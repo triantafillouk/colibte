@@ -1,0 +1,17 @@
+[Desktop Entry]
+Name=ctg3
+GenericName=Colibri Text Editor
+Comment=Edit text files
+Exec=ctg3 %U
+Terminal=false
+Type=Application
+StartupNotify=true
+MimeType=text/plain;
+Icon=accessories-text-editor
+Categories=GNOME;GTK;Utility;TextEditor;
+X-GNOME-FullName=ctg3 Editor
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-Product=ctg3
+X-GNOME-Bugzilla-Component=general
+X-GNOME-Bugzilla-Version=766T45
+X-Ubuntu-Gettext-Domain=ctg3

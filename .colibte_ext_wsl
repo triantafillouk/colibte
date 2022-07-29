@@ -1,0 +1,36 @@
+# extensions configuration file 
+none=none
+# use wordpad for rtf files
+rtf=int,/mnt/c/Program\ Files/Windows\ NT/Accessories/wordpad.exe
+crw=griv
+DNG=griv
+jpg=griv -w
+JPG=griv
+png=griv
+gif=griv
+xpm=griv
+tif=griv
+cr2=griv
+nef=griv
+tiff=griv
+orf=griv
+dng=griv
+ppm=griv
+# For windows commands we need to escape spaces (backslaces) and use
+# normal slaces in file names
+doc=/mnt/c/Program\ Files/Microsoft\ Office/root/Office16/WINWORD.EXE
+docx=/mnt/c/Program\ Files/Microsoft\ Office/root/Office16/WINWORD.EXE
+xls=/mnt/c/Program\ Files/Microsoft\ Office/root/Office16/EXCEL.EXE
+xlsx=/mnt/c/Program\ Files/Microsoft\ Office/root/Office16/EXCEL.EXE
+# for browsers 'web:' at the begining denotes that program needs to 
+# prepend the file name with "file://"
+pdf=web:/mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe
+html=web:/mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe
+htm=web:/mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe
+php=web:/mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe
+svg=web:/mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe
+asp=web:/mnt/c/Program\ Files\ \(x86\)/Microsoft/Edge/Application/msedge.exe
+tar=tar tvf,tar tvf 
+tgz=tar tvzf, tar tvzf
+tbz=tar tvjf
+vrml=vrmlview

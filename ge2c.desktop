@@ -1,0 +1,17 @@
+[Desktop Entry]
+Name=ge2c
+GenericName=Text Editor
+Comment=Edit text files
+Exec=ge2c %U
+Terminal=false
+Type=Application
+StartupNotify=true
+MimeType=text/plain;
+Icon=accessories-text-editor
+Categories=GNOME;GTK;Utility;TextEditor;
+X-GNOME-FullName=ge2c Editor
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-Product=ge2c
+X-GNOME-Bugzilla-Component=general
+X-GNOME-Bugzilla-Version=t631
+X-Ubuntu-Gettext-Domain=ge2c

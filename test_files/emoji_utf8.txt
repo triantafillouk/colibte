@@ -1,0 +1,30 @@
+
+# Emoji characters
+
+link	🔗
+lock	🔒
+door	🚪
+window	🪟
+litter in bin	🚮
+"🔙"
+# buttons
+right	▶
+left	◀
+up		🔼	🔺
+downn	🔽	🔻
+
+bright	🔆
+
+check mark	✔
+🔠🔡🔢🔣ℹ-
+circles
+red	🔴
+orange	🟠
+yellow	🟡
+green	🟢
+blue	🔵
+# hands
+👋👌🤞
+👈👉👆👇
+👍👎
+

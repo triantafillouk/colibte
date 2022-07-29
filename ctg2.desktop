@@ -1,0 +1,17 @@
+[Desktop Entry]
+Name=ctg2
+GenericName=Colibri Text Editor
+Comment=Edit text files
+Exec=ctg2 %U
+Terminal=false
+Type=Application
+StartupNotify=true
+MimeType=text/plain;
+Icon=accessories-text-editor
+Categories=GNOME;GTK;Utility;TextEditor;
+X-GNOME-FullName=ctg2 Editor
+X-GNOME-Bugzilla-Bugzilla=GNOME
+X-GNOME-Bugzilla-Product=ctg2
+X-GNOME-Bugzilla-Component=general
+X-GNOME-Bugzilla-Version=766T45
+X-Ubuntu-Gettext-Domain=ctg2

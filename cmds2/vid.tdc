@@ -1,0 +1,28 @@
+
+# r=y/x 
+# y=r*x, x=y/r
+# r=4/3 or 16/9
+
+# d is diagonal
+# x*x+y*y=d*d -> y/r*y/r+y*y=d*d -> y*y(1/(r*r)+1)=d*d
+# x*x+y*y=d*d -> x*x+r*x*r*x=d*d -> x*x*(1+r*r)=d*d
+
+d=dinput("inches:")
+r=4/3
+y=sqrt(d*d/(1+1/(r*r)))	:    32
+x=sqrt(d*d/(1+r*r))		:    24
+sqrt(x*x+y*y)			:    40
+cx=x*2.54				: 60.960000
+cy=y*2.54				: 81.280000
+print(" 4/3 format inches "+d+" x="+cx+"cm cy="+cy+"cm")
+# ----------------------------------------------------
+
+r=16/9
+y=sqrt(d*d/(1+1/(r*r)))	: 34.863021
+x=sqrt(d*d/(1+r*r))		: 19.610450
+sqrt(x*x+y*y)			:    40
+cx=x*2.54				: 49.810542
+cy=y*2.54				: 88.552075
+print("16/9 format inches "+d+" x="+cx+"cm cy="+cy+"cm")
+print("test end")
+

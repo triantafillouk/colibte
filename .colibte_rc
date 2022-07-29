@@ -1,0 +1,147 @@
+assign_sub ("page_loop", "M-!")
+assign_sub ("show_out","M-,")
+assign_sub ("w_abbrev", "M-/")
+assign_sub ("test1", "^XX")
+assign_sub ("clear_results", "^XC")
+assign_sub ("clear_results", "M-?")
+assign_sub ("test1","M-~")
+
+#color_scheme(2)
+font="andale mono 14"
+#_backup_extention=".bak"
+# print("font set ok!")
+#
+# set_locale(7)
+
+function page_loop()
+{
+ cls()
+ bof(1)
+ show_time("started",0)
+ i=0
+ while(1) {
+	k=next_page(1)
+#	print(i)
+	update_screen(1)
+	if(k==0) break
+	#show_time("loop:"+i+"o="+k,1)
+ }
+ show_time("Ended",2)
+ print("----")
+}
+
+function show_out()
+{
+ if(!in_view("[out]")) {
+	vsplit_window()
+	next_window()
+	select_file("[out]")
+	prev_window()
+ }
+}
+
+function w_abbrev()
+{
+# goto end of the word and set cposition
+ if(_file_bflag <4 ) 
+ { 
+ goto_eow(0)
+ cposition = _position
+ prev_word(1)
+#get the current word
+ cw1 = _next_word
+# print("w_abbrev: cw1="+cw1)
+ i = 0
+ pind=0
+# check the previous 100 words
+ while(i<1000)
+ {
+ s=prev_word(1)
+# print("s = "+s)
+ if(s < 1 )
+ {
+	break
+ }
+
+ p1 = _next_word
+# print("previous p1="+p1)
+ j=s_index(p1,cw1)
+ if(j==1)
+ {
+#	print("old position is")
+#	print(cposition)
+#	print("found position is:")
+#	print(_position)
+	_position = cposition
+#	print("new/old position is:")
+#	print(_position)
+ 	del_prev_word(1)
+	insert (p1)
+	i=1000
+	break
+ }
+ i = i+1
+ pind=pind+1
+ }
+
+ if(j==0)
+ {
+	p1="no word found starting with '"+cw1+"'"
+	_position = cposition
+ }
+ p1=p1+" "+pind+" words back"
+ message(p1)
+ } else {
+ 	error_log("read only!")
+ }
+}
+
+function test1()
+{
+ print("test1")
+ print("Version:"+_version)
+# print(_version)
+ print("file name:"+_file_name)
+ print("current_char is: ["+_char+"]")
+ print("Search pattern:"+_search_pattern)
+ print("Replace pattern:"+_replace_pattern)
+ print("Date:"+_time)
+ print("Match:"+_regexp_match)
+ print("column = "+_column)
+ print("line = "+_line)
+ print("position ="+_position)
+ print("base name is "+_base_name)
+ print("Key:"+_key)
+ print("text:"+_text)
+ print("window_rows:"+_window_rows)
+ print("window cols:"+_window_cols)
+ print("found:"+_found)
+ print("next word:"+_next_word)
+}
+
+#clear results
+function clear_results()
+{
+line1=_line+1
+bof
+test=1
+found=0
+while(test)
+{
+ test = search_forward(":")
+ if(test)
+ {
+#	print(_text)	
+	erase_eol()
+	found=found+1
+ }
+ else
+ {
+	message ("cleared "+found+" results!)")
+	unmark_buffer
+	break
+ }
+}
+ goto_line(line1)
+
+}

@@ -1,0 +1,6 @@
+open_file("k1.txt")
+insert("header")
+newline(2)
+insert("---")
+newline(1)
+save_file()

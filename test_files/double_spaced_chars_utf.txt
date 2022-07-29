@@ -1,0 +1,13 @@
+
+# a unix file with double spaced utf characters (ascii and japanese characters)
+
+MULTICAST_ENABLE                  = "マルチキャストでの探索を有効にする"
+TIMEOUT_SETTING                   = "通信エラーとする時間 ："
+TTL                               = "マルチキャストTTL ："
+"｀ａｂｃｄｅｆｇｈｈｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｘｚ｛｜｝～｟｠｡｢｣､30) ："
+"！＂＃＄％＆＇（）＊＋，－．／０１２３４５６７８９：；＜＝＞？"
+"＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＭＯＰＱＲＳＴＵＶＷＸＹＺ［＼］＾＿"
+SC                                = "秒"
+ADD_PORT_WIZARD                   = "EpsonNet Print ポートの追加ウィザード"
+PORT_ADDED                        = "次の EpsonNet Print ポートを追加しようとしています。"
+HOST_NAME_IP                      = "名前またはIPアドレス :"

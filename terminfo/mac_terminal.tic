@@ -1,0 +1,18 @@
+# Mac terminal key options
+# the following is just a personal selection
+
+# Arrow key combinations
+# shift UP	 	\033[5~		page up
+# shift DOWN	\033[6~		page down
+# shift LEFT	\033[d		select previous char
+# shift RIGHT	\033[c		select next char
+
+# ALT UP		\033[w		next window
+# ALT DOWN		\033[z		next file
+# ALT LEFT		\033P		prev history mark
+# ALT RIGHT		\033N		next history mark
+
+# CTRL UP		\033OM		find previous
+# CTRL DOWN		\033[15~	find next
+# CTRL LEFT		\033[P		previous word
+# CTRL RIGHT	]033[N		next word

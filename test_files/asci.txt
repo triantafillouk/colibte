@@ -1,0 +1,36 @@
+# letters with diferent codepage interpratation
+# can be viewed differently depending the font local and file codepage selected
+# use macro set_locale(codepage id)
+# where codepage is from the following table
+# and reload the file
+# ISO characters will be highligted
+
+0	"UTF-8",
+1	"ISO8859-1",
+2	"ISO8859-2",
+3	"ISO8859-3",
+4	"ISO8859-4",
+5	"ISO8859-5",
+6	"ISO8859-6",
+7	"ISO8859-7",
+8	"ISO8859-8",
+9	"ISO8859-9",
+10	"ISO8859-10",
+11	"ISO8859-11",	/* thai */
+12	"ISO8859-13",
+13	"ISO8859-14",
+14	"ISO8859-15",
+15	"ISO8859-16",
+16	"windows-1253",
+17	"KOI8-T",
+18	"CP87",
+19	"CP737"
+
+
+         :0123456789ABCDEF
+0xA0 160 : ¡¢£¤¥¦§¨©ª«¬­®¯
+0xB0 176 :°±²³´µ¶·¸¹º»¼½¾¿
+0xC0 192 :ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ
+0xD0 208 :ĞÑÒÓÔÕÖ×ØÙÚÛÜİŞß
+0xE0 224 :àáâãäåæçèéêëìíîï
+0xF0 240 :ğñòóôõö÷øùúûüışÿ

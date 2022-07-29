@@ -1,0 +1,10 @@
+# alternate user menu
+# first letter is menu letter,first field is menu item, second field is command to execute
+e edit local menu ; open_file (".colibte.mnu")
+h edit user menu ; open_file ("~/.colibte/.colte.mnu")
+c Color file edit ; open_file("~/.colibte/.colors16")
+i edit user extentions file ; open_file ("~/.colibte/.colte_ext")
+l git log ; exec("git log")
+s git status ; exec("git status")
+1 git log 1 line ; exec("git log --oneline")
+p pwd ; exec("pwd") 

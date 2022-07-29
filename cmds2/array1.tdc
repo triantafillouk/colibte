@@ -1,0 +1,54 @@
+# test arrays
+cls
+k=1.22
+a = [k 1 2 3]
+2*a:array 2, slot 1 rows 1,cols 4
+a*2:array 3, slot 1 rows 1,cols 4
+a+a:array 4, slot 1 rows 1,cols 4
+a-a:array 5, slot 1 rows 1,cols 4
+at=T(a)
+at:array 6, slot 2 rows 4,cols 1
+a1=a*at: 15.488400
+a2=at*a:array 7, slot 1 rows 4,cols 4
+ia=INV(a2):array 31, slot 4 rows 4,cols 4
+ka=k-a:array 32, slot 1 rows 1,cols 4
+ak=a-k:array 33, slot 0 rows 1,cols 4
+a:array 0, slot 1 rows 1,cols 4
+ka:array 32, slot 6 rows 1,cols 4
+ak:array 33, slot 7 rows 1,cols 4
+i=0
+a[0]: 1.220000
+a[1]:   1.0
+a[2]:   2.0
+a[3]:   3.0
+a[i]: 1.220000
+# a two dimensional array
+b=[2.1 2.2,4.3 4.4]
+b:array 1, slot 9 rows 2,cols 2
+i=0
+b[i][0]: 2.100000
+b[i][1]: 2.200000
+b[0][i]: 2.100000
+b[1][i]: 4.300000
+i=1
+b[i][0]: 4.300000
+b[i][1]: 4.400000
+b[0][i]: 2.200000
+b[1][i]: 4.400000
+# show assignment
+c=a
+c:array 0, slot 10 rows 1,cols 4
+
+d=b
+d:array 1, slot 11 rows 2,cols 2
+# multiplication by number
+e=b*2	:array 34, slot 9 rows 2,cols 2
+e1=2*b	:array 35, slot 9 rows 2,cols 2
+e:array 34, slot 12 rows 2,cols 2
+# next is not working!!!! ???
+b:array 1, slot 9 rows 2,cols 2
+e1=2*b:array 36, slot 9 rows 2,cols 2
+e1:array 36, slot 13 rows 2,cols 2
+bt=T(b)
+bt:array 37, slot 14 rows 2,cols 2
+print("finished")

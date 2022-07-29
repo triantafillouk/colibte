@@ -1,0 +1,559 @@
+A dos text file
+-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-Uncompressing ... done
+
+Loading boot manager..
+
+Boot manager loaded.
+Entering autoboot mode.
+Type any character to enter command mode.
+Error: /image on /dev/mirror/gmroots1f
+	does not exist or is not a file
+umount: /mnt: not a file system root directory
+boot failed
+BOOTMGR[1]> pwd
+unknown command pwd
+BOOTMGR[2]> reboot
+unknown command reload
+
+CPU Microcode Revision:  20h
+CPUID:                   6D8h
+BIOS version:            8035
+BIOS build date:         11/05/2008
+Press ESC key twice to skip memory test9% of the system memory tested OK12% of the system memory tested OK15% of the system memory tested OK18% of the system memory tested OK21% of the system memory tested OK24% of the system memory tested OK27% of the system memory tested OK31% of the system memory tested OK34% of the system memory tested OK37% of the system memory tested OK40% of the system memory tested OK43% of the system memory tested OK46% of the system memory tested OK49% of the system memory tested OK52% of the system memory tested OK56% of the system memory tested OK59% of the system memory tested OK62% of the system memory tested OK65% of the system memory tested OK68% of the system memory tested OK71% of the system memory tested OK74% of the system memory tested OK77% of the system memory tested OK81% of the system memory tested OK84% of the system memory tested OK87% of the system memory tested OK90% of the system memory tested OK93% of the system memory tested OK96% of the system memory tested OK99% of the system memory tested OK100% of the system memory tested OK1,072,300,032 bytes of system memory tested OK
+-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-Uncompressing ... done
+
+Loading boot manager..
+
+Boot manager loaded.
+Entering autoboot mode.
+Type any character to enter command mode.
+Error: /image on /dev/mirror/gmroots1f
+	does not exist or is not a file
+umount: /mnt: not a file system root directory
+boot failed
+BOOTMGR[1]> ls
+cd: can't cd to /mnt/image
+bin	dev	lib	mnt	sbin	usr
+cdrom	etc	libexec	root	tmp	var
+umount: /mnt: not a file system root directory
+BOOTMGR[2]> cd /mnt/image
+unknown command cd
+BOOTMGR[3]> ls /mnt
+cd: can't cd to /mnt/image
+ls: /mnt/mnt: No such file or directory
+umount: /mnt: not a file system root directory
+BOOTMGR[4]> ls /mnt/image
+cd: can't cd to /mnt/image
+ls: /mnt/mnt/image: No such file or directory
+umount: /mnt: not a file system root directory
+BOOTMGR[5]> ls  cd..
+unknown command cd..
+BOOTMGR[6]> ?
+unknown command ?
+BOOTMGR[7]> hr elp
+boot    	Boot/Load and Run kernel or executable
+install         Proceed to install new IPSO image
+halt    	Halt the system
+setenv          Set Environment Variable
+unsetenv        Clear Environment Variable
+printenv        Print Environment Variables
+passwd          Set password for system
+ls      	List Directory
+sysinfo         Display System Information
+unsetalias      Clear System alias
+setalias        Set System alias
+showalias       Show System aliases
+set-defaults    Set bootmgr defaults
+netconfig	Configure network boot parameters
+raid		Configuration utility for RAID systems
+BOOTMGR[8]> sysinfo
+CPU 0: 1496 MHz Intel(R) Celeron(R) M processor 1.50GHz
+Memory: 1026609152 (980M bytes)
+Disk Devices:
+	IO port 0x1f0 adc0: unit 0 (ad0): <STEC M2T CF 1.0.0>
+		1024MB (2001888 sectors), 1986 cyls, 16 heads, 63 S/T
+	IO port 0x5088 adc2: unit 0 (ad4): <FUJITSU MHZ2080BS G1>
+		80026MB (156301488 sectors), 16383 cyls, 16 heads, 63 S/T
+Network Interfaces:
+loop0:  flags=10b<UP,LINK,LOOPBACK,PRESENT>
+tun0:  flags=107<UP,LINK,POINTOPOINT,PRESENT>
+eth1:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1c half duplex
+eth2:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1d half duplex
+eth3:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1e half duplex
+eth4:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1f half duplex
+BOOTMGR[9]> printenv
+NOKIA IPSO BOOTMGR VERSION=6.2-GA039 04.14.2010-225515 
+autoboot: YES
+testboot: NO
+bootwait: 0
+boot-file: 
+boot-flags: 
+boot-device: mirror/gmroots1
+vendor: Nokia
+model: IP
+bmslice: 0
+BOOTMGR[10]> showalias
+BOOTMGR[11]> ls /?
+cd: can't cd to /mnt/image
+ls: /mnt/?: No such file or directory
+umount: /mnt: not a file system root directory
+BOOTMGR[12]> ls
+cd: can't cd to /mnt/image
+bin	dev	lib	mnt	sbin	usr
+cdrom	etc	libexec	root	tmp	var
+umount: /mnt: not a file system root directory
+BOOTMGR[13]>  ls/mn      ls / /mnt
+cd: can't cd to /mnt/image
+ls: /mnt/mnt: No such file or directory
+umount: /mnt: not a file system root directory
+BOOTMGR[14]> ls /dev
+cd: can't cd to /mnt/image
+ls: /mnt/dev: No such file or directory
+umount: /mnt: not a file system root directory
+BOOTMGR[15]> l /etc      ls /etc
+cd: can't cd to /mnt/image
+ls: /mnt/etc: No such file or directory
+umount: /mnt: not a file system root directory
+BOOTMGR[16]> 
+BOOTMGR[17]> 
+BOOTMGR[18]> ls  help
+boot    	Boot/Load and Run kernel or executable
+install         Proceed to install new IPSO image
+halt    	Halt the system
+setenv          Set Environment Variable
+unsetenv        Clear Environment Variable
+printenv        Print Environment Variables
+passwd          Set password for system
+ls      	List Directory
+sysinfo         Display System Information
+unsetalias      Clear System alias
+setalias        Set System alias
+showalias       Show System aliases
+set-defaults    Set bootmgr defaults
+netconfig	Configure network boot parameters
+raid		Configuration utility for RAID systems
+BOOTMGR[19]> install
+
+
+################### IPSO Full Installation ####################
+You will need to supply the following information:
+	Client IP address/netmask, FTP server IP address and filename,
+	system serial number, and other license information.
+This process will DESTROY any existing files and data on your disk.
+#################################################################
+Continue? (y/n) [n] n
+BOOTMGR[20]> printenv
+NOKIA IPSO BOOTMGR VERSION=6.2-GA039 04.14.2010-225515 
+autoboot: YES
+testboot: NO
+bootwait: 0
+boot-file: 
+boot-flags: 
+boot-device: mirror/gmroots1
+vendor: Nokia
+model: IP
+bmslice: 0
+BOOTMGR[21]> ls /
+cd: can't cd to /mnt/image
+\umount: /mnt: not a file system root directory
+BOOTMGR[22]> ls -?
+cd: can't cd to /mnt/image
+ls: illegal option -- ?
+usage: ls [-ABCFGHILPRSTUWZabcdfghiklmnopqrstuwx1] [file ...]
+umount: /mnt: not a file system root directory
+BOOTMGR[23]> ls -help
+cd: can't cd to /mnt/image
+ls: illegal option -- e
+usage: ls [-ABCFGHILPRSTUWZabcdfghiklmnopqrstuwx1] [file ...]
+umount: /mnt: not a file system root directory
+BOOTMGR[24]> ls /m mirror
+cd: can't cd to /mnt/image
+ls: /mnt/mirror: No such file or directory
+umount: /mnt: not a file system root directory
+BOOTMGR[25]> sysinfo
+CPU 0: 1496 MHz Intel(R) Celeron(R) M processor 1.50GHz
+Memory: 1026609152 (980M bytes)
+Disk Devices:
+	IO port 0x1f0 adc0: unit 0 (ad0): <STEC M2T CF 1.0.0>
+		1024MB (2001888 sectors), 1986 cyls, 16 heads, 63 S/T
+	IO port 0x5088 adc2: unit 0 (ad4): <FUJITSU MHZ2080BS G1>
+		80026MB (156301488 sectors), 16383 cyls, 16 heads, 63 S/T
+Network Interfaces:
+loop0:  flags=10b<UP,LINK,LOOPBACK,PRESENT>
+tun0:  flags=107<UP,LINK,POINTOPOINT,PRESENT>
+eth1:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1c half duplex
+eth2:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1d half duplex
+eth3:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1e half duplex
+eth4:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1f half duplex
+BOOTMGR[26]> help
+boot    	Boot/Load and Run kernel or executable
+install         Proceed to install new IPSO image
+halt    	Halt the system
+setenv          Set Environment Variable
+unsetenv        Clear Environment Variable
+printenv        Print Environment Variables
+passwd          Set password for system
+ls      	List Directory
+sysinfo         Display System Information
+unsetalias      Clear System alias
+setalias        Set System alias
+showalias       Show System aliases
+set-defaults    Set bootmgr defaults
+netconfig	Configure network boot parameters
+raid		Configuration utility for RAID systems
+BOOTMGR[27]> ls ad0
+cd: can't cd to /mnt/image
+bin	dev	lib	mnt	sbin	usr
+cdrom	etc	libexec	root	tmp	var
+umount: /mnt: not a file system root directory
+BOOTMGR[28]> ls bin
+cd: can't cd to /mnt/image
+install	pwd	sh
+umount: /mnt: not a file system root directory
+BOOTMGR[29]> pwd
+unknown command pwd
+BOOTMGR[30]> sh
+# 
+# exit
+BOOTMGR[31]> sh
+# ls /bin
+install	pwd	sh
+# ls  pwd
+/
+# ls /
+bin	dev	lib	mnt	sbin	usr
+cdrom	etc	libexec	root	tmp	var
+# ls /mnt
+# ls /dev
+ad0		ad4s1d		cuad1.init	md0		ttyd0.init
+ad0a		ad4s1e		cuad1.lock	mdctl		ttyd0.lock
+ad0as4		ad4s1f		devctl		mem		ttyd1
+ad0c		ata		devstat		null		ttyd1.init
+ad0cs4		bmmem		fd		pccard0.cis	ttyd1.lock
+ad0s4		console		fido		pccard1.cis	xpt0
+ad4		ctty		geom.ctl	pci		zero
+ad4s1		cuad0		io		stderr
+ad4s1a		cuad0.init	klog		stdin
+ad4s1b		cuad0.lock	kmem		stdout
+ad4s1c		cuad1		lcmem		ttyd0
+# ls /dev/ad0
+/dev/ad0
+# ^[[A    ls /dev/ad4
+/dev/ad4
+# cd /dev
+# pd wd
+/dev
+# cd ad0
+cd: can't cd to ad0
+# cd ad0
+cd: can't cd to ad0
+# pwd
+/dev
+# ls
+ad0		ad4s1d		cuad1.init	md0		ttyd0.init
+ad0a		ad4s1e		cuad1.lock	mdctl		ttyd0.lock
+ad0as4		ad4s1f		devctl		mem		ttyd1
+ad0c		ata		devstat		null		ttyd1.init
+ad0cs4		bmmem		fd		pccard0.cis	ttyd1.lock
+ad0s4		console		fido		pccard1.cis	xpt0
+ad4		ctty		geom.ctl	pci		zero
+ad4s1		cuad0		io		stderr
+ad4s1a		cuad0.init	klog		stdin
+ad4s1b		cuad0.lock	kmem		stdout
+ad4s1c		cuad1		lcmem		ttyd0
+# cd /dev/ad0
+cd: can't cd to /dev/ad0
+# cd .ad4
+cd: can't cd to .ad4
+# exit
+BOOTMGR[32]> s ls
+cd: can't cd to /mnt/image
+bin	dev	lib	mnt	sbin	usr
+cdrom	etc	libexec	root	tmp	var
+umount: /mnt: not a file system root directory
+BOOTMGR[33]> help
+boot    	Boot/Load and Run kernel or executable
+install         Proceed to install new IPSO image
+halt    	Halt the system
+setenv          Set Environment Variable
+unsetenv        Clear Environment Variable
+printenv        Print Environment Variables
+passwd          Set password for system
+ls      	List Directory
+sysinfo         Display System Information
+unsetalias      Clear System alias
+setalias        Set System alias
+showalias       Show System aliases
+set-defaults    Set bootmgr defaults
+netconfig	Configure network boot parameters
+raid		Configuration utility for RAID systems
+BOOTMGR[34]> 
+BOOTMGR[35]> 
+BOOTMGR[36]> 
+BOOTMGR[37]> 
+BOOTMGR[38]> printenv
+NOKIA IPSO BOOTMGR VERSION=6.2-GA039 04.14.2010-225515 
+autoboot: YES
+testboot: NO
+bootwait: 0
+boot-file: 
+boot-flags: 
+boot-device: mirror/gmroots1
+vendor: Nokia
+model: IP
+bmslice: 0
+BOOTMGR[39]> sysinfo
+CPU 0: 1496 MHz Intel(R) Celeron(R) M processor 1.50GHz
+Memory: 1026609152 (980M bytes)
+Disk Devices:
+	IO port 0x1f0 adc0: unit 0 (ad0): <STEC M2T CF 1.0.0>
+		1024MB (2001888 sectors), 1986 cyls, 16 heads, 63 S/T
+	IO port 0x5088 adc2: unit 0 (ad4): <FUJITSU MHZ2080BS G1>
+		80026MB (156301488 sectors), 16383 cyls, 16 heads, 63 S/T
+Network Interfaces:
+loop0:  flags=10b<UP,LINK,LOOPBACK,PRESENT>
+tun0:  flags=107<UP,LINK,POINTOPOINT,PRESENT>
+eth1:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1c half duplex
+eth2:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1d half duplex
+eth3:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1e half duplex
+eth4:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1f half duplex
+BOOTMGR[40]> ls
+cd: can't cd to /mnt/image
+bin	dev	lib	mnt	sbin	usr
+cdrom	etc	libexec	root	tmp	var
+umount: /mnt: not a file system root directory
+BOOTMGR[41]> 
+
+CPU Microcode Revision:  20h
+CPUID:                   6D8h
+BIOS version:            8035
+BIOS build date:         11/05/2008
+Press ESC key twice to skip memory test9% of the system memory tested OK12% of the system memory tested OK15% of the system memory tested OK18% of the system memory tested OK21% of the system memory tested OK24% of the system memory tested OK27% of the system memory tested OK31% of the system memory tested OK34% of the system memory tested OK37% of the system memory tested OK40% of the system memory tested OK43% of the system memory tested OK46% of the system memory tested OK49% of the system memory tested OK52% of the system memory tested OK56% of the system memory tested OK59% of the system memory tested OK62% of the system memory tested OK65% of the system memory tested OK68% of the system memory tested OK71% of the system memory tested OK74% of the system memory tested OK77% of the system memory tested OK81% of the system memory tested OK84% of the system memory tested OK87% of the system memory tested OK90% of the system memory tested OK93% of the system memory tested OK96% of the system memory tested OK99% of the system memory tested OK100% of the system memory tested OK1,072,300,032 bytes of system memory tested OK
+-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-Uncompressing ... done
+
+Loading boot manager..
+
+Boot manager loaded.
+Entering autoboot mode.
+Type any character to enter command mode.
+Error: /image on /dev/mirror/gmroots1f
+	does not exist or is not a file
+umount: /mnt: not a file system root directory
+boot failed
+BOOTMGR[1]> ls
+cd: can't cd to /mnt/image
+bin	dev	lib	mnt	sbin	usr
+cdrom	etc	libexec	root	tmp	var
+umount: /mnt: not a file system root directory
+BOOTMGR[2]> printenv
+NOKIA IPSO BOOTMGR VERSION=6.2-GA039 04.14.2010-225515 
+autoboot: YES
+testboot: NO
+bootwait: 0
+boot-file: 
+boot-flags: 
+boot-device: mirror/gmroots1
+vendor: Nokia
+model: IP
+bmslice: 0
+BOOTMGR[3]> ls
+cd: can't cd to /mnt/image
+bin	dev	lib	mnt	sbin	usr
+cdrom	etc	libexec	root	tmp	var
+umount: /mnt: not a file system root directory
+BOOTMGR[4]> ls /mnt
+cd: can't cd to /mnt/image
+ls: /mnt/mnt: No such file or directory
+umount: /mnt: not a file system root directory
+BOOTMGR[5]> ls /
+cd: can't cd to /mnt/image
+umount: /mnt: not a file system root directory
+BOOTMGR[6]> exir t
+unknown command exit
+BOOTMGR[7]> sh
+# ls /mnt
+# ls /
+bin	dev	lib	mnt	sbin	usr
+cdrom	etc	libexec	root	tmp	var
+# ls /dev
+ad0		ad4s1d		cuad1.init	md0		ttyd0.init
+ad0a		ad4s1e		cuad1.lock	mdctl		ttyd0.lock
+ad0as4		ad4s1f		devctl		mem		ttyd1
+ad0c		ata		devstat		null		ttyd1.init
+ad0cs4		bmmem		fd		pccard0.cis	ttyd1.lock
+ad0s4		console		fido		pccard1.cis	xpt0
+ad4		ctty		geom.ctl	pci		zero
+ad4s1		cuad0		io		stderr
+ad4s1a		cuad0.init	klog		stdin
+ad4s1b		cuad0.lock	kmem		stdout
+ad4s1c		cuad1		lcmem		ttyd0
+# ls /mnt/image
+ls: /mnt/image: No such file or directory
+# ls /mnt
+# sysinfo
+sysinfo: not found
+# exit
+BOOTMGR[8]> sysinfo
+CPU 0: 1496 MHz Intel(R) Celeron(R) M processor 1.50GHz
+Memory: 1026609152 (980M bytes)
+Disk Devices:
+	IO port 0x1f0 adc0: unit 0 (ad0): <STEC M2T CF 1.0.0>
+		1024MB (2001888 sectors), 1986 cyls, 16 heads, 63 S/T
+	IO port 0x5088 adc2: unit 0 (ad4): <FUJITSU MHZ2080BS G1>
+		80026MB (156301488 sectors), 16383 cyls, 16 heads, 63 S/T
+Network Interfaces:
+loop0:  flags=10b<UP,LINK,LOOPBACK,PRESENT>
+tun0:  flags=107<UP,LINK,POINTOPOINT,PRESENT>
+eth1:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1c half duplex
+eth2:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1d half duplex
+eth3:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1e half duplex
+eth4:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1f half duplex
+BOOTMGR[9]> sysinfo
+CPU 0: 1496 MHz Intel(R) Celeron(R) M processor 1.50GHz
+Memory: 1026609152 (980M bytes)
+Disk Devices:
+	IO port 0x1f0 adc0: unit 0 (ad0): <STEC M2T CF 1.0.0>
+		1024MB (2001888 sectors), 1986 cyls, 16 heads, 63 S/T
+	IO port 0x5088 adc2: unit 0 (ad4): <FUJITSU MHZ2080BS G1>
+		80026MB (156301488 sectors), 16383 cyls, 16 heads, 63 S/T
+Network Interfaces:
+loop0:  flags=10b<UP,LINK,LOOPBACK,PRESENT>
+tun0:  flags=107<UP,LINK,POINTOPOINT,PRESENT>
+eth1:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1c half duplex
+eth2:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1d half duplex
+eth3:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1e half duplex
+eth4:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1f half duplex
+BOOTMGR[10]> he  sysinfo
+CPU 0: 1496 MHz Intel(R) Celeron(R) M processor 1.50GHz
+Memory: 1026609152 (980M bytes)
+Disk Devices:
+	IO port 0x1f0 adc0: unit 0 (ad0): <STEC M2T CF 1.0.0>
+		1024MB (2001888 sectors), 1986 cyls, 16 heads, 63 S/T
+	IO port 0x5088 adc2: unit 0 (ad4): <FUJITSU MHZ2080BS G1>
+		80026MB (156301488 sectors), 16383 cyls, 16 heads, 63 S/T
+Network Interfaces:
+loop0:  flags=10b<UP,LINK,LOOPBACK,PRESENT>
+tun0:  flags=107<UP,LINK,POINTOPOINT,PRESENT>
+eth1:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1c half duplex
+eth2:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1d half duplex
+eth3:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1e half duplex
+eth4:  flags=130<BROADCAST,MULTICAST,PRESENT>
+	ether 00:a0:8e:b6:b7:1f half duplex
+BOOTMGR[11]> printenv
+NOKIA IPSO BOOTMGR VERSION=6.2-GA039 04.14.2010-225515 
+autoboot: YES
+testboot: NO
+bootwait: 0
+boot-file: 
+boot-flags: 
+boot-device: mirror/gmroots1
+vendor: Nokia
+model: IP
+bmslice: 0
+BOOTMGR[12]> exit
+unknown command exit
+BOOTMGR[13]> sh
+# ls    mount
+/dev/md0 on / (ufs, local, read-only)
+devfs on /dev (devfs, local)
+# ls /m dev
+ad0		ad4s1d		cuad1.init	md0		ttyd0.init
+ad0a		ad4s1e		cuad1.lock	mdctl		ttyd0.lock
+ad0as4		ad4s1f		devctl		mem		ttyd1
+ad0c		ata		devstat		null		ttyd1.init
+ad0cs4		bmmem		fd		pccard0.cis	ttyd1.lock
+ad0s4		console		fido		pccard1.cis	xpt0
+ad4		ctty		geom.ctl	pci		zero
+ad4s1		cuad0		io		stderr
+ad4s1a		cuad0.init	klog		stdin
+ad4s1b		cuad0.lock	kmem		stdout
+ad4s1c		cuad1		lcmem		ttyd0
+# ls /dev/ad4
+/dev/ad4
+# 
+# 
+# 
+# 
+# 
+# 
+# ls /dev
+ad0		ad4s1d		cuad1.init	md0		ttyd0.init
+ad0a		ad4s1e		cuad1.lock	mdctl		ttyd0.lock
+ad0as4		ad4s1f		devctl		mem		ttyd1
+ad0c		ata		devstat		null		ttyd1.init
+ad0cs4		bmmem		fd		pccard0.cis	ttyd1.lock
+ad0s4		console		fido		pccard1.cis	xpt0
+ad4		ctty		geom.ctl	pci		zero
+ad4s1		cuad0		io		stderr
+ad4s1a		cuad0.init	klog		stdin
+ad4s1b		cuad0.lock	kmem		stdout
+ad4s1c		cuad1		lcmem		ttyd0
+# 
+\# 
+> 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# ls /dev/ad0
+/dev/ad0
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# mount
+/dev/md0 on / (ufs, local, read-only)
+devfs on /dev (devfs, local)
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# sysinfo
+sysinfo: not found
+# 
+# 
+# 
+# 
+# 
+# 
+# exit
+BOOTMGR[14]> 
+-
