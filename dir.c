@@ -1744,7 +1744,7 @@ int insert_dir(FILEBUF *buf_dir,int retain)
  free(namelist);
 
  set_Offset(0);
- cbfp->b_header = "#Perms  Size  Date            Name                 ";
+ cbfp->b_header = " Perms  Size  Date            Name                 ";
  cbfp->b_flag = FSNLIST|FSDIRED;
  cbfp->b_state = FS_VIEW|FS_ACTIVE;
  cbfp->dir_list_str = dir_list_str;

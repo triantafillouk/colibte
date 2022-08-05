@@ -451,7 +451,10 @@ int both_down(int n)
 	cwp->draw_flag=1;
 	upd_column_pos();
 	check_cursor_position(cwp);
+	set_update(cwp,UPD_EDIT);
 	next_window(1);
+	set_update(cwp,UPD_EDIT);
+
 	cwp->draw_flag=1;
 	return(TRUE);
 }
@@ -465,7 +468,10 @@ int both_up(int n)
 	cwp->draw_flag=1;
 	upd_column_pos();
 	check_cursor_position(cwp);
+	set_update(cwp,UPD_EDIT);
 	prev_window(1);
+	set_update(cwp,UPD_EDIT);
+
 	cwp->draw_flag=1;
 	return(TRUE);
 }

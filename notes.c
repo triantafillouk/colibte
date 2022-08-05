@@ -1088,9 +1088,9 @@ int show_tag_view(int n)
 	select_filebuf(tag_view);
 
 	if(cbfp->b_lang==0) {
-		cbfp->b_header="#TAG             │ NAME                │ CATEGORY           │ TITLE                                                   │";
+		cbfp->b_header=" TAG             │ NAME                │ CATEGORY           │ TITLE                                                   │";
 	} else {
-		cbfp->b_header="#TAG             | NAME                | CATEGORY           | TITLE                                                   ";
+		cbfp->b_header=" TAG             | NAME                | CATEGORY           | TITLE                                                   ";
 	};
 
 	int tag_width[] = { 1,TAGS_WIDTH };
