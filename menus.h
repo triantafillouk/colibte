@@ -15,15 +15,17 @@ M_element e_notes[] =
 	// {0, 'N', "New note       ","", new_note,0,"FTN"},
 	// {0, 'C', "new Cal note   ","", new_note, (struct MENUS *)2,"FTC"},
 	// {0, 'C', "new Todo note  ","", new_note, (struct MENUS *)3,"FTC"},
-	{0, 'D', "notes Dir      ","", open_notes_dir,0,"FTD"},
-	{0, 'C', "Clear tags     ","", select_tag, (struct MENUS *)TAG_UNSELECT_ALL, "FTC"},
-	{0, 'V', "View tag notes ","", show_tag_view,0, "FTV"},
-	{0, 'L', "caLendar list  ","", show_calendar_list,0,"FTL"},
-	{0, 'T', "Todo list      ","", show_todo_list,0,"FTT"},
-	{0, 'S', "Search notes   ","", grep_cmd, (struct MENUS *)3, "FTS"},
-	{0, 'A', "save As note   ","", save_as_note,0,"FTA"},
-	{0, 'B', "Init notes db  ","", init_notes_db,0,"FTI"},
-	// {0, 'E', "rEcreate notes db","",	recreate_notes_db,0,"TE"},
+	{0, 'D', "notes Dir        ","", open_notes_dir,0,"FTD"},
+	{0, 'C', "Clear tags       ","", select_tag, (struct MENUS *)TAG_UNSELECT_ALL, "FTC"},
+	{0, 'V', "View tag notes   ","", show_tag_view,0, "FTV"},
+	{0, 'L', "caLendar list    ","", show_calendar_list,0,"FTL"},
+	{0, 'T', "Todo list        ","", show_todo_list,0,"FTT"},
+	{0, 'S', "Search notes     ","", grep_cmd, (struct MENUS *)3, "FTS"},
+	{0, 'A', "save As note     ","", save_as_note,0,"FTA"},
+	{0, 'I', "Init notes db    ","", init_notes_db,0,"FTI"},
+	{0, 'U', "Update notes db  ","", update_notes_db,0,"FTU"},
+	{0, 'E', "rEcreate notes db","", recreate_notes_db,0,"FTE"},
+	{0, 'Y', "notes EncrYpt key","", set_notes_key,0,"FTY"},
 	{0, 0, NULL,"",NULL,0,NULL}
 };
 
@@ -555,12 +557,10 @@ M_element e_tools[] =
 	{0, 'U', "Update ctags     ","",	update_tags, 0,"TU" },
 	{0, 'P', "recalc Program   ","_+recalc Program",  refresh_current_buffer, 0,"TP"},
 	{0, 'L', "recalc Line      ","_=recal Line",  refresh_current_line, 0,"TL"},
-#if	TNOTES
+#if	TNOTES0
 	{0, 'Y', "Notes EncrYpt key","", 	set_notes_key,0,"TY"},
 	{0, 'N', "init Notes db    ","",    init_notes_db,0,"TN"},
 	{0, 'E', "rEcreate notes db","",	recreate_notes_db,0,"TE"},
-#else
-	{0, 'Y', "EncrYpt key      ","", 	set_key,0,"TY"},
 #endif
 	{MMENU, 'D', "Debug            ","", NULL, &m_debug,"TD"},
 	{0, 0, NULL,"",NULL,0,NULL}

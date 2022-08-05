@@ -951,6 +951,67 @@ int recreate_notes_db(int n)
 	msg_line("Notes database recreated!");
 	return true;
 }
+
+	/* update database with new notes  */
+int update_notes_db(int n)
+{
+ int status;
+ char cmd[1024];
+ char notes_dir[256];
+ char tmp_file[256];
+ char **notes_files;
+ FILEBUF *current_buffer=cbfp;
+	MESG("--- update_notes_db: ----");
+	// create notes db
+	// status = init_notes_db(1);
+	set_bfname(notes_dir,NOTES_DIR);
+	sprintf(tmp_file,"/tmp/notes_contents.out");
+	sprintf(cmd,"find -L %s  >%s 2>/dev/null",notes_dir,tmp_file);
+	status = system(cmd);
+	if(status!=0) { return error_line("cannot update notes db");};
+	sync();
+	int size=0;
+	notes_files = read_sarray(tmp_file,&size);
+	for(int i=0 ;notes_files[i]!=NULL;i++){
+		struct stat st;
+//		MESG("- insert [%s]",notes_files[i]);
+		if(!stat(notes_files[i],&st))
+		{
+			int flen=strlen(notes_files[i]);
+			if(flen>9) 
+			if(!strcmp(notes_files[i]+flen-9,".DS_Store")) {
+				// MESG("  skip DS_Notes: %s",notes_files[i]);
+				continue;
+			};
+			if(!S_ISDIR(st.st_mode)) {
+				FILEBUF *bp;
+				// msg_line("!! %3d insert: [%s]",i,notes_files[i]);
+				notes_struct *s_note;
+				bp=new_filebuf(notes_files[i],0);
+				bp->b_note = init_note();
+				select_filebuf(bp);
+				if(!parse_note(bp)) {
+					error_line("	file [%s] Not a note file !!!!!!!!!!!!",notes_files[i]);
+					delete_filebuf(bp,1);
+					continue;					
+				};
+				s_note=bp->b_note;
+				MESG("update - n=[%s] title=[%s] cat=[%s] tags=[%s]",s_note->n_name,s_note->n_title,s_note->n_cat,s_note->n_tags);
+				status=save_to_db(s_note);
+				select_filebuf(current_buffer);
+				delete_filebuf(bp,1);
+			} else {
+				// MESG("- skip, %s this is dir",notes_files[i]);
+			};
+		} else {
+			MESG("cannot stat file %s",notes_files[i]);
+		};
+	};
+//	MESG("before free_sarray");
+	free_sarray(notes_files);
+	msg_line("Notes database recreated!");
+	return true;
+}
 #endif
 
 
