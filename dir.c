@@ -1374,7 +1374,8 @@ int dir_left(int n)
 	};
   set_update(cwp,UPD_EDIT|UPD_STATUS);
   stat = list_dir(bf->cdir->dir_name,bf);
-  cwp->current_note_line=bf->cdir->cline;
+  cwp->current_note_line=bf->cdir->cline+1;
+  if(cwp->current_note_line > bf->dir_list_str->size-1) cwp->current_note_line=bf->dir_list_str->size-1;
   return(stat);
 }
 
