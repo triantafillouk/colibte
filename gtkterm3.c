@@ -590,6 +590,7 @@ void hide_cursor (char *from)
 	// MESG("hide_cursor: draw line %d",cpposy);
 	draw_window_line(wd->wp,cpposy);
 	end_draw(wd,"hide cursor");
+	// MESG("hide_cursor: end");
 	cursor_showing = 0;
 	ind++;
 	return;
@@ -694,7 +695,7 @@ void show_slide(WINDP *wp)
  gfloat value;
  if(in_slide) return;
  set_sposition(wp,&start,&len);
-
+ // MESG("show_slide: slide_flag=%d",slide_flag);
  value = start;
  if(value==0) value=1;
  if(slide_flag!=2) 
@@ -729,6 +730,7 @@ void show_slide(WINDP *wp)
  gtk_adjustment_set_value(wp->gwp->draw_adj, value);
  slide_flag=0;
  };
+ // MESG("show_slide: end");
 }
 
 void drv_start_window_update(WINDP *wp)
@@ -1321,10 +1323,12 @@ void cb_set_position(GtkAdjustment *adj, GtkWidget *widget)
 	if(prev_line==gline) { in_slide=0; slide_flag=0; return;};
 	// MESG("cb_set_position: hide cursor %d",cursor_showing);
 	hide_cursor("cb_set_position");
+	// MESG("cb_set_position: after hiding cursor");
 	if(cbfp->b_flag & FSNLIST) {
 		cwp->current_note_line=gline;
 	} else textpoint_set_lc(cwp->tp_current,gline-1,0);
 	upd_column_pos();
+
 	check_cursor_position(wd->wp);
 #if	1	// this is not needed for wayland!, it sends a draw event in any case !!!!
 //	update_all=true;

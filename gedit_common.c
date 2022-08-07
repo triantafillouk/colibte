@@ -56,9 +56,9 @@ ge_edit_display_event(GtkWidget	*widget, GdkEvent *event)
  static int event_usec=0;
  static int double_click=0;
  
+ // MESG("ge_edit_display_event:");
  g_return_val_if_fail(widget !=NULL,FALSE);
  g_return_val_if_fail(GTK_IS_EDIT_DISPLAY(widget),FALSE);
- // MESG("ge_edit_display_event:");
  wd = GTK_EDIT_DISPLAY(widget);
 	if(event->type == GDK_KEY_PRESS) {
 		on_dra0_key_press_event(widget, (GdkEventKey *)event, NULL );

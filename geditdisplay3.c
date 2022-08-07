@@ -133,8 +133,9 @@ ge_edit_draw_event(GtkWidget *widget,cairo_t *cr)
 		// MESG(" ge_edit_draw_event: already in draw, return! %d",ind++);
 		return RVAL;
 	};
+	// MESG("ge_edit_draw_event:");
 	if(wd->cr!=NULL) {
-		MESG("ge_edit_draw_event: wd->cr !NULL, end_draw and return! %d",ind++);
+		// MESG("ge_edit_draw_event: wd->cr !NULL, end_draw and return! %d",ind++);
 		gdk_window_end_draw_frame(wd->edit_window,wd->edit_gdk_context);
 		wd->cr=NULL;
 		return RVAL;
@@ -145,6 +146,7 @@ ge_edit_draw_event(GtkWidget *widget,cairo_t *cr)
 
 	if(clip_rect.width<3 || clip_rect.height<3) 
 	{
+#if	1
 		GdkRGBA *lcolor;
 		lcolor = colors[color_scheme_ind][BACKGROUND];
 		// redraw cliped area near scroll slide!
@@ -155,16 +157,18 @@ ge_edit_draw_event(GtkWidget *widget,cairo_t *cr)
 		cairo_fill(cr);
 
 		wd->in_draw=0;
+#endif
+		expose_window(wd->wp);
 		// MESG(" draw_event: fill (w=%d h=%d) end small return !!, %d",clip_rect.width,clip_rect.height,ind++);
 		return RVAL;
 	}
 
 	first_time++;
 	if(in_slide || slide_flag){
-		MESG("in slide, no draw! in_slide=%d flag=%d return! %d",in_slide,slide_flag,ind++);
+		// MESG("in slide, no draw! in_slide=%d flag=%d return! %d",in_slide,slide_flag,ind++);
 		wd->in_draw=0;
 		if(wd->wp == cwp) {
-			show_cursor("ge_edit_event,in slide");
+			show_cursor("ge_edit_draw_event,in slide");
 			show_position_info(0);
 		};
 
@@ -235,6 +239,7 @@ ge_edit_draw_event(GtkWidget *widget,cairo_t *cr)
 		show_cursor("ge_edit_event");
 			// show_position_info(0);
 	} else {;
+		// MESG("status line!");
 		status_line(wd->wp);
 	};
 	wd->cr=NULL;

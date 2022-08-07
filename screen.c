@@ -396,7 +396,7 @@ int draw_window_line(WINDP *wp, int row)
 /* update virtual window to physical */
 void draw_window(int flag, WINDP *wp,char *from)
 {
-//  static int ind=0;
+ static int ind=0;
  register int i;
  int ulines=0;
  // MESG(" draw_window: id=%d from=%s ind=%d",wp->id,from,ind);
@@ -431,6 +431,7 @@ void draw_window(int flag, WINDP *wp,char *from)
 
 	wp->draw_flag=0;
 	// drv_win_flush(wp);
+	// MESG("draw_window: end");
 }
 
 void set_draw_flag(WINDP *wp,char *from)
@@ -454,6 +455,7 @@ void update_physical_windows()
 		};
 	};
 	drv_post_windows_update();
+	// MESG("update_physical_windows: end");
 }
 
 // check of numerics in line mask from start, set to type if ok

@@ -186,6 +186,8 @@ unsigned int put_wchar(WINDP *wp, char *st)
 
 void drv_move(int y,int x) 
 {
+	if(y<0) y=0;
+	if(x<0) x=0;
 	px=CLEN *x;
 	py=CHEIGHTI*y;
 	cposx=x;
