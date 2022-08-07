@@ -862,7 +862,6 @@ int search_notes_dir(int n);
 int search_notes_tagged(int n);
 int view_notes_by_date(int n);
 int create_notes_db(int n);
-int update_notes_db(int n);
 int show_calendar_list(int n);
 int show_todo_list(int n);
 char *get_notes_status();

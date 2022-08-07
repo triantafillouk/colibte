@@ -556,7 +556,11 @@ int show_keys(int n)
 	char *description;
 	int emulation = get_cfg_int("keyboard_emulation",0);
 	char *emulation_name[] = {"Native","Micro Emacs",NULL};
-
+#if	TNOTES
+	int max_keytables=4;
+#else
+	int max_keytables=3;
+#endif
 	if (split_window(1) == FALSE)	return(FALSE);
 	bp = new_filebuf("[Keyboard list]", FSINVS);
 
@@ -566,7 +570,9 @@ int show_keys(int n)
 	ktbs[0]=keytab;
 	ktbs[1]=keytab_dir;
 	ktbs[2]=keytab_view;
+#if	TNOTES
 	ktbs[3]=keytab_notes;
+#endif
 	if(emulation>1) emulation=0;
 	// show by function
 	insert_string_nl(bp,"## Key assignements sorted by function (all key tables)");
@@ -579,7 +585,7 @@ int show_keys(int n)
 	for (ftp = ftable;ftp->n_func != NULL;ftp++) {
 		is_assigned=0;
 		/* search in keytab */
-		for(table=0;table<4;table++)
+		for(table=0;table<max_keytables;table++)
 
 		for (ktp = ktbs[table];ktp->k_fp != NULL;ktp++) {
 			if (ktp->k_fp == ftp->n_func) {
@@ -599,7 +605,7 @@ int show_keys(int n)
 
 	// show by key
 	insert_string_nl(bp,"\n## Sorted by key");
-	for(table=0;table<4;table++) {
+	for(table=0;table<max_keytables;table++) {
 		snprintf(sline,MAXLLEN,"### %s",table_name[table]);
 		insert_string_nl(bp,sline);
 

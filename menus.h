@@ -23,8 +23,8 @@ M_element e_notes[] =
 	{0, 'S', "Search notes     ","", grep_cmd, (struct MENUS *)3, "FTS"},
 	{0, 'A', "save As note     ","", save_as_note,0,"FTA"},
 	{0, 'I', "Init notes db    ","", init_notes_db,0,"FTI"},
-	{0, 'U', "Update notes db  ","", update_notes_db,0,"FTU"},
-	{0, 'E', "rEcreate notes db","", recreate_notes_db,0,"FTE"},
+	{0, 'U', "Update notes db  ","", recreate_notes_db,(struct MENUS *)0,"FTU"},
+	{0, 'E', "rEcreate notes db","", recreate_notes_db,(struct MENUS *)1,"FTE"},
 	{0, 'Y', "notes EncrYpt key","", set_notes_key,0,"FTY"},
 	{0, 0, NULL,"",NULL,0,NULL}
 };

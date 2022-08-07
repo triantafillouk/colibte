@@ -403,7 +403,7 @@ char **read_sarray(char *file_name,int *size)
    int string_size, read_size;
    FILE *handler = fopen(file_name, "r");
 	int lines=0;
-	MESG("read_sarray:");
+	// MESG("read_sarray:");
    if (handler)
    {
        // Seek the last byte of the file
@@ -415,7 +415,7 @@ char **read_sarray(char *file_name,int *size)
 
        // Allocate a string that can hold it all
        buffer = (char*) malloc(sizeof(char) * (string_size + 1) );
-	   MESG("read_sarray: size=%d",string_size);
+	   // MESG("read_sarray: size=%d",string_size);
 	   if(buffer){
 		int i;
 		int l=0;
@@ -441,7 +441,7 @@ char **read_sarray(char *file_name,int *size)
 		array=malloc((lines+1)*sizeof(char *));
 		for(l=0,i=0;l<lines;l++){
 			array[l]=buffer+i;
-			MESG("[%3d] %s pos %d",l,array[l],i);
+			// MESG("%3d [%s] pos %d",l,array[l],i);
 			while(i<read_size && buffer[i]>0) i++;
 			while(i<read_size && buffer[i]==0) i++;
 		};
