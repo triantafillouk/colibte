@@ -453,7 +453,7 @@ VIDEO **new_screen();
 void reallocate_windows();
 
 // input.c
-int confirm(char *title,char *prompt);
+int confirm(char *title,char *prompt,int always);
 int ectoc(int c);
 int (*getname(char *prompt))();
 int complete(char *buf);

@@ -265,11 +265,12 @@ void end_interactive()
 	entry_mode=KNORMAL;
 }
 
-int confirm(char *title, char *prompt)
+int confirm(char *title, char *prompt,int always)
 {
 	int c;
 	int (*execf)();
 	char message[256];
+	if(!always && ((int)bt_dval("safe_ops")==0)) return true;
 	snprintf(message,256,"%s, %s",title,prompt);
 	start_interactive(message);
 	entry_mode=KCONFIRM;

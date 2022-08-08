@@ -1411,6 +1411,14 @@ void status_line(WINDP *wp)
 	*stp=0;
 
 	if(wp->w_ntcols-2 > NUM_COLS_SHORT){	/* not in the very short mode!  */
+#if	TNOTES
+		if(bp->b_type & NOTE_TYPE 
+			|| bp->b_type & NOTE_CAL_TYPE
+			|| bp->b_type & NOTE_TODO_TYPE
+		) {
+			*stp++='N';n++;
+		};
+#endif
 		if(wp->w_fp->b_flag & FSDIRED){
 			if(wp->w_fp->b_state & FS_VIEW) { *stp++ = 'V'; n++;}
 			else {*stp++ = 'D'; n++;};

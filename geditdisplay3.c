@@ -146,7 +146,6 @@ ge_edit_draw_event(GtkWidget *widget,cairo_t *cr)
 
 	if(clip_rect.width<3 || clip_rect.height<3) 
 	{
-#if	1
 		GdkRGBA *lcolor;
 		lcolor = colors[color_scheme_ind][BACKGROUND];
 		// redraw cliped area near scroll slide!
@@ -157,7 +156,6 @@ ge_edit_draw_event(GtkWidget *widget,cairo_t *cr)
 		cairo_fill(cr);
 
 		wd->in_draw=0;
-#endif
 		expose_window(wd->wp);
 		// MESG(" draw_event: fill (w=%d h=%d) end small return !!, %d",clip_rect.width,clip_rect.height,ind++);
 		return RVAL;

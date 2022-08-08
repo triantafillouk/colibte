@@ -147,6 +147,8 @@ void load_config()
 	set_btval("show_cdata",-1,NULL,get_cfg_int("show_cdata",1));
 	set_btval("save_history",-1,NULL,get_cfg_int("save_history",0));
 	set_btval("large_toolbar_icons",-1,NULL,get_cfg_int("large_toolbar_icons",1));
+	set_btval("safe_ops",-1,NULL,get_cfg_int("safe_ops",1));
+
 	set_btval("use_titlebar",-1,NULL,get_cfg_int("use_titlebar",1));
 	set_btval("color_scheme",-1,NULL,get_cfg_int("color_scheme",2));
 	set_btval("xcolor_scheme",-1,NULL,get_cfg_int("xcolor_scheme",2));
@@ -175,6 +177,7 @@ void save_config()
  	set_cfg_int("show_position",(int)bt_dval("show_position"));
 	set_cfg_int("save_history",(int)bt_dval("save_history"));
 	set_cfg_int("large_toolbar_icons",(int)bt_dval("large_toolbar_icons"));
+	set_cfg_int("safe_ops",(int)bt_dval("safe_ops"));
 	set_cfg_int("use_titlebar",(int)bt_dval("use_titlebar"));
 	set_cfg_int("color_scheme",(int)bt_dval("color_scheme"));
 	set_cfg_int("xcolor_scheme",(int)bt_dval("xcolor_scheme"));

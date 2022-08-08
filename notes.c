@@ -446,7 +446,7 @@ int save_to_db(notes_struct *note)
  int note_id=0;
  if((db=notes_db_open())==NULL) return false;
  MESG("save_to_db:");
- MESG("save_to_db: title [%s]",note->n_title);
+ // MESG("save_to_db: title [%s]",note->n_title);
  // MESG("note name [%s]",note->n_name);
  // check if found
  if(snprintf(sql,1024,"SELECT Category,rowid from notes where Name = '%s';",note->n_name)>=1024) {
@@ -467,7 +467,7 @@ int save_to_db(notes_struct *note)
 //		MESG("	- new tag  [%s]",tag);
 	}; 
  
- MESG("save_to_db: note_id=%d name=[%s] cat=[%s] new_cat=[%s]",note_id,note->n_name,note->n_cat,new_cat);
+ // MESG("save_to_db: note_id=%d name=[%s] cat=[%s] new_cat=[%s]",note_id,note->n_name,note->n_cat,new_cat);
  if(note_id && !strcmp(note->n_cat,(char *)new_cat )) {
 	MESG("same note file! update [%s]/[%s]",new_cat,note->n_name);
 
@@ -499,7 +499,7 @@ int save_to_db(notes_struct *note)
 	};
  } else {
  	int new_note_id;
-	MESG("new note id! insert [%s]/[%s]",new_cat,note->n_name);
+	// MESG("new note id! insert [%s]/[%s]",new_cat,note->n_name);
 	strcpy(sql,"BEGIN TRANSACTION; ");
 	strcat(sql,"INSERT INTO notes(Name, Title, Date, Category, Encrypt) ");
 	strcat(sql,"VALUES ('");
@@ -1382,7 +1382,7 @@ int select_tag(int n)
 int delete_note_row()
 {
 	istr *row_data;
-	MESG("delete_note_row: %d",cwp->current_tag_line);
+	MESG("delete_note_row: tag_line=%d note_line=%d",cwp->current_tag_line,cwp->current_note_line);
 	int line=0;
 	// int note_id=-1;
 
@@ -1397,14 +1397,10 @@ int delete_note_row()
 			MESG("delete_note_row: line=%d note_id = %d size=%d",line,row_data->index,cbfp->dir_list_str->size);
 			cbfp->b_state ^= FS_VIEW;
 			if(line==cbfp->dir_list_str->size && line>0) cwp->current_note_line--;
-#if	0
-			// MESG("row %d line %d",line,cbfp->lines);
-			delete_line(1);
-			// MESG("row %d line %d",line,cbfp->lines);
-			if(cbfp->lines==line+1) prev_line(1);
-#endif
+
 			cbfp->b_state |= FS_VIEW;
 			set_update(cwp,UPD_EDIT);
+			cbfp->b_notes--;
 			break;
 		};
 		line++;
@@ -1540,7 +1536,7 @@ int delete_note_file(char *full_name)
 	stat = unlink(full_name);
 	if(stat!=0) {
 		error_line("cannot delete file [%s]",full_name);
-		if( confirm("Cannot delete the note file", "delete note from db?")) stat=0;
+		if( confirm("Cannot delete the note file", "delete note from db?",1)) stat=0;
 	};
 	return stat;
 }
@@ -1579,7 +1575,7 @@ int delete_tagnote(int n)
 	MESG("delete_tagnote: list");
 
 	char *full_name = get_current_note_name();
- 
+ 	if(!confirm("Delete note",full_name,0)) return false;
 	if(full_name==NULL) {
 	 	MESG("edit_note: note name is null!");
 		return false;
@@ -1608,8 +1604,8 @@ int delete_tagnote(int n)
 
 	int tag_id = get_current_tag_id();
 	strcpy(tag_name, get_current_tag_name());
+	if(!confirm("Delete tag",tag_name,0)) return false;
 	MESG("delete_tagnote: line=%d tag_id=%d name %s",cwp->current_tag_line,tag_id,tag_name);
-	// return false;
 
 	sprintf(sql_str,"select count (tag_id) from tags where tag_id = %d;",tag_id);
 	count = query_int1(db, sql_str);
@@ -1630,20 +1626,17 @@ int delete_tagnote(int n)
   } else {		/* delete note  */
 	int note_id = get_current_note_id();
 	char *full_name = get_current_note_name();
-
+	if(!confirm("Delete note",full_name,0)) return false;
 	// delete the file
 	if(!delete_note_file(full_name))
 	{
-		msg_line("deleted note file [%s]",full_name,cwp->current_tag_line);
+		msg_line("deleted note file [%s]",full_name,cwp->current_note_line);
 		// delete the note
+		// MESG("file %s deleted, delete noteid %d",full_name,note_id);
 		if(delete_noteid(note_id)) {
-			cwp->current_tag_line--;
-			if(cwp->current_tag_line<1) {
-				select_tag(TAG_UNSELECT_ALL);
-				cbfp->b_flag=FSNOTES;
-			};
+			delete_note_row();
 			set_update(cwp,UPD_MOVE|UPD_WINDOW);
-			return show_tag_view(1);
+			return true;
 		} else return false;
 	} else {
 		error_line("could not delete note file [%s]",full_name);

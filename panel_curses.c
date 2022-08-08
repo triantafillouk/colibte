@@ -118,11 +118,14 @@ void drv_window_delete(WINDP *wp)
 {
 }
 
-int confirm(char *title, char *prompt)
+int confirm(char *title, char *prompt,int always)
 {
 	int c;
 	int (*execf)();
 	char message[256];
+	if(!always && ((int)bt_dval("safe_ops")==0)) {
+		return true;
+	};
 	snprintf(message,256,"%s, %s",title,prompt);
 	start_interactive(message);
 	entry_mode=KCONFIRM;
@@ -1584,6 +1587,7 @@ void end_interactive()
 	// MESG("end_interactive: entry_mode=%d");
 	remove_box();
 	entry_mode=KNORMAL;
+	set_update(cwp,UPD_STATUS);
 }
 
 // remove box and show info behind it
@@ -1593,6 +1597,7 @@ void remove_box()
  cbox=(BOX *) lpop(box_list);
  if(cbox==NULL) return;
  hide_panel(cbox->panel);
+ update_panels();
  del_panel(cbox->panel);
  if(cbox->wnd!=NULL) delwin(cbox->wnd);
 

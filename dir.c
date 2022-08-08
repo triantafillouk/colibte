@@ -721,6 +721,8 @@ int dir_del1(int  n)
   status=chdir(cbfp->b_dname);
   
   status=dir_getfile(fname,1);
+  if(!confirm("Delete file",fname,0)) return FALSE;
+
   // MESG("dir_del1: [%s] ---------",fname);
   if(status<0) {
   	return error_line("cannot access file '%s' to delete! status=%d",fname,status);
@@ -751,7 +753,7 @@ int dir_del1(int  n)
 	if(status) {
 		sstat=snprintf(sconfirm,MAXLLEN,"Dir [%s] not empty",fname);
 		if(sstat>=MAXLLEN) { return error_line("command truncated!");};
-		if( confirm(sconfirm,"remove ?")) {
+		if( confirm(sconfirm,"remove ?",1)) {
 			sstat=snprintf(rmcmd,MAXFLEN,"rm -rf %s 2> /dev/null",fname);
 			if(sstat<MAXFLEN) status=system(rmcmd);
 			else { return error_line("cannot delete file, command truncated!");};

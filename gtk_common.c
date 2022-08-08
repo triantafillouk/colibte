@@ -13,8 +13,9 @@ extern FILEBUF *cbfp;
 
 GtkWidget *wlist;
 
-int confirm(char *title,char *prompt) {
+int confirm(char *title,char *prompt,int always) {
   int result; 
+  if(!always && ((int)bt_dval("safe_ops")==0)) return true;
   GtkWidget *dialog;
   dialog = gtk_message_dialog_new(GTK_WINDOW(parent),
             GTK_DIALOG_DESTROY_WITH_PARENT,

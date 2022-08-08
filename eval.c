@@ -408,6 +408,10 @@ int set_option_val(int vnum,char *svalue)
 		  	set_btval("large_toolbar_icons",-1,NULL,v1);
 		  	break;
 		  };
+		  case EMSAFEOPS: {
+		  	set_btval("safe_ops",-1,NULL,v1);
+		  	break;
+		  };
 		  case EMCOLORSCHEME: {
 		  	set_btval("color_scheme",-1,NULL,v1);
 		  	break;

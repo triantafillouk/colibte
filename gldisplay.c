@@ -265,7 +265,14 @@ void status_line(WINDP *wp)
 	strlcpy(fdname,bp->b_dname,MAXLLEN);
 	stp = m_st+strlen(m_st);
 	*stp++ = ' ';
-
+#if	TNOTES
+		if(bp->b_type & NOTE_TYPE 
+			|| bp->b_type & NOTE_CAL_TYPE
+			|| bp->b_type & NOTE_TODO_TYPE
+		) {
+			*stp++='N';n++;
+		};
+#endif
 	if(wp->w_fp->b_state & FS_CHG) {*stp++ = '*'; n++;}
 
 	if(wp->w_fp->b_flag & FSDIRED){

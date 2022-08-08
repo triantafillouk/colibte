@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION "#01.7 (7/8/2022)"
+#define VERSION "#01.8 (8/8/2022)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -822,6 +822,7 @@ enum env_defs {
 	EMCDATA		,	/* show cursor data  */
 	EMSAVHIST	,	/* save history  */
 	EMLARGEICONS,	/* Use large toolbar icons  */
+	EMSAFEOPS,		/* Use safe operations  */
 	EMUSETITLEBAR,	/* Use titlebar  */
 	EMCCASE,		/* exact match  */
 	EMCOVER,		/* overwite  */

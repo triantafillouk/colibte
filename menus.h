@@ -195,6 +195,7 @@ M_element e_global_params[] =
 #if	GTK
 	{MTOGGLE,'I',"use embeded Icons    ","embed_icons",toggle_parameter,(struct MENUS *)EMBEDICONS ,"MGI"},
 #endif
+	{MTOGGLE,'S',"use Safe ops         ","safe_ops",toggle_parameter,(struct MENUS *)EMSAFEOPS,"MGS"},
 	{MTOGGLE,'O',"show cursor Offset   ","show_coffset",toggle_parameter,(struct MENUS *)EMCOFFSET ,"MGO"},
 	{MTOGGLE,'D',"show cursor Data     ","show_cdata",toggle_parameter,(struct MENUS *)EMCDATA ,"MGD"},
 	{MTOGGLE,'H',"save file History    ","save_history",toggle_parameter,(struct MENUS *)EMSAVHIST ,"MGH"},

@@ -29,6 +29,7 @@ VAR option_names[] = {
 	{"show_cdata",1,NULL},
 	{"save_history",0,NULL},
 	{"large_toolbar_icons",0,NULL},
+	{"safe_ops",0,NULL},
 
 	{"use_titlebar",1,NULL},
 	{"exact_match",0,NULL},
