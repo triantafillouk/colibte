@@ -646,15 +646,9 @@ int parse_note(FILEBUF *fp)
 		return true;
 	};
 
-	if(note==NULL) {
-		// MESG("--- parse_note: Note is null!!!");
-		note=fp->b_note=init_note();
-	};
-	
 	ptr = find_str_reol(fp,ptr,"#Date: ",note->n_date,sizeof(note->n_date));
 	
 	// MESG("Normal note: date ptr=%ld date=[%s]",ptr,note->n_date);
-		if(ptr==0) errors++;
 		char *start_cat_name = NULL;
 		if((start_cat_name = strstr(fp->b_dname,"calendar")) !=NULL) {
 			sprintf(note->n_tags,"calendar");
@@ -695,14 +689,13 @@ int parse_note(FILEBUF *fp)
 		if(errors>2) return false;
 		return(true);
 	};
+
 	ptr = find_str_reol(fp,ptr,"#Name: ",note->n_name,sizeof(note->n_name));
 	if(ptr==0 && (strlen(note->n_tags)==0)) {
 		MESG("!		name not found!, set to %s",fp->b_fname);
 		if(snprintf(note->n_name,sizeof(note->n_name),"%s",fp->b_fname)>=sizeof(note->n_name)) MESG("note name truncated");
-		// return false;
-	} else {;
-		if(snprintf(note->n_name,sizeof(note->n_name),"%s",fp->b_fname)>=sizeof(note->n_name)) MESG("note name truncated");
 	};
+
 	ptr = find_str_reol(fp,ptr,"#Title: ",note->n_title,sizeof(note->n_title));
 	if(ptr==0 ) {
 		// MESG("	title not found!");
@@ -715,6 +708,7 @@ int parse_note(FILEBUF *fp)
 			};
 		};
 	};
+
 	ptr = find_str_reol(fp,ptr,"#Category: ",note->n_cat,sizeof(note->n_cat));
 	if(ptr==0) {
 	errors++;
@@ -1510,7 +1504,9 @@ int edit_note(int n)
 
 	set_hmark(1,"edit_note");
 
- if(n==0) cbfp->b_state |= FS_VIEW;
+ // if(n==0) 
+ MESG("set readonly!");
+ bp->b_state |= FS_VIEW;
  return true;
 }
 

@@ -278,6 +278,8 @@ void status_line(WINDP *wp)
 	if(wp->w_fp->b_flag & FSDIRED){
 		if(wp->w_fp->b_state & FS_VIEW) {*stp++ = 'V'; n++;}
 		else {*stp++ = 'D'; n++;};
+	} else {
+		if(wp->w_fp->b_state & FS_VIEW) {*stp++ = 'V'; n++;}
 	};
 	if(wp->w_fp->b_flag & FSMMAP) {*stp++ = 'M'; n++;};
 	if(wp->w_fp->b_flag & FSNLIST) {*stp++ = 'L'; n++;};

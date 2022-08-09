@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION "#01.8 (8/8/2022)"
+#define VERSION "#01.9 (9/8/2022)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -55,7 +55,6 @@
 #define	NOTE_TYPE		1024
 #define	NOTE_CAL_TYPE	2048
 #define	NOTE_TODO_TYPE	4096
-
 
 #define	C_LINEBEG	1	// at beginning of line
 #define C_LINEEND	2	// at end of line

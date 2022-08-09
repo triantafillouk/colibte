@@ -320,18 +320,23 @@ int dir_edit(int n)
   // MESG("dir_edit: dont_edit=%d",dont_edit());
   if(!(cbfp->b_flag & FSNLIST))
   {
-#if	0
+	
+	if(cbfp->b_flag & FSINVS) return(TRUE);
+	if(!IS_FLAG(cbfp->b_state,FS_VIEWA)) return (TRUE);
+	int old_type=cbfp->b_type;
+	MESG("flags b_state=0x%X b_flag=0x%X b_type=0x%X",cbfp->b_state,cbfp->b_flag,cbfp->b_type);
+	// if(cbfp->b_state>=FSNOTES) old_b_flag=FSNOTES;
+#if	1
     num offset;
 	int ppline = tp_line(cwp->tp_current)-tp_line(cwp->tp_hline)+1;
 #endif
-	if(cbfp->b_flag & FSINVS) return(TRUE);
 
 	if(snprintf(fname,MAXFLEN,"%s/%s",cbfp->b_dname,cbfp->b_fname) >= MAXFLEN) {
 		return(TRUE);
 	};
 
 	vb = cbfp;
-#if	0
+#if	1
 	offset=tp_offset(cwp->tp_current);
 #endif
 	b = new_filebuf(dir_name(vb->dir_num),0);
@@ -343,9 +348,11 @@ int dir_edit(int n)
 
 	status=goto_file(fname);
 	strlcpy(cbfp->b_dname,getcwd(dname,MAXFLEN),MAXFLEN);
-#if	0
+#if	1
 	igotooffset(offset,ppline);
 #endif
+	MESG("new flags add 0x%X",old_type);
+	cbfp->b_type = old_type;
 	set_hmark(1,"dir_edit:a");
 	return(status);
   } else {

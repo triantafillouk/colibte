@@ -1823,7 +1823,16 @@ int insert_indent(int n)
 int delete_line(int n)
 {
  int status;
- // MESG("delete_line:");
+	if(cbfp->b_type & NOTE_TYPE 
+		|| cbfp->b_type & NOTE_CAL_TYPE
+		|| cbfp->b_type & NOTE_TODO_TYPE
+	) {
+ 	dir_left(1);
+	return delete_tagnote(1);
+ };
+
+ MESG("delete_line:");
+
  if(dont_edit()) return FALSE;
 
  offs start=LineBegin(Offset());
