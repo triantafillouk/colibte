@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION "#01.9 (9/8/2022)"
+#define VERSION 	"#01.10 (9/8/2022)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -254,13 +254,6 @@ typedef long long num;
 
 #define	PATHCHR	':'
 #define DIRSEPSTR "/"
-
-/* special file definitions */
-#define	XE_START		".colibte_rc"
-#define	XE_HELP			".colibte.hlp"
-#define	XE_USER_MENU	".colibte.mnu"
-#define	XE_EXTENSIONS	".colibte_ext"
-#define XE_HISTORY		".colibte_history"
 
 
 #define NUM_COLS_RCFINFO	24	/* row col full info  */

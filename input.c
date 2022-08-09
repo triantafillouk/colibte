@@ -482,7 +482,7 @@ int load_keys()
  char str_line[MAXLLEN];
  static char name1[MAXFLEN];
 
- strcpy(name1,".colibte_keys");
+ strcpy(name1,APPLICATION_KEYS);
  fname=find_file(NULL,name1,0);
  if(fname==NULL) { 
  	SYS_ERROR("load_keys: cannot open %s",name1);

@@ -4,6 +4,7 @@
 
 # default values for flags
 UNAME := $(shell uname)
+APP_NAME=colibte
 
 PCURSES=0
 XLIB=0
@@ -30,7 +31,7 @@ OSYSTEM=DARWIN
 SHAREDDIR=/usr/local/share
 X11include=-I/opt/X11/include/
 X11lib0= -lX11 -L/opt/X11/lib  `pkg-config glib-2.0 --libs`
-EXTFILE=.colibte_ext_mac
+EXTFILE=.$(APP_NAME)_ext_mac
 WSL:=0
 CC=clang
 #CC=gcc-9
@@ -44,7 +45,7 @@ OSYSTEM=LINUX
 X11include=-I/opt/X11/include/
 X11lib0=-L/usr/X11R6/lib -lX11 -L/opt/X11/lib  `pkg-config glib-2.0 --libs`
 WSL:=`uname -a|grep "icrosoft" |wc -l`
-EXTFILE:=.colibte_ext_$(WSL)
+EXTFILE:=.$(APP_NAME)_ext_$(WSL)
 CC=gcc -DWSL=$(WSL) 
 endif
 
@@ -55,7 +56,7 @@ X11include=
 X11lib0=-L/usr/X11R6/lib -lX11 -L/opt/X11/lib 
 LPCURSES0=-lpanel -lcurses -L/usr/lib -lglib-2.0
 OSYSTEM=SOLARIS
-EXTFILE=.colibte_ext_linux
+EXTFILE=.$(APP_NAME)_ext_linux
 WSL=0
 CC=gcc
 endif
@@ -326,29 +327,31 @@ cleanall :
 	rm -f cte ctxe ctg2 ctg3 ce
 
 install : cte ctg2 ctg3
-	install .colibte_rc ~
+	install .$(APP_NAME)_rc ~
 	if [ "$(OSYSTEM)" = "DARWIN"]; then \
-		install .colibte_ext_mac ~/.colibte/.colibte_ext;\
+		install .$(APP_NAME)_ext_mac ~/.$(APP_NAME)/.$(APP_NAME)_ext;\
 	else \
 		if [ "$(WSL)" = "1" ]; then \
-			install .colibte_ext_wsl ~/.colibte/.colibte_ext;\
+			install .$(APP_NAME)_ext_wsl ~/.$(APP_NAME)/.$(APP_NAME)_ext;\
 		else \
-			install .colibte_ext_linux ~/.colibte/.colibte_ext;\
+			install .$(APP_NAME)_ext_linux ~/.$(APP_NAME)/.$(APP_NAME)_ext;\
 		fi \
 	fi
-	install -d ~/.colibte
-	install .colors16_ori ~/.colibte/.colors16
-	sudo install -d "$(SHAREDDIR)"/colibte
-	sudo install .colibte_rc "$(SHAREDDIR)"/colibte
+	install -d ~/.$(APP_NAME)
+	install .colors16_ori ~/.$(APP_NAME)/.colors16
+	install .$(APP_NAME)_mnu ~/.$(APP_NAME)/.$(APP_NAME)_mnu
+
+	sudo install -d "$(SHAREDDIR)"/$(APP_NAME)
+	sudo install .c$(APP_NAME)_rc "$(SHAREDDIR)"/$(APP_NAME)
 	if [ "$(WSL)" = "1" ]; then \
-		sudo install .colibte_ext_wsl "$(SHAREDDIR)"/colibte/.colibte_ext;\
+		sudo install .$(APP_NAME)_ext_wsl "$(SHAREDDIR)"/$(APP_NAME)/.$(APP_NAME)_ext;\
 	else \
-		sudo install .colibte_ext_linux "$(SHAREDDIR)"/colibte/.colibte_ext;\
+		sudo install .$(APP_NAME)_ext_linux "$(SHAREDDIR)"/$(APP_NAME)/.$(APP_NAME)_ext;\
 	fi
-	sudo install -d "$(SHAREDDIR)"/colibte/pixmaps
-	sudo install -d "$(SHAREDDIR)"/colibte/help
-	sudo install help/colibte.md "$(SHAREDDIR)"/colibte/colibte.md
-	sudo install pixmap/*.xpm "$(SHAREDDIR)"/colibte/pixmaps
+	sudo install -d "$(SHAREDDIR)"/$(APP_NAME)/pixmaps
+	sudo install -d "$(SHAREDDIR)"/$(APP_NAME)/help
+	sudo install help/$(APP_NAME).md "$(SHAREDDIR)"/$(APP_NAME)/$(APP_NAME).md
+	sudo install pixmap/*.xpm "$(SHAREDDIR)"/$(APP_NAME)/pixmaps
 	sudo install ctg2.desktop "$(SHAREDDIR)"/applications
 	sudo install ctg3.desktop /"$(SHAREDDIR)"/applications
 	sudo install ctg2 /usr/local/bin
@@ -357,23 +360,23 @@ install : cte ctg2 ctg3
 #	sudo install ctxe /usr/local/bin
 
 install_files:
-	install .colibte_rc ~
+	install .$(APP_NAME)_rc ~
 	if [ "$(WSL)" = "1" ]; then \
-		install .colibte_wsl ~/.colibte/.colibte_ext;\
+		install .$(APP_NAME)_wsl ~/.$(APP_NAME)/.$(APP_NAME)_ext;\
 	else \
-		install .colibte_ext_linux ~/.colibte/.colibte_ext;\
+		install .$(APP_NAME)_ext_linux ~/.$(APP_NAME)/.$(APP_NAME)_ext;\
 	fi
-	sudo install -d "$(SHAREDDIR)"/colibte
-	sudo install .colibte_rc "$(SHAREDDIR)"/colibte
+	sudo install -d "$(SHAREDDIR)"/$(APP_NAME)
+	sudo install .$(APP_NAME)_rc "$(SHAREDDIR)"/$(APP_NAME)
 	if [ "$(WSL)" = "1" ]; then \
-		sudo install .colibte_ext_wsl "$(SHAREDDIR)"/colibte/.colibte_ext;\
+		sudo install .$(APP_NAME)_ext_wsl "$(SHAREDDIR)"/$(APP_NAME)/.$(APP_NAME)_ext;\
 	else \
-		sudo install .colibte_ext_linux "$(SHAREDDIR)"/.colibte_ext;\
+		sudo install .$(APP_NAME)_ext_linux "$(SHAREDDIR)"/.$(APP_NAME)_ext;\
 	fi
-	sudo install -d "$(SHAREDDIR)"/colibte/pixmaps
-	sudo install -d "$(SHAREDDIR)"/colibte/help
-	sudo install help/colibte.md "$(SHAREDDIR)"/colibte/colibte.md
-	sudo install pixmap/*.xpm "$(SHAREDDIR)"/colibte/pixmaps
+	sudo install -d "$(SHAREDDIR)"/$(APP_NAME)/pixmaps
+	sudo install -d "$(SHAREDDIR)"/$(APP_NAME)/help
+	sudo install help/$(APP_NAME).md "$(SHAREDDIR)"/$(APP_NAME)/$(APP_NAME).md
+	sudo install pixmap/*.xpm "$(SHAREDDIR)"/$(APP_NAME)/pixmaps
 	sudo install ctg2.desktop "$(SHAREDDIR)"/applications
 	sudo install ctg3.desktop "$(SHAREDDIR)"/applications
 

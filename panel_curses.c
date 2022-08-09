@@ -2718,8 +2718,8 @@ int color_scheme_save()
 
  sstat=snprintf(name1,MAXFLEN,".colors16a");
  fname=find_file(NULL,name1,0);
- if(fname==NULL) { // create a new file under ~/.colibte
- 	sstat=snprintf(buf,MAXFLEN,"%s/.colibte/%s",getenv("HOME"),name1);
+ if(fname==NULL) { // create a new file under home . dir
+ 	sstat=snprintf(buf,MAXFLEN,"%s/.%s/%s",getenv("HOME"),APPLICATION_NAME,name1);
 	fname=buf;
 	f1=fopen(fname,"w+");
  } else {

@@ -9,15 +9,14 @@
 #include <glib/gstdio.h>
 
 #include "xe.h"
-#define CONFIGFILE "colibte.conf"
 
-const char cfg_group[] = "colibte";
+const char cfg_group[] = APPLICATION_NAME;
 extern alist *local_key_list;
 
 struct {
 	GKeyFile *cfg;
 	char *configfile;
-} colibte;
+} app_cfg;
 
 #if	NUSE
 /* get a string from configuration */
@@ -26,10 +25,10 @@ char * get_cfg_str(char *label, char *default_str)
 	char *cfg_val;
 
 	// get a string value
-	if (!g_key_file_has_key(colibte.cfg, cfg_group, label, NULL)) {
-		g_key_file_set_value(colibte.cfg, cfg_group, label, default_str);
+	if (!g_key_file_has_key(app_cfg.cfg, cfg_group, label, NULL)) {
+		g_key_file_set_value(app_cfg.cfg, cfg_group, label, default_str);
 	}
-	cfg_val = g_key_file_get_value(colibte.cfg, cfg_group, label, NULL);
+	cfg_val = g_key_file_get_value(app_cfg.cfg, cfg_group, label, NULL);
 
 	return cfg_val;
 }
@@ -39,7 +38,7 @@ char * get_cfg_str(char *label, char *default_str)
 /* set a string configuration variable */
 void set_cfg_str(char *label, char *str_val)
 {
-	g_key_file_set_value(colibte.cfg, cfg_group, label, str_val);
+	g_key_file_set_value(app_cfg.cfg, cfg_group, label, str_val);
 }
 #endif
 
@@ -49,13 +48,13 @@ int  get_cfg_int(char *label,int default_val)
 	char *cfg_val;
 	int dval;
 
-	if (!g_key_file_has_key(colibte.cfg, cfg_group, label, NULL)) {
+	if (!g_key_file_has_key(app_cfg.cfg, cfg_group, label, NULL)) {
 		cfg_val=(char *)g_malloc(20);
 		snprintf(cfg_val,20,"%d",default_val);
-		g_key_file_set_value(colibte.cfg, cfg_group, label, cfg_val);
+		g_key_file_set_value(app_cfg.cfg, cfg_group, label, cfg_val);
 //		MESG("set_cfg_int: new val for [%s] with default %s",label,cfg_val);
 	} else {
-		cfg_val = g_key_file_get_value(colibte.cfg, cfg_group, label, NULL);
+		cfg_val = g_key_file_get_value(app_cfg.cfg, cfg_group, label, NULL);
 //		MESG("set_cfg_int: read [%s] val %s",label,cfg_val);
 	};
 	dval = (int)atof(cfg_val);
@@ -72,7 +71,7 @@ void set_cfg_int(char *label,int ival)
 	cfg_val=(char *)g_malloc(20);
 	snprintf(cfg_val,20,"%d",ival);
 
-	g_key_file_set_value(colibte.cfg, cfg_group, label, cfg_val);
+	g_key_file_set_value(app_cfg.cfg, cfg_group, label, cfg_val);
 	g_free(cfg_val);
 }
 
@@ -82,12 +81,12 @@ double  get_cfg_val(char *label,double default_val)
 	char *cfg_val;
 	double dval;
 
-	if (!g_key_file_has_key(colibte.cfg, cfg_group, label, NULL)) {
+	if (!g_key_file_has_key(app_cfg.cfg, cfg_group, label, NULL)) {
 		cfg_val=(char *)g_malloc(20);
 		snprintf(cfg_val,20,"%lf",default_val);
-		g_key_file_set_value(colibte.cfg, cfg_group, label, cfg_val);
+		g_key_file_set_value(app_cfg.cfg, cfg_group, label, cfg_val);
 	} else {
-		cfg_val = g_key_file_get_value(colibte.cfg, cfg_group, label, NULL);
+		cfg_val = g_key_file_get_value(app_cfg.cfg, cfg_group, label, NULL);
 	};
 	dval = atof(cfg_val);
 	g_free(cfg_val);
@@ -103,30 +102,30 @@ void load_config()
 	char* configdir = NULL;
 //	MESG("load_config:");
 	/* Config file initialization*/
-	colibte.cfg = g_key_file_new();
+	app_cfg.cfg = g_key_file_new();
 
-	configdir = g_build_filename( g_get_user_config_dir(), "colibte", NULL );
+	configdir = g_build_filename( g_get_user_config_dir(), APPLICATION_NAME, NULL );
 	if( ! g_file_test( g_get_user_config_dir(), G_FILE_TEST_EXISTS) )
 		g_mkdir( g_get_user_config_dir(), 0755 );
 	if( ! g_file_test( configdir, G_FILE_TEST_EXISTS) )
 		g_mkdir( configdir, 0755 );
 
 	/* Use more standard-conforming path for config files, if available. */
-	colibte.configfile=g_build_filename(configdir, CONFIGFILE, NULL);
+	app_cfg.configfile=g_build_filename(configdir, CONFIGFILE, NULL);
 	g_free(configdir);
 	
-	MESG("load configuration from %s",colibte.configfile);
+	MESG("load configuration from %s",app_cfg.configfile);
 
-	if (! g_file_test(colibte.configfile, G_FILE_TEST_EXISTS)) {
+	if (! g_file_test(app_cfg.configfile, G_FILE_TEST_EXISTS)) {
 		char *new_file_contents;
 
-		MESG("No config file yet, create an empty one to %s",colibte.configfile);
-		new_file_contents=g_strconcat("[colibte]\n", "", NULL);
-		g_file_set_contents(colibte.configfile, new_file_contents, strlen(new_file_contents), NULL);
+		MESG("No config file yet, create an empty one to %s",app_cfg.configfile);
+		new_file_contents=g_strconcat("[",APPLICATION_NAME,"]\n", "", NULL);
+		g_file_set_contents(app_cfg.configfile, new_file_contents, strlen(new_file_contents), NULL);
 		
 		g_free(new_file_contents);
 	} else {
-		if (!g_key_file_load_from_file(colibte.cfg, colibte.configfile, 0, &gerror)) {
+		if (!g_key_file_load_from_file(app_cfg.cfg, app_cfg.configfile, 0, &gerror)) {
 			if(gerror) { error_line("error %s reading config file!",gerror->message);}
 			else error_line("error reading config file!");
 		};
@@ -182,19 +181,19 @@ void save_config()
 	set_cfg_int("color_scheme",(int)bt_dval("color_scheme"));
 	set_cfg_int("xcolor_scheme",(int)bt_dval("xcolor_scheme"));
 	
-	data = g_key_file_to_data(colibte.cfg, &len, &gerror);
+	data = g_key_file_to_data(app_cfg.cfg, &len, &gerror);
 //	MESG("write cfg file: len=%ld",(long)len);
 
 	if (!data) {
 //		MESG("No data to write to key file");
 		exit(1);
 	}
-	MESG("save configuration to %s",colibte.configfile);
+	MESG("save configuration to %s",app_cfg.configfile);
 
-	g_file_set_contents(colibte.configfile, data, len, NULL);	// write to config file
+	g_file_set_contents(app_cfg.configfile, data, len, NULL);	// write to config file
 
-	g_key_file_free(colibte.cfg);
-	g_free(colibte.configfile);
+	g_key_file_free(app_cfg.cfg);
+	g_free(app_cfg.configfile);
 }
 
 
@@ -209,10 +208,10 @@ int save_keys()
  char key_line[MAXLLEN];
  AKEYS *key;
 
- strcpy(name1,".colibte_keys");
+ strcpy(name1,APPLICATION_KEYS);
  fname=find_file(NULL,name1,0);
  if(fname==NULL) {
-	snprintf(name1,MAXFLEN,"%s/%s",getenv("HOME"),".colibte_keys");
+	snprintf(name1,MAXFLEN,"%s/%s",getenv("HOME"),APPLICATION_KEYS);
 //	MESG("save_keys: to [%s]",name1);
 	fname=name1;
  };

@@ -321,12 +321,12 @@ int load_scratch_files()
  int stat=0;
  int ind=0;
  // MESG("load_scratch_files:");
- stat=snprintf(home_dir,MAXFLEN,"%s/.colibte",getenv("HOME"));
+ stat=snprintf(home_dir,MAXFLEN,"%s/.%s",getenv("HOME"),APPLICATION_NAME);
  if(stat>=MAXFLEN) MESG("truncated scratch file");
 
  d1 = opendir((const char *)home_dir);
  if(d1==NULL) {
- 	MESG("cannot read home .colibte dir");
+ 	MESG("cannot read home .%s dir",APPLICATION_NAME);
  } else {
  	int i=0;
 	struct dirent *df1;
@@ -744,7 +744,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	is_scratch = scratch_ind(base_name);
 
 	if(is_scratch) {
-		snprintf(dir_name,MAXFLEN,"%s/.colibte",getenv("HOME"));
+		snprintf(dir_name,MAXFLEN,"%s/.%s",getenv("HOME"),APPLICATION_NAME);
 	} else {
 		if(cbfp){
 		if(cbfp->b_dname[0]==0){
@@ -810,7 +810,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 					s=getcwd(dir_name,MAXFLEN);
 				} else {
 					if(is_scratch) {
-						snprintf(dir_name,MAXFLEN,"%s/.colibte",getenv("HOME"));
+						snprintf(dir_name,MAXFLEN,"%s/.%s",getenv("HOME"),APPLICATION_NAME);
 					} else {
 						strcpy(dir_name,"");
 					}
@@ -1680,7 +1680,7 @@ int menufile(int n)
  char **ddnames;
  char **ddvalue;
  char *exec_s;	/* execute string */
- fname = find_file(NULL,XE_USER_MENU,1); /* strlcpy(fname,"em0.mnu",MAXFLEN); */
+ fname = find_file(NULL,APPLICATION_USER_MENU,1); /* strlcpy(fname,"em0.mnu",MAXFLEN); */
 
  //if(list_on()) return 0;
 // set_list_type(4);
@@ -1824,9 +1824,9 @@ int save_file_history(int n)
  char *fname;
  if(bt_dval("save_history")==0) return 0;
 // MESG("save_file_history:");
- fname = find_file(NULL,XE_HISTORY,1);
+ fname = find_file(NULL,APPLICATION_HISTORY,1);
  if(fname==NULL) { 
-	snprintf(fname_s,MAXFLEN,"%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,XE_HISTORY);
+	snprintf(fname_s,MAXFLEN,"%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,APPLICATION_HISTORY);
 	fname=fname_s;
  };
 // MESG("save_file_history: %s",fname);
@@ -1837,7 +1837,7 @@ int read_file_history(int n)
 {
  char *fname;
 
- fname = find_file(NULL,XE_HISTORY,1);
+ fname = find_file(NULL,APPLICATION_HISTORY,1);
  recent_file_list=new_list(0,"read_file_history");
  if(fname==NULL) return(0);
 // MESG("read_file_history: from [%s]",fname);
@@ -1855,7 +1855,7 @@ int open_recent_file(int n)
  int lheight=20;
  int err;
 
- fname = find_file(NULL,XE_HISTORY,1);
+ fname = find_file(NULL,APPLICATION_HISTORY,1);
  if(fname==NULL) return(0);
 
  recent_files = (char **)array_data(recent_file_list);

@@ -71,8 +71,8 @@ int color_scheme_save()
 // sprintf(name1,".color%1d.col",scheme_ind);
  strlcpy(name1,".xcolors",MAXFLEN);
  fname=find_file(NULL,name1,0);
- if(fname==NULL) { // create a new file under ~/.colibte
- 	stat=snprintf(buf,MAXFLEN,"%s/.colibte/%s",getenv("HOME"),name1);
+ if(fname==NULL) { // create a new file under home dir . app dir
+ 	stat=snprintf(buf,MAXFLEN,"%s/.%s/%s",getenv("HOME"),APPLICATION_NAME,name1);
 	if(stat>MAXFLEN) { MESG("truncated color file");return FALSE;};
 	fname=buf;
 	f1=fopen(fname,"w+");

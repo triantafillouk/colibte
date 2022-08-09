@@ -5,16 +5,24 @@
 	(or at your option) any later version.
 */
 
-/* application config include file definitions */
+/* application name definitions */
 #ifndef __DEFINES
 #define __DEFINES
 
-// application data dir
-#define APPLICATION_DIR	"/usr/local/share/colibte"
+#define APPLICATION_NAME "colibte"
 
-#define APPLICATION_DOT_DIR	".colibte"
+#define APPLICATION_DIR			"/usr/local/share/colibte"
+#define APPLICATION_KEYS 		".colibte_keys"
+#define	APPLICATION_RC 			".colibte_rc"
 
-// application icon dir
+#define APPLICATION_DOT_DIR		".colibte"
+#define APPLICATION_HELP 		"colibte.md"
+#define APPLICATION_USER_MENU	".colibte_mnu"
+#define APPLICATION_EXTENSIONS	".colibte_ext"
+#define	APPLICATION_HISTORY		".colibte_history"
+#define CONFIGFILE 				"colibte.conf"
+
+// application share dir
 #define PIXMAP_DIR	"/usr/local/share/colibte/pixmaps/"
 #define PIXMAP_DOT_DIR  ".colibte/pixmaps/"
 

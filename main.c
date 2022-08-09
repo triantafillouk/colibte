@@ -109,7 +109,7 @@ int main(int argc, char **argv)
 		init_names();
 		init_extensions();	// file extensions
 		if(startfile==NULL) {
-			startfile=find_file(NULL,XE_START,1);
+			startfile=find_file(NULL,APPLICATION_RC,1);
 		};
 	};
 

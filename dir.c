@@ -72,7 +72,8 @@ void init_names()
  init_clipboard();
  
  strlcpy(home_dir,getenv("HOME"),MAXFLEN);
- strlcat(home_dir,"/.colibte",MAXFLEN);
+ strlcat(home_dir,"/.",MAXFLEN);
+ strlcat(home_dir,APPLICATION_NAME,MAXFLEN);
  if(stat(home_dir,&st)==0) 
  {	// check for editors home dir
  	if(S_ISDIR(st.st_mode)) {
@@ -80,12 +81,12 @@ void init_names()
 		unlink(home_dir);
  		mkdir(home_dir,S_IRWXU);
  	}
- } else { /* Not .colibte dir in user's home dir, create it. */
+ } else { /* Not a . dir in user's home dir, create it. */
  	// create dir
 	if(mkdir(home_dir,S_IRWXU)) {
-		SYS_ERROR("cannot create .colibte dir in home dir");
+		SYS_ERROR("cannot create .%s dir in home dir",APPLICATION_NAME);
 	} else {
-		MESG("created .colibte dir in home dir");
+		MESG("created .%s dir in home dir",APPLICATION_NAME);
 	};
 	// move files from default dir here
  };
@@ -834,7 +835,7 @@ void init_extensions()
 
  set_start_dir(NULL);
 
- fname = find_file(NULL,XE_EXTENSIONS,1);
+ fname = find_file(NULL,APPLICATION_EXTENSIONS,1);
 
  read_pairs(fname,2,'=',&f_extension,&f_extcmd);
  // MESG("init_extentions: file=[%s]",fname);

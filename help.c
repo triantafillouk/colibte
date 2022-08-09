@@ -17,7 +17,7 @@ int help(int n)
 
 	FILEBUF *bp;	/* buffer pointer to help */
 	char *fname=NULL;		/* ptr to file returned by find_file() */
-	fname = find_file("help",XE_HELP,1);
+	fname = find_file("help",APPLICATION_HELP,1);
 
 	if (fname == NULL) {
 		msg_line("could not find help file!");
