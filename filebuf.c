@@ -518,10 +518,11 @@ void FindLineCol(TextPoint *tp)
 	};
 
 	TextPoint   *found=NULL;
+	TextPoint	*scan;
 	offs	 dist=INT_MAX;
 	offs	 new_dist=INT_MAX-1;
 
-	for(TextPoint *scan=fp->tp_last; scan; scan=scan->t_next) {
+	for(scan=fp->tp_last; scan; scan=scan->t_next) {
 		if(scan==tp) continue;
 		if(!(scan->flags)) 
 		{
@@ -779,8 +780,8 @@ void  FindOffset(TextPoint *tp)
 		};
 		return;
 	};
-
-	for(TextPoint *scan=fp->tp_last ; scan; scan=scan->t_next) {
+	TextPoint *scan;
+	for(scan=fp->tp_last ; scan; scan=scan->t_next) {
 		if(scan==tp) continue;
 		if(!(scan->flags))
 		{
@@ -884,8 +885,9 @@ void textpoint_set(TextPoint *tp,offs o)
 void  ResetTextPoints(FILEBUF *bp,int flag)
 {
  num size=0;
+ TextPoint *scan;
  if(!flag) { size = tp_offset(bp->tp_text_end); };
- for(TextPoint *scan=bp->tp_last; scan; scan=scan->t_next) {
+ for(scan=bp->tp_last; scan; scan=scan->t_next) {
   	scan->line=scan->col=scan->offset=0;
  	scan->flags = FULLDEFINED;
  }; 
@@ -897,8 +899,9 @@ void  ResetTextPoints(FILEBUF *bp,int flag)
 
 void  textpoint_OrFlags(FILEBUF *fp,int mask)
 {
+	TextPoint *scan;
    mask&=COLUNDEFINED|LINEUNDEFINED;
-   for(TextPoint *scan=fp->tp_last; scan; scan=scan->t_next) {
+   for(scan=fp->tp_last; scan; scan=scan->t_next) {
       if(scan->offset>0) scan->flags|=mask;
    };
 }

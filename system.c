@@ -779,6 +779,7 @@ int mkdirRecursive(const char *path, mode_t mode)
     char opath[PATH_MAX];
     size_t len;
 	int stat;
+	char *p;
 //	MESG("mkdirRecursive:path=[%s]",path);
     strncpy(opath, path, sizeof(opath));
     opath[sizeof(opath) - 1] = '\0';
@@ -788,7 +789,7 @@ int mkdirRecursive(const char *path, mode_t mode)
         return 0;
     else if (opath[len - 1] == '/')
         opath[len - 1] = '\0';
-    for(char *p = opath+1; *p; p++) {
+    for(p = opath+1; *p; p++) {
         if (*p == '/') {
             *p = '\0';
 //			MESG("mkdir:check [%s]",opath);

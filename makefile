@@ -142,7 +142,7 @@ xe.h :
 #	${CC}  -c -Wall -I/usr/local/pgsql/src/include -funsigned-char $*.c
 #	${CC}  -c -Wall -O2 -mcpu=pentium -I/usr/local/pgsql/src/include -funsigned-char $*.c 
 #	${CC}  -c -Wall -O2 -mcpu=pentium -I/usr/include/gtk-1.2 -I/usr/include/glib-1.2 -funsigned-char $*.c 
-	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char -DTNOTES=$(TNOTES)  $*.c 
+	${CC} $(FLAGS1) -c -std=c90  -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char -DTNOTES=$(TNOTES)  $*.c 
 #	${CC}  -c -Wall -O2 -mcpu=pentium -I/usr/include/gtk-2.0 -I/usr/include/glib-1.2 -funsigned-char $*.c 
 
 #	This for SCO. -J is for unsigned char
@@ -342,7 +342,7 @@ install : cte ctg2 ctg3
 	install .$(APP_NAME)_mnu ~/.$(APP_NAME)/.$(APP_NAME)_mnu
 
 	sudo install -d "$(SHAREDDIR)"/$(APP_NAME)
-	sudo install .c$(APP_NAME)_rc "$(SHAREDDIR)"/$(APP_NAME)
+	sudo install .$(APP_NAME)_rc "$(SHAREDDIR)"/$(APP_NAME)
 	if [ "$(WSL)" = "1" ]; then \
 		sudo install .$(APP_NAME)_ext_wsl "$(SHAREDDIR)"/$(APP_NAME)/.$(APP_NAME)_ext;\
 	else \

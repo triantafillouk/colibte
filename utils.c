@@ -208,7 +208,8 @@ void sarray_clear_data(char **array)
 {
 // MESG("sarray_clear_data:");
  if(array!=NULL){
-	for(int i=0;array[i]!=NULL;i++){
+ 	int i;
+	for(i=0;array[i]!=NULL;i++){
 		if(array[i]) free(array[i]);
 		array[i]=NULL;
 	};
@@ -219,7 +220,8 @@ void sarray_clear_data(char **array)
 void sarray_clear(char **array)
 {
  if(array!=NULL){
-	for(int i=0;array[i]!=NULL;i++) {
+ 	int i;
+	for(i=0;array[i]!=NULL;i++) {
 		if(array[i]!=NULL) free(array[i]);
 	};
 	free(array);
@@ -308,8 +310,9 @@ int sarray_index(char **sarray,char *st)
 
 void string_2_nospaces(char *string)
 {
+ int i;
 // MESG("string_2_nospaces:[%s]",string);
- for(int i=0;i<strlen(string);i++) {
+ for(i=0;i<strlen(string);i++) {
  	if(string[i]==32 || string[i]==9) string[i] = '_';
  } 
 }
@@ -325,7 +328,8 @@ int iarray_index(int *iarray,int i_to_find, int max_element)
 
 int iarray_remove(int *iarray, int start, int max_element)
 {
- for(int i=start;i<max_element-1;i++) iarray[i]=iarray[i+1];
+ int i;
+ for(i=start;i<max_element-1;i++) iarray[i]=iarray[i+1];
  iarray[max_element-1]=-1;
  return max_element-1;
 }

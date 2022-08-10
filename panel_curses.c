@@ -2174,17 +2174,18 @@ void create_default_scheme()
 {
  int scheme_ind;
  for(scheme_ind=0;scheme_ind<COLOR_SCHEMES;scheme_ind++){
+	int i;
 	COLOR_SCHEME *scheme = malloc(sizeof(COLOR_SCHEME));
 	scheme->scheme_name = scheme_names[scheme_ind];
 
-	for(int i=0;i<16;i++) {
+	for(i=0;i<16;i++) {
 		RGB_DEF *rv;
 		rv = get_rgb_values(basic_color_values[scheme_ind][i]);
 		scheme->basic_colors[i].r=rv->r;
 		scheme->basic_colors[i].g=rv->g;
 		scheme->basic_colors[i].b=rv->b;
 	};
-	for(int i=0;i<COLOR_TYPES;i++) {
+	for(i=0;i<COLOR_TYPES;i++) {
 		scheme->color_attr[i].index = color_t[scheme_ind][i].index;
 		scheme->color_attr[i].attrib = color_t[scheme_ind][i].attrib;
 	};

@@ -70,7 +70,8 @@ int new_note(int type)
  char scratch_name[24];
  int scratch_ind=99;
  int res;
- for(int i=0;i<100;i++) {
+ int i;
+ for(i=0;i<100;i++) {
  	if(scratch_files[i]==0) {
 		scratch_ind=i+1;
 		scratch_files[i]=scratch_ind;
@@ -965,8 +966,9 @@ int recreate_notes_db(int n)
 	int dirs=0;
 	int notes_skipped=0;
 	int notes_new=0;
+	int i;
 	notes_files = read_sarray(tmp_file,&size);
-	for(int i=0 ;notes_files[i]!=NULL;i++){
+	for(i=0 ;notes_files[i]!=NULL;i++){
 		struct stat st;
 //		MESG("- insert [%s]",notes_files[i]);
 		if(!stat(notes_files[i],&st))
@@ -1028,15 +1030,15 @@ char *sql_note_str(char *query_string)
 {
  static char sql_str[1024];
  char s_num[16];
-
+ int i;
  strcpy(sql_str,query_string);
- MESG("sql_note_str:(%s)",query_string);
+ // MESG("sql_note_str:(%s)",query_string);
  	if(num_of_selected_tags>0) {
  	
 	strcat(sql_str," where rowid in (select note_id  from tags group by note_id having count(case when tag_id in (");
 	sprintf(s_num,"%d",sel_tags[0]);
 	strcat(sql_str,s_num);
-	for(int i=1;i<num_of_selected_tags;i++) {
+	for(i=1;i<num_of_selected_tags;i++) {
 		sprintf(s_num,"%d",sel_tags[i]);
 		strcat(sql_str,",");
 		strcat(sql_str,s_num);

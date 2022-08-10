@@ -1586,8 +1586,9 @@ int insert_string_col(FILEBUF *fp,char *str,int col)
 	if(col<0) {
 		ToLineEnd();
 	} else {
+		int i;
 		ToLineBegin();
-		for(int i=0;i<col;i++) {
+		for(i=0;i<col;i++) {
 			if(Eol()) { 
 			// insert space
 				insert_string(fp," ",1);
