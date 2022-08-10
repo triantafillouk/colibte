@@ -1043,7 +1043,7 @@ int dir_right(int n)
 	return error_line("Cannot find file type of [%s]",fname_ns);
   };
 
-  if(ftype==FTYPE_NORMAL) { // view the file
+  if(ftype==FTYPE_NORMAL || ftype==FTYPE_LINK) { // view the file
 	cbfp->cdir->cline = getcline();
 
 	cwp->w_ppline = window_cursor_line(cwp)+1;
