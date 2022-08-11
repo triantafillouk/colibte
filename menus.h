@@ -33,6 +33,17 @@ M_element e_notes[] =
 MENUS m_notes = {
 	"Notes",5,1,VERTICAL, e_notes
 };
+
+M_element e_notes_tag[] = {
+	{0, 'D', "Delete tag note","",delete_tagnote,0,"WD"},
+	{0, 'T', "Toggle tag     ","",toggle_tag,0,"WT"},
+	{0, 'R', "Remove tags    ","",remove_tags,0,"WR"},
+	{0, 0, NULL,"",NULL,0,NULL}
+};
+
+MENUS m_notes_tag = {
+	"Notes work",10,1,VERTICAL, e_notes_tag
+};
 #endif
 
 #if	TNOTES

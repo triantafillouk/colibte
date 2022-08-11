@@ -30,15 +30,6 @@ void set_cursor(int flag,char *from);
 GtkWidget *popup_select_on, *popup_select_off, *popup_boxed_region, *popup_sort_menu;
 
 
-int work_menu(int n)
-{
- // MESG("work_menu:");
- if(cbfp->b_flag & FSDIRED) {
-	return execute_menu(1);
- };
- return true;
-}
-
 /* initialize screen */
 void vtinit(int argc, char **argv)
 {

@@ -104,11 +104,6 @@ void top_menu(int init)
 	hdab(pos_x, mm1->element[i].high, mm1->element[i].txt,bch,fch);
 	pos_x += HLABEL_WIDTH;
  };
-#if	0
-//  char arrows[] = "| Move ←  →  Find ↑  ↓ ";
- char arrows[] = "| ←  →  ↑  ↓";
- hdab(pos_x,0,arrows,bch,fch);
-#endif
 }
 
 /* initialize screen */
@@ -235,7 +230,7 @@ void show_menu_line(int line,M_element *element,int bcolor,int fcolor)
 		{
 			active='*';
 		};
-		MESG("menu line: [%s]->[%c]",element->help,active);
+		// MESG("menu line: [%s]->[%c]",element->help,active);
 		sprintf(text_line,"%c%s",active,element->txt);	
 	} else {
 		strcpy(text_line,element->txt);
@@ -619,23 +614,6 @@ int notes_menu_command(int n)
 	return execute_menu(1);
 }
 #endif
-
-int work_menu(int n)
-{
- if(cwp->selection) {
- 	start_menu = &m_select_on;
-	return execute_menu(0);
- } else {
-	 if(test_b_flag (FSDIRED)) {
-	 	start_menu = &m_sort;
-		return execute_menu(0);
-	 } else {
-	 	start_menu = &m_select_off;
-		return execute_menu(0);
-	 };
- }
- return true;
-}
 
  /* new_wp, new_line, new_column have been set */
 void move_to_new_position(num new_column,num new_line)
@@ -1294,8 +1272,8 @@ void main_loop()
 
 int show_version(int n)
 {
- MESG("show_version:");
- msg_line("This is KE version %s !",VERSION);
+ // MESG("show_version:");
+ msg_line("This is %s version %s !",APPLICATION_NAME,VERSION);
  return(FALSE);
 }
 
@@ -1778,5 +1756,7 @@ void set_window_font(WINDP *WP)
 void drv_start_window_update(WINDP *wp)
 {
 }
+
+#include "menu_common.c"
 
 /* --- */

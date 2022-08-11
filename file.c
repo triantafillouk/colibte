@@ -1501,10 +1501,6 @@ int save_file(int n)
  FILEBUF *fp=cbfp;
 
  // MESG("save_file: [%s] b_type=%X,b_flag=%X",fp->b_fname,fp->b_type,fp->b_flag);
-
-	if(fp->b_flag & FSNLIST) {
-		return work_menu(1);
-	};
 	if(dont_edit()) return TRUE;
 #if	TNOTES
 	if(fp->b_type & NOTE_TYPE 

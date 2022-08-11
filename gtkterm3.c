@@ -2380,5 +2380,6 @@ int get_utf_length(utfchar *utf_char_str)
 }
 
 #include "gtk_common.c"
+#include "menu_common.c"
 
 /* -- */

@@ -196,7 +196,6 @@ void push_dir(FILEBUF *) ;
 void pop_dir(FILEBUF *);
 void reinit_dir(FILEBUF *);
 void show_textpoints(char *title,FILEBUF *);
-
 void set_string_val(char **, char *);
 
 // filebuf.c

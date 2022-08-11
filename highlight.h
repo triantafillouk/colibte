@@ -152,7 +152,7 @@ char *sln_w[] = { "EndProjectSection","ProjectSection","EndProject","Project","E
 char *sln_w1[] = { "Debug","Presolution","" };
 
 // from gnu make
-char *make_w[] = { "ifeq","ifneq","ifdef","ifndef","else","endif","or","and","foreach","" };
+char *make_w[] = { "ifeq","ifneq","ifdef","ifndef","else","endif","or","and","foreach","if","fi","" };
 char *make_w1[] = { "subst","patsubst","strip","findstring","filter","filter-out","sort","call","words","firstword","lastword","notdir","suffix","basename",
 	"addsuffix","addprefix","join","wildcard","realpath","abspath","dir","word","wordlist","eval","origin","flavor","error","warning","info","shell","guile","" };
 
