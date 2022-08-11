@@ -675,24 +675,13 @@ int dir_other_reload(int n)
 {
   FILEBUF *dbuf;	/* destination dir buffer  */
   WINDP *wp;
-#if	0
-  num top_offset;
-  num f_offset;
-#endif
+
  	// MESG("dir_other_reload:");
 	dbuf=get_dir_buffer(DIR_OTHER,0);	/* get destination dir buffer  */
 	if(dbuf==NULL) return 0;
 	// MESG("dir_other_reload:[%s]",dbuf->b_dname);
 	wp = find_buffer_window(dbuf);
 	if(wp){
-#if	0
-		f_offset = tp_offset(wp->w_fp->tp_current);
-		top_offset = tp_offset(wp->tp_hline);
-	
-		textpoint_set(wp->tp_hline,top_offset);
-		textpoint_set(wp->w_fp->save_current,top_offset);
-		textpoint_set(wp->w_fp->tp_current,f_offset);
-#endif
 		insert_dir(dbuf,1);
 		set_update(wp,UPD_EDIT|UPD_MOVE);
 	} else {
@@ -736,7 +725,7 @@ int dir_del1(int  n)
   	return error_line("cannot access file '%s' to delete! status=%d",fname,status);
   }
   
-  if(status==FTYPE_NORMAL||status==FTYPE_LINK) 	/* normal file or link */
+  if(status==FTYPE_NORMAL||status==FTYPE_LINK||status==FTYPE_DIRLINK) 	/* normal file or link */
   {
 	status=dir_getfile(fname,0); // unlink understand spaces!
 	// MESG("dir_del1: [%s] status=%d",fname,status);
@@ -1043,7 +1032,7 @@ int dir_right(int n)
 	return error_line("Cannot find file type of [%s]",fname_ns);
   };
 
-  if(ftype==FTYPE_NORMAL || ftype==FTYPE_LINK) { // view the file
+  if(ftype==FTYPE_NORMAL) { // view the file
 	cbfp->cdir->cline = getcline();
 
 	cwp->w_ppline = window_cursor_line(cwp)+1;
@@ -1464,12 +1453,7 @@ int dir_getfile(char *fname,int flag)
 
  // MESG("dir_getfile: b_flag=%X [%s]",cbfp->b_flag,line_str);  
  c=line_str[0];
-#if	0
- if(c=='f' || c=='s' || c=='~') {
-	stat_result=-1;
-	MESG("set stat_result: -1 type %c",c);
- };
-#endif
+
  if(c=='#' ||c=='!'||c=='/') ftype=FTYPE_DIR;else ftype=FTYPE_NORMAL;
  c=line_str[1];
  if(c=='l') is_link=1;
@@ -1538,15 +1522,9 @@ int dir_getfile(char *fname,int flag)
 
  if(is_link)
  {
-  if(stat_result==-1) { 
-  	// MESG("stat_result: -1");
-	return (FTYPE_LINK);
-  };
-	// MESG("return type link!");
-	return(FTYPE_LINK);
-  // if((t.st_mode & S_IFMT) == S_IFDIR) ftype=FTYPE_DIR;else ftype=FTYPE_NORMAL;
+	if(S_ISDIR(t.st_mode)) return FTYPE_DIRLINK;
+	else return FTYPE_NORMAL;
  };
- 
  return(ftype); 
 }
 
