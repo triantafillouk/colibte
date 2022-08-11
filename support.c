@@ -380,14 +380,16 @@ void MESG(const char *fmt, ...)
 {
  va_list args;
  static char mline[512];
+ if(!debug_flag()) return;
+
     if (fmt != NULL) {
 		va_start(args,fmt);
 		vsnprintf(mline,511,fmt,args);
 		va_end(args);
 
-		msg_log(1,"%s",mline);	// send to system log
-		if((debug_flag()) && mline[0]!=0) 	/*   */
+		if(mline[0]!=0) 	/*   */
 		{
+			msg_log(1,"%s",mline);	// send to system log
 			fprintf(stderr,"%s\n",mline);
 			fflush(stderr);
 		};
