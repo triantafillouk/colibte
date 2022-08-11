@@ -1096,14 +1096,24 @@ int quick_close(int n)
 		return FALSE;
 	};
 	oldcb = cbfp;                          /* save in case we fail */
-	// MESG("quick_close:");
+	MESG("quick_close:");
+	if(oldcb->connect_buffer!=NULL) MESG("	is connected!");
 	if(cbfp->b_fname[0]!=CHR_LBRA)
 	if(!dont_edit()) {
 		// save the buffer
 		msg_line("[Saving %s]",oldcb->b_fname);
 		if ((status = save_file( n)) != TRUE) {
-              		cbfp= oldcb;	/* restore fp */
-               		return(status);
+
+			if(cbfp->connect_buffer!=NULL) {
+				MESG("buffer is connected!");
+				FILEBUF *connect_fp=cbfp->connect_buffer;
+				select_filebuf(connect_fp);
+				delete_filebuf(oldcb,1);
+				return(OK_CLRSL);
+			};
+
+      		cbfp= oldcb;	/* restore fp */
+       		return(status);
         }
 	};
 	if(cbfp->b_flag == FSDIRED && (cbfp->b_state & FS_VIEW) &&
@@ -1111,9 +1121,18 @@ int quick_close(int n)
 			delete_hmark(1);
 			return dir_left(1);
 	}else {
-//		MESG("quick_close: close_file");
-		close_file(1);
-		return(TRUE);
+	MESG("quick_close: close_file");
+		if(cbfp->connect_buffer!=NULL) {
+		MESG("buffer is connected!");
+			FILEBUF *connect_fp=cbfp->connect_buffer;
+			select_filebuf(connect_fp);
+			delete_filebuf(oldcb,1);
+			return(OK_CLRSL);
+		} else {;
+			MESG("no connected!!!");
+			close_file(1);
+			return(TRUE);
+		};
 	};
 
 	if(cbfp == oldcb) 

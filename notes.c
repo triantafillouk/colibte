@@ -90,7 +90,7 @@ int new_note(int type)
  };
 
  stat=goto_file(scratch_name);
- MESG("new_note: stat=%d",stat);
+ // MESG("new_note: stat=%d",stat);
  if(stat) {
 	cbfp->scratch_num=scratch_ind;
 	insert_preamble(cbfp,type);
@@ -112,7 +112,7 @@ int new_note(int type)
 		goto_eol(1);
 	}
 
-	MESG("new_note: b_type=0x%X",cbfp->b_type);
+	// MESG("new_note: b_type=0x%X",cbfp->b_type);
 	set_hmark(0,"new_note:");
 	msg_line("note created b_type=%X b_flag=%X",cbfp->b_type,cbfp->b_flag);
  };
@@ -167,12 +167,10 @@ offs find_str_reol(FILEBUF *fp, offs start, char *needle_string, char *return_st
 		};
 		*rs=0;
 		ptr+=fp->EolSize;
-		MESG("Found [%s] value = [%s] next line at %ld len=%d",needle_string,return_string,ptr,len);
+		// MESG("Found [%s] value = [%s] next line at %ld len=%d",needle_string,return_string,ptr,len);
 	} else {
-		MESG("string [%s] not found!",needle_string);
-		// *return_string=0;
+		// MESG("string [%s] not found!",needle_string);
 		ptr=0;
-		// strcpy(rs,"empty");
 	};
 	return ptr;
 }
@@ -217,15 +215,14 @@ alist *query_string_columns(sqlite3 *db, char *sql,int *widths)
  int step;
  char txt[1024];
  char space[512];
- // char *sep="│";
+
  txt[0]=0;
- MESG("query_string_columns: sql=[%s]",sql);
+ // MESG("query_string_columns: sql=[%s]",sql);
  stat = sqlite3_prepare_v2(db, sql, -1, &res, 0);
  alist *a=new_list(0,"query_column");
  if(stat==SQLITE_OK) {
 	int rows=0;
 	while((step=sqlite3_step(res))==SQLITE_ROW) {
-		// char *txt = strdup((char *)sqlite3_column_text(res,0));
 		int column;
 		txt[0]=0;
 		rows++;
@@ -267,12 +264,12 @@ double *query_num_column(sqlite3 *db, char *sql)
  double *darray=NULL;
  stat = sqlite3_prepare_v2(db, sql, -1, &res, 0);
  if(stat==SQLITE_OK) {
-// 	MESG("query prepared!");
+	// MESG("query prepared!");
 	alist *a=new_list(0,"query_column");
 	int i=0;
 	while((step=sqlite3_step(res))==SQLITE_ROW) {
 		double num = sqlite3_column_double(res,0);
-//		MESG("	step %d num = %f",i,num);
+		// MESG("	step %d num = %f",i,num);
 		void *data = malloc(sizeof(double));
 		memcpy(data,(void *)&num,sizeof(double));
 		add_element_to_list((void *)data,a);
@@ -281,7 +278,7 @@ double *query_num_column(sqlite3 *db, char *sql)
 	double *da= darray;
 	i=0;
 	da[i++]=a->size;
-//	MESG("query_num_column: size=%f",da[0]);
+	// MESG("query_num_column: size=%f",da[0]);
 	lbegin(a);
 	void *data=NULL;
 	while((data=lget(a))!=NULL){
@@ -304,12 +301,11 @@ int *query_int_column(sqlite3 *db, char *sql,int *count)
  int *iarray=NULL;
  stat = sqlite3_prepare_v2(db, sql, -1, &res, 0);
  if(stat==SQLITE_OK) {
-// 	MESG("query prepared!");
 	alist *a=new_list(0,"query_column");
 	int i=0;
 	while((step=sqlite3_step(res))==SQLITE_ROW) {
 		double num = sqlite3_column_double(res,0);
-//		MESG("	step %d num = %f",i,num);
+		// MESG("	step %d num = %f",i,num);
 		void *data = malloc(sizeof(double));
 		memcpy(data,(void *)&num,sizeof(double));
 		add_element_to_list((void *)data,a);
@@ -325,7 +321,7 @@ int *query_int_column(sqlite3 *db, char *sql,int *count)
 		double da;
 		memcpy((void *)(&da),data,sizeof(double));
 		iarray[i++]=(int) da;
-//		MESG(" %2d : %f",i-1,da[i-1]);
+		// MESG(" %2d : %f",i-1,da[i-1]);
 	};
 	empty_list(a);
 	free_list(a,"query_column");
@@ -537,7 +533,7 @@ int save_tag(sqlite3 *db,int notes_id,char *tag)
 {
 	int tag_id;
 	char sql[MAXMLEN];
-	MESG("save_tag: %s",tag);
+	// MESG("save_tag: %s",tag);
 	if(snprintf(sql,MAXMLEN,"INSERT INTO TAG(NAME) VALUES('%s');",tag)>=MAXMLEN) {
 		ERROR("tag truncated!");
 		return false;
@@ -1049,7 +1045,7 @@ char *sql_note_str(char *query_string)
 	strcat(sql_str,")");
 	};
 
- MESG("sql_note_str:->(%s)",sql_str);
+ // MESG("sql_note_str:->(%s)",sql_str);
  return sql_str;
 }
 
@@ -1201,7 +1197,7 @@ int set_tag_view_position(int line,int column)
 		column=0;
 		line+=cwp->top_tag_line;
 		cwp->current_tag_line = line;
-		MESG("set tag at line %d",line);
+		// MESG("set tag at line %d",line);
 		if(prev_line==line && prev_col==column) {
 			// toggle tag 
 			select_tag(TAG_SELECT_TOGGLE);
@@ -1216,7 +1212,7 @@ int set_tag_view_position(int line,int column)
 		};
 	
 		cwp->current_note_line = line;
-		MESG("set note at line %d",line);
+		// MESG("set note at line %d",line);
 	};
 	prev_col=column;
 	prev_line=line;
@@ -1232,7 +1228,8 @@ int toggle_tagnote(int n)
 	// int b_flag = (cbfp->b_flag >>6) << 6;
 	int b_flag = cbfp->b_flag;
 	if(b_flag & FSNLIST) return FALSE;
-	MESG("toggle_tagnote: b_flag=%X current_tag_line=%d",cbfp->b_flag,cwp->current_tag_line);
+
+	// MESG("toggle_tagnote: b_flag=%X current_tag_line=%d",cbfp->b_flag,cwp->current_tag_line);
 	if(b_flag==FSNOTES) {
 		cbfp->b_flag=FSNOTESN;
 		msg_line("Notes column active");
@@ -1299,9 +1296,20 @@ int select_tag(int n)
 {
  char *select_word=NULL;
  int tag_id=0;
- MESG("select_tag: n=%d current_tag=%d",n,cwp->current_tag_line);
+ // MESG("select_tag: n=%d current_tag=%d",n,cwp->current_tag_line);
 
- if(cwp->w_fp->b_flag & FSNLIST) return dir_tag(n);
+	if(cwp->w_fp->b_flag & FSNLIST) {
+		if(n==0) {
+			istr *dir_str;
+			lbegin(cbfp->dir_list_str);
+			while((dir_str = (istr *)lget_current(cbfp->dir_list_str))!=NULL) {
+				dir_str->selected=0;
+				lmove_to_next(cbfp->dir_list_str,0);
+			};
+			set_update(cwp,UPD_EDIT);
+		 	return 1;
+		} else return dir_tag(n);
+	};
 
 	if(cwp->w_fp->b_flag & FSNOTESN)
 	{
@@ -1316,7 +1324,7 @@ int select_tag(int n)
 		int tag_id1=0;
 		select_word = query_string(db,sql,&tag_id1); 
 		sqlite3_close(db);
-		MESG("	found select_word=[%s] tag_id=%d",select_word,tag_id);
+		// MESG("	found select_word=[%s] tag_id=%d",select_word,tag_id);
 
 		istr **row_data = (istr **) array_data(cbfp->b_tag_list);
 		istr *tag_istr = row_data[cwp->current_tag_line];
@@ -1378,7 +1386,7 @@ int select_tag(int n)
 int delete_note_row()
 {
 	istr *row_data;
-	MESG("delete_note_row: tag_line=%d note_line=%d",cwp->current_tag_line,cwp->current_note_line);
+	// MESG("delete_note_row: tag_line=%d note_line=%d",cwp->current_tag_line,cwp->current_note_line);
 	int line=0;
 	// int note_id=-1;
 
@@ -1386,11 +1394,9 @@ int delete_note_row()
 	while((row_data = (istr *)lget_current(cbfp->dir_list_str))!=NULL) {
 
 		if(line == cwp->current_note_line) {
-			// note_id = row_data->index;
-			MESG("delete_note_row: line=%d note_id = %d size=%d",line,row_data->index,cbfp->dir_list_str->size);
-			// return 0;
+			// MESG("delete_note_row: line=%d note_id = %d size=%d",line,row_data->index,cbfp->dir_list_str->size);
 			remove_current_from_list(cbfp->dir_list_str);
-			MESG("delete_note_row: line=%d note_id = %d size=%d",line,row_data->index,cbfp->dir_list_str->size);
+			// MESG("delete_note_row: line=%d note_id = %d size=%d",line,row_data->index,cbfp->dir_list_str->size);
 			cbfp->b_state ^= FS_VIEW;
 			if(line==cbfp->dir_list_str->size && line>0) cwp->current_note_line--;
 
@@ -1426,7 +1432,7 @@ char *get_current_tag_name()
 
  if((db=notes_db_open())==NULL) return NULL;
  tag_id = get_current_tag_id();
- MESG("get_current_tag_name: tag_id=%d",tag_id);
+ // MESG("get_current_tag_name: tag_id=%d",tag_id);
  if(tag_id<0) return NULL;
 
  sprintf(sql,"SELECT name,rowid from tag where rowid = %d",tag_id);
@@ -1475,7 +1481,6 @@ char *get_current_note_name()
 int edit_note(int n)
 {
  // MESG("edit_note:");
- // int note_id=-1;
   char *full_name = get_current_note_name();
  
  if(full_name==NULL) {
@@ -1506,8 +1511,6 @@ int edit_note(int n)
 
 	set_hmark(1,"edit_note");
 
- // if(n==0) 
- MESG("set readonly!");
  bp->b_state |= FS_VIEW;
  return true;
 }
@@ -1516,14 +1519,14 @@ int view_note(int n)
 {
 	// int b_flag = (cbfp->b_flag >>8) << 8;
 	int b_flag = cbfp->b_flag;
-	MESG("view_note: %X %X FSNOTES=%X",cbfp->b_flag,b_flag, FSNOTES);
+	// MESG("view_note: %X %X FSNOTES=%X",cbfp->b_flag,b_flag, FSNOTES);
 	if( b_flag == FSNOTESN
 		|| b_flag & FSNLIST
 	) {
-		MESG("->edit_note");
+		// MESG("->edit_note");
 		return edit_note(0);
 	} else if (b_flag & FSNOTES) {
-		MESG("->show_category");
+		// MESG("->show_category");
 		return show_category_list(get_current_tag_name());
 	} else return false;
 }
@@ -1544,7 +1547,7 @@ int delete_noteid(int note_id)
 	sqlite3 *db;
 	char sql_str[MAXLLEN];
 	if(note_id>0){
-	MESG("delete_noteid: %d",note_id);
+	// MESG("delete_noteid: %d",note_id);
 		if((db=notes_db_open())==NULL) return false;
 	
 			// delete note
@@ -1570,7 +1573,7 @@ int delete_tagnote(int n)
   int b_flag = (cbfp->b_flag >>8) << 8;
   if(b_flag == FSNLIST) {
 	int note_id = get_current_note_id();
-	MESG("delete_tagnote: list");
+	// MESG("delete_tagnote: list");
 
 	char *full_name = get_current_note_name();
  	if(!confirm("Delete note",full_name,0)) return false;
@@ -1578,7 +1581,8 @@ int delete_tagnote(int n)
 	 	MESG("edit_note: note name is null!");
 		return false;
 	};
-	MESG("delete_tagnote: full_name=[%s] id=%d",full_name,note_id);	
+
+	// MESG("delete_tagnote: full_name=[%s] id=%d",full_name,note_id);	
 	// delete note file
 	if(!delete_note_file(full_name))
 	{
@@ -1603,7 +1607,7 @@ int delete_tagnote(int n)
 	int tag_id = get_current_tag_id();
 	strcpy(tag_name, get_current_tag_name());
 	if(!confirm("Delete tag",tag_name,0)) return false;
-	MESG("delete_tagnote: line=%d tag_id=%d name %s",cwp->current_tag_line,tag_id,tag_name);
+	// MESG("delete_tagnote: line=%d tag_id=%d name %s",cwp->current_tag_line,tag_id,tag_name);
 
 	sprintf(sql_str,"select count (tag_id) from tags where tag_id = %d;",tag_id);
 	count = query_int1(db, sql_str);

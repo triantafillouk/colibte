@@ -1,6 +1,7 @@
 /*
 	common functions for menu support
 */
+extern MENUS *start_menu;
 
 int work_menu(int n)
 {

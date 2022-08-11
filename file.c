@@ -389,6 +389,9 @@ int close_file(int n)
 		};
 	};
 
+	if(cbfp->connect_buffer!=NULL) {
+		f_previous=cbfp->connect_buffer;
+	} else {
 	/* find the previous buffer in buffer list */
 	lfind_data((void *)f_toclose,file_list);
 	lmove_to_previous(file_list,1);
@@ -405,6 +408,7 @@ int close_file(int n)
 	if(f_previous==NULL) {
 		// this is the only edited file, just quit
 		quit(1);
+	};
 	};
 
 	if(cbfp == f_toclose) {

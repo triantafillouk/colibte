@@ -12,6 +12,7 @@ extern int nnarg;
 extern FILEBUF *cbfp;
 
 GtkWidget *wlist;
+MENUS *start_menu = &m_topn;
 
 int confirm(char *title,char *prompt,int always) {
   int result; 
@@ -1731,6 +1732,36 @@ int text_mouse_right_press(int n)
 int text_mouse_error(int n)
 {
 	return FALSE;
+}
+
+int execute_menu(int n)
+{
+ FILEBUF *fp=cbfp;
+	if(fp->b_flag & FSDIRED && fp->b_flag & FSNLIST) {
+		if(fp->b_flag & FSNLIST) {
+			start_menu = &m_sort;	/* or a dir menu !!!!  */
+			drv_show_menu_popup(popup_sort_menu);
+		} else {
+			if (cwp->selection) drv_show_menu_popup(popup_select_on);
+			else drv_show_menu_popup(popup_select_off);
+		};
+	} 
+#if	TNOTES
+	else if(fp->b_flag & FSNOTES) {
+	 	// start_menu=&m_notes_tag;
+	} else if(fp->b_flag & FSNLIST) {
+	 	// start_menu=&m_notes_tag;
+	} 
+#endif
+	else {
+			if (cwp->selection) drv_show_menu_popup(popup_select_on);
+			else drv_show_menu_popup(popup_select_off);
+	};
+
+//	events_flush();
+	set_update(cwp,UPD_MOVE);
+//	update_screen(TRUE);
+	return 1;
 }
 
 /* -- */

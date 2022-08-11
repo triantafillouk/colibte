@@ -418,13 +418,5 @@ int arrange_window(WINDP *wp,int mouse_y)
  return(1); 
 }
 
-int execute_menu(int n)
-{
-	drv_show_menu_popup(popup_sort_menu);
-//	events_flush();
-	set_update(cwp,UPD_MOVE);
-//	update_screen(TRUE);
-	return 1;
-}
 
 /* -- */
