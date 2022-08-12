@@ -20,10 +20,12 @@ void allocate_array(struct array_dat *adat);
 void init_array(struct array_dat *array, int rows,int cols)
 {
 	int ctype=VTYPE_ARRAY;	/* default is numeric!!  */
+	MESG("ex_nums=%d ex_nquote=%d ex_nvars=%d",ex_nums,ex_nquote,ex_nvars);
 	if(ex_nums) ctype=VTYPE_ARRAY;
 	else if(ex_nquote) ctype=VTYPE_SARRAY;
 	else if(ex_nquote>0 && ex_nums>0) ctype=VTYPE_AMIXED;
 	else if(ex_nvars) ctype=VTYPE_DYNAMIC;
+	MESG("ctype=%d",ctype);
 	array->rows=rows;
 	array->cols=cols;
 	array->atype=ctype;
@@ -32,7 +34,8 @@ void init_array(struct array_dat *array, int rows,int cols)
 	ex_vtype=ctype;
 	/* init again after use the ex values!  */
 	ex_nums=0;ex_nquote=0;ex_nvars=0;
-	ex_vtype=VTYPE_ARRAY;
+	// ex_vtype=VTYPE_ARRAY;
+	MESG("init_array: type=%d",ex_vtype);
 }
 
 
@@ -78,6 +81,7 @@ void free_array(char *spos,struct array_dat *adat)
 void allocate_array(struct array_dat *adat)
 {
  int i;
+ MESG("allocate_array: astat=%d type=%d",adat->astat,adat->atype);
  if(adat->astat==0 || adat->atype==VTYPE_DYNAMIC) {	/* new/renew  */
  	if(adat->atype==VTYPE_ARRAY) {	/* allocate num array  */
 
@@ -106,6 +110,7 @@ void allocate_array(struct array_dat *adat)
 
 	};
 	if(adat->atype==VTYPE_SARRAY) {	/* allocate string array  */
+		MESG("	allocate string array %d rows, %d cols",adat->rows,adat->cols);
 	 	if(adat->dat != NULL) free(adat->dat);	/* free string array  */
 		adat->sval=(char **)malloc(sizeof(char *)*adat->rows*adat->cols);
 		for(i=0;i< adat->rows*adat->cols;i++) adat->sval[i]=NULL;

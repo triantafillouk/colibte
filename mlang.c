@@ -1043,6 +1043,7 @@ double factor_line_array()
 	cdim=1;
 	ex_array=adat;
 	ex_name="Definition";
+	MESG("factor_line_array:");
 	allocate_array(ex_array);
 	NTOKEN2;
 	while(cdim>0){
@@ -1059,6 +1060,10 @@ double factor_line_array()
 				if(adat->cols>1) adat->dval[i]=value;
 				else adat->dval[j]=value;
 			};
+		};
+		if(adat->atype==VTYPE_SARRAY) {
+			MESG("	add row%d col=%d [%s]",i,j,slval);
+			if(slval!=NULL)	adat->sval[cols*j+i]=strdup(slval);
 		};
 		i++;if(i>cols) cols=i;
 		if(tok->ttype==TOK_SHOW || tok->ttype==TOK_RBRAKET) {
@@ -1092,6 +1097,11 @@ double factor_variable()
 			NTOKEN2;
 			RTRN(lsslot->dval);
 		case VTYPE_ARRAY:
+			ex_array=lsslot->adat;
+			ex_name=tok->tname;
+			NTOKEN2;
+			RTRN(lsslot->dval);
+		case VTYPE_SARRAY:
 			ex_array=lsslot->adat;
 			ex_name=tok->tname;
 			NTOKEN2;
