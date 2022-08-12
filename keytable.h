@@ -1,5 +1,5 @@
 /*
-	colibte. Curses,gtk editor,notes,directory browser
+	Curses,gtk editor,notes,directory browser
 	Copyright Kostas Triantafillou
 	GNU LESSER GENERAL PUBLIC LICENSE version 2 
 	(or at your option) any later version.

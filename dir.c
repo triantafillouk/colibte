@@ -326,24 +326,18 @@ int dir_edit(int n)
 	if(!IS_FLAG(cbfp->b_state,FS_VIEWA)) return (TRUE);
 
 	// MESG("flags b_state=0x%X b_flag=0x%X b_type=0x%X",cbfp->b_state,cbfp->b_flag,cbfp->b_type);
-#if	1
-    num offset;
+    num offset=tp_offset(cwp->tp_current);;
+	FILEBUF *is_connected_to = cbfp->connect_buffer;
 	int ppline = tp_line(cwp->tp_current)-tp_line(cwp->tp_hline)+1;
-#endif
 	
 	if(snprintf(fname,MAXFLEN,"%s/%s",cbfp->b_dname,cbfp->b_fname) >= MAXFLEN) {
 		return(TRUE);
 	};
 
 	vb = cbfp;
-#if	1
-	offset=tp_offset(cwp->tp_current);
-#endif
 	b = new_filebuf(dir_name(vb->dir_num),0);
 	// MESG("set connect buffer !!");
-
 	b->b_type = cbfp->b_type;
-	FILEBUF *is_connected_to = cbfp->connect_buffer;
 	int is_type = cbfp->b_type;
 
 	select_filebuf(b);
@@ -1532,6 +1526,7 @@ int dir_getfile(char *fname,int flag)
 	if(S_ISDIR(t.st_mode)) return FTYPE_DIRLINK;
 	else return FTYPE_NORMAL;
  };
+ 
  return(ftype); 
 }
 

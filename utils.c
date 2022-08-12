@@ -360,18 +360,14 @@ int lstartwith(char *line,char c)
 
 void set_full_name(char *full_name,char *dir_name,char *file_name,int len)
 {
-#if	1
 	if(dir_name[0]==0) {
 		strlcpy(full_name,getcwd(NULL,MAXFLEN),len);
 		strlcat(full_name,"/",len);
 		strlcat(full_name,file_name,len);
 	
 	} else {
-#endif
 		strlcpy(full_name,dir_name,len);
 		strlcat(full_name,"/",len);
 		strlcat(full_name,file_name,len);
-#if	1
 	}
-#endif
 }

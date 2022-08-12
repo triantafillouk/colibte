@@ -5,9 +5,10 @@
 	(or at your option) any later version.
 
 	Link list (double linked lists) support functions
+	Copywrite Kostas Triantafillou 2005
 */
 
-/* version 14/10/2020 */
+/* version 10/8/2022 */
 #define	FULL 0
 #include "alist.h"
 #include <stdlib.h>
@@ -25,6 +26,7 @@ void MESG(const char *fmt, ...);
 }
 #endif
 
+/* simple string compare */
 int scmp(const char *s1,const char *s2)
 {
 	while(*s1 && *s1 == *s2){
@@ -161,14 +163,6 @@ void pop_current(alist *li)
 }
 #endif
 
-/* close list (add the first element at the end */
-void close_list(alist *list)
-{
- void *d;
- d = list->head->data;
- add_element_to_list(d,list);
-}
-
 /* insert at current position (ie before current element!) */
 _el * linsert(alist *list,void *d)
 {
@@ -249,7 +243,7 @@ void lbegin(alist *l)
 }
 
 /* move current to end of the list */
-inline void lend(alist *l)
+void lend(alist *l)
 {
  l->current = l->last;
 }
@@ -264,6 +258,7 @@ void *lget(alist *l)
  return(d);
 } 
 
+#if	NUSE
 // get last no move
 void *lget_last_nomove(alist *l)
 {
@@ -272,6 +267,7 @@ void *lget_last_nomove(alist *l)
  d=l->last->data;
  return(d);
 }
+#endif
 
 // get last, and remove it from list
 void *lpop(alist *l)
@@ -281,7 +277,7 @@ void *lpop(alist *l)
  if(l->last == NULL) return NULL;
  d=l->last->data;
  p=l->last;
-// printf("lpop: remove last from list!");
+// printf("lpop: remove last from list!\n");
  // remove it from list
  if(l->last==l->head) {
  	l->last=l->head=NULL;
@@ -310,7 +306,7 @@ void *lget_current(alist *l)
 {
  if(l==NULL) { 	/* List is empty!  */
 	return NULL;
- }
+ };
  if(l->current == NULL) {
 	return NULL;
  };
@@ -335,7 +331,7 @@ _el *get_current(alist *l)
  return(l->current);
 }
 
-
+#if	NUSE
 void find_current(alist *l, _el *el)
 {
  _el *pel;
@@ -344,6 +340,7 @@ void find_current(alist *l, _el *el)
  };
  l->current = el;
 }
+#endif
 
 /* set data of current */
 void lset_current(alist *l,void *data)
@@ -360,13 +357,11 @@ void lmove_to_next(alist *l,int circ)
  if(l->current == l->last && circ) { 
  		l->current = l->head;
  } else {
-	if(l->current==0) { 
-		}
- 	else l->current = l->current->next;
+	if(l->current!=NULL) l->current = l->current->next;
  }
 }
 
-// move to next circular
+// move to next not circular
 void lmove_to_nextnc(alist *l)
 {
 	if(l->current!=NULL) l->current = l->current->next;
@@ -523,7 +518,7 @@ void show_string_list(alist *list,char *title)
  list->current=current;
 }
 
-#if	FULL
+#if	NUSE
 /* delete current element, next element becomes current */
 /* frees also the data */
 /* use remove_current_from_list instead! */
@@ -561,6 +556,8 @@ int  delete_current(alist *list)
 	list->array_valid=0;
 	if(pi!=NULL) free(pi);
 	return 1;
+
+ return 0;
 }
 #endif
 
@@ -592,6 +589,7 @@ int move_down(void *data,alist *pl)
 int  remove_current_from_list(alist *list)
 {
  _el *pi,*prev;
+
  pi = list->current;
  if(pi==NULL) return 0;	// empty list
  if(list->head == pi) {	// this is the head to remove
@@ -623,6 +621,7 @@ int  remove_current_from_list(alist *list)
 	if(list->current!=NULL) return 1; 
 	else return 0;
 }
+
 
 /* free element and data from a list */
 void empty_list(alist *list)
@@ -702,7 +701,7 @@ void free_list(alist *list,char *title)
 void show_alist(alist *pl)
 {
  _el *pel;
- for(pel=pl->head;pel!=NULL;pel=pel->next) {next
+ for(pel=pl->head;pel!=NULL;pel=pel->next) {
   MESG(": %ld p=%ld n=%ld",(long)pel,(long)pel->prev,(long)pel->next);
  };
  if(pl->last!=NULL) MESG("last: %ld p=%ld n=%ld",(long)pl->last,(long)pl->last->prev,(long)pl->last->next);
@@ -762,11 +761,9 @@ void **array_data(alist *list)
  	};
 	list->data[i]=NULL;
 	list->array_valid=1;
-	return(list->data);
- } else {
-// 	MESG("valid: elements %d",list->size);
- 	return(list->data);
+
  };
+ return(list->data);
 }
 
 /* create a list from a string list */
