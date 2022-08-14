@@ -1398,13 +1398,15 @@ int file_read(FILEBUF *bp, char *fname)
 int file_read1(FILEBUF *bp, char *fname)
 {
  if(!execmd) msg_line(" reading file: %s",fname);
-// MESG("file_read1:");
+ MESG("file_read1:");
  /* clear the buffer */
  if(empty_filebuf(bp)!=TRUE) return FALSE;
-
+ 
  if(!ifile(bp,fname,0)) return(FALSE);
+ MESG("file_read1: 1");
  bp->b_flag &= ~FSINVS;
  bp->b_state &= ~FS_CHG;
+ MESG("file_read1: end");
  return TRUE; 
 }
 

@@ -171,7 +171,7 @@ int read_pairs(char *fname,char delimiter,char ***name,char ***value)
 	int delimit_ok=0;
  	s[strlen(s)-1]=0; // remove newline
 	if(strlen(s)==0) continue;
-	if(s[0]=='#' || s[0]==';') continue;
+	if(s[0]=='#' || s[0]==';'||s[0]=='[') continue;
 	cp1=s;
 	cp2=NULL;
 	while( *cp1++) {

@@ -18,6 +18,32 @@ struct {
 	char *configfile;
 } app_cfg;
 
+char *flags_array[] = {
+	"keyboard_emulation",
+	"make_backup"        ,
+	"show_hex"           ,
+	"fillcol"            ,
+	"tabsize"            ,
+	"embed_icons"        ,
+	"show_position"      ,
+	"show_vinfo"         ,
+	"show_vmlines"       ,
+	"show_coffset"       ,
+	"show_cdata"         ,
+	"save_history"       ,
+	"large_toolbar_icons",
+	"safe_ops"           ,
+	"use_titlebar"       ,
+	"color_scheme"       ,
+	"xcolor_scheme"      ,
+	NULL
+};
+
+int flag_defaults[] = {
+	0, 0,	0,	72,	4,	0,	1,	0,	0,	0,	1,	0,	1,	1,	1,	2,	2,
+	-1
+};
+
 #if	NUSE
 /* get a string from configuration */
 char * get_cfg_str(char *label, char *default_str)
@@ -95,6 +121,31 @@ double  get_cfg_val(char *label,double default_val)
 
 extern int color_scheme_ind;
 
+#if	1
+void load_config()
+{
+ MESG("load_config:");
+#if	1
+ char *fname = find_file(NULL,CONFIGFILE,0,0);
+ if(fname==NULL) return;
+ int i=0;
+ char **name_array;
+ char **value_array;
+ char *flag_name;
+ int pair_nums=0;
+ pair_nums=read_pairs(fname,'=',&name_array,&value_array);
+ if(pair_nums) {
+	for(flag_name=name_array[i];(flag_name=name_array[i])!=NULL;i++){
+		MESG("set [%s] to %d",flag_name,atoi(value_array[i]));
+		set_btval(flag_name,-1,NULL,atoi(value_array[i]));
+	};
+ };
+//  sarray_clear(name_array);
+ // sarray_clear(value_array);
+#endif
+MESG("configuration loaded!");
+}
+#else
 /* load configuration */
 void load_config()
 {
@@ -154,9 +205,27 @@ void load_config()
 
 //	MESG("configuration loaded!");
 }
+#endif
 
-/* save configuration */
+#if	1
 void save_config()
+{
+ char *fname = find_file(NULL,CONFIGFILE,0,1);
+ FILE *f = fopen(fname,"w");
+ char *flag_name;
+ int i=0;
+ MESG("save_config: to [%s]",fname);
+
+ fprintf(f,"[%s]\n",APPLICATION_NAME);
+ for(flag_name=flags_array[i];(flag_name=flags_array[i])!=NULL;i++) {
+	MESG("flag %d: [%s]",i,flag_name);
+	fprintf(f,"%s=%d\n",flag_name,(int)bt_dval(flag_name));
+ };
+ fclose(f);
+}
+#else
+/* save configuration */
+void save_config1()
 {
 	GError *gerror = NULL;
 	gsize len = 0;
@@ -195,9 +264,7 @@ void save_config()
 	g_key_file_free(app_cfg.cfg);
 	g_free(app_cfg.configfile);
 }
-
-
-
+#endif
 
 int save_keys()
 {
