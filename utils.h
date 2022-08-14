@@ -11,7 +11,7 @@
 #define	_UTILS_
 double  show_time(char *description,int init);
 int vfind(char *s,char *m[],int nu);
-int read_pairs(char *fname,int fcomment,char delimiter,char ***name,char ***value);
+int read_pairs(char *fname,char delimiter,char ***name,char ***value);
 void sarray_clear(char **array); /* free a string array */
 void sarray_clear_data(char **array);
 void revstr(char *st); /* reverse a string */

@@ -1682,7 +1682,7 @@ int menufile(int n)
  char *exec_s;	/* execute string */
  if((fname = find_file(NULL,APPLICATION_USER_MENU,1,0))==NULL) return FALSE;
 
- nu=read_pairs(fname,2,';',&ddnames,&ddvalue);
+ nu=read_pairs(fname,';',&ddnames,&ddvalue);
  if(nu<1) { msg_line("user menu not found");return 0;};
  if(macro_exec) { 
  	if(n>0) s=n-1;else return 0;

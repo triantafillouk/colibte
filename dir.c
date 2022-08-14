@@ -827,7 +827,7 @@ void init_extensions()
 
  if((fname = find_file(NULL,APPLICATION_EXTENSIONS,1,0))==NULL) return;
 
- read_pairs(fname,2,'=',&f_extension,&f_extcmd);
+ read_pairs(fname,'=',&f_extension,&f_extcmd);
  // MESG("init_extentions: file=[%s]",fname);
 // for(int i=0;f_extcmd[i]!=NULL;i++) MESG("%d: %s=%s",i,f_extension[i],f_extcmd[i]);
 }
