@@ -2616,12 +2616,7 @@ int color_scheme_read()
  COLOR_SCHEME *scheme=NULL;
 
 // MESG("color_scheme_read:");
- strcpy(name1,".colors16");
- fname=find_file(NULL,name1,1);
- if(fname==NULL) { 
- 	ERROR("color_scheme_read: cannot open %s",name1);
-	return 0;
- };
+ if((fname=find_file(NULL,".colors16",1,0))==NULL) return FALSE;
 
  f1=fopen(fname,"r");
  if(f1!=NULL) {
@@ -2712,20 +2707,13 @@ int color_scheme_save()
  FILE *f1;
  char *fname;
  char buf[MAXFLEN];
- static char name1[MAXFLEN];
  int i;
  int scheme_ind;
  int sstat=0;
 
- sstat=snprintf(name1,MAXFLEN,".colors16a");
- fname=find_file(NULL,name1,0);
- if(fname==NULL) { // create a new file under home . dir
- 	sstat=snprintf(buf,MAXFLEN,"%s/.%s/%s",getenv("HOME"),APPLICATION_NAME,name1);
-	fname=buf;
-	f1=fopen(fname,"w+");
- } else {
-	f1=fopen(fname,"w");
- };
+ fname=find_file(NULL,".colors16a",0,1);
+
+ f1=fopen(fname,"w");
  if(sstat>MAXFLEN) return FALSE;
  if(f1!=NULL) {
 

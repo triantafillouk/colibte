@@ -825,7 +825,7 @@ void init_extensions()
 
  set_start_dir(NULL);
 
- fname = find_file(NULL,APPLICATION_EXTENSIONS,1);
+ if((fname = find_file(NULL,APPLICATION_EXTENSIONS,1,0))==NULL) return;
 
  read_pairs(fname,2,'=',&f_extension,&f_extcmd);
  // MESG("init_extentions: file=[%s]",fname);

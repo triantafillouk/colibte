@@ -53,7 +53,7 @@ char *get_dir_name(char *full_name);
 char *get_base_name(char *full_name);
 
 /* find a file in a path */
-char *find_file(char *subdir, char *fname, int check_start_dir);
+char *find_file(char *subdir, char *fname, int check_start_dir,int create_if_not_found);
 
 /* check if file exists */
 int file_exist(char *fname);

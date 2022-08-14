@@ -1680,10 +1680,7 @@ int menufile(int n)
  char **ddnames;
  char **ddvalue;
  char *exec_s;	/* execute string */
- fname = find_file(NULL,APPLICATION_USER_MENU,1); /* strlcpy(fname,"em0.mnu",MAXFLEN); */
-
- //if(list_on()) return 0;
-// set_list_type(4);
+ if((fname = find_file(NULL,APPLICATION_USER_MENU,1,0))==NULL) return FALSE;
 
  nu=read_pairs(fname,2,';',&ddnames,&ddvalue);
  if(nu<1) { msg_line("user menu not found");return 0;};
@@ -1820,15 +1817,10 @@ int add_to_recent_list(char *full_file_name)
 
 int save_file_history(int n)
 {
- char fname_s[MAXFLEN];
  char *fname;
  if(bt_dval("save_history")==0) return 0;
 // MESG("save_file_history:");
- fname = find_file(NULL,APPLICATION_HISTORY,1);
- if(fname==NULL) { 
-	snprintf(fname_s,MAXFLEN,"%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,APPLICATION_HISTORY);
-	fname=fname_s;
- };
+ fname = find_file(NULL,APPLICATION_HISTORY,1,1);
 // MESG("save_file_history: %s",fname);
  return save_list_array(fname,recent_file_list);
 }
@@ -1837,9 +1829,9 @@ int read_file_history(int n)
 {
  char *fname;
 
- fname = find_file(NULL,APPLICATION_HISTORY,1);
+ if((fname = find_file(NULL,APPLICATION_HISTORY,1,0))==NULL) return FALSE;
  recent_file_list=new_list(0,"read_file_history");
- if(fname==NULL) return(0);
+
 // MESG("read_file_history: from [%s]",fname);
  read_list_array(fname,recent_file_list);
 // show_string_list(recent_file_list,"after read history");
@@ -1855,7 +1847,7 @@ int open_recent_file(int n)
  int lheight=20;
  int err;
 
- fname = find_file(NULL,APPLICATION_HISTORY,1);
+ fname = find_file(NULL,APPLICATION_HISTORY,1,0);
  if(fname==NULL) return(0);
 
  recent_files = (char **)array_data(recent_file_list);

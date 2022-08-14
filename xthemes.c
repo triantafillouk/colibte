@@ -14,18 +14,15 @@ int color_scheme_read()
 {
  FILE *f1;
  char *fname;
- static char name1[MAXFLEN];
  char *b,bline[MAXFLEN];
+ char name1[MAXFLEN];
  int i,j;
  char left;
  int scheme_ind=0;
 // MESG("color_scheme_read:");
- strlcpy(name1,".xcolors",MAXFLEN);
- fname=find_file(NULL,name1,0);
- if(fname==NULL) { 
-// 	ERROR("color_scheme_read: cannot open %s",name1);
-	return 0;
- };
+
+ if((fname=find_file(NULL,".colors",0,0))==NULL) return FALSE;
+
  f1=fopen(fname,"r");
  if(f1!=NULL) {
 
@@ -62,23 +59,13 @@ int color_scheme_save()
 {
  FILE *f1;
  char *fname;
- char buf[MAXFLEN];
- static char name1[MAXFLEN];
  int i;
  int scheme_ind;
- int stat=0;
 
 // sprintf(name1,".color%1d.col",scheme_ind);
- strlcpy(name1,".xcolors",MAXFLEN);
- fname=find_file(NULL,name1,0);
- if(fname==NULL) { // create a new file under home dir . app dir
- 	stat=snprintf(buf,MAXFLEN,"%s/.%s/%s",getenv("HOME"),APPLICATION_NAME,name1);
-	if(stat>MAXFLEN) { MESG("truncated color file");return FALSE;};
-	fname=buf;
-	f1=fopen(fname,"w+");
- } else {
-	f1=fopen(fname,"w");
- };
+ fname=find_file(NULL,".xcolors",0,1);
+ f1=fopen(fname,"w");
+
  if(f1!=NULL) {
 	 for(scheme_ind=0;scheme_ind<COLOR_SCHEMES;scheme_ind++)
 	 {

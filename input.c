@@ -483,11 +483,8 @@ int load_keys()
  static char name1[MAXFLEN];
 
  strcpy(name1,APPLICATION_KEYS);
- fname=find_file(NULL,name1,0);
- if(fname==NULL) { 
- 	SYS_ERROR("load_keys: cannot open %s",name1);
-	return 0;
- };
+ if((fname=find_file(NULL,name1,0,0)) == NULL) return FALSE;
+
  f1=fopen(fname,"r");
 
  while(fgets(str_line,MAXLLEN,f1)){

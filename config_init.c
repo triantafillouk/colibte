@@ -204,17 +204,10 @@ int save_keys()
  FILE *f1;
  char *fname;
  int stat=0;
- static char name1[MAXFLEN];
  char key_line[MAXLLEN];
  AKEYS *key;
 
- strcpy(name1,APPLICATION_KEYS);
- fname=find_file(NULL,name1,0);
- if(fname==NULL) {
-	snprintf(name1,MAXFLEN,"%s/%s",getenv("HOME"),APPLICATION_KEYS);
-//	MESG("save_keys: to [%s]",name1);
-	fname=name1;
- };
+ fname=find_file(NULL,APPLICATION_KEYS,0,1);
  f1=fopen(fname,"w");
  lbegin(local_key_list);
  while( (key=(AKEYS *)lget(local_key_list))!=NULL)

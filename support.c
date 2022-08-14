@@ -228,7 +228,7 @@ int file_exist(char *fname)
  return FALSE;
 }
 
-char *find_file(char *subdir, char *fname, int check_start_dir)
+char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_not_found)
 {
 	char *path;	/* environmental PATH variable */
 	char *sp;	/* pointer into path spec */
@@ -285,7 +285,13 @@ char *find_file(char *subdir, char *fname, int check_start_dir)
 			if(file_exist(fspec)) return(fspec);
 
 			if (*path == PATHCHR) ++path;
-		}
+		};
+	if(create_if_not_found) {	/* Create it in . hme dir  */
+		slen=snprintf(fspec,MAXFLEN,"%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,subdir,fname);
+		MESG("create new file [%s]",fspec);
+		return(fspec);
+	} else
+	MESG("file [%s] not found!",fname);
 	return(NULL);
 }
 

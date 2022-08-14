@@ -694,7 +694,7 @@ int exec_file(int n)
 		return(status);
 	}
 	/* look up the path for the file */
-	if(fname[0]!='/' && fname[0]!=CHR_LBRA) fspec = find_file("cmds",fname,1);
+	if(fname[0]!='/' && fname[0]!=CHR_LBRA) fspec = find_file("cmds",fname,1,0);
 	else fspec=fname;
 	if(fspec==NULL) fspec=fname;	/* if not found try relative to current dir!  */
 	/* if it isn't around */

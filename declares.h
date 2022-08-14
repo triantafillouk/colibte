@@ -321,7 +321,7 @@ int unassign_key(int n);
 int describe_key(int n);
 int getckey();
 int startup(char *sfname);
-char *find_file(char *subdir,char *fname,int cflag);
+char *find_file(char *subdir,char *fname,int cflag,int create_if_not_found);
 char *cmdstr(int c);
 char *function_name(int (*func)(), char **description);
 int execsub(int i);
