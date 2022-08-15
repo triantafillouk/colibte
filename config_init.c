@@ -18,32 +18,6 @@ struct {
 	char *configfile;
 } app_cfg;
 
-char *flags_array[] = {
-	"keyboard_emulation",
-	"make_backup"        ,
-	"show_hex"           ,
-	"fillcol"            ,
-	"tabsize"            ,
-	"embed_icons"        ,
-	"show_position"      ,
-	"show_vinfo"         ,
-	"show_vmlines"       ,
-	"show_coffset"       ,
-	"show_cdata"         ,
-	"save_history"       ,
-	"large_toolbar_icons",
-	"safe_ops"           ,
-	"use_titlebar"       ,
-	"color_scheme"       ,
-	"xcolor_scheme"      ,
-	NULL
-};
-
-int flag_defaults[] = {
-	0, 0,	0,	72,	4,	0,	1,	0,	0,	0,	1,	0,	1,	1,	1,	2,	2,
-	-1
-};
-
 #if	NUSE
 /* get a string from configuration */
 char * get_cfg_str(char *label, char *default_str)
@@ -68,6 +42,7 @@ void set_cfg_str(char *label, char *str_val)
 }
 #endif
 
+#if	NUSE
 /* get an int variable from configuration */
 int  get_cfg_int(char *label,int default_val)
 {
@@ -88,7 +63,9 @@ int  get_cfg_int(char *label,int default_val)
 //	MESG("get_cfg_int:[%s] %d",label,dval);
 	return dval;
 }
+#endif
 
+#if	NUSE
 /* set an int configuration variable */
 void set_cfg_int(char *label,int ival)
 {
@@ -100,7 +77,9 @@ void set_cfg_int(char *label,int ival)
 	g_key_file_set_value(app_cfg.cfg, cfg_group, label, cfg_val);
 	g_free(cfg_val);
 }
+#endif
 
+#if	NUSE
 /* get a double float variable from configuration */
 double  get_cfg_val(char *label,double default_val)
 {
@@ -118,17 +97,20 @@ double  get_cfg_val(char *label,double default_val)
 	g_free(cfg_val);
 	return dval;
 }
+#endif
 
 extern int color_scheme_ind;
 
 #if	1
+extern VAR option_names[];
+
 void load_config()
 {
- MESG("load_config:");
-#if	1
- char *fname = find_file(NULL,CONFIGFILE,0,0);
- if(fname==NULL) return;
  int i=0;
+ MESG("load_config:");
+ char *fname = find_file(NULL,CONFIGFILE,0,0);
+
+ if(fname) {
  char **name_array;
  char **value_array;
  char *flag_name;
@@ -136,14 +118,17 @@ void load_config()
  pair_nums=read_pairs(fname,'=',&name_array,&value_array);
  if(pair_nums) {
 	for(flag_name=name_array[i];(flag_name=name_array[i])!=NULL;i++){
-		MESG("set [%s] to %d",flag_name,atoi(value_array[i]));
+		MESG("	- set [%s] to %d",flag_name,atoi(value_array[i]));
 		set_btval(flag_name,-1,NULL,atoi(value_array[i]));
 	};
  };
-//  sarray_clear(name_array);
- // sarray_clear(value_array);
-#endif
-MESG("configuration loaded!");
+ // find_btnode(bt_table,name);
+ sarray_clear(name_array);
+ sarray_clear(value_array);
+ };
+ set_key_emulation((int)bt_dval("keyboard_emulation"));
+
+ MESG("configuration loaded!");
 }
 #else
 /* load configuration */
@@ -212,14 +197,15 @@ void save_config()
 {
  char *fname = find_file(NULL,CONFIGFILE,0,1);
  FILE *f = fopen(fname,"w");
- char *flag_name;
  int i=0;
- MESG("save_config: to [%s]",fname);
+ // MESG("save_config: to [%s]",fname);
 
  fprintf(f,"[%s]\n",APPLICATION_NAME);
- for(flag_name=flags_array[i];(flag_name=flags_array[i])!=NULL;i++) {
-	MESG("flag %d: [%s]",i,flag_name);
-	fprintf(f,"%s=%d\n",flag_name,(int)bt_dval(flag_name));
+ VAR *var;
+ i=0;var=&option_names[i];
+ while(var->name) {
+	fprintf(f,"%s=%d\n",var->name,(int)bt_dval(var->name));
+	i++;var=&option_names[i];
  };
  fclose(f);
 }
