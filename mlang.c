@@ -2494,7 +2494,6 @@ double exec_block1(int level)
  double val=0;
  stage_level=0;
  TDS("exec_block1");
-// MESG("exec_block1:");
    while(1) 
    {
 	switch(tok->ttype){
@@ -2517,7 +2516,6 @@ double exec_block1(int level)
 			continue;
 			};
 	 };
-
 	if(drv_check_break_key()) {
 		syntax_error("user interruption",100);
 		if(is_break1) return 0;
@@ -2539,7 +2537,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  tok_struct *old_tok=tok;
  // MESG("compute_block: %s",bp->b_fname);
  if(use_fp->symbol_tree==NULL) {
-// 	MESG("create new symbol_tree for use_fp!");
+	// MESG("create new symbol_tree for use_fp!");
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);
 	extra=100;
 	use_fp->symbol_tree->max_items=extra;
@@ -2547,9 +2545,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	if(current_stable==NULL) {
 		current_stable=new_symbol_table(use_fp->symbol_tree->max_items);
 	};
-	// MESG("compute_block\n");
 	parse_block1(bp,use_fp->symbol_tree,start,extra);
-	// MESG("after parse block\n");
 
 	if(start) {
 		local_symbols=new_symbol_table(bp->symbol_tree->max_items);
