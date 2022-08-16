@@ -16,6 +16,7 @@
 
 void set_box_background_color(GtkWidget *box,char *bgcolor);
 void set_box_color(GtkWidget *box,char *color,char *bgcolor);
+char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_not_found);
 
 GtkWidget *kt_new_listview(GtkListStore *store, GtkWidget *parent_box, gchar **ctitles,int show_titles)
 {

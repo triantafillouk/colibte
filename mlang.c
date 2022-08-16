@@ -17,6 +17,7 @@
 #define	SYNTAX_DEBUG	0
 #define	NTOKEN2	tok++
 #define FACTOR_FUNCTION tok->factor_function()
+#define	USE_SARRAYS	1
 
 void mesg_out(const char *fmt, ...);
 extern FILEBUF *cbfp;
@@ -728,7 +729,9 @@ MVAR * push_args_1(int nargs)
 			va_i->sval=strdup(slval);
 			break;
 		case VTYPE_ARRAY:
+		case VTYPE_SARRAY:
 			va_i->adat=ex_array;
+			va_i->vtype=ex_array->atype;
 			break;
 		default:
 			ERROR("error: wrong type arg %d",ex_vtype);
@@ -769,7 +772,7 @@ double eval_fun1(int fnum)
 			NTOKEN2;
 			vv[i] = num_expression();
 			if(ex_vtype==VTYPE_STRING) strlcpy(arg[i],slval,MAXLLEN);
-			else if (ex_vtype==VTYPE_ARRAY) arr=ex_array;
+			else if (ex_vtype==VTYPE_ARRAY||ex_vtype==VTYPE_SARRAY) arr=ex_array;
 			else arg[i][0]=0;
 		};
 		NTOKEN2;
@@ -951,6 +954,7 @@ double eval_fun1(int fnum)
 				ex_vtype=VTYPE_NUM;
 				break;
 		case UFPRINT:	// to stdio, be carefull CHECK !!!!
+				// MESG("UFPRINT: arr=%d",arr);
 				if(arr) print_array1("",arr);
 				else {
 				if(arg[0][0] !=0 ) {
@@ -1043,7 +1047,7 @@ double factor_line_array()
 	cdim=1;
 	ex_array=adat;
 	ex_name="Definition";
-	MESG("factor_line_array:");
+	// MESG("factor_line_array:");
 	allocate_array(ex_array);
 	NTOKEN2;
 	while(cdim>0){
@@ -1062,7 +1066,7 @@ double factor_line_array()
 			};
 		};
 		if(adat->atype==VTYPE_SARRAY) {
-			MESG("	add row%d col=%d [%s]",i,j,slval);
+			// MESG("	add row %d col=%d [%s]",i,j,slval);
 			if(slval!=NULL)	adat->sval[cols*j+i]=strdup(slval);
 		};
 		i++;if(i>cols) cols=i;
@@ -1078,7 +1082,7 @@ double factor_line_array()
 	};
 	ex_array->astat=1;
 	ex_vtype=adat->atype;
-//		print_array1("",adat);
+	print_array1("",adat);
 	NTOKEN2;
 	RTRN(1.2);
 }
@@ -1097,10 +1101,6 @@ double factor_variable()
 			NTOKEN2;
 			RTRN(lsslot->dval);
 		case VTYPE_ARRAY:
-			ex_array=lsslot->adat;
-			ex_name=tok->tname;
-			NTOKEN2;
-			RTRN(lsslot->dval);
 		case VTYPE_SARRAY:
 			ex_array=lsslot->adat;
 			ex_name=tok->tname;
@@ -2044,7 +2044,7 @@ double assign_val(double none)
 		if(sslot->vtype==VTYPE_STRING) {
 			free(sslot->sval);
 		} else {
-			if(sslot->vtype!=VTYPE_ARRAY)	/* added to handle arrays (v698l) but CHECK!!!!  */
+			if(sslot->vtype!=VTYPE_ARRAY && sslot->vtype!=VTYPE_SARRAY)	/* added to handle arrays (v698l) but CHECK!!!!  */
 				sslot->vtype=ex_vtype;
 			if(ex_vtype==VTYPE_NUM) {
 				*sslot->pdval=v1;
@@ -2054,8 +2054,10 @@ double assign_val(double none)
 				sslot->sval=strdup(slval);
 				return(0);
 			};
-			if(ex_vtype==VTYPE_ARRAY) {
+			if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
+				// MESG("assign array to var!");
 				sslot->adat=ex_array;
+				sslot->vtype=ex_array->atype;
 				if(ex_array->astat==3) ex_array->astat=1;	/* make it local to variable  */
 			};
 		};
@@ -2065,11 +2067,14 @@ double assign_val(double none)
 			sslot->dval=v1;
 			return(v1);
 		};
-		if(ex_vtype==VTYPE_ARRAY) {
+		if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
 //				print_array1("assign array ",ex_array);
 //				print_array1("to array",sslot->adat);
 			if(ex_array->anum != sslot->adat->anum) {
  				if(sslot->adat->dval) free_array("assign",sslot->adat);
+				if(sslot->adat->sval) {
+					// MESG("free string array!");
+				};
 				sslot->adat=ex_array;
 				if(ex_array->astat==3) ex_array->astat=1;	/* make it local to variable  */
 			};
@@ -2103,6 +2108,7 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 			case VTYPE_STRING:
 				arg_dat->sval=va->sval;break;
 			case VTYPE_ARRAY:
+			case VTYPE_SARRAY:
 				arg_dat->adat=va->adat;break;
 			default:
 				ERROR("assign_args:[%d] type is wrong! (%d)",i,va->vtype);
@@ -2219,7 +2225,7 @@ void refresh_ddot_1(double value)
 	} else {	/* a decimal value!  */
 		stat=snprintf(sout,MAXLLEN," %5.*f",precision,value);
 	};
- } else if(ex_vtype==VTYPE_ARRAY) {
+ } else if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
 	array_dat *adat = ex_array;
  	stat=snprintf(sout,MAXLLEN,"array %d, slot %ld rows %d,cols %d",adat->anum,lsslot-current_stable,adat->rows,adat->cols);
 	print_array1(":",adat);
