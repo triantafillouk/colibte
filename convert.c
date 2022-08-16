@@ -129,11 +129,8 @@ int unix2dos(int n)
 /* Character convertions */
 int convert_char(int n)
 {
- num op,lbegin;
+ num op;
  byte c;
- int len,i;
- char *cc1=NULL, *c2;
- num cline;
  FILEBUF *cfp=current_filebuf();
 
  if(test_b_flag(FSDIRED)) return(0);
@@ -141,7 +138,6 @@ int convert_char(int n)
  n--;
  set_update(cwp,UPD_FULL);
  // keep current line
- cline=GetLine();
  if(n<2) { 
  for(op=0;op<FSize(cfp);op++) {
 	c=CharAt(op);
@@ -154,6 +150,10 @@ int convert_char(int n)
  } 
 #if	USE_GLIB
  else { // utf8 conversions
+	char *cc1=NULL,*c2;
+	int len,i;
+	num lbegin;
+	num cline=GetLine();
 	if(n==2) {	// convert from local to utf
 	op=0;
 	lbegin=op;
