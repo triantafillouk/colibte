@@ -245,7 +245,7 @@ GtkWidget* create_pixmap(GtkWidget *widget, char *filename)
   GError *error=NULL;
   
   /* We first try any pixmaps directories set by the application. */
-	if((found_filename = find_file("pixmaps",filename,1,0)==NULL)) return NULL;
+	if((found_filename = find_file("pixmaps",filename,1,0))==NULL) return NULL;
 
 	pixbuf = gdk_pixbuf_new_from_file(found_filename,&error);
 	if(pixbuf) {
