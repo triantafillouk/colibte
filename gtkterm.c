@@ -215,10 +215,17 @@ create_parent (void)
   parent = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   // MESG("create_parent: reset_position=$d",bt_dval("reset_position"));
   if(bt_dval("reset_position")==0) {
+#if	USE_GLIB0
 	  parent_width = get_cfg_int("x11_width",parent_width);
 	  parent_height = get_cfg_int("x11_height",parent_height);
 	  parent_x = get_cfg_int("x11_x",parent_x);
 	  parent_y = get_cfg_int("x11_y",parent_y);
+#else
+	  parent_width  = (int)bt_dval("x11_width");
+	  parent_height = (int)bt_dval("x11_height");
+	  parent_x      = (int)bt_dval("x11_x");
+	  parent_y      = (int)bt_dval("x11_y");
+#endif
   };
 #if	DARWIN
   if(parent_y>=22) parent_y -= 22;

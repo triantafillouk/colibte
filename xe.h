@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.17 (15/8/2022)"
+#define VERSION 	"#01.17 no glib (16/8/2022)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -29,6 +29,7 @@
 #define	USE_UTF8	1	/* Use utf8 characters  */
 
 #define	USE_FAST	1 & PCURSES	/* erase line for double width characters in panel_curses  */
+// #define	USE_GLIB	0
 
 #if	DARWIN
 #define	_FILE_OFFSET_BITS	64

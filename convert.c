@@ -7,8 +7,7 @@
 */
 
 #include	"xe.h"
-#define GLIB	1
-#if	GLIB
+#if	USE_GLIB
 #include	<glib-2.0/glib/gconvert.h>
 #endif
 
@@ -152,7 +151,9 @@ int convert_char(int n)
 		set_Char(op,c);
 	};	
  }
- } else { // utf8 conversions
+ } 
+#if	USE_GLIB
+ else { // utf8 conversions
 	if(n==2) {	// convert from local to utf
 	op=0;
 	lbegin=op;
@@ -231,6 +232,9 @@ int convert_char(int n)
 	};
 	textpoint_set_lc(cwp->tp_current,cline,0);
  };
+#else
+ else return FALSE;
+#endif
  set_modified(cfp);
  return(TRUE);
 }

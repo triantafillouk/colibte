@@ -11,7 +11,7 @@ XLIB=0
 GTK=0
 XPLOT=0
 EMBED_ICONS=0
-
+USE_GLIB=0
 # include support for notes database in sqlite3
 TNOTES=1
 
@@ -22,15 +22,20 @@ _X11_=0
 OSYSTEM=OTHERUNIX
 SHAREDDIR=/usr/share
 
+ifeq ($(USE_GLIB),1)
+GLIB_LIB=`pkg-config glib-2.0 --libs`
+else
+GLIB_LIB=''
+endif
 
 # for Darwin
 ifeq ($(UNAME), Darwin)
 GLIBINCLUDE=`pkg-config glib-2.0 --cflags`
-LPCURSES0=-lpanel -lncurses -L/opt/local/lib `pkg-config glib-2.0 --libs`
+LPCURSES0=-lpanel -lncurses -L/opt/local/lib $(GLIB_LIB)
 OSYSTEM=DARWIN
 SHAREDDIR=/usr/local/share
 X11include=-I/opt/X11/include/
-X11lib0= -lX11 -L/opt/X11/lib  `pkg-config glib-2.0 --libs`
+X11lib0= -lX11 -L/opt/X11/lib $(GLIB_LIB)
 EXTFILE=.$(APP_NAME)_ext_mac
 WSL:=0
 CC=clang
@@ -40,10 +45,10 @@ endif
 # for Linux
 ifeq ($(UNAME), Linux)
 GLIBINCLUDE=`pkg-config glib-2.0 --cflags`
-LPCURSES0=-lpanelw -lncursesw  `pkg-config glib-2.0 --libs`
+LPCURSES0=-lpanelw -lncursesw  $(GLIB_LIBS)
 OSYSTEM=LINUX
 X11include=-I/opt/X11/include/
-X11lib0=-L/usr/X11R6/lib -lX11 -L/opt/X11/lib  `pkg-config glib-2.0 --libs`
+X11lib0=-L/usr/X11R6/lib -lX11 -L/opt/X11/lib 
 WSL:=`uname -a|grep "icrosoft" |wc -l`
 EXTFILE:=.$(APP_NAME)_ext_$(WSL)
 CC=gcc -DWSL=$(WSL) 
@@ -64,7 +69,7 @@ endif
 # for cygwin
 ifeq ($(UNAME), CYGWIN_NT-10.0)
 GLIBINCLUDE=`pkg-config glib-2.0 --cflags`
-LPCURSES0=-lpanelw -lncursesw  `pkg-config glib-2.0 --libs`
+LPCURSES0=-lpanelw -lncursesw  $(GLIB_LIBS)
 OSYSTEM=CYGWIN
 WSL=0
 ##CC=gcc
@@ -115,7 +120,7 @@ ctg2 ctg3 : _X11_=1
 
 ctg2 gldisplay.o : GTK2=1
 
-FLAGS1 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DWSL=$(WSL) -DPCURSES=$(PCURSES) -DTNOTES=$(TNOTES) -DGTK=$(GTK)  -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) -DTNOTES=$(TNOTES) $(X11include) -I/usr/include/ncurses $(GLIBINCLUDE)
+FLAGS1 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DWSL=$(WSL) -DPCURSES=$(PCURSES) -DTNOTES=$(TNOTES) -DGTK=$(GTK) $(GLIBINCLUDE) -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) -DTNOTES=$(TNOTES) $(X11include) -I/usr/include/ncurses
 
 FLAGS3 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) $(X11include) $(GLIBINCLUDE)
 
@@ -142,7 +147,7 @@ xe.h :
 #	${CC}  -c -Wall -I/usr/local/pgsql/src/include -funsigned-char $*.c
 #	${CC}  -c -Wall -O2 -mcpu=pentium -I/usr/local/pgsql/src/include -funsigned-char $*.c 
 #	${CC}  -c -Wall -O2 -mcpu=pentium -I/usr/include/gtk-1.2 -I/usr/include/glib-1.2 -funsigned-char $*.c 
-	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char -DTNOTES=$(TNOTES)  $*.c 
+	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char -DTNOTES=$(TNOTES) -DUSE_GLIB=$(USE_GLIB)  $(GLIBINCLUDE) $*.c 
 #	${CC}  -c -Wall -O2 -mcpu=pentium -I/usr/include/gtk-2.0 -I/usr/include/glib-1.2 -funsigned-char $*.c 
 
 #	This for SCO. -J is for unsigned char
@@ -151,23 +156,23 @@ xe.h :
 main.o: main.c xe.h globals.h  keytable.h func.h
 
 gmain.o: main.c xe.h globals.h  keytable.h func.h
-	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char main.c -o gmain.o
+	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char main.c -DUSE_GLIB=$(USE_GLIB) -o gmain.o
 
 input.o: keytable.h input.c 
-	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char input.c 
+	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -DUSE_GLIB=$(USE_GLIB) -funsigned-char input.c 
 
 ginput.o: keytable.h input.c
-	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char input.c -o ginput.o
+	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -DUSE_GLIB=$(USE_GLIB) -funsigned-char input.c -o ginput.o
 
 edit.o: edit.c xe.h
 
 gldisplay.o: xe.h screen.c menus.h
 
 screen.o: xe.h screen.c
-	${CC} $(FLAGS1) -DGTK3=0 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char screen.c -o screen.o
+	${CC} $(FLAGS1) -DGTK3=0 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -DUSE_GLIB=$(USE_GLIB) -funsigned-char screen.c -o screen.o
 
 screen3.o: xe.h screen.c
-	${CC} $(FLAGS1) -DGTK3=1 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char screen.c -o screen3.o
+	${CC} $(FLAGS1) -DGTK3=1 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -DUSE_GLIB=$(USE_GLIB) -funsigned-char screen.c -o screen3.o
 
 eval.o: xe.h eval.c eval.h alist.h 
 
@@ -179,10 +184,10 @@ mlangg.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang.h alist.h xe.h
 	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char mlang.c -o mlangg.o
 
 tldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h
-	${CC} tldisplay.c $(FLAGS1) -DTNOTES=${TNOTES} -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o tldisplay.o
+	${CC} tldisplay.c $(FLAGS1) -DTNOTES=${TNOTES} -c -Wall $(CPU_OPTIONS) -DUSE_GLIB=$(USE_GLIB) -I/usr/include/ncursesw -funsigned-char -o tldisplay.o
 
 xldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h
-	${CC} tldisplay.c $(FLAGS1) -c -Wall $(CPU_OPTIONS)  -funsigned-char -o xldisplay.o
+	${CC} tldisplay.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -DUSE_GLIB=$(USE_GLIB) -funsigned-char -o xldisplay.o
 
 gtkterm.o: gtkterm.c gtkterm.h xthemes.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h gtk_common.c
 
@@ -207,7 +212,7 @@ gtk_support.o: gtk_support.c gtk_support.h
 
 # For GTK3
 gtkterm3.o: xe.h gtkterm3.c gtkterm3.h xthemes.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h geditdisplay3.h gtk_common.c
-	${CC} $(FLAGS1) -c -DGTK=1 -Wall $(CPU_OPTIONS) $(GLIBINCLUDE) $(GTKINCLUDE3) -funsigned-char gtkterm3.c -o gtkterm3.o
+	${CC} $(FLAGS1) -c -DGTK=1 -Wall $(CPU_OPTIONS) $(GTKINCLUDE3) -funsigned-char gtkterm3.c -o gtkterm3.o
 
 gplotc3.o: gplotc3.c gplot3.h plot_cairo3.c plot_commonc.c
 	${CC}  -c ${FLAGS1}  ${GTKINCLUDE3} -o gplotc3.o  gplotc3.c
@@ -241,19 +246,19 @@ ginput3.o: keytable.h input.c
 #	The following is with gtk3 library and cairo plot. gplotc(gcanvas)
 ifeq ($(TNOTES), 1)
 ctg3: tplot.o system.o gldisplay.o edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o  utils.o alist.o filebuf.o gplotc3.o  support.o config_init.o convert.o  gtk_support3.o geditdisplay3.o  gcanvas3.o  highlight.o utf8_support.o notes.o
-	${CC} tplot.o system.o gldisplay.o  edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o gplotc3.o  gtk_support3.o config_init.o support.o geditdisplay3.o gcanvas3.o  highlight.o utf8_support.o notes.o -o ctg3  $(GTK3_FLAGS) -lm -lX11
+	${CC} tplot.o system.o gldisplay.o  edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o gplotc3.o  gtk_support3.o config_init.o support.o geditdisplay3.o gcanvas3.o  highlight.o utf8_support.o notes.o -o ctg3  $(GLIB_LIBS) $(GTK3_FLAGS) -lm -lX11
 else
 ctg3: tplot.o system.o gldisplay.o edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o  utils.o alist.o filebuf.o gplotc3.o  support.o config_init.o convert.o  gtk_support3.o geditdisplay3.o  gcanvas3.o  highlight.o utf8_support.o
-	${CC} tplot.o system.o gldisplay.o  edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o gplotc3.o  gtk_support3.o config_init.o support.o geditdisplay3.o gcanvas3.o  highlight.o utf8_support.o -o ctg3  $(GTK3_FLAGS) -lm -lX11
+	${CC} tplot.o system.o gldisplay.o  edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o gplotc3.o  gtk_support3.o config_init.o support.o geditdisplay3.o gcanvas3.o  highlight.o utf8_support.o -o ctg3  $(GLIB_LIBS) $(GTK3_FLAGS) -lm -lX11
 endif
 
 #	The following is with gtk2 library and cairo plot. gplotc(gcanvas)
 ifeq ($(TNOTES), 1)
 ctg2 : gmain.o system.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o   gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o plot_cairo.c  config_init.o utf8_support.o notes.o
-	${CC} gmain.o system.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o notes.o -o ctg2  -lX11 $(GTK2_FLAGS) -lm
+	${CC} gmain.o system.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o notes.o -o ctg2  -lX11 $(GTK2_FLAGS)  $(GLIB_LIBS) -lm
 else
 ctg2 : gmain.o system.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o   gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o plot_cairo.c  config_init.o utf8_support.o
-	${CC} gmain.o system.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o -o ctg2  -lX11 $(GTK2_FLAGS) -lm
+	${CC} gmain.o system.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o -o ctg2  -lX11 $(GTK2_FLAGS)  $(GLIB_LIBS) -lm
 endif
 
 # This is with Xlib library, no plot !
@@ -270,10 +275,10 @@ endif
 
 # with curses, panel, no plot !
 cte : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o
-	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o -o cte  ${LPCURSES} -lm
+	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o -o cte  $(GLIB_LIBS) ${LPCURSES} -lm
 
 ce : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o
-	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o -o ce  ${LPCURSES} -lm
+	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o -o ce  $(GLIB_LIBS) ${LPCURSES} -lm
 
 gplotc.o: gplotc.c plot_cairo.c plot_commonc.c gplot.h
 	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o $*.o  $*.c

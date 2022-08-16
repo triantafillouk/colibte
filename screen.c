@@ -321,6 +321,23 @@ void update_status()
 	}
 }
 
+#if	!USE_GLIB
+char *lstr_to_upper(char *s)
+{
+ char *us = strdup(s);
+ char *us0=&us[0];
+ while(*us0) *us=toupper((unsigned char)*us0++);
+ return us;
+}
+
+char *lstr_to_lower(char *s)
+{
+ char *us = strdup(s);
+ char *us0=&us[0];
+ while(*us0) *us=toupper((unsigned char)*us0++);
+ return us;
+}
+#endif
 
 /*
  * Update a single virtual line in a window to the physical one. 
@@ -340,9 +357,15 @@ int draw_window_line(WINDP *wp, int row)
 
  // MESG(">draw_window_line: row=%d",row);
  if(gmode_reg_exp) {
+#if	USE_GLIB
 	if(gmode_exact_case) match=strdup(patmatch);
  	else match = g_utf8_strup(patmatch,-1);
 	lower_match = g_utf8_strdown(match,-1);
+#else
+	if(gmode_exact_case) match=strdup(patmatch);
+ 	else match = lstr_to_upper(patmatch);
+	lower_match = lstr_to_lower(match);
+#endif
  } else {
  	match=search_pattern;
  	lower_match = search_lowercase_pattern;
@@ -386,7 +409,11 @@ int draw_window_line(WINDP *wp, int row)
 	};
   };
  };
+#if	USE_GLIB
  if(gmode_reg_exp) { g_free(lower_match);g_free(match);};
+#else
+ if(gmode_reg_exp) { free(lower_match);free(match);};
+#endif
  put_wtext(wp,row,wp->w_ntcols);
  vp1->v_flag =0;
  // MESG("ok!");
@@ -688,7 +715,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		char_bytes = ptr1-char_bytes;
 		display_size=get_utf_length(&uc);
 		c=uc.uval[0];
-#if 1	// Convert to composed character if possible to view it!
+#if USE_GLIB	// Convert to composed character if possible to view it!
 		if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) {
 			char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
 //				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
@@ -1048,7 +1075,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 			display_size=get_utf_length(&uc);
 			c=uc.uval[0];
 			if(c==0xE0 && uc.uval[1]>=0xB8) fp->slow_display=1;	/* slow down for thai chars  */
-#if 1	// Convert to composed character if possible to view it!
+#if USE_GLIB	// Convert to composed character if possible to view it!
 			if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) {
 				char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
 //				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);

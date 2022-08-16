@@ -192,6 +192,7 @@ int get1key()
 			c=drv_getc(0);
 			utfokey[utflen-1]=c;
 			utfokey[utflen]=0;
+#if	USE_GLIB
 			if(cbfp->b_lang && entry_mode==KNORMAL) {
 				char *outkey;
 				gsize r,w;
@@ -203,6 +204,7 @@ int get1key()
 				utflen=0;
 				utfokey[0]=0;
 			};
+#endif
 		} else utflen=0;
 	};
  };

@@ -75,22 +75,46 @@ int eq1(int x,int y,int z)
 
 void get_lowercase_string(char *lower, char *string)
 {
+#if	USE_GLIB
 	gchar *tmp_string;
+#else
+	char *tmp_string;
+#endif
 	int size=strlen(string)+1;
 	if(size>MAXLLEN) size=MAXLLEN;
+#if	USE_GLIB
 	tmp_string = g_utf8_strdown(string,-1);
+#else
+	tmp_string = lstr_to_lower(string);
+#endif
 	strlcpy(lower,tmp_string,size);
+#if	USE_GLIB
 	g_free(tmp_string);
+#else
+	free(tmp_string);
+#endif
 }
 
 void get_uppercase_string(char *upper, char *string)
 {
+#if	USE_GLIB
 	gchar *tmp_string;
+#else
+	char *tmp_string;
+#endif
 	int size=strlen(string)+1;
 	if(size>MAXLLEN) size=MAXLLEN;
+#if	USE_GLIB
 	tmp_string = g_utf8_strup(string,-1);
+#else
+	tmp_string = lstr_to_upper(string);
+#endif
 	strlcpy(upper,tmp_string,size);
+#if	USE_GLIB
 	g_free(tmp_string);
+#else
+	free(tmp_string);
+#endif
 }
 
 /*
@@ -910,7 +934,11 @@ int forw_stat(int n)
  		char *str = &idata->start;
 		ind++;
 		if(ind <= current_line) continue;
+#if	USE_GLIB
 		gchar *tmp_str = g_utf8_strup(str,-1);
+#else
+		char *tmp_str = lstr_to_upper(str);
+#endif
 		// if(strcasestr(str,&search_pattern[0])!=NULL) 
 		if(strstr(tmp_str,&search_pattern[0])!=NULL) 
 		{
@@ -922,9 +950,19 @@ int forw_stat(int n)
 				cwp->current_note_line=ind;
 
 			set_update(cwp,UPD_WINDOW);
+#if	USE_GLIB
 			g_free(tmp_str);
+#else
+			free(tmp_str);
+#endif
 			return 1;
-		};g_free(tmp_str);
+		};
+#if	USE_GLIB
+		g_free(tmp_str);
+#else
+		free(tmp_str);
+#endif
+
 		// printf("%2d [%s]\n",ind,str);
 	};
 	return 0;
@@ -982,8 +1020,11 @@ int back_stat(int n)
 	};
 	// printf("-- current ind=%d %d\n",ind,current_line);
 	idata=(istr *)lget_previous(search_list);
+#if	USE_GLIB
 	gchar *tmp_str;
-
+#else
+	char *tmp_str;
+#endif
 	// printf("is_last=%d\n",is_last);
 	
 	while((idata=(istr *)lget_current(search_list)))
@@ -992,7 +1033,11 @@ int back_stat(int n)
 		ind--;
 		// printf("check %d\n",ind);
 		if(ind<-1) break;
+#if	USE_GLIB
 		tmp_str = g_utf8_strup(str,-1);
+#else
+		tmp_str = lstr_to_upper(str);
+#endif
 		if(strstr(tmp_str,&search_pattern[0])!=NULL) {
 			// printf("found ind=%d [%s] in [%s]\n",ind,&search_pattern[0],str);
 #if	TNOTES
@@ -1002,9 +1047,18 @@ int back_stat(int n)
 #endif
 				cwp->current_note_line=ind+is_last;
 			set_update(cwp,UPD_WINDOW);
+#if	USE_GLIB
 			g_free(tmp_str);
+#else
+			free(tmp_str);
+#endif
 			return 1;
-		};g_free(tmp_str);
+		};
+#if	USE_GLIB
+		g_free(tmp_str);
+#else
+		free(tmp_str);
+#endif
 		// printf("ind1=%d %2d [%s]\n",ind,idata->index,str);
 		lmove_to_previous(search_list,0);
 	};

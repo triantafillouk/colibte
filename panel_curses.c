@@ -1614,6 +1614,7 @@ void xupdate_box()
 	wrefresh(cbox->wnd);
 }
 
+#if	USE_GLIB
 /* Convert a current local string to utf for output */
 char *str_local_to_utf(WINDP *wp,char *in)
 {
@@ -1629,6 +1630,7 @@ char *str_local_to_utf(WINDP *wp,char *in)
  }
  else return space;
 }
+#endif
 
 int check_v_sibling(WINDP *wp,int left,int top,int new_cols)
 {
@@ -1952,7 +1954,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 				continue;
 			};
 		};
-
+#if	USE_GLIB
 		if(ch>128 && v1->uval[1]==0) {	/* this is a local character, convert from local to utf  */
 			 strlcpy(vstr,str_local_to_utf(wp,(char *)v1->uval),6);
 			 if(wp->w_fp->b_lang==0)
@@ -1962,7 +1964,9 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 		} else {
 			memcpy(vstr,v1->uval,6);
 		};
-
+#else
+		memcpy(vstr,v1->uval,6);
+#endif
 		if		(vstr[0]==0xF0 && vstr[1]==0x9F && vstr[2]!=0x8F && vstr[2]!=0x91 && vstr[2]!=0x92 && vstr[2]!=0x94 && vstr[2]!=0x96 && vstr[2]!=0x98 && vstr[2]!=0xA4 && vstr[2]!=0xA7 ) { wprintw(wp->gwp->draw,"%c",'?');ccor++;}
 		// else if	(vstr[0]==0xF0 && vstr[1]==0x9F && vstr[2]!=0x94) wprintw(wp->gwp->draw,"%c",'?');
 		else if	(vstr[0]==0xF0 && vstr[1]==0x9D) { wprintw(wp->gwp->draw,"%s",unknown1);}
@@ -2031,11 +2035,14 @@ void box_line_print(int line,int start,char *st, int w, int selected,int active_
  if(selected)  drv_wcolor(cbox->wnd,MENU_BG,MENU_FG);
  else drv_wcolor(cbox->wnd,MENU_FG,MENU_BG);
  // MESG("box_line_print: y=%d h=%d [%s]",y,cbox->y2 - cbox->y -1,st);
-
+#if	USE_GLIB
  char *normal_st = g_utf8_normalize(st,-1,G_NORMALIZE_ALL_COMPOSE);
  snprintf(string_to_show,256,"%-*s",real_width,normal_st);
  // MESG("[%s] -> [%s]",st,normal_st);
  g_free(normal_st);
+#else
+ snprintf(string_to_show,256,"%-*s",real_width,st);
+#endif
  utf_string_break(string_to_show,width);
  if(y+1 > (cbox->y2 - cbox->y -1)) return;
  wmove(cbox->wnd,y+1,1);
@@ -2706,7 +2713,6 @@ int color_scheme_save()
 {
  FILE *f1;
  char *fname;
- char buf[MAXFLEN];
  int i;
  int scheme_ind;
  int sstat=0;
