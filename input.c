@@ -192,6 +192,7 @@ int get1key()
 			c=drv_getc(0);
 			utfokey[utflen-1]=c;
 			utfokey[utflen]=0;
+#if	USE_GLIB
 			if(cbfp->b_lang && entry_mode==KNORMAL) {
 				char *outkey;
 				gsize r,w;
@@ -203,6 +204,7 @@ int get1key()
 				utflen=0;
 				utfokey[0]=0;
 			};
+#endif
 		} else utflen=0;
 	};
  };
@@ -404,6 +406,7 @@ int assign_sub(int n)
 	int(*kfunc)(int);
 	int s;
 	funname[0]=0;
+	// MESG("assign_sub:");
 	if((s = nextarg("Assign: subroutine name :", funname, 32,true))!=TRUE) return(s);
 //	show_token(cbfp->parser,"assign_sub: after nextarg!");
 	kfunc = execsub;
@@ -411,7 +414,7 @@ int assign_sub(int n)
 	c = getckey();
 //	show_token(cbfp->parser,"assign_sub: after getkey!");
 
-	msg_line(xe_key_name(c));
+	// msg_line(xe_key_name(c));
 	return(set_key_function(kfunc,c,funname));
 }
 
@@ -483,11 +486,8 @@ int load_keys()
  static char name1[MAXFLEN];
 
  strcpy(name1,APPLICATION_KEYS);
- fname=find_file(NULL,name1,0);
- if(fname==NULL) { 
- 	SYS_ERROR("load_keys: cannot open %s",name1);
-	return 0;
- };
+ if((fname=find_file(NULL,name1,0,0)) == NULL) return FALSE;
+
  f1=fopen(fname,"r");
 
  while(fgets(str_line,MAXLLEN,f1)){
@@ -554,8 +554,10 @@ int show_keys(int n)
 	int table;
 	char sline[MAXLLEN];
 	char *description;
-	int emulation = get_cfg_int("keyboard_emulation",0);
+	// int emulation = get_cfg_int("keyboard_emulation",0);
+	int emulation = (int) bt_dval("keyboard_emulation");
 	char *emulation_name[] = {"Native","Micro Emacs",NULL};
+	
 #if	TNOTES
 	int max_keytables=4;
 #else
@@ -691,6 +693,7 @@ char *cmd_to_tstr(int cmd)
 
 int set_key_emulation(int emulation)
 {
+	MESG("set_key_emulation: %d",emulation);
 	set_btval("keyboard_emulation",-1,NULL,emulation);
 	if(emulation == 1) keytab = keytab_emacs;
 	else keytab = keytab_win;

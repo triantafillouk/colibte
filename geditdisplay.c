@@ -108,11 +108,17 @@ int on_parent_configure              (GtkWidget       *widget,
   int p_width,p_height;
 
   gtk_window_get_size((GtkWindow *)widget,&p_width,&p_height);
-
-  set_cfg_int("x11_width",p_width);
-  set_cfg_int("x11_height",p_height);
-  set_cfg_int("x11_x",event->x);
-  set_cfg_int("x11_y",event->y);
+#if	USE_GLIB0
+	set_cfg_int("x11_width",p_width);
+	set_cfg_int("x11_height",p_height);
+	set_cfg_int("x11_x",event->x);
+	set_cfg_int("x11_y",event->y);
+#else
+	set_btval("x11_x",-1,NULL,event->x);
+	set_btval("x11_y",-1,NULL,event->y);
+	set_btval("x11_width",-1,NULL,p_width);
+	set_btval("x11_height",-1,NULL,p_height);
+#endif
 //	MESG("on_parent_configure: [%d,%d]",event->width,event->height);
   return(FALSE);
 }

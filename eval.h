@@ -31,10 +31,14 @@ VAR option_names[] = {
 	{"large_toolbar_icons",0,NULL},
 	{"safe_ops",0,NULL},
 
-	{"use_titlebar",1,NULL},
 	{"exact_match",0,NULL},
 	{"mode_over",0,NULL},
 	{"mode_regexp",0,NULL},
+	{"use_titlebar",1,NULL},
+	{"x11_x",10,NULL},
+	{"x11_y",10,NULL},
+	{"x11_width",500,NULL},
+	{"x11_height",300,NULL},
 	{NULL,0},
 };
 

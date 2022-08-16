@@ -158,6 +158,7 @@ int utf8_str_left(char *st,int pos)
  return i;
 }
 
+#if	NUSE
 /* return string,len  if utf-8 valid else NULL  */
 char *utf_check(char *utf, gsize *utf_len)
 {
@@ -210,6 +211,7 @@ char *utf_check(char *utf, gsize *utf_len)
 	return utf;
  };
 }
+#endif
 
 // no check previous utf8 char
 unsigned char *prev_utf8_char(unsigned char *string,int pos)

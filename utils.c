@@ -151,7 +151,7 @@ int vfind(char *s,char *m[],int nu)
 }
 
 /* read a file with pairs (name, value) */
-int read_pairs(char *fname,int fcomment,char delimiter,char ***name,char ***value)
+int read_pairs(char *fname,char delimiter,char ***name,char ***value)
 {
  dlist *sl1;
  delement *e1;
@@ -165,13 +165,13 @@ int read_pairs(char *fname,int fcomment,char delimiter,char ***name,char ***valu
 // initialize the list
  sl1=new_dlist();
  f=fopen(fname,"r");
- if(fcomment>2) add_dlist_element(sl1,"none","none");
  if(!f) { name=NULL; value=NULL;return 0;};
+ 
  while(fgets(s,1000,f)) {
 	int delimit_ok=0;
  	s[strlen(s)-1]=0; // remove newline
 	if(strlen(s)==0) continue;
-	if(fcomment && s[0]=='#') continue;
+	if(s[0]=='#' || s[0]==';'||s[0]=='[') continue;
 	cp1=s;
 	cp2=NULL;
 	while( *cp1++) {
@@ -182,7 +182,7 @@ int read_pairs(char *fname,int fcomment,char delimiter,char ***name,char ***valu
 			break;
 		};
 	};
-	if(!delimit_ok) continue;
+	if(!delimit_ok) continue;	/* this is not pair!  */
 	svalue=strdup(cp2);
 	sname=strdup(s);
  	add_dlist_element(sl1, sname,svalue);
@@ -202,6 +202,31 @@ int read_pairs(char *fname,int fcomment,char delimiter,char ***name,char ***valu
  *value=s2;
  return(i);
 }
+
+#if	NUSE
+int write_pairs(char *fname,char *title, char *delimiter,char **name_array,char **value_array)
+{
+ FILE *f;
+ char *name;
+ char *value;
+ char s[MAXLLEN];
+ f=fopen(fname,"w");
+ if(f) {
+ 	sprintf(s,"[%s]\n",title);
+	fwrite(s,strlen(s),1,f);
+	name=name_array[0];
+	value=value_array[0];
+	while(*name) {
+		sprintf(s,"%s%s%s\n",name,delimiter,value);
+		fwrite(s,strlen(s),1,f);
+		name++;value++;
+	};
+ 	fclose(f);
+	return TRUE;
+ };
+ return FALSE;
+}
+#endif
 
 /* clear string array data */
 void sarray_clear_data(char **array)
@@ -360,18 +385,14 @@ int lstartwith(char *line,char c)
 
 void set_full_name(char *full_name,char *dir_name,char *file_name,int len)
 {
-#if	1
 	if(dir_name[0]==0) {
 		strlcpy(full_name,getcwd(NULL,MAXFLEN),len);
 		strlcat(full_name,"/",len);
 		strlcat(full_name,file_name,len);
 	
 	} else {
-#endif
 		strlcpy(full_name,dir_name,len);
 		strlcat(full_name,"/",len);
 		strlcat(full_name,file_name,len);
-#if	1
 	}
-#endif
 }

@@ -132,12 +132,8 @@ GtkWidget* create_pixmap(GtkWidget *widget, char *filename)
       return create_dummy_pixmap (widget);
 
   /* We first try any pixmaps directories set by the application. */
-	found_filename = find_file("pixmap",filename,1);
-
-  if (!found_filename) {
-      g_warning ("Couldn't find pixmap file: %s", filename);
-      return create_dummy_pixmap (widget);
-  }
+	if((found_filename = find_file("pixmap",filename,1,0))==NULL) 
+		return create_dummy_pixmap (widget);
 
   colormap = gtk_widget_get_colormap (widget);
   gdkpixmap = gdk_pixmap_colormap_create_from_xpm (NULL, colormap, &mask,

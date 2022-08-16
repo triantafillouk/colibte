@@ -391,8 +391,10 @@ M_element e_gconvert[] =
 {
 	{0, '9', "IBM PC to ISO8859", "", 	convert_char, (struct MENUS *)1,"MT9"},
 	{0, 'P', "ISO8859 to IBM PC", "",	convert_char, (struct MENUS *)2,"MTP"},
-	{0, 'U', "ISO8859 to UTF8  ", "",	convert_char, (struct MENUS *)3,"MTU"},
-	{0, 'F', "Utf8 to ISO8859  ", "",	convert_char, (struct MENUS *)4,"MTF"},
+#if	USE_GLIB
+	{0, 'U', "local to UTF8    ", "",	convert_char, (struct MENUS *)3,"MTU"},
+	{0, 'F', "Utf8 to local    ", "",	convert_char, (struct MENUS *)4,"MTF"},
+#endif
 	{0, 0, NULL,"",NULL,0}
 };
 
@@ -463,6 +465,7 @@ M_element e_lang[] =
 	{0, 0, NULL,"",NULL,0,NULL}
 };
 
+#if	USE_GLIB
 M_element e_local[] =
 {
 	{0,'0',"utf-8       ","",set_default_local,(struct MENUS *)1 ,"ML0"},
@@ -490,7 +493,9 @@ M_element e_local[] =
 #endif
 	{0, 0, NULL,"",NULL,0,NULL}
 };
+#endif
 
+#if	USE_GLIB
 MENUS m_lang = {
 	"Lang",
 	50,4, VERTICAL,e_lang
@@ -500,7 +505,7 @@ MENUS m_local = {
 	"Local",
 	50,4, VERTICAL,e_local
 };
-
+#endif
 
 M_element e_mode[] =
 	{
@@ -524,9 +529,11 @@ M_element e_mode[] =
 #endif
 	{0, 'L', "Line lock        ","", toggle_move_lock,0,"ML"},
 	{0,	'P', "Page lock        ","", toggle_sync_lock,0,"MP"},
+#if	USE_GLIB
 	{MMENU, 'C', "file Codepage    ", "",  NULL, &m_lang,"MC"},
 #if	!GTK
 	{MMENU, 'F', "Font local       ", "",  NULL, &m_local,"MF"},
+#endif
 #endif
     {MMENU, 'S', "Sort mode        ", "",  NULL, &m_sort,"MS"},
 	{0, 0, NULL,"",NULL,0,NULL}

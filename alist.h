@@ -4,7 +4,7 @@
 	GPL2 lib license
 */
 
-/* version 14/10/2020 */
+/* version  10/8/2022 */
 
 #ifndef __ALIST_KT__
 #define	__ALIST_KT__
@@ -16,6 +16,7 @@
 #define	AVL_BALANCE	1
 #define A_DEBUG	0
 #define	_ASTACK	0
+#define	FULL		0
 
 typedef struct _el
 {
@@ -40,8 +41,8 @@ typedef struct alist
 {
  int id;	// list id
  struct _el *head;
- struct _el *current;
  struct _el *last;
+ struct _el *current;
  unsigned int size;
  void **data;
  int array_valid;
@@ -53,7 +54,7 @@ typedef struct alist
 
 /* function declarations */
 int scmp(const char *s1,const char *s2);
-alist *new_list(int id,char *); // create a list
+alist *new_list(int id,char *title); // create a list
 #if	_ASTACK
 astack *new_astack(void *dat);	// create a stack
 sstack *new_stack();
@@ -77,7 +78,9 @@ void *lpop(alist *l); // get last and remove it
 #define lpush(p,l) add_element_to_list(p,l) 
 void lset_current(alist *l,void *d); // find and set current data
 void set_current(alist *l, _el *el); /* set current element no check */
+#if	NUSE
 void find_current(alist *l, _el *el);// set current element
+#endif
 void *lget_circ(alist *l);
 void *lget_prev_circ(alist *l); 
 void lmove_to_previous(alist *l,int circ); // move current pointer to previous
@@ -98,8 +101,10 @@ int move_down(void *p,alist *l);
 void free_list(alist *l,char *);
 void remove_elements(alist *list);
 int list_is_empty(alist *pl);
-#if	FULL
+#if	NUSE
 int  delete_current(alist *list);
+#endif
+#if	FULL
 void empty_list1(alist *list,int (*ff)(void *));
 #endif
 void set_last(alist *);

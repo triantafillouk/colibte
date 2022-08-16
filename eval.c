@@ -694,7 +694,7 @@ int exec_file(int n)
 		return(status);
 	}
 	/* look up the path for the file */
-	if(fname[0]!='/' && fname[0]!=CHR_LBRA) fspec = find_file("cmds",fname,1);
+	if(fname[0]!='/' && fname[0]!=CHR_LBRA) fspec = find_file("cmds",fname,1,0);
 	else fspec=fname;
 	if(fspec==NULL) fspec=fname;	/* if not found try relative to current dir!  */
 	/* if it isn't around */
@@ -724,19 +724,23 @@ int dofile(char *fname)
 	int status;	/* results of various calls */
 	char bname[MAXFLEN];
 	snprintf(bname,MAXFLEN,"[%s]",fname);
-	// MESG("dofile:[%s]",fname);
+	MESG("dofile:[%s]",fname);
 	show_stage=0;
 	set_screen_update(false);
 	if((bp=get_filebuf(bname,NULL,0))==NULL) { // file not in memory, load it!
 		if ((bp = new_filebuf(bname, 0)) == NULL) /* get the needed buffer */
 			return(FALSE);
+	MESG("dofile: 01");
 
 	/* and try to read in the file to execute */
 		if(cbfp == NULL) cbfp=bp;
+	MESG("dofile: 10 %s",fname);
 		if ((status = file_read1(bp,fname)) != TRUE) {
+			MESG("dofile: status=%d",status);
 			return(status);
 		};
 	} else {
+	MESG("dofile: 02");
 		if((bp->b_state & FS_ACTIVE)==0) {
 			activate_file(bp);
 			if ((status = file_read1(bp,fname)) != TRUE) {
@@ -747,14 +751,19 @@ int dofile(char *fname)
 			activate_file(bp);
 		};
 	};
+	MESG("go execute it");
 	/* go execute it! */
 	int backup_caf=current_active_flag;
 	set_dval(compute_block(bp,bp,1));
+	MESG("----");
 	current_active_flag=backup_caf;
+	MESG("dofile: 1");
 	/* if not displayed, remove the now unneeded macro buffer and exit */
 	if (bp->b_nwnd == 0) 
 		delete_filebuf(bp,1);
 	set_screen_update(true);
+	MESG("dofile: 2");
+
 	if(err_num>0) return(FALSE);
 	return(TRUE);
 }

@@ -1208,6 +1208,7 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
      if(ci<32 && disinp) cursor_x++;
    };
  };
+#if	USE_GLIB
  if(cbfp->b_lang == 0) {	// default lang is UTF8, no convertion
 	strlcpy(st1,st2,MAXLLEN);
  } else {	// convert to local buffer character set
@@ -1217,6 +1218,9 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
  	strlcpy(st1, ustr ,MAXLLEN);
  	g_free(ustr);
  };
+#else
+	strlcpy(st1,st2,MAXLLEN);
+#endif
  
  list_update(st2);
  kbdmode=saved_kbdmode;
@@ -1428,6 +1432,7 @@ void status_line(WINDP *wp)
 	};
 
 	/* directory name,file name */
+#if	USE_GLIB
 	char *composite;
 	char cp_data[MAXLLEN];
 	char *full_name;
@@ -1440,6 +1445,13 @@ void status_line(WINDP *wp)
 	strlcpy(cp,full_name,MAXLLEN);
 	// MESG("           : cp        [%s]",cp);
 	g_free(composite);
+#else
+	char cp_data[MAXLLEN];
+	char *full_name;
+	full_name = get_pfname(fdname,bp->b_fname,max_t-1);
+	cp=cp_data;
+	strlcpy(cp,full_name,MAXLLEN);
+#endif
 	// MESG("           : freed!");
 	int utf_ntcols = wp->w_ntcols + strlen(cp) - utf_num_chars(cp);
 	for(;(c= *cp);n++) {

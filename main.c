@@ -98,21 +98,30 @@ int main(int argc, char **argv)
 	discmd = FALSE;
 	set_start_dir(NULL);
 	if(!execmd) {
+		// MESG("init_system_clipboard");
 		init_system_clipboard();
+		// MESG("open_log");
 		open_log(argv[0]);	/* connect to syslog  */
+		// MESG("set_start_time");
 		set_start_time();
+		// MESG("init_drv_env");
 		driver_type=init_drv_env();	// driver depending variable initialization
+		// MESG("load_config");
 		load_config();
+		// MESG("load_keys");
 		load_keys();
+		// MESG("read_file_history");
 		read_file_history(1);
 		/* initialize the editor */
+		// MESG("init_names");
 		init_names();
+		// MESG("init_exensions");
 		init_extensions();	// file extensions
 		if(startfile==NULL) {
-			startfile=find_file(NULL,APPLICATION_RC,1);
+			startfile=find_file(NULL,APPLICATION_RC,1,0);
 		};
 	};
-
+	// MESG("execute statup file");
 	/* execute startup file here */
 	if(startfile!=NULL) {
 		if(firstbp!=NULL){
@@ -122,9 +131,13 @@ int main(int argc, char **argv)
 			) 	
 			{
 				dofile(startfile);
-//				MESG("startfile executed!");
+				// MESG("startfile executed!");
 			};
-		} else dofile(startfile);
+		} else {
+			// MESG("do startfile");
+			dofile(startfile);
+		};
+		// MESG("show errors");
 		if(err_num) {	/* show any errors in start file!!  */
 			start_err_num=err_num;
 			start_err_str=err_str;
@@ -134,8 +147,9 @@ int main(int argc, char **argv)
 		start_err_num=12;
 		start_err_str="Could not find a start file!";
 	};
+	// MESG("set_screen_update");
 	set_screen_update(true);
-//	MESG("startfile status: %d [%s]",start_err_num,start_err_str);
+	// MESG("startfile status: %d [%s]",start_err_num,start_err_str);
 	scratch_files[0] = load_scratch_files();
 
 #if	TNOTES
@@ -147,15 +161,15 @@ int main(int argc, char **argv)
 #endif
 	{
 	if(firstbp==NULL) {
-		MESG("no start file! scratch=%d",scratch_files[0]);
+		// MESG("no start file! scratch=%d",scratch_files[0]);
 		if(scratch_files[0]==0) {
 		// no files, or no scratch files, create new scratch file!
 			edinit("[new 1]");
 			scratch_files[0]=1;
 			activate_file(cbfp);
-		MESG("start with new scratch file!");
+		// MESG("start with new scratch file!");
 		};
-		MESG("Scratch files are %d",scratch_files[0]);
+		// MESG("Scratch files are %d",scratch_files[0]);
 		cbfp = get_first_scratch_buffer();
 	} else {
 		cbfp = firstbp;

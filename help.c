@@ -17,12 +17,8 @@ int help(int n)
 
 	FILEBUF *bp;	/* buffer pointer to help */
 	char *fname=NULL;		/* ptr to file returned by find_file() */
-	fname = find_file("help",APPLICATION_HELP,1);
+	if((fname = find_file("help",APPLICATION_HELP,1,0))==NULL) return FALSE;;
 
-	if (fname == NULL) {
-		msg_line("could not find help file!");
-		return(FALSE);
-	};
 	bp = new_filebuf(fname,FSINVS);
 	if(bp==NULL) {
 		msg_line("cannot open help!");

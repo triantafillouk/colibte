@@ -89,7 +89,7 @@ int delete_window(int n)
 {	/* new gtk version! */
 	WINDP *new_wp;	/* window to go and receive deleted space */
 	WINDP *to_delete=cwp;
-	if(window_list->head->next == NULL) return(TRUE);	/* this is the only window */
+	if(window_list->size==1) return(TRUE);	/* this is the only window */
 
 
 	if(window_list->head->data == cwp) {

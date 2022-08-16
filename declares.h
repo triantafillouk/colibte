@@ -81,7 +81,14 @@ int select_highlight(int);
 int check_update_highlight(int flag);
 int file_type_is(char *extention,int check_type);
 void open_log(char *program_name);
+#if	USE_GLIB0
 void set_cfg_int(char *label,int ival);
+#endif
+#if	!USE_GLIB
+char *lstr_to_upper(char *s);
+char *lstr_to_lower(char *s);
+#endif
+
 
 
 int load_session(int);
@@ -321,7 +328,7 @@ int unassign_key(int n);
 int describe_key(int n);
 int getckey();
 int startup(char *sfname);
-char *find_file(char *subdir,char *fname,int cflag);
+char *find_file(char *subdir,char *fname,int cflag,int create_if_not_found);
 char *cmdstr(int c);
 char *function_name(int (*func)(), char **description);
 int execsub(int i);
