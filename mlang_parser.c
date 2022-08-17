@@ -70,6 +70,7 @@ int add_to_symbol_tree(BTREE *stable,char *name)
 {
 	BTNODE *btn=NULL;
 	/* create the variable in the symbol_table!  */
+	MESG("add_to_symbol_tree: %s table items=%d",name,stable->items);
 	btn=add_btnode(stable,name);
 	if(stable->new_flag) {
 		btn->node_type=TOK_VAR;
@@ -77,9 +78,11 @@ int add_to_symbol_tree(BTREE *stable,char *name)
 		btn->node_index=stable->items-1;	/*  variable index  */
 		btn->sval=NULL;
 		stable->new_flag=0;
+		MESG("- this is new! index=%d",btn->node_index+1);
 		return (btn->node_index+1);
 	} else {
 		// found 
+		MESG(" - this found! index=%d type=%d subtype=%d",btn->node_index+1,btn->node_type,btn->node_index);
 		return -(btn->node_index+1);
 	}
 }
@@ -241,6 +244,7 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 {
  int ind;
  	tok->ttype=TOK_VAR;
+	MESG("set_var: name=%s",name);
 	ind=add_to_symbol_tree(stree,name);
 	ex_edenv=TOK_VAR;
 	if(ind>0) { 	/* this is a new one  */
@@ -331,27 +335,31 @@ MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
  int ind=0;
  tok=new_tok();
  tok->ttype=TOK_VAR;
+ tok->tind=VTYPE_SARRAY;
+ tok->adat=main_args;
+ tok->tname=strdup("args");
  tok->level=0;
- set_var(bt_table,tok,"args");
- ind = add_to_symbol_tree(bt_table,"args");
+ set_var(stree,tok,"args");	/* bt_table  */
+ MESG("- ttype=%d tind=%d",tok->ttype,tok->tind);
+ // ind = add_to_symbol_tree(stree,"args");
  MESG("add_to_symbol_tree args ind=%d",ind);
 #if	1
   {
-	tok->tnode = find_bt_element("args");
+	// tok->tnode = find_bt_element("args");
 	if(tok->tnode) MESG("found tnode!");
-	tok->tnode->node_type=TOK_VAR;
-	tok->tnode->node_index=VTYPE_SARRAY;
-	tok->tind=VTYPE_SARRAY;
-	tok->tname = tok->tnode->node_name;
-	tok->adat = main_args;
+	// tok->tnode->node_type=TOK_VAR;
+	// tok->tnode->node_index=VTYPE_SARRAY;
+	// tok->tname = tok->tnode->node_name;
 	// show_token(tok,"args");
 	MESG("show main_args in mlang!");
 	MESG("	cols=%d rows=%d",main_args->cols,main_args->rows);
-
-	MESG("TOKEN num=%d type=%d name=%d ind=%d",tok->tnum,tok->ttype,tok->tname,tok->tind);
+	MESG("TOKEN num=%d",tok->tnum);
+	MESG("TOKEN type=%d",tok->ttype);
+	MESG("TOKEN name=%s",(char *)tok->tname);
+	MESG("TOKEN num=%d type=%d name=%s ind=%d",tok->tnum,tok->ttype,tok->tname,tok->tind);
 	if(tok->adat) {
-		MESG("args rows=%d cols=%d",main_args->cols,main_args->rows);
-		MESG("args rows=%d cols=%d",tok->adat->cols,tok->adat->rows);
+		MESG("main args rows=%d cols=%d",main_args->cols,main_args->rows);
+		MESG("tok  args rows=%d cols=%d",tok->adat->cols,tok->adat->rows);
 	};
  	MESG("args btnode found!");
  };

@@ -967,7 +967,7 @@ double eval_fun1(int fnum)
 				ex_vtype=VTYPE_NUM;
 				break;
 		case UFPRINT:	// to stdio, be carefull CHECK !!!!
-				// MESG("UFPRINT: arr=%d",arr);
+				MESG("UFPRINT: arr=%d",arr);
 				if(arr) print_array1("",arr);
 				else {
 				if(arg[0][0] !=0 ) {
