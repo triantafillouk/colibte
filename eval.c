@@ -35,6 +35,8 @@ extern FILEBUF *cbfp;
 extern int record_session;
 #endif
 
+int dofile(char *fname);
+
 // Editor variables
 char *fvars[] = {
 	"_file_name",		/* CURRENT FILE NAME */

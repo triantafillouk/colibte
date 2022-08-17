@@ -17,6 +17,7 @@ struct array_dat *new_array(int rows,int cols);
 struct array_dat *new_array_similar(array_dat *a);
 void allocate_array(struct array_dat *adat);
 
+
 void init_array(struct array_dat *array, int rows,int cols)
 {
 	int ctype=VTYPE_ARRAY;	/* default is numeric!!  */
@@ -38,6 +39,14 @@ void init_array(struct array_dat *array, int rows,int cols)
 	MESG("init_array: type=%d",ex_vtype);
 }
 
+/* List array is one dimensional string array  */
+struct array_dat * new_list_array(int cols)
+{
+	struct array_dat *sarray;
+	ex_nquote=1;
+	sarray = new_array(1,cols);
+	return sarray;
+}
 
 void free_array_dat(struct array_dat *adat)
 {
@@ -81,7 +90,7 @@ void free_array(char *spos,struct array_dat *adat)
 void allocate_array(struct array_dat *adat)
 {
  int i;
- MESG("allocate_array: astat=%d type=%d",adat->astat,adat->atype);
+ // MESG("allocate_array: astat=%d type=%d",adat->astat,adat->atype);
  if(adat->astat==0 || adat->atype==VTYPE_DYNAMIC) {	/* new/renew  */
  	if(adat->atype==VTYPE_ARRAY) {	/* allocate num array  */
 

@@ -804,7 +804,6 @@ int str_in_list(alist *list,char *str,int start)
 BTREE *new_btree(char *name,int level);
 BTNODE *add_btnode(BTREE *bt,char *name);
 int delete_btnode_named(BTREE *bt,char *name);
-int delete_btree(BTREE *bt);
 BTNODE *find_btnode(BTREE *bt,char *name);
 void show_subtree(BTNODE *node);
 void show_ordered_subtree(BTNODE *node);

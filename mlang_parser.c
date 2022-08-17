@@ -283,7 +283,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int next_tok_type=0;
  int script_active=0;
 
-// MESG("parse_block1: file_type=%d",bf->b_type);
+MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
  if(
  	file_type_is("CMD",bf->b_type)
 	|| file_type_is("DOT",bf->b_type)
@@ -303,6 +303,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  lex_parser=new_list(0,"lex_parser");
 
  if(init==1 || stree==NULL) {	/* create a new symbo table if needed  */
+	if(bf->symbol_tree) free_btree(bf->symbol_tree);
 	bf->symbol_tree=new_btree(bf->b_fname,0);
 	stree=bf->symbol_tree;
 	stree->max_items=999999;
@@ -316,6 +317,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		scan=nscan;
 	};
  };
+
  foffset=0;	/* goto to the beginning of the buffer  */
  cstack=new_list(0,"curles_stack"); // create curles stack 
  
@@ -323,6 +325,39 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  err_line=0;
  tok_line=0;
  save_stage_level=stage_level;
+#if	1
+
+
+ int ind=0;
+ tok=new_tok();
+ tok->ttype=TOK_VAR;
+ tok->level=0;
+ set_var(bt_table,tok,"args");
+ ind = add_to_symbol_tree(bt_table,"args");
+ MESG("add_to_symbol_tree args ind=%d",ind);
+#if	1
+  {
+	tok->tnode = find_bt_element("args");
+	if(tok->tnode) MESG("found tnode!");
+	tok->tnode->node_type=TOK_VAR;
+	tok->tnode->node_index=VTYPE_SARRAY;
+	tok->tind=VTYPE_SARRAY;
+	tok->tname = tok->tnode->node_name;
+	tok->adat = main_args;
+	// show_token(tok,"args");
+	MESG("show main_args in mlang!");
+	MESG("	cols=%d rows=%d",main_args->cols,main_args->rows);
+
+	MESG("TOKEN num=%d type=%d name=%d ind=%d",tok->tnum,tok->ttype,tok->tname,tok->tind);
+	if(tok->adat) {
+		MESG("args rows=%d cols=%d",main_args->cols,main_args->rows);
+		MESG("args rows=%d cols=%d",tok->adat->cols,tok->adat->rows);
+	};
+ 	MESG("args btnode found!");
+ };
+#endif
+#endif
+
  while(getnc1(bf,&cc,&tok_type))
  {
  // MESG("	cc=%d type=%d %s ",cc,tok_type,tok_name[tok_type]);

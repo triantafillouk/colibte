@@ -21,8 +21,10 @@
 
 void mesg_out(const char *fmt, ...);
 extern FILEBUF *cbfp;
+extern array_dat *main_args;
 
 #if	SYNTAX_DEBUG
+tind
 #define	SHOWTOK {if(discmd) { MESG("  [%2d][%*s-%s][%d]  %s",stage_level,stage_level,"",Tds,tok->tnum,tok_name[tok->ttype]);};}
 
 #define	TDS(name)   char *Tds=name;\
@@ -156,7 +158,7 @@ char *tok_name[] = {
 
 // function names with number of arguments
 m_function m_functions[] = {
-	{"strlen",1},        /* STRING LENGTH */
+	{"len",1},        /* STRING LENGTH */
 	{"upper$",1},        /* UPPERCASE STRING */
     {"lower$",1},        /* LOWER CASE STRING */
 	{"left$",2},
@@ -402,6 +404,7 @@ tok_struct *new_tok()
  tok->tgroup=0;
  tok->factor_function=factor_none;
  tok->tnode=NULL;
+ // MESG("new_tok:");
  return(tok);
 }
 
@@ -470,6 +473,7 @@ void init_hash()
   for(i=0; m_functions[i].f_name != NULL;i++){ 
 	insert_bt_element(bt_table,m_functions[i].f_name,TOK_FUNC,i);
   };
+
 /* env variable */
   for(i=0;fvars[i]!=NULL;i++)
   {
@@ -479,7 +483,9 @@ void init_hash()
 /* option variables  */
  for(i=0;option_names[i].name!=NULL;i++) {
 	set_btval(option_names[i].name,TOK_OPTION,option_names[i].sval,option_names[i].dval);
- }
+ };
+
+ // set_btval("args",TOK_VAR,"",0);
 
  for(i=0;term_types[i].term_name!=NULL;i++)
  {
@@ -494,6 +500,7 @@ void init_hash()
 
 void initialize_vars()
 {
+ MESG("initialize_vars");
 }
 
 
@@ -832,7 +839,13 @@ double eval_fun1(int fnum)
 					value=0;
 				};
 				break;
-		case UFLENGTH:	value =strlen(arg[0]);ex_vtype=VTYPE_NUM;break;
+		case UFLENGTH:	
+			if(ex_vtype==VTYPE_STRING) { value =strlen(arg[0]);ex_vtype=VTYPE_NUM;break;};
+			if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
+				value=ex_array->rows*ex_array->cols;
+				ex_vtype=VTYPE_NUM;
+				break;
+			};
 		case UFLEFT:	strlcpy(slval,arg[0],MAXLLEN);
 				if(vv[1]>0 && vv[1]<strlen(arg[0])) slval[(int)vv[1]]=0;
 				ex_vtype=VTYPE_STRING;

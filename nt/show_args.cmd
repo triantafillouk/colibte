@@ -1,0 +1,2 @@
+# show arguments
+print(args)
