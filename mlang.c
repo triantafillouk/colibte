@@ -2683,8 +2683,10 @@ int refresh_current_buffer(int nused)
  if(plot_on()) plot_redraw();
  textpoint_set_lc(cwp->tp_current,curline,0);
  msg_line("");
- return(1);
+ set_update(cwp,UPD_EDIT);
+ return(OK_CLRSL);
 }
+
 // parse, check current buffer
 int parse_check_current_buffer(int n)
 {
