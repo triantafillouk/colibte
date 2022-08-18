@@ -70,7 +70,7 @@ int add_to_symbol_tree(BTREE *stable,char *name)
 {
 	BTNODE *btn=NULL;
 	/* create the variable in the symbol_table!  */
-	MESG("add_to_symbol_tree: %s table items=%d",name,stable->items);
+	// MESG("add_to_symbol_tree: %s table items=%d",name,stable->items);
 	btn=add_btnode(stable,name);
 	if(stable->new_flag) {
 		btn->node_type=TOK_VAR;
@@ -78,11 +78,11 @@ int add_to_symbol_tree(BTREE *stable,char *name)
 		btn->node_index=stable->items-1;	/*  variable index  */
 		btn->sval=NULL;
 		stable->new_flag=0;
-		MESG("- this is new! index=%d",btn->node_index+1);
+		// MESG("- this is new! index=%d",btn->node_index+1);
 		return (btn->node_index+1);
 	} else {
 		// found 
-		MESG(" - this found! index=%d type=%d subtype=%d",btn->node_index+1,btn->node_type,btn->node_index);
+		// MESG(" - this found! index=%d type=%d subtype=%d",btn->node_index+1,btn->node_type,btn->node_index);
 		return -(btn->node_index+1);
 	}
 }
@@ -244,7 +244,7 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 {
  int ind;
  	tok->ttype=TOK_VAR;
-	MESG("set_var: name=%s",name);
+	// MESG("set_var: name=%s",name);
 	ind=add_to_symbol_tree(stree,name);
 	ex_edenv=TOK_VAR;
 	if(ind>0) { 	/* this is a new one  */

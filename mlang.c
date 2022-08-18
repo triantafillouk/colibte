@@ -197,8 +197,8 @@ m_function m_functions[] = {
 	{"at_eof",0},	/* if at end of file  */
 	{"at_bol",0},	/* if at begin of line  */
 	{"at_eol",0},	/* if at end of line  */
-	{"at_bop",0},	/* if at begin of paragraph  */
-	{"at_eop",0},	/* if at end of paragraph  */
+	{"args_size",0},	/* main arguments list size  */
+	{"args",1},	/* main  argument at position */
 	{NULL,0}
 };
 
@@ -243,8 +243,8 @@ UFATBOF,
 UFATEOF,
 UFATBOL,
 UFATEOL,
-UFATBOP,
-UFATEOP
+UFMAINARGLEN,
+UFMAINARG
 };
 
 /* directives */
@@ -967,7 +967,6 @@ double eval_fun1(int fnum)
 				ex_vtype=VTYPE_NUM;
 				break;
 		case UFPRINT:	// to stdio, be carefull CHECK !!!!
-				MESG("UFPRINT: arr=%d",arr);
 				if(arr) print_array1("",arr);
 				else {
 				if(arg[0][0] !=0 ) {
@@ -1007,6 +1006,22 @@ double eval_fun1(int fnum)
 			return(FBolAt(cbfp,Offset()));
 		case UFATEOL:
 			return(FEolAt(cbfp,Offset()));
+		case UFMAINARGLEN:
+			MESG("argument size: rows=%d cols=%d",main_args->rows,main_args->cols);
+			ex_vtype=VTYPE_NUM;
+			return main_args->cols;
+		case UFMAINARG: {
+			int ind;
+			ind=(int)vv[0];
+			if(ind<main_args->cols) {
+			strcpy(slval,main_args->sval[(int)vv[0]]);
+			ex_vtype=VTYPE_STRING;
+			return atof(slval);
+			} else {
+				ex_vtype=VTYPE_NUM;
+				return 0.0;
+			};
+		};
 		default:
 			value=0.0;
 			ex_vtype=VTYPE_NUM;
@@ -2378,7 +2393,7 @@ double tok_dir_fori()
 	NTOKEN2;
 
 	dstep=num_expression();
-
+	// MESG("fori: from %f to %f step %f",dinit,dmax,dstep);
 	if(tok->ttype!=TOK_RPAR) { err_num=226;ERROR("for i: error %d",err_num);};
 	NTOKEN2;	/* skip right parenthesis  */
 	// set block start
@@ -2390,6 +2405,11 @@ double tok_dir_fori()
 	} else {
 		skip_sentence1();
 		end_block=tok;
+	};
+	if(dinit==dmax) {
+		tok=end_block;
+		current_active_flag=old_active_flag;
+		return 1;
 	};
 	if(dstep>0 && dmax > *pdval) {
 		for(;*pdval < dmax; *pdval +=dstep) {

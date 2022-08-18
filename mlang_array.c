@@ -21,12 +21,12 @@ void allocate_array(struct array_dat *adat);
 void init_array(struct array_dat *array, int rows,int cols)
 {
 	int ctype=VTYPE_ARRAY;	/* default is numeric!!  */
-	MESG("init_array: ex_nums=%d ex_nquote=%d ex_nvars=%d",ex_nums,ex_nquote,ex_nvars);
+	// MESG("init_array: ex_nums=%d ex_nquote=%d ex_nvars=%d",ex_nums,ex_nquote,ex_nvars);
 	if(ex_nums) ctype=VTYPE_ARRAY;
 	else if(ex_nquote) ctype=VTYPE_SARRAY;
 	else if(ex_nquote>0 && ex_nums>0) ctype=VTYPE_AMIXED;
 	else if(ex_nvars) ctype=VTYPE_DYNAMIC;
-	MESG("ctype=%d",ctype);
+	// MESG("ctype=%d",ctype);
 	array->rows=rows;
 	array->cols=cols;
 	array->atype=ctype;
@@ -35,8 +35,7 @@ void init_array(struct array_dat *array, int rows,int cols)
 	ex_vtype=ctype;
 	/* init again after use the ex values!  */
 	ex_nums=0;ex_nquote=0;ex_nvars=0;
-	// ex_vtype=VTYPE_ARRAY;
-	MESG("init_array: type=%d",ex_vtype);
+	// MESG("init_array: type=%d",ex_vtype);
 }
 
 /* List array is one dimensional string array  */
@@ -119,7 +118,7 @@ void allocate_array(struct array_dat *adat)
 
 	};
 	if(adat->atype==VTYPE_SARRAY) {	/* allocate string array  */
-		MESG("	allocate string array %d rows, %d cols",adat->rows,adat->cols);
+		// MESG("	allocate string array %d rows, %d cols",adat->rows,adat->cols);
 	 	if(adat->dat != NULL) free(adat->dat);	/* free string array  */
 		adat->sval=(char **)malloc(sizeof(char *)*adat->rows*adat->cols);
 		for(i=0;i< adat->rows*adat->cols;i++) adat->sval[i]=NULL;
@@ -136,7 +135,7 @@ void allocate_array(struct array_dat *adat)
 struct array_dat *alloc_array()
 {
  static int array_num=0;
- MESG("aloc_array:");
+ // MESG("aloc_array:");
  array_dat *na=(array_dat *)malloc(sizeof(struct array_dat));
  na->anum = array_num++;
  return(na);

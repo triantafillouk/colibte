@@ -264,11 +264,12 @@ void parse_command_line(int argc, char **argv)
 					startfile=argv[carg];
 					if(execmd) 
 					{	/* initialize array  */
-						// MESG("initialize array of size %d",argc-4);
-						main_args = new_list_array(argc-4);
+						// MESG("initialize array starting at %d",carg);
+						main_args = new_list_array(argc-carg-1);
 						allocate_array(main_args);
-						MESG("show main_args");
-						MESG("	cols=%d rows=%d",main_args->cols,main_args->rows);
+						a_arg=0;
+						// MESG("show main_args");
+						// MESG("	cols=%d rows=%d",main_args->cols,main_args->rows);
 					};
 					break;
 // mcurflag is used by ncurses, do not use mouse integration
@@ -304,14 +305,15 @@ void parse_command_line(int argc, char **argv)
 			}
 		}  else {
 			if(execmd) {	/* popylate the array  */
-				MESG("- push %d -> %d of %d: %s",carg,a_arg,argc,argv[carg]);
-				main_args->sval[a_arg] = argv[a_arg];
+				// MESG("- push %d -> %d of %d: %s",carg,a_arg,argc,argv[carg]);
+				main_args->sval[a_arg] = argv[carg];
 				a_arg++;
+				// carg++;
 				continue;
 			};
 			int bflag=0;
 			/* Process an input file */
-			MESG("- process %d: %s",carg,argv[carg]);
+			// MESG("- process %d: %s",carg,argv[carg]);
 			set_bfname(bname,argv[carg]);
 //			MESG("main: new input file: [%s]",bname);
 			if(mmapflag) bflag |= FSMMAP;
