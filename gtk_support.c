@@ -17,7 +17,7 @@
 
 
 static GList *pixmaps_directories = NULL;
-
+char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_not_found);
 double bt_dval(char *name);
 
 GtkWidget *kt_new_listview(GtkListStore *store, GtkWidget *parent_box, gchar **ctitles,int show_titles)
@@ -132,7 +132,7 @@ GtkWidget* create_pixmap(GtkWidget *widget, char *filename)
       return create_dummy_pixmap (widget);
 
   /* We first try any pixmaps directories set by the application. */
-	if((found_filename = find_file("pixmap",filename,1,0))==NULL) 
+	if((found_filename = find_file("pixmaps",filename,1,0))==NULL) 
 		return create_dummy_pixmap (widget);
 
   colormap = gtk_widget_get_colormap (widget);

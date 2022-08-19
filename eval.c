@@ -35,6 +35,8 @@ extern FILEBUF *cbfp;
 extern int record_session;
 #endif
 
+int dofile(char *fname);
+
 // Editor variables
 char *fvars[] = {
 	"_file_name",		/* CURRENT FILE NAME */
@@ -724,23 +726,23 @@ int dofile(char *fname)
 	int status;	/* results of various calls */
 	char bname[MAXFLEN];
 	snprintf(bname,MAXFLEN,"[%s]",fname);
-	MESG("dofile:[%s]",fname);
+	// MESG("dofile:[%s]",fname);
 	show_stage=0;
 	set_screen_update(false);
 	if((bp=get_filebuf(bname,NULL,0))==NULL) { // file not in memory, load it!
 		if ((bp = new_filebuf(bname, 0)) == NULL) /* get the needed buffer */
 			return(FALSE);
-	MESG("dofile: 01");
+	// MESG("dofile: 01");
 
 	/* and try to read in the file to execute */
 		if(cbfp == NULL) cbfp=bp;
-	MESG("dofile: 10 %s",fname);
+		// MESG("dofile: 10 %s",fname);
 		if ((status = file_read1(bp,fname)) != TRUE) {
-			MESG("dofile: status=%d",status);
+			// MESG("dofile: status=%d",status);
 			return(status);
 		};
 	} else {
-	MESG("dofile: 02");
+		// MESG("dofile: 02");
 		if((bp->b_state & FS_ACTIVE)==0) {
 			activate_file(bp);
 			if ((status = file_read1(bp,fname)) != TRUE) {
@@ -751,18 +753,17 @@ int dofile(char *fname)
 			activate_file(bp);
 		};
 	};
-	MESG("go execute it");
+	// MESG("go execute it");
 	/* go execute it! */
 	int backup_caf=current_active_flag;
 	set_dval(compute_block(bp,bp,1));
-	MESG("----");
 	current_active_flag=backup_caf;
-	MESG("dofile: 1");
+	// MESG("dofile: 1");
 	/* if not displayed, remove the now unneeded macro buffer and exit */
 	if (bp->b_nwnd == 0) 
 		delete_filebuf(bp,1);
 	set_screen_update(true);
-	MESG("dofile: 2");
+	// MESG("dofile: 2");
 
 	if(err_num>0) return(FALSE);
 	return(TRUE);

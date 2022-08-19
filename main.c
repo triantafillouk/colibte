@@ -16,6 +16,7 @@
 #include	<sys/stat.h>
 #include	<sys/types.h>
 #include	<syslog.h>
+#include	"mlang.h"
 
 char *startfile=NULL;	/* startfile to execute */
 #if	RSESSION
@@ -39,6 +40,9 @@ alist *color_schemes;
 
 void help_arguments(int f);
 void set_screen_update(int flag);
+
+struct array_dat *main_args=NULL;
+int dofile(char *fname);
 
 int new_in_key_list=0;
 
@@ -134,7 +138,7 @@ int main(int argc, char **argv)
 				// MESG("startfile executed!");
 			};
 		} else {
-			// MESG("do startfile");
+			MESG("do startfile");
 			dofile(startfile);
 		};
 		// MESG("show errors");
@@ -216,7 +220,7 @@ void parse_command_line(int argc, char **argv)
 	int cryptflag;			/* encrypting on the way in? */
 	char ekey[MAXSLEN];		/* startup encryption key */
 #endif
-
+	int a_arg=0;
 #if	CRYPT
 	cryptflag = FALSE;	/* no encryption by default */
 #endif
@@ -258,6 +262,15 @@ void parse_command_line(int argc, char **argv)
 				case 'X':	/* execute file as statrup */
 					carg++;
 					startfile=argv[carg];
+					if(execmd) 
+					{	/* initialize array  */
+						// MESG("initialize array starting at %d",carg);
+						main_args = new_list_array(argc-carg-1);
+						allocate_array(main_args);
+						a_arg=0;
+						// MESG("show main_args");
+						// MESG("	cols=%d rows=%d",main_args->cols,main_args->rows);
+					};
 					break;
 // mcurflag is used by ncurses, do not use mouse integration
 				case 'n':
@@ -291,8 +304,16 @@ void parse_command_line(int argc, char **argv)
 					break;
 			}
 		}  else {
+			if(execmd) {	/* popylate the array  */
+				// MESG("- push %d -> %d of %d: %s",carg,a_arg,argc,argv[carg]);
+				main_args->sval[a_arg] = argv[carg];
+				a_arg++;
+				// carg++;
+				continue;
+			};
 			int bflag=0;
 			/* Process an input file */
+			// MESG("- process %d: %s",carg,argv[carg]);
 			set_bfname(bname,argv[carg]);
 //			MESG("main: new input file: [%s]",bname);
 			if(mmapflag) bflag |= FSMMAP;

@@ -407,7 +407,7 @@ double gosub(char *,VAR *vargs);
 int execsub(int n);
 
 int exec_file(int n);
-int dofile(char *fname);
+// int dofile(char *fname,array_dat *args_array);
 #if	CTAGS
 int update_tags(int n);
 #endif

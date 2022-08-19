@@ -17,13 +17,16 @@ struct array_dat *new_array(int rows,int cols);
 struct array_dat *new_array_similar(array_dat *a);
 void allocate_array(struct array_dat *adat);
 
+
 void init_array(struct array_dat *array, int rows,int cols)
 {
 	int ctype=VTYPE_ARRAY;	/* default is numeric!!  */
+	// MESG("init_array: ex_nums=%d ex_nquote=%d ex_nvars=%d",ex_nums,ex_nquote,ex_nvars);
 	if(ex_nums) ctype=VTYPE_ARRAY;
 	else if(ex_nquote) ctype=VTYPE_SARRAY;
 	else if(ex_nquote>0 && ex_nums>0) ctype=VTYPE_AMIXED;
 	else if(ex_nvars) ctype=VTYPE_DYNAMIC;
+	// MESG("ctype=%d",ctype);
 	array->rows=rows;
 	array->cols=cols;
 	array->atype=ctype;
@@ -32,9 +35,17 @@ void init_array(struct array_dat *array, int rows,int cols)
 	ex_vtype=ctype;
 	/* init again after use the ex values!  */
 	ex_nums=0;ex_nquote=0;ex_nvars=0;
-	ex_vtype=VTYPE_ARRAY;
+	// MESG("init_array: type=%d",ex_vtype);
 }
 
+/* List array is one dimensional string array  */
+struct array_dat * new_list_array(int cols)
+{
+	struct array_dat *sarray;
+	ex_nquote=1;
+	sarray = new_array(1,cols);
+	return sarray;
+}
 
 void free_array_dat(struct array_dat *adat)
 {
@@ -78,6 +89,7 @@ void free_array(char *spos,struct array_dat *adat)
 void allocate_array(struct array_dat *adat)
 {
  int i;
+ // MESG("allocate_array: astat=%d type=%d",adat->astat,adat->atype);
  if(adat->astat==0 || adat->atype==VTYPE_DYNAMIC) {	/* new/renew  */
  	if(adat->atype==VTYPE_ARRAY) {	/* allocate num array  */
 
@@ -106,9 +118,11 @@ void allocate_array(struct array_dat *adat)
 
 	};
 	if(adat->atype==VTYPE_SARRAY) {	/* allocate string array  */
+		// MESG("	allocate string array %d rows, %d cols",adat->rows,adat->cols);
 	 	if(adat->dat != NULL) free(adat->dat);	/* free string array  */
 		adat->sval=(char **)malloc(sizeof(char *)*adat->rows*adat->cols);
 		for(i=0;i< adat->rows*adat->cols;i++) adat->sval[i]=NULL;
+		adat->astat=3;
 	};
 	if(adat->atype==VTYPE_AMIXED || adat->atype==VTYPE_DYNAMIC) {	/* new mixed  */
 		if(adat->mval!=NULL) free(adat->mval);
@@ -121,6 +135,7 @@ void allocate_array(struct array_dat *adat)
 struct array_dat *alloc_array()
 {
  static int array_num=0;
+ // MESG("aloc_array:");
  array_dat *na=(array_dat *)malloc(sizeof(struct array_dat));
  na->anum = array_num++;
  return(na);
@@ -714,18 +729,22 @@ void print_array1(char *title,array_dat *adat)
 		return;
 	};
 	
-	snprintf(so,MAXLLEN,"# %s Array %s, %d rows=%d cols=%d astat=%d",title,ex_name,adat->anum,adat->rows,adat->cols,adat->astat);
+	snprintf(so,MAXLLEN,"# %s Array %s, %d rows=%d cols=%d astat=%d type=%d",title,ex_name,adat->anum,adat->rows,adat->cols,adat->astat,adat->atype);
 	out_print(so,1);
 	strcpy(so,"");
 	if(adat->astat!=0) {
 	if(adat->rows>1 && adat->cols>1) {
 		snprintf(so,MAXLLEN,"#   :");
-		for(i=0;i< adat->cols;i++) { snprintf(s2,128,"%8d",i);strcat(so,s2);};
+		for(i=0;i< adat->cols;i++) { 
+			snprintf(s2,128,"%10d ",i);
+			strcat(so,s2);
+		};
 		out_print(so,1);
 		for(j=0;j<adat->rows;j++){
 			snprintf(so,128," %3d: ",j);
 			for(i=0;i<adat->cols;i++) {
-				snprintf(s2,128,"%7.3f ",adat->dval2[j][i]);
+				if(adat->atype==VTYPE_ARRAY) snprintf(s2,128,"%7.3f ",adat->dval2[j][i]);
+				else snprintf(s2,128,"%10s ",adat->sval[j*adat->cols+i]);
 				strcat(so,s2);
 			};
 			out_print(so,1);
@@ -733,12 +752,14 @@ void print_array1(char *title,array_dat *adat)
 	} else {
 		if(adat->cols==1) {
 			for(i=0;i<adat->rows;i++) {
-				snprintf(so,128," %3d: %f",i,adat->dval[i]);
+				if(adat->atype==VTYPE_ARRAY) snprintf(so,128," %3d: %f",i,adat->dval[i]);
+				else snprintf(so,128," %3d: %s",i,adat->sval[i]);
 				out_print(so,1);
 			};
 		} else {
 			for(i=0;i<adat->cols;i++) {
-				snprintf(s2,128,"%05.3f(%d) ",adat->dval[i],i);
+				if(adat->atype==VTYPE_ARRAY) snprintf(s2,128,"%05.3f(%d) ",adat->dval[i],i);
+				else snprintf(s2,128,"%10s(%d) ",adat->sval[i],i);
 				strcat(so,s2);
 			};
 			out_print(so,1);

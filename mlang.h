@@ -108,6 +108,8 @@ void set_error(tok_struct *tok,int index,char *description);
 int plot_on();
 void plot_redraw();
 BTNODE *find_bt_element(char *value);
+struct array_dat * new_list_array(int cols);
+void allocate_array(struct array_dat *adat);
 
 // Token type enumerator
 enum {

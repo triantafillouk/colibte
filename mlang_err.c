@@ -515,6 +515,7 @@ int err_factor()
 				continue;
 			};
 			err_num=err_num_expression();
+			
 			i++;if(i>cols) cols=i;
 			if(tok->ttype==TOK_RBRAKET) {
 				cdim=0;break;

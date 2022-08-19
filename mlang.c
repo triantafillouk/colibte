@@ -17,11 +17,14 @@
 #define	SYNTAX_DEBUG	0
 #define	NTOKEN2	tok++
 #define FACTOR_FUNCTION tok->factor_function()
+#define	USE_SARRAYS	1
 
 void mesg_out(const char *fmt, ...);
 extern FILEBUF *cbfp;
+extern array_dat *main_args;
 
 #if	SYNTAX_DEBUG
+tind
 #define	SHOWTOK {if(discmd) { MESG("  [%2d][%*s-%s][%d]  %s",stage_level,stage_level,"",Tds,tok->tnum,tok_name[tok->ttype]);};}
 
 #define	TDS(name)   char *Tds=name;\
@@ -155,7 +158,7 @@ char *tok_name[] = {
 
 // function names with number of arguments
 m_function m_functions[] = {
-	{"strlen",1},        /* STRING LENGTH */
+	{"len",1},        /* STRING LENGTH */
 	{"upper$",1},        /* UPPERCASE STRING */
     {"lower$",1},        /* LOWER CASE STRING */
 	{"left$",2},
@@ -194,8 +197,8 @@ m_function m_functions[] = {
 	{"at_eof",0},	/* if at end of file  */
 	{"at_bol",0},	/* if at begin of line  */
 	{"at_eol",0},	/* if at end of line  */
-	{"at_bop",0},	/* if at begin of paragraph  */
-	{"at_eop",0},	/* if at end of paragraph  */
+	{"args_size",0},	/* main arguments list size  */
+	{"args",1},	/* main  argument at position */
 	{NULL,0}
 };
 
@@ -240,8 +243,8 @@ UFATBOF,
 UFATEOF,
 UFATBOL,
 UFATEOL,
-UFATBOP,
-UFATEOP
+UFMAINARGLEN,
+UFMAINARG
 };
 
 /* directives */
@@ -401,6 +404,7 @@ tok_struct *new_tok()
  tok->tgroup=0;
  tok->factor_function=factor_none;
  tok->tnode=NULL;
+ // MESG("new_tok:");
  return(tok);
 }
 
@@ -469,6 +473,7 @@ void init_hash()
   for(i=0; m_functions[i].f_name != NULL;i++){ 
 	insert_bt_element(bt_table,m_functions[i].f_name,TOK_FUNC,i);
   };
+
 /* env variable */
   for(i=0;fvars[i]!=NULL;i++)
   {
@@ -478,7 +483,9 @@ void init_hash()
 /* option variables  */
  for(i=0;option_names[i].name!=NULL;i++) {
 	set_btval(option_names[i].name,TOK_OPTION,option_names[i].sval,option_names[i].dval);
- }
+ };
+
+ // set_btval("args",TOK_VAR,"",0);
 
  for(i=0;term_types[i].term_name!=NULL;i++)
  {
@@ -493,6 +500,7 @@ void init_hash()
 
 void initialize_vars()
 {
+ MESG("initialize_vars");
 }
 
 
@@ -728,7 +736,9 @@ MVAR * push_args_1(int nargs)
 			va_i->sval=strdup(slval);
 			break;
 		case VTYPE_ARRAY:
+		case VTYPE_SARRAY:
 			va_i->adat=ex_array;
+			va_i->vtype=ex_array->atype;
 			break;
 		default:
 			ERROR("error: wrong type arg %d",ex_vtype);
@@ -769,7 +779,7 @@ double eval_fun1(int fnum)
 			NTOKEN2;
 			vv[i] = num_expression();
 			if(ex_vtype==VTYPE_STRING) strlcpy(arg[i],slval,MAXLLEN);
-			else if (ex_vtype==VTYPE_ARRAY) arr=ex_array;
+			else if (ex_vtype==VTYPE_ARRAY||ex_vtype==VTYPE_SARRAY) arr=ex_array;
 			else arg[i][0]=0;
 		};
 		NTOKEN2;
@@ -829,7 +839,13 @@ double eval_fun1(int fnum)
 					value=0;
 				};
 				break;
-		case UFLENGTH:	value =strlen(arg[0]);ex_vtype=VTYPE_NUM;break;
+		case UFLENGTH:	
+			if(ex_vtype==VTYPE_STRING) { value =strlen(arg[0]);ex_vtype=VTYPE_NUM;break;};
+			if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
+				value=ex_array->rows*ex_array->cols;
+				ex_vtype=VTYPE_NUM;
+				break;
+			};
 		case UFLEFT:	strlcpy(slval,arg[0],MAXLLEN);
 				if(vv[1]>0 && vv[1]<strlen(arg[0])) slval[(int)vv[1]]=0;
 				ex_vtype=VTYPE_STRING;
@@ -990,6 +1006,22 @@ double eval_fun1(int fnum)
 			return(FBolAt(cbfp,Offset()));
 		case UFATEOL:
 			return(FEolAt(cbfp,Offset()));
+		case UFMAINARGLEN:
+			MESG("argument size: rows=%d cols=%d",main_args->rows,main_args->cols);
+			ex_vtype=VTYPE_NUM;
+			return main_args->cols;
+		case UFMAINARG: {
+			int ind;
+			ind=(int)vv[0];
+			if(ind<main_args->cols) {
+			strcpy(slval,main_args->sval[(int)vv[0]]);
+			ex_vtype=VTYPE_STRING;
+			return atof(slval);
+			} else {
+				ex_vtype=VTYPE_NUM;
+				return 0.0;
+			};
+		};
 		default:
 			value=0.0;
 			ex_vtype=VTYPE_NUM;
@@ -1043,6 +1075,7 @@ double factor_line_array()
 	cdim=1;
 	ex_array=adat;
 	ex_name="Definition";
+	// MESG("factor_line_array:");
 	allocate_array(ex_array);
 	NTOKEN2;
 	while(cdim>0){
@@ -1060,6 +1093,10 @@ double factor_line_array()
 				else adat->dval[j]=value;
 			};
 		};
+		if(adat->atype==VTYPE_SARRAY) {
+			// MESG("	add row %d col=%d [%s]",i,j,slval);
+			if(slval!=NULL)	adat->sval[cols*j+i]=strdup(slval);
+		};
 		i++;if(i>cols) cols=i;
 		if(tok->ttype==TOK_SHOW || tok->ttype==TOK_RBRAKET) {
 			cdim=0;break;
@@ -1073,7 +1110,7 @@ double factor_line_array()
 	};
 	ex_array->astat=1;
 	ex_vtype=adat->atype;
-//		print_array1("",adat);
+	print_array1("",adat);
 	NTOKEN2;
 	RTRN(1.2);
 }
@@ -1092,6 +1129,7 @@ double factor_variable()
 			NTOKEN2;
 			RTRN(lsslot->dval);
 		case VTYPE_ARRAY:
+		case VTYPE_SARRAY:
 			ex_array=lsslot->adat;
 			ex_name=tok->tname;
 			NTOKEN2;
@@ -2034,7 +2072,7 @@ double assign_val(double none)
 		if(sslot->vtype==VTYPE_STRING) {
 			free(sslot->sval);
 		} else {
-			if(sslot->vtype!=VTYPE_ARRAY)	/* added to handle arrays (v698l) but CHECK!!!!  */
+			if(sslot->vtype!=VTYPE_ARRAY && sslot->vtype!=VTYPE_SARRAY)	/* added to handle arrays (v698l) but CHECK!!!!  */
 				sslot->vtype=ex_vtype;
 			if(ex_vtype==VTYPE_NUM) {
 				*sslot->pdval=v1;
@@ -2044,8 +2082,10 @@ double assign_val(double none)
 				sslot->sval=strdup(slval);
 				return(0);
 			};
-			if(ex_vtype==VTYPE_ARRAY) {
+			if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
+				// MESG("assign array to var!");
 				sslot->adat=ex_array;
+				sslot->vtype=ex_array->atype;
 				if(ex_array->astat==3) ex_array->astat=1;	/* make it local to variable  */
 			};
 		};
@@ -2055,11 +2095,14 @@ double assign_val(double none)
 			sslot->dval=v1;
 			return(v1);
 		};
-		if(ex_vtype==VTYPE_ARRAY) {
+		if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
 //				print_array1("assign array ",ex_array);
 //				print_array1("to array",sslot->adat);
 			if(ex_array->anum != sslot->adat->anum) {
  				if(sslot->adat->dval) free_array("assign",sslot->adat);
+				if(sslot->adat->sval) {
+					// MESG("free string array!");
+				};
 				sslot->adat=ex_array;
 				if(ex_array->astat==3) ex_array->astat=1;	/* make it local to variable  */
 			};
@@ -2093,6 +2136,7 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 			case VTYPE_STRING:
 				arg_dat->sval=va->sval;break;
 			case VTYPE_ARRAY:
+			case VTYPE_SARRAY:
 				arg_dat->adat=va->adat;break;
 			default:
 				ERROR("assign_args:[%d] type is wrong! (%d)",i,va->vtype);
@@ -2209,7 +2253,7 @@ void refresh_ddot_1(double value)
 	} else {	/* a decimal value!  */
 		stat=snprintf(sout,MAXLLEN," %5.*f",precision,value);
 	};
- } else if(ex_vtype==VTYPE_ARRAY) {
+ } else if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
 	array_dat *adat = ex_array;
  	stat=snprintf(sout,MAXLLEN,"array %d, slot %ld rows %d,cols %d",adat->anum,lsslot-current_stable,adat->rows,adat->cols);
 	print_array1(":",adat);
@@ -2349,7 +2393,7 @@ double tok_dir_fori()
 	NTOKEN2;
 
 	dstep=num_expression();
-
+	// MESG("fori: from %f to %f step %f",dinit,dmax,dstep);
 	if(tok->ttype!=TOK_RPAR) { err_num=226;ERROR("for i: error %d",err_num);};
 	NTOKEN2;	/* skip right parenthesis  */
 	// set block start
@@ -2361,6 +2405,11 @@ double tok_dir_fori()
 	} else {
 		skip_sentence1();
 		end_block=tok;
+	};
+	if(dinit==dmax) {
+		tok=end_block;
+		current_active_flag=old_active_flag;
+		return 1;
 	};
 	if(dstep>0 && dmax > *pdval) {
 		for(;*pdval < dmax; *pdval +=dstep) {
@@ -2654,8 +2703,10 @@ int refresh_current_buffer(int nused)
  if(plot_on()) plot_redraw();
  textpoint_set_lc(cwp->tp_current,curline,0);
  msg_line("");
- return(1);
+ set_update(cwp,UPD_EDIT);
+ return(OK_CLRSL);
 }
+
 // parse, check current buffer
 int parse_check_current_buffer(int n)
 {

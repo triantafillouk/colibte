@@ -16,6 +16,7 @@
 
 void set_box_background_color(GtkWidget *box,char *bgcolor);
 void set_box_color(GtkWidget *box,char *color,char *bgcolor);
+char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_not_found);
 
 GtkWidget *kt_new_listview(GtkListStore *store, GtkWidget *parent_box, gchar **ctitles,int show_titles)
 {
@@ -244,7 +245,7 @@ GtkWidget* create_pixmap(GtkWidget *widget, char *filename)
   GError *error=NULL;
   
   /* We first try any pixmaps directories set by the application. */
-	if((found_filename = find_file("pixmaps",filename,1,0)==NULL)) return NULL;
+	if((found_filename = find_file("pixmaps",filename,1,0))==NULL) return NULL;
 
 	pixbuf = gdk_pixbuf_new_from_file(found_filename,&error);
 	if(pixbuf) {

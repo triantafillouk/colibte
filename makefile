@@ -25,7 +25,7 @@ SHAREDDIR=/usr/share
 ifeq ($(USE_GLIB),1)
 GLIB_LIB=`pkg-config glib-2.0 --libs`
 else
-GLIB_LIB=''
+GLIB_LIB=
 endif
 
 # for Darwin

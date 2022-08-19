@@ -70,6 +70,7 @@ int add_to_symbol_tree(BTREE *stable,char *name)
 {
 	BTNODE *btn=NULL;
 	/* create the variable in the symbol_table!  */
+	// MESG("add_to_symbol_tree: %s table items=%d",name,stable->items);
 	btn=add_btnode(stable,name);
 	if(stable->new_flag) {
 		btn->node_type=TOK_VAR;
@@ -77,9 +78,11 @@ int add_to_symbol_tree(BTREE *stable,char *name)
 		btn->node_index=stable->items-1;	/*  variable index  */
 		btn->sval=NULL;
 		stable->new_flag=0;
+		// MESG("- this is new! index=%d",btn->node_index+1);
 		return (btn->node_index+1);
 	} else {
 		// found 
+		// MESG(" - this found! index=%d type=%d subtype=%d",btn->node_index+1,btn->node_type,btn->node_index);
 		return -(btn->node_index+1);
 	}
 }
@@ -241,6 +244,7 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 {
  int ind;
  	tok->ttype=TOK_VAR;
+	// MESG("set_var: name=%s",name);
 	ind=add_to_symbol_tree(stree,name);
 	ex_edenv=TOK_VAR;
 	if(ind>0) { 	/* this is a new one  */
@@ -283,7 +287,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int next_tok_type=0;
  int script_active=0;
 
-// MESG("parse_block1: file_type=%d",bf->b_type);
+MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
  if(
  	file_type_is("CMD",bf->b_type)
 	|| file_type_is("DOT",bf->b_type)
@@ -303,6 +307,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  lex_parser=new_list(0,"lex_parser");
 
  if(init==1 || stree==NULL) {	/* create a new symbo table if needed  */
+	if(bf->symbol_tree) free_btree(bf->symbol_tree);
 	bf->symbol_tree=new_btree(bf->b_fname,0);
 	stree=bf->symbol_tree;
 	stree->max_items=999999;
@@ -316,6 +321,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		scan=nscan;
 	};
  };
+
  foffset=0;	/* goto to the beginning of the buffer  */
  cstack=new_list(0,"curles_stack"); // create curles stack 
  
@@ -323,6 +329,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  err_line=0;
  tok_line=0;
  save_stage_level=stage_level;
+
  while(getnc1(bf,&cc,&tok_type))
  {
  // MESG("	cc=%d type=%d %s ",cc,tok_type,tok_name[tok_type]);
