@@ -74,6 +74,7 @@ extern void main_loop();
 int driver_type;
 char *lc_lang;
 int mmnote=0;
+int mmtodo=0;
 
 FILEBUF *get_first_scratch_buffer()
 {
@@ -160,8 +161,19 @@ int main(int argc, char **argv)
 	if(mmnote) {
 		edinit("[Tag view]");
 		activate_file(cbfp);
-//		MESG("selected tag view cfbp=%s",cbfp->b_fname);
+// 		view_note(1);
+		// activate_file(cbfp);
+		set_update(cwp,UPD_EDIT);
+		MESG("selected tag view cfbp=%s",cbfp->b_fname);
 	} else 
+	if(mmtodo) {
+		edinit("[todo view]");
+		activate_file(cbfp);
+		set_update(cwp,UPD_EDIT);
+// 		view_note(1);
+		// set_update(cwp,UPD_EDIT);
+		MESG("selected todo view %f",cbfp->b_fname);		
+	} else
 #endif
 	{
 	if(firstbp==NULL) {
@@ -184,7 +196,18 @@ int main(int argc, char **argv)
 	if(mmnote){
 		show_tag_view(1);
 		select_filebuf(cbfp);
+		MESG("selected tag view 2 cfbp=%s",cbfp->b_fname);
 	} else
+	if(mmtodo) {
+		show_todo_list(0);
+		select_filebuf(cbfp);
+// 		set_update(cwp,UPD_EDIT);
+		// activate_file(cbfp);
+		// view_note(1);
+		// activate_file(cbfp);
+		set_update(cwp,UPD_EDIT);
+		MESG("todo view 2");
+	}
 #endif
 	{
 		select_filebuf(cbfp);
@@ -282,6 +305,9 @@ void parse_command_line(int argc, char **argv)
 #if	TNOTES
 				case 'N':
 					mmnote = TRUE;
+					break;
+				case 't':
+					mmtodo = TRUE;
 					break;
 #endif
 				case 'p':
