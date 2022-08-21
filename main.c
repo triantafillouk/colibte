@@ -75,6 +75,7 @@ int driver_type;
 char *lc_lang;
 int mmnote=0;
 int mmtodo=0;
+int mmcal=0;
 
 FILEBUF *get_first_scratch_buffer()
 {
@@ -173,6 +174,11 @@ int main(int argc, char **argv)
 // 		view_note(1);
 		// set_update(cwp,UPD_EDIT);
 		MESG("selected todo view %f",cbfp->b_fname);		
+	} else 
+	if(mmcal) {
+		edinit("[calendar view]");
+		activate_file(cbfp);
+		set_update(cwp,UPD_EDIT);
 	} else
 #endif
 	{
@@ -207,7 +213,13 @@ int main(int argc, char **argv)
 		// activate_file(cbfp);
 		set_update(cwp,UPD_EDIT);
 		MESG("todo view 2");
-	}
+	} else
+	if(mmcal) {
+		show_calendar_list(0);
+		select_filebuf(cbfp);	
+		set_update(cwp,UPD_EDIT);
+		MESG("calendar view 2");
+	} else
 #endif
 	{
 		select_filebuf(cbfp);
@@ -306,8 +318,11 @@ void parse_command_line(int argc, char **argv)
 				case 'N':
 					mmnote = TRUE;
 					break;
-				case 't':
+				case 'T':
 					mmtodo = TRUE;
+					break;
+				case 'L':
+					mmcal = TRUE;
 					break;
 #endif
 				case 'p':

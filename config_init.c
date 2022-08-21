@@ -174,17 +174,17 @@ void load_config()
  pair_nums=read_pairs(fname,'=',&name_array,&value_array);
  if(pair_nums) {
 	for(flag_name=name_array[i];(flag_name=name_array[i])!=NULL;i++){
-		MESG("	- set [%s] to %d",flag_name,atoi(value_array[i]));
+		// MESG("	- set [%s] to %d",flag_name,atoi(value_array[i]));
 		set_btval(flag_name,-1,NULL,atoi(value_array[i]));
 	};
  };
 
  sarray_clear(name_array);
  sarray_clear(value_array);
+ MESG("configuration loaded! (%d) pairs",pair_nums);
  };
  set_key_emulation((int)bt_dval("keyboard_emulation"));
 
- MESG("configuration loaded!");
 }
 #endif
 
@@ -234,6 +234,7 @@ void save_config()
 {
  char *fname = find_file(NULL,CONFIGFILE,0,1);
  FILE *f = fopen(fname,"w");
+ if(f) {
  int i=0;
  // MESG("save_config: to [%s]",fname);
 
@@ -245,6 +246,10 @@ void save_config()
 	i++;var=&option_names[i];
  };
  fclose(f);
+ MESG("configuration saved to %s",fname);
+ } else {
+ 	MESG("cannot write to configuration file %s",fname);
+ }
 }
 #endif
 
