@@ -81,7 +81,7 @@ int new_note(int type)
  if(type<2) type=1;
  if(type==1) snprintf(scratch_name,24,"[note %d]",scratch_ind);
  if(type==2) { 
-	res=snprintf(scratch_name,24,"%s",date_string(3));
+	res=snprintf(scratch_name,24,"%s.cal",date_string(3));
 	if(res==25) MESG("cal name truncated");
  };
  if(type==3) { 
@@ -442,7 +442,7 @@ int save_to_db(notes_struct *note)
  int stat=false;
  int note_id=0;
  if((db=notes_db_open())==NULL) return false;
- MESG("save_to_db:");
+ // MESG("save_to_db:");
  // MESG("save_to_db: title [%s]",note->n_title);
  // MESG("note name [%s]",note->n_name);
  // check if found
@@ -591,7 +591,7 @@ int parse_note(FILEBUF *fp)
 		return false;
 	};
 	if(fp->b_type & NOTE_CAL_TYPE) {
-		MESG("	--- NOTE_CAL_TYPE:");
+		MESG("	--- NOTE_CAL_TYPE:fname=[%s]",fp->b_fname);
 #if	0
 		if(note==NULL) {
 			MESG("calendar note is null!!!");
@@ -649,7 +649,8 @@ int parse_note(FILEBUF *fp)
 		char *start_cat_name = NULL;
 		if((start_cat_name = strstr(fp->b_dname,"calendar")) !=NULL) {
 			sprintf(note->n_tags,"calendar");
-			MESG("calendar note: date=[%s]",note->n_date);
+			if(strstr(fp->b_fname,".cal")) strcpy(note->n_name,fp->b_fname);
+			// MESG("calendar note: date=[%s]",note->n_date);
 		} else 
 		if((start_cat_name = strstr(fp->b_dname,"todo")) !=NULL) {
 			sprintf(note->n_tags,"todo");
@@ -659,7 +660,6 @@ int parse_note(FILEBUF *fp)
 			// MESG("	set n_cat=%s n_name=%s",note->n_cat,note->n_name);
 		} else { 
 			// MESG("not a note,calendar,todo!");
-			// return false; 
 		};
 	if(ptr==0) {
 		errors++;
@@ -682,7 +682,7 @@ int parse_note(FILEBUF *fp)
 			MESG("### parse error, category is empty!");
 			return false;
 		};
-		MESG(";set cat=%s name=%s errors=%d",note->n_cat,note->n_name,errors);
+		// MESG(";set cat=%s name=%s errors=%d",note->n_cat,note->n_name,errors);
 		if(errors>2) return false;
 		return(true);
 	};
@@ -717,7 +717,7 @@ int parse_note(FILEBUF *fp)
 			strcpy(note->n_cat,cat);
 		};
 	}}; 
-	MESG("parse_note: Category = [%s] dir=%s",note->n_cat,fp->b_dname);
+	MESG("parse_note: Category = [%s] dir=%s name=[%s]",note->n_cat,fp->b_dname,fp->b_fname);
 	ptr = find_str_reol(fp,ptr,"#Tags: ",note->n_tags,sizeof(note->n_tags));
 
 	// TODO strip spaces
@@ -775,7 +775,7 @@ int save_note()
 	// create category subdir if not present!
 	set_notes_subdir(fp->b_dname,fp->b_note->n_cat);
 
-	// MESG("save_note: dir path [%s]",fp->b_dname);
+	MESG("save_note: dir path [%s][%s]",fp->b_dname,fp->b_fname);
 	struct stat statd;
 	if(stat(fp->b_dname,&statd)) {
 		status=mkdirRecursive(fp->b_dname,S_IRWXU);
@@ -983,7 +983,7 @@ int recreate_notes_db(int n)
 				bp=new_filebuf(notes_files[i],0);
 				bp->b_note = init_note();
 				select_filebuf(bp);
-				MESG("#%3d: go parse %s",i,notes_files[i]);
+				// MESG("#%3d: go parse %s",i,notes_files[i]);
 				if(!parse_note(bp)) {
 					msg_line(" file [%s] Not a note file !!!!!!!!!!!!",notes_files[i]);
 					delete_filebuf(bp,1);
@@ -992,7 +992,7 @@ int recreate_notes_db(int n)
 					continue;					
 				};
 				s_note=bp->b_note;
-				MESG("%3d: add - n=[%s] title=[%s] cat=[%s] tags=[%s]",i,s_note->n_name,s_note->n_title,s_note->n_cat,s_note->n_tags);
+				// MESG("%3d: add - n=[%s] title=[%s] cat=[%s] tags=[%s]",i,s_note->n_name,s_note->n_title,s_note->n_cat,s_note->n_tags);
 				status=save_to_db(s_note);
 				notes_new++;
 				select_filebuf(current_buffer);
