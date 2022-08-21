@@ -292,7 +292,7 @@ MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
  	file_type_is("CMD",bf->b_type)
 	|| file_type_is("DOT",bf->b_type)
 	|| file_type_is("GTEXT",bf->b_type) 
-	|| bf->b_type==0
+	// || bf->b_type==0
  ) script_active=1;
 
  if(bf->tok_table !=NULL && init==0) 
@@ -324,7 +324,7 @@ MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
 
  foffset=0;	/* goto to the beginning of the buffer  */
  cstack=new_list(0,"curles_stack"); // create curles stack 
- 
+ // MESG("before looping: script_active=%d",script_active);
  err_num=0;
  err_line=0;
  tok_line=0;
