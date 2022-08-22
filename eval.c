@@ -596,6 +596,7 @@ double compute_string(char *s,char *new_string)
  	init_error();
 	initialize_vars();
 	insert_string(fp,s,strlen(s));
+	fp->b_type=1;
 	value=compute_block(fp,cbfp,0);
 
 	if(new_string) {
@@ -1260,8 +1261,8 @@ int refresh_current_line(int nused)
 		textpoint_set(cwp->tp_current,tpo);	/* where it was !  */
 	};
 
-	set_update(cwp,UPD_ALL);
- 	return(UPD_ALL);
+	set_update(cwp,UPD_EDIT);
+ 	return(TRUE);
 }
 
 /* -- */

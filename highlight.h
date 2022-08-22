@@ -297,6 +297,7 @@ char *terraform_extensions[] = {"tfvars","tf",""};
 
 SHLIGHT hts[] = {
  { "NONE",0,0,none_w,none_w, highlight_text,update_highlight_none,c_in_txt_word,no_extensions,comment_perl },
+ { "CMD",0,0,cmd_w,cmd_w1, highlight_cmd,update_highlight,c_incword,cmd_extensions,comment_perl },
  { "TEXT",1,0,text_w,none_w, highlight_text,update_highlight_line,c_in_txt_word,txt_extensions,comment_perl },
  { "C", 0,0,c_w,c_w1,highlight_c,update_highlight,c_incword,c_extensions,comment_cc },
  { "SHELL",0,0,shell_w,shell_w1, highlight_shell,update_highlight,c_incword,shell_extensions,comment_perl },
@@ -319,7 +320,6 @@ SHLIGHT hts[] = {
  { "PYTHON",0,1,python_w,python_w1, highlight_python,update_highlight,c_incword,python_extensions,comment_perl },
  { "BASIC",1,0,basic_w,basic_w1, highlight_other,update_highlight,c_incword,basic_extensions,comment_basic },
  { "WML",1,0,wml_w,wml_w1, highlight_html,update_highlight,c_incword,wml_extensions,comment_html },
- { "CMD",0,0,cmd_w,cmd_w1, highlight_cmd,update_highlight,c_incword,cmd_extensions,comment_perl },
  { "DOT",1,0,none_w,none_w, highlight_other,update_highlight,c_incword,dot_extensions,comment_perl },
  { "XML",1,0,xml_w,xml_w1, highlight_html,update_highlight,c_incword,xml_extensions,comment_html },
  { "MAIL",0,0,mail_w,mail_w1, highlight_text,update_highlight,c_incword,no_extensions,comment_none },
