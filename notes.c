@@ -443,7 +443,7 @@ int save_to_db(notes_struct *note)
  int note_id=0;
  if((db=notes_db_open())==NULL) return false;
  // MESG("save_to_db:");
- // MESG("save_to_db: title [%s]",note->n_title);
+ MESG("save_to_db: title [%s]",note->n_title);
  // MESG("note name [%s]",note->n_name);
  // check if found
  if(snprintf(sql,1024,"SELECT Category,rowid from notes where Name = '%s';",note->n_name)>=1024) {
@@ -455,10 +455,11 @@ int save_to_db(notes_struct *note)
  // MESG(" new_cat=[%s] note_id is %d!",new_cat,note_id);
  
  char **current_tag_array = split_2_sarray(note->n_tags,',');
+	 // MESG("	tags array [%s]",note->n_tags);
 	char **ta=current_tag_array;
 	char *tag;
 
-//	MESG("--- new tag list ----");
+	//	MESG("--- new tag list ----");
 	while((tag = *ta++)!=NULL) {
 		string_2_nospaces(tag);
 //		MESG("	- new tag  [%s]",tag);
@@ -466,7 +467,7 @@ int save_to_db(notes_struct *note)
  
  // MESG("save_to_db: note_id=%d name=[%s] cat=[%s] new_cat=[%s]",note_id,note->n_name,note->n_cat,new_cat);
  if(note_id && !strcmp(note->n_cat,(char *)new_cat )) {
-	MESG("same note file! update [%s]/[%s]",new_cat,note->n_name);
+	// MESG("same note file! update [%s]/[%s]",new_cat,note->n_name);
 
 	// delete all old tags (no check!!)
 	sprintf(sql,"delete from tags where note_id = %d;",note_id);
@@ -514,7 +515,7 @@ int save_to_db(notes_struct *note)
 		stat=false;
 		new_note_id=0;
 	};
- // create tags
+	// create tags
  	if(new_note_id) {
 		char **ta=current_tag_array;
 		char *tag;
@@ -540,14 +541,13 @@ int save_tag(sqlite3 *db,int notes_id,char *tag)
 	};
 	if(sql_exec(db,sql,1)) {
 		tag_id = sqlite3_last_insert_rowid(db);
-//		MESG("New tag [%s]",tag);
+		//	MESG("New tag [%s]",tag);
 	} else {
 		tag_id=0;
-//		MESG("tag [%s] exists",tag);
 		// get tag id!
 		if(snprintf(sql,120,"SELECT rowid from tag where name = '%s';",tag)>=120) MESG("truncated tag!"); 
 		tag_id = query_rowid(db,sql);
-//		MESG("tag id is %d",tag_id);
+		//	MESG("tag id is %d",tag_id);
 	};
 	sprintf(sql,"INSERT INTO TAGS(tag_id,note_id) VALUES ('%d', '%d');",tag_id,notes_id);
 	sql_exec(db,sql,0);
@@ -592,17 +592,7 @@ int parse_note(FILEBUF *fp)
 	};
 	if(fp->b_type & NOTE_CAL_TYPE) {
 		MESG("	--- NOTE_CAL_TYPE:fname=[%s]",fp->b_fname);
-#if	0
-		if(note==NULL) {
-			MESG("calendar note is null!!!");
-			note=fp->b_note=init_note();
-			strcpy(note->n_name,fp->b_fname);
-			errors++;
-			// MESG("parse_note:1 n_name=[%s]",note->n_name);
-		};
-#else
 		strcpy(note->n_name,fp->b_fname);
-#endif
 		strcpy(note->n_date,fp->b_fname);
 		// MESG("parse_note: n_date=[%s]",note->n_date);
 		if(strlen(note->n_name)==0)	{
@@ -614,7 +604,13 @@ int parse_note(FILEBUF *fp)
 		strcpy(note->n_cat,"calendar/");
 		memcpy(note->n_cat+9,fp->b_fname,4);note->n_cat[13]=0;	// add the year to calendar category
 		// MESG("calendar cat [%s]",note->n_cat);
-		sprintf(note->n_tags,"calendar");
+
+		note->n_tags[0]=0;
+		ptr = find_str_reol(fp,ptr,"#Tags:",note->n_tags,sizeof(note->n_tags));
+		if(!strstr(note->n_tags,"calendar")){
+			strncat(note->n_tags,",",sizeof(note->n_tags));
+			strncat(note->n_tags,"calendar",sizeof(note->n_tags));
+		};
 		return true;
 	};
 
@@ -639,7 +635,12 @@ int parse_note(FILEBUF *fp)
 		// MESG("calendar, title = %s",note->n_title);
 		strcpy(note->n_cat,"todo/");
 		memcpy(note->n_cat+9,fp->b_fname,4);note->n_cat[13]=0;
-		sprintf(note->n_tags,"todo");
+		note->n_tags[0]=0;
+		ptr = find_str_reol(fp,ptr,"#Tags:",note->n_tags,sizeof(note->n_tags));
+		if(!strstr(note->n_tags,"todo")){
+			strncat(note->n_tags,",",sizeof(note->n_tags));
+			strncat(note->n_tags,"todo",sizeof(note->n_tags));
+		};
 		return true;
 	};
 
