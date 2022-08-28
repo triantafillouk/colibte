@@ -387,21 +387,23 @@ MENUS m_color = {
 };
 #endif
 
+#if	USE_GLIB
 M_element e_gconvert[] =
 {
 	{0, '9', "IBM PC to ISO8859", "", 	convert_char, (struct MENUS *)1,"MT9"},
 	{0, 'P', "ISO8859 to IBM PC", "",	convert_char, (struct MENUS *)2,"MTP"},
-#if	USE_GLIB
 	{0, 'U', "local to UTF8    ", "",	convert_char, (struct MENUS *)3,"MTU"},
 	{0, 'F', "Utf8 to local    ", "",	convert_char, (struct MENUS *)4,"MTF"},
-#endif
 	{0, 0, NULL,"",NULL,0}
 };
+#endif
 
+#if	USE_GLIB
 MENUS m_gconvert = {
 	"GConvert",
 	50, 5, VERTICAL,e_gconvert
 };
+#endif
 
 M_element e_convert[] = 
 {
@@ -523,7 +525,9 @@ M_element e_mode[] =
 	{MMENU,'M',"color scheMe     ","", NULL, &m_color,"MM" },
 #endif
 #endif
+#if	USE_GLIB
 	{MMENU, 'T', "character converT", "", 	NULL, &m_gconvert,"MT"},
+#endif
 #if	!PCURSES
 	{0, 'F', "select Font     ","",select_font_mono,0,"MF"},
 #endif

@@ -17,6 +17,7 @@
 #include	"keytable.h"
 #include	"mlang.h"
 
+#if	USE_GLIB
 /* Translate output to ISO-8859-7 , IBMPC 737 */
 char x_out[2][128] = {
  {
@@ -42,6 +43,8 @@ char x_out[2][128] = {
  0xA7,0xA8,0xAA,0xA9,0xAB,0xAC,0xAD,0xAE,0xAF,0xE0,0xE4,0xE8,0xE6,0xE7,0xE9,255  /* 240 */
  },
 };
+#endif
+
 
 char ascii_cap[256] = {
 	0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,
@@ -343,10 +346,12 @@ inline int capital(int c)
 	return ascii_cap[c];
 }
 
+#if	USE_GLIB
 inline int xlate(int lang, int c)
 {
 	return x_out[lang][c-128];
 }
+#endif
 
 //returns item of key-function table
 KEYTAB *key_item(KEYTAB *key_table,int c)

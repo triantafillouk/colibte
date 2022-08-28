@@ -126,6 +126,7 @@ int unix2dos(int n)
  return true;
 }
 
+#if	USE_GLIB
 /* Character convertions */
 int convert_char(int n)
 {
@@ -148,7 +149,6 @@ int convert_char(int n)
 	};	
  }
  } 
-#if	USE_GLIB
  else { // utf8 conversions
 	char *cc1=NULL,*c2;
 	int len,i;
@@ -232,11 +232,9 @@ int convert_char(int n)
 	};
 	textpoint_set_lc(cwp->tp_current,cline,0);
  };
-#else
- else return FALSE;
-#endif
  set_modified(cfp);
  return(TRUE);
 }
+#endif
 
 /* -- */
