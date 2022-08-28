@@ -887,7 +887,7 @@ int show_sqlite_tables(char *fname)
     
     if (rc != SQLITE_OK) {
 		error_line("Cannot open database: %s", sqlite3_errmsg(db));
-        sqlite3_close(db);
+        sqlite3_close(db);	/* ??  */
         return false;
     };
     

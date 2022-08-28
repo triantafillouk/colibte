@@ -120,7 +120,7 @@ ctg2 ctg3 : _X11_=1
 
 ctg2 gldisplay.o : GTK2=1
 
-FLAGS1 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DWSL=$(WSL) -DPCURSES=$(PCURSES) -DTNOTES=$(TNOTES) -DGTK=$(GTK) $(GLIBINCLUDE) -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) -DTNOTES=$(TNOTES) $(X11include) -I/usr/include/ncurses
+FLAGS1 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DWSL=$(WSL) -DPCURSES=$(PCURSES) -DTNOTES=$(TNOTES) -DGTK=$(GTK) $(GLIBINCLUDE) -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) -DTNOTES=$(TNOTES) -DUSE_GLIB=$(USE_GLIB) $(X11include) -I/usr/include/ncurses
 
 FLAGS3 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) $(X11include) $(GLIBINCLUDE)
 
@@ -147,7 +147,7 @@ xe.h :
 #	${CC}  -c -Wall -I/usr/local/pgsql/src/include -funsigned-char $*.c
 #	${CC}  -c -Wall -O2 -mcpu=pentium -I/usr/local/pgsql/src/include -funsigned-char $*.c 
 #	${CC}  -c -Wall -O2 -mcpu=pentium -I/usr/include/gtk-1.2 -I/usr/include/glib-1.2 -funsigned-char $*.c 
-	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char -DTNOTES=$(TNOTES) -DUSE_GLIB=$(USE_GLIB)  $(GLIBINCLUDE) $*.c 
+	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char  $(GLIBINCLUDE) $*.c 
 #	${CC}  -c -Wall -O2 -mcpu=pentium -I/usr/include/gtk-2.0 -I/usr/include/glib-1.2 -funsigned-char $*.c 
 
 #	This for SCO. -J is for unsigned char
@@ -156,23 +156,23 @@ xe.h :
 main.o: main.c xe.h globals.h  keytable.h func.h
 
 gmain.o: main.c xe.h globals.h  keytable.h func.h
-	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char main.c -DUSE_GLIB=$(USE_GLIB) -o gmain.o
+	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char main.c -o gmain.o
 
 input.o: keytable.h input.c 
-	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -DUSE_GLIB=$(USE_GLIB) -funsigned-char input.c 
+	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char input.c 
 
 ginput.o: keytable.h input.c
-	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -DUSE_GLIB=$(USE_GLIB) -funsigned-char input.c -o ginput.o
+	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char input.c -o ginput.o
 
 edit.o: edit.c xe.h
 
 gldisplay.o: xe.h screen.c menus.h
 
 screen.o: xe.h screen.c
-	${CC} $(FLAGS1) -DGTK3=0 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -DUSE_GLIB=$(USE_GLIB) -funsigned-char screen.c -o screen.o
+	${CC} $(FLAGS1) -DGTK3=0 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char screen.c -o screen.o
 
 screen3.o: xe.h screen.c
-	${CC} $(FLAGS1) -DGTK3=1 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -DUSE_GLIB=$(USE_GLIB) -funsigned-char screen.c -o screen3.o
+	${CC} $(FLAGS1) -DGTK3=1 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE)  -funsigned-char screen.c -o screen3.o
 
 eval.o: xe.h eval.c eval.h alist.h 
 
@@ -184,10 +184,10 @@ mlangg.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang.h alist.h xe.h
 	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char mlang.c -o mlangg.o
 
 tldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h
-	${CC} tldisplay.c $(FLAGS1) -DTNOTES=${TNOTES} -c -Wall $(CPU_OPTIONS) -DUSE_GLIB=$(USE_GLIB) -I/usr/include/ncursesw -funsigned-char -o tldisplay.o
+	${CC} tldisplay.c $(FLAGS1)  -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o tldisplay.o
 
 xldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h
-	${CC} tldisplay.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -DUSE_GLIB=$(USE_GLIB) -funsigned-char -o xldisplay.o
+	${CC} tldisplay.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -funsigned-char -o xldisplay.o
 
 gtkterm.o: gtkterm.c gtkterm.h xthemes.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h gtk_common.c
 
@@ -241,7 +241,7 @@ xinput.o: keytable.h input.c
 	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE3) -funsigned-char input.c -o xinput.o
 
 ginput3.o: keytable.h input.c
-	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE3) -funsigned-char input.c -o ginput3.o
+	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE3)  -funsigned-char input.c -o ginput3.o
 
 #	The following is with gtk3 library and cairo plot. gplotc(gcanvas)
 ifeq ($(TNOTES), 1)
