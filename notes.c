@@ -417,15 +417,21 @@ int sql_exec(sqlite3 *db, char *sql,int ignore)
  return true;
 }
 
+void notes_db_close(sqlite3 *db)
+{
+	MESG("notes_db_close:>");
+	sqlite3_close(db);
+}
+
 sqlite3 * notes_db_open()
 {
  char db_file_name[256];
  sqlite3 *db;
  set_bfname(db_file_name,NOTES_DBFILE);
- // MESG("noted_db_open:");
+ MESG("notes_db_open:<");
  if(sqlite3_open(db_file_name,&db)!=SQLITE_OK) {
 	error_line("Notes db [%s]: %s",db_file_name,sqlite3_errmsg(db));
-	sqlite3_close(db);
+	notes_db_close(db);
 	init_notes_db(1);
 	if(sqlite3_open(db_file_name,&db)!=SQLITE_OK){
 		error_line("Cannot create Notes db [%s]: %s",db_file_name,sqlite3_errmsg(db));
@@ -526,7 +532,7 @@ int save_to_db(notes_struct *note)
  	} else stat=false;
  };
  free_sarray(current_tag_array);
- sqlite3_close(db);
+ notes_db_close(db);
  return stat;
 }
 
@@ -887,7 +893,7 @@ int show_sqlite_tables(char *fname)
     
     if (rc != SQLITE_OK) {
 		error_line("Cannot open database: %s", sqlite3_errmsg(db));
-        sqlite3_close(db);	/* ??  */
+        notes_db_close(db);
         return false;
     };
     
@@ -897,11 +903,11 @@ int show_sqlite_tables(char *fname)
     if (rc != SQLITE_OK ) {
         error_line("SQL error: %s", err_msg);
         sqlite3_free(err_msg);
-        sqlite3_close(db);
+        notes_db_close(db);
         return false;
     } 
     
-    sqlite3_close(db);
+	notes_db_close(db);
     return true;
 }
 
@@ -926,10 +932,10 @@ int init_notes_db(int n)
 	if(stat != SQLITE_OK) {
 		error_line("sql error: %s",err_msg);
 		sqlite3_free(err_msg);
-		sqlite3_close(db);
+		notes_db_close(db);
 		return false;
 	} else {
-		sqlite3_close(db);
+		notes_db_close(db);
 		msg_line("Noted db initialized!");
 //		show_sqlite_tables(db_file_name);
 		return true;
@@ -1326,7 +1332,7 @@ int select_tag(int n)
 		sprintf(sql,"SELECT name from tag where rowid = %d;",tag_id); 
 		int tag_id1=0;
 		select_word = query_string(db,sql,&tag_id1); 
-		sqlite3_close(db);
+		notes_db_close(db);
 		// MESG("	found select_word=[%s] tag_id=%d",select_word,tag_id);
 
 		istr **row_data = (istr **) array_data(cbfp->b_tag_list);
@@ -1565,7 +1571,7 @@ int delete_noteid(int note_id)
 				error_line("cannot delete note_id %d from tags!",note_id);
 			};
 
-			sqlite3_close(db);
+			notes_db_close(db);
 
 		return true;
 	} else return false;
@@ -1623,10 +1629,10 @@ int delete_tagnote(int n)
 		};
 	} else {
 		msg_line("cannot delete tag [%s], used %d times!",tag_name,count);
-		sqlite3_close(db);
+		notes_db_close(db);
 		return false;
 	};
-	sqlite3_close(db);
+	notes_db_close(db);
 	show_tag_view(1);
   } else {		/* delete note  */
 	int note_id = get_current_note_id();

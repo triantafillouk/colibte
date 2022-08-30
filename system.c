@@ -479,7 +479,7 @@ int grep_cmd(int  n)
 #endif
 			status=snprintf(line,MAXLLEN,"grep -nr \"%s\" * 2>/dev/null |grep -v Binary > %s 2> /dev/null",tline,filnam);
 	} else {
-		status=snprintf(line,MAXLLEN,"(grep -n \"%s\" %s |grep -v Binary > %s)  2> /dev/null",tline,extension_string(cbfp),filnam);
+		status=snprintf(line,MAXLLEN,"(grep -n \"%s\" * %s |grep -v Binary > %s)  2> /dev/null",tline,extension_string(cbfp),filnam);
 	}
 //	MESG("grep: [%s]",line);
 	if(status>MAXFLEN) return FALSE;
