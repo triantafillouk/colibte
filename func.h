@@ -24,8 +24,9 @@ FUNCS	ftable[] = {
 	{"execsub",	1,		execsub,"execute a subroutine"},
 	{"region_lower",0,		lowerregion,"Lower case the characters of a selected region"},
 	{"region_upper",0,		upperregion,"Upper case the characters of a selected region"},
+#if	USE_GLIB
 	{"convert_char",1,		convert_char,"Character set conversion"},
-
+#endif
 	{"insert_tab",	1,		insert_tab,"Insert a tab"},
 	{"remove_tab",	1,		remove_tab,"Remove a tab"},
 	{"new_file",	0,		new_file,"new file"},

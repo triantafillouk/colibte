@@ -327,7 +327,7 @@ char *lstr_to_upper(char *s)
 {
  char *us = strdup(s);
  char *us0=&us[0];
- while(*us0) *us=toupper((unsigned char)*us0++);
+ while(*us0) *us0++=toupper((unsigned char)*s++);
  return us;
 }
 
@@ -335,7 +335,7 @@ char *lstr_to_lower(char *s)
 {
  char *us = strdup(s);
  char *us0=&us[0];
- while(*us0) *us=toupper((unsigned char)*us0++);
+ while(*us0) *us0++=tolower((unsigned char)*s++);
  return us;
 }
 #endif

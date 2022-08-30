@@ -1095,7 +1095,7 @@ double factor_line_array()
 		};
 		if(adat->atype==VTYPE_SARRAY) {
 			// MESG("	add row %d col=%d [%s]",i,j,slval);
-			if(slval!=NULL)	adat->sval[cols*j+i]=strdup(slval);
+			adat->sval[cols*j+i]=strdup(slval);
 		};
 		i++;if(i>cols) cols=i;
 		if(tok->ttype==TOK_SHOW || tok->ttype==TOK_RBRAKET) {
