@@ -289,7 +289,7 @@ FUNCS	ftable[] = {
 	{"remove_tags",0,	remove_tags,""},
 	{"delete_tagnote",0,delete_tagnote,""},
 	{"save_as_note",0, save_as_note,""},
-	{"recreate_notes_db",0,recreate_notes_db,""},
+	{"recreate_notes_db",1,recreate_notes_db,""},
 #endif
 	{"do_nothing",0,	do_nothing,"do nothing"},
 	{NULL,	0,		NULL}

@@ -953,6 +953,7 @@ int recreate_notes_db(int n)
 		status = init_notes_db(1);
 	};
 	set_bfname(notes_dir,NOTES_DIR);
+	set_notes_key(1);
 	sprintf(tmp_file,"/tmp/notes_contents.out");
 	sprintf(cmd,"find -L %s  >%s 2>/dev/null",notes_dir,tmp_file);
 	status = system(cmd);
@@ -966,7 +967,8 @@ int recreate_notes_db(int n)
 	notes_files = read_sarray(tmp_file,&size);
 	for(i=0 ;notes_files[i]!=NULL;i++){
 		struct stat st;
-//		MESG("- insert [%s]",notes_files[i]);
+		MESG("---- insert [%s][%s]",notes_files[i],get_sval());
+		
 		if(!stat(notes_files[i],&st))
 		{
 			int flen=strlen(notes_files[i]);
@@ -1007,7 +1009,7 @@ int recreate_notes_db(int n)
 		};
 	};
 	set_btval("notes_recreate",1,"",0);
-	free_sarray(notes_files);
+	// free_sarray(notes_files);
 	msg_line("# recreated_notes_db: new %d, dirs %d, skipped %d",notes_new,dirs,notes_skipped);
 	return true;
 }
@@ -1703,7 +1705,7 @@ int set_notes_key(int n)
 	char b_key[MAXSLEN];
 	int status=1;
 	b_key[0]=0;
-//	MESG("set_notes_key:");
+	MESG("set_notes_key:");
 	status = nextarg("Notes Encryption String: ", b_key, MAXSLEN,false);
 //	disinp = odisinp;
 	if (status != TRUE)  return(status);
