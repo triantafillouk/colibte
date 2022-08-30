@@ -72,6 +72,7 @@ int new_file(int n)
  stat=goto_file(scratch_name);
  if(stat) {
 	 cbfp->scratch_num=scratch_ind;
+	 cbfp->b_type=1;
 	 set_hmark(1,"new_file:");
 	 return TRUE;
  } else return false;
@@ -864,7 +865,6 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->buffer=NULL;	// no data!
 	bp->tp_last=NULL;
 	bp->npoints=0;
-
 	bp->symbol_tree=NULL;
 	bp->symbol_table=NULL;
 
@@ -925,8 +925,10 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->save_current_note=0;
 #endif
 	strlcpy(bp->b_fname, base_name,255);
-	if(is_scratch) set_highlight(bp,highlight_index("TEXT",&ind2));
-	else
+	if(is_scratch) {
+		set_highlight(bp,highlight_index("TEXT",&ind2));
+		bp->b_type=1;
+	} else
 	if(bname[0]==CHR_LBRA) {
 		set_highlight(bp,highlight_index("CMD",&ind2));
 //			if(!is_scratch_name(bname)) bp->main_undo->enabled=false;

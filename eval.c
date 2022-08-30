@@ -662,7 +662,7 @@ int exec_named_function(char *name)
 		msg_line("No function named %s",bufn);
 		return(FALSE);
     };
-
+	bp->b_type=1;	/* set file type to cmd  */
 
 	/* parse the block if not already parsed  */
 	parse_block1(bp,NULL,0,0);	/* do not init if already parsed!  */
