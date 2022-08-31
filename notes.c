@@ -716,16 +716,31 @@ int parse_note(FILEBUF *fp)
 	errors++;
 	if(strlen(note->n_cat)==0) {
 		char *cat=strstr(fp->b_dname,"Notes");
-		if(cat-fp->b_dname==strlen(fp->b_dname)) return false;
+		if(cat-fp->b_dname==strlen(fp->b_dname)) {
+			MESG("wrong category dir name=[%s] category=[%s]",fp->b_dname,cat);
+			return false;
+		};
 		if(cat!=NULL) {
 			cat+=6;
 			strcpy(note->n_cat,cat);
 		};
-	}}; 
+	}} else { 
+#if	1
+	// TODO . check if category is same as dir when recreating database!!!
+		char *cat=strstr(fp->b_dname,"Notes");
+		if(cat) {
+		cat+=6;
+		
+		if(strcmp(note->n_cat,cat)) {
+			MESG("	! dir=[%s] cat=[%s] cat will be %s",cat,note->n_cat,cat);
+			strcpy(note->n_cat,cat);
+		};
+		};
+#endif
+	};
 	// MESG("parse_note: Category = [%s] dir=%s name=[%s]",note->n_cat,fp->b_dname,fp->b_fname);
 	ptr = find_str_reol(fp,ptr,"#Tags: ",note->n_tags,sizeof(note->n_tags));
 
-	// TODO strip spaces
 	// MESG("parse_note: tags = [%s]",note->n_tags);
 	if(string_is_empty(note->n_cat)) {
 		errors++;
