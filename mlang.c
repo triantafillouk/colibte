@@ -67,14 +67,14 @@ int tok_mask[256];
 
 int ex_vtype=0; 	/* type of previous expression */
 int ex_edenv=0;	/* true after encount an editor env variable */
-double ex_value;	// saved double value
+static double ex_value;	// saved double value
 array_dat *ex_array=NULL;
 int ex_nvars=0;	/* true is there are variables in the array definition  */
 int ex_nquote=0;	/* true if there are strings in the array definition  */
 int ex_nums=0;	/* true if array is only numeric  */
 char *ex_name=NULL;	/* variable name of the previous array  */
-char slval[MAXLLEN];// saved string value
-FILEBUF *ex_file=NULL;
+static char slval[MAXLLEN];// saved string value
+// FILEBUF *ex_file=NULL;
 
 /* error control variables  */
 int err_num=0;
@@ -260,6 +260,14 @@ char *directives[] = {
 
 
 array_dat *transpose(array_dat *array1);
+
+void show_token()
+{
+	if(tok!=NULL) 
+		MESG(";ctoken %X num=%3d type=%d",(long)&tok, tok->tnum,tok->ttype);
+	else 
+		MESG(";ctoken is NULL !!!!!!!!!!!!!!!!!!!!!!!!!!");
+}
 
 void init_btree_table()
 {
@@ -552,7 +560,7 @@ void delete_symbol_table(tok_data *td, int size)
 {
  int i;
  tok_data *sslot;
- MESG("delete_symbol_table: size=%d",size);
+ // MESG("delete_symbol_table: size=%d",size);
  if(td) {
  for(i=0;i<size;i++) {
  	sslot=&td[i];
@@ -767,7 +775,7 @@ double eval_fun1(int fnum)
 	int stat=0;
 	array_dat *arr=NULL;
 	TDS("eval_fun1");
-	MESG(";eval_fun1:");
+	// MESG(";eval_fun1:");
 	ia=m_functions[fnum].f_args;
 	
 	f_entry=entry_mode;
@@ -1007,7 +1015,7 @@ double eval_fun1(int fnum)
 		case UFATEOL:
 			return(FEolAt(cbfp,Offset()));
 		case UFMAINARGLEN:
-			MESG("argument size: rows=%d cols=%d",main_args->rows,main_args->cols);
+			// MESG("argument size: rows=%d cols=%d",main_args->rows,main_args->cols);
 			ex_vtype=VTYPE_NUM;
 			return main_args->cols;
 		case UFMAINARG: {
@@ -1220,13 +1228,13 @@ double factor_cmd()
 	FUNCS *ed_command;
 
 	ex_vtype=VTYPE_NUM;
-	MESG(";factor_cmd: ttype=%d",tok->ttype);
+	// MESG(";factor_cmd: ttype=%d",tok->ttype);
 	var_index = tok->tnode->node_index;
 	ed_command = ftable+var_index;
 	NTOKEN2;
 	save_macro_exec=macro_exec;
 	macro_exec=MACRO_MODE2;
-	MESG(";ed_command: args=%d",ed_command->arg);
+	// MESG(";ed_command: args=%d",ed_command->arg);
 	if(ed_command->arg) {
 		if(ed_command->arg>2 || ed_command->arg<0) {
 			NTOKEN2;	/* skip parenthesis  */
@@ -1264,11 +1272,11 @@ double factor_cmd()
 	err_line=tok->tline;
 	err_str=NULL;
 	tok_struct *tok1=tok;
-	MESG(";factor_cmd: execute function! tnum=%d",tok->tnum);
+	// MESG(";factor_cmd: execute function! tnum=%d",tok->tnum);
 	status=ed_command->n_func((int)value);
-	MESG("toknum1 = %d",tok1->tnum);
+	// MESG("toknum1 = %d",tok1->tnum);
 	tok=tok1;
-	MESG(";TOC_CMD: tnum=%d status=%d check_par=%d",tok->tnum,status,check_par);
+	// MESG(";TOC_CMD: tnum=%d status=%d check_par=%d",tok->tnum,status,check_par);
 	ex_value=status;
 //	editor command returns a numeric value
 	slval[0]=0;
@@ -1283,7 +1291,7 @@ double factor_cmd()
 		show_error("Factor");
 		RTRN(status);
 	};
-	MESG(";factor_cmd:end tnum=%d value=%f ex_value=%f",tok->tnum,value,ex_value);
+	// MESG(";factor_cmd:end tnum=%d value=%f ex_value=%f",tok->tnum,value,ex_value);
 	RTRN(ex_value);
 }
 
@@ -1397,12 +1405,12 @@ double factor_func()
 {
 	BTNODE *bte; 
 	double value;
-	MESG(";factor_func: tnum=%d",tok->tnum);
+	// MESG(";factor_func: tnum=%d",tok->tnum);
 	ex_vtype=VTYPE_NUM;
 	bte=tok->tnode;
 	NTOKEN2;	/* skip left parenthesis  */
 	value = eval_fun1(bte->node_index);
-	MESG(";factor_func: end tnum=%d v=%f",tok->tnum,value);
+	// MESG(";factor_func: end tnum=%d v=%f",tok->tnum,value);
 	RTRN(value);
 }
 
@@ -1893,7 +1901,7 @@ double term_minus(double value)
 double num_term2()
 {
  TDS("num_term2");
- MESG("num_term2: ttype=%d",tok->ttype);
+ // MESG("num_term2: ttype=%d",tok->ttype);
  double v1 = FACTOR_FUNCTION;
 	 while(tok->tgroup==TOK_TERM2)
 	 {
@@ -1906,7 +1914,7 @@ double num_term2()
 double num_term1()
 {
  TDS("num_term1");
- MESG("num_term1: ttype=%d",tok->ttype);
+ // MESG("num_term1: ttype=%d",tok->ttype);
  double v1 = num_term2();
 	 while(tok->tgroup==TOK_TERM1)
 	 {
@@ -1920,7 +1928,7 @@ double num_expression()
 {
  double value;
  TDS("num_expression");
- MESG(";num_expression: tnum=%d ttype=%d",tok->tnum,tok->ttype);
+ // MESG(";num_expression: tnum=%d ttype=%d",tok->tnum,tok->ttype);
  ex_vtype=VTYPE_NUM;
  ex_value=0;
  slval[0]=0;
@@ -1928,7 +1936,7 @@ double num_expression()
  while(tok->tgroup==TOK_TERM) {
 	value = tok->term_function(value);
  };
- MESG(";num_expression:end ttnum=%d return value=%f slval=[%s]",tok->tnum,value,slval);
+ // MESG(";num_expression:end ttnum=%d return value=%f slval=[%s]",tok->tnum,value,slval);
  return value;
 }
 
@@ -2005,7 +2013,7 @@ double lexpression()
 {
  double value;
  TDS("lexpression");
- MESG(";lexpression: ttype=%d",tok->ttype);
+ // MESG(";lexpression: ttype=%d",tok->ttype);
  value = cexpression();
 // MESG("lexpression : [%s] cexpression result = %f",tok_info(tok),value);
  if(tok->tgroup == TOK_TERM0){
@@ -2030,7 +2038,7 @@ double cexpression()
  double value;
  tok_struct *tok0;
  TDS("cexpression");
- MESG(";cexpression ttype=%d",tok->ttype);
+ // MESG(";cexpression ttype=%d",tok->ttype);
  value = num_expression();
 
  if(tok->tgroup!=TOK_COMPARE) RTRN(value);
@@ -2514,7 +2522,7 @@ double tok_dir_while()
 double exec_sentence1()
 {
  TDS("exec_sentence1");
- MESG(";exec_sentence1: ttype=%d",tok->ttype);
+ // MESG(";exec_sentence1: ttype=%d",tok->ttype);
  switch(tok->ttype) {
 	case TOK_EOF:
 	case TOK_RCURL:	
@@ -2556,7 +2564,7 @@ double exec_block1(int level)
  TDS("exec_block1");
    while(1) 
    {
-	MESG(";exec_block: ttype=%d",tok->ttype);
+	// MESG(";exec_block: ttype=%d",tok->ttype);
 	switch(tok->ttype){
 		case TOK_EOF: return(val);
 		case TOK_SEP:
@@ -2596,9 +2604,9 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  tok_data *local_symbols;
  tok_data *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
- MESG(";compute_block: %s",bp->b_fname);
+ // MESG(";compute_block: %s",bp->b_fname);
  if(use_fp->symbol_tree==NULL) {
-	MESG("create new symbol_tree for use_fp!");
+	// MESG("create new symbol_tree for use_fp!");
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);
 	extra=100;
 	use_fp->symbol_tree->max_items=extra;
@@ -2626,11 +2634,11 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	init_exec_flags();
 	tok=bp->tok_table;
 	drv_start_checking_break();
-	MESG("exec block->");
+	// MESG("exec block->");
 	val=exec_block1(0);
-	MESG("after exec_block");
+	// MESG("after exec_block");
 	drv_stop_checking_break();
-	MESG("--- start=%d",start);
+	// MESG("--- start=%d",start);
 	if(start) {
 		if(bp->symbol_tree)
 		delete_symbol_table(local_symbols,bp->symbol_tree->items);
@@ -2644,7 +2652,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	val=0;
  };
  tok=old_tok;
- MESG("exec_block return %f",val);
+ // MESG("compute_block return %f",val);
  return(val); 
 }
 
@@ -2883,9 +2891,10 @@ double get_val()
 	return (ex_value);
 }
 
+
 char *get_sval()
 {
-	MESG("get_sval: tnum=%d",tok->tnum);
+	// MESG("get_sval: tnum=%d",tok->tnum);
 	return(slval);
 }
 
@@ -2924,7 +2933,7 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 		};
 	} else {
 		/* slval has already the next argument */
-		MESG("nextarg: slval=%s",get_sval());	
+		// MESG("nextarg: slval=%s",get_sval());	
 		strlcpy(buffer,get_sval(),size);
 	};
 	return(TRUE);

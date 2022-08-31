@@ -20,7 +20,7 @@ extern int scratch_files[];
 notes_struct *init_note();
 int get_current_tag_id();
 char *get_current_tag_name();
-
+void show_token();
 
 int insert_preamble(FILEBUF *fp,int type)
 {
@@ -585,7 +585,7 @@ int parse_note(FILEBUF *fp)
 		return false;
 	};
 	if(note==NULL) note=fp->b_note=init_note();
-	MESG("!parse_note: --- b_type=%X dir=[%s] name=[%s] tags=[%s] lines=%d",fp->b_type,fp->b_dname,fp->b_fname,note->n_tags,fp->lines);
+	// MESG("!parse_note: --- b_type=%X dir=[%s] name=[%s] tags=[%s] lines=%d",fp->b_type,fp->b_dname,fp->b_fname,note->n_tags,fp->lines);
 	if(fp->lines<2) {
 		MESG("### parse error, too few lines (%d)!!",fp->lines);
 		return false;
@@ -730,17 +730,21 @@ int parse_note(FILEBUF *fp)
 	if(string_is_empty(note->n_cat)) {
 		errors++;
 		MESG("parse_note: category string is empty!");
+#if	0
 		goto_bof(1);
 		next_line(3);goto_eol(1);
 		insert_string(fp,"new",strlen("new"));
+#endif
 		strcpy(note->n_cat,"new");
 	};
 
 	if(string_is_empty(note->n_tags)) {
 		MESG("!	parse_note: tags string is empty!");
+#if	9
 		goto_bof(1);
 		next_line(4);goto_eol(1);
 		insert_string(fp,"new",strlen("new"));
+#endif
 		strcpy(note->n_tags,"new");
 	};
 	// MESG("	errors %d name=[%s]",errors,note->n_name);
@@ -776,7 +780,7 @@ int save_note()
 		msg_line("can not save note with empty filename!");
 		return false;
 	};
-	note=cbfp->b_note;
+	note=fp->b_note;
 	// create category subdir if not present!
 	set_notes_subdir(fp->b_dname,fp->b_note->n_cat);
 
@@ -934,7 +938,7 @@ int init_notes_db(int n)
 		return false;
 	} else {
 		notes_db_close(db);
-		msg_line("Noted db initialized!");
+		msg_line("Notes db initialized!");
 //		show_sqlite_tables(db_file_name);
 		return true;
 	};
@@ -949,7 +953,7 @@ int recreate_notes_db(int n)
  char notes_dir[256];
  char tmp_file[256];
  char **notes_files;
- FILEBUF *current_buffer=cbfp;
+ // FILEBUF *current_buffer=cbfp;
 	MESG("--- recreate_notes_db: ---- n=%d",n);
 	set_btval("notes_recreate",1,"",1);
 	// create notes db
@@ -972,8 +976,8 @@ int recreate_notes_db(int n)
 	notes_files = read_sarray(tmp_file,&size);
 	for(i=0 ;notes_files[i]!=NULL;i++){
 		struct stat st;
-		// MESG("---- insert [%s][%s]",notes_files[i],get_sval());
-		
+		// MESG("---- insert %d: [%s]",i,notes_files[i]);
+		// show_token();
 		if(!stat(notes_files[i],&st))
 		{
 			int flen=strlen(notes_files[i]);
@@ -987,13 +991,17 @@ int recreate_notes_db(int n)
 				FILEBUF *bp;
 				// msg_line("!! %3d insert: [%s]",i,notes_files[i]);
 				notes_struct *s_note;
+				// FILEBUF *current_buffer=cbfp;
 				bp=new_filebuf(notes_files[i],0);
 				bp->b_note = init_note();
-				select_filebuf(bp);
+				// select_filebuf(bp);
+				activate_file(bp);
 				// MESG("#%3d: go parse %s",i,notes_files[i]);
 				if(!parse_note(bp)) {
 					msg_line(" file [%s] Not a note file !!!!!!!!!!!!",notes_files[i]);
 					delete_filebuf(bp,1);
+					// select_filebuf(current_buffer);
+					// show_token();
 					MESG("- skip file [%s]",notes_files[i]);
 					notes_skipped++;
 					continue;					
@@ -1002,19 +1010,25 @@ int recreate_notes_db(int n)
 				// MESG("%3d: add - n=[%s] title=[%s] cat=[%s] tags=[%s]",i,s_note->n_name,s_note->n_title,s_note->n_cat,s_note->n_tags);
 				status=save_to_db(s_note);
 				notes_new++;
-				select_filebuf(current_buffer);
+				// select_filebuf(current_buffer);
 				delete_filebuf(bp,1);
+				MESG("	+ %3d note added [%s]!",i,notes_files[i]);
 			} else {
 				dirs++;
+				// select_filebuf(current_buffer);
+				// show_token();
 				// MESG("- skip, %s this is dir",notes_files[i]);
 			};
 		} else {
+			// show_token();
 			MESG("- skip file that cannot stat file %s",notes_files[i]);
 			notes_skipped++;
 		};
+		
 	};
 	set_btval("notes_recreate",1,"",0);
-	// free_sarray(notes_files);
+	free_sarray(notes_files);
+	// select_filebuf(current_buffer);
 	msg_line("# recreated_notes_db: new %d, dirs %d, skipped %d",notes_new,dirs,notes_skipped);
 	return true;
 }
