@@ -552,7 +552,7 @@ void delete_symbol_table(tok_data *td, int size)
 {
  int i;
  tok_data *sslot;
-
+ MESG("delete_symbol_table: size=%d",size);
  if(td) {
  for(i=0;i<size;i++) {
  	sslot=&td[i];
@@ -2598,7 +2598,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  tok_struct *old_tok=tok;
  MESG(";compute_block: %s",bp->b_fname);
  if(use_fp->symbol_tree==NULL) {
-	// MESG("create new symbol_tree for use_fp!");
+	MESG("create new symbol_tree for use_fp!");
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);
 	extra=100;
 	use_fp->symbol_tree->max_items=extra;
@@ -2630,8 +2630,9 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	val=exec_block1(0);
 	MESG("after exec_block");
 	drv_stop_checking_break();
-	MESG("---2");
+	MESG("--- start=%d",start);
 	if(start) {
+		if(bp->symbol_tree)
 		delete_symbol_table(local_symbols,bp->symbol_tree->items);
 		current_stable=old_symbol_table;
 	};
@@ -2643,6 +2644,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	val=0;
  };
  tok=old_tok;
+ MESG("exec_block return %f",val);
  return(val); 
 }
 

@@ -419,7 +419,7 @@ int sql_exec(sqlite3 *db, char *sql,int ignore)
 
 void notes_db_close(sqlite3 *db)
 {
-	MESG("notes_db_close:>");
+	// MESG("notes_db_close:>");
 	sqlite3_close(db);
 }
 
@@ -428,7 +428,7 @@ sqlite3 * notes_db_open()
  char db_file_name[256];
  sqlite3 *db;
  set_bfname(db_file_name,NOTES_DBFILE);
- MESG("notes_db_open:<");
+ // MESG("notes_db_open:<");
  if(sqlite3_open(db_file_name,&db)!=SQLITE_OK) {
 	error_line("Notes db [%s]: %s",db_file_name,sqlite3_errmsg(db));
 	notes_db_close(db);
@@ -448,9 +448,7 @@ int save_to_db(notes_struct *note)
  int stat=false;
  int note_id=0;
  if((db=notes_db_open())==NULL) return false;
- // MESG("save_to_db:");
- MESG("save_to_db: title [%s]",note->n_title);
- // MESG("note name [%s]",note->n_name);
+ // MESG("save_to_db: title [%s]",note->n_title);
  // check if found
  if(snprintf(sql,1024,"SELECT Category,rowid from notes where Name = '%s';",note->n_name)>=1024) {
  	ERROR("%s","Notes name too long!");
@@ -512,7 +510,7 @@ int save_to_db(notes_struct *note)
 	strcat(sql,note->n_date); strcat(sql,"','");
 	strcat(sql,note->n_cat); strcat(sql,"',0);");
 	strcat(sql,"END TRANSACTION;");
-	MESG("save_to_db: [%s]",sql);
+	// MESG("save_to_db: [%s]",sql);
 	if (sql_exec(db,sql,0)){
 		// msg_line(" Note saved to db!");
 		stat=true;
@@ -597,7 +595,7 @@ int parse_note(FILEBUF *fp)
 		return false;
 	};
 	if(fp->b_type & NOTE_CAL_TYPE) {
-		MESG("	--- NOTE_CAL_TYPE:fname=[%s]",fp->b_fname);
+		// MESG("	--- NOTE_CAL_TYPE:fname=[%s]",fp->b_fname);
 		strcpy(note->n_name,fp->b_fname);
 		strcpy(note->n_date,fp->b_fname);
 		// MESG("parse_note: n_date=[%s]",note->n_date);
@@ -621,7 +619,7 @@ int parse_note(FILEBUF *fp)
 	};
 
 	if(fp->b_type & NOTE_TODO_TYPE) {
-		MESG("	--- NOTE_TODO_TYPE:");
+		// MESG("	--- NOTE_TODO_TYPE:");
 		if(note==NULL) {
 			// MESG("TODO note is null!!!");
 			note=fp->b_note=init_note();
@@ -724,7 +722,7 @@ int parse_note(FILEBUF *fp)
 			strcpy(note->n_cat,cat);
 		};
 	}}; 
-	MESG("parse_note: Category = [%s] dir=%s name=[%s]",note->n_cat,fp->b_dname,fp->b_fname);
+	// MESG("parse_note: Category = [%s] dir=%s name=[%s]",note->n_cat,fp->b_dname,fp->b_fname);
 	ptr = find_str_reol(fp,ptr,"#Tags: ",note->n_tags,sizeof(note->n_tags));
 
 	// TODO strip spaces
@@ -974,7 +972,7 @@ int recreate_notes_db(int n)
 	notes_files = read_sarray(tmp_file,&size);
 	for(i=0 ;notes_files[i]!=NULL;i++){
 		struct stat st;
-		MESG("---- insert [%s][%s]",notes_files[i],get_sval());
+		// MESG("---- insert [%s][%s]",notes_files[i],get_sval());
 		
 		if(!stat(notes_files[i],&st))
 		{
