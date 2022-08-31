@@ -754,17 +754,15 @@ int dofile(char *fname)
 			activate_file(bp);
 		};
 	};
-	// MESG("go execute it");
 	/* go execute it! */
 	int backup_caf=current_active_flag;
-	set_dval(compute_block(bp,bp,1));
+	double d = compute_block(bp,bp,1);
+	set_dval(d);
 	current_active_flag=backup_caf;
-	// MESG("dofile: 1");
 	/* if not displayed, remove the now unneeded macro buffer and exit */
 	if (bp->b_nwnd == 0) 
 		delete_filebuf(bp,1);
 	set_screen_update(true);
-	// MESG("dofile: 2");
 
 	if(err_num>0) return(FALSE);
 	return(TRUE);

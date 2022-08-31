@@ -201,12 +201,13 @@ void msg_line(char *fmt, ...)
 {
  va_list args;
  char mline[512];
-	if(macro_exec) return;
+	if(macro_exec && !execmd) return;
+
     va_start(args, fmt);
     vsnprintf(mline,512, fmt, args);
 	
     va_end(args);
-
+	
 	if(execmd) {
 		if(strlen(mline)>0 && mline[0]!=' ') fprintf(stderr,"%s\n",mline);
 	} else { 
@@ -215,8 +216,8 @@ void msg_line(char *fmt, ...)
 			if(strlen(mline)>0 && mline[0]!=' ') MESG("%s",mline); 
 		};
 		drv_msg_line(mline);
+		set_update(cwp,UPD_MOVE);	/* to force restore cursor after message  */
 	};
-	set_update(cwp,UPD_MOVE);	/* to force restore cursor after message  */
 }
 
 int error_line(char *error_message,...)

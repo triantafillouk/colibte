@@ -14,6 +14,8 @@
 
 extern int update_all;
 extern FILEBUF *cbfp;
+void set_sval(char *s);
+
 
 struct timeval start_time;	/* editor time started stamp */
 
@@ -206,7 +208,7 @@ int exec_shell(char *tline)
 	set_unique_tmp_file(filerr,"error",MAXFLEN);
 
 	/* get the command  */
-	slval[0]=0;
+	set_sval("");
 
 	strcat(tline," > ");	// output file
 	strcat(tline,filnam);
@@ -302,7 +304,7 @@ int shell_cmd1(int  nused)
 	/* get the command  */
 	tline[0]=0;
     if ((s=nextarg("!", tline, MAXLLEN,true)) != TRUE) return(s);
-	slval[0]=0;
+	set_sval("");
 
 	strcat(tline," > ");	// output file
 	strcat(tline,filnam);
@@ -479,7 +481,7 @@ int grep_cmd(int  n)
 #endif
 			status=snprintf(line,MAXLLEN,"grep -nr \"%s\" * 2>/dev/null |grep -v Binary > %s 2> /dev/null",tline,filnam);
 	} else {
-		status=snprintf(line,MAXLLEN,"(grep -n \"%s\" %s |grep -v Binary > %s)  2> /dev/null",tline,extension_string(cbfp),filnam);
+		status=snprintf(line,MAXLLEN,"(grep -n \"%s\" * %s |grep -v Binary > %s)  2> /dev/null",tline,extension_string(cbfp),filnam);
 	}
 //	MESG("grep: [%s]",line);
 	if(status>MAXFLEN) return FALSE;
