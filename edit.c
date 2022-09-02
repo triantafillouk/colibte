@@ -1844,15 +1844,17 @@ int delete_line(int n)
 {
  int status;
 #if	TNOTES
-	if(cbfp->b_type & NOTE_TYPE 
+	if((cbfp->b_type & NOTE_TYPE 
 		|| cbfp->b_type & NOTE_CAL_TYPE
-		|| cbfp->b_type & NOTE_TODO_TYPE
+		|| cbfp->b_type & NOTE_TODO_TYPE) && dont_edit()
 	) {
- 	dir_left(1);
-	return delete_tagnote(1);
+	if(confirm("Delete note","",0)) {	
+	 	dir_left(1);
+		delete_tagnote(1);
+	};
  };
 #endif
- MESG("delete_line:");
+ // MESG("delete_line:");
 
  if(dont_edit()) return FALSE;
 

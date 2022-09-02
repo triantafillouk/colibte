@@ -1604,7 +1604,7 @@ int delete_noteid(int note_id)
 	} else return false;
 }
 
-int delete_tagnote(int n)
+int delete_tagnote(int force)
 {
   int b_flag = (cbfp->b_flag >>8) << 8;
   if(b_flag == FSNLIST) {
@@ -1612,7 +1612,8 @@ int delete_tagnote(int n)
 	// MESG("delete_tagnote: list");
 
 	char *full_name = get_current_note_name();
- 	if(!confirm("Delete note",full_name,0)) return false;
+	if(!force)
+ 		if(!confirm("Delete note",full_name,0)) return false;
 	if(full_name==NULL) {
 	 	MESG("edit_note: note name is null!");
 		return false;
