@@ -377,6 +377,27 @@ int is_utf_accent(FILEBUF *fp, offs o)
  } else return 0;
 }
 
+int s_is_utf_accent(char *utfstr, int o)
+{
+ int ch,ch1;
+ int size=strlen(utfstr);
+ ch=utfstr[o];
+ ch1=utfstr[o+1];
+ if(((ch==0xCC || ch==0xCD) && (ch1<0xB0 && ch1>0x7F))
+// 	|| (ch==0xCD && (ch1<0xB0))
+ ){	// check for double accent
+	if(o+3>=size)	return 0;
+	ch=utfstr[o+2];
+	ch1=utfstr[o+3];
+	if(((ch==0xCC || ch==0xCD) && (ch1<0xB0 && ch1>0x7F))
+	){
+		return 4;
+	} else {
+		return 2;
+	};
+ } else return 0;
+}
+
 int utf8charlen_nocheck(int ch)
 {
  if(ch<129) return 1;
@@ -453,6 +474,70 @@ int FUtfCharLen(FILEBUF *fp,offs o)
 		}};
 //#endif
 	};
+	return clen;
+}
+
+int SUtfCharLen(char *utfstr,int offset,utfchar *uc)
+{
+ int ch;
+ int ch1;
+ int clen=1;
+ int utf_accent=0;
+ int o=offset;
+ int size=strlen(utfstr);
+	clen_error=0;
+	if(*utfstr==0) { uc->uval[0]=0;return 0;};
+
+		ch=utfstr[o];
+		if(ch<0xC0) {
+			if(ch>128) {
+				clen_error=1;	/* this is not a valid start for utf  */
+				return 1;
+			};
+//			MESG("0: ch=%X %d",ch,ch);
+			if(ch<32) return clen;
+		} else if(ch<0xE0) {
+//			MESG("1: ch=%X %d",ch,ch);
+			if(o+1<size){
+				ch1=utfstr[o+1];
+				if(ch1<128 || ch1>0xBF) { clen_error=2;return 1;};	/* not a middle utf char  */
+				clen=2;
+//#if	DARWIN || PCURSES
+				if((ch==0xCC||ch==0xCD) && !utf8_error() /* && drv_type<3 */ ) 
+				{
+					utf_accent=1;
+//					MESG("allone accent! clen=%d");
+					return clen;	/* return without checking for next accent  */
+				};
+//#endif
+			} else {
+				clen_error=3;	/* incomplete, eof  */
+				return clen;
+			};
+		}
+		else if(ch<0xF0) {
+			ch1=utfstr[o+1];
+			if(ch1<128 || ch1>0xBF) { clen_error=4;return 1;};	/* not a middle utf char  */
+			ch1=utfstr[o+2];
+			if(ch1<128 || ch1>0xBF) { clen_error=5;return 1;};	/* not a middle utf char  */
+			clen=3;
+		} else {
+			char ch2,ch3;
+			ch1=utfstr[o+1];
+			if(ch1<128 || ch1>0xBF) { clen_error=6;return 1;};	/* not a middle utf char  */
+			ch2=utfstr[o+2];
+			if(ch2<128 || ch2>0xBF) { clen_error=7;return 1;};	/* not a middle utf char  */
+			ch3=utfstr[o+3];
+			if(ch3<128 || ch3>0xBF) { clen_error=8;return 1;};	/* not a middle utf char  */
+			clen=4;
+//			MESG("- 4:o=%ld %2X %2X %2X %2X",o,ch,ch1,ch2,ch3);
+		}
+//#if	DARWIN || PCURSES
+		if(clen<3 && !utf_accent ) {	/* check next char for accent!  */
+		if(o+clen+1<=size){
+			clen += s_is_utf_accent(utfstr,o+clen);
+		}};
+//#endif
 	return clen;
 }
 

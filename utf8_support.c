@@ -96,8 +96,9 @@ int  SUtfCharAt(char *utfstr, int offset, utfchar *uc)
 {
  int i,ulen;
  int o=offset;
-	ulen=utf8_countBytes[(int)utfstr[offset]];
-	for(i=0;i<4;i++){
+	// ulen=utf8_countBytes[(int)utfstr[offset]];
+	ulen=SUtfCharLen(utfstr,offset,uc);
+	for(i=0;i<8;i++){
 		if(i<ulen) {
 		uc->uval[i]=utfstr[o+i];
 		} else uc->uval[i]=0;

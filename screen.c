@@ -714,10 +714,13 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		num char_bytes=ptr1;
 		ptr1 = SUtfCharAt(header,ptr1,&uc);
 		char_bytes = ptr1-char_bytes;
-		display_size=get_utf_length(&uc);
+		// display_size=get_utf_length(&uc);
+		display_size=SUtfCharLen(header,ptr1,&uc);
 		c=uc.uval[0];
 #if USE_GLIB	// Convert to composed character if possible to view it!
-		if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) {
+		// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
+		if(1)
+		{
 			char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
 //				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
 			if(strlen((char *)uc.uval)>strlen(composed)) {
@@ -1077,7 +1080,9 @@ offs vtline(WINDP *wp, offs tp_offs)
 			c=uc.uval[0];
 			if(c==0xE0 && uc.uval[1]>=0xB8) fp->slow_display=1;	/* slow down for thai chars  */
 #if USE_GLIB	// Convert to composed character if possible to view it!
-			if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) {
+			// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
+			if(1)
+			{
 				char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
 //				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
 				if(strlen((char *)uc.uval)>strlen(composed)) {
