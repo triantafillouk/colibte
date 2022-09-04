@@ -1935,7 +1935,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 	wmove(wp->gwp->draw,row,xcol);
 	imax=maxcol+1;
-	// if(wp->w_fp->slow_display) 
+	if(wp->w_fp->slow_display) 
 	{ /* a little bit slower but clears shadow text!  */
 		wclrtoeol(wp->gwp->draw);
 		wrefresh(wp->gwp->draw);
