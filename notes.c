@@ -755,7 +755,7 @@ int parse_note(FILEBUF *fp)
 
 	if(string_is_empty(note->n_tags)) {
 		MESG("!	parse_note: tags string is empty!");
-#if	9
+#if	0
 		goto_bof(1);
 		next_line(4);goto_eol(1);
 		insert_string(fp,"new",strlen("new"));
