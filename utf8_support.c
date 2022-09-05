@@ -13,8 +13,6 @@
 #include <string.h>
 #include "support.h"
 
-int get_utf_length(utfchar *utf_char_str);
-int SUtfCharLen(char *utfstr,int offset,utfchar *uc);
 
 int utf_error=0;
 
@@ -92,6 +90,89 @@ int utf_num_chars(char *utf)
  return utflen;
 }
 
+int SUtfCharLen(char *utfstr,int offset,utfchar *uc)
+{
+ int ch;
+ int ch1;
+ int clen=1;
+ int utf_accent=0;
+ int o=offset;
+ int size=strlen(utfstr);
+	if(*utfstr==0) { uc->uval[0]=0;return 0;};
+
+		ch=utfstr[o];
+		if(ch<0xC0) {
+			if(ch>128) {
+				set_utf8_error(1);	/* this is not a valid start for utf  */
+				return 1;
+			};
+			if(ch<32) return clen;
+		} else if(ch<0xE0) {
+			if(o+1<=size){
+				ch1=utfstr[o+1];
+				if(ch1<128 || ch1>0xBF) { set_utf8_error(2);return 1;};	/* not a middle utf char  */
+				clen=2;
+				if((ch==0xCC||ch==0xCD) && !utf8_error() /* && drv_type<3 */ ) 
+				{
+					utf_accent=1;
+					// MESG("allone accent! clen=%d");
+					return clen;	/* return without checking for next accent  */
+				};
+			} else {
+				set_utf8_error(3);	/* incomplete, eof  */
+				return clen;
+			};
+		}
+		else if(ch<0xF0) {
+			ch1=utfstr[o+1];
+			if(ch1<128 || ch1>0xBF) { set_utf8_error(4);return 1;};	/* not a middle utf char  */
+			ch1=utfstr[o+2];
+			if(ch1<128 || ch1>0xBF) { set_utf8_error(5);return 1;};	/* not a middle utf char  */
+			clen=3;
+		} else {
+			char ch2,ch3;
+			ch1=utfstr[o+1];
+			if(ch1<128 || ch1>0xBF) { set_utf8_error(6);return 1;};	/* not a middle utf char  */
+			ch2=utfstr[o+2];
+			if(ch2<128 || ch2>0xBF) { set_utf8_error(7);return 1;};	/* not a middle utf char  */
+			ch3=utfstr[o+3];
+			if(ch3<128 || ch3>0xBF) { set_utf8_error(8);return 1;};	/* not a middle utf char  */
+			clen=4;
+		}
+		if(clen<3 && !utf_accent ) {	/* check next char for accent!  */
+		{
+			// MESG("- s=[%s] o=%d",utfstr+o,o);
+			clen += s_is_utf_accent(utfstr,o+clen);
+			// if(clen>2) MESG("[%s][%s] total size=%d at %ld",utfstr,utfstr+o,clen,o);
+		}};
+	return clen;
+}
+
+int s_is_utf_accent(char *utfstr, int o)
+{
+ int ch,ch1;
+ int size=strlen(utfstr);
+ ch=utfstr[o];
+
+ if(ch==0) return 0;
+ ch1=utfstr[o+1];
+ if(ch==0) return 0;
+ // MESG("check accent at %d size=%d ch=%X ch1=%X",o,size,ch,ch1);
+ if(((ch==0xCC || ch==0xCD) && (ch1<0xB0 && ch1>0x7F))
+// 	|| (ch==0xCD && (ch1<0xB0))
+ ){	// check for double accent
+	if(o+3>size)	return 2;
+	ch=utfstr[o+2];
+	ch1=utfstr[o+3];
+	if(((ch==0xCC || ch==0xCD) && (ch1<0xB0 && ch1>0x7F))
+	){
+		return 4;
+	} else {
+		return 2;
+	};
+ } else return 0;
+}
+
 /* put to uc the utf value, advance by the length, return new offset */
 int  SUtfCharAt(char *utfstr, int offset, utfchar *uc)
 {
@@ -120,8 +201,12 @@ void utf_string_break(char *utf_string, int column)
 			// MESG("break at %d [%s]",s-utf_string,utf_string);
 			return;
 		};
+#if	1
+		i = SUtfCharAt(s,0,&uc);
+#else
 		SUtfCharAt(s,0,&uc);
 		i += get_utf_length(&uc);
+#endif
 		s += utf8_countBytes[(int)*s];
 	 };	
 }
@@ -139,7 +224,9 @@ char * utf8_rtruncate(char *utf_string, int len)
 	return utf_string+pos;
 }
 
-/* position of previous utf char  */
+/* position of previous utf char.
+   Does not take into account composed accented character!  
+*/
 int utf8_str_left(char *st,int pos)
 {
  int i;

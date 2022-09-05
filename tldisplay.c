@@ -1357,25 +1357,28 @@ void status_line(WINDP *wp)
 	int max_t;
 	char status_string[512], *stp;
 	char fdname[MAXLLEN];
-
+#if	USE_CLASSIC
 	int hline1 = '-';	/* or 18  */
 	int hline2 = '=';	/* or 15  */
+#endif
 	char modecode[]=MODECODE;
 
 	if(!discmd) return;
 
     bp = wp->w_fp;
 	if(bp==NULL) return;
-
-	strlcpy(fdname,bp->b_dname,MAXLLEN);
+	if(wp->w_ntcols>NUM_COLS_SHORT) strlcpy(fdname,bp->b_dname,MAXLLEN);
+	else strlcpy(fdname,bp->b_fname,MAXLLEN);
 
 	if(wp->w_ntcols > NUM_COLS_FULL) max_t = wp->w_ntcols - NUM_COLS_FINFO - show_position_size(wp,0);
 	else if(wp->w_ntcols > NUM_COLS_SHORT) max_t = wp->w_ntcols - NUM_COLS_FINFO - show_position_size(wp,1);
 	else if(wp->w_ntcols > NUM_COLS_NOINFO) max_t = wp->w_ntcols - show_position_size(wp,-1);
 	else max_t = wp->w_ntcols-2;
-
+#if	USE_CLASSIC
 	lchar = (wp == cwp) ? hline2 : hline1;	/* mark the current buffer */
-
+#else
+	lchar = ' ';
+#endif
 	stp = status_string;
 
 //	in debug mode print window number at bottom left
@@ -1440,9 +1443,14 @@ void status_line(WINDP *wp)
 	// MESG("status_line: fdname [%s] l=%d",fdname,strlen(fdname));
 	composite = g_utf8_normalize(fdname,-1,G_NORMALIZE_ALL_COMPOSE);
 	// MESG("           : composite [%s]",composite);
+	if(wp->w_ntcols>NUM_COLS_SHORT) {
 	full_name = get_pfname(composite,bp->b_fname,max_t-1);
 	// MESG("           : full_name [%s] l=%d max_t=%d",full_name,strlen(full_name),max_t);
 	strlcpy(cp,full_name,MAXLLEN);
+	} else {
+	
+	strlcpy(cp,bp->b_fname,MAXLLEN);
+	};
 	// MESG("           : cp        [%s]",cp);
 	g_free(composite);
 #else
@@ -1459,10 +1467,15 @@ void status_line(WINDP *wp)
 		*stp++ = c;
 		cp++;
 	};
+	*stp++ = ' ';
 
-    while (n++ < utf_ntcols)  /* Pad to full width. */
+    while (n++ < utf_ntcols-21)  /* Pad to full width. */
     {
 		*stp++ = lchar;
+    }
+    while (n++ <= utf_ntcols)  /* Pad to full width. */
+    {
+		*stp++ = ' ';
     }
 	*stp=0;
 

@@ -27,3 +27,6 @@ unsigned char *prev_utf8_char(unsigned char *string,int pos);
 int utf8_len(char *str);
 int utf8_ord(char *str);
 char * utf_string_rtruncate(char *utf_string, int len);
+int get_utf_length(utfchar *utf_char_str);
+int SUtfCharLen(char *utfstr,int offset,utfchar *uc);
+int s_is_utf_accent(char *utfstr, int o);
