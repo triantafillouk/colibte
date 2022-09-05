@@ -1935,12 +1935,14 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 	wmove(wp->gwp->draw,row,xcol);
 	imax=maxcol+1;
+
 	if(wp->w_fp->slow_display) 
 	{ /* a little bit slower but clears shadow text!  */
 		wclrtoeol(wp->gwp->draw);
 		wrefresh(wp->gwp->draw);
 	 	update_panels();
 	};
+
 	for(i=0;i<=imax;i++) {
 	 uint32_t ch;
 		ccolor=v1->fcolor;

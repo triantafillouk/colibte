@@ -14,6 +14,7 @@
 #include "support.h"
 
 int get_utf_length(utfchar *utf_char_str);
+int SUtfCharLen(char *utfstr,int offset,utfchar *uc);
 
 int utf_error=0;
 
@@ -96,12 +97,11 @@ int  SUtfCharAt(char *utfstr, int offset, utfchar *uc)
 {
  int i,ulen;
  int o=offset;
-	ulen=utf8_countBytes[(int)utfstr[offset]];
-	for(i=0;i<4;i++){
-		if(i<ulen) {
-		uc->uval[i]=utfstr[o+i];
-		} else uc->uval[i]=0;
-	};
+	memset(uc->uval,0,12);
+	// ulen=utf8_countBytes[(int)utfstr[offset]];
+	ulen=SUtfCharLen(utfstr,offset,uc);
+	// MESG(" SUtfcharAt: [%s] o=%d ulen=%d",utfstr,o,ulen);
+	for(i=0;i<ulen;i++) uc->uval[i]=utfstr[o+i];
 	return o+ulen;
 }
 

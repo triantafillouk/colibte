@@ -21,6 +21,7 @@ void vteeoc(WINDP *wp, int endcol);
 int get_current_line();
 void upd_move(WINDP *wp,char *from);
 void vteeol(WINDP *wp, int selected,int inside);
+int SUtfCharLen(char *utfstr,int offset,utfchar *uc);
 
 int specialh=0;
 /* highlight state  */
@@ -601,7 +602,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
  vchar *v_text;
  int i0;
  char *header = str;
-
+ int header_size=strlen(header);
  int ptr1=0;
  char *info_mask="           ";
  static char *vtlm=NULL; // virtual line character mask
@@ -651,12 +652,13 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 //	create mask for the whole line without tabs of special characters
 	int p=ptr1;
 	for(i=start_col;i<llen;i++) {
+		if(p>header_size) break;
 		p = SUtfCharAt(header,p,&uc);
 		c=uc.uval[0];
 		if(c>127) {
 			int size;
 			size=get_utf_length(&uc);
-			if((c==0xE0||c==0xCE) && uc.uval[1]>=0xB0) { 	/* slow down for thai chars  */
+			if(c==0xE0 && uc.uval[1]>=0xB0) { 	/* slow down for thai chars  */
 				wp->w_fp->slow_display=1;
 			}
 			col += size-1;
@@ -670,11 +672,11 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		};
 	};
 	vtlm[rlen]=0;
-	// MESG("vt_str: 3 vtlm[%d]=[%s]",wp->vtrow,vtlm);
 
 //	find the offset of the first column
 	col=start_col;
 	for (i=start_col;  col<first_column  &&  i < llen; ++i) { // invisible characters before first column shown
+		if(ptr1>=header_size) break;
 		ptr1 = SUtfCharAt(header,ptr1,&uc);
 		c=uc.uval[0];
 		if(c>127) {
@@ -708,6 +710,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	for (; i <  llen && wp->vtcol < wp->w_ntcols; i++) 
 	{	// this is the on screen shown area of the line
 		int display_size=0;
+		if(ptr1>=header_size) break;
 		memset(uc.uval,0,8);
 		// show selection
 
@@ -715,9 +718,12 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		ptr1 = SUtfCharAt(header,ptr1,&uc);
 		char_bytes = ptr1-char_bytes;
 		display_size=get_utf_length(&uc);
+		// display_size=SUtfCharLen(header,ptr1,&uc);
 		c=uc.uval[0];
 #if USE_GLIB	// Convert to composed character if possible to view it!
-		if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) {
+		// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
+		if(1)
+		{
 			char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
 //				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
 			if(strlen((char *)uc.uval)>strlen(composed)) {
@@ -992,7 +998,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 			if(c>127) {
 				int size;
 				size=get_utf_length(&uc);
-				if((c==0xE0||c==0xCE) && uc.uval[1]>=0xB0)  fp->slow_display=1; /* slow down for thai chars  */
+				if(c==0xE0 && uc.uval[1]>=0xB0)  fp->slow_display=1; /* slow down for thai chars  */
 				col += size-1;
 				c='m';
 			};
@@ -1075,9 +1081,11 @@ offs vtline(WINDP *wp, offs tp_offs)
 			char_bytes = ptr1-char_bytes;
 			display_size=get_utf_length(&uc);
 			c=uc.uval[0];
-			if((c==0xE0||c==0xCE) && uc.uval[1]>=0xB0)  fp->slow_display=1;	/* slow down for thai chars  */
+			if(c==0xE0 && uc.uval[1]>=0xB0)  fp->slow_display=1;	/* slow down for thai chars  */
 #if USE_GLIB	// Convert to composed character if possible to view it!
-			if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) {
+			// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
+			if(1)
+			{
 				char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
 //				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
 				if(strlen((char *)uc.uval)>strlen(composed)) {
