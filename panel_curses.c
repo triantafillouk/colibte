@@ -1942,6 +1942,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
         maxne=i;
     };
     v1=vtext;
+	// maxne=imax;
 #endif
 #if	1
 	// if(wp->w_fp->slow_display) 

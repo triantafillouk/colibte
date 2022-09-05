@@ -21,6 +21,7 @@ void vteeoc(WINDP *wp, int endcol);
 int get_current_line();
 void upd_move(WINDP *wp,char *from);
 void vteeol(WINDP *wp, int selected,int inside);
+int SUtfCharLen(char *utfstr,int offset,utfchar *uc);
 
 int specialh=0;
 /* highlight state  */

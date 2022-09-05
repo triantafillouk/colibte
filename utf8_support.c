@@ -14,6 +14,7 @@
 #include "support.h"
 
 int get_utf_length(utfchar *utf_char_str);
+int SUtfCharLen(char *utfstr,int offset,utfchar *uc);
 
 int utf_error=0;
 
