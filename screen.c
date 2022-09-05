@@ -658,7 +658,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		if(c>127) {
 			int size;
 			size=get_utf_length(&uc);
-			if(c==0xE0 && uc.uval[1]>=0xB8) { 	/* slow down for thai chars  */
+			if(c==0xE0 && uc.uval[1]>=0xB0) { 	/* slow down for thai chars  */
 				wp->w_fp->slow_display=1;
 			}
 			col += size-1;
@@ -672,7 +672,6 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		};
 	};
 	vtlm[rlen]=0;
-	// MESG("vt_str: 3 vtlm[%d]=[%s]",wp->vtrow,vtlm);
 
 //	find the offset of the first column
 	col=start_col;
@@ -999,7 +998,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 			if(c>127) {
 				int size;
 				size=get_utf_length(&uc);
-				if(c==0xE0 && uc.uval[1]>=0xB8) fp->slow_display=1; /* slow down for thai chars  */
+				if(c==0xE0 && uc.uval[1]>=0xB0)  fp->slow_display=1; /* slow down for thai chars  */
 				col += size-1;
 				c='m';
 			};
@@ -1082,7 +1081,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 			char_bytes = ptr1-char_bytes;
 			display_size=get_utf_length(&uc);
 			c=uc.uval[0];
-			if(c==0xE0 && uc.uval[1]>=0xB8) fp->slow_display=1;	/* slow down for thai chars  */
+			if(c==0xE0 && uc.uval[1]>=0xB0)  fp->slow_display=1;	/* slow down for thai chars  */
 #if USE_GLIB	// Convert to composed character if possible to view it!
 			// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
 			if(1)
