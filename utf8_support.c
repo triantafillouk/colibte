@@ -201,7 +201,7 @@ void utf_string_break(char *utf_string, int column)
 			// MESG("break at %d [%s]",s-utf_string,utf_string);
 			return;
 		};
-#if	1
+#if	0
 		i = SUtfCharAt(s,0,&uc);
 #else
 		SUtfCharAt(s,0,&uc);
