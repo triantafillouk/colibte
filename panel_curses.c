@@ -1935,25 +1935,15 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 	wmove(wp->gwp->draw,row,xcol);
 	imax=maxcol+1;
-#if 1
-    int maxne=0;
-    for(i=0;i<=imax;i++,v1++) {
-        if(v1->uval[0]==' '||v1->uval[0]==0) continue;
-        maxne=i;
-    };
-    v1=vtext;
-	// maxne=imax;
-#endif
-#if	1
-	// if(wp->w_fp->slow_display) 
+
+	if(wp->w_fp->slow_display) 
 	{ /* a little bit slower but clears shadow text!  */
 		wclrtoeol(wp->gwp->draw);
 		wrefresh(wp->gwp->draw);
 	 	update_panels();
 	};
-	wmove(wp->gwp->draw,row,0);
-#endif
-	for(i=0;i<=maxne;i++) {
+
+	for(i=0;i<=imax;i++) {
 	 uint32_t ch;
 		ccolor=v1->fcolor;
 		cattr=v1->bcolor;

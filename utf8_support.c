@@ -97,13 +97,22 @@ int  SUtfCharAt(char *utfstr, int offset, utfchar *uc)
 {
  int i,ulen;
  int o=offset;
+	memset(uc->uval,0,12);
 	// ulen=utf8_countBytes[(int)utfstr[offset]];
 	ulen=SUtfCharLen(utfstr,offset,uc);
+	// MESG(" SUtfcharAt: [%s] o=%d ulen=%d",utfstr,o,ulen);
+// 	if(ulen>8) MESG("SUtfCharAt [%s] at %d len>8 %d",utfstr,offset,ulen);
+	// if(ulen>8) MESG("SUtfCharAt: [%s] found double accent at %d ulen=%d",offset,ulen);
+	// if(ulen==4) MESG("SUtfCharAt: [%s] found accent at %d ulen=%d",utfstr,offset,ulen);
+#if	1	
+	for(i=0;i<ulen;i++) uc->uval[i]=utfstr[o+i];
+#else
 	for(i=0;i<8;i++){
 		if(i<ulen) {
 		uc->uval[i]=utfstr[o+i];
 		} else uc->uval[i]=0;
 	};
+#endif
 	return o+ulen;
 }
 

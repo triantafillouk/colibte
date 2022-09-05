@@ -602,7 +602,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
  vchar *v_text;
  int i0;
  char *header = str;
-
+ int header_size=strlen(header);
  int ptr1=0;
  char *info_mask="           ";
  static char *vtlm=NULL; // virtual line character mask
@@ -652,6 +652,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 //	create mask for the whole line without tabs of special characters
 	int p=ptr1;
 	for(i=start_col;i<llen;i++) {
+		if(p>header_size) break;
 		p = SUtfCharAt(header,p,&uc);
 		c=uc.uval[0];
 		if(c>127) {
@@ -676,6 +677,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 //	find the offset of the first column
 	col=start_col;
 	for (i=start_col;  col<first_column  &&  i < llen; ++i) { // invisible characters before first column shown
+		if(ptr1>=header_size) break;
 		ptr1 = SUtfCharAt(header,ptr1,&uc);
 		c=uc.uval[0];
 		if(c>127) {
@@ -709,14 +711,15 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	for (; i <  llen && wp->vtcol < wp->w_ntcols; i++) 
 	{	// this is the on screen shown area of the line
 		int display_size=0;
+		if(ptr1>=header_size) break;
 		memset(uc.uval,0,8);
 		// show selection
 
 		num char_bytes=ptr1;
 		ptr1 = SUtfCharAt(header,ptr1,&uc);
 		char_bytes = ptr1-char_bytes;
-		// display_size=get_utf_length(&uc);
-		display_size=SUtfCharLen(header,ptr1,&uc);
+		display_size=get_utf_length(&uc);
+		// display_size=SUtfCharLen(header,ptr1,&uc);
 		c=uc.uval[0];
 #if USE_GLIB	// Convert to composed character if possible to view it!
 		// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
