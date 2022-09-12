@@ -11,7 +11,6 @@
 
 int delete_region();
 
-void set_buffer_update();
 int is_utf_accent(FILEBUF *fp, offs o);
 offs MoveToColumn(int go_col);
 int export_region(ClipBoard *);	/* this is platform dependant!  */
@@ -2194,12 +2193,11 @@ int set_case(int n)
  return TRUE;
 }
 
-
 /* toggle highlight on/off */
 int toggle_highlight(int n)
 {
  if(syntaxh) syntaxh=0;else syntaxh=1;
- set_buffer_update();
+ set_update(cwp,UPD_ALL);
  return TRUE;
 }
 

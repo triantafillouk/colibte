@@ -162,22 +162,6 @@ void set_update(WINDP *wp_toset, int flag)
  if(flag & UPD_ALL) update_all=1;
 }
 
-/* update all windows with current buffer  */
-void set_buffer_update()
-{
- WINDP *wp;
- if(cbfp->b_nwnd==0) return;
- lbegin(window_list);
- while((wp=(WINDP *)lget_current(window_list))!=NULL){
- 	if(wp->w_fp == cbfp) {
-		_el *cwin=window_list->current;
-		set_update(wp,UPD_WINDOW);
-		window_list->current=cwin;
-	};
-	lmove_to_next(window_list,0);
- }; 
-}
-
 int show_key(int key)
 {
  char *ptr;

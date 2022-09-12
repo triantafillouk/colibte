@@ -308,11 +308,14 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 			if(cbfp->b_flag & FSDIRED) {
 				if(button==1) dir_right(0);
 				// if(button==3) dir_left(0);
-			} else {
+			} 
+#if	TNOTES
+			else {
 				if(button==1) {
 					view_note(0);
 				};
 			};
+#endif
 			update_screen(FALSE);
 			return;
 			};
@@ -340,9 +343,9 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 				if(update_ok) {
 					if(
 #if	TNOTES
-						cwp->w_fp->b_flag & FSNOTES || cwp->w_fp->b_flag & FSNOTESN
+						cwp->w_fp->b_flag & FSNOTES || cwp->w_fp->b_flag & FSNOTESN ||
 #endif
-						|| cwp->w_fp->b_flag & FSNLIST ) {
+						cwp->w_fp->b_flag & FSNLIST ) {
 						mouse_col=set_tag_view_position(new_line,mouse_col);
 						update_screen(TRUE);
 					} else {

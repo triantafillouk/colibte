@@ -126,7 +126,7 @@ char *get_font_string()
  return fstr;
 }
 
-unsigned int put_wstring(WINDP *wp, char *st,int ulen)
+int put_wstring(WINDP *wp, char *st,int ulen)
 {
  GeEditDisplay *wd = GTK_EDIT_DISPLAY(wp->gwp->draw);
 // show text line
@@ -305,8 +305,9 @@ void update_cursor_position()
 #if	TNOTES
 	if(cwp->w_fp->b_flag == FSNOTES) movecursor(cwp->current_tag_line-cwp->top_tag_line, WGetCol());
 	else if(cwp->w_fp->b_flag & FSNOTESN) movecursor(cwp->current_note_line-cwp->top_note_line, WGetCol());
+	else
 #endif
-	else if(cwp->w_fp->b_flag & FSNLIST) {
+	if(cwp->w_fp->b_flag & FSNLIST) {
 		// MESG("move %d %d",cwp->current_note_line-cwp->top_note_line, 0);
 		movecursor(cwp->current_note_line-cwp->top_note_line, 0);
 	} else movecursor(cwp->currow,WGetCol());

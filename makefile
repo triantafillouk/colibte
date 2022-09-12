@@ -244,31 +244,16 @@ ginput3.o: keytable.h input.c
 	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE3)  -funsigned-char input.c -o ginput3.o
 
 #	The following is with gtk3 library and cairo plot. gplotc(gcanvas)
-ifeq ($(TNOTES), 1)
 ctg3: tplot.o system.o gldisplay.o edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o  utils.o alist.o filebuf.o gplotc3.o  support.o config_init.o convert.o  gtk_support3.o geditdisplay3.o  gcanvas3.o  highlight.o utf8_support.o notes.o
 	${CC} tplot.o system.o gldisplay.o  edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o gplotc3.o  gtk_support3.o config_init.o support.o geditdisplay3.o gcanvas3.o  highlight.o utf8_support.o notes.o -o ctg3  $(GLIB_LIB) $(GTK3_FLAGS) -lm -lX11
-else
-ctg3: tplot.o system.o gldisplay.o edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o  utils.o alist.o filebuf.o gplotc3.o  support.o config_init.o convert.o  gtk_support3.o geditdisplay3.o  gcanvas3.o  highlight.o utf8_support.o
-	${CC} tplot.o system.o gldisplay.o  edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o gplotc3.o  gtk_support3.o config_init.o support.o geditdisplay3.o gcanvas3.o  highlight.o utf8_support.o -o ctg3  $(GLIB_LIB) $(GTK3_FLAGS) -lm -lX11
-endif
 
 #	The following is with gtk2 library and cairo plot. gplotc(gcanvas)
-ifeq ($(TNOTES), 1)
 ctg2 : gmain.o system.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o   gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o plot_cairo.c  config_init.o utf8_support.o notes.o
 	${CC} gmain.o system.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o notes.o -o ctg2  -lX11 $(GTK2_FLAGS)  $(GLIB_LIB) -lm
-else
-ctg2 : gmain.o system.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o   gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o plot_cairo.c  config_init.o utf8_support.o
-	${CC} gmain.o system.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o -o ctg2  -lX11 $(GTK2_FLAGS)  $(GLIB_LIB) -lm
-endif
 
 # This is with Xlib library, no plot !
-ifeq ($(TNOTES),1)
 ctxe : main.o system.o edit.o screen.o  xldisplay.o eval.o mlang.o  file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o  highlight.o dir.o utils.o alist.o filebuf.o support.o config_init.o utf8_support.o notes.o
 	${CC} main.o system.o edit.o screen.o   xldisplay.o eval.o mlang.o file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o highlight.o dir.o utils.o alist.o  filebuf.o support.o config_init.o utf8_support.o notes.o -o ctxe -lm  ${X11lib}
-else
-ctxe : main.o system.o edit.o screen.o  xldisplay.o eval.o mlang.o  file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o  highlight.o dir.o utils.o alist.o filebuf.o support.o config_init.o utf8_support.o
-	${CC} main.o system.o edit.o screen.o   xldisplay.o eval.o mlang.o file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o highlight.o dir.o utils.o alist.o  filebuf.o support.o config_init.o utf8_support.o -o ctxe -lm  ${X11lib}
-endif
 
 #	This is for SCO and Xlib. -lsocket is needed at the end of every X application
 #	cc -b elf main.o system.o edit.o  display.o eval.om lang.o file.o input.o help.o search.o  word.o window.o marks.o convert.o   xlib.o -o emacs  -lm -L/usr/X11R6/lib -lX11 -lsocket
