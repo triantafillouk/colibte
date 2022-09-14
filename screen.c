@@ -560,6 +560,7 @@ int checkwords(FILEBUF *fp,char *line, int *start, char **words,int type)
 	return(wordfound);
 }
 
+#if	NUSE
 int utf_lerror()
 {
  if(
@@ -567,6 +568,7 @@ int utf_lerror()
 	) return(1);
  else return 0;
 }
+#endif
 
 num utf_FLineLen(FILEBUF *fp, offs ptr);
 
@@ -607,8 +609,9 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
  };
  wp->vs[0]->v_flag=1;
  v_text = wp->vs[wp->vtrow]->v_text;
+#if	NUSE
  wp->vs[wp->vtrow]->utf_error=0;
-
+#endif
  int fg_color=FOREGROUND;
  if(wp->w_fp->b_flag & FSDIRED) {
 	if(str[1]=='l') fg_color=TAGFORE;
@@ -825,7 +828,9 @@ offs vtline(WINDP *wp, offs tp_offs)
 	v_text[i].uval[0]=0;
  };
  memset(v_text,0,sizeof(struct vchar)*wp->w_ntcols);
+#if	NUSE
  wp->vs[wp->vtrow]->utf_error=0;
+#endif
  first_column = wp->w_lcol;	/* first column to show at the beginning of the line */
  
 	col = 0;
@@ -839,7 +844,9 @@ offs vtline(WINDP *wp, offs tp_offs)
 	if((wp->w_fp->b_lang == 0 
 	   ) && (!hexmode)) {
 		llen = utf_FLineLen(wp->w_fp,ptr1);
+#if	NUSE
 		wp->vs[wp->vtrow]->utf_error=utf8_error();
+#endif
 		if(utf8_error()) llen=ptr2-ptr1;
 	} else {
 		llen = ptr2 - ptr1;

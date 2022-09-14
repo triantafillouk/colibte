@@ -1604,11 +1604,7 @@ int get_utf_length(utfchar *utf_char_str)
 		if(b2==0x80) return 1; 	/* 1/4 en  */
 		if(b2==0x8B) return 0;	/* zero space  */
 		if(b2==0x8C) return 0;	/* zero space  */
-#if	DARWIN
-		if(b2==0x8D) return 1;
-#else
 		if(b2==0x8D) return 0;	/* zero space  */
-#endif
 		return 1;
 	};
 	if(b1==0x81 || b1==0x82) return 1; 	/* diacriticals, subscripts, currency symbols  */

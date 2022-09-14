@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.39  (11/9/2022)"
+#define VERSION 	"#01.40  (14/9/2022)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -289,7 +289,9 @@ typedef struct vchar {
 
 typedef struct  VIDEO {
 	short int	v_flag;		/* line Flags */
+#if	NUSE
 	short int	utf_error;	/* not valid utf8 char!  */
+#endif
 #if	PANGO_TEST0
 	int left_x_pos;
 	int start_column;
