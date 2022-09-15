@@ -227,7 +227,7 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
  namelist = NULL;
  // MESG("scandir2: sizeof stat=%d dirent=%d",sizeof(struct stat),sizeof(struct kdirent));
  d1 = opendir(dirname);
- if(d1==NULL) { return error_line("cant open dir");};
+ if(d1==NULL) { return error_line("cant open dir %s",dirname);};
  if(chdir(dirname)) { return error_line("cant open dir %s",dirname);};
 
  for(i=0;;i++) {
@@ -237,7 +237,7 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
 	 namelist = (struct kdirent **)realloc((void *)namelist, ((i+256)*sizeof(struct kdirent *)));
 	};
 	if(df1==NULL) { num_of_files=i; closedir(d1);break;};
-	if(namelist==NULL) { error_line("cant create namelist");};
+	if(namelist==NULL) { return error_line("cant create directory namelist");};
 
 	namelist[i]=(struct kdirent *)malloc(sizeof(struct kdirent)+strlen(df1->d_name)+1);
 	if(namelist[i]==NULL) exit(1);
@@ -490,7 +490,7 @@ int dir_move(int n)
   } else s1=0;
   s2=system(sline);
 
-  if(s2 != 0) { error_line("Error moving %s to %s",fname,destination);}
+  if(s2 != 0) { return error_line("Error moving %s to %s",fname,destination);}
   else {
 	// check if moved to other dir
 	if(strstr(destination,"/")!=NULL) is_other_dir=1;
@@ -540,8 +540,7 @@ int dir_file_rename(int n)
   escape_file_name(destination);
   if(snprintf(sline,MAXLLEN,"mv %s %s 2> /dev/null",
   	fname,destination)>=MAXLLEN) {
-	msg_line("Name too long!");
-	return(FALSE);
+	return error_line("Name too long!");
   };
 
   s1=chdir(cbfp->b_dname);
@@ -553,7 +552,7 @@ int dir_file_rename(int n)
 
   s2=system(sline);
 
-  if(s2 != 0) { error_line("Error moving file");}
+  if(s2 != 0) { return error_line("Error moving file to %s",destination);}
   else {
 	// check if moved to other dir
 	if(strstr(destination,"/")!=NULL) is_other_dir=1;
@@ -579,11 +578,11 @@ int dir_new_file(int n)
 	if((s1 = nextarg("New file as : ",fname,MAXFLEN,true)) !=TRUE) return(s1);
     escape_file_name(fname);
 	sstat=snprintf(sline,MAXLLEN,"touch %s 2> /dev/null",fname);
-	if(sstat>=MAXLLEN) MESG("truncated 9");
+	if(sstat>=MAXLLEN) return error_line("truncated file at 9");
 
 	s1=chdir(cbfp->b_dname);
 	s1=system(sline);
-	if(s1 != 0) { error_line("Error creating file");};
+	if(s1 != 0) { return error_line("Error creating file %s",fname);};
 	// insert file ..
 	s1=stat(fname,&t);
 	str_tfile(&t,fname,250);
@@ -607,7 +606,7 @@ int dir_new_dir(int n)
 
     s1=chdir(cbfp->b_dname);
 	s1=system(sline);
-	if(s1 != 0) { error_line("Error creating dir");};
+	if(s1 != 0) { return error_line("Error creating dir %s",fname);};
 	// insert file ..
 	s1=stat(fname,&t);
 	str_tfile(&t,fname,250);
@@ -652,11 +651,11 @@ int dir_link(int n)
 
   escape_file_name(destination);
   sstat=snprintf(sline,MAXLLEN,"ln -s %s %s 2>/dev/null",source_name,destination);
-  if(sstat>=MAXLLEN) { MESG("dir link fname overflow!");return FALSE;};
+  if(sstat>=MAXLLEN) { return error_line("dir link fname overflow!");return FALSE;};
 
   s1=chdir(cbfp->b_dname);
   s2=system(sline);
-  if(s2 != 0) { error_line("Error linking file!");};
+  if(s2 != 0) { return error_line("Error linking file to %s",destination);};
 // refresh other buffer if onscreen
   dir_other_reload(1);
   return 1;

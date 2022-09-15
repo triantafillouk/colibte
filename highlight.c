@@ -265,7 +265,7 @@ int comment_with_string(char *comment_string,int start)
 		set_modified(cbfp);
 		return(size);
 	} else {
-		error_line("read only!");
+		msg_line("read only!");
 		return false;
 	}
 }

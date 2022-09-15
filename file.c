@@ -1464,8 +1464,7 @@ int saveas_file(int n)
 	if(scratch_num) 
 	{
 		if(chdir(get_start_dir())) {
-			error_line("cannot find start dir to save file!");
-			return FALSE;
+			return error_line("cannot find start dir to save file!");
 		};
 		scratch_files[scratch_num-1]=0;
 	};
@@ -1475,8 +1474,7 @@ int saveas_file(int n)
 		FILEBUF *vb=cbfp;
 		int status;
 		if(!strcmp(cbfp->b_fname,fname)) {
-			msg_line("cannot write to the same read only file!");
-			return(false);
+			return error_line("cannot write to the same read only file!");
 		};
 		vb->b_state = FS_ACTIVE;	/* set it so we can write it  */
 	    strlcpy(vb->b_fname, fname,MAXFLEN);
@@ -1564,12 +1562,10 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
 	// /proc/kmsg
 	// /proc/kcore
 	if(strcmp(fname,"kmsg")==0 && strcmp(bp->b_dname,"/proc")==0) {
-		msg_line("should not access /proc/kmsg");
-		return FALSE;
+		return error_line("should not access /proc/kmsg");
 	};
 	if(strcmp(fname,"kcore")==0 && strcmp(bp->b_dname,"/proc")==0) {
-		msg_line("should not access /proc/kcore");
-		return FALSE;
+		return error_line("should not access /proc/kcore");
 	};
 
 	int ftype = file_type(fname, &tc, oext);

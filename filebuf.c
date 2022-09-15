@@ -2031,15 +2031,13 @@ int	writeout(char *name, FILEBUF *bf)
    if(nfile==-1)
    {
      FError(name);
-	 error_line("cannot open file %s to write",name);
-     return(false);
+	 return error_line("cannot open file %s to write",name);
    }
 
    int lock_res=LockFile(nfile,false);
    if(lock_res==-1)   {
      close(nfile);
-	 error_line("cannot lock file %s for write!",name); 
-     return(false);
+	 return error_line("cannot lock file %s for write!",name); 
    };
 
    if(lock_res==-2) msg_line("Warning: file %s locking failed",name);

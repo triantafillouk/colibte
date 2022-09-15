@@ -1219,7 +1219,7 @@ int refresh_current_line(int nused)
  offs tpo;	// current offset
  offs sl,el; // start, end of line
  int dsize=0;
-
+ offs i;
  show_stage=0;
 
 	tpo=tp_offset(cwp->tp_current);
@@ -1228,7 +1228,7 @@ int refresh_current_line(int nused)
 
 	el=FLineEnd(cbfp,tpo);
 	dsize=el-sl;
-	for(long i=sl;i<el;i++) {
+	for(i=sl;i<el;i++) {
 		if(CharAt(i)==':') { is_ddot=!(cbfp->b_state & FS_VIEW);break;};
 	};
 
