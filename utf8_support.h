@@ -13,6 +13,7 @@ typedef struct utfchar {
 	unsigned char uval[12];
 } utfchar;
 
+int error_line(char *error_message,...);
 int utf_num_chars(char *utf);
 int  SUtfCharAt(char *utfstr, int offset, utfchar *uc);
 int utf8_countbytes(int c);

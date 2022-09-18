@@ -13,7 +13,6 @@
 #include <string.h>
 #include "support.h"
 
-
 int utf_error=0;
 
 int utf8_error()
@@ -106,7 +105,7 @@ int SUtfCharLen(char *utfstr,int offset,utfchar *uc)
 				set_utf8_error(1);	/* this is not a valid start for utf  */
 				return 1;
 			};
-			if(ch<32) return clen;
+			if(ch<32) return 1;
 		} else if(ch<0xE0) {
 			if(o+1<=size){
 				ch1=utfstr[o+1];
@@ -116,11 +115,11 @@ int SUtfCharLen(char *utfstr,int offset,utfchar *uc)
 				{
 					utf_accent=1;
 					// MESG("allone accent! clen=%d");
-					return clen;	/* return without checking for next accent  */
+					return 2;	/* return without checking for next accent  */
 				};
 			} else {
 				set_utf8_error(3);	/* incomplete, eof  */
-				return clen;
+				return 1;
 			};
 		}
 		else if(ch<0xF0) {
@@ -128,7 +127,7 @@ int SUtfCharLen(char *utfstr,int offset,utfchar *uc)
 			if(ch1<128 || ch1>0xBF) { set_utf8_error(4);return 1;};	/* not a middle utf char  */
 			ch1=utfstr[o+2];
 			if(ch1<128 || ch1>0xBF) { set_utf8_error(5);return 1;};	/* not a middle utf char  */
-			clen=3;
+			return 3;
 		} else {
 			char ch2,ch3;
 			ch1=utfstr[o+1];
@@ -137,14 +136,14 @@ int SUtfCharLen(char *utfstr,int offset,utfchar *uc)
 			if(ch2<128 || ch2>0xBF) { set_utf8_error(7);return 1;};	/* not a middle utf char  */
 			ch3=utfstr[o+3];
 			if(ch3<128 || ch3>0xBF) { set_utf8_error(8);return 1;};	/* not a middle utf char  */
-			clen=4;
+			return 4;
 		}
 		if(clen<3 && !utf_accent ) {	/* check next char for accent!  */
-		{
 			// MESG("- s=[%s] o=%d",utfstr+o,o);
 			clen += s_is_utf_accent(utfstr,o+clen);
-			// if(clen>2) MESG("[%s][%s] total size=%d at %ld",utfstr,utfstr+o,clen,o);
-		}};
+		} else {
+			MESG("clen=%d",clen);
+		};
 	return clen;
 }
 
@@ -181,7 +180,7 @@ int  SUtfCharAt(char *utfstr, int offset, utfchar *uc)
 	memset(uc->uval,0,12);
 	// ulen=utf8_countBytes[(int)utfstr[offset]];
 	ulen=SUtfCharLen(utfstr,offset,uc);
-	// MESG(" SUtfcharAt: [%s] o=%d ulen=%d",utfstr,o,ulen);
+	if(ulen>12) { error_line(" SUtfcharAt: [%s] o=%d ulen=%d",utfstr,o,ulen);ulen=12;};
 	for(i=0;i<ulen;i++) uc->uval[i]=utfstr[o+i];
 	return o+ulen;
 }
