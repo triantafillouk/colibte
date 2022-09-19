@@ -412,7 +412,7 @@ void draw_window(int flag, WINDP *wp,char *from)
  // static int ind=0;
  register int i;
  int ulines=0;
- // MESG(" draw_window: id=%d from=%s ind=%d",wp->id,from,ind);
+	// MESG(" draw_window: id=%d from=%s ind=%d",wp->id,from,ind);
 	drv_start_window_update(wp);
  	prepare_converter(wp->w_fp->b_lang);
 	set_window_font(wp);
@@ -443,8 +443,7 @@ void draw_window(int flag, WINDP *wp,char *from)
 	};
 
 	wp->draw_flag=0;
-	// drv_win_flush(wp);
-	// MESG("draw_window: end");
+	// MESG(" draw_window: end");
 }
 
 void set_draw_flag(WINDP *wp,char *from)
@@ -632,8 +631,8 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 //	Mask creation (vtlm)
 	if(llen>=vtla) { // increase allocation as needed
 		vtla=llen+128;
-		if(vtlm!=NULL) { free(vtlm); vtlm=NULL;};
-		vtlm=malloc(vtla);
+		if(vtlm!=NULL) { efree(vtlm,"free old vtlm"); vtlm=NULL;};
+		vtlm=emalloc(vtla,"increase vtlm allocation");
 	};
 
 //	create mask for the whole line without tabs of special characters
@@ -794,6 +793,17 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	} else vteeoc(wp,max_size);
 }
 
+// use this instead of realloc to debug
+char * resize_buffer(char *buffer,num old_size,num new_size)
+{
+ // MESG("resize_buffer: old=%ld new=%ld",old_size,new_size);
+ char *new_allocation=emalloc(new_size,"vtlm new allocation2");
+ memcpy(new_allocation,buffer,old_size);
+ if(buffer!=NULL) efree(buffer,"resize, free old buffer");
+ return new_allocation;
+}
+
+
 /* update line starting at offset start of specific window */
 offs vtline(WINDP *wp, offs tp_offs)
 {
@@ -822,7 +832,7 @@ offs vtline(WINDP *wp, offs tp_offs)
  num_columns=wp->w_infocol;
 
  v_text = wp->vs[wp->vtrow]->v_text;
-
+ // MESG("vtline: < %d vtla=%d",wp->vtrow,vtla);
  for(i=0;i<wp->w_ntcols;i++) {
  	v_text[i].uval[0]='A';
 	v_text[i].uval[0]=0;
@@ -875,11 +885,16 @@ offs vtline(WINDP *wp, offs tp_offs)
 			col0=col1;col1=i0;
 		};
 	};
+
 //	Mask creation (vtlm)
-	if(llen>=vtla) { // increase allocation as needed
-		vtla=llen+128;
-		if(vtlm!=NULL) { free(vtlm); vtlm=NULL;};
-		vtlm=malloc(vtla);
+	if(vtla==0) { // initial mask allocation
+		vtla=128;
+		if(llen>=vtla) vtla=llen+128;
+		if(vtlm!=NULL) { 
+			// MESG("	vtlm is not null, free!!!!");
+			efree(vtlm,"initial allocation free vtlm");
+		};
+		vtlm=emalloc(vtla,"initial allocation vtlm");
 	};
 
 	if(hexmode) {
@@ -926,8 +941,11 @@ offs vtline(WINDP *wp, offs tp_offs)
 		}
 		if(syntaxh) 
 		{
+
 //	create mask for the whole line without tabs or special characters
 		offs p=ptr1;
+
+		// col=0;
 		for(i=0;i<llen;i++) {
 			if(fp->b_lang == 0 && !utf8_error()) {
 				p = FUtfCharAt(fp,p,&uc);
@@ -948,23 +966,29 @@ offs vtline(WINDP *wp, offs tp_offs)
 				++col;
 			};
 			if(c<32) c='C';
-
+			if(col>=vtla) {
+				vtlm=resize_buffer(vtlm,vtla,vtla+256);
+				vtla+=256;
+			};
 			while(rlen<col){
-				if(rlen>vtla) { vtla+=256; vtlm=realloc((void *)vtlm,vtla);};
 				vtlm[rlen++]=c;
 			};
 		};
 		vtlm[rlen]=0;
-//		MESG("vtlm[%d]=[%s]",wp->vtrow,vtlm);
+		if(col>=vtla)
+		MESG("vtlm[%d]=[%s] col=%d vtla=%d",wp->vtrow,vtlm,col,vtla);
+
 		int canstart=1;
 		for(i0=0 ;i0< rlen;i0++) {
 			// Check for boundary characters
 				c1 = vtlm[i0];
 				if(!fp->hl->c_inword(c1))
 				{ 
-					canstart=1;continue;
+					canstart=1;
+					continue;
 				}
 			if(canstart) {
+			// MESG("		421 i0=%d",i0);
 			// Highlight numerics, set type to H_NUMERIC
 				if(!checknumerics(fp,vtlm,&i0,H_NUMERIC))
 			// check for words of type 1, set type to H_WORD1
@@ -972,9 +996,10 @@ offs vtline(WINDP *wp, offs tp_offs)
 			// check for words of type 2, set type to H_WORD2
 				checkwords(fp,vtlm,&i0,fp->hl->w1,H_WORD2);
 				canstart=0;
+				// MESG("	422 i0=%d",i0);
 			}
  		};
- 		};
+ 		};	// syntaxh
 	};
 	
 //	find the offset of the first column
@@ -1167,7 +1192,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 		wp->w_fp->hl->h_function(c);
 	};
 	};
-//	MESG("end line: ----------------------------------");
+	// MESG("end line: >");
 	return cur_lend+wp->w_fp->EolSize;
 }
 
@@ -1692,7 +1717,7 @@ int update_screen(int force)
 
 	/* update any windows that need refreshing */
 	hide_cursor("update_screen: start");
-
+	// MESG("hide_cursor: ok!");
 	if(cwp->selection) {
 		if(cwp->selection == REGION_LINE) 
 			textpoint_set(cwp->w_emark,LineEnd(tp_offset(cwp->tp_current)));
@@ -1705,7 +1730,7 @@ int update_screen(int force)
 	if (update_all)	{ 
 		updgar();
 	};
-
+	// MESG("loop windows");
 	lbegin(window_list);
 	while((wp=(WINDP *)lget(window_list))!=NULL)
 	{
@@ -1966,7 +1991,6 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 			/* and update the virtual line */
 			wp->vs[sline]->v_flag =1;
 			vtmove(wp,sline, 0);
-	
 			if (lp_offs <= FSize(wp->w_fp)) { // if not at the end of file
 			/* if we are not at the end */
 				if(cwp->selection==0) set_selection(false);
@@ -1974,6 +1998,7 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 				/* we must update the column selection here */
 				if(cwp->selection) set_selection(false);
 			};
+			
 			vteeol(wp,0,0);
 		}
 	}
@@ -2175,15 +2200,16 @@ void free_virtual_window(WINDP *wp)
  if(drv_type<2) return;	/* no need for curses,xlib for now, they use a common virtual area for all windows  */
 	
  if(wp->vs!=NULL) { /* free it before allocate new size! */
+	// MESG("free_virtual_window:");
  	for(i=0;i< wp->w_ntrows+2;i++) {
 		if(wp->vs[i]!=NULL) {
-			free(wp->vs[i]);
+			efree(wp->vs[i],"free row");
 			wp->vs[i]=NULL;
 		} else {
 			break;
 		};
 	};
-    free(wp->vs);
+    efree(wp->vs,"free window vs");
 	wp->vs=NULL;
  };
 }
@@ -2193,9 +2219,9 @@ void allocate_virtual_window(WINDP *wp)
  VIDEO *vp;
  int i;
  // MESG("	- allocate_virtual_window: cols=%d rows=%d",wp->w_ntcols,wp->w_ntrows);
- wp->vs = (VIDEO **) malloc(sizeof(VIDEO *) * (wp->w_ntrows+3));
+ wp->vs = (VIDEO **) emalloc(sizeof(VIDEO *) * (wp->w_ntrows+3),"allocation virtual window");
  for(i=0;i< wp->w_ntrows+2;i++) {
- 	vp = (VIDEO *) malloc(sizeof(VIDEO) + (wp->w_ntcols+2) * sizeof(struct vchar));
+ 	vp = (VIDEO *) emalloc(sizeof(VIDEO) + (wp->w_ntcols+2) * sizeof(struct vchar),"allocate virtual line");
  	if(vp==NULL) {
 		ERROR("could not allocate memory for virtual window");
 		exit(1);

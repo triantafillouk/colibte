@@ -10,7 +10,7 @@
 #endif
 
 typedef struct utfchar {
-	unsigned char uval[12];
+	unsigned char uval[16];
 } utfchar;
 
 int error_line(char *error_message,...);

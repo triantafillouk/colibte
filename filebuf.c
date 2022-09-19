@@ -92,12 +92,13 @@ void *emalloc(long size,char *des)
  void *a;
  a=malloc(size);
  if(a==NULL) SYS_ERROR("emalloc: %s size=%ld",des,size);
+ // MESG("emalloc: [%s] %d pos=0x%llX",des,size,(long long)a);
  return a;
 }
 
 void efree(void *p,char *des)
 {
-// MESG("efree:%s [%llX]",des,(long long)p);
+ // MESG("efree:%s [%llX]",des,(long long)p);
  if(p!=NULL) {
  	free(p);
  } else {
