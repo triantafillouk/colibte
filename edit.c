@@ -1964,9 +1964,10 @@ int copy_region(int n)
 
  if(!clipboard_copy(MainClipBoard)) return FALSE;
  export_region(MainClipBoard);
-
+ 
  set_update(cwp,UPD_WINDOW);
  setmark(0); // remove selection
+
  if(MainClipBoard->rect) 
 	snprintf(s,80,"[%lldx%lld bytes copied]",MainClipBoard->width,MainClipBoard->height);
  else

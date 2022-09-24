@@ -933,6 +933,19 @@ int clipboard_copy(ClipBoard *clip)
   utfchar uc;
 
 	if (clip->text!=NULL) { efree(clip->text,"clipboard_copy");clip->text=NULL;};
+#if	1
+	if(cbfp->b_flag & FSNLIST && cbfp->b_flag & FSDIRED)
+	{
+		char fname[MAXFLEN];
+		dir_getfile(fname,1);
+		clip->rect=0;
+		clip->height=1;
+		clip->width=strlen(fname);
+		clip->text=(char*)emalloc(clip->width,"dir name");
+		strcpy(clip->text,fname);
+		return(TRUE);
+	} else
+#endif
 	if(cwp->selection == REGION_COLM)
    {
       clip->rect=TRUE;
