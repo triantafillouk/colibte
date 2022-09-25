@@ -929,9 +929,10 @@ offs  ScanForCharForward(FILEBUF *fp,offs start,byte ch)
 // operates on cbfp,cwp
 int clipboard_copy(ClipBoard *clip)
 {
+  static int full_path=0;
   FILEBUF *fp = cwp->w_fp;
   utfchar uc;
-
+  
 	if (clip->text!=NULL) { efree(clip->text,"clipboard_copy");clip->text=NULL;};
 #if	1
 	if(cbfp->b_flag & FSNLIST && cbfp->b_flag & FSDIRED)
@@ -941,8 +942,17 @@ int clipboard_copy(ClipBoard *clip)
 		clip->rect=0;
 		clip->height=1;
 		clip->width=strlen(fname);
+		if(full_path) clip->width+=strlen(cbfp->b_dname)+1;
 		clip->text=(char*)emalloc(clip->width,"dir name");
-		strcpy(clip->text,fname);
+		if(full_path) {
+			strcpy(clip->text,cbfp->b_dname);
+			clip->text[strlen(clip->text)]='/';
+			strcpy(clip->text+strlen(clip->text),fname);
+			full_path=0;
+		} else {
+			full_path=1;
+			strcpy(clip->text,fname);
+		};
 		return(TRUE);
 	} else
 #endif
@@ -1041,7 +1051,8 @@ int clipboard_copy(ClipBoard *clip)
       	GetBlock(cwp->w_fp,clip->text,tp_offset(cwp->w_emark),clip->width);
 	  else
       	GetBlock(cwp->w_fp,clip->text,tp_offset(cwp->w_smark),clip->width);
-   }
+   };
+   full_path=0;
    return(true);
 }
 

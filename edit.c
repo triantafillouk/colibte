@@ -125,17 +125,9 @@ int toggle_parameter(int type)
 int goto_bol(int n)
 {
 	// MESG("goto_bol: b_flag=%X",cbfp->b_flag);
-#if	1
 	if(cbfp->b_flag==FSNOTES || cbfp->b_flag & FSNOTESN || cbfp->b_flag& FSNLIST) {
 		return goto_bof(n);
 	};
-#else
-	if(cbfp->b_flag & FSNLIST) {
-		cwp->current_note_line=0;
-		set_update(cwp,UPD_WINDOW);
-		return (OK_RSTGOAL);
-	};
-#endif
 	/* in interactive mode first go to the beginning of the window then at bof */
 	if(BolAt(Offset()) && macro_exec==FALSE && kbdmode==STOP) 
 	{
@@ -167,17 +159,9 @@ int prev_character(int n)
 int goto_eol(int n)
 {
 	// MESG("goto_eol: b_flag=%X",cbfp->b_flag);
-#if	1
 	if(cbfp->b_flag==FSNOTES || cbfp->b_flag & FSNOTESN || cbfp->b_flag& FSNLIST) {
 		return goto_eof(n);
 	};
-#else
-	if(cbfp->b_flag & FSNLIST) {
-		cwp->current_note_line=cbfp->dir_list_str->size-1;
-		set_update(cwp,UPD_WINDOW);
-		return (OK_RSTGOAL);
-	};
-#endif
 	if(Eol() && macro_exec==FALSE && kbdmode==STOP) {
 		if(getcline() == (tp_line(cwp->tp_hline)+cwp->w_ntrows-2-half_last_line)) 
 		{
@@ -361,7 +345,8 @@ int goto_eof(int n)
 		return (OK_CLRSL);
 	} else 
 	if(cbfp->b_flag& FSNLIST) {
-		toline=cbfp->lines-headline-1;
+		cwp->goal_column=0;
+		toline=cbfp->b_notes-headline;
 		cwp->current_note_line = toline;
 		MoveLineCol(toline,cwp->goal_column);
 		set_update(cwp,UPD_WINDOW);
