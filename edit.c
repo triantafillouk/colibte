@@ -74,9 +74,12 @@ int toggle_parameter(int type)
 //  MESG("toggle_parameter: type[%d]=[%s] gmode=%d ",type,option_names[type].name,gmode);
   toggle_val(option_names[type].name);
   switch(type) {
-  	case EMKEYEMUL:	
-		msg_line("restart to change keyboard emulation");
-		break;
+  	case EMKEYEMUL:	{
+		int emulation;
+		emulation = (int)bt_dval(option_names[type].name);
+		set_key_emulation(emulation);
+		msg_line("set key amulation to %s",(emulation==0) ? "native":"emacs");
+		}; break;
 	case EMBEDICONS: // toggle_val("embed_icons");
 //		redraw toolbar (now needs restart)
 		msg_line("restart to change icons");

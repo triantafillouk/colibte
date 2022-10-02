@@ -64,7 +64,7 @@ char ascii_cap[256] = {
 	'P','R','S','S','T','Y','F','X','C','V','I','Y','O','Y','V',' '
 };
 
-KEYTAB *keytab;
+KEYTAB *key_table;
 
 int tstr_to_command(char *tstr);
 char *cmd_to_tstr(int cmd);
@@ -535,7 +535,7 @@ int unassign_key(int n)
 		msg_line("Unassign key :");
 		c = getckey();	
 	};
-	ktp=key_item(keytab,c);
+	ktp=key_item(key_table,c);
 	/* if no assignement, complain */
 	if (ktp->k_fp == NULL) {
 		msg_line("[Key not assinged to a function]");
@@ -574,7 +574,7 @@ int show_keys(int n)
 	EmptyText(bp);
 	select_filebuf(bp);
 
-	ktbs[0]=keytab;
+	ktbs[0]=key_table;
 	ktbs[1]=keytab_dir;
 	ktbs[2]=keytab_view;
 #if	TNOTES
@@ -700,8 +700,8 @@ int set_key_emulation(int emulation)
 {
 	MESG("set_key_emulation: %d",emulation);
 	set_btval("keyboard_emulation",-1,NULL,emulation);
-	if(emulation == 1) keytab = keytab_emacs;
-	else keytab = keytab_win;
+	if(emulation == 1) key_table = keytab_emacs;
+	else key_table = keytab_win;
 	return emulation;
 }
 
@@ -729,7 +729,7 @@ int (*key_function(int c,int f))()
 		// MESG("FS_VIEW: no key!");
 	};
     
-	ktp = key_item(keytab,c);
+	ktp = key_item(key_table,c);
 	if(ktp->macro_name==NULL) return NULL;
 	strlcpy(subname,ktp->macro_name,MAXFLEN);
 	if(ktp->k_fp !=NULL && ktp->k_fp!=NOFUNCTION) return(ktp->k_fp);
@@ -740,7 +740,7 @@ int (*key_function(int c,int f))()
 char * xe_key_name(int c)
 {
 	KEYTAB *ktp;
-	ktp = key_item(keytab,c);
+	ktp = key_item(key_table,c);
 	if(ktp==NULL) return (cmd_to_tstr(c));
 	if(ktp->macro_name==NULL) return (cmd_to_tstr(c));
 	if(ktp->macro_name[0]==0) return (cmd_to_tstr(c));

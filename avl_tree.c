@@ -239,4 +239,18 @@ BTNODE * add_btnode(BTREE *tree, char *name)
 	return res;
 }
 
+#if	NUSE
+void delete_avl_node(BTNODE *node)
+{
+ if(node->left) {
+ 	delete_avl_node(node->left);
+	btn_free(node->left);node->left=NULL;
+ };
+ if(node->right) {
+ 	delete_avl_node(node->right);
+	btn_free(node->right);node->right=NULL;
+ };
+ if(node->sval) free(node->sval);
+}
+#endif
 #endif
