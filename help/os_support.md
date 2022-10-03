@@ -2,7 +2,7 @@
 # Notes and special handling for various operating systems
 
 ## Linux
- Has been tested on Ubuntu, centos, fedori, redhat
+> Has been tested on Ubuntu, centos, fedori, redhat
  
 ## WSL (Windows Linux Subsystem)
 

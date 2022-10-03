@@ -91,6 +91,7 @@ void highlight_dir(int c);
 void highlight_rust(int c);
 void highlight_tags(int c);
 void highlight_sln(int c);
+void highlight_md(int c);
 
 char *c_w[] = { "if","else","do","while","switch","case","for","return","break","goto","continue","typedef",
 	"namespace","this","throw","try","catch","@property","" };
@@ -249,7 +250,7 @@ char *go_extensions[] = { "GO","go","" };
 char *v_extensions[] = { "V","v","" };
 char *rust_extensions[] = { "RS","rs","" };
 char *txt_extensions[] = { "TEXT","txt","help","readme","" };
-char *gtxt_extensions[] = { "GTEXT","tdc","md","cal","" };
+char *gtxt_extensions[] = { "GTEXT","tdc","cal","" };
 char *perl_extensions[] = { "PL","pl","perl","cgi","pm","t","" };
 char *ps1_extensions[] = { "PS1","ps1","" };
 char *tcl_extensions[] = { "TCL","tcl","" };
@@ -258,6 +259,7 @@ char *html_extensions[] = { "HTML","htm","html","shtml","shtm","cfml","cfm","cfc
 		"erb",	// embedded ruby
 		"ejs","dust",	//	embedded EJS
 		"" };
+char *md_extensions[] = {"md","markdown","mdown","mkdn",""};
 char *wml_extensions[] = { "WML","wml",""};
 char *info_extensions[] = { "INFO","inf",""};
 char *xml_extensions[] = { "XML","xml","gla","wxs","wxl","wsdl","rss","atom","rdf","xslt","xsl","xul","xbl","xsd","mathml","xaml",""};
@@ -353,6 +355,7 @@ SHLIGHT hts[] = {
  { "V", 0,0,v_w,v_w1,highlight_c,update_highlight,c_incword,v_extensions,comment_cc },
  { "JULIA",0,0,julia_w,julia_w1,highlight_julia,update_highlight,c_incword,julia_extensions,comment_perl },
  { "CAL",1,0,none_w,none_w, highlight_cmd,update_highlight_line,c_in_txt_word,gtxt_extensions,comment_perl },
+ { "MD",0,0,none_w,none_w, highlight_md, update_highlight, c_in_txt_word,md_extensions,comment_perl },
  { NULL,0,0,NULL,NULL,NULL,NULL,NULL }
 };
 

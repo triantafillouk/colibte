@@ -942,7 +942,7 @@ void highlight_rust(int c)
 /*
 	Highlight html new style
 */
-#define CHECK_WORDS		9
+#define CHECK_WORDS		10
 
 #define START_SCRIPT	2
 #define STOP_SCRIPT		1
@@ -953,6 +953,7 @@ void highlight_rust(int c)
 #define STOP_COMMENT	7
 #define START_DATA		8
 #define STOP_DATA		9
+#define START_MDCODE	10
 
 #define	LANG_SCRIPT		1
 #define LANG_CSS		2
@@ -963,7 +964,8 @@ char *ssword[CHECK_WORDS] = {
 	"</STYLE","<STYLE",
 	"<!--[", 
 	"<!--", "-->",
-	"![CDATA","!]]>", 
+	"![CDATA","!]]>"
+	, "```"					/* md code */
 };
 
 int ssind[CHECK_WORDS];
@@ -1183,6 +1185,7 @@ void highlight_html(int c)
   };
 }
 
+
 void highlight_css(int c)
 {
  if(highlight_note(c)) return;
@@ -1191,6 +1194,166 @@ void highlight_css(int c)
 		slang=LANG_CSS;
 		hquotem=0;
  }
+}
+
+void highlight_md(int c)
+{
+  int hstruct=0;
+// NEW_STYLE
+  if(highlight_note(c)) return;
+
+  hstruct=check_words(c);
+  switch(hstruct) {
+	case START_COMMENT:
+		if(!slang) { // only in html
+			hquotem |= H_QUOTEC;
+		};
+		break;
+	case STOP_COMMENT:
+		if(!slang) { // only in html
+			hquotem &= ~H_QUOTEC;
+		};
+	case START_MDCODE:
+		if(slang) {
+			slang=0;
+			hquotem &= ~H_QUOTEC;
+		} else {
+			slang=LANG_SCRIPT;
+			hquotem |= H_QUOTEC;
+		};
+		break;
+  };
+
+  switch(c) {
+	case (CHR_RESET) : // initialize
+//		MESG("html reset:");
+		hstate=0;
+		slang=0;
+//		hquotem=0;
+		break;
+	/* single quotes */
+	case CHR_SQUOTE: 
+		if(slang || (hquotem & H_QUOTE7))
+		if(hstate!=HS_ESC) {
+			if(hquotem & H_QUOTE7 && !(hquotem & H_QUOTE2)) {
+				if(hquotem == H_QUOTE7) {
+					hquotem = H_QUOTE1 | H_QUOTE7;
+				} else {
+					hquotem = H_QUOTE7;  
+				}
+			} else hquotem = (hquotem)? hquotem & ~H_QUOTE1: H_QUOTE1;
+		};
+		hstate=0;
+		break;
+	// NEW_STYLE for ccs's
+	case CHR_CURLL:
+		if(!(hquotem & H_QUOTEC))
+		if(slang==LANG_CSS && hquotem!=H_QUOTEC) hquotem=0;
+		break;
+	case CHR_CURLR:
+		if(!(hquotem & H_QUOTEC))
+		if(slang==LANG_CSS && hquotem!=H_QUOTEC) hquotem=0;
+		break;
+	case ':':
+		if(!(hquotem & H_QUOTEC))
+		if(slang==LANG_CSS && hquotem!=H_QUOTEC) hquotem=H_QUOTE7;
+		break;
+	case ';':{
+		if(!(hquotem & H_QUOTEC))
+		if(slang==LANG_CSS || slang==0) hquotem=0;
+		break;}
+	case '&':
+		if(!(hquotem & H_QUOTEC))
+		if(!slang && hquotem==0) hquotem=H_QUOTE7;
+		break;
+
+	/* double quotes */
+	case CHR_DQUOTE:
+//		if(hstate!=HS_ESC) hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
+		if(slang || (hquotem & H_QUOTE7))
+		if(hstate!=HS_ESC) {
+			if(hquotem & H_QUOTE7 && !(hquotem & H_QUOTE1)) {
+				if(hquotem == H_QUOTE7) {
+					hquotem = H_QUOTE2 | H_QUOTE7;
+				} else {
+					hquotem = H_QUOTE7;
+				}
+			} else hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
+		};
+		hstate=0;
+		break;
+
+	case '#': {
+		if(slang==0) {
+		if(hstate==HS_LINESTART) hquotem=H_QUOTE6;
+		hstate=0;
+		break;
+		};
+	};
+
+	/* comments */
+	case CHR_SLASH:
+		if(hquotem&H_QUOTE1 || hquotem&H_QUOTE2) { hstate=0;break;};
+		if(hstate==HS_PSMALLER) break;
+		if(slang==LANG_SCRIPT||slang==LANG_CSS) {
+		if(hquotem!=H_QUOTE2 && hquotem!=H_QUOTE1) {
+			if(hstate==HS_PREVSLASH) hquotem=H_QUOTE5;
+			else if(hstate==HS_PREVAST) {hquotem &= ~H_QUOTEC;}
+			else if(hstate!=HS_ESC ){
+				if(hquotem & H_QUOTE7) hquotem &= ~H_QUOTE7;
+				else if(hstate==HS_SPEC) hquotem |= H_QUOTE7;
+			}
+		};
+		if(hquotem!=H_QUOTEC) hstate=HS_PREVSLASH;
+		} // else hstate=0;
+		break;
+	case CHR_BSLASH:{
+		hstate=(hstate==HS_PREVESC)?0:HS_PREVESC;
+		};
+		break;
+	case CHR_LINE:
+	case CHR_CR:
+		hquotem &= ~(H_QUOTE6|H_QUOTE5);
+		hstate=HS_LINESTART;
+		break;
+	case CHR_BIGER:
+//		MESG("	< slang=%d",slang);
+		if(hstate==HS_LINESTART) {
+			hquotem |= H_QUOTE8;
+			hstate=0;
+		};
+		break;
+#if	0
+	case CHR_BIGER:
+		if(slang==LANG_SCRIPT && !(hquotem&H_QUOTEC)) { 
+			if(hstate==HS_QMARK || hstate==HS_ES2) {
+				slang=0;
+			};
+		} else {
+			if(hquotem & H_QUOTEC) {
+				if(hstate==HS_ES2) hquotem=0;
+			} else {
+				hquotem=0;
+			}
+			if(hquotem & H_QUOTE8) hstate &= ~H_QUOTE8;
+		};
+		hstate=0;
+		break;
+#endif
+	case CHR_PARL:
+		hstate=HS_SPEC;
+		break;
+	case ' ':
+	case '\t':
+		if(hstate!=HS_LINESTART && hstate!=HS_PSMALLER && hstate!=HS_SPEC) hstate=0;
+		if(hquotem==H_QUOTE8) hquotem=H_QUOTE7;
+		break;		
+	default: { 
+		if(hstate==HS_PSMALLER && hquotem==0) hquotem = H_QUOTE8;
+		hstate=0;
+		
+	};
+  };
 }
 
 void highlight_jscript(int c)
