@@ -30,6 +30,7 @@
  A modified terminfo entry is included in directory "terminfo". 
  Use the following command
  $ sudo tic ubuntu_wsl_ext.tic
+
  Also other modified terminfo entries are included that correct some keyboard functions and color support as follows:
  - cygkt.tic
  - mac_terminal.tic

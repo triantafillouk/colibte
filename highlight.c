@@ -1198,6 +1198,7 @@ void highlight_css(int c)
 
 void highlight_md(int c)
 {
+  static int prev_space=1;
   int hstruct=0;
 // NEW_STYLE
   if(highlight_note(c)) return;
@@ -1206,13 +1207,13 @@ void highlight_md(int c)
   switch(hstruct) {
 	case START_COMMENT:
 		if(!slang) { // only in html
-			hquotem |= H_QUOTEC;
+			hquotem = H_QUOTEC;
 		};
 		break;
 	case STOP_COMMENT:
 		if(!slang) { // only in html
-			hquotem &= ~H_QUOTEC;
-		};
+			hquotem =0;
+		};break;
 	case START_MDCODE:
 		if(slang) {
 			slang=0;
@@ -1227,24 +1228,21 @@ void highlight_md(int c)
   switch(c) {
 	case (CHR_RESET) : // initialize
 //		MESG("html reset:");
-		hstate=0;
+		hstate=HS_LINESTART;
 		slang=0;
-//		hquotem=0;
+		hquotem=0;
+		prev_space=1;	
 		break;
-	/* single quotes */
-	case CHR_SQUOTE: 
-		if(slang || (hquotem & H_QUOTE7))
-		if(hstate!=HS_ESC) {
-			if(hquotem & H_QUOTE7 && !(hquotem & H_QUOTE2)) {
-				if(hquotem == H_QUOTE7) {
-					hquotem = H_QUOTE1 | H_QUOTE7;
-				} else {
-					hquotem = H_QUOTE7;  
-				}
-			} else hquotem = (hquotem)? hquotem & ~H_QUOTE1: H_QUOTE1;
+	case CHR_DQUOTE:
+		if(hstate!=HS_LETTER) {
+			if(hstate!=HS_PREVESC) hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
+		} else {
+			hquotem &= ~H_QUOTE2;
 		};
 		hstate=0;
+		prev_space=0;
 		break;
+
 	// NEW_STYLE for ccs's
 	case CHR_CURLL:
 		if(!(hquotem & H_QUOTEC))
@@ -1266,25 +1264,10 @@ void highlight_md(int c)
 		if(!(hquotem & H_QUOTEC))
 		if(!slang && hquotem==0) hquotem=H_QUOTE7;
 		break;
-
-	/* double quotes */
-	case CHR_DQUOTE:
-//		if(hstate!=HS_ESC) hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
-		if(slang || (hquotem & H_QUOTE7))
-		if(hstate!=HS_ESC) {
-			if(hquotem & H_QUOTE7 && !(hquotem & H_QUOTE1)) {
-				if(hquotem == H_QUOTE7) {
-					hquotem = H_QUOTE2 | H_QUOTE7;
-				} else {
-					hquotem = H_QUOTE7;
-				}
-			} else hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
-		};
-		hstate=0;
-		break;
-
 	case '#': {
 		if(slang==0) {
+		if(hquotem==H_QUOTE6) hquotem=H_QUOTE1;
+		else
 		if(hstate==HS_LINESTART) hquotem=H_QUOTE6;
 		hstate=0;
 		break;
@@ -1313,33 +1296,15 @@ void highlight_md(int c)
 		break;
 	case CHR_LINE:
 	case CHR_CR:
-		hquotem &= ~(H_QUOTE6|H_QUOTE5);
+		hquotem &= ~(H_QUOTE6|H_QUOTE5|H_QUOTE1);
 		hstate=HS_LINESTART;
 		break;
 	case CHR_BIGER:
-//		MESG("	< slang=%d",slang);
 		if(hstate==HS_LINESTART) {
 			hquotem |= H_QUOTE8;
 			hstate=0;
 		};
 		break;
-#if	0
-	case CHR_BIGER:
-		if(slang==LANG_SCRIPT && !(hquotem&H_QUOTEC)) { 
-			if(hstate==HS_QMARK || hstate==HS_ES2) {
-				slang=0;
-			};
-		} else {
-			if(hquotem & H_QUOTEC) {
-				if(hstate==HS_ES2) hquotem=0;
-			} else {
-				hquotem=0;
-			}
-			if(hquotem & H_QUOTE8) hstate &= ~H_QUOTE8;
-		};
-		hstate=0;
-		break;
-#endif
 	case CHR_PARL:
 		hstate=HS_SPEC;
 		break;
