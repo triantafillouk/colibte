@@ -1198,9 +1198,9 @@ void highlight_css(int c)
 
 void highlight_md(int c)
 {
-  static int prev_space=1;
   int hstruct=0;
-// NEW_STYLE
+  static int bold=0;
+
   if(highlight_note(c)) return;
 
   hstruct=check_words(c);
@@ -1232,7 +1232,7 @@ void highlight_md(int c)
 		hstate=HS_LINESTART;
 		slang=0;
 		hquotem=0;
-		prev_space=1;	
+		bold=0;
 		break;
 	case CHR_DQUOTE:
 		if(hstate!=HS_LETTER) {
@@ -1241,31 +1241,7 @@ void highlight_md(int c)
 			hquotem &= ~H_QUOTE2;
 		};
 		hstate=0;
-		prev_space=0;
 		break;
-#if	0
-	// NEW_STYLE for ccs's
-	case CHR_CURLL:
-		if(!(hquotem & H_QUOTEC))
-		if(slang==LANG_CSS && hquotem!=H_QUOTEC) hquotem=0;
-		break;
-	case CHR_CURLR:
-		if(!(hquotem & H_QUOTEC))
-		if(slang==LANG_CSS && hquotem!=H_QUOTEC) hquotem=0;
-		break;
-	case ':':
-		if(!(hquotem & H_QUOTEC))
-		if(slang==LANG_CSS && hquotem!=H_QUOTEC) hquotem=H_QUOTE7;
-		break;
-	case ';':{
-		if(!(hquotem & H_QUOTEC))
-		if(slang==LANG_CSS || slang==0) hquotem=0;
-		break;}
-	case '&':
-		if(!(hquotem & H_QUOTEC))
-		if(!slang && hquotem==0) hquotem=H_QUOTE7;
-		break;
-#endif
 	case '#': {
 		if(slang==0) {
 		if(hquotem==H_QUOTE6) hquotem=H_QUOTE1;
@@ -1288,15 +1264,41 @@ void highlight_md(int c)
 			hstate=0;
 		};
 		break;
+	case '*':
+		if(hstate==HS_PREVAST||hstate==0||hstate==HS_LINESTART) {
+			MESG(" *+ hstate=%d bold=%d",hstate,bold);
+			hstate=HS_PREVAST;
+			bold++;
+		} else {
+			MESG(" *- hstate=%d bold=%d",hstate,bold);
+			// hstate=HS_SPEC;
+			bold--;
+		};
+		if(bold==0) { 
+			hquotem=0;hstate=0;
+			MESG(" bold 0 ");
+		};
+		if(bold==1) {
+			MESG(" bold 1");
+			hquotem=H_QUOTE9;
+		};
+		if(bold==2) {
+			MESG(" bold 2");
+			hquotem=H_QUOTE2;
+		};
+		break;
 	case ' ':
 	case '\t':
-		if(hstate!=HS_LINESTART && hstate!=HS_PSMALLER && hstate!=HS_SPEC) hstate=0;
-		if(hquotem==H_QUOTE8) hquotem=H_QUOTE7;
+		if(hstate!=HS_LINESTART) hstate=0;
+		// if(hquotem==H_QUOTE8) hquotem=H_QUOTE7;
 		break;		
 	default: { 
 		if(hstate==HS_PSMALLER && hquotem==0) hquotem = H_QUOTE8;
-		hstate=0;
-		
+		if(hstate==HS_PREVAST) { 
+			hstate=HS_SPEC;
+			MESG(" set bold state to HS_SPEC=%d",hstate);
+		} 
+		else if(hstate!=HS_SPEC) hstate=0;		
 	};
   };
 }

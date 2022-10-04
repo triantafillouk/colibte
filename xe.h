@@ -429,6 +429,7 @@ typedef struct MLQUOTES {
 #define H_QUOTE7	64	/* inside <> for html  */
 #define	H_QUOTE8	128	/* first word inside < > for html  */
 #define	H_QUOTE9	256	/* word in preprocessor  */
+#define	H_QUOTE10	512
 #define	H_UTFERR	512	/* utf string error  */
 
 #define H_WORD1		10	/* found word type1  */

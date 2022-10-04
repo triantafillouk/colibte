@@ -7,9 +7,9 @@
 ## WSL (Windows Linux Subsystem)
 
 ### Terminal conflicting keyboard assignements
- To use ALT+LEFT and ALT+RIGHT keyboard assignements (previous and next history mark) 
- add these lines in Terminal's settings.json in the "actions" table.
-  
+ To use ALT+LEFT and *ALT+RIGHT* keyboard *assignements* (previous and next history mark) 
+ add these **lines** in Terminal's settings.json in the "actions" table.
+```  
     {
             "command": "unbound",
             "keys": "alt+right"
@@ -18,14 +18,16 @@
             "command": "unbound",
              "keys": "alt+left"
     },
+```
 
 > Also ^V sometimes is assigned as paste command from the terminal.
  Use shift+^V for the terminal
+```
 	{
 		"command": "paste",
 		"keys":	"ctrl+shift+v"
 	}
-
+```
  For the correct extended cursor support (after column 128) a modification is needed in the terminfo entry.
  A modified terminfo entry is included in directory "terminfo". 
  Use the following command
