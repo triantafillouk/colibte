@@ -1,8 +1,8 @@
 # Colibri text editor
 # Notes and special handling for various operating systems
-
+<!-- html comment --> 
 ## Linux
-> Has been tested on Ubuntu, centos, fedori, redhat
+> Has been tested on Ubuntu, centos, fedora, redhat
  
 ## WSL (Windows Linux Subsystem)
 
@@ -19,7 +19,7 @@
              "keys": "alt+left"
     },
 
- Also ^V sometimes is assigned as paste command from the terminal.
+> Also ^V sometimes is assigned as paste command from the terminal.
  Use shift+^V for the terminal
 	{
 		"command": "paste",
@@ -50,7 +50,6 @@ tic terminfo_file_name.tic
  Compile 'em' to use without sqlite3 database support
 
 ## MacOS
-
 
 ### for Kitty terminal add the following in the kitty.conf configuration file
 ```

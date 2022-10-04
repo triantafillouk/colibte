@@ -1204,6 +1204,7 @@ void highlight_md(int c)
   if(highlight_note(c)) return;
 
   hstruct=check_words(c);
+  
   switch(hstruct) {
 	case START_COMMENT:
 		if(!slang) { // only in html
@@ -1217,10 +1218,10 @@ void highlight_md(int c)
 	case START_MDCODE:
 		if(slang) {
 			slang=0;
-			hquotem &= ~H_QUOTEC;
+			hquotem &= ~H_QUOTE7;
 		} else {
 			slang=LANG_SCRIPT;
-			hquotem |= H_QUOTEC;
+			hquotem |= H_QUOTE7;
 		};
 		break;
   };
@@ -1242,7 +1243,7 @@ void highlight_md(int c)
 		hstate=0;
 		prev_space=0;
 		break;
-
+#if	0
 	// NEW_STYLE for ccs's
 	case CHR_CURLL:
 		if(!(hquotem & H_QUOTEC))
@@ -1264,49 +1265,28 @@ void highlight_md(int c)
 		if(!(hquotem & H_QUOTEC))
 		if(!slang && hquotem==0) hquotem=H_QUOTE7;
 		break;
+#endif
 	case '#': {
 		if(slang==0) {
 		if(hquotem==H_QUOTE6) hquotem=H_QUOTE1;
 		else
-		if(hstate==HS_LINESTART) hquotem=H_QUOTE6;
-		hstate=0;
+		if(hstate==HS_LINESTART){ 
+			if(hquotem!=H_QUOTE7) hquotem=H_QUOTE6;
+			hstate=0;
+		};
 		break;
 		};
 	};
-
-	/* comments */
-	case CHR_SLASH:
-		if(hquotem&H_QUOTE1 || hquotem&H_QUOTE2) { hstate=0;break;};
-		if(hstate==HS_PSMALLER) break;
-		if(slang==LANG_SCRIPT||slang==LANG_CSS) {
-		if(hquotem!=H_QUOTE2 && hquotem!=H_QUOTE1) {
-			if(hstate==HS_PREVSLASH) hquotem=H_QUOTE5;
-			else if(hstate==HS_PREVAST) {hquotem &= ~H_QUOTEC;}
-			else if(hstate!=HS_ESC ){
-				if(hquotem & H_QUOTE7) hquotem &= ~H_QUOTE7;
-				else if(hstate==HS_SPEC) hquotem |= H_QUOTE7;
-			}
-		};
-		if(hquotem!=H_QUOTEC) hstate=HS_PREVSLASH;
-		} // else hstate=0;
-		break;
-	case CHR_BSLASH:{
-		hstate=(hstate==HS_PREVESC)?0:HS_PREVESC;
-		};
-		break;
 	case CHR_LINE:
 	case CHR_CR:
-		hquotem &= ~(H_QUOTE6|H_QUOTE5|H_QUOTE1);
+		hquotem &= ~(H_QUOTE6|H_QUOTE5|H_QUOTE1|H_QUOTE4);
 		hstate=HS_LINESTART;
 		break;
 	case CHR_BIGER:
 		if(hstate==HS_LINESTART) {
-			hquotem |= H_QUOTE8;
+			hquotem |= H_QUOTE4;
 			hstate=0;
 		};
-		break;
-	case CHR_PARL:
-		hstate=HS_SPEC;
 		break;
 	case ' ':
 	case '\t':

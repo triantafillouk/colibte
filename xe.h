@@ -424,9 +424,7 @@ typedef struct MLQUOTES {
 #define	H_COMMENT	4	/* comments usually multiline */
 #define H_QUOTEC	4
 #define H_QUOTE4	8	/* %, ! at start of line or other  */
-#define	H_LCOMMENT	16	/* line comment */
 #define H_QUOTE5	16	/* comments rest of the line (c++ // , ;  )  */
-#define	H_QPREPR	32
 #define H_QUOTE6	32	/* preprocessing ( # at start of line )  */
 #define H_QUOTE7	64	/* inside <> for html  */
 #define	H_QUOTE8	128	/* first word inside < > for html  */
