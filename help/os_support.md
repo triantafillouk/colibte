@@ -3,12 +3,20 @@
 <!-- html comment --> 
 ## Linux
 > Has been tested on Ubuntu, centos, fedora, redhat
- 
+> ljasd
+>> aaskd;alskd
+>> ;as;askd;ksd
+
 ## WSL (Windows Linux Subsystem)
 
-### Terminal conflicting keyboard assignements
+## Terminal conflicting keyboard assignements
+
  To use ALT+LEFT and *ALT+RIGHT* keyboard *assignements* (previous and next history mark) 
- add these **lines** in Terminal's settings.json in the "actions" table.
+ add these **lines** in Terminal's ***settings.json*** in the "actions" table.
+
+ To use ALT+LEFT and _ALT+RIGHT_ keyboard _assignements_ (previous and next history mark) 
+ add these __lines__ in Terminal's ___settings.json___ in the "actions" table.
+
 ```  
     {
             "command": "unbound",

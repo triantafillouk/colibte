@@ -1200,11 +1200,12 @@ void highlight_md(int c)
 {
   int hstruct=0;
   static int bold=0;
+  static int prev_set=0;
 
   if(highlight_note(c)) return;
 
   hstruct=check_words(c);
-  
+  if(prev_set) { hquotem=prev_set;prev_set=0;};
   switch(hstruct) {
 	case START_COMMENT:
 		if(!slang) { // only in html
@@ -1218,10 +1219,12 @@ void highlight_md(int c)
 	case START_MDCODE:
 		if(slang) {
 			slang=0;
-			hquotem &= ~H_QUOTE7;
+			hquotem=0;
 		} else {
 			slang=LANG_SCRIPT;
-			hquotem |= H_QUOTE7;
+			// hquotem |= H_QUOTE7;
+			prev_set = H_QUOTE7;
+			hquotem=0;
 		};
 		break;
   };
@@ -1242,15 +1245,21 @@ void highlight_md(int c)
 		};
 		hstate=0;
 		break;
+	case '`': 
+		if(hstate==HS_LINESTART) hquotem=0;
+		break;
 	case '#': {
 		if(slang==0) {
-		if(hquotem==H_QUOTE6) hquotem=H_QUOTE1;
-		else
-		if(hstate==HS_LINESTART){ 
-			if(hquotem!=H_QUOTE7) hquotem=H_QUOTE6;
-			hstate=0;
-		};
-		break;
+			if(hquotem==H_QUOTE6) prev_set=H_QUOTE1;
+			else if(hquotem==H_QUOTE1) {
+				prev_set=H_QUOTE1;
+				hquotem=H_QUOTE6;
+			};
+			if(hstate==HS_LINESTART){ 
+				if(hquotem!=H_QUOTE7) hquotem=H_QUOTE6;
+				hstate=0;
+			};
+			break;
 		};
 	};
 	case CHR_LINE:
@@ -1264,40 +1273,72 @@ void highlight_md(int c)
 			hstate=0;
 		};
 		break;
-	case '*':
-		if(hstate==HS_PREVAST||hstate==0||hstate==HS_LINESTART) {
-			MESG(" *+ hstate=%d bold=%d",hstate,bold);
-			hstate=HS_PREVAST;
+#if	1
+	case '_':
+		if(hstate==HS_PREVSLASH||hstate==HS_PREVSPACE||hstate==HS_LINESTART) {
+			hstate=HS_PREVSLASH;
 			bold++;
 		} else {
-			MESG(" *- hstate=%d bold=%d",hstate,bold);
-			// hstate=HS_SPEC;
 			bold--;
 		};
 		if(bold==0) { 
-			hquotem=0;hstate=0;
-			MESG(" bold 0 ");
+			hquotem=0;
+			hstate=0;
 		};
-		if(bold==1) {
-			MESG(" bold 1");
-			hquotem=H_QUOTE9;
+		if(bold==1) {	/* italics  */
+			prev_set=H_QUOTE9;
+			hquotem=0;
 		};
-		if(bold==2) {
-			MESG(" bold 2");
-			hquotem=H_QUOTE2;
+		if(bold==2) {	/* bold  */
+			prev_set=H_QUOTE8;
+			hquotem=0;
+		};
+		if(bold==3) {	/* bold+italics  */
+			prev_set=H_QUOTE2;
+			hquotem=0;
+		};
+		break;
+#endif
+	case '*':
+		if(hstate==HS_PREVAST||hstate==HS_PREVSPACE||hstate==HS_LINESTART) {
+			hstate=HS_PREVAST;
+			bold++;
+		} else {
+			bold--;
+		};
+		if(bold==0) { 
+			hquotem=0;
+			hstate=0;
+		};
+		if(bold==1) {	/* italics  */
+			prev_set=H_QUOTE9;
+			hquotem=0;
+		};
+		if(bold==2) {	/* bold  */
+			prev_set=H_QUOTE8;
+			hquotem=0;
+		};
+		if(bold==3) {	/* bold+italics  */
+			prev_set=H_QUOTE2;
+			hquotem=0;
 		};
 		break;
 	case ' ':
 	case '\t':
-		if(hstate!=HS_LINESTART) hstate=0;
+		if(hstate!=HS_LINESTART) hstate=HS_PREVSPACE;
 		// if(hquotem==H_QUOTE8) hquotem=H_QUOTE7;
 		break;		
 	default: { 
 		if(hstate==HS_PSMALLER && hquotem==0) hquotem = H_QUOTE8;
 		if(hstate==HS_PREVAST) { 
 			hstate=HS_SPEC;
-			MESG(" set bold state to HS_SPEC=%d",hstate);
+			// MESG(" set bold state to HS_SPEC=%d",hstate);
+		} else 
+		if(hstate==HS_PREVSLASH) { 
+			hstate=HS_SPEC;
+			// MESG(" set bold state to HS_SPEC=%d",hstate);
 		} 
+
 		else if(hstate!=HS_SPEC) hstate=0;		
 	};
   };
