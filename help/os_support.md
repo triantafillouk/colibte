@@ -72,12 +72,12 @@ map shift+DOWN send_text all \x1b[6~
 ```
 # alt - combinations
 left	\033P
-up		\033[w
+up		\033\[w
 right	\033N
-down	\033[z
+down	\033\[z
 
 # control - combinations
-left	\033[P
+left	\033\[P
 up		\033OM
 right	\033[N
 down	\033[15~
