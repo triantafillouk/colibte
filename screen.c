@@ -22,6 +22,7 @@ int get_current_line();
 void upd_move(WINDP *wp,char *from);
 void vteeol(WINDP *wp, int selected,int inside);
 int SUtfCharLen(char *utfstr,int offset,utfchar *uc);
+int line_bcolor=0;
 
 int specialh=0;
 /* highlight state  */
@@ -596,6 +597,8 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
  int num_columns=0;	/* columns of line number shown  */
  int last_column=wp->w_ntcols;
 
+ line_bcolor=wp->w_bcolor;
+
  if(max_size>0) last_column=start_col+max_size;
  if(last_column>wp->w_ntcols) last_column=wp->w_ntcols;
  if(start_col==0) num_columns=wp->w_infocol;
@@ -830,6 +833,7 @@ offs vtline(WINDP *wp, offs tp_offs)
  num line_num = wp->tp_hline->line + wp->vtrow;
 
  num_columns=wp->w_infocol;
+ line_bcolor=wp->w_bcolor;
 
  v_text = wp->vs[wp->vtrow]->v_text;
  // MESG("vtline: < %d vtla=%d",wp->vtrow,vtla);
@@ -1314,7 +1318,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			case H_QUOTE1:
 			case H_QUOTE7+H_QUOTE1:  
 				ctl_f=SQUOTEFORE;
-				ctl_b=wp->w_bcolor;
+				ctl_b=line_bcolor;
 				break;
 			/* double quotes */
 			case H_QUOTE2:
@@ -1328,7 +1332,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			case H_QUOTE4:
 //			case H_UTFERR:
 				ctl_f = TAGFORE ;
-				ctl_b=wp->w_bcolor;
+				ctl_b=line_bcolor;
 				break;
 			/* C,C++ Comments */
 			case H_QUOTEC:
@@ -1338,24 +1342,36 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			case H_QUOTEC+H_QUOTE7+H_QUOTE1:
 			case H_QUOTEC+H_QUOTE7+H_QUOTE2:
 				ctl_f = COMMENTFORE;
-				ctl_b = wp->w_bcolor;
+				ctl_b = line_bcolor;
 				break;
 			/* Preprocessing */
 			case H_QUOTE6:
 				ctl_f=PREPFORE;
-				ctl_b=wp->w_bcolor;
+				ctl_b=line_bcolor;
 				break;
 			case H_QUOTE7:
-				ctl_f=W_FORE;ctl_b=wp->w_bcolor;
+				ctl_f=W_FORE;
+				ctl_b=line_bcolor;
 				break;
 			/* % tag */
 			case H_QUOTE8:
-				ctl_f = TAGFORE;ctl_b=wp->w_bcolor;
+				ctl_f = TAGFORE;
+				ctl_b=line_bcolor;
 				break;
 			case H_QUOTE9:
-//				ctl_f=W_FORE;ctl_b=wp->w_bcolor;
-				ctl_f=WORD2FORE;ctl_b=wp->w_bcolor;
+				ctl_f=WORD2FORE;
+				ctl_b=line_bcolor;
 				break;
+			case H_QUOTE10:
+				line_bcolor=INFOBACK;
+				ctl_b=line_bcolor;
+				ctl_f=wp->w_fcolor;
+				break;			
+			case H_QUOTE11:
+				// line_bcolor=INFOBACK;
+				ctl_b=INFOBACK;
+				// ctl_f=wp->w_fcolor;
+				break;			
 			};
 		};
 		if(get_selection()){ctl_f = FOREGROUND;ctl_b=MODEBACK;};
@@ -1363,35 +1379,35 @@ void vtputwc(WINDP *wp, utfchar *uc)
 		if( hquotem==H_QUOTE7 && c=='=') {
 			ctl_f=CNUMERIC;
 		}
-		if((ctl_f==0 && ctl_b==0))
+		if((ctl_f==0 && (ctl_b==0||ctl_b==line_bcolor)))
 		switch(c) { 
 			case 39: 	/* single quote  */
-				ctl_f =SPECFORE;ctl_b=wp->w_bcolor;
+				ctl_f =SPECFORE;ctl_b=line_bcolor;
 				break;
 			case CHR_LBRA: case CHR_RBRA:
 			case '(': case ')':
 			case '{': case '}':
 			case ';': case ':':
-				ctl_f = SPECFORE;ctl_b=wp->w_bcolor;
+				ctl_f = SPECFORE;ctl_b=line_bcolor;
 				break;
 			case '*': 
-				ctl_f = SPECFORE;ctl_b=wp->w_bcolor;
+				ctl_f = SPECFORE;ctl_b=line_bcolor;
 				break;
 			case '=':
 			case '+': case '-':
 			case '&':
 			case '<': case '>': case ',':
-				ctl_f = SPECFORE;ctl_b=wp->w_bcolor;
+				ctl_f = SPECFORE;ctl_b=line_bcolor;
 			break;
 
 			default:
-				ctl_f=wp->w_fcolor;ctl_b=wp->w_bcolor;
+				ctl_f=wp->w_fcolor;ctl_b=line_bcolor;
 		};
 
 		/* orizon different color creates problems if utf and local char set (utf string error)  */
 		/* if on the orizon make it a different color */
 		if (((wp->vtcol == wp->w_ntcols-1)) || (wp->vtcol==0 && wp->w_lcol > 0)) {
-			ctl_f = ORIZON;ctl_b=wp->w_bcolor;
+			ctl_f = ORIZON;ctl_b=line_bcolor;
 		};
 
 		// this is for screens that do not support output at 128-159
@@ -1426,7 +1442,8 @@ void vteeol(WINDP *wp, int selected,int inside)
     vp = wp->vs[wp->vtrow];	// vtrow
 	// MESG("vteeol: row=%d selected=%d col=%d",wp->vtrow,selected,wp->vtcol);
     ctl_f=wp->w_fcolor;
-	ctl_b=wp->w_bcolor;
+	// ctl_b=wp->w_bcolor;
+	ctl_b = line_bcolor;
 #if	DARWIN
 	blank=CHR_NBSPACE;	// use this for mac terminal!
 #else
@@ -1463,7 +1480,7 @@ void vteeoc(WINDP *wp, int endcol)
     vp = wp->vs[wp->vtrow];	// vtrow
 
     ctl_f=wp->w_fcolor;
-	ctl_b=wp->w_bcolor;
+	ctl_b=line_bcolor;
 	ctl_b=QUOTEBACK;
 #if	DARWIN
 	blank=CHR_NBSPACE;	// use this for mac terminal!
@@ -1484,7 +1501,7 @@ void vt1eol(WINDP *wp,int c,int color)
 {
 	vchar *vpt;
     vpt = wp->vs[wp->vtrow]->v_text;
-	svmchar(vpt+wp->vtcol,c,wp->w_bcolor,color,wp->w_ntcols-wp->vtcol);
+	svmchar(vpt+wp->vtcol,c,line_bcolor,color,wp->w_ntcols-wp->vtcol);
 	wp->vtcol=wp->w_ntcols;
 }
 

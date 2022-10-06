@@ -1222,7 +1222,6 @@ void highlight_md(int c)
 			hquotem=0;
 		} else {
 			slang=LANG_SCRIPT;
-			// hquotem |= H_QUOTE7;
 			prev_set = H_QUOTE7;
 			hquotem=0;
 		};
@@ -1237,6 +1236,7 @@ void highlight_md(int c)
 		hquotem=0;
 		bold=0;
 		break;
+#if	NUSE
 	case CHR_DQUOTE:
 		if(hstate!=HS_LETTER) {
 			if(hstate!=HS_PREVESC) hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
@@ -1245,10 +1245,21 @@ void highlight_md(int c)
 		};
 		hstate=0;
 		break;
-	case '`': 
+#endif
+	case '`': // code block 
 		if(hstate==HS_LINESTART) hquotem=0;
+		if(slang==0) {
+			if(hquotem & H_QUOTE11) {
+				hquotem &= ~H_QUOTE11;
+				prev_set=0;
+				hstate=0;
+			} else {
+				prev_set = hquotem | H_QUOTE11;
+				hstate=0;
+			};
+		};
 		break;
-	case '#': {
+	case '#': {	// Headers
 		if(slang==0) {
 			if(hquotem==H_QUOTE6) prev_set=H_QUOTE1;
 			else if(hquotem==H_QUOTE1) {
@@ -1264,12 +1275,17 @@ void highlight_md(int c)
 	};
 	case CHR_LINE:
 	case CHR_CR:
-		hquotem &= ~(H_QUOTE6|H_QUOTE5|H_QUOTE1|H_QUOTE4);
+		hquotem &= ~(H_QUOTE1|H_QUOTE4|H_QUOTE5|H_QUOTE6|H_QUOTE10|H_QUOTE11);
 		hstate=HS_LINESTART;
 		break;
 	case CHR_BIGER:
 		if(hstate==HS_LINESTART) {
-			hquotem |= H_QUOTE4;
+			prev_set = H_QUOTE10;
+			hquotem=0;
+			hstate=0;
+		} else if(hquotem & H_QUOTE10) {
+			prev_set = H_QUOTE10;
+			hquotem=0;
 			hstate=0;
 		};
 		break;

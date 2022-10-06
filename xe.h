@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.47  (3/10/2022)"
+#define VERSION 	"#01.48  (6/10/2022)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -419,7 +419,7 @@ typedef struct MLQUOTES {
 } MLQUOTES;
 
 /* highlight quote masks */
-#define H_QUOTE1	1	/* single quotes, usually multiline */
+#define H_QUOTE1	1	/* single quotes, singleline */
 #define H_QUOTE2	2	/* double quotes, usually multiline */
 #define	H_COMMENT	4	/* comments usually multiline */
 #define H_QUOTEC	4
@@ -429,8 +429,9 @@ typedef struct MLQUOTES {
 #define H_QUOTE7	64	/* inside <> for html  */
 #define	H_QUOTE8	128	/* first word inside < > for html  */
 #define	H_QUOTE9	256	/* word in preprocessor  */
-#define	H_QUOTE10	512
-#define	H_UTFERR	512	/* utf string error  */
+#define	H_QUOTE10	512	/* light background, rest of the line  */
+#define	H_QUOTE11	1024/* toggle light background */
+#define H_UTFERR	2048	/* Utf8 error  */
 
 #define H_WORD1		10	/* found word type1  */
 #define	H_WORD2		11	/* found word type2  */
