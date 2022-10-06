@@ -2,7 +2,7 @@
 ==================================================
 
 ## text editor general commands
-    record_macro()                    : start macro recording
+	record_macro()                    : start macro recording
     exec_macro()                      : execute a macro command
     quit()                            : quit program
     set_arg(num)                      : set multiple argument
