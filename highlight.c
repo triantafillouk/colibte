@@ -1370,7 +1370,7 @@ void highlight_md(int c)
 		break;
 	case ' ':
 	case '\t':
-		if(bold) { hquotem=0; prev_set=0;bold=0;};
+		if(bold==1) { hquotem=0; prev_set=0;bold=0;};
 		if(hstate!=HS_LINESTART) hstate=HS_PREVSPACE;
 		// if(hquotem==H_QUOTE8) hquotem=H_QUOTE7;
 		break;		
