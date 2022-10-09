@@ -31,7 +31,7 @@ extern int slang;
 extern int stop_word_highlight;
 extern int start_word_highlight;
 extern FILEBUF *cbfp;
-
+extern drv_colors;
 extern int sel_tags[11];
 extern int num_of_selected_tags;
 
@@ -611,10 +611,9 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
  };
  wp->vs[0]->v_flag=1;
  v_text = wp->vs[wp->vtrow]->v_text;
-#if	NUSE
- wp->vs[wp->vtrow]->utf_error=0;
-#endif
+
  int fg_color=FOREGROUND;
+ int bg_color=BACKGROUND;
  if(wp->w_fp->b_flag & FSDIRED) {
 	if(str[1]=='l') fg_color=TAGFORE;
 	else {
@@ -750,40 +749,37 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	
 	if(max_size<0) start_color_column=start_col+num_columns;
 	else end_column=max_size+num_columns;
-	if(row>0)	/* not for header!  */
-	for(i0=start_color_column;i0<= end_column;i0++){
+	if(row>0) {	/* not for header!  */
 		if(index==row) {
+			bg_color=INFOBACK;
+			if(drv_colors==8) fg_color=BACKGROUND;
+		} else {
 			if(selected>0) {
-				svcolor(v_text+i0,INFOBACK,fg_color);
+				bg_color=MODEBACKI;
 			} else {
+				bg_color=BACKGROUND;
+			};
+		};
+	for(i0=start_color_column;i0<= end_column;i0++){
 #if	TNOTES
 				if(start_col!=0) {
 					if(wp->w_fp->b_flag==FSNOTES) {
-						svcolor(v_text+i0,INFOBACK,CNUMERIC);
-					} else {
-						svcolor(v_text+i0,INFOBACK,fg_color);
+						fg_color=CNUMERIC;
 					};
 				} else {
-					if(wp->w_fp->b_flag==FSNOTES || wp->w_fp->b_flag & FSNLIST) {
-						svcolor(v_text+i0,INFOBACK,fg_color);
-					} else svcolor(v_text+i0,INFOBACK,CNUMERIC);
+					if(wp->w_fp->b_flag!=FSNOTES && !(wp->w_fp->b_flag & FSNLIST)) 
+						fg_color=CNUMERIC;
 				};
-#else
-				svcolor(v_text+i0,INFOBACK,fg_color);
 #endif
-			}
-		} else {
-			if(selected>0) {
-				svcolor(v_text+i0,MODEBACKI,fg_color);
-			} else {
-				svcolor(v_text+i0,BACKGROUND,fg_color);
-			};
-		};
-	} else 
+		svcolor(v_text+i0,bg_color,fg_color);
+	}} else 
 	{
+		if(drv_colors==8) { bg_color=MODEBACK;fg_color=CNUMERIC;}
+		else { bg_color=MODEBACKI;fg_color=MODEFORE;};
+
 		for(i0=start_color_column;i0<= end_column;i0++)
 		{
-			svcolor(v_text+i0,MODEBACKI,MODEFORE);
+			svcolor(v_text+i0,bg_color,fg_color);
 		};
 		vteeol(wp,2,0);
 		return;
@@ -1462,10 +1458,11 @@ void vteeol(WINDP *wp, int selected,int inside)
 		};
 	} else {
 			if(selected) {
-				if(selected==2) svmchar(vp->v_text+wp->vtcol,blank,MODEBACKI,ctl_f,wp->w_ntcols-wp->vtcol);	// header
-				else if(selected==3) svmchar(vp->v_text+wp->vtcol,blank,MODEBACKI,ctl_f,wp->w_ntcols-wp->vtcol);	// just selected
-				else if(selected==-1) svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,wp->w_ntcols-wp->vtcol);	// empty
-				else svmchar(vp->v_text+wp->vtcol,blank,INFOBACK,ctl_f,wp->w_ntcols-wp->vtcol);				// current line
+				if(selected==2)       { if(drv_colors>8) ctl_b=MODEBACKI;else ctl_b=MODEBACK;}	// header
+				else if(selected==3)  { if(drv_colors>8) ctl_b=MODEBACKI;else ctl_b=MODEBACK;}	// just selected
+				else if(selected==-1) ;	// empty
+				else                  ctl_b=INFOBACK;	// current line
+				svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,wp->w_ntcols-wp->vtcol);
 			} else svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,wp->w_ntcols-wp->vtcol);
 	}
 	wp->vtcol=wp->w_ntcols;

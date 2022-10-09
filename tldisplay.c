@@ -11,6 +11,7 @@
 #include	"support.h"
 #include	"menus.h"
 #include	"panel_curses.h"
+#define	USE_CLASSIC	1
 
 char **getdir(char *dirname,char *s_find,int *num);
 int utf_num_chars(char *);
@@ -1357,10 +1358,8 @@ void status_line(WINDP *wp)
 	int max_t;
 	char status_string[512], *stp;
 	char fdname[MAXLLEN];
-#if	USE_CLASSIC
 	int hline1 = '-';	/* or 18  */
 	int hline2 = '=';	/* or 15  */
-#endif
 	char modecode[]=MODECODE;
 
 	if(!discmd) return;
@@ -1374,11 +1373,12 @@ void status_line(WINDP *wp)
 	else if(wp->w_ntcols > NUM_COLS_SHORT) max_t = wp->w_ntcols - NUM_COLS_FINFO - show_position_size(wp,1);
 	else if(wp->w_ntcols > NUM_COLS_NOINFO) max_t = wp->w_ntcols - show_position_size(wp,-1);
 	else max_t = wp->w_ntcols-2;
-#if	USE_CLASSIC
-	lchar = (wp == cwp) ? hline2 : hline1;	/* mark the current buffer */
-#else
-	lchar = ' ';
-#endif
+
+	if(drv_colors>8) 
+		lchar = ' ';
+	else
+		lchar = (wp == cwp) ? hline2 : hline1;	/* mark the current buffer */
+
 	stp = status_string;
 
 //	in debug mode print window number at bottom left

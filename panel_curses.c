@@ -148,12 +148,13 @@ int color_pair(int fg_color,int bg_color)
 {
  int pair_ind=-1;
  int cpair;
+
  if(drv_colors>16) {
 	pair_ind = pair_num[fg_color][bg_color];
 	cpair = COLOR_PAIR(pair_ind);
  } else {
 	int fcol = current_color[fg_color].index;
-	int bcol = current_color[bg_color].index;
+	int bcol = current_color[bg_color].index % drv_basic_colors;
 	cpair = COLOR_PAIR((fcol%drv_basic_colors)*drv_basic_colors+bcol);
  };
 
@@ -619,7 +620,10 @@ void drv_open()
  start_color();
  drv_colors=COLORS;
  drv_color_pairs=COLOR_PAIRS;
- if(drv_color_pairs>255) drv_basic_colors=16;
+ if(drv_color_pairs>255) {
+ 	drv_basic_colors=16;
+	drv_colors=16;
+ };
  save_original_colors();
  color_scheme_read();
 
@@ -2289,7 +2293,7 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
  char *status_string = show_string;
  int rpos=utf_num_chars(status_string)+2;
 
- if((drv_color_pairs>63) && cwp!=wp) {	/* if enough color pairs, use them ! */
+ if((drv_color_pairs>63 && drv_colors!=8) && cwp!=wp) {	/* if enough color pairs, use them ! */
  	fg_color=MODEFOREI;
 	bg_color=MODEBACKI;
  };
@@ -2832,8 +2836,13 @@ void show_slide(WINDP *wp)
  int bg_color=MODEBACK;
  curs_set(0);
  if(cwp!=wp) {
- 	fg_color=MODEFOREI;
-	bg_color=MODEBACKI;
+	if(drv_colors>8) {
+	 	fg_color=MODEFOREI;
+		bg_color=MODEBACKI;
+	} else {
+	 	fg_color=BACKGROUND;
+		bg_color=MODEBACK;
+	};
  };
 
  if(bt_dval("show_position")==0) {

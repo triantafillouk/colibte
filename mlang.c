@@ -78,7 +78,7 @@ static char slval[MAXLLEN];// saved string value
 
 /* error control variables  */
 int err_num=0;
-int drv_max_colors=8;
+int drv_max_colors=16;
 static int err_line=0;
 static tok_struct *tok;	/* current token!!  */
 
