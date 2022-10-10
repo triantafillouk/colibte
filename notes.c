@@ -612,7 +612,7 @@ int parse_note(FILEBUF *fp)
 		note->n_tags[0]=0;
 		ptr = find_str_reol(fp,ptr,"#Tags:",note->n_tags,sizeof(note->n_tags));
 		if(!strstr(note->n_tags,"calendar")){
-			strncat(note->n_tags,",",sizeof(note->n_tags));
+			if(strlen(note->n_tags)>0) strncat(note->n_tags,",",sizeof(note->n_tags));
 			strncat(note->n_tags,"calendar",sizeof(note->n_tags));
 		};
 		return true;
@@ -642,7 +642,7 @@ int parse_note(FILEBUF *fp)
 		note->n_tags[0]=0;
 		ptr = find_str_reol(fp,ptr,"#Tags:",note->n_tags,sizeof(note->n_tags));
 		if(!strstr(note->n_tags,"todo")){
-			strncat(note->n_tags,",",sizeof(note->n_tags));
+			if(strlen(note->n_tags)>0) strncat(note->n_tags,",",sizeof(note->n_tags));
 			strncat(note->n_tags,"todo",sizeof(note->n_tags));
 		};
 		return true;
