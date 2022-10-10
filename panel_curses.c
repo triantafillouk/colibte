@@ -1388,22 +1388,14 @@ void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
  int attrib=0;
 
   fcol = current_scheme->color_attr[afcol].index % 16;
-//  bcol = current_scheme->color_attr[abcol].index % COL_BASIC;
-
-  if(is_cygwin)
+  if(drv_colors==8)
   {
 	  if(fcol>COL_BASIC-1) { 
 		attrib=A_BOLD;
 		fcol %= COL_BASIC;
   	  };
   };
-	attrib |= current_scheme->color_attr[afcol].attrib;
-#if	0
-	if(attrib & A_UNDERLINE) wattron(wnd,A_UNDERLINE);
-	else wattroff(wnd,A_UNDERLINE);
-	if(attrib & A_REVERSE) wattron(wnd,A_REVERSE);
-	else wattroff(wnd,A_REVERSE);
-#endif
+  attrib |= current_scheme->color_attr[afcol].attrib;
   wattrset(wnd,color_pair(afcol,abcol)|attrib);
  }
 }

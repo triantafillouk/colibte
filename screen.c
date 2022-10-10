@@ -31,7 +31,7 @@ extern int slang;
 extern int stop_word_highlight;
 extern int start_word_highlight;
 extern FILEBUF *cbfp;
-extern drv_colors;
+extern int drv_colors;
 extern int sel_tags[11];
 extern int num_of_selected_tags;
 
@@ -755,24 +755,25 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 			if(drv_colors==8) fg_color=BACKGROUND;
 		} else {
 			if(selected>0) {
-				bg_color=MODEBACKI;
+				if(drv_colors==8) bg_color=MODEBACK;
+				else bg_color=MODEBACKI;
 			} else {
 				bg_color=BACKGROUND;
 			};
 		};
-	for(i0=start_color_column;i0<= end_column;i0++){
 #if	TNOTES
-				if(start_col!=0) {
-					if(wp->w_fp->b_flag==FSNOTES) {
-						fg_color=CNUMERIC;
-					};
-				} else {
-					if(wp->w_fp->b_flag!=FSNOTES && !(wp->w_fp->b_flag & FSNLIST)) 
-						fg_color=CNUMERIC;
-				};
+		if(!(wp->w_fp->b_flag & FSNLIST)) fg_color=CNUMERIC;
+		if(start_col!=0) {
+			if(wp->w_fp->b_flag==FSNOTES) {
+				fg_color=FOREGROUND;
+			};
+		} else {
+			if(wp->w_fp->b_flag!=FSNOTES && !(wp->w_fp->b_flag & FSNLIST)) 
+				fg_color=FOREGROUND;
+		};
 #endif
-		svcolor(v_text+i0,bg_color,fg_color);
-	}} else 
+		for(i0=start_color_column;i0<= end_column;i0++) svcolor(v_text+i0,bg_color,fg_color);
+	} else 
 	{
 		if(drv_colors==8) { bg_color=MODEBACK;fg_color=CNUMERIC;}
 		else { bg_color=MODEBACKI;fg_color=MODEFORE;};
@@ -1346,7 +1347,8 @@ void vtputwc(WINDP *wp, utfchar *uc)
 				ctl_b=line_bcolor;
 				break;
 			case H_QUOTE7:
-				ctl_f=W_FORE;
+				if(drv_colors==8) line_bcolor=MODEBACK;
+				else line_bcolor=MODEBACKI;
 				ctl_b=line_bcolor;
 				break;
 			/* % tag */
@@ -1365,7 +1367,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 				break;			
 			case H_QUOTE11:
 				// line_bcolor=INFOBACK;
-				ctl_b=INFOBACK;
+				ctl_b=MODEBACKI;
 				// ctl_f=wp->w_fcolor;
 				break;			
 			};
@@ -1458,9 +1460,9 @@ void vteeol(WINDP *wp, int selected,int inside)
 		};
 	} else {
 			if(selected) {
-				if(selected==2)       { if(drv_colors>8) ctl_b=MODEBACKI;else ctl_b=MODEBACK;}	// header
-				else if(selected==3)  { if(drv_colors>8) ctl_b=MODEBACKI;else ctl_b=MODEBACK;}	// just selected
-				else if(selected==-1) ;	// empty
+				if(selected==2)       { if(drv_colors>8)  ctl_b=MODEBACKI;else ctl_b=MODEBACK;}	// header
+				else if(selected==3)  { if(drv_colors>8)  ctl_b=MODEBACKI;else ctl_b=MODEBACK;}	// just selected
+				else if(selected==-1) { if(drv_colors==8) ctl_b=MODEBACK ;}	// empty
 				else                  ctl_b=INFOBACK;	// current line
 				svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,wp->w_ntcols-wp->vtcol);
 			} else svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,wp->w_ntcols-wp->vtcol);

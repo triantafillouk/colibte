@@ -1203,11 +1203,13 @@ void highlight_md(int c)
   static int prev_set=-1;
   static int prev_esc=0;
   static int hquote_start=0;
+  static int prev_line=-1;
 
   if(highlight_note(c)) return;
 
   hstruct=check_words(c);
-  if(prev_set>=0) { hquotem=prev_set;prev_set=-1;};
+  if(prev_set>=0) { hquotem=prev_set;prev_set=-1;prev_line=-1;};
+
   switch(hstruct) {
 	case START_COMMENT:
 		if(!slang) { // only in html
@@ -1224,7 +1226,7 @@ void highlight_md(int c)
 			hquotem=0;
 		} else {
 			slang=LANG_SCRIPT;
-			prev_set = H_QUOTE7;
+			prev_line = H_QUOTE7;
 			hquotem=0;
 		};
 		break;
@@ -1234,6 +1236,7 @@ void highlight_md(int c)
 	case (CHR_RESET) : // initialize
 //		MESG("html reset:");
 		hstate=HS_LINESTART;
+		prev_line=-1;
 		slang=0;
 		hquotem=0;
 		bold=0;
@@ -1254,6 +1257,15 @@ void highlight_md(int c)
 		prev_set=-1;
 		hstate=0;
 		break;
+	case CHR_DQUOTE:
+		if(hquotem & H_QUOTE7) {
+		if(hstate!=HS_ESC) { 
+			if(hquotem==H_QUOTE7) hquotem=H_QUOTE7+H_QUOTE2;
+			else hquotem=H_QUOTE7;
+		};
+		// hstate=0;
+		};break;
+
 	case '`': // code block 
 		if(prev_esc) { prev_esc=0;break;};
 		if(hstate==HS_LINESTART) hquotem=0;
@@ -1286,12 +1298,16 @@ void highlight_md(int c)
 	};
 	case CHR_LINE:
 	case CHR_CR:
-		hquotem &= ~(H_QUOTE1|H_QUOTE4|H_QUOTE5|H_QUOTE6|H_QUOTE10|H_QUOTE11);
+		if(prev_line>=0) { hquotem=prev_line;prev_line=-1;}
+		else {
+			hquotem &= ~(H_QUOTE1|H_QUOTE4|H_QUOTE5|H_QUOTE6|H_QUOTE10|H_QUOTE11);
+		};
 		hstate=HS_LINESTART;
 		break;
 
 	case '<':
 		if(prev_esc) { prev_esc=0;break;};
+		if(hquotem & H_QUOTE7) break;
 		prev_set = H_COMMENT;
 		hstate=0;
 		hquote_start=hquotem;

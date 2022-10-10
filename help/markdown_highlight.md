@@ -2,7 +2,7 @@
 ## Markdown highlight in text mode.
 
 ### Headings
-- H1 headings are marked with different color.
+- H1 "headings" are marked with different color.
 - All type of [headings](headings) with a different color. 
 - The first '#' are highlighted the same as H1 headings
 
