@@ -1226,7 +1226,7 @@ void highlight_md(int c)
 			hquotem=0;
 		} else {
 			slang=LANG_SCRIPT;
-			prev_line = H_QUOTE7;
+			prev_line = H_QUOTE12;
 			hquotem=0;
 		};
 		break;
@@ -1246,22 +1246,22 @@ void highlight_md(int c)
 		break;
 	case '[':
 		if(prev_esc) { prev_esc=0;break;};
-		if(hquotem & H_QUOTE10||hquotem & H_QUOTE11|| hquotem & H_QUOTE7) break;
+		if(hquotem & H_QUOTE10||hquotem & H_QUOTE11|| hquotem & H_QUOTE12) break;
 		prev_set = hquotem | H_QUOTE9;
 		hstate=0;
 		break;
 	case ']':
 		if(prev_esc) { prev_esc=0;break;};
-		if(hquotem & H_QUOTE10||hquotem & H_QUOTE11|| hquotem & H_QUOTE7) break;
+		if(hquotem & H_QUOTE10||hquotem & H_QUOTE11|| hquotem & H_QUOTE12) break;
 		hquotem &= ~(H_QUOTE9);
 		prev_set=-1;
 		hstate=0;
 		break;
 	case CHR_DQUOTE:
-		if(hquotem & H_QUOTE7) {
+		if(hquotem & H_QUOTE12) {
 		if(hstate!=HS_ESC) { 
-			if(hquotem==H_QUOTE7) hquotem=H_QUOTE7+H_QUOTE2;
-			else hquotem=H_QUOTE7;
+			if(hquotem==H_QUOTE12) hquotem=H_QUOTE12+H_QUOTE2;
+			else hquotem=H_QUOTE12;
 		};
 		// hstate=0;
 		};break;
@@ -1282,7 +1282,7 @@ void highlight_md(int c)
 		break;
 	case '#': {	// Headers
 		if(prev_esc) { prev_esc=0;break;};
-		if(hquotem & H_QUOTE10||hquotem & H_QUOTE11|| hquotem & H_QUOTE7) break;
+		if(hquotem & H_QUOTE10||hquotem & H_QUOTE11|| hquotem & H_QUOTE12) break;
 		if(slang==0) {
 			if(hquotem==H_QUOTE6) prev_set=H_QUOTE1;
 			else if(hquotem==H_QUOTE1) {
@@ -1290,7 +1290,7 @@ void highlight_md(int c)
 				hquotem=H_QUOTE6;
 			};
 			if(hstate==HS_LINESTART){ 
-				if(hquotem!=H_QUOTE7) hquotem=H_QUOTE6;
+				if(hquotem!=H_QUOTE12) hquotem=H_QUOTE6;
 				hstate=0;
 			};
 			break;
@@ -1307,7 +1307,7 @@ void highlight_md(int c)
 
 	case '<':
 		if(prev_esc) { prev_esc=0;break;};
-		if(hquotem & H_QUOTE7) break;
+		if(hquotem & H_QUOTE12) break;
 		prev_set = H_COMMENT;
 		hstate=0;
 		hquote_start=hquotem;
@@ -1316,7 +1316,7 @@ void highlight_md(int c)
 
 	case CHR_BIGER:
 		if(prev_esc) { prev_esc=0;break;};
-		if(hquotem & H_QUOTE10||hquotem & H_QUOTE11|| hquotem & H_QUOTE7) break;
+		if(hquotem & H_QUOTE10||hquotem & H_QUOTE11|| hquotem & H_QUOTE12) break;
 		if(hstate==HS_LINESTART) {
 			prev_set = H_QUOTE10;
 			hquotem=0;
@@ -1334,7 +1334,7 @@ void highlight_md(int c)
 		break;
 	case '_':
 		if(prev_esc) { prev_esc=0;break;};
-		if(hquotem & H_QUOTE10||hquotem & H_QUOTE11|| hquotem & H_QUOTE7) break;
+		if(hquotem & H_QUOTE10||hquotem & H_QUOTE11|| hquotem & H_QUOTE12) break;
 		if(hstate==HS_PREVSLASH||hstate==HS_PREVSPACE||hstate==HS_LINESTART) {
 			hstate=HS_PREVSLASH;
 			bold++;
@@ -1360,7 +1360,7 @@ void highlight_md(int c)
 		break;
 	case '*':
 		if(prev_esc) { prev_esc=0;break;};
-		if(hquotem & H_QUOTE10||hquotem & H_QUOTE11|| hquotem & H_QUOTE7) break;
+		if(hquotem & H_QUOTE10||hquotem & H_QUOTE11|| hquotem & H_QUOTE12) break;
 		if(hstate==HS_PREVAST||hstate==HS_PREVSPACE||hstate==HS_LINESTART) {
 			hstate=HS_PREVAST;
 			bold++;
@@ -1388,7 +1388,6 @@ void highlight_md(int c)
 	case '\t':
 		if(bold==1) { hquotem=0; prev_set=0;bold=0;};
 		if(hstate!=HS_LINESTART) hstate=HS_PREVSPACE;
-		// if(hquotem==H_QUOTE8) hquotem=H_QUOTE7;
 		break;		
 	default: { 
 		prev_esc=0;

@@ -1346,10 +1346,13 @@ void vtputwc(WINDP *wp, utfchar *uc)
 				ctl_f=PREPFORE;
 				ctl_b=line_bcolor;
 				break;
-			case H_QUOTE7:
+			case H_QUOTE12:
 				if(drv_colors==8) line_bcolor=MODEBACK;
 				else line_bcolor=MODEBACKI;
 				ctl_b=line_bcolor;
+				break;
+			case H_QUOTE7:
+				ctl_f=W_FORE;ctl_b=wp->w_bcolor;
 				break;
 			/* % tag */
 			case H_QUOTE8:

@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.52  (10/10/2022)"
+#define VERSION 	"#01.53  (11/10/2022)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -431,7 +431,8 @@ typedef struct MLQUOTES {
 #define	H_QUOTE9	256	/* word in preprocessor  */
 #define	H_QUOTE10	512	/* light background, rest of the line  */
 #define	H_QUOTE11	1024/* toggle light background */
-#define H_UTFERR	2048	/* Utf8 error  */
+#define H_QUOTE12	2048
+#define H_UTFERR	4096	/* Utf8 error  */
 
 #define H_WORD1		10	/* found word type1  */
 #define	H_WORD2		11	/* found word type2  */
