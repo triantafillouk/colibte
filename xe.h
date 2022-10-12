@@ -410,7 +410,7 @@ typedef struct DRV_FLAGS {
 } DRV_FLAGS;
 
 typedef struct MLQUOTES {
-	unsigned char w_hquotem;
+	unsigned int w_hquotem;
 	unsigned char w_hselection;
 	unsigned char w_slang;
 	unsigned char w_jflag;	/* for json parse  */

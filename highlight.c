@@ -15,6 +15,7 @@
 int hselection=0;
 
 int hquotem=0;	/* highlight quote mask */
+int hprev_line=-1;
 int slang=0;		/* script language in html */
 int css_style=0;	/* cs html style   */
 int hstate=0;
@@ -1203,12 +1204,11 @@ void highlight_md(int c)
   static int prev_set=-1;
   static int prev_esc=0;
   static int hquote_start=0;
-  static int prev_line=-1;
 
   if(highlight_note(c)) return;
 
   hstruct=check_words(c);
-  if(prev_set>=0) { hquotem=prev_set;prev_set=-1;prev_line=-1;};
+  if(prev_set>=0) { hquotem=prev_set;prev_set=-1;hprev_line=-1;};
 
   switch(hstruct) {
 	case START_COMMENT:
@@ -1226,7 +1226,7 @@ void highlight_md(int c)
 			hquotem=0;
 		} else {
 			slang=LANG_SCRIPT;
-			prev_line = H_QUOTE12;
+			hprev_line = H_QUOTE12;
 			hquotem=0;
 		};
 		break;
@@ -1236,7 +1236,8 @@ void highlight_md(int c)
 	case (CHR_RESET) : // initialize
 //		MESG("html reset:");
 		hstate=HS_LINESTART;
-		prev_line=-1;
+		hprev_line=-1;
+		prev_set=-1;
 		slang=0;
 		hquotem=0;
 		bold=0;
@@ -1298,7 +1299,7 @@ void highlight_md(int c)
 	};
 	case CHR_LINE:
 	case CHR_CR:
-		if(prev_line>=0) { hquotem=prev_line;prev_line=-1;}
+		if(hprev_line>=0) { hquotem=hprev_line;hprev_line=-1;}
 		else {
 			hquotem &= ~(H_QUOTE1|H_QUOTE4|H_QUOTE5|H_QUOTE6|H_QUOTE10|H_QUOTE11);
 		};
@@ -2720,6 +2721,7 @@ void highlight_text(int c)
 		hstate=0;
 		break;
 	};
+#if	0
 	case ';': {
 		if(hstate==HS_LINESTART) hquotem=H_QUOTE5;
 		hstate=0;
@@ -2732,6 +2734,7 @@ void highlight_text(int c)
 		if(hstate==HS_LINESTART) hquotem=H_QUOTE4;
 		hstate=0;
 		break;
+#endif
 	case CHR_CR:
 	case CHR_LINE:
 		hquotem &= ~(H_QUOTE6|H_QUOTE4|H_QUOTE5|H_QUOTE1|H_QUOTE2);
@@ -2836,13 +2839,15 @@ void fquote_state(offs till_offs, offs from_offs, WINDP *wp)
 
 void setwquotes(WINDP *wp,int ind,num known_offset)
 {
-//	MESG("setwquotes:[%s] ind=%d wp_id=%d btype=%d slang=%d hnote=%d o=%lld",wp->w_fp->b_fname,ind,wp->id,wp->w_fp->b_type,slang,hnote,known_offset);
+	if(hprev_line>=0) hquotem=hprev_line;
+// MESG("setwquotes:[%s] ind=%d wp_id=%d btype=%d slang=%d hnote=%d hquotem=%X o=%lld",wp->w_fp->b_fname,ind,wp->id,wp->w_fp->b_type,slang,hnote,hquotem,known_offset);
 	wp->hs[ind].w_hquotem = hquotem;
 	wp->hs[ind].w_slang = slang;
 	wp->hs[ind].w_jflag = in_array+2*first;
 	wp->hs[ind].w_hselection = hselection;
 	wp->hs[ind].w_notes = hnote;
 	wp->hs[ind].known_offset = known_offset;
+	// MESG("	w_hquotem[%d]=%X",ind,wp->hs[ind].w_hquotem);
 	if(ind==0) tp_copy(wp->tp_hsknown,wp->tp_hline);
 }
 
@@ -2855,7 +2860,7 @@ void getwquotes(WINDP *wp,int ind)
 	first = wp->hs[ind].w_jflag/2;
 	hselection=wp->hs[ind].w_hselection;
 	hnote = wp->hs[ind].w_notes;
-//	MESG("getwquotes:[%s] ind=%d wp_id=%d b_type=%d slang=%d hnote=%d o=%lld",wp->w_fp->b_fname,ind,wp->id,wp->w_fp->b_type,slang,hnote,wp->hs[ind].known_offset);
+// MESG("getwquotes:[%s] ind=%d wp_id=%d b_type=%d slang=%d hnote=%d hquotem=%X o=%lld",wp->w_fp->b_fname,ind,wp->id,wp->w_fp->b_type,slang,hnote,hquotem,wp->hs[ind].known_offset);
 }
 
 /*
