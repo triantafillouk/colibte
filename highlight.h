@@ -355,7 +355,7 @@ SHLIGHT hts[] = {
  { "V", 0,0,v_w,v_w1,highlight_c,update_highlight,c_incword,v_extensions,comment_cc },
  { "JULIA",0,0,julia_w,julia_w1,highlight_julia,update_highlight,c_incword,julia_extensions,comment_perl },
  { "CAL",1,0,none_w,none_w, highlight_cmd,update_highlight_line,c_in_txt_word,gtxt_extensions,comment_perl },
- { "MD",0,0,none_w,none_w, highlight_md, update_highlight, c_in_txt_word,md_extensions,comment_perl },
+ { "MD",0,0,none_w,none_w, highlight_md, update_highlight, c_in_txt_word,md_extensions,comment_html },
  { NULL,0,0,NULL,NULL,NULL,NULL,NULL }
 };
 

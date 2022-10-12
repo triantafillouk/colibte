@@ -749,7 +749,7 @@ void highlight_c(int c)
 		break;
 	case '\n':
 	case CHR_CR:
-		hquotem &= ~(H_QUOTE6|H_QUOTE4|H_QUOTE5|H_QUOTE7|H_QUOTE9);
+		hquotem &= ~(H_QUOTE6|H_QUOTE4|H_QUOTE5|H_QUOTE9);
 		hstate=HS_LINESTART;
 //		single_quoted=0;
 //		double_quoted=0;
@@ -852,7 +852,7 @@ void highlight_julia(int c)
 		break;
 	case '\n':
 	case CHR_CR:
-		hquotem &= ~(H_QUOTE6|H_QUOTE4|H_QUOTE5|H_QUOTE7|H_QUOTE9);
+		hquotem &= ~(H_QUOTE6|H_QUOTE4|H_QUOTE5|H_QUOTE9);
 		hstate=HS_LINESTART;
 		flag_word=0;
 		break;
@@ -1529,7 +1529,7 @@ void highlight_perl(int c)
 	/* single quotes */
 	case CHR_SQUOTE: 
 //		if(hstate!=HS_ESC) hquotem = (hquotem)? hquotem & ~H_QUOTE1: H_QUOTE1;
-		if(hstate!=HS_ESC && !(hquotem & H_QUOTE7)) {
+		if(hstate!=HS_ESC) {
 			if(hquotem & H_QUOTE4 && !(hquotem & H_QUOTE2)) {
 				if(hquotem == H_QUOTE4) {
 					hquotem = H_QUOTE1 | H_QUOTE4;
@@ -1542,8 +1542,7 @@ void highlight_perl(int c)
 		break;
 	/* double quotes */
 	case CHR_DQUOTE:
-//		if(hstate!=HS_ESC) hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
-		if(hstate!=HS_ESC && !(hquotem & H_QUOTE7)) {
+		if(hstate!=HS_ESC) {
 			if(hquotem & H_QUOTE4 && !(hquotem & H_QUOTE1)) {
 				if(hquotem == H_QUOTE4) {
 					hquotem = H_QUOTE2 | H_QUOTE4;
@@ -1556,7 +1555,6 @@ void highlight_perl(int c)
 		break;
 	/* comments */
 	case '#':
-		
 		if((hstate!=HS_PREVESC) && (hquotem!=H_QUOTE2 && hquotem!=H_QUOTE1)) {
 			hquotem |= H_QUOTE5;
 		};
@@ -1569,7 +1567,7 @@ void highlight_perl(int c)
 		break;
 	case '\n':
 	case CHR_CR:
-		hquotem &= ~(H_QUOTE6|H_QUOTE4|H_QUOTE5|H_QUOTE7|H_QUOTE9);
+		hquotem &= ~(H_QUOTE6|H_QUOTE4|H_QUOTE5|H_QUOTE9);
 		hstate=HS_LINESTART;
 		break;
 	case '!':
@@ -1626,7 +1624,7 @@ void highlight_json(int c)
 		if(hquotem==0) { if(hstate==0) first=1;};
 		break;
 	case CHR_DQUOTE:
-		if(hstate==HS_ESC) break;
+		if(hstate==HS_ESC) { hstate=0;break;};
 		if(first) {
 			if(hquotem == 0 && next_quote==0) next_quote=H_QUOTE2;
 			else {
@@ -1823,7 +1821,7 @@ void highlight_yaml(int c)
 
 	case CHR_SQUOTE:
 		if(hquotem != H_QUOTE6 && !(hquotem&H_QUOTE2)){
-			if(hstate==HS_ESC) break;
+			if(hstate==HS_ESC) { hstate=0;break;};
 			if(first) {
 				if(hquotem == 0 && next_quote==0) next_quote=H_QUOTE1;
 				else {
@@ -1841,7 +1839,7 @@ void highlight_yaml(int c)
 
 	case CHR_DQUOTE:
 		if(hquotem  != H_QUOTE6){
-			if(hstate==HS_ESC) break;
+			if(hstate==HS_ESC) { hstate=0;break;};
 			if(first) {
 				if((hquotem == 0||hquotem==H_QUOTE4) && next_quote==0) next_quote=H_QUOTE2;
 				else {
@@ -1943,12 +1941,10 @@ void highlight_matlab(int c)
 		};
 //		hstate=HS_PREVAST;
 		break;
-#if	1
 	case '#':
 		if(hstate==HS_LINESTART) hquotem = (hquotem)? hquotem : H_QUOTE6;
 		hstate=0;
 		break;
-#endif
 	/*  comments */
 	case '%':
 		if(hquotem!=H_QUOTE2 && hquotem!=H_QUOTE1) {
@@ -2418,66 +2414,6 @@ void highlight_tags(int c)
   };
 }
 
-#if	NUSE
-void highlight_dir(int c)
-{
-  line_col++;
-  switch(c) {
-	case CHR_CR:
-	case CHR_LINE:
-		hquotem=0;
-		hstate=HS_LINESTART;
-		slang=0;
-		line_col=0;
-		break;
-	case '#': {
-		if(hstate==HS_LINESTART) {
-			hquotem=H_QUOTE6;
-			hstate=0;
-		};break;
-	};
-	case 'l': {
-		if(line_col==2) { 
-			if(hquotem==H_QUOTE6) {
-				hquotem=H_QUOTE5;
-			} else {
-				hquotem=H_QUOTE4;
-			};
-			hstate=0;
-		};break;
-	};
-	case 'c': {
-		if(hstate==HS_LINESTART) {
-			hquotem=H_QUOTE7;
-			hstate=0;
-		};break;
-	};
-	case 'b': {
-		if(hstate==HS_LINESTART) {
-			hquotem=H_QUOTE4;
-			hstate=0;
-		};break;
-	};
-	case '/': {
-		if(hstate==HS_LINESTART) {
-			hquotem=H_QUOTE1;
-			hstate=0;
-		};break;
-	};
-	case ';': {
-		if(hstate==HS_LINESTART) {
-			hquotem=H_QUOTE7;
-			hstate=0;
-		};break;
-	};
-	default: { 
-		if((c>='A' && c<='Z') || (c>='a' && c<='z') || c>128) hstate |= HS_LETTER;
-		else hstate=0;
-	};
-  };
-}
-#endif
-
 void highlight_cobol(int c)
 {
   if(highlight_note(c)) return;
@@ -2609,7 +2545,12 @@ void highlight_sql(int c)
 void highlight_cmd(int c)
 {
   static int prev_space=1;
+  static int prev_set=-1;
+
   if(highlight_note(c)) return;
+
+  if(prev_set>=0) { hquotem=prev_set;prev_set=-1;};
+
   switch(c) {
 	case CHR_RESET:
 		hstate=0;
@@ -2675,6 +2616,17 @@ void highlight_cmd(int c)
 		hstate=HS_LINESTART;
 		prev_space=1;
 		break;
+	case '`': // code block 
+		if(hstate==HS_PREVESC) break;
+		if(hquotem & H_QUOTE11) {
+			hquotem &= ~H_QUOTE11;
+			prev_set=-1;
+			hstate=0;
+		} else {
+			prev_set = hquotem | H_QUOTE11;
+			hstate=0;
+		};
+		break;
 	case ' ':
 	case '\t':
 		prev_space=1;
@@ -2697,44 +2649,21 @@ void highlight_text(int c)
 		hstate=0;
 		slang=1;	/* if 1 highlights numerics  */
 		break;
-#if	0
-	/* single quotes */
-	case '`':
-	case CHR_SQUOTE: 
-		if(hstate!=HS_LETTER) {
-			if(hstate!=HS_ESC) {
-				hquotem = (hquotem)? hquotem & ~H_QUOTE1: H_QUOTE1;
-			}
-		} else {
-			hquotem &= ~H_QUOTE1;
-		};
-		hstate=0;
-		break;
-	/* double quotes */
-	case CHR_DQUOTE:
-			if(hstate!=HS_ESC) hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
-		hstate=0;
-		break;
-#endif
 	case '#': {	/* Only on the beginning of the line  */
 		if(hstate==HS_LINESTART) hquotem=H_QUOTE6;
 		hstate=0;
 		break;
 	};
-#if	0
+
 	case ';': {
 		if(hstate==HS_LINESTART) hquotem=H_QUOTE5;
 		hstate=0;
 		break;
 	};
-	case '\\':
-		hstate=(hstate==HS_ESC)?0:HS_ESC;
-		break;
 	case '%': case '!':
 		if(hstate==HS_LINESTART) hquotem=H_QUOTE4;
 		hstate=0;
 		break;
-#endif
 	case CHR_CR:
 	case CHR_LINE:
 		hquotem &= ~(H_QUOTE6|H_QUOTE4|H_QUOTE5|H_QUOTE1|H_QUOTE2);
