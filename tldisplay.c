@@ -1605,6 +1605,7 @@ int get_utf_length(utfchar *utf_char_str)
 		if(b2==0x8B) return 0;	/* zero space  */
 		if(b2==0x8C) return 0;	/* zero space  */
 		if(b2==0x8D) return 0;	/* zero space  */
+		if(b2==0xA6) return 1;
 		return 1;
 	};
 	if(b1==0x81 || b1==0x82) return 1; 	/* diacriticals, subscripts, currency symbols  */
@@ -1613,6 +1614,7 @@ int get_utf_length(utfchar *utf_char_str)
 		if(b2 > 0x8F && b2< 0xb1) return 0;	/* combining characters */
 		return 1;
 	};
+	if(b1 == 0x84) return 2;
 	if(b1 == 0x92) return 1;
 #if	DARWIN
 	if(b1==0x9C||b1==0x9D||b1==0x9E) return 2;

@@ -504,19 +504,6 @@ int highlight_type(char *extention)
  return 0;
 }
 
-#if	NUSE
-int get_current_highlight(WINDP *wp)
-{
- if(!discmd) return 0;
- num ptr1=tp_offset(wp->tp_hline);
- num ptr2=tp_offset(wp->tp_current)+2;
- getwquotes(wp,0);
- int h1=hquotem;
- fquote_state(ptr2,ptr1,wp);
- MESG("get_current_highlight: %ld=%X -> %ld=%X",ptr1,h1,ptr2,hquotem);
- return hquotem;
-}
-#endif
 
 /*	returns true if full window update is needed 
 	updates window flags selecting lines to draw or all

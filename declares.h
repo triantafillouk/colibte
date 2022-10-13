@@ -106,9 +106,6 @@ int select_scheme(int n);
 void create_default_scheme();
 
 // display.c
-#if	NUSE
-int utf_lerror();
-#endif
 int error_line(char *,...);
 void vtinit();
 int update_screen(int);

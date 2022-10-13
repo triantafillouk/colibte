@@ -85,9 +85,6 @@ void highlight_ecl(int c);
 void highlight_sql(int c);
 void highlight_matlab(int c);
 void highlight_cmd(int c);
-#if	NUSE
-void highlight_dir(int c);
-#endif
 void highlight_rust(int c);
 void highlight_tags(int c);
 void highlight_sln(int c);
@@ -342,11 +339,7 @@ SHLIGHT hts[] = {
  { "YAML",0,1,yaml_w,yaml_w1, highlight_yaml,update_highlight_line,c_incword,yaml_extensions,comment_perl },
  { "JSON",0,0,jscript_w,jscript_w1,highlight_json,update_highlight,c_incword,json_extensions,comment_cc },
  { "TERRAFORM",0,0,terraform_w,terraform_w1,highlight_terraform,update_highlight,c_incword,terraform_extensions,comment_cc },
-#if	NUSE
- { "DIR",0,0,dir_w,dir_w1,highlight_dir,update_highlight_none,c_incword,dir_extensions,comment_cc },
-#else
  { "DIR",0,0,dir_w,dir_w1,highlight_text,update_highlight_none,c_incword,dir_extensions,comment_cc },
-#endif
  { "GO", 0,0,go_w,go_w1,highlight_c,update_highlight,c_incword,go_extensions,comment_cc },
  { "RUST", 0,0,rust_w,rust_w1,highlight_rust,update_highlight,c_incword,rust_extensions,comment_cc },
  { "TAGVIEW",0,0,tag_w,tag_w1, highlight_tags,update_highlight,c_incword,tag_extensions,comment_none },
