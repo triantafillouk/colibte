@@ -256,8 +256,8 @@ MENUS m_edit =
 
 M_element e_select_on[] = 
 {
-	{0, 'X', "cut          ^X","^Xcut",	cut_region, (struct MENUS *)1,"EX"} ,	
 	{0, 'C', "Copy         ^C","^Ccopy",	copy_region, 0,"EC"} ,	
+	{0, 'X', "cut          ^X","^Xcut",	cut_region, (struct MENUS *)1,"EX"} ,	
 	{0, 'U', "Unselect       ","",  set_mark,0,"EU"},
 	{0, 0, NULL,"",NULL,0,NULL}
 };
@@ -269,14 +269,14 @@ MENUS m_select_on = {
 
 M_element e_select_off[] = 
 {
-	{0, 'S', "Start selection  ","", set_mark, 0, "ES"} ,	
-	{0, 'C', "start Column sel ","", set_column_mark, 0,"EC"},
-	{0, 'P', "Paste            ","", system_paste, 0,"EV"} ,	
-	{0, 'T', "find Tag         ","", find_tag, (struct MENUS *)1, "EWT"},
-	{0, 'G', "Goto file        ","", open_file, (struct MENUS *)3, "EWG"},
-	{0, 'B', "go Back          ","", prev_hmark, (struct MENUS *)1, "EWB"},
-	{0, 'F', "go Forward       ","", next_hmark, (struct MENUS *)1, "EWF"},
-	{0, 'M', "Match fence    ^]","", match_fence,0,"SM"},
+	{0, 'B', " <-  go Back    ","", prev_hmark, (struct MENUS *)1, "EWB"},
+	{0, 'F', " ->  go Forward ","", next_hmark, (struct MENUS *)1, "EWF"},
+	{0, 'S', "Start selection ","", set_mark, 0, "ES"} ,	
+	{0, 'C', "start Column sel","", set_column_mark, 0,"EC"},
+	{0, 'P', "Paste           ","", system_paste, 0,"EV"} ,	
+	{0, 'T', "find Tag        ","", find_tag, (struct MENUS *)1, "EWT"},
+	{0, 'G', "Goto file       ","", open_file, (struct MENUS *)3, "EWG"},
+	{0, 'M', "Match fence   ^]","", match_fence,0,"SM"},
 	{0, 0, NULL,"",NULL,0,NULL}
 };
 

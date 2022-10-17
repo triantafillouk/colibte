@@ -294,7 +294,9 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
  	if((j=strlen(m1->element[nu].txt)) >maxl) maxl=j;
  };
  if(orient==VERTICAL){
-	sx = pos_x; sy=m1->ypos;
+	sx = pos_x; 
+	// sy=m1->ypos;
+	sy = pos_y;
  } else {
 	sx=0; sy=0;
 #if	TARROWS
@@ -529,6 +531,7 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 // int last_key_recorded=0;
 
 MENUS *start_menu = &m_topn;
+extern int mousey,mousex;
 
 int execute_menu(int fixed)	/* execute menu */
 {
@@ -589,8 +592,14 @@ int execute_menu(int fixed)	/* execute menu */
  	pos_x = line*HLABEL_WIDTH;
 	pos_y = 1;
  } else {
- 	pos_x = main_menu->xpos;
-	pos_y = line+1;
+	if(fixed<0) {
+		MESG("menu at x=%d y=%d",mousex,mousey);
+		pos_x=mousex;
+		pos_y=mousey;
+	} else {
+	 	pos_x = main_menu->xpos;
+		pos_y = line+1;
+	};
  };
  execfunc = get_menucmd(main_menu,line,pos_x,pos_y);
  in_menu=0;

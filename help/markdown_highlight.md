@@ -6,10 +6,10 @@
 - All type of [headings](headings) with a different color. 
 - The first '#' are highlighted the same as H1 headings
 
-### Html inline coloring like the following
->	<p style="color:red;">Lorem ipsum...</p>
+### Html inline coloring like the following line
+	<p style="color:red;">Lorem ipsum...</p>
 
-### Html comments are highlighted like the following line
+### Html multiline comments are highlighted like the following line
 <!-- html comment --> 
 
 ### blockquotes are highlighted with different background color 
@@ -17,8 +17,8 @@
 >> double blockquotes
 >>> Triple block quotes
 
-### Normal code and html tagging
- This is <b>inline</b> code `if(a==1) b=3`
+### Normal code block and html tagging
+ This is <b>inline</b> html tagging and code block `if(a==1) b=3`
 
 ### Italics, bold, bold-italics are <em>highlighted</em> with a different color as follows
  * This is *italics*.
