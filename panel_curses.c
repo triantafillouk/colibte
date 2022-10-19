@@ -112,8 +112,6 @@ extern alist *color_schemes;
 extern char utfokey[10];
 extern int utflen;
 
-//#define U8_MASK_LEAD_BYTE(leadByte, countTrailBytes) ((leadByte)&=(1<<(6-(countTrailBytes)))-1)
-
 void drv_window_delete(WINDP *wp)
 {
 }
@@ -726,7 +724,7 @@ int text_mouse_function(int move)
 	if(mouse_button==KMOUSE_NONE) {
 		return 0;
 	};
- MESG("text_mouse_function: button=%d",mouse_button);
+ // MESG("text_mouse_function: button=%d",mouse_button);
 
  if(is_in_top_menu()) {
 	if(move==KMOUSE_RELEASE+KMOUSE_BUTTON1){
@@ -739,7 +737,7 @@ int text_mouse_function(int move)
 	}
  	return TRUE;
  };
- MESG("text_mouse_function:1");
+ // MESG("text_mouse_function:1");
 	wp = get_mouse_window();
 	if(wp==NULL) {
 		wp=is_in_status();
@@ -751,14 +749,14 @@ int text_mouse_function(int move)
 				update_screen(FALSE);
 				return -1;
 			} else {
-			MESG("text_mouse_function: move=%X",move);
+			// MESG("text_mouse_function: move=%X",move);
 				if(move==KMOUSE_RELEASE+KMOUSE_BUTTON1){
 					mouse_started_in_rline=0;
 //					MESG("reset mouse_started: release 1");
 				};
 				if(move==KMOUSE_RELEASE+KMOUSE_BUTTON1){
 					mouse_window_col = mousex - wp->gwp->t_xpos - wp->w_infocol;
-					MESG("text_mouse_function: col=%d",mouse_window_col);
+					// MESG("text_mouse_function: col=%d",mouse_window_col);
 					if((cbfp->b_flag & FSNLIST) && (mouse_window_col<5)) {
 						// dir_left(0);
 						// update_screen(FALSE);
@@ -772,7 +770,7 @@ int text_mouse_function(int move)
 				};
 			};
 		} else {
-			MESG("text_mouse_function: return -1");
+			// MESG("text_mouse_function: return -1");
 			return -1;
 		};
 	} else {
@@ -782,7 +780,7 @@ int text_mouse_function(int move)
 	/* We are in an editors window */
 	mouse_window_row = mousey - wp->gwp->t_ypos;
 	mouse_window_col = mousex - wp->gwp->t_xpos - wp->w_infocol;
-	MESG("	r=%d c=%d",mouse_window_row,mouse_window_col);
+	// MESG("	r=%d c=%d",mouse_window_row,mouse_window_col);
 	if(move>KMOUSE_RELEASE) {
 		mouse_started_in_rline=0;
 		// MESG("reset mouse_started, button released!");
@@ -856,7 +854,7 @@ int text_mouse_function(int move)
 	if(mouse_window_col<0) mouse_window_col=0;	/* inside info left column  */
 	new_offset=LineBegin(tp_offset(cwp->tp_hline));
 
-	MESG("tp_hline:1 new_offset=%ld row=%d",new_offset,mouse_window_row);
+	// MESG("tp_hline:1 new_offset=%ld row=%d",new_offset,mouse_window_row);
 	int head_line=(cbfp->b_header!=NULL);
 	for(i=head_line;i<mouse_window_row;i++) 
 	{
@@ -1453,7 +1451,6 @@ int getkcmd(char *k)
 	    };
 	    c1 |= c0;
 	    if(c3=='^') { c1 |= 128;}
-#if	1
 		else {
 			if(c3==';'){
 				c=*k++;
@@ -1466,7 +1463,6 @@ int getkcmd(char *k)
 				// fprintf(stderr,"spec2: SPEC2=%X n2=%X c0=%X c1=%X\n",SPEC2,n2,c0,c1);
 			}
 		}
-#endif
 	    return(c1);
 	  };
 	  if(c0==0) c0='@';
@@ -1595,7 +1591,6 @@ void end_interactive()
 // remove box and show info behind it
 void remove_box()
 {
- // if(entry_mode==KENTRY) return;
  cbox=(BOX *) lpop(box_list);
  if(cbox==NULL) return;
  hide_panel(cbox->panel);
@@ -2593,7 +2588,7 @@ int text_mouse_release(int n)
 {
 
 	if(mousepx==mouserx && mousepy==mousery) {	/* this is just a click!  */
-		MESG("text_mouse_release: %X",KMOUSE_RELEASE+mouse_button);
+		// MESG("text_mouse_release: %X",KMOUSE_RELEASE+mouse_button);
 		text_mouse_function(KMOUSE_RELEASE+mouse_button);
 	} else {
 		text_mouse_function(KMOUSE_RELEASE+mouse_button);

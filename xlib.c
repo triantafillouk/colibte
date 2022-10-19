@@ -38,6 +38,7 @@
 #define TTOP	1
 #define TBOTTOM	0
 
+
 int color_menu_fg,color_menu_bg;
 #if	1
 char *font_names[] = { 
@@ -168,6 +169,7 @@ int cursor_px=0;
 int cursor_py=0;
 int CLEN,CHEIGHT,CFONTBASE;
 int CLEN_DL, CHEIGHT_DL,CFONTBASE_DL;
+int CHEIGHTI=1;
 
 Display *dis0;
 int screen_num;
@@ -248,7 +250,7 @@ void start_interactive(char *prompt)
 #if	0	// PROMPT_AS_BOX
 	disp_box(prompt,2,4,5,6,60);
 	// dspv(cbox->wnd,2,1,prompt);
-	box_print(0,0," Y/N",58,0,0);
+	box_line_print(0,0," Y/N",58,0,0);
 	hide_cursor_dl();
 #else
 	msg_line("%s ",prompt);
@@ -442,6 +444,8 @@ void drv_open()
  init_colors();
 
  CLEN = 10; CHEIGHT=20;
+ CHEIGHTI=CHEIGHT;
+
  parent_width = CLEN*lenx+SBWIDTH;
  parent_height = CHEIGHT*leny+2*dl_height;
 
@@ -527,6 +531,7 @@ void drv_open()
  CLEN = XTextWidth(font_main,"m",1);
  CHEIGHT = font_main->ascent + font_main->descent;
  CFONTBASE = font_main->descent;
+ CHEIGHTI=CHEIGHT;
 
  lenx = (parent_width-SBWIDTH)/CLEN;
  leny = (parent_height-2*dl_height)/CHEIGHT;
@@ -705,7 +710,7 @@ int put_wstring(Drawable dw,int ypos,char *st)
 
 // Display string in box
 // this is mainly used in selectl
-void box_print(int y,int x, char *st,int width, int f, int active)
+void box_line_print(int y,int x, char *st,int width, int f, int active)
 {
  char show_string[256];
  int len;
