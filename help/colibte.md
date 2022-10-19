@@ -10,21 +10,21 @@
  editable user menu. (ALT-A)
 
 ## Basic characteristics
-	* A console and gtk driver
-	* A directory and file viewer of text docuemets
-	* Highlight support for many programming languages
-	* Multiple windows (vertical and horizontal splitting).
-	* An easy menu system
-	* His own and micro emacs keyboard assignment support.
-	* A C-like macro language.
-	* Notes taking handling with tags and todo,  calendar modes
-	* Decent mouse support for console and Gtk drivers.
-	* ctags support for code search.
-	* Color scheme support.
-		10 predefined color schemes
-	* function keys assignements
-	* Keyboard recording and replay.
-	* Use of previous and next history keys (like in a browser)
+	- A console and gtk driver
+	- A directory and file viewer of text docuemets
+	- Highlight support for many programming languages
+	- Multiple windows (vertical and horizontal splitting).
+	- An easy menu system
+	- His own and micro emacs keyboard assignment support.
+	- A C-like macro language.
+	- Notes taking handling with tags and todo,  calendar modes
+	- Decent mouse support for console and Gtk drivers.
+	- ctags support for code search.
+	- Color scheme support.
+		- 10 predefined color schemes
+	- function keys assignements
+	- Keyboard recording and replay.
+	- Use of previous and next history keys (like in a browser)
 
 ## Driver and OS support
 
@@ -95,18 +95,18 @@ For the moment there are the following drivers.
 
 ### FUNCTION KEYS
 
-- F1	: Show file info.
-- F2	: Insert argument count 
-- F3	: Quick close, saves the file and close it.
-- F4	: Describe next key.
-- F5	: Find next.
-- F6	: Find previous.
-- F7	: Start, End keyboard macro.
-- F8	: Replay keyboard macro
-- F9	: Execute a shell command
-- F10	: Next file in the same window.
-- F11 : Toggle page movement (syncronizes page movement on multiple windows when using PGUP, PGDN).
-- F12 : Toggle movement lock
+ - F1	: Show file info.
+ - F2	: Insert argument count 
+ - F3	: Quick close, saves the file and close it.
+ - F4	: Describe next key.
+ - F5	: Find next.
+ - F6	: Find previous.
+ - F7	: Start, End keyboard macro.
+ - F8	: Replay keyboard macro
+ - F9	: Execute a shell command
+ - F10	: Next file in the same window.
+ - F11 : Toggle page movement (syncronizes page movement on multiple windows when using PGUP, PGDN).
+ - F12 : Toggle movement lock
 
 
 ### Assign function to a key.
@@ -120,27 +120,26 @@ Window Menu is the main way to access this functionality.
   
 New files open in current window.  
 
-- ^P	            :   go to next window
-- ^N	            :   next file in current window.
-- ^X2 or ALT-W2		:	Split window horizontally
-- ^X3 or ALT-W3		:	Split window vertically
-- ^X1 or Alt-W1		:	Zoom current window.
-- ^X0 or ALT-W0		:	Close current window
-- ^B				:	Select current buffer from list
+ - ^P	            :   go to next window
+ - ^N	            :   next file in current window.
+ - ^X2 or ALT-W2		:	Split window horizontally
+ - ^X3 or ALT-W3		:	Split window vertically
+ - ^X1 or Alt-W1		:	Zoom current window.
+ - ^X0 or ALT-W0		:	Close current window
+ - ^B				:	Select current buffer from list
 
 ### Search - replace
 
-- ^S, F5 or ^F in memacs mode : Search forward.
-- ^R, F6		              : Search backward
--  Alt-R 	Replace a pattern with a new one from current position to the end of the file.
--  Alt-^R	Query replace with the following options.
->  (Υ)	replace one.  
->  (Ν)	Skip one.  
->  (!)	replace all.  
->  (U)	Correct last replace.  
->  (.)	Abandon replacements.  
->  (^G)	Abandon replacements.  
-
+ - ^S, F5 or ^F in memacs mode : Search forward.
+ - ^R, F6		              : Search backward
+ -  Alt-R 	Replace a pattern with a new one from current position to the end of the file.
+ -  Alt-^R	Query replace with the following options.
+    >  (Υ)	replace one.  
+    >  (Ν)	Skip one.  
+    >  (!)	replace all.  
+    >  (U)	Correct last replace.  
+    >  (.)	Abandon replacements.  
+    >  (^G)	Abandon replacements.  
 -   Search Menu starts other functions also.
 
 

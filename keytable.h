@@ -470,6 +470,7 @@ KEYTAB keytab_dir[] = {
 	{'d',		dir_new_dir,"d"},
 	{CNTRL|'D',	dir_del1,"^D"},	
 	{'b',		dir_left,"b"},
+	{'\\',		dir_left,"BSLASH"},
 	{'i',		dir_right,"i"},
 	{'j',		dir_showfileinfo,"j"},
 	{'r',		dir_reload,"r"},
@@ -510,7 +511,8 @@ KEYTAB keytab_view[] = {
 /* and some not so vi compatible  */
 	{'1',		goto_bof,"1"},
 	{'v',		quick_close,"v"},
-	{SPEC1|'D', dir_left,"KEY-LEFT"},
+//	{SPEC1|'D', dir_left,"KEY-LEFT"},
+	{'\\',		dir_left,"BSLASH"},
 	{'q',		close_file,"q"},
 	{CHR_LBRA,		goto_bop,"["},
 	{CHR_RBRA,		goto_eop,"]"},

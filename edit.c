@@ -11,7 +11,6 @@
 
 int delete_region();
 
-void set_buffer_update();
 int is_utf_accent(FILEBUF *fp, offs o);
 offs MoveToColumn(int go_col);
 int export_region(ClipBoard *);	/* this is platform dependant!  */
@@ -75,9 +74,12 @@ int toggle_parameter(int type)
 //  MESG("toggle_parameter: type[%d]=[%s] gmode=%d ",type,option_names[type].name,gmode);
   toggle_val(option_names[type].name);
   switch(type) {
-  	case EMKEYEMUL:	
-		msg_line("restart to change keyboard emulation");
-		break;
+  	case EMKEYEMUL:	{
+		int emulation;
+		emulation = (int)bt_dval(option_names[type].name);
+		set_key_emulation(emulation);
+		msg_line("set key amulation to %s",(emulation==0) ? "native":"emacs");
+		}; break;
 	case EMBEDICONS: // toggle_val("embed_icons");
 //		redraw toolbar (now needs restart)
 		msg_line("restart to change icons");
@@ -126,17 +128,9 @@ int toggle_parameter(int type)
 int goto_bol(int n)
 {
 	// MESG("goto_bol: b_flag=%X",cbfp->b_flag);
-#if	1
 	if(cbfp->b_flag==FSNOTES || cbfp->b_flag & FSNOTESN || cbfp->b_flag& FSNLIST) {
 		return goto_bof(n);
 	};
-#else
-	if(cbfp->b_flag & FSNLIST) {
-		cwp->current_note_line=0;
-		set_update(cwp,UPD_WINDOW);
-		return (OK_RSTGOAL);
-	};
-#endif
 	/* in interactive mode first go to the beginning of the window then at bof */
 	if(BolAt(Offset()) && macro_exec==FALSE && kbdmode==STOP) 
 	{
@@ -168,17 +162,9 @@ int prev_character(int n)
 int goto_eol(int n)
 {
 	// MESG("goto_eol: b_flag=%X",cbfp->b_flag);
-#if	1
 	if(cbfp->b_flag==FSNOTES || cbfp->b_flag & FSNOTESN || cbfp->b_flag& FSNLIST) {
 		return goto_eof(n);
 	};
-#else
-	if(cbfp->b_flag & FSNLIST) {
-		cwp->current_note_line=cbfp->dir_list_str->size-1;
-		set_update(cwp,UPD_WINDOW);
-		return (OK_RSTGOAL);
-	};
-#endif
 	if(Eol() && macro_exec==FALSE && kbdmode==STOP) {
 		if(getcline() == (tp_line(cwp->tp_hline)+cwp->w_ntrows-2-half_last_line)) 
 		{
@@ -362,7 +348,8 @@ int goto_eof(int n)
 		return (OK_CLRSL);
 	} else 
 	if(cbfp->b_flag& FSNLIST) {
-		toline=cbfp->lines-headline-1;
+		cwp->goal_column=0;
+		toline=cbfp->b_notes-headline;
 		cwp->current_note_line = toline;
 		MoveLineCol(toline,cwp->goal_column);
 		set_update(cwp,UPD_WINDOW);
@@ -1965,9 +1952,10 @@ int copy_region(int n)
 
  if(!clipboard_copy(MainClipBoard)) return FALSE;
  export_region(MainClipBoard);
-
+ 
  set_update(cwp,UPD_WINDOW);
  setmark(0); // remove selection
+
  if(MainClipBoard->rect) 
 	snprintf(s,80,"[%lldx%lld bytes copied]",MainClipBoard->width,MainClipBoard->height);
  else
@@ -2194,12 +2182,11 @@ int set_case(int n)
  return TRUE;
 }
 
-
 /* toggle highlight on/off */
 int toggle_highlight(int n)
 {
  if(syntaxh) syntaxh=0;else syntaxh=1;
- set_buffer_update();
+ set_update(cwp,UPD_ALL);
  return TRUE;
 }
 

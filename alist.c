@@ -556,8 +556,6 @@ int  delete_current(alist *list)
 	list->array_valid=0;
 	if(pi!=NULL) free(pi);
 	return 1;
-
- return 0;
 }
 #endif
 

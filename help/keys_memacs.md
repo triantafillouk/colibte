@@ -13,22 +13,22 @@
 | work                   |      -                        | -           | Work menu
 | show_version           |      -                        | -           | Show the current version on status line
 | abort                  | ^G             (      CTRL-G) | Normal mode | Abort key
-| abort                  | Escape         (  ALT-CTRL-[) | Normal mode | Abort key
+| abort                  | Escape         (  ALT-CTRL-\[) | Normal mode | Abort key
 | color_scheme           |      -                        | -           | Change the color scheme currently used
 | xcolor_scheme          |      -                        | -           | Change the xcolor scheme currently used
-| prev_character         | KEY-LEFT       (      ALT-[D) | Normal mode | move left
+| prev_character         | KEY-LEFT       (      ALT-\[D) | Normal mode | move left
 | prev_character         | Arrow left     (      ALT-OD) | Normal mode | move left
 | prev_character         | Arrow1 left    (    spec2 33) | Normal mode | move left
 | prev_character         | h              (           h) |   view mode | move left
-| record_macro           | key F7         (    ALT-[18~) | Normal mode | start and stop a key macro recording
-| bof                    | ALT-<          (       ALT-<) | Normal mode | Go to the start of the file
+| record_macro           | key F7         (    ALT-\[18~) | Normal mode | start and stop a key macro recording
+| bof                    | ALT-\<          (       ALT-\<) | Normal mode | Go to the start of the file
 | bof                    | ^HOME          (    spec2 11) | Normal mode | Go to the start of the file
 | bof                    | ^numeric 7     (    spec2 51) | Normal mode | Go to the start of the file
 | bof                    | 1              (           1) |   view mode | Go to the start of the file
 | bof                    | 1              (           1) |  notes mode | Go to the start of the file
 | bol                    | ^A             (      CTRL-A) | Normal mode | Go to the start of the line
 | bol                    | Home key       (      ALT-OH) | Normal mode | Go to the start of the line
-| bol                    | Home1 key      (      ALT-[H) | Normal mode | Go to the start of the line
+| bol                    | Home1 key      (      ALT-\[H) | Normal mode | Go to the start of the line
 | bol                    | Home2 key      (      ALT-OM) | Normal mode | Go to the start of the line
 | bol                    | 0              (           0) |   view mode | Go to the start of the line
 | assign_function        | ALT-K          (       ALT-K) | Normal mode | Assign a function to a key
@@ -46,11 +46,11 @@
 | convert_char           |      -                        | -           | Character set conversion
 | insert_tab             | ALT-I          (       ALT-I) | Normal mode | Insert a tab
 | remove_tab             | ^X^I           (         ^XI) | Normal mode | Remove a tab
-| remove_tab             | Shift TAB      (      ALT-[Z) | Normal mode | Remove a tab
+| remove_tab             | Shift TAB      `(      ALT-[Z)` | Normal mode | Remove a tab
 | new_file               |      -                        | -           | new file
 | rename_file            | ^XN            (         ^XN) | Normal mode | rename current file
 | copy_region            | ^C             (      CTRL-C) | Normal mode | Copy region to clipboard
-| copy_region            | ALT-[I         (      ALT-[I) | Normal mode | Copy region to clipboard
+| copy_region            | `ALT-[I`         (      `ALT-[I)` | Normal mode | Copy region to clipboard
 | count_words            | ALT-^C         (  ALT-CTRL-C) | Normal mode | Count words of a selected region
 | del_blank_lines        | ^X^O           (         ^XO) | Normal mode | Delete blanc lines before and after cursor, alsways left one blank line
 | close_file             | ^XK            (         ^XK) | Normal mode | close current file
@@ -58,7 +58,7 @@
 | close_file             | q              (           q) |  notes mode | close current file
 | set_bg                 | ALT-Z          (       ALT-Z) | Normal mode | suspend
 | set_bg                 | ^XZ            (         ^XZ) | Normal mode | suspend
-| del_char               | delete key     (     ALT-[3~) | Normal mode | delete the character under the cursor
+| del_char               | delete key     (     ALT-\[3~) | Normal mode | delete the character under the cursor
 | del_next_word          | ALT-D          (       ALT-D) | Normal mode | delete current word
 | one_window             | ^X1            (         ^X1) | Normal mode | remove all other windows
 | del_prev_word          | ALT-^H         (  ALT-CTRL-H) | Normal mode | delete previous word
@@ -70,12 +70,12 @@
 | set_color              |      -                        | -           | set the background color
 | show_keys              |      -                        | -           | show the current key assignements
 | color_scheme_read      |      -                        | -           | color scheme read from file
-| describe_key           | F4             (    ALT-[14~) | Normal mode | Show the function or subroutine assigned to a key
+| describe_key           | F4             (  `ALT-[14~`) | Normal mode | Show the function or subroutine assigned to a key
 | describe_key           | key F4         (      ALT-OS) | Normal mode | Show the function or subroutine assigned to a key
 | macro_line             | ALT-4          (       ALT-4) | Normal mode | execute a command line
 | macro_line             | ALT-^X         (  ALT-CTRL-X) | Normal mode | execute a command line
 | set_arg                | ALT space      (       ALT- ) | Normal mode | set a numeric argument for next function to execute
-| set_arg                | F2             (    ALT-[12~) | Normal mode | set a numeric argument for next function to execute
+| set_arg                | F2             (  `ALT-[12~`) | Normal mode | set a numeric argument for next function to execute
 | set_arg                | key F2         (      ALT-OQ) | Normal mode | set a numeric argument for next function to execute
 | detab_line             | ^X^D           (         ^XD) | Normal mode | Convert tabs to spaces
 | line_fill              | ^XF            (         ^XF) | Normal mode | fill the line, in right align mode insert spaces bettween characters
@@ -85,8 +85,8 @@
 | eof                    | G              (           G) |   view mode | Go to the end of file
 | eof                    | G              (           G) |  notes mode | Go to the end of file
 | eol                    | ^E             (      CTRL-E) | Normal mode | Go to the end of line
-| eol                    | ALT-[F         (      ALT-[F) | Normal mode | Go to the end of line
-| eol                    | End key        (      ALT-OF) | Normal mode | Go to the end of line
+| eol                    | `ALT-[F`       (    `ALT-[F`) | Normal mode | Go to the end of line
+| eol                    | End key        (    `ALT-OF`) | Normal mode | Go to the end of line
 | eol                    | End1 key       (   spec2 213) | Normal mode | Go to the end of line
 | eol                    | $              (           $) |   view mode | Go to the end of line
 | entab_line             | ^X^E           (         ^XE) | Normal mode | Convert spaces to tabs in a line
@@ -94,7 +94,7 @@
 | comment_line2          | ALT-;          (       ALT-;) | Normal mode | Comment line end
 | swap_mark              | ^X^X           (         ^XX) | Normal mode | swap mark and cursor position
 | exec_file              |      -                        | -           | execute a macro file
-| exec_macro             | key F8         (    ALT-[19~) | Normal mode | execute a saved macro (F8)
+| exec_macro             | key F8         (  `ALT-[19~`) | Normal mode | execute a saved macro (F8)
 | parse_check            | ^X\            (         ^X\) | Normal mode | parse_check_current_buffer
 | show_tokens            |      -                        | -           | show token list of a parsed buffer
 | undo                   | ^Z             (      CTRL-Z) | Normal mode | Undo changes
@@ -109,23 +109,23 @@
 | open_file              | ^O             (      CTRL-O) | Normal mode | Open a file for editing
 | clear_buffer           |      -                        | -           | Clear buffer named
 | unmark_buffer          |      -                        | -           | unmark current buffer
-| next_character         | KEY-RIGHT      (      ALT-[C) | Normal mode | move right
+| next_character         | KEY-RIGHT      (    `ALT-[C`) | Normal mode | move right
 | next_character         | Arrow right    (      ALT-OC) | Normal mode | move right
 | next_character         | Arrow1 right   (   spec2 233) | Normal mode | move right
 | next_character         | l              (           l) |   view mode | move right
 | next_character         | l              (            ) |   view mode | move right
-| select_next_character  | SHIFT rigt     (      ALT-[c) | Normal mode | select and move right
-| select_prev_character  | SHIFT left     (      ALT-[d) | Normal mode | select and move left
-| select_next_line       | SHIFT down     (      ALT-[b) | Normal mode | select and move down
-| select_prev_line       | SHIFT up       (      ALT-[a) | Normal mode | select and move up
+| select_next_character  | SHIFT rigt     (      `ALT-[c`) | Normal mode | select and move right
+| select_prev_character  | SHIFT left     (      `ALT-[d`) | Normal mode | select and move left
+| select_next_line       | SHIFT down     (      `ALT-[b`) | Normal mode | select and move down
+| select_prev_line       | SHIFT up       (      `ALT-[a`) | Normal mode | select and move up
 | goto_line              | ALT-G          (       ALT-G) | Normal mode | Go to a specific line
 | match_fence            | ^]             (      CTRL-]) | Normal mode | Find a correspondig fence and go there (C fences)
 | tab                    | tab            (      CTRL-I) | Normal mode | insert a tab
-| find_previous          | key F6         (    ALT-[17~) | Normal mode | Find previous occurense of a search
+| find_previous          | key F6         (    `ALT-[17~`) | Normal mode | Find previous occurense of a search
 | find_previous          | ^Up arrow      (     spec2 4) | Normal mode | Find previous occurense of a search
 | find_previous          | N              (           N) |   view mode | Find previous occurense of a search
 | find_previous          | N              (           N) |  notes mode | Find previous occurense of a search
-| find_next              | key F5         (    ALT-[15~) | Normal mode | Find next occurense of a search
+| find_next              | key F5         (    `ALT-[15~`) | Normal mode | Find next occurense of a search
 | find_next              | ^Down arrow    (     spec2 5) | Normal mode | Find next occurense of a search
 | find_next              | n              (           n) |   view mode | Find next occurense of a search
 | find_next              | n              (           n) |  notes mode | Find next occurense of a search
@@ -145,7 +145,7 @@
 | help                   |      -                        | -           | Show help text
 | exec                   | ALT-1          (       ALT-1) | Normal mode | Execute a shell command, show output in [command] buffer
 | exec                   | ^X!            (         ^X!) | Normal mode | Execute a shell command, show output in [command] buffer
-| exec                   | key F9         (    ALT-[20~) | Normal mode | Execute a shell command, show output in [command] buffer
+| exec                   | key F9         (    `ALT-[20~`) | Normal mode | Execute a shell command, show output in [command] buffer
 | bg_cmd                 | ^X&            (         ^X&) | Normal mode | Execute a background command, output in /tmp/cmd### file, error in /tmp/err### file
 | new_shell              |      -                        | -           | start interactive shell (xterm like)
 | rgrep_command          | ALT-%          (       ALT-%) | Normal mode | Recursive find insize current directory
@@ -163,11 +163,11 @@
 | insert_indent          | ^J             (      CTRL-J) | Normal mode | insert indent
 | insert_indent          | Enter key      (      ALT-OM) | Normal mode | insert indent
 | next_file              | ^N             (      CTRL-N) | Normal mode | show next file in current window
-| next_file              | key F10        (    ALT-[21~) | Normal mode | show next file in current window
-| next_file              | ^PG-DOWN       (      ALT-[z) | Normal mode | show next file in current window
+| next_file              | key F10        (  `ALT-[21~`) | Normal mode | show next file in current window
+| next_file              | ^PG-DOWN       (    `ALT-[z`) | Normal mode | show next file in current window
 | next_file              | spec2 197      (   spec2 197) | Normal mode | show next file in current window
 | next_file              | ^Page DN       (    spec2 21) | Normal mode | show next file in current window
-| next_line              | KEY-DOWN       (      ALT-[B) | Normal mode | goto next line
+| next_line              | KEY-DOWN       (    `ALT-[B`) | Normal mode | goto next line
 | next_line              | Arrow down     (      ALT-OB) | Normal mode | goto next line
 | next_line              | Arrow1 down    (   spec2 214) | Normal mode | goto next line
 | next_line              | j              (           j) |   view mode | goto next line
@@ -179,12 +179,12 @@
 | next_paragraph         | ]              (           ]) |   view mode | Go to end of paragraph
 | next_page              | ]              (           ]) |    dir mode | Goto next page
 | next_page              | ]              (           ]) |  notes mode | Goto next page
-| next_word              | ^KEY-RIGHT     (      ALT-[N) | Normal mode | move to next word
+| next_word              | ^KEY-RIGHT     (    `ALT-[N`) | Normal mode | move to next word
 | next_word              | key crt        (     spec2 6) | Normal mode | move to next word
 | next_word              | b              (           w) |   view mode | move to next word
 | next_window            | ^P             (      CTRL-P) | Normal mode | Go to next window
 | next_window            | ^XO            (         ^XO) | Normal mode | Go to next window
-| next_window            | ^PG-UP         (      ALT-[w) | Normal mode | Go to next window
+| next_window            | ^PG-UP         (    `ALT-[w`) | Normal mode | Go to next window
 | next_window            | spec2 196      (   spec2 196) | Normal mode | Go to next window
 | next_window            | Center key     (      ALT-OE) | Normal mode | Go to next window
 | next_window            | ^numeric 9     (    spec2 53) | Normal mode | Go to next window
@@ -192,23 +192,23 @@
 | goto_eow               | ^\             (      CTRL-\) | Normal mode | move to end of word
 | goto_eow               | ALT-\          (       ALT-\) | Normal mode | move to end of word
 | goto_eow               | e              (           e) |   view mode | move to end of word
-| prev_page              | [              (           [) |    dir mode | Move on page backwards
-| prev_page              | [              (           [) |  notes mode | Move on page backwards
-| prev_line              | KEY-UP         (      ALT-[A) | Normal mode | move up
+| prev_page              | \[             (          \[) |    dir mode | Move on page backwards
+| prev_page              | \[             (          \[) |  notes mode | Move on page backwards
+| prev_line              | KEY-UP         (     ALT-\[A) | Normal mode | move up
 | prev_line              | Arrow up       (      ALT-OA) | Normal mode | move up
 | prev_line              | k              (           k) |   view mode | move up
 | prev_line              | k              (           k) |  notes mode | move up
-| prev_paragraph         | ^X[            (         ^X[) | Normal mode | Move to the begin of previous paragraph
-| prev_paragraph         | [              (           [) |   view mode | Move to the begin of previous paragraph
+| prev_paragraph         | `^X[`          (       `^X[`) | Normal mode | Move to the begin of previous paragraph
+| prev_paragraph         | \[             (          \[) |   view mode | Move to the begin of previous paragraph
 | prev_word              | ALT-|          (       ALT-|) | Normal mode | Move to previous word
 | prev_word              | ALT-B          (       ALT-B) | Normal mode | Move to previous word
-| prev_word              | ^KEY-LEFT      (      ALT-[P) | Normal mode | Move to previous word
+| prev_word              | ^KEY-LEFT      (    `ALT-[P`) | Normal mode | Move to previous word
 | prev_word              | spec2 7        (     spec2 7) | Normal mode | Move to previous word
 | prev_word              | b              (           b) |   view mode | Move to previous word
 | prev_window            | ^XP            (         ^XP) | Normal mode | Move to previous window
 | query_replace          | ^X^R           (         ^XR) | Normal mode | Interacive replace
 | query_replace          | ALT-^R         (  ALT-CTRL-R) | Normal mode | Interacive replace
-| quick_close            | F3             (    ALT-[13~) | Normal mode | Save file and close it
+| quick_close            | F3             (  `ALT-[13~`) | Normal mode | Save file and close it
 | quick_close            | key F3         (      ALT-OR) | Normal mode | Save file and close it
 | quick_close            | v              (           v) |   view mode | Save file and close it
 | quote_character        | ^Q             (      CTRL-Q) | Normal mode | Insert control character at current position
@@ -246,7 +246,7 @@
 | saveas_file            | ^X^W           (         ^XW) | Normal mode | Save the file as another name
 | paste_region           | ^V             (      CTRL-V) | Normal mode | Past the clipboard contents in current position
 | cut_region             | ^W             (      CTRL-W) | Normal mode | Cut the region and put it in clipboard
-| cut_region             | ALT-[W         (      ALT-[W) | Normal mode | Cut the region and put it in clipboard
+| cut_region             | `ALT-[W`       (    `ALT-[W`) | Normal mode | Cut the region and put it in clipboard
 | update_screen          |      -                        | -           | update_screen
 | update_tags            | ^XG            (         ^XG) | Normal mode | Update C-Tags
 | find_tag               | ALT-.          (       ALT-.) | Normal mode | Find the function under cursor in other files of current dir
@@ -260,10 +260,10 @@
 | clear_bmark            | ALT-0          (       ALT-0) | Normal mode | Clear all bookmarks
 | prev_hmark             | ^U             (      CTRL-U) | Normal mode | Go to previous histoty mark
 | prev_hmark             | ALT-P          (       ALT-P) | Normal mode | Go to previous histoty mark
-| prev_hmark             | ALT left arrow (      ALT-[p) | Normal mode | Go to previous histoty mark
+| prev_hmark             | ALT left arrow (      ALT-\[p) | Normal mode | Go to previous histoty mark
 | prev_hmark             | Previous mark  (   spec2 199) | Normal mode | Go to previous histoty mark
 | next_hmark             | ALT-N          (       ALT-N) | Normal mode | Goto next history mark
-| next_hmark             | ALT right arrow(      ALT-[n) | Normal mode | Goto next history mark
+| next_hmark             | ALT right arrow(      ALT-\[n) | Normal mode | Goto next history mark
 | next_hmark             | Next mark      (   spec2 198) | Normal mode | Goto next history mark
 | select_hmark           | ALT-J          (       ALT-J) | Normal mode | Select history mark
 | set_option             | ^XS            (         ^XS) | Normal mode | set option. If interactive select option from a list
@@ -271,22 +271,22 @@
 | toggle_move_lock       | ^XM            (         ^XM) | Normal mode | toggle movement lock
 | toggle_move_lock       | ALT-^M         (  ALT-CTRL-M) | Normal mode | toggle movement lock
 | toggle_move_lock       | F12            (      ALT-Oa) | Normal mode | toggle movement lock
-| toggle_move_lock       | key F12        (    ALT-[24~) | Normal mode | toggle movement lock
+| toggle_move_lock       | key F12        (    ALT-\[24~) | Normal mode | toggle movement lock
 | toggle_sync_lock       | ^XL            (         ^XL) | Normal mode | toggle page movement lock
 | toggle_sync_lock       | ALT-^L         (  ALT-CTRL-L) | Normal mode | toggle page movement lock
-| toggle_sync_lock       | key F11        (    ALT-[23~) | Normal mode | toggle page movement lock
+| toggle_sync_lock       | key F11        (    ALT-\[23~) | Normal mode | toggle page movement lock
 | toggle_sync_lock       | key shift F11  (      ALT-OY) | Normal mode | toggle page movement lock
-| page_move_up           | Pg Dn          (     ALT-[6~) | Normal mode | page move up
+| page_move_up           | Pg Dn          (     ALT-\[6~) | Normal mode | page move up
 | page_move_up           | Pg1 Dn         (    spec2 89) | Normal mode | page move up
-| page_move_down         | Pg Up          (     ALT-[5~) | Normal mode | page move down
+| page_move_down         | Pg Up          (     ALT-\[5~) | Normal mode | page move down
 | page_move_down         | Pg1 Up         (      ALT-Oy) | Normal mode | page move down
 | set_over               |      -                        | -           | set/unset overwrite
 | set_case               |      -                        | -           | set case sensitive search flag
 | set_regexp             |      -                        | -           | set regular expression search flag
 | toggle_over            | ^XI            (         ^XI) | Normal mode | toggle overwrite
 | toggle_over            | ALT-^O         (  ALT-CTRL-O) | Normal mode | toggle overwrite
-| toggle_over            | Insert key     (     ALT-[2~) | Normal mode | toggle overwrite
-| toggle_over            | OVERWRITE      (     ALT-[0~) | Normal mode | toggle overwrite
+| toggle_over            | Insert key     (     ALT-\[2~) | Normal mode | toggle overwrite
+| toggle_over            | OVERWRITE      (     ALT-\[0~) | Normal mode | toggle overwrite
 | toggle_over            | Inser1 key     (   spec2 212) | Normal mode | toggle overwrite
 | show_tag_view          |      -                        | -           | show tag view
 | show_calendar_list     |      -                        | -           | show calendar list
@@ -314,12 +314,12 @@
 | touch                  | f              (           f) |    dir mode | create new file (dir mode)
 | link                   | l              (           l) |    dir mode | symbolic link (dir mode)
 | dir_right              | i              (           i) |    dir mode | Dir right: view file on enter directory
-| dir_right              | Arrow right    (      ALT-[C) |    dir mode | Dir right: view file on enter directory
+| dir_right              | Arrow right    (      ALT-\[C) |    dir mode | Dir right: view file on enter directory
 | dir_right              | spec c         (      ALT-OC) |    dir mode | Dir right: view file on enter directory
 | dir_left               | b              (           b) |    dir mode | Dir left: exit viewing file or goto to parent directory
-| dir_left               | Arrow left     (      ALT-[D) |    dir mode | Dir left: exit viewing file or goto to parent directory
+| dir_left               | Arrow left     (      ALT-\[D) |    dir mode | Dir left: exit viewing file or goto to parent directory
 | dir_left               | spec d         (      ALT-OD) |    dir mode | Dir left: exit viewing file or goto to parent directory
-| dir_left               | KEY-LEFT       (      ALT-[D) |   view mode | Dir left: exit viewing file or goto to parent directory
+| dir_left               | KEY-LEFT       (      ALT-\[D) |   view mode | Dir left: exit viewing file or goto to parent directory
 | view_next              | .              (           .) |   view mode | view next file
 | view_previous          | ,              (           ,) |   view mode | view previous file
 | dir_tag                | space          (            ) |    dir mode | Tag current file (dir mode)
@@ -336,7 +336,7 @@
 | toggle_tagnote         | tab            (      CTRL-I) |  notes mode | 
 | edit_note              | e              (           e) |  notes mode | 
 | view_note              | v              (           v) |  notes mode | 
-| view_note              | KEY-RIGHT      (      ALT-[C) |  notes mode | 
+| view_note              | KEY-RIGHT      (      ALT-\[C) |  notes mode | 
 | toggle_tag             |                (            ) |  notes mode | 
 | toggle_tag             | t              (           t) |  notes mode | 
 | unselect_tag           | u              (           u) |  notes mode | 
@@ -488,18 +488,18 @@
 | ALT-^P          | hard_reposition      |  ALT-CTRL-P
 | ALT-^R          | query_replace        |  ALT-CTRL-R
 | ALT-^X          | macro_line           |  ALT-CTRL-X
-| Escape          | abort                |  ALT-CTRL-[
+| Escape          | abort                |  ALT-CTRL-\[
 | backspace       | del_prev_char        |  
-| KEY-UP          | prev_line            |  ALT-[A
-| KEY-LEFT        | prev_character       |  ALT-[D
-| KEY-RIGHT       | next_character       |  ALT-[C
-| KEY-DOWN        | next_line            |  ALT-[B
-| Pg Up           | page_move_down       |  ALT-[5~
-| Pg Dn           | page_move_up         |  ALT-[6~
-| Insert key      | toggle_over          |  ALT-[2~
-| OVERWRITE       | toggle_over          |  ALT-[0~
-| ^KEY-LEFT       | prev_word            |  ALT-[P
-| ^KEY-RIGHT      | next_word            |  ALT-[N
+| KEY-UP          | prev_line            |  ALT-\[A
+| KEY-LEFT        | prev_character       |  ALT-\[D
+| KEY-RIGHT       | next_character       |  ALT-\[C
+| KEY-DOWN        | next_line            |  ALT-\[B
+| Pg Up           | page_move_down       |  ALT-\[5~
+| Pg Dn           | page_move_up         |  ALT-\[6~
+| Insert key      | toggle_over          |  ALT-\[2~
+| OVERWRITE       | toggle_over          |  ALT-\[0~
+| ^KEY-LEFT       | prev_word            |  ALT-\[P
+| ^KEY-RIGHT      | next_word            |  ALT-\[N
 | SHIFT-INSERT    | system_paste         |  ALT-CTRL-Y
 | ALT-S           | menu                 |  ALT-S
 | ALT-F           | menu                 |  ALT-F
@@ -508,36 +508,36 @@
 | ALT-M           | menu                 |  ALT-M
 | ALT-T           | menu                 |  ALT-T
 | ALT-W           | menu                 |  ALT-W
-| F2              | set_arg              |  ALT-[12~
-| F3              | quick_close          |  ALT-[13~
-| F4              | describe_key         |  ALT-[14~
-| key F5          | find_next            |  ALT-[15~
-| key F6          | find_previous        |  ALT-[17~
-| key F7          | record_macro         |  ALT-[18~
-| key F8          | exec_macro           |  ALT-[19~
-| key F9          | exec                 |  ALT-[20~
-| key F10         | next_file            |  ALT-[21~
-| key F11         | toggle_sync_lock     |  ALT-[23~
-| ALT-[I          | copy_region          |  ALT-[I
-| ALT-[W          | cut_region           |  ALT-[W
+| F2              | set_arg              |  ALT-\[12~
+| F3              | quick_close          |  ALT-\[13~
+| F4              | describe_key         |  ALT-\[14~
+| key F5          | find_next            |  ALT-\[15~
+| key F6          | find_previous        |  ALT-\[17~
+| key F7          | record_macro         |  ALT-\[18~
+| key F8          | exec_macro           |  ALT-\[19~
+| key F9          | exec                 |  ALT-\[20~
+| key F10         | next_file            |  ALT-\[21~
+| key F11         | toggle_sync_lock     |  ALT-\[23~
+| ALT-\[I          | copy_region          |  ALT-\[I
+| ALT-\[W          | cut_region           |  ALT-\[W
 | ^HOME           | bof                  |  spec2 11
 | ^END            | eof                  |  spec2 9
 | ALT-(           | window_column_decrease |  ALT-(
 | ALT-)           | window_column_increase |  ALT-)
 | ALT--           | window_row_decrease  |  ALT--
 | ALT-_           | window_row_increase  |  ALT-_
-| ^PG-DOWN        | next_file            |  ALT-[z
-| ^PG-UP          | next_window          |  ALT-[w
-| SHIFT rigt      | select_next_character |  ALT-[c
-| SHIFT down      | select_next_line     |  ALT-[b
-| SHIFT left      | select_prev_character |  ALT-[d
-| SHIFT up        | select_prev_line     |  ALT-[a
-| ALT right arrow | next_hmark           |  ALT-[n
-| ALT left arrow  | prev_hmark           |  ALT-[p
-| Shift TAB       | remove_tab           |  ALT-[Z
+| ^PG-DOWN        | next_file            |  ALT-\[z
+| ^PG-UP          | next_window          |  ALT-\[w
+| SHIFT rigt      | select_next_character |  ALT-\[c
+| SHIFT down      | select_next_line     |  ALT-\[b
+| SHIFT left      | select_prev_character |  ALT-\[d
+| SHIFT up        | select_prev_line     |  ALT-\[a
+| ALT right arrow | next_hmark           |  ALT-\[n
+| ALT left arrow  | prev_hmark           |  ALT-\[p
+| Shift TAB       | remove_tab           |  ALT-\[Z
 | F12             | toggle_move_lock     |  ALT-Oa
 | key F1          | show_info            |  ALT-OP
-| ALT-[F          | eol                  |  ALT-[F
+| ALT-\[F          | eol                  |  ALT-\[F
 | spec2 7         | prev_word            |  spec2 7
 | spec2 197       | next_file            |  spec2 197
 | spec2 196       | next_window          |  spec2 196
@@ -549,7 +549,7 @@
 | ALT-?           | clear_results        |  subroutine
 | ALT-~           | test1                |  subroutine
 | Home key        | bol                  |  ALT-OH
-| Home1 key       | bol                  |  ALT-[H
+| Home1 key       | bol                  |  ALT-\[H
 | Home2 key       | bol                  |  ALT-OM
 | End key         | eol                  |  ALT-OF
 | End1 key        | eol                  |  spec2 213
@@ -572,9 +572,9 @@
 | key F4          | describe_key         |  ALT-OS
 | ^Up arrow       | find_previous        |  spec2 4
 | ^numeric 9      | next_window          |  spec2 53
-| key F12         | toggle_move_lock     |  ALT-[24~
+| key F12         | toggle_move_lock     |  ALT-\[24~
 | key shift F11   | toggle_sync_lock     |  ALT-OY
-| delete key      | del_char             |  ALT-[3~
+| delete key      | del_char             |  ALT-\[3~
 | Next mark       | next_hmark           |  spec2 198
 | Previous mark   | prev_hmark           |  spec2 199
 | Enter key       | insert_indent        |  ALT-OM
@@ -599,14 +599,14 @@
 | x               | dir_exec             |  x
 | v               | dir_view             |  v
 | s               | script_exec          |  s
-| Arrow right     | dir_right            |  ALT-[C
-| Arrow left      | dir_left             |  ALT-[D
+| Arrow right     | dir_right            |  ALT-\[C
+| Arrow left      | dir_left             |  ALT-\[D
 | spec c          | dir_right            |  ALT-OC
 | spec d          | dir_left             |  ALT-OD
 | space           | dir_tag              |   
 | tab             | next_window          |  CTRL-I
-| [               | prev_page            |  [
-| ]               | next_page            |  ]
+| \[               | prev_page            |  \[
+| \]               | next_page            |  \]
 ### view mode
 | key shortcut    | macro name           | description                          |
 | --------------- | -------------------- | ------------------------------------ |
@@ -628,10 +628,10 @@
 | G               | eof                  |  G
 | 1               | bof                  |  1
 | v               | quick_close          |  v
-| KEY-LEFT        | dir_left             |  ALT-[D
+| KEY-LEFT        | dir_left             |  ALT-\[D
 | q               | close_file           |  q
-| [               | prev_paragraph       |  [
-| ]               | next_paragraph       |  ]
+| \[               | prev_paragraph       |  \[
+| \]               | next_paragraph       |  \]
 | ,               | view_previous        |  ,
 | .               | view_next            |  .
 ### notes mode
@@ -650,7 +650,7 @@
 | del             | delete_tagnote       |  CTRL-D
 | e               | edit_note            |  e
 | v               | view_note            |  v
-| KEY-RIGHT       | view_note            |  ALT-[C
+| KEY-RIGHT       | view_note            |  ALT-\[C
 | k               | prev_line            |  k
 | j               | next_line            |  j
 | n               | find_next            |  n
@@ -660,5 +660,5 @@
 | G               | eof                  |  G
 | 1               | bof                  |  1
 | q               | close_file           |  q
-| [               | prev_page            |  [
-| ]               | next_page            |  ]
+| \[               | prev_page            |  \[
+| \]               | next_page            |  \]

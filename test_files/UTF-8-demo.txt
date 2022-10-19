@@ -1,7 +1,8 @@
 # Some UTF-8 encoded text characters
 # Modified from 
 Markus Kuhn [ˈmaʳkʊs kuːn] <http://www.cl.cam.ac.uk/~mgk25/> — 2002-07-25
-
+क्‍ष
+ರ್ಕ
 # Added are some of the emoji characters
 # Note that all this is not supported correctly on all platforms
 
@@ -50,13 +51,22 @@ Markus Kuhn [ˈmaʳkʊs kuːn] <http://www.cl.cam.ac.uk/~mgk25/> — 2002-07-25
 1
 👨👮👳💆🏃
 ✖➕	➖	➗	
+✔️
+✔️ 
+✔   
+
+❌ ️
 ✅❌❎➿		〽	
 red:	 	🔴
 green:		🟢
 blue:		🔵
 😇😜😴😡
 🦘‍🔶🔷🔸🔺🔻
-
+- - thin space
+- - hair space
+-‌- zero  width space
+――――――― horizontal bar
+————
 The ASCII compatible UTF-8 encoding used in this plain-text file
 is defined in Unicode, ISO 10646-1, and RFC 2279.
 

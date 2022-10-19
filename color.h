@@ -63,7 +63,7 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* magenta */	"#E0D0A0",  // LBACKGROUND, INFOBACK
 	/* cyan */		"#0097B7",	// MODEBACK/selections
 	/* white */		"#E3E3E3",	// BACKGROUND, SEARCHFORE, CBOXTFORE, MENUFG
-	/* brown */		"#606060",	// QUOTEFORE, MODEBACKI, INFOFORE, TAGFORE
+	/* brown */		"#909090",	// QUOTEFORE, MODEBACKI, INFOFORE, TAGFORE
 	/* lred */		"#FF0000",	// CHANGEDFORE, CTRLFORE
 	/* lgreen */	"#006000",	// SQUOTEFORE, W_FORE
 	/* yellow */	"#FFFF00",	// DROWCOL
@@ -86,7 +86,7 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* cyan */		"#009090",
 #endif
 	/* white */		"#D0D0D0",
-	/* brown */		"#406060",
+	/* brown */		"#303040",
 	/* lred */		"#FF0000",
 	/* lgreen */	"#98E098",
 	/* yellow */	"#FFFF00",
@@ -143,7 +143,7 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* magenta */	"#A8A8A0",
 	/* cyan */		"#36648B",
 	/* white */		"grey55",
-	/* brown */		"#404040",
+	/* brown */		"#707070",
 	/* lred */		"#FF4D4D",
 	/* lgreen */	"#0E500E",
 	/* yellow */	"#FFFF00",
@@ -181,7 +181,7 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* magenta */	"#C0C0B0",
 	/* cyan */		"#0064A4",
 	/* white */		"#E0E0DF0",
-	/* brown */		"#333333",
+	/* brown */		"#999999",
 	/* lred */		"#FF3333",
 	/* lgreen */	"#009900",
 	/* yellow */	"#FFFF00",
@@ -200,7 +200,7 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* magenta */	"#404040",
 	/* cyan */		"#006688",
 	/* white */		"#E0E0E0",
-	/* brown */		"#707070",
+	/* brown */		"#404050",
 	/* lred */		"#CD7C33",
 	/* lgreen */	"#90EE90",
 	/* yellow */	"#FFFF00",

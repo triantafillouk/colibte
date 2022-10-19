@@ -430,7 +430,7 @@ sqlite3 * notes_db_open()
  set_bfname(db_file_name,NOTES_DBFILE);
  // MESG("notes_db_open:<");
  if(sqlite3_open(db_file_name,&db)!=SQLITE_OK) {
-	error_line("Notes db [%s]: %s",db_file_name,sqlite3_errmsg(db));
+	msg_line("Notes db [%s]: %s",db_file_name,sqlite3_errmsg(db));
 	notes_db_close(db);
 	init_notes_db(1);
 	if(sqlite3_open(db_file_name,&db)!=SQLITE_OK){
@@ -612,7 +612,7 @@ int parse_note(FILEBUF *fp)
 		note->n_tags[0]=0;
 		ptr = find_str_reol(fp,ptr,"#Tags:",note->n_tags,sizeof(note->n_tags));
 		if(!strstr(note->n_tags,"calendar")){
-			strncat(note->n_tags,",",sizeof(note->n_tags));
+			if(strlen(note->n_tags)>0) strncat(note->n_tags,",",sizeof(note->n_tags));
 			strncat(note->n_tags,"calendar",sizeof(note->n_tags));
 		};
 		return true;
@@ -642,7 +642,7 @@ int parse_note(FILEBUF *fp)
 		note->n_tags[0]=0;
 		ptr = find_str_reol(fp,ptr,"#Tags:",note->n_tags,sizeof(note->n_tags));
 		if(!strstr(note->n_tags,"todo")){
-			strncat(note->n_tags,",",sizeof(note->n_tags));
+			if(strlen(note->n_tags)>0) strncat(note->n_tags,",",sizeof(note->n_tags));
 			strncat(note->n_tags,"todo",sizeof(note->n_tags));
 		};
 		return true;
@@ -893,8 +893,8 @@ int move_to_notes(int n) 	/* dir mode  */
 int callback_print(void *NotUsed, int argc, char **argv, 
                     char **azColName) {
     NotUsed = 0;
-    
-    for (int i = 0; i < argc; i++) {
+ 	int i;   
+    for (i = 0; i < argc; i++) {
         MESG("TABLE: %s", argv[i] ? argv[i] : "NULL");
     };
     return 0;

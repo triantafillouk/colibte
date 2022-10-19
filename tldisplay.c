@@ -11,6 +11,7 @@
 #include	"support.h"
 #include	"menus.h"
 #include	"panel_curses.h"
+#define	USE_CLASSIC	1
 
 char **getdir(char *dirname,char *s_find,int *num);
 int utf_num_chars(char *);
@@ -247,13 +248,14 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
  int bch=color_menu_bg;
  int fch=color_menu_fg;
  int (*execf)();
+ int border=1;
 
  sx=sy=maxl=nu=0;
  in_menu=1;
  c_menu=m1;
  ftime=1;
  orient=m1->orient;
- // MESG("get_menucmd:[%s] orient=%d xpos=%d ypos=%d pos_x=%d pos_y=%d",m1->title,m1->orient,m1->xpos,m1->ypos,pos_x,pos_y);
+ MESG("get_menucmd:[%s] orient=%d xpos=%d ypos=%d pos_x=%d pos_y=%d",m1->title,m1->orient,m1->xpos,m1->ypos,pos_x,pos_y);
  if(kbdmode==PLAY||kbdmode==BPLAY){
 	
 	short line=first;
@@ -275,7 +277,9 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 		};
 
 		if(m2->element[line2].type == MMENU){
-			execf = get_menucmd(m2->element[line2].menu,line2,0,0) ;
+			MENUS *submenu=m2->element[line2].menu;
+			MESG(" Call get_menucmd x=%d y=%d line2=%d",submenu->xpos,submenu->ypos,line2);
+			execf = get_menucmd(submenu,line2,submenu->xpos,submenu->ypos) ;
 		} else {
 			execf = m2->element[line2].func;
 			repeat_arg = (long int)m2->element[line2].menu;
@@ -293,7 +297,9 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
  	if((j=strlen(m1->element[nu].txt)) >maxl) maxl=j;
  };
  if(orient==VERTICAL){
-	sx = pos_x; sy=m1->ypos;
+	sx = pos_x; 
+	// sy=m1->ypos;
+	sy = pos_y;
  } else {
 	sx=0; sy=0;
 #if	TARROWS
@@ -305,9 +311,9 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 
  if(orient==VERTICAL) {
 	if(first<0) {	/* mouse dependant position  */
-		disp_box("",0*16+2,-1,-1,nu,maxl);
+		disp_box("",border,-1,-1,nu,maxl);
 	} else {
-		disp_box("",0*16+2,sy,sx,sy+nu+1,sx+maxl+1);
+		disp_box("",border,sy,sx,sy+nu+1,sx+maxl+1);
 	};
   } else {
 	maxl++;	/* separate horizontal menu elements  */
@@ -403,7 +409,8 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 				execf = get_menucmd(m1->element[i].menu,0,iol*HLABEL_WIDTH,1) ;
 			} else {
 //				MESG("goto menu");
-				execf = get_menucmd(m1->element[i].menu,0,pos_x+maxl,pos_y) ;
+				MENUS *submenu=m1->element[i].menu;
+				execf = get_menucmd(submenu,0,pos_x+maxl,submenu->ypos) ;
 //				MESG("returned from submenu");
 				remove_box();
 				return execf;
@@ -528,6 +535,7 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 // int last_key_recorded=0;
 
 MENUS *start_menu = &m_topn;
+extern int mousey,mousex;
 
 int execute_menu(int fixed)	/* execute menu */
 {
@@ -587,9 +595,17 @@ int execute_menu(int fixed)	/* execute menu */
  if(main_menu->orient==HORIZONTAL) {
  	pos_x = line*HLABEL_WIDTH;
 	pos_y = 1;
- } else {
- 	pos_x = main_menu->xpos;
-	pos_y = line+1;
+	 } else {
+	MESG(" fixed = %d mouse x=%d y=%d",fixed,mousex,mousey);
+	if(fixed<0) {
+		MESG("menu at x=%d y=%d",mousex,mousey);
+		pos_x=mousex;
+		pos_y=mousey;
+	} else {
+	 	pos_x = main_menu->xpos;
+		// pos_y = line+1;
+		pos_y = main_menu->ypos;
+	};
  };
  execfunc = get_menucmd(main_menu,line,pos_x,pos_y);
  in_menu=0;
@@ -636,16 +652,19 @@ int selectl(char *title,char *m_array[],int nu,int max_height,int sx,int sy,int 
 {
  int i,c,iol,start;
  int found=0;
+ int border=0;
 
  char name[MAXFLEN];
  int (*execf)();
  char *title_shown=strdup(title);
  int slen=0; 
 
- hide_cursor("selectl");
- 
+
  if(nu==0) { return(-1);};
  if(nu==1) return(0);
+ hide_cursor("selectl");
+ border = (strlen(title)==0);
+
  activate_list_mode();
 // MESG("selectl:[%s] nu=%d max_height=%d",title,nu,max_height);
 
@@ -656,7 +675,7 @@ int selectl(char *title,char *m_array[],int nu,int max_height,int sx,int sy,int 
  if(nu<max_height) max_height=nu;
  if(sy+max_height > drv_numrow) max_height=drv_numrow - sy;
 
- disp_box(title_shown,16*7+2,sy,sx,sy+max_height+1,sx+width+1);
+ disp_box(title_shown,border,sy,sx,sy+max_height+1,sx+width+1);
  free(title_shown);
 
  start=disp_list(m_array,start,nu,max_height,sx,sy,width,active);
@@ -1357,7 +1376,6 @@ void status_line(WINDP *wp)
 	int max_t;
 	char status_string[512], *stp;
 	char fdname[MAXLLEN];
-
 	int hline1 = '-';	/* or 18  */
 	int hline2 = '=';	/* or 15  */
 	char modecode[]=MODECODE;
@@ -1366,15 +1384,18 @@ void status_line(WINDP *wp)
 
     bp = wp->w_fp;
 	if(bp==NULL) return;
-
-	strlcpy(fdname,bp->b_dname,MAXLLEN);
+	if(wp->w_ntcols>NUM_COLS_SHORT) strlcpy(fdname,bp->b_dname,MAXLLEN);
+	else strlcpy(fdname,bp->b_fname,MAXLLEN);
 
 	if(wp->w_ntcols > NUM_COLS_FULL) max_t = wp->w_ntcols - NUM_COLS_FINFO - show_position_size(wp,0);
 	else if(wp->w_ntcols > NUM_COLS_SHORT) max_t = wp->w_ntcols - NUM_COLS_FINFO - show_position_size(wp,1);
 	else if(wp->w_ntcols > NUM_COLS_NOINFO) max_t = wp->w_ntcols - show_position_size(wp,-1);
 	else max_t = wp->w_ntcols-2;
 
-	lchar = (wp == cwp) ? hline2 : hline1;	/* mark the current buffer */
+	if(drv_colors>8) 
+		lchar = ' ';
+	else
+		lchar = (wp == cwp) ? hline2 : hline1;	/* mark the current buffer */
 
 	stp = status_string;
 
@@ -1440,9 +1461,14 @@ void status_line(WINDP *wp)
 	// MESG("status_line: fdname [%s] l=%d",fdname,strlen(fdname));
 	composite = g_utf8_normalize(fdname,-1,G_NORMALIZE_ALL_COMPOSE);
 	// MESG("           : composite [%s]",composite);
+	if(wp->w_ntcols>NUM_COLS_SHORT) {
 	full_name = get_pfname(composite,bp->b_fname,max_t-1);
 	// MESG("           : full_name [%s] l=%d max_t=%d",full_name,strlen(full_name),max_t);
 	strlcpy(cp,full_name,MAXLLEN);
+	} else {
+	
+	strlcpy(cp,bp->b_fname,MAXLLEN);
+	};
 	// MESG("           : cp        [%s]",cp);
 	g_free(composite);
 #else
@@ -1459,10 +1485,15 @@ void status_line(WINDP *wp)
 		*stp++ = c;
 		cp++;
 	};
+	*stp++ = ' ';
 
-    while (n++ < utf_ntcols)  /* Pad to full width. */
+    while (n++ < utf_ntcols-21)  /* Pad to full width. */
     {
 		*stp++ = lchar;
+    }
+    while (n++ <= utf_ntcols)  /* Pad to full width. */
+    {
+		*stp++ = ' ';
     }
 	*stp=0;
 
@@ -1591,11 +1622,8 @@ int get_utf_length(utfchar *utf_char_str)
 		if(b2==0x80) return 1; 	/* 1/4 en  */
 		if(b2==0x8B) return 0;	/* zero space  */
 		if(b2==0x8C) return 0;	/* zero space  */
-#if	DARWIN
-		if(b2==0x8D) return 1;
-#else
 		if(b2==0x8D) return 0;	/* zero space  */
-#endif
+		if(b2==0xA6) return 1;
 		return 1;
 	};
 	if(b1==0x81 || b1==0x82) return 1; 	/* diacriticals, subscripts, currency symbols  */
@@ -1604,6 +1632,7 @@ int get_utf_length(utfchar *utf_char_str)
 		if(b2 > 0x8F && b2< 0xb1) return 0;	/* combining characters */
 		return 1;
 	};
+	if(b1 == 0x84) return 2;
 	if(b1 == 0x92) return 1;
 #if	DARWIN
 	if(b1==0x9C||b1==0x9D||b1==0x9E) return 2;

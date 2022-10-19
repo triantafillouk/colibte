@@ -18,7 +18,7 @@
 #include	<panel.h>
 #include	<term.h>
 #include	"color.h"
-#include	<sys/signal.h>
+#include	<signal.h>
 #include	<termios.h>
 #include	<sys/ioctl.h>
 #include	<fcntl.h>
@@ -148,12 +148,13 @@ int color_pair(int fg_color,int bg_color)
 {
  int pair_ind=-1;
  int cpair;
+
  if(drv_colors>16) {
 	pair_ind = pair_num[fg_color][bg_color];
 	cpair = COLOR_PAIR(pair_ind);
  } else {
 	int fcol = current_color[fg_color].index;
-	int bcol = current_color[bg_color].index;
+	int bcol = current_color[bg_color].index % drv_basic_colors;
 	cpair = COLOR_PAIR((fcol%drv_basic_colors)*drv_basic_colors+bcol);
  };
 
@@ -619,7 +620,10 @@ void drv_open()
  start_color();
  drv_colors=COLORS;
  drv_color_pairs=COLOR_PAIRS;
- if(drv_color_pairs>255) drv_basic_colors=16;
+ if(drv_color_pairs>255) {
+ 	drv_basic_colors=16;
+	drv_colors=16;
+ };
  save_original_colors();
  color_scheme_read();
 
@@ -722,7 +726,7 @@ int text_mouse_function(int move)
 	if(mouse_button==KMOUSE_NONE) {
 		return 0;
 	};
- // MESG("text_mouse_function: button=%d",mouse_button);
+ MESG("text_mouse_function: button=%d",mouse_button);
 
  if(is_in_top_menu()) {
 	if(move==KMOUSE_RELEASE+KMOUSE_BUTTON1){
@@ -735,7 +739,7 @@ int text_mouse_function(int move)
 	}
  	return TRUE;
  };
-
+ MESG("text_mouse_function:1");
 	wp = get_mouse_window();
 	if(wp==NULL) {
 		wp=is_in_status();
@@ -747,12 +751,14 @@ int text_mouse_function(int move)
 				update_screen(FALSE);
 				return -1;
 			} else {
+			MESG("text_mouse_function: move=%X",move);
 				if(move==KMOUSE_RELEASE+KMOUSE_BUTTON1){
 					mouse_started_in_rline=0;
 //					MESG("reset mouse_started: release 1");
 				};
 				if(move==KMOUSE_RELEASE+KMOUSE_BUTTON1){
 					mouse_window_col = mousex - wp->gwp->t_xpos - wp->w_infocol;
+					MESG("text_mouse_function: col=%d",mouse_window_col);
 					if((cbfp->b_flag & FSNLIST) && (mouse_window_col<5)) {
 						// dir_left(0);
 						// update_screen(FALSE);
@@ -765,7 +771,10 @@ int text_mouse_function(int move)
 				
 				};
 			};
-		} else	return -1;
+		} else {
+			MESG("text_mouse_function: return -1");
+			return -1;
+		};
 	} else {
 	
 	set_current_window(wp,"mouse in window");
@@ -773,7 +782,7 @@ int text_mouse_function(int move)
 	/* We are in an editors window */
 	mouse_window_row = mousey - wp->gwp->t_ypos;
 	mouse_window_col = mousex - wp->gwp->t_xpos - wp->w_infocol;
-	// MESG("	r=%d c=%d",mouse_window_row,mouse_window_col);
+	MESG("	r=%d c=%d",mouse_window_row,mouse_window_col);
 	if(move>KMOUSE_RELEASE) {
 		mouse_started_in_rline=0;
 		// MESG("reset mouse_started, button released!");
@@ -847,7 +856,7 @@ int text_mouse_function(int move)
 	if(mouse_window_col<0) mouse_window_col=0;	/* inside info left column  */
 	new_offset=LineBegin(tp_offset(cwp->tp_hline));
 
-	// MESG("tp_hline:1 new_offset=%ld row=%d",new_offset,mouse_window_row);
+	MESG("tp_hline:1 new_offset=%ld row=%d",new_offset,mouse_window_row);
 	int head_line=(cbfp->b_header!=NULL);
 	for(i=head_line;i<mouse_window_row;i++) 
 	{
@@ -1384,22 +1393,14 @@ void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
  int attrib=0;
 
   fcol = current_scheme->color_attr[afcol].index % 16;
-//  bcol = current_scheme->color_attr[abcol].index % COL_BASIC;
-
-  if(is_cygwin)
+  if(drv_colors==8)
   {
 	  if(fcol>COL_BASIC-1) { 
 		attrib=A_BOLD;
 		fcol %= COL_BASIC;
   	  };
   };
-	attrib |= current_scheme->color_attr[afcol].attrib;
-#if	0
-	if(attrib & A_UNDERLINE) wattron(wnd,A_UNDERLINE);
-	else wattroff(wnd,A_UNDERLINE);
-	if(attrib & A_REVERSE) wattron(wnd,A_REVERSE);
-	else wattroff(wnd,A_REVERSE);
-#endif
+  attrib |= current_scheme->color_attr[afcol].attrib;
   wattrset(wnd,color_pair(afcol,abcol)|attrib);
  }
 }
@@ -1528,7 +1529,7 @@ void show_cursor_dl(int pos)
 
 void hide_cursor_dl() { curs_set(0); }
 
-void disp_box(char *box_title,int atr,int y1,int x1,int y2,int x2)
+void disp_box(char *box_title,int border,int y1,int x1,int y2,int x2)
 {
  // push box -------------------------
  cbox=(BOX *)malloc(sizeof(struct BOX));
@@ -1552,6 +1553,7 @@ void disp_box(char *box_title,int atr,int y1,int x1,int y2,int x2)
  };
  cbox->wnd=drv_new_win("box",y2-y1+1,x2-x1+1,y1,x1);
  cbox->panel=new_panel(cbox->wnd);
+ cbox->border=border;
 
  drv_wcolor(cbox->wnd,CBOXTFORE,CBOXTBACK);	/* in case we want it a different color!  */
 
@@ -1577,7 +1579,7 @@ void start_interactive(char *prompt)
 {
 	// MESG("start_interactive:[%s]",prompt);
 	entry_mode=KENTRY;
-	disp_box(prompt,2,4,5,6,60);
+	disp_box(prompt,1,4,5,6,60);
 	box_line_print(0,0," Y/N",58,0,-1);
 	hide_cursor_dl();
 }
@@ -2289,7 +2291,7 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
  char *status_string = show_string;
  int rpos=utf_num_chars(status_string)+2;
 
- if((drv_color_pairs>63) && cwp!=wp) {	/* if enough color pairs, use them ! */
+ if((drv_color_pairs>63 && drv_colors!=8) && cwp!=wp) {	/* if enough color pairs, use them ! */
  	fg_color=MODEFOREI;
 	bg_color=MODEBACKI;
  };
@@ -2589,7 +2591,9 @@ int text_mouse_right_press(int n)
 
 int text_mouse_release(int n)
 {
+
 	if(mousepx==mouserx && mousepy==mousery) {	/* this is just a click!  */
+		MESG("text_mouse_release: %X",KMOUSE_RELEASE+mouse_button);
 		text_mouse_function(KMOUSE_RELEASE+mouse_button);
 	} else {
 		text_mouse_function(KMOUSE_RELEASE+mouse_button);
@@ -2832,8 +2836,13 @@ void show_slide(WINDP *wp)
  int bg_color=MODEBACK;
  curs_set(0);
  if(cwp!=wp) {
- 	fg_color=MODEFOREI;
-	bg_color=MODEBACKI;
+	if(drv_colors>8) {
+	 	fg_color=MODEFOREI;
+		bg_color=MODEBACKI;
+	} else {
+	 	fg_color=BACKGROUND;
+		bg_color=MODEBACK;
+	};
  };
 
  if(bt_dval("show_position")==0) {

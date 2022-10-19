@@ -92,12 +92,13 @@ void *emalloc(long size,char *des)
  void *a;
  a=malloc(size);
  if(a==NULL) SYS_ERROR("emalloc: %s size=%ld",des,size);
+ // MESG("emalloc: [%s] %d pos=0x%llX",des,size,(long long)a);
  return a;
 }
 
 void efree(void *p,char *des)
 {
-// MESG("efree:%s [%llX]",des,(long long)p);
+ // MESG("efree:%s [%llX]",des,(long long)p);
  if(p!=NULL) {
  	free(p);
  } else {
@@ -377,30 +378,6 @@ int is_utf_accent(FILEBUF *fp, offs o)
  } else return 0;
 }
 
-int s_is_utf_accent(char *utfstr, int o)
-{
- int ch,ch1;
- int size=strlen(utfstr);
- ch=utfstr[o];
-
- if(ch==0) return 0;
- ch1=utfstr[o+1];
- if(ch==0) return 0;
- // MESG("check accent at %d size=%d ch=%X ch1=%X",o,size,ch,ch1);
- if(((ch==0xCC || ch==0xCD) && (ch1<0xB0 && ch1>0x7F))
-// 	|| (ch==0xCD && (ch1<0xB0))
- ){	// check for double accent
-	if(o+3>size)	return 2;
-	ch=utfstr[o+2];
-	ch1=utfstr[o+3];
-	if(((ch==0xCC || ch==0xCD) && (ch1<0xB0 && ch1>0x7F))
-	){
-		return 4;
-	} else {
-		return 2;
-	};
- } else return 0;
-}
 
 int utf8charlen_nocheck(int ch)
 {
@@ -481,75 +458,6 @@ int FUtfCharLen(FILEBUF *fp,offs o)
 	return clen;
 }
 
-int SUtfCharLen(char *utfstr,int offset,utfchar *uc)
-{
- int ch;
- int ch1;
- int clen=1;
- int utf_accent=0;
- int o=offset;
- int size=strlen(utfstr);
-	clen_error=0;
-	if(*utfstr==0) { uc->uval[0]=0;return 0;};
-
-		ch=utfstr[o];
-		if(ch<0xC0) {
-			if(ch>128) {
-				clen_error=1;	/* this is not a valid start for utf  */
-				return 1;
-			};
-//			MESG("0: ch=%X %d",ch,ch);
-			if(ch<32) return clen;
-		} else if(ch<0xE0) {
-			if(o+1<=size){
-				char s1[3];
-				ch1=utfstr[o+1];
-				s1[0]=ch;s1[1]=ch1;s1[2]=0;
-				// MESG("- size=%3d [%s] o=%3d ch=%X %d",size,s1,offset,ch,ch);
-				if(ch1<128 || ch1>0xBF) { clen_error=2;return 1;};	/* not a middle utf char  */
-				clen=2;
-//#if	DARWIN || PCURSES
-				if((ch==0xCC||ch==0xCD) && !utf8_error() /* && drv_type<3 */ ) 
-				{
-					utf_accent=1;
-//					MESG("allone accent! clen=%d");
-					return clen;	/* return without checking for next accent  */
-				};
-//#endif
-			} else {
-				clen_error=3;	/* incomplete, eof  */
-				return clen;
-			};
-		}
-		else if(ch<0xF0) {
-			ch1=utfstr[o+1];
-			if(ch1<128 || ch1>0xBF) { clen_error=4;return 1;};	/* not a middle utf char  */
-			ch1=utfstr[o+2];
-			if(ch1<128 || ch1>0xBF) { clen_error=5;return 1;};	/* not a middle utf char  */
-			clen=3;
-		} else {
-			char ch2,ch3;
-			ch1=utfstr[o+1];
-			if(ch1<128 || ch1>0xBF) { clen_error=6;return 1;};	/* not a middle utf char  */
-			ch2=utfstr[o+2];
-			if(ch2<128 || ch2>0xBF) { clen_error=7;return 1;};	/* not a middle utf char  */
-			ch3=utfstr[o+3];
-			if(ch3<128 || ch3>0xBF) { clen_error=8;return 1;};	/* not a middle utf char  */
-			clen=4;
-//			MESG("- 4:o=%ld %2X %2X %2X %2X",o,ch,ch1,ch2,ch3);
-		}
-//#if	DARWIN || PCURSES
-		if(clen<3 && !utf_accent ) {	/* check next char for accent!  */
-		// if(o+clen+1<=size)
-		{
-			// MESG("- s=[%s] o=%d",utfstr+o,o);
-			clen += s_is_utf_accent(utfstr,o+clen);
-			// if(clen>2) MESG("[%s][%s] total size=%d at %ld",utfstr,utfstr+o,clen,o);
-		}};
-//#endif
-	// MESG(" UtfCharLen: return clen=%d",clen);
-	return clen;
-}
 
 int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs)
 {
@@ -1021,10 +929,33 @@ offs  ScanForCharForward(FILEBUF *fp,offs start,byte ch)
 // operates on cbfp,cwp
 int clipboard_copy(ClipBoard *clip)
 {
+  static int full_path=0;
   FILEBUF *fp = cwp->w_fp;
   utfchar uc;
-
+  
 	if (clip->text!=NULL) { efree(clip->text,"clipboard_copy");clip->text=NULL;};
+#if	1
+	if(cbfp->b_flag & FSNLIST && cbfp->b_flag & FSDIRED)
+	{
+		char fname[MAXFLEN];
+		dir_getfile(fname,1);
+		clip->rect=0;
+		clip->height=1;
+		clip->width=strlen(fname);
+		if(full_path) clip->width+=strlen(cbfp->b_dname)+1;
+		clip->text=(char*)emalloc(clip->width,"dir name");
+		if(full_path) {
+			strcpy(clip->text,cbfp->b_dname);
+			clip->text[strlen(clip->text)]='/';
+			strcpy(clip->text+strlen(clip->text),fname);
+			full_path=0;
+		} else {
+			full_path=1;
+			strcpy(clip->text,fname);
+		};
+		return(TRUE);
+	} else
+#endif
 	if(cwp->selection == REGION_COLM)
    {
       clip->rect=TRUE;
@@ -1120,7 +1051,8 @@ int clipboard_copy(ClipBoard *clip)
       	GetBlock(cwp->w_fp,clip->text,tp_offset(cwp->w_emark),clip->width);
 	  else
       	GetBlock(cwp->w_fp,clip->text,tp_offset(cwp->w_smark),clip->width);
-   }
+   };
+   full_path=0;
    return(true);
 }
 
@@ -1349,16 +1281,10 @@ offs  FUtfCharAt(FILEBUF *bf, offs offset, utfchar *uc)
  int i,ulen;
  offs o=offset;
 	ulen=FUtfCharLen(bf,o);
-	// memset(uc->uval,0,8);
+	memset(uc->uval,0,8);
 //	MESG("o=%ld ulen=%d",o,ulen);
-	for(i=0;i<8;i++){
-		if(i<ulen) {
+	for(i=0;i<ulen;i++){
 			uc->uval[i]=FCharAt(bf,o+i);
-		} else {
-			uc->uval[i]=0;
-		};
-	};
-	if(clen_error) {
 	};
 	return o+ulen;
 }
@@ -2130,15 +2056,13 @@ int	writeout(char *name, FILEBUF *bf)
    if(nfile==-1)
    {
      FError(name);
-	 error_line("cannot open file %s to write",name);
-     return(false);
+	 return error_line("cannot open file %s to write",name);
    }
 
    int lock_res=LockFile(nfile,false);
    if(lock_res==-1)   {
      close(nfile);
-	 error_line("cannot lock file %s for write!",name); 
-     return(false);
+	 return error_line("cannot lock file %s for write!",name); 
    };
 
    if(lock_res==-2) msg_line("Warning: file %s locking failed",name);

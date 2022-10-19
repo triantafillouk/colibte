@@ -177,6 +177,10 @@ int delete_btnn(BTREE *bt, char *name);
 void free_btnode(BTNODE *btn);
 BTNODE *new_btnode();
 BTNODE *find_btnode(BTREE *t,char *name);
+void btn_free(BTNODE *btn);
+#if	NUSE
+void delete_avl_node(BTNODE *node);
+#endif
 #endif
 
 #endif

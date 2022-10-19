@@ -2044,7 +2044,7 @@ int get_utf_length(utfchar *utf_char_str)
  b0=utf_char_str->uval[0];
  if(b0==0) return 0;
  if(b0<128) return 1;
-
+ // MESG("c=%X %X",b0,utf_char_str->uval[1]);
 #if	DARWIN | 1
  // accents do not take space in mac 
  if((b0==0xCC || b0==0xCD) && utf_char_str->uval[1]< 0xB0) return 0;
@@ -2069,7 +2069,7 @@ int get_utf_length(utfchar *utf_char_str)
 		if(b2 > 0x8F && b2< 0xb1) return 0;	/* combining characters */
 		return 1;
 	};
-	if(b1 == 0x92) return 2;
+	if(b1 == 0x92) return 2; // circled
 	if(b1 == 0x93) return 2;
 	if(b1 == 0xB0) {
 		int b2=utf_char_str->uval[2];

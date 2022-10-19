@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.36  (5/9/2022)"
+#define VERSION 	"#01.55T1  (18/10/2022)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -289,7 +289,9 @@ typedef struct vchar {
 
 typedef struct  VIDEO {
 	short int	v_flag;		/* line Flags */
+#if	NUSE
 	short int	utf_error;	/* not valid utf8 char!  */
+#endif
 #if	PANGO_TEST0
 	int left_x_pos;
 	int start_column;
@@ -408,7 +410,7 @@ typedef struct DRV_FLAGS {
 } DRV_FLAGS;
 
 typedef struct MLQUOTES {
-	unsigned char w_hquotem;
+	unsigned int w_hquotem;
 	unsigned char w_hselection;
 	unsigned char w_slang;
 	unsigned char w_jflag;	/* for json parse  */
@@ -417,19 +419,20 @@ typedef struct MLQUOTES {
 } MLQUOTES;
 
 /* highlight quote masks */
-#define H_QUOTE1	1	/* single quotes, usually multiline */
+#define H_QUOTE1	1	/* single quotes, singleline */
 #define H_QUOTE2	2	/* double quotes, usually multiline */
 #define	H_COMMENT	4	/* comments usually multiline */
 #define H_QUOTEC	4
 #define H_QUOTE4	8	/* %, ! at start of line or other  */
-#define	H_LCOMMENT	16	/* line comment */
 #define H_QUOTE5	16	/* comments rest of the line (c++ // , ;  )  */
-#define	H_QPREPR	32
 #define H_QUOTE6	32	/* preprocessing ( # at start of line )  */
 #define H_QUOTE7	64	/* inside <> for html  */
 #define	H_QUOTE8	128	/* first word inside < > for html  */
 #define	H_QUOTE9	256	/* word in preprocessor  */
-#define	H_UTFERR	512	/* utf string error  */
+#define	H_QUOTE10	512	/* light background, rest of the line  */
+#define	H_QUOTE11	1024/* toggle light background */
+#define H_QUOTE12	2048
+#define H_UTFERR	4096	/* Utf8 error  */
 
 #define H_WORD1		10	/* found word type1  */
 #define	H_WORD2		11	/* found word type2  */

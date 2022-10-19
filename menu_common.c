@@ -26,5 +26,5 @@ int work_menu(int n)
 		else start_menu = &m_select_off;
 	};
 
- return execute_menu(1);
+ return execute_menu(-1);
 }

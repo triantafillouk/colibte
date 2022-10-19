@@ -22,6 +22,7 @@ int get_current_line();
 void upd_move(WINDP *wp,char *from);
 void vteeol(WINDP *wp, int selected,int inside);
 int SUtfCharLen(char *utfstr,int offset,utfchar *uc);
+int line_bcolor=0;
 
 int specialh=0;
 /* highlight state  */
@@ -30,7 +31,7 @@ extern int slang;
 extern int stop_word_highlight;
 extern int start_word_highlight;
 extern FILEBUF *cbfp;
-
+extern int drv_colors;
 extern int sel_tags[11];
 extern int num_of_selected_tags;
 
@@ -160,22 +161,6 @@ void set_update(WINDP *wp_toset, int flag)
  };
 
  if(flag & UPD_ALL) update_all=1;
-}
-
-/* update all windows with current buffer  */
-void set_buffer_update()
-{
- WINDP *wp;
- if(cbfp->b_nwnd==0) return;
- lbegin(window_list);
- while((wp=(WINDP *)lget_current(window_list))!=NULL){
- 	if(wp->w_fp == cbfp) {
-		_el *cwin=window_list->current;
-		set_update(wp,UPD_WINDOW);
-		window_list->current=cwin;
-	};
-	lmove_to_next(window_list,0);
- }; 
 }
 
 int show_key(int key)
@@ -428,7 +413,7 @@ void draw_window(int flag, WINDP *wp,char *from)
  // static int ind=0;
  register int i;
  int ulines=0;
- // MESG(" draw_window: id=%d from=%s ind=%d",wp->id,from,ind);
+	// MESG(" draw_window: id=%d from=%s ind=%d",wp->id,from,ind);
 	drv_start_window_update(wp);
  	prepare_converter(wp->w_fp->b_lang);
 	set_window_font(wp);
@@ -459,8 +444,7 @@ void draw_window(int flag, WINDP *wp,char *from)
 	};
 
 	wp->draw_flag=0;
-	// drv_win_flush(wp);
-	// MESG("draw_window: end");
+	// MESG(" draw_window: end");
 }
 
 void set_draw_flag(WINDP *wp,char *from)
@@ -576,16 +560,7 @@ int checkwords(FILEBUF *fp,char *line, int *start, char **words,int type)
 	return(wordfound);
 }
 
-int utf_lerror()
-{
- if(
- 	cwp->vs[(int)(getcline()-tp_line(cwp->tp_hline))]->utf_error
-	) return(1);
- else return 0;
-}
-
 num utf_FLineLen(FILEBUF *fp, offs ptr);
-
 
 /*
 	put a string on a virtual screen at row,start_col,with max_size
@@ -595,7 +570,6 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
  int first_column;	// first column to show
  int c=0;
  utfchar uc;
- // MESG("vt_str:[%s]",str);
  int i=0;
  num col;
  num llen=0;	/* Number of characters in the line  */
@@ -611,6 +585,8 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
  int num_columns=0;	/* columns of line number shown  */
  int last_column=wp->w_ntcols;
 
+ line_bcolor=wp->w_bcolor;
+
  if(max_size>0) last_column=start_col+max_size;
  if(last_column>wp->w_ntcols) last_column=wp->w_ntcols;
  if(start_col==0) num_columns=wp->w_infocol;
@@ -623,9 +599,9 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
  };
  wp->vs[0]->v_flag=1;
  v_text = wp->vs[wp->vtrow]->v_text;
- wp->vs[wp->vtrow]->utf_error=0;
 
  int fg_color=FOREGROUND;
+ int bg_color=BACKGROUND;
  if(wp->w_fp->b_flag & FSDIRED) {
 	if(str[1]=='l') fg_color=TAGFORE;
 	else {
@@ -645,8 +621,8 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 //	Mask creation (vtlm)
 	if(llen>=vtla) { // increase allocation as needed
 		vtla=llen+128;
-		if(vtlm!=NULL) { free(vtlm); vtlm=NULL;};
-		vtlm=malloc(vtla);
+		if(vtlm!=NULL) { efree(vtlm,"free old vtlm"); vtlm=NULL;};
+		vtlm=emalloc(vtla,"increase vtlm allocation");
 	};
 
 //	create mask for the whole line without tabs of special characters
@@ -761,40 +737,38 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	
 	if(max_size<0) start_color_column=start_col+num_columns;
 	else end_column=max_size+num_columns;
-	if(row>0)	/* not for header!  */
-	for(i0=start_color_column;i0<= end_column;i0++){
+	if(row>0) {	/* not for header!  */
 		if(index==row) {
-			if(selected>0) {
-				svcolor(v_text+i0,INFOBACK,fg_color);
-			} else {
-#if	TNOTES
-				if(start_col!=0) {
-					if(wp->w_fp->b_flag==FSNOTES) {
-						svcolor(v_text+i0,INFOBACK,CNUMERIC);
-					} else {
-						svcolor(v_text+i0,INFOBACK,fg_color);
-					};
-				} else {
-					if(wp->w_fp->b_flag==FSNOTES || wp->w_fp->b_flag & FSNLIST) {
-						svcolor(v_text+i0,INFOBACK,fg_color);
-					} else svcolor(v_text+i0,INFOBACK,CNUMERIC);
-				};
-#else
-				svcolor(v_text+i0,INFOBACK,fg_color);
-#endif
-			}
+			bg_color=INFOBACK;
+			if(drv_colors==8) fg_color=BACKGROUND;
 		} else {
 			if(selected>0) {
-				svcolor(v_text+i0,MODEBACKI,fg_color);
+				if(drv_colors==8) bg_color=MODEBACK;
+				else bg_color=MODEBACKI;
 			} else {
-				svcolor(v_text+i0,BACKGROUND,fg_color);
+				bg_color=BACKGROUND;
 			};
 		};
+#if	TNOTES
+		if(!(wp->w_fp->b_flag & FSNLIST)) fg_color=CNUMERIC;
+		if(start_col!=0) {
+			if(wp->w_fp->b_flag==FSNOTES) {
+				fg_color=FOREGROUND;
+			};
+		} else {
+			if(wp->w_fp->b_flag!=FSNOTES && !(wp->w_fp->b_flag & FSNLIST)) 
+				fg_color=FOREGROUND;
+		};
+#endif
+		for(i0=start_color_column;i0<= end_column;i0++) svcolor(v_text+i0,bg_color,fg_color);
 	} else 
 	{
+		if(drv_colors==8) { bg_color=MODEBACK;fg_color=CNUMERIC;}
+		else { bg_color=MODEBACKI;fg_color=MODEFORE;};
+
 		for(i0=start_color_column;i0<= end_column;i0++)
 		{
-			svcolor(v_text+i0,MODEBACKI,MODEFORE);
+			svcolor(v_text+i0,bg_color,fg_color);
 		};
 		vteeol(wp,2,0);
 		return;
@@ -806,6 +780,17 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		else vteeol(wp,0,0);
 	} else vteeoc(wp,max_size);
 }
+
+// use this instead of realloc to debug
+char * resize_buffer(char *buffer,num old_size,num new_size)
+{
+ // MESG("resize_buffer: old=%ld new=%ld",old_size,new_size);
+ char *new_allocation=emalloc(new_size,"vtlm new allocation2");
+ memcpy(new_allocation,buffer,old_size);
+ if(buffer!=NULL) efree(buffer,"resize, free old buffer");
+ return new_allocation;
+}
+
 
 /* update line starting at offset start of specific window */
 offs vtline(WINDP *wp, offs tp_offs)
@@ -833,15 +818,16 @@ offs vtline(WINDP *wp, offs tp_offs)
  num line_num = wp->tp_hline->line + wp->vtrow;
 
  num_columns=wp->w_infocol;
+ line_bcolor=wp->w_bcolor;
 
  v_text = wp->vs[wp->vtrow]->v_text;
-
+ // MESG("vtline: < %d vtla=%d",wp->vtrow,vtla);
  for(i=0;i<wp->w_ntcols;i++) {
  	v_text[i].uval[0]='A';
 	v_text[i].uval[0]=0;
  };
  memset(v_text,0,sizeof(struct vchar)*wp->w_ntcols);
- wp->vs[wp->vtrow]->utf_error=0;
+
  first_column = wp->w_lcol;	/* first column to show at the beginning of the line */
  
 	col = 0;
@@ -855,7 +841,6 @@ offs vtline(WINDP *wp, offs tp_offs)
 	if((wp->w_fp->b_lang == 0 
 	   ) && (!hexmode)) {
 		llen = utf_FLineLen(wp->w_fp,ptr1);
-		wp->vs[wp->vtrow]->utf_error=utf8_error();
 		if(utf8_error()) llen=ptr2-ptr1;
 	} else {
 		llen = ptr2 - ptr1;
@@ -884,11 +869,16 @@ offs vtline(WINDP *wp, offs tp_offs)
 			col0=col1;col1=i0;
 		};
 	};
+
 //	Mask creation (vtlm)
-	if(llen>=vtla) { // increase allocation as needed
-		vtla=llen+128;
-		if(vtlm!=NULL) { free(vtlm); vtlm=NULL;};
-		vtlm=malloc(vtla);
+	if(vtla==0) { // initial mask allocation
+		vtla=128;
+		if(llen>=vtla) vtla=llen+128;
+		if(vtlm!=NULL) { 
+			// MESG("	vtlm is not null, free!!!!");
+			efree(vtlm,"initial allocation free vtlm");
+		};
+		vtlm=emalloc(vtla,"initial allocation vtlm");
 	};
 
 	if(hexmode) {
@@ -935,8 +925,11 @@ offs vtline(WINDP *wp, offs tp_offs)
 		}
 		if(syntaxh) 
 		{
+
 //	create mask for the whole line without tabs or special characters
 		offs p=ptr1;
+
+		// col=0;
 		for(i=0;i<llen;i++) {
 			if(fp->b_lang == 0 && !utf8_error()) {
 				p = FUtfCharAt(fp,p,&uc);
@@ -957,23 +950,29 @@ offs vtline(WINDP *wp, offs tp_offs)
 				++col;
 			};
 			if(c<32) c='C';
-
+			if(col>=vtla) {
+				vtlm=resize_buffer(vtlm,vtla,vtla+256);
+				vtla+=256;
+			};
 			while(rlen<col){
-				if(rlen>vtla) { vtla+=256; vtlm=realloc((void *)vtlm,vtla);};
 				vtlm[rlen++]=c;
 			};
 		};
 		vtlm[rlen]=0;
-//		MESG("vtlm[%d]=[%s]",wp->vtrow,vtlm);
+		if(col>=vtla)
+		MESG("vtlm[%d]=[%s] col=%d vtla=%d",wp->vtrow,vtlm,col,vtla);
+
 		int canstart=1;
 		for(i0=0 ;i0< rlen;i0++) {
 			// Check for boundary characters
 				c1 = vtlm[i0];
 				if(!fp->hl->c_inword(c1))
 				{ 
-					canstart=1;continue;
+					canstart=1;
+					continue;
 				}
 			if(canstart) {
+			// MESG("		421 i0=%d",i0);
 			// Highlight numerics, set type to H_NUMERIC
 				if(!checknumerics(fp,vtlm,&i0,H_NUMERIC))
 			// check for words of type 1, set type to H_WORD1
@@ -981,9 +980,10 @@ offs vtline(WINDP *wp, offs tp_offs)
 			// check for words of type 2, set type to H_WORD2
 				checkwords(fp,vtlm,&i0,fp->hl->w1,H_WORD2);
 				canstart=0;
+				// MESG("	422 i0=%d",i0);
 			}
  		};
- 		};
+ 		};	// syntaxh
 	};
 	
 //	find the offset of the first column
@@ -1176,7 +1176,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 		wp->w_fp->hl->h_function(c);
 	};
 	};
-//	MESG("end line: ----------------------------------");
+	// MESG("end line: >");
 	return cur_lend+wp->w_fp->EolSize;
 }
 
@@ -1298,7 +1298,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			case H_QUOTE1:
 			case H_QUOTE7+H_QUOTE1:  
 				ctl_f=SQUOTEFORE;
-				ctl_b=wp->w_bcolor;
+				ctl_b=line_bcolor;
 				break;
 			/* double quotes */
 			case H_QUOTE2:
@@ -1312,7 +1312,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			case H_QUOTE4:
 //			case H_UTFERR:
 				ctl_f = TAGFORE ;
-				ctl_b=wp->w_bcolor;
+				ctl_b=line_bcolor;
 				break;
 			/* C,C++ Comments */
 			case H_QUOTEC:
@@ -1322,24 +1322,40 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			case H_QUOTEC+H_QUOTE7+H_QUOTE1:
 			case H_QUOTEC+H_QUOTE7+H_QUOTE2:
 				ctl_f = COMMENTFORE;
-				ctl_b = wp->w_bcolor;
+				ctl_b = line_bcolor;
 				break;
 			/* Preprocessing */
 			case H_QUOTE6:
 				ctl_f=PREPFORE;
-				ctl_b=wp->w_bcolor;
+				ctl_b=line_bcolor;
+				break;
+			case H_QUOTE12:
+				if(drv_colors==8) line_bcolor=MODEBACK;
+				else line_bcolor=MODEBACKI;
+				ctl_b=line_bcolor;
 				break;
 			case H_QUOTE7:
 				ctl_f=W_FORE;ctl_b=wp->w_bcolor;
 				break;
 			/* % tag */
 			case H_QUOTE8:
-				ctl_f = TAGFORE;ctl_b=wp->w_bcolor;
+				ctl_f = TAGFORE;
+				ctl_b=line_bcolor;
 				break;
 			case H_QUOTE9:
-//				ctl_f=W_FORE;ctl_b=wp->w_bcolor;
-				ctl_f=WORD2FORE;ctl_b=wp->w_bcolor;
+				ctl_f=WORD2FORE;
+				ctl_b=line_bcolor;
 				break;
+			case H_QUOTE10:
+				line_bcolor=INFOBACK;
+				ctl_b=line_bcolor;
+				ctl_f=wp->w_fcolor;
+				break;			
+			case H_QUOTE11:
+				// line_bcolor=INFOBACK;
+				ctl_b=MODEBACKI;
+				// ctl_f=wp->w_fcolor;
+				break;			
 			};
 		};
 		if(get_selection()){ctl_f = FOREGROUND;ctl_b=MODEBACK;};
@@ -1347,35 +1363,35 @@ void vtputwc(WINDP *wp, utfchar *uc)
 		if( hquotem==H_QUOTE7 && c=='=') {
 			ctl_f=CNUMERIC;
 		}
-		if((ctl_f==0 && ctl_b==0))
+		if((ctl_f==0 && (ctl_b==0||ctl_b==line_bcolor)))
 		switch(c) { 
 			case 39: 	/* single quote  */
-				ctl_f =SPECFORE;ctl_b=wp->w_bcolor;
+				ctl_f =SPECFORE;ctl_b=line_bcolor;
 				break;
 			case CHR_LBRA: case CHR_RBRA:
 			case '(': case ')':
 			case '{': case '}':
 			case ';': case ':':
-				ctl_f = SPECFORE;ctl_b=wp->w_bcolor;
+				ctl_f = SPECFORE;ctl_b=line_bcolor;
 				break;
 			case '*': 
-				ctl_f = SPECFORE;ctl_b=wp->w_bcolor;
+				ctl_f = SPECFORE;ctl_b=line_bcolor;
 				break;
 			case '=':
 			case '+': case '-':
 			case '&':
 			case '<': case '>': case ',':
-				ctl_f = SPECFORE;ctl_b=wp->w_bcolor;
+				ctl_f = SPECFORE;ctl_b=line_bcolor;
 			break;
 
 			default:
-				ctl_f=wp->w_fcolor;ctl_b=wp->w_bcolor;
+				ctl_f=wp->w_fcolor;ctl_b=line_bcolor;
 		};
 
 		/* orizon different color creates problems if utf and local char set (utf string error)  */
 		/* if on the orizon make it a different color */
 		if (((wp->vtcol == wp->w_ntcols-1)) || (wp->vtcol==0 && wp->w_lcol > 0)) {
-			ctl_f = ORIZON;ctl_b=wp->w_bcolor;
+			ctl_f = ORIZON;ctl_b=line_bcolor;
 		};
 
 		// this is for screens that do not support output at 128-159
@@ -1410,7 +1426,8 @@ void vteeol(WINDP *wp, int selected,int inside)
     vp = wp->vs[wp->vtrow];	// vtrow
 	// MESG("vteeol: row=%d selected=%d col=%d",wp->vtrow,selected,wp->vtcol);
     ctl_f=wp->w_fcolor;
-	ctl_b=wp->w_bcolor;
+	// ctl_b=wp->w_bcolor;
+	ctl_b = line_bcolor;
 #if	DARWIN
 	blank=CHR_NBSPACE;	// use this for mac terminal!
 #else
@@ -1429,10 +1446,11 @@ void vteeol(WINDP *wp, int selected,int inside)
 		};
 	} else {
 			if(selected) {
-				if(selected==2) svmchar(vp->v_text+wp->vtcol,blank,MODEBACKI,ctl_f,wp->w_ntcols-wp->vtcol);	// header
-				else if(selected==3) svmchar(vp->v_text+wp->vtcol,blank,MODEBACKI,ctl_f,wp->w_ntcols-wp->vtcol);	// just selected
-				else if(selected==-1) svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,wp->w_ntcols-wp->vtcol);	// empty
-				else svmchar(vp->v_text+wp->vtcol,blank,INFOBACK,ctl_f,wp->w_ntcols-wp->vtcol);				// current line
+				if(selected==2)       { if(drv_colors>8)  ctl_b=MODEBACKI;else ctl_b=MODEBACK;}	// header
+				else if(selected==3)  { if(drv_colors>8)  ctl_b=MODEBACKI;else ctl_b=MODEBACK;}	// just selected
+				else if(selected==-1) { if(drv_colors==8) ctl_b=MODEBACK ;}	// empty
+				else                  ctl_b=INFOBACK;	// current line
+				svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,wp->w_ntcols-wp->vtcol);
 			} else svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,wp->w_ntcols-wp->vtcol);
 	}
 	wp->vtcol=wp->w_ntcols;
@@ -1447,7 +1465,7 @@ void vteeoc(WINDP *wp, int endcol)
     vp = wp->vs[wp->vtrow];	// vtrow
 
     ctl_f=wp->w_fcolor;
-	ctl_b=wp->w_bcolor;
+	ctl_b=line_bcolor;
 	ctl_b=QUOTEBACK;
 #if	DARWIN
 	blank=CHR_NBSPACE;	// use this for mac terminal!
@@ -1468,7 +1486,7 @@ void vt1eol(WINDP *wp,int c,int color)
 {
 	vchar *vpt;
     vpt = wp->vs[wp->vtrow]->v_text;
-	svmchar(vpt+wp->vtcol,c,wp->w_bcolor,color,wp->w_ntcols-wp->vtcol);
+	svmchar(vpt+wp->vtcol,c,line_bcolor,color,wp->w_ntcols-wp->vtcol);
 	wp->vtcol=wp->w_ntcols;
 }
 
@@ -1701,7 +1719,7 @@ int update_screen(int force)
 
 	/* update any windows that need refreshing */
 	hide_cursor("update_screen: start");
-
+	// MESG("hide_cursor: ok!");
 	if(cwp->selection) {
 		if(cwp->selection == REGION_LINE) 
 			textpoint_set(cwp->w_emark,LineEnd(tp_offset(cwp->tp_current)));
@@ -1714,7 +1732,7 @@ int update_screen(int force)
 	if (update_all)	{ 
 		updgar();
 	};
-
+	// MESG("loop windows");
 	lbegin(window_list);
 	while((wp=(WINDP *)lget(window_list))!=NULL)
 	{
@@ -1975,7 +1993,6 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 			/* and update the virtual line */
 			wp->vs[sline]->v_flag =1;
 			vtmove(wp,sline, 0);
-	
 			if (lp_offs <= FSize(wp->w_fp)) { // if not at the end of file
 			/* if we are not at the end */
 				if(cwp->selection==0) set_selection(false);
@@ -1983,6 +2000,7 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 				/* we must update the column selection here */
 				if(cwp->selection) set_selection(false);
 			};
+			
 			vteeol(wp,0,0);
 		}
 	}
@@ -2184,15 +2202,16 @@ void free_virtual_window(WINDP *wp)
  if(drv_type<2) return;	/* no need for curses,xlib for now, they use a common virtual area for all windows  */
 	
  if(wp->vs!=NULL) { /* free it before allocate new size! */
+	// MESG("free_virtual_window:");
  	for(i=0;i< wp->w_ntrows+2;i++) {
 		if(wp->vs[i]!=NULL) {
-			free(wp->vs[i]);
+			efree(wp->vs[i],"free row");
 			wp->vs[i]=NULL;
 		} else {
 			break;
 		};
 	};
-    free(wp->vs);
+    efree(wp->vs,"free window vs");
 	wp->vs=NULL;
  };
 }
@@ -2202,9 +2221,9 @@ void allocate_virtual_window(WINDP *wp)
  VIDEO *vp;
  int i;
  // MESG("	- allocate_virtual_window: cols=%d rows=%d",wp->w_ntcols,wp->w_ntrows);
- wp->vs = (VIDEO **) malloc(sizeof(VIDEO *) * (wp->w_ntrows+3));
+ wp->vs = (VIDEO **) emalloc(sizeof(VIDEO *) * (wp->w_ntrows+3),"allocation virtual window");
  for(i=0;i< wp->w_ntrows+2;i++) {
- 	vp = (VIDEO *) malloc(sizeof(VIDEO) + (wp->w_ntcols+2) * sizeof(struct vchar));
+ 	vp = (VIDEO *) emalloc(sizeof(VIDEO) + (wp->w_ntcols+2) * sizeof(struct vchar),"allocate virtual line");
  	if(vp==NULL) {
 		ERROR("could not allocate memory for virtual window");
 		exit(1);

@@ -85,12 +85,10 @@ void highlight_ecl(int c);
 void highlight_sql(int c);
 void highlight_matlab(int c);
 void highlight_cmd(int c);
-#if	NUSE
-void highlight_dir(int c);
-#endif
 void highlight_rust(int c);
 void highlight_tags(int c);
 void highlight_sln(int c);
+void highlight_md(int c);
 
 char *c_w[] = { "if","else","do","while","switch","case","for","return","break","goto","continue","typedef",
 	"namespace","this","throw","try","catch","@property","" };
@@ -249,7 +247,7 @@ char *go_extensions[] = { "GO","go","" };
 char *v_extensions[] = { "V","v","" };
 char *rust_extensions[] = { "RS","rs","" };
 char *txt_extensions[] = { "TEXT","txt","help","readme","" };
-char *gtxt_extensions[] = { "GTEXT","tdc","md","cal","" };
+char *gtxt_extensions[] = { "GTEXT","tdc","cal","" };
 char *perl_extensions[] = { "PL","pl","perl","cgi","pm","t","" };
 char *ps1_extensions[] = { "PS1","ps1","" };
 char *tcl_extensions[] = { "TCL","tcl","" };
@@ -258,6 +256,7 @@ char *html_extensions[] = { "HTML","htm","html","shtml","shtm","cfml","cfm","cfc
 		"erb",	// embedded ruby
 		"ejs","dust",	//	embedded EJS
 		"" };
+char *md_extensions[] = {"md","markdown","mdown","mkdn",""};
 char *wml_extensions[] = { "WML","wml",""};
 char *info_extensions[] = { "INFO","inf",""};
 char *xml_extensions[] = { "XML","xml","gla","wxs","wxl","wsdl","rss","atom","rdf","xslt","xsl","xul","xbl","xsd","mathml","xaml",""};
@@ -340,11 +339,7 @@ SHLIGHT hts[] = {
  { "YAML",0,1,yaml_w,yaml_w1, highlight_yaml,update_highlight_line,c_incword,yaml_extensions,comment_perl },
  { "JSON",0,0,jscript_w,jscript_w1,highlight_json,update_highlight,c_incword,json_extensions,comment_cc },
  { "TERRAFORM",0,0,terraform_w,terraform_w1,highlight_terraform,update_highlight,c_incword,terraform_extensions,comment_cc },
-#if	NUSE
- { "DIR",0,0,dir_w,dir_w1,highlight_dir,update_highlight_none,c_incword,dir_extensions,comment_cc },
-#else
  { "DIR",0,0,dir_w,dir_w1,highlight_text,update_highlight_none,c_incword,dir_extensions,comment_cc },
-#endif
  { "GO", 0,0,go_w,go_w1,highlight_c,update_highlight,c_incword,go_extensions,comment_cc },
  { "RUST", 0,0,rust_w,rust_w1,highlight_rust,update_highlight,c_incword,rust_extensions,comment_cc },
  { "TAGVIEW",0,0,tag_w,tag_w1, highlight_tags,update_highlight,c_incword,tag_extensions,comment_none },
@@ -353,6 +348,7 @@ SHLIGHT hts[] = {
  { "V", 0,0,v_w,v_w1,highlight_c,update_highlight,c_incword,v_extensions,comment_cc },
  { "JULIA",0,0,julia_w,julia_w1,highlight_julia,update_highlight,c_incword,julia_extensions,comment_perl },
  { "CAL",1,0,none_w,none_w, highlight_cmd,update_highlight_line,c_in_txt_word,gtxt_extensions,comment_perl },
+ { "MD",0,0,none_w,none_w, highlight_md, update_highlight, c_in_txt_word,md_extensions,comment_html },
  { NULL,0,0,NULL,NULL,NULL,NULL,NULL }
 };
 
