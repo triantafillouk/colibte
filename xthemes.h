@@ -116,14 +116,14 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#006000",	/* W_FORE H_QUOTE7 tag words */
 	"#800080",	/* ORIZON orizon characters foreground */
 	"#0000AE",	/* CNUMERIC numeric foreground */
-	"#606060",	/* INFOFORE  */
+	"#606070",	/* INFOFORE  */
 	"#E0D0A0",	/* INFOBACK  */ 
 	"#EFE3B8",	/* CBOXTFORE, */ 
 	"#0000AE", 	/* CBOXTBACK  */
 	"#EFE3B8",	/* MENU_FG */
 	"#0000AE",	/* MENU_BG  */
 	"#000000",	/* Modeline Foreground MODEFOREI inactive */
-	"#606060",	/* Modeline BACKGOUND  MODEBACKI inactive */
+	"#B0B0B0",	/* Modeline BACKGOUND  MODEBACKI inactive */
  },
  /* Midnight */
  {
@@ -154,7 +154,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"white","blue",	/* CBOXTFORE, CBOXTBACK  */
 	"white","blue",	/* MENU_FG, MENU_BG  */
 	"black",	/* Modeline Foreground MODEFOREI inactive */
-	"bisque4",	/* Modeline BACKGOUND  MODEBACKI inactive */
+	"#303040",	/* Modeline BACKGOUND  MODEBACKI inactive */
  },
  /* Sea - cyan */
  {
@@ -185,7 +185,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"white","blue",
 	"white","blue",
 	"white",	/* Modeline Foreground MODEFOREI inactive */
-	"grey50",	/* Modeline BACKGOUND  MODEBACKI inactive */
+	"#406070",	/* Modeline BACKGOUND  MODEBACKI inactive */
  },
  /* Blue Sky*/
  {
@@ -247,7 +247,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"white","blue",
 	"white","blue",
 	"grey65",	/* Modeline Foreground MODEFOREI inactive */
-	"#404040",	/* Modeline BACKGOUND  MODEBACKI inactive */
+	"#909090",	/* Modeline BACKGOUND  MODEBACKI inactive */
  },
  // Dark Gray
  {
@@ -278,7 +278,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#F2F2D9","gray50",
 	"#F2F2D9","blue",
 	"grey45",	/* Modeline Foreground MODEFOREI inactive */
-	"#404040",	/* Modeline BACKGOUND  MODEBACKI inactive */
+	"#434343",	/* Modeline BACKGOUND  MODEBACKI inactive */
  },
  // Sunny
  {
@@ -309,7 +309,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"white","gray20",
 	"white","blue",
 	"grey99",	/* Modeline Foreground MODEFOREI inactive */
-	"grey50",	/* Modeline BACKGOUND  MODEBACKI inactive */
+	"#999999",	/* Modeline BACKGOUND  MODEBACKI inactive */
  },
  /* Twilight */
  {
@@ -340,7 +340,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"white","grey70",
 	"white","blue",
 	"black",	/* Modeline Foreground MODEFOREI inactive */
-	"bisque4",	/* Modeline BACKGOUND  MODEBACKI inactive */
+	"#404050",	/* Modeline BACKGOUND  MODEBACKI inactive */
  },
 // Lunar
  {
@@ -371,7 +371,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"white","grey70",
 	"white","blue",
 	"black",	/* Modeline Foreground MODEFOREI inactive */
-	"bisque4",	/* Modeline BACKGOUND  MODEBACKI inactive */
+	"#4D4D4D",	/* Modeline BACKGOUND  MODEBACKI inactive */
  },
 // Vcode
  {
