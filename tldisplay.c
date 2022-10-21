@@ -74,7 +74,6 @@ void update_selection()
 
 			upd_all_virtual_lines(wp,"update_selection");	/* update all lines */
 			wp->w_flag = 0;
-//			reset ppline ??	
 	}
 
 	updgar();
@@ -248,6 +247,7 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
  int bch=color_menu_bg;
  int fch=color_menu_fg;
  int (*execf)();
+ int border=1;
 
  sx=sy=maxl=nu=0;
  in_menu=1;
@@ -276,7 +276,9 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 		};
 
 		if(m2->element[line2].type == MMENU){
-			execf = get_menucmd(m2->element[line2].menu,line2,0,0) ;
+			MENUS *submenu=m2->element[line2].menu;
+			// MESG(" Call get_menucmd x=%d y=%d line2=%d",submenu->xpos,submenu->ypos,line2);
+			execf = get_menucmd(submenu,line2,submenu->xpos,submenu->ypos) ;
 		} else {
 			execf = m2->element[line2].func;
 			repeat_arg = (long int)m2->element[line2].menu;
@@ -308,9 +310,9 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 
  if(orient==VERTICAL) {
 	if(first<0) {	/* mouse dependant position  */
-		disp_box("",0*16+2,-1,-1,nu,maxl);
+		disp_box("",border,-1,-1,nu,maxl);
 	} else {
-		disp_box("",0*16+2,sy,sx,sy+nu+1,sx+maxl+1);
+		disp_box("",border,sy,sx,sy+nu+1,sx+maxl+1);
 	};
   } else {
 	maxl++;	/* separate horizontal menu elements  */
@@ -336,7 +338,6 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
  };
  drv_flush();
  /* get keyboard */
-// execf=noop;
  while(1) {
 	if(orient==HORIZONTAL && ftime==1) {
 		i=first;
@@ -406,7 +407,8 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 				execf = get_menucmd(m1->element[i].menu,0,iol*HLABEL_WIDTH,1) ;
 			} else {
 //				MESG("goto menu");
-				execf = get_menucmd(m1->element[i].menu,0,pos_x+maxl,pos_y) ;
+				MENUS *submenu=m1->element[i].menu;
+				execf = get_menucmd(submenu,0,pos_x+maxl,submenu->ypos) ;
 //				MESG("returned from submenu");
 				remove_box();
 				return execf;
@@ -447,7 +449,6 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 		if (execf==page_move_up) {
 			i+=10; if(i>nu-1) i=nu-1;
 		};
-//		MESG("2");
 		if(execf==NULL) refresh_menu();
 
 		if(execf != new_line) {
@@ -474,7 +475,6 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 		iol=i;
 		set_box_cline(iol);
 		};
-//		MESG("loop while next line");
 	  };
 	 };
 	 if( execf == abort_cmd) { 
@@ -528,8 +528,6 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
  };
 }
 
-// int last_key_recorded=0;
-
 MENUS *start_menu = &m_topn;
 extern int mousey,mousex;
 
@@ -540,11 +538,11 @@ int execute_menu(int fixed)	/* execute menu */
  int line=1;
  short key;
  long int repeat = repeat_arg;
- MENUS *main_menu;
+ MENUS *active_menu;
  int pos_x=0;
  int pos_y=0;
 
- main_menu = start_menu;
+ active_menu = start_menu;
 
  if(kbdmode==PLAY||kbdmode==BPLAY){
 
@@ -556,10 +554,10 @@ int execute_menu(int fixed)	/* execute menu */
  	key=normalize(key);
 	for(line=0;;line++) 
 	{
-	if(main_menu->element[line].high==0) {line=0;break;};
-	if(main_menu->element[line].high==key) break;
+	if(active_menu->element[line].high==0) {line=0;break;};
+	if(active_menu->element[line].high==key) break;
 	};
-	m1 = main_menu->element[line].menu;
+	m1 = active_menu->element[line].menu;
 
 	key = get_next_key(kbdmode);
 
@@ -580,28 +578,28 @@ int execute_menu(int fixed)	/* execute menu */
 
 	for(line=0;;line++) 
 	{
-	if(main_menu->element[line].high==0) {line=0;break;};
-	if(main_menu->element[line].high==capital(key)) break;
+	if(active_menu->element[line].high==0) {line=0;break;};
+	if(active_menu->element[line].high==capital(key)) break;
 	};
 	record_key(key);
 //	MESG("menu key: %c",key);
  }
  if(macro_exec) return 1;
  if(fixed==0) line=-1;
- if(main_menu->orient==HORIZONTAL) {
+ if(active_menu->orient==HORIZONTAL) {
  	pos_x = line*HLABEL_WIDTH;
 	pos_y = 1;
- } else {
+	 } else {
+	// MESG(" fixed = %d mouse x=%d y=%d",fixed,mousex,mousey);
 	if(fixed<0) {
-		MESG("menu at x=%d y=%d",mousex,mousey);
 		pos_x=mousex;
 		pos_y=mousey;
 	} else {
-	 	pos_x = main_menu->xpos;
-		pos_y = line+1;
+	 	pos_x = active_menu->xpos;
+		pos_y = active_menu->ypos;
 	};
  };
- execfunc = get_menucmd(main_menu,line,pos_x,pos_y);
+ execfunc = get_menucmd(active_menu,line,pos_x,pos_y);
  in_menu=0;
  clear_message_line();
 
@@ -616,14 +614,6 @@ int menu_command(int n)
 	start_menu = &m_topn;
 	return execute_menu(1);
 }
-
-#if	TNOTES0
-int notes_menu_command(int n)
-{
-	start_menu = &m_notes;
-	return execute_menu(1);
-}
-#endif
 
  /* new_wp, new_line, new_column have been set */
 void move_to_new_position(num new_column,num new_line)
@@ -646,16 +636,19 @@ int selectl(char *title,char *m_array[],int nu,int max_height,int sx,int sy,int 
 {
  int i,c,iol,start;
  int found=0;
+ int border=0;
 
  char name[MAXFLEN];
  int (*execf)();
  char *title_shown=strdup(title);
  int slen=0; 
 
- hide_cursor("selectl");
- 
+
  if(nu==0) { return(-1);};
  if(nu==1) return(0);
+ hide_cursor("selectl");
+ border = (strlen(title)==0);
+
  activate_list_mode();
 // MESG("selectl:[%s] nu=%d max_height=%d",title,nu,max_height);
 
@@ -666,7 +659,7 @@ int selectl(char *title,char *m_array[],int nu,int max_height,int sx,int sy,int 
  if(nu<max_height) max_height=nu;
  if(sy+max_height > drv_numrow) max_height=drv_numrow - sy;
 
- disp_box(title_shown,16*7+2,sy,sx,sy+max_height+1,sx+width+1);
+ disp_box(title_shown,border,sy,sx,sy+max_height+1,sx+width+1);
  free(title_shown);
 
  start=disp_list(m_array,start,nu,max_height,sx,sy,width,active);
@@ -675,7 +668,6 @@ int selectl(char *title,char *m_array[],int nu,int max_height,int sx,int sy,int 
  iol=0;
  set_box_cline(0);
  for(;;) {
-// 	MESG("xupdate_box:2");
 	xupdate_box();
 
 	c=getcmd();
@@ -685,11 +677,9 @@ int selectl(char *title,char *m_array[],int nu,int max_height,int sx,int sy,int 
 
 	if(execf==do_nothing) continue;
 	if(execf==new_line) {
-		// MESG(":	new_line!");
 		break;
 	};
 	if(execf==abort_cmd||execf==paste_region||execf==menu_command ) {
-		// MESG(": other execute!");
 		break;
 	};
 	if(execf==mouse_move) {
@@ -700,7 +690,6 @@ int selectl(char *title,char *m_array[],int nu,int max_height,int sx,int sy,int 
 	} else
 	if(execf == goto_line) {  // get next character as number in list (xwin)
 		i=get_box_cline()+start;
-		// MESG(":	goto_line i=%d iol=%d",i,iol);
 		if(i==iol) {
 			execf=new_line;
 			break;
@@ -718,7 +707,6 @@ int selectl(char *title,char *m_array[],int nu,int max_height,int sx,int sy,int 
 		if(i<start) {
 			start=i;
 			start=disp_list(m_array,start,nu,max_height,sx,sy,width,active);
-			// i++;
 		};
 	} else
 	if(execf==prev_page || execf==page_move_down) {
@@ -769,7 +757,6 @@ int selectl(char *title,char *m_array[],int nu,int max_height,int sx,int sy,int 
 			// MESG(": next_line iol=%d i=%d max=%d",iol,i,max_height);
 			if(i-start>=max_height) {
 			start = disp_list(m_array,start+1,nu,max_height,sx,sy,width,active);
-			// i--;
 			};
 
 			// set_box_cline(i);
@@ -1761,10 +1748,7 @@ int get_utf_length(utfchar *utf_char_str)
  if(b0==0xF3) return 1;
  if(b0==0xE1) {
 	int b1=utf_char_str->uval[1];
-#if	WSL0
-	// if(b1==0x84) return 2;
-	// if(b1==0x85) return 1;
-#endif
+
 	return 1;
 	if(b1>0x83) return 2;
 	

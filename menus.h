@@ -610,10 +610,10 @@ M_element e_topn[] =
 	{0,    '2'," ↓  ","find next",	find_next, (struct MENUS *)1,"S5" },	
 	{0,    '3'," ↑  ","find previous",	find_previous, (struct MENUS *)1,"S6" },
 #else
-	{0,    '0',"Back","back", prev_hmark, (struct MENUS *)1, "EWB"},
-	{0,    '1',"Forw","next", next_hmark, (struct MENUS *)1, "EWF"},
+	{0,    '0'," <- ","back", prev_hmark, (struct MENUS *)1, "EWB"},
+	{0,    '1'," -> ","next", next_hmark, (struct MENUS *)1, "EWF"},
 	{0,    '2',"Next","find next",	find_next, (struct MENUS *)1,"S5" },	
-	{0,    '3',"Previous","find previous",	find_previous, (struct MENUS *)1,"S6" },
+	{0,    '3',"Prev","find previous",	find_previous, (struct MENUS *)1,"S6" },
 #endif
 #endif
 	{0, 0, NULL,"",NULL,0,NULL}

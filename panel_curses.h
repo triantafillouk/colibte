@@ -10,6 +10,7 @@ typedef struct BOX {
 #if	PCURSES
 	WINDOW *wnd;
 	PANEL *panel;
+	int border;
 #endif
 	char title[256];
 	int x,y;

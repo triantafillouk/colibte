@@ -30,11 +30,7 @@
     {
             "command": "unbound",
             "keys": "alt+right"
-    },
-    {
-            "command": "unbound",
-             "keys": "alt+left"
-    },
+    }
 ```
 
 ---------------------------------------

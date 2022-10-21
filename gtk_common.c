@@ -1750,6 +1750,7 @@ int execute_menu(int n)
 #if	TNOTES
 	else if(fp->b_flag & FSNOTES) {
 	 	// start_menu=&m_notes_tag;
+		// drv_show_menu_popup(m_notes_tag);
 	} else if(fp->b_flag & FSNLIST) {
 	 	// start_menu=&m_notes_tag;
 	} 

@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.55  (17/10/2022)"
+#define VERSION 	"#01.56  (21/10/2022)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -624,6 +624,7 @@ typedef struct  FILEBUF {
 	struct	dir_l	*rdir;
 	struct	dir_l	*cdir;
 	struct	alist	*dir_list_str;
+	int		sort_mode;
 	int		flen0;					/* Initial line len  */
 	int		file_id;				/* file id while reading  */
 	int		b_nwnd;                 /* Count of windows on buffer   */
@@ -644,6 +645,7 @@ typedef struct  FILEBUF {
 #endif
 	char	b_dname[MAXFLEN];	/* directory name */
 	int		b_type;			/* buffer,file type */
+
 	int		scratch_num;	/* scratch number or 0  */
 	int		dir_num;		/* dir number  */
 	struct SHLIGHT *hl;		/* highlight type structure */

@@ -63,7 +63,7 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* magenta */	"#E0D0A0",  // LBACKGROUND, INFOBACK
 	/* cyan */		"#0097B7",	// MODEBACK/selections
 	/* white */		"#E3E3E3",	// BACKGROUND, SEARCHFORE, CBOXTFORE, MENUFG
-	/* brown */		"#909090",	// QUOTEFORE, MODEBACKI, INFOFORE, TAGFORE
+	/* brown */		"#B0B0B0",	// QUOTEFORE, MODEBACKI, INFOFORE, TAGFORE
 	/* lred */		"#FF0000",	// CHANGEDFORE, CTRLFORE
 	/* lgreen */	"#006000",	// SQUOTEFORE, W_FORE
 	/* yellow */	"#FFFF00",	// DROWCOL
@@ -143,7 +143,7 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* magenta */	"#A8A8A0",
 	/* cyan */		"#36648B",
 	/* white */		"grey55",
-	/* brown */		"#707070",
+	/* brown */		"#909090",
 	/* lred */		"#FF4D4D",
 	/* lgreen */	"#0E500E",
 	/* yellow */	"#FFFF00",
@@ -276,7 +276,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{LGREEN,0},		/* W_FORE */
 	{LMAGENTA,0},	/* ORIZON */
 	{BLUE,0},		/* CNUMERIC */
-	{BROWN,0},		/* INFOFORE  */
+	{BLACK,0},		/* INFOFORE  */
 	{MAGENTA,0},	/* INFOBACK  */
 	{WHITE,0},		/* CBOXTFORE */
 	{BROWN,0},		/* CBOXTBACK */
