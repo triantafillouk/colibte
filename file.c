@@ -1507,6 +1507,25 @@ int save_file(int n)
  // MESG("save_file: [%s] b_type=%X,b_flag=%X",fp->b_fname,fp->b_type,fp->b_flag);
 	if(dont_edit()) return TRUE;
 #if	TNOTES
+	if(is_scratch_buffer(cbfp)) {
+		// set file name
+		snprintf(fp->b_fname,24,"%s.cal",date_string(3));
+		
+		// insert calendar header
+		goto_bof(1);
+		insert_preamble(fp,2);
+		prev_line(1);delete_line(1);
+		insert_string_nl(fp,"# Untitled note");
+		insert_string_nl(fp,"");
+		
+		// check for title
+		
+		// set fp to calendar type
+		fp->b_type = NOTE_CAL_TYPE;
+		// and remove scratch type
+		fp->scratch_num=0;
+	};
+
 	if(fp->b_type & NOTE_TYPE 
 		|| fp->b_type & NOTE_CAL_TYPE
 		|| fp->b_type & NOTE_TODO_TYPE
