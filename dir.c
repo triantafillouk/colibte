@@ -44,7 +44,7 @@ void escape_file_name(char *fname);
 void delete_current_list_line();
 
 int pdline=-1;
-int sort_mode=0;
+int current_sort_mode=-1;
 
 typedef       int     (*Fintss)(const char *, const char *);
 
@@ -162,6 +162,7 @@ int dir_cmp(struct kdirent *a, struct kdirent *b,int sort_mode)
 	case 3: return(a->t.st_size < b->t.st_size? 1:-1);
 	case 4: return(a->t.st_mtime > b->t.st_mtime? 1:-1);	/* modification time  */
 	case 5: return(a->t.st_mtime < b->t.st_mtime? 1:-1);	/* reverse modification time  */
+
 	case 6: return(a->t.st_ctime > b->t.st_ctime? 1:-1);	/* status change time  */
 	case 7: return(a->t.st_ctime < b->t.st_ctime? 1:-1);	/* status change reverse time  */
 	case 8: return(a->t.st_atime > b->t.st_atime? 1:-1);	/* access time  */
@@ -200,17 +201,49 @@ char **getdir(char *dirname,char *s_find,int *num)
 
 int set_sort_mode(int mode)
 {
- int old_mode = sort_mode;
+ int current_sort_mode=cwp->w_fp->sort_mode;
+ MESG("set_sort_mode: current=%d",current_sort_mode);
  if(!(cwp->w_fp->b_flag & FSDIRED)) return true;
-	if(mode<0) {	/* reverse sort  */
-		sort_mode = ((sort_mode % 2)==sort_mode) ? (sort_mode+1): (sort_mode-1);
+	if(mode==current_sort_mode) 
+	{	/* reverse sort  */
+		if(current_sort_mode%2) current_sort_mode-=1;
+		else current_sort_mode+=1;
 	} else {
-		sort_mode=mode;
+		current_sort_mode=mode;
 	} ;
-	if(sort_mode != old_mode) {
+	cwp->w_fp->sort_mode=current_sort_mode;
+	MESG("	new sort mode=%d",current_sort_mode);
+	// if(sort_mode != old_mode) 
+	{
 		dir_reload(1);
 	};
 	return true;
+}
+
+int change_sort_mode(int mouse_col)
+{
+	if(mouse_col>7 && mouse_col<15) {
+		MESG("sort by size");
+		set_sort_mode(2);
+		// update_screen(TRUE);
+		return 1;
+	// set/toggle sort by size 
+	};  
+	if(mouse_col>15 && mouse_col<30) {
+	// set/toggle sort by date
+		MESG("sort by date");
+		set_sort_mode(4);
+		// update_screen(TRUE);
+		return 1;
+ 	};
+	if(mouse_col>30) {
+		MESG("sort by name");
+		// set/toggle sort by name
+		set_sort_mode(0);
+		// update_screen(TRUE);
+		return 1;
+	};
+	return 0;
 }
 
 /* this is a local scandir. Not all operating systems use the BSD one! */
@@ -259,7 +292,7 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
 	};
  } ;
    namelist[i]=NULL;
-   qsort_dir(namelist,num_of_files,sort_mode);
+   qsort_dir(namelist,num_of_files,current_sort_mode);
    *namelist_a = namelist;
  return(num_of_files);
 }
@@ -666,7 +699,8 @@ int dir_reload(int n)
 	pdline = cbfp->cdir->cline-1;
 	reinit_dir(cbfp);
 	set_update(cwp,UPD_EDIT);
-
+	if(cbfp->sort_mode == -1) cbfp->sort_mode=0;
+	current_sort_mode=cbfp->sort_mode;
 	list_dir(cbfp->cdir->dir_name,cbfp);
 	return 1;
 }
@@ -1644,8 +1678,8 @@ if((t->st_mode & S_IXUSR \
  || t->st_mode & S_IXGRP \
  || t->st_mode & S_IXOTH) && mx1=='-') mx1='x';
 
- if(sort_mode>7) t1 = localtime(&t->st_atime);
- else if(sort_mode>5) t1 = localtime(&t->st_ctime);
+ if(current_sort_mode>7) t1 = localtime(&t->st_atime);
+ else if(current_sort_mode>5) t1 = localtime(&t->st_ctime);
  else t1 = localtime(&t->st_mtime);
  year = t1->tm_year;
  if(year>99) year-=100;
@@ -1734,7 +1768,22 @@ int insert_dir(FILEBUF *buf_dir,int retain)
  free(namelist);
 
  set_Offset(0);
- cbfp->b_header = " Perms  Size  Date            Name                 ";
+ switch(cbfp->sort_mode){
+	case 0:
+	case -1: cbfp->b_header = " Perms   Size  Date          ↓Name                 ";break;
+	case 1:  cbfp->b_header = " Perms   Size  Date          ↑Name                 ";break;
+	case 2:  cbfp->b_header = " Perms  ↓Size  Date           Name                 ";break;
+	case 3:  cbfp->b_header = " Perms  ↑Size  Date           Name                 ";break;
+	case 4:  
+	case 6:  
+	case 8:  cbfp->b_header = " Perms   Size ↓Date           Name                 ";break;
+	case 5:
+	case 7:
+	case 9:  cbfp->b_header = " Perms   Size ↑Date           Name                 ";break;
+	
+	default:
+		cbfp->b_header = " Perms  Size  Date            Name                 ";
+ }; 
  cbfp->b_flag = FSNLIST|FSDIRED;
  cbfp->b_state = FS_VIEW|FS_ACTIVE;
  cbfp->dir_list_str = dir_list_str;
@@ -1762,6 +1811,8 @@ int listdir(int dtype)
  	if(chdir(get_start_dir())) return false;
  };
  set_bfname(go_name,".");
+ if(cbfp->sort_mode==-1) cbfp->sort_mode=0;
+ current_sort_mode=cbfp->sort_mode;
  stat=goto_dir(go_name,dtype);
  set_hmark(0,"dir_name");
 

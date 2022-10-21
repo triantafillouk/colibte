@@ -826,7 +826,14 @@ int text_mouse_function(int move)
 				dir_left(0);
 				update_screen(FALSE);
 				return(0);
-			} 
+			};
+			if(mouse_window_row<1) {
+				if(change_sort_mode(mouse_window_col)){
+					update_screen(TRUE);
+					// return(0);
+				};
+				return(0);
+			};
 #if	0
 			else {
 				// MESG("mouse dir mode");

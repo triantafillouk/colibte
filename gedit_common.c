@@ -284,8 +284,16 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
  };
 
  mouse_row=y/CHEIGHTI-(wp->w_fp->b_header!=NULL);
- if(mouse_row<0) mouse_row=0;
  mouse_col=x/CLEN;
+ change_window(wp);
+ if(mouse_row<0) {
+	if(!change_sort_mode(mouse_col)) {
+		mouse_row=prow;
+		mouse_col=pcol;
+	};
+	update_screen(TRUE);
+	return;
+ };
  // MESG("update_from_mouse: prow=%d col=%d row=%d",prow,mouse_col,mouse_row);
  if(prow<0) update_full=1;
  if(mouse_row==prow && mouse_col==pcol) { 
@@ -302,6 +310,7 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 	/* We are always in an editors window */
 	if(cbfp->b_flag & FSNLIST) {
 		new_line = wp->top_note_line+mouse_row;
+		MESG("mouse at new_line=%d",new_line);
 		if(new_line==wp->current_note_line) {
 			// MESG("dir: in same line=%d",new_line);
 			if(button==1) {
