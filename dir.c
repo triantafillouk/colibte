@@ -397,11 +397,10 @@ int dir_edit(int n)
   	if(ftype<0) return(FALSE);
   	if(ftype==FTYPE_NORMAL) {
 		set_full_name(dname,cbfp->b_dname,fname,MAXFLEN);
-
 		status=goto_file(dname);
 		set_working_dir(cbfp->b_dname);
 		set_hmark(1,"dir_edit:b");
-  	};
+  	} else msg_line("not normal");
 	return(status);
  };
 }
@@ -813,7 +812,7 @@ int movein_dir(char *fname)
    };
    // MESG("movein_dir: cline=%ld pdline=%ld",cbfp->cdir->cline,pdline);
    pdline = -1;
-
+	msg_line("");
 	push_dir(cbfp);
 	// create a new one!!
 	cbfp->cdir = (dir_l *)malloc(sizeof(struct dir_l));
@@ -1055,7 +1054,7 @@ int dir_right(int n)
   char fname_ns[512];
   int status=FALSE;
 
-  // MESG("dir_right: b_flag=%X",cbfp->b_flag);
+  MESG("dir_right: b_flag=%X",cbfp->b_flag);
   if(!(cbfp->b_flag & FSNLIST)) return false;
 
   ftype=dir_getfile(fname,1);
@@ -1402,7 +1401,7 @@ int dir_left(int n)
 			msg_line("cannot move to parent dir!");
 			return(false);
 		};
-
+		msg_line(time2a());
 		reinit_dir(bf);
 	};
   set_update(cwp,UPD_EDIT|UPD_STATUS);
@@ -1487,7 +1486,7 @@ int dir_getfile(char *fname,int flag)
 
  // MESG("dir_getfile: b_flag=%X [%s]",cbfp->b_flag,line_str);  
  c=line_str[0];
-
+ if(c=='c') { SYS_ERROR("cannot view c type files");return -1;};
  if(c=='#' ||c=='!'||c=='/') ftype=FTYPE_DIR;else ftype=FTYPE_NORMAL;
  c=line_str[1];
  if(c=='l') is_link=1;
@@ -1616,6 +1615,7 @@ void pop_dir(FILEBUF *bf)
 	if(bf->cdir!=NULL) free(bf->cdir);
 	bf->cdir=old;
  };
+ msg_line(time2a());
  // MESG("pop_dir: name=[%s] line=%d",bf->cdir->dir_name,bf->cdir->cline);
 }
 

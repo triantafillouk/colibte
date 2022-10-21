@@ -303,6 +303,7 @@ int goto_bof(int n)
 		cwp->current_note_line=0;
 		// MoveLineCol(0,cwp->goal_column);
 		set_update(cwp,UPD_WINDOW);
+		msg_line(time2a());
 		return (OK_RSTGOAL);
 	};
 #endif
@@ -310,6 +311,7 @@ int goto_bof(int n)
 	undo_set_noglue();
 	if(execmd) return (OK_CLRSL);
 	set_update(cwp,UPD_WINDOW);
+	msg_line(time2a());
 
 	return (OK_RSTGOAL);
 }
@@ -353,6 +355,7 @@ int goto_eof(int n)
 		cwp->current_note_line = toline;
 		MoveLineCol(toline,cwp->goal_column);
 		set_update(cwp,UPD_WINDOW);
+		msg_line(time2a());
 		return (OK_CLRSL);
 	}
 	// MESG("next_page: toline=%d col=%d",toline,cwp->goal_column);
@@ -363,7 +366,7 @@ int goto_eof(int n)
 	set_hmark(0,"goto_eof");
 	set_update(cwp,UPD_WINDOW);
 	cwp->w_ppline=0;
-
+	msg_line(time2a());
 	return (OK_RSTGOAL);
 }
 
@@ -437,6 +440,7 @@ int next_line(int n)
 		cwp->current_note_line+=n;		
 		if(cwp->current_note_line >= cbfp->b_notes) cwp->current_note_line=cbfp->b_notes-1;
 		// MESG("next_line: FSNOTESN, new note_line=%d flag=%d",cwp->current_note_line,cbfp->b_flag);
+		msg_line(time2a());
 		set_update(cwp,UPD_MOVE);
 		return(TRUE);
 	};
@@ -516,6 +520,7 @@ int prev_line(int n)
 		// MESG("prev_line: FSNOTESN, note_line=%d flag=%d",cwp->current_note_line,cbfp->b_flag);
 		set_update(cwp,UPD_MOVE);
 		// return(true);
+		msg_line(time2a());
 	};
 
     if(lock_move) {
