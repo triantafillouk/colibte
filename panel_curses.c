@@ -54,6 +54,7 @@ num get_lines(FILEBUF *bp);
 int imove_top_line(num new_top_line);
 int set_sposition(WINDP *wp,int *st, int *l);
 void utf_string_break(char *utf_string, int column);
+int change_sort_mode(int mouse_col);
 
 int	colorupdate;
 int color_scheme_ind=0;

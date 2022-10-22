@@ -511,7 +511,7 @@ KEYTAB keytab_view[] = {
 /* and some not so vi compatible  */
 	{'1',		goto_bof,"1"},
 	{'v',		quick_close,"v"},
-//	{SPEC1|'D', dir_left,"KEY-LEFT"},
+	{SPEC1|'D', dir_left,"KEY-LEFT"},
 	{'\\',		dir_left,"BSLASH"},
 	{'q',		close_file,"q"},
 	{CHR_LBRA,		goto_bop,"["},
