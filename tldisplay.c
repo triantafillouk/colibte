@@ -1622,11 +1622,7 @@ int get_utf_length(utfchar *utf_char_str)
 	if(b1==0x99) {
 		int b2=utf_char_str->uval[2];
 		if(b2==0x80||b2==0x82) return 1;
-#if	DARWIN
 		return 2;
-#else
-		return 1;
-#endif
 	};
 	if(b1==0x8F||b1==0x9B||b1==0x9C||b1==0x9D) return 2;
 	if(b1 > 0x83 && b1< 0xBA) {
