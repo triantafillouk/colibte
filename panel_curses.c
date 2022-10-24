@@ -43,6 +43,7 @@ void save_original_colors();
 void update_selection();
 void restore_original_colors();
 int set_tag_view_position(int line,int column);
+int change_sort_mode(int mouse_col);
 
 BOX *cbox=NULL; // current box
 BOX *msg_box=NULL;	// current message box

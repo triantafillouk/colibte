@@ -43,6 +43,7 @@ int scratch_ind(char *bname)
 
 int is_scratch_buffer(FILEBUF *bp)
 {
+	// MESG("- scartch is %d",bp->scratch_num);
 	if(bp) return bp->scratch_num;
 	return 0;
 }
@@ -1457,6 +1458,15 @@ int saveas_file(int n)
 	char	dname[MAXFLEN];
 	int scratch_num=0;
 	char	save_as_msg[MAXFLEN];
+#if	TNOTES
+	if(cbfp->b_type & NOTE_TYPE 
+		|| cbfp->b_type & NOTE_CAL_TYPE
+		|| cbfp->b_type & NOTE_TODO_TYPE
+	) {
+		msg_line("complete notes form first, then save!");
+		return 0;
+	};
+#endif
 	strlcpy(fname,cbfp->b_fname,MAXFLEN);
 	if(snprintf(save_as_msg,MAXFLEN,"Save as: %s:",get_working_dir())>=MAXFLEN) return FALSE;
     if ((stat=nextarg(save_as_msg, fname, MAXFLEN,true)) != TRUE) return FALSE;
