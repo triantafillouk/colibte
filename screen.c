@@ -698,7 +698,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		c=uc.uval[0];
 #if USE_GLIB	// Convert to composed character if possible to view it!
 		// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
-		if(1)
+		if(uc.uval[3]!=0)
 		{
 			char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
 //				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
@@ -1084,7 +1084,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 			if(c==0xE0 && uc.uval[1]>=0xB0)  fp->slow_display=1;	/* slow down for thai chars  */
 #if USE_GLIB	// Convert to composed character if possible to view it!
 			// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
-			if(1)
+			if(uc.uval[3]!=0)
 			{
 				char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
 //				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
