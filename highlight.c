@@ -1210,16 +1210,28 @@ void highlight_md(int c)
 	case START_MDCODE:
 		if(slang) {
 			slang=0;
+			hprev_line=0;
 			hquotem=0;
+			// MESG("end mdcode>");
 		} else {
 			slang=LANG_SCRIPT;
 			hprev_line = H_QUOTE12;
 			hquotem=0;
+			// MESG("<start mdcode");
 		};
 		break;
   };
 
   switch(c) {
+	case CHR_LINE:
+	case CHR_CR:
+		// if(slang) MESG("LINE_START! hprev_line=%d hquotem=%d",hprev_line,hquotem);
+		if(hprev_line>=0) { hquotem=hprev_line;hprev_line=-1;}
+		else {
+			hquotem &= ~(H_QUOTE1|H_QUOTE4|H_QUOTE5|H_QUOTE6|H_QUOTE10|H_QUOTE11);
+		};
+		hstate=HS_LINESTART;
+		break;
 	case (CHR_RESET) : // initialize
 //		MESG("html reset:");
 		hstate=HS_LINESTART;
@@ -1284,14 +1296,6 @@ void highlight_md(int c)
 			break;
 		};
 	};
-	case CHR_LINE:
-	case CHR_CR:
-		if(hprev_line>=0) { hquotem=hprev_line;hprev_line=-1;}
-		else {
-			hquotem &= ~(H_QUOTE1|H_QUOTE4|H_QUOTE5|H_QUOTE6|H_QUOTE10|H_QUOTE11);
-		};
-		hstate=HS_LINESTART;
-		break;
 
 	case '<':
 		if(prev_esc) { prev_esc=0;break;};
