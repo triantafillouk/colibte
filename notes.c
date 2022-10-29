@@ -1526,7 +1526,7 @@ int edit_note(int n)
 	return false;
  };
  FILEBUF *bp;
-	// MESG("edit_note:[%s]",full_name);
+	MESG("edit_note:[%s] n=%d b_type=%d",full_name,n,cbfp->b_type);
 	if(edit_file(full_name)) return true;
 	
 	if((bp=new_filebuf(full_name,0))==NULL) {
@@ -1549,7 +1549,7 @@ int edit_note(int n)
 
 	set_hmark(1,"edit_note");
 
- bp->b_state |= FS_VIEW;
+ if(n==0) bp->b_state |= FS_VIEW;
  return true;
 }
 

@@ -1977,7 +1977,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 		memcpy(vstr,v1->uval,6);
 #endif
 #if	DARWIN
-		if(vstr[0]>0x20) {MESG("  %2d %2d [%s] [%X %X %X]",row,i,vstr,vstr[0],vstr[1],vstr[2]);};
+		// if(vstr[0]>0x20) {MESG("  %2d %2d [%s] [%X %X %X]",row,i,vstr,vstr[0],vstr[1],vstr[2]);};
 		if(vstr[0]==0x20) {vstr[0]=0xC2;vstr[1]=0x80;};
 #endif
 		if		(vstr[0]==0xF0 && vstr[1]==0x9F && vstr[2]!=0x8F && vstr[2]!=0x91 && vstr[2]!=0x92 && vstr[2]!=0x94 && vstr[2]!=0x96 && vstr[2]!=0x98 && vstr[2]!=0xA4 && vstr[2]!=0xA7 ) { wprintw(wp->gwp->draw,"%c",'?');ccor++;}

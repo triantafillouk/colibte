@@ -115,7 +115,7 @@ int next_file(int n)
 int activate_file(FILEBUF *bp)
 {
 	if(bp->b_dname[0]!=0) if(chdir(bp->b_dname)!=0) return false;
-	// MESG("activate_file:[%s] b_type=%d b_flag=%X",bp->b_fname,bp->b_type,bp->b_flag);
+	MESG("activate_file:[%s] b_type=%d b_flag=%X",bp->b_fname,bp->b_type,bp->b_flag);
 	if ((bp->b_state & FS_ACTIVE) ==0)
 	{	
 //		MESG("active_file: is not active, activate it!");
@@ -745,7 +745,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	int dir_num=0;
 	int is_scratch=0;
 	create_base_name(base_name,bname);
-	// MESG("new_filebuf:base_name=[%s] bname=[%s]",base_name,bname);
+	MESG("new_filebuf:base_name=[%s] bname=[%s]",base_name,bname);
 	dir_name[0]=0;
 	is_scratch = scratch_ind(base_name);
 
@@ -1220,9 +1220,12 @@ int set_buf_key(FILEBUF *bp)	/* reset encryption key of current file */
 
 	/* get the string to use as an encrytion string */
 	bp->b_key[0]=0;
-	// MESG("set_buf_key: b_type=%d %d",bp->b_type,NOTE_TYPE);
+	MESG("set_buf_key: b_type=%d %d",bp->b_type,NOTE_TYPE);
 #if	TNOTES
-	if(bp->b_type & NOTE_TYPE) {
+	if(bp->b_type & NOTE_TYPE
+		|| bp->b_type & NOTE_CAL_TYPE
+		|| bp->b_type & NOTE_TODO_TYPE
+	) {
 
 		if(get_notes_key() == NULL) {
 			set_notes_key(1);
@@ -1644,21 +1647,25 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
 #if	CRYPT
 	if ((bp->bom_type == FTYPE_ENCRYPTED) 
 		/* and if only text, tdc,cmd and notes are to be encrypted!  */
-		&& (file_type_is("GTEXT",bp->b_type) || file_type_is("CMD",bp->b_type) || file_type_is("TEXT",bp->b_type) || (bp->b_type & NOTE_TYPE))
+		&& (file_type_is("GTEXT",bp->b_type) 
+		|| file_type_is("CMD",bp->b_type) 
+		|| file_type_is("TEXT",bp->b_type) 
+		|| file_type_is("MD",bp->b_type) 
+		|| (bp->b_type & NOTE_TYPE))
 		 ) {	
 			// MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
 			bp->b_mode |= EMCRYPT;
 #if	TNOTES
 			if(bt_dval("notes_recreate")) {
-				// MESG("Notes recreate!");
+				MESG("Notes recreate!");
 				if(get_notes_key(1)==NULL) {
- 					// MESG("get new notes key");
+ 					MESG("get new notes key");
 					set_notes_key(1);
 					if(get_notes_key()) {
 						strcpy(bp->b_key,get_notes_key());
 					} else return false;
 				} else {
-					// MESG("set key from notes key!");
+					MESG("set key from notes key!");
 					strcpy(bp->b_key,get_notes_key());
 				};
 				s=true;
