@@ -477,12 +477,13 @@ char **split_2_sarray(char *in_string,int split_chr)
 	if(string_size==0) return NULL;
 
    // Allocate a string that can hold it all
-   buffer = strdup(in_string);
-   // MESG("split_2_sarray [%s]",in_string);
+   char *start=in_string;
+   while(*start==' ') start++;
+   buffer = strdup(start);
+   MESG("split_2_sarray [%s]",start);
    if(buffer){
 	int i;
 	int l;
-	
 	for(i=0,l=0;i<string_size;i++){
 #if	1
 		if(buffer[i]==' ') { 

@@ -1308,7 +1308,6 @@ int view_previous(int n)
 #if	TNOTES
  else 
  if(cbfp->b_flag & FSNOTESN || cbfp->b_flag & FSNLIST) {
-	prev_line(1);
  	view_note(1);
 	set_update(cwp,UPD_EDIT|UPD_STATUS);
  };
