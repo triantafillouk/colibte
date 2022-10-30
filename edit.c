@@ -1088,7 +1088,7 @@ int quick_close(int n)
 		return FALSE;
 	};
 	oldcb = cbfp;                          /* save in case we fail */
-	MESG("quick_close:");
+	// MESG("quick_close:");
 	if(oldcb->connect_buffer!=NULL) MESG("	is connected!");
 	if(cbfp->b_fname[0]!=CHR_LBRA)
 	if(!dont_edit()) {
@@ -1113,7 +1113,7 @@ int quick_close(int n)
 			delete_hmark(1);
 			return dir_left(1);
 	}else {
-	MESG("quick_close: close_file");
+	// MESG("quick_close: close_file");
 		if(cbfp->connect_buffer!=NULL) {
 		MESG("buffer is connected!");
 			FILEBUF *connect_fp=cbfp->connect_buffer;
@@ -1121,7 +1121,7 @@ int quick_close(int n)
 			delete_filebuf(oldcb,1);
 			return(OK_CLRSL);
 		} else {;
-			MESG("no connected!!!");
+			// MESG("no connected!!!");
 			close_file(1);
 			return(TRUE);
 		};

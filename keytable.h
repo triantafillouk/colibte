@@ -511,7 +511,7 @@ KEYTAB keytab_view[] = {
 /* and some not so vi compatible  */
 	{'1',		goto_bof,"1"},
 	{'v',		quick_close,"v"},
-//	{SPEC1|'D', dir_left,"KEY-LEFT"},
+	{SPEC1|'D', dir_left,"KEY-LEFT"},
 	{'\\',		dir_left,"BSLASH"},
 	{'q',		close_file,"q"},
 	{CHR_LBRA,		goto_bop,"["},
@@ -538,6 +538,7 @@ KEYTAB keytab_notes[] = {
 	{'e',		edit_note,"e"},
 	{'v',		view_note,"v"},
 	{SPEC1|'C', view_note,"KEY-RIGHT"},
+	{SPEC1|'D', dir_left,"KEY-LEFT"},
 
 	{'k',		prev_line,"k"},
 	{'j',		next_line,"j"},

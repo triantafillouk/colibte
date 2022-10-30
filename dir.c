@@ -352,9 +352,10 @@ int dir_edit(int n)
   char fname[MAXFLEN];
   char dname[MAXFLEN];
 
-  // MESG("dir_edit:");
+  MESG("dir_edit: b_flag=%X b_type=%d",cbfp->b_flag,cbfp->b_type);
   if(!(cbfp->b_flag & FSNLIST))
   {
+	int old_type=cbfp->b_type;
 	if(cbfp->b_flag & FSINVS) return(TRUE);
 	if(!IS_FLAG(cbfp->b_state,FS_VIEWA)) return (TRUE);
 
@@ -369,8 +370,8 @@ int dir_edit(int n)
 
 	vb = cbfp;
 	b = new_filebuf(dir_name(vb->dir_num),0);
-	// MESG("set connect buffer !!");
-	b->b_type = cbfp->b_type;
+	b->b_type = cbfp->b_type|old_type;
+	// MESG("set connect buffer !! b_type=%d",b->b_type);
 	int is_type = cbfp->b_type;
 
 	select_filebuf(b);
@@ -378,13 +379,21 @@ int dir_edit(int n)
 	delete_filebuf(vb,1);
 	/* then open the file the usual way */
 
+	// MESG("1---- b_type=%d",cbfp->b_type);
+#if	1
+	cbfp->b_flag=0;
+	// MESG("file[%s / %s -> %s",cbfp->b_dname,cbfp->b_fname,fname);
+	create_base_name(cbfp->b_fname,fname);
+	// MESG("file[%s / %s -> %s",cbfp->b_dname,cbfp->b_fname,fname);
+	file_read(cbfp,fname);
+#else
 	status=goto_file(fname);
+#endif
+	// MESG("2----");
 
 	strlcpy(cbfp->b_dname,getcwd(dname,MAXFLEN),MAXFLEN);
-#if	1
 	igotooffset(offset,ppline);
-#endif
-	// MESG("new flags add 0x%X",old_type);
+	// MESG("new flags add %d is_type=%d",old_type,is_type);
 	cbfp->connect_buffer = is_connected_to;
 	cbfp->b_type = is_type;
 
@@ -393,7 +402,7 @@ int dir_edit(int n)
   } else {
 	
 	ftype=dir_getfile(fname,0);
-
+	// MESG("dir_edit: ftype=%d",ftype);
   	if(ftype<0) return(FALSE);
   	if(ftype==FTYPE_NORMAL) {
 		set_full_name(dname,cbfp->b_dname,fname,MAXFLEN);
@@ -1299,7 +1308,6 @@ int view_previous(int n)
 #if	TNOTES
  else 
  if(cbfp->b_flag & FSNOTESN || cbfp->b_flag & FSNLIST) {
-	prev_line(1);
  	view_note(1);
 	set_update(cwp,UPD_EDIT|UPD_STATUS);
  };

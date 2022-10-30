@@ -1,0 +1,6 @@
+# Some UTF-8 encoded peculiar characters
+✅❌❎--
+✅.
+❌.
+❌.
+

@@ -86,13 +86,13 @@ int new_note(int type)
  };
  if(type==3) { 
 	res=snprintf(scratch_name,24,"%s",date_string(3));
-	if(res==25) MESG("cal name truncated");
+	if(res==25) MESG("todo name truncated");
  };
 
  stat=goto_file(scratch_name);
  // MESG("new_note: stat=%d",stat);
  if(stat) {
-	cbfp->scratch_num=scratch_ind;
+	// cbfp->scratch_num=scratch_ind;
 	insert_preamble(cbfp,type);
 	// goto name field
 	goto_bof(1);
@@ -488,6 +488,7 @@ int save_to_db(notes_struct *note)
 	if(snprintf(sql,1024,"UPDATE notes set Title = \"%s\" where rowid = %d",note->n_title,note_id)>=1024) {
 		MESG("Title truncated!");
 	} ;
+	MESG("update title sql=[%s]",sql);
 	if(!sql_exec(db,sql,0)){
 		error_line("Cannot update title");
 	};
@@ -604,13 +605,14 @@ int parse_note(FILEBUF *fp)
 		};
 		// MESG("parse_note:2 n_name=[%s]",note->n_name);
 		ptr = find_str_reol(fp,ptr,"# ",note->n_title,sizeof(note->n_title));
+		if(ptr==0) find_str_reol(fp,ptr,"#Title: ",note->n_title,sizeof(note->n_title));
 		// MESG("calendar, title = %s",note->n_title);
 		strcpy(note->n_cat,"calendar/");
 		memcpy(note->n_cat+9,fp->b_fname,4);note->n_cat[13]=0;	// add the year to calendar category
 		// MESG("calendar cat [%s]",note->n_cat);
 
 		note->n_tags[0]=0;
-		ptr = find_str_reol(fp,ptr,"#Tags:",note->n_tags,sizeof(note->n_tags));
+		ptr = find_str_reol(fp,ptr,"#Tags: ",note->n_tags,sizeof(note->n_tags));
 		if(!strstr(note->n_tags,"calendar")){
 			if(strlen(note->n_tags)>0) strncat(note->n_tags,",",sizeof(note->n_tags));
 			strncat(note->n_tags,"calendar",sizeof(note->n_tags));
@@ -633,18 +635,20 @@ int parse_note(FILEBUF *fp)
 		};
 		// ptr = find_str_reol(fp,ptr,"#Name: ",note->n_name,sizeof(note->n_name));
 
-		// MESG("parse_note:2 n_name=[%s]",note->n_name);
+		MESG("todo, name [%s]",note->n_name);
 		ptr = find_str_reol(fp,ptr,"#Title: ",note->n_title,sizeof(note->n_title));
 		if(ptr==0) errors++;
-		// MESG("calendar, title = %s",note->n_title);
+		MESG("	title = %s",note->n_title);
 		strcpy(note->n_cat,"todo/");
-		memcpy(note->n_cat+9,fp->b_fname,4);note->n_cat[13]=0;
+		memcpy(note->n_cat+5,fp->b_fname,4);note->n_cat[9]=0;
+		MESG("	category [%s]",note->n_cat);
 		note->n_tags[0]=0;
 		ptr = find_str_reol(fp,ptr,"#Tags:",note->n_tags,sizeof(note->n_tags));
 		if(!strstr(note->n_tags,"todo")){
 			if(strlen(note->n_tags)>0) strncat(note->n_tags,",",sizeof(note->n_tags));
 			strncat(note->n_tags,"todo",sizeof(note->n_tags));
 		};
+		MESG("	tags: [%s]",note->n_tags);
 		return true;
 	};
 
@@ -1524,7 +1528,7 @@ int edit_note(int n)
 	return false;
  };
  FILEBUF *bp;
-	// MESG("edit_note:[%s]",full_name);
+	MESG("edit_note:[%s] n=%d b_type=%d",full_name,n,cbfp->b_type);
 	if(edit_file(full_name)) return true;
 	
 	if((bp=new_filebuf(full_name,0))==NULL) {
@@ -1547,7 +1551,7 @@ int edit_note(int n)
 
 	set_hmark(1,"edit_note");
 
- bp->b_state |= FS_VIEW;
+ if(n==0) bp->b_state |= FS_VIEW;
  return true;
 }
 

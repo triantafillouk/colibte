@@ -1973,7 +1973,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 int ifile(FILEBUF *bf,char *name,int ir_flag)
 {
  int stat;
-// MESG("ifile: [%s] ir_flag=%d",name,ir_flag);
+ // MESG("ifile: [%s] ir_flag=%d",name,ir_flag);
  stat=ifile0(bf,name,ir_flag);
  return(stat);
 }

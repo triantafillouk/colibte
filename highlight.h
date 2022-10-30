@@ -32,7 +32,6 @@ int comment_sql(int n);
 #define HS_PREVACCENT	3
 #define HS_PREVSLASH	4
 #define HS_PREVESC		5
-#define HS_ESC			5
 #define HS_PSMALLER		6
 #define HS_END1			7
 #define HS_END2			8

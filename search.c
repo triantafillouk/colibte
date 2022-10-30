@@ -93,7 +93,7 @@ void get_lowercase_string(char *lower, char *string)
 #else
 	free(tmp_string);
 #endif
-	MESG("get_lowercase_string:[%s]->[%s]",string,lower);
+	// MESG("get_lowercase_string:[%s]->[%s]",string,lower);
 }
 
 void get_uppercase_string(char *upper, char *string)
@@ -116,7 +116,7 @@ void get_uppercase_string(char *upper, char *string)
 #else
 	free(tmp_string);
 #endif
-	MESG("get_uppercase_string:[%s]->[%s]",string,upper);
+	// MESG("get_uppercase_string:[%s]->[%s]",string,upper);
 }
 
 /*

@@ -467,33 +467,37 @@ char **read_sarray(char *file_name,int *size)
 }
 
 
-char **split_2_sarray(char *str,int split_chr)
+char **split_2_sarray(char *in_string,int split_chr)
 {
  char **array=NULL;
    char *buffer = NULL;
    int string_size;
    int count=0;
-   string_size=strlen(str);
+   string_size=strlen(in_string);
+	if(string_size==0) return NULL;
+
    // Allocate a string that can hold it all
-   buffer = malloc(string_size+1);
-   // MESG("split_2_sarray [%s]",str);
+   char *start=in_string;
+   while(*start==' ') start++;
+   buffer = strdup(start);
+   MESG("split_2_sarray [%s]",start);
    if(buffer){
 	int i;
 	int l;
-	
 	for(i=0,l=0;i<string_size;i++){
 #if	1
-		if(str[i]==' ') { 
+		if(buffer[i]==' ') { 
 			// MESG("	space l=%d i=%d",l,i);
+			// buffer[i]='_';
 			continue;
 		}; 	/* trim starting spaces  */
 #endif
-		if(str[i]==split_chr){
+		if(buffer[i]==split_chr){
 			count++;
-			buffer[l++]=0;
-		} else buffer[l++]=str[i];
+			buffer[i]=0;
+		}
 	};
-	buffer[i]=0;
+	// buffer[i]=0;
 	// MESG("	%d components",count+1);
 	array=malloc((count+2)*sizeof(char *));
 	for(l=0,i=0;l<count+1;l++){
