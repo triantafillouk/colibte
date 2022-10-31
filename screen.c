@@ -739,8 +739,10 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	else end_column=max_size+num_columns;
 	if(row>0) {	/* not for header!  */
 		if(index==row) {
-			bg_color=INFOBACK;
-			if(drv_colors==8) fg_color=BACKGROUND;
+			bg_color=CBOXTBACK;
+			if(drv_colors==8) 
+				fg_color=BACKGROUND;
+			else if(selected>0) fg_color=CNUMERIC;
 		} else {
 			if(selected>0) {
 				if(drv_colors==8) bg_color=MODEBACK;
@@ -764,8 +766,8 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	} else 
 	{
 		if(drv_colors==8) { bg_color=MODEBACK;fg_color=CNUMERIC;}
-		else { bg_color=MODEBACKI;fg_color=MODEFORE;};
-
+		else { bg_color=INFOBACK;fg_color=MODEFORE;};
+		line_bcolor=bg_color;
 		for(i0=start_color_column;i0<= end_column;i0++)
 		{
 			svcolor(v_text+i0,bg_color,fg_color);
@@ -1454,11 +1456,11 @@ void vteeol(WINDP *wp, int selected,int inside)
 				if(selected==2)       { if(drv_colors>8)  ctl_b=MODEBACKI;else ctl_b=MODEBACK;}	// header
 				else if(selected==3)  { if(drv_colors>8)  ctl_b=MODEBACKI;else ctl_b=MODEBACK;}	// just selected
 				else if(selected==-1) { if(drv_colors==8) ctl_b=MODEBACK ;}	// empty
-				else                  ctl_b=INFOBACK;	// current line
+				else                  ctl_b=CBOXTBACK;	// current line
 				svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,wp->w_ntcols-wp->vtcol);
 			} else {
 				// MESG("	from col=%d line_bcolor=%X %X width=%d",wp->vtcol,line_bcolor,ctl_b,wp->w_ntcols-wp->vtcol);
-				svmchar(vp->v_text+wp->vtcol,blank,line_bcolor,ctl_f,wp->w_ntcols-wp->vtcol);
+				svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,wp->w_ntcols-wp->vtcol);
 			};
 	}
 	wp->vtcol=wp->w_ntcols;

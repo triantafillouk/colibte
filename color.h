@@ -80,11 +80,7 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* orange */ 	"#F09000",
 	/* blue */		"#0070A0",
 	/* magenta */	"#303020",
-#if	1
 	/* cyan */		"#006080",
-#else
-	/* cyan */		"#009090",
-#endif
 	/* white */		"#D0D0D0",
 	/* brown */		"#303040",
 	/* lred */		"#FF0000",
@@ -291,7 +287,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{WHITE,0},	/* Foreground FOREGR*/
 	{BLACK,0},	/* Background BACKGR*/
 	{LWHITE,0},	/* Modeline Foreground MODEFORE*/
-	{CYAN,0},	/* Modeline BACKGOUND  MODEBACK*/
+	{BLUE,0},	/* Modeline BACKGOUND  MODEBACK*/
 	{YELLOW,A_BOLD},	/* Display row-column DROWCOL*/
 	{LWHITE,0},	/* search foreground SEARFORE*/
 	{RED,0},	/* search background SEARBACK*/
