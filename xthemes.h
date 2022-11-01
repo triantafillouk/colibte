@@ -97,17 +97,17 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#000000",	/* Foreground FOREGROUND */
 	"#E3E3E3",	/* Background BACKGROUND */  /* !BG! */
 	"#FFFFFF",	/* Modeline Foreground MODEFORE*/
-	"#0097B7",	/* Modeline BACKGROUND , selections MODEBACK*/ /* !BG! */
+	"#80B0D0",	/* Modeline BACKGROUND , selections MODEBACK*/ /* !BG! */
 	"yellow2",	/* Display row-column DROWCOL*/
 	"#EFE3B8",	/* search foreground SEARFORE*/
 	"#AE0000",	/* search background SEARBACK*/ /* !BG! */
-	"#606060",	/* QUOTEFORE , H_QUOTE2 */
+	"#303030",	/* QUOTEFORE , H_QUOTE2 */
 	"#A0F0A0",	/* QUOTEBACK */ 
 	"#906000",	/* COMMENTFORE H_QUOTE5 */
 	"#E0D0A0",	/* LBACKGROUND  */
 	"#00A080",	/* PREPFORE, H_QUOTE6 preprocessor foreground */
 	"#FF0000",	/* CHANGEDFORE */
-	"#606060",	/* TAGFORE H_QUOTE4, 8 */
+	"#303030",	/* TAGFORE H_QUOTE4, 8 */
 	"#AE0000",	/* WORD1FORE */
 	"#0000FF",	/* SPECFORE H_QUOTE1, single quotes */
 	"#006000",	/* Single quote foreground */
@@ -116,7 +116,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#006000",	/* W_FORE H_QUOTE7 tag words */
 	"#800080",	/* ORIZON orizon characters foreground */
 	"#0000AE",	/* CNUMERIC numeric foreground */
-	"#606070",	/* INFOFORE  */
+	"#303070",	/* INFOFORE  */
 	"#E0D0A0",	/* INFOBACK  */ 
 	"#EFE3B8",	/* CBOXTFORE, */ 
 	"#0000AE", 	/* CBOXTBACK  */
@@ -130,10 +130,10 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#D0D0D0",	/* FOREGROUND */
 	"black",	/* BACKGROUND */
 	"white",	/* Modeline Foreground MODEFORE*/
-	"steelblue4",	/* Modeline BACKGOUND  MODEBACK*/
+	"#005070",	/* Modeline BACKGOUND  MODEBACK*/
 	"yellow",	/* Display row-column DROWCOL*/
 	"#FFF0F0",	/* search foreground SEARFORE*/
-	"#D00000",	/* search background SEARBACK*/
+	"#A00000",	/* search background SEARBACK*/
 	"#D0D0D0",	/* QUOTEFORE */
 	"#008000",	/* QUOTEBACK */
 	"#F09000",	/* COMMENTFORE */
@@ -221,15 +221,15 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
  // GRAY
  {
 	"black",	/* Foreground FOREGR*/
-	"grey55",	/* Background BACKGR*/
+	"grey45",	/* Background BACKGR*/
 	"white",	/* Modeline Foreground MODEFORE*/
-	"#36648B",	/* Modeline BACKGOUND  MODEBACK*/
+	"#506080",	/* Modeline BACKGOUND  MODEBACK*/
 	"yellow",	/* Display row-column DROWCOL*/
 	"white",	/* search foreground SEARFORE*/
 	"red4",	/* search background SEARBACK*/
 	"#F2F2F2",	/* QUOTEFORE */
 	"#008000",	/* QUOTEBACK */
-	"#E0D0A0",	/* COMMENTFORE */
+	"#E5D5A5",	/* COMMENTFORE */
 	"#A8A8A0",	/* LBACKGROUND */
 	"yellow",/* PREPFORE */
 	"#FF4D4D",	/* CHANGEDFORE */
@@ -254,7 +254,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#FFFFFF",	/* Foreground FOREGR*/
 	"#303030",	/* Background BACKGR*/
 	"white",	/* Modeline Foreground MODEFORE*/
-	"steelblue4",	/* Modeline BACKGOUND  MODEBACK*/
+	"#336164",	/* Modeline BACKGOUND  MODEBACK*/
 	"yellow",	/* Display row-column DROWCOL*/
 	"#FFFFFF",	/* search foreground SEARFORE*/
 	"red2",	/* search background SEARBACK*/
@@ -271,10 +271,10 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#FA0000",	/* CTRLFORE */
 	"#9999FF",	/* WORD2FORE */
 	"#FA0000",	/* W_FORE */
-	"magenta", /* ORIZON */
-	"#99E6E6",	/* CNUMERIC */
+	"#FF00FF",  /* ORIZON */
+	"#9999FF",	/* CNUMERIC */
 	"#B0B0B0",	/* INFOFORE  */
-	"#505050",	/* INFOBACK  */ 
+	"#5F5F5F",	/* INFOBACK  */ 
 	"#F2F2D9","gray50",
 	"#F2F2D9","blue",
 	"grey45",	/* Modeline Foreground MODEFOREI inactive */
@@ -283,14 +283,14 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
  // Sunny
  {
 	"black",	/* Foreground FOREGR*/
-	"#E0E0DF",	/* Background BACKGR*/
+	"#E0E0F0",	/* Background BACKGR*/
 	"#FFFFFF",	/* Modeline Foreground MODEFORE*/
-	"steelblue",	/* Modeline BACKGOUND  MODEBACK*/
+	"#B0C0D0",	/* Modeline BACKGOUND  MODEBACK*/
 	"yellow2",	/* Display row-column DROWCOL*/
 	"#FFFFFF",	/* search foreground SEARFORE*/
 	"#AD0000",	/* search background SEARBACK*/
 	"#E0E4E0",	/* QUOTEFORE */
-	"#009400",	/* QUOTEBACK */
+	"#00B000",	/* QUOTEBACK */
 	"#A04040",	/* COMMENTFORE */
 	"#E0E0D0",	/* LBACKGROUND */
 	"#FF3333",	/* PREPFORE */
@@ -304,8 +304,8 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#009400",	/* W_FORE */
 	"magenta3", /* ORIZON */
 	"#1C99CC",	/* CNUMERIC */
-	"grey20",	/* INFOFORE  */
-	"grey80",	/* INFOBACK  */ 
+	"black",	/* INFOFORE  */
+	"#C0C0B0",	/* INFOBACK  */ 
 	"white","gray20",
 	"white","blue",
 	"grey99",	/* Modeline Foreground MODEFOREI inactive */
@@ -316,13 +316,13 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#E0E0E0",	/* Foreground FOREGR*/
 	"#141414",	/* Background BACKGR*/
 	"white",	/* Modeline Foreground MODEFORE*/
-	"steelblue4",	/* Modeline BACKGOUND  MODEBACK*/
+	"#004466",	/* Modeline BACKGOUND  MODEBACK*/
 	"yellow",	/* Display row-column DROWCOL*/
 	"white",	/* search foreground SEARFORE*/
 	"#F05050",	/* search background SEARBACK*/
 	"white",	/* QUOTEFORE */
-	"#508050",	/* QUOTEBACK */
-	"#5F5A60",	/* COMMENTFORE */
+	"#407040",	/* QUOTEBACK */
+	"#606070",	/* COMMENTFORE */
 	"grey20",	/* LBACKGROUND */
 	"#8996A8",	/* PREPFORE */
 	"bisque3",	/* CHANGEDFORE */
@@ -347,7 +347,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#E8D8D8",	/* Foreground FOREGR*/
 	"#202020",	/* Background BACKGR*/
 	"white",	/* Modeline Foreground MODEFORE*/
-	"steelblue4",	/* Modeline BACKGOUND  MODEBACK*/
+	"#006181",	/* Modeline BACKGOUND  MODEBACK*/
 	"yellow",	/* Display row-column DROWCOL*/
 	"#E8D8D8",	/* search foreground SEARFORE*/
 	"#D06060",	/* search background SEARBACK*/

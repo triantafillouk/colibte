@@ -739,7 +739,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	else end_column=max_size+num_columns;
 	if(row>0) {	/* not for header!  */
 		if(index==row) {
-			bg_color=CBOXTBACK;
+			bg_color=MODEBACK;
 			if(drv_colors==8) 
 				fg_color=BACKGROUND;
 			else if(selected>0) fg_color=CNUMERIC;
@@ -1134,27 +1134,21 @@ offs vtline(WINDP *wp, offs tp_offs)
 			// svcolor(v_text+i0,SEARBACK,CNUMERIC);
 			if(i0+first_column > rlen+num_columns) break;
 			c1=vtlm[i0+first_column-num_columns];
-			// bcol = v_text[i0].bcolor;
-			bcol = line_bcolor;
+			bcol = v_text[i0].bcolor;
 			fcol = v_text[i0].fcolor;
-			// svcolor(v_text+i0,SEARBACK,CNUMERIC);
+#if	1
 			if(bcol!=MODEBACK)	
 			if(bcol!=BACKGROUND || fcol!=FOREGROUND) {continue;};
-			if(i0>stop_word_highlight) { continue;};
-			if(bcol==MODEBACK) 
-			{
-				if(c1==H_WORD1) svcolor(v_text+i0,MODEBACK,WORD1FORE);
-				if(c1==H_WORD2) svcolor(v_text+i0,MODEBACK,WORD2FORE);
+#endif
+			if(i0>stop_word_highlight) { continue;};	// in yaml only!
+			if(fcol!=COMMENTFORE && fcol!=PREPFORE) {
+				if(c1==H_WORD1) svcolor(v_text+i0,bcol,WORD1FORE);
+				if(c1==H_WORD2) svcolor(v_text+i0,bcol,WORD2FORE);
 				if(c1==H_NUMERIC) {
-					svcolor(v_text+i0,MODEBACK,CNUMERIC);
-				};
-			} else {
-				if(c1==H_WORD1) svcolor(v_text+i0,BACKGROUND,WORD1FORE);
-				if(c1==H_WORD2) svcolor(v_text+i0,BACKGROUND,WORD2FORE);
-				if(c1==H_NUMERIC) {
-					svcolor(v_text+i0,BACKGROUND,CNUMERIC);
+					svcolor(v_text+i0,bcol,CNUMERIC);
 				};
 			};
+
 		};
 	};
 
@@ -1229,7 +1223,10 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			c1='?';
 		};
 
-		if(get_selection()){ctl_f = FOREGROUND;ctl_b=MODEBACK;};
+		if(get_selection()){
+			ctl_f = FOREGROUND;
+			ctl_b=MODEBACK;
+		};
 		svchar(vp->v_text+wp->vtcol,c1,ctl_b,ctl_f);
 		wp->vtcol++;
 
@@ -1365,7 +1362,11 @@ void vtputwc(WINDP *wp, utfchar *uc)
 				ctl_b=line_bcolor=wp->w_bcolor;	
 			};
 		};
-		if(get_selection()){ctl_f = FOREGROUND;ctl_b=MODEBACK;};
+		if(get_selection()){
+			// ctl_f = FOREGROUND;
+			ctl_b=MODEBACK;
+			// line_bcolor=ctl_b;
+		};
 
 		if( hquotem==H_QUOTE7 && c=='=') {
 			ctl_f=CNUMERIC;
@@ -1398,7 +1399,8 @@ void vtputwc(WINDP *wp, utfchar *uc)
 		/* orizon different color creates problems if utf and local char set (utf string error)  */
 		/* if on the orizon make it a different color */
 		if (((wp->vtcol == wp->w_ntcols-1)) || (wp->vtcol==0 && wp->w_lcol > 0)) {
-			ctl_f = ORIZON;ctl_b=line_bcolor;
+			ctl_f = ORIZON;
+			// ctl_b=line_bcolor;
 		};
 
 		// this is for screens that do not support output at 128-159
@@ -1435,6 +1437,7 @@ void vteeol(WINDP *wp, int selected,int inside)
     ctl_f=wp->w_fcolor;
 	// ctl_b=wp->w_bcolor;
 	ctl_b = line_bcolor;
+	// if(wp->vtrow==0) ctl_b=INFOBACK;
 #if	DARWIN
 	blank=CHR_NBSPACE;	// use this for mac terminal!
 #else
@@ -1453,13 +1456,14 @@ void vteeol(WINDP *wp, int selected,int inside)
 		};
 	} else {
 			if(selected) {
-				if(selected==2)       { if(drv_colors>8)  ctl_b=MODEBACKI;else ctl_b=MODEBACK;}	// header
+				if(selected==2)       { if(drv_colors>8)  ctl_b=INFOBACK;else ctl_b=MODEBACK;}	// header
 				else if(selected==3)  { if(drv_colors>8)  ctl_b=MODEBACKI;else ctl_b=MODEBACK;}	// just selected
 				else if(selected==-1) { if(drv_colors==8) ctl_b=MODEBACK ;}	// empty
-				else                  ctl_b=CBOXTBACK;	// current line
+				else                  ctl_b=MODEBACK;	// current line
 				svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,wp->w_ntcols-wp->vtcol);
 			} else {
 				// MESG("	from col=%d line_bcolor=%X %X width=%d",wp->vtcol,line_bcolor,ctl_b,wp->w_ntcols-wp->vtcol);
+				
 				svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,wp->w_ntcols-wp->vtcol);
 			};
 	}

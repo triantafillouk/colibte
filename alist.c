@@ -7,7 +7,6 @@
 	Link list (double linked lists) support functions
 	Copywrite Kostas Triantafillou 2005
 */
-
 /* version 10/8/2022 */
 #define	FULL 0
 #include "alist.h"

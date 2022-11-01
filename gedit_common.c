@@ -14,6 +14,7 @@ num physical_column(num vcol);
 int set_tag_view_position(int line,int column);
 extern FILEBUF *cbfp;
 int get_current_line();
+int change_sort_mode(int mouse_col);
 
 // This is used in scrolling!
 void move_window_lines(WINDP *wp,int lines)
