@@ -221,14 +221,14 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
  // GRAY
  {
 	"black",	/* Foreground FOREGR*/
-	"grey45",	/* Background BACKGR*/
+	"grey55",	/* Background BACKGR*/
 	"white",	/* Modeline Foreground MODEFORE*/
-	"#506080",	/* Modeline BACKGOUND  MODEBACK*/
+	"#5080A0",	/* Modeline BACKGOUND  MODEBACK*/
 	"yellow",	/* Display row-column DROWCOL*/
 	"white",	/* search foreground SEARFORE*/
 	"red4",	/* search background SEARBACK*/
 	"#F2F2F2",	/* QUOTEFORE */
-	"#008000",	/* QUOTEBACK */
+	"#50A050",	/* QUOTEBACK */
 	"#E5D5A5",	/* COMMENTFORE */
 	"#A8A8A0",	/* LBACKGROUND */
 	"yellow",/* PREPFORE */
@@ -316,7 +316,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#E0E0E0",	/* Foreground FOREGR*/
 	"#141414",	/* Background BACKGR*/
 	"white",	/* Modeline Foreground MODEFORE*/
-	"#004466",	/* Modeline BACKGOUND  MODEBACK*/
+	"#406688",	/* Modeline BACKGOUND  MODEBACK*/
 	"yellow",	/* Display row-column DROWCOL*/
 	"white",	/* search foreground SEARFORE*/
 	"#F05050",	/* search background SEARBACK*/
@@ -324,7 +324,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#407040",	/* QUOTEBACK */
 	"#606070",	/* COMMENTFORE */
 	"grey20",	/* LBACKGROUND */
-	"#8996A8",	/* PREPFORE */
+	"#00B0CF",	/* PREPFORE */
 	"bisque3",	/* CHANGEDFORE */
 	"#F0AD80",	/* TAGFORE */
 	"#CD7C33",	/* WORD1 */

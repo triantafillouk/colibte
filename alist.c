@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
+char *a="this";
 #if	defined _MESG_DEFINED
 void MESG(const char *fmt, ...);
 #else

@@ -133,12 +133,12 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
  {
  	/* black */		"#000000",
 	/* red  */		"red4",
-	/* green */		"#008000",
+	/* green */		"#508050",
 	/* orange */ 	"#E5D5A5",
 	/* blue */		"#004090",
 	/* magenta */	"#A8A8A0",
-	/* cyan */		"#506080",
-	/* white */		"grey45",
+	/* cyan */		"#5080A0",
+	/* white */		"grey55",
 	/* brown */		"#909090",
 	/* lred */		"#FF4D4D",
 	/* lgreen */	"#0E500E",
@@ -192,9 +192,9 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* red  */		"#804040",
 	/* green */		"#407040",
 	/* orange */ 	"#F0AD80",
-	/* blue */		"#8996F8",
+	/* blue */		"#006688",
 	/* magenta */	"#404040",
-	/* cyan */		"#004466",
+	/* cyan */		"#406688",
 	/* white */		"#E0E0E0",
 	/* brown */		"#606070",
 	/* lred */		"#CD7C33",
@@ -384,7 +384,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{BROWN,0}
  },
  
- /* GREY1 */
+ /* Gray */
  {
 	{BLACK,1},	/* Foreground FOREGR*/
 	{WHITE,0},	/* Background BACKGR*/
@@ -410,7 +410,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{LBLUE,0},	/* CNUMERIC */
 	{BLACK,0},	/* INFOFORE  */
 	{MAGENTA,0},/* INFOBACK  */
-	{WHITE,0},	/* CBOXTFORE */
+	{LWHITE,0},	/* CBOXTFORE */
 	{CYAN,0},	/* CBOXTBACK */
 	{LWHITE,0},
 	{BLUE,0},
@@ -478,7 +478,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{BLACK,0},	/* INFOFORE  */
 	{MAGENTA,0},/* INFOBACK  */
 	{LWHITE,0},	/* CBOXTFORE */
-	{CYAN,0},	/* CBOXTBACK */
+	{BROWN,0},	/* CBOXTBACK */
 	{WHITE,0},
 	{BLUE,0},
 	{WHITE,0},
@@ -497,7 +497,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{GREEN,0},	/* QUOTEBACK */
 	{BROWN,0},	/* COMMENTFORE */
 	{MAGENTA,0},/* LBACKGROUND */
-	{BLUE,0},	/* PREPFORE */
+	{LBLUE,0},	/* PREPFORE */
 	{ORANGE,0},	/* CHANGEDFORE */
 	{ORANGE,0},	/* TAGFORE */
 	{LRED,0},	/* WORD1BACK */
@@ -513,7 +513,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{WHITE,0},	/* CBOXTFORE */
 	{CYAN,0},	/* CBOXTBACK */
 	{WHITE,0},
-	{CYAN,0},
+	{BLUE,0},
 	{WHITE,0},
 	{BROWN,0}
  },

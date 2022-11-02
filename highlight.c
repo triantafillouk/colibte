@@ -1400,7 +1400,7 @@ void highlight_md(int c)
 
 void highlight_jscript(int c)
 {
-  static set_prev=-1;
+  static int set_prev=-1;
   if(highlight_note(c)) return;
 
   if(set_prev>=0) { hquotem=set_prev;set_prev=-1;};

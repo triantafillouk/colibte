@@ -286,7 +286,7 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 
  mouse_row=y/CHEIGHTI-(wp->w_fp->b_header!=NULL);
  mouse_col=x/CLEN;
- change_window(wp);
+ if(cwp!=wp) change_window(wp);
  if(mouse_row<0) {
 	if(!change_sort_mode(mouse_col)) {
 		mouse_row=prow;

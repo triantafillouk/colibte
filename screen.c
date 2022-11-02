@@ -1363,7 +1363,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			};
 		};
 		if(get_selection()){
-			// ctl_f = FOREGROUND;
+			ctl_f = FOREGROUND;
 			ctl_b=MODEBACK;
 			// line_bcolor=ctl_b;
 		};
