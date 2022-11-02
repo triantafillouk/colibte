@@ -34,10 +34,24 @@ MENUS m_notes = {
 	"Notes",5,1,VERTICAL, e_notes
 };
 
+M_element e_note_popup[] =
+{
+	{0, 'N', "New note       ","", new_note,0,"FTN"},
+	{0, 'C', "new Cal note   ","", new_note, (struct MENUS *)2,"FTC"},
+	{0, 'C', "new Todo note  ","", new_note, (struct MENUS *)3,"FTC"},
+	{0, 'D', "Delete tag note","", delete_tagnote,0,"WD"},
+
+	{0, 0, NULL,"",NULL,0,NULL}
+};
+
+MENUS m_note_popup = {
+	"Notes",5,1,VERTICAL, e_note_popup
+};
+
 M_element e_notes_tag[] = {
-	{0, 'D', "Delete tag note","",delete_tagnote,0,"WD"},
-	{0, 'T', "Toggle tag     ","",toggle_tag,0,"WT"},
-	{0, 'R', "Remove tags    ","",remove_tags,0,"WR"},
+	{0, 'D', "Delete tag note     ","",delete_tagnote,0,"WD"},
+	{0, 'T', "Toggle tag selection","",toggle_tag,0,"WT"},
+	{0, 'U', "Unselect tags       ","",remove_tags,0,"WR"},
 	{0, 0, NULL,"",NULL,0,NULL}
 };
 
@@ -274,7 +288,7 @@ M_element e_select_off[] =
 	{0, 'S', "Start selection ","", set_mark, 0, "ES"} ,	
 	{0, 'C', "start Column sel","", set_column_mark, 0,"EC"},
 	{0, 'P', "Paste           ","", system_paste, 0,"EV"} ,	
-	{0, 'T', "find Tag        ","", find_tag, (struct MENUS *)1, "EWT"},
+	{0, 'T', "find definiTion ","", find_tag, (struct MENUS *)1, "EWT"},
 	{0, 'G', "Goto file       ","", open_file, (struct MENUS *)3, "EWG"},
 	{0, 'M', "Match fence   ^]","", match_fence,0,"SM"},
 	{0, 0, NULL,"",NULL,0,NULL}

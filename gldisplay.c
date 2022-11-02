@@ -27,7 +27,7 @@ void delete_gwindow(WINDP *wp);
 void drv_free_win(WINDP *wp);
 void set_cursor(int flag,char *from);
 
-GtkWidget *popup_select_on, *popup_select_off, *popup_boxed_region, *popup_sort_menu;
+GtkWidget *popup_select_on, *popup_select_off, *popup_boxed_region, *popup_sort_menu,*popup_tag_menu,*popup_notes_menu;
 
 
 /* initialize screen */

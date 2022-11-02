@@ -45,6 +45,7 @@ void set_box_style(GtkWidget *widget,int font_size,char *fgcolor,char *bgcolor);
 void set_edit_font(GeEditDisplay *wd);
 GtkWidget *pixbuf_icon(const char **embeded_icon);
 int check_cr(WINDP *wp,char *msg);
+MENUS *start_menu = &m_topn;
 
 /* local variables */
 int color_scheme_ind;
@@ -57,7 +58,7 @@ int changed_color=0;
 GIConv cd;
 
 GtkWidget * create_top_menu(MENUS *menu_des , GtkWidget *parent,GtkAccelGroup  *menu_accels);
-extern GtkWidget *popup_select_on, *popup_select_off, *popup_boxed_region, *popup_sort_menu;
+extern GtkWidget *popup_select_on, *popup_select_off, *popup_boxed_region, *popup_sort_menu,*popup_tag_menu,*popup_notes_menu;
 void new_gwp_draw(GWINDP *gwp,WINDP *wp,GtkWidget *parent,int ptype);
 
 cairo_t *begin_draw(GeEditDisplay *wd,cairo_region_t *region,char *message);
@@ -254,6 +255,8 @@ create_parent (void)
   popup_select_off = create_top_menu( &m_select_off, parent, accel_group);
   popup_boxed_region = create_top_menu( &m_boxed_region, parent, accel_group);
   popup_sort_menu = create_top_menu( &m_sort, parent, accel_group);
+  popup_tag_menu = create_top_menu( &m_notes_tag, parent, accel_group);
+  popup_notes_menu = create_top_menu( &m_note_popup, parent, accel_group);
 
   if((int)bt_dval("use_titlebar")){
 	  create_main_menu(parent_title_bar, parent, &m_topn,accel_group);
@@ -2002,7 +2005,8 @@ gtk_box_pack_start(GTK_BOX(vbox), scwin, TRUE, TRUE, 1);
 
 void drv_show_menu_popup(GtkWidget *popup_menu)
 {
-	MESG("drv_show_menu_popup:");
+	MESG("drv_show_menu_popup: b_flag=%X",cbfp->b_flag);
+	// start_menu=&m_notes_tag;
 	gtk_menu_popup_at_pointer(GTK_MENU(popup_menu),NULL);
 }
 

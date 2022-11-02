@@ -373,6 +373,14 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 		};
 		if(button==3) {
 			// MESG("button:3");
+			if(cbfp->b_flag & FSNOTES) {
+				drv_show_menu_popup(popup_tag_menu);
+				update_screen(TRUE);
+			} else 
+			if(cbfp->b_flag & FSNOTESN) {
+				drv_show_menu_popup(popup_notes_menu);
+				update_screen(TRUE);
+			} else
 			if(!(cbfp->b_flag & FSNLIST) && !cwp->selection) {
 				// MESG("button:3 no selection or FSNLIST!");
 				if(cbfp->b_flag & FSDIRED) {

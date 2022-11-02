@@ -23,7 +23,7 @@ int newxy(WINDP *wp);
 void update_from_mouse(WINDP *wp,int x,int y,int button,int reset);
 void set_window_font(WINDP *wp);
 
-extern GtkWidget *popup_select_on, *popup_select_off, *popup_boxed_region, *popup_sort_menu;
+extern GtkWidget *popup_select_on, *popup_select_off, *popup_boxed_region, *popup_sort_menu,*popup_tag_menu,*popup_notes_menu;
 
 extern float CHEIGHT,CLEN,CFONTBASE,SLBASE;
 extern int CHEIGHTI;

@@ -37,6 +37,7 @@ int put_wtext1(WINDP *wp, int row,int pos_x,int col);
 /* local variables */
 int color_scheme_ind;
 int compact1 = 1;
+MENUS *start_menu = &m_topn;
 
 int drv_type=DRIVER_GTK2;
 extern short  *kbdsptr;
@@ -47,7 +48,7 @@ int changed_color=0;
 GIConv cd;
 
 GtkWidget * create_top_menu(MENUS *menu_des , GtkWidget *parent,GtkAccelGroup  *menu_accels);
-extern GtkWidget *popup_select_on, *popup_select_off, *popup_boxed_region, *popup_sort_menu;
+extern GtkWidget *popup_select_on, *popup_select_off, *popup_boxed_region, *popup_sort_menu,*popup_tag_menu,*popup_notes_menu;
 extern FILEBUF *cbfp;
 extern int clen_error;
 
@@ -245,6 +246,8 @@ create_parent (void)
   popup_select_off = create_top_menu( &m_select_off, parent, accel_group);
   popup_boxed_region = create_top_menu( &m_boxed_region, parent, accel_group);
   popup_sort_menu = create_top_menu( &m_sort, parent, accel_group);
+  popup_tag_menu = create_top_menu( &m_notes_tag, parent, accel_group);
+  popup_notes_menu = create_top_menu( &m_note_popup, parent, accel_group);
 
 	hbox2 = gtk_hbox_new (FALSE, 0);
 	gtk_widget_show (hbox2);
