@@ -27,7 +27,7 @@ void ge_set_initial_font(GtkWidget *widget);
 void set_edit_font(GeEditDisplay *wd);
 void upd_some_virtual_lines(WINDP *wp,char *from);
 
-extern GtkWidget *popup_select_on, *popup_select_off, *popup_boxed_region, *popup_sort_menu;
+extern GtkWidget *popup_select_on, *popup_select_off, *popup_boxed_region, *popup_sort_menu,*popup_tag_menu,*popup_notes_menu;
 void end_draw(GeEditDisplay *wd,char *message);
 
 extern float CHEIGHT,CLEN,CFONTBASE,SLHEIGHT,SLBASE;

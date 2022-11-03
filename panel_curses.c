@@ -452,7 +452,7 @@ int split_window(int n)
 		wp->gwp->t_xpos = cwp->gwp->t_xpos;
         wp->w_ntrows = ntrl+1;
 		wp->w_ntcols = cwp->w_ntcols;
-		set_update(wp,UPD_EDIT|UPD_STATUS);
+		set_update(wp,UPD_ALL|UPD_STATUS);
 		drv_set_wvs(wp);
 		return (next_window(1));
 }
@@ -483,7 +483,7 @@ int vsplit_window(int n)
 
 		wp->w_ntcols = ntr;
         wp->w_ntrows = cwp->w_ntrows;
-		set_update(wp,UPD_EDIT|UPD_STATUS);
+		set_update(wp,UPD_ALL|UPD_STATUS);
 		drv_set_wvs(wp);
 		return (next_window(1));
 }
@@ -2303,7 +2303,7 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
  int status_row=wp->w_ntrows-1;;
  int maxlen;
  int fg_color=MODEFORE;
- int bg_color=MODEBACK;
+ int bg_color=MENU_BG;
  char *status_string = show_string;
  int rpos=utf_num_chars(status_string)+2;
 
@@ -2849,7 +2849,7 @@ void show_slide(WINDP *wp)
 // char left_half[5] = { 0xE2,0x96,0x8C,0,0};
 // char xblock[5] = { 0xE2,0x95,0xB3,0,0};
  int fg_color=MODEFORE;
- int bg_color=MODEBACK;
+ int bg_color=MENU_BG;
  curs_set(0);
  if(cwp!=wp) {
 	if(drv_colors>8) {
@@ -2857,7 +2857,7 @@ void show_slide(WINDP *wp)
 		bg_color=MODEBACKI;
 	} else {
 	 	fg_color=BACKGROUND;
-		bg_color=MODEBACK;
+		bg_color=MENU_BG;
 	};
  };
 

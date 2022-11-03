@@ -202,7 +202,7 @@ char **getdir(char *dirname,char *s_find,int *num)
 int set_sort_mode(int mode)
 {
  int current_sort_mode=cwp->w_fp->sort_mode;
- MESG("set_sort_mode: current=%d",current_sort_mode);
+ // MESG("set_sort_mode: current=%d",current_sort_mode);
  if(!(cwp->w_fp->b_flag & FSDIRED)) return true;
 	if(mode==current_sort_mode) 
 	{	/* reverse sort  */
@@ -212,7 +212,7 @@ int set_sort_mode(int mode)
 		current_sort_mode=mode;
 	} ;
 	cwp->w_fp->sort_mode=current_sort_mode;
-	MESG("	new sort mode=%d",current_sort_mode);
+	// MESG("	new sort mode=%d",current_sort_mode);
 	// if(sort_mode != old_mode) 
 	{
 		dir_reload(1);
@@ -223,24 +223,21 @@ int set_sort_mode(int mode)
 int change_sort_mode(int mouse_col)
 {
 	if(mouse_col>7 && mouse_col<15) {
-		MESG("sort by size");
+		// MESG("sort by size");
 		set_sort_mode(2);
-		// update_screen(TRUE);
 		return 1;
 	// set/toggle sort by size 
 	};  
 	if(mouse_col>15 && mouse_col<30) {
-	// set/toggle sort by date
-		MESG("sort by date");
+		// set/toggle sort by date
+		// MESG("sort by date");
 		set_sort_mode(4);
-		// update_screen(TRUE);
 		return 1;
  	};
 	if(mouse_col>30) {
-		MESG("sort by name");
+		// MESG("sort by name");
 		// set/toggle sort by name
 		set_sort_mode(0);
-		// update_screen(TRUE);
 		return 1;
 	};
 	return 0;
@@ -346,63 +343,39 @@ void set_todirname(char *base_name,int dir_num)
 
 int dir_edit(int n) 
 {
-  int status=FALSE;
-  int ftype;
-  FILEBUF *b,*vb;
   char fname[MAXFLEN];
-  char dname[MAXFLEN];
 
-  MESG("dir_edit: b_flag=%X b_type=%d",cbfp->b_flag,cbfp->b_type);
+  // MESG("dir_edit: b_flag=%X b_type=%d",cbfp->b_flag,cbfp->b_type);
   if(!(cbfp->b_flag & FSNLIST))
   {
-	int old_type=cbfp->b_type;
+	// int old_type=cbfp->b_type;
 	if(cbfp->b_flag & FSINVS) return(TRUE);
 	if(!IS_FLAG(cbfp->b_state,FS_VIEWA)) return (TRUE);
 
-	// MESG("flags b_state=0x%X b_flag=0x%X b_type=0x%X",cbfp->b_state,cbfp->b_flag,cbfp->b_type);
-    num offset=tp_offset(cwp->tp_current);;
-	FILEBUF *is_connected_to = cbfp->connect_buffer;
+	// MESG("file[%s / %s -> %s",cbfp->b_dname,cbfp->b_fname,fname);
+    num poffset=tp_offset(cwp->tp_current);;
 	int ppline = tp_line(cwp->tp_current)-tp_line(cwp->tp_hline)+1;
-	
 	if(snprintf(fname,MAXFLEN,"%s/%s",cbfp->b_dname,cbfp->b_fname) >= MAXFLEN) {
-		return(TRUE);
+		return(FALSE);
 	};
-
-	vb = cbfp;
-	b = new_filebuf(dir_name(vb->dir_num),0);
-	b->b_type = cbfp->b_type|old_type;
-	// MESG("set connect buffer !! b_type=%d",b->b_type);
-	int is_type = cbfp->b_type;
-
-	select_filebuf(b);
-	/* delete view file buffer */
-	delete_filebuf(vb,1);
-	/* then open the file the usual way */
-
-	// MESG("1---- b_type=%d",cbfp->b_type);
-#if	1
-	cbfp->b_flag=0;
-	// MESG("file[%s / %s -> %s",cbfp->b_dname,cbfp->b_fname,fname);
-	create_base_name(cbfp->b_fname,fname);
-	// MESG("file[%s / %s -> %s",cbfp->b_dname,cbfp->b_fname,fname);
-	file_read(cbfp,fname);
-#else
-	status=goto_file(fname);
-#endif
-	// MESG("2----");
-
-	strlcpy(cbfp->b_dname,getcwd(dname,MAXFLEN),MAXFLEN);
-	igotooffset(offset,ppline);
-	// MESG("new flags add %d is_type=%d",old_type,is_type);
-	cbfp->connect_buffer = is_connected_to;
-	cbfp->b_type = is_type;
-
-	set_hmark(1,"dir_edit:a");
-	return(status);
-  } else {
+	// MESG("dir_edit: [%s / %s]",cbfp->b_dname,cbfp->b_fname);
+	if(empty_filebuf(cbfp)!=TRUE) return FALSE;
+	cbfp->b_flag &= ~(FSDIRED|FSMMAP);
 	
+	 if(! ifile(cbfp,fname,0)) return(FALSE);
+
+	igotooffset(poffset,ppline);
+	cbfp->b_state &= ~FS_CHG;
+	set_update(cwp,UPD_FULL);
+	set_hmark(1,"dir_edit:a");
+	return TRUE;
+  } else {
+	int status=FALSE;
+	char dname[MAXFLEN];
+	int ftype;
+
 	ftype=dir_getfile(fname,0);
-	// MESG("dir_edit: ftype=%d",ftype);
+	// MESG("dir_edit: ftype=%d fname=[%s]",ftype,fname);
   	if(ftype<0) return(FALSE);
   	if(ftype==FTYPE_NORMAL) {
 		set_full_name(dname,cbfp->b_dname,fname,MAXFLEN);
@@ -755,7 +728,7 @@ int dir_del1(int  n)
 {
   int status;
   char fname[MAXFLEN];
-  MESG("\ndir_del1:");
+  // MESG("\ndir_del1:");
   if(!(cbfp->b_flag & FSNLIST)) return FALSE;
   status=chdir(cbfp->b_dname);
   
@@ -1014,7 +987,7 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 			strlcat(wd,cmd_ext,MAXLLEN);
 			strlcat(wd," ",MAXLLEN);
 			strlcat(wd,fname,MAXLLEN);
-			MESG("use exec_shell [%s]",wd);
+			// MESG("use exec_shell [%s]",wd);
 			exec_shell(wd);
 			return true;
 			};
@@ -1063,7 +1036,7 @@ int dir_right(int n)
   char fname_ns[512];
   int status=FALSE;
 
-  MESG("dir_right: b_flag=%X",cbfp->b_flag);
+  // MESG("dir_right: b_flag=%X",cbfp->b_flag);
   if(!(cbfp->b_flag & FSNLIST)) return false;
 
   ftype=dir_getfile(fname,1);
@@ -1260,7 +1233,7 @@ FILEBUF *get_dir_buffer(int flag,int dnum)
 	while((bp=(FILEBUF *)lget(file_list))!=NULL)
 	{
 		if(bp->dir_num==dnum) {
-			MESG("found dir buffer:");
+			// MESG("found dir buffer:");
 			return(bp);
 		}
 	};
@@ -1517,7 +1490,7 @@ int dir_getfile(char *fname,int flag)
 
  if(stat_result<0) {
 	strlcpy(fname,f1,MAXFLEN);
-	MESG("stat_result: <0 , return [%s]!",fname);
+	// MESG("stat_result: <0 , return [%s]!",fname);
 	return(1);
  };
  // MESG("get_file: [%s] is_link=%d",f1,is_link);

@@ -1385,7 +1385,6 @@ int file_read(FILEBUF *bp, char *fname)
  /* clear the buffer */
  if(empty_filebuf(bp)!=TRUE) return FALSE;
  if(fname!=bp->b_fname) strlcpy(bp->b_fname, fname,MAXFLEN);
- 
  if(! ifile(bp,fname,0) && fname[0]!=CHR_LBRA) {
 // 	msg_line("No lines for file %s",fname);
 	return(FALSE);
@@ -1398,7 +1397,7 @@ int file_read(FILEBUF *bp, char *fname)
 	if(stat<MAXFLEN) unlink(scratch_file);
  };
  set_update(cwp,UPD_FULL);
-// MESG("file_read: end: b_type=%d",bp->b_type);
+ // MESG("file_read: end: b_type=%d",bp->b_type);
  return TRUE; 
 }
 

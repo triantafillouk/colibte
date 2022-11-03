@@ -232,6 +232,7 @@ int show_info(int n)
 	if(strlen(bp->b_dname)>0) {
 		SMESG("Buffer directory: [%s]",bp->b_dname);
 	};
+	if(bp->connect_buffer) SMESG(" connected to %s",bp->connect_buffer->b_fname);
 	if(debug_flag()) {
 		SMESG("Flags: b_mode=%X b_flag=%X view_mode=%X b_type=%X",cbfp->b_mode,cbfp->b_flag,cbfp->view_mode,cbfp->b_type);
 	};
@@ -2975,7 +2976,7 @@ num fread16(char *file_name,char *buffer,num size)
 int   ReadBlock(char *fname,int fd,offs size,offs *act_read)
 {
    FILEBUF *fp=cbfp;
-   MESG("ReadBlock:[%s] size=%ld",fname,size);
+   // MESG("ReadBlock:[%s] size=%ld",fname,size);
    if(fp->b_flag & FSMMAP)  return false;
    if(size==0)   {
       *act_read=0;
@@ -3560,7 +3561,7 @@ int empty_tok_table(FILEBUF *fp);
 
 void  EmptyText(FILEBUF *bp)
 {
-//	MESG("EmptyText:[%s]",bp->b_fname);
+   // MESG("EmptyText:[%s]",bp->b_fname);
    if(bp==NULL) return;
    undo_clear(bp->main_undo);
    ResetTextPoints(bp,1);

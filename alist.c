@@ -7,14 +7,13 @@
 	Link list (double linked lists) support functions
 	Copywrite Kostas Triantafillou 2005
 */
-
 /* version 10/8/2022 */
 #define	FULL 0
 #include "alist.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
+char *a="this";
 #if	defined _MESG_DEFINED
 void MESG(const char *fmt, ...);
 #else

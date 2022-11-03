@@ -12,7 +12,6 @@ extern int nnarg;
 extern FILEBUF *cbfp;
 
 GtkWidget *wlist;
-MENUS *start_menu = &m_topn;
 
 int confirm(char *title,char *prompt,int always) {
   int result; 
@@ -1738,6 +1737,7 @@ int text_mouse_error(int n)
 int execute_menu(int n)
 {
  FILEBUF *fp=cbfp;
+ // MESG("execute_menu: n=%d b_flag=%X",n,fp->b_flag);
 	if(fp->b_flag & FSDIRED && fp->b_flag & FSNLIST) {
 		if(fp->b_flag & FSNLIST) {
 			start_menu = &m_sort;	/* or a dir menu !!!!  */
@@ -1747,12 +1747,12 @@ int execute_menu(int n)
 			else drv_show_menu_popup(popup_select_off);
 		};
 	} 
-#if	TNOTES
+#if	TNOTES0
 	else if(fp->b_flag & FSNOTES) {
-	 	// start_menu=&m_notes_tag;
-		// drv_show_menu_popup(m_notes_tag);
+	 	start_menu=&m_notes_tag;
+		drv_show_menu_popup(popup_tag_menu);
 	} else if(fp->b_flag & FSNLIST) {
-	 	// start_menu=&m_notes_tag;
+	 	start_menu=&m_notes_tag;
 	} 
 #endif
 	else {

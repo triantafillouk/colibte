@@ -14,6 +14,7 @@ num physical_column(num vcol);
 int set_tag_view_position(int line,int column);
 extern FILEBUF *cbfp;
 int get_current_line();
+int change_sort_mode(int mouse_col);
 
 // This is used in scrolling!
 void move_window_lines(WINDP *wp,int lines)
@@ -285,7 +286,7 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 
  mouse_row=y/CHEIGHTI-(wp->w_fp->b_header!=NULL);
  mouse_col=x/CLEN;
- change_window(wp);
+ if(cwp!=wp) change_window(wp);
  if(mouse_row<0) {
 	if(!change_sort_mode(mouse_col)) {
 		mouse_row=prow;
@@ -372,6 +373,14 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 		};
 		if(button==3) {
 			// MESG("button:3");
+			if(cbfp->b_flag & FSNOTES) {
+				drv_show_menu_popup(popup_tag_menu);
+				update_screen(TRUE);
+			} else 
+			if(cbfp->b_flag & FSNOTESN) {
+				drv_show_menu_popup(popup_notes_menu);
+				update_screen(TRUE);
+			} else
 			if(!(cbfp->b_flag & FSNLIST) && !cwp->selection) {
 				// MESG("button:3 no selection or FSNLIST!");
 				if(cbfp->b_flag & FSDIRED) {
