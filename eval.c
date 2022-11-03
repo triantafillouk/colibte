@@ -872,7 +872,7 @@ void record_key(short ks)
 	if(cbfp->b_lang==0 && ks<256) {
 		int len=utf8_countbytes(ks);
 		int n;
-		MESG("	record_session_key: len=%d",len);
+		// MESG("	record_session_key: len=%d",len);
 		if(len>1){
 			for(n=1;n<len;n++){
 				record_session_key(utfokey[n]);
@@ -943,7 +943,7 @@ int replay(int mode,int ntimes)
 // short *end;
  kbdmode=mode;
 
- MESG("replay: mode=%X  ----------------------",mode);
+ // MESG("replay: mode=%X  ----------------------",mode);
  while(ntimes--)
  {
   int c;
