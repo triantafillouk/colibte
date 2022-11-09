@@ -807,8 +807,9 @@ offs vtline(WINDP *wp, offs tp_offs)
  vchar *v_text;
  int i0;
  FILEBUF *fp = wp->w_fp;; 
- int c1,bcol,fcol;
-
+ int c1;
+ int fcol=FOREGROUND;
+ int bcol=BACKGROUND;
  offs s1,s2,ptr1,ptr2;
  offs cur_lend=0;
  int hexmode = wp->w_fp->view_mode & VMHEX;
@@ -1127,6 +1128,9 @@ offs vtline(WINDP *wp, offs tp_offs)
 			vtputc(wp, FCharAt(fp,ptr1++));
 		}
 	};
+#if	0
+	if(get_selection()) bcol=MODEBACK;
+#endif
 	/* highlight according to evaluated mask */
 	if(syntaxh && slang)
 	{
@@ -1134,10 +1138,12 @@ offs vtline(WINDP *wp, offs tp_offs)
 			// svcolor(v_text+i0,SEARBACK,CNUMERIC);
 			if(i0+first_column > rlen+num_columns) break;
 			c1=vtlm[i0+first_column-num_columns];
-			// bcol = v_text[i0].bcolor;
-			bcol = line_bcolor;
+#if	0
+			if(bcol!=MODEBACK) bcol = line_bcolor;
+#endif
 			fcol = v_text[i0].fcolor;
-#if	1
+			bcol = v_text[i0].bcolor;
+#if	0
 			if(bcol!=MODEBACK)	
 			if(bcol!=BACKGROUND || fcol!=FOREGROUND) {continue;};
 #endif
@@ -1226,7 +1232,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 
 		if(get_selection()){
 			ctl_f = FOREGROUND;
-			ctl_b=MODEBACK;
+			ctl_b = MODEBACK;
 		};
 		svchar(vp->v_text+wp->vtcol,c1,ctl_b,ctl_f);
 		wp->vtcol++;
@@ -1355,18 +1361,15 @@ void vtputwc(WINDP *wp, utfchar *uc)
 				break;			
 			case H_QUOTE11:
 			case H_QUOTE11+H_QUOTE9:
-				// line_bcolor=INFOBACK;
 				ctl_b=MODEBACKI;
-				// ctl_f=wp->w_fcolor;
 				break;		
 			case 0:
 				ctl_b=line_bcolor=wp->w_bcolor;	
 			};
 		};
 		if(get_selection()){
-			ctl_f = FOREGROUND;
-			ctl_b=MODEBACK;
-			// line_bcolor=ctl_b;
+			// ctl_f = FOREGROUND;
+			ctl_b = MODEBACK;
 		};
 
 		if( hquotem==H_QUOTE7 && c=='=') {
