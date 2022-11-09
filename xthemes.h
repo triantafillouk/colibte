@@ -145,7 +145,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#98E098",	/* SPECFORE */
 	"#008000",	/* single quote foreground */
 	"#FF0000",	/* CTRLFORE */
-	"steelblue1",	/* WORD2FORE */
+	"#00D0D0",	/* WORD2FORE */
 	"magenta",	/* W_FORE */
 	"magenta3", /* ORIZON */
 	"#FFF0F0",	/* CNUMERIC */
@@ -316,7 +316,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#E0E0E0",	/* Foreground FOREGR*/
 	"#141414",	/* Background BACKGR*/
 	"white",	/* Modeline Foreground MODEFORE*/
-	"#406688",	/* Modeline BACKGOUND  MODEBACK*/
+	"#205060",	/* Modeline BACKGOUND  MODEBACK*/
 	"yellow",	/* Display row-column DROWCOL*/
 	"white",	/* search foreground SEARFORE*/
 	"#F05050",	/* search background SEARBACK*/

@@ -83,12 +83,12 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* cyan */		"#005070",
 	/* white */		"#D0D0D0",
 	/* brown */		"#303040",
-	/* lred */		"#FF0000",
+	/* lred */		"#D00000",
 	/* lgreen */	"#98E098",
 	/* yellow */	"#FFFF00",
 	/* lblue */		"#0000FF",
 	/* lmagenta */	"#FF00FF",
-	/* lcyan */		"steelblue1",
+	/* lcyan */		"#00D0D0",
 	/* lwhite */	"#FFF0F0"
  },
 // Cyan
@@ -194,7 +194,7 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* orange */ 	"#F0AD80",
 	/* blue */		"#006688",
 	/* magenta */	"#404040",
-	/* cyan */		"#406688",
+	/* cyan */		"#205060",
 	/* white */		"#E0E0E0",
 	/* brown */		"#606070",
 	/* lred */		"#CD7C33",

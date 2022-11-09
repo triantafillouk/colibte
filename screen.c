@@ -1138,15 +1138,13 @@ offs vtline(WINDP *wp, offs tp_offs)
 			// svcolor(v_text+i0,SEARBACK,CNUMERIC);
 			if(i0+first_column > rlen+num_columns) break;
 			c1=vtlm[i0+first_column-num_columns];
-#if	0
-			if(bcol!=MODEBACK) bcol = line_bcolor;
-#endif
+
 			fcol = v_text[i0].fcolor;
 			bcol = v_text[i0].bcolor;
-#if	0
+
 			if(bcol!=MODEBACK)	
 			if(bcol!=BACKGROUND || fcol!=FOREGROUND) {continue;};
-#endif
+
 			if(i0>stop_word_highlight) { continue;};	// in yaml only!
 			if(fcol!=COMMENTFORE && fcol!=PREPFORE) {
 				if(c1==H_WORD1) svcolor(v_text+i0,bcol,WORD1FORE);
@@ -1368,7 +1366,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			};
 		};
 		if(get_selection()){
-			// ctl_f = FOREGROUND;
+			ctl_f = FOREGROUND;
 			ctl_b = MODEBACK;
 		};
 
