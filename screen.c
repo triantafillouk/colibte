@@ -1128,7 +1128,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 			vtputc(wp, FCharAt(fp,ptr1++));
 		}
 	};
-#if	1
+#if	0
 	if(get_selection()) {
 		// fcol=CNUMERIC;
 		bcol=MODEBACK;
@@ -1149,14 +1149,15 @@ offs vtline(WINDP *wp, offs tp_offs)
 			if(bcol!=BACKGROUND || fcol!=FOREGROUND) {continue;};
 
 			if(i0>stop_word_highlight) { continue;};	// in yaml only!
-			if(fcol!=COMMENTFORE && fcol!=PREPFORE) {
+			// if(fcol!=COMMENTFORE && fcol!=PREPFORE) 
+			if(bcol==BACKGROUND && fcol!=COMMENTFORE && fcol!=PREPFORE)
+			{
 				if(c1==H_WORD1) svcolor(v_text+i0,bcol,WORD1FORE);
-				if(c1==H_WORD2) svcolor(v_text+i0,bcol,WORD2FORE);
-				if(c1==H_NUMERIC) {
+				else if(c1==H_WORD2) svcolor(v_text+i0,bcol,WORD2FORE);
+				else if(c1==H_NUMERIC) {
 					svcolor(v_text+i0,bcol,CNUMERIC);
-				};
-			};
-
+				} else svcolor(v_text+i0,bcol,fcol);
+			} 
 		};
 	};
 
