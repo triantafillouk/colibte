@@ -1128,8 +1128,11 @@ offs vtline(WINDP *wp, offs tp_offs)
 			vtputc(wp, FCharAt(fp,ptr1++));
 		}
 	};
-#if	0
-	if(get_selection()) bcol=MODEBACK;
+#if	1
+	if(get_selection()) {
+		// fcol=CNUMERIC;
+		bcol=MODEBACK;
+	};
 #endif
 	/* highlight according to evaluated mask */
 	if(syntaxh && slang)
@@ -1158,7 +1161,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 	};
 
 	// in case of utf error show local chars with different color!
-	if(slang)
+	// if(slang)
 	if(fp->b_lang==0){
 		for(i0=0;i0<wp->w_ntcols-1;i0++) {
 			if(v_text[i0].uval[0]>128) 
@@ -1205,7 +1208,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 	start_column=wp->w_infocol;
 
 	if(fp->view_mode & VMHEX) {
-		unsigned char c1;
+	 unsigned char c1=0;
 
 	 for(i=0;i<1;)
 	 {
@@ -1217,7 +1220,11 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			ctl_b=wp->w_bcolor; 
 		} else { 
 			ctl_b=QUOTEBACK;
+#if	1	/* show corresponding lower ascii character  */
 			c1=c-0x80;
+#else	/* show corresponding local codepage character  */
+			c1=c;
+#endif
 		};
 		if(c1<0x20) {
 			ctl_f=CTRLFORE;
@@ -1405,19 +1412,6 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			// ctl_b=line_bcolor;
 		};
 
-		// this is for screens that do not support output at 128-159
-		// must be disabled to show characters from 128-159! (old IBM national codes like 737 ...)
-		if(fp->view_mode & VMHEX) {
-		if(c>127 && c<160) {
-			c-=64;
-			ctl_f = PREPFORE;
-			ctl_b = QUOTEBACK;
-		};
-		}
-		/* If the font is not the same as the document char set
-		   convert to the right language.
-		   Then put the real character on the screen.
-		*/
 //		MESG("--> at col=%d [%s]",wp->vtcol,uc->uval);
 		svwchar(vp->v_text+wp->vtcol,uc,ctl_b,ctl_f);
 		wp->vtcol++;
