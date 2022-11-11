@@ -104,7 +104,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#303030",	/* QUOTEFORE , H_QUOTE2 */
 	"#A0F0A0",	/* QUOTEBACK */ 
 	"#906000",	/* COMMENTFORE H_QUOTE5 */
-	"#E0D0A0",	/* LBACKGROUND  */
+	"#B0B0C0",	/* LBACKGROUND  */
 	"#00A080",	/* PREPFORE, H_QUOTE6 preprocessor foreground */
 	"#FF0000",	/* CHANGEDFORE */
 	"#303030",	/* TAGFORE H_QUOTE4, 8 */
@@ -137,7 +137,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#D0D0D0",	/* QUOTEFORE */
 	"#008000",	/* QUOTEBACK */
 	"#F09000",	/* COMMENTFORE */
-	"grey10",	/* LBACKGROUND */
+	"#202025",	/* LBACKGROUND */
 	"yellow",	/* PREPFORE */
 	"bisque3",	/* CHANGEDFORE */
 	"#98E098",	/* TAGFORE */
@@ -168,7 +168,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#D0D0D0",	/* QUOTEFORE */
 	"#008000",	/* QUOTEBACK */
 	"#F09000",	/* COMMENTFORE */
-	"#005080",	/* LBACKGROUND */
+	"#506070",	/* LBACKGROUND */
 	"yellow",	/* PREPFORE */
 	"#FF0000",	/* CHANGEDFORE */
 	"#00FF00",	/* TAGFORE */
@@ -199,7 +199,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#D0D0D0",	/* QUOTEFORE */
 	"#008000",	/* QUOTEBACK */
 	"#F09000",	/* COMMENTFORE */
-	"#008080",	/* LBACKGROUND */
+	"#204060",	/* LBACKGROUND */
 	"yellow",	/* PREPFORE */
 	"bisque3",	/* CHANGEDFORE */
 	"#00FF00",	/* TAGFORE */
@@ -230,7 +230,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#F2F2F2",	/* QUOTEFORE */
 	"#50A050",	/* QUOTEBACK */
 	"#E5D5A5",	/* COMMENTFORE */
-	"#A8A8A0",	/* LBACKGROUND */
+	"#858585",	/* LBACKGROUND */
 	"yellow",/* PREPFORE */
 	"#FF4D4D",	/* CHANGEDFORE */
 	"#00FFFF",	/* TAGFORE */
@@ -261,7 +261,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#F2F2D9",	/* QUOTEFORE */
 	"#007A00",	/* QUOTEBACK */
 	"orange2",	/* COMMENTFORE */
-	"#5F5F5F",	/* LBACKGROUND */
+	"#404055",	/* LBACKGROUND */
 	"yellow",	/* PREPFORE */
 	"#FF9999",	/* CHANGEDFORE */
 	"orange2",	/* TAGFORE */
@@ -292,7 +292,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#E0E4E0",	/* QUOTEFORE */
 	"#00B000",	/* QUOTEBACK */
 	"#A04040",	/* COMMENTFORE */
-	"#E0E0D0",	/* LBACKGROUND */
+	"#B0B0C0",	/* LBACKGROUND */
 	"#FF3333",	/* PREPFORE */
 	"#FF3333",	/* CHANGEDFORE */
 	"#A04040",	/* TAGFORE */
@@ -323,8 +323,8 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"white",	/* QUOTEFORE */
 	"#407040",	/* QUOTEBACK */
 	"#606070",	/* COMMENTFORE */
-	"grey20",	/* LBACKGROUND */
-	"#00B0CF",	/* PREPFORE */
+	"#404050",	/* LBACKGROUND */
+	"#FFFF00",	/* PREPFORE */
 	"bisque3",	/* CHANGEDFORE */
 	"#F0AD80",	/* TAGFORE */
 	"#CD7C33",	/* WORD1 */
@@ -354,7 +354,7 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#E68000",	/* QUOTEFORE */
 	"#202020",	/* QUOTEBACK */
 	"#60B060",	/* COMMENTFORE */
-	"#444433",	/* LBACKGROUND */
+	"#444445",	/* LBACKGROUND */
 	"#FF90FF",	/* PREPFORE */
 	"#FF90FF",	/* CHANGEDFORE */
 	"#A0F0A0",	/* TAGFORE */

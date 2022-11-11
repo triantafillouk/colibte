@@ -257,7 +257,7 @@ int getcmd()
 
 		if(c==CHR_LBRA) {
 			c = get1key();
-			if(text_mouse_key(&c)){
+			if(text_mouse_key(&c)){	/* this can be a mouse key!!  */
 			  return(set_record_key(c));
 			};
 			if(utflen>0) {

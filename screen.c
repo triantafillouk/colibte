@@ -1345,7 +1345,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 				break;
 			case H_QUOTE12:
 				if(drv_colors==8) line_bcolor=MODEBACK;
-				else line_bcolor=MODEBACKI;
+				else line_bcolor=LBACKGROUND;
 				ctl_b=line_bcolor;
 				break;
 			case H_QUOTE7:

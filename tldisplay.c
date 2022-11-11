@@ -11,7 +11,6 @@
 #include	"support.h"
 #include	"menus.h"
 #include	"panel_curses.h"
-#define	USE_CLASSIC	1
 
 char **getdir(char *dirname,char *s_find,int *num);
 int utf_num_chars(char *);
@@ -1370,9 +1369,11 @@ void status_line(WINDP *wp)
 	else if(wp->w_ntcols > NUM_COLS_NOINFO) max_t = wp->w_ntcols - show_position_size(wp,-1);
 	else max_t = wp->w_ntcols-2;
 
+#if	!CLASSIC_STATUS
 	if(drv_colors>8) 
 		lchar = ' ';
 	else
+#endif
 		lchar = (wp == cwp) ? hline2 : hline1;	/* mark the current buffer */
 
 	stp = status_string;

@@ -1199,7 +1199,7 @@ void put_string_statusline(WINDP *wp, char *st, int position)
  if(cwp->gwp == NULL) return;
 
  if(wp==cwp) {
-	bg_color = color_name[color_scheme_ind][MODEBACK];
+	bg_color = color_name[color_scheme_ind][CBOXTBACK];
 	fg_color = color_name[color_scheme_ind][MODEFORE];
  } else {
 	bg_color = color_name[color_scheme_ind][MODEBACKI];

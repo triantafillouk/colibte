@@ -207,7 +207,7 @@ extern int new_line(int n);
 function_int key_convert_from_mouse(function_int execf)
 {
  static int pressed_button=KMOUSE_NONE;
-//	MESG("kcfm:");
+	MESG("kcfm: pressed_button=%d",pressed_button);
 	if( execf == text_mouse_left_press) {
 		execf = do_nothing;
 		pressed_button = mouse_button_in_box(pressed_button);
@@ -244,6 +244,7 @@ char *drv_info()
   snprintf(info,256,"ncurses colors=%d color pairs=%d basic colors=%d",drv_colors,drv_color_pairs,drv_basic_colors);
   return info;
 }
+
 
 GWINDP * drv_new_twinp()
 {
@@ -726,7 +727,7 @@ int text_mouse_function(int move)
 	if(mouse_button==KMOUSE_NONE) {
 		return 0;
 	};
- // MESG("text_mouse_function: button=%d",mouse_button);
+ MESG("text_mouse_function: button=%d move=%d",mouse_button,move);
 
  if(is_in_top_menu()) {
 	if(move==KMOUSE_RELEASE+KMOUSE_BUTTON1){
@@ -784,10 +785,15 @@ int text_mouse_function(int move)
 	mouse_window_col = mousex - wp->gwp->t_xpos - wp->w_infocol;
 	// MESG("	r=%d c=%d",mouse_window_row,mouse_window_col);
 	if(move>KMOUSE_RELEASE) {
+
+
+
 		mouse_started_in_rline=0;
-		// MESG("reset mouse_started, button released!");
+		start_line=0;
+		start_col=0;
+		MESG("reset mouse_started, button released!");
 	} else {
-		// MESG("mouse pressed mb=%d move=%d row=%d col=%d",mouse_button,move,mouse_window_row,mouse_window_col);
+		MESG("mouse pressed mb=%d move=%d row=%d col=%d",mouse_button,move,mouse_window_row,mouse_window_col);
 	};
 	if(mouse_button==KMOUSE_BUTTON1 && move<KMOUSE_RELEASE){
 		if(mouse_window_col==wp->w_ntcols-cwp->w_infocol) { // on rline (position status line)
@@ -1259,6 +1265,7 @@ int getanum(int *end_key)
  return num;
 }
 
+
 int get_mouse_key()
 {
  int c;
@@ -1370,6 +1377,7 @@ int text_mouse_key(int *c)
 			enable_key_mouse();
 			extended_mouse=1;
 			msg_line("mouse has been reset!!");
+			return TRUE;
 		};
 	};
 	return FALSE;
@@ -2306,12 +2314,12 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
  int bg_color=MENU_BG;
  char *status_string = show_string;
  int rpos=utf_num_chars(status_string)+2;
-
+#if	!CLASSIC_STATUS
  if((drv_color_pairs>63 && drv_colors!=8) && cwp!=wp) {	/* if enough color pairs, use them ! */
  	fg_color=MODEFOREI;
 	bg_color=MODEBACKI;
  };
-
+#endif
 // change foreground color if buffer changed
  if(wp->w_fp->b_state & FS_CHG) {
  	fg_color=CHANGEFORE;
@@ -2584,7 +2592,7 @@ int text_mouse_left_press(int n)
  static num ppress=0;
  num press_time;
  num diff_time=0;
-
+ MESG("mouse_left_press:");
  mouse_button=KMOUSE_BUTTON1;
  gettimeofday(&timev,NULL);
  press_time=(num) timev.tv_sec*1000000 + (num) timev.tv_usec;
@@ -2600,6 +2608,7 @@ int text_mouse_left_press(int n)
 
 int text_mouse_right_press(int n)
 {
+ MESG("mouse_right_press:");
  mouse_button=KMOUSE_BUTTON3;
  text_mouse_function(KMOUSE_BUTTON3);	/* remove selections  */
   return FALSE;
@@ -2851,6 +2860,8 @@ void show_slide(WINDP *wp)
  int fg_color=MODEFORE;
  int bg_color=MENU_BG;
  curs_set(0);
+
+#if	!CLASSIC_STATUS
  if(cwp!=wp) {
 	if(drv_colors>8) {
 	 	fg_color=MODEFOREI;
@@ -2860,6 +2871,7 @@ void show_slide(WINDP *wp)
 		bg_color=MENU_BG;
 	};
  };
+#endif
 
  if(bt_dval("show_position")==0) {
  	return;

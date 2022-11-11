@@ -60,36 +60,36 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* green */		"#A0F0A0",	// QUOTEBACK
 	/* orange */ 	"#906000",	// COMMENTFORE
 	/* blue */		"#0000AE",	// CNUMERIC, MENU_BG, CBOXTBACK,
-	/* magenta */	"#E0D0A0",  // LBACKGROUND, INFOBACK
+	/* magenta */	"#F0D0A0",  // LBACKGROUND, INFOBACK
 	/* cyan */		"#80B0D0",	// MODEBACK/selections
 	/* white */		"#E3E3E3",	// BACKGROUND, SEARCHFORE, CBOXTFORE, MENUFG
-	/* brown */		"#606060",	// QUOTEFORE, MODEBACKI, INFOFORE, TAGFORE
+	/* brown */		"#A0A0A0",	// QUOTEFORE, MODEBACKI, INFOFORE, TAGFORE
 	/* lred */		"#FF0000",	// CHANGEDFORE, CTRLFORE
 	/* lgreen */	"#006000",	// SQUOTEFORE, W_FORE
 	/* yellow */	"#FFFF00",	// DROWCOL
-	/* lblue */		"#0000FF",	// SPECFORE
+	/* lblue */		"#B0B0C0",	// SPECFORE
 	/* lmagenta */	"#800080",	// WORD2FORE, ORIZON
 	/* lcyan */		"#00A080",	// PREPFORE
 	/* lwhite */	"#FFFFFF"	// MODEFORE
  },
 // Midnight
  {
- 	/* black */		"#000000",
-	/* red  */		"#A00000",
-	/* green */		"#008000",
-	/* orange */ 	"#F09000",
-	/* blue */		"#0070A0",
-	/* magenta */	"#303020",
-	/* cyan */		"#005070",
-	/* white */		"#D0D0D0",
-	/* brown */		"#303040",
-	/* lred */		"#D00000",
-	/* lgreen */	"#98E098",
-	/* yellow */	"#FFFF00",
-	/* lblue */		"#0000FF",
-	/* lmagenta */	"#FF00FF",
-	/* lcyan */		"#00D0D0",
-	/* lwhite */	"#FFF0F0"
+ 	/* black */		"#000000",	// background
+	/* red  */		"#A00000",	// search background
+	/* green */		"#008000",	// quote background, squote foreground
+	/* orange */ 	"#F09000",	// comment foreground
+	/* blue */		"#0070A0",	// menu background
+	/* magenta */	"#303020",	// light, background
+	/* cyan */		"#005070",	// select background
+	/* white */		"#B0B0B0",	// foreground, info foreground,
+	/* brown */		"#303040",	// info background
+	/* lred */		"#D00000",	// word1 foreground
+	/* lgreen */	"#98E098",	// special foreground
+	/* yellow */	"#FFFF00",	// prep,row-column foreground
+	/* lblue */		"#202025",
+	/* lmagenta */	"#FF00FF",	// endline foreground
+	/* lcyan */		"#00D0D0",	// word2 foreground
+	/* lwhite */	"#FFF0F0"	// stand out,numeric, search foreground
  },
 // Cyan
  {
@@ -101,11 +101,11 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* magenta */	"#404030",
 	/* cyan */		"#004050",
 	/* white */		"#D0D0D0",
-	/* brown */		"#406070",
+	/* brown */		"#303030",
 	/* lred */		"#FF0000",
 	/* lgreen */	"#00FF00",
 	/* yellow */	"#FFFF00",
-	/* lblue */		"#0000FF",
+	/* lblue */		"#506070",
 	/* lmagenta */	"#FF00FF",
 	/* lcyan */		"#00FFFF",
 	/* lwhite */	"#FFFFFF"
@@ -124,7 +124,7 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* lred */		"#FF0000",
 	/* lgreen */	"#00FF00",
 	/* yellow */	"#FFFF00",
-	/* lblue */		"#0000FF",
+	/* lblue */		"#204060",
 	/* lmagenta */	"#FF00FF",
 	/* lcyan */		"#00FFFF",
 	/* lwhite */	"#FFFFFF"
@@ -138,12 +138,12 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* blue */		"#004090",
 	/* magenta */	"#A8A8A0",
 	/* cyan */		"#5080A0",
-	/* white */		"grey55",
-	/* brown */		"#909090",
+	/* white */		"#909090",
+	/* brown */		"#707070",
 	/* lred */		"#FF4D4D",
-	/* lgreen */	"#0E500E",
+	/* lgreen */	"#00D0D0",
 	/* yellow */	"#FFFF00",
-	/* lblue */		"#0000CC",
+	/* lblue */		"#858585",
 	/* lmagenta */	"#8C008C",
 	/* lcyan */		"#00FFFF",
 	/* lwhite */	"#F2F2F2"
@@ -162,7 +162,7 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* lred */		"#FF9999",
 	/* lgreen */	"#66FF66",
 	/* yellow */	"#FFFF00",
-	/* lblue */		"#9999FF",
+	/* lblue */		"#404055",
 	/* lmagenta */	"#FF00FF",
 	/* lcyan */		"#99E6E6",
 	/* lwhite */	"#FFFFFF"
@@ -177,11 +177,11 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* magenta */	"#C0C0B0",
 	/* cyan */		"#B0C0D0",
 	/* white */		"#E0E0F0",
-	/* brown */		"#999999",
+	/* brown */		"#777777",
 	/* lred */		"#FF3333",
 	/* lgreen */	"#009900",
 	/* yellow */	"#FFFF00",
-	/* lblue */		"#0000B3",
+	/* lblue */		"#B0B0C0",
 	/* lmagenta */	"#FF00FF",
 	/* lcyan */		"#1C99CC",
 	/* lwhite */	"#FFFFFF"
@@ -196,11 +196,11 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* magenta */	"#404040",
 	/* cyan */		"#205060",
 	/* white */		"#E0E0E0",
-	/* brown */		"#606070",
+	/* brown */		"#707080",
 	/* lred */		"#CD7C33",
 	/* lgreen */	"#90EE90",
 	/* yellow */	"#FFFF00",
-	/* lblue */		"#00B0CF",
+	/* lblue */		"#202530",
 	/* lmagenta */	"#FF00FF",
 	/* lcyan */		"#F9EE98",
 	/* lwhite */	"#FFFFFF"
@@ -219,7 +219,7 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* lred */		"#FF4D4D",
 	/* lgreen */	"#A0F0A0",
 	/* yellow */	"#FFFF00",
-	/* lblue */		"#0000FF",
+	/* lblue */		"#404050",
 	/* lmagenta */	"#FF90FF",
 	/* lcyan */		"#40C0FF",
 	/* lwhite */	"#FFFFFF"
@@ -240,7 +240,7 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* yellow */	"#FFFF00",
 	/* lblue */		"#559BD5",
 	/* lmagenta */	"#C485BF",
-	/* lcyan */		"#9BDBFC",
+	/* lcyan */		"#444445",
 	/* lwhite */	"#FFFFFF"
  }
 };
@@ -260,12 +260,12 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{BROWN,0},		/* QUOTEFORE */
 	{GREEN,0},		/* QUOTEBACK */
 	{ORANGE,0},		/* COMMENTFORE */
-	{MAGENTA,0},	/* LBACKGROUND */
+	{LBLUE,0},	/* LBACKGROUND */
 	{LCYAN,0},		/* PREPFORE */
 	{LRED,0},		/* CHANGEDFORE */
 	{BROWN,0},		/* TAGFORE */
 	{RED,0},		/* WORD1FORE */
-	{LBLUE,0},		/* SPECFORE */
+	{BLUE,0},		/* SPECFORE */
 	{LGREEN,0},		/* SQUOTEFORE */
 	{LRED,0},		/* CTRLFORE */
 	{LMAGENTA,0},	/* WORD2FORE */
@@ -294,7 +294,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{WHITE,0},	/* QUOTEFORE */
 	{GREEN,0},	/* QUOTEBACK */
 	{ORANGE,0},	/* COMMENTFORE */
-	{BLACK,0},	/* LBACKGROUND */
+	{LBLUE,0},	/* LBACKGROUND */
 	{YELLOW,0},	/* PREPFORE */
 	{ORANGE,0},	/* CHANGEDFORE */
 	{LGREEN,0},	/* TAGFORE */
@@ -328,7 +328,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{WHITE,0},	/* QUOTEFORE */
 	{GREEN,0},	/* QUOTEBACK */
 	{ORANGE,0},	/* COMMENTFORE */
-	{BLUE,0},	/* LBACKGROUND */
+	{LBLUE,0},	/* LBACKGROUND */
 	{YELLOW,0},	/* PREPFORE */
 	{LRED,0},	/* CHANGEDFORE */
 	{LGREEN	,0},/* TAGFORE */
@@ -350,7 +350,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{BROWN,0}
  },
 
- /* Blue */
+ /* Blue Sky*/
  {
 	{WHITE,0},	/* Foreground FOREGR*/
 	{BLUE,0},	/* Background BACKGR*/
@@ -362,7 +362,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{WHITE,0},	/* QUOTEFORE */
 	{GREEN,0},	/* QUOTEBACK */
 	{ORANGE,0},	/* COMMENTFORE */
-	{CYAN,0},	/* LBACKGROUND */
+	{LBLUE,0},	/* LBACKGROUND */
 	{YELLOW,0},	/* PREPFORE */
 	{ORANGE,0},	/* CHANGEDFORE */
 	{LGREEN,0},	/* TAGFORE */
@@ -371,7 +371,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{GREEN,0},	/* SQUOTEFORE */
 	{LRED,0},	/* CTRLFORE */
 	{LCYAN,0},	/* WORD2FORE */
-	{LMAGENTA,0},	/* W_FORE */
+	{LMAGENTA,0}, /* W_FORE */
 	{LMAGENTA,0},/* ORIZON */
 	{LWHITE,0},	/* CNUMERIC */
 	{WHITE,0},	/* INFOFORE  */
@@ -396,7 +396,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{LWHITE,0},	/* QUOTEFORE */
 	{GREEN,0},	/* QUOTEBACK */
 	{ORANGE,0},	/* COMMENTFORE */
-	{MAGENTA,0},	/* LBACKGROUND */
+	{LBLUE,0},	/* LBACKGROUND */
 	{YELLOW,0},	/* PREPFORE */
 	{ORANGE,0},	/* CHANGEDFORE */
 	{LCYAN,0},	/* TAGFORE */
@@ -407,7 +407,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{RED,0},	/* WORD2FORE */
 	{LCYAN,0},	/* W_FORE */
 	{LMAGENTA,0}, /* ORIZON */
-	{LBLUE,0},	/* CNUMERIC */
+	{BLUE,0},	/* CNUMERIC */
 	{BLACK,0},	/* INFOFORE  */
 	{MAGENTA,0},/* INFOBACK  */
 	{LWHITE,0},	/* CBOXTFORE */
@@ -420,7 +420,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 
  /* Dark gray */
  {
-	{LWHITE,0},	/* Foreground FOREGR*/
+	{WHITE,0},	/* Foreground FOREGR*/
 	{BLACK,0},	/* Background BACKGR*/
 	{LWHITE,0},	/* Modeline Foreground MODEFORE*/
 	{CYAN,0},	/* Modeline BACKGOUND  MODEBACK*/
@@ -430,7 +430,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{WHITE,0},	/* QUOTEFORE */
 	{GREEN,0},	/* QUOTEBACK */
 	{ORANGE,0},	/* COMMENTFORE */
-	{MAGENTA,0},	/* LBACKGROUND */
+	{LBLUE,0},	/* LBACKGROUND */
 	{YELLOW,0},	/* PREPFORE */
 	{ORANGE,0},  /* CHANGEDFORE */
 	{ORANGE,0},	/* TAGFORE */
@@ -438,10 +438,10 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{LGREEN,0},	/* SPECFORE */
 	{LGREEN,0},	/* SQUOTEFORE */
 	{RED,0},	/* CTRLFORE */
-	{LBLUE,0},	/* WORD2FORE */
+	{LCYAN,0},	/* WORD2FORE */
 	{RED,0},	/* W_FORE */
 	{LMAGENTA,0}, /* ORIZON */
-	{LCYAN,0},	/* CNUMERIC */
+	{LWHITE,0},	/* CNUMERIC */
 	{WHITE,0},	/* INFOFORE  */
 	{MAGENTA,0},/* INFOBACK  */
 	{WHITE,0},	/* CBOXTFORE */
@@ -463,7 +463,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{WHITE,0},/* QUOTEFORE */
 	{GREEN,0},	/* QUOTEBACK */
 	{ORANGE,0},	/* COMMENTFORE */
-	{WHITE,0},	/* LBACKGROUND */
+	{LBLUE,0},	/* LBACKGROUND */
 	{LRED,0},	/* PREPFORE */
 	{ORANGE,0},	/* CHANGEDFORE */
 	{ORANGE,0},	/* TAGFORE */
@@ -471,7 +471,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{LGREEN,0},	/* SPECFORE */
 	{LGREEN,0},	/* SQUOTEFORE */
 	{LRED,0},	/* CTRLFORE */
-	{LBLUE,0},	/* WORD2FORE */
+	{LMAGENTA,0},	/* WORD2FORE */
 	{GREEN,0},	/* W_FORE */
 	{LMAGENTA,0}, /* ORIZON */
 	{LCYAN,0},	/* CNUMERIC */
@@ -496,11 +496,11 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{LWHITE,0},	/* QUOTEFORE */
 	{GREEN,0},	/* QUOTEBACK */
 	{BROWN,0},	/* COMMENTFORE */
-	{MAGENTA,0},/* LBACKGROUND */
-	{LBLUE,0},	/* PREPFORE */
+	{LBLUE,0},/* LBACKGROUND */
+	{YELLOW,0},	/* PREPFORE */
 	{ORANGE,0},	/* CHANGEDFORE */
 	{ORANGE,0},	/* TAGFORE */
-	{LRED,0},	/* WORD1BACK */
+	{LRED,0},	/* WORD1FORE */
 	{LGREEN,0},	/* SPECFORE */
 	{LGREEN,0},	/* SQUOTEFORE */
 	{LRED,0},	/* CTRLFORE */
@@ -529,7 +529,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{ORANGE,0},	/* QUOTEFORE */
 	{BLACK,0},	/* QUOTEBACK */
 	{GREEN,0},	/* COMMENTFORE */
-	{MAGENTA,0},	/* LBACKGROUND */
+	{LBLUE,0},	/* LBACKGROUND */
 	{LMAGENTA,0},	/* PREPFORE */
 	{LMAGENTA,0},	/* CHANGEFORE */
 	{LGREEN,0},	/* TAGFORE */
@@ -562,7 +562,7 @@ color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
 	{ORANGE,0},	/* QUOTEFORE */
 	{BLACK,0},	/* QUOTEBACK */
 	{GREEN,0},	/* COMMENTFORE */
-	{BLACK,0},	/* LBACKGROUND */
+	{LCYAN,0},	/* LBACKGROUND */
 	{YELLOW,0},	/* PREPFORE */
 	{ORANGE,0},	/* CHANGEDFORE */
 	{LGREEN,0},	/* TAGFORE */
