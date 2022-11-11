@@ -36,6 +36,7 @@
 
 #define COL_BASIC	8
 #define COL_BOLD	A_BOLD
+#define CLEAR_BG	0
 
 #include "panel_curses.h"
 
@@ -149,6 +150,11 @@ int color_pair(int fg_color,int bg_color)
  int pair_ind=-1;
  int cpair;
 
+#if	NEW_COLORS
+	int fcol = current_color[fg_color].index;
+	int bcol = current_color[bg_color].index;
+	cpair = COLOR_PAIR(fcol*FG_COLORS+bcol);
+#else
  if(drv_colors>16) {
 	pair_ind = pair_num[fg_color][bg_color];
 	cpair = COLOR_PAIR(pair_ind);
@@ -157,6 +163,7 @@ int color_pair(int fg_color,int bg_color)
 	int bcol = current_color[bg_color].index % drv_basic_colors;
 	cpair = COLOR_PAIR((fcol%drv_basic_colors)*drv_basic_colors+bcol);
  };
+#endif
 
  return(cpair);
 }
@@ -414,9 +421,11 @@ void create_rline(WINDP *wp)
 
 	wp->gwp->vline=drv_new_win("vline",wp->w_ntrows,1,wp->gwp->t_ypos,wp->gwp->t_xpos+wp->w_ntcols);
 	wp->gwp->vline_panel=new_panel(wp->gwp->vline);
+#if	CLEAR_BG
 	if(wp->gwp->vline!=NULL) {
-		wbkgd(wp->gwp->vline,color_pair(MODEFORE,MODEBACK));
+		wbkgd(wp->gwp->vline,color_pair(COLOR_FG,COLOR_SELECT_BG));
 	};
+#endif
 }
 
 void set_1window()
@@ -631,8 +640,8 @@ void drv_open()
  if(drv_colors>drv_max_colors) drv_colors=drv_max_colors;
 // MESG("set drv_colors to %d color pairs are %d",drv_colors,drv_color_pairs);
 
-	color_menu_fg=MENU_FG;
-	color_menu_bg=MENU_BG;
+	color_menu_fg=COLOR_FG;
+	color_menu_bg=COLOR_MENU_BG;
 
 // print_colors("Original ones");
 //   MESG("drv_open: color_scheme_ind=%d",color_scheme_ind);
@@ -1088,17 +1097,20 @@ int drv_check_break_key()
  return 0;
 }
 
+// Full screen clear
 void drv_back_color()
 {
- WINDP *wp;
- bkgdset(color_pair(FOREGROUND,BACKGROUND));
+ bkgdset(color_pair(COLOR_FG,COLOR_BG));
  clear();
 // MESG("drv_back_color:");
+#if	CLEAR_BG
+ WINDP *wp;
  lbegin(window_list);
  while((wp=(WINDP *)lget(window_list))!=NULL)
  {
-	wbkgd(wp->gwp->draw,color_pair(FOREGROUND,BACKGROUND));
+	wbkgd(wp->gwp->draw,color_pair(COLOR_FG,COLOR_BG));
  };
+#endif
 }
 
 extern int 	(*get_function())();
@@ -1397,7 +1409,7 @@ void drv_move(int row, int col)
 void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
 {
  if(drv_colors>16) {
- 	if(afcol==SPECFORE||afcol==PREPFORE) {
+ 	if(afcol==COLOR_SPEC_FG||afcol==COLOR_PREP_FG) {
 		wattron(wnd,COL_BOLD);
 	} else {
 		wattroff(wnd,COL_BOLD);
@@ -1568,7 +1580,7 @@ void disp_box(char *box_title,int border,int y1,int x1,int y2,int x2)
  cbox->panel=new_panel(cbox->wnd);
  cbox->border=border;
 
- drv_wcolor(cbox->wnd,CBOXTFORE,CBOXTBACK);	/* in case we want it a different color!  */
+ drv_wcolor(cbox->wnd,COLOR_FG,COLOR_BOX_BG);	/* in case we want it a different color!  */
 
  cbox->y=y1;
  cbox->x=x1;
@@ -1975,7 +1987,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 		if(ch>128 && v1->uval[1]==0) {	/* this is a local character, convert from local to utf  */
 			 strlcpy(vstr,str_local_to_utf(wp,(char *)v1->uval),6);
 			 if(wp->w_fp->b_lang==0)
-			 	drv_wcolor(wp->gwp->draw,CTRLFORE,cattr);	/* show local chars with different color  */
+			 	drv_wcolor(wp->gwp->draw,COLOR_CTRL_FG,cattr);	/* show local chars with different color  */
 			 else
 			 	drv_wcolor(wp->gwp->draw,ccolor,cattr);
 		} else {
@@ -2036,7 +2048,7 @@ void xdab(int y,int b,char *st,int bcolor,int fcolor)
 	if(b==*s) {
 		wmove(cbox->wnd,y,x);
 		wrefresh(cbox->wnd);
-		drv_wcolor(cbox->wnd,CTRLFORE,bcolor);
+		drv_wcolor(cbox->wnd,COLOR_CTRL_FG,bcolor);
 		waddch(cbox->wnd,b);
 		break;
 	};
@@ -2061,8 +2073,8 @@ void box_line_print(int line,int start,char *st, int w, int selected,int active_
  int real_width;
  if(active>=0) width--;
  real_width = width + strlen(st)-utf_num_chars(st)+1;
- if(selected)  drv_wcolor(cbox->wnd,MENU_BG,MENU_FG);
- else drv_wcolor(cbox->wnd,MENU_FG,MENU_BG);
+ if(selected)  drv_wcolor(cbox->wnd,COLOR_MENU_BG,COLOR_FG);
+ else drv_wcolor(cbox->wnd,COLOR_MENU_BG,COLOR_FG);
  // MESG("box_line_print: y=%d h=%d [%s]",y,cbox->y2 - cbox->y -1,st);
 #if	USE_GLIB
  char *normal_st = g_utf8_normalize(st,-1,G_NORMALIZE_ALL_COMPOSE);
@@ -2084,7 +2096,7 @@ void box_line_print(int line,int start,char *st, int w, int selected,int active_
 	wprintw(cbox->wnd,"~%s",string_to_show);
 #endif
  else wprintw(cbox->wnd," %s",string_to_show);
- drv_wcolor(cbox->wnd,MENU_FG,MENU_BG);
+ drv_wcolor(cbox->wnd,COLOR_FG,COLOR_MENU_BG);
 
  wrefresh(cbox->wnd);
 }
@@ -2122,7 +2134,7 @@ void clear_hmenu()
 {
  curs_set(0);
 
- drv_wcolor(hmenu_window,MENU_FG,MENU_BG);
+ drv_wcolor(hmenu_window,COLOR_FG,COLOR_MENU_BG);
  wmove(hmenu_window,0,0);
  wprintw(hmenu_window,"%*s",drv_numcol,"  ");
  wrefresh(hmenu_window);
@@ -2144,12 +2156,12 @@ void drv_msg_line(char *arg)
 	if (discmd == FALSE || macro_exec) return;
 	curs_set(0);
 	wmove(mesg_window,0,0);	
-
+#if	CLEAR_BG
 	if(app_error) 
-		wbkgd(mesg_window,color_pair(FOREGROUND,SEARBACK));
+		wbkgd(mesg_window,color_pair(COLOR_FG,COLOR_SEARBCH_BG));
 	else
-		wbkgd(mesg_window,color_pair(FOREGROUND,BACKGROUND));
-
+		wbkgd(mesg_window,color_pair(COLOR_FG,COLOR_BG));
+#endif
 
 	utf_string_break(arg,drv_numcol-1);
 	wprintw(mesg_window,"%s",(char *)str2out(arg));
@@ -2174,13 +2186,13 @@ int dspv(WINDOW *disp_window,int x,int y,char *st)
 
  while((c=*st++)!=0) {
  	if(c<32) {
-		drv_wcolor(disp_window,CTRLFORE,BACKGROUND);
+		drv_wcolor(disp_window,COLOR_CTRL_FG,COLOR_BG);
 		waddch(disp_window,'^');
 		(c)+=64;
 		len++;
 	};
 	waddch(disp_window,c);
-	drv_wcolor(disp_window,FOREGROUND,BACKGROUND);
+	drv_wcolor(disp_window,COLOR_FG,COLOR_BG);
  };
  getyx(disp_window,y_pos,x_pos);
  wclrtoeol(disp_window);
@@ -2193,7 +2205,8 @@ RGB_DEF original_color[XCOLOR_TYPES];
 void restore_original_colors()
 {
  int i;
- for(i=0;i<XCOLOR_TYPES;i++) {
+ for(i=0;i<XCOLOR_TYPES;i++) 
+ {
  	init_color(i,original_color[i].r,original_color[i].g,original_color[i].b);
  };
 }
@@ -2262,6 +2275,15 @@ void set_scheme_colors(int scheme)
 // show_debug_color_attr(current_color);
  
  if(drv_colors==0) return;
+#if	NEW_COLORS
+	RGB_COLORS *color_val = current_scheme->basic_colors;
+	for(i=0;i<FG_COLORS+BG_COLORS;i++) {
+		init_color(i,color_val[i].r,color_val[i].g,color_val[i].b);
+//		MESG(" - color %2d: (%d %d %d) attr=%d",i,color_val[j],color_val[j+1],color_val[j+2],color_val[j+3]);
+	};
+	for(i=0;i<FG_COLORS;i++) 
+		for(j=0;j<BG_COLORS;j++) init_pair(i*FG_COLORS+j,i,j);
+#else
  if(drv_colors>16) {
 	for(i=0;i<XCOLOR_TYPES;i++) {
 		RGB_DEF *rv;
@@ -2288,6 +2310,7 @@ void set_scheme_colors(int scheme)
 	for(i=0;i<drv_basic_colors;i++) 
 		for(j=0;j<drv_basic_colors;j++) init_pair(i*drv_basic_colors+j,i,j);
  };
+#endif
 // MESG("set_scheme_colors:end");
 }
 
@@ -2310,19 +2333,19 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
 {
  int status_row=wp->w_ntrows-1;;
  int maxlen;
- int fg_color=MODEFORE;
- int bg_color=MENU_BG;
+ int fg_color=COLOR_FG;
+ int bg_color=COLOR_MENU_BG;
  char *status_string = show_string;
  int rpos=utf_num_chars(status_string)+2;
 #if	!CLASSIC_STATUS
  if((drv_color_pairs>63 && drv_colors!=8) && cwp!=wp) {	/* if enough color pairs, use them ! */
- 	fg_color=MODEFOREI;
-	bg_color=MODEBACKI;
+ 	fg_color=COLOR_INACTIVE_FG;
+	bg_color=COLOR_INACTIVE_BG;
  };
 #endif
 // change foreground color if buffer changed
  if(wp->w_fp->b_state & FS_CHG) {
- 	fg_color=CHANGEFORE;
+ 	fg_color=COLOR_CHANGE_FG;
  }
 
  curs_set(0);
@@ -2332,7 +2355,7 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
 		rpos = utf_num_chars(status_string)+2;
 	};
 	if(wp->w_ntcols-rpos<10) return;
-	drv_wcolor(wp->gwp->draw,DROWCOL,bg_color);
+	drv_wcolor(wp->gwp->draw,COLOR_ROWCOL_FG,bg_color);
 	wmove(wp->gwp->draw,status_row,wp->w_ntcols-rpos);
 	maxlen=wp->w_ntcols-rpos;
  } else {
@@ -2360,7 +2383,7 @@ void hdab(int x,int b,char *s,int bcolor,int fcolor)
  for(;*s;x++,s++) {
 	if(b==*s) {
 		wmove(hmenu_window,0,x);
-		drv_wcolor(hmenu_window,CTRLFORE,bcolor);
+		drv_wcolor(hmenu_window,COLOR_CTRL_FG,bcolor);
 		waddch(hmenu_window,b);
 		break;
 	};
@@ -2857,18 +2880,18 @@ void show_slide(WINDP *wp)
 // char hatch_line[5] = { 0xE2,0x96,0x93,0,0};
 // char left_half[5] = { 0xE2,0x96,0x8C,0,0};
 // char xblock[5] = { 0xE2,0x95,0xB3,0,0};
- int fg_color=MODEFORE;
- int bg_color=MENU_BG;
+ int fg_color=COLOR_FG;
+ int bg_color=COLOR_MENU_BG;
  curs_set(0);
 
 #if	!CLASSIC_STATUS
  if(cwp!=wp) {
 	if(drv_colors>8) {
-	 	fg_color=MODEFOREI;
-		bg_color=MODEBACKI;
+	 	fg_color=COLOR_INACTIVE_FG;
+		bg_color=COLOR_INACTIVE_BG;
 	} else {
-	 	fg_color=BACKGROUND;
-		bg_color=MENU_BG;
+	 	fg_color=COLOR_FG;
+		bg_color=COLOR_MENU_BG;
 	};
  };
 #endif
@@ -2881,7 +2904,9 @@ void show_slide(WINDP *wp)
 // MESG("show_slide: window=%d start=%d end=%d len=%d",wp->id,start,end,len);
 
  drv_wcolor(wp->gwp->vline,fg_color,bg_color);
+#if	CLEAR_BG
  wbkgd(wp->gwp->vline,color_pair(fg_color,bg_color));
+#endif
  for(row=0;row<wp->w_ntrows-1;row++){
 	wmove(wp->gwp->vline,row,0);
 	wrefresh(wp->gwp->vline);
@@ -2894,7 +2919,7 @@ void show_slide(WINDP *wp)
  wmove(wp->gwp->vline,wp->w_ntrows,0);
  /* show change flag at bottom right corner!  */
  if(wp->w_fp->b_flag & (1 << 1)) {
- 	drv_wcolor(wp->gwp->vline,CTRLFORE,bg_color);
+ 	drv_wcolor(wp->gwp->vline,COLOR_CTRL_FG,bg_color);
  	wprintw(wp->gwp->vline,"%s","*");
  } else wprintw(wp->gwp->vline,"%s"," ");
 

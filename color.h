@@ -82,12 +82,12 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 	/* magenta */	"#303020",	// light, background
 	/* cyan */		"#005070",	// select background
 	/* white */		"#B0B0B0",	// foreground, info foreground,
-	/* brown */		"#303040",	// info background
+	/* brown */		"#303040",	// info background, inactive bg
 	/* lred */		"#D00000",	// word1 foreground
 	/* lgreen */	"#98E098",	// special foreground
 	/* yellow */	"#FFFF00",	// prep,row-column foreground
-	/* lblue */		"#202025",
-	/* lmagenta */	"#FF00FF",	// endline foreground
+	/* lblue */		"#202025",	// lbackground
+	/* lmagenta */	"#FF00FF",	// Horizon foreground, wor3 (html) foreground
 	/* lcyan */		"#00D0D0",	// word2 foreground
 	/* lwhite */	"#FFF0F0"	// stand out,numeric, search foreground
  },
@@ -591,99 +591,6 @@ typedef struct CPAIR {
 	int attr;
 } CPAIR;
 
-#define MAX_PAIRS	84
-CPAIR color_pairs[MAX_PAIRS] = {
-	{ FOREGROUND,BACKGROUND,0},
-	{ QUOTEFORE,BACKGROUND,0},
-	{ SPECFORE,BACKGROUND,0},
-	{ SPECFORE,BACKGROUND,1},
-	{ SQUOTEFORE,BACKGROUND,1},
-	{ PREPFORE,BACKGROUND,1},
-	{ CTRLFORE,BACKGROUND,1},
-	{ TAGFORE,BACKGROUND,0},
-	{ TAGFORE,BACKGROUND,1},
-	{ W_FORE,BACKGROUND,0},
-	{ WORD1FORE,BACKGROUND,0},
-	{ WORD2FORE,BACKGROUND,0},
-	{ CNUMERIC,BACKGROUND,0},
-	{ ORIZON,BACKGROUND,0},
-	{ COMMENTFORE,BACKGROUND,0},
-	{ QUOTEFORE,QUOTEBACK,0},
-	{ PREPFORE,BACKGROUND,1},
-	{ CTRLFORE,MODEBACK,1},
-	{ CTRLFORE,QUOTEBACK,1},
-
-	{ FOREGROUND, CBOXTBACK,0},
-	{ QUOTEFORE , CBOXTBACK,0},
-	{ SPECFORE  , CBOXTBACK,0},
-	{ SPECFORE  , CBOXTBACK,1},
-	{ SQUOTEFORE, CBOXTBACK,1},
-	{ PREPFORE  , CBOXTBACK,1},
-	{ CTRLFORE  , CBOXTBACK,1},
-	{ TAGFORE   , CBOXTBACK,0},
-	{ TAGFORE   , CBOXTBACK,1},
-	{ W_FORE    , CBOXTBACK,0},
-	{ WORD1FORE , CBOXTBACK,0},
-	{ WORD2FORE , CBOXTBACK,0},
-	{ CNUMERIC  , CBOXTBACK,0},
-	{ ORIZON	, CBOXTBACK,0},
-	{ COMMENTFORE,CBOXTBACK,0},
-// for selection
-
-	{ FOREGROUND,INFOBACK,0},
-	{ QUOTEFORE,INFOBACK,0},
-	{ SQUOTEFORE,INFOBACK,0},
-	{ SPECFORE,INFOBACK,0},
-	{ SPECFORE,INFOBACK,1},
-	{ PREPFORE,INFOBACK,1},
-	{ CTRLFORE,INFOBACK,1},
-	{ TAGFORE,INFOBACK,0},
-	{ TAGFORE,INFOBACK,1},
-	{ W_FORE,INFOBACK,0},
-	{ WORD1FORE,INFOBACK,0},
-	{ WORD2FORE,INFOBACK,0},
-	{ CNUMERIC,INFOBACK,1},
-	{ CNUMERIC,INFOBACK,0},
-	{ ORIZON,INFOBACK,0},
-	{ COMMENTFORE,INFOBACK,0},
-
-	{ FOREGROUND,MODEBACK,0},
-	{ QUOTEFORE,MODEBACK,0},
-	{ SPECFORE,MODEBACK,0},
-	{ SPECFORE,MODEBACK,1},
-	{ SQUOTEFORE,MODEBACK,1},
-	{ PREPFORE,MODEBACK,1},
-	{ CTRLFORE,MODEBACK,1},
-	{ TAGFORE,MODEBACK,0},
-	{ TAGFORE,MODEBACK,1},
-	{ W_FORE,MODEBACK,0},
-	{ WORD1FORE,MODEBACK,0},
-	{ WORD2FORE,MODEBACK,0},
-	{ CNUMERIC,MODEBACK,0},
-	{ ORIZON,MODEBACK,0},
-	{ COMMENTFORE,MODEBACK,0},
-
-	{ INFOFORE,INFOBACK,0},
-	{ INFOBACK,INFOFORE,0},
-	{ SEARFORE,SEARBACK,0},
-
-	{ CBOXTFORE,CBOXTBACK,0},	/* box outside, modeline   */
-	{ DROWCOL,CBOXTBACK,0},	/* modeline row col  */
-	{ MENU_FG,MENU_BG,0},	/* normal menu,inactive box inside  */
-	{ MENU_BG,MENU_FG,0},	/* active box inside  */
-	{ CBOXTFORE,CBOXTBACK,0},
-	{ CBOXTFORE,CBOXTBACK,1},
-	{ CBOXTBACK,CBOXTFORE,0},
-	{ CBOXTBACK,CBOXTFORE,1},
-	{ CTRLFORE,MENU_BG,0},
-	{ CTRLFORE,MENU_FG,0},
-	{ CTRLFORE,MENU_BG,1},
-	{ CTRLFORE,MENU_FG,1},
-	{ DROWCOL,MODEBACK,1},
-	{ MODEFORE,MODEBACK,0},
-	{ CHANGEFORE,MODEBACK,0},
-	{ CHANGEFORE,MODEBACKI,0}
-};
 
 char *color_type[] = {
 	"normal_fg",	/* 0, Foreground FOREGR*/

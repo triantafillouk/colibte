@@ -24,6 +24,8 @@
 #define	XCOLOR_TYPES	30
 #define	COLOR_SCHEMES	10
 
+#define	NEW_COLORS	1
+
 #define	PANGO_TEST	1
 #define	TARROWS		1	/* Use arrow menus in panel curses  */
 #define	USE_UTF8	1	/* Use utf8 characters  */
@@ -830,13 +832,16 @@ enum env_defs {
  /* file extensions */
 #define	FX_COMPRESS	37
 
+#if	!NEW_COLORS
 /* color type name definitions */
 enum color_types {
 	FOREGROUND,		/* 1 common foreground */
 	BACKGROUND,		/* 0 common background   */
 	MODEFORE,		/* 2 modeline foreground  */
 	MODEBACK,		/* 3 modeline background  */
+
 	DROWCOL	,		/* 4 row/column foreground on modeline  */
+
 	SEARFORE,		/* 5 search foreground  */
 	SEARBACK,		/* 6 search background  */
 	QUOTEFORE,		/* 7 double quotes foreground  */
@@ -863,6 +868,41 @@ enum color_types {
 	MODEFOREI,		/* Modeline inactive foreground  */
 	MODEBACKI,		/* Modeline inactive background  */
 };
+#endif
+
+#if	NEW_COLORS
+#define	BG_COLORS	10
+enum color_types_bg {
+	COLOR_BG,			// BACKGROUND
+	COLOR_MENU_BG,		// MENU_BG
+	COLOR_SELECT_BG,	// MODEBACK
+	COLOR_SEARCH_BG,	// SEARBACK
+	COLOR_QUOTE_BG,		// QUOTEBACK
+	COLOR_LIGHT_BG,		// LBACKGROUND
+	COLOR_INFO_BG,		// INFOBACK
+	COLOR_INACTIVE_BG,	// MODEBACKI
+	COLOR_BOX_BG,		// CBOXTBACK
+	COLOR_CODE_BG		// color code bg
+};
+
+#define	FG_COLORS	14
+enum color_types_fg {
+	COLOR_FG,			// FOREGROUND, INFOFORE, QUOTEFORE,CBOXTFORE
+	COLOR_STANDOUT_FG,	// SEARFORE, CNUMERIC, MENUSTART, MENU_FG, CBOXFORE
+	COLOR_CTRL_FG,		// menu start fg, CTRLFORE
+	COLOR_PREP_FG,		// PREPFORE
+	COLOR_WORD1_FG,		// WORD1FORE
+	COLOR_WORD2_FG,		// WORD2FORE
+	COLOR_WORD3_FG,		// W_FORE
+	COLOR_SPEC_FG,		// SPECFORE
+	COLOR_SQUOTE_FG,	// SQUOTEFORE
+	COLOR_COMMENT_FG,	// COMMENTFORE
+	COLOR_CHANGE_FG,	// CHANGEFORE
+	COLOR_HORIZON_FG,	// ORIZON
+	COLOR_INACTIVE_FG,	// MODEFOREI
+	COLOR_ROWCOL_FG		// DROWCOL
+};
+#endif
 
 /* Icon Element types  */
 #define	ENORMAL	0
