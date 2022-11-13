@@ -423,8 +423,8 @@ WINDP *dublicate_window(WINDP *wp0)
  };
 
  wp->selection=0;
- wp->w_fcolor = FOREGROUND; 
- wp->w_bcolor = BACKGROUND;
+ wp->w_fcolor = COLOR_FG; 
+ wp->w_bcolor = COLOR_BG;
 
  set_selection(false);
  return wp;
@@ -436,8 +436,8 @@ void set_windows_color()
  lbegin(window_list);
  while((wp=(WINDP *)lget(window_list))!=NULL)
  {
- wp->w_fcolor = FOREGROUND;
- wp->w_bcolor = BACKGROUND;
+ wp->w_fcolor = COLOR_FG;
+ wp->w_bcolor = COLOR_BG;
  wp->w_flag=UPD_FULL;
  };
 }

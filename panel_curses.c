@@ -115,6 +115,35 @@ extern alist *color_schemes;
 extern char utfokey[10];
 extern int utflen;
 
+char *color_type_names[] = {
+	"bg normal",
+	"bg menu",
+	"bg selection",
+	"bg search",
+	"bg quote",
+	"bg light",
+	"bg info",
+	"bg inactive",
+	"bg box",
+	"bg code",
+	
+	"fg normal",
+	"fg menu",
+	"fg standout",
+	"fg control",
+	"fg prep",
+	"fg word1",
+	"fg word2",
+	"fg word3",
+	"fg special",
+	"fg squote",
+	"fg comment",
+	"fg changed",
+	"fg horizon",
+	"fg inactive",
+	"fg rowcol"
+};
+
 void drv_window_delete(WINDP *wp)
 {
 }
@@ -153,7 +182,8 @@ int color_pair(int fg_color,int bg_color)
 #if	NEW_COLORS
 	int fcol = current_color[fg_color].index;
 	int bcol = current_color[bg_color].index;
-	cpair = COLOR_PAIR(fcol*FG_COLORS+bcol);
+// 	cpair = COLOR_PAIR(fcol*FG_COLORS+bcol);
+	cpair = COLOR_PAIR((fg_color-BG_COLORS)*FG_COLORS+bg_color);
 #else
  if(drv_colors>16) {
 	pair_ind = pair_num[fg_color][bg_color];
@@ -2226,18 +2256,32 @@ void create_default_scheme()
 	int i;
 	COLOR_SCHEME *scheme = malloc(sizeof(COLOR_SCHEME));
 	scheme->scheme_name = scheme_names[scheme_ind];
-
-	for(i=0;i<16;i++) {
+#if	NEW_COLORS
+	int total_colors=24;
+#else
+	int total_colors=16;
+#endif
+	for(i=0;i<total_colors;i++) 
+	{
 		RGB_DEF *rv;
 		rv = get_rgb_values(basic_color_values[scheme_ind][i]);
 		scheme->basic_colors[i].r=rv->r;
 		scheme->basic_colors[i].g=rv->g;
 		scheme->basic_colors[i].b=rv->b;
 	};
-	for(i=0;i<COLOR_TYPES;i++) {
+#if	NEW_COLORS
+	for(i=0;i<total_colors;i++) 
+	{
+		scheme->color_attr[i].index = i;
+		scheme->color_attr[i].attrib = 0;
+	};
+#else
+	for(i=0;i<COLOR_TYPES;i++) 
+	{
 		scheme->color_attr[i].index = color_t[scheme_ind][i].index;
 		scheme->color_attr[i].attrib = color_t[scheme_ind][i].attrib;
 	};
+#endif
 //	show_debug_color_attr(scheme->color_attr);
 	add_element_to_list((void *)scheme,color_schemes);
  };
@@ -2256,7 +2300,7 @@ void set_scheme_colors(int scheme)
 {
  int i,j;
  int scheme_ind=0;
-// MESG("set_scheme_colors: %d of %d drv_colors=%d color_scheme_ind=%d",scheme,color_schemes->size,drv_colors,color_scheme_ind);
+MESG("set_scheme_colors: %d of %d drv_colors=%d color_scheme_ind=%d",scheme,color_schemes->size,drv_colors,color_scheme_ind);
  if(scheme<1 || scheme> color_schemes->size) scheme=1;
 
  color_scheme_ind=scheme-1;
@@ -2279,10 +2323,13 @@ void set_scheme_colors(int scheme)
 	RGB_COLORS *color_val = current_scheme->basic_colors;
 	for(i=0;i<FG_COLORS+BG_COLORS;i++) {
 		init_color(i,color_val[i].r,color_val[i].g,color_val[i].b);
-//		MESG(" - color %2d: (%d %d %d) attr=%d",i,color_val[j],color_val[j+1],color_val[j+2],color_val[j+3]);
+		MESG(" - color %2d [%15s]: (%d %d %d)",i,color_type_names[i],color_val[i].r,color_val[i].g,color_val[i].b);
 	};
 	for(i=0;i<FG_COLORS;i++) 
-		for(j=0;j<BG_COLORS;j++) init_pair(i*FG_COLORS+j,i,j);
+		for(j=0;j<BG_COLORS;j++) {
+			MESG(" - pair %3d: f=%d b=%d",i*FG_COLORS+j,i+BG_COLORS,j);
+			init_pair(i*FG_COLORS+j,i+BG_COLORS,j);
+		};
 #else
  if(drv_colors>16) {
 	for(i=0;i<XCOLOR_TYPES;i++) {
@@ -2789,7 +2836,9 @@ int color_scheme_save()
 		};
 		fprintf(f1,"\n");
 	/* write color values  */
-		 for(i=0;i<XCOLOR_TYPES;i++){
+#if	NEW_COLORS
+#else
+		 for(i=0;i<COLOR_TYPES;i++){
 			if(color_t[scheme_ind][i].attrib) {
 				int attr=color_t[scheme_ind][i].attrib;
 				char sattr[64];
@@ -2803,6 +2852,7 @@ int color_scheme_save()
 			} else
 		  		fprintf(f1,"%s=%s\n",color_type[i],basic_color_names[color_t[scheme_ind][i].index]);
 		 };
+#endif
 		 fprintf(f1,"# end of %s\n\n",scheme_names[scheme_ind]);
 	 }
 
