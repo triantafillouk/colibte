@@ -81,10 +81,12 @@ void svwchar(vchar *vc, utfchar *uc,int b_color,int f_color)
 	vc->uval[7]=0;
  };
  vc->bcolor=b_color;
- vc->fcolor=f_color;
-
+ vc->fcolor=f_color % 256;
+ vc->attr = f_color>256;
+#if	0
  vc->display_width=CLEN;
  vc->display_height=CHEIGHTI;
+#endif
 }
 
 /* set non utf char with color  */
@@ -101,9 +103,10 @@ void  svchar(vchar *vc,int val,int b_color,int f_color)
  vc->attr = f_color > 256;
  vc->bcolor=b_color;
  vc->fcolor=f_color;
-
+#if	0
  vc->display_width=CLEN;
  vc->display_height=CHEIGHTI;
+#endif
 }
 
 /* set virtual color */

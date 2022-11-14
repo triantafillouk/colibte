@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.58T6 (11/11/2022)"
+#define VERSION 	"#01.58T7 (15/11/2022)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -284,8 +284,10 @@ typedef struct vchar {
 	unsigned short attr:8;
 	unsigned short bcolor:8;	/* background  */
 	unsigned short fcolor;	/* foreground  */
-	unsigned int display_width;
-	unsigned int display_height;
+#if	0
+	unsigned short display_width;
+	unsigned short display_height;
+#endif
 } vchar;
 
 typedef struct  VIDEO {
