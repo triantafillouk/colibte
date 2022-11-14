@@ -1962,7 +1962,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 	for(i=0;i<=imax;i++) {
 	 uint32_t ch;
-		ccolor=v1->fcolor;
+		ccolor=v1->fcolor+v1->attr*256;
 		cattr=v1->bcolor;
 		// if(row==0) MESG("row %d underline i=%d ccolor=%d cattr=%d",row,i,ccolor,cattr);
 		drv_wcolor(wp->gwp->draw,ccolor,cattr);

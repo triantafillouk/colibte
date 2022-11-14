@@ -98,7 +98,7 @@ void  svchar(vchar *vc,int val,int b_color,int f_color)
  vc->uval[5]=0; 
  vc->uval[6]=0; 
  vc->uval[7]=0; 
-
+ vc->attr = f_color > 256;
  vc->bcolor=b_color;
  vc->fcolor=f_color;
 
@@ -110,8 +110,9 @@ void  svchar(vchar *vc,int val,int b_color,int f_color)
 void  svcolor(vchar *vc,int b_color,int f_color)
 {
  // if(f_color>256) MESG("svcolor: f_color=%d",f_color);
+ vc->attr = f_color>256;
  vc->bcolor=b_color;
- vc->fcolor=f_color;
+ vc->fcolor=f_color%256;
 }
 
 /* set virtual special multiple  character */

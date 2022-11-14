@@ -281,7 +281,8 @@ typedef struct notes_struct {
 
 typedef struct vchar {
 	unsigned char uval[8];	/* stores a utf char  */
-	unsigned short bcolor;	/* background  */
+	unsigned short attr:8;
+	unsigned short bcolor:8;	/* background  */
 	unsigned short fcolor;	/* foreground  */
 	unsigned int display_width;
 	unsigned int display_height;
