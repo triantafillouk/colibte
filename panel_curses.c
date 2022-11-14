@@ -1396,6 +1396,9 @@ void drv_move(int row, int col)
 
 void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
 {
+ int attrib=0;
+ if(afcol>256) { afcol=afcol%256;attrib=A_UNDERLINE;};
+
  if(drv_colors>16) {
  	if(afcol==SPECFORE||afcol==PREPFORE) {
 		wattron(wnd,COL_BOLD);
@@ -1405,8 +1408,7 @@ void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
 	};
  } else {
  int fcol;
- int attrib=0;
-
+  // MESG("drv_wcolor: f=%d b=%d",afcol,abcol);
   fcol = current_scheme->color_attr[afcol].index % 16;
   if(drv_colors==8)
   {
@@ -1415,6 +1417,7 @@ void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
 		fcol %= COL_BASIC;
   	  };
   };
+
   attrib |= current_scheme->color_attr[afcol].attrib;
   wattrset(wnd,color_pair(afcol,abcol)|attrib);
  }
@@ -1961,6 +1964,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 	 uint32_t ch;
 		ccolor=v1->fcolor;
 		cattr=v1->bcolor;
+		// if(row==0) MESG("row %d underline i=%d ccolor=%d cattr=%d",row,i,ccolor,cattr);
 		drv_wcolor(wp->gwp->draw,ccolor,cattr);
 		ch=v1->uval[0];
 		if(ch==0xFF) { 	/* skip in case of char len > 1  */

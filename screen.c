@@ -109,6 +109,7 @@ void  svchar(vchar *vc,int val,int b_color,int f_color)
 /* set virtual color */
 void  svcolor(vchar *vc,int b_color,int f_color)
 {
+ // if(f_color>256) MESG("svcolor: f_color=%d",f_color);
  vc->bcolor=b_color;
  vc->fcolor=f_color;
 }
@@ -765,14 +766,15 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		for(i0=start_color_column;i0<= end_column;i0++) svcolor(v_text+i0,bg_color,fg_color);
 	} else 
 	{
+		// MESG("header: drv_colors=%d",drv_colors);
 		if(drv_colors==8) { bg_color=MODEBACK;fg_color=CNUMERIC;}
-		else { bg_color=INFOBACK;fg_color=MODEFORE;};
+		else { bg_color=INFOBACK;fg_color=MODEFORE+256;};
 		line_bcolor=bg_color;
 		for(i0=start_color_column;i0<= end_column;i0++)
 		{
 			svcolor(v_text+i0,bg_color,fg_color);
 		};
-		vteeol(wp,2,0);
+		vteeol(wp,2,1);
 		return;
 	};
 	// MESG("vt_str: end max_size=%d",max_size);
@@ -1432,6 +1434,7 @@ void vteeol(WINDP *wp, int selected,int inside)
     vp = wp->vs[wp->vtrow];	// vtrow
 	// MESG("vteeol: row=%d selected=%d col=%d",wp->vtrow,selected,wp->vtcol);
     ctl_f=wp->w_fcolor;
+	// if(wp->vtrow==0 && inside) ctl_f+=256;
 	// ctl_b=wp->w_bcolor;
 	ctl_b = line_bcolor;
 	// if(wp->vtrow==0) ctl_b=INFOBACK;
@@ -1453,7 +1456,7 @@ void vteeol(WINDP *wp, int selected,int inside)
 		};
 	} else {
 			if(selected) {
-				if(selected==2)       { if(drv_colors>8)  ctl_b=INFOBACK;else ctl_b=MODEBACK;}	// header
+				if(selected==2)       { if(drv_colors>8)  ctl_b=INFOBACK;else ctl_b=MODEBACK; ctl_f+=256;}	// header
 				else if(selected==3)  { if(drv_colors>8)  ctl_b=MODEBACKI;else ctl_b=MODEBACK;}	// just selected
 				else if(selected==-1) { if(drv_colors==8) ctl_b=MODEBACK ;}	// empty
 				else                  ctl_b=MODEBACK;	// current line
