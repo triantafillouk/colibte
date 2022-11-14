@@ -183,7 +183,8 @@ int color_pair(int fg_color,int bg_color)
 	int fcol = current_color[fg_color].index;
 	int bcol = current_color[bg_color].index;
 // 	cpair = COLOR_PAIR(fcol*FG_COLORS+bcol);
-	cpair = COLOR_PAIR((fg_color-BG_COLORS)*FG_COLORS+bg_color);
+	cpair = COLOR_PAIR((fg_color-BG_COLORS)*FG_COLORS+bg_color+1);
+	if(fg_color==COLOR_FG) MESG("- cp: color_fg bg_color=%d pair=%d",bg_color,(fg_color-BG_COLORS)*FG_COLORS+bg_color+1);
 #else
  if(drv_colors>16) {
 	pair_ind = pair_num[fg_color][bg_color];
@@ -670,7 +671,7 @@ void drv_open()
  if(drv_colors>drv_max_colors) drv_colors=drv_max_colors;
 // MESG("set drv_colors to %d color pairs are %d",drv_colors,drv_color_pairs);
 
-	color_menu_fg=COLOR_FG;
+	color_menu_fg=COLOR_MENU_FG;
 	color_menu_bg=COLOR_MENU_BG;
 
 // print_colors("Original ones");
@@ -1438,6 +1439,11 @@ void drv_move(int row, int col)
 
 void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
 {
+#if	NEW_COLORS
+  int attrib=0;
+  // if(afcol==COLOR_FG || afcol==COLOR_WORD2_FG) attrib=A_BOLD;
+  wattrset(wnd,color_pair(afcol,abcol)|attrib);
+#else
  if(drv_colors>16) {
  	if(afcol==COLOR_SPEC_FG||afcol==COLOR_PREP_FG) {
 		wattron(wnd,COL_BOLD);
@@ -1448,7 +1454,6 @@ void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
  } else {
  int fcol;
  int attrib=0;
-
   fcol = current_scheme->color_attr[afcol].index % 16;
   if(drv_colors==8)
   {
@@ -1460,6 +1465,7 @@ void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
   attrib |= current_scheme->color_attr[afcol].attrib;
   wattrset(wnd,color_pair(afcol,abcol)|attrib);
  }
+#endif
 }
 
 
@@ -1610,7 +1616,7 @@ void disp_box(char *box_title,int border,int y1,int x1,int y2,int x2)
  cbox->panel=new_panel(cbox->wnd);
  cbox->border=border;
 
- drv_wcolor(cbox->wnd,COLOR_FG,COLOR_BOX_BG);	/* in case we want it a different color!  */
+ drv_wcolor(cbox->wnd,COLOR_MENU_FG,COLOR_BOX_BG);	/* in case we want it a different color!  */
 
  cbox->y=y1;
  cbox->x=x1;
@@ -2103,8 +2109,8 @@ void box_line_print(int line,int start,char *st, int w, int selected,int active_
  int real_width;
  if(active>=0) width--;
  real_width = width + strlen(st)-utf_num_chars(st)+1;
- if(selected)  drv_wcolor(cbox->wnd,COLOR_MENU_BG,COLOR_FG);
- else drv_wcolor(cbox->wnd,COLOR_MENU_BG,COLOR_FG);
+ if(selected)  drv_wcolor(cbox->wnd,COLOR_MENU_FG,COLOR_SELECT_BG);
+ else drv_wcolor(cbox->wnd,COLOR_MENU_FG,COLOR_MENU_BG);
  // MESG("box_line_print: y=%d h=%d [%s]",y,cbox->y2 - cbox->y -1,st);
 #if	USE_GLIB
  char *normal_st = g_utf8_normalize(st,-1,G_NORMALIZE_ALL_COMPOSE);
@@ -2126,7 +2132,7 @@ void box_line_print(int line,int start,char *st, int w, int selected,int active_
 	wprintw(cbox->wnd,"~%s",string_to_show);
 #endif
  else wprintw(cbox->wnd," %s",string_to_show);
- drv_wcolor(cbox->wnd,COLOR_FG,COLOR_MENU_BG);
+ // drv_wcolor(cbox->wnd,COLOR_MENU_BG,COLOR_MENU_FG);
 
  wrefresh(cbox->wnd);
 }
@@ -2164,7 +2170,7 @@ void clear_hmenu()
 {
  curs_set(0);
 
- drv_wcolor(hmenu_window,COLOR_FG,COLOR_MENU_BG);
+ drv_wcolor(hmenu_window,COLOR_MENU_FG,COLOR_MENU_BG);
  wmove(hmenu_window,0,0);
  wprintw(hmenu_window,"%*s",drv_numcol,"  ");
  wrefresh(hmenu_window);
@@ -2188,7 +2194,7 @@ void drv_msg_line(char *arg)
 	wmove(mesg_window,0,0);	
 #if	CLEAR_BG
 	if(app_error) 
-		wbkgd(mesg_window,color_pair(COLOR_FG,COLOR_SEARBCH_BG));
+		wbkgd(mesg_window,color_pair(COLOR_FG,COLOR_SEARCH_BG));
 	else
 		wbkgd(mesg_window,color_pair(COLOR_FG,COLOR_BG));
 #endif
@@ -2256,14 +2262,17 @@ void create_default_scheme()
 	int i;
 	COLOR_SCHEME *scheme = malloc(sizeof(COLOR_SCHEME));
 	scheme->scheme_name = scheme_names[scheme_ind];
+
+	// fprintf(stderr,"scheme %d [%s] ----------------------\n",scheme_ind,scheme->scheme_name);
 #if	NEW_COLORS
-	int total_colors=24;
+	int total_colors=FG_COLORS+BG_COLORS;
 #else
 	int total_colors=16;
 #endif
 	for(i=0;i<total_colors;i++) 
 	{
 		RGB_DEF *rv;
+		// fprintf(stderr,"- color %d\n",i);
 		rv = get_rgb_values(basic_color_values[scheme_ind][i]);
 		scheme->basic_colors[i].r=rv->r;
 		scheme->basic_colors[i].g=rv->g;
@@ -2273,7 +2282,7 @@ void create_default_scheme()
 	for(i=0;i<total_colors;i++) 
 	{
 		scheme->color_attr[i].index = i;
-		scheme->color_attr[i].attrib = 0;
+		scheme->color_attr[i].attrib = 1;
 	};
 #else
 	for(i=0;i<COLOR_TYPES;i++) 
@@ -2328,7 +2337,7 @@ MESG("set_scheme_colors: %d of %d drv_colors=%d color_scheme_ind=%d",scheme,colo
 	for(i=0;i<FG_COLORS;i++) 
 		for(j=0;j<BG_COLORS;j++) {
 			MESG(" - pair %3d: f=%d b=%d",i*FG_COLORS+j,i+BG_COLORS,j);
-			init_pair(i*FG_COLORS+j,i+BG_COLORS,j);
+			init_pair(i*FG_COLORS+j+1,i+BG_COLORS,j);
 		};
 #else
  if(drv_colors>16) {
@@ -2380,7 +2389,7 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
 {
  int status_row=wp->w_ntrows-1;;
  int maxlen;
- int fg_color=COLOR_FG;
+ int fg_color=COLOR_MENU_FG;
  int bg_color=COLOR_MENU_BG;
  char *status_string = show_string;
  int rpos=utf_num_chars(status_string)+2;
@@ -2624,7 +2633,7 @@ int new_shell(int n)
 		return(TRUE);
 	};
 	drv_move(drv_numrow, 0);			 /* Seek to last line.	 */
-	drv_wcolor(stdscr,WHITE,BLACK);
+	drv_wcolor(stdscr,COLOR_FG,COLOR_BG);
 	drv_flush();
 	drv_close();							  /* stty to old settings */
 	if ((cp = getenv("SHELL")) != NULL && *cp != '\0')
@@ -2930,7 +2939,7 @@ void show_slide(WINDP *wp)
 // char hatch_line[5] = { 0xE2,0x96,0x93,0,0};
 // char left_half[5] = { 0xE2,0x96,0x8C,0,0};
 // char xblock[5] = { 0xE2,0x95,0xB3,0,0};
- int fg_color=COLOR_FG;
+ int fg_color=COLOR_MENU_FG;
  int bg_color=COLOR_MENU_BG;
  curs_set(0);
 
@@ -2940,7 +2949,7 @@ void show_slide(WINDP *wp)
 	 	fg_color=COLOR_INACTIVE_FG;
 		bg_color=COLOR_INACTIVE_BG;
 	} else {
-	 	fg_color=COLOR_FG;
+	 	fg_color=COLOR_MENU_FG;
 		bg_color=COLOR_MENU_BG;
 	};
  };
@@ -2979,4 +2988,3 @@ void show_slide(WINDP *wp)
 }
 
 /* -- */
-

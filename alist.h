@@ -3,7 +3,10 @@
 	Copyright K.Triantafillou
 	GPL2 lib license
 */
-
+#if	0
+ ;aslkd ;alskd;alsk d;laskd;laskd;lask ;lsakd ;alskd ;aslkd askld'asadsadad'
+ if int else struct
+#endif
 /* version  10/8/2022 */
 
 #ifndef __ALIST_KT__

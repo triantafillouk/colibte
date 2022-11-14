@@ -48,7 +48,6 @@ int new_in_key_list=0;
 
 void init_lists()
 {
-// MESG("init_lists:");
  file_list=new_list(0,"file_list");
  window_list=new_list(0,"window_list");
  var_list=new_list(0,"var_list");
@@ -97,11 +96,11 @@ int main(int argc, char **argv)
 	errno=0;
 
 	init_hash();
+	discmd = FALSE;
 	init_lists();
 	scratch_files[0]=0;
-//	MESG("main:start");
 	parse_command_line(argc,argv);
-	discmd = FALSE;
+	// MESG("main:start1");
 	set_start_dir(NULL);
 	if(!execmd) {
 		// MESG("init_system_clipboard");
