@@ -978,11 +978,11 @@ offs vtline(WINDP *wp, offs tp_offs)
 			if(canstart) {
 			// MESG("		421 i0=%d",i0);
 			// Highlight numerics, set type to H_NUMERIC
-				if(!checknumerics(fp,vtlm,&i0,H_NUMERIC))
+				if(!checknumerics(fp,vtlm,&i0,COLOR_STANDOUT_FG))
 			// check for words of type 1, set type to H_WORD1
-				if(!checkwords(fp,vtlm,&i0,fp->hl->w0,H_WORD1))
+				if(!checkwords(fp,vtlm,&i0,fp->hl->w0,COLOR_WORD1_FG))
 			// check for words of type 2, set type to H_WORD2
-				checkwords(fp,vtlm,&i0,fp->hl->w1,H_WORD2);
+				checkwords(fp,vtlm,&i0,fp->hl->w1,COLOR_WORD2_FG);
 				canstart=0;
 				// MESG("	422 i0=%d",i0);
 			}
@@ -1350,7 +1350,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 				break;
 			/* % tag */
 			case H_QUOTE8:
-				ctl_f = COLOR_HORIZON_FG; // TAGFORE;
+				ctl_f = COLOR_WORD3_FG; // TAGFORE;
 				ctl_b=line_bcolor;
 				break;
 			case H_QUOTE9:
@@ -1364,7 +1364,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 				break;			
 			case H_QUOTE11:
 			case H_QUOTE11+H_QUOTE9:
-				ctl_b=COLOR_LIGHT_BG;
+				ctl_b=COLOR_INACTIVE_BG;
 				break;		
 			case 0:
 				ctl_b=line_bcolor=wp->w_bcolor;	
