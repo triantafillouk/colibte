@@ -100,7 +100,8 @@ void  svchar(vchar *vc,int val,int b_color,int f_color)
  vc->uval[5]=0; 
  vc->uval[6]=0; 
  vc->uval[7]=0; 
- vc->attr = f_color > 256;
+ vc->attr = f_color > 255;
+ // if(vc->attr) MESG("svchar ul");
  vc->bcolor=b_color;
  vc->fcolor=f_color;
 #if	0
@@ -113,7 +114,7 @@ void  svchar(vchar *vc,int val,int b_color,int f_color)
 void  svcolor(vchar *vc,int b_color,int f_color)
 {
  // if(f_color>256) MESG("svcolor: f_color=%d",f_color);
- vc->attr = f_color>256;
+ vc->attr = f_color>255;
  vc->bcolor=b_color;
  vc->fcolor=f_color%256;
 }
@@ -121,6 +122,7 @@ void  svcolor(vchar *vc,int b_color,int f_color)
 /* set virtual special multiple  character */
 void svmchar(vchar *vc,int ustr,int b_color,int f_color,int count)
 {
+ // if(f_color>255) MESG("svmchar: ul count=%d",count);
  while(count>0) {
  	svchar(vc,ustr,b_color,f_color);
 	count--;
@@ -1460,7 +1462,10 @@ void vteeol(WINDP *wp, int selected,int inside)
 		};
 	} else {
 			if(selected) {
-				if(selected==2)       { if(drv_colors>8)  ctl_b=INFOBACK;else ctl_b=MODEBACK; ctl_f+=256;}	// header
+				if(selected==2)       { 
+					if(drv_colors==8) { ctl_b=MODEBACK;ctl_f=CNUMERIC;}
+					else { ctl_b=INFOBACK;ctl_f=MODEFORE+256;};
+				}	// header
 				else if(selected==3)  { if(drv_colors>8)  ctl_b=MODEBACKI;else ctl_b=MODEBACK;}	// just selected
 				else if(selected==-1) { if(drv_colors==8) ctl_b=MODEBACK ;}	// empty
 				else                  ctl_b=MODEBACK;	// current line
