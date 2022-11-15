@@ -176,16 +176,15 @@ int confirm(char *title, char *prompt,int always)
 
 int color_pair(int fg_color,int bg_color)
 {
- int pair_ind=-1;
  int cpair;
 
 #if	NEW_COLORS
-	int fcol = current_color[fg_color].index;
-	int bcol = current_color[bg_color].index;
-// 	cpair = COLOR_PAIR(fcol*FG_COLORS+bcol);
+// 	int fcol = current_color[fg_color].index;
+//	int bcol = current_color[bg_color].index;
 	cpair = COLOR_PAIR((fg_color-BG_COLORS)*FG_COLORS+bg_color+1);
-	if(fg_color==COLOR_FG) MESG("- cp: color_fg bg_color=%d pair=%d",bg_color,(fg_color-BG_COLORS)*FG_COLORS+bg_color+1);
+	// if(fg_color==COLOR_FG) MESG("- cp: color_fg bg_color=%d pair=%d",bg_color,(fg_color-BG_COLORS)*FG_COLORS+bg_color+1);
 #else
+ int pair_ind=-1;
  if(drv_colors>16) {
 	pair_ind = pair_num[fg_color][bg_color];
 	cpair = COLOR_PAIR(pair_ind);
@@ -2192,7 +2191,7 @@ void drv_msg_line(char *arg)
 	if (discmd == FALSE || macro_exec) return;
 	curs_set(0);
 	wmove(mesg_window,0,0);	
-#if	CLEAR_BG
+#if	1
 	if(app_error) 
 		wbkgd(mesg_window,color_pair(COLOR_FG,COLOR_SEARCH_BG));
 	else

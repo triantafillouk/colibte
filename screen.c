@@ -766,7 +766,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	} else 
 	{
 		if(drv_colors==8) { bg_color=COLOR_SELECT_BG;fg_color=COLOR_STANDOUT_FG;}
-		else { bg_color=COLOR_INFO_BG;fg_color=COLOR_FG;};
+		else { bg_color=COLOR_INFO_BG;fg_color=COLOR_MENU_FG;};
 		line_bcolor=bg_color;
 		for(i0=start_color_column;i0<= end_column;i0++)
 		{
