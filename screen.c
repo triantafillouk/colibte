@@ -81,10 +81,12 @@ void svwchar(vchar *vc, utfchar *uc,int b_color,int f_color)
 	vc->uval[7]=0;
  };
  vc->bcolor=b_color;
- vc->fcolor=f_color;
-
+ vc->fcolor=f_color%256;
+ vc->attr = f_color>255;
+#if	0
  vc->display_width=CLEN;
  vc->display_height=CHEIGHTI;
+#endif
 }
 
 /* set non utf char with color  */
@@ -100,17 +102,20 @@ void  svchar(vchar *vc,int val,int b_color,int f_color)
  vc->uval[7]=0; 
 
  vc->bcolor=b_color;
- vc->fcolor=f_color;
-
+ vc->fcolor=f_color%256;
+ vc->attr = f_color > 255;
+#if	0
  vc->display_width=CLEN;
  vc->display_height=CHEIGHTI;
+#endif
 }
 
 /* set virtual color */
 void  svcolor(vchar *vc,int b_color,int f_color)
 {
  vc->bcolor=b_color;
- vc->fcolor=f_color;
+ vc->fcolor=f_color % 256;
+ vc->attr = f_color > 255;
 }
 
 /* set virtual special multiple  character */
@@ -759,20 +764,20 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 			};
 		} else {
 			if(wp->w_fp->b_flag!=FSNOTES && !(wp->w_fp->b_flag & FSNLIST)) 
-				fg_color=COLOR_BG;
+				fg_color=COLOR_FG;
 		};
 #endif
 		for(i0=start_color_column;i0<= end_column;i0++) svcolor(v_text+i0,bg_color,fg_color);
 	} else 
 	{
-		if(drv_colors==8) { bg_color=COLOR_SELECT_BG;fg_color=COLOR_STANDOUT_FG;}
-		else { bg_color=COLOR_INFO_BG;fg_color=COLOR_MENU_FG;};
+		if(drv_colors==8) { bg_color=COLOR_SELECT_BG;fg_color=COLOR_STANDOUT_FG+256;}
+		else { bg_color=COLOR_INFO_BG;fg_color=COLOR_MENU_FG+256;};
 		line_bcolor=bg_color;
 		for(i0=start_color_column;i0<= end_column;i0++)
 		{
 			svcolor(v_text+i0,bg_color,fg_color);
 		};
-		vteeol(wp,2,0);
+		vteeol(wp,2,1);
 		return;
 	};
 	// MESG("vt_str: end max_size=%d",max_size);
@@ -1450,7 +1455,11 @@ void vteeol(WINDP *wp, int selected,int inside)
 		};
 	} else {
 			if(selected) {
-				if(selected==2)       { if(drv_colors>8)  ctl_b=COLOR_INFO_BG;else ctl_b=COLOR_SELECT_BG;}	// header
+				if(selected==2)       { 
+					if(drv_colors>8) { 
+						ctl_b=COLOR_INFO_BG;ctl_f=COLOR_MENU_FG+256;
+					} else { ctl_b=COLOR_SELECT_BG;ctl_f=COLOR_MENU_FG+256;};
+				}	// header
 				else if(selected==3)  { if(drv_colors>8)  ctl_b=COLOR_INACTIVE_BG;else ctl_b=COLOR_SELECT_BG;}	// just selected
 				else if(selected==-1) { if(drv_colors==8) ctl_b=COLOR_SELECT_BG ;}	// empty
 				else                  ctl_b=COLOR_SELECT_BG;	// current line

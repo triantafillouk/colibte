@@ -284,10 +284,13 @@ typedef struct notes_struct {
 
 typedef struct vchar {
 	unsigned char uval[8];	/* stores a utf char  */
+	unsigned short attr:8;
 	unsigned short bcolor:8;	/* background  */
-	unsigned short fcolor:8;	/* foreground  */
+	unsigned short fcolor;	/* foreground  */
+#if	0
 	unsigned int display_width;
 	unsigned int display_height;
+#endif
 } vchar;
 
 typedef struct  VIDEO {

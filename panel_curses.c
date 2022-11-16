@@ -1450,8 +1450,10 @@ void drv_move(int row, int col)
 
 void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
 {
+ int attrib=0;
+ if(afcol>255) { afcol=afcol%256;attrib=A_UNDERLINE;};
+
 #if	NEW_COLORS
-  int attrib=0;
   // if(afcol==COLOR_FG || afcol==COLOR_WORD2_FG) attrib=A_BOLD;
   wattrset(wnd,color_pair(afcol,abcol)|attrib);
 #else
@@ -1464,7 +1466,6 @@ void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
 	};
  } else {
  int fcol;
- int attrib=0;
   fcol = current_scheme->color_attr[afcol].index % 16;
   if(drv_colors==8)
   {
@@ -2018,7 +2019,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 	for(i=0;i<=imax;i++) {
 	 uint32_t ch;
-		ccolor=v1->fcolor;
+		ccolor=v1->fcolor+v1->attr*256;
 		cattr=v1->bcolor;
 		drv_wcolor(wp->gwp->draw,ccolor,cattr);
 		ch=v1->uval[0];
