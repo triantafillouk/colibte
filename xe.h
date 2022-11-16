@@ -25,6 +25,7 @@
 #define	COLOR_SCHEMES	10
 
 #define	NEW_COLORS	1
+#define NEW_COLOR8	0
 
 #define	PANGO_TEST	1
 #define	TARROWS		1	/* Use arrow menus in panel curses  */

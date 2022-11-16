@@ -93,6 +93,7 @@ WINDOW *hmenu_window;	/* horizontal menu curses window  */
 WINDOW *mesg_window;	/* message line curses window  */
 PANEL *hmenu_panel=NULL;
 PANEL *mesg_panel=NULL;
+extern int color16_8[BG_COLORS+FG_COLORS];
 
 int color_pair(int fg_color,int bg_color);
 void free_virtual_window(WINDP *wp);
@@ -181,7 +182,18 @@ int color_pair(int fg_color,int bg_color)
 #if	NEW_COLORS
 // 	int fcol = current_color[fg_color].index;
 //	int bcol = current_color[bg_color].index;
-	cpair = COLOR_PAIR((fg_color-BG_COLORS)*FG_COLORS+bg_color+1);
+	if(drv_colors>8) cpair = COLOR_PAIR((fg_color-BG_COLORS)*FG_COLORS+bg_color+1);
+	else {
+#if	NEW_COLOR8
+		int fcol = current_color[fg_color].index;
+		int bcol = current_color[bg_color].index % drv_basic_colors;
+		cpair = COLOR_PAIR((fcol%drv_basic_colors)*drv_basic_colors+bcol);
+#else
+		int fg = color16_8[fg_color]%8;
+		int bg = color16_8[bg_color]%8;
+		cpair = COLOR_PAIR(fg*8+bg);
+#endif
+	};
 	// if(fg_color==COLOR_FG) MESG("- cp: color_fg bg_color=%d pair=%d",bg_color,(fg_color-BG_COLORS)*FG_COLORS+bg_color+1);
 #else
  int pair_ind=-1;
@@ -2329,15 +2341,26 @@ MESG("set_scheme_colors: %d of %d drv_colors=%d color_scheme_ind=%d",scheme,colo
  if(drv_colors==0) return;
 #if	NEW_COLORS
 	RGB_COLORS *color_val = current_scheme->basic_colors;
-	for(i=0;i<FG_COLORS+BG_COLORS;i++) {
-		init_color(i,color_val[i].r,color_val[i].g,color_val[i].b);
-		MESG(" - color %2d [%15s]: (%d %d %d)",i,color_type_names[i],color_val[i].r,color_val[i].g,color_val[i].b);
-	};
-	for(i=0;i<FG_COLORS;i++) 
-		for(j=0;j<BG_COLORS;j++) {
-			MESG(" - pair %3d: f=%d b=%d",i*FG_COLORS+j,i+BG_COLORS,j);
-			init_pair(i*FG_COLORS+j+1,i+BG_COLORS,j);
+	if(drv_colors>8) {
+		for(i=0;i<FG_COLORS+BG_COLORS;i++) {
+			init_color(i,color_val[i].r,color_val[i].g,color_val[i].b);
+			MESG(" - color %2d [%15s]: (%d %d %d)",i,color_type_names[i],color_val[i].r,color_val[i].g,color_val[i].b);
 		};
+		for(i=0;i<FG_COLORS;i++) 
+			for(j=0;j<BG_COLORS;j++) {
+				MESG(" - pair %3d: f=%d b=%d",i*FG_COLORS+j,i+BG_COLORS,j);
+				init_pair(i*FG_COLORS+j+1,i+BG_COLORS,j);
+			};
+	} else {
+		for(j=0;j<16;j++) {
+		 	int i=color8_16[j];
+			init_color(j,color_val[i].r,color_val[i].g,color_val[i].b);
+			MESG(" - color %2d [%15s]: (%d %d %d)",j,color_type_names[i],color_val[i].r,color_val[i].g,color_val[i].b);
+		};
+	
+		for(i=0;i<drv_basic_colors;i++) 
+			for(j=0;j<drv_basic_colors;j++) init_pair(i*drv_basic_colors+j,i,j);
+	};
 #else
  if(drv_colors>16) {
 	for(i=0;i<XCOLOR_TYPES;i++) {

@@ -29,6 +29,57 @@
 #define LCYAN		14
 #define LWHITE		15
 
+// 16 colors to 8 colors translation
+// for black backgrounds!!
+int color16_8[] = {
+ BLACK,
+ BLUE,
+ CYAN,
+ RED,
+ GREEN,
+ BROWN,
+ BROWN,
+ MAGENTA,
+ BROWN,
+ BROWN,
+
+ WHITE,	/* COLOR_FG  */
+ WHITE,
+ LBLUE,
+ LRED,	
+ YELLOW,	/* COLOR_PREP_FG  */
+ LCYAN,	/* WORD1  */
+ LMAGENTA,	/* WORD2  */
+ LBLUE,	/* WORD3  */
+ LGREEN,	/* SPEC  */
+ GREEN,
+ ORANGE,	/* COMMENT  */
+ ORANGE,	/* CHANGED_FG  */
+ LMAGENTA,	/* HORIZON  */
+ WHITE,
+ YELLOW
+};
+
+int color8_16[] = {
+	COLOR_BG,		/* BLACK  */
+	COLOR_SEARCH_BG,	/* RED  */
+	COLOR_SELECT_BG,	/* CYAN  */
+	COLOR_COMMENT_FG,	/* ORANGE  */
+	COLOR_MENU_BG,		/* BLUE  */
+	COLOR_INFO_BG,		/* MAGENTA  */
+	COLOR_SELECT_BG,	/* CYAN  */
+	COLOR_FG,			/* WHITE  */
+
+	COLOR_LIGHT_BG,		/* BROWN  */
+	COLOR_WORD2_FG,		/* LRED  */
+	COLOR_SPEC_FG,		/* LGREEN  */
+	COLOR_ROWCOL_FG,	/* YELLOW  */
+	COLOR_STANDOUT_FG,	/* LWHITE  */
+	COLOR_HORIZON_FG,	/* LMAGENTA  */
+	COLOR_WORD1_FG,		/* LCYAN  */
+	COLOR_MENU_FG		/* LWHITE  */
+};
+
 #if NEW_COLORS
 #define	COLOR_TYPES	FG_COLORS+BG_COLORS
 int pair_num[FG_COLORS][BG_COLORS];
