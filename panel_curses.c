@@ -1397,7 +1397,7 @@ void drv_move(int row, int col)
 void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
 {
  int attrib=0;
- if(afcol>256) { afcol=afcol%256;attrib=A_UNDERLINE;};
+ if(afcol>255) { afcol=afcol%256;attrib=A_UNDERLINE;};
 
  if(drv_colors>16) {
  	if(afcol==SPECFORE||afcol==PREPFORE) {
@@ -1413,7 +1413,7 @@ void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
   if(drv_colors==8)
   {
 	  if(fcol>COL_BASIC-1) { 
-		attrib=A_BOLD;
+		attrib|=A_BOLD;
 		fcol %= COL_BASIC;
   	  };
   };

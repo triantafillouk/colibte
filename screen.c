@@ -773,7 +773,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	} else 
 	{
 		// MESG("header: drv_colors=%d",drv_colors);
-		if(drv_colors==8) { bg_color=MODEBACK;fg_color=CNUMERIC;}
+		if(drv_colors==8) { bg_color=MODEBACK;fg_color=CNUMERIC+256;}
 		else { bg_color=INFOBACK;fg_color=MODEFORE+256;};
 		line_bcolor=bg_color;
 		for(i0=start_color_column;i0<= end_column;i0++)
@@ -1463,7 +1463,7 @@ void vteeol(WINDP *wp, int selected,int inside)
 	} else {
 			if(selected) {
 				if(selected==2)       { 
-					if(drv_colors==8) { ctl_b=MODEBACK;ctl_f=CNUMERIC;}
+					if(drv_colors==8) { ctl_b=MODEBACK;ctl_f=CNUMERIC+256;}
 					else { ctl_b=INFOBACK;ctl_f=MODEFORE+256;};
 				}	// header
 				else if(selected==3)  { if(drv_colors>8)  ctl_b=MODEBACKI;else ctl_b=MODEBACK;}	// just selected
