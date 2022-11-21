@@ -12,6 +12,7 @@
 extern alist *window_list;
 extern int *color;
 extern FILEBUF *cbfp;
+extern int color_scheme_ind;
 
 GWINDP * drv_new_twinp();
 
@@ -37,6 +38,7 @@ int reposition(int n)
 	else if(sline==cwp->w_ntrows-1) { movelines = midline-cwp->w_ntrows;}
 
 	move_window(movelines);
+	change_color_scheme(color_scheme_ind+1);
     return (TRUE);
 }
 
