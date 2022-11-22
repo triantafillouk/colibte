@@ -1257,9 +1257,9 @@ void vtputwc(WINDP *wp, utfchar *uc)
 
 	if(wp->vtcol == start_column-1){
 #if	DARWIN || PCURSES
-		svchar(vp->v_text+wp->vtcol++,CHR_NBSPACE,COLOR_INFO_BG,COLOR_INFO_BG);
+		svchar(vp->v_text+wp->vtcol++,CHR_NBSPACE,COLOR_INFO_BG,COLOR_FG);
 #else
-		svchar(vp->v_text+wp->vtcol++,CHR_SPACE,COLOR_INFO_BG,COLOR_INFO_BG);
+		svchar(vp->v_text+wp->vtcol++,CHR_SPACE,COLOR_INFO_BG,COLOR_FG);
 #endif
 		return;
 	};

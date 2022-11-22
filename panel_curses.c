@@ -182,18 +182,16 @@ int color_pair(int fg_color,int bg_color)
 #if	NEW_COLORS
 // 	int fcol = current_color[fg_color].index;
 //	int bcol = current_color[bg_color].index;
+	if(fg_color<BG_COLORS || fg_color>FG_COLORS+15) MESG("color pair fgcolor out of range %d",fg_color);
+	if(bg_color<0 || bg_color>BG_COLORS) MESG("color pair bgcolor out of range %d",bg_color);
 	if(drv_colors>8) {
 		cpair = COLOR_PAIR((fg_color-BG_COLORS)*FG_COLORS+bg_color+2);
 	} else {
-#if	NEW_COLOR8
-		int fcol = current_color[fg_color].index;
-		int bcol = current_color[bg_color].index % drv_basic_colors;
-		cpair = COLOR_PAIR((fcol%drv_basic_colors)*drv_basic_colors+bcol);
-#else
-		int fg = color16_8[fg_color]%8;
-		int bg = color16_8[bg_color]%8;
-		cpair = COLOR_PAIR(fg*8+bg);
-#endif
+		int fg = color16_8[fg_color];
+		int bg = color16_8[bg_color];
+		cpair = COLOR_PAIR((fg%8) *8+bg+1);
+		if(fg>8) cpair |= COL_BOLD;
+		// printf("cpair=%X (%d %d) a=%X\n",cpair,fg%8,bg,fg>8);
 	};
 	// if(fg_color==COLOR_FG) MESG("- cp: color_fg bg_color=%d pair=%d",bg_color,(fg_color-BG_COLORS)*FG_COLORS+bg_color+1);
 #else
@@ -2249,6 +2247,7 @@ RGB_DEF original_color[XCOLOR_TYPES];
 void restore_original_colors()
 {
  int i;
+ MESG("restore_original_colors:");
  for(i=0;i<XCOLOR_TYPES;i++) 
  {
  	init_color(i,original_color[i].r,original_color[i].g,original_color[i].b);
@@ -2258,6 +2257,7 @@ void restore_original_colors()
 void save_original_colors()
 {
  int i;
+ MESG("save_original_colors:");
  for(i=0;i<XCOLOR_TYPES;i++) {
  	color_content(i,(short int *)(&original_color[i].r),(short int *)(&original_color[i].g),(short int *)(&original_color[i].b));
  };
@@ -2318,7 +2318,7 @@ void set_scheme_colors(int scheme)
 {
  int i,j;
  int scheme_ind=0;
-MESG("set_scheme_colors: %d of %d drv_colors=%d color_scheme_ind=%d",scheme,color_schemes->size,drv_colors,color_scheme_ind);
+MESG("set_scheme_colors: scheme=%d drv_colors=%d",scheme,drv_colors);
  if(scheme<1 || scheme> color_schemes->size) scheme=1;
 
  color_scheme_ind=scheme-1;
@@ -2341,32 +2341,36 @@ MESG("set_scheme_colors: %d of %d drv_colors=%d color_scheme_ind=%d",scheme,colo
 	RGB_COLORS *color_val = current_scheme->basic_colors;
 	if(drv_colors>8) {
 		for(i=0;i<FG_COLORS+BG_COLORS;i++) {
+			// printf("init_color(%d)[%d,%d,%d]\n",i,color_val[i].r,color_val[i].g,color_val[i].b);
+			refresh();
 			init_color(i,color_val[i].r,color_val[i].g,color_val[i].b);
-			MESG(" - color %2d [%15s]: (%d %d %d)",i,color_type_names[i],color_val[i].r,color_val[i].g,color_val[i].b);
+			// MESG(" - color %2d [%15s]: (%d %d %d)",i,color_type_names[i],color_val[i].r,color_val[i].g,color_val[i].b);
 		};
 		for(i=0;i<FG_COLORS;i++) 
 			for(j=0;j<BG_COLORS;j++) {
-				MESG(" - pair %3d: f=%d b=%d",i*FG_COLORS+j,i+BG_COLORS,j);
+				// MESG(" - pair %3d: f=%d b=%d",i*FG_COLORS+j,i+BG_COLORS,j);
 				init_pair(i*FG_COLORS+j+2,i+BG_COLORS,j);
 			};
 	} else {
-		for(j=0;j<16;j++) {
+#if	0
+		for(j=0;j<8;j++) {
 		 	int i=color8_16[j];
+			// printf("init_color(%d)[%d,%d,%d]\n",j,color_val[i].r,color_val[i].g,color_val[i].b);
 			init_color(j,color_val[i].r,color_val[i].g,color_val[i].b);
 			MESG(" - color %2d [%15s]: (%d %d %d)",j,color_type_names[i],color_val[i].r,color_val[i].g,color_val[i].b);
 		};
-	
+		refresh();
+#endif
+#if	1
 		for(i=0;i<drv_basic_colors;i++) 
-			for(j=0;j<drv_basic_colors;j++) init_pair(i*drv_basic_colors+j,i,j);
+			for(j=0;j<drv_basic_colors;j++) {
+				int pair=i*drv_basic_colors+j+1;
+				init_pair(pair,i,j);
+				// MESG("init_pair %d as (%d %d)",pair,i,j);
+			};
+#endif
 	};
 #else
-	RGB_COLORS *color_val = current_scheme->basic_colors;
-	for(i=0;i<16;i++) {
-		init_color(i,color_val[i].r,color_val[i].g,color_val[i].b);
-//		MESG(" - color %2d: (%d %d %d) attr=%d",i,color_val[j],color_val[j+1],color_val[j+2],color_val[j+3]);
-	};
-	for(i=0;i<drv_basic_colors;i++) 
-		for(j=0;j<drv_basic_colors;j++) init_pair(i*drv_basic_colors+j,i,j);
 #endif
 // MESG("set_scheme_colors:end");
 }

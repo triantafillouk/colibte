@@ -38,9 +38,9 @@ int color16_8[] = {
  RED,
  GREEN,
  BROWN,
- BROWN,
- MAGENTA,
- BROWN,
+ BLACK,
+ BLUE,
+ BLUE,
  BROWN,
 
  WHITE,	/* COLOR_FG  */
@@ -61,9 +61,9 @@ int color16_8[] = {
 };
 
 int color8_16[] = {
-	COLOR_BG,		/* BLACK  */
+	COLOR_BG,			/* BLACK  */
 	COLOR_SEARCH_BG,	/* RED  */
-	COLOR_SELECT_BG,	/* CYAN  */
+	COLOR_QUOTE_BG,		/* GREEN  */
 	COLOR_COMMENT_FG,	/* ORANGE  */
 	COLOR_MENU_BG,		/* BLUE  */
 	COLOR_INFO_BG,		/* MAGENTA  */
