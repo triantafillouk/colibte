@@ -1,0 +1,7596 @@
+[?1049h[22;0;0t[1;31r(B[m[4l[?7h[?1000h[H[2J[39;49m[?1000h[?1003h
+init_color(0)[0,0,0]
+init_color(1)[627,0,0]
+init_color(2)[0,502,0]
+init_color(3)[941,565,0]
+init_color(4)[0,439,627]
+init_color(5)[188,188,188]
+init_color(6)[0,314,439]
+init_color(7)[690,690,690]
+[?1003h[?25l[37m[44m[K[134G(B[m[39;49m[37m[40m(B[0;1m[31m[44mF(B[0m[37m[44mILE(B[m[39;49m[37m[40m[9G(B[0;1m[31m[44mE(B[0m[37m[44mdit(B[m[39;49m[37m[40m[17G(B[0;1m[31m[44mS(B[0m[37m[44mearch[18G(B[m[39;49m[37m[40m[25G(B[0;1m[31m[44mW(B[0m[37m[44mindow[26G(B[m[39;49m[37m[40m[33G(B[0;1m[31m[44mM(B[0m[37m[44mode(B[m[39;49m[37m[40m[41G(B[0;1m[31m[44mT(B[0m[37m[44mools(B[m[39;49m[37m[40m[49G(B[0;1m[31m[44mH(B[0m[37m[44melp(B[m[39;49m[37m[40m[1;58H[37m[44m←  (B[m[39;49m[37m[40m[66G[37m[44m→  (B[m[39;49m[37m[40m[74G[37m[44m↓  (B[m[39;49m[37m[40m[82G[37m[44m↑  (B[m[39;49m[37m[40m
+cpair=3C00 (7 4) a=0
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=3C00 (7 4) a=0
+
+cpair=3C00 (7 4) a=0
+
+cpair=3C00 (7 4) a=0
+init_color(0)[0,0,0]
+init_color(1)[627,0,0]
+init_color(2)[0,502,0]
+init_color(3)[37m[44m[K[134G(B[m[39;49m[37m[40m[31d[37m[40mMon Nov 21 16:13:05 2022(B[m[39;49m[37m[40m[H(B[0;1m[31m[44mF(B[0m[37m[44mILE(B[m[39;49m[37m[40m[9G(B[0;1m[31m[44mE(B[0m[37m[44mdit(B[m[39;49m[37m[40m[17G(B[0;1m[31m[44mS(B[0m[37m[44mearch[18G(B[m[39;49m[37m[40m[25G(B[0;1m[31m[44mW(B[0m[37m[44mindow[26G(B[m[39;49m[37m[40m[33G(B[0;1m[31m[44mM(B[0m[37m[44mode(B[m[39;49m[37m[40m[41G(B[0;1m[31m[44mT(B[0m[37m[44mools(B[m[39;49m[37m[40m[49G(B[0;1m[31m[44mH(B[0m[37m[44melp(B[m[39;49m[37m[40m[941,565,0]
+init_color(4)[0,439,627]
+init_color(5)[188,188,188]
+init_color(6)[0,314,439]
+init_color(7)[690,690,690]
+
+cpair=3800 (7 0) a=0
+
+cpair=3C00 (7 4) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3[1;58H[37m[44m←  (B[m[39;49m[37m[40m[66G[37m[44m→  (B[m[39;49m[37m[40m[74G[37m[44m↓  (B[m[39;49m[37m[40m[82G[37m[44m↑  (B[m[39;49m[37m[40m[2;134H[37m[44m║[3;134H(B[m[39;49m[37m[40m[37m[44m║[4;134H(B[m[39;49m[37m[40m[37m[44m║[5;134H(B[m[39;49m[37m[40m[37m[44m║[6;134H(B[m[39;49m[37m[40m[37m[44m║[7;134H(B[m[39;49m[37m[40m[37m[44m║[8;134H(B[m[39;49m[37m[40m[37m[44m║[9;134H(B[m[39;49m[37m[40m[37m[44m║[10;134H(B[m[39;49m[37m[40m[37m[44m║[11;134H(B[m[39;49m[37m[40m[37m[44m║[12;134H(B[m[39;49m[37m[40m[37m[44m║[13;134H(B[m[39;49m[37m[40m[37m[44m║[14;134H(B[m[39;49m[37m[40m[37m[44m║[15;134H(B[m[39;49m[37m[40m[37m[44m║[16;134H(B[m[39;49m[37m[40m[37m[44m║[17;134H(B[m[39;49m[37m[40m[37m[44m║[18;134H(B[m[39;49m[37m[40m[37m[44m║[19;134H(B[m[39;49m[37m[40m[37m[44m║[20;134H(B[m[39;49m[37m[40m[37m[44m║[21;134H(B[m[39;49m[37m[40m[37m[44m║[22;134H(B[m[39;49m[37m[40m[37m[44m║[23;134H(B[m[39;49m[37m[40m[37m[44m║[24;134H(B[m[39;49m[37m[40m[37m[44m║[25;134H(B[m[39;49m[37m[40m[37m[44m║[26;134H(B[m[39;49m[37m[40m[37m[44m║[27;134H(B[m[39;49m[37m[40m[37m[44m║[28;134H(B[m[39;49m[37m[40m[37m[44m║[29;134H(B[m[39;49m[37m[40mC00 (7 4) a=0
+
+cpair=3C00 (7 4) a=0
+
+cpair=3C00 (7 4) a=0
+
+cpair=3C00 (7 4) a=0
+
+cpair=3C00 (7 4) a=0
+
+cpair=3C00 (7 4) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0[39;49m[37m[40m[37m[40m[H[2J(B[0;1m[31m[44mF(B[0m[37m[44mILE    (B[0;1m[31m[44mE(B[0m[37m[44mdit    (B[0;1m[31m[44mS(B[0m[37m[44mearch  (B[0;1m[31m[44mW(B[0m[37m[44mindow  (B[0;1m[31m[44mM(B[0m[37m[44mode    (B[0;1m[31m[44mT(B[0m[37m[44mools   (B[0;1m[31m[44mH(B[0m[37m[44melp     ←       →       ↓       ↑[K[2;133H[37m[40m[1K [37m[44m║[3;134H║[4;134H║[5;134H║[6;134H║[7;134H║[8;134H║[9;134H║[10;134H║[11;134H║[12;134H║[13;134H║[14;134H║[15;134H║[16;134H║[17;134H║[18;134H║[19;134H║[20;134H║[21;134H║[22;134H║[23;134H║[24;134H║[25;134H║[26;134H║[27;134H║[28;134H║[30;1H===u= [new 1] ===================================================================================================[20X[31d[37m[40mMon Nov 21 16:13:05 2022[K[3d(B[m[39;49m[37m[40m) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3[39;49m[37m[40m[37m[40m[H[2J(B[0;1m[31m[44mF(B[0m[37m[44mILE    (B[0;1m[31m[44mE(B[0m[37m[44mdit    (B[0;1m[31m[44mS(B[0m[37m[44mearch  (B[0;1m[31m[44mW(B[0m[37m[44mindow  (B[0;1m[31m[44mM(B[0m[37m[44mode    (B[0;1m[31m[44mT(B[0m[37m[44mools   (B[0;1m[31m[44mH(B[0m[37m[44melp     ←       →       ↓       ↑[K[2;133H[37m[40m[1K [37m[44m║[3;1H[37m[40mmanage service[119X[134G[37m[44m║[4;134H║[5;134H║[6;134H║[7;134H║[8;134H║[9;134H║[10;134H║[11;134H║[12;134H║[13;134H║[14;134H║[15;134H║[16;134H║[17;134H║[18;134H║[19;134H║[20;134H║[21;134H║[22;134H║[23;134H║[24;134H║[25;134H║[26;134H║[27;134H║[28;134H║[29;134H║[30;1H===u= [new 1] ===================================================================================================[K[31d[37m[40mMon Nov 21 16:13:05 2022[K[4d(B[m[39;49m[37m[40m800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+[5d
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7[37m[40mapi[6d(B[m[39;49m[37m[40m 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+[7d
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7[8d 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair[37m[40mlog analytics space[9d(B[m[39;49m[37m[40m=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7[10d 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair[37m[40mbicept[11d(B[m[39;49m[37m[40m=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=[12d0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 [13d(7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=201000 (2 0) a=1
+
+cpair=201000 (2 0) a=1
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0[37m[40mcontainer (B[0;1m[32m[40m->(B[0m[37m[40m api management[14d(B[m[39;49m[37m[40m) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3[15d800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+[16d
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3[17d800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+[18d
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7[19d 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair[20d=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7[21d 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair[22d=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=[23d0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair[24d=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=[25d0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 [26d(7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpa[27dir=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 [28d(7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpa[29dir=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) [30d[2;134H[3d[4d[5d[6d[7d[8d[9d[10d[11d[12d[13d[14d[15d[16d[17d[18d[19d[20d[21d[22d[23d[24d[25d[26d[27d[28d[29d[H[C[1;10H[1;18H[1;26H[1;34H[1;42H[1;50H[1;61Ha=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3C00 (7 4) a=0
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=200C00 (1 4) a=1
+
+cpair=3C00 (7 4) a=0
+
+cpair=3C0[1;69H[1;77H[1;85H[?12l[?25h[30;114H(B[0;1m[33m[44m    1   1   1 000A[134G(B[m[39;49m[37m[40m[2d[?25l[31;4H[37m[40m Nov 21 [31;20H 2022                                                                                                             [?7l [?7h(B[m[39;49m[37m[40m[37m[40mSaving the file "[new 1]"...[K(B[m[39;49m[37m[40m[37m[40mfile "[new 1]" saved[K(B[m[39;49m[37m[40m[?1000l0 (7 4) a=0
+
+cpair=3C00 (7 4) a=0
+
+cpair=3C00 (7 4) a=0
+
+cpair=201C00 (3 4) a=1
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+
+cpair=3800 (7 0) a=0
+[?1003l[39;49m(B[m[31;1H[?12l[?25h[?1049l[23;0;0t[?1l>

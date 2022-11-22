@@ -187,15 +187,19 @@ int color_pair(int fg_color,int bg_color)
 	if(drv_colors>8) {
 		cpair = COLOR_PAIR((fg_color-BG_COLORS)*FG_COLORS+bg_color+2);
 	} else {
+#if	1
+		int fg = color_t[color_scheme_ind][fg_color];
+		int bg = color_t[color_scheme_ind][bg_color];
+#else
 		int fg = color16_8[fg_color];
 		int bg = color16_8[bg_color];
+#endif
 		cpair = COLOR_PAIR((fg%8) *8+bg+1);
 		if(fg>8) cpair |= COL_BOLD;
 		// printf("cpair=%X (%d %d) a=%X\n",cpair,fg%8,bg,fg>8);
 	};
 	// if(fg_color==COLOR_FG) MESG("- cp: color_fg bg_color=%d pair=%d",bg_color,(fg_color-BG_COLORS)*FG_COLORS+bg_color+1);
 #else
- int pair_ind=-1;
 	int fcol = current_color[fg_color].index;
 	int bcol = current_color[bg_color].index % drv_basic_colors;
 	cpair = COLOR_PAIR((fcol%drv_basic_colors)*drv_basic_colors+bcol);
@@ -2352,27 +2356,27 @@ MESG("set_scheme_colors: scheme=%d drv_colors=%d",scheme,drv_colors);
 				init_pair(i*FG_COLORS+j+2,i+BG_COLORS,j);
 			};
 	} else {
-#if	0
+		if(can_change_color()){
 		for(j=0;j<8;j++) {
 		 	int i=color8_16[j];
 			// printf("init_color(%d)[%d,%d,%d]\n",j,color_val[i].r,color_val[i].g,color_val[i].b);
 			init_color(j,color_val[i].r,color_val[i].g,color_val[i].b);
-			MESG(" - color %2d [%15s]: (%d %d %d)",j,color_type_names[i],color_val[i].r,color_val[i].g,color_val[i].b);
+			// MESG(" - color %2d [%15s]: (%d %d %d)",j,color_type_names[i],color_val[i].r,color_val[i].g,color_val[i].b);
 		};
-		refresh();
-#endif
-#if	1
+		} else {
+			MESG("terminal cannot change color!");
+		};
+		int stat=0;
 		for(i=0;i<drv_basic_colors;i++) 
 			for(j=0;j<drv_basic_colors;j++) {
 				int pair=i*drv_basic_colors+j+1;
-				init_pair(pair,i,j);
-				// MESG("init_pair %d as (%d %d)",pair,i,j);
+				stat=init_pair(pair,i,j);
+				// MESG("init_pair %d: %d as (%d %d)",stat,pair,i,j);
 			};
-#endif
 	};
 #else
 #endif
-// MESG("set_scheme_colors:end");
+MESG("set_scheme_colors:end");
 }
 
 /* change color scheme */
@@ -2386,6 +2390,7 @@ int change_color_scheme(int  n)
  drv_back_color();
  set_windows_color();
  drv_update_styles();
+ MESG("change_color_scheme: end!");
  return(TRUE);
 }
 

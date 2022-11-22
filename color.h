@@ -32,32 +32,32 @@
 // 16 colors to 8 colors translation
 // for black backgrounds!!
 int color16_8[] = {
- BLACK,
- BLUE,
- CYAN,
- RED,
- GREEN,
- BROWN,
- BLACK,
- BLUE,
- BLUE,
- BROWN,
+ BLACK,		/* COLOR_BG  */
+ BLUE,		/* MENU_BG  */
+ CYAN,		/* SELECT_BG  */
+ RED,		/* SEARCH_BG  */
+ GREEN,		/* QUOTE_BG  */
+ BROWN,		/* LIGHT_BG  */
+ BLACK,		/* INFO_BG  */
+ BLUE,		/* INACTIVE_BG  */
+ BLUE,		/* BOX_BG  */
 
- WHITE,	/* COLOR_FG  */
- WHITE,
- LWHITE,
- LRED,	
- YELLOW,	/* COLOR_PREP_FG  */
- LCYAN,	/* WORD1  */
+ BROWN,		/* CODE_BG */
+ WHITE,		/* FG  */
+ WHITE,		/* MENU_FG */
+ LWHITE,	/* STANDOUT_FG */
+ LRED,		/* CTRL_FG */
+ YELLOW,	/* PREP_FG  */
+ LCYAN,		/* WORD1  */
  LMAGENTA,	/* WORD2  */
- LBLUE,	/* WORD3  */
+ LBLUE,		/* WORD3  */
  LGREEN,	/* SPEC  */
- GREEN,
- ORANGE,	/* COMMENT  */
+ GREEN,		/* SQUOTE_FG */
+ ORANGE,	/* COMMENT_FG  */
  ORANGE,	/* CHANGED_FG  */
- LMAGENTA,	/* HORIZON  */
- WHITE,
- YELLOW
+ LMAGENTA,	/* HORIZON_FG  */
+ WHITE,		/* INACTIVE_FG  */
+ YELLOW		/* ROWCOL_FG  */
 };
 
 int color8_16[] = {
@@ -925,6 +925,299 @@ color_curses color_t[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	{BLUE,0},
 	{WHITE,0},
 	{BROWN,0}
+ }
+};
+#else
+int color_t[COLOR_SCHEMES][BG_COLORS+FG_COLORS] = {
+ /* Snow */
+ {
+ WHITE,		/* COLOR_BG  */
+ BLUE,		/* MENU_BG  */
+ CYAN,		/* SELECT_BG  */
+ RED,		/* SEARCH_BG  */
+ GREEN,		/* QUOTE_BG  */
+ BROWN,		/* LIGHT_BG  */
+ WHITE,		/* INFO_BG  */
+ BLUE,		/* INACTIVE_BG  */
+ BLUE,		/* BOX_BG  */
+
+ BROWN,		/* CODE_BG */
+ BLACK,		/* FG  */
+ WHITE,		/* MENU_FG */
+ LWHITE,	/* STANDOUT_FG */
+ LRED,		/* CTRL_FG */
+ YELLOW,	/* PREP_FG  */
+ LCYAN,		/* WORD1  */
+ LMAGENTA,	/* WORD2  */
+ LBLUE,		/* WORD3  */
+ LGREEN,	/* SPEC  */
+ GREEN,		/* SQUOTE_FG */
+ ORANGE,	/* COMMENT_FG  */
+ ORANGE,	/* CHANGED_FG  */
+ LMAGENTA,	/* HORIZON_FG  */
+ WHITE,		/* INACTIVE_FG  */
+ YELLOW		/* ROWCOL_FG  */
+},
+ /* Midnight */
+ {
+ BLACK,		/* COLOR_BG  */
+ BLUE,		/* MENU_BG  */
+ CYAN,		/* SELECT_BG  */
+ RED,		/* SEARCH_BG  */
+ GREEN,		/* QUOTE_BG  */
+ BROWN,		/* LIGHT_BG  */
+ BLACK,		/* INFO_BG  */
+ BLUE,		/* INACTIVE_BG  */
+ BLUE,		/* BOX_BG  */
+
+ BROWN,		/* CODE_BG */
+ WHITE,		/* FG  */
+ WHITE,		/* MENU_FG */
+ LWHITE,	/* STANDOUT_FG */
+ LRED,		/* CTRL_FG */
+ YELLOW,	/* PREP_FG  */
+ LCYAN,		/* WORD1  */
+ LMAGENTA,	/* WORD2  */
+ LBLUE,		/* WORD3  */
+ LGREEN,	/* SPEC  */
+ GREEN,		/* SQUOTE_FG */
+ ORANGE,	/* COMMENT_FG  */
+ ORANGE,	/* CHANGED_FG  */
+ LMAGENTA,	/* HORIZON_FG  */
+ WHITE,		/* INACTIVE_FG  */
+ YELLOW		/* ROWCOL_FG  */
+},
+ /* Cyan */
+ {
+ CYAN,		/* COLOR_BG  */
+ BLUE,		/* MENU_BG  */
+ BLUE,		/* SELECT_BG  */
+ RED,		/* SEARCH_BG  */
+ GREEN,		/* QUOTE_BG  */
+ BROWN,		/* LIGHT_BG  */
+ BLACK,		/* INFO_BG  */
+ BLUE,		/* INACTIVE_BG  */
+ BLUE,		/* BOX_BG  */
+ BROWN,		/* CODE_BG */
+
+ WHITE,		/* FG  */
+ WHITE,		/* MENU_FG */
+ LWHITE,	/* STANDOUT_FG */
+ LRED,		/* CTRL_FG */
+ YELLOW,	/* PREP_FG  */
+ LCYAN,		/* WORD1  */
+ LMAGENTA,	/* WORD2  */
+ LBLUE,		/* WORD3  */
+ LGREEN,	/* SPEC  */
+ GREEN,		/* SQUOTE_FG */
+ ORANGE,	/* COMMENT_FG  */
+ ORANGE,	/* CHANGED_FG  */
+ LMAGENTA,	/* HORIZON_FG  */
+ WHITE,		/* INACTIVE_FG  */
+ YELLOW		/* ROWCOL_FG  */
+ },
+ /* Blue */
+ {
+ BLUE,		/* COLOR_BG  */
+ CYAN,		/* MENU_BG  */
+ CYAN,		/* SELECT_BG  */
+ RED,		/* SEARCH_BG  */
+ GREEN,		/* QUOTE_BG  */
+ BROWN,		/* LIGHT_BG  */
+ BLUE,		/* INFO_BG  */
+ CYAN,		/* INACTIVE_BG  */
+ CYAN,		/* BOX_BG  */
+
+ BROWN,		/* CODE_BG */
+ WHITE,		/* FG  */
+ WHITE,		/* MENU_FG */
+ LWHITE,	/* STANDOUT_FG */
+ LRED,		/* CTRL_FG */
+ YELLOW,	/* PREP_FG  */
+ LCYAN,		/* WORD1  */
+ LMAGENTA,	/* WORD2  */
+ LBLUE,		/* WORD3  */
+ LGREEN,	/* SPEC  */
+ GREEN,		/* SQUOTE_FG */
+ ORANGE,	/* COMMENT_FG  */
+ ORANGE,	/* CHANGED_FG  */
+ LMAGENTA,	/* HORIZON_FG  */
+ WHITE,		/* INACTIVE_FG  */
+ YELLOW		/* ROWCOL_FG  */
+ },
+ /* Gray */
+ {
+ WHITE,		/* COLOR_BG  */
+ BLUE,		/* MENU_BG  */
+ CYAN,		/* SELECT_BG  */
+ RED,		/* SEARCH_BG  */
+ GREEN,		/* QUOTE_BG  */
+ BROWN,		/* LIGHT_BG  */
+ WHITE,		/* INFO_BG  */
+ BLUE,		/* INACTIVE_BG  */
+ BLUE,		/* BOX_BG  */
+
+ BROWN,		/* CODE_BG */
+ BLACK,		/* FG  */
+ WHITE,		/* MENU_FG */
+ LWHITE,	/* STANDOUT_FG */
+ LRED,		/* CTRL_FG */
+ YELLOW,	/* PREP_FG  */
+ LCYAN,		/* WORD1  */
+ LMAGENTA,	/* WORD2  */
+ LBLUE,		/* WORD3  */
+ LGREEN,	/* SPEC  */
+ GREEN,		/* SQUOTE_FG */
+ ORANGE,	/* COMMENT_FG  */
+ ORANGE,	/* CHANGED_FG  */
+ LMAGENTA,	/* HORIZON_FG  */
+ WHITE,		/* INACTIVE_FG  */
+ YELLOW		/* ROWCOL_FG  */
+ },
+ /* Dark gray */
+ {
+ BLACK,		/* COLOR_BG  */
+ BLUE,		/* MENU_BG  */
+ CYAN,		/* SELECT_BG  */
+ RED,		/* SEARCH_BG  */
+ GREEN,		/* QUOTE_BG  */
+ BROWN,		/* LIGHT_BG  */
+ BLACK,		/* INFO_BG  */
+ BLUE,		/* INACTIVE_BG  */
+ BLUE,		/* BOX_BG  */
+
+ BROWN,		/* CODE_BG */
+ WHITE,		/* FG  */
+ WHITE,		/* MENU_FG */
+ LWHITE,	/* STANDOUT_FG */
+ LRED,		/* CTRL_FG */
+ YELLOW,	/* PREP_FG  */
+ LCYAN,		/* WORD1  */
+ LMAGENTA,	/* WORD2  */
+ LBLUE,		/* WORD3  */
+ LGREEN,	/* SPEC  */
+ GREEN,		/* SQUOTE_FG */
+ ORANGE,	/* COMMENT_FG  */
+ ORANGE,	/* CHANGED_FG  */
+ LMAGENTA,	/* HORIZON_FG  */
+ WHITE,		/* INACTIVE_FG  */
+ YELLOW		/* ROWCOL_FG  */
+ },
+ /* Sunny */
+ {
+ WHITE,		/* COLOR_BG  */
+ BLUE,		/* MENU_BG  */
+ CYAN,		/* SELECT_BG  */
+ RED,		/* SEARCH_BG  */
+ GREEN,		/* QUOTE_BG  */
+ BROWN,		/* LIGHT_BG  */
+ WHITE,		/* INFO_BG  */
+ BLUE,		/* INACTIVE_BG  */
+ BLUE,		/* BOX_BG  */
+
+ BROWN,		/* CODE_BG */
+ BLACK,		/* FG  */
+ WHITE,		/* MENU_FG */
+ LWHITE,	/* STANDOUT_FG */
+ LRED,		/* CTRL_FG */
+ YELLOW,	/* PREP_FG  */
+ LCYAN,		/* WORD1  */
+ LMAGENTA,	/* WORD2  */
+ LBLUE,		/* WORD3  */
+ LGREEN,	/* SPEC  */
+ GREEN,		/* SQUOTE_FG */
+ ORANGE,	/* COMMENT_FG  */
+ ORANGE,	/* CHANGED_FG  */
+ LMAGENTA,	/* HORIZON_FG  */
+ WHITE,		/* INACTIVE_FG  */
+ YELLOW		/* ROWCOL_FG  */
+ },
+ /* Twilight */
+ {
+ BLACK,		/* COLOR_BG  */
+ BLUE,		/* MENU_BG  */
+ CYAN,		/* SELECT_BG  */
+ RED,		/* SEARCH_BG  */
+ GREEN,		/* QUOTE_BG  */
+ BROWN,		/* LIGHT_BG  */
+ BLACK,		/* INFO_BG  */
+ BLUE,		/* INACTIVE_BG  */
+ BLUE,		/* BOX_BG  */
+
+ BROWN,		/* CODE_BG */
+ WHITE,		/* FG  */
+ WHITE,		/* MENU_FG */
+ LWHITE,	/* STANDOUT_FG */
+ LRED,		/* CTRL_FG */
+ YELLOW,	/* PREP_FG  */
+ LCYAN,		/* WORD1  */
+ LMAGENTA,	/* WORD2  */
+ LBLUE,		/* WORD3  */
+ LGREEN,	/* SPEC  */
+ GREEN,		/* SQUOTE_FG */
+ ORANGE,	/* COMMENT_FG  */
+ ORANGE,	/* CHANGED_FG  */
+ LMAGENTA,	/* HORIZON_FG  */
+ WHITE,		/* INACTIVE_FG  */
+ YELLOW		/* ROWCOL_FG  */
+ },
+ /* Lunar */
+ {
+ BLACK,		/* COLOR_BG  */
+ BLUE,		/* MENU_BG  */
+ CYAN,		/* SELECT_BG  */
+ RED,		/* SEARCH_BG  */
+ GREEN,		/* QUOTE_BG  */
+ BROWN,		/* LIGHT_BG  */
+ BLACK,		/* INFO_BG  */
+ BLUE,		/* INACTIVE_BG  */
+ BLUE,		/* BOX_BG  */
+
+ BROWN,		/* CODE_BG */
+ WHITE,		/* FG  */
+ WHITE,		/* MENU_FG */
+ LWHITE,	/* STANDOUT_FG */
+ LRED,		/* CTRL_FG */
+ YELLOW,	/* PREP_FG  */
+ LCYAN,		/* WORD1  */
+ LMAGENTA,	/* WORD2  */
+ LBLUE,		/* WORD3  */
+ LGREEN,	/* SPEC  */
+ GREEN,		/* SQUOTE_FG */
+ ORANGE,	/* COMMENT_FG  */
+ ORANGE,	/* CHANGED_FG  */
+ LMAGENTA,	/* HORIZON_FG  */
+ WHITE,		/* INACTIVE_FG  */
+ YELLOW		/* ROWCOL_FG  */
+ },
+ /* Velvet */
+ {
+ BLACK,		/* COLOR_BG  */
+ BLUE,		/* MENU_BG  */
+ CYAN,		/* SELECT_BG  */
+ RED,		/* SEARCH_BG  */
+ GREEN,		/* QUOTE_BG  */
+ BROWN,		/* LIGHT_BG  */
+ BLACK,		/* INFO_BG  */
+ BLUE,		/* INACTIVE_BG  */
+ BLUE,		/* BOX_BG  */
+
+ BROWN,		/* CODE_BG */
+ WHITE,		/* FG  */
+ WHITE,		/* MENU_FG */
+ LWHITE,	/* STANDOUT_FG */
+ LRED,		/* CTRL_FG */
+ YELLOW,	/* PREP_FG  */
+ LCYAN,		/* WORD1  */
+ LMAGENTA,	/* WORD2  */
+ LBLUE,		/* WORD3  */
+ LGREEN,	/* SPEC  */
+ GREEN,		/* SQUOTE_FG */
+ ORANGE,	/* COMMENT_FG  */
+ ORANGE,	/* CHANGED_FG  */
+ LMAGENTA,	/* HORIZON_FG  */
+ WHITE,		/* INACTIVE_FG  */
+ YELLOW		/* ROWCOL_FG  */
  }
 };
 #endif

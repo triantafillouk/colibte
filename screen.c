@@ -746,7 +746,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		if(index==row) {
 			bg_color=COLOR_SELECT_BG;
 			if(drv_colors==8) 
-				fg_color=COLOR_BG;
+				fg_color=COLOR_FG;
 			else if(selected>0) fg_color=COLOR_STANDOUT_FG;
 		} else {
 			if(selected>0) {
