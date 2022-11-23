@@ -108,7 +108,8 @@ typedef struct COLOR_SCHEME {
 } COLOR_SCHEME;
 
 #if	NEW_COLORS
-char *basic_color_values[COLOR_SCHEMES][BG_COLORS+FG_COLORS] = {
+// #define XCOLOR_TYPES	BG_COLORS+FG_COLORS
+char *basic_color_values[COLOR_SCHEMES][XCOLOR_TYPES] = {
  // Snow
  {
 	"#E3E3E3", // COLOR_BG,			BACKGROUND
@@ -1231,7 +1232,37 @@ typedef struct CPAIR {
 	int attr;
 } CPAIR;
 
+#if	NEW_COLORS
+char *color_type[] = {
+	"normal_bg",
+	"menu_bg",
+	"selection_bg",
+	"search_bg",
+	"quote_bg",
+	"light_bg",
+	"info_bg",
+	"inactive_bg",
+	"box_bg",
+	"code_bg"
 
+	"normal_fg",
+	"menu_fg",
+	"standout_fg",
+	"control_fg",
+	"prep_fg",
+	"word1_fg",
+	"word2_fg",
+	"word3_fg",
+	"special_fg",
+	"single quote_fg",
+	"comment_fg",
+	"changed_fg",
+	"horizon_fg",
+	"inactive_fg",
+	"rowcol_fg"
+};
+
+#else
 char *color_type[] = {
 	"normal_fg",	/* 0, Foreground FOREGR*/
 	"normal_bg",	/* 1, Background BACKGR*/
@@ -1264,6 +1295,7 @@ char *color_type[] = {
 	"imodeline_fg",	/* 21, Modeline inactive FG MODEFOREI, CBOXTFORE */
 	"imodeline_bg",	/* 22, Modeline inactive BG MODEBACKI, CBOXTBACK */
 };
+#endif
 
 char *basic_color_names[] = {
 	"black","red","green","orange","blue","magenta","cyan","white",

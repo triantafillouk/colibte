@@ -1479,7 +1479,7 @@ int change_color_scheme(int  n)
  } else {
 	color_scheme_ind=n-1;
  };
- set_btval("xcolor_scheme",-1,NULL,color_scheme_ind+1); 
+ set_btval("xcolor_scheme",-1,NULL,color_scheme_ind); 
  set_update(cwp,UPD_ALL);
  if(!discmd) return true;
 

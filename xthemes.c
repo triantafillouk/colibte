@@ -44,7 +44,7 @@ int color_scheme_read()
 	};
 	sscanf(b,"%d=%s",&j,name1);
 	if(j<XCOLOR_TYPES) {
-		if(strcmp(color_name[scheme_ind][j],name1)) color_name[scheme_ind][j]=strdup(name1);
+		if(strcmp(basic_color_values[scheme_ind][j],name1)) basic_color_values[scheme_ind][j]=strdup(name1);
 	};
  };
 
@@ -71,7 +71,7 @@ int color_scheme_save()
 	 {
 		 fprintf(f1,"[%s]\n",scheme_names[scheme_ind]);
 		 for(i=0;i<XCOLOR_TYPES;i++){
-		  fprintf(f1,"%02d=%s\n",i,color_name[scheme_ind][i]);
+		  fprintf(f1,"%02d=%s\n",i,basic_color_values[scheme_ind][i]);
 		 };
 	 }
 

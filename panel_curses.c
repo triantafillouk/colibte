@@ -17,7 +17,7 @@
 #include	<stdlib.h>
 #include	<panel.h>
 #include	<term.h>
-#include	"color.h"
+// #include	"color.h"
 #include	<signal.h>
 #include	<termios.h>
 #include	<sys/ioctl.h>

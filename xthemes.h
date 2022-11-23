@@ -6,6 +6,7 @@
 
 */
 /* variables and definitions common in X */
+#define	NEW_COLORS	1
 
 #if	GTK
 char *font_list[] = {
@@ -30,32 +31,32 @@ char *font_names[] = {
 			NULL
 };
 
-#define CTYPE_ROWS	20
+#define CTYPE_ROWS	18
 
 // negative background value denotes that correspondiong color box 
 // not displayed
 
 color_element ctype[] = {
-	{1,"Normal text",FOREGROUND,BACKGROUND,NULL,NULL},
-	{2,"Active modeline",MODEFORE,MODEBACK,NULL,NULL},
-	{3,"Pasive modeline",MODEFOREI,MODEBACKI,NULL,NULL},
-	{4,"RowCol show",DROWCOL,-MODEBACK,NULL,NULL},
-	{5,"Search text",SEARFORE,SEARBACK,NULL,NULL},
-	{6,"Double quote text",QUOTEFORE,QUOTEBACK,NULL,NULL},
-	{7,"Special chars text",SPECFORE,-BACKGROUND,NULL,NULL},
-	{8,"Single quote text",SQUOTEFORE,-BACKGROUND,NULL,NULL},
-	{9,"Preprocessing",PREPFORE,-BACKGROUND,NULL,NULL},
-	{10,"Control chars",CTRLFORE,-BACKGROUND,NULL,NULL},
-	{11,"Tags",TAGFORE,-BACKGROUND,NULL,NULL},
-	{12,"Tags2 quote7",W_FORE,-BACKGROUND,NULL,NULL},
-	{13,"Words1",WORD1FORE,-BACKGROUND,NULL,NULL},
-	{14,"Words2",WORD2FORE,-BACKGROUND,NULL,NULL},
-	{15,"Numeric values",CNUMERIC,-BACKGROUND,NULL,NULL},
-	{16,"Comments",COMMENTFORE,-BACKGROUND,NULL,NULL},
-	{17,"Info cols",INFOFORE,INFOBACK,NULL,NULL},
-	{18,"Horizon", ORIZON,-BACKGROUND,NULL,NULL},
-	{19,"ncurses box",CBOXTFORE,CBOXTBACK,NULL,NULL},
-	{20,"ncurses menu",MENU_FG,MENU_BG,NULL,NULL},
+	{1,"Normal text",COLOR_FG,COLOR_BG,NULL,NULL},
+	{2,"Active modeline",COLOR_MENU_FG,COLOR_MENU_BG,NULL,NULL},
+	{3,"Pasive modeline",COLOR_INACTIVE_FG,COLOR_INACTIVE_BG,NULL,NULL},
+	{4,"RowCol show",COLOR_ROWCOL_FG,-COLOR_MENU_BG,NULL,NULL},
+	{5,"Search text",-COLOR_FG,COLOR_SEARCH_BG,NULL,NULL},
+	{6,"Double quote text",-COLOR_FG,COLOR_QUOTE_BG,NULL,NULL},
+	{7,"Special chars text",COLOR_SPEC_FG,-COLOR_BG,NULL,NULL},
+	{8,"Single quote text",COLOR_SQUOTE_FG,-COLOR_BG,NULL,NULL},
+	{9,"Preprocessing",COLOR_PREP_FG,-COLOR_BG,NULL,NULL},
+	{10,"Control chars",COLOR_CTRL_FG,-COLOR_BG,NULL,NULL},
+	// {11,"Tags",TAGFORE,-BACKGROUND,NULL,NULL},
+	{11,"Tags2 quote7",COLOR_WORD3_FG,-COLOR_BG,NULL,NULL},
+	{12,"Words1",COLOR_WORD1_FG,-COLOR_BG,NULL,NULL},
+	{13,"Words2",COLOR_WORD2_FG,-COLOR_BG,NULL,NULL},
+	{14,"Numeric values",COLOR_STANDOUT_FG,-COLOR_BG,NULL,NULL},
+	{15,"Comments",COLOR_COMMENT_FG,-COLOR_BG,NULL,NULL},
+	{16,"Info cols",-COLOR_FG,COLOR_INFO_BG,NULL,NULL},
+	{17,"Horizon", COLOR_HORIZON_FG,-COLOR_BG,NULL,NULL},
+	{18,"ncurses box",-COLOR_FG,COLOR_BOX_BG,NULL,NULL},
+	// {20,"ncurses menu",MENU_FG,MENU_BG,NULL,NULL},
 };
 
 #else
@@ -91,6 +92,9 @@ char *scheme_names[] = {
 	NULL,NULL
 };
 
+#if NEW_COLORS
+#include "color.h"
+#else
 char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
  // Snow
  {
@@ -405,3 +409,4 @@ char *color_name[COLOR_SCHEMES][XCOLOR_TYPES] = {
 	"#343435",	/* Modeline BACKGOUND  MODEBACKI inactive */
  }
 };
+#endif

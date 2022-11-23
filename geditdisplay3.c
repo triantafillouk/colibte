@@ -147,7 +147,7 @@ ge_edit_draw_event(GtkWidget *widget,cairo_t *cr)
 	if(clip_rect.width<3 || clip_rect.height<3) 
 	{
 		GdkRGBA *lcolor;
-		lcolor = colors[color_scheme_ind][BACKGROUND];
+		lcolor = colors[color_scheme_ind][COLOR_BG];
 		// redraw cliped area near scroll slide!
 		cairo_set_operator(cr,CAIRO_OPERATOR_OVER);
 		// redraw with background color!!

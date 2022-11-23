@@ -396,7 +396,7 @@ void drv_win_flush(WINDP *wp)
 void drv_set_default_bgcolor()
 {
  GdkRGBA *gcolorb;
- gcolorb = colors[color_scheme_ind][BACKGROUND];
+ gcolorb = colors[color_scheme_ind][COLOR_BG];
  ccolorb_default.red = (float)gcolorb->red;
  ccolorb_default.green = (float)gcolorb->green;
  ccolorb_default.blue = (float)gcolorb->blue;
@@ -458,10 +458,12 @@ void init_color()
 
  for(j=0;j<COLOR_SCHEMES;j++)
  {
+	MESG("init_color: scheme %d of %d--------------------------------",j,COLOR_SCHEMES);
 	for(i=0;i<XCOLOR_TYPES;i++) 
 	{
-		if(!gdk_rgba_parse(&color,color_name[j][i] )) {
-	  		ERROR("color %s is not in database",color_name[j][i]);
+		MESG("	rgba parse %2d [%s]",i,basic_color_values[j][i]);
+		if(!gdk_rgba_parse(&color,basic_color_values[j][i] )) {
+	  		ERROR("color %s is not in database",basic_color_values[j][i]);
 			exit(0);
 		};
 		colors[j][i]=(GdkRGBA *) malloc(sizeof(GdkRGBA));
@@ -897,13 +899,17 @@ void scheme_names_button_change(GtkWidget *wdg, void* data)
  color_scheme_ind = active;
  change_color_scheme(color_scheme_ind+1);
  update_screen(1);
+ 	MESG("update color scheme %d -------------------",color_scheme_ind);
   for(i=0;i<CTYPE_ROWS;i++) {
 	// update fg,bg color button colors
+	MESG("update color:%2d [%30s] %2d %2d",ctype[i].row,ctype[i].label,ctype[i].fg,ctype[i].bg);
+	if(ctype[i].fg>=0)
 	gtk_color_chooser_set_rgba(
 		(GtkColorChooser *)ctype[i].button_fg,
 		colors[color_scheme_ind][ctype[i].fg]
 		);
-		if(ctype[i].button_bg!=NULL){
+
+	if(ctype[i].button_bg!=NULL){
 	gtk_color_chooser_set_rgba(
 		(GtkColorChooser *)ctype[i].button_bg,
 		colors[color_scheme_ind][ctype[i].bg]
@@ -912,6 +918,7 @@ void scheme_names_button_change(GtkWidget *wdg, void* data)
 	// show color sample
 	show_color_sample(table1,i+1,"text");
   }; 
+ MESG("scheme_names_button_change: end");
 }
 
 void set_box_style(GtkWidget *widget,int font_size,char *fgcolor,char *bgcolor)
@@ -1074,7 +1081,7 @@ void new_gwp_draw(GWINDP *gwp,WINDP *wp,GtkWidget *parent,int ptype)
  gtk_widget_set_margin_top(GTK_WIDGET(gwp->status3), 0);
  gtk_widget_set_margin_bottom(GTK_WIDGET(gwp->status3), 0);
  gtk_widget_set_size_request (gwp->status3, 50,1);
- set_box_color(gtk_statusbar_get_message_area ((GtkStatusbar *)(gwp->status3)),"yellow",color_name[color_scheme_ind][MODEBACK]);
+ set_box_color(gtk_statusbar_get_message_area ((GtkStatusbar *)(gwp->status3)),"yellow",basic_color_values[color_scheme_ind][COLOR_BG]);
 #endif
 
  
@@ -1082,8 +1089,7 @@ void new_gwp_draw(GWINDP *gwp,WINDP *wp,GtkWidget *parent,int ptype)
 
 
  gtk_box_pack_start (sb2, (GtkWidget *)gwp->status2, FALSE, FALSE, 0);
-
- set_box_background_color(gwp->hstatus,color_name[color_scheme_ind][MODEBACK]);
+ set_box_background_color(gwp->hstatus,basic_color_values[color_scheme_ind][COLOR_BG]);
 
  gtk_box_pack_start (GTK_BOX (gwp->hstatus), (GtkWidget *)sb2, FALSE, FALSE, 0);
  gtk_box_pack_start (GTK_BOX (gwp->hstatus), (GtkWidget *)box_status1, TRUE, TRUE, 0);
@@ -1199,11 +1205,11 @@ void put_string_statusline(WINDP *wp, char *st, int position)
  if(cwp->gwp == NULL) return;
 
  if(wp==cwp) {
-	bg_color = color_name[color_scheme_ind][CBOXTBACK];
-	fg_color = color_name[color_scheme_ind][MODEFORE];
+	bg_color = basic_color_values[color_scheme_ind][COLOR_BOX_BG];
+	fg_color = basic_color_values[color_scheme_ind][COLOR_MENU_FG];
  } else {
-	bg_color = color_name[color_scheme_ind][MODEBACKI];
-	fg_color = color_name[color_scheme_ind][MODEFOREI];
+	bg_color = basic_color_values[color_scheme_ind][COLOR_INACTIVE_BG];
+	fg_color = basic_color_values[color_scheme_ind][COLOR_INACTIVE_FG];
 	// clear status3 on all windows except current window
 #if	LABEL_STATUS
 	// GtkWidget *label = gtk_label_new (NULL);
@@ -1654,18 +1660,18 @@ void color_button_update_color_fg(GtkWidget *color_button, gpointer data)
   foreground_changed=1;
   gtk_color_chooser_get_rgba((GtkColorChooser *)color_button,&color);
   sprintf(cname,"#%02X%02X%02X",(int)(color.red*255),(int)(color.green*255),(int)(color.blue*255));
-  color_name[color_scheme_ind][ce->fg]=strdup(cname);
+  basic_color_values[color_scheme_ind][ce->fg]=strdup(cname);
   set_box_color(ce->sample_box,
-  	color_name[color_scheme_ind][ce->fg],
-  	color_name[color_scheme_ind][bg_index]);
+  	basic_color_values[color_scheme_ind][ce->fg],
+  	basic_color_values[color_scheme_ind][bg_index]);
   sprintf(text_sample,"changed fg: bg=%s fg=%s",
-   color_name[color_scheme_ind][bg_index],color_name[color_scheme_ind][ce->fg]);
-//  MESG("update_color_fg: bg_i=%d bg=[%s] fg=[%s]", ce->bg,color_name[color_scheme_ind][bg_index],color_name[color_scheme_ind][ce->fg]);
+   basic_color_values[color_scheme_ind][bg_index],basic_color_values[color_scheme_ind][ce->fg]);
+//  MESG("update_color_fg: bg_i=%d bg=[%s] fg=[%s]", ce->bg,basic_color_values[color_scheme_ind][bg_index],basic_color_values[color_scheme_ind][ce->fg]);
   gtk_statusbar_pop((GtkStatusbar *)ce->sample_ctext,1);
   gtk_statusbar_push((GtkStatusbar *)ce->sample_ctext,1,text_sample);
 	set_box_color(gtk_statusbar_get_message_area ((GtkStatusbar *)ce->sample_ctext),
-  	color_name[color_scheme_ind][ce->fg],
-  	color_name[color_scheme_ind][bg_index]);
+  	basic_color_values[color_scheme_ind][ce->fg],
+  	basic_color_values[color_scheme_ind][bg_index]);
 
   colors[color_scheme_ind][ce->fg]->red=color.red;
   colors[color_scheme_ind][ce->fg]->green=color.green;
@@ -1684,20 +1690,20 @@ void color_button_update_color_bg(GtkWidget *color_button, gpointer data)
   foreground_changed=0;
   gtk_color_chooser_get_rgba((GtkColorChooser *)color_button,&color);
   sprintf(cname,"#%02X%02X%02X",(int)(color.red*255),(int)(color.green*255),(int)(color.blue*255));
-  color_name[color_scheme_ind][ce->bg]=strdup(cname);
+  basic_color_values[color_scheme_ind][ce->bg]=strdup(cname);
   sprintf(text_sample,"changed bg: bg=%s fg=%s",
-   color_name[color_scheme_ind][ce->bg],color_name[color_scheme_ind][ce->fg]);
+   basic_color_values[color_scheme_ind][ce->bg],basic_color_values[color_scheme_ind][ce->fg]);
 
-//  MESG("update_color_bg: bg=[%s] fg=[%s]", color_name[color_scheme_ind][ce->bg],color_name[color_scheme_ind][ce->fg]);
+//  MESG("update_color_bg: bg=[%s] fg=[%s]", basic_color_values[color_scheme_ind][ce->bg],basic_color_values[color_scheme_ind][ce->fg]);
 
   set_box_color(ce->sample_box,
-  	color_name[color_scheme_ind][ce->fg],
-  	color_name[color_scheme_ind][ce->bg]);
+  	basic_color_values[color_scheme_ind][ce->fg],
+  	basic_color_values[color_scheme_ind][ce->bg]);
   gtk_statusbar_pop((GtkStatusbar *)ce->sample_ctext,1);
   gtk_statusbar_push((GtkStatusbar *)ce->sample_ctext,1,text_sample);
 	set_box_color(gtk_statusbar_get_message_area ((GtkStatusbar *)ce->sample_ctext),
-  	color_name[color_scheme_ind][ce->fg],
-  	color_name[color_scheme_ind][ce->bg]);
+  	basic_color_values[color_scheme_ind][ce->fg],
+  	basic_color_values[color_scheme_ind][ce->bg]);
 
   colors[color_scheme_ind][ce->bg]->red=color.red;
   colors[color_scheme_ind][ce->bg]->green=color.green;
@@ -1722,7 +1728,8 @@ void print_colors()
   int fr,fg,fb;
   int br,bg,bb;
   int bgindex;
-  color = (GdkRGBA *)colors[color_scheme_ind][ctype[i].fg];
+  if(ctype[i].fg>0) color = (GdkRGBA *)colors[color_scheme_ind][ctype[i].fg];
+	else color = (GdkRGBA *)colors[color_scheme_ind][-ctype[i].fg];
   fr=(int)(color->red*255);
   fg=(int)(color->green*255);
   fb=(int)(color->blue*255);
@@ -1798,7 +1805,8 @@ void show_color_sample(GtkWidget *table,int ypos,char *text)
 	} else {
 		bgindex=-ctype[i].bg;
 	};
-	fgindex=ctype[i].fg;
+	if(ctype[i].fg>=0) fgindex=ctype[i].fg;
+	else fgindex=-ctype[i].fg;
 
 #if	TNEW
  	if(ctype[i].sample_ctext != NULL) {
@@ -1810,6 +1818,10 @@ void show_color_sample(GtkWidget *table,int ypos,char *text)
 		ctype[i].sample_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 		ctype[i].sample_ctext = gtk_statusbar_new ();
 		gtk_box_pack_start(GTK_BOX(ctype[i].sample_box),ctype[i].sample_ctext,TRUE,TRUE,2);
+		gtk_widget_set_margin_top(GTK_WIDGET(ctype[i].sample_box), 0);
+		gtk_widget_set_margin_bottom(GTK_WIDGET(ctype[i].sample_box), 0);
+		gtk_widget_set_margin_top(GTK_WIDGET(ctype[i].sample_ctext), 0);
+		gtk_widget_set_margin_bottom(GTK_WIDGET(ctype[i].sample_ctext), 0);
 		is_new=true;
 	};
 #endif
@@ -1833,20 +1845,20 @@ void show_color_sample(GtkWidget *table,int ypos,char *text)
 #if	TNEW
 	gtk_box_pack_start(GTK_BOX(cbox),ctext,TRUE,TRUE,2);
 #endif
-	snprintf(msg,100,"%s fg=%s bg=%s",text,color_name[color_scheme_ind][fgindex],color_name[color_scheme_ind][bgindex]);
+	snprintf(msg,100,"%s fg=%s bg=%s",text,basic_color_values[color_scheme_ind][fgindex],basic_color_values[color_scheme_ind][bgindex]);
 	gtk_statusbar_pop((GtkStatusbar *)ctext,1);
 	gtk_statusbar_push((GtkStatusbar *)ctext,1,msg);
 
 	set_box_color(cbox,
-		color_name[color_scheme_ind][fgindex],
-		color_name[color_scheme_ind][bgindex]);
+		basic_color_values[color_scheme_ind][fgindex],
+		basic_color_values[color_scheme_ind][bgindex]);
 	set_box_color(gtk_statusbar_get_message_area ((GtkStatusbar *)ctext),
-		color_name[color_scheme_ind][fgindex],
-		color_name[color_scheme_ind][bgindex]);
+		basic_color_values[color_scheme_ind][fgindex],
+		basic_color_values[color_scheme_ind][bgindex]);
 
 //	MESG("	- %d bg=[%s] fg=[%s]",ypos,
-//		color_name[color_scheme_ind][fgindex],
-//		color_name[color_scheme_ind][bgindex]);
+//		basic_color_values[color_scheme_ind][fgindex],
+//		basic_color_values[color_scheme_ind][bgindex]);
 #if	TNEW
 	put_to_table(cbox,table,ypos,4,0);
 #else
@@ -1884,7 +1896,7 @@ int set_color(int n)
  gtk_window_set_transient_for(GTK_WINDOW(colors_win),GTK_WINDOW(parent));
  gtk_widget_show(colors_win);
 
-  GtkWidget *label,*fgb,*bgb;
+  GtkWidget *label,*fgb=NULL,*bgb=NULL;
   int ypos;
 /*
 gtk_box_pack_start(GTK_BOX(vbox), scwin, TRUE, TRUE, 1);
@@ -1971,17 +1983,17 @@ gtk_box_pack_start(GTK_BOX(vbox), scwin, TRUE, TRUE, 1);
 	put_to_table(label,table1,ypos,1,1);
 
 	// show color buttons foreground,background if needed
-	fgb = gtk_color_button_new_with_rgba (colors[color_scheme_ind][ctype[i].fg]);
-
-	ctype[i].button_fg=fgb;
-	gtk_container_set_border_width((GtkContainer *)fgb,0);
-
-	snprintf(color_title,100,"Foreground %s",ctype[i].label);
-	gtk_color_button_set_title((GtkColorButton *)fgb,color_title);
-	put_to_table(fgb,table1,ypos,2,0);
-//	gtk_widget_set_tooltip_text (GTK_WIDGET(fgb),color_title);
-	g_signal_connect(G_OBJECT(fgb),	"color-set", (GCallback) color_button_update_color_fg ,(gpointer)&ctype[i]);
-	if(ctype[i].bg>0) {
+	if(ctype[i].fg>=0) {
+		fgb = gtk_color_button_new_with_rgba (colors[color_scheme_ind][ctype[i].fg]);
+	
+		ctype[i].button_fg=fgb;
+		gtk_container_set_border_width((GtkContainer *)fgb,0);
+		snprintf(color_title,100,"Foreground %s",ctype[i].label);
+		gtk_color_button_set_title((GtkColorButton *)fgb,color_title);
+		put_to_table(fgb,table1,ypos,2,0);
+		g_signal_connect(G_OBJECT(fgb),	"color-set", (GCallback) color_button_update_color_fg ,(gpointer)&ctype[i]);
+	};
+	if(ctype[i].bg>=0) {
 		bgb = gtk_color_button_new_with_rgba (colors[color_scheme_ind][ctype[i].bg]);
 		gtk_widget_set_size_request(GTK_WIDGET(bgb), bsize,bsize);
 		ctype[i].button_bg=bgb;

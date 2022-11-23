@@ -21,7 +21,7 @@
 #define	CLASSIC_STATUS 	0
 
 #define DOUBLE_ESC	0	/* use double escape for abort command else single  */
-#define	XCOLOR_TYPES	30
+#define	XCOLOR_TYPES	25
 #define	COLOR_SCHEMES	10
 
 #define	NEW_COLORS	1
@@ -870,7 +870,7 @@ enum color_types {
 	MENU_FG,		/* menu foreground normal  */
 	MENU_BG,		/* menu background, box iside background  */
 	MODEFOREI,		/* Modeline inactive foreground  */
-	MODEBACKI,		/* Modeline inactive background  */
+	MODEBACKI		/* Modeline inactive background  */
 };
 #endif
 
