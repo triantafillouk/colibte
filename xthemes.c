@@ -9,6 +9,14 @@
 	are using X11 color schemes
 */
 
+int check_type(char *type)
+{
+ int i=0;
+ for(i=0;i<XCOLOR_TYPES;i++) {
+ 	if(!strcmp(type,color_type[i])) return i;
+ };
+ return -1;
+}
 
 int color_scheme_read()
 {
@@ -21,7 +29,7 @@ int color_scheme_read()
  int scheme_ind=0;
 // MESG("color_scheme_read:");
 
- if((fname=find_file(NULL,".colors",0,0))==NULL) return FALSE;
+ if((fname=find_file(NULL,".xcolors",0,0))==NULL) return FALSE;
 
  f1=fopen(fname,"r");
  if(f1!=NULL) {
@@ -33,19 +41,25 @@ int color_scheme_read()
 	if(lstartwith(b,'#')) continue;
 	if(lstartwith(b,0)) continue; 	/* skip blank lines  */
 	if(lstartwith(b,CHR_LBRA)) {
-		sscanf(b,"%c%s]\n",&left,name1);
+		strcpy(name1,b+1);
 		name1[strlen(name1)-1]=0;
 		scheme_ind=-1;
 		for(i=0;i<COLOR_SCHEMES;i++) {
 			if(strcmp(name1,scheme_names[i])==0){ scheme_ind=i;break;};
 		};
+
 		if(scheme_ind<0) return(0); // error
+		MESG("read scheme name [%s] [%s] -> ind=%d",b,name1,scheme_ind);
 		continue;
 	};
-	sscanf(b,"%d=%s",&j,name1);
-	if(j<XCOLOR_TYPES) {
-		if(strcmp(basic_color_values[scheme_ind][j],name1)) basic_color_values[scheme_ind][j]=strdup(name1);
+	char **a_as;
+	a_as = split_2_sarray(b,'=');
+	j=check_type(a_as[0]);
+		// MESG("	read color [%s][%d] = [%s]",a_as[0],j,a_as[1]);
+	if(j>=0) {
+		basic_color_values[scheme_ind][j]=strdup(a_as[1]);
 	};
+	free_sarray(a_as);
  };
 
  fclose(f1);
@@ -69,9 +83,10 @@ int color_scheme_save()
  if(f1!=NULL) {
 	 for(scheme_ind=0;scheme_ind<COLOR_SCHEMES;scheme_ind++)
 	 {
+		MESG("save scheme %d",scheme_ind);
 		 fprintf(f1,"[%s]\n",scheme_names[scheme_ind]);
 		 for(i=0;i<XCOLOR_TYPES;i++){
-		  fprintf(f1,"%02d=%s\n",i,basic_color_values[scheme_ind][i]);
+		  fprintf(f1,"%s=%s\n",color_type[i],basic_color_values[scheme_ind][i]);
 		 };
 	 }
 

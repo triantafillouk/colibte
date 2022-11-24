@@ -480,7 +480,7 @@ char **split_2_sarray(char *in_string,int split_chr)
    char *start=in_string;
    while(*start==' ') start++;
    buffer = strdup(start);
-   MESG("split_2_sarray [%s]",start);
+   // MESG("split_2_sarray [%s]",start);
    if(buffer){
 	int i;
 	int l;

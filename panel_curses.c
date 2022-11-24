@@ -116,6 +116,11 @@ extern alist *color_schemes;
 extern char utfokey[10];
 extern int utflen;
 
+char *basic_color_names[] = {
+	"black","red","green","orange","blue","magenta","cyan","white",
+	"brown","lred","lgreen","yellow","lblue","lmagenta","lcyan","lwhite"
+};
+
 char *color_type_names[] = {
 	"bg normal",
 	"bg menu",

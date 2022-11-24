@@ -608,7 +608,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
  int fg_color=COLOR_FG;
  int bg_color=COLOR_BG;
  if(wp->w_fp->b_flag & FSDIRED) {
-	if(str[1]=='l') fg_color=COLOR_HORIZON_FG;	// TAGFORE;
+	if(str[1]=='l') fg_color=COLOR_SQUOTE_FG;	// TAGFORE;
 	else {
 		if(str[0]=='#') fg_color=COLOR_PREP_FG;	/* H_QUOTE6  */
 		else if(str[0]=='c' ) fg_color=COLOR_WORD1_FG;	/* H_QUOTE7  */

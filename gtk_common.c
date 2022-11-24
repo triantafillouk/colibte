@@ -47,7 +47,7 @@ void drv_open()
 	dis0 = XOpenDisplay(display_name);
 	screen_num = DefaultScreen(dis0);
 
-	color_scheme_ind=(int)bt_dval("xcolor_scheme")-1;
+	color_scheme_ind=(int)bt_dval("xcolor_scheme");
 	init_color();
 
 	parent = create_parent();
@@ -1473,12 +1473,13 @@ void create_default_scheme()
 /* change color scheme */
 int change_color_scheme(int  n)
 {
- 
+ MESG("change_color_scheme: %d",n);
  if(n<1 || n>COLOR_SCHEMES)	{
 	color_scheme_ind=0;
  } else {
 	color_scheme_ind=n-1;
  };
+ MESG("change_color_scheme: now is %d",color_scheme_ind);
  set_btval("xcolor_scheme",-1,NULL,color_scheme_ind); 
  set_update(cwp,UPD_ALL);
  if(!discmd) return true;

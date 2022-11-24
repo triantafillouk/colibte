@@ -1233,6 +1233,7 @@ typedef struct CPAIR {
 } CPAIR;
 
 #if	NEW_COLORS
+#if	1
 char *color_type[] = {
 	"normal_bg",
 	"menu_bg",
@@ -1243,14 +1244,13 @@ char *color_type[] = {
 	"info_bg",
 	"inactive_bg",
 	"box_bg",
-	"code_bg"
-
+	"code_bg",
 	"normal_fg",
 	"menu_fg",
 	"standout_fg",
 	"control_fg",
 	"prep_fg",
-	"word1_fg",
+	"word1_FG",
 	"word2_fg",
 	"word3_fg",
 	"special_fg",
@@ -1261,7 +1261,7 @@ char *color_type[] = {
 	"inactive_fg",
 	"rowcol_fg"
 };
-
+#endif
 #else
 char *color_type[] = {
 	"normal_fg",	/* 0, Foreground FOREGR*/
@@ -1297,9 +1297,5 @@ char *color_type[] = {
 };
 #endif
 
-char *basic_color_names[] = {
-	"black","red","green","orange","blue","magenta","cyan","white",
-	"brown","lred","lgreen","yellow","lblue","lmagenta","lcyan","lwhite"
-};
 
 /* --- */

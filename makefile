@@ -189,7 +189,7 @@ tldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h
 xldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h
 	${CC} tldisplay.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -funsigned-char -o xldisplay.o
 
-gtkterm.o: gtkterm.c gtkterm.h xthemes.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h gtk_common.c
+gtkterm.o: gtkterm.c gtkterm.h xthemes.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h gtk_common.c xthemes.c
 
 highlight.o: highlight.c highlight.h
 
@@ -211,7 +211,7 @@ gtk_support.o: gtk_support.c gtk_support.h
 	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o gtk_support.o gtk_support.c
 
 # For GTK3
-gtkterm3.o: xe.h gtkterm3.c gtkterm3.h xthemes.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h geditdisplay3.h gtk_common.c
+gtkterm3.o: xe.h gtkterm3.c gtkterm3.h xthemes.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h geditdisplay3.h gtk_common.c xthemes.c
 	${CC} $(FLAGS1) -c -DGTK=1 -Wall $(CPU_OPTIONS) $(GTKINCLUDE3) -funsigned-char gtkterm3.c -o gtkterm3.o
 
 gplotc3.o: gplotc3.c gplot3.h plot_cairo3.c plot_commonc.c
