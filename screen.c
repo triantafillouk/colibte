@@ -1350,12 +1350,12 @@ void vtputwc(WINDP *wp, utfchar *uc)
 				else line_bcolor=COLOR_CODE_BG;
 				ctl_b=line_bcolor;
 				break;
-			case H_QUOTE7:
+			case H_QUOTE7:	/* next words in html tags  */
 				ctl_f=COLOR_WORD3_FG;ctl_b=wp->w_bcolor;
 				break;
 			/* % tag */
-			case H_QUOTE8:
-				ctl_f = COLOR_WORD3_FG; // TAGFORE;
+			case H_QUOTE8:	/* first word after < in html  */
+				ctl_f = COLOR_WORD1_FG; // TAGFORE;
 				ctl_b=line_bcolor;
 				break;
 			case H_QUOTE9:
