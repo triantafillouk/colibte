@@ -29,6 +29,13 @@
 #define LCYAN		14
 #define LWHITE		15
 
+// default color schemes
+char *scheme_names[] = {
+	"Snow","Midnight","Cyan","Blue","Gray","Dark gray",
+	"Sunny","Twilight","Lunar","Velvet",
+	NULL,NULL
+};
+
 // 16 colors to 8 colors translation
 // for black backgrounds!!
 int color16_8[] = {
@@ -80,14 +87,6 @@ int color8_16[] = {
 	COLOR_MENU_FG		/* LWHITE  */
 };
 
-#if NEW_COLORS
-#define	COLOR_TYPES	FG_COLORS+BG_COLORS
-// int pair_num[FG_COLORS][BG_COLORS];
-#else
-#define	COLOR_TYPES	XCOLOR_TYPES
-// int pair_num[XCOLOR_TYPES][XCOLOR_TYPES];
-#endif
-
 typedef struct color_curses {
 	int index;	/* color index  */
 	int attrib;	/* attibute  */
@@ -103,13 +102,12 @@ typedef struct colors16 {
 
 typedef struct COLOR_SCHEME {
 	char *scheme_name;
-	RGB_COLORS basic_colors[34];
-	color_curses color_attr[34];
+	RGB_COLORS basic_colors[COLOR_TYPES];
+	color_curses color_attr[COLOR_TYPES];
 } COLOR_SCHEME;
 
 #if	NEW_COLORS
-// #define XCOLOR_TYPES	BG_COLORS+FG_COLORS
-char *basic_color_values[COLOR_SCHEMES][XCOLOR_TYPES] = {
+char *basic_color_values[COLOR_SCHEMES][COLOR_TYPES] = {
  // Snow
  {
 	"#E3E3E3", // COLOR_BG,			BACKGROUND
@@ -594,7 +592,7 @@ char *basic_color_values[COLOR_SCHEMES][16] = {
 color_curses *current_color;
 
 #if	!NEW_COLORS
-color_curses color_t[COLOR_SCHEMES][XCOLOR_TYPES] = {
+color_curses color_t[COLOR_SCHEMES][COLOR_TYPES] = {
  /* Snow */
  {
 	{BLACK,0},		/* Foreground FOREGROUND*/

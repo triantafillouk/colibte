@@ -106,7 +106,7 @@ int check_cr(WINDP *wp,char *msg)
 extern int slide_flag;
 extern int in_slide;
 
-extern GdkRGBA *colors[COLOR_SCHEMES][XCOLOR_TYPES];
+extern GdkRGBA *colors[COLOR_SCHEMES][COLOR_TYPES];
 extern int color_scheme_ind;
 
 extern int ppy;

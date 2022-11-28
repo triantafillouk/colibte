@@ -174,7 +174,7 @@ char *current_font_name=NULL;
 
 int ncolors;
 
-GdkRGBA *colors[COLOR_SCHEMES][XCOLOR_TYPES];
+GdkRGBA *colors[COLOR_SCHEMES][COLOR_TYPES];
 
 GdkRGBA ccolorb,ccolorf;
 GdkRGBA ccolorb_default;
@@ -430,12 +430,12 @@ void drv_color(int fcol,int bcol)
 {
  GdkRGBA *gcolorf,*gcolorb;
 #if	NUSE
- if(bcol>XCOLOR_TYPES) {
-	MESG("drv_color: bcol=%d > %d",bcol,XCOLOR_TYPES);
+ if(bcol>COLOR_TYPES) {
+	MESG("drv_color: bcol=%d > %d",bcol,COLOR_TYPES);
  	bcol=0;
  };
- if(fcol>XCOLOR_TYPES) {
-	MESG("drv_color: fcol=%d > %d",fcol,XCOLOR_TYPES);
+ if(fcol>COLOR_TYPES) {
+	MESG("drv_color: fcol=%d > %d",fcol,COLOR_TYPES);
  	fcol=1;
  };
 #endif
@@ -460,7 +460,7 @@ void init_color()
  for(j=0;j<COLOR_SCHEMES;j++)
  {
 	// MESG("init_color: scheme %d of %d--------------------------------",j,COLOR_SCHEMES);
-	for(i=0;i<XCOLOR_TYPES;i++) 
+	for(i=0;i<COLOR_TYPES;i++) 
 	{
 		// MESG("	rgba parse %2d [%s]",i,basic_color_values[j][i]);
 		if(!gdk_rgba_parse(&color,basic_color_values[j][i] )) {

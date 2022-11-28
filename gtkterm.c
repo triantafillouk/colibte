@@ -176,7 +176,7 @@ char *current_font_name=NULL;
 
 int ncolors;
 
-GdkColor  *colors[COLOR_SCHEMES][XCOLOR_TYPES];
+GdkColor  *colors[COLOR_SCHEMES][COLOR_TYPES];
 
 fcolor_t ccolorb,ccolorf;
 fcolor_t ccolorb_default;
@@ -438,8 +438,8 @@ void window_clear(WINDP *wp)
 void drv_color(int fcol,int bcol) 
 {
  GdkColor *gcolorf,*gcolorb;
- if(bcol>XCOLOR_TYPES) bcol=0;
- if(fcol>XCOLOR_TYPES) fcol=1;
+ if(bcol>COLOR_TYPES) bcol=0;
+ if(fcol>COLOR_TYPES) fcol=1;
 	gcolorb = colors[color_scheme_ind][bcol];
 	ccolorb.red = (float)gcolorb->red/65535;
 	ccolorb.green = (float)gcolorb->green/65535;
@@ -459,7 +459,7 @@ void init_color()
   cmap = gdk_colormap_get_system ();	/* use the system colormap */
  
  for(j=0;j<COLOR_SCHEMES;j++)
- for(i=0;i<XCOLOR_TYPES;i++) 
+ for(i=0;i<COLOR_TYPES;i++) 
  {
   if(!gdk_color_parse(basic_color_values[j][i], &color  )) {
   	ERROR("color %s is not in database",basic_color_values[j][i]);

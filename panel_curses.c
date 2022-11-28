@@ -2251,13 +2251,13 @@ int dspv(WINDOW *disp_window,int x,int y,char *st)
  return(x_pos - x);
 }
 
-RGB_DEF original_color[XCOLOR_TYPES];
+RGB_DEF original_color[COLOR_TYPES];
 
 void restore_original_colors()
 {
  int i;
  MESG("restore_original_colors:");
- for(i=0;i<XCOLOR_TYPES;i++) 
+ for(i=0;i<COLOR_TYPES;i++) 
  {
  	init_color(i,original_color[i].r,original_color[i].g,original_color[i].b);
  };
@@ -2267,7 +2267,7 @@ void save_original_colors()
 {
  int i;
  MESG("save_original_colors:");
- for(i=0;i<XCOLOR_TYPES;i++) {
+ for(i=0;i<COLOR_TYPES;i++) {
  	color_content(i,(short int *)(&original_color[i].r),(short int *)(&original_color[i].g),(short int *)(&original_color[i].b));
  };
 }
@@ -2358,7 +2358,9 @@ MESG("set_scheme_colors: scheme=%d drv_colors=%d",scheme,drv_colors);
 		for(i=0;i<FG_COLORS;i++) 
 			for(j=0;j<BG_COLORS;j++) {
 				// MESG(" - pair %3d: f=%d b=%d",i*FG_COLORS+j,i+BG_COLORS,j);
-				init_pair(i*FG_COLORS+j+2,i+BG_COLORS,j);
+				int pair=i*FG_COLORS+j+2;
+				init_pair(pair,i+BG_COLORS,j);
+				// MESG("init_pair : %d as (%d %d)",pair,i,j);
 			};
 	} else {
 		if(can_change_color()){
@@ -2371,12 +2373,11 @@ MESG("set_scheme_colors: scheme=%d drv_colors=%d",scheme,drv_colors);
 		} else {
 			MESG("terminal cannot change color!");
 		};
-		int stat=0;
 		for(i=0;i<drv_basic_colors;i++) 
 			for(j=0;j<drv_basic_colors;j++) {
 				int pair=i*drv_basic_colors+j+1;
-				stat=init_pair(pair,i,j);
-				// MESG("init_pair %d: %d as (%d %d)",stat,pair,i,j);
+				init_pair(pair,i,j);
+				// MESG("init_pair : %d as (%d %d)",pair,i,j);
 			};
 	};
 #else
@@ -2804,10 +2805,10 @@ int color_scheme_read()
 		scheme->basic_colors[j].g = rv->g;
 		scheme->basic_colors[j].b = rv->b;
 	} else {	/* check, this must be color type!  */
-		for(j=0;j<XCOLOR_TYPES;j++) {	/* get the color type index  */
+		for(j=0;j<COLOR_TYPES;j++) {	/* get the color type index  */
 			if(strcmp(ctype,color_type[j])==0) break;
 		};
-		if(j<XCOLOR_TYPES) { // matched color type
+		if(j<COLOR_TYPES) { // matched color type
 			for(i=0;i<16;i++) {	/* get the color index of the color type  */
 				if(strcmp(name1,basic_color_names[i])==0) break;
 			};
@@ -2833,6 +2834,7 @@ int color_scheme_read()
 	return 0;
  };
 }
+
 
 /* save default colors to home dir   */
 int color_scheme_save()
