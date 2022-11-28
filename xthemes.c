@@ -25,7 +25,6 @@ int color_scheme_read()
  char *b,bline[MAXFLEN];
  char name1[MAXFLEN];
  int i,j;
- char left;
  int scheme_ind=0;
 // MESG("color_scheme_read:");
 
@@ -76,7 +75,6 @@ int color8_scheme_read()
  char *b,bline[MAXFLEN];
  char name1[MAXFLEN];
  int i,j;
- char left;
  int scheme_ind=0;
 // MESG("color_scheme_read:");
 

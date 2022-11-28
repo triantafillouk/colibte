@@ -38,9 +38,8 @@
 #define TTOP	1
 #define TBOTTOM	0
 
-
 int color_menu_fg,color_menu_bg;
-#if	1
+
 char *font_names[] = { 
 	"-*-fixed-*-*-*-*-*-*-*-*-*-*-ISO10646-1",
 	"-misc-*-*-r-*-*-14-*-*-*-*-ISO10646-1",
@@ -52,19 +51,21 @@ char *font_names[] = {
 	"-misc-*-*-*-*-*-20-*-*-*-*-ISO10646-1",
 	"-*-courier-*-r-*-*-25-*-*-*-*-ISO10646-1",
 	NULL };
-#else
-char *font_names[] = { 
-	"-*-fixed-*-*-*-*-*-*-*-*-*-*-*-7",
-	"-misc-*-*-r-*-*-14-*-*-*-*-*-7",
-	"7x14",
-	"7x14bold", 
-	"-*-courier-*-r-*-*-17-*-*-*-*-*-*",
-	"-misc-*-*-*-*-*-15-*-*-*-*-*-7",
-	"-misc-*-*-*-*-*-18-*-*-*-*-*-7",
-	"-misc-*-*-*-*-*-20-*-*-*-*-*-7",
-	"-*-courier-*-r-*-*-25-*-*-*-*-*-*",
-	NULL };
-#endif
+
+char *font_list[] = {
+	"1. Fixed 12",
+	"2. Fixed 14",
+	"3. Fixed 7x14",
+	"4. Fixed 7x14 bold",
+	"5. Courier 17",
+	"6. Misc 15",
+	"7. Misc 18",
+	"8. Misc 20",
+	"9. Courier 25",
+	"Select font"
+};
+
+#define	DL_FONT	5
 
 int drv_type=DRIVER_XLIB;
 int mouse_col=0;	/* mouse position x */
