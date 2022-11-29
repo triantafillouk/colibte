@@ -610,6 +610,7 @@ void free_sarray(char **sarray)
 	free(sarray);	/* free pointer array  */
 }
 
+
 #if !DARWIN
 size_t strlcat(char *dst, const char *src, size_t size)
 {

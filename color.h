@@ -98,8 +98,10 @@ typedef struct RGB_COLORS {
 
 typedef struct COLOR_SCHEME {
 	char *scheme_name;
-	// char *color_values[COLOR_TYPES];
+	char *color_values[COLOR_TYPES];
+#if	0
 	RGB_COLORS basic_colors[COLOR_TYPES];
+#endif
 	color_curses color_attr[COLOR_TYPES];
 } COLOR_SCHEME;
 
@@ -725,7 +727,7 @@ char *color_type[] = {
 	"word2_fg",
 	"word3_fg",
 	"special_fg",
-	"single quote_fg",
+	"single_quote_fg",
 	"comment_fg",
 	"changed_fg",
 	"horizon_fg",

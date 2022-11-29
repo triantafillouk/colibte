@@ -19,14 +19,14 @@ color_element ctype[] = {
 	{1,"Normal text",COLOR_FG,COLOR_BG,NULL,NULL},
 
 	{2,"Search text",-COLOR_FG,COLOR_SEARCH_BG,NULL,NULL},
-	{3,"Double quote text",-COLOR_FG,COLOR_QUOTE_BG,NULL,NULL},
+	{3,"Double quote",-COLOR_FG,COLOR_QUOTE_BG,NULL,NULL},
 	{4,"Info cols",-COLOR_FG,COLOR_INFO_BG,NULL,NULL},
 	{5,"Selection",-COLOR_FG,COLOR_SELECT_BG,NULL,NULL},
 	
 	{6,"Preprocessing",COLOR_PREP_FG,-COLOR_BG,NULL,NULL},
 	{7,"Standout",COLOR_STANDOUT_FG,-COLOR_BG,NULL,NULL},
-	{8,"Special chars text",COLOR_SPEC_FG,-COLOR_BG,NULL,NULL},
-	{9,"Single quote text",COLOR_SQUOTE_FG,-COLOR_BG,NULL,NULL},
+	{8,"Special chars",COLOR_SPEC_FG,-COLOR_BG,NULL,NULL},
+	{9,"Single quotes",COLOR_SQUOTE_FG,-COLOR_BG,NULL,NULL},
 	{10,"Comments",COLOR_COMMENT_FG,-COLOR_BG,NULL,NULL},
 	{12,"Words1",COLOR_WORD1_FG,-COLOR_BG,NULL,NULL},
 	{13,"Words2",COLOR_WORD2_FG,-COLOR_BG,NULL,NULL},

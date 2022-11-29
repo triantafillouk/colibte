@@ -18,6 +18,7 @@ int check_type(char *type)
  return -1;
 }
 
+
 int color_scheme_read()
 {
  FILE *f1;

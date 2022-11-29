@@ -17,7 +17,6 @@
 #include	<stdlib.h>
 #include	<panel.h>
 #include	<term.h>
-// #include	"color.h"
 #include	<signal.h>
 #include	<termios.h>
 #include	<sys/ioctl.h>
@@ -184,31 +183,23 @@ int color_pair(int fg_color,int bg_color)
 {
  int cpair;
 
-#if	NEW_COLORS
-// 	int fcol = current_color[fg_color].index;
-//	int bcol = current_color[bg_color].index;
 	if(fg_color<BG_COLORS || fg_color>FG_COLORS+15) MESG("color pair fgcolor out of range %d",fg_color);
 	if(bg_color<0 || bg_color>BG_COLORS) MESG("color pair bgcolor out of range %d",bg_color);
 	if(drv_colors>8) {
 		cpair = COLOR_PAIR((fg_color-BG_COLORS)*FG_COLORS+bg_color+2);
 	} else {
 #if	1
+		int fg=current_scheme->color_attr[fg_color].index%8;
+		int bg=current_scheme->color_attr[bg_color].index%8;
+#else
 		int fg = color_t[color_scheme_ind][fg_color];
 		int bg = color_t[color_scheme_ind][bg_color];
-#else
-		int fg = color16_8[fg_color];
-		int bg = color16_8[bg_color];
 #endif
 		cpair = COLOR_PAIR((fg%8) *8+bg+1);
 		if(fg>8) cpair |= COL_BOLD;
 		// printf("cpair=%X (%d %d) a=%X\n",cpair,fg%8,bg,fg>8);
 	};
 	// if(fg_color==COLOR_FG) MESG("- cp: color_fg bg_color=%d pair=%d",bg_color,(fg_color-BG_COLORS)*FG_COLORS+bg_color+1);
-#else
-	int fcol = current_color[fg_color].index;
-	int bcol = current_color[bg_color].index % drv_basic_colors;
-	cpair = COLOR_PAIR((fcol%drv_basic_colors)*drv_basic_colors+bcol);
-#endif
 
  return(cpair);
 }
@@ -2281,34 +2272,14 @@ void create_default_scheme()
 	scheme->scheme_name = scheme_names[scheme_ind];
 
 	// fprintf(stderr,"scheme %d [%s] ----------------------\n",scheme_ind,scheme->scheme_name);
-#if	NEW_COLORS
 	int total_colors=FG_COLORS+BG_COLORS;
-	if(drv_colors==8) total_colors=16;
-#else
-	int total_colors=16;
-#endif
-	for(i=0;i<total_colors;i++) 
-	{
-		RGB_DEF *rv;
-		// fprintf(stderr,"- color %d\n",i);
-		rv = get_rgb_values(basic_color_values[scheme_ind][i]);
-		scheme->basic_colors[i].r=rv->r;
-		scheme->basic_colors[i].g=rv->g;
-		scheme->basic_colors[i].b=rv->b;
-	};
-#if	NEW_COLORS
-	for(i=0;i<total_colors;i++) 
-	{
-		scheme->color_attr[i].index = i;
-		scheme->color_attr[i].attrib = 0;
-	};
-#else
-	for(i=0;i<COLOR_TYPES;i++) 
-	{
-		scheme->color_attr[i].index = color_t[scheme_ind][i].index;
-		scheme->color_attr[i].attrib = color_t[scheme_ind][i].attrib;
-	};
-#endif
+		for(i=0;i<total_colors;i++) 
+		{
+			scheme->color_values[i]=basic_color_values[scheme_ind][i];
+			scheme->color_attr[i].index = color_t[scheme_ind][i];
+			scheme->color_attr[i].attrib = 0;
+			// fprintf(stderr," create_default_scheme: scheme ind=%d: i=%d [%s] color %d\n",scheme_ind,i,color_type_names[i],scheme->color_attr[i].index);
+		};
 //	show_debug_color_attr(scheme->color_attr);
 	add_element_to_list((void *)scheme,color_schemes);
  };
@@ -2334,25 +2305,35 @@ MESG("set_scheme_colors: scheme=%d drv_colors=%d",scheme,drv_colors);
  set_btval("color_scheme",-1,NULL,color_scheme_ind+1); 
  lbegin(color_schemes);
  while((current_scheme=(COLOR_SCHEME *)lget(color_schemes))!=NULL) {
-// 	MESG(" check scheme  %d <> %d [%s]",scheme_ind,color_scheme_ind,current_scheme->scheme_name);
+	MESG(" check scheme  %d <> %d [%s]",scheme_ind,color_scheme_ind,current_scheme->scheme_name);
  	if(scheme_ind==color_scheme_ind) {
-//		MESG("	selected scheme %d [%s]",scheme,current_scheme->scheme_name);
+	MESG("	selected scheme %d [%s]",scheme,current_scheme->scheme_name);
+	MESG("init scheme1 %s colors=%d",current_scheme->scheme_name,drv_colors);
 		break;
 	};
 	scheme_ind++;
  };
  
+ MESG("init scheme2 %s colors=%d",current_scheme->scheme_name,drv_colors);
  current_color = current_scheme->color_attr;
 // show_debug_color_attr(current_color);
  
  if(drv_colors==0) return;
 #if	NEW_COLORS
+#if	0
 	RGB_COLORS *color_val = current_scheme->basic_colors;
+#endif
+	MESG("init scheme3 %s colors=%d",current_scheme->scheme_name,drv_colors);
 	if(drv_colors>8) {
 		for(i=0;i<FG_COLORS+BG_COLORS;i++) {
-			// printf("init_color(%d)[%d,%d,%d]\n",i,color_val[i].r,color_val[i].g,color_val[i].b);
 			refresh();
+#if	1
+			MESG("	set color %d: %s",i,current_scheme->color_values[i]);
+			RGB_DEF *rv = get_rgb_values(current_scheme->color_values[i]);
+			init_color(i,rv->r,rv->g,rv->b);
+#else
 			init_color(i,color_val[i].r,color_val[i].g,color_val[i].b);
+#endif
 			// MESG(" - color %2d [%15s]: (%d %d %d)",i,color_type_names[i],color_val[i].r,color_val[i].g,color_val[i].b);
 		};
 		for(i=0;i<FG_COLORS;i++) 
@@ -2367,7 +2348,12 @@ MESG("set_scheme_colors: scheme=%d drv_colors=%d",scheme,drv_colors);
 		for(j=0;j<8;j++) {
 		 	int i=color8_16[j];
 			// printf("init_color(%d)[%d,%d,%d]\n",j,color_val[i].r,color_val[i].g,color_val[i].b);
+#if	1
+			RGB_DEF *rv = get_rgb_values(current_scheme->color_values[i]);
+			init_color(i,rv->r,rv->g,rv->b);
+#else
 			init_color(j,color_val[i].r,color_val[i].g,color_val[i].b);
+#endif
 			// MESG(" - color %2d [%15s]: (%d %d %d)",j,color_type_names[i],color_val[i].r,color_val[i].g,color_val[i].b);
 		};
 		} else {
@@ -2737,7 +2723,18 @@ int select1_font(int n)
 	return(TRUE);
 }
 
-int color_scheme_read()
+int check_type(char *type)
+{
+ int i=0;
+ for(i=0;i<COLOR_TYPES;i++) {
+ 	if(!strcmp(type,color_type[i])) return i;
+ };
+ return -1;
+}
+
+// int sarray_index(char **sarray,char *val);
+
+int color8_scheme_read()
 {
  FILE *f1;
  char *fname;
@@ -2750,7 +2747,7 @@ int color_scheme_read()
  COLOR_SCHEME *scheme=NULL;
 
 // MESG("color_scheme_read:");
- if((fname=find_file(NULL,".colors16",1,0))==NULL) return FALSE;
+ if((fname=find_file(NULL,".colors8",1,0))==NULL) return FALSE;
 
  f1=fopen(fname,"r");
  if(f1!=NULL) {
@@ -2760,6 +2757,7 @@ int color_scheme_read()
 	int eq_ind=0;
 	char *eq_chr;
 	if(strlen(b)>0) b[strlen(b)-1]=0;
+
 	eq_chr = strchr(b,'=');
 	if(eq_chr) {
 		eq_ind = eq_chr-b;
@@ -2790,41 +2788,104 @@ int color_scheme_read()
 			scheme = malloc(sizeof(COLOR_SCHEME));
 			add_element_to_list((void *)scheme,color_schemes);
 			scheme->scheme_name = strdup(name1);
-			MESG("	create new scheme %s schemes now %d",name1,color_schemes->size);
+			MESG("	create new scheme %s schemes now %d -----------------",name1,color_schemes->size);
 		};
 		continue;
 	};
 	sscanf(b,"%s %s %s",ctype,name1,name2);
-//	MESG("ctype [%s] name1 [%s] name2 [%s] ",ctype,name1,name2);
-	for(j=0;j<16;j++) {	/* check if color value  */
-		if(strcmp(ctype,basic_color_names[j])==0) break;
-	};
-	if(j<16) { 	/* matched basic color as j, set value j  */
-		rv = get_rgb_values(name1);	/* convert hex or named color value to rgb  */
-		scheme->basic_colors[j].r = rv->r;
-		scheme->basic_colors[j].g = rv->g;
-		scheme->basic_colors[j].b = rv->b;
-	} else {	/* check, this must be color type!  */
-		for(j=0;j<COLOR_TYPES;j++) {	/* get the color type index  */
-			if(strcmp(ctype,color_type[j])==0) break;
-		};
-		if(j<COLOR_TYPES) { // matched color type
-			for(i=0;i<16;i++) {	/* get the color index of the color type  */
-				if(strcmp(name1,basic_color_names[i])==0) break;
-			};
+	j = sarray_index(color_type,ctype);
+	if(j>=0)
+	{	/* check, this must be color type!  */
+		MESG("ctype b=[%s] ctype=[%s] name1=[%s] name2=[%s] -> %d (%s)",b,ctype,name1,name2,j,color_type_names[j]);
+			i=sarray_index(basic_color_names,name1);
 			scheme->color_attr[j].index=i;
+			scheme->color_attr[j].attrib=0;
 			// set attrib !!
+#if	0
 			scheme->color_attr[j].attrib=0;
 			if(strlen(name2)>0) {
 			// convert name2 to attrib!
-				if(strstr(name2,"bold")) scheme->color_attr[j].attrib |= A_BOLD;
+				if(strstr(name2,"bold") || j>8) scheme->color_attr[j].attrib |= A_BOLD;
 				if(strstr(name2,"underline")) scheme->color_attr[j].attrib |= A_UNDERLINE;
 				if(strstr(name2,"reverse")) scheme->color_attr[j].attrib |= A_REVERSE;
 				if(strstr(name2,"dim")) scheme->color_attr[j].attrib |= A_DIM;
-//				MESG("arttr of %d (%s) is %X",j,name2,color_t[scheme_ind][j].attrib);
 			};
-		} else continue;
+#endif
+	} else {
+		MESG("ctype b=[%s] ctype=[%s] name1=[%s] name2=[%s]  not found!!!",b,ctype,name1,name2);
 	};
+ };
+	MESG("color file read ok!");
+	fclose(f1);
+	return 1;
+ } else {
+ 	ERROR("color_scheme_read: cannot open file %s",fname);
+	return 0;
+ };
+}
+
+int color_scheme_read()
+{
+ FILE *f1;
+ char *fname;
+ static char name1[MAXFLEN];
+ static char name2[MAXFLEN];
+ char *b,bline[MAXFLEN];
+ char ctype[256];
+ int i,j;
+ char left;
+ COLOR_SCHEME *scheme=NULL;
+ if(drv_colors<16) return color8_scheme_read();
+
+// MESG("color_scheme_read:");
+ if((fname=find_file(NULL,".colors16",1,0))==NULL) return FALSE;
+
+ f1=fopen(fname,"r");
+ if(f1!=NULL) {
+ while((b=fgets(bline,MAXFLEN,f1))!=NULL)
+ {
+	int eq_ind=0;
+	char *eq_chr;
+	if(strlen(b)>0) b[strlen(b)-1]=0;
+
+	if(lstartwith(b,';')) continue;
+	if(lstartwith(b,'#')) continue;
+	if(lstartwith(b,0)) continue; 	/* skip blank lines  */
+	name2[0]=0;
+	if(lstartwith(b,CHR_LBRA)) {	/* new color scheme  */
+		COLOR_SCHEME *cs;
+		int ind=0;
+		sscanf(b,"%c%s]\n",&left,name1);
+		name1[strlen(name1)-1]=0;
+
+		scheme=NULL;
+		lbegin(color_schemes);
+		// MESG(" read scheme named [%s]",name1);
+		while((cs=(COLOR_SCHEME *)lget(color_schemes))!=NULL)
+		{
+			if(strcmp(name1,cs->scheme_name)==0){ 
+				scheme = cs;
+				break;
+			};
+			ind++;
+		};
+		if(!scheme) { 	/* a new scheme!!  */
+			scheme = malloc(sizeof(COLOR_SCHEME));
+			add_element_to_list((void *)scheme,color_schemes);
+			scheme->scheme_name = strdup(name1);
+			MESG("	create new scheme %s schemes now %d",name1,color_schemes->size);
+		};
+		continue;
+	};
+	char **a_as;
+	a_as = split_2_sarray(b,'=');
+	// j=check_type(a_as[0]);
+	j=sarray_index(color_type,a_as[0]);
+		MESG("	read color b=[%s] a=[%s][%d] = [%s]",b,a_as[0],j,a_as[1]);
+	if(j>=0) {
+		scheme->color_values[j]=strdup(a_as[1]);
+	};
+	free_sarray(a_as);
  };
 	MESG("color file read ok!");
 	fclose(f1);
@@ -2862,23 +2923,6 @@ int color_scheme_save()
 		};
 		fprintf(f1,"\n");
 	/* write color values  */
-#if	NEW_COLORS
-#else
-		 for(i=0;i<COLOR_TYPES;i++){
-			if(color_t[scheme_ind][i].attrib) {
-				int attr=color_t[scheme_ind][i].attrib;
-				char sattr[64];
-				sattr[0]=0;
-				if(attr & A_BOLD) strcat(sattr,"bold,");
-				if(attr & A_UNDERLINE) strcat(sattr,"underline,");
-				if(attr & A_REVERSE) strcat(sattr,"reverse");
-				if(attr & A_DIM) strcat(sattr,"dim");
-
-		  		fprintf(f1,"%s=%s %s\n",color_type[i],basic_color_names[color_t[scheme_ind][i].index],sattr);
-			} else
-		  		fprintf(f1,"%s=%s\n",color_type[i],basic_color_names[color_t[scheme_ind][i].index]);
-		 };
-#endif
 		 fprintf(f1,"# end of %s\n\n",scheme_names[scheme_ind]);
 	 }
 
