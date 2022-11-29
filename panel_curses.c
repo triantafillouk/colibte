@@ -120,35 +120,6 @@ char *basic_color_names[] = {
 	"brown","lred","lgreen","yellow","lblue","lmagenta","lcyan","lwhite"
 };
 
-char *color_type_names[] = {
-	"bg normal",
-	"bg menu",
-	"bg selection",
-	"bg search",
-	"bg quote",
-	"bg light",
-	"bg info",
-	"bg inactive",
-	"bg box",
-	"bg code",
-	
-	"fg normal",
-	"fg menu",
-	"fg standout",
-	"fg control",
-	"fg prep",
-	"fg word1",
-	"fg word2",
-	"fg word3",
-	"fg special",
-	"fg squote",
-	"fg comment",
-	"fg changed",
-	"fg horizon",
-	"fg inactive",
-	"fg rowcol"
-};
-
 void drv_window_delete(WINDP *wp)
 {
 }
@@ -1445,8 +1416,8 @@ void drv_move(int row, int col)
 void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
 {
  int attrib=0;
- if(afcol>255) { afcol=afcol%256;attrib=A_UNDERLINE;};
-
+ if(afcol>255) { afcol=afcol%256;attrib=A_UNDERLINE;}
+ else attrib=current_scheme->color_attr[afcol].attrib;
 #if	NEW_COLORS
   // if(afcol==COLOR_FG || afcol==COLOR_WORD2_FG) attrib=A_BOLD;
   wattrset(wnd,color_pair(afcol,abcol)|attrib);
@@ -2278,7 +2249,6 @@ void create_default_scheme()
 			scheme->color_values[i]=basic_color_values[scheme_ind][i];
 			scheme->color_attr[i].index = color_t[scheme_ind][i];
 			scheme->color_attr[i].attrib = 0;
-			// fprintf(stderr," create_default_scheme: scheme ind=%d: i=%d [%s] color %d\n",scheme_ind,i,color_type_names[i],scheme->color_attr[i].index);
 		};
 //	show_debug_color_attr(scheme->color_attr);
 	add_element_to_list((void *)scheme,color_schemes);
@@ -2334,7 +2304,6 @@ MESG("set_scheme_colors: scheme=%d drv_colors=%d",scheme,drv_colors);
 #else
 			init_color(i,color_val[i].r,color_val[i].g,color_val[i].b);
 #endif
-			// MESG(" - color %2d [%15s]: (%d %d %d)",i,color_type_names[i],color_val[i].r,color_val[i].g,color_val[i].b);
 		};
 		for(i=0;i<FG_COLORS;i++) 
 			for(j=0;j<BG_COLORS;j++) {
@@ -2354,7 +2323,6 @@ MESG("set_scheme_colors: scheme=%d drv_colors=%d",scheme,drv_colors);
 #else
 			init_color(j,color_val[i].r,color_val[i].g,color_val[i].b);
 #endif
-			// MESG(" - color %2d [%15s]: (%d %d %d)",j,color_type_names[i],color_val[i].r,color_val[i].g,color_val[i].b);
 		};
 		} else {
 			MESG("terminal cannot change color!");
@@ -2796,23 +2764,20 @@ int color8_scheme_read()
 	j = sarray_index(color_type,ctype);
 	if(j>=0)
 	{	/* check, this must be color type!  */
-		MESG("ctype b=[%s] ctype=[%s] name1=[%s] name2=[%s] -> %d (%s)",b,ctype,name1,name2,j,color_type_names[j]);
 			i=sarray_index(basic_color_names,name1);
 			scheme->color_attr[j].index=i;
 			scheme->color_attr[j].attrib=0;
 			// set attrib !!
-#if	0
-			scheme->color_attr[j].attrib=0;
-			if(strlen(name2)>0) {
+#if	1
 			// convert name2 to attrib!
-				if(strstr(name2,"bold") || j>8) scheme->color_attr[j].attrib |= A_BOLD;
-				if(strstr(name2,"underline")) scheme->color_attr[j].attrib |= A_UNDERLINE;
-				if(strstr(name2,"reverse")) scheme->color_attr[j].attrib |= A_REVERSE;
-				if(strstr(name2,"dim")) scheme->color_attr[j].attrib |= A_DIM;
-			};
+			if(strstr(name2,"bold") || i>8) scheme->color_attr[j].attrib |= A_BOLD;
+			if(strstr(name2,"underline")) scheme->color_attr[j].attrib |= A_UNDERLINE;
+			if(strstr(name2,"reverse")) scheme->color_attr[j].attrib |= A_REVERSE;
+			if(strstr(name2,"dim")) scheme->color_attr[j].attrib |= A_DIM;
 #endif
+		MESG("ctype b=[%s] ctype=[%s] name1=[%s] name2=[%s] -> %d (%s) a=%d",b,ctype,name1,name2,j,color_type[j],scheme->color_attr[j].attrib);
 	} else {
-		MESG("ctype b=[%s] ctype=[%s] name1=[%s] name2=[%s]  not found!!!",b,ctype,name1,name2);
+		// MESG("ctype b=[%s] ctype=[%s] name1=[%s] name2=[%s]  not found!!!",b,ctype,name1,name2);
 	};
  };
 	MESG("color file read ok!");
