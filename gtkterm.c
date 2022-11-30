@@ -34,6 +34,7 @@ void gtk_entry_commit_cb(GtkIMContext *context, const gchar  *str, gpointer data
 void button_color_save(GtkWidget *wd, gpointer *data);
 int put_wtext1(WINDP *wp, int row,int pos_x,int col);
 void set_cursor(int val,char *from);
+char **get_scheme_names();
 
 /* local variables */
 int color_scheme_ind;
@@ -455,28 +456,12 @@ void drv_color(int fcol,int bcol)
 
 void init_color()
 {
- int i,j;
- GdkColor color;
-	/* Read the colors from the conf files  */
+ int i;
+ /* Read the colors from the conf files  */
   color_scheme_read();
   cmap = gdk_colormap_get_system ();	/* use the system colormap */
 
-#if	1
  for(i=0;i<COLOR_TYPES;i++) current_colors[i]=(GdkColor *)malloc(sizeof(GdkColor));
-#else
- for(j=0;j<COLOR_SCHEMES;j++)
- for(i=0;i<COLOR_TYPES;i++) 
- {
-  if(!gdk_color_parse(basic_color_values[j][i], &color  )) {
-  	ERROR("color %s is not in database",basic_color_values[j][i]);
-	exit(0);
-  };
-	colors[j][i]=(GdkColor *) malloc(sizeof(GdkColor));
-	memcpy(colors[j][i],&color,sizeof(GdkColor));
-	
-  ncolors++;
- };
-#endif
 }
 
 void set_current_colors()
@@ -1579,22 +1564,11 @@ int set_color(int n)
   GtkWidget *sbutton;
   GtkWidget *apply_button;
   GtkWidget *close_button;
+  char **scheme_names = get_scheme_names();
 
  int i;
  char wtitle[256];
-#if	0
- char **scheme_names,**sn;
- COLOR_SCHEME *cscheme;
- MESG("set_color:");
- scheme_names = malloc(sizeof(char **)*color_schemes->size+1);
- sn=scheme_names;
- lbegin(color_schemes);
- while((cscheme=(COLOR_SCHEME *)lget(color_schemes))!=NULL) {
-	*sn=strdup(cscheme->scheme_name);
-	MESG(" - add %s",*sn);
-	sn++;
- };
-#endif
+
  if(colors_win!=NULL) {
  	gtk_widget_show(colors_win);
 	return(1);
@@ -1618,7 +1592,7 @@ int set_color(int n)
   hbox1 = gtk_hbox_new(FALSE,0);gtk_widget_show(hbox1);
   scheme_label=gtk_label_new("select color scheme");gtk_widget_show(scheme_label);
 
-  scheme_names_button=new_combo_box(default_scheme_names,color_scheme_ind);
+  scheme_names_button=new_combo_box(scheme_names,color_scheme_ind);
   gtk_signal_connect(GTK_OBJECT(scheme_names_button),"changed", (GtkSignalFunc) scheme_names_button_change ,NULL);
 
   hbox2 = gtk_hbox_new(FALSE,0);gtk_widget_show(hbox2);
@@ -1658,7 +1632,7 @@ int set_color(int n)
 		put_to_table(fgb,table1,ypos,2,0);
 		gtk_signal_connect(GTK_OBJECT(fgb),	"clicked", (GtkSignalFunc) color_button_select_fg ,(gpointer)&ctype[i]);
 	};
-	if(ctype[i].bg>0 || ctype[i].bg==0 && i==0) {
+	if(ctype[i].bg>0 || (ctype[i].bg==0 && i==0)) {
 		bgb = gtk_button_new_with_label ("BG");
 		put_to_table(bgb,table1,ypos,3,0);
 		gtk_signal_connect(GTK_OBJECT(bgb),	"clicked", (GtkSignalFunc) color_button_select_bg ,(gpointer)&ctype[i]);

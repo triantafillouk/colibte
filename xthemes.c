@@ -9,57 +9,6 @@
 	are using X11 color schemes
 */
 
-#if	GTK0
-int color_scheme_read()
-{
- FILE *f1;
- char *fname;
- char *b,bline[MAXFLEN];
- char name1[MAXFLEN];
- int i,j;
- int scheme_ind=0;
-MESG("color_scheme_read:");
-
- if((fname=find_file(NULL,".xcolors",0,0))==NULL) return FALSE;
-
- f1=fopen(fname,"r");
- if(f1!=NULL) {
- while((b=fgets(bline,MAXFLEN,f1))!=NULL)
- {
-	if(strlen(b)>0) b[strlen(b)-1]=0;
-	if(lstartwith(b,';')) continue;
-	if(lstartwith(b,'#')) continue;
-	if(lstartwith(b,0)) continue; 	/* skip blank lines  */
-
-	if(lstartwith(b,CHR_LBRA)) {	/* new color scheme  */
-		strcpy(name1,b+1);
-		name1[strlen(name1)-1]=0;
-		scheme_ind=-1;
-		for(i=0;i<COLOR_SCHEMES;i++) {
-			if(strcmp(name1,default_scheme_names[i])==0){ scheme_ind=i;break;};
-		};
-
-		if(scheme_ind<0) return(0); // error
-		MESG("read scheme name [%s] [%s] -> ind=%d",b,name1,scheme_ind);
-		continue;
-	};
-	char **a_as;
-	a_as = split_2_sarray(b,'=');
-	j=sarray_index(color_type,a_as[0]);
-		// MESG("	read color [%s][%d] = [%s]",a_as[0],j,a_as[1]);
-	if(j>=0) {
-		basic_color_values[scheme_ind][j]=strdup(a_as[1]);
-	};
-	free_sarray(a_as);
- };
-
- fclose(f1);
- } else {
- 	ERROR("color_scheme_read: cannot open file %s",fname);
- };
- return 1;
-}
-#endif
 #if	!GTK
 int color8_scheme_read()
 {
@@ -149,7 +98,6 @@ int color8_scheme_read()
 }
 #endif
 
-#if	1
 int color_scheme_read()
 {
  FILE *f1;
@@ -220,7 +168,6 @@ int color_scheme_read()
 	return 0;
  };
 }
-#endif
 
 /* save default colors to home dir   */
 int color_scheme_save()
@@ -228,7 +175,7 @@ int color_scheme_save()
  FILE *f1;
  char *fname;
  int i;
- int scheme_ind;
+ int scheme_ind=0;
 // sprintf(name1,".color%1d.col",scheme_ind);
  fname=find_file(NULL,".xcolors",0,1);
  f1=fopen(fname,"w");
@@ -275,7 +222,7 @@ void init_default_schemes()
 /* change color scheme */
 int change_color_scheme(int  scheme)
 {
-MESG("change_color_scheme: n=%d,color_scheme_ind=%d",scheme,color_scheme_ind);
+ MESG("change_color_scheme: n=%d,color_scheme_ind=%d",scheme,color_scheme_ind);
  if(scheme<1 || scheme> color_schemes->size) scheme=1;
  set_current_scheme(scheme);
  if(!discmd) return (TRUE);

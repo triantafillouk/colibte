@@ -33,6 +33,8 @@ void button_color_save(GtkWidget *wd, gpointer *data);
 void set_cursor(int val,char *from);
 void set_window_font(WINDP *wp);
 void ge_edit_display_expose_area(GtkWidget *widget, GdkRectangle *area);
+char **get_scheme_names();
+
 GdkRGBA *current_colors[COLOR_TYPES];
 
 extern int update_all;
@@ -1924,9 +1926,8 @@ int set_color(int n)
 
   GtkWidget *label,*fgb=NULL,*bgb=NULL;
   int ypos;
-/*
-gtk_box_pack_start(GTK_BOX(vbox), scwin, TRUE, TRUE, 1);
-*/
+  char **scheme_names = get_scheme_names();
+
 #if	0
   GtkWidget *scwin = gtk_scrolled_window_new(NULL, NULL);
   gtk_container_add(GTK_CONTAINER(scwin), colors_win);
@@ -1946,7 +1947,7 @@ gtk_box_pack_start(GTK_BOX(vbox), scwin, TRUE, TRUE, 1);
 	snprintf(label_txt,100,"<span font=\"14\"  >select color scheme</span>");
 	gtk_label_set_markup ((GtkLabel *)scheme_label,label_txt);
 
-  scheme_names_button=new_combo_box(default_scheme_names,color_scheme_ind);
+  scheme_names_button=new_combo_box(scheme_names,color_scheme_ind);
   g_signal_connect(G_OBJECT(scheme_names_button),"changed", (GCallback) scheme_names_button_change ,NULL);
 
   hbox2 = gtk_box_new(GTK_ORIENTATION_HORIZONTAL,0);gtk_widget_show(hbox2);

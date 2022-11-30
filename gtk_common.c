@@ -14,6 +14,19 @@ extern alist *color_schemes;
 
 GtkWidget *wlist;
 
+char **get_scheme_names()
+{
+ char **scheme_names = malloc(sizeof(char *)*color_schemes->size+1);
+ char **name=scheme_names;
+ COLOR_SCHEME *cs;
+ lbegin(color_schemes);
+ while((cs=(COLOR_SCHEME *)lget(color_schemes))!=NULL) {
+	*name++ = strdup(cs->scheme_name);
+ };
+ *name=NULL;
+ return scheme_names;
+}
+
 void set_current_scheme(int scheme)
 {
  int scheme_ind=0;
