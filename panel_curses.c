@@ -159,13 +159,9 @@ int color_pair(int fg_color,int bg_color)
 	if(drv_colors>8) {
 		cpair = COLOR_PAIR((fg_color-BG_COLORS)*FG_COLORS+bg_color+2);
 	} else {
-#if	1
 		int fg=current_scheme->color_attr[fg_color].index%8;
 		int bg=current_scheme->color_attr[bg_color].index%8;
-#else
-		int fg = color_t[color_scheme_ind][fg_color];
-		int bg = color_t[color_scheme_ind][bg_color];
-#endif
+
 		cpair = COLOR_PAIR((fg%8) *8+bg+1);
 		if(fg>8) cpair |= COL_BOLD;
 		// printf("cpair=%X (%d %d) a=%X\n",cpair,fg%8,bg,fg>8);
@@ -1418,31 +1414,9 @@ void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
  int attrib=0;
  if(afcol>255) { afcol=afcol%256;attrib=A_UNDERLINE;}
  else attrib=current_scheme->color_attr[afcol].attrib;
-#if	NEW_COLORS
+
   // if(afcol==COLOR_FG || afcol==COLOR_WORD2_FG) attrib=A_BOLD;
   wattrset(wnd,color_pair(afcol,abcol)|attrib);
-#else
- if(drv_colors>16) {
- 	if(afcol==COLOR_SPEC_FG||afcol==COLOR_PREP_FG) {
-		wattron(wnd,COL_BOLD);
-	} else {
-		wattroff(wnd,COL_BOLD);
-		wattron(wnd,color_pair(afcol,abcol));
-	};
- } else {
- int fcol;
-  fcol = current_scheme->color_attr[afcol].index % 16;
-  if(drv_colors==8)
-  {
-	  if(fcol>COL_BASIC-1) { 
-		attrib=A_BOLD;
-		fcol %= COL_BASIC;
-  	  };
-  };
-  attrib |= current_scheme->color_attr[afcol].attrib;
-  wattrset(wnd,color_pair(afcol,abcol)|attrib);
- }
-#endif
 }
 
 
@@ -2234,7 +2208,8 @@ void save_original_colors()
  };
 }
 
-void create_default_scheme()
+#if	NUSE
+void init_default_schemes()
 {
  int scheme_ind;
  for(scheme_ind=0;scheme_ind<COLOR_SCHEMES;scheme_ind++){
@@ -2254,6 +2229,7 @@ void create_default_scheme()
 	add_element_to_list((void *)scheme,color_schemes);
  };
 }
+#endif
 
 void show_debug_color_attr(color_curses *current_color)
 {
@@ -2290,20 +2266,13 @@ MESG("set_scheme_colors: scheme=%d drv_colors=%d",scheme,drv_colors);
  
  if(drv_colors==0) return;
 #if	NEW_COLORS
-#if	0
-	RGB_COLORS *color_val = current_scheme->basic_colors;
-#endif
 	MESG("init scheme3 %s colors=%d",current_scheme->scheme_name,drv_colors);
 	if(drv_colors>8) {
 		for(i=0;i<FG_COLORS+BG_COLORS;i++) {
 			refresh();
-#if	1
 			MESG("	set color %d: %s",i,current_scheme->color_values[i]);
 			RGB_DEF *rv = get_rgb_values(current_scheme->color_values[i]);
 			init_color(i,rv->r,rv->g,rv->b);
-#else
-			init_color(i,color_val[i].r,color_val[i].g,color_val[i].b);
-#endif
 		};
 		for(i=0;i<FG_COLORS;i++) 
 			for(j=0;j<BG_COLORS;j++) {
@@ -2317,12 +2286,8 @@ MESG("set_scheme_colors: scheme=%d drv_colors=%d",scheme,drv_colors);
 		for(j=0;j<8;j++) {
 		 	int i=color8_16[j];
 			// printf("init_color(%d)[%d,%d,%d]\n",j,color_val[i].r,color_val[i].g,color_val[i].b);
-#if	1
 			RGB_DEF *rv = get_rgb_values(current_scheme->color_values[i]);
 			init_color(i,rv->r,rv->g,rv->b);
-#else
-			init_color(j,color_val[i].r,color_val[i].g,color_val[i].b);
-#endif
 		};
 		} else {
 			MESG("terminal cannot change color!");
@@ -2700,202 +2665,6 @@ int check_type(char *type)
  return -1;
 }
 
-// int sarray_index(char **sarray,char *val);
-
-int color8_scheme_read()
-{
- FILE *f1;
- char *fname;
- static char name1[MAXFLEN];
- static char name2[MAXFLEN];
- char *b,bline[MAXFLEN];
- char ctype[256];
- int i,j;
- char left;
- COLOR_SCHEME *scheme=NULL;
-
-// MESG("color_scheme_read:");
- if((fname=find_file(NULL,".colors8",1,0))==NULL) return FALSE;
-
- f1=fopen(fname,"r");
- if(f1!=NULL) {
- while((b=fgets(bline,MAXFLEN,f1))!=NULL)
- {
-	RGB_DEF *rv;
-	int eq_ind=0;
-	char *eq_chr;
-	if(strlen(b)>0) b[strlen(b)-1]=0;
-
-	eq_chr = strchr(b,'=');
-	if(eq_chr) {
-		eq_ind = eq_chr-b;
-		b[eq_ind]=' ';
-	}
-	if(lstartwith(b,';')) continue;
-	if(lstartwith(b,'#')) continue;
-	if(lstartwith(b,0)) continue; 	/* skip blank lines  */
-	name2[0]=0;
-	if(lstartwith(b,CHR_LBRA)) {	/* new color scheme  */
-		COLOR_SCHEME *cs;
-		int ind=0;
-		sscanf(b,"%c%s]\n",&left,name1);
-		name1[strlen(name1)-1]=0;
-
-		scheme=NULL;
-		lbegin(color_schemes);
-//		MESG(" read scheme named [%s]",name1);
-		while((cs=(COLOR_SCHEME *)lget(color_schemes))!=NULL)
-		{
-			if(strcmp(name1,cs->scheme_name)==0){ 
-				scheme = cs;
-				break;
-			};
-			ind++;
-		};
-		if(!scheme) { 	/* a new scheme!!  */
-			scheme = malloc(sizeof(COLOR_SCHEME));
-			add_element_to_list((void *)scheme,color_schemes);
-			scheme->scheme_name = strdup(name1);
-			MESG("	create new scheme %s schemes now %d -----------------",name1,color_schemes->size);
-		};
-		continue;
-	};
-	sscanf(b,"%s %s %s",ctype,name1,name2);
-	j = sarray_index(color_type,ctype);
-	if(j>=0)
-	{	/* check, this must be color type!  */
-			i=sarray_index(basic_color_names,name1);
-			scheme->color_attr[j].index=i;
-			scheme->color_attr[j].attrib=0;
-			// set attrib !!
-#if	1
-			// convert name2 to attrib!
-			if(strstr(name2,"bold") || i>8) scheme->color_attr[j].attrib |= A_BOLD;
-			if(strstr(name2,"underline")) scheme->color_attr[j].attrib |= A_UNDERLINE;
-			if(strstr(name2,"reverse")) scheme->color_attr[j].attrib |= A_REVERSE;
-			if(strstr(name2,"dim")) scheme->color_attr[j].attrib |= A_DIM;
-#endif
-		MESG("ctype b=[%s] ctype=[%s] name1=[%s] name2=[%s] -> %d (%s) a=%d",b,ctype,name1,name2,j,color_type[j],scheme->color_attr[j].attrib);
-	} else {
-		// MESG("ctype b=[%s] ctype=[%s] name1=[%s] name2=[%s]  not found!!!",b,ctype,name1,name2);
-	};
- };
-	MESG("color file read ok!");
-	fclose(f1);
-	return 1;
- } else {
- 	ERROR("color_scheme_read: cannot open file %s",fname);
-	return 0;
- };
-}
-
-int color_scheme_read()
-{
- FILE *f1;
- char *fname;
- static char name1[MAXFLEN];
- static char name2[MAXFLEN];
- char *b,bline[MAXFLEN];
- char ctype[256];
- int i,j;
- char left;
- COLOR_SCHEME *scheme=NULL;
- if(drv_colors<16) return color8_scheme_read();
-
-// MESG("color_scheme_read:");
- if((fname=find_file(NULL,".colors16",1,0))==NULL) return FALSE;
-
- f1=fopen(fname,"r");
- if(f1!=NULL) {
- while((b=fgets(bline,MAXFLEN,f1))!=NULL)
- {
-	int eq_ind=0;
-	char *eq_chr;
-	if(strlen(b)>0) b[strlen(b)-1]=0;
-
-	if(lstartwith(b,';')) continue;
-	if(lstartwith(b,'#')) continue;
-	if(lstartwith(b,0)) continue; 	/* skip blank lines  */
-	name2[0]=0;
-	if(lstartwith(b,CHR_LBRA)) {	/* new color scheme  */
-		COLOR_SCHEME *cs;
-		int ind=0;
-		sscanf(b,"%c%s]\n",&left,name1);
-		name1[strlen(name1)-1]=0;
-
-		scheme=NULL;
-		lbegin(color_schemes);
-		// MESG(" read scheme named [%s]",name1);
-		while((cs=(COLOR_SCHEME *)lget(color_schemes))!=NULL)
-		{
-			if(strcmp(name1,cs->scheme_name)==0){ 
-				scheme = cs;
-				break;
-			};
-			ind++;
-		};
-		if(!scheme) { 	/* a new scheme!!  */
-			scheme = malloc(sizeof(COLOR_SCHEME));
-			add_element_to_list((void *)scheme,color_schemes);
-			scheme->scheme_name = strdup(name1);
-			MESG("	create new scheme %s schemes now %d",name1,color_schemes->size);
-		};
-		continue;
-	};
-	char **a_as;
-	a_as = split_2_sarray(b,'=');
-	// j=check_type(a_as[0]);
-	j=sarray_index(color_type,a_as[0]);
-		MESG("	read color b=[%s] a=[%s][%d] = [%s]",b,a_as[0],j,a_as[1]);
-	if(j>=0) {
-		scheme->color_values[j]=strdup(a_as[1]);
-	};
-	free_sarray(a_as);
- };
-	MESG("color file read ok!");
-	fclose(f1);
-	return 1;
- } else {
- 	ERROR("color_scheme_read: cannot open file %s",fname);
-	return 0;
- };
-}
-
-
-/* save default colors to home dir   */
-int color_scheme_save()
-{
- FILE *f1;
- char *fname;
- int i;
- int scheme_ind;
- int sstat=0;
-
- fname=find_file(NULL,".colors16a",0,1);
-
- f1=fopen(fname,"w");
- if(sstat>MAXFLEN) return FALSE;
- if(f1!=NULL) {
-
-	 for(scheme_ind=0;scheme_ind<COLOR_SCHEMES;scheme_ind++)
-	 {
-	/* write scheme name  */
-		 fprintf(f1,"[%s]\n",scheme_names[scheme_ind]);
-	/* write color types  */
-		for(i=0;i<16;i++) {
-			fprintf(f1,"%s=%s\n",basic_color_names[i],
-				basic_color_values[scheme_ind][i]);
-		};
-		fprintf(f1,"\n");
-	/* write color values  */
-		 fprintf(f1,"# end of %s\n\n",scheme_names[scheme_ind]);
-	 }
-
-	 fclose(f1);
-	 msg_line("color scheme %d saved",scheme_ind+1);
- } else msg_line("color_save: cannot create file %s",fname);
- return 1;
-}
 
 int select_scheme(int n)
 {
@@ -2920,7 +2689,6 @@ int select_scheme(int n)
  };
  return 1;
 }
-
 
 int set_sposition(WINDP *wp,int *st, int *l)
 {
@@ -3012,5 +2780,7 @@ void show_slide(WINDP *wp)
 // update_panels();
 // doupdate();
 }
+
+#include "xthemes.c"
 
 /* -- */

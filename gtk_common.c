@@ -1471,8 +1471,8 @@ typedef struct RGB_DEF {
  char *color_name;
 } RGB_DEF;
 RGB_DEF *get_rgb_values(char *color_name);
-extern alist *color_schemes;
 
+#if	NUSE
 void init_default_schemes()
 {
  MESG("init_default_schemes:");
@@ -1482,33 +1482,17 @@ void init_default_schemes()
 	COLOR_SCHEME *scheme = malloc(sizeof(COLOR_SCHEME));
 	scheme->scheme_name = scheme_names[scheme_ind];
 
-	fprintf(stderr,"scheme %d [%s] ----------------------\n",scheme_ind,scheme->scheme_name);
 	int total_colors=FG_COLORS+BG_COLORS;
-	if(drv_colors==8) total_colors=16;
-
 	for(i=0;i<total_colors;i++) 
 	{
 		// fprintf(stderr,"- color %d\n",i);
 		scheme->color_values[i]=basic_color_values[scheme_ind][i];
-#if	0
-		RGB_DEF *rv;
-		rv = get_rgb_values(basic_color_values[scheme_ind][i]);
-
-		scheme->basic_colors[i].r=rv->r;
-		scheme->basic_colors[i].g=rv->g;
-		scheme->basic_colors[i].b=rv->b;
-#endif
 	};
 	add_element_to_list((void *)scheme,color_schemes);
  };
 	
 }
-
-void create_default_scheme()
-{
-	MESG("create_default_scheme:");
-	init_default_schemes();
-}
+#endif
 
 /* change color scheme */
 int change_color_scheme(int  n)

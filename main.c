@@ -59,7 +59,7 @@ void init_lists()
  dir2_list=new_list(0,"dir2_list");
  local_key_list=new_list(0,"local_key_list");
  color_schemes=new_list(0,"color_schemes");
- create_default_scheme();
+ init_default_schemes();
 }
 
 int start_err_num=0;

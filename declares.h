@@ -103,7 +103,7 @@ int color_scheme_read();
 int set_sort_mode(int mode);
 
 int select_scheme(int n);
-void create_default_scheme();
+void init_default_schemes();
 
 // display.c
 int error_line(char *,...);
