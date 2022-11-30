@@ -106,7 +106,8 @@ int check_cr(WINDP *wp,char *msg)
 extern int slide_flag;
 extern int in_slide;
 
-extern GdkRGBA *colors[COLOR_SCHEMES][COLOR_TYPES];
+extern GdkRGBA *current_colors[COLOR_TYPES];
+
 extern int color_scheme_ind;
 
 extern int ppy;
@@ -147,7 +148,7 @@ ge_edit_draw_event(GtkWidget *widget,cairo_t *cr)
 	if(clip_rect.width<3 || clip_rect.height<3) 
 	{
 		GdkRGBA *lcolor;
-		lcolor = colors[color_scheme_ind][COLOR_BG];
+		lcolor = current_colors[COLOR_BG];
 		// redraw cliped area near scroll slide!
 		cairo_set_operator(cr,CAIRO_OPERATOR_OVER);
 		// redraw with background color!!
@@ -183,8 +184,6 @@ ge_edit_draw_event(GtkWidget *widget,cairo_t *cr)
 	wd->edit_rect.x = 0;
 	wd->edit_rect.y = 0;
 	
-	drv_update_styles();
-
 	if(first_time==1) /* for the first time only */
 	{
 		ge_set_initial_font(widget);

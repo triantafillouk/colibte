@@ -16,6 +16,7 @@ extern int font_weight;
 extern char *current_font_name;
 extern char **mono_fonts_list;
 extern int mono_fonts_number;
+extern int color_scheme_ind;
 
 int selection_on=-1;
 
@@ -305,7 +306,8 @@ ge_edit_display_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
 		cairo_destroy(wd->cr);
 		gdk_pixmap_unref(wd->edit_pixmap);
 	};
-	drv_update_styles();
+	change_color_scheme(color_scheme_ind+1);
+	// drv_update_styles();
 	/* get backing pixmap to draw into */
 	wd->edit_pixmap = gdk_pixmap_new(wd->edit_window, allocation->width,
 				    allocation->height, -1);

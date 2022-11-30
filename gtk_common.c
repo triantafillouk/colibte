@@ -30,7 +30,7 @@ void set_current_scheme(int scheme)
 	};
 	scheme_ind++;
  };
- 
+ set_current_colors();
  MESG("set_current_scheme:end");
 }
 
@@ -72,14 +72,16 @@ void drv_open()
 
 	color_scheme_ind=(int)bt_dval("xcolor_scheme");
 	init_color();
-
+	set_current_scheme(color_scheme_ind+1);
 	parent = create_parent();
 	if(cwp==NULL) { ERROR("no cwp!");exit(0);};
 	wlist=create_select_window();	// this is the list window (only one!)
 	gtk_widget_realize(parent);
+	MESG("parent realized!");
 	gtk_widget_show(parent);
-
+	MESG("parent showed!");
 	gtk_widget_grab_focus(cwp->gwp->draw);
+	MESG("drv_open: end");
 }
 
 void show_cursor_dl(int pos)
@@ -1494,28 +1496,6 @@ typedef struct RGB_DEF {
  char *color_name;
 } RGB_DEF;
 RGB_DEF *get_rgb_values(char *color_name);
-
-#if	NUSE
-void init_default_schemes()
-{
- MESG("init_default_schemes:");
- int scheme_ind;
- for(scheme_ind=0;scheme_ind<COLOR_SCHEMES;scheme_ind++){
-	int i;
-	COLOR_SCHEME *scheme = malloc(sizeof(COLOR_SCHEME));
-	scheme->scheme_name = scheme_names[scheme_ind];
-
-	int total_colors=FG_COLORS+BG_COLORS;
-	for(i=0;i<total_colors;i++) 
-	{
-		// fprintf(stderr,"- color %d\n",i);
-		scheme->color_values[i]=basic_color_values[scheme_ind][i];
-	};
-	add_element_to_list((void *)scheme,color_schemes);
- };
-	
-}
-#endif
 
 void set_cursor(int val,char *from)
 {

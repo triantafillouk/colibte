@@ -93,7 +93,7 @@ WINDOW *hmenu_window;	/* horizontal menu curses window  */
 WINDOW *mesg_window;	/* message line curses window  */
 PANEL *hmenu_panel=NULL;
 PANEL *mesg_panel=NULL;
-extern int color16_8[BG_COLORS+FG_COLORS];
+// extern int color16_8[BG_COLORS+FG_COLORS];
 
 int color_pair(int fg_color,int bg_color);
 void free_virtual_window(WINDP *wp);

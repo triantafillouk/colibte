@@ -30,12 +30,13 @@
 #define LWHITE		15
 
 // default color schemes
-char *scheme_names[] = {
+char *default_scheme_names[] = {
 	"Snow","Midnight","Cyan","Blue","Gray","Dark gray",
 	"Sunny","Twilight","Lunar","Velvet",
 	NULL,NULL
 };
 
+#if	NUSE
 // 16 colors to 8 colors translation
 // for black backgrounds!!
 int color16_8[] = {
@@ -66,7 +67,9 @@ int color16_8[] = {
  WHITE,		/* INACTIVE_FG  */
  YELLOW		/* ROWCOL_FG  */
 };
+#endif
 
+#if !GTK
 int color8_16[] = {
 	COLOR_BG,			/* BLACK  */
 	COLOR_SEARCH_BG,	/* RED  */
@@ -86,6 +89,7 @@ int color8_16[] = {
 	COLOR_WORD1_FG,		/* LCYAN  */
 	COLOR_MENU_FG		/* LWHITE  */
 };
+#endif
 
 typedef struct color_curses {
 	int index;	/* color index  */
@@ -99,9 +103,6 @@ typedef struct RGB_COLORS {
 typedef struct COLOR_SCHEME {
 	char *scheme_name;
 	char *color_values[COLOR_TYPES];
-#if	0
-	RGB_COLORS basic_colors[COLOR_TYPES];
-#endif
 	color_curses color_attr[COLOR_TYPES];
 } COLOR_SCHEME;
 

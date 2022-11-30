@@ -9,7 +9,7 @@
 	are using X11 color schemes
 */
 
-#if	GTK
+#if	GTK0
 int color_scheme_read()
 {
  FILE *f1;
@@ -18,7 +18,7 @@ int color_scheme_read()
  char name1[MAXFLEN];
  int i,j;
  int scheme_ind=0;
-// MESG("color_scheme_read:");
+MESG("color_scheme_read:");
 
  if((fname=find_file(NULL,".xcolors",0,0))==NULL) return FALSE;
 
@@ -36,7 +36,7 @@ int color_scheme_read()
 		name1[strlen(name1)-1]=0;
 		scheme_ind=-1;
 		for(i=0;i<COLOR_SCHEMES;i++) {
-			if(strcmp(name1,scheme_names[i])==0){ scheme_ind=i;break;};
+			if(strcmp(name1,default_scheme_names[i])==0){ scheme_ind=i;break;};
 		};
 
 		if(scheme_ind<0) return(0); // error
@@ -59,7 +59,8 @@ int color_scheme_read()
  };
  return 1;
 }
-#else
+#endif
+#if	!GTK
 int color8_scheme_read()
 {
  FILE *f1;
@@ -146,7 +147,9 @@ int color8_scheme_read()
 	return 0;
  };
 }
+#endif
 
+#if	1
 int color_scheme_read()
 {
  FILE *f1;
@@ -157,9 +160,10 @@ int color_scheme_read()
  char left;
  COLOR_SCHEME *scheme=NULL;
 
+#if	!GTK
  if(drv_colors<16) return color8_scheme_read();
-
-// MESG("color_scheme_read:");
+#endif
+ MESG("color_scheme_read:");
  if((fname=find_file(NULL,".colors16",1,0))==NULL) return FALSE;
 
  f1=fopen(fname,"r");
@@ -192,6 +196,8 @@ int color_scheme_read()
 			scheme = malloc(sizeof(COLOR_SCHEME));
 			add_element_to_list((void *)scheme,color_schemes);
 			scheme->scheme_name = strdup(name1);
+			int i;
+			for(i=0;i<COLOR_TYPES;i++) scheme->color_values[i]="#203040";
 			MESG("	create new scheme %s schemes now %d",name1,color_schemes->size);
 		};
 		continue;
@@ -200,7 +206,7 @@ int color_scheme_read()
 	a_as = split_2_sarray(b,'=');
 	// j=check_type(a_as[0]);
 	j=sarray_index(color_type,a_as[0]);
-		MESG("	read color b=[%s] a=[%s][%d] = [%s]",b,a_as[0],j,a_as[1]);
+	// MESG("	read color b=[%s] a=[%s][%d] = [%s]",b,a_as[0],j,a_as[1]);
 	if(j>=0) {
 		scheme->color_values[j]=strdup(a_as[1]);
 	};
@@ -223,21 +229,20 @@ int color_scheme_save()
  char *fname;
  int i;
  int scheme_ind;
-
 // sprintf(name1,".color%1d.col",scheme_ind);
  fname=find_file(NULL,".xcolors",0,1);
  f1=fopen(fname,"w");
 
  if(f1!=NULL) {
-	 for(scheme_ind=0;scheme_ind<COLOR_SCHEMES;scheme_ind++)
-	 {
-		MESG("save scheme %d",scheme_ind);
-		 fprintf(f1,"[%s]\n",scheme_names[scheme_ind]);
+	COLOR_SCHEME *scheme;
+	lbegin(color_schemes);
+	while((scheme=(COLOR_SCHEME *)lget(color_schemes))!=NULL){
+		MESG("save_scheme: %s",scheme->scheme_name);	
+		fprintf(f1,"[%s]\n",scheme->scheme_name);
 		 for(i=0;i<COLOR_TYPES;i++){
-		  fprintf(f1,"%s=%s\n",color_type[i],basic_color_values[scheme_ind][i]);
+		  fprintf(f1,"%s=%s\n",color_type[i],scheme->color_values[i]);
 		 };
-	 }
-
+	};
 	 fclose(f1);
 	 msg_line("color scheme %d saved",scheme_ind+1);
  } else msg_line("color_save: cannot create file %s",fname);
@@ -252,7 +257,7 @@ void init_default_schemes()
  for(scheme_ind=0;scheme_ind<COLOR_SCHEMES;scheme_ind++){
 	int i;
 	COLOR_SCHEME *scheme = malloc(sizeof(COLOR_SCHEME));
-	scheme->scheme_name = scheme_names[scheme_ind];
+	scheme->scheme_name = default_scheme_names[scheme_ind];
 
 	// fprintf(stderr,"scheme %d [%s] ----------------------\n",scheme_ind,scheme->scheme_name);
 	int total_colors=FG_COLORS+BG_COLORS;
@@ -262,7 +267,6 @@ void init_default_schemes()
 			scheme->color_attr[i].index = color_t[scheme_ind][i];
 			scheme->color_attr[i].attrib = 0;
 		};
-//	show_debug_color_attr(scheme->color_attr);
 	add_element_to_list((void *)scheme,color_schemes);
  };
 }
@@ -271,7 +275,7 @@ void init_default_schemes()
 /* change color scheme */
 int change_color_scheme(int  scheme)
 {
-// MESG("change_color_scheme: n=%d,color_scheme_ind=%d",n,color_scheme_ind);
+MESG("change_color_scheme: n=%d,color_scheme_ind=%d",scheme,color_scheme_ind);
  if(scheme<1 || scheme> color_schemes->size) scheme=1;
  set_current_scheme(scheme);
  if(!discmd) return (TRUE);
