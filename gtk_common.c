@@ -10,8 +10,31 @@
 extern VAR option_names[];
 extern int nnarg;
 extern FILEBUF *cbfp;
+extern alist *color_schemes;
 
 GtkWidget *wlist;
+
+void set_current_scheme(int scheme)
+{
+ int scheme_ind=0;
+ MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
+
+ color_scheme_ind=scheme-1;
+ set_btval("color_scheme",-1,NULL,color_scheme_ind+1); 
+ lbegin(color_schemes);
+ while((current_scheme=(COLOR_SCHEME *)lget(color_schemes))!=NULL) {
+	// MESG(" check scheme  %d <> %d [%s]",scheme_ind,color_scheme_ind,current_scheme->scheme_name);
+ 	if(scheme_ind==color_scheme_ind) {
+		MESG("	set_current_scheme %d [%s]",scheme,current_scheme->scheme_name);
+		break;
+	};
+	scheme_ind++;
+ };
+ 
+ MESG("set_current_scheme:end");
+}
+
+#include "xthemes.c"
 
 int confirm(char *title,char *prompt,int always) {
   int result; 
@@ -1494,26 +1517,10 @@ void init_default_schemes()
 }
 #endif
 
-/* change color scheme */
-int change_color_scheme(int  n)
+void set_cursor(int val,char *from)
 {
- MESG("change_color_scheme: %d",n);
- if(n<1 || n>COLOR_SCHEMES)	{
-	color_scheme_ind=0;
- } else {
-	color_scheme_ind=n-1;
- };
- MESG("change_color_scheme: now is %d",color_scheme_ind);
- set_btval("xcolor_scheme",-1,NULL,color_scheme_ind); 
- set_update(cwp,UPD_ALL);
- if(!discmd) return true;
-
- drv_back_color();
-// hide_cursor("change_color_scheme");
- set_cursor(0,"change_color_scheme");
- set_windows_color();
- drv_update_styles();
- return(TRUE);
+	cursor_showing=val;
+//	MESG("set_cursor: val=%d %s",val,from);
 }
 
 

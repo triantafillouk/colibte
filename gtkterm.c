@@ -22,7 +22,7 @@
 #include "menus.h"
 #include "icon.h"
 
-#include "xthemes.c"
+// #include "xthemes.c"
 #define	SHOW_CLINE	1
 int addutfvchar1(char *str, vchar *vc, int pos,FILEBUF *w_fp);
 
@@ -33,9 +33,12 @@ GtkWidget *new_combo_box(char **list,int active);
 void gtk_entry_commit_cb(GtkIMContext *context, const gchar  *str, gpointer data);
 void button_color_save(GtkWidget *wd, gpointer *data);
 int put_wtext1(WINDP *wp, int row,int pos_x,int col);
+void set_cursor(int val,char *from);
 
 /* local variables */
 int color_scheme_ind;
+COLOR_SCHEME *current_scheme=NULL;
+
 int compact1 = 1;
 MENUS *start_menu = &m_topn;
 
@@ -472,11 +475,6 @@ void init_color()
  };
 }
 
-void set_cursor(int val,char *from)
-{
-	cursor_showing=val;
-//	MESG("set_cursor: val=%d %s",val,from);
-}
 
 int cursor_status()
 {

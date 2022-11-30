@@ -59,8 +59,9 @@ int change_sort_mode(int mouse_col);
 
 int	colorupdate;
 int color_scheme_ind=0;
-int cursor_showing=0;
 COLOR_SCHEME *current_scheme=NULL;
+
+int cursor_showing=0;
 
 extern int drv_numrow;		// current driver screen rows
 extern int drv_numcol;		// current driver screen columns
@@ -548,7 +549,7 @@ void set_wvs(WINDP *wp);
 
 int color_menu_fg,color_menu_bg;
 
-void set_scheme_colors(int scheme);
+void set_current_scheme(int scheme);
 
 /* set the screen/main window size */
 void drv_size()
@@ -648,7 +649,7 @@ void drv_open()
 
 // print_colors("Original ones");
 //   MESG("drv_open: color_scheme_ind=%d",color_scheme_ind);
-   set_scheme_colors(color_scheme_ind+1);	/* set default midnight theme  */
+   set_current_scheme(color_scheme_ind+1);	/* set default midnight theme  */
 
  // driver specific keyboard bindings
  drv_bindkeys();
@@ -2208,29 +2209,6 @@ void save_original_colors()
  };
 }
 
-#if	NUSE
-void init_default_schemes()
-{
- int scheme_ind;
- for(scheme_ind=0;scheme_ind<COLOR_SCHEMES;scheme_ind++){
-	int i;
-	COLOR_SCHEME *scheme = malloc(sizeof(COLOR_SCHEME));
-	scheme->scheme_name = scheme_names[scheme_ind];
-
-	// fprintf(stderr,"scheme %d [%s] ----------------------\n",scheme_ind,scheme->scheme_name);
-	int total_colors=FG_COLORS+BG_COLORS;
-		for(i=0;i<total_colors;i++) 
-		{
-			scheme->color_values[i]=basic_color_values[scheme_ind][i];
-			scheme->color_attr[i].index = color_t[scheme_ind][i];
-			scheme->color_attr[i].attrib = 0;
-		};
-//	show_debug_color_attr(scheme->color_attr);
-	add_element_to_list((void *)scheme,color_schemes);
- };
-}
-#endif
-
 void show_debug_color_attr(color_curses *current_color)
 {
  int i;
@@ -2240,11 +2218,11 @@ void show_debug_color_attr(color_curses *current_color)
  };
 }
 
-void set_scheme_colors(int scheme)
+void set_current_scheme(int scheme)
 {
  int i,j;
  int scheme_ind=0;
-MESG("set_scheme_colors: scheme=%d drv_colors=%d",scheme,drv_colors);
+MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
  if(scheme<1 || scheme> color_schemes->size) scheme=1;
 
  color_scheme_ind=scheme-1;
@@ -2265,7 +2243,6 @@ MESG("set_scheme_colors: scheme=%d drv_colors=%d",scheme,drv_colors);
 // show_debug_color_attr(current_color);
  
  if(drv_colors==0) return;
-#if	NEW_COLORS
 	MESG("init scheme3 %s colors=%d",current_scheme->scheme_name,drv_colors);
 	if(drv_colors>8) {
 		for(i=0;i<FG_COLORS+BG_COLORS;i++) {
@@ -2299,24 +2276,13 @@ MESG("set_scheme_colors: scheme=%d drv_colors=%d",scheme,drv_colors);
 				// MESG("init_pair : %d as (%d %d)",pair,i,j);
 			};
 	};
-#else
-#endif
-MESG("set_scheme_colors:end");
+MESG("set_current_scheme:end");
 }
 
-/* change color scheme */
-int change_color_scheme(int  n)
+void set_cursor(int val,char *from)
 {
-// MESG("change_color_scheme: n=%d,color_scheme_ind=%d",n,color_scheme_ind);
- set_scheme_colors(n);
- if(!discmd) return (TRUE);
- set_update(cwp,UPD_ALL);
- // update also the vertical window separator lines
- drv_back_color();
- set_windows_color();
- drv_update_styles();
- MESG("change_color_scheme: end!");
- return(TRUE);
+	cursor_showing=val;
+//	MESG("set_cursor: val=%d %s",val,from);
 }
 
 /* status of each window  */

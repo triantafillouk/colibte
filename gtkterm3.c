@@ -20,7 +20,7 @@
 #include "menus.h"
 #include "icon.h"
 
-#include "xthemes.c"
+// #include "xthemes.c"
 #define	SHOW_CLINE	1
 #define	LABEL_STATUS	0
 
@@ -45,10 +45,14 @@ void set_box_style(GtkWidget *widget,int font_size,char *fgcolor,char *bgcolor);
 void set_edit_font(GeEditDisplay *wd);
 GtkWidget *pixbuf_icon(const char **embeded_icon);
 int check_cr(WINDP *wp,char *msg);
+void set_cursor(int val,char *from);
+
 MENUS *start_menu = &m_topn;
 
 /* local variables */
-int color_scheme_ind;
+int color_scheme_ind=0;
+COLOR_SCHEME *current_scheme=NULL;
+
 int compact1 = 1;
 
 int drv_type=DRIVER_GTK3;
@@ -544,11 +548,6 @@ void show_cursor (char *from)
 	// MESG("show_cursor [%s] id=%d x=%d y=%d %d>",from,cwp->id,cposx,cposy,ind++);
 }
 
-void set_cursor(int val,char *from)
-{
-	cursor_showing=val;
-//	MESG("set_cursor: val=%d %s",val,from);
-}
 
 int cursor_status()
 {

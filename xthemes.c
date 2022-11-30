@@ -267,3 +267,21 @@ void init_default_schemes()
  };
 }
 
+
+/* change color scheme */
+int change_color_scheme(int  scheme)
+{
+// MESG("change_color_scheme: n=%d,color_scheme_ind=%d",n,color_scheme_ind);
+ if(scheme<1 || scheme> color_schemes->size) scheme=1;
+ set_current_scheme(scheme);
+ if(!discmd) return (TRUE);
+ set_btval("xcolor_scheme",-1,NULL,color_scheme_ind); 
+ set_update(cwp,UPD_ALL);
+ // update also the vertical window separator lines
+ drv_back_color();
+ set_cursor(0,"change_color_scheme");
+ set_windows_color();
+ drv_update_styles();
+ MESG("change_color_scheme: end!");
+ return(TRUE);
+}
