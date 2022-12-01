@@ -33,7 +33,7 @@ void end_draw(GeEditDisplay *wd,char *message);
 extern float CHEIGHT,CLEN,CFONTBASE,SLHEIGHT,SLBASE;
 extern int CHEIGHTI;
 extern int update_all;
-//extern int cursor_showing;
+
 void set_cursor(int val,char *from);
 extern int pfont_index,font_size,status_font_size;
 
@@ -44,7 +44,6 @@ static void ge_edit_display_init           (GeEditDisplay *wd);
 static void ge_edit_display_realize        (GtkWidget *widget);
 static void ge_edit_display_unrealize      (GtkWidget *widget);
 
-//static void ge_edit_display_style_set      (GtkWidget *widget, GtkStyle *previous_style);
 static gint ge_edit_display_event (GtkWidget *widget, GdkEvent *event);
 static gint ge_edit_draw_event (GtkWidget *widget, cairo_t *cr);
 
@@ -106,7 +105,8 @@ int check_cr(WINDP *wp,char *msg)
 extern int slide_flag;
 extern int in_slide;
 
-extern GdkRGBA *colors[COLOR_SCHEMES][XCOLOR_TYPES];
+extern GdkRGBA *current_colors[COLOR_TYPES];
+
 extern int color_scheme_ind;
 
 extern int ppy;
@@ -147,7 +147,7 @@ ge_edit_draw_event(GtkWidget *widget,cairo_t *cr)
 	if(clip_rect.width<3 || clip_rect.height<3) 
 	{
 		GdkRGBA *lcolor;
-		lcolor = colors[color_scheme_ind][BACKGROUND];
+		lcolor = current_colors[COLOR_BG];
 		// redraw cliped area near scroll slide!
 		cairo_set_operator(cr,CAIRO_OPERATOR_OVER);
 		// redraw with background color!!
@@ -183,8 +183,6 @@ ge_edit_draw_event(GtkWidget *widget,cairo_t *cr)
 	wd->edit_rect.x = 0;
 	wd->edit_rect.y = 0;
 	
-	drv_update_styles();
-
 	if(first_time==1) /* for the first time only */
 	{
 		ge_set_initial_font(widget);
@@ -253,17 +251,12 @@ int on_parent_configure              (GtkWidget       *widget,
 	int p_width,p_height;
 
 	gtk_window_get_size((GtkWindow *)widget,&p_width,&p_height);
-#if	USE_GLIB0
-	set_cfg_int("x11_x",event->x);
-	set_cfg_int("x11_y",event->y);
-	set_cfg_int("x11_width",p_width);
-	set_cfg_int("x11_height",p_height);
-#else
+
 	set_btval("x11_x",-1,NULL,event->x);
 	set_btval("x11_y",-1,NULL,event->y);
 	set_btval("x11_width",-1,NULL,p_width);
 	set_btval("x11_height",-1,NULL,p_height);
-#endif
+
 //	MESG("on_parent_configure: x=%d y=%d [%d,%d]",event->x,event->y,event->width,event->height);
 //	MESG("window width=%d height=%d",p_width,p_height);
 
@@ -362,7 +355,7 @@ cairo_t *begin_draw(GeEditDisplay *wd,cairo_region_t *region,char *from)
  unsigned long lwd;
  lwd = (unsigned long) (wd->edit_window);
  	// wd->act=0;
-#if	0
+#if	NUSE
 	if(wd->in_draw) { 
 //		MESG("	in draw, return cr! from %s",from);
 		return wd->cr;
@@ -394,21 +387,14 @@ void end_draw(GeEditDisplay *wd,char *from)
 		return;
 	};
 	// MESG("end_draw: finish from %s",from);
-#if	01
+
 	if(wd->region) {
 		// MESG("end_draw: call queue_draw_region");
 		gtk_widget_queue_draw_region ((GtkWidget *)wd->wp->gwp->draw,wd->region);
 		// MESG("end_draw: after queue_draw_region");
 	};
-#endif
+
 	if(wd->cr!=NULL){
-#if	0
-	if(wd->region) {
-		// MESG("end_draw: call queue_draw_region");
-		gtk_widget_queue_draw_region ((GtkWidget *)wd->wp->gwp->draw,wd->region);
-		// MESG("end_draw: after queue_draw_region");
-	};
-#endif
 		gdk_window_end_draw_frame(wd->edit_window,wd->edit_gdk_context);
 	};
 	wd->cr=NULL;
@@ -430,8 +416,8 @@ void ge_set_initial_font(GtkWidget *widget)
 #else
 		current_font_name="Monospace";
 #endif	
-		font_size=12;
-		status_font_size=12;
+		font_size=14;
+		status_font_size=14;
 
 		region = gdk_window_get_clip_region (wd->edit_window);
 		// MESG("ge_set_initial_font:");

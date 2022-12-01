@@ -331,9 +331,9 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
  set_box_cline(iol);
 
  if(orient==VERTICAL){
-	show_menu_line(i,&m1->element[i],fch,bch);
+	show_menu_line(i,&m1->element[i],COLOR_SELECT_BG,fch);
  } else	{
- 	hdab(sx+i*HLABEL_WIDTH,m1->element[i].high,m1->element[i].txt,fch,bch);
+ 	hdab(sx+i*HLABEL_WIDTH,m1->element[i].high,m1->element[i].txt,COLOR_SELECT_BG,fch);
  };
  drv_flush();
  /* get keyboard */
@@ -364,9 +364,9 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 					hdab(sx+HLABEL_WIDTH*(iol),m1->element[iol].high,m1->element[iol].txt,bch,fch);
 				};
 				if(orient==VERTICAL){
-					show_menu_line(i,&m1->element[i],fch,bch);
+					show_menu_line(i,&m1->element[i],COLOR_SELECT_BG,fch);
 				}else {
-					hdab(sx+HLABEL_WIDTH*(i),m1->element[i].high,m1->element[i].txt,fch,bch);
+					hdab(sx+HLABEL_WIDTH*(i),m1->element[i].high,m1->element[i].txt,COLOR_SELECT_BG,fch);
 				};
 				iol=i;
 				set_box_cline(iol);
@@ -467,9 +467,9 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 			hdab(sx+HLABEL_WIDTH*(iol),m1->element[iol].high,m1->element[iol].txt,bch,fch);
 		};
 		if(orient==VERTICAL){
-			show_menu_line(i,&m1->element[i],fch,bch);
+			show_menu_line(i,&m1->element[i],COLOR_SELECT_BG,fch);
 		} else {
-			hdab(sx+HLABEL_WIDTH*(i),m1->element[i].high,m1->element[i].txt,fch,bch);
+			hdab(sx+HLABEL_WIDTH*(i),m1->element[i].high,m1->element[i].txt,COLOR_SELECT_BG,fch);
 		};
 		iol=i;
 		set_box_cline(iol);
@@ -513,11 +513,11 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 //		MESG("orient=vertical iol=%d i=%d",iol,i);
 		if(iol!=i){
 		show_menu_line(iol,&m1->element[iol],bch,fch);
-		show_menu_line(i,&m1->element[i],fch,bch);
+		show_menu_line(i,&m1->element[i],COLOR_SELECT_BG,fch);
 		};
 	} else {
-		hdab(sx+HLABEL_WIDTH*(iol),m1->element[iol].high,m1->element[iol].txt,fch,bch);
-		hdab(sx+HLABEL_WIDTH*(i),m1->element[i].high,m1->element[i].txt,bch,fch);
+		hdab(sx+HLABEL_WIDTH*(iol),m1->element[iol].high,m1->element[iol].txt,bch,fch);
+		hdab(sx+HLABEL_WIDTH*(i),m1->element[i].high,m1->element[i].txt,COLOR_SELECT_BG,fch);
 	};
 	}
 	iol=i;

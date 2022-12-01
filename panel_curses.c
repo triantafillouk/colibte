@@ -17,7 +17,6 @@
 #include	<stdlib.h>
 #include	<panel.h>
 #include	<term.h>
-#include	"color.h"
 #include	<signal.h>
 #include	<termios.h>
 #include	<sys/ioctl.h>
@@ -36,6 +35,7 @@
 
 #define COL_BASIC	8
 #define COL_BOLD	A_BOLD
+#define CLEAR_BG	0
 
 #include "panel_curses.h"
 
@@ -59,8 +59,11 @@ int change_sort_mode(int mouse_col);
 
 int	colorupdate;
 int color_scheme_ind=0;
-int cursor_showing=0;
 COLOR_SCHEME *current_scheme=NULL;
+char **get_scheme_names();
+COLOR_SCHEME *get_scheme(int scheme_num);
+
+int cursor_showing=0;
 
 extern int drv_numrow;		// current driver screen rows
 extern int drv_numcol;		// current driver screen columns
@@ -92,6 +95,7 @@ WINDOW *hmenu_window;	/* horizontal menu curses window  */
 WINDOW *mesg_window;	/* message line curses window  */
 PANEL *hmenu_panel=NULL;
 PANEL *mesg_panel=NULL;
+// extern int color16_8[BG_COLORS+FG_COLORS];
 
 int color_pair(int fg_color,int bg_color);
 void free_virtual_window(WINDP *wp);
@@ -107,12 +111,13 @@ alist *box_list;
 
 extern alist *window_list;
 extern MENUS m_topn;
-extern alist *color_schemes;
+extern alist *color_scheme_list;
 
  /* from ICU utf8.h modified */
 //extern int utf8_countBytes[256];
 extern char utfokey[10];
 extern int utflen;
+
 
 void drv_window_delete(WINDP *wp)
 {
@@ -146,17 +151,21 @@ int confirm(char *title, char *prompt,int always)
 
 int color_pair(int fg_color,int bg_color)
 {
- int pair_ind=-1;
  int cpair;
 
- if(drv_colors>16) {
-	pair_ind = pair_num[fg_color][bg_color];
-	cpair = COLOR_PAIR(pair_ind);
- } else {
-	int fcol = current_color[fg_color].index;
-	int bcol = current_color[bg_color].index % drv_basic_colors;
-	cpair = COLOR_PAIR((fcol%drv_basic_colors)*drv_basic_colors+bcol);
- };
+	if(fg_color<BG_COLORS || fg_color>FG_COLORS+15) MESG("color pair fgcolor out of range %d",fg_color);
+	if(bg_color<0 || bg_color>BG_COLORS) MESG("color pair bgcolor out of range %d",bg_color);
+	if(drv_colors>8) {
+		cpair = COLOR_PAIR((fg_color-BG_COLORS)*FG_COLORS+bg_color+2);
+	} else {
+		int fg=current_scheme->color_attr[fg_color].index%8;
+		int bg=current_scheme->color_attr[bg_color].index%8;
+
+		cpair = COLOR_PAIR((fg%8) *8+bg+1);
+		if(fg>8) cpair |= COL_BOLD;
+		// printf("cpair=%X (%d %d) a=%X\n",cpair,fg%8,bg,fg>8);
+	};
+	// if(fg_color==COLOR_FG) MESG("- cp: color_fg bg_color=%d pair=%d",bg_color,(fg_color-BG_COLORS)*FG_COLORS+bg_color+1);
 
  return(cpair);
 }
@@ -207,7 +216,7 @@ extern int new_line(int n);
 function_int key_convert_from_mouse(function_int execf)
 {
  static int pressed_button=KMOUSE_NONE;
-	MESG("kcfm: pressed_button=%d",pressed_button);
+	// MESG("kcfm: pressed_button=%d",pressed_button);
 	if( execf == text_mouse_left_press) {
 		execf = do_nothing;
 		pressed_button = mouse_button_in_box(pressed_button);
@@ -414,9 +423,11 @@ void create_rline(WINDP *wp)
 
 	wp->gwp->vline=drv_new_win("vline",wp->w_ntrows,1,wp->gwp->t_ypos,wp->gwp->t_xpos+wp->w_ntcols);
 	wp->gwp->vline_panel=new_panel(wp->gwp->vline);
+#if	CLEAR_BG
 	if(wp->gwp->vline!=NULL) {
-		wbkgd(wp->gwp->vline,color_pair(MODEFORE,MODEBACK));
+		wbkgd(wp->gwp->vline,color_pair(COLOR_FG,COLOR_SELECT_BG));
 	};
+#endif
 }
 
 void set_1window()
@@ -536,7 +547,7 @@ void set_wvs(WINDP *wp);
 
 int color_menu_fg,color_menu_bg;
 
-void set_scheme_colors(int scheme);
+void set_current_scheme(int scheme);
 
 /* set the screen/main window size */
 void drv_size()
@@ -631,12 +642,12 @@ void drv_open()
  if(drv_colors>drv_max_colors) drv_colors=drv_max_colors;
 // MESG("set drv_colors to %d color pairs are %d",drv_colors,drv_color_pairs);
 
-	color_menu_fg=MENU_FG;
-	color_menu_bg=MENU_BG;
+	color_menu_fg=COLOR_MENU_FG;
+	color_menu_bg=COLOR_MENU_BG;
 
 // print_colors("Original ones");
 //   MESG("drv_open: color_scheme_ind=%d",color_scheme_ind);
-   set_scheme_colors(color_scheme_ind+1);	/* set default midnight theme  */
+   set_current_scheme(color_scheme_ind+1);	/* set default midnight theme  */
 
  // driver specific keyboard bindings
  drv_bindkeys();
@@ -727,7 +738,7 @@ int text_mouse_function(int move)
 	if(mouse_button==KMOUSE_NONE) {
 		return 0;
 	};
- MESG("text_mouse_function: button=%d move=%d",mouse_button,move);
+ // MESG("text_mouse_function: button=%d move=%d",mouse_button,move);
 
  if(is_in_top_menu()) {
 	if(move==KMOUSE_RELEASE+KMOUSE_BUTTON1){
@@ -791,9 +802,9 @@ int text_mouse_function(int move)
 		mouse_started_in_rline=0;
 		start_line=0;
 		start_col=0;
-		MESG("reset mouse_started, button released!");
+		// MESG("reset mouse_started, button released!");
 	} else {
-		MESG("mouse pressed mb=%d move=%d row=%d col=%d",mouse_button,move,mouse_window_row,mouse_window_col);
+		// MESG("mouse pressed mb=%d move=%d row=%d col=%d",mouse_button,move,mouse_window_row,mouse_window_col);
 	};
 	if(mouse_button==KMOUSE_BUTTON1 && move<KMOUSE_RELEASE){
 		if(mouse_window_col==wp->w_ntcols-cwp->w_infocol) { // on rline (position status line)
@@ -842,7 +853,7 @@ int text_mouse_function(int move)
 				};
 				return(0);
 			};
-#if	0
+#if	NUSE
 			else {
 				// MESG("mouse dir mode");
 				if(cbfp->b_flag & FSNLIST) {
@@ -1088,17 +1099,20 @@ int drv_check_break_key()
  return 0;
 }
 
+// Full screen clear
 void drv_back_color()
 {
- WINDP *wp;
- bkgdset(color_pair(FOREGROUND,BACKGROUND));
+ bkgdset(color_pair(COLOR_FG,COLOR_BG));
  clear();
 // MESG("drv_back_color:");
+#if	CLEAR_BG
+ WINDP *wp;
  lbegin(window_list);
  while((wp=(WINDP *)lget(window_list))!=NULL)
  {
-	wbkgd(wp->gwp->draw,color_pair(FOREGROUND,BACKGROUND));
+	wbkgd(wp->gwp->draw,color_pair(COLOR_FG,COLOR_BG));
  };
+#endif
 }
 
 extern int 	(*get_function())();
@@ -1397,30 +1411,10 @@ void drv_move(int row, int col)
 void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
 {
  int attrib=0;
- if(afcol>255) { afcol=afcol%256;attrib=A_UNDERLINE;};
+ if(afcol>255) { afcol=afcol%256;attrib=A_UNDERLINE;}
+ else attrib=current_scheme->color_attr[afcol].attrib;
 
- if(drv_colors>16) {
- 	if(afcol==SPECFORE||afcol==PREPFORE) {
-		wattron(wnd,COL_BOLD);
-	} else {
-		wattroff(wnd,COL_BOLD);
-		wattron(wnd,color_pair(afcol,abcol));
-	};
- } else {
- int fcol;
-  // MESG("drv_wcolor: f=%d b=%d",afcol,abcol);
-  fcol = current_scheme->color_attr[afcol].index % 16;
-  if(drv_colors==8)
-  {
-	  if(fcol>COL_BASIC-1) { 
-		attrib|=A_BOLD;
-		fcol %= COL_BASIC;
-  	  };
-  };
-
-  attrib |= current_scheme->color_attr[afcol].attrib;
   wattrset(wnd,color_pair(afcol,abcol)|attrib);
- }
 }
 
 
@@ -1571,7 +1565,7 @@ void disp_box(char *box_title,int border,int y1,int x1,int y2,int x2)
  cbox->panel=new_panel(cbox->wnd);
  cbox->border=border;
 
- drv_wcolor(cbox->wnd,CBOXTFORE,CBOXTBACK);	/* in case we want it a different color!  */
+ drv_wcolor(cbox->wnd,COLOR_MENU_FG,COLOR_BOX_BG);	/* in case we want it a different color!  */
 
  cbox->y=y1;
  cbox->x=x1;
@@ -1979,7 +1973,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 		if(ch>128 && v1->uval[1]==0) {	/* this is a local character, convert from local to utf  */
 			 strlcpy(vstr,str_local_to_utf(wp,(char *)v1->uval),6);
 			 if(wp->w_fp->b_lang==0)
-			 	drv_wcolor(wp->gwp->draw,CTRLFORE,cattr);	/* show local chars with different color  */
+			 	drv_wcolor(wp->gwp->draw,COLOR_CTRL_FG,cattr);	/* show local chars with different color  */
 			 else
 			 	drv_wcolor(wp->gwp->draw,ccolor,cattr);
 		} else {
@@ -2040,7 +2034,7 @@ void xdab(int y,int b,char *st,int bcolor,int fcolor)
 	if(b==*s) {
 		wmove(cbox->wnd,y,x);
 		wrefresh(cbox->wnd);
-		drv_wcolor(cbox->wnd,CTRLFORE,bcolor);
+		drv_wcolor(cbox->wnd,COLOR_CTRL_FG,bcolor);
 		waddch(cbox->wnd,b);
 		break;
 	};
@@ -2065,8 +2059,8 @@ void box_line_print(int line,int start,char *st, int w, int selected,int active_
  int real_width;
  if(active>=0) width--;
  real_width = width + strlen(st)-utf_num_chars(st)+1;
- if(selected)  drv_wcolor(cbox->wnd,MENU_BG,MENU_FG);
- else drv_wcolor(cbox->wnd,MENU_FG,MENU_BG);
+ if(selected)  drv_wcolor(cbox->wnd,COLOR_MENU_FG,COLOR_SELECT_BG);
+ else drv_wcolor(cbox->wnd,COLOR_MENU_FG,COLOR_MENU_BG);
  // MESG("box_line_print: y=%d h=%d [%s]",y,cbox->y2 - cbox->y -1,st);
 #if	USE_GLIB
  char *normal_st = g_utf8_normalize(st,-1,G_NORMALIZE_ALL_COMPOSE);
@@ -2088,7 +2082,7 @@ void box_line_print(int line,int start,char *st, int w, int selected,int active_
 	wprintw(cbox->wnd,"~%s",string_to_show);
 #endif
  else wprintw(cbox->wnd," %s",string_to_show);
- drv_wcolor(cbox->wnd,MENU_FG,MENU_BG);
+ // drv_wcolor(cbox->wnd,COLOR_MENU_BG,COLOR_MENU_FG);
 
  wrefresh(cbox->wnd);
 }
@@ -2126,7 +2120,7 @@ void clear_hmenu()
 {
  curs_set(0);
 
- drv_wcolor(hmenu_window,MENU_FG,MENU_BG);
+ drv_wcolor(hmenu_window,COLOR_MENU_FG,COLOR_MENU_BG);
  wmove(hmenu_window,0,0);
  wprintw(hmenu_window,"%*s",drv_numcol,"  ");
  wrefresh(hmenu_window);
@@ -2148,12 +2142,12 @@ void drv_msg_line(char *arg)
 	if (discmd == FALSE || macro_exec) return;
 	curs_set(0);
 	wmove(mesg_window,0,0);	
-
+#if	1
 	if(app_error) 
-		wbkgd(mesg_window,color_pair(FOREGROUND,SEARBACK));
+		wbkgd(mesg_window,color_pair(COLOR_FG,COLOR_SEARCH_BG));
 	else
-		wbkgd(mesg_window,color_pair(FOREGROUND,BACKGROUND));
-
+		wbkgd(mesg_window,color_pair(COLOR_FG,COLOR_BG));
+#endif
 
 	utf_string_break(arg,drv_numcol-1);
 	wprintw(mesg_window,"%s",(char *)str2out(arg));
@@ -2178,13 +2172,13 @@ int dspv(WINDOW *disp_window,int x,int y,char *st)
 
  while((c=*st++)!=0) {
  	if(c<32) {
-		drv_wcolor(disp_window,CTRLFORE,BACKGROUND);
+		drv_wcolor(disp_window,COLOR_CTRL_FG,COLOR_BG);
 		waddch(disp_window,'^');
 		(c)+=64;
 		len++;
 	};
 	waddch(disp_window,c);
-	drv_wcolor(disp_window,FOREGROUND,BACKGROUND);
+	drv_wcolor(disp_window,COLOR_FG,COLOR_BG);
  };
  getyx(disp_window,y_pos,x_pos);
  wclrtoeol(disp_window);
@@ -2192,12 +2186,14 @@ int dspv(WINDOW *disp_window,int x,int y,char *st)
  return(x_pos - x);
 }
 
-RGB_DEF original_color[XCOLOR_TYPES];
+RGB_DEF original_color[COLOR_TYPES];
 
 void restore_original_colors()
 {
  int i;
- for(i=0;i<XCOLOR_TYPES;i++) {
+ // MESG("restore_original_colors:");
+ for(i=0;i<COLOR_TYPES;i++) 
+ {
  	init_color(i,original_color[i].r,original_color[i].g,original_color[i].b);
  };
 }
@@ -2205,32 +2201,9 @@ void restore_original_colors()
 void save_original_colors()
 {
  int i;
- for(i=0;i<XCOLOR_TYPES;i++) {
+ // MESG("save_original_colors:");
+ for(i=0;i<COLOR_TYPES;i++) {
  	color_content(i,(short int *)(&original_color[i].r),(short int *)(&original_color[i].g),(short int *)(&original_color[i].b));
- };
-}
-
-void create_default_scheme()
-{
- int scheme_ind;
- for(scheme_ind=0;scheme_ind<COLOR_SCHEMES;scheme_ind++){
-	int i;
-	COLOR_SCHEME *scheme = malloc(sizeof(COLOR_SCHEME));
-	scheme->scheme_name = scheme_names[scheme_ind];
-
-	for(i=0;i<16;i++) {
-		RGB_DEF *rv;
-		rv = get_rgb_values(basic_color_values[scheme_ind][i]);
-		scheme->basic_colors[i].r=rv->r;
-		scheme->basic_colors[i].g=rv->g;
-		scheme->basic_colors[i].b=rv->b;
-	};
-	for(i=0;i<COLOR_TYPES;i++) {
-		scheme->color_attr[i].index = color_t[scheme_ind][i].index;
-		scheme->color_attr[i].attrib = color_t[scheme_ind][i].attrib;
-	};
-//	show_debug_color_attr(scheme->color_attr);
-	add_element_to_list((void *)scheme,color_schemes);
  };
 }
 
@@ -2243,70 +2216,54 @@ void show_debug_color_attr(color_curses *current_color)
  };
 }
 
-void set_scheme_colors(int scheme)
+void set_current_scheme(int scheme)
 {
  int i,j;
- int scheme_ind=0;
-// MESG("set_scheme_colors: %d of %d drv_colors=%d color_scheme_ind=%d",scheme,color_schemes->size,drv_colors,color_scheme_ind);
- if(scheme<1 || scheme> color_schemes->size) scheme=1;
+ // MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
+ if(scheme<1 || scheme> color_scheme_list->size) scheme=1;
 
  color_scheme_ind=scheme-1;
  set_btval("color_scheme",-1,NULL,color_scheme_ind+1); 
- lbegin(color_schemes);
- while((current_scheme=(COLOR_SCHEME *)lget(color_schemes))!=NULL) {
-// 	MESG(" check scheme  %d <> %d [%s]",scheme_ind,color_scheme_ind,current_scheme->scheme_name);
- 	if(scheme_ind==color_scheme_ind) {
-//		MESG("	selected scheme %d [%s]",scheme,current_scheme->scheme_name);
-		break;
-	};
-	scheme_ind++;
- };
- 
+
+ current_scheme = get_scheme(color_scheme_ind);
+
+ // MESG("init scheme2 %s colors=%d",current_scheme->scheme_name,drv_colors);
  current_color = current_scheme->color_attr;
 // show_debug_color_attr(current_color);
  
  if(drv_colors==0) return;
- if(drv_colors>16) {
-	for(i=0;i<XCOLOR_TYPES;i++) {
-		RGB_DEF *rv;
-		rv = get_rgb_values(color_name[color_scheme_ind][i]);
-		init_color(i,rv->r,rv->g,rv->b);
+	// MESG("init scheme3 %s colors=%d",current_scheme->scheme_name,drv_colors);
+	if(drv_colors>8) {
+		for(i=0;i<FG_COLORS+BG_COLORS;i++) {
+			refresh();
+			// MESG("	set color %d: %s",i,current_scheme->color_values[i]);
+			RGB_DEF *rv = get_rgb_values(current_scheme->color_values[i]);
+			init_color(i,rv->r,rv->g,rv->b);
+		};
+		for(i=0;i<FG_COLORS;i++) 
+			for(j=0;j<BG_COLORS;j++) {
+				// MESG(" - pair %3d: f=%d b=%d",i*FG_COLORS+j,i+BG_COLORS,j);
+				int pair=i*FG_COLORS+j+2;
+				init_pair(pair,i+BG_COLORS,j);
+				// MESG("init_pair : %d as (%d %d)",pair,i,j);
+			};
+	} else {
+		// 8 color terminals is supposed to not be able to change color values
+		// so we simple define all color pairs
+		for(i=0;i<drv_basic_colors;i++) 
+			for(j=0;j<drv_basic_colors;j++) {
+				int pair=i*drv_basic_colors+j+1;
+				init_pair(pair,i,j);
+				// MESG("init_pair : %d as (%d %d)",pair,i,j);
+			};
 	};
-	// init pair_num array to 0
-	for(i=0;i<XCOLOR_TYPES;i++) for(j=0;j<XCOLOR_TYPES;j++) 
-		pair_num[i][j]=0;
-	for(i=0;i<MAX_PAIRS;i++) {
-		int fg_color,bg_color;
-		fg_color=color_pairs[i].fg_color;
-		bg_color=color_pairs[i].bg_color;
-	
-		pair_num[fg_color][bg_color]=i+16;
-		init_pair(i+16,fg_color,bg_color); 
-	}; 
- } else {
-	RGB_COLORS *color_val = current_scheme->basic_colors;
-	for(i=0;i<16;i++) {
-		init_color(i,color_val[i].r,color_val[i].g,color_val[i].b);
-//		MESG(" - color %2d: (%d %d %d) attr=%d",i,color_val[j],color_val[j+1],color_val[j+2],color_val[j+3]);
-	};
-	for(i=0;i<drv_basic_colors;i++) 
-		for(j=0;j<drv_basic_colors;j++) init_pair(i*drv_basic_colors+j,i,j);
- };
-// MESG("set_scheme_colors:end");
+// MESG("set_current_scheme:end");
 }
 
-/* change color scheme */
-int change_color_scheme(int  n)
+void set_cursor(int val,char *from)
 {
-// MESG("change_color_scheme: n=%d,color_scheme_ind=%d",n,color_scheme_ind);
- set_scheme_colors(n);
- if(!discmd) return (TRUE);
- set_update(cwp,UPD_ALL);
- // update also the vertical window separator lines
- drv_back_color();
- set_windows_color();
- drv_update_styles();
- return(TRUE);
+	cursor_showing=val;
+//	MESG("set_cursor: val=%d %s",val,from);
 }
 
 /* status of each window  */
@@ -2314,19 +2271,19 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
 {
  int status_row=wp->w_ntrows-1;;
  int maxlen;
- int fg_color=MODEFORE;
- int bg_color=MENU_BG;
+ int fg_color=COLOR_MENU_FG;
+ int bg_color=COLOR_MENU_BG;
  char *status_string = show_string;
  int rpos=utf_num_chars(status_string)+2;
 #if	!CLASSIC_STATUS
  if((drv_color_pairs>63 && drv_colors!=8) && cwp!=wp) {	/* if enough color pairs, use them ! */
- 	fg_color=MODEFOREI;
-	bg_color=MODEBACKI;
+ 	fg_color=COLOR_INACTIVE_FG;
+	bg_color=COLOR_INACTIVE_BG;
  };
 #endif
 // change foreground color if buffer changed
  if(wp->w_fp->b_state & FS_CHG) {
- 	fg_color=CHANGEFORE;
+ 	fg_color=COLOR_CHANGE_FG;
  }
 
  curs_set(0);
@@ -2336,7 +2293,7 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
 		rpos = utf_num_chars(status_string)+2;
 	};
 	if(wp->w_ntcols-rpos<10) return;
-	drv_wcolor(wp->gwp->draw,DROWCOL,bg_color);
+	drv_wcolor(wp->gwp->draw,COLOR_ROWCOL_FG,bg_color);
 	wmove(wp->gwp->draw,status_row,wp->w_ntcols-rpos);
 	maxlen=wp->w_ntcols-rpos;
  } else {
@@ -2364,7 +2321,7 @@ void hdab(int x,int b,char *s,int bcolor,int fcolor)
  for(;*s;x++,s++) {
 	if(b==*s) {
 		wmove(hmenu_window,0,x);
-		drv_wcolor(hmenu_window,CTRLFORE,bcolor);
+		drv_wcolor(hmenu_window,COLOR_CTRL_FG,bcolor);
 		waddch(hmenu_window,b);
 		break;
 	};
@@ -2558,7 +2515,7 @@ int new_shell(int n)
 		return(TRUE);
 	};
 	drv_move(drv_numrow, 0);			 /* Seek to last line.	 */
-	drv_wcolor(stdscr,WHITE,BLACK);
+	drv_wcolor(stdscr,COLOR_FG,COLOR_BG);
 	drv_flush();
 	drv_close();							  /* stty to old settings */
 	if ((cp = getenv("SHELL")) != NULL && *cp != '\0')
@@ -2596,7 +2553,8 @@ int text_mouse_left_press(int n)
  static num ppress=0;
  num press_time;
  num diff_time=0;
- MESG("mouse_left_press:");
+
+ // MESG("mouse_left_press:");
  mouse_button=KMOUSE_BUTTON1;
  gettimeofday(&timev,NULL);
  press_time=(num) timev.tv_sec*1000000 + (num) timev.tv_usec;
@@ -2612,7 +2570,7 @@ int text_mouse_left_press(int n)
 
 int text_mouse_right_press(int n)
 {
- MESG("mouse_right_press:");
+ // MESG("mouse_right_press:");
  mouse_button=KMOUSE_BUTTON3;
  text_mouse_function(KMOUSE_BUTTON3);	/* remove selections  */
   return FALSE;
@@ -2646,169 +2604,13 @@ int select1_font(int n)
 	return(TRUE);
 }
 
-int color_scheme_read()
-{
- FILE *f1;
- char *fname;
- static char name1[MAXFLEN];
- static char name2[MAXFLEN];
- char *b,bline[MAXFLEN];
- char ctype[256];
- int i,j;
- char left;
- COLOR_SCHEME *scheme=NULL;
-
-// MESG("color_scheme_read:");
- if((fname=find_file(NULL,".colors16",1,0))==NULL) return FALSE;
-
- f1=fopen(fname,"r");
- if(f1!=NULL) {
- while((b=fgets(bline,MAXFLEN,f1))!=NULL)
- {
-	RGB_DEF *rv;
-	int eq_ind=0;
-	char *eq_chr;
-	if(strlen(b)>0) b[strlen(b)-1]=0;
-	eq_chr = strchr(b,'=');
-	if(eq_chr) {
-		eq_ind = eq_chr-b;
-		b[eq_ind]=' ';
-	}
-	if(lstartwith(b,';')) continue;
-	if(lstartwith(b,'#')) continue;
-	if(lstartwith(b,0)) continue; 	/* skip blank lines  */
-	name2[0]=0;
-	if(lstartwith(b,CHR_LBRA)) {	/* new color scheme  */
-		COLOR_SCHEME *cs;
-		int ind=0;
-		sscanf(b,"%c%s]\n",&left,name1);
-		name1[strlen(name1)-1]=0;
-
-		scheme=NULL;
-		lbegin(color_schemes);
-//		MESG(" read scheme named [%s]",name1);
-		while((cs=(COLOR_SCHEME *)lget(color_schemes))!=NULL)
-		{
-			if(strcmp(name1,cs->scheme_name)==0){ 
-				scheme = cs;
-				break;
-			};
-			ind++;
-		};
-		if(!scheme) { 	/* a new scheme!!  */
-			scheme = malloc(sizeof(COLOR_SCHEME));
-			add_element_to_list((void *)scheme,color_schemes);
-			scheme->scheme_name = strdup(name1);
-			MESG("	create new scheme %s schemes now %d",name1,color_schemes->size);
-		};
-		continue;
-	};
-	sscanf(b,"%s %s %s",ctype,name1,name2);
-//	MESG("ctype [%s] name1 [%s] name2 [%s] ",ctype,name1,name2);
-	for(j=0;j<16;j++) {	/* check if color value  */
-		if(strcmp(ctype,basic_color_names[j])==0) break;
-	};
-	if(j<16) { 	/* matched basic color as j, set value j  */
-		rv = get_rgb_values(name1);	/* convert hex or named color value to rgb  */
-		scheme->basic_colors[j].r = rv->r;
-		scheme->basic_colors[j].g = rv->g;
-		scheme->basic_colors[j].b = rv->b;
-	} else {	/* check, this must be color type!  */
-		for(j=0;j<XCOLOR_TYPES;j++) {	/* get the color type index  */
-			if(strcmp(ctype,color_type[j])==0) break;
-		};
-		if(j<XCOLOR_TYPES) { // matched color type
-			for(i=0;i<16;i++) {	/* get the color index of the color type  */
-				if(strcmp(name1,basic_color_names[i])==0) break;
-			};
-			scheme->color_attr[j].index=i;
-			// set attrib !!
-			scheme->color_attr[j].attrib=0;
-			if(strlen(name2)>0) {
-			// convert name2 to attrib!
-				if(strstr(name2,"bold")) scheme->color_attr[j].attrib |= A_BOLD;
-				if(strstr(name2,"underline")) scheme->color_attr[j].attrib |= A_UNDERLINE;
-				if(strstr(name2,"reverse")) scheme->color_attr[j].attrib |= A_REVERSE;
-				if(strstr(name2,"dim")) scheme->color_attr[j].attrib |= A_DIM;
-//				MESG("arttr of %d (%s) is %X",j,name2,color_t[scheme_ind][j].attrib);
-			};
-		} else continue;
-	};
- };
-	MESG("color file read ok!");
-	fclose(f1);
-	return 1;
- } else {
- 	ERROR("color_scheme_read: cannot open file %s",fname);
-	return 0;
- };
-}
-
-/* save default colors to home dir   */
-int color_scheme_save()
-{
- FILE *f1;
- char *fname;
- int i;
- int scheme_ind;
- int sstat=0;
-
- fname=find_file(NULL,".colors16a",0,1);
-
- f1=fopen(fname,"w");
- if(sstat>MAXFLEN) return FALSE;
- if(f1!=NULL) {
-
-	 for(scheme_ind=0;scheme_ind<COLOR_SCHEMES;scheme_ind++)
-	 {
-	/* write scheme name  */
-		 fprintf(f1,"[%s]\n",scheme_names[scheme_ind]);
-	/* write color types  */
-		for(i=0;i<16;i++) {
-			fprintf(f1,"%s=%s\n",basic_color_names[i],
-				basic_color_values[scheme_ind][i]);
-		};
-		fprintf(f1,"\n");
-	/* write color values  */
-		 for(i=0;i<XCOLOR_TYPES;i++){
-			if(color_t[scheme_ind][i].attrib) {
-				int attr=color_t[scheme_ind][i].attrib;
-				char sattr[64];
-				sattr[0]=0;
-				if(attr & A_BOLD) strcat(sattr,"bold,");
-				if(attr & A_UNDERLINE) strcat(sattr,"underline,");
-				if(attr & A_REVERSE) strcat(sattr,"reverse");
-				if(attr & A_DIM) strcat(sattr,"dim");
-
-		  		fprintf(f1,"%s=%s %s\n",color_type[i],basic_color_names[color_t[scheme_ind][i].index],sattr);
-			} else
-		  		fprintf(f1,"%s=%s\n",color_type[i],basic_color_names[color_t[scheme_ind][i].index]);
-		 };
-		 fprintf(f1,"# end of %s\n\n",scheme_names[scheme_ind]);
-	 }
-
-	 fclose(f1);
-	 msg_line("color scheme %d saved",scheme_ind+1);
- } else msg_line("color_save: cannot create file %s",fname);
- return 1;
-}
-
 int select_scheme(int n)
 {
  int nv;
- int ind=0;
  char **scheme_names;
- COLOR_SCHEME *cs;
-// if(list_on()) return 0;
-// set_list_type(LSCHEME);
- scheme_names=(char **)malloc(sizeof(char *)*(color_schemes->size+1));
- lbegin(color_schemes);
- while((cs=(COLOR_SCHEME *)lget(color_schemes))!=NULL) {
- 	scheme_names[ind++]=strdup(cs->scheme_name);
-//	MESG("scheme %d [%s]",ind-1,scheme_names[ind-1]);
- }; 
- scheme_names[ind]=NULL;
- nv = selectl("select scheme",scheme_names,color_schemes->size,20,30,1,20,color_scheme_ind);
+
+ scheme_names = get_scheme_names();
+ nv = selectl("select scheme",scheme_names,color_scheme_list->size,20,30,1,20,color_scheme_ind);
  sarray_clear(scheme_names);
  if(nv>=0) {
 // 	MESG("selected %d scheme",nv);
@@ -2816,7 +2618,6 @@ int select_scheme(int n)
  };
  return 1;
 }
-
 
 int set_sposition(WINDP *wp,int *st, int *l)
 {
@@ -2861,18 +2662,18 @@ void show_slide(WINDP *wp)
 // char hatch_line[5] = { 0xE2,0x96,0x93,0,0};
 // char left_half[5] = { 0xE2,0x96,0x8C,0,0};
 // char xblock[5] = { 0xE2,0x95,0xB3,0,0};
- int fg_color=MODEFORE;
- int bg_color=MENU_BG;
+ int fg_color=COLOR_MENU_FG;
+ int bg_color=COLOR_MENU_BG;
  curs_set(0);
 
 #if	!CLASSIC_STATUS
  if(cwp!=wp) {
 	if(drv_colors>8) {
-	 	fg_color=MODEFOREI;
-		bg_color=MODEBACKI;
+	 	fg_color=COLOR_INACTIVE_FG;
+		bg_color=COLOR_INACTIVE_BG;
 	} else {
-	 	fg_color=BACKGROUND;
-		bg_color=MENU_BG;
+	 	fg_color=COLOR_MENU_FG;
+		bg_color=COLOR_MENU_BG;
 	};
  };
 #endif
@@ -2885,7 +2686,9 @@ void show_slide(WINDP *wp)
 // MESG("show_slide: window=%d start=%d end=%d len=%d",wp->id,start,end,len);
 
  drv_wcolor(wp->gwp->vline,fg_color,bg_color);
+#if	CLEAR_BG
  wbkgd(wp->gwp->vline,color_pair(fg_color,bg_color));
+#endif
  for(row=0;row<wp->w_ntrows-1;row++){
 	wmove(wp->gwp->vline,row,0);
 	wrefresh(wp->gwp->vline);
@@ -2898,7 +2701,7 @@ void show_slide(WINDP *wp)
  wmove(wp->gwp->vline,wp->w_ntrows,0);
  /* show change flag at bottom right corner!  */
  if(wp->w_fp->b_flag & (1 << 1)) {
- 	drv_wcolor(wp->gwp->vline,CTRLFORE,bg_color);
+ 	drv_wcolor(wp->gwp->vline,COLOR_CTRL_FG,bg_color);
  	wprintw(wp->gwp->vline,"%s","*");
  } else wprintw(wp->gwp->vline,"%s"," ");
 
@@ -2907,5 +2710,6 @@ void show_slide(WINDP *wp)
 // doupdate();
 }
 
-/* -- */
+#include "xthemes.c"
 
+/* -- */
