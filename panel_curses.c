@@ -60,6 +60,8 @@ int change_sort_mode(int mouse_col);
 int	colorupdate;
 int color_scheme_ind=0;
 COLOR_SCHEME *current_scheme=NULL;
+char **get_scheme_names();
+COLOR_SCHEME *get_scheme(int scheme_num);
 
 int cursor_showing=0;
 
@@ -109,17 +111,13 @@ alist *box_list;
 
 extern alist *window_list;
 extern MENUS m_topn;
-extern alist *color_schemes;
+extern alist *color_scheme_list;
 
  /* from ICU utf8.h modified */
 //extern int utf8_countBytes[256];
 extern char utfokey[10];
 extern int utflen;
 
-char *basic_color_names[] = {
-	"black","red","green","orange","blue","magenta","cyan","white",
-	"brown","lred","lgreen","yellow","lblue","lmagenta","lcyan","lwhite"
-};
 
 void drv_window_delete(WINDP *wp)
 {
@@ -218,7 +216,7 @@ extern int new_line(int n);
 function_int key_convert_from_mouse(function_int execf)
 {
  static int pressed_button=KMOUSE_NONE;
-	MESG("kcfm: pressed_button=%d",pressed_button);
+	// MESG("kcfm: pressed_button=%d",pressed_button);
 	if( execf == text_mouse_left_press) {
 		execf = do_nothing;
 		pressed_button = mouse_button_in_box(pressed_button);
@@ -740,7 +738,7 @@ int text_mouse_function(int move)
 	if(mouse_button==KMOUSE_NONE) {
 		return 0;
 	};
- MESG("text_mouse_function: button=%d move=%d",mouse_button,move);
+ // MESG("text_mouse_function: button=%d move=%d",mouse_button,move);
 
  if(is_in_top_menu()) {
 	if(move==KMOUSE_RELEASE+KMOUSE_BUTTON1){
@@ -804,9 +802,9 @@ int text_mouse_function(int move)
 		mouse_started_in_rline=0;
 		start_line=0;
 		start_col=0;
-		MESG("reset mouse_started, button released!");
+		// MESG("reset mouse_started, button released!");
 	} else {
-		MESG("mouse pressed mb=%d move=%d row=%d col=%d",mouse_button,move,mouse_window_row,mouse_window_col);
+		// MESG("mouse pressed mb=%d move=%d row=%d col=%d",mouse_button,move,mouse_window_row,mouse_window_col);
 	};
 	if(mouse_button==KMOUSE_BUTTON1 && move<KMOUSE_RELEASE){
 		if(mouse_window_col==wp->w_ntcols-cwp->w_infocol) { // on rline (position status line)
@@ -855,7 +853,7 @@ int text_mouse_function(int move)
 				};
 				return(0);
 			};
-#if	0
+#if	NUSE
 			else {
 				// MESG("mouse dir mode");
 				if(cbfp->b_flag & FSNLIST) {
@@ -1416,7 +1414,6 @@ void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
  if(afcol>255) { afcol=afcol%256;attrib=A_UNDERLINE;}
  else attrib=current_scheme->color_attr[afcol].attrib;
 
-  // if(afcol==COLOR_FG || afcol==COLOR_WORD2_FG) attrib=A_BOLD;
   wattrset(wnd,color_pair(afcol,abcol)|attrib);
 }
 
@@ -2193,7 +2190,7 @@ RGB_DEF original_color[COLOR_TYPES];
 void restore_original_colors()
 {
  int i;
- MESG("restore_original_colors:");
+ // MESG("restore_original_colors:");
  for(i=0;i<COLOR_TYPES;i++) 
  {
  	init_color(i,original_color[i].r,original_color[i].g,original_color[i].b);
@@ -2203,7 +2200,7 @@ void restore_original_colors()
 void save_original_colors()
 {
  int i;
- MESG("save_original_colors:");
+ // MESG("save_original_colors:");
  for(i=0;i<COLOR_TYPES;i++) {
  	color_content(i,(short int *)(&original_color[i].r),(short int *)(&original_color[i].g),(short int *)(&original_color[i].b));
  };
@@ -2221,33 +2218,24 @@ void show_debug_color_attr(color_curses *current_color)
 void set_current_scheme(int scheme)
 {
  int i,j;
- int scheme_ind=0;
-MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
- if(scheme<1 || scheme> color_schemes->size) scheme=1;
+ // MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
+ if(scheme<1 || scheme> color_scheme_list->size) scheme=1;
 
  color_scheme_ind=scheme-1;
  set_btval("color_scheme",-1,NULL,color_scheme_ind+1); 
- lbegin(color_schemes);
- while((current_scheme=(COLOR_SCHEME *)lget(color_schemes))!=NULL) {
-	MESG(" check scheme  %d <> %d [%s]",scheme_ind,color_scheme_ind,current_scheme->scheme_name);
- 	if(scheme_ind==color_scheme_ind) {
-	MESG("	selected scheme %d [%s]",scheme,current_scheme->scheme_name);
-	MESG("init scheme1 %s colors=%d",current_scheme->scheme_name,drv_colors);
-		break;
-	};
-	scheme_ind++;
- };
- 
- MESG("init scheme2 %s colors=%d",current_scheme->scheme_name,drv_colors);
+
+ current_scheme = get_scheme(color_scheme_ind);
+
+ // MESG("init scheme2 %s colors=%d",current_scheme->scheme_name,drv_colors);
  current_color = current_scheme->color_attr;
 // show_debug_color_attr(current_color);
  
  if(drv_colors==0) return;
-	MESG("init scheme3 %s colors=%d",current_scheme->scheme_name,drv_colors);
+	// MESG("init scheme3 %s colors=%d",current_scheme->scheme_name,drv_colors);
 	if(drv_colors>8) {
 		for(i=0;i<FG_COLORS+BG_COLORS;i++) {
 			refresh();
-			MESG("	set color %d: %s",i,current_scheme->color_values[i]);
+			// MESG("	set color %d: %s",i,current_scheme->color_values[i]);
 			RGB_DEF *rv = get_rgb_values(current_scheme->color_values[i]);
 			init_color(i,rv->r,rv->g,rv->b);
 		};
@@ -2259,16 +2247,8 @@ MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
 				// MESG("init_pair : %d as (%d %d)",pair,i,j);
 			};
 	} else {
-		if(can_change_color()){
-		for(j=0;j<8;j++) {
-		 	int i=color8_16[j];
-			// printf("init_color(%d)[%d,%d,%d]\n",j,color_val[i].r,color_val[i].g,color_val[i].b);
-			RGB_DEF *rv = get_rgb_values(current_scheme->color_values[i]);
-			init_color(i,rv->r,rv->g,rv->b);
-		};
-		} else {
-			MESG("terminal cannot change color!");
-		};
+		// 8 color terminals is supposed to not be able to change color values
+		// so we simple define all color pairs
 		for(i=0;i<drv_basic_colors;i++) 
 			for(j=0;j<drv_basic_colors;j++) {
 				int pair=i*drv_basic_colors+j+1;
@@ -2276,7 +2256,7 @@ MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
 				// MESG("init_pair : %d as (%d %d)",pair,i,j);
 			};
 	};
-MESG("set_current_scheme:end");
+// MESG("set_current_scheme:end");
 }
 
 void set_cursor(int val,char *from)
@@ -2572,7 +2552,8 @@ int text_mouse_left_press(int n)
  static num ppress=0;
  num press_time;
  num diff_time=0;
- MESG("mouse_left_press:");
+
+ // MESG("mouse_left_press:");
  mouse_button=KMOUSE_BUTTON1;
  gettimeofday(&timev,NULL);
  press_time=(num) timev.tv_sec*1000000 + (num) timev.tv_usec;
@@ -2588,7 +2569,7 @@ int text_mouse_left_press(int n)
 
 int text_mouse_right_press(int n)
 {
- MESG("mouse_right_press:");
+ // MESG("mouse_right_press:");
  mouse_button=KMOUSE_BUTTON3;
  text_mouse_function(KMOUSE_BUTTON3);	/* remove selections  */
   return FALSE;
@@ -2622,32 +2603,13 @@ int select1_font(int n)
 	return(TRUE);
 }
 
-int check_type(char *type)
-{
- int i=0;
- for(i=0;i<COLOR_TYPES;i++) {
- 	if(!strcmp(type,color_type[i])) return i;
- };
- return -1;
-}
-
-
 int select_scheme(int n)
 {
  int nv;
- int ind=0;
  char **scheme_names;
- COLOR_SCHEME *cs;
-// if(list_on()) return 0;
-// set_list_type(LSCHEME);
- scheme_names=(char **)malloc(sizeof(char *)*(color_schemes->size+1));
- lbegin(color_schemes);
- while((cs=(COLOR_SCHEME *)lget(color_schemes))!=NULL) {
- 	scheme_names[ind++]=strdup(cs->scheme_name);
-//	MESG("scheme %d [%s]",ind-1,scheme_names[ind-1]);
- }; 
- scheme_names[ind]=NULL;
- nv = selectl("select scheme",scheme_names,color_schemes->size,20,30,1,20,color_scheme_ind);
+
+ scheme_names = get_scheme_names();
+ nv = selectl("select scheme",scheme_names,color_scheme_list->size,20,30,1,20,color_scheme_ind);
  sarray_clear(scheme_names);
  if(nv>=0) {
 // 	MESG("selected %d scheme",nv);

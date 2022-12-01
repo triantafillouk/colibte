@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.58T6 (11/11/2022)"
+#define VERSION 	"#01.58T11 (1/12/2022)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -835,45 +835,6 @@ enum env_defs {
  /* file extensions */
 #define	FX_COMPRESS	37
 
-#if	!NEW_COLORS
-/* color type name definitions */
-enum color_types {
-	FOREGROUND,		/* 1 common foreground */
-	BACKGROUND,		/* 0 common background   */
-	MODEFORE,		/* 2 modeline foreground  */
-	MODEBACK,		/* 3 modeline background  */
-
-	DROWCOL	,		/* 4 row/column foreground on modeline  */
-
-	SEARFORE,		/* 5 search foreground  */
-	SEARBACK,		/* 6 search background  */
-	QUOTEFORE,		/* 7 double quotes foreground  */
-	QUOTEBACK,		/* 8 double quotes background  */
-	COMMENTFORE,	/* 9 comments foreground  */
-	LBACKGROUND,	/* light background  */
-	PREPFORE ,		/* 11 preprocessing foreground  */
-	CHANGEFORE,		/* 12 Changed flag foreground */
-	TAGFORE	,		/* 13 H_QUOTE4, H_QUOTE8  */
-	WORD1FORE,		/* 14 word1 foreground  */
-	SPECFORE,		/* 15 single quotes, special characters foreround */
-	SQUOTEFORE,		/* --  */
-	CTRLFORE,		/* 16 control character foreground  */
-	WORD2FORE,		/* 17 word2 foreround  */
-	W_FORE	,		/* 18 H_QUOTE7 tag words for html/xml */
-	ORIZON	,		/* 19 orizon characters foreground  */
-	CNUMERIC,		/* 20 characters foreground  */
-	INFOFORE,		/* 23  */
-	INFOBACK,		/* 24  */
-	CBOXTFORE,		/* Box foreground  */
-	CBOXTBACK,		/* Box background  */
-	MENU_FG,		/* menu foreground normal  */
-	MENU_BG,		/* menu background, box iside background  */
-	MODEFOREI,		/* Modeline inactive foreground  */
-	MODEBACKI		/* Modeline inactive background  */
-};
-#endif
-
-#if	NEW_COLORS
 #define	BG_COLORS	10
 enum color_types_bg {
 	COLOR_BG,			// BACKGROUND
@@ -908,7 +869,6 @@ enum color_types_fg {
 };
 
 #define COLOR_TYPES	BG_COLORS+FG_COLORS
-#endif
 
 /* Icon Element types  */
 #define	ENORMAL	0

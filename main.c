@@ -36,7 +36,7 @@ alist *macro_list;
 alist *dir_list;
 alist *dir2_list;
 alist *local_key_list;
-alist *color_schemes;
+alist *color_scheme_list;
 
 void help_arguments(int f);
 void set_screen_update(int flag);
@@ -58,7 +58,7 @@ void init_lists()
  dir_list=new_list(0,"dir_list");
  dir2_list=new_list(0,"dir2_list");
  local_key_list=new_list(0,"local_key_list");
- color_schemes=new_list(0,"color_schemes");
+ color_scheme_list=new_list(0,"color_schemes");
  init_default_schemes();
 }
 

@@ -5,7 +5,7 @@
 	(or at your option) any later version.
 */
 /* gtk2 screen driver */
-	
+
 #include "xe.h"
 
 #include <gdk/gdk.h>
@@ -22,7 +22,6 @@
 #include "menus.h"
 #include "icon.h"
 
-// #include "xthemes.c"
 #define	SHOW_CLINE	1
 int addutfvchar1(char *str, vchar *vc, int pos,FILEBUF *w_fp);
 
@@ -367,9 +366,9 @@ void drv_update_styles()
  st3a = gtk_style_new();
  st3i = gtk_style_new();
 
- gdk_color_parse(current_scheme->color_values[COLOR_INACTIVE_FG],&st1a->text[GTK_STATE_NORMAL]);
+ gdk_color_parse(current_scheme->color_values[COLOR_MENU_FG],&st1a->text[GTK_STATE_NORMAL]);
 
- gdk_color_parse(current_scheme->color_values[COLOR_INACTIVE_FG],&st1a->fg[GTK_STATE_NORMAL]);
+ gdk_color_parse(current_scheme->color_values[COLOR_MENU_FG],&st1a->fg[GTK_STATE_NORMAL]);
  gdk_color_parse(current_scheme->color_values[COLOR_MENU_BG],&st1a->base[GTK_STATE_NORMAL]);
  gdk_color_parse(current_scheme->color_values[COLOR_MENU_BG],&st1a->bg[GTK_STATE_NORMAL]);
 
@@ -461,7 +460,8 @@ void init_color()
   color_scheme_read();
   cmap = gdk_colormap_get_system ();	/* use the system colormap */
 
- for(i=0;i<COLOR_TYPES;i++) current_colors[i]=(GdkColor *)malloc(sizeof(GdkColor));
+ for(i=0;i<COLOR_TYPES;i++) 
+ 	current_colors[i]=(GdkColor *)malloc(sizeof(GdkColor));
 }
 
 void set_current_colors()

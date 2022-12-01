@@ -6,7 +6,6 @@
 
 */
 /* variables and definitions common in X */
-#define	NEW_COLORS	1
 
 #if	GTK
 
@@ -45,8 +44,8 @@ color_element ctype[] = {
 	// {20,"ncurses menu",MENU_FG,MENU_BG,NULL,NULL},
 };
 
-int font_size = 16;
-int status_font_size = 16;
+int font_size = 14;
+int status_font_size = 14;
 #endif
 
 #include "color.h"

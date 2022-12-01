@@ -20,7 +20,6 @@
 #include "menus.h"
 #include "icon.h"
 
-// #include "xthemes.c"
 #define	SHOW_CLINE	1
 #define	LABEL_STATUS	0
 
@@ -218,7 +217,7 @@ create_parent (void)
   accel_group = gtk_accel_group_new ();
   parent = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 
-  MESG("create_parent");
+  // MESG("create_parent");
   if((int)bt_dval("use_titlebar")){
 	parent_title_bar = gtk_header_bar_new();
 	/* Use gtk titlebar  */
@@ -359,7 +358,7 @@ create_parent (void)
 
 	cwp = make_split(NULL);
 	curgwp = ge_cedit_new(vbox1, cwp,0);
-  MESG("parent created!");
+  // MESG("parent created!");
   return parent;
 }
 
@@ -385,7 +384,7 @@ int color_equal(GdkRGBA *color1,GdkRGBA  *color2)
 
 void drv_update_styles()
 {
-	MESG("drv_update_styles:");
+	// MESG("drv_update_styles:");
  // we have to destroy old styles if they exist!
 }
 
@@ -458,29 +457,11 @@ void drv_color(int fcol,int bcol)
 void init_color()
 {
  int i;
-	/* Read the colors from the conf files  */
-  MESG("init_color:");
+  // MESG("init_color:");
+  /* Read the colors from the conf files  */
   color_scheme_read();
-#if	1
- for(i=0;i<COLOR_TYPES;i++) current_colors[i]=(GdkRGBA *)malloc(sizeof(GdkRGBA));
-#else
- for(j=0;j<COLOR_SCHEMES;j++)
- {
-	// MESG("init_color: scheme %d of %d--------------------------------",j,COLOR_SCHEMES);
-	for(i=0;i<COLOR_TYPES;i++) 
-	{
-		// MESG("	rgba parse %2d [%s]",i,basic_color_values[j][i]);
-		if(!gdk_rgba_parse(&color,basic_color_values[j][i] )) {
-	  		ERROR("color %s is not in database",basic_color_values[j][i]);
-			exit(0);
-		};
-		colors[j][i]=(GdkRGBA *) malloc(sizeof(GdkRGBA));
-		memcpy(colors[j][i],&color,sizeof(GdkRGBA));
-		ncolors++;
- 	}
- };
-#endif
- MESG("init_color: end");
+  for(i=0;i<COLOR_TYPES;i++) 
+  	current_colors[i]=(GdkRGBA *)malloc(sizeof(GdkRGBA));
 }
 
 void set_current_colors()
@@ -1673,7 +1654,7 @@ void color_button_update_color_fg(GtkWidget *color_button, gpointer data)
   char text_sample[64];
   int fg_color=ce->fg;
   int bg_color=ce->bg;
-  MESG("color_button_update_color_fg: ");
+  // MESG("color_button_update_color_fg: ");
   if(fg_color<0) fg_color=ce->fg;
   if(bg_color<0) bg_color=ce->bg;
 
@@ -1687,8 +1668,7 @@ void color_button_update_color_fg(GtkWidget *color_button, gpointer data)
   	current_scheme->color_values[bg_color]);
   sprintf(text_sample,"changed fg: bg=%s fg=%s",
    current_scheme->color_values[bg_color],current_scheme->color_values[fg_color]);
-  MESG("color_button_update_color_bg: scheme=%d color=%d cname=[%s]",color_scheme_ind,bg_color,cname);
-//  MESG("update_color_fg: bg_i=%d bg=[%s] fg=[%s]", ce->bg,current_scheme->color_values[bg_index],current_scheme->color_values[ce->fg]);
+  // MESG("color_button_update_color_bg: scheme=%d color=%d cname=[%s]",color_scheme_ind,bg_color,cname);
   gtk_statusbar_pop((GtkStatusbar *)ce->sample_ctext,1);
   gtk_statusbar_push((GtkStatusbar *)ce->sample_ctext,1,text_sample);
 	set_box_color(gtk_statusbar_get_message_area ((GtkStatusbar *)ce->sample_ctext),
@@ -1711,13 +1691,13 @@ void color_button_update_color_bg(GtkWidget *color_button, gpointer data)
   int bg_color=ce->bg;
   if(fg_color<0) fg_color=-ce->fg;
   if(bg_color<0) bg_color=-ce->bg;
-  MESG("color_button_update_color_bg: ");
+  // MESG("color_button_update_color_bg: ");
   current_color_element=ce;
   foreground_changed=0;
   
   gtk_color_chooser_get_rgba((GtkColorChooser *)color_button,&color);
   sprintf(cname,"#%02X%02X%02X",(int)(color.red*255),(int)(color.green*255),(int)(color.blue*255));
-  MESG("color_button_update_color_bg: scheme=%d color=%d cname=[%s]",color_scheme_ind,bg_color,cname);
+  // MESG("color_button_update_color_bg: scheme=%d color=%d cname=[%s]",color_scheme_ind,bg_color,cname);
   current_scheme->color_values[ce->bg]=strdup(cname);
   sprintf(text_sample,"changed bg: bg=%s fg=%s",
    current_scheme->color_values[bg_color],current_scheme->color_values[fg_color]);
@@ -1884,9 +1864,6 @@ void show_color_sample(GtkWidget *table,int ypos,char *text)
 		current_scheme->color_values[fgindex],
 		current_scheme->color_values[bgindex]);
 
-//	MESG("	- %d bg=[%s] fg=[%s]",ypos,
-//		current_scheme->color_values[fgindex],
-//		current_scheme->color_values[bgindex]);
 #if	TNEW
 	put_to_table(cbox,table,ypos,4,0);
 #else
@@ -1991,7 +1968,6 @@ int set_color(int n)
 //  g_signal_connect(G_OBJECT(apply_button),"clicked", (GCallback) button_color_apply ,NULL);
   g_signal_connect(G_OBJECT(close_button),"clicked", (GCallback) button_color_close ,(void *)colors_win);
   g_signal_connect(G_OBJECT(colors_win),"delete_event", (GCallback) colors_win_destroy_cb ,(void *)colors_win);
-//  MESG("set color, create boxes %d rows",CTYPE_ROWS);
   for(i=0;i<CTYPE_ROWS;i++) {
   	char color_title[100];
 	ypos=i+1;  

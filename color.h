@@ -29,76 +29,11 @@
 #define LCYAN		14
 #define LWHITE		15
 
-// default color schemes
-char *default_scheme_names[] = {
-	"Snow","Midnight","Cyan","Blue","Gray","Dark gray",
-	"Sunny","Twilight","Lunar","Velvet",
-	NULL,NULL
-};
-
-#if	NUSE
-// 16 colors to 8 colors translation
-// for black backgrounds!!
-int color16_8[] = {
- BLACK,		/* COLOR_BG  */
- BLUE,		/* MENU_BG  */
- CYAN,		/* SELECT_BG  */
- RED,		/* SEARCH_BG  */
- GREEN,		/* QUOTE_BG  */
- BROWN,		/* LIGHT_BG  */
- BLACK,		/* INFO_BG  */
- BLUE,		/* INACTIVE_BG  */
- BLUE,		/* BOX_BG  */
-
- BROWN,		/* CODE_BG */
- WHITE,		/* FG  */
- WHITE,		/* MENU_FG */
- LWHITE,	/* STANDOUT_FG */
- LRED,		/* CTRL_FG */
- YELLOW,	/* PREP_FG  */
- LCYAN,		/* WORD1  */
- LMAGENTA,	/* WORD2  */
- LBLUE,		/* WORD3  */
- LGREEN,	/* SPEC  */
- GREEN,		/* SQUOTE_FG */
- ORANGE,	/* COMMENT_FG  */
- ORANGE,	/* CHANGED_FG  */
- LMAGENTA,	/* HORIZON_FG  */
- WHITE,		/* INACTIVE_FG  */
- YELLOW		/* ROWCOL_FG  */
-};
-#endif
-
-#if !GTK
-int color8_16[] = {
-	COLOR_BG,			/* BLACK  */
-	COLOR_SEARCH_BG,	/* RED  */
-	COLOR_QUOTE_BG,		/* GREEN  */
-	COLOR_COMMENT_FG,	/* ORANGE  */
-	COLOR_MENU_BG,		/* BLUE  */
-	COLOR_INFO_BG,		/* MAGENTA  */
-	COLOR_SELECT_BG,	/* CYAN  */
-	COLOR_FG,			/* WHITE  */
-
-	COLOR_LIGHT_BG,		/* BROWN  */
-	COLOR_WORD2_FG,		/* LRED  */
-	COLOR_SPEC_FG,		/* LGREEN  */
-	COLOR_ROWCOL_FG,	/* YELLOW  */
-	COLOR_STANDOUT_FG,	/* LWHITE  */
-	COLOR_HORIZON_FG,	/* LMAGENTA  */
-	COLOR_WORD1_FG,		/* LCYAN  */
-	COLOR_MENU_FG		/* LWHITE  */
-};
-#endif
 
 typedef struct color_curses {
 	int index;	/* color index  */
-	int attrib;	/* attibute  */
+	int attrib;	/* attribute  */
 } color_curses;
-
-typedef struct RGB_COLORS {
-	int r,g,b;
-} RGB_COLORS;
 
 typedef struct COLOR_SCHEME {
 	char *scheme_name;
@@ -106,7 +41,6 @@ typedef struct COLOR_SCHEME {
 	color_curses color_attr[COLOR_TYPES];
 } COLOR_SCHEME;
 
-#if	NEW_COLORS
 char *basic_color_values[COLOR_SCHEMES][COLOR_TYPES] = {
  // Snow
  {
@@ -394,12 +328,9 @@ char *basic_color_values[COLOR_SCHEMES][COLOR_TYPES] = {
 	"#FFFF00"  // COLOR_ROWCOL_FG		DROWCOL
  }
 };
-#else
-#endif
 
 color_curses *current_color;
 
-#if	NEW_COLORS
 /*
  These are correspondance table for 8 basic color terminals and no possibility to
  change their values
@@ -696,17 +627,7 @@ int color_t[COLOR_SCHEMES][BG_COLORS+FG_COLORS] = {
  YELLOW		/* ROWCOL_FG  */
  }
 };
-#endif
 
-#if	0
-typedef struct CPAIR {
-	int fg_color;
-	int bg_color;
-	int attr;
-} CPAIR;
-#endif
-
-#if	NEW_COLORS
 char *color_type[] = {
 	"normal_bg",
 	"menu_bg",
@@ -735,8 +656,5 @@ char *color_type[] = {
 	"inactive_fg",
 	"rowcol_fg"
 };
-#else
-#endif
-
 
 /* --- */

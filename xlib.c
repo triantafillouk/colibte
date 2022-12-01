@@ -25,8 +25,15 @@
 #include	"xkeys.h"
 #include	"xthemes.h"
 #include	"menu.h"
-#include	"xthemes.c"
 #include	"panel_curses.h"
+
+int color_scheme_ind;
+COLOR_SCHEME *current_scheme=NULL;
+void set_cursor(int val,char *from);
+void drv_back_color();
+void set_current_scheme(int scheme);
+
+#include	"xthemes.c"
 
 #define XF864		1	/* greek keyboard in XFree86 version 4 */
 
@@ -128,7 +135,6 @@ void drv_move(int y,int x);
 int set_sposition(WINDP *wp,int *,int *);
 int set_fontindex(int n);
 int set_font(char *);
-void drv_back_color();
 void sinsert_nl(char *,int);
 void Draw_up_button(GWINDP *gwp,int,int,int);
 void Draw_dn_button(GWINDP *gwp,int,int,int);
@@ -149,7 +155,7 @@ XSizeHints shints;
 #define	SHOW_SHADOW	1
 int in_editor=-1;
 int	selection_on=-1;
-int color_scheme_ind;
+
 XSizeHints bar_hints;
 XSizeHints parent_hints = {
    PMinSize | PResizeInc | PBaseSize | PWinGravity,
@@ -242,6 +248,12 @@ function_int key_convert_from_mouse(function_int execf)
 void do_timer(int i)
 {
 
+}
+
+void set_cursor(int val,char *from)
+{
+	cursor_showing=val;
+//	MESG("set_cursor: val=%d %s",val,from);
 }
 
 void start_interactive(char *prompt)
@@ -461,9 +473,11 @@ void drv_open()
  bar_hints.max_width  = SBWIDTH ;
 
  parent = XCreateSimpleWindow(dis0, RootWindow(dis0,screen_num),
- 	0,0, parent_width,parent_height,0,
-	foreground_pixel,
-	background_pixel
+ 	0,0, 	/* x,y  */
+	parent_width,parent_height,
+	0,	/* border width  */
+	foreground_pixel,	/* border  */
+	background_pixel	/* background  */
 	);
 
  mapped=1;
@@ -481,7 +495,7 @@ void drv_open()
 
  init_downline();
 
- background_pixel = basic_color_values[color_scheme_ind][COLOR_BG];
+ background_pixel = colors[color_scheme_ind][COLOR_BG];
  valuemask= CWBackPixel;
 
 	xsubw1=(Pixmap)NULL;
@@ -2698,6 +2712,15 @@ void drv_msg_line(char *arg)
 
 
 
+void set_current_scheme(int scheme)
+{
+ color_scheme_ind=scheme-1;
+ set_btval("color_scheme",-1,NULL,color_scheme_ind+1); 
+
+ current_scheme = get_scheme(color_scheme_ind);
+}
+
+#if	0
 /* change color scheme */
 int change_color_scheme(int  n)
 {
@@ -2714,6 +2737,7 @@ int change_color_scheme(int  n)
  drv_update_styles();
  return(TRUE);
 }
+#endif
 
 void refresh_menu()
 {

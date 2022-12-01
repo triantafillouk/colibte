@@ -9,7 +9,21 @@
 	are using X11 color schemes
 */
 
-#if	!GTK
+extern alist *color_scheme_list;
+
+char *basic_color_names[] = {
+	"black","red","green","orange","blue","magenta","cyan","white",
+	"brown","lred","lgreen","yellow","lblue","lmagenta","lcyan","lwhite"
+};
+
+// default color schemes
+char *default_scheme_names[] = {
+	"Snow","Midnight","Cyan","Blue","Gray","Dark gray",
+	"Sunny","Twilight","Lunar","Velvet",
+	NULL,NULL
+};
+
+#if	PCURSES
 int color8_scheme_read()
 {
  FILE *f1;
@@ -50,9 +64,9 @@ int color8_scheme_read()
 		name1[strlen(name1)-1]=0;
 
 		scheme=NULL;
-		lbegin(color_schemes);
+		lbegin(color_scheme_list);
 //		MESG(" read scheme named [%s]",name1);
-		while((cs=(COLOR_SCHEME *)lget(color_schemes))!=NULL)
+		while((cs=(COLOR_SCHEME *)lget(color_scheme_list))!=NULL)
 		{
 			if(strcmp(name1,cs->scheme_name)==0){ 
 				scheme = cs;
@@ -62,9 +76,9 @@ int color8_scheme_read()
 		};
 		if(!scheme) { 	/* a new scheme!!  */
 			scheme = malloc(sizeof(COLOR_SCHEME));
-			add_element_to_list((void *)scheme,color_schemes);
+			add_element_to_list((void *)scheme,color_scheme_list);
 			scheme->scheme_name = strdup(name1);
-			MESG("	create new scheme %s schemes now %d -----------------",name1,color_schemes->size);
+			// MESG("	create new scheme %s schemes now %d -----------------",name1,color_scheme_list->size);
 		};
 		continue;
 	};
@@ -76,14 +90,13 @@ int color8_scheme_read()
 			scheme->color_attr[j].index=i;
 			scheme->color_attr[j].attrib=0;
 			// set attrib !!
-#if	1
 			// convert name2 to attrib!
 			if(strstr(name2,"bold") || i>8) scheme->color_attr[j].attrib |= A_BOLD;
 			if(strstr(name2,"underline")) scheme->color_attr[j].attrib |= A_UNDERLINE;
 			if(strstr(name2,"reverse")) scheme->color_attr[j].attrib |= A_REVERSE;
 			if(strstr(name2,"dim")) scheme->color_attr[j].attrib |= A_DIM;
-#endif
-		MESG("ctype b=[%s] ctype=[%s] name1=[%s] name2=[%s] -> %d (%s) a=%d",b,ctype,name1,name2,j,color_type[j],scheme->color_attr[j].attrib);
+
+		// MESG("ctype b=[%s] ctype=[%s] name1=[%s] name2=[%s] -> %d (%s) a=%d",b,ctype,name1,name2,j,color_type[j],scheme->color_attr[j].attrib);
 	} else {
 		// MESG("ctype b=[%s] ctype=[%s] name1=[%s] name2=[%s]  not found!!!",b,ctype,name1,name2);
 	};
@@ -98,6 +111,21 @@ int color8_scheme_read()
 }
 #endif
 
+COLOR_SCHEME *get_scheme(int scheme_num)
+{
+ COLOR_SCHEME *cs;
+ int scheme_ind=0;
+
+ lbegin(color_scheme_list);
+ while((cs=(COLOR_SCHEME *)lget(color_scheme_list))!=NULL) {
+ 	if(scheme_ind==scheme_num) {
+		break;
+	};
+	scheme_ind++;
+ };
+ return cs;
+}
+
 int color_scheme_read()
 {
  FILE *f1;
@@ -108,10 +136,10 @@ int color_scheme_read()
  char left;
  COLOR_SCHEME *scheme=NULL;
 
-#if	!GTK
+#if	PCURSES
  if(drv_colors<16) return color8_scheme_read();
 #endif
- MESG("color_scheme_read:");
+ // MESG("color_scheme_read:");
  if((fname=find_file(NULL,".colors16",1,0))==NULL) return FALSE;
 
  f1=fopen(fname,"r");
@@ -130,9 +158,9 @@ int color_scheme_read()
 		name1[strlen(name1)-1]=0;
 
 		scheme=NULL;
-		lbegin(color_schemes);
+		lbegin(color_scheme_list);
 		// MESG(" read scheme named [%s]",name1);
-		while((cs=(COLOR_SCHEME *)lget(color_schemes))!=NULL)
+		while((cs=(COLOR_SCHEME *)lget(color_scheme_list))!=NULL)
 		{
 			if(strcmp(name1,cs->scheme_name)==0){ 
 				scheme = cs;
@@ -142,11 +170,11 @@ int color_scheme_read()
 		};
 		if(!scheme) { 	/* a new scheme!!  */
 			scheme = malloc(sizeof(COLOR_SCHEME));
-			add_element_to_list((void *)scheme,color_schemes);
+			add_element_to_list((void *)scheme,color_scheme_list);
 			scheme->scheme_name = strdup(name1);
 			int i;
 			for(i=0;i<COLOR_TYPES;i++) scheme->color_values[i]="#203040";
-			MESG("	create new scheme %s schemes now %d",name1,color_schemes->size);
+			MESG("	create new scheme %s schemes now %d",name1,color_scheme_list->size);
 		};
 		continue;
 	};
@@ -182,8 +210,8 @@ int color_scheme_save()
 
  if(f1!=NULL) {
 	COLOR_SCHEME *scheme;
-	lbegin(color_schemes);
-	while((scheme=(COLOR_SCHEME *)lget(color_schemes))!=NULL){
+	lbegin(color_scheme_list);
+	while((scheme=(COLOR_SCHEME *)lget(color_scheme_list))!=NULL){
 		MESG("save_scheme: %s",scheme->scheme_name);	
 		fprintf(f1,"[%s]\n",scheme->scheme_name);
 		 for(i=0;i<COLOR_TYPES;i++){
@@ -196,7 +224,18 @@ int color_scheme_save()
  return 1;
 }
 
-extern alist *color_schemes;
+char **get_scheme_names()
+{
+ char **scheme_names = malloc(sizeof(char *)*color_scheme_list->size+1);
+ char **name=scheme_names;
+ COLOR_SCHEME *cs;
+ lbegin(color_scheme_list);
+ while((cs=(COLOR_SCHEME *)lget(color_scheme_list))!=NULL) {
+	*name++ = strdup(cs->scheme_name);
+ };
+ *name=NULL;
+ return scheme_names;
+}
 
 void init_default_schemes()
 {
@@ -214,7 +253,7 @@ void init_default_schemes()
 			scheme->color_attr[i].index = color_t[scheme_ind][i];
 			scheme->color_attr[i].attrib = 0;
 		};
-	add_element_to_list((void *)scheme,color_schemes);
+	add_element_to_list((void *)scheme,color_scheme_list);
  };
 }
 
@@ -222,8 +261,8 @@ void init_default_schemes()
 /* change color scheme */
 int change_color_scheme(int  scheme)
 {
- MESG("change_color_scheme: n=%d,color_scheme_ind=%d",scheme,color_scheme_ind);
- if(scheme<1 || scheme> color_schemes->size) scheme=1;
+ // MESG("change_color_scheme: n=%d,color_scheme_ind=%d",scheme,color_scheme_ind);
+ if(scheme<1 || scheme> color_scheme_list->size) scheme=1;
  set_current_scheme(scheme);
  if(!discmd) return (TRUE);
  set_btval("xcolor_scheme",-1,NULL,color_scheme_ind); 
@@ -233,6 +272,6 @@ int change_color_scheme(int  scheme)
  set_cursor(0,"change_color_scheme");
  set_windows_color();
  drv_update_styles();
- MESG("change_color_scheme: end!");
+ // MESG("change_color_scheme: end!");
  return(TRUE);
 }

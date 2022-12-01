@@ -10,39 +10,19 @@
 extern VAR option_names[];
 extern int nnarg;
 extern FILEBUF *cbfp;
-extern alist *color_schemes;
 
 GtkWidget *wlist;
-
-char **get_scheme_names()
-{
- char **scheme_names = malloc(sizeof(char *)*color_schemes->size+1);
- char **name=scheme_names;
- COLOR_SCHEME *cs;
- lbegin(color_schemes);
- while((cs=(COLOR_SCHEME *)lget(color_schemes))!=NULL) {
-	*name++ = strdup(cs->scheme_name);
- };
- *name=NULL;
- return scheme_names;
-}
+COLOR_SCHEME *get_scheme(int scheme_num);
 
 void set_current_scheme(int scheme)
 {
- int scheme_ind=0;
  MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
 
  color_scheme_ind=scheme-1;
  set_btval("color_scheme",-1,NULL,color_scheme_ind+1); 
- lbegin(color_schemes);
- while((current_scheme=(COLOR_SCHEME *)lget(color_schemes))!=NULL) {
-	// MESG(" check scheme  %d <> %d [%s]",scheme_ind,color_scheme_ind,current_scheme->scheme_name);
- 	if(scheme_ind==color_scheme_ind) {
-		MESG("	set_current_scheme %d [%s]",scheme,current_scheme->scheme_name);
-		break;
-	};
-	scheme_ind++;
- };
+
+ current_scheme = get_scheme(color_scheme_ind);
+
  set_current_colors();
  MESG("set_current_scheme:end");
 }
@@ -174,6 +154,7 @@ int put_wstring(WINDP *wp, char *st,int ulen)
  };
  pango_layout_set_text (wd->layout, st, -1);
  pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
+ // pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_ULTRALIGHT);
  pango_layout_get_size (wd->layout, &width, &height);
  int y_pos_correction=0;
  int c_width=CLEN*ulen;
@@ -207,6 +188,7 @@ unsigned int put_wchar(WINDP *wp, char *st)
  };
  pango_layout_set_text (wd->layout, st, -1);
  pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
+ // pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_BOLD);
  pango_layout_get_size (wd->layout, &width, &height);
  int y_pos_correction=0;
  int c_width=CLEN;
