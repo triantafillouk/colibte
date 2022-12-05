@@ -1410,11 +1410,11 @@ void drv_move(int row, int col)
 
 void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
 {
- int attrib=0;
- if(afcol>255) { afcol=afcol%256;attrib=A_UNDERLINE;}
- else attrib=current_scheme->color_attr[afcol].attrib;
-
-  wattrset(wnd,color_pair(afcol,abcol)|attrib);
+ int fcolor=afcol%256;
+ unsigned int attrib=current_scheme->color_attr[fcolor].attrib;
+ if(afcol>255) attrib = A_UNDERLINE;
+  // if(attrib>0) MESG("- attrib %X fcolor=%X",attrib,afcol);
+  wattrset(wnd,color_pair(fcolor,abcol)|attrib);
 }
 
 
@@ -1925,15 +1925,16 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
  int xcol=0;
  vchar *v1, *vtext;
  VIDEO *vp1;
- int ccolor,cattr;
+ int fcolor,bcolor;
  char vstr[8];
  vp1 = wp->vs[row];
  v1=vtext=vp1->v_text;
  // char *unknown2="🔠"; 
  char *unknown1="¤"; 
 
- ccolor=255;
- cattr=255;
+ fcolor=255;
+ bcolor=0;
+
  maxcol -= 2;	/* ??  */
  memset(vstr,0,8);
 
@@ -1956,10 +1957,10 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 	for(i=0;i<=imax;i++) {
 	 uint32_t ch;
-		ccolor=v1->fcolor+v1->attr*256;
-		cattr=v1->bcolor;
-		// if(row==0) MESG("row %d underline i=%d ccolor=%d cattr=%d",row,i,ccolor,cattr);
-		drv_wcolor(wp->gwp->draw,ccolor,cattr);
+	 	fcolor = v1->fcolor+v1->attr;
+		bcolor=v1->bcolor;
+		// if(row==0) MESG("row %d underline i=%d bcolor=%d cattr=%d",row,i,bcolor,fcolor);
+		drv_wcolor(wp->gwp->draw,fcolor,bcolor);
 		ch=v1->uval[0];
 		if(ch==0xFF) { 	/* skip in case of char len > 1  */
 			if(v1->uval[1]==0xFF) 
@@ -1973,9 +1974,9 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 		if(ch>128 && v1->uval[1]==0) {	/* this is a local character, convert from local to utf  */
 			 strlcpy(vstr,str_local_to_utf(wp,(char *)v1->uval),6);
 			 if(wp->w_fp->b_lang==0)
-			 	drv_wcolor(wp->gwp->draw,COLOR_CTRL_FG,cattr);	/* show local chars with different color  */
+			 	drv_wcolor(wp->gwp->draw,COLOR_CTRL_FG,bcolor);	/* show local chars with different color  */
 			 else
-			 	drv_wcolor(wp->gwp->draw,ccolor,cattr);
+			 	drv_wcolor(wp->gwp->draw,fcolor,bcolor);
 		} else {
 			memcpy(vstr,v1->uval,6);
 		};

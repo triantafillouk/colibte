@@ -204,7 +204,7 @@ search.o: xe.h search.c
 curses.o: curses.c color.h menus.h keytable.h
 	${CC} curses.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o curses.o
  
-panel_curses.o: panel_curses.c color.h menus.h keytable.h xthemes.h color.h rgb_colors.h
+panel_curses.o: panel_curses.c color.h menus.h keytable.h xthemes.h color.h rgb_colors.h xthemes.c
 	${CC} panel_curses.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o panel_curses.o 
 
 gtk_support.o: gtk_support.c gtk_support.h

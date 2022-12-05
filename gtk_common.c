@@ -143,7 +143,7 @@ char *get_font_string()
  return fstr;
 }
 
-int put_wstring(WINDP *wp, char *st,int ulen)
+int put_wstring(WINDP *wp, char *st,int ulen,int attr)
 {
  GeEditDisplay *wd = GTK_EDIT_DISPLAY(wp->gwp->draw);
 // show text line
@@ -154,7 +154,12 @@ int put_wstring(WINDP *wp, char *st,int ulen)
  };
  pango_layout_set_text (wd->layout, st, -1);
  pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
- // pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_ULTRALIGHT);
+ if(attr) { MESG(" [%s] %X",st,attr);
+	if(attr & A_BOLD) pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_HEAVY);
+	else pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_ULTRALIGHT);
+ 	if(attr & A_UNDERLINE) pango_font_description_set_style(wd->ge_font_desc,PANGO_STYLE_OBLIQUE);
+	else pango_font_description_set_style(wd->ge_font_desc,PANGO_STYLE_NORMAL);
+ };
  pango_layout_get_size (wd->layout, &width, &height);
  int y_pos_correction=0;
  int c_width=CLEN*ulen;
@@ -533,17 +538,18 @@ void put_wtext_slow(WINDP *wp, int row,int maxcol)
  int i1;
  vchar *v1, *vtext;
  VIDEO *vp1;
- int ccolor,cattr;
+ int fcolor,bcolor;
+ // int cattr;
  char st[MAXBLEN];
 
  vp1 = wp->vs[row];
  v1=vtext=vp1->v_text;
 
  imin=0;
- ccolor=v1[0].fcolor;
- cattr=v1[0].bcolor;
+ fcolor=v1[0].fcolor;
+ bcolor=v1[0].bcolor;
  // MESG("---> draw row slow %d",row);
- drv_color(ccolor,cattr);
+ drv_color(fcolor,bcolor);
 	imax=maxcol;
 
 	/* count of trailing spaces is maxcol-imax */
@@ -554,10 +560,10 @@ void put_wtext_slow(WINDP *wp, int row,int maxcol)
 		if(v1[col].uval[0]==0xFF) {	/* skip space of wide utf chars  */
 			if(v1[col].uval[1]==0xFF) continue;
 		};
-		ccolor=v1[col].fcolor;
-		cattr=v1[col].bcolor;
+		fcolor=v1[col].fcolor;
+		bcolor=v1[col].bcolor;
 
-		drv_color(ccolor,cattr); 
+		drv_color(fcolor,bcolor); 
 		i1=addutfvchar1(st,&v1[col],i1,wp->w_fp);
 		st[i1]=0;i1=0;
 		drv_move(row,col);
@@ -577,20 +583,22 @@ void put_wtext(WINDP *wp, int row,int maxcol)
  // int p_space=0;
  vchar *v1, *vtext;
  VIDEO *vp1;
- int ccolor,cattr;
+ int fcolor,bcolor,cattr=0;
  char st[MAXBLEN];
- int ccolor_p,cattr_p;
+ int fcolor_p,bcolor_p;
  int imove=0;
  vp1 = wp->vs[row];
  v1=vtext=vp1->v_text;
 
  imin=0;
- ccolor=v1[0].fcolor;
- cattr=v1[0].bcolor;
- ccolor_p=ccolor;
- cattr_p=cattr;
+ fcolor=v1[0].fcolor;
+ bcolor=v1[0].bcolor;
+ cattr = v1[0].attr;
+ fcolor_p=fcolor;
+ bcolor_p=bcolor;
+ 
  // MESG("---> draw row %d",row);
- 	drv_color(ccolor,cattr);
+ 	drv_color(fcolor,bcolor);
 	imax=maxcol;
 
 	/* count of trailing spaces is maxcol-imtrax */
@@ -601,21 +609,21 @@ void put_wtext(WINDP *wp, int row,int maxcol)
 			// imove--;
 			if(v1[col].uval[1]==0xFF) continue;
 		};
-		ccolor=v1[col].fcolor;
-		cattr=v1[col].bcolor;
-		if(ccolor!=ccolor_p || cattr!=cattr_p) {
+		fcolor=v1[col].fcolor;
+		bcolor=v1[col].bcolor;
+		if(fcolor!=fcolor_p || bcolor!=bcolor_p) {
 			if(i1>0) {
 				st[i1]=0;
 				drv_move(row,imove);
-				if(put_wstring(wp,st,col-imove)==-1) {
+				if(put_wstring(wp,st,col-imove,cattr)==-1) {
 					put_wtext_slow(wp,row,maxcol);
 					return;
 				};
 			};
-			drv_color(ccolor,cattr);
+			drv_color(fcolor,bcolor);
 			i1=0;
 			imove=col; 
-			ccolor_p=ccolor;cattr_p=cattr;
+			fcolor_p=fcolor;bcolor_p=bcolor;
 		};
 		// if(v1[col].uval[0]==0x20) p_space=1;
 		i1=addutfvchar1(st,&v1[col],i1,wp->w_fp);
@@ -624,7 +632,7 @@ void put_wtext(WINDP *wp, int row,int maxcol)
 	};
 	if(i1>0) {
 		st[i1]=0;
-		if(put_wstring(wp,st,col-imove)==-1) {
+		if(put_wstring(wp,st,col-imove,cattr)==-1) {
 			put_wtext_slow(wp,row,maxcol);
 		};
 	};

@@ -82,7 +82,7 @@ void svwchar(vchar *vc, utfchar *uc,int b_color,int f_color)
  };
  vc->bcolor=b_color;
  vc->fcolor=f_color%256;
- vc->attr = f_color>255;
+ vc->attr = f_color - vc->fcolor;
 #if	0
  vc->display_width=CLEN;
  vc->display_height=CHEIGHTI;
@@ -100,11 +100,10 @@ void  svchar(vchar *vc,int val,int b_color,int f_color)
  vc->uval[5]=0; 
  vc->uval[6]=0; 
  vc->uval[7]=0; 
- vc->attr = f_color > 255;
  // if(vc->attr) MESG("svchar ul");
  vc->bcolor=b_color;
  vc->fcolor=f_color%256;
- vc->attr = f_color > 255;
+ vc->attr = f_color - (vc->fcolor);
 #if	0
  vc->display_width=CLEN;
  vc->display_height=CHEIGHTI;
@@ -114,11 +113,9 @@ void  svchar(vchar *vc,int val,int b_color,int f_color)
 /* set virtual color */
 void  svcolor(vchar *vc,int b_color,int f_color)
 {
- // if(f_color>256) MESG("svcolor: f_color=%d",f_color);
- vc->attr = f_color>255;
  vc->bcolor=b_color;
  vc->fcolor=f_color % 256;
- vc->attr = f_color > 255;
+ vc->attr = f_color - (f_color % 256);
 }
 
 /* set virtual special multiple  character */
@@ -775,7 +772,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	} else 
 	{
 		if(drv_colors==8) { bg_color=COLOR_SELECT_BG;fg_color=COLOR_STANDOUT_FG+256;}
-		else { bg_color=COLOR_INFO_BG;fg_color=COLOR_MENU_FG+256;};
+		else { bg_color=COLOR_INFO_BG;fg_color=COLOR_MENU_FG+A_UNDERLINE;};
 		line_bcolor=bg_color;
 		for(i0=start_color_column;i0<= end_column;i0++)
 		{

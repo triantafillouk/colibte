@@ -108,6 +108,12 @@
 
 #if	GTK
 #include <gtk/gtk.h>
+
+#define	A_BOLD		0x100
+#define	A_UNDERLINE	0x200
+#define	A_ITALIC	0x400
+#define A_DIM		0x800
+#define	A_REVERSE	0x1000
 #endif
 
 #if	PCURSES
@@ -282,9 +288,9 @@ typedef struct notes_struct {
 
 typedef struct vchar {
 	unsigned char uval[8];	/* stores a utf char  */
-	unsigned short attr:8;
-	unsigned short bcolor:8;	/* background  */
-	unsigned short fcolor;	/* foreground  */
+	int  attr;
+	short int bcolor;	/* background  */
+	int fcolor;	/* foreground  */
 #if	0
 	unsigned int display_width;
 	unsigned int display_height;
