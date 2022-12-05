@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.58T11 (1/12/2022)"
+#define VERSION 	"#01.58T12 (4/12/2022)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -21,7 +21,6 @@
 #define	CLASSIC_STATUS 	0
 
 #define DOUBLE_ESC	0	/* use double escape for abort command else single  */
-#define	COLOR_SCHEMES	10
 
 #define	NEW_COLORS	1
 #define NEW_COLOR8	0

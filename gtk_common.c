@@ -12,7 +12,7 @@ extern int nnarg;
 extern FILEBUF *cbfp;
 
 GtkWidget *wlist;
-COLOR_SCHEME *get_scheme(int scheme_num);
+COLOR_SCHEME *get_scheme_by_index(int scheme_num);
 
 void set_current_scheme(int scheme)
 {
@@ -21,7 +21,7 @@ void set_current_scheme(int scheme)
  color_scheme_ind=scheme-1;
  set_btval("color_scheme",-1,NULL,color_scheme_ind+1); 
 
- current_scheme = get_scheme(color_scheme_ind);
+ current_scheme = get_scheme_by_index(color_scheme_ind);
 
  set_current_colors();
  MESG("set_current_scheme:end");

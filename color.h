@@ -331,6 +331,7 @@ char *basic_color_values[COLOR_SCHEMES][COLOR_TYPES] = {
 
 color_curses *current_color;
 
+#if	PCURSES
 /*
  These are correspondance table for 8 basic color terminals and no possibility to
  change their values
@@ -627,6 +628,7 @@ int color_t[COLOR_SCHEMES][BG_COLORS+FG_COLORS] = {
  YELLOW		/* ROWCOL_FG  */
  }
 };
+#endif
 
 char *color_type[] = {
 	"normal_bg",
@@ -645,7 +647,7 @@ char *color_type[] = {
 	"standout_fg",
 	"control_fg",
 	"prep_fg",
-	"word1_FG",
+	"word1_fg",
 	"word2_fg",
 	"word3_fg",
 	"special_fg",

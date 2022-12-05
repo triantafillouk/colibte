@@ -61,7 +61,7 @@ int	colorupdate;
 int color_scheme_ind=0;
 COLOR_SCHEME *current_scheme=NULL;
 char **get_scheme_names();
-COLOR_SCHEME *get_scheme(int scheme_num);
+COLOR_SCHEME *get_scheme_by_index(int scheme_num);
 
 int cursor_showing=0;
 
@@ -2225,7 +2225,7 @@ void set_current_scheme(int scheme)
  color_scheme_ind=scheme-1;
  set_btval("color_scheme",-1,NULL,color_scheme_ind+1); 
 
- current_scheme = get_scheme(color_scheme_ind);
+ current_scheme = get_scheme_by_index(color_scheme_ind);
 
  // MESG("init scheme2 %s colors=%d",current_scheme->scheme_name,drv_colors);
  current_color = current_scheme->color_attr;

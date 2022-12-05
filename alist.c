@@ -8,6 +8,8 @@
 	Copywrite Kostas Triantafillou 2005
 */
 /* version 10/8/2022 */
+char *a = "test, remove it!";
+
 #define	FULL 0
 #include "alist.h"
 #include <stdlib.h>

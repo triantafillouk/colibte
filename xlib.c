@@ -2717,7 +2717,7 @@ void set_current_scheme(int scheme)
  color_scheme_ind=scheme-1;
  set_btval("color_scheme",-1,NULL,color_scheme_ind+1); 
 
- current_scheme = get_scheme(color_scheme_ind);
+ current_scheme = get_scheme_by_index(color_scheme_ind);
 }
 
 #if	0
