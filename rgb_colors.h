@@ -705,7 +705,7 @@ RGB_DEF *get_rgb_values(char *color_name)
 {
  static RGB_DEF rgb_value;
  RGB_DEF *rgb_v = &color_defs[0];
-// fprintf(stderr,"get_rgb_calues:[%s]\n",color_name);
+ // fprintf(stderr,"get_rgb_values:[%s]\n",color_name);
  if(color_name[0]=='#') {
  	int i;
 	char cs[3];
@@ -734,6 +734,6 @@ RGB_DEF *get_rgb_values(char *color_name)
 		};
 	 };
  };
-//	fprintf(stderr,"- %s  %d %d %d\n",color_name,rgb_value.r,rgb_value.g,rgb_value.b);
+ // fprintf(stderr,"- [%s]  %d %d %d\n",color_name,rgb_value.r,rgb_value.g,rgb_value.b);
  return &rgb_value;
 }

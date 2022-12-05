@@ -189,7 +189,7 @@ tldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h
 xldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h
 	${CC} tldisplay.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -funsigned-char -o xldisplay.o
 
-gtkterm.o: gtkterm.c gtkterm.h xthemes.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h gtk_common.c
+gtkterm.o: gtkterm.c gtkterm.h xthemes.h color.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h gtk_common.c xthemes.c
 
 highlight.o: highlight.c highlight.h
 
@@ -204,14 +204,14 @@ search.o: xe.h search.c
 curses.o: curses.c color.h menus.h keytable.h
 	${CC} curses.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o curses.o
  
-panel_curses.o: panel_curses.c color.h menus.h keytable.h xthemes.h rgb_colors.h
+panel_curses.o: panel_curses.c color.h menus.h keytable.h xthemes.h color.h rgb_colors.h
 	${CC} panel_curses.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o panel_curses.o 
 
 gtk_support.o: gtk_support.c gtk_support.h
 	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o gtk_support.o gtk_support.c
 
 # For GTK3
-gtkterm3.o: xe.h gtkterm3.c gtkterm3.h xthemes.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h geditdisplay3.h gtk_common.c
+gtkterm3.o: xe.h gtkterm3.c gtkterm3.h xthemes.h color.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h geditdisplay3.h gtk_common.c xthemes.c
 	${CC} $(FLAGS1) -c -DGTK=1 -Wall $(CPU_OPTIONS) $(GTKINCLUDE3) -funsigned-char gtkterm3.c -o gtkterm3.o
 
 gplotc3.o: gplotc3.c gplot3.h plot_cairo3.c plot_commonc.c
@@ -259,7 +259,7 @@ ctxe : main.o system.o edit.o screen.o  xldisplay.o eval.o mlang.o  file.o  xinp
 #	cc -b elf main.o system.o edit.o  display.o eval.om lang.o file.o input.o help.o search.o  word.o window.o marks.o convert.o   xlib.o -o emacs  -lm -L/usr/X11R6/lib -lX11 -lsocket
 
 # with curses, panel, no plot !
-cte : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o
+cte : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o xthemes.c
 	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o -o cte  $(GLIB_LIB) ${LPCURSES} -lm
 
 ce : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o

@@ -309,6 +309,7 @@ void revstr(char *st)
  Not case sensitive.
  returns -1 if not found.
 */
+#if	0
 int sarray_index(char **sarray,char *st)
 {
  static int i=0;
@@ -332,6 +333,20 @@ int sarray_index(char **sarray,char *st)
  }};
  return(-1);
 }
+#else
+int sarray_index(char **sarray,char *val)
+{
+ char *s;
+ int ind=0;
+ if(sarray==NULL || val==NULL) return -1;
+ 
+ while((s=*sarray++)!=NULL) {
+ 	if(!strcasecmp(s,val)) return ind;
+	ind++;
+ };
+ return -1;
+}
+#endif
 
 void string_2_nospaces(char *string)
 {

@@ -25,8 +25,15 @@
 #include	"xkeys.h"
 #include	"xthemes.h"
 #include	"menu.h"
-#include	"xthemes.c"
 #include	"panel_curses.h"
+
+int color_scheme_ind;
+COLOR_SCHEME *current_scheme=NULL;
+void set_cursor(int val,char *from);
+void drv_back_color();
+void set_current_scheme(int scheme);
+
+#include	"xthemes.c"
 
 #define XF864		1	/* greek keyboard in XFree86 version 4 */
 
@@ -38,9 +45,8 @@
 #define TTOP	1
 #define TBOTTOM	0
 
-
 int color_menu_fg,color_menu_bg;
-#if	1
+
 char *font_names[] = { 
 	"-*-fixed-*-*-*-*-*-*-*-*-*-*-ISO10646-1",
 	"-misc-*-*-r-*-*-14-*-*-*-*-ISO10646-1",
@@ -52,19 +58,21 @@ char *font_names[] = {
 	"-misc-*-*-*-*-*-20-*-*-*-*-ISO10646-1",
 	"-*-courier-*-r-*-*-25-*-*-*-*-ISO10646-1",
 	NULL };
-#else
-char *font_names[] = { 
-	"-*-fixed-*-*-*-*-*-*-*-*-*-*-*-7",
-	"-misc-*-*-r-*-*-14-*-*-*-*-*-7",
-	"7x14",
-	"7x14bold", 
-	"-*-courier-*-r-*-*-17-*-*-*-*-*-*",
-	"-misc-*-*-*-*-*-15-*-*-*-*-*-7",
-	"-misc-*-*-*-*-*-18-*-*-*-*-*-7",
-	"-misc-*-*-*-*-*-20-*-*-*-*-*-7",
-	"-*-courier-*-r-*-*-25-*-*-*-*-*-*",
-	NULL };
-#endif
+
+char *font_list[] = {
+	"1. Fixed 12",
+	"2. Fixed 14",
+	"3. Fixed 7x14",
+	"4. Fixed 7x14 bold",
+	"5. Courier 17",
+	"6. Misc 15",
+	"7. Misc 18",
+	"8. Misc 20",
+	"9. Courier 25",
+	"Select font"
+};
+
+#define	DL_FONT	5
 
 int drv_type=DRIVER_XLIB;
 int mouse_col=0;	/* mouse position x */
@@ -127,7 +135,6 @@ void drv_move(int y,int x);
 int set_sposition(WINDP *wp,int *,int *);
 int set_fontindex(int n);
 int set_font(char *);
-void drv_back_color();
 void sinsert_nl(char *,int);
 void Draw_up_button(GWINDP *gwp,int,int,int);
 void Draw_dn_button(GWINDP *gwp,int,int,int);
@@ -148,7 +155,7 @@ XSizeHints shints;
 #define	SHOW_SHADOW	1
 int in_editor=-1;
 int	selection_on=-1;
-int color_scheme_ind;
+
 XSizeHints bar_hints;
 XSizeHints parent_hints = {
    PMinSize | PResizeInc | PBaseSize | PWinGravity,
@@ -224,7 +231,7 @@ Visual *default_visual;
 XColor exact_def;
 int ncolors;
 
-int colors[COLOR_SCHEMES][XCOLOR_TYPES];
+int colors[COLOR_SCHEMES][COLOR_TYPES];
 XVisualInfo visual_info;
 unsigned long background_pixel=0L, foreground_pixel=1L;
 
@@ -241,6 +248,12 @@ function_int key_convert_from_mouse(function_int execf)
 void do_timer(int i)
 {
 
+}
+
+void set_cursor(int val,char *from)
+{
+	cursor_showing=val;
+//	MESG("set_cursor: val=%d %s",val,from);
 }
 
 void start_interactive(char *prompt)
@@ -394,8 +407,8 @@ void drv_window_xwin(WINDP *wp)
 
  wp->gwp->sbar = XCreateSimpleWindow(dis0, parent,
 	gwp->d_xpos+gwp->d_width,gwp->d_ypos, SBWIDTH,gwp->d_height ,0,
-	colors[color_scheme_ind][INFOFORE],
-	colors[color_scheme_ind][INFOBACK]
+	colors[color_scheme_ind][COLOR_FG],
+	colors[color_scheme_ind][COLOR_INFO_BG]
 	); 
 
  XChangeWindowAttributes(dis0,wp->gwp->sbar,valuemask,&setwinattr); 
@@ -460,27 +473,29 @@ void drv_open()
  bar_hints.max_width  = SBWIDTH ;
 
  parent = XCreateSimpleWindow(dis0, RootWindow(dis0,screen_num),
- 	0,0, parent_width,parent_height,0,
-	foreground_pixel,
-	background_pixel
+ 	0,0, 	/* x,y  */
+	parent_width,parent_height,
+	0,	/* border width  */
+	foreground_pixel,	/* border  */
+	background_pixel	/* background  */
 	);
 
  mapped=1;
  wmenu = XCreateSimpleWindow(dis0, parent,
 	0,0 , parent_width, dl_height,0,
 	BlackPixel(dis0,screen_num),
-	colors[color_scheme_ind][MODEBACK]
+	colors[color_scheme_ind][COLOR_MENU_BG]
 	);
 
  downline = XCreateSimpleWindow(dis0, parent,
 	0,1,1,1,0,
 	BlackPixel(dis0,screen_num),
-	colors[color_scheme_ind][MODEBACK]
+	colors[color_scheme_ind][COLOR_MENU_BG]
 	);
 
  init_downline();
 
- background_pixel = colors[color_scheme_ind][BACKGROUND];
+ background_pixel = colors[color_scheme_ind][COLOR_BG];
  valuemask= CWBackPixel;
 
 	xsubw1=(Pixmap)NULL;
@@ -723,11 +738,11 @@ void box_line_print(int y,int x, char *st,int width, int f, int active)
  len=strlen(show_string);
  XSetFunction(dis0,dl_gc,GXcopy);
  if(!f) {
-	XSetBackground(dis0, dl_gc, colors[color_scheme_ind][MODEBACK]);
-	XSetForeground(dis0, dl_gc, colors[color_scheme_ind][MODEFORE]);
+	XSetBackground(dis0, dl_gc, colors[color_scheme_ind][COLOR_MENU_BG]);
+	XSetForeground(dis0, dl_gc, colors[color_scheme_ind][COLOR_MENU_FG]);
  } else {
-	XSetBackground(dis0, dl_gc, colors[color_scheme_ind][MODEFORE]);
-	XSetForeground(dis0, dl_gc, colors[color_scheme_ind][MODEBACK]);
+	XSetBackground(dis0, dl_gc, colors[color_scheme_ind][COLOR_MENU_FG]);
+	XSetForeground(dis0, dl_gc, colors[color_scheme_ind][COLOR_MENU_BG]);
  };
  XFillRectangle (dis0, xsubw1 , dl_gc, x*CLEN_DL+x1, (y)*CHEIGHT_DL+y1+1,CLEN_DL*len,CHEIGHT_DL-1); 
  XDrawImageString(dis0, xsubw1, dl_gc, x*CLEN_DL+x1, (y+1)*CHEIGHT_DL+y1-CFONTBASE_DL,show_string,len);
@@ -745,23 +760,23 @@ void put_string_statusline(WINDP *wp,char *st,int position)
  };
 
  if(position>0){
-  XSetForeground(dis0, status_gc, colors[color_scheme_ind][DROWCOL]);
+  XSetForeground(dis0, status_gc, colors[color_scheme_ind][COLOR_ROWCOL_FG]);
  } else {
-  XSetForeground(dis0, status_gc, colors[color_scheme_ind][MODEFORE]);
+  XSetForeground(dis0, status_gc, colors[color_scheme_ind][COLOR_MENU_FG]);
  };
 
   if(cwp==wp) {
-	  XSetBackground(dis0, status_gc, colors[color_scheme_ind][MODEBACK]);
+	  XSetBackground(dis0, status_gc, colors[color_scheme_ind][COLOR_MENU_BG]);
   } else {
-	  XSetBackground(dis0, status_gc, colors[color_scheme_ind][MODEBACKI]);
+	  XSetBackground(dis0, status_gc, colors[color_scheme_ind][COLOR_INACTIVE_BG]);
   };
 
   if(position==0) {
 	XSetWindowAttributes xwatt;
 	if(wp==cwp) 
-		xwatt.background_pixel = colors[color_scheme_ind][MODEBACK];
+		xwatt.background_pixel = colors[color_scheme_ind][COLOR_MENU_BG];
 	else 
-		xwatt.background_pixel = colors[color_scheme_ind][MODEBACKI];
+		xwatt.background_pixel = colors[color_scheme_ind][COLOR_INACTIVE_BG];
 
  	XChangeWindowAttributes(dis0, wp->gwp->status, CWBackPixel, &xwatt);
 	
@@ -861,8 +876,8 @@ void drv_color(int fcol,int bcol) {
 void init_colors()
 {
  int i,j;
- color_menu_fg=MODEFORE;
- color_menu_bg=MODEBACK;
+ color_menu_fg=COLOR_MENU_FG;
+ color_menu_bg=COLOR_MENU_BG;
 
  color_scheme_read();
  default_depth = DefaultDepth(dis0,screen_num);
@@ -873,9 +888,9 @@ void init_colors()
  while(!XMatchVisualInfo(dis0,screen_num,default_depth,i--,&visual_info));
  
  for(j=0;j<COLOR_SCHEMES;j++) {
-	for(i=0;i<XCOLOR_TYPES;i++) 
+	for(i=0;i<COLOR_TYPES;i++) 
 	{
-	  if(!XParseColor(dis0, cmap, color_name[j][i], &exact_def)) {
+	  if(!XParseColor(dis0, cmap, basic_color_values[j][i], &exact_def)) {
 		exit(0);
 	  };
 	  if(!XAllocColor(dis0,cmap,&exact_def)) {
@@ -885,8 +900,8 @@ void init_colors()
 	  ncolors++;
 	};
  };
-	foreground_pixel=colors[color_scheme_ind][MODEFORE];
-	background_pixel=colors[color_scheme_ind][MODEBACK];
+	foreground_pixel=colors[color_scheme_ind][COLOR_MENU_FG];
+	background_pixel=colors[color_scheme_ind][COLOR_MENU_BG];
 }
 
 int get_menu_index_from_mouse()
@@ -1665,7 +1680,7 @@ void window_clear(WINDP *wp)
 void show_cursor (char *from)
 {
 	if(cursor_draw) hide_cursor ("show_cursor");
-   	XSetForeground(dis0, cursor_gc, colors[color_scheme_ind][MODEFORE]);
+   	XSetForeground(dis0, cursor_gc, colors[color_scheme_ind][COLOR_MENU_FG]);
 	cursor_draw=cwp->gwp->draw;
 	XFillRectangle( dis0, cursor_draw,
 				cursor_gc,
@@ -1756,10 +1771,10 @@ void disp_rectangle(int x,int y,int x1,int y1)
 	
 	XSetLineAttributes(dis0, gc, 4, LineSolid, CapRound, JoinRound); 
 
-	drv_color(MODEFORE,0);
+	drv_color(COLOR_MENU_FG,0);
 	XDrawLine(dis0, xsubw1, gc, 2, 2, xl-2, 2);
 	XDrawLine(dis0, xsubw1, gc, 2, 2, 2, yl-2);
-	drv_color(MODEFORE,0);
+	drv_color(COLOR_MENU_FG,0);
 	XDrawLine(dis0, xsubw1, gc, 2, yl-2, xl-2, yl-2);
 	XDrawLine(dis0, xsubw1, gc, xl-2, 2, xl-2, yl-2);
 	// create area for redisplay window in case of exposure events
@@ -2059,7 +2074,7 @@ void drv_back_color()
 {
  XSetWindowAttributes xwatt;
  unsigned long valuemask;
- background_pixel = colors[color_scheme_ind][BACKGROUND];
+ background_pixel = colors[color_scheme_ind][COLOR_BG];
 //	valuemask= CWBackingPixel | CWBackPixel;
 //	xwatt.backing_pixel = background_pixel;
 	valuemask= CWBackPixel;
@@ -2067,7 +2082,7 @@ void drv_back_color()
  	XChangeWindowAttributes(dis0, parent, valuemask, &xwatt);
 	XChangeWindowAttributes(dis0, downline, valuemask, &xwatt);
 
-	xwatt.background_pixel = colors[color_scheme_ind][MODEBACK];
+	xwatt.background_pixel = colors[color_scheme_ind][COLOR_MENU_BG];
 	XChangeWindowAttributes(dis0, wmenu, valuemask, &xwatt);
 }
 
@@ -2075,7 +2090,7 @@ void drv_win_color(WINDP *wp)
 {
  XSetWindowAttributes xwatt;
  unsigned long valuemask;
- background_pixel = colors[color_scheme_ind][BACKGROUND];
+ background_pixel = colors[color_scheme_ind][COLOR_BG];
 	valuemask= CWBackingPixel | CWBackPixel;
 	xwatt.backing_pixel = background_pixel;
 	valuemask= CWBackPixel;
@@ -2090,7 +2105,7 @@ void drv_update_styles()
 
  XSetWindowAttributes xwatt;
  unsigned long valuemask;
- background_pixel = colors[color_scheme_ind][BACKGROUND];
+ background_pixel = colors[color_scheme_ind][COLOR_BG];
 //	valuemask= CWBackingPixel | CWBackPixel;
 //	xwatt.backing_pixel = background_pixel;
 	valuemask= CWBackPixel;
@@ -2273,20 +2288,18 @@ void init_downline()
   dltop_gc = XCreateGC(dis0, parent, valuemask,&gcvalues);
   dlbotom_gc = XCreateGC(dis0, parent, valuemask,&gcvalues);
   XSetLineAttributes(dis0,dl_gc,1,LineSolid,CapRound, JoinRound);
-  XSetForeground(dis0, dltop_gc, colors[color_scheme_ind][MODEFOREI]);
-  XSetForeground(dis0, dlbotom_gc, colors[color_scheme_ind][MODEBACKI]);
+  XSetForeground(dis0, dltop_gc, colors[color_scheme_ind][COLOR_INACTIVE_FG]);
+  XSetForeground(dis0, dlbotom_gc, colors[color_scheme_ind][COLOR_INACTIVE_BG]);
 
-//  xwatt.background_pixel = colors[color_scheme_ind][BAR_FOREGROUND];
-//  XChangeWindowAttributes(dis0, downline, CWBackPixel, &xwatt);
 #endif
-  XSetForeground(dis0, dl_gc, colors[color_scheme_ind][BACKGROUND]);
-  XSetBackground(dis0, dl_gc, colors[color_scheme_ind][FOREGROUND]);
+  XSetForeground(dis0, dl_gc, colors[color_scheme_ind][COLOR_BG]);
+  XSetBackground(dis0, dl_gc, colors[color_scheme_ind][COLOR_FG]);
   XSetFont(dis0, dl_gc,font_status->fid);
 
   status_gc = XCreateGC(dis0, parent, valuemask,&gcvalues);
   XSetLineAttributes(dis0,status_gc,1,LineSolid,CapRound, JoinRound);
-  XSetForeground(dis0, status_gc, colors[color_scheme_ind][MODEFORE]);
-  XSetBackground(dis0, status_gc, colors[color_scheme_ind][MODEBACK]);
+  XSetForeground(dis0, status_gc, colors[color_scheme_ind][COLOR_MENU_FG]);
+  XSetBackground(dis0, status_gc, colors[color_scheme_ind][COLOR_MENU_BG]);
   XSetFont(dis0, status_gc,font_status->fid);
 
   CLEN_DL = XTextWidth(font_status,"m",1);
@@ -2303,12 +2316,12 @@ void show_downline()
 {
  XSetWindowAttributes xwatt;
 
-  xwatt.background_pixel = colors[color_scheme_ind][MODEBACK];
+  xwatt.background_pixel = colors[color_scheme_ind][COLOR_MENU_BG];
   XChangeWindowAttributes(dis0, downline, CWBackPixel, &xwatt);
   
   XClearWindow(dis0,downline);
-  XSetBackground(dis0, dl_gc, colors[color_scheme_ind][MODEBACK]);
-  XSetForeground(dis0, dl_gc, colors[color_scheme_ind][MODEFOREI]);
+  XSetBackground(dis0, dl_gc, colors[color_scheme_ind][COLOR_MENU_BG]);
+  XSetForeground(dis0, dl_gc, colors[color_scheme_ind][COLOR_INACTIVE_BG]);
 
 #if	HLINES
   XDrawLine(dis0, downline, dlbotom_gc, 0, 0, parent_width, 0);
@@ -2328,10 +2341,10 @@ void init_slide(WINDP *wp)
   wp->gwp->botom_gc = XCreateGC(dis0, gwp->sbar, valuemask,&gcvalues);
   XSetLineAttributes(dis0,wp->gwp->sgc,1,LineSolid,CapRound, JoinRound);
 
-  XSetForeground(dis0, wp->gwp->sgc, colors[color_ind][INFOBACK]);
-  XSetForeground(dis0, wp->gwp->sgm, colors[color_ind][INFOFORE]);
-  XSetForeground(dis0, wp->gwp->top_gc, colors[color_ind][CBOXTFORE]);
-  XSetForeground(dis0, wp->gwp->botom_gc, colors[color_ind][CBOXTBACK]);
+  XSetForeground(dis0, wp->gwp->sgc, colors[color_ind][COLOR_INFO_BG]);
+  XSetForeground(dis0, wp->gwp->sgm, colors[color_ind][COLOR_FG]);
+  XSetForeground(dis0, wp->gwp->top_gc, colors[color_ind][COLOR_MENU_FG]);
+  XSetForeground(dis0, wp->gwp->botom_gc, colors[color_ind][COLOR_BOX_BG]);
 }
 
 
@@ -2602,7 +2615,7 @@ void xdab(int y,int b,char *s,int bcolor,int fcolor)
 
  for(i=x1;*s;i+=CLEN_DL,s++) {
 	if(b==*s) {
-		XSetForeground(dis0,dl_gc, colors[color_scheme_ind][CTRLFORE]);
+		XSetForeground(dis0,dl_gc, colors[color_scheme_ind][COLOR_CTRL_FG]);
 		sattr[0]=b;
 		sattr[1]=0;
 		XDrawImageString(dis0,xsubw1,dl_gc,i,(y+1)*CHEIGHT_DL+y1-CFONTBASE_DL,sattr,1);
@@ -2621,7 +2634,7 @@ void remove_box()
  if(xsubw1!=(Pixmap)NULL) {
  	XFreePixmap(dis0,xsubw1);
  	xsubw1=(Pixmap)NULL;
- 	drv_color(BACKGROUND,FOREGROUND);
+ 	drv_color(COLOR_BG,COLOR_FG);
  };
  XFlush(dis0);
 }
@@ -2668,7 +2681,7 @@ void hdab(int x,int b,char *s,int bcolor, int fcolor)
 // return;
  for(i=x1;*s;i+=CLEN_DL,s++) {
 	if(b==*s) {
-		XSetForeground(dis0,dl_gc, colors[color_scheme_ind][CTRLFORE]);
+		XSetForeground(dis0,dl_gc, colors[color_scheme_ind][COLOR_CTRL_FG]);
 		sattr[0]=b;
 		sattr[1]=0;
 		XDrawImageString(dis0,wmenu,dl_gc,i,h+y1-CFONTBASE_DL,sattr,1);
@@ -2699,6 +2712,15 @@ void drv_msg_line(char *arg)
 
 
 
+void set_current_scheme(int scheme)
+{
+ color_scheme_ind=scheme-1;
+ set_btval("color_scheme",-1,NULL,color_scheme_ind+1); 
+
+ current_scheme = get_scheme_by_index(color_scheme_ind);
+}
+
+#if	0
 /* change color scheme */
 int change_color_scheme(int  n)
 {
@@ -2715,6 +2737,7 @@ int change_color_scheme(int  n)
  drv_update_styles();
  return(TRUE);
 }
+#endif
 
 void refresh_menu()
 {

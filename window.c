@@ -12,6 +12,7 @@
 extern alist *window_list;
 extern int *color;
 extern FILEBUF *cbfp;
+extern int color_scheme_ind;
 
 GWINDP * drv_new_twinp();
 
@@ -37,6 +38,7 @@ int reposition(int n)
 	else if(sline==cwp->w_ntrows-1) { movelines = midline-cwp->w_ntrows;}
 
 	move_window(movelines);
+	change_color_scheme(color_scheme_ind+1);
     return (TRUE);
 }
 
@@ -423,8 +425,8 @@ WINDP *dublicate_window(WINDP *wp0)
  };
 
  wp->selection=0;
- wp->w_fcolor = FOREGROUND; 
- wp->w_bcolor = BACKGROUND;
+ wp->w_fcolor = COLOR_FG; 
+ wp->w_bcolor = COLOR_BG;
 
  set_selection(false);
  return wp;
@@ -436,8 +438,8 @@ void set_windows_color()
  lbegin(window_list);
  while((wp=(WINDP *)lget(window_list))!=NULL)
  {
- wp->w_fcolor = FOREGROUND;
- wp->w_bcolor = BACKGROUND;
+ wp->w_fcolor = COLOR_FG;
+ wp->w_bcolor = COLOR_BG;
  wp->w_flag=UPD_FULL;
  };
 }

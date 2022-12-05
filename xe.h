@@ -11,17 +11,19 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.58 (3/10/2022)"
+#define VERSION 	"#01.58T12 (4/12/2022)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
 /* Test flags */
 #define NUSE		0	/* not used anymore */
 #define	RSESSION	1	/* record session */
+#define	CLASSIC_STATUS 	0
 
 #define DOUBLE_ESC	0	/* use double escape for abort command else single  */
-#define	XCOLOR_TYPES	30
-#define	COLOR_SCHEMES	10
+
+#define	NEW_COLORS	1
+#define NEW_COLOR8	0
 
 #define	PANGO_TEST	1
 #define	TARROWS		1	/* Use arrow menus in panel curses  */
@@ -280,10 +282,13 @@ typedef struct notes_struct {
 
 typedef struct vchar {
 	unsigned char uval[8];	/* stores a utf char  */
+	unsigned short attr:8;
 	unsigned short bcolor:8;	/* background  */
-	unsigned short fcolor:8;	/* foreground  */
+	unsigned short fcolor;	/* foreground  */
+#if	0
 	unsigned int display_width;
 	unsigned int display_height;
+#endif
 } vchar;
 
 typedef struct  VIDEO {
@@ -829,39 +834,40 @@ enum env_defs {
  /* file extensions */
 #define	FX_COMPRESS	37
 
-/* color type name definitions */
-enum color_types {
-	FOREGROUND,		/* 1 common foreground */
-	BACKGROUND,		/* 0 common background   */
-	MODEFORE,		/* 2 modeline foreground  */
-	MODEBACK,		/* 3 modeline background  */
-	DROWCOL	,		/* 4 row/column foreground on modeline  */
-	SEARFORE,		/* 5 search foreground  */
-	SEARBACK,		/* 6 search background  */
-	QUOTEFORE,		/* 7 double quotes foreground  */
-	QUOTEBACK,		/* 8 double quotes background  */
-	COMMENTFORE,	/* 9 comments foreground  */
-	LBACKGROUND,	/* light background  */
-	PREPFORE ,		/* 11 preprocessing foreground  */
-	CHANGEFORE,		/* 12 Changed flag foreground */
-	TAGFORE	,		/* 13 H_QUOTE4, H_QUOTE8  */
-	WORD1FORE,		/* 14 word1 foreground  */
-	SPECFORE,		/* 15 single quotes, special characters foreround */
-	SQUOTEFORE,		/* --  */
-	CTRLFORE,		/* 16 control character foreground  */
-	WORD2FORE,		/* 17 word2 foreround  */
-	W_FORE	,		/* 18 H_QUOTE7 tag words for html/xml */
-	ORIZON	,		/* 19 orizon characters foreground  */
-	CNUMERIC,		/* 20 characters foreground  */
-	INFOFORE,		/* 23  */
-	INFOBACK,		/* 24  */
-	CBOXTFORE,		/* Box foreground  */
-	CBOXTBACK,		/* Box background  */
-	MENU_FG,		/* menu foreground normal  */
-	MENU_BG,		/* menu background, box iside background  */
-	MODEFOREI,		/* Modeline inactive foreground  */
-	MODEBACKI,		/* Modeline inactive background  */
+#define	BG_COLORS	10
+enum color_types_bg {
+	COLOR_BG,			// BACKGROUND
+	COLOR_MENU_BG,		// MENU_BG
+	COLOR_SELECT_BG,	// MODEBACK
+	COLOR_SEARCH_BG,	// SEARBACK
+	COLOR_QUOTE_BG,		// QUOTEBACK
+	COLOR_LIGHT_BG,		// LBACKGROUND
+	COLOR_INFO_BG,		// INFOBACK
+	COLOR_INACTIVE_BG,	// MODEBACKI
+	COLOR_BOX_BG,		// CBOXTBACK
+	COLOR_CODE_BG		// color code bg
 };
+
+#define	FG_COLORS	15
+enum color_types_fg {
+	COLOR_FG=BG_COLORS,	// FOREGROUND, INFOFORE, QUOTEFORE
+	COLOR_MENU_FG,		// CBOXTFORE
+	COLOR_STANDOUT_FG,	// SEARFORE, CNUMERIC, MENUSTART, MENU_FG, CBOXFORE
+	COLOR_CTRL_FG,		// menu start fg, CTRLFORE
+	COLOR_PREP_FG,		// PREPFORE
+	COLOR_WORD1_FG,		// WORD1FORE
+	COLOR_WORD2_FG,		// WORD2FORE
+	COLOR_WORD3_FG,		// W_FORE
+	COLOR_SPEC_FG,		// SPECFORE
+	COLOR_SQUOTE_FG,	// SQUOTEFORE
+	COLOR_COMMENT_FG,	// COMMENTFORE
+	COLOR_CHANGE_FG,	// CHANGEFORE
+	COLOR_HORIZON_FG,	// ORIZON
+	COLOR_INACTIVE_FG,	// MODEFOREI
+	COLOR_ROWCOL_FG		// DROWCOL
+};
+
+#define COLOR_TYPES	BG_COLORS+FG_COLORS
 
 /* Icon Element types  */
 #define	ENORMAL	0

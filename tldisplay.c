@@ -11,7 +11,6 @@
 #include	"support.h"
 #include	"menus.h"
 #include	"panel_curses.h"
-#define	USE_CLASSIC	1
 
 char **getdir(char *dirname,char *s_find,int *num);
 int utf_num_chars(char *);
@@ -332,9 +331,9 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
  set_box_cline(iol);
 
  if(orient==VERTICAL){
-	show_menu_line(i,&m1->element[i],fch,bch);
+	show_menu_line(i,&m1->element[i],COLOR_SELECT_BG,fch);
  } else	{
- 	hdab(sx+i*HLABEL_WIDTH,m1->element[i].high,m1->element[i].txt,fch,bch);
+ 	hdab(sx+i*HLABEL_WIDTH,m1->element[i].high,m1->element[i].txt,COLOR_SELECT_BG,fch);
  };
  drv_flush();
  /* get keyboard */
@@ -365,9 +364,9 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 					hdab(sx+HLABEL_WIDTH*(iol),m1->element[iol].high,m1->element[iol].txt,bch,fch);
 				};
 				if(orient==VERTICAL){
-					show_menu_line(i,&m1->element[i],fch,bch);
+					show_menu_line(i,&m1->element[i],COLOR_SELECT_BG,fch);
 				}else {
-					hdab(sx+HLABEL_WIDTH*(i),m1->element[i].high,m1->element[i].txt,fch,bch);
+					hdab(sx+HLABEL_WIDTH*(i),m1->element[i].high,m1->element[i].txt,COLOR_SELECT_BG,fch);
 				};
 				iol=i;
 				set_box_cline(iol);
@@ -468,9 +467,9 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 			hdab(sx+HLABEL_WIDTH*(iol),m1->element[iol].high,m1->element[iol].txt,bch,fch);
 		};
 		if(orient==VERTICAL){
-			show_menu_line(i,&m1->element[i],fch,bch);
+			show_menu_line(i,&m1->element[i],COLOR_SELECT_BG,fch);
 		} else {
-			hdab(sx+HLABEL_WIDTH*(i),m1->element[i].high,m1->element[i].txt,fch,bch);
+			hdab(sx+HLABEL_WIDTH*(i),m1->element[i].high,m1->element[i].txt,COLOR_SELECT_BG,fch);
 		};
 		iol=i;
 		set_box_cline(iol);
@@ -514,11 +513,11 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 //		MESG("orient=vertical iol=%d i=%d",iol,i);
 		if(iol!=i){
 		show_menu_line(iol,&m1->element[iol],bch,fch);
-		show_menu_line(i,&m1->element[i],fch,bch);
+		show_menu_line(i,&m1->element[i],COLOR_SELECT_BG,fch);
 		};
 	} else {
-		hdab(sx+HLABEL_WIDTH*(iol),m1->element[iol].high,m1->element[iol].txt,fch,bch);
-		hdab(sx+HLABEL_WIDTH*(i),m1->element[i].high,m1->element[i].txt,bch,fch);
+		hdab(sx+HLABEL_WIDTH*(iol),m1->element[iol].high,m1->element[iol].txt,bch,fch);
+		hdab(sx+HLABEL_WIDTH*(i),m1->element[i].high,m1->element[i].txt,COLOR_SELECT_BG,fch);
 	};
 	}
 	iol=i;
@@ -1370,9 +1369,11 @@ void status_line(WINDP *wp)
 	else if(wp->w_ntcols > NUM_COLS_NOINFO) max_t = wp->w_ntcols - show_position_size(wp,-1);
 	else max_t = wp->w_ntcols-2;
 
+#if	!CLASSIC_STATUS
 	if(drv_colors>8) 
 		lchar = ' ';
 	else
+#endif
 		lchar = (wp == cwp) ? hline2 : hline1;	/* mark the current buffer */
 
 	stp = status_string;

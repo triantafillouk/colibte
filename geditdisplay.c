@@ -16,6 +16,7 @@ extern int font_weight;
 extern char *current_font_name;
 extern char **mono_fonts_list;
 extern int mono_fonts_number;
+extern int color_scheme_ind;
 
 int selection_on=-1;
 
@@ -28,7 +29,7 @@ extern GtkWidget *popup_select_on, *popup_select_off, *popup_boxed_region, *popu
 extern float CHEIGHT,CLEN,CFONTBASE,SLBASE;
 extern int CHEIGHTI;
 extern int update_all;
-//extern int cursor_showing;
+
 extern int font_index,font_size;
 void set_cursor(int val,char *from);
 
@@ -42,7 +43,7 @@ void ge_edit_display_size_allocate  (GtkWidget *widget, GtkAllocation *allocatio
 
 static gint ge_edit_display_expose         (GtkWidget *widget, GdkEventExpose *event);
 void ge_edit_display_expose_area    (GtkWidget *widget, GdkRectangle *area);
-//static void ge_edit_display_style_set      (GtkWidget *widget, GtkStyle *previous_style);
+
 static int ge_edit_focus_in		(GtkWidget *widget, GdkEventFocus *event);
 static int ge_edit_focus_out	(GtkWidget *widget, GdkEventFocus *event);
 static void ge_edit_display_draw_focus		(GtkWidget *widget);
@@ -305,6 +306,7 @@ ge_edit_display_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
 		cairo_destroy(wd->cr);
 		gdk_pixmap_unref(wd->edit_pixmap);
 	};
+	change_color_scheme(color_scheme_ind+1);
 	drv_update_styles();
 	/* get backing pixmap to draw into */
 	wd->edit_pixmap = gdk_pixmap_new(wd->edit_window, allocation->width,
@@ -416,9 +418,10 @@ ge_edit_display_expose_area(GtkWidget *widget, GdkRectangle *area)
 static void
 ge_edit_display_draw_focus (GtkWidget *widget)
 {
-#if	NOTUSED
+#if	NUSE
  GdkRectangle rect;
  GeEditDisplay *wd;
+ MESG("ge_edit_display_draw_focus:");
  g_return_if_fail(widget !=NULL);
  g_return_if_fail(GTK_IS_EDIT_DISPLAY(widget));
 

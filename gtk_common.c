@@ -12,6 +12,22 @@ extern int nnarg;
 extern FILEBUF *cbfp;
 
 GtkWidget *wlist;
+COLOR_SCHEME *get_scheme_by_index(int scheme_num);
+
+void set_current_scheme(int scheme)
+{
+ MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
+
+ color_scheme_ind=scheme-1;
+ set_btval("color_scheme",-1,NULL,color_scheme_ind+1); 
+
+ current_scheme = get_scheme_by_index(color_scheme_ind);
+
+ set_current_colors();
+ MESG("set_current_scheme:end");
+}
+
+#include "xthemes.c"
 
 int confirm(char *title,char *prompt,int always) {
   int result; 
@@ -47,16 +63,18 @@ void drv_open()
 	dis0 = XOpenDisplay(display_name);
 	screen_num = DefaultScreen(dis0);
 
-	color_scheme_ind=(int)bt_dval("xcolor_scheme")-1;
+	color_scheme_ind=(int)bt_dval("xcolor_scheme");
 	init_color();
-
+	set_current_scheme(color_scheme_ind+1);
 	parent = create_parent();
 	if(cwp==NULL) { ERROR("no cwp!");exit(0);};
 	wlist=create_select_window();	// this is the list window (only one!)
 	gtk_widget_realize(parent);
+	MESG("parent realized!");
 	gtk_widget_show(parent);
-
+	MESG("parent showed!");
 	gtk_widget_grab_focus(cwp->gwp->draw);
+	MESG("drv_open: end");
 }
 
 void show_cursor_dl(int pos)
@@ -136,6 +154,7 @@ int put_wstring(WINDP *wp, char *st,int ulen)
  };
  pango_layout_set_text (wd->layout, st, -1);
  pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
+ // pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_ULTRALIGHT);
  pango_layout_get_size (wd->layout, &width, &height);
  int y_pos_correction=0;
  int c_width=CLEN*ulen;
@@ -169,6 +188,7 @@ unsigned int put_wchar(WINDP *wp, char *st)
  };
  pango_layout_set_text (wd->layout, st, -1);
  pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
+ // pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_BOLD);
  pango_layout_get_size (wd->layout, &width, &height);
  int y_pos_correction=0;
  int c_width=CLEN;
@@ -1466,29 +1486,16 @@ void drv_msg_line(char *arg)
 	drv_flush();
 }
 
-void create_default_scheme()
-{
-}
+typedef struct RGB_DEF {
+ int r,g,b;
+ char *color_name;
+} RGB_DEF;
+RGB_DEF *get_rgb_values(char *color_name);
 
-/* change color scheme */
-int change_color_scheme(int  n)
+void set_cursor(int val,char *from)
 {
- 
- if(n<1 || n>COLOR_SCHEMES)	{
-	color_scheme_ind=0;
- } else {
-	color_scheme_ind=n-1;
- };
- set_btval("xcolor_scheme",-1,NULL,color_scheme_ind+1); 
- set_update(cwp,UPD_ALL);
- if(!discmd) return true;
-
- drv_back_color();
-// hide_cursor("change_color_scheme");
- set_cursor(0,"change_color_scheme");
- set_windows_color();
- drv_update_styles();
- return(TRUE);
+	cursor_showing=val;
+//	MESG("set_cursor: val=%d %s",val,from);
 }
 
 

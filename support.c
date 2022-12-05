@@ -480,7 +480,7 @@ char **split_2_sarray(char *in_string,int split_chr)
    char *start=in_string;
    while(*start==' ') start++;
    buffer = strdup(start);
-   MESG("split_2_sarray [%s]",start);
+   // MESG("split_2_sarray [%s]",start);
    if(buffer){
 	int i;
 	int l;
@@ -609,6 +609,7 @@ void free_sarray(char **sarray)
 	free(buffer);	/* free contents  */
 	free(sarray);	/* free pointer array  */
 }
+
 
 #if !DARWIN
 size_t strlcat(char *dst, const char *src, size_t size)
