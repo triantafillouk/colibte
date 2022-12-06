@@ -11,7 +11,7 @@ extern alist *color_scheme_list;
 
 char *basic_color_names[] = {
 	"black","red","green","orange","blue","magenta","cyan","white",
-	"brown","lred","lgreen","yellow","lblue","lmagenta","lcyan","lwhite"
+	"brown","lred","lgreen","yellow","lblue","lmagenta","lcyan","lwhite",NULL
 };
 
 // default color schemes
@@ -110,7 +110,6 @@ int color_scheme_read()
 	sscanf(b,"%s %s %s",ctype,name1,name2);
 	j=sarray_index(color_type,ctype);
 	if(j>=0) {
-		scheme->color_attr[j].attrib=0;
 		i=sarray_index(basic_color_names,name1);
 		if(i>=0) {
 			scheme->color_attr[j].index=i;	/* 8 colors index  */
@@ -124,10 +123,10 @@ int color_scheme_read()
 			if(strstr(name2,"italic")) scheme->color_attr[j].attrib |= A_ITALIC;
 			if(strstr(name2,"dim")) scheme->color_attr[j].attrib |= A_DIM;
 			if(strstr(name2,"reverse")) scheme->color_attr[j].attrib |= A_REVERSE;
-		// MESG(" [%s] color [%s] = %s %s -> %X",b,color_type[j],name1,name2,scheme->color_attr[j].attrib);
+		if(scheme->color_attr[j].attrib!=0) MESG(" %s: %s %s %X",ctype,name1,name2,scheme->color_attr[j].attrib);
 	};
  };
-	MESG("color file read ok 1 !");
+	MESG("color file read ok !");
 	fclose(f1);
 	return 1;
  } else {
@@ -184,7 +183,7 @@ void init_default_schemes()
 	COLOR_SCHEME *scheme = malloc(sizeof(COLOR_SCHEME));
 	scheme->scheme_name = default_scheme_names[scheme_ind];
 
-	// fprintf(stderr,"scheme %d [%s] ----------------------\n",scheme_ind,scheme->scheme_name);
+	fprintf(stderr,"scheme %d [%s] ----------------------\n",scheme_ind,scheme->scheme_name);
 	int total_colors=FG_COLORS+BG_COLORS;
 		for(i=0;i<total_colors;i++) 
 		{

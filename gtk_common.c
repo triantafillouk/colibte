@@ -611,16 +611,17 @@ void put_wtext(WINDP *wp, int row,int maxcol)
 		};
 		fcolor=v1[col].fcolor;
 		bcolor=v1[col].bcolor;
+		cattr=v1[col].attr;
 		if(fcolor!=fcolor_p || bcolor!=bcolor_p) {
 			if(i1>0) {
 				st[i1]=0;
 				drv_move(row,imove);
+				drv_color(fcolor,bcolor);
 				if(put_wstring(wp,st,col-imove,cattr)==-1) {
 					put_wtext_slow(wp,row,maxcol);
 					return;
 				};
 			};
-			drv_color(fcolor,bcolor);
 			i1=0;
 			imove=col; 
 			fcolor_p=fcolor;bcolor_p=bcolor;
