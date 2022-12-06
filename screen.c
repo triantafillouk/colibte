@@ -24,6 +24,19 @@ void vteeol(WINDP *wp, int selected,int inside);
 int SUtfCharLen(char *utfstr,int offset,utfchar *uc);
 int line_bcolor=0;
 
+typedef struct color_curses {
+	int index;	/* color index  */
+	int attrib;	/* attribute  */
+} color_curses;
+
+typedef struct COLOR_SCHEME {
+	char *scheme_name;
+	char *color_values[COLOR_TYPES];
+	color_curses color_attr[COLOR_TYPES];
+} COLOR_SCHEME;
+
+extern COLOR_SCHEME *current_scheme;
+
 int specialh=0;
 /* highlight state  */
 extern int hquotem;
@@ -82,7 +95,15 @@ void svwchar(vchar *vc, utfchar *uc,int b_color,int f_color)
  };
  vc->bcolor=b_color;
  vc->fcolor=f_color%256;
- vc->attr = f_color - vc->fcolor;
+ if(f_color>255) {
+ 	vc->attr = f_color - (vc->fcolor);
+	MESG("! %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
+ } else {
+ 	vc->attr = current_scheme->color_attr[vc->fcolor].attrib;
+	// if(vc->uval[0]!=' ')
+	// MESG("~ %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
+ };
+//  vc->attr = f_color - vc->fcolor;
 #if	0
  vc->display_width=CLEN;
  vc->display_height=CHEIGHTI;
@@ -103,7 +124,14 @@ void  svchar(vchar *vc,int val,int b_color,int f_color)
  // if(vc->attr) MESG("svchar ul");
  vc->bcolor=b_color;
  vc->fcolor=f_color%256;
- vc->attr = f_color - (vc->fcolor);
+ if(f_color>255) {
+ 	vc->attr = f_color - (vc->fcolor);
+	// MESG("# %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
+ } else {
+ 	vc->attr = current_scheme->color_attr[vc->fcolor].attrib;
+	// if(vc->uval[0]!=' ')
+	// MESG("- %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
+ };
 #if	0
  vc->display_width=CLEN;
  vc->display_height=CHEIGHTI;
@@ -114,8 +142,14 @@ void  svchar(vchar *vc,int val,int b_color,int f_color)
 void  svcolor(vchar *vc,int b_color,int f_color)
 {
  vc->bcolor=b_color;
- vc->fcolor=f_color % 256;
- vc->attr = f_color - (f_color % 256);
+	 vc->fcolor=f_color % 256;
+	 if(f_color>255) {
+	 	vc->attr = f_color - (f_color % 256);
+		 MESG("- %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
+	 } else {
+		 vc->attr = current_scheme->color_attr[vc->fcolor].attrib;
+		 // MESG("+ %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
+	};
 }
 
 /* set virtual special multiple  character */
@@ -771,7 +805,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		for(i0=start_color_column;i0<= end_column;i0++) svcolor(v_text+i0,bg_color,fg_color);
 	} else 
 	{
-		if(drv_colors==8) { bg_color=COLOR_SELECT_BG;fg_color=COLOR_STANDOUT_FG+256;}
+		if(drv_colors==8) { bg_color=COLOR_SELECT_BG;fg_color=COLOR_STANDOUT_FG+A_UNDERLINE;}
 		else { bg_color=COLOR_INFO_BG;fg_color=COLOR_MENU_FG+A_UNDERLINE;};
 		line_bcolor=bg_color;
 		for(i0=start_color_column;i0<= end_column;i0++)
@@ -1203,7 +1237,7 @@ void vtputc(WINDP *wp, unsigned int c)
 void vtputwc(WINDP *wp, utfchar *uc)
 {
 	FILEBUF *fp=wp->w_fp;
-	unsigned char ctl_f=0,ctl_b=0;
+	unsigned int ctl_f=0,ctl_b=0;
 	int i=0;
 	unsigned int c=uc->uval[0];
 	register VIDEO *vp;	/* ptr to line being updated */

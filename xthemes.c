@@ -183,7 +183,7 @@ void init_default_schemes()
 	COLOR_SCHEME *scheme = malloc(sizeof(COLOR_SCHEME));
 	scheme->scheme_name = default_scheme_names[scheme_ind];
 
-	fprintf(stderr,"scheme %d [%s] ----------------------\n",scheme_ind,scheme->scheme_name);
+	// fprintf(stderr,"scheme %d [%s] ----------------------\n",scheme_ind,scheme->scheme_name);
 	int total_colors=FG_COLORS+BG_COLORS;
 		for(i=0;i<total_colors;i++) 
 		{

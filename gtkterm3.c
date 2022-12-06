@@ -627,7 +627,7 @@ void set_edit_font(GeEditDisplay *wd)
 	/* use pango metrics  */
 	if(wd->layout==NULL) {
 		wd->layout=pango_cairo_create_layout (wd->cr);
-		// MESG("set_edit_font: new layout!");
+		MESG("set_edit_font: new layout!");
 	};
 	PangoContext *context = pango_layout_get_context(wd->layout);
 	PangoLanguage *language = pango_language_get_default();

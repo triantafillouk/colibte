@@ -152,14 +152,32 @@ int put_wstring(WINDP *wp, char *st,int ulen,int attr)
  	wd->layout = pango_cairo_create_layout (wd->cr);
 	// MESG("put_wstring: new layout!");
  };
+
+	if(attr & A_BOLD) {
+		MESG(" [%s] %X bold",st,attr);
+		pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_HEAVY);
+	} 
+	else pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_NORMAL);
+ 	if(attr & A_ITALIC) {
+		MESG(" [%s] %X italics",st,attr);
+		pango_font_description_set_style(wd->ge_font_desc,PANGO_STYLE_OBLIQUE);
+	} else pango_font_description_set_style(wd->ge_font_desc,PANGO_STYLE_NORMAL);
+#if 1
+ 	PangoAttrList * attrs = pango_attr_list_new ();
+	if(attr & A_UNDERLINE) { 
+	 MESG(" [%s] %X underline",st,attr);
+	 pango_attr_list_insert (attrs, pango_attr_underline_new(PANGO_UNDERLINE_DOUBLE));
+	 pango_layout_set_attributes (wd->layout, attrs);
+ 	} else {
+
+	 pango_attr_list_insert (attrs, pango_attr_underline_new(PANGO_UNDERLINE_NONE));
+	 pango_layout_set_attributes (wd->layout, attrs);
+ 	};
+#endif
+ 
  pango_layout_set_text (wd->layout, st, -1);
  pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
- if(attr) { MESG(" [%s] %X",st,attr);
-	if(attr & A_BOLD) pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_HEAVY);
-	else pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_ULTRALIGHT);
- 	if(attr & A_UNDERLINE) pango_font_description_set_style(wd->ge_font_desc,PANGO_STYLE_OBLIQUE);
-	else pango_font_description_set_style(wd->ge_font_desc,PANGO_STYLE_NORMAL);
- };
+
  pango_layout_get_size (wd->layout, &width, &height);
  int y_pos_correction=0;
  int c_width=CLEN*ulen;
@@ -177,7 +195,7 @@ int put_wstring(WINDP *wp, char *st,int ulen,int attr)
  cairo_move_to(wd->cr,px+1,py+1-y_pos_correction);
  cairo_set_source_rgb(wd->cr,ccolorf.red,ccolorf.green,ccolorf.blue);
  pango_cairo_show_layout (wd->cr, wd->layout);
- // px += width/PANGO_SCALE;
+ pango_attr_list_unref (attrs);
  px += ulen*CLEN;
  return width/PANGO_SCALE;
 }
@@ -585,7 +603,7 @@ void put_wtext(WINDP *wp, int row,int maxcol)
  VIDEO *vp1;
  int fcolor,bcolor,cattr=0;
  char st[MAXBLEN];
- int fcolor_p,bcolor_p;
+ int fcolor_p,bcolor_p,attr_p;
  int imove=0;
  vp1 = wp->vs[row];
  v1=vtext=vp1->v_text;
@@ -593,9 +611,10 @@ void put_wtext(WINDP *wp, int row,int maxcol)
  imin=0;
  fcolor=v1[0].fcolor;
  bcolor=v1[0].bcolor;
- cattr = v1[0].attr;
+ cattr =v1[0].attr;
  fcolor_p=fcolor;
  bcolor_p=bcolor;
+ attr_p = cattr;
  
  // MESG("---> draw row %d",row);
  	drv_color(fcolor,bcolor);
@@ -611,20 +630,21 @@ void put_wtext(WINDP *wp, int row,int maxcol)
 		};
 		fcolor=v1[col].fcolor;
 		bcolor=v1[col].bcolor;
-		cattr=v1[col].attr;
-		if(fcolor!=fcolor_p || bcolor!=bcolor_p) {
+		cattr =v1[col].attr;
+		
+		if(fcolor!=fcolor_p || bcolor!=bcolor_p || cattr!=attr_p) {
 			if(i1>0) {
 				st[i1]=0;
 				drv_move(row,imove);
-				drv_color(fcolor,bcolor);
-				if(put_wstring(wp,st,col-imove,cattr)==-1) {
+				if(put_wstring(wp,st,col-imove,attr_p)==-1) {
 					put_wtext_slow(wp,row,maxcol);
 					return;
 				};
 			};
+			drv_color(fcolor,bcolor);
 			i1=0;
 			imove=col; 
-			fcolor_p=fcolor;bcolor_p=bcolor;
+			fcolor_p=fcolor;bcolor_p=bcolor;attr_p=cattr;
 		};
 		// if(v1[col].uval[0]==0x20) p_space=1;
 		i1=addutfvchar1(st,&v1[col],i1,wp->w_fp);
