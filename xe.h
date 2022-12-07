@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.58T12 (4/12/2022)"
+#define VERSION 	"#01.58T13 (6/12/2022)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -106,14 +106,14 @@
 #include "utf8_support.h"
 #include "input.h"
 
+#define	FONT_STYLE_BOLD			0x100
+#define	FONT_STYLE_UNDERLINE	0x200
+#define	FONT_STYLE_ITALIC		0x400
+#define FONT_STYLE_REVERSE		0x800
+#define FONT_STYLE_DIM			0x1000
+
 #if	GTK
 #include <gtk/gtk.h>
-
-#define	A_BOLD		0x100
-#define	A_UNDERLINE	0x200
-#define	A_ITALIC	0x400
-#define A_DIM		0x800
-#define	A_REVERSE	0x1000
 #endif
 
 #if	PCURSES
@@ -288,9 +288,9 @@ typedef struct notes_struct {
 
 typedef struct vchar {
 	unsigned char uval[8];	/* stores a utf char  */
-	int  attr;
+	short int  attr;
 	short int bcolor;	/* background  */
-	int fcolor;	/* foreground  */
+	short int fcolor;	/* foreground  */
 #if	0
 	unsigned int display_width;
 	unsigned int display_height;

@@ -68,7 +68,7 @@ int color_scheme_read()
 	 if((fname=find_file(NULL,".colors8",1,0))==NULL) return FALSE;
  } else 
 #endif
- if((fname=find_file(NULL,".colors16",1,0))==NULL) return FALSE;
+ if((fname=find_file(NULL,".colors",1,0))==NULL) return FALSE;
 
  f1=fopen(fname,"r");
  if(f1!=NULL) {
@@ -118,11 +118,11 @@ int color_scheme_read()
 		};
 		scheme->color_attr[j].attrib=0;
 
-			if(strstr(name2,"bold") || i>8) scheme->color_attr[j].attrib |= A_BOLD;
-			if(strstr(name2,"underline")) scheme->color_attr[j].attrib |= A_UNDERLINE;
-			if(strstr(name2,"italic")) scheme->color_attr[j].attrib |= A_ITALIC;
-			if(strstr(name2,"dim")) scheme->color_attr[j].attrib |= A_DIM;
-			if(strstr(name2,"reverse")) scheme->color_attr[j].attrib |= A_REVERSE;
+			if(strstr(name2,"bold") || i>8) scheme->color_attr[j].attrib |= FONT_STYLE_BOLD;
+			if(strstr(name2,"underline")) scheme->color_attr[j].attrib |= FONT_STYLE_UNDERLINE;
+			if(strstr(name2,"italic")) scheme->color_attr[j].attrib |= FONT_STYLE_ITALIC;
+			if(strstr(name2,"dim")) scheme->color_attr[j].attrib |= FONT_STYLE_DIM;
+			if(strstr(name2,"reverse")) scheme->color_attr[j].attrib |= FONT_STYLE_REVERSE;
 		if(scheme->color_attr[j].attrib!=0) MESG(" %s: %s %s %X",ctype,name1,name2,scheme->color_attr[j].attrib);
 	};
  };
@@ -143,7 +143,7 @@ int color_scheme_save()
  int i;
  int scheme_ind=0;
 // sprintf(name1,".color%1d.col",scheme_ind);
- fname=find_file(NULL,".colors16",0,1);
+ fname=find_file(NULL,".colors",0,1);
  f1=fopen(fname,"w");
 
  if(f1!=NULL) {

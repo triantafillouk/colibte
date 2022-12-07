@@ -1402,7 +1402,6 @@ void drv_win_move(WINDP *wp,int row,int col)
 	wmove(stdscr,wp->gwp->t_ypos+row,wp->gwp->t_xpos+col);
 }
 
-
 void drv_move(int row, int col)
 {
 	wmove(stdscr,row,col);
@@ -1410,10 +1409,15 @@ void drv_move(int row, int col)
 
 void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
 {
- int fcolor=afcol%256;
- unsigned int attrib=current_scheme->color_attr[fcolor].attrib;
- if(afcol>255) attrib = A_UNDERLINE;
-  // if(attrib>0) MESG("- attrib %X fcolor=%X",attrib,afcol);
+ int fcolor=afcol % 0x100;
+ int attrib=0;
+ if(afcol & FONT_STYLE_UNDERLINE) attrib |=A_UNDERLINE;
+ if(afcol & FONT_STYLE_ITALIC) attrib |= A_ITALIC;
+ if(afcol & FONT_STYLE_BOLD) attrib |= A_BOLD;
+ if(afcol & FONT_STYLE_DIM) attrib |= A_DIM;
+ if(afcol & FONT_STYLE_REVERSE) attrib |= A_REVERSE;
+
+  // if(attrib>0) MESG("- attrib %X fcolor=%X afcol=%X",attrib,fcolor,afcol);
   wattrset(wnd,color_pair(fcolor,abcol)|attrib);
 }
 
@@ -1957,8 +1961,9 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 	for(i=0;i<=imax;i++) {
 	 uint32_t ch;
-	 	fcolor = v1->fcolor+v1->attr;
-		bcolor=v1->bcolor;
+	 	if(v1->fcolor < 256) fcolor = v1->fcolor+v1->attr;
+		else fcolor = v1->fcolor;
+		bcolor = v1->bcolor;
 		// if(row==0) MESG("row %d underline i=%d bcolor=%d cattr=%d",row,i,bcolor,fcolor);
 		drv_wcolor(wp->gwp->draw,fcolor,bcolor);
 		ch=v1->uval[0];

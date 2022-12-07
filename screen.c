@@ -805,8 +805,8 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		for(i0=start_color_column;i0<= end_column;i0++) svcolor(v_text+i0,bg_color,fg_color);
 	} else 
 	{
-		if(drv_colors==8) { bg_color=COLOR_SELECT_BG;fg_color=COLOR_STANDOUT_FG+A_UNDERLINE;}
-		else { bg_color=COLOR_INFO_BG;fg_color=COLOR_MENU_FG+A_UNDERLINE;};
+		if(drv_colors==8) { bg_color=COLOR_SELECT_BG;fg_color=COLOR_STANDOUT_FG+FONT_STYLE_UNDERLINE;}
+		else { bg_color=COLOR_INFO_BG;fg_color=COLOR_MENU_FG+FONT_STYLE_UNDERLINE;};
 		line_bcolor=bg_color;
 		for(i0=start_color_column;i0<= end_column;i0++)
 		{
