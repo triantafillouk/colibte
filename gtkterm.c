@@ -366,29 +366,28 @@ void drv_update_styles()
  st3a = gtk_style_new();
  st3i = gtk_style_new();
 
- gdk_color_parse(current_scheme->color_values[COLOR_MENU_FG],&st1a->text[GTK_STATE_NORMAL]);
-
- gdk_color_parse(current_scheme->color_values[COLOR_MENU_FG],&st1a->fg[GTK_STATE_NORMAL]);
- gdk_color_parse(current_scheme->color_values[COLOR_MENU_BG],&st1a->base[GTK_STATE_NORMAL]);
- gdk_color_parse(current_scheme->color_values[COLOR_MENU_BG],&st1a->bg[GTK_STATE_NORMAL]);
+ gdk_color_parse(current_scheme->color_style[COLOR_MENU_FG].color_value,&st1a->text[GTK_STATE_NORMAL]);
+ gdk_color_parse(current_scheme->color_style[COLOR_MENU_FG].color_value,&st1a->fg[GTK_STATE_NORMAL]);
+ gdk_color_parse(current_scheme->color_style[COLOR_MENU_BG].color_value,&st1a->base[GTK_STATE_NORMAL]);
+ gdk_color_parse(current_scheme->color_style[COLOR_MENU_BG].color_value,&st1a->bg[GTK_STATE_NORMAL]);
 
  gdk_color_parse("green",&st1a->base[GTK_STATE_SELECTED]);
 
- gdk_color_parse(current_scheme->color_values[COLOR_INACTIVE_FG],&st1i->text[GTK_STATE_NORMAL]);
- gdk_color_parse(current_scheme->color_values[COLOR_INACTIVE_FG],&st1i->fg[GTK_STATE_NORMAL]);
- gdk_color_parse(current_scheme->color_values[COLOR_INACTIVE_BG],&st1i->base[GTK_STATE_NORMAL]);
+ gdk_color_parse(current_scheme->color_style[COLOR_INACTIVE_FG].color_value,&st1i->text[GTK_STATE_NORMAL]);
+ gdk_color_parse(current_scheme->color_style[COLOR_INACTIVE_FG].color_value,&st1i->fg[GTK_STATE_NORMAL]);
+ gdk_color_parse(current_scheme->color_style[COLOR_INACTIVE_BG].color_value,&st1i->base[GTK_STATE_NORMAL]);
  gdk_color_parse("green",&st1i->base[GTK_STATE_SELECTED]);
 
- gdk_color_parse(current_scheme->color_values[COLOR_ROWCOL_FG],&st3a->text[GTK_STATE_NORMAL]);
- gdk_color_parse(current_scheme->color_values[COLOR_ROWCOL_FG],&st3a->fg[GTK_STATE_NORMAL]);
- gdk_color_parse(current_scheme->color_values[COLOR_MENU_BG],&st3a->base[GTK_STATE_NORMAL]);
- gdk_color_parse(current_scheme->color_values[COLOR_MENU_BG],&st3a->bg[GTK_STATE_NORMAL]);
+ gdk_color_parse(current_scheme->color_style[COLOR_ROWCOL_FG].color_value,&st3a->text[GTK_STATE_NORMAL]);
+ gdk_color_parse(current_scheme->color_style[COLOR_ROWCOL_FG].color_value,&st3a->fg[GTK_STATE_NORMAL]);
+ gdk_color_parse(current_scheme->color_style[COLOR_MENU_BG].color_value,&st3a->base[GTK_STATE_NORMAL]);
+ gdk_color_parse(current_scheme->color_style[COLOR_MENU_BG].color_value,&st3a->bg[GTK_STATE_NORMAL]);
  gdk_color_parse("green",&st3a->base[GTK_STATE_SELECTED]);
 
- gdk_color_parse(current_scheme->color_values[COLOR_ROWCOL_FG],&st3i->text[GTK_STATE_NORMAL]);
- gdk_color_parse(current_scheme->color_values[COLOR_ROWCOL_FG],&st3i->fg[GTK_STATE_NORMAL]);
- gdk_color_parse(current_scheme->color_values[COLOR_INACTIVE_BG],&st3i->base[GTK_STATE_NORMAL]);
- gdk_color_parse(current_scheme->color_values[COLOR_INACTIVE_BG],&st3i->bg[GTK_STATE_NORMAL]);
+ gdk_color_parse(current_scheme->color_style[COLOR_ROWCOL_FG].color_value,&st3i->text[GTK_STATE_NORMAL]);
+ gdk_color_parse(current_scheme->color_style[COLOR_ROWCOL_FG].color_value,&st3i->fg[GTK_STATE_NORMAL]);
+ gdk_color_parse(current_scheme->color_style[COLOR_INACTIVE_BG].color_value,&st3i->base[GTK_STATE_NORMAL]);
+ gdk_color_parse(current_scheme->color_style[COLOR_INACTIVE_BG].color_value,&st3i->bg[GTK_STATE_NORMAL]);
  gdk_color_parse("green",&st3i->base[GTK_STATE_SELECTED]);
  MESG("drv_update_styles: end");
 }
@@ -469,8 +468,8 @@ void set_current_colors()
  int i=0;
  GdkColor color;
  for(i=0;i<COLOR_TYPES;i++) {
-  if(!gdk_color_parse(current_scheme->color_values[i], &color  )) {
-  	ERROR("color %s is not in database",current_scheme->color_values[i]);
+  if(!gdk_color_parse(current_scheme->color_style[i].color_value, &color  )) {
+  	ERROR("color %s is not in database",current_scheme->color_style[i].color_value);
 	exit(0);
   };
 	memcpy(current_colors[i],&color,sizeof(GdkColor));
@@ -1456,7 +1455,7 @@ void color_ok_select(GtkWidget *wd, gpointer *data)
 	};	
  };
  sprintf(new_color_name,"#%02X%02X%02X",gcolor->red/256,gcolor->green/256,gcolor->blue/256);
- current_scheme->color_values[changed_color]=strdup(new_color_name);
+ current_scheme->color_style[changed_color].color_value=strdup(new_color_name);
 
  gtk_widget_show(ctext);
 }
@@ -1530,8 +1529,8 @@ void show_color_sample(GtkWidget *table,int ypos,char *text)
 	if(ctype[i].sample_style==NULL) {
 		ctype[i].sample_style=gtk_style_new();
 		box_style = ctype[i].sample_style;
-		gdk_color_parse(current_scheme->color_values[bgindex],&box_style->base[GTK_STATE_NORMAL]);
-		gdk_color_parse(current_scheme->color_values[fgindex],&box_style->text[GTK_STATE_NORMAL]);
+		gdk_color_parse(current_scheme->color_style[bgindex].color_value,&box_style->base[GTK_STATE_NORMAL]);
+		gdk_color_parse(current_scheme->color_style[fgindex].color_value,&box_style->text[GTK_STATE_NORMAL]);
 	} else {
 		bcolor = (GdkColor *)current_colors[bgindex];
 		fcolor = (GdkColor *)current_colors[fgindex];

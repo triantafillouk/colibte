@@ -372,7 +372,7 @@ cairo_t *begin_draw(GeEditDisplay *wd,cairo_region_t *region,char *from)
 	wd->region=region;
 
 	if(wd->layout==NULL) {
-		// MESG("begin_draw: new layout!");
+		MESG("begin_draw: new layout!");
 		wd->layout = pango_cairo_create_layout (wd->cr);
 	};
 	return wd->cr;
