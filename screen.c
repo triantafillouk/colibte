@@ -8,6 +8,7 @@
 /* common screen functions for all interfaces  */
 
 #include "xe.h"
+#include "color.h"
 
 void vtputwc(WINDP *wp, utfchar *uc);
 extern int save_trace(int n);
@@ -23,17 +24,6 @@ void upd_move(WINDP *wp,char *from);
 void vteeol(WINDP *wp, int selected,int inside);
 int SUtfCharLen(char *utfstr,int offset,utfchar *uc);
 int line_bcolor=0;
-
-typedef struct color_curses {
-	int index;	/* color index  */
-	int attrib;	/* attribute  */
-} color_curses;
-
-typedef struct COLOR_SCHEME {
-	char *scheme_name;
-	char *color_values[COLOR_TYPES];
-	color_curses color_attr[COLOR_TYPES];
-} COLOR_SCHEME;
 
 extern COLOR_SCHEME *current_scheme;
 
@@ -99,7 +89,7 @@ void svwchar(vchar *vc, utfchar *uc,int b_color,int f_color)
  	vc->attr = f_color - (vc->fcolor);
 	MESG("! %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
  } else {
- 	vc->attr = current_scheme->color_attr[vc->fcolor].attrib;
+ 	vc->attr = current_scheme->color_style[vc->fcolor].color_attr;
 	// if(vc->uval[0]!=' ')
 	// MESG("~ %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
  };
@@ -128,7 +118,7 @@ void  svchar(vchar *vc,int val,int b_color,int f_color)
  	vc->attr = f_color - (vc->fcolor);
 	// MESG("# %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
  } else {
- 	vc->attr = current_scheme->color_attr[vc->fcolor].attrib;
+ 	vc->attr = current_scheme->color_style[vc->fcolor].color_attr;
 	// if(vc->uval[0]!=' ')
 	// MESG("- %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
  };
@@ -145,9 +135,9 @@ void  svcolor(vchar *vc,int b_color,int f_color)
 	 vc->fcolor=f_color % 256;
 	 if(f_color>255) {
 	 	vc->attr = f_color - (f_color % 256);
-		 MESG("- %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
+		 // MESG("- %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
 	 } else {
-		 vc->attr = current_scheme->color_attr[vc->fcolor].attrib;
+		 vc->attr = current_scheme->color_style[vc->fcolor].color_attr;
 		 // MESG("+ %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
 	};
 }

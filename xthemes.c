@@ -100,10 +100,10 @@ int color_scheme_read()
 			add_element_to_list((void *)scheme,color_scheme_list);
 			scheme->scheme_name = strdup(name1);
 			int i;
-			for(i=0;i<COLOR_TYPES;i++) scheme->color_values[i]="#203040";
+			for(i=0;i<COLOR_TYPES;i++) scheme->color_style[i].color_value="#203040";
 			// MESG("	create new scheme %s schemes now %d",name1,color_scheme_list->size);
 		};
-		MESG("-------- Scheme name %s -----------",name1);
+		// MESG("-------- read scheme named %s -----------",name1);
 		continue;
 	};
 	strcpy(name2,"");
@@ -112,18 +112,20 @@ int color_scheme_read()
 	if(j>=0) {
 		i=sarray_index(basic_color_names,name1);
 		if(i>=0) {
-			scheme->color_attr[j].index=i;	/* 8 colors index  */
+			scheme->color_style[j].color_index=i;	/* 8 colors index  */
 		} else {
-			scheme->color_values[j]=strdup(name1);	/* color value  */
+			scheme->color_style[j].color_value=strdup(name1);	/* color value  */
+			scheme->color_style[j].color_index=j;
 		};
-		scheme->color_attr[j].attrib=0;
+		scheme->color_style[j].color_attr=0;
 
-			if(strstr(name2,"bold") || i>8) scheme->color_attr[j].attrib |= FONT_STYLE_BOLD;
-			if(strstr(name2,"underline")) scheme->color_attr[j].attrib |= FONT_STYLE_UNDERLINE;
-			if(strstr(name2,"italic")) scheme->color_attr[j].attrib |= FONT_STYLE_ITALIC;
-			if(strstr(name2,"dim")) scheme->color_attr[j].attrib |= FONT_STYLE_DIM;
-			if(strstr(name2,"reverse")) scheme->color_attr[j].attrib |= FONT_STYLE_REVERSE;
-		if(scheme->color_attr[j].attrib!=0) MESG(" %s: %s %s %X",ctype,name1,name2,scheme->color_attr[j].attrib);
+			if(!strcasecmp(name2,"bold") || i>8) scheme->color_style[j].color_attr |= FONT_STYLE_BOLD;
+			if(!strcasecmp(name2,"underline"))   scheme->color_style[j].color_attr |= FONT_STYLE_UNDERLINE;
+			if(!strcasecmp(name2,"italic"))      scheme->color_style[j].color_attr |= FONT_STYLE_ITALIC;
+			if(!strcasecmp(name2,"dim"))         scheme->color_style[j].color_attr |= FONT_STYLE_DIM;
+			if(!strcasecmp(name2,"reverse"))     scheme->color_style[j].color_attr |= FONT_STYLE_REVERSE;
+			// if(scheme->color_style[j].color_attr!=0) 
+			// MESG(" b=[%s] -> ctype=%s: name1=%s name2=%s a=[%X]",b,ctype,name1,name2,scheme->color_style[j].color_attr);
 	};
  };
 	MESG("color file read ok !");
@@ -153,7 +155,16 @@ int color_scheme_save()
 		MESG("save_scheme: %s",scheme->scheme_name);	
 		fprintf(f1,"[%s]\n",scheme->scheme_name);
 		 for(i=0;i<COLOR_TYPES;i++){
-		  fprintf(f1,"%s=%s\n",color_type[i],scheme->color_values[i]);
+		  char *attr;
+		  switch(scheme->color_style[i].color_attr) {
+		  	case FONT_STYLE_BOLD		: attr="bold";break;
+			case FONT_STYLE_UNDERLINE	: attr="underline";break;
+			case FONT_STYLE_ITALIC		: attr="italic";break;
+			case FONT_STYLE_DIM			: attr="dim";break;
+			case FONT_STYLE_REVERSE		: attr="reverse";break;
+			default: attr="";
+		  };
+		  fprintf(f1,"%s=%s %s\n",color_type[i],scheme->color_style[i].color_value,attr);
 		 };
 	};
 	 fclose(f1);
@@ -187,13 +198,9 @@ void init_default_schemes()
 	int total_colors=FG_COLORS+BG_COLORS;
 		for(i=0;i<total_colors;i++) 
 		{
-			scheme->color_values[i]=basic_color_values[scheme_ind][i];
-#if	PCURSES
-			scheme->color_attr[i].index = color_t[scheme_ind][i];
-#else
-			scheme->color_attr[i].index = i;
-#endif
-			scheme->color_attr[i].attrib = 0;
+			scheme->color_style[i].color_value=basic_color_values[scheme_ind][i].color_value;
+			scheme->color_style[i].color_index=basic_color_values[scheme_ind][i].color_index;
+			scheme->color_style[i].color_attr =basic_color_values[scheme_ind][i].color_attr;;
 		};
 	add_element_to_list((void *)scheme,color_scheme_list);
  };

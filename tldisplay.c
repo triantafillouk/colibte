@@ -8,6 +8,7 @@
 /* This is the curses/xlib version of display functions */
 
 #include	"xe.h"
+#include	"color.h"
 #include	"support.h"
 #include	"menus.h"
 #include	"panel_curses.h"

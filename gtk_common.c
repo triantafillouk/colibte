@@ -24,7 +24,7 @@ void set_current_scheme(int scheme)
  current_scheme = get_scheme_by_index(color_scheme_ind);
 
  set_current_colors();
- MESG("set_current_scheme:end");
+ MESG("set_current_scheme: %s end",current_scheme->scheme_name);
 }
 
 #include "xthemes.c"
@@ -153,27 +153,20 @@ int put_wstring(WINDP *wp, char *st,int ulen,int attr)
 	// MESG("put_wstring: new layout!");
  };
 
-	if(attr & FONT_STYLE_BOLD) {
-		MESG(" [%s] %X bold",st,attr);
-		pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_HEAVY);
-	} 
+	if(attr & FONT_STYLE_BOLD) pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_HEAVY);
 	else pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_NORMAL);
- 	if(attr & FONT_STYLE_ITALIC) {
-		MESG(" [%s] %X italics",st,attr);
-		pango_font_description_set_style(wd->ge_font_desc,PANGO_STYLE_OBLIQUE);
-	} else pango_font_description_set_style(wd->ge_font_desc,PANGO_STYLE_NORMAL);
-#if 1
+
+ 	if(attr & FONT_STYLE_ITALIC) pango_font_description_set_style(wd->ge_font_desc,PANGO_STYLE_OBLIQUE);
+	else pango_font_description_set_style(wd->ge_font_desc,PANGO_STYLE_NORMAL);
+
  	PangoAttrList * attrs = pango_attr_list_new ();
 	if(attr & FONT_STYLE_UNDERLINE) { 
-	 MESG(" [%s] %X underline",st,attr);
-	 pango_attr_list_insert (attrs, pango_attr_underline_new(PANGO_UNDERLINE_DOUBLE));
-	 pango_layout_set_attributes (wd->layout, attrs);
+		pango_attr_list_insert (attrs, pango_attr_underline_new(PANGO_UNDERLINE_DOUBLE));
+		pango_layout_set_attributes (wd->layout, attrs);
  	} else {
-
-	 pango_attr_list_insert (attrs, pango_attr_underline_new(PANGO_UNDERLINE_NONE));
-	 pango_layout_set_attributes (wd->layout, attrs);
+		pango_attr_list_insert (attrs, pango_attr_underline_new(PANGO_UNDERLINE_NONE));
+		pango_layout_set_attributes (wd->layout, attrs);
  	};
-#endif
  
  pango_layout_set_text (wd->layout, st, -1);
  pango_layout_set_font_description (wd->layout, wd->ge_font_desc);

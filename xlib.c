@@ -888,9 +888,10 @@ void init_colors()
  while(!XMatchVisualInfo(dis0,screen_num,default_depth,i--,&visual_info));
  
  for(j=0;j<COLOR_SCHEMES;j++) {
+	COLOR_SCHEME *scheme = get_scheme_by_index(j);
 	for(i=0;i<COLOR_TYPES;i++) 
 	{
-	  if(!XParseColor(dis0, cmap, basic_color_values[j][i], &exact_def)) {
+	  if(!XParseColor(dis0, cmap, scheme->color_style[i].color_value, &exact_def)) {
 		exit(0);
 	  };
 	  if(!XAllocColor(dis0,cmap,&exact_def)) {
