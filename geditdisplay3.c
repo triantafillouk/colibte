@@ -8,6 +8,7 @@
 */
 
 #include "xe.h"
+#include "color.h"
 #include "geditdisplay3.h"
 
 int x_insert ();
