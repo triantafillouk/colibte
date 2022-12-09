@@ -1411,16 +1411,24 @@ void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
 {
  int fcolor=afcol % 0x100;
  int attrib=0;
- if(afcol & FONT_STYLE_UNDERLINE) attrib |=A_UNDERLINE;
+ if(afcol & FONT_STYLE_UNDERLINE) {
+ 	attrib |=A_UNDERLINE;
+ } else {
+ 	int a = current_scheme->color_style[fcolor].color_attr;
+	if(a & FONT_STYLE_ITALIC) attrib |= A_ITALIC;
+	if(a & FONT_STYLE_BOLD) attrib |= A_BOLD;
+	if(a & FONT_STYLE_DIM) attrib |= A_DIM;
+	if(a & FONT_STYLE_REVERSE) attrib |= A_REVERSE;
+ };
+#if	0
  if(afcol & FONT_STYLE_ITALIC) attrib |= A_ITALIC;
  if(afcol & FONT_STYLE_BOLD) attrib |= A_BOLD;
  if(afcol & FONT_STYLE_DIM) attrib |= A_DIM;
  if(afcol & FONT_STYLE_REVERSE) attrib |= A_REVERSE;
-
+#endif
   // if(attrib>0) MESG("- attrib %X fcolor=%X afcol=%X",attrib,fcolor,afcol);
   wattrset(wnd,color_pair(fcolor,abcol)|attrib);
 }
-
 
 void drv_update_styles()
 {

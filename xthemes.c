@@ -55,9 +55,7 @@ int color_scheme_read()
  FILE *f1;
  char *fname;
  static char name1[MAXFLEN];
- // static char name2[MAXFLEN];
  char *b,bline[MAXFLEN];
- // char ctype[256];
  int i,j;
  char left;
  COLOR_SCHEME *scheme=NULL;
@@ -106,7 +104,6 @@ int color_scheme_read()
 		// MESG("-------- read scheme named %s -----------",name1);
 		continue;
 	};
-#if	1
 	char **arg_list = split_2_sarray(b,' ');
 	char **sa = arg_list;
 	char *item = *sa++; 
@@ -131,29 +128,6 @@ int color_scheme_read()
 		};
 	};
 	free_sarray(arg_list);
-#else
-	strcpy(name2,"");
-	sscanf(b,"%s %s %s",ctype,name1,name2);
-	j=sarray_index(color_type,ctype);
-	if(j>=0) {
-		i=sarray_index(basic_color_names,name1);
-		if(i>=0) {
-			scheme->color_style[j].color_index=i;	/* 8 colors index  */
-		} else {
-			scheme->color_style[j].color_value=strdup(name1);	/* color value  */
-			scheme->color_style[j].color_index=j;
-		};
-		scheme->color_style[j].color_attr=0;
-
-			if(!strcasecmp(name2,"bold") || i>8) scheme->color_style[j].color_attr |= FONT_STYLE_BOLD;
-			if(!strcasecmp(name2,"underline"))   scheme->color_style[j].color_attr |= FONT_STYLE_UNDERLINE;
-			if(!strcasecmp(name2,"italic"))      scheme->color_style[j].color_attr |= FONT_STYLE_ITALIC;
-			if(!strcasecmp(name2,"dim"))         scheme->color_style[j].color_attr |= FONT_STYLE_DIM;
-			if(!strcasecmp(name2,"reverse"))     scheme->color_style[j].color_attr |= FONT_STYLE_REVERSE;
-			// if(scheme->color_style[j].color_attr!=0) 
-			// MESG(" b=[%s] -> ctype=%s: name1=%s name2=%s a=[%X]",b,ctype,name1,name2,scheme->color_style[j].color_attr);
-	};
-#endif
  };
 	MESG("color file read ok !");
 	fclose(f1);
@@ -182,6 +156,15 @@ int color_scheme_save()
 		MESG("save_scheme: %s",scheme->scheme_name);	
 		fprintf(f1,"[%s]\n",scheme->scheme_name);
 		 for(i=0;i<COLOR_TYPES;i++){
+#if	1
+			char attr[64];
+			strcpy(attr,"");
+			if(scheme->color_style[i].color_attr & FONT_STYLE_BOLD) strcat(attr,"bold ");
+			if(scheme->color_style[i].color_attr & FONT_STYLE_UNDERLINE) strcat(attr,"underline ");
+			if(scheme->color_style[i].color_attr & FONT_STYLE_ITALIC) strcat(attr,"italic ");
+			if(scheme->color_style[i].color_attr & FONT_STYLE_DIM) strcat(attr,"dim ");
+			if(scheme->color_style[i].color_attr & FONT_STYLE_REVERSE) strcat(attr,"reverse ");
+#else
 		  char *attr;
 		  switch(scheme->color_style[i].color_attr) {
 		  	case FONT_STYLE_BOLD		: attr="bold";break;
@@ -191,11 +174,12 @@ int color_scheme_save()
 			case FONT_STYLE_REVERSE		: attr="reverse";break;
 			default: attr="";
 		  };
+#endif
 		  fprintf(f1,"%s=%s %s\n",color_type[i],scheme->color_style[i].color_value,attr);
 		 };
 	};
 	 fclose(f1);
-	 msg_line("color scheme %d saved",scheme_ind+1);
+	 msg_line("colors saved");
  } else msg_line("color_save: cannot create file %s",fname);
  return 1;
 }
