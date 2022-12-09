@@ -1411,20 +1411,13 @@ void vtputwc(WINDP *wp, utfchar *uc)
 		if((ctl_f==0 && (ctl_b==0||ctl_b==line_bcolor)))
 		switch(c) { 
 			case 39: 	/* single quote  */
-				ctl_f =COLOR_SPEC_FG;ctl_b=line_bcolor;
-				break;
 			case CHR_LBRA: case CHR_RBRA:
 			case '(': case ')':
 			case '{': case '}':
 			case ';': case ':':
-				ctl_f = COLOR_SPEC_FG;ctl_b=line_bcolor;
-				break;
-			case '*': 
-				ctl_f = COLOR_SPEC_FG;ctl_b=line_bcolor;
-				break;
-			case '=':
+			case '*': case '=':
 			case '+': case '-':
-			case '&':
+			case '&': case '%':
 			case '<': case '>': case ',':
 				ctl_f = COLOR_SPEC_FG;ctl_b=line_bcolor;
 			break;

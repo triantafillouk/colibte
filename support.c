@@ -478,7 +478,9 @@ char **split_2_sarray(char *in_string,int split_chr)
 
    // Allocate a string that can hold it all
    char *start=in_string;
-   while(*start==' ') start++;
+   while(*start==' '||*start==9) start++;	/* trim starting spaces */
+   char *end=in_string+string_size-1;
+   while(*end==' '||*end==9) *end--=0;		/* trim ending spaces  */
    buffer = strdup(start);
    // MESG("split_2_sarray [%s]",start);
    if(buffer){
@@ -486,6 +488,7 @@ char **split_2_sarray(char *in_string,int split_chr)
 	int l;
 	for(i=0,l=0;i<string_size;i++){
 #if	1
+		if(split_chr!=' ')
 		if(buffer[i]==' ') { 
 			// MESG("	space l=%d i=%d",l,i);
 			// buffer[i]='_';

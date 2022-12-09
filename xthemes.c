@@ -55,9 +55,9 @@ int color_scheme_read()
  FILE *f1;
  char *fname;
  static char name1[MAXFLEN];
- static char name2[MAXFLEN];
+ // static char name2[MAXFLEN];
  char *b,bline[MAXFLEN];
- char ctype[256];
+ // char ctype[256];
  int i,j;
  char left;
  COLOR_SCHEME *scheme=NULL;
@@ -106,6 +106,32 @@ int color_scheme_read()
 		// MESG("-------- read scheme named %s -----------",name1);
 		continue;
 	};
+#if	1
+	char **arg_list = split_2_sarray(b,' ');
+	char **sa = arg_list;
+	char *item = *sa++; 
+	j = sarray_index(color_type,item);	/* get color type  */
+	if(j>=0) {
+	// loop for attributes
+		scheme->color_style[j].color_attr=0;
+		while((item = *sa++) !=NULL) {
+			// MESG(" - [%s]",item);
+			i=sarray_index(basic_color_names,item);
+			if(i>=0) {
+				scheme->color_style[j].color_index=i;	/* 8 colors index  */
+			} else {
+				scheme->color_style[j].color_index=j;
+				if(!strcasecmp(item,"bold"))	 		scheme->color_style[j].color_attr |= FONT_STYLE_BOLD;
+				else if(!strcasecmp(item,"underline"))  scheme->color_style[j].color_attr |= FONT_STYLE_UNDERLINE;
+				else if(!strcasecmp(item,"italic"))     scheme->color_style[j].color_attr |= FONT_STYLE_ITALIC;
+				else if(!strcasecmp(item,"dim"))        scheme->color_style[j].color_attr |= FONT_STYLE_DIM;
+				else if(!strcasecmp(item,"reverse"))    scheme->color_style[j].color_attr |= FONT_STYLE_REVERSE;
+				else scheme->color_style[j].color_value=strdup(item);	/* otherwise it is a color value  */
+			};
+		};
+	};
+	free_sarray(arg_list);
+#else
 	strcpy(name2,"");
 	sscanf(b,"%s %s %s",ctype,name1,name2);
 	j=sarray_index(color_type,ctype);
@@ -127,6 +153,7 @@ int color_scheme_read()
 			// if(scheme->color_style[j].color_attr!=0) 
 			// MESG(" b=[%s] -> ctype=%s: name1=%s name2=%s a=[%X]",b,ctype,name1,name2,scheme->color_style[j].color_attr);
 	};
+#endif
  };
 	MESG("color file read ok !");
 	fclose(f1);
