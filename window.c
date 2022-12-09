@@ -8,6 +8,7 @@
 /* window management.  */
 
 #include	"xe.h"
+#include	"color.h"
 
 extern alist *window_list;
 extern int *color;

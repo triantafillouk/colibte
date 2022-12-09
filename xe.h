@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.58T12 (4/12/2022)"
+#define VERSION 	"#01.58T14 (9/12/2022)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -105,6 +105,12 @@
 #include "alist.h"
 #include "utf8_support.h"
 #include "input.h"
+
+#define	FONT_STYLE_BOLD			0x100
+#define	FONT_STYLE_UNDERLINE	0x200
+#define	FONT_STYLE_ITALIC		0x400
+#define FONT_STYLE_REVERSE		0x800
+#define FONT_STYLE_DIM			0x1000
 
 #if	GTK
 #include <gtk/gtk.h>
@@ -282,9 +288,9 @@ typedef struct notes_struct {
 
 typedef struct vchar {
 	unsigned char uval[8];	/* stores a utf char  */
-	unsigned short attr:8;
-	unsigned short bcolor:8;	/* background  */
-	unsigned short fcolor;	/* foreground  */
+	short int  attr;
+	short int bcolor;	/* background  */
+	int fcolor;	/* foreground  */
 #if	0
 	unsigned int display_width;
 	unsigned int display_height;
@@ -833,41 +839,6 @@ enum env_defs {
 
  /* file extensions */
 #define	FX_COMPRESS	37
-
-#define	BG_COLORS	10
-enum color_types_bg {
-	COLOR_BG,			// BACKGROUND
-	COLOR_MENU_BG,		// MENU_BG
-	COLOR_SELECT_BG,	// MODEBACK
-	COLOR_SEARCH_BG,	// SEARBACK
-	COLOR_QUOTE_BG,		// QUOTEBACK
-	COLOR_LIGHT_BG,		// LBACKGROUND
-	COLOR_INFO_BG,		// INFOBACK
-	COLOR_INACTIVE_BG,	// MODEBACKI
-	COLOR_BOX_BG,		// CBOXTBACK
-	COLOR_CODE_BG		// color code bg
-};
-
-#define	FG_COLORS	15
-enum color_types_fg {
-	COLOR_FG=BG_COLORS,	// FOREGROUND, INFOFORE, QUOTEFORE
-	COLOR_MENU_FG,		// CBOXTFORE
-	COLOR_STANDOUT_FG,	// SEARFORE, CNUMERIC, MENUSTART, MENU_FG, CBOXFORE
-	COLOR_CTRL_FG,		// menu start fg, CTRLFORE
-	COLOR_PREP_FG,		// PREPFORE
-	COLOR_WORD1_FG,		// WORD1FORE
-	COLOR_WORD2_FG,		// WORD2FORE
-	COLOR_WORD3_FG,		// W_FORE
-	COLOR_SPEC_FG,		// SPECFORE
-	COLOR_SQUOTE_FG,	// SQUOTEFORE
-	COLOR_COMMENT_FG,	// COMMENTFORE
-	COLOR_CHANGE_FG,	// CHANGEFORE
-	COLOR_HORIZON_FG,	// ORIZON
-	COLOR_INACTIVE_FG,	// MODEFOREI
-	COLOR_ROWCOL_FG		// DROWCOL
-};
-
-#define COLOR_TYPES	BG_COLORS+FG_COLORS
 
 /* Icon Element types  */
 #define	ENORMAL	0

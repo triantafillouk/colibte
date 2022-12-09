@@ -50,7 +50,7 @@ BOX *msg_box=NULL;	// current message box
 
 int drv_type=DRIVER_CURSES;
 int vswidth=1;	/* vertical separator width  */
-void show_debug_color_attr(color_curses *current_color);
+void show_debug_color_attr(COLOR_SCHEME *current_scheme);
 num get_lines(FILEBUF *bp);
 int imove_top_line(num new_top_line);
 int set_sposition(WINDP *wp,int *st, int *l);
@@ -158,8 +158,8 @@ int color_pair(int fg_color,int bg_color)
 	if(drv_colors>8) {
 		cpair = COLOR_PAIR((fg_color-BG_COLORS)*FG_COLORS+bg_color+2);
 	} else {
-		int fg=current_scheme->color_attr[fg_color].index%8;
-		int bg=current_scheme->color_attr[bg_color].index%8;
+		int fg=current_scheme->color_style[fg_color].color_index%8;
+		int bg=current_scheme->color_style[bg_color].color_index%8;
 
 		cpair = COLOR_PAIR((fg%8) *8+bg+1);
 		if(fg>8) cpair |= COL_BOLD;
@@ -1402,7 +1402,6 @@ void drv_win_move(WINDP *wp,int row,int col)
 	wmove(stdscr,wp->gwp->t_ypos+row,wp->gwp->t_xpos+col);
 }
 
-
 void drv_move(int row, int col)
 {
 	wmove(stdscr,row,col);
@@ -1410,13 +1409,26 @@ void drv_move(int row, int col)
 
 void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
 {
+ int fcolor=afcol % 0x100;
  int attrib=0;
- if(afcol>255) { afcol=afcol%256;attrib=A_UNDERLINE;}
- else attrib=current_scheme->color_attr[afcol].attrib;
-
-  wattrset(wnd,color_pair(afcol,abcol)|attrib);
+ if(afcol & FONT_STYLE_UNDERLINE) {
+ 	attrib |=A_UNDERLINE;
+ } else {
+ 	int a = current_scheme->color_style[fcolor].color_attr;
+	if(a & FONT_STYLE_ITALIC) attrib |= A_ITALIC;
+	if(a & FONT_STYLE_BOLD) attrib |= A_BOLD;
+	if(a & FONT_STYLE_DIM) attrib |= A_DIM;
+	if(a & FONT_STYLE_REVERSE) attrib |= A_REVERSE;
+ };
+#if	0
+ if(afcol & FONT_STYLE_ITALIC) attrib |= A_ITALIC;
+ if(afcol & FONT_STYLE_BOLD) attrib |= A_BOLD;
+ if(afcol & FONT_STYLE_DIM) attrib |= A_DIM;
+ if(afcol & FONT_STYLE_REVERSE) attrib |= A_REVERSE;
+#endif
+  // if(attrib>0) MESG("- attrib %X fcolor=%X afcol=%X",attrib,fcolor,afcol);
+  wattrset(wnd,color_pair(fcolor,abcol)|attrib);
 }
-
 
 void drv_update_styles()
 {
@@ -1925,15 +1937,16 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
  int xcol=0;
  vchar *v1, *vtext;
  VIDEO *vp1;
- int ccolor,cattr;
+ int fcolor,bcolor;
  char vstr[8];
  vp1 = wp->vs[row];
  v1=vtext=vp1->v_text;
  // char *unknown2="🔠"; 
  char *unknown1="¤"; 
 
- ccolor=255;
- cattr=255;
+ fcolor=255;
+ bcolor=0;
+
  maxcol -= 2;	/* ??  */
  memset(vstr,0,8);
 
@@ -1956,10 +1969,11 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 	for(i=0;i<=imax;i++) {
 	 uint32_t ch;
-		ccolor=v1->fcolor+v1->attr*256;
-		cattr=v1->bcolor;
-		// if(row==0) MESG("row %d underline i=%d ccolor=%d cattr=%d",row,i,ccolor,cattr);
-		drv_wcolor(wp->gwp->draw,ccolor,cattr);
+	 	if(v1->fcolor < 256) fcolor = v1->fcolor+v1->attr;
+		else fcolor = v1->fcolor;
+		bcolor = v1->bcolor;
+
+		drv_wcolor(wp->gwp->draw,fcolor,bcolor);
 		ch=v1->uval[0];
 		if(ch==0xFF) { 	/* skip in case of char len > 1  */
 			if(v1->uval[1]==0xFF) 
@@ -1973,9 +1987,9 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 		if(ch>128 && v1->uval[1]==0) {	/* this is a local character, convert from local to utf  */
 			 strlcpy(vstr,str_local_to_utf(wp,(char *)v1->uval),6);
 			 if(wp->w_fp->b_lang==0)
-			 	drv_wcolor(wp->gwp->draw,COLOR_CTRL_FG,cattr);	/* show local chars with different color  */
+			 	drv_wcolor(wp->gwp->draw,COLOR_CTRL_FG,bcolor);	/* show local chars with different color  */
 			 else
-			 	drv_wcolor(wp->gwp->draw,ccolor,cattr);
+			 	drv_wcolor(wp->gwp->draw,fcolor,bcolor);
 		} else {
 			memcpy(vstr,v1->uval,6);
 		};
@@ -2207,19 +2221,19 @@ void save_original_colors()
  };
 }
 
-void show_debug_color_attr(color_curses *current_color)
+void show_debug_color_attr(COLOR_SCHEME *current_cscheme)
 {
  int i;
  fprintf(stderr,"show_debug_color_attr: scheme=%d\n",color_scheme_ind);
  for(i=0;i<COLOR_TYPES;i++) {
- 	fprintf(stderr," color %d attrib %d\n",current_color[i].index,current_color[i].attrib);
+ 	fprintf(stderr," color %d attrib %d\n",current_scheme->color_style[i].color_index,current_scheme->color_style[i].color_attr);
  };
 }
 
 void set_current_scheme(int scheme)
 {
  int i,j;
- // MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
+ MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
  if(scheme<1 || scheme> color_scheme_list->size) scheme=1;
 
  color_scheme_ind=scheme-1;
@@ -2228,8 +2242,7 @@ void set_current_scheme(int scheme)
  current_scheme = get_scheme_by_index(color_scheme_ind);
 
  // MESG("init scheme2 %s colors=%d",current_scheme->scheme_name,drv_colors);
- current_color = current_scheme->color_attr;
-// show_debug_color_attr(current_color);
+ // show_debug_color_attr(current_scheme);
  
  if(drv_colors==0) return;
 	// MESG("init scheme3 %s colors=%d",current_scheme->scheme_name,drv_colors);
@@ -2237,7 +2250,7 @@ void set_current_scheme(int scheme)
 		for(i=0;i<FG_COLORS+BG_COLORS;i++) {
 			refresh();
 			// MESG("	set color %d: %s",i,current_scheme->color_values[i]);
-			RGB_DEF *rv = get_rgb_values(current_scheme->color_values[i]);
+			RGB_DEF *rv = get_rgb_values(current_scheme->color_style[i].color_value);
 			init_color(i,rv->r,rv->g,rv->b);
 		};
 		for(i=0;i<FG_COLORS;i++) 
