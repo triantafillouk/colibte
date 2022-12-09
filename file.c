@@ -438,6 +438,7 @@ int close_file(int n)
 
 	if(f_toclose) delete_filebuf(f_toclose,1);
 	clear_message_line();
+	set_update(cwp,UPD_ALL);
 	return TRUE;
 }
 
