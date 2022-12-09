@@ -155,7 +155,6 @@ int color_scheme_save()
 		MESG("save_scheme: %s",scheme->scheme_name);	
 		fprintf(f1,"[%s]\n",scheme->scheme_name);
 		 for(i=0;i<COLOR_TYPES;i++){
-#if	1
 			char attr[64];
 			strcpy(attr,"");
 			if(scheme->color_style[i].color_attr & FONT_STYLE_BOLD) strcat(attr,"bold ");
