@@ -60,7 +60,7 @@ int color_scheme_read()
  char left;
  COLOR_SCHEME *scheme=NULL;
 
- MESG("color_scheme_read:");
+ MESG("color_scheme_read: drv_colors=%d",drv_colors);
 #if	PCURSES
  if(drv_colors<16) {
 	 if((fname=find_file(NULL,".colors8",1,0))==NULL) return FALSE;
@@ -108,16 +108,17 @@ int color_scheme_read()
 	char **sa = arg_list;
 	char *item = *sa++; 
 	j = sarray_index(color_type,item);	/* get color type  */
+	scheme->color_style[j].color_index=0;
 	if(j>=0) {
 	// loop for attributes
 		scheme->color_style[j].color_attr=0;
 		while((item = *sa++) !=NULL) {
-			// MESG(" - [%s]",item);
 			i=sarray_index(basic_color_names,item);
 			if(i>=0) {
-				scheme->color_style[j].color_index=i;	/* 8 colors index  */
+				if(i>7) scheme->color_style[j].color_attr |= FONT_STYLE_BOLD;
+				scheme->color_style[j].color_index=i%8;	/* 8 colors index  */
 			} else {
-				scheme->color_style[j].color_index=j;
+				if(scheme->color_style[j].color_index==0) scheme->color_style[j].color_index=j;
 				if(!strcasecmp(item,"bold"))	 		scheme->color_style[j].color_attr |= FONT_STYLE_BOLD;
 				else if(!strcasecmp(item,"underline"))  scheme->color_style[j].color_attr |= FONT_STYLE_UNDERLINE;
 				else if(!strcasecmp(item,"italic"))     scheme->color_style[j].color_attr |= FONT_STYLE_ITALIC;
@@ -144,8 +145,6 @@ int color_scheme_save()
  FILE *f1;
  char *fname;
  int i;
- int scheme_ind=0;
-// sprintf(name1,".color%1d.col",scheme_ind);
  fname=find_file(NULL,".colors",0,1);
  f1=fopen(fname,"w");
 
@@ -156,7 +155,6 @@ int color_scheme_save()
 		MESG("save_scheme: %s",scheme->scheme_name);	
 		fprintf(f1,"[%s]\n",scheme->scheme_name);
 		 for(i=0;i<COLOR_TYPES;i++){
-#if	1
 			char attr[64];
 			strcpy(attr,"");
 			if(scheme->color_style[i].color_attr & FONT_STYLE_BOLD) strcat(attr,"bold ");
@@ -164,17 +162,6 @@ int color_scheme_save()
 			if(scheme->color_style[i].color_attr & FONT_STYLE_ITALIC) strcat(attr,"italic ");
 			if(scheme->color_style[i].color_attr & FONT_STYLE_DIM) strcat(attr,"dim ");
 			if(scheme->color_style[i].color_attr & FONT_STYLE_REVERSE) strcat(attr,"reverse ");
-#else
-		  char *attr;
-		  switch(scheme->color_style[i].color_attr) {
-		  	case FONT_STYLE_BOLD		: attr="bold";break;
-			case FONT_STYLE_UNDERLINE	: attr="underline";break;
-			case FONT_STYLE_ITALIC		: attr="italic";break;
-			case FONT_STYLE_DIM			: attr="dim";break;
-			case FONT_STYLE_REVERSE		: attr="reverse";break;
-			default: attr="";
-		  };
-#endif
 		  fprintf(f1,"%s=%s %s\n",color_type[i],scheme->color_style[i].color_value,attr);
 		 };
 	};
