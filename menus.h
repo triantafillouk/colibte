@@ -77,7 +77,7 @@ MENUS m_new = {
 
 M_element e_file[] = 
 {
-	{0, 'O', "Open file    ^O","^OOpen file", open_file, 0,"FO" },
+	{0, 'O', "Open file    ^O","^OOpen file", open_file, (struct MENUS *)0,"FO" },
 
 #if	TNOTES
 	{MMENU, 'N', "New           >","", NULL, &m_new,"FN"},

@@ -5,6 +5,7 @@
 # default values for flags
 UNAME := $(shell uname)
 APP_NAME=colibte
+# GVERS := $(shell git log -n 1  --oneline)
 
 PCURSES=0
 XLIB=0
@@ -51,7 +52,9 @@ X11include=-I/opt/X11/include/
 X11lib0=-L/usr/X11R6/lib -lX11 -L/opt/X11/lib 
 WSL:=`uname -a|grep "icrosoft" |wc -l`
 EXTFILE:=.$(APP_NAME)_ext_$(WSL)
-CC=gcc -DWSL=$(WSL) 
+GVERS != git log -1 --pretty=tformat:%h,%s
+# GVERS != git log --oneline -n 1
+CC=gcc -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
 endif
 
 # for solaris

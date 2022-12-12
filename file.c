@@ -1102,7 +1102,7 @@ int open_file_named(char *fname)
 		return(err);
 	};
 	err=goto_file(full_name);
-	set_hmark(1,"open_file:b");
+	set_hmark(1,"open_file_named");
 	return err;
 }
 
@@ -1120,10 +1120,15 @@ int open_file(int n)
  int err=0;
  int stat=0;
  int line=0;
-
+ MESG("open_file: %d",n);
 	fname[0]=0;
 	set_list_type(LDIR);
-	strlcpy(tname,getcurfword(),MAXFLEN);
+	if(n>0) {
+		if(n==3) {
+			if(!BolAt(Offset())) goto_bol(1);
+		};
+		strlcpy(tname,getcurfword(),MAXFLEN);
+	} else tname[0]=0;
 	if(! (cbfp->b_flag & FSDIRED)){
 	if(cbfp->b_fname[0]==CHR_LBRA) {
 		if(chdir(get_start_dir())) {
