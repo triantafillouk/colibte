@@ -15,6 +15,7 @@ EMBED_ICONS=0
 USE_GLIB=1
 # include support for notes database in sqlite3
 TNOTES=1
+GVERS != git log -1 --pretty=tformat:%h,%s
 
 GTKINCLUDE3=`pkg-config gtk+-3.0 --cflags`
 GTKINCLUDE3=`pkg-config gtk+-3.0 --cflags`
@@ -39,8 +40,8 @@ X11include=-I/opt/X11/include/
 X11lib0= -lX11 -L/opt/X11/lib $(GLIB_LIB)
 EXTFILE=.$(APP_NAME)_ext_mac
 WSL:=0
-# CC=clang
-CC=gcc-11
+# CC=clang -DGVERS='"$(GVERS)"'
+CC=gcc-11 -DGVERS='"$(GVERS)"'
 endif
 
 # for Linux
@@ -52,8 +53,6 @@ X11include=-I/opt/X11/include/
 X11lib0=-L/usr/X11R6/lib -lX11 -L/opt/X11/lib 
 WSL:=`uname -a|grep "icrosoft" |wc -l`
 EXTFILE:=.$(APP_NAME)_ext_$(WSL)
-GVERS != git log -1 --pretty=tformat:%h,%s
-# GVERS != git log --oneline -n 1
 CC=gcc -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
 endif
 
@@ -75,7 +74,7 @@ GLIBINCLUDE=`pkg-config glib-2.0 --cflags`
 LPCURSES0=-lpanelw -lncursesw  $(GLIB_LIB)
 OSYSTEM=CYGWIN
 WSL=0
-##CC=gcc
+##CC=gcc -DGVERS='"$(GVERS)"'
 endif
 
 ctxe : XLIB=1

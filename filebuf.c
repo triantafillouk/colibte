@@ -223,7 +223,9 @@ int show_info(int n)
 	SMESG("%s",date_string(1));
 	SMESG("--- Application info ----------------------------------------");
 	SMESG("%s version %s",PROGNAME,VERSION);
-	SMESG("git [%s]",GVERS);
+#ifdef	GVERS
+	SMESG("git:%s",GVERS);
+#endif
 	SMESG("Current directory: %s",getcwd(s1,256));
 	SMESG("Start dir: %s",get_start_dir());
 	SMESG("Default codepage used : [%s]",codepage_str[default_lang]);
