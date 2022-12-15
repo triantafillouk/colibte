@@ -132,12 +132,12 @@ int view_functions(int nused)
 	status=snprintf(tag_file,256,"%s.tag",cbfp->b_fname);
 	if(status>=256) { msg_line("string overflow 1 in view_functions");events_flush();return false;};
 
-	status=snprintf(tag_cmd,256,"ctags -x --c-kinds=%s %s 2>err1 | awk '{print $1,$3,$6,$7 $8 $9}' > %s 2>/dev/null",kind,cbfp->b_fname,tag_file);
+	status=snprintf(tag_cmd,256,"ctags -x --c-kinds=%s %s 2>err1 | awk '{print $3,$6,$7 $8 $9}' > %s 2>/dev/null",kind,cbfp->b_fname,tag_file);
 	if(status>=256) { msg_line("string overflow 2 in view_functions");events_flush();return false;};
 	// MESG("tag_cmd=[%s]",tag_cmd);
 	status=system(tag_cmd);
 	if(status!=0) {
-		MESG("view_functions: status=%d",status);
+		// MESG("view_functions: status=%d",status);
 		msg_line("cannot use view_function");
 		return FALSE;
 	};
@@ -150,11 +150,14 @@ int view_functions(int nused)
 	// MESG("selected %d",j1);
 
 	if(j1>=0) {
-		char *iline=strstr(function_array[j1]," ");
+		// char *iline=strstr(function_array[j1]," ");
+		char *iline=function_array[j1];
 		int line=atoi(iline);
 		// msg_line("at %d",line);
 		msg_line(function_array[j1]);
+		set_hmark(0,"function");
 		igotolinecol(line,1,0);
+		set_hmark(1,"function");
 	};
 		clear_message_line();
 	} else {

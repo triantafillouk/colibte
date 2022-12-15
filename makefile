@@ -5,7 +5,6 @@
 # default values for flags
 UNAME := $(shell uname)
 APP_NAME=colibte
-# GVERS := $(shell git log -n 1  --oneline)
 
 PCURSES=0
 XLIB=0
@@ -15,7 +14,7 @@ EMBED_ICONS=0
 USE_GLIB=1
 # include support for notes database in sqlite3
 TNOTES=1
-GVERS != git log -1 --pretty=tformat:%h,%s
+GVERS := $(shell git log -1 --pretty=tformat:%h,%s)
 
 GTKINCLUDE3=`pkg-config gtk+-3.0 --cflags`
 GTKINCLUDE3=`pkg-config gtk+-3.0 --cflags`

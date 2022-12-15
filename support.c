@@ -452,7 +452,7 @@ char **read_sarray(char *file_name,int *size)
 		array=malloc((lines+1)*sizeof(char *));
 		for(l=0,i=0;l<lines;l++){
 			array[l]=buffer+i;
-			// MESG("%3d [%s] pos %d",l,array[l],i);
+			MESG("%3d [%s] pos %d",l,array[l],i);
 			while(i<read_size && buffer[i]>0) i++;
 			while(i<read_size && buffer[i]==0) i++;
 		};
