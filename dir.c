@@ -49,7 +49,7 @@ int current_sort_mode=-1;
 typedef       int     (*Fintss)(const char *, const char *);
 
  /* This is used in dired mode dates */
-char *month[] = { "Jan", "Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","error" };
+char *month[] = { "Jan", "Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","error",NULL };
 
 void convert_to_windows_name(char *fname)
 {
@@ -1024,7 +1024,11 @@ int dir_exec(int n)
   // MESG("dir_exec: ftype=%d",ftype);
 
   if(ftype==FTYPE_LINK || ftype<0) return FALSE;
-  status=exec_ext(fname,fname,FILE_EXEC);
+  if(ftype==FTYPE_DIRLINK || ftype==FTYPE_DIR) {
+	status = movein_dir(fname);
+  } else {
+	status=exec_ext(fname,fname,FILE_EXEC);
+  };
   return status;
 }
 
