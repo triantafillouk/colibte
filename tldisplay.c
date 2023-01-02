@@ -667,6 +667,7 @@ int selectl(char *title,char *m_array[],int nu,int max_height,int sx,int sy,int 
  box_line_print(i,0,m_array[i],width,1,active);
  iol=0;
  set_box_cline(0);
+ // MESG("start key loop:");
  for(;;) {
 	xupdate_box();
 
@@ -677,6 +678,7 @@ int selectl(char *title,char *m_array[],int nu,int max_height,int sx,int sy,int 
 
 	if(execf==do_nothing) continue;
 	if(execf==new_line) {
+		// MESG("new_line! i=%d",i);
 		break;
 	};
 	if(execf==abort_cmd||execf==paste_region||execf==menu_command ) {
@@ -753,7 +755,7 @@ int selectl(char *title,char *m_array[],int nu,int max_height,int sx,int sy,int 
 		} else
 	if(execf==next_line || execf==scroll_up) {
 			i=iol+1;
-			if(i>=nu) continue;
+			if(i>=nu) {i=nu;continue;};
 			// MESG(": next_line iol=%d i=%d max=%d",iol,i,max_height);
 			if(i-start>=max_height) {
 			start = disp_list(m_array,start+1,nu,max_height,sx,sy,width,active);
@@ -822,6 +824,7 @@ int selectl(char *title,char *m_array[],int nu,int max_height,int sx,int sy,int 
 	} else found=0;
 	set_box_cline(iol);
  };
+ // MESG("remove_box:");
  remove_box();
  msg_line("");
  drv_flush();
@@ -831,8 +834,11 @@ int selectl(char *title,char *m_array[],int nu,int max_height,int sx,int sy,int 
  if(execf == abort_cmd ) { list_off();return(-1);};
  if(execf == paste_region ) { list_off(); return(-10);};
  if(execf == new_line ) { 
-	// MESG(": new_line: i=%d iol=%d",i,iol);
- 	list_off();return(i);
+	// MESG(": new_line: i=%d iol=%d nu=%d",i,iol,nu);
+ 	list_off();
+	if(i>nu-1) i=nu-1;
+	// MESG("return %d",i);
+	return(i);
  };
  if(execf == menu_command) {
  	list_off(); return menu_command(1);
