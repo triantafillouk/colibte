@@ -65,13 +65,14 @@ void change_window(WINDP *wp)
 {
  WINDP *pwp;	// previous window
  pwp = cwp;
+ MESG("change_window:");
+
+ reset_region_textpoints();
+ set_update(cwp,UPD_EDIT);
  hide_cursor("change_window");
+
  set_current_window(wp,"change_window");
- // refresh both status lines
- if(pwp->selection) {
- 	pwp->selection=0;
-	pwp->w_flag=UPD_FULL;
- };
+ reset_region_textpoints();
  set_update(wp,UPD_MOVE);
  status_line(pwp);
  status_line(wp);

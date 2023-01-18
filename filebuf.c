@@ -1116,8 +1116,9 @@ int clipboard_paste(ClipBoard *clip)
 
 void reset_region_textpoints()
 {
-	textpoint_set(cwp->w_smark,0);
-	textpoint_set(cwp->w_emark,0);
+	textpoint_set(cwp->w_smark,tp_offset(cwp->tp_current));
+	textpoint_set(cwp->w_emark,tp_offset(cwp->tp_current));
+	cwp->selection=0;
 }
 
 
