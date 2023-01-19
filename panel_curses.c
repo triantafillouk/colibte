@@ -738,7 +738,7 @@ int text_mouse_function(int move)
 	if(mouse_button==KMOUSE_NONE) {
 		return 0;
 	};
- MESG("text_mouse_function: button=%d move=%d",mouse_button,move);
+ // MESG("text_mouse_function: button=%d move=%d",mouse_button,move);
 
  if(is_in_top_menu()) {
 	if(move==KMOUSE_RELEASE+KMOUSE_BUTTON1){
@@ -751,21 +751,15 @@ int text_mouse_function(int move)
 	}
  	return TRUE;
  };
- MESG("text_mouse_function:1");
+ // MESG("text_mouse_function:1");
 	wp = get_mouse_window();
 	if(wp==NULL) {
 		wp=is_in_status();
 
 		if(wp) { 
 			if(wp!=cwp) {
-#if	1
-				MESG("mouse changed window!");
+				// MESG("mouse changed window!");
 				change_window(wp);
-#else
-				set_current_window(wp,"text_mouse_function");
-				update_status();
-				update_screen(FALSE);
-#endif
 				return -1;
 			} else {
 			// MESG("text_mouse_function: move=%X",move);
@@ -794,25 +788,16 @@ int text_mouse_function(int move)
 		};
 	} else {
 	if(wp!=cwp) {
-		MESG("change window with mouse!");
-		reset_region_textpoints();
+		// MESG("change window with mouse!");
+		// reset_region_textpoints();
 		set_mark(0);
 		change_window(wp);
-		// reset_region_textpoints();
-		// set_mark(0);
 	};
-	// set_current_window(wp,"mouse in window");
-	// reset_region_textpoints();
-	// set_selection(0);
-	// set_update(cwp,UPD_EDIT);
 	/* We are in an editors window */
 	mouse_window_row = mousey - wp->gwp->t_ypos;
 	mouse_window_col = mousex - wp->gwp->t_xpos - wp->w_infocol;
 	// MESG("	r=%d c=%d",mouse_window_row,mouse_window_col);
 	if(move>KMOUSE_RELEASE) {
-
-
-
 		mouse_started_in_rline=0;
 		start_line=0;
 		start_col=0;
