@@ -1,5 +1,4 @@
-
-
+```
 # This is a comment in macro lang, not parses
 
 This is a mixed text document with embeded script portions.
@@ -7,18 +6,19 @@ We must be able to correctly parse the document and the script parts
 ; This apears with a different color (it starts with semicolon)
 ! This also apears with a different color (it starts with !)
 
-{@
+```
 cls
 a=1
 a!=1	:   0.0
 ;b=1	# This is else a comment, separator here is transparent
 ! g=a+b:   2.0
-@}
+```
 
 This line is also not parsed! 
 # This line is partially parsed from here {@ b=33 @} to here!
 
-{@
+```
 d=a+2*b:  67.0
-@}
+print(d)
+```
 final result is 4

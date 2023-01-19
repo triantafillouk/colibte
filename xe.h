@@ -249,6 +249,7 @@ typedef long long num;
 #define	CHR_RBRA	']'			/* right bracket  */
 #define	CHR_DQUOTE	'"'			/* double quote  */
 #define	CHR_SQUOTE	'\''		/* single quote  */
+#define CHR_BQUOTE	'`'			/* back single quote  */
 #define	CHR_BSLASH	'\\'		/* back slash  */
 #define CHR_PARL		'('
 #define CHR_PARR		')'

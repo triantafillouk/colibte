@@ -2720,7 +2720,7 @@ int refresh_current_buffer(int nused)
 		msg_line("Result is [%s %f]",slval,val);
 	};
  } else {
- 	msg_line("parse error %d ",err_num);
+ 	msg_line("parse error %d line %d level %d [%s]",err_num,err_line+1,stage_level,err_str);
 	return(0);
  };
 

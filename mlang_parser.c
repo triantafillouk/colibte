@@ -136,6 +136,8 @@ int getnstr1(FILEBUF *bf, int cc, char *str)
 	foffset++;
 	if(nc==CHR_BSLASH) { pbslash=1;continue;};
 	if(nc==cc && pbslash==0) break;
+	if(nc==CHR_LINE) break;
+	if(nc==CHR_BQUOTE) break;
 	*s++ = nc;len++;
 	pbslash=0;
  }
@@ -210,7 +212,7 @@ double getnum1(FILEBUF *bf, int cc,tok_struct *tok)
 				return(vbd+vad);
 			}
 		} else { 
-			set_error(tok,104,"numeric error. variable cannot start with number");
+			set_error(tok,104,"wrong variable name, must start with a letter");
 			return(vbd+vad);
 		}
 		if(after_dot) {
@@ -286,8 +288,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int tok_type=0;
  int next_tok_type=0;
  int script_active=0;
+ int bquotes=0;
 
-// MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
+MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
  if(
  	file_type_is("CMD",bf->b_type)
 	|| file_type_is("DOT",bf->b_type)
@@ -332,17 +335,28 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
  while(getnc1(bf,&cc,&tok_type))
  {
- // MESG("	cc=%d type=%d %s ",cc,tok_type,tok_name[tok_type]);
+#if	1
+ char active='-';
+ if(script_active) active='+';
+ MESG("%ccc=%d [%c] type=%d %s line=%d err=%d level=%d",active,cc, cc,tok_type,tok_name[tok_type],tok_line,err_num,curl_level);
+#endif
  if(err_num>0) return 0.0;
 	value=0;
 	nword[0]=0;
+	if(tok_type!=TOK_BQUOTE) bquotes=0;
+	else bquotes++;
 #if	1
 	if(script_active==0) {
+		if(tok_type==TOK_BQUOTE) {
+			if(bquotes==3) script_active=1;
+				continue;
+		};
 		if(tok_type==TOK_LCURL) {
 			if(next_token_type(bf)==TOK_AT) {
 				getnc1(bf,&cc,&tok_type);
 				tok_type=TOK_START;
 				script_active=1;
+				// MESG("script starts");
 			} continue;
 		};
 		continue;
@@ -385,6 +399,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		case TOK_LCURL:
 			is_now_curl=1;
 			curl_level++;cc=0;
+			// MESG("left_curl: level=%d",curl_level);
 			break;
 		case TOK_RCURL:
 			{ 
@@ -466,8 +481,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		case TOK_AT:
 			if(next_token_type(bf)==TOK_RCURL) {
 				getnc1(bf,&cc,&tok_type);
+				// curl_level--;
+				// getnc1(bf,&cc,&tok_type);
 				tok_type=TOK_END;
 				script_active=0;
+				MESG("script stops!");
 			};continue;
 #endif
 		case TOK_AND:
@@ -529,7 +547,17 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 			};break;
 		case TOK_BQUOTE:
-			slen=getnstr1(bf,cc,nword);
+			if(script_active) {
+				if(bquotes==3) {
+					script_active=0;
+					continue;
+				};
+				if(next_token_type(bf)!=TOK_BQUOTE) slen=getnstr1(bf,cc,nword);
+				else continue;
+			} else {
+				if(bquotes==3) script_active=1;
+				continue;
+			};
 			break;
 		case TOK_DOLAR:
 		case TOK_TILDA:
@@ -746,7 +774,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 	if(err_num>0) {ERROR("ERROR: line=%d type=%d [%s]",err_line,err_num,err_str);break;};
  };
-
+ MESG("END of parsing! type=%d level=%d",tok_type,curl_level);
  {	/* add eof token!  */
 	if(tok_type!=TOK_SEP || tok_type==0) 
 	{	
