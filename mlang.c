@@ -1349,7 +1349,7 @@ double factor_quote()
 	RTRN(0);		/* 0 value for string variables  */
 }
 
-double factor_bquote()
+double factor_at()
 {
 	int bval=macro_exec;
 	double value;
@@ -1695,9 +1695,9 @@ FFunction factor_funcs[] = {
 	factor_line_array,	// TOK_LBRAKET		,
 	factor_error,	// TOK_RBRAKET		,
 	factor_none,	// TOK_SQUOTE		,
-	factor_none,	// TOK_AT			,
+	factor_at,		// TOK_AT			,
 	factor_none,	// TOK_RANGE		,
-	factor_bquote,	// TOK_BQUOTE
+	factor_none,	// TOK_BQUOTE
 	factor_none,	// TOK_DOLAR		,
 	factor_none,	// TOK_TILDA		,
 	increase_val,	// TOK_INCREASE	,

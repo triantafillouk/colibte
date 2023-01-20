@@ -592,11 +592,11 @@ int err_factor()
 		ex_nquote++;
 		RT_MESG1(4882);
 	 	};
-	case TOK_BQUOTE: {
+	case TOK_AT: {
 		xpos=489;
 		ex_vtype=VTYPE_NUM;
 		RT_MESG1(4891);
-	};
+		};
 	case TOK_MINUS:
 	case TOK_PLUS:
 		if(pre_symbol>1) {

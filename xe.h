@@ -443,7 +443,8 @@ typedef struct MLQUOTES {
 #define	H_QUOTE10	512	/* light background, rest of the line  */
 #define	H_QUOTE11	1024/* toggle light background */
 #define H_QUOTE12	2048
-#define H_UTFERR	4096	/* Utf8 error  */
+#define H_LINESEP	4096
+#define H_UTFERR	8192	/* Utf8 error  */
 
 #define H_WORD1		10	/* found word type1  */
 #define	H_WORD2		11	/* found word type2  */

@@ -137,10 +137,11 @@ int getnstr1(FILEBUF *bf, int cc, char *str)
 	if(nc==CHR_BSLASH) { pbslash=1;continue;};
 	if(nc==cc && pbslash==0) break;
 	if(nc==CHR_LINE) break;
-	if(nc==CHR_BQUOTE) break;
+	if(nc=='@') break;
+	// printf("%c %d ",nc,nc);
 	*s++ = nc;len++;
 	pbslash=0;
- }
+ };printf("\n");
  *s=0;
  return(len);
 }
@@ -348,7 +349,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(script_active==0) {
 		if(tok_type==TOK_BQUOTE) {
 			if(bquotes) script_active=1;
-			MESG("start script: line %d",tok_line);
+			// MESG("start script: line %d",tok_line);
 		};
 		if(tok_type==TOK_NL) tok_line++;
 		continue;
@@ -469,17 +470,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				getnc1(bf,&cc,&tok_type);
 				tok_type=TOK_BIGGEREQ;
 			} break;
-#if	0
-		case TOK_AT:
-			if(next_token_type(bf)==TOK_RCURL) {
-				getnc1(bf,&cc,&tok_type);
-				// curl_level--;
-				// getnc1(bf,&cc,&tok_type);
-				tok_type=TOK_END;
-				script_active=0;
-				MESG("script stops!");
-			};continue;
-#endif
 		case TOK_AND:
 		case TOK_OR:
 		case TOK_XOR:
@@ -538,28 +528,17 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				tok_type=TOK_COMMA;
 			};
 			};break;
+		case TOK_AT:
+			slen=getnstr1(bf,cc,nword);
+			// printf("tok_at [%s] %d\n",nword, slen);
+			// printf("tok_at [%s]\n",(char *)tok->tname);
+			break;
+
 		case TOK_BQUOTE:
-#if	1
-			MESG("stop script! line %d",tok_line);
+			// MESG("stop script! line %d",tok_line);
 			bquotes=0;
 			script_active=0;
 			continue;
-#else
-			if(script_active) {
-				if(bquotes>0) {
-					MESG("stop script! line %d",tok_line);
-					bquotes=0;
-					script_active=0;
-					continue;
-				};
-				if(next_token_type(bf)!=TOK_BQUOTE) slen=getnstr1(bf,cc,nword);
-				else continue;
-			} else {
-				if(bquotes==3 || bquotes==1) script_active=1;
-				continue;
-			};
-#endif
-			break;
 		case TOK_DOLAR:
 		case TOK_TILDA:
 		case TOK_BSLASH:
@@ -602,7 +581,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok->ttype==TOK_QUOTE) {
 		tok->tname=strdup(nword);
 	};
-	if(tok->ttype==TOK_BQUOTE) {
+	if(tok->ttype==TOK_AT) {
 		tok->tname=strdup(nword);
 	};
 	if(tok->ttype==TOK_LPAR) tok->tname=" ( ";

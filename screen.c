@@ -1288,7 +1288,13 @@ void vtputwc(WINDP *wp, utfchar *uc)
 #endif
 		return;
 	};
-
+	if(hquotem & H_LINESEP) {
+		if(!(wp==cwp && (wp->vtrow == window_cursor_line(wp)))){ 
+		wp->vtcol=start_column;
+		vt1eol(wp,'_',COLOR_STANDOUT_FG);
+		return;
+		};
+	};
 	if(syntaxh) {
 		wp->w_fp->hl->h_function(c); 
 	};
@@ -1393,6 +1399,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 				ctl_f=wp->w_fcolor;
 				break;			
 			case H_QUOTE11:
+				ctl_f=wp->w_fcolor;
 			case H_QUOTE11+H_QUOTE9:
 				ctl_b=COLOR_INACTIVE_BG;
 				break;		
