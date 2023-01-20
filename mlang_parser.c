@@ -290,11 +290,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int script_active=0;
  int bquotes=0;
 
-MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
+// MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
  if(
  	file_type_is("CMD",bf->b_type)
 	|| file_type_is("DOT",bf->b_type)
-	|| file_type_is("GTEXT",bf->b_type) 
+	// || file_type_is("GTEXT",bf->b_type) 
 	// || bf->b_type==0
  ) script_active=1;
 
@@ -335,30 +335,22 @@ MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
 
  while(getnc1(bf,&cc,&tok_type))
  {
-#if	1
+	if(tok_type!=TOK_BQUOTE) bquotes=0;	else bquotes++;
+#if	0
  char active='-';
  if(script_active) active='+';
- MESG("%ccc=%d [%c] type=%d %s line=%d err=%d level=%d",active,cc, cc,tok_type,tok_name[tok_type],tok_line,err_num,curl_level);
+ MESG("%ccc=%d [%c] type=%d %s line=%d err=%d bquotes=%d",active,cc, cc,tok_type,tok_name[tok_type],tok_line,err_num,bquotes);
 #endif
  if(err_num>0) return 0.0;
 	value=0;
 	nword[0]=0;
-	if(tok_type!=TOK_BQUOTE) bquotes=0;
-	else bquotes++;
 #if	1
 	if(script_active==0) {
 		if(tok_type==TOK_BQUOTE) {
-			if(bquotes==3) script_active=1;
-				continue;
+			if(bquotes) script_active=1;
+			MESG("start script: line %d",tok_line);
 		};
-		if(tok_type==TOK_LCURL) {
-			if(next_token_type(bf)==TOK_AT) {
-				getnc1(bf,&cc,&tok_type);
-				tok_type=TOK_START;
-				script_active=1;
-				// MESG("script starts");
-			} continue;
-		};
+		if(tok_type==TOK_NL) tok_line++;
 		continue;
 	};
 #endif
@@ -477,7 +469,7 @@ MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
 				getnc1(bf,&cc,&tok_type);
 				tok_type=TOK_BIGGEREQ;
 			} break;
-#if	1
+#if	0
 		case TOK_AT:
 			if(next_token_type(bf)==TOK_RCURL) {
 				getnc1(bf,&cc,&tok_type);
@@ -547,17 +539,26 @@ MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
 			};
 			};break;
 		case TOK_BQUOTE:
+#if	1
+			MESG("stop script! line %d",tok_line);
+			bquotes=0;
+			script_active=0;
+			continue;
+#else
 			if(script_active) {
-				if(bquotes==3) {
+				if(bquotes>0) {
+					MESG("stop script! line %d",tok_line);
+					bquotes=0;
 					script_active=0;
 					continue;
 				};
 				if(next_token_type(bf)!=TOK_BQUOTE) slen=getnstr1(bf,cc,nword);
 				else continue;
 			} else {
-				if(bquotes==3) script_active=1;
+				if(bquotes==3 || bquotes==1) script_active=1;
 				continue;
 			};
+#endif
 			break;
 		case TOK_DOLAR:
 		case TOK_TILDA:
