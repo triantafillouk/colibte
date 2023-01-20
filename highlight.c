@@ -688,7 +688,7 @@ void highlight_c(int c)
 		if(hquotem&H_QUOTE2) { hstate=0; break;};
 //		if(double_quoted) { hstate=0;break;};
 		if(hstate!=HS_PREVESC) { 
-			if(hquotem) hquotem=0;else prev_set=H_QUOTE1;
+			if(hquotem) hquotem=hquotem & ~H_QUOTE1;else prev_set=H_QUOTE1;
 			// hquotem = (hquotem)? hquotem & ~H_QUOTE1: hquotem | H_QUOTE1;
 			single_quoted = (single_quoted)? 0:1;
 		}; 
@@ -808,7 +808,7 @@ void highlight_julia(int c)
 		if(hquotem&H_QUOTE2) { hstate=0;break;};
 //		if(double_quoted) { hstate=0;break;};
 		if(hstate!=HS_PREVESC) { 
-			if(hquotem) hquotem=0;
+			if(hquotem) hquotem=hquotem & ~H_QUOTE1;
 			else prev_set = H_QUOTE1;
 			// hquotem = (hquotem)? hquotem & ~H_QUOTE1: hquotem | H_QUOTE1;
 			single_quoted = (single_quoted)? 0:1;
