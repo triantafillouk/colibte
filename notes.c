@@ -9,6 +9,7 @@
 #include "xe.h"
 
 extern FILEBUF *cbfp;
+#define	MD_NOTES	1
 
 /* ----- other utility functions ------ */
 #if	TNOTES
@@ -35,28 +36,52 @@ int insert_preamble(FILEBUF *fp,int type)
 	if(type<2) type=1;
 	switch(type) {
 		case 1: {	/* normal note */
+#if	MD_NOTES
+			insert_string_nl(fp,"---");
+#endif
 			insert_string_nl(fp,"#Name: ");
 			insert_string_nl(fp,"#Title: ");
 			insert_string_nl(fp,"#Category: ");	/* Directory!  */
 			insert_string_nl(fp,"#Tags: ");
+#if	MD_NOTES
+			insert_string_nl(fp,"---");
+#else
 			insert_string_nl(fp,"");
-			
+#endif			
 			};break;
 		case 2: {	/* calendar note */
+#if	MD_NOTES
+			insert_string_nl(fp,"---");
+#endif
 			strcpy(fp->b_note->n_name,fp->b_fname);
-			 strcat(fp->b_note->n_name,".cal");
+#if	MD_NOTES
+			strcat(fp->b_note->n_name,"_cal.md");
+#else
+			strcat(fp->b_note->n_name,".cal");
+#endif
 			strcpy(fp->b_note->n_date,fp->b_fname);
 			insert_string_nl(fp,"# ");
+#if	MD_NOTES
+			insert_string_nl(fp,"---");
+#endif
 //			insert_string_nl(fp,"");
 			};break;
 		case 3: {	/* todo note */
 			strcpy(fp->b_note->n_name,fp->b_fname);
-			 strcat(fp->b_note->n_name,".todo");
+#if	MD_NOTES
+			strcat(fp->b_note->n_name,"_todo.md");
+#else
+			strcat(fp->b_note->n_name,".todo");
+#endif
 			strcpy(fp->b_note->n_date,fp->b_fname);
 			insert_string_nl(fp,"#Title: ");
 			// strcpy(date_header,"#  ");
 			insert_string_nl(fp,"#Tags: todo");
+#if	M_NOTES
+			insert_string_nl(fp,"---");
+#else
 			insert_string_nl(fp,"");
+#endif
 			insert_string_nl(fp,"");
 			};break;
 	};
@@ -81,7 +106,11 @@ int new_note(int type)
  if(type<2) type=1;
  if(type==1) snprintf(scratch_name,24,"[note %d]",scratch_ind);
  if(type==2) { 
+#if	MD_NOTES
+	res=snprintf(scratch_name,24,"%s_cal.md",date_string(3));
+#else
 	res=snprintf(scratch_name,24,"%s.cal",date_string(3));
+#endif
 	if(res==25) MESG("cal name truncated");
  };
  if(type==3) { 
@@ -601,7 +630,11 @@ int parse_note(FILEBUF *fp)
 		strcpy(note->n_date,fp->b_fname);
 		// MESG("parse_note: n_date=[%s]",note->n_date);
 		if(strlen(note->n_name)==0)	{
+#if	MD_NOTES
+			if(snprintf(note->n_name,sizeof(note->n_name),"%s_cal.md",fp->b_fname)>sizeof(note->n_name)) MESG("note name truncated!");
+#else
 			if(snprintf(note->n_name,sizeof(note->n_name),"%s.cal",fp->b_fname)>sizeof(note->n_name)) MESG("note name truncated!");
+#endif
 		};
 		// MESG("parse_note:2 n_name=[%s]",note->n_name);
 		ptr = find_str_reol(fp,ptr,"# ",note->n_title,sizeof(note->n_title));
@@ -631,7 +664,11 @@ int parse_note(FILEBUF *fp)
 		};
 
 		if(strlen(note->n_name)==0)	{
+#if	MD_NOTES
+			if(snprintf(note->n_name,sizeof(note->n_name),"%s_todo.md",fp->b_fname)>sizeof(note->n_name)) MESG("note name truncated!");
+#else
 			if(snprintf(note->n_name,sizeof(note->n_name),"%s.todo",fp->b_fname)>sizeof(note->n_name)) MESG("note name truncated!");
+#endif
 		};
 		// ptr = find_str_reol(fp,ptr,"#Name: ",note->n_name,sizeof(note->n_name));
 
@@ -658,7 +695,7 @@ int parse_note(FILEBUF *fp)
 		char *start_cat_name = NULL;
 		if((start_cat_name = strstr(fp->b_dname,"calendar")) !=NULL) {
 			sprintf(note->n_tags,"calendar");
-			if(strstr(fp->b_fname,".cal")) strcpy(note->n_name,fp->b_fname);
+			if(strstr(fp->b_fname,".cal")||strstr(fp->b_fname,"_cal.md")) strcpy(note->n_name,fp->b_fname);
 			// MESG("calendar note: date=[%s]",note->n_date);
 		} else 
 		if((start_cat_name = strstr(fp->b_dname,"todo")) !=NULL) {
@@ -1541,9 +1578,13 @@ int edit_note(int n)
 	bp->connect_line = cwp->current_tag_line;
 	bp->connect_column = cwp->current_note_line;
 	
-	if(!strncmp(".cal",bp->b_fname+(strlen(bp->b_fname)-4),4)){
+	if(!strncmp(".cal",bp->b_fname+(strlen(bp->b_fname)-4),4) 
+		|| !strncmp("_cal.md",bp->b_fname+(strlen(bp->b_fname)-7),7) 
+		){
 		bp->b_type|=NOTE_CAL_TYPE;
-	} else if(!strncmp(".todo",bp->b_fname+(strlen(bp->b_fname)-4),4)){
+	} else if(!strncmp(".todo",bp->b_fname+(strlen(bp->b_fname)-5),5)
+			||!strncmp("_todo.md",bp->b_fname+(strlen(bp->b_fname)-8),8))
+		{
 		bp->b_type|=NOTE_TODO_TYPE;
 	} else bp->b_type|=NOTE_TYPE;
 

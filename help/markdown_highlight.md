@@ -5,6 +5,7 @@
 - H1 "headings" are marked with different color.
 - All type of [`test`headings](headings) with a different color. 
 - The first '#' are highlighted the same as H1 headings
+---
 
 ### Html inline coloring like the following line
 	<p style="color:red;">Lorem ipsum...</p>

@@ -1209,7 +1209,7 @@ void highlight_md(int c)
   static int hquote_start=0;
   static int line_set=0;
 
-  if(highlight_note(c)) return;
+  // if(highlight_note(c)) return;
 
   hstruct=check_words(c);
   if(prev_set>=0) { hquotem=prev_set;prev_set=-1;hprev_line=-1;};
@@ -2641,11 +2641,13 @@ void highlight_cmd(int c)
 		hstate=HS_LINESTART;
 		prev_space=1;
 		break;
+#if	0
 	case '@': // code block
 		if(hstate==HS_PREVESC||hquotem & H_QUOTE1||hquotem & H_QUOTE2) break;
 		// if(hquotem & H_QUOTE11) hquotem=0;else hquotem=H_QUOTE11;
 		if(hquotem & H_QUOTE11) hquotem=0;else prev_set=H_QUOTE11;
 		break;
+#endif
 	case ' ':
 	case '\t':
 		prev_space=1;
