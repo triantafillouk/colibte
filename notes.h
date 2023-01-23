@@ -13,9 +13,9 @@
 #define	NOTES_PARENT	"~/.colibte"
 						// "~/.colibte/Notes"
 						// "~/.xe/Notes"
-#define NOTES_DIR		NOTES_PARENT"/Notes_md11"
-#define NOTES_DBFILE	NOTES_PARENT"/notes_md.db"
-#define NOTES_DIR0		"Notes_md11"
+#define NOTES_DIR		NOTES_PARENT"/Notes"
+#define NOTES_DBFILE	NOTES_PARENT"/notes.db"
+#define NOTES_DIR0		"Notes"
 
 #define	TAG_UNSELECT_ALL		0
 #define TAG_SELECT_CURRENT		1
