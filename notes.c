@@ -28,31 +28,26 @@ int insert_preamble(FILEBUF *fp,int type)
  char date_header[MAXSLEN];
  if(fp->b_note==NULL) fp->b_note=init_note();
 
- sprintf(date_header,"#Date: %s",date_string(2));
 
+#if	MD_NOTES
+	insert_string_nl(fp,"---");
+#endif
+	sprintf(date_header,"#Date: %s",date_string(2));
 	date_header[strlen(date_header)-1]=0;	/* remove new line at the end!  */
 	insert_string_nl(fp,date_header);
 
 	if(type<2) type=1;
 	switch(type) {
 		case 1: {	/* normal note */
-#if	MD_NOTES
-			insert_string_nl(fp,"---");
-#endif
 			insert_string_nl(fp,"#Name: ");
 			insert_string_nl(fp,"#Title: ");
 			insert_string_nl(fp,"#Category: ");	/* Directory!  */
 			insert_string_nl(fp,"#Tags: ");
-#if	MD_NOTES
-			insert_string_nl(fp,"---");
-#else
+#if	!MD_NOTES
 			insert_string_nl(fp,"");
 #endif			
 			};break;
 		case 2: {	/* calendar note */
-#if	MD_NOTES
-			insert_string_nl(fp,"---");
-#endif
 			strcpy(fp->b_note->n_name,fp->b_fname);
 #if	MD_NOTES
 			strcat(fp->b_note->n_name,"_cal.md");
@@ -61,10 +56,6 @@ int insert_preamble(FILEBUF *fp,int type)
 #endif
 			strcpy(fp->b_note->n_date,fp->b_fname);
 			insert_string_nl(fp,"# ");
-#if	MD_NOTES
-			insert_string_nl(fp,"---");
-#endif
-//			insert_string_nl(fp,"");
 			};break;
 		case 3: {	/* todo note */
 			strcpy(fp->b_note->n_name,fp->b_fname);
@@ -77,14 +68,14 @@ int insert_preamble(FILEBUF *fp,int type)
 			insert_string_nl(fp,"#Title: ");
 			// strcpy(date_header,"#  ");
 			insert_string_nl(fp,"#Tags: todo");
-#if	M_NOTES
-			insert_string_nl(fp,"---");
-#else
+#if	!MD_NOTES
 			insert_string_nl(fp,"");
 #endif
-			insert_string_nl(fp,"");
 			};break;
 	};
+#if	MD_NOTES
+	insert_string_nl(fp,"---");
+#endif
 	return(true);
 }
 
@@ -125,21 +116,28 @@ int new_note(int type)
 	insert_preamble(cbfp,type);
 	// goto name field
 	goto_bof(1);
+
 	if(type==1) {
 		cbfp->b_type=NOTE_TYPE;
-		next_line(1);
-		goto_eol(1);
 	};
 	if(type==2) {
 		cbfp->b_type=NOTE_CAL_TYPE+highlight_type("cal");
-		next_line(1);
-		goto_eol(1);
 	};
 	if(type==3) {
 		cbfp->b_type=NOTE_TODO_TYPE+highlight_type("todo");
-		next_line(1);
-		goto_eol(1);
 	}
+
+#if	MD_NOTES
+	int type=0;
+	set_highlight(cbfp,highlight_index("MD",&type));
+#endif
+
+#if	MD_NOTES
+	next_line(2);
+#else
+	next_line(1);
+#endif
+	goto_eol(1);
 
 	// MESG("new_note: b_type=0x%X",cbfp->b_type);
 	set_hmark(0,"new_note:");
@@ -366,7 +364,7 @@ char *query_string(sqlite3 *db,char *sql,int *index)
  sqlite3_stmt *res;
  int step;
  static char return_string[512];
-// MESG("query string: [%s]",sql);
+ // MESG("query string: [%s]",sql);
  *index=0;
 
  stat = sqlite3_prepare_v2(db, sql, -1, &res, 0);
@@ -376,7 +374,7 @@ char *query_string(sqlite3 *db,char *sql,int *index)
 	if(step==SQLITE_ROW) {
 		strcpy(return_string,(char *)sqlite3_column_text(res,0));
 		*index = sqlite3_column_int(res,1);;
-		// MESG("query_string: result: %s row=%d",return_string,*index);
+		MESG("query_string: result: %s row=%d",return_string,*index);
 		sqlite3_finalize(res);
 		return return_string;
 	} else {
@@ -436,7 +434,7 @@ int sql_exec(sqlite3 *db, char *sql,int ignore)
 {
  char *err_msg=NULL;
 
- // MESG("sql_exec: [%s]",sql);
+ MESG("sql_exec: [%s]",sql);
  if(sqlite3_exec(db, sql, 0, 0, &err_msg)!=SQLITE_OK)
  {
  	if(ignore==0) error_line("sql error: %s", err_msg);
@@ -457,7 +455,7 @@ sqlite3 * notes_db_open()
  char db_file_name[256];
  sqlite3 *db;
  set_bfname(db_file_name,NOTES_DBFILE);
- // MESG("notes_db_open:<");
+ MESG("notes_db_open:< [%s]",db_file_name);
  if(sqlite3_open(db_file_name,&db)!=SQLITE_OK) {
 	msg_line("Notes db [%s]: %s",db_file_name,sqlite3_errmsg(db));
 	notes_db_close(db);
@@ -531,7 +529,7 @@ int save_to_db(notes_struct *note)
 	};
  } else {
  	int new_note_id;
-	// MESG("new note id! insert [%s]/[%s]",new_cat,note->n_name);
+	MESG("new note id! insert [%s]/[%s]",new_cat,note->n_name);
 	strcpy(sql,"BEGIN TRANSACTION; ");
 	strcat(sql,"INSERT INTO notes(Name, Title, Date, Category, Encrypt) ");
 	strcat(sql,"VALUES ('");
@@ -540,7 +538,7 @@ int save_to_db(notes_struct *note)
 	strcat(sql,note->n_date); strcat(sql,"','");
 	strcat(sql,note->n_cat); strcat(sql,"',0);");
 	strcat(sql,"END TRANSACTION;");
-	// MESG("save_to_db: [%s]",sql);
+	MESG("save_to_db: [%s]",sql);
 	if (sql_exec(db,sql,0)){
 		// msg_line(" Note saved to db!");
 		stat=true;
@@ -641,8 +639,9 @@ int parse_note(FILEBUF *fp)
 		if(ptr==0) find_str_reol(fp,ptr,"#Title: ",note->n_title,sizeof(note->n_title));
 		// MESG("calendar, title = %s",note->n_title);
 		strcpy(note->n_cat,"calendar/");
-		memcpy(note->n_cat+9,fp->b_fname,4);note->n_cat[13]=0;	// add the year to calendar category
-		// MESG("calendar cat [%s]",note->n_cat);
+		int len1=strlen(NOTES_PARENT-2);
+		memcpy(note->n_cat+len1,fp->b_fname,4);note->n_cat[len1+4]=0;	// add the year to calendar category
+		MESG("calendar cat [%s]",note->n_cat);
 
 		note->n_tags[0]=0;
 		ptr = find_str_reol(fp,ptr,"#Tags: ",note->n_tags,sizeof(note->n_tags));
@@ -678,7 +677,7 @@ int parse_note(FILEBUF *fp)
 		MESG("	title = %s",note->n_title);
 		strcpy(note->n_cat,"todo/");
 		memcpy(note->n_cat+5,fp->b_fname,4);note->n_cat[9]=0;
-		MESG("	category [%s]",note->n_cat);
+		MESG("	category 2 todo [%s]",note->n_cat);
 		note->n_tags[0]=0;
 		ptr = find_str_reol(fp,ptr,"#Tags:",note->n_tags,sizeof(note->n_tags));
 		if(!strstr(note->n_tags,"todo")){
@@ -703,7 +702,7 @@ int parse_note(FILEBUF *fp)
 			// MESG("todo note: %s",note->n_date);
 			strcpy(note->n_cat,"todo");
 			if(strstr(fp->b_fname,"todo")) strcpy(note->n_name,fp->b_fname);
-			// MESG("	set n_cat=%s n_name=%s",note->n_cat,note->n_name);
+			MESG("	todo set n_cat=%s n_name=%s",note->n_cat,note->n_name);
 		} else { 
 			// MESG("not a note,calendar,todo!");
 		};
@@ -728,7 +727,7 @@ int parse_note(FILEBUF *fp)
 			MESG("### parse error, category is empty!");
 			return false;
 		};
-		// MESG(";set cat=%s name=%s errors=%d",note->n_cat,note->n_name,errors);
+		MESG("	;set 4 cat=%s name=%s errors=%d",note->n_cat,note->n_name,errors);
 		if(errors>2) return false;
 		return(true);
 	};
@@ -756,24 +755,25 @@ int parse_note(FILEBUF *fp)
 	if(ptr==0) {
 	errors++;
 	if(strlen(note->n_cat)==0) {
-		char *cat=strstr(fp->b_dname,"Notes");
+		char *cat=strstr(fp->b_dname,"Notes_md11");
 		if(cat-fp->b_dname==strlen(fp->b_dname)) {
 			MESG("wrong category dir name=[%s] category=[%s]",fp->b_dname,cat);
 			return false;
 		};
 		if(cat!=NULL) {
-			cat+=6;
+			cat+=strlen("Notes_md11");
 			strcpy(note->n_cat,cat);
+			MESG("	cat 5 %s",note->n_cat);
 		};
 	}} else { 
 #if	1
 	// TODO . check if category is same as dir when recreating database!!!
-		char *cat=strstr(fp->b_dname,"Notes");
+		char *cat=strstr(fp->b_dname,"Notes_md11");
 		if(cat) {
-		cat+=6;
+		cat+=strlen("Notes_md11");
 		
 		if(strcmp(note->n_cat,cat)) {
-			MESG("	! dir=[%s] cat=[%s] cat will be %s",cat,note->n_cat,cat);
+			MESG("	! cat 6 dir=[%s] cat=[%s] cat will be %s",cat,note->n_cat,cat);
 			strcpy(note->n_cat,cat);
 		};
 		};
@@ -978,14 +978,14 @@ int init_notes_db(int n)
 
 //	MESG("init_notes_db: sqlite3 version is %s",sqlite3_libversion());
 	if((db=notes_db_open())==NULL) return false;
-
+	MESG("init_notes_db: db file opened!");
 	char *sql = "DROP TABLE IF EXISTS notes;"\
 				"CREATE TABLE notes(Id int primary key, Name TEXT, Title TEXT, Date TEXT, Category TEXT, Encrypt int);"\
 				"DROP TABLE IF EXISTS tag;"\
 				"CREATE TABLE tag(Id int primary key, Name TEXT unique);"\
 				"DROP TABLE IF EXISTS tags;"\
 				"CREATE TABLE tags(Tag_id int, Note_id int)";
-
+	MESG("init sql is [%s]",sql);
 	stat = sqlite3_exec(db, sql, 0,0, &err_msg);
 	if(stat != SQLITE_OK) {
 		error_line("sql error: %s",err_msg);
@@ -1022,7 +1022,7 @@ int recreate_notes_db(int n)
 	sprintf(tmp_file,"/tmp/notes_contents.out");
 	sprintf(cmd,"find -L %s  >%s 2>/dev/null",notes_dir,tmp_file);
 	status = system(cmd);
-	if(status!=0) { return error_line("cannot read notes directory!");};
+	if(status!=0) { return error_line("cannot read notes directory %s!",notes_dir);};
 	sync();
 	int size=0;
 	int dirs=0;
@@ -1543,12 +1543,17 @@ char *get_current_note_name()
  // MESG("get_current_note_name: note_id=%d",note_id);
 
  sprintf(full_name,"SELECT category,rowid from notes where rowid = %d",note_id);
+ MESG("	category,rowid = [%s]",full_name);
+ MESG("	NOTES_DIR=[%s]",NOTES_DIR);
  if(snprintf(notes_name,1024,"%s/%s/",NOTES_DIR,query_string(db,full_name,&note_id))>=1024) {
  	ERROR("notes file name too long, truncated!"); ; 
  };
+ MESG("	notes_name = [%s]",notes_name);
  sprintf(full_name,"SELECT name,rowid from notes where rowid = %d",note_id);
+ MESG("	fukk_name = [%s]",full_name);
 
  strcat(notes_name,query_string(db,full_name,&note_id));
+ MESG("	notes_name = [%s]",notes_name);
 
  set_bfname(full_name,notes_name);
  return full_name;
@@ -1557,7 +1562,7 @@ char *get_current_note_name()
 
 int edit_note(int n)
 {
- // MESG("edit_note:");
+  MESG("edit_note:");
   char *full_name = get_current_note_name();
  
  if(full_name==NULL) {

@@ -218,6 +218,11 @@ int read1line(FILEBUF *fp)
 	return(TRUE);
 }
 
+int file_type_ind(char *extention)
+{
+
+}
+
 int file_type_is(char *extention,int check_type)
 {
  int ct=check_type%NOTE_TYPE;
