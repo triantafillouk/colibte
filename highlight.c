@@ -218,11 +218,6 @@ int read1line(FILEBUF *fp)
 	return(TRUE);
 }
 
-int file_type_ind(char *extention)
-{
-
-}
-
 int file_type_is(char *extention,int check_type)
 {
  int ct=check_type%NOTE_TYPE;
@@ -230,8 +225,6 @@ int file_type_is(char *extention,int check_type)
  if(!strcmp(hts[ct].description,extention)) return TRUE;
  else return FALSE;
 }
-
-
 
 int comment_with_string(char *comment_string,int start)
 {

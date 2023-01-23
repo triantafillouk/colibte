@@ -459,11 +459,12 @@ sqlite3 * notes_db_open()
  if(sqlite3_open(db_file_name,&db)!=SQLITE_OK) {
 	msg_line("Notes db [%s]: %s",db_file_name,sqlite3_errmsg(db));
 	notes_db_close(db);
-	init_notes_db(1);
-	if(sqlite3_open(db_file_name,&db)!=SQLITE_OK){
-		error_line("Cannot create Notes db [%s]: %s",db_file_name,sqlite3_errmsg(db));
-		return NULL;
-	};
+	if(init_notes_db(1)) {
+		if(sqlite3_open(db_file_name,&db)!=SQLITE_OK){
+			error_line("Cannot create Notes db [%s]: %s",db_file_name,sqlite3_errmsg(db));
+			return NULL;
+		};
+	} else return NULL;
  };
  return db;
 }
@@ -639,9 +640,8 @@ int parse_note(FILEBUF *fp)
 		if(ptr==0) find_str_reol(fp,ptr,"#Title: ",note->n_title,sizeof(note->n_title));
 		// MESG("calendar, title = %s",note->n_title);
 		strcpy(note->n_cat,"calendar/");
-		int len1=strlen(NOTES_PARENT-2);
-		memcpy(note->n_cat+len1,fp->b_fname,4);note->n_cat[len1+4]=0;	// add the year to calendar category
-		MESG("calendar cat [%s]",note->n_cat);
+		memcpy(note->n_cat+9,fp->b_fname,4);note->n_cat[13]=0;	// add the year to calendar category
+		// MESG("calendar cat [%s]",note->n_cat);
 
 		note->n_tags[0]=0;
 		ptr = find_str_reol(fp,ptr,"#Tags: ",note->n_tags,sizeof(note->n_tags));
@@ -1550,7 +1550,7 @@ char *get_current_note_name()
  };
  MESG("	notes_name = [%s]",notes_name);
  sprintf(full_name,"SELECT name,rowid from notes where rowid = %d",note_id);
- MESG("	fukk_name = [%s]",full_name);
+ MESG("	full_name = [%s]",full_name);
 
  strcat(notes_name,query_string(db,full_name,&note_id));
  MESG("	notes_name = [%s]",notes_name);
