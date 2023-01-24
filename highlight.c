@@ -2577,11 +2577,11 @@ void highlight_cmd(int c)
 	case CHR_RESET:
 		hstate=0;
 		slang=LANG_SCRIPT;
-		prev_space=1;
+		prev_space=0;
 		break;
 	case CHR_SQUOTE: 
 		if(hstate!=HS_PREVESC){
-		if(prev_space)
+		if(prev_space||hstate==HS_LINESTART)
 		{
 			if(hquotem&H_QUOTE1) hquotem = hquotem & ~H_QUOTE1;
 			else prev_set = H_QUOTE1;
@@ -2610,26 +2610,27 @@ void highlight_cmd(int c)
 		 if(hquotem==H_QUOTE11) hquotem=0;else  prev_set = H_QUOTE11;
 		break;
 	case '-':
-		if(hstate==HS_LINESTART) {
+		if(hstate==HS_LINESTART && prev_space==0) {
 			line_set++;
 			if(line_set==2) {
 				hquotem=H_LINESEP;
 				hstate=0;
 				line_set=0;	
 			} else {
-				hquotem=H_QUOTE6;
+				// hquotem=H_QUOTE6;
 			};
 		};
 		break;
 
 	case '#': {
 		if(hquotem==H_QUOTE1 || hquotem==H_QUOTE2) break;
-		if(hstate==HS_LINESTART || hstate==HS_PREVSPACE) {
-		// if(hquotem != H_QUOTE1 && hquotem!=H_QUOTE2) 
+		if(hstate==HS_LINESTART || prev_space) {
 			hquotem=H_QUOTE6;
+			hstate=HS_TAG;
+		} else {
+			hstate=0;
+			hstate=0;
 		};
-		hstate=0;
-		
 		prev_space=0;
 		break;
 	};
@@ -2652,18 +2653,21 @@ void highlight_cmd(int c)
 	case CHR_LINE:
 		if(hquotem!=H_QUOTEC && hquotem!=H_QUOTE11) hquotem = 0;
 		hstate=HS_LINESTART;
-		prev_space=1;
+		prev_space=0;
 		line_set=0;
-
 		break;
 	case ' ':
 	case '\t':
 		prev_space=1;
-		if(hstate!=HS_LINESTART) hstate=0;
-		break;		
+		if(hstate==HS_TAG) hquotem=H_QUOTE6;
+		hstate = HS_PREVSPACE;
+		if(hquotem!=H_QUOTE6) hquotem=0;
+		break;
 	default: { 
-		if((c>='A' && c<='Z') || (c>='a' && c<='z') || c>128) hstate |= HS_LETTER;
-		else hstate=0;
+		if((c>='A' && c<='Z') || (c>='a' && c<='z') || c>128) {
+			hstate |= HS_LETTER;
+			if(hstate & HS_TAG) hquotem=H_QUOTE4; 
+		} else hstate=0;
 		prev_space=0;
 	};
   };

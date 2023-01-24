@@ -27,9 +27,23 @@ int comment_sql(int n);
 
 
 /* character states */
+#if	1
 #define HS_LINESTART	1
 #define HS_PREVAST		2
-#define HS_PREVACCENT	3
+#define HS_PREVSLASH	4
+#define HS_PREVESC		8
+#define HS_PSMALLER		16
+#define HS_END1			32
+#define HS_END2			64
+#define	HS_SPEC			128	// special
+#define HS_QMARK		256
+#define HS_ES2			512
+#define HS_LETTER		1024	// alpha
+#define HS_PREVSPACE	2048
+#define HS_TAG			4096
+#else
+#define HS_LINESTART	1
+#define HS_PREVAST		2
 #define HS_PREVSLASH	4
 #define HS_PREVESC		5
 #define HS_PSMALLER		6
@@ -37,15 +51,11 @@ int comment_sql(int n);
 #define HS_END2			8
 #define	HS_SPEC			9	// special
 #define HS_QMARK		10
-#define HS_Q1			11
-#define HS_S0			20
-#define	HS_S1			21
-#define HS_S2			22
-#define HS_S3			23
-#define HS_ES1			24
 #define HS_ES2			25
 #define HS_LETTER		30	// alpha
 #define HS_PREVSPACE	64
+#define HS_TAG			128
+#endif
 	/* inserted script language  */
 
 /* flags */

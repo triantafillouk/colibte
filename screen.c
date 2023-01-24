@@ -1289,15 +1289,13 @@ void vtputwc(WINDP *wp, utfchar *uc)
 		return;
 	};
 	if(hquotem & H_LINESEP) {
-		// if(!(wp==cwp && (wp->vtrow == window_cursor_line(wp))))
-		// if(wp->vtrow != window_cursor_line(wp))
-		{ 
 		for(wp->vtcol=start_column;wp->vtcol< wp->w_ntcols-start_column;wp->vtcol++){ 
-			svwchar(vp->v_text+wp->vtcol,(utfchar *)"─",COLOR_BG,COLOR_COMMENT_FG);	/* single line separator  */
-			// svwchar(vp->v_text+wp->vtcol,(utfchar *)"═",COLOR_BG,COLOR_COMMENT_FG);	/* double line separator */
-		} return;
+			// svwchar(vp->v_text+wp->vtcol,(utfchar *)"─",COLOR_BG,COLOR_COMMENT_FG);	/* single line separator  */
+			svwchar(vp->v_text+wp->vtcol,(utfchar *)"═",COLOR_BG,COLOR_COMMENT_FG);	/* double line separator */
 		};
+		return;
 	};
+
 	if(syntaxh) {
 		wp->w_fp->hl->h_function(c); 
 	};
