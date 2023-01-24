@@ -623,8 +623,10 @@ int check_init(FILEBUF *bf)
  tok_struct *tok_table=bf->tok_table;
  int err=0;
  stage_level=0;
+ // MESG("check_init: [%s] %d",bf->b_fname,bf->b_type);
  if(tok_table==NULL) 
  {
+ 	// MESG("create token table [%s]",bf->b_fname);
 	parse_block1(bf,NULL,1,0);
 	if(err_num>0) {
 		msg_line("found parsed errors: err_num=%d",err_num);
@@ -649,6 +651,7 @@ int check_init(FILEBUF *bf)
  };
 
  tok=tok_table;
+ // MESG("check_init:end [%s] %d",bf->b_fname,bf->b_type);
  if(bf->err>0) {
 	return bf->err;
  };
@@ -2690,6 +2693,7 @@ int refresh_current_buffer(int nused)
  /* clear parse list  */
  empty_tok_table(fp);
  fp->err=-1;
+ // MESG("refresh_current_buffer:[%s] %d",fp->b_fname,fp->b_type);
  parse_block1(fp,fp->symbol_tree,1,100);	/* init tree,extra 100 symbols  */
 
  if(err_num<1){	/* if no errors  */
@@ -2852,7 +2856,7 @@ int show_parse_buffer(int n)
  err_num=0;
  err_line=0;
  show_stage=0;
-
+ // MESG("show_parse_buffer:");
  /* clear parse list  */
  empty_tok_table(fp);
  parse_block1(fp,fp->symbol_tree,1,0);

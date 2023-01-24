@@ -1,3 +1,5 @@
+# a recursive function that adds 3 arguments with a quirk
+
 function add3(a,b,c)
 {
  if(c==0) { return (0) }
@@ -5,6 +7,13 @@ function add3(a,b,c)
  return(d)
 }
 
+cls
 
-result = add3(1,2,4)
-result:    12 | 0xC | 0o14
+result = add3(1,2,1)
+result:   3.0
+
+`
+ this should act as a comment
+`
+print("result is new "+result);
+

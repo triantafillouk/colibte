@@ -746,7 +746,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	int dir_num=0;
 	int is_scratch=0;
 	create_base_name(base_name,bname);
-	MESG("new_filebuf:base_name=[%s] bname=[%s]",base_name,bname);
+	// MESG("new_filebuf:base_name=[%s] bname=[%s]",base_name,bname);
 	dir_name[0]=0;
 	is_scratch = scratch_ind(base_name);
 
@@ -1120,7 +1120,7 @@ int open_file(int n)
  int err=0;
  int stat=0;
  int line=0;
- MESG("open_file: %d",n);
+ // MESG("open_file: %d",n);
 	fname[0]=0;
 	set_list_type(LDIR);
 	if(n>0) {

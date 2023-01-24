@@ -2567,6 +2567,7 @@ void highlight_cmd(int c)
 {
   static int prev_space=1;
   static int prev_set=-1;
+  static int line_set=0;
 
   if(highlight_note(c)) return;
 
@@ -2605,12 +2606,26 @@ void highlight_cmd(int c)
 		break;
 	case CHR_BQUOTE: 
 		if(hquotem&H_QUOTE1 || hquotem&H_QUOTE2) { hstate=0;break;};
-		if(hquotem==H_QUOTEC) hquotem=0;else  prev_set = H_QUOTEC;
+		// if(hquotem==H_QUOTEC) hquotem=0;else  prev_set = H_QUOTEC;
+		 if(hquotem==H_QUOTE11) hquotem=0;else  prev_set = H_QUOTE11;
+		break;
+	case '-':
+		if(hstate==HS_LINESTART) {
+			line_set++;
+			if(line_set==2) {
+				hquotem=H_LINESEP;
+				hstate=0;
+				line_set=0;	
+			} else {
+				hquotem=H_QUOTE6;
+			};
+		};
 		break;
 
 	case '#': {
+		if(hquotem==H_QUOTE1 || hquotem==H_QUOTE2) break;
 		if(hstate==HS_LINESTART || hstate==HS_PREVSPACE) {
-		if(hquotem != H_QUOTE1 && hquotem!=H_QUOTE2) 
+		// if(hquotem != H_QUOTE1 && hquotem!=H_QUOTE2) 
 			hquotem=H_QUOTE6;
 		};
 		hstate=0;
@@ -2638,14 +2653,9 @@ void highlight_cmd(int c)
 		if(hquotem!=H_QUOTEC && hquotem!=H_QUOTE11) hquotem = 0;
 		hstate=HS_LINESTART;
 		prev_space=1;
+		line_set=0;
+
 		break;
-#if	0
-	case '@': // code block
-		if(hstate==HS_PREVESC||hquotem & H_QUOTE1||hquotem & H_QUOTE2) break;
-		// if(hquotem & H_QUOTE11) hquotem=0;else hquotem=H_QUOTE11;
-		if(hquotem & H_QUOTE11) hquotem=0;else prev_set=H_QUOTE11;
-		break;
-#endif
 	case ' ':
 	case '\t':
 		prev_space=1;

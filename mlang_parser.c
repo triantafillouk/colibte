@@ -141,7 +141,8 @@ int getnstr1(FILEBUF *bf, int cc, char *str)
 	// printf("%c %d ",nc,nc);
 	*s++ = nc;len++;
 	pbslash=0;
- };printf("\n");
+ };
+ // printf("\n");
  *s=0;
  return(len);
 }
@@ -399,6 +400,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				curl_level--;cc=1;
 				if(curl_level<0) {err_num=102;err_str="curls dont match!";return(0);};
 				if(curl_level==store_level && is_storelines) {
+					// MESG(" TOK_RCURL: go create_function_buffer");
 					create_function_buffer(bf,proc_name,start_proc_offset,foffset);
 
 					tok->ttype=TOK_SEP;
@@ -754,7 +756,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 	if(err_num>0) {ERROR("ERROR: line=%d type=%d [%s]",err_line,err_num,err_str);break;};
  };
- MESG("END of parsing! type=%d level=%d",tok_type,curl_level);
+ // MESG("END of parsing! type=%d level=%d",tok_type,curl_level);
  {	/* add eof token!  */
 	if(tok_type!=TOK_SEP || tok_type==0) 
 	{	

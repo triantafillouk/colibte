@@ -655,7 +655,7 @@ int exec_named_function(char *name)
 	/* construct the buffer name */
 	bufn[0] = CHR_LBRA;
 	strlcat(bufn, "]",MAXFLEN);
-//	MESG("exec_named_function: name=%s bufn=%s",name,bufn);	
+	// MESG("exec_named_function: name=%s bufn=%s",name,bufn);	
 	/* find the pointer to that buffer */
     if ((bp=get_filebuf(bufn,NULL,FSINVS)) == NULL) 
 	{
@@ -1184,7 +1184,7 @@ int create_function_buffer(FILEBUF *pbuf,char *function_name,offs start_function
  char bname[MAXFLEN];
  char *function_block;
  int function_size=0;
-
+	// MESG("create_function_buffer:");
 	bname[0] = CHR_LBRA;
 	strlcpy(bname+1,function_name,250);
 	insert_bt_element(bt_table,bname+1,TOK_PROC,0);	/* insert in main table  */
@@ -1203,6 +1203,9 @@ int create_function_buffer(FILEBUF *pbuf,char *function_name,offs start_function
 	insert_string(macrobuf,function_block,function_size);
 	efree(function_block,"function_block");
 
+	// set buffer type to cmd
+	macrobuf->b_type=1;
+	// MESG("created sub file [%s] type %d",pbuf->b_fname,pbuf->b_type);
 	return(1);
 }
 
