@@ -94,6 +94,7 @@ void highlight_ecl(int c);
 void highlight_sql(int c);
 void highlight_matlab(int c);
 void highlight_cmd(int c);
+void highlight_gtext(int c);
 void highlight_rust(int c);
 void highlight_tags(int c);
 void highlight_sln(int c);
@@ -324,7 +325,7 @@ SHLIGHT hts[] = {
  { "MAN",1,0,none_w,none_w, highlight_text,update_highlight,c_incword,man_extensions,comment_none },
  { "M4",0,0,none_w,none_w, highlight_text,update_highlight,c_incword,m4_extensions,comment_none },
  { "INFO",1,0,none_w,none_w, highlight_text,update_highlight,c_incword,info_extensions,comment_none },
- { "GTEXT",1,0,none_w,none_w, highlight_cmd,update_highlight_line,c_in_txt_word,gtxt_extensions,comment_perl },
+ { "GTEXT",1,0,none_w,none_w, highlight_gtext,update_highlight_line,c_in_txt_word,gtxt_extensions,comment_perl },
  { "PYTHON",0,1,python_w,python_w1, highlight_python,update_highlight,c_incword,python_extensions,comment_perl },
  { "BASIC",1,0,basic_w,basic_w1, highlight_other,update_highlight,c_incword,basic_extensions,comment_basic },
  { "WML",1,0,wml_w,wml_w1, highlight_html,update_highlight,c_incword,wml_extensions,comment_html },

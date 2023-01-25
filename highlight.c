@@ -2577,6 +2577,99 @@ void highlight_cmd(int c)
 	case CHR_RESET:
 		hstate=0;
 		slang=LANG_SCRIPT;
+		prev_space=1;
+		break;
+	case CHR_SQUOTE: 
+		if(hstate!=HS_PREVESC){
+		if(prev_space)
+		{
+			if(hquotem&H_QUOTE1) hquotem = hquotem & ~H_QUOTE1;
+			else prev_set = H_QUOTE1;
+			// hquotem = (hquotem)? hquotem & ~H_QUOTE1: H_QUOTE1;
+		} else {
+			if(hquotem & H_QUOTE1) {
+				hquotem = hquotem & ~H_QUOTE1;
+			}
+		}
+		prev_space=0;
+		hstate=0;
+		};
+		break;
+	case CHR_DQUOTE:
+		if(hstate!=HS_LETTER) {
+			if(hstate!=HS_PREVESC) hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
+		} else {
+			hquotem &= ~H_QUOTE2;
+		};
+		hstate=0;
+		prev_space=0;
+		break;
+	case CHR_BQUOTE: 
+		if(hquotem&H_QUOTE1 || hquotem&H_QUOTE2|| hquotem&H_QUOTE6) { hstate=0;break;};
+		if(hquotem==H_QUOTEC) hquotem=0;else  prev_set = H_QUOTEC;
+		 // if(hquotem==H_QUOTE11) hquotem=0;else  prev_set = H_QUOTE11;
+		break;
+	case '-':
+		if(hstate==HS_LINESTART) {
+			line_set++;
+			if(line_set==2) {
+				hquotem=H_LINESEP;
+				hstate=0;
+				line_set=0;	
+			} else {
+				hquotem=H_QUOTE6;
+			};
+		};
+		break;
+
+	case '#': {
+		if(hquotem==H_QUOTE1 || hquotem==H_QUOTE2 || hquotem==H_QUOTEC) break;
+		if(hstate==HS_LINESTART || hstate==HS_PREVSPACE) {
+			hquotem=H_QUOTE6;
+		};
+		hstate=0;
+		prev_space=0;
+		break;
+	};
+	case '\\':
+		hstate=(hstate==HS_PREVESC)?0:HS_PREVESC;
+		prev_space=0;
+		break;
+	case CHR_CR:
+	case CHR_LINE:
+		if(hquotem!=H_QUOTEC) hquotem = 0;
+		hstate=HS_LINESTART;
+		prev_space=1;
+		line_set=0;
+
+		break;
+	case ' ':
+	case '\t':
+		prev_space=1;
+		if(hstate!=HS_LINESTART) hstate=0;
+		break;		
+	default: { 
+		if((c>='A' && c<='Z') || (c>='a' && c<='z') || c>128) hstate |= HS_LETTER;
+		else hstate=0;
+		prev_space=0;
+	};
+  };
+}
+
+void highlight_gtext(int c)
+{
+  static int prev_space=1;
+  static int prev_set=-1;
+  static int line_set=0;
+
+  if(highlight_note(c)) return;
+
+  if(prev_set>=0) { hquotem=prev_set;prev_set=-1;};
+
+  switch(c) {
+	case CHR_RESET:
+		hstate=0;
+		slang=LANG_SCRIPT;
 		prev_space=0;
 		break;
 	case CHR_SQUOTE: 
@@ -2603,11 +2696,6 @@ void highlight_cmd(int c)
 		};
 		hstate=0;
 		prev_space=0;
-		break;
-	case CHR_BQUOTE: 
-		if(hquotem&H_QUOTE1 || hquotem&H_QUOTE2) { hstate=0;break;};
-		// if(hquotem==H_QUOTEC) hquotem=0;else  prev_set = H_QUOTEC;
-		 if(hquotem==H_QUOTE11) hquotem=0;else  prev_set = H_QUOTE11;
 		break;
 	case '-':
 		if(hstate==HS_LINESTART && prev_space==0) {
@@ -2651,7 +2739,7 @@ void highlight_cmd(int c)
 		break;
 	case CHR_CR:
 	case CHR_LINE:
-		if(hquotem!=H_QUOTEC && hquotem!=H_QUOTE11) hquotem = 0;
+		if(hquotem!=H_QUOTEC) hquotem = 0;
 		hstate=HS_LINESTART;
 		prev_space=0;
 		line_set=0;

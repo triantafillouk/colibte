@@ -2,15 +2,15 @@
 
  Colibte is a lightweight, easy, fast, low memory consuption text editor for Linux.
  It also works in WSL, in powershell if compiled with cygnu and in MAC.
- It has a menu and support for multiple windows, both vertically or horizontally splited.
+ It has an old style menu and support for multiple windows, both vertically or horizontally splited.
  It has color themes and highlight for various programming languages.
  With its DIR mode we can navigate easily on the file structure. 
  External programs can be defined to be used as viewer or editors for specific files.
  A hex mode with editing is also provided.
- editable user menu. (ALT-A)
+ An editable user menu is supplied. (ALT-A)
 
 ## Basic characteristics
-	- A console and gtk driver
+	- A console and gtk driver.
 	- A directory and file viewer of text docuemets
 	- Highlight support for many programming languages
 	- Multiple windows (vertical and horizontal splitting).
@@ -95,7 +95,7 @@ For the moment there are the following drivers.
 
 ### FUNCTION KEYS
 
- - F1	: Show file info.
+ - F1	: Show program version and file info.
  - F2	: Insert argument count 
  - F3	: Quick close, saves the file and close it.
  - F4	: Describe next key.
@@ -142,14 +142,6 @@ New files open in current window.
     >  (^G)	Abandon replacements.  
 -   Search Menu starts other functions also.
 
-
-### Editing keys.
-
-- DEL remove current character.
-- Backspace (or Control-H) removes previous letter.
-- Control-D	deletes current line.
-- Control-K	remove character till the end of the line.
-- Control-Backspace removes previous word.
 
 ### Region operations/Clipboard.
 
@@ -232,7 +224,7 @@ variable_a = 10+20 :  30.0
  Use ALT-+  to evaluate/execute current macro buffer. The output is printed on buffer '[out]'  
  Using the -x flag when started a macro file can be executed instead starting the editor.  
 
-## C-mode utilities
+## C-mode utilities (when editing c,c++ file types)
 
  ALT-.	find tag (C mode) Find the function under the cursor in current dir.
  ALT-;	Add a C comment at the end of the line
@@ -254,23 +246,27 @@ A browser like history is maintainted.
 
 ## User Preferences
 
- ALT-Edit - Preferences allows to edit user preferences.
+ ALT-Edit - Preferences allows to edit user preferences.  
  - Fill column (default is 72). To be used with ALT-Q to break a big line.
  - Left margin (default is 4).	Left margin used for converting big lines to small ones. (ALt-Q).
- - keydebug on/off
  - Tabsize (default is 4). Tabs are converted automatically to spaces for python and ansible files.
- - files to be greped for pattern search.
  - Print precision for the macro language.
- - Show HEX values for the macro language.
- - keyboard emulation (emacs like or native). (needs a restart to be activated)
- - make a backup while saving a file.
+
+ ALso use ALT-M-G(global) to set global parameters 
+ - exact match on/off in searching
+ - use regular expression in searching
+ - Show HEX values output in macro language.
+ - Chage keyboard emulation (Emacs, native)
  - Embed icons for GTK drivers (Use its own icons).
+ - Activate creation of backup files during savings (add .~ extension)
+ - Use safe delete (asks for confirmation before deleting files)
  - Show position information on status line.
- - show vmlines (line numbers)
- - Show current offset on status line.
  - Show current character on status line.
  - Save file history (used to open recent files!).
- - Use classic status instead of color to show current window.
+
+
+ - Show current offset on status line.
+ - show vmlines (line numbers)
 
 ## Program command line names
 | program name | description |
@@ -279,11 +275,9 @@ A browser like history is maintainted.
 | ctg2  | gtk2 driver with notes |
 | ctg3  | gtk3 driver with notes |
 | cxe	| X11 driver with notes (no utf8 support) |
-| ce    | console ncurses/panel driver witouth notes. No need for sqlite3 library |
+| ce    | console ncurses/panel driver without notes. No need for sqlite3 library |
 
 ## Command line flags
-
-
 
  -k	or  
  -K		edit with encryption (asks encryption code before saving the file).  

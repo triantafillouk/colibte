@@ -13,7 +13,7 @@ result = add3(1,2,1)
 result:   3.0
 
 `
- this should act as a comment
+ this should act as a multiline comment
 `
 print("result is new "+result);
 
