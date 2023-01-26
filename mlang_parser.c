@@ -353,6 +353,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			// MESG("start script: line %d",tok_line);
 		};
 		if(tok_type==TOK_NL) tok_line++;
+		last_correct_line=tok_line;
 		continue;
 	};
 #endif
@@ -367,7 +368,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
 		case TOK_NL: 
 			if(cc!=';') {
-				tok_line++;
+				tok_line++;last_correct_line=tok_line;
 				skip_line1(bf,cc);
 				if(is_now_sep || after_rpar) continue;
 				is_now_sep=1;
@@ -526,6 +527,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				|| next_token_type(bf)==TOK_SPACE
 			) {
 				if(next_token_type(bf)==TOK_NL) tok_line++;
+				last_correct_line=tok_line;
 				getnc1(bf,&cc,&tok_type);
 				tok_type=TOK_COMMA;
 			};
@@ -548,12 +550,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		default:
 			{
 			err_num=103;
-			err_line=tok_line;
+			if(tok_line) err_line=tok_line;else err_line=last_correct_line;
 			err_str="character unrecognised";
 			return(0);
 			};
 	};
-	// MESG("-- token type=%d %s",tok_type,tok_name[tok_type]);
+	// MESG("- token type=%d %s",tok_type,tok_name[tok_type]);
 	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {
 	if(!(is_now_sep && (tok_type==TOK_LCURL||tok_type==TOK_RCURL) )){
@@ -754,7 +756,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 		};
 	};
-	if(err_num>0) {ERROR("ERROR: line=%d type=%d [%s]",err_line,err_num,err_str);break;};
+	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
  // MESG("END of parsing! type=%d level=%d",tok_type,curl_level);
  {	/* add eof token!  */
@@ -772,7 +774,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	tok->tline=tok_line;
 	if(curl_level!=0 && err_num<1) set_error(tok,106,"parse error: invalid number of curls");
 	if(par_level!=0 && err_num<1) { 
-		err_num=104;err_line=0;err_str="parse error: invalid number of pars";
+		err_num=104;err_line=last_correct_line;err_str="parse error: invalid number of pars";
 		ERROR("parenthesis error: line %d",tok_line);
 	};
 	bf->m_mode=M_PARSED;	

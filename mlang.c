@@ -24,7 +24,6 @@ extern FILEBUF *cbfp;
 extern array_dat *main_args;
 
 #if	SYNTAX_DEBUG
-tind
 #define	SHOWTOK {if(discmd) { MESG("  [%2d][%*s-%s][%d]  %s",stage_level,stage_level,"",Tds,tok->tnum,tok_name[tok->ttype]);};}
 
 #define	TDS(name)   char *Tds=name;\
@@ -64,7 +63,6 @@ char sout[MAXLLEN];	// used for messaging (msg_line), output print
 TLIST ctoklist=NULL;
 int is_break1=0;
 int tok_mask[256];
-
 int ex_vtype=0; 	/* type of previous expression */
 int ex_edenv=0;	/* true after encount an editor env variable */
 static double ex_value;	// saved double value
@@ -80,6 +78,7 @@ static char slval[MAXLLEN];// saved string value
 int err_num=0;
 int drv_max_colors=16;
 static int err_line=0;
+int last_correct_line=0;
 static tok_struct *tok;	/* current token!!  */
 
 char *err_str;
@@ -260,7 +259,7 @@ char *directives[] = {
 
 
 array_dat *transpose(array_dat *array1);
-
+#if	NUSE
 void show_token()
 {
 	if(tok!=NULL) 
@@ -268,6 +267,7 @@ void show_token()
 	else 
 		MESG(";ctoken is NULL !!!!!!!!!!!!!!!!!!!!!!!!!!");
 }
+#endif
 
 void init_btree_table()
 {
@@ -605,15 +605,15 @@ void init_exec_flags()
  ex_nvars=0;ex_nquote=0;ex_nums=0;	/* initialize table counters  */
 }
 
-void show_error(char *from)
+void show_error(char *from,char *name)
 {
  int var_index=-1;
  if(tok) if(tok->tnode) var_index=tok->tnode->node_index;
  if(var_index>=0)
-	ERROR("%s error %d after function [%s] at line %d: [%s]",from,err_num,ftable[var_index].n_name,err_line,err_str);
+	ERROR("%s error %d file %s after function [%s] after line %d: [%s]",from,err_num,name,ftable[var_index].n_name,last_correct_line,err_str);
  else {
 	// MESG("var_index=%d",var_index);
-	ERROR("%s error %d at line %d: [%s]",from,err_num,err_line,err_str);
+	ERROR("%s error %d file %s after line %d: [%s]",from,err_num,name,last_correct_line,err_str);
  };
 }
 
@@ -638,7 +638,7 @@ int check_init(FILEBUF *bf)
 		return(201);
 	}
  };
-
+ // MESG("check_init: 2");
  if(bf->err<1) 
  {
 	tok=bf->tok_table;
@@ -778,7 +778,7 @@ double eval_fun1(int fnum)
 	int stat=0;
 	array_dat *arr=NULL;
 	TDS("eval_fun1");
-	// MESG(";eval_fun1:");
+	// MESG(";eval_fun1: fnum=%d",fnum);
 	ia=m_functions[fnum].f_args;
 	
 	f_entry=entry_mode;
@@ -1291,7 +1291,7 @@ double factor_cmd()
 
 	if(err_num>0) {
 		// ERROR("error %d after function [%s] at line %d: %s",err_num,ftable[var_index].n_name,err_line,err_str);
-		show_error("Factor");
+		show_error("Factor","factor_cmd");
 		RTRN(status);
 	};
 	// MESG(";factor_cmd:end tnum=%d value=%f ex_value=%f",tok->tnum,value,ex_value);
@@ -2630,7 +2630,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  {
 	if((err_num=check_init(bp))>0) {
 // 		mesg_out("Error %d %s line %d ex_vtype=%d ex_value=%f slval=[%s]!",err_num,err_str,err_line,ex_vtype,ex_value,slval);
-		show_error("Check init");
+		show_error("Check init",bp->b_fname);
 		return(0);
 	};
 
@@ -2704,7 +2704,7 @@ int refresh_current_buffer(int nused)
 	drv_start_checking_break();
 	if(check_init(fp)>0) {
 		drv_stop_checking_break();
-		show_error("refresh buffer1");
+		show_error("refresh buffer",fp->b_fname);
 		// msg_line("syntax error %d line %d [%s]",err_num,err_line,err_str);
 		// mesg_out("syntax error %d line %d [%s]",err_num,err_line,err_str);
 		return(0);
@@ -2715,7 +2715,7 @@ int refresh_current_buffer(int nused)
 	val=exec_block1(0);
 	drv_stop_checking_break();
 	if(err_num>0) {
-		show_error("refresh buffer");
+		show_error("refresh buffer",fp->b_fname);
 		// msg_line("Error %d [%s] at line %d",err_num,err_str,err_line);
 		// mesg_out("Error %d [%s] at line %d",err_num,err_str,err_line);
 	} else {
@@ -2754,7 +2754,7 @@ int parse_check_current_buffer(int n)
  if(err_num>0) {
 	macro_exec=0;
 	msg_line("syntax error %d line %d [%s]",err_num,err_line,err_str);
-	show_error("parse_check");
+	show_error("parse_check",fp->b_fname);
 	igotolinecol(err_line+1,1,1);
  	return(0);
  } else {
@@ -2797,7 +2797,7 @@ int parse_buffer_show_tokens(int n)
  
  if(err_num>0) {
 	macro_exec=0;
-	show_error("parse_buffer_show_token");
+	show_error("parse_buffer_show_token",fp->b_fname);
 	// msg_line("syntax error %d line %d [%s]",err_num,err_line,err_str);
 	igotolinecol(err_line+1,1,1);
  	return(0);

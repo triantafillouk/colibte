@@ -977,7 +977,7 @@ FILEBUF *cls_fout(char *bname)
  	lbegin(window_list);
 	while((wp=(WINDP *)lget(window_list))!=NULL) {
 		if(wp->w_fp==bp){
-			set_update(wp,UPD_FULL);
+			set_update(wp,UPD_EDIT);
 		};
 	};
 	return bp;

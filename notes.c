@@ -21,7 +21,6 @@ extern int scratch_files[];
 notes_struct *init_note();
 int get_current_tag_id();
 char *get_current_tag_name();
-void show_token();
 
 int insert_preamble(FILEBUF *fp,int type)
 {
@@ -1136,7 +1135,6 @@ int recreate_notes_db(int n)
 	for(i=0 ;notes_files[i]!=NULL;i++){
 		struct stat st;
 		// MESG("---- insert %d: [%s]",i,notes_files[i]);
-		// show_token();
 		if(!stat(notes_files[i],&st))
 		{
 			int flen=strlen(notes_files[i]);
@@ -1161,7 +1159,6 @@ int recreate_notes_db(int n)
 					msg_line(" file [%s] Not a note file !!!!!!!!!!!!",notes_files[i]);
 					delete_filebuf(bp,1);
 					// select_filebuf(current_buffer);
-					// show_token();
 					MESG("- skip file [%s]",notes_files[i]);
 					notes_skipped++;
 					continue;					
@@ -1176,11 +1173,9 @@ int recreate_notes_db(int n)
 			} else {
 				dirs++;
 				// select_filebuf(current_buffer);
-				// show_token();
 				// MESG("- skip, %s this is dir",notes_files[i]);
 			};
 		} else {
-			// show_token();
 			MESG("- skip file that cannot stat file %s",notes_files[i]);
 			notes_skipped++;
 		};
