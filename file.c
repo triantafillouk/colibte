@@ -115,7 +115,7 @@ int next_file(int n)
 int activate_file(FILEBUF *bp)
 {
 	if(bp->b_dname[0]!=0) if(chdir(bp->b_dname)!=0) return false;
-	MESG("activate_file:[%s] b_type=%d b_flag=%X",bp->b_fname,bp->b_type,bp->b_flag);
+	// MESG("activate_file:[%s] b_type=%d b_flag=%X",bp->b_fname,bp->b_type,bp->b_flag);
 	if ((bp->b_state & FS_ACTIVE) ==0)
 	{	
 //		MESG("active_file: is not active, activate it!");

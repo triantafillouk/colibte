@@ -46,7 +46,7 @@ tok_struct *add_token(TLIST lex_parser,int tok_type,int cc,char *label)
 	tok=new_tok();
 	add_element_to_list((void *)tok,lex_parser);
 	tok->tnum=lex_parser->size-1;
-//	fprintf(stderr,"added token %3d: ind=%d type=[%s] [%s]\n",tok->tnum,cc,tok_name[tok_type],label);
+	MESG("added token %3d: ind=%d type=[%s] [%s]",tok->tnum,cc,tok_name[tok_type],label);
  return tok;
 }
 
@@ -267,7 +267,7 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 {
  double value=0;
- int cc;
+ int cc=0;
  char nword[256];
  int slen=0;
  int is_storelines=0;
@@ -290,9 +290,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int tok_type=0;
  int next_tok_type=0;
  int script_active=0;
- int bquotes=0;
+ // int bquotes=0;
 
-// MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
+MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
  if(
  	file_type_is("CMD",bf->b_type)
 	|| file_type_is("DOT",bf->b_type)
@@ -337,26 +337,28 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
  while(getnc1(bf,&cc,&tok_type))
  {
-	if(tok_type!=TOK_BQUOTE) bquotes=0;	else bquotes++;
-#if	0
- char active='-';
- if(script_active) active='+';
- MESG("%ccc=%d [%c] type=%d %s line=%d err=%d bquotes=%d",active,cc, cc,tok_type,tok_name[tok_type],tok_line,err_num,bquotes);
+	if(script_active) {
+		if(tok_type==TOK_BQUOTE) { 
+			script_active=0;
+			continue;
+		}; 
+	} else {
+		if(tok_type==TOK_BQUOTE) {
+			script_active=1;
+			continue;
+		};
+		if(tok_type==TOK_NL) {  MESG(" - newline in comment %d",tok_line);tok_line++;};
+		continue;
+	};
+
+#if	1
+ if(tok_type==TOK_NL) MESG(" - New line -------  type=%d %s line=%d",tok_type,tok_name[tok_type],tok_line);
+ else MESG(" - %d [%c] type=%d %s line=%d",cc, cc,tok_type,tok_name[tok_type],tok_line);
 #endif
  if(err_num>0) return 0.0;
 	value=0;
 	nword[0]=0;
-#if	1
-	if(script_active==0) {
-		if(tok_type==TOK_BQUOTE) {
-			if(bquotes) script_active=1;
-			// MESG("start script: line %d",tok_line);
-		};
-		if(tok_type==TOK_NL) tok_line++;
-		last_correct_line=tok_line;
-		continue;
-	};
-#endif
+
 	switch(tok_type) {
 		case TOK_SEP:
 			if(is_now_sep) continue;
@@ -367,8 +369,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 
 		case TOK_NL: 
+			tok_line++;
 			if(cc!=';') {
-				tok_line++;last_correct_line=tok_line;
+				last_correct_line=tok_line;
 				skip_line1(bf,cc);
 				if(is_now_sep || after_rpar) continue;
 				is_now_sep=1;
@@ -420,6 +423,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 							break;
 						};
 						getnc1(bf,&cc,&tok_type);
+						if(tok_type==TOK_NL) tok_line++;
 					};
 					tok_type=TOK_RCURL;
 				};
@@ -446,6 +450,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			break;
 		case TOK_COMMENT:
 			skip_2nl(bf);
+			tok_line++;
 			continue;
 
 		case TOK_NOT:
@@ -538,11 +543,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			// printf("tok_at [%s]\n",(char *)tok->tname);
 			break;
 
-		case TOK_BQUOTE:
-			// MESG("stop script! line %d",tok_line);
-			bquotes=0;
-			script_active=0;
-			continue;
 		case TOK_DOLAR:
 		case TOK_TILDA:
 		case TOK_BSLASH:
@@ -758,7 +758,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
- // MESG("END of parsing! type=%d level=%d",tok_type,curl_level);
+ MESG("END of parsing! type=%d level=%d",tok_type,curl_level);
  {	/* add eof token!  */
 	if(tok_type!=TOK_SEP || tok_type==0) 
 	{	
@@ -783,13 +783,13 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	bf->symbol_tree->max_items = bf->symbol_tree->items+extra;
  };
 
-/* create token table from token list  */
+ MESG("create token table from token list");
  set_tok_table(bf, lex_parser);
 
  free_list(lex_parser,"lex_parser");
  free_list(cstack,"cstack");
  stage_level=save_stage_level;
-
+ MESG("parse_block1:[%s] end toke items %d",bf->b_fname,bf->symbol_tree->max_items);
  return(TRUE); 
 }
 

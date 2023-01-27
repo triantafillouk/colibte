@@ -2781,11 +2781,12 @@ int parse_buffer_show_tokens(int n)
  err_num=check_init(fp);
 
  tok_ind=fp->tok_table;
+ MESG("Print token table to out buffer");
  if(tok_ind==NULL) {
 	msg_line("parsing buffer produced no table!");
 	return(0);
  };
- out_print("-------- Token list -----------------------------------",1);
+ out_print(" -------- Token list -----------------------------------",1);
  while(1)
  {
 	if((ind%25)==0)  out_print("Num Line Ind Level  Type               Val        Group",1);
