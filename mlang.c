@@ -2786,7 +2786,7 @@ int parse_buffer_show_tokens(int n)
 	msg_line("parsing buffer produced no table!");
 	return(0);
  };
- out_print(" -------- Token list -----------------------------------",1);
+ out_print("|-------- Token list -----------------------------------",1);
  while(1)
  {
 	if((ind%25)==0)  out_print("Num Line Ind Level  Type               Val        Group",1);

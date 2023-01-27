@@ -88,12 +88,10 @@ char * tok_info2(tok_struct *tok)
 
 // Return with message
 #define RT_MESG { \
-	if(err_num>0) mesg_out(" -[%s][%d] end with error %d position %d line %d",Tds,tok->tnum,err_num,xpos,tok->tline);\
 	stage_level--;return(err_num);\
 }
 
 #define RT_MESG1(pos) { \
-	CHECK_TOK(pos);\
 	stage_level--;return(err_num);\
 }
 
@@ -101,6 +99,16 @@ char * tok_info2(tok_struct *tok)
 
 
 #define SHOW_STAGE(pos)	{ stage_level++;show_type='#';CHECK_TOK(pos);}
+
+#if	1
+
+#define	NTOKEN_ERR(xxx)	{ tok++;}
+
+#define TDSERR(description) {}
+
+#define	CHECK_TOK(pos) {}
+
+#else
 
 #define	CHECK_TOK(pos) { xpos=pos;\
 		if(err_num>0) {\
@@ -117,6 +125,8 @@ char * tok_info2(tok_struct *tok)
 #define	NTOKEN_ERR(xxx)	{ tok++;show_type=';';CHECK_TOK(xxx);}
 
 #define TDSERR(description) char *Tds=description;
+#endif
+
 
 int parse_level=0;
 char show_type=' ';

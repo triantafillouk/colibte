@@ -199,7 +199,7 @@ extern int h_type[];
 /* create message string */
 #define SMESG(format,...) { \
     stat=snprintf(s,width, format, ##__VA_ARGS__);\
-	s[stat]=0; /* this is needed because snprintf does not guarantee a 0 at the end of the string */ \
+	if(stat>width)	s[stat]=0; /* this is needed because snprintf does not guarantee a 0 at the end of the string */ \
 	sm[i++]=strdup(s);\
 	sm[i]=NULL;\
 	if(drv_type>0) MESG("show_info: %s",s);\

@@ -46,7 +46,7 @@ tok_struct *add_token(TLIST lex_parser,int tok_type,int cc,char *label)
 	tok=new_tok();
 	add_element_to_list((void *)tok,lex_parser);
 	tok->tnum=lex_parser->size-1;
-	MESG("added token %3d: ind=%d type=[%s] [%s]",tok->tnum,cc,tok_name[tok_type],label);
+	// MESG("added token %3d: ind=%d type=[%s] [%s]",tok->tnum,cc,tok_name[tok_type],label);
  return tok;
 }
 
@@ -292,7 +292,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int script_active=0;
  // int bquotes=0;
 
-MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
+// MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
  if(
  	file_type_is("CMD",bf->b_type)
 	|| file_type_is("DOT",bf->b_type)
@@ -347,11 +347,11 @@ MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
 			script_active=1;
 			continue;
 		};
-		if(tok_type==TOK_NL) {  MESG(" - newline in comment %d",tok_line);tok_line++;};
+		// if(tok_type==TOK_NL) {  MESG(" - newline in comment %d",tok_line);tok_line++;};
 		continue;
 	};
 
-#if	1
+#if	0
  if(tok_type==TOK_NL) MESG(" - New line -------  type=%d %s line=%d",tok_type,tok_name[tok_type],tok_line);
  else MESG(" - %d [%c] type=%d %s line=%d",cc, cc,tok_type,tok_name[tok_type],tok_line);
 #endif
@@ -758,20 +758,27 @@ MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
 	};
 	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
- MESG("END of parsing! type=%d level=%d",tok_type,curl_level);
+ // MESG("END of parsing! type=%d level=%d",tok_type,curl_level);
  {	/* add eof token!  */
-	if(tok_type!=TOK_SEP || tok_type==0) 
+	if(tok_type!=TOK_SEP) 
 	{	
-		ADD_TOKEN;
-		tok->ttype=TOK_SEP;
-		tok->tind=0;
-		tok->tline=tok_line;
+		if(tok_type==0) {
+			tok->ttype=TOK_SEP;
+			tok->tname="end 0";
+		} else {
+			ADD_TOKEN;
+			tok->ttype=TOK_SEP;
+			tok->tind=0;
+			tok->tline=tok_line;
+			tok->tname="end sep";
+		};
 	};
 	bf->end_token=tok;	/* save end token  */
 	ADD_TOKEN
 	tok->ttype=TOK_EOF;
 	tok->tind=0;
 	tok->tline=tok_line;
+	tok->tname="eof";
 	if(curl_level!=0 && err_num<1) set_error(tok,106,"parse error: invalid number of curls");
 	if(par_level!=0 && err_num<1) { 
 		err_num=104;err_line=last_correct_line;err_str="parse error: invalid number of pars";
@@ -783,13 +790,13 @@ MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
 	bf->symbol_tree->max_items = bf->symbol_tree->items+extra;
  };
 
- MESG("create token table from token list");
+ // MESG("create token table from token list");
  set_tok_table(bf, lex_parser);
 
  free_list(lex_parser,"lex_parser");
  free_list(cstack,"cstack");
  stage_level=save_stage_level;
- MESG("parse_block1:[%s] end toke items %d",bf->b_fname,bf->symbol_tree->max_items);
+ // MESG("parse_block1:[%s] end toke items %d",bf->b_fname,bf->symbol_tree->max_items);
  return(TRUE); 
 }
 
