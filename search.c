@@ -764,8 +764,8 @@ qprompt:
 		end_offset += rlength - found_bytes_len;
 		status = delins(found_bytes_len, &replace_pattern[0]);
 		last_offset = Offset();
-// 		set_Offset(current_offset+strlen(replace_pattern));
-		set_Offset(current_offset+1);
+		set_Offset(current_offset+strlen(replace_pattern));
+		// set_Offset(current_offset+1);
 
 		// MESG("after replace, end_offset=%ld last_offset=%ld",end_offset,last_offset);
 		if (status != TRUE)
@@ -791,14 +791,9 @@ qprompt:
 int delins(int dlength, char *instr)
 {
 	// MESG("delins: o=%ld delete %d chars, insert [%s]",Offset(),dlength,instr);
-#if	0
-	return ReplaceBlock(instr,dlength);
-#else
 	if(!DeleteBlock(0,dlength)) return FALSE;
 	if(!InsertBlock(cbfp,instr,strlen(instr),0,0)) return FALSE;
-	// set_Offset(Offset()+strlen(instr));
 	return (TRUE);
-#endif
 }
 
 
