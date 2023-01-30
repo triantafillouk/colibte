@@ -737,7 +737,23 @@ MVAR * push_args_1(int nargs)
 	
 	value = num_expression();
 	va_i->vtype=ex_vtype;
-
+#if	1
+	if(ex_vtype==VTYPE_NUM) {
+			va_i->dval=value;
+			va_i->vtype=VTYPE_NUM;
+	} else
+	if(ex_vtype==VTYPE_STRING) {
+			va_i->sval=strdup(slval);
+	} else 
+	if(ex_vtype==VTYPE_ARRAY||ex_vtype==VTYPE_SARRAY) {
+			va_i->adat=ex_array;
+			va_i->vtype=ex_array->atype;
+	} else {
+			ERROR("error: wrong type arg %d",ex_vtype);
+			err_num=202;
+			clear_args(va,i); return(NULL);
+	}
+#else
 	switch(ex_vtype) {
 		case VTYPE_NUM:
 			va_i->dval=value;
@@ -756,7 +772,7 @@ MVAR * push_args_1(int nargs)
 			err_num=202;
 			clear_args(va,i); return(NULL);
 	}
-
+#endif
 	NTOKEN2; // skip separator or right parenthesis!
  };
  return(va);
@@ -1634,14 +1650,24 @@ static double term1_div(double v1)
 	RTRN(v1);
 }
 
+double factor_rcurl(){
+	NTOKEN2;
+	return -1;
+}
+
+double factor_sep(){
+	NTOKEN2;
+	return 0.0;
+}
+
 FFunction factor_funcs[] = {
 	factor_none,	// TOK_NONE
-	factor_none,	// TOK_SEP
+	factor_sep,		// TOK_SEP
 	factor_none,	// TOK_SPACE
 	factor_none,	// TOK_LETTER
 	
 	factor_none,	// TOK_LCURL	,
-	factor_none,	// TOK_RCURL	,
+	factor_rcurl,	// TOK_RCURL	,
 	factor_quote,	// TOK_QUOTE
 	factor_lpar,	// TOK_LPAR
 	factor_error,	// TOK_RPAR	
@@ -2207,6 +2233,7 @@ void skip_sentence1()
 	switch(tok->ttype) {
 		case TOK_DIR_ELSE:	/* this one starts a new sentence!!  */
 		case TOK_SEP:
+			tok->cexpr_function=factor_funcs[tok->ttype];
 			NTOKEN2;
 			return;
 		case TOK_LPAR:
@@ -2532,7 +2559,7 @@ double exec_sentence1()
 		return 0;
  	case TOK_LCURL:	/* we are at the start of the block  */
 		NTOKEN2;
-		return exec_block1(tok->level);
+		return exec_block1();
 	case TOK_DIR_IF:
 		return tok_dir_if();
 	case TOK_DIR_FOR:
@@ -2560,7 +2587,7 @@ double exec_sentence1()
 }
 
 /* exec multiple sentences at the same level */
-double exec_block1(int level)
+double exec_block1()
 {
  double val=0;
  stage_level=0;
@@ -2568,31 +2595,38 @@ double exec_block1(int level)
    while(1) 
    {
 	// MESG(";exec_block: ttype=%d",tok->ttype);
-	switch(tok->ttype){
-		case TOK_EOF: return(val);
-		case TOK_SEP:
-		case TOK_RPAR:
-			NTOKEN2;
-			continue;
-		case TOK_COMMA:
-			NTOKEN2;
-			break;
-		case TOK_RCURL:
-			NTOKEN2;
-			return(val);
-		case TOK_SHOW: {
-			// insert result at offset!!
-			// MESG("call refresh_ddot:");
-			refresh_ddot_1(val);
-			NTOKEN2;
-			continue;
-			};
-	 };
+#if	1
+	if(tok->ttype==TOK_EOF) return(val);
+	if(tok->ttype==TOK_SEP || tok->ttype==TOK_RPAR){
+		if(tok->factor_function()==0.0) continue; 
+		// NTOKEN2;continue;
+	};
+	if(tok->ttype==TOK_RCURL) { NTOKEN2;return(val);};
+	if(tok->ttype==TOK_COMMA) { NTOKEN2;};
+	if(tok->ttype==TOK_SHOW) {
+		refresh_ddot_1(val);NTOKEN2;continue;
+	};
+
 	if(drv_check_break_key()) {
 		syntax_error("user interruption",100);
 		if(is_break1) return 0;
 	};
+#else
+	if(tok->ttype==TOK_EOF) return(val);
+	if(tok->ttype==TOK_SEP || tok->ttype==TOK_RPAR){
+		NTOKEN2;continue;
+	};
+	if(tok->ttype==TOK_RCURL) { NTOKEN2;return(val);};
+	if(tok->ttype==TOK_COMMA) { NTOKEN2;};
+	if(tok->ttype==TOK_SHOW) {
+		refresh_ddot_1(val);NTOKEN2;continue;
+	};
 
+	if(drv_check_break_key()) {
+		syntax_error("user interruption",100);
+		if(is_break1) return 0;
+	};
+#endif
  	val=exec_sentence1();
 	if(!current_active_flag) return(val);
    };
@@ -2638,7 +2672,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	tok=bp->tok_table;
 	drv_start_checking_break();
 	// MESG("exec block->");
-	val=exec_block1(0);
+	val=exec_block1();
 	// MESG("after exec_block");
 	drv_stop_checking_break();
 	// MESG("--- start=%d",start);
@@ -2712,7 +2746,7 @@ int refresh_current_buffer(int nused)
  	msg_line("evaluating ...");
 	init_exec_flags();
 	tok=fp->tok_table;
-	val=exec_block1(0);
+	val=exec_block1();
 	drv_stop_checking_break();
 	if(err_num>0) {
 		show_error("refresh buffer",fp->b_fname);
@@ -2816,6 +2850,16 @@ char * tok_info(tok_struct *tok)
 	if(tok->adat) dat=2;
 
 	if(tok->tname!=NULL){
+#if	1
+		if(tok->ttype==TOK_SHOW) { snprintf(stok,MAXLLEN,"%3d %4d %3d  %3d   [%2d=%12s] [:]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME);
+		} else
+		if(tok->ttype==TOK_LCURL||tok->ttype==TOK_RCURL) {
+				snprintf(stok,MAXLLEN,"%3d %4d %3d  %3d   [%2d=%12s] %s other is %d",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum);
+		} else
+				if(tok->tgroup>0)
+					snprintf(stok,MAXLLEN,"%3d %4d %3d  %3d   [%2d=%12s] [%s] group [%d:%s]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tok_name[tok->tgroup]);
+				else snprintf(stok,MAXLLEN,"%3d %4d %3d  %3d   [%2d=%12s] [%s]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname);
+#else
 		switch(tok->ttype){
 			case TOK_SHOW:		
 				snprintf(stok,MAXLLEN,"%3d %4d %3d  %3d   [%2d=%12s] [:]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME);
@@ -2830,7 +2874,13 @@ char * tok_info(tok_struct *tok)
 					snprintf(stok,MAXLLEN,"%3d %4d %3d  %3d   [%2d=%12s] [%s] group [%d:%s]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tok_name[tok->tgroup]);
 				else snprintf(stok,MAXLLEN,"%3d %4d %3d  %3d   [%2d=%12s] [%s]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname);
 		};
+#endif
 	} else {
+#if	1
+		if(tok->ttype==TOK_LBRAKET||tok->ttype==TOK_RBRAKET) {
+			snprintf(stok,MAXLLEN,"%3d %4d %3d  %3d   [%2d=%12s] dat=%d",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,dat);
+		} else snprintf(stok,MAXLLEN,"%3d %4d %3d  %3d   [%2d=%12s] [%f]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,tok->dval);
+#else 
 		switch(tok->ttype){
 			case TOK_LBRAKET:
 			case TOK_RBRAKET:
@@ -2839,6 +2889,7 @@ char * tok_info(tok_struct *tok)
 			default:
 				snprintf(stok,MAXLLEN,"%3d %4d %3d  %3d   [%2d=%12s] [%f]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,tok->dval);
 		};
+#endif
 	};
 	return stok;
 }
