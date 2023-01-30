@@ -1660,6 +1660,20 @@ void highlight_json(int c)
 		}
 		hstate=0;
 		break;
+
+	case '/':
+		if(hquotem&H_QUOTE1 || hquotem&H_QUOTE2) { hstate=0;break;};
+		if(hquotem!=H_QUOTE2 && hquotem!=H_QUOTE1) {
+			if(hstate==HS_PREVSLASH) hquotem |=H_QUOTE5;
+			else hstate=HS_PREVSLASH;
+		};
+		break;
+	case '\n':
+	case CHR_CR:
+		hquotem = 0;
+		hstate=HS_LINESTART;
+		break;
+
 	case '#':
 		if(hstate==HS_LINESTART) hquotem = (hquotem)? hquotem : H_QUOTE6;
 		hstate=0;
