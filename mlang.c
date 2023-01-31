@@ -300,10 +300,11 @@ curl_struct *new_curl(int level,int mline, struct _el *el)
  return(lcurl);
 }
 
+
 static inline double factor_none()
 {
 	NTOKEN2;
-	return 0.0;
+	return 0.0;	/* continue  */
 }
 
 double add_value(double v1)
@@ -411,6 +412,7 @@ tok_struct *new_tok()
  tok->ttype=0;
  tok->tgroup=0;
  tok->factor_function=factor_none;
+ tok->directive=lexpression;
  tok->tnode=NULL;
  // MESG("new_tok:");
  return(tok);
@@ -613,7 +615,7 @@ void show_error(char *from,char *name)
 	ERROR("%s error %d file %s after function [%s] after line %d: [%s]",from,err_num,name,ftable[var_index].n_name,last_correct_line,err_str);
  else {
 	// MESG("var_index=%d",var_index);
-	ERROR("%s error %d file %s after line %d: [%s]",from,err_num,name,last_correct_line,err_str);
+	ERROR("%s error %d file %s before line %d: [%s]",from,err_num,name,last_correct_line,err_str);
  };
 }
 
@@ -1079,7 +1081,7 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	};
 
 	assign_args1(vargs,current_stable,nargs);
-	value=exec_sentence1();
+	value=tok->directive();
 
 	/* remove local variable tree and restore the old one  */
 	delete_symbol_table(current_stable,bp->symbol_tree->items);
@@ -1106,7 +1108,7 @@ double factor_line_array()
 	allocate_array(ex_array);
 	NTOKEN2;
 	while(cdim>0){
-	while(1) {
+	while(tok->ttype!=TOK_END) {
 		if(tok->ttype==TOK_SEP) { 
 			NTOKEN2;
 			continue;
@@ -1749,6 +1751,28 @@ FFunction factor_funcs[] = {
 	factor_none		// TOK_OTHER,
 };
 
+// Directove functions
+
+static double inline dir_lcurl()
+{
+	NTOKEN2;
+	return exec_block1();
+}
+
+static double inline dir_break()
+{
+	NTOKEN2;
+	current_active_flag=0;
+	return 0;
+}
+
+static double inline dir_return()
+{	double val;
+	NTOKEN2;
+	val=lexpression();
+	current_active_flag=0;	/* skip rest of function  */
+	return(val);
+}
 
 double term_plus(double value)
 {
@@ -2166,13 +2190,12 @@ double assign_val(double none)
 
 int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 {
- int i=0;
  TDS("assign_args1");
 
  NTOKEN2; /* skip name */
 
  if(va) {
-	
+	int i;
 	NTOKEN2;
 	for(i=0;i<nargs;i++,va++) {
 		tok_data *arg_dat=&symbols[tok->tind];
@@ -2197,17 +2220,7 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 	};
  } else { // we send no arguments!
 	// skip till end parenthesis setting default values for arguments!!??
-	i=0;
-
-	if(tok->ttype==TOK_LPAR) NTOKEN2;
-	do {
-		if(tok->ttype==TOK_RPAR) break;
-		NTOKEN2;	/* skip semicolon or end parenthesis */
-
-		if(tok->ttype==TOK_RPAR) break;
-		NTOKEN2;
-		i++;
-	} while(1) ;
+	while(tok->ttype!=TOK_RPAR && tok->ttype!=TOK_END) NTOKEN2;
  };
  NTOKEN2;
 // show_token(tok,"assign_args: end after assign %d args",i);
@@ -2328,7 +2341,7 @@ double tok_dir_if()
 
 	NTOKEN2;	/* skip right parenthesis  */
 	if(val) {
-		val=exec_sentence1();
+		val=tok->directive();
 	} else {
 		skip_sentence1();	/* at the begin of next blocl/sentence  */
 		exec_else=1;
@@ -2337,7 +2350,7 @@ double tok_dir_if()
 	if(check_skip_token1(TOK_DIR_ELSE))
 	{
 		if(exec_else)	{
-			val=exec_sentence1();	/* eval else statement */
+			val=tok->directive();	/* eval else statement */
 		} else {
 			skip_sentence1();	/* skip else statement  */
 		};
@@ -2379,33 +2392,26 @@ double tok_dir_for()
 		end_block=tok;
 	};
 
-	while(1) {
-		// set tlist to check pointer
+	while(!is_break1) {
 		double val;
+		// check expression
 		tok=check_element;
 		val=lexpression();
-		// check for interruption!
-		if(val 
-//			&& current_active_flag
-		) {
+
+		if(val) {
 			tok=start_block;
-			exec_sentence1();
+			tok->directive();
 //			MESG("before loop: break is %d active=%d",is_break1,current_active_flag);
-			if(current_active_flag==0) {
-				tok=end_block;
-				break;			
-			};
 			tok=loop_element;
 			val=lexpression();	/* exec for loop  */
 //			MESG("loop value %f",val);
 		} else {
-			if(is_break1) { tok=cbfp->end_token;return(0);};
-			// end for loop skipping one sentence or curl block
-			tok=end_block;
 			break;
 		};
 //		MESG("before next loop: val=%f",val);		
 	};
+	if(is_break1) { tok=cbfp->end_token;return(0);};
+	tok=end_block;
 	current_active_flag=old_active_flag;
 //	MESG("-- end for loop: active = %d",current_active_flag);	
 	return 1;
@@ -2463,10 +2469,9 @@ double tok_dir_fori()
 		for(;*pdval < dmax; *pdval +=dstep) {
 
 			tok=start_block;
-			exec_sentence1();
+			tok->directive();
 			if(current_active_flag==0) {
 				if(is_break1) { tok=cbfp->end_token;return(0);};
-				tok=end_block;
 				break;
 			};
 		};
@@ -2474,10 +2479,9 @@ double tok_dir_fori()
 		for(; *pdval > dmax; *pdval +=dstep) {
 
 			tok=start_block;
-			exec_sentence1();
+			tok->directive();
 			if(current_active_flag==0) {
 				if(is_break1) { tok=cbfp->end_token;return(0);};
-				tok=end_block;
 				break;
 			};
 		};
@@ -2486,6 +2490,7 @@ double tok_dir_fori()
 		ERROR("error: infinite fori loop %d",err_num);
 		tok=end_block;
 	};
+	tok=end_block;
 	current_active_flag=old_active_flag;
 	return 1;
 }
@@ -2518,72 +2523,25 @@ double tok_dir_while()
 
 	// set tok pointer here
 	do {
-		double val=0;
 		// set tlist to tok pointer
 		tok=check_element;
-		val=lexpression();	/* CHECK should be lexpression  */
-		// on the block start
-		tok=start_block;
 
-		if(val) {
-			exec_sentence1();
+		if(lexpression()) {
+			// on the block start
+			tok=start_block;
+			tok->directive();
 			if(current_active_flag==0) {	/* only after break  */
 				if(is_break1) { tok=cbfp->end_token;return(0);};
-				tok=end_block;
 				break;
 			};
 		} else {
-			// skip one sentence or curl block
-			tok=end_block;
 			break;
 		};
 
 	} while(1); 
+	tok=end_block;	/* to the end of executable block  */
 	current_active_flag=old_active_flag;
 	return 1;
-}
-
-/*
- execute a sentence from a token list.
- pointer is already be set. 
- Stops on next separator (comma, semicolon, same level of parentesis or curl)
-*/
-
-double exec_sentence1()
-{
- TDS("exec_sentence1");
- // MESG(";exec_sentence1: ttype=%d",tok->ttype);
- switch(tok->ttype) {
-	case TOK_EOF:
-	case TOK_RCURL:	
-		return 0;
- 	case TOK_LCURL:	/* we are at the start of the block  */
-		NTOKEN2;
-		return exec_block1();
-	case TOK_DIR_IF:
-		return tok_dir_if();
-	case TOK_DIR_FOR:
-		return tok_dir_for();
-	case TOK_DIR_FORI:
-		return tok_dir_fori();
-	case TOK_DIR_WHILE:
-		return tok_dir_while();
-	case TOK_DIR_BREAK:
-		NTOKEN2;	/*   */
-		current_active_flag=0;
-		return(0);
-	case TOK_DIR_RETURN:
-	{	double val;
-		NTOKEN2;
-		val=lexpression();
-		current_active_flag=0;	/* skip rest of function  */
-		return(val);
-	}
-	default:
-		return lexpression();
- }; 
-
- return(0); 
 }
 
 /* exec multiple sentences at the same level */
@@ -2592,15 +2550,11 @@ double exec_block1()
  double val=0;
  stage_level=0;
  TDS("exec_block1");
-   while(1) 
+   while(tok->ttype!=TOK_EOF) 
    {
 	// MESG(";exec_block: ttype=%d",tok->ttype);
-#if	1
-	if(tok->ttype==TOK_EOF) return(val);
-	if(tok->ttype==TOK_SEP || tok->ttype==TOK_RPAR){
-		if(tok->factor_function()==0.0) continue; 
-		// NTOKEN2;continue;
-	};
+	// if(tok->ttype==TOK_RPAR) { exit(1);};
+	if(tok->ttype==TOK_SEP){ NTOKEN2;continue;	};
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;return(val);};
 	if(tok->ttype==TOK_COMMA) { NTOKEN2;};
 	if(tok->ttype==TOK_SHOW) {
@@ -2611,23 +2565,8 @@ double exec_block1()
 		syntax_error("user interruption",100);
 		if(is_break1) return 0;
 	};
-#else
-	if(tok->ttype==TOK_EOF) return(val);
-	if(tok->ttype==TOK_SEP || tok->ttype==TOK_RPAR){
-		NTOKEN2;continue;
-	};
-	if(tok->ttype==TOK_RCURL) { NTOKEN2;return(val);};
-	if(tok->ttype==TOK_COMMA) { NTOKEN2;};
-	if(tok->ttype==TOK_SHOW) {
-		refresh_ddot_1(val);NTOKEN2;continue;
-	};
 
-	if(drv_check_break_key()) {
-		syntax_error("user interruption",100);
-		if(is_break1) return 0;
-	};
-#endif
- 	val=exec_sentence1();
+ 	val=tok->directive();
 	if(!current_active_flag) return(val);
    };
 	return(val);

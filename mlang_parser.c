@@ -605,7 +605,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	/* term3  */
 	if(tok->ttype==TOK_MOD) {tok->tname=" % ";tok->tgroup=TOK_TERM2;};
 	if(tok->ttype==TOK_POWER) {tok->tname=" ** "; tok->tgroup=TOK_TERM2;};
-	if(tok->ttype==TOK_INCREASE) { tok->tname=" INC ";};
+	if(tok->ttype==TOK_INCREASE) { tok->tname=" INC ";tok->tgroup=TOK_TERM2;};
 	if(tok->ttype==TOK_DECREASE) { tok->tname=" DEC ";};
 	/* boolean tokens  */
 	if(tok->ttype==TOK_AND) { tok->tname=" AND ";tok->tgroup=TOK_TERM0;};

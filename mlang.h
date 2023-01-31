@@ -28,6 +28,7 @@ typedef struct tok_struct {
 		TFunction term_function;
 		EFunction cexpr_function;
 	};
+	FFunction directive;
 	union {	
 	struct BTNODE *tnode;
 	struct curl_struct *tcurl;

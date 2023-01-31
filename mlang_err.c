@@ -528,7 +528,7 @@ int err_factor()
 		xpos=476;syntax_error("separator in factor!",xpos);
 		RT_MESG1(xpos);
 	case TOK_SHOW:
-		xpos=477;syntax_error(": in factor",xpos);
+		// xpos=477;syntax_error(": in factor",xpos);
 		RT_MESG1(xpos);
 	case TOK_LBRAKET:{	/* array definition  */
 		pre_symbol=0;
@@ -575,7 +575,7 @@ int err_factor()
 	case TOK_RPAR:
 		xpos=479;
 		pnum--;
-		syntax_error("wrong argument number",xpos);
+		// syntax_error("wrong argument number",xpos);
 		RT_MESG1(480);
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
@@ -1051,6 +1051,7 @@ int err_check_sentence1()
 		break;
  	case TOK_LCURL:
 	{	
+		tok->directive = dir_lcurl;
 		NTOKEN_ERR(627);
 		CHECK_TOK(628);
 		err_num=err_check_block1(tok->level);
@@ -1060,6 +1061,7 @@ int err_check_sentence1()
 	case TOK_DIR_IF:
 		{
 //		int is_block=0;
+		tok->directive = tok_dir_if;
 		NTOKEN_ERR(631);	/* go to next token after if */
 		xpos=632;
 		check_skip_token_err1(TOK_LPAR,"tok_dir_if",xpos);
@@ -1089,6 +1091,7 @@ int err_check_sentence1()
 		tok_struct *start_block;	// element at block start
 		tok_struct *end_block;	/* at the block end  */
 		int is_block=0;
+		tok->directive = tok_dir_fori;
 		NTOKEN_ERR(640);	/* go to next token after for */
 		NTOKEN_ERR(6401);	/* skip left parenthesis  */
 		if(tok->ttype==TOK_VAR) {
@@ -1132,6 +1135,7 @@ int err_check_sentence1()
 	case TOK_DIR_FOR:
 		{
 		tok_struct *start_block;	// element at block start
+		tok->directive=tok_dir_for;
 		NTOKEN_ERR(641);	/* go to next token after for */
 		check_skip_token_err1(TOK_LPAR,"tok_dir_for",xpos);
 		CHECK_TOK(6411);
@@ -1161,7 +1165,7 @@ int err_check_sentence1()
 		{
 			tok_struct *check_element; // check element pointer
 			tok_struct *start_block;	// element at block start
-
+			tok->directive=tok_dir_while;
 			NTOKEN_ERR(654);	/* go to next toke after while */
 			check_skip_token_err1(TOK_LPAR,"tok_dir_while",xpos);
 			CHECK_TOK(656);
@@ -1186,9 +1190,11 @@ int err_check_sentence1()
 		break;
 
 	case TOK_DIR_BREAK:
+		tok->directive = dir_break;
 		NTOKEN_ERR(663);
 		RT_MESG;
 	case TOK_DIR_RETURN:
+		tok->directive = dir_return;
 		NTOKEN_ERR(664);	/* skip left par, CHECK if no par!!, remove from parser!!  */
 		err_num=err_lexpression();
 		RT_MESG1(666);
