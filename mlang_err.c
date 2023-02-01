@@ -100,16 +100,6 @@ char * tok_info2(tok_struct *tok)
 
 #define SHOW_STAGE(pos)	{ stage_level++;show_type='#';CHECK_TOK(pos);}
 
-#if	1
-
-#define	NTOKEN_ERR(xxx)	{ tok++;}
-
-#define TDSERR(description) {}
-
-#define	CHECK_TOK(pos) {}
-
-#else
-
 #define	CHECK_TOK(pos) { xpos=pos;\
 		if(err_num>0) {\
 			show_type=' ';\
@@ -125,7 +115,6 @@ char * tok_info2(tok_struct *tok)
 #define	NTOKEN_ERR(xxx)	{ tok++;show_type=';';CHECK_TOK(xxx);}
 
 #define TDSERR(description) char *Tds=description;
-#endif
 
 
 int parse_level=0;
@@ -401,7 +390,7 @@ int err_increase_val()
 	NTOKEN_ERR(444);
 	return(444);
  };
- NTOKEN_ERR(444);
+ // NTOKEN_ERR(444);
  RT_MESG1(444);
 }
 
@@ -501,16 +490,6 @@ int err_factor()
 	case TOK_MINUS:
 		pre_symbol++;
  };
- if(tok0->ttype==TOK_INCREASE) {
- 	// MESG("increase %d ",tok0->tnum);
-	xpos=471;
-	RT_MESG1(xpos);
- };
- if(tok0->ttype==TOK_DECREASE) {
- 	// MESG("decrease %d ",tok0->tnum);
-	xpos=472;
-	RT_MESG1(xpos);
- };
  NTOKEN_ERR(473);
  // MESG("set factor function:");
  // MESG("token type %d",tok0->ttype);
@@ -581,6 +560,16 @@ int err_factor()
 	case TOK_VAR:{	// 0 variable
 		pre_symbol=0;
 		ex_nvars++;
+		if(tok->ttype==TOK_INCREASE) {
+			tok->dval=1;
+			tok->tgroup=TOK_INCREASE;
+			NTOKEN_ERR(498);
+		} else
+		if(tok->ttype==TOK_DECREASE) {
+			tok->tgroup=TOK_INCREASE;
+			tok->dval=-1;
+			NTOKEN_ERR(498);
+		};
 		RT_MESG1(493);}
 	case TOK_ARRAY1:{
 		err_num=err_factor(); 
@@ -809,8 +798,6 @@ int err_factor()
 	case TOK_ASSIGN:
 	case TOK_INCREASEBY:
 	case TOK_DECREASEBY:
-	case TOK_INCREASE:
-	case TOK_DECREASE:
 		RT_MESG1(527);
 	default:
 		xpos=527;
@@ -992,11 +979,12 @@ int err_lexpression()
 			NTOKEN_ERR(710);
 			err_num=err_assign_env();
 			RT_MESG1(7141);
+#if	0
 		case TOK_INCREASE:
-			// tok->factor_function = increase_val; 
-			tok->factor_function = factor_funcs[tok->ttype];
+			// tok->factor_function = factor_funcs[tok->ttype];
 			NTOKEN_ERR(710);
-			err_num=err_increase_val();
+			// continue;
+			// err_num=err_increase_val();
 			RT_MESG1(7142);
 		case TOK_DECREASE:
 			// tok->factor_function = increase_val; 
@@ -1004,6 +992,7 @@ int err_lexpression()
 			NTOKEN_ERR(710);
 			err_num=err_decrease_val();
 			RT_MESG1(7142);
+#endif
 		default:
 			RT_MESG1(715);
 	};

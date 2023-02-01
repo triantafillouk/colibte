@@ -334,7 +334,7 @@ double increase_val()
 	TDS("increase_val");
 	ex_vtype=VTYPE_NUM;
 	v0=add_value(1.0);
-	NTOKEN2;
+	// NTOKEN2;
 	return(v0);
 }
 
@@ -351,12 +351,12 @@ double decrease_by()
 {
 	double v1,v0;
 	tok_data *sslot;
-	TDS("increase_val");
+	TDS("decrease_val");
 	sslot=lsslot;
-	// MESG("increase_val: ind=%d type=%d",sslot->ind,sslot->vtype);
+	// MESG("decrease_val: ind=%d type=%d",sslot->ind,sslot->vtype);
 	NTOKEN2;
 	v1=lexpression();
-	// MESG("increase by %f",v1);
+	// MESG("decrease by %f",v1);
 	if(sslot->vtype==VTYPE_NUM) {
 		v0=sslot->dval;
 		sslot->dval =v0-v1;
@@ -1150,9 +1150,15 @@ double factor_variable()
 	ex_vtype=lsslot->vtype;
 	// MESG("	factor_variable: ind=%d type=%d",lsslot->ind,lsslot->vtype);
 	switch(lsslot->vtype) {
-		case VTYPE_NUM: 
+		case VTYPE_NUM:{
+			double val=lsslot->dval; 
 			NTOKEN2;
-			RTRN(lsslot->dval);
+			if(tok->tgroup==TOK_INCREASE) {
+				lsslot->dval += tok->dval;
+				NTOKEN2;
+			};
+			RTRN(val);
+			};
 		case VTYPE_STRING:
 			strlcpy(slval,lsslot->sval,MAXLLEN);
 			NTOKEN2;
@@ -2716,6 +2722,7 @@ int parse_check_current_buffer(int n)
  err_num=0;
  err_line=0;
  show_stage=1;
+ MESG("parse_check_current_buffer: %d",is_mlang(fp));
  if(!is_mlang(fp)) return 0;
 
  /* clear parse list  */
@@ -2723,7 +2730,9 @@ int parse_check_current_buffer(int n)
  stage_level=0;
  // clear out buffer
  cls_fout("[out]");
+ MESG("clear output");
  err_num=check_init(fp);
+ 
  if(err_num>0) {
 	macro_exec=0;
 	msg_line("syntax error %d line %d [%s]",err_num,err_line,err_str);
@@ -2842,12 +2851,13 @@ int show_parse_buffer(int n)
  FILEBUF *outbuf;
  tok_struct *tok_table,*tok_ind;
  fp=cbfp;
+
+ MESG("show_parse_buffer:");
  if(!is_mlang(fp)) return 0;
 
  err_num=0;
  err_line=0;
  show_stage=0;
- // MESG("show_parse_buffer:");
  /* clear parse list  */
  empty_tok_table(fp);
  parse_block1(fp,fp->symbol_tree,1,0);
