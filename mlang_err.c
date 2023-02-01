@@ -60,8 +60,8 @@ char * tok_info2(tok_struct *tok)
 				snprintf(stok,MAXLLEN,"%d:%d %s %s",tok->tline,tok->tnum,TNAME,(char *)tok->tname);
 		};
 	} else {
-		MESG("token name is null! line %d",last_correct_line);
-		snprintf(stok,MAXLLEN,"tname is null!");
+		MESG("token name is null! line %d type %d",last_correct_line,tok->ttype);
+		snprintf(stok,MAXLLEN,"type %d tname is null!",tok->ttype);
 		};
 	} else {
 			snprintf(stok,MAXLLEN,"%2d:%3d %s [%f]",tok->tline,tok->tnum,TNAME,tok->dval);
@@ -100,22 +100,27 @@ char * tok_info2(tok_struct *tok)
 
 #define SHOW_STAGE(pos)	{ stage_level++;show_type='#';CHECK_TOK(pos);}
 
+#if	0
+#define	CHECK_TOK(pos) { xpos=pos ;}
+#define	NTOKEN_ERR(xxx)	{ tok++;show_type=';';CHECK_TOK(xxx);}
+#define TDSERR(description) {} 
+#else
 #define	CHECK_TOK(pos) { xpos=pos;\
 		if(err_num>0) {\
 			show_type=' ';\
 			mesg_out("!err [%2d][%4d]%*s-%s: [%s]",stage_level,xpos,stage_level,"",Tds,tok_info2(tok));\
 			return(err_num);\
 		} else {\
-			if(show_stage==1) mesg_out(" %c[%2d][%4d]%*s-%s:[%s]",show_type,stage_level,xpos,stage_level,"",Tds,tok_info2(tok));\
+			if(show_stage==1) mesg_out(" %c[%2d][%4d][%4d]%*s-%s:[%s]",show_type,tok->tnum,stage_level,xpos,stage_level,"",Tds,tok_info2(tok));\
 			show_type=' ';\
-			MESG(" %c[%2d][%4d]%*s-%s:[%s]",show_type,stage_level,xpos,stage_level,"",Tds,tok_info2(tok));\
+			MESG(" %c[%2d][%3d][%4d]%*s-%s:[%s]",show_type,stage_level,tok->tnum,xpos,stage_level,"",Tds,tok_info2(tok));\
 		}\
 }
 
 #define	NTOKEN_ERR(xxx)	{ tok++;show_type=';';CHECK_TOK(xxx);}
 
 #define TDSERR(description) char *Tds=description;
-
+#endif
 
 int parse_level=0;
 char show_type=' ';
@@ -609,6 +614,7 @@ int err_factor()
 	case TOK_NUM:
 		pre_symbol=0;
 		ex_nums++;
+		tok0->tname="numeric";
 		RT_MESG1(487);
 	case TOK_QUOTE:	 { // string 
 		xpos=488;
@@ -798,6 +804,7 @@ int err_factor()
 	case TOK_ASSIGN:
 	case TOK_INCREASEBY:
 	case TOK_DECREASEBY:
+		tok0->tname="asign";
 		RT_MESG1(527);
 	default:
 		xpos=527;
@@ -959,12 +966,14 @@ int err_lexpression()
 		};
 		case TOK_INCREASEBY: {
 			tok->term_function = increase_by;
+			tok->tname = "+=";
 			NTOKEN_ERR(710);
 			err_num=err_increase_by();
 			RT_MESG1(714);
 		};
 		case TOK_DECREASEBY: {
 			tok->term_function = decrease_by;
+			tok->tname = "-=";
 			NTOKEN_ERR(710);
 			err_num=err_decrease_by();
 			RT_MESG1(714);
@@ -979,20 +988,6 @@ int err_lexpression()
 			NTOKEN_ERR(710);
 			err_num=err_assign_env();
 			RT_MESG1(7141);
-#if	0
-		case TOK_INCREASE:
-			// tok->factor_function = factor_funcs[tok->ttype];
-			NTOKEN_ERR(710);
-			// continue;
-			// err_num=err_increase_val();
-			RT_MESG1(7142);
-		case TOK_DECREASE:
-			// tok->factor_function = increase_val; 
-			tok->factor_function = factor_funcs[tok->ttype];
-			NTOKEN_ERR(710);
-			err_num=err_decrease_val();
-			RT_MESG1(7142);
-#endif
 		default:
 			RT_MESG1(715);
 	};

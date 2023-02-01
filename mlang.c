@@ -332,6 +332,7 @@ double increase_val()
 {
  double v0;
 	TDS("increase_val");
+	MESG("increase_val:");
 	ex_vtype=VTYPE_NUM;
 	v0=add_value(1.0);
 	// NTOKEN2;
@@ -341,6 +342,7 @@ double increase_val()
 double decrease_val()
 {
 	TDS("decrease_val");
+	MESG("decrease_val:");
 	ex_vtype=VTYPE_NUM;
 	add_value(-1.0);
 	NTOKEN2;
@@ -361,14 +363,14 @@ double decrease_by()
 		v0=sslot->dval;
 		sslot->dval =v0-v1;
 		// MESG("num: %f -> %f",v0,v1);
-		return(v0);
+		return(sslot->dval);
 	};
 	if(sslot->vtype==VTYPE_ARRAY) {
 		v0=*sslot->pdval;
 		
 		*sslot->pdval = v0-v1;
 		// MESG("array: %f -> %f",v0,*sslot->pdval);
-		return(v0);
+		return(v0-v1);
 	};
 	return(-1);
 }
@@ -387,14 +389,14 @@ double increase_by()
 		v0=sslot->dval;
 		sslot->dval = v0+v1;
 		// MESG("num: %f -> %f",v0,v1);
-		return(v0);
+		return(sslot->dval);
 	};
 	if(sslot->vtype==VTYPE_ARRAY) {
 		v0=*sslot->pdval;
 		
 		*sslot->pdval = v0+v1;
 		// MESG("array: %f -> %f",v0,*sslot->pdval);
-		return(v0);
+		return(v0+v1);
 	};
 	return(-1);
 }
@@ -407,7 +409,7 @@ tok_struct *new_tok()
  tok->tind=0;
  tok->tline=0;
  tok->tnum=0;
- tok->tname=NULL;
+ tok->tname="";
  tok->dval=0;
  tok->ttype=0;
  tok->tgroup=0;

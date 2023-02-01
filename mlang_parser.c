@@ -292,7 +292,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int script_active=0;
  // int bquotes=0;
 
-// MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
+ // MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
  if(
  	file_type_is("CMD",bf->b_type)
 	|| file_type_is("DOT",bf->b_type)
@@ -350,15 +350,13 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		// if(tok_type==TOK_NL) {  MESG(" - newline in comment %d",tok_line);tok_line++;};
 		continue;
 	};
-
 #if	0
  if(tok_type==TOK_NL) MESG(" - New line -------  type=%d %s line=%d",tok_type,tok_name[tok_type],tok_line);
- else MESG(" - %d [%c] type=%d %s line=%d",cc, cc,tok_type,tok_name[tok_type],tok_line);
+ MESG(" - %d [%c] type=%d %s line=%d",cc, cc,tok_type,tok_name[tok_type],tok_line);
 #endif
  if(err_num>0) return 0.0;
 	value=0;
 	nword[0]=0;
-
 	switch(tok_type) {
 		case TOK_SEP:
 			if(is_now_sep) continue;
@@ -391,7 +389,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			slen=getnword1(bf,cc,nword);
 			break;
 		case TOK_NUM:
+			// MESG("TOK_NUM: old num=%d type=%d name %s,new type %d ",tok->tnum,tok->ttype,tok->tname,tok_type);
 			value=getnum1(bf,cc,tok);
+			// MESG("TOK_NUM: num=%d type=%d val=%f",tok->tnum,tok->ttype,value);
+			// tok->tname = " numeric!! ";
 			if(err_num>0) return(0);
 			break;
 		case TOK_LCURL:
@@ -519,6 +520,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		case TOK_DIV:
 			break;
 		case TOK_ASSIGN:
+			// MESG("TOK_ASSIGN:");
 			if(next_token_type(bf)==TOK_ASSIGN) {
 				getnc1(bf,&cc,&tok_type);
 				tok_type=TOK_EQUAL;
@@ -573,12 +575,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 	if(tok_type!=TOK_SEP) is_now_sep=0;
 	if(tok_type!=TOK_LCURL && tok_type!=TOK_RCURL) is_now_curl=0;
-	tok->tname=NULL;
+
 	tok->ttype=tok_type;
-//	tok->tind=cc;
 	tok->dval=value;
 	tok->tline=tok_line;
 	tok->level=curl_level;
+
 	if(tok->ttype==TOK_SHOW) {
 		tok->tname=(void *)new_textpoint_at(bf,TP_DDOT,ddot_offset-1);
 	};
@@ -588,9 +590,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok->ttype==TOK_AT) {
 		tok->tname=strdup(nword);
 	};
+
 	if(tok->ttype==TOK_LPAR) tok->tname=" ( ";
 	if(tok->ttype==TOK_RPAR) tok->tname=" ) ";
 	if(tok->ttype==TOK_SEP) tok->tname=" ; ";
+	if(tok->ttype==TOK_NUM) tok->tname="numeric";
 	if(tok->ttype==TOK_ASSIGN) { tok->tname=" = ";tok->tgroup=TOK_TERM0;};
 	if(tok->ttype==TOK_ASSIGNENV) { tok->tname=" setenv ";tok->tgroup=TOK_TERM0;};
 	if(tok->ttype==TOK_ASSIGNOPT) { tok->tname=" setoption ";tok->tgroup=TOK_TERM0;};
@@ -677,9 +681,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
 						switch(tok_type){
 							case TOK_NUM:
+								tok->tname="numeric2";
 								ADD_TOKEN;
 								value=getnum1(bf,cc,tok);
 								tok->ttype=TOK_NUM;
+								tok->tname="numeric3";
 								tok->dval=value;
 								break;
 							case TOK_LETTER:
