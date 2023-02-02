@@ -256,18 +256,7 @@ char *directives[] = {
  "for","function","fori",NULL
 };
 
-
-
 array_dat *transpose(array_dat *array1);
-#if	NUSE
-void show_token()
-{
-	if(tok!=NULL) 
-		MESG(";ctoken %X num=%3d type=%d",(long)&tok, tok->tnum,tok->ttype);
-	else 
-		MESG(";ctoken is NULL !!!!!!!!!!!!!!!!!!!!!!!!!!");
-}
-#endif
 
 void init_btree_table()
 {
@@ -355,14 +344,12 @@ double decrease_by()
 	tok_data *sslot;
 	TDS("decrease_val");
 	sslot=lsslot;
-	// MESG("decrease_val: ind=%d type=%d",sslot->ind,sslot->vtype);
-	NTOKEN2;
+	// MESG("decrease_by: of [%s]",tok_info(lsslot));
 	v1=lexpression();
-	// MESG("decrease by %f",v1);
+
 	if(sslot->vtype==VTYPE_NUM) {
 		v0=sslot->dval;
 		sslot->dval =v0-v1;
-		// MESG("num: %f -> %f",v0,v1);
 		return(sslot->dval);
 	};
 	if(sslot->vtype==VTYPE_ARRAY) {
@@ -382,15 +369,11 @@ double increase_by()
 	TDS("increase_by");
 	sslot=lsslot;
 	// MESG("increase_by: of [%s]",tok_info(lsslot));
-	// MESG("increase_by: by [%s]",tok_info(tok));
-	// NTOKEN2;
-	// MESG("increase_by: start of lexpression [%s]",tok_info(tok));
 	v1=lexpression();
-	// MESG("increase by %f",v1);
+
 	if(sslot->vtype==VTYPE_NUM) {
 		v0=sslot->dval;
 		sslot->dval = v0+v1;
-		// MESG("num: %f -> %f",v0,v1);
 		return(sslot->dval);
 	};
 	if(sslot->vtype==VTYPE_ARRAY) {
@@ -514,7 +497,7 @@ void init_hash()
 
 void initialize_vars()
 {
- MESG("initialize_vars");
+ // MESG("initialize_vars");
 }
 
 
@@ -618,7 +601,6 @@ void show_error(char *from,char *name)
  if(var_index>=0)
 	ERROR("%s error %d file %s after function [%s] after line %d: [%s]",from,err_num,name,ftable[var_index].n_name,last_correct_line,err_str);
  else {
-	// MESG("var_index=%d",var_index);
 	ERROR("%s error %d file %s before line %d: [%s]",from,err_num,name,last_correct_line,err_str);
  };
 }
@@ -644,7 +626,7 @@ int check_init(FILEBUF *bf)
 		return(201);
 	}
  };
- // MESG("check_init: 2");
+
  if(bf->err<1) 
  {
 	tok=bf->tok_table;
@@ -1229,7 +1211,7 @@ double factor_array1()
 	// MESG("factor_array1:ind=%d ",array_slot->ind);
 	NTOKEN2;
 	ind1=(int)FACTOR_FUNCTION;
-	// MESG("	ind1=%d",ind1);
+
 	if(array_slot->adat == NULL) {
 		ex_nums=1;
 		array_slot->adat=new_array(ind1+1,1);
@@ -1238,9 +1220,9 @@ double factor_array1()
 	} else {
 		
 	};
-	// MESG("-----");
+
 	dval = array_slot->adat->dval;
-	// MESG("	ind1=%d value=%f",ind1,value);
+
 	value=dval[ind1];
 		array_slot->pdval=&dval[ind1];
 		lsslot=array_slot;
@@ -1436,7 +1418,7 @@ double factor_func()
 {
 	BTNODE *bte; 
 	double value;
-	// MESG(";factor_func: tnum=%d",tok->tnum);
+	// MESG(";factor_func: [%s]",tok);
 	ex_vtype=VTYPE_NUM;
 	bte=tok->tnode;
 	NTOKEN2;	/* skip left parenthesis  */
@@ -1574,7 +1556,6 @@ static double term1_mul(double v1)
 					for(i=0;i<loc_array->cols;i++){
 						v1 += loc_array->dval[i]*ex_array->dval[i];
 					};
-					// MESG("v1=%f",v1);
 					ex_vtype=VTYPE_NUM;
 					// free old ex_array ???
 					ex_array=NULL;
@@ -1968,10 +1949,8 @@ double num_term2()
  double v1 = FACTOR_FUNCTION;
 	 while(tok->tgroup==TOK_TERM2)
 	 {
-		// MESG("	num_term2: function of [%s]",tok_info(tok));
 		v1 = tok->term_function(v1);
 	 };
-	 // MESG("	num_term2:end [%s]",tok_info(tok));
  RTRN(v1);
 }
 
@@ -1981,12 +1960,10 @@ double num_term1()
  TDS("num_term1");
  // MESG("num_term1: [%s]",tok_info(tok));
  double v1 = num_term2();
- // MESG("	num_term1: after term2 [%s]",tok_info(tok));
 	 while(tok->tgroup==TOK_TERM1)
 	 {
 		v1 = tok->term_function(v1);
 	 };
-	 // MESG("	num_term1: end [%s]",tok_info(tok));
  RTRN(v1);
 }
 
@@ -2244,11 +2221,11 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 #include "mlang_parser.c"
 
 // skip next sentence in a list
-void skip_sentence1(char *from)
+void skip_sentence1()
 {
  int plevel=0;
  TDS("skip_sentence1");
- // MESG("skip_sentence: %s",from);
+ // MESG("skip_sentence:");
  if(tok->ttype==TOK_LCURL) {
 		tok=tok->match_tok; 
 		NTOKEN2;
@@ -2358,7 +2335,7 @@ double tok_dir_if()
 	if(val) {
 		val=tok->directive();
 	} else {
-		skip_sentence1("else");	/* at the begin of next blocl/sentence  */
+		skip_sentence1();	/* at the begin of next blocl/sentence  */
 		exec_else=1;
 	}
 	// check for else statement!
@@ -2367,7 +2344,7 @@ double tok_dir_if()
 		if(exec_else)	{
 			val=tok->directive();	/* eval else statement */
 		} else {
-			skip_sentence1("else");	/* skip else statement  */
+			skip_sentence1();	/* skip else statement  */
 		};
 	} else {
 //			NTOKEN2;
@@ -2386,17 +2363,17 @@ double tok_dir_for()
 //	MESG("-- start for loop: active = %d",current_active_flag);	
 	NTOKEN2;	/* go to next token after for */
 	NTOKEN2;	/* skip left parenthesis  */
-	// MESG("dir_for: initial");
+
 	lexpression();	/* initial   */
 	NTOKEN2;	/* skip separator! */
 	// set check_list
 	check_element=tok;
-	// MESG("for check element [%s]",tok_info(check_element));
-	skip_sentence1("check");	/* skip check element  */
+
+	skip_sentence1();	/* skip check element  */
 	// set loop_list
 	loop_element=tok;
 	// MESG("for loop element  [%s]",tok_info(loop_element));
-	skip_sentence1("lopp");	/* skip loop element  */
+	skip_sentence1();	/* skip loop element  */
 
 	NTOKEN2;	/* skip right parenthesis  */
 	// set block start
@@ -2406,7 +2383,7 @@ double tok_dir_for()
 		end_block=tok->match_tok; 
 		end_block++;
 	} else {
-		skip_sentence1("for rest");
+		skip_sentence1();
 		end_block=tok;
 	};
 #if	0
@@ -2479,7 +2456,7 @@ double tok_dir_fori()
 		end_block=tok->match_tok; 
 		end_block++;
 	} else {
-		skip_sentence1("fori rest");
+		skip_sentence1();
 		end_block=tok;
 	};
 	if(dinit==dmax) {
@@ -2528,7 +2505,7 @@ double tok_dir_while()
 	NTOKEN2;	/* skip left parenthesis  */
 
 	check_element=tok;	/* this is the check element!  */
-	skip_sentence1("while");	/* for now skip it  */
+	skip_sentence1();	/* for now skip it  */
 
 	NTOKEN2;	/* skip right parenthesis  */
 
@@ -2539,7 +2516,7 @@ double tok_dir_while()
 		end_block=tok->match_tok;
 		end_block++;
 	} else {
-		skip_sentence1("while1");
+		skip_sentence1();
 		end_block=tok;
 	};
 
@@ -2634,7 +2611,6 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	drv_start_checking_break();
 	// MESG("exec block->");
 	val=exec_block1();
-	// MESG("after exec_block");
 	drv_stop_checking_break();
 	// MESG("--- start=%d",start);
 	if(start) {
@@ -2738,7 +2714,7 @@ int parse_check_current_buffer(int n)
  err_num=0;
  err_line=0;
  show_stage=1;
- MESG("parse_check_current_buffer: %d",is_mlang(fp));
+ // MESG("parse_check_current_buffer: %d",is_mlang(fp));
  if(!is_mlang(fp)) return 0;
 
  /* clear parse list  */

@@ -60,7 +60,7 @@ char * tok_info2(tok_struct *tok)
 				snprintf(stok,MAXLLEN,"%d:%d %s %s",tok->tline,tok->tnum,TNAME,(char *)tok->tname);
 		};
 	} else {
-		MESG("token name is null! line %d type %d",last_correct_line,tok->ttype);
+		// MESG("token name is null! line %d type %d",last_correct_line,tok->ttype);
 		snprintf(stok,MAXLLEN,"type %d tname is null!",tok->ttype);
 		};
 	} else {
@@ -105,6 +105,7 @@ char * tok_info2(tok_struct *tok)
 #define	NTOKEN_ERR(xxx)	{ tok++;show_type=';';CHECK_TOK(xxx);}
 #define TDSERR(description) {} 
 #else
+
 #define	CHECK_TOK(pos) { xpos=pos;\
 		if(err_num>0) {\
 			show_type=' ';\

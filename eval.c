@@ -733,17 +733,14 @@ int dofile(char *fname)
 	if((bp=get_filebuf(bname,NULL,0))==NULL) { // file not in memory, load it!
 		if ((bp = new_filebuf(bname, 0)) == NULL) /* get the needed buffer */
 			return(FALSE);
-	// MESG("dofile: 01");
 
 	/* and try to read in the file to execute */
 		if(cbfp == NULL) cbfp=bp;
 		// MESG("dofile: 10 %s",fname);
 		if ((status = file_read1(bp,fname)) != TRUE) {
-			// MESG("dofile: status=%d",status);
 			return(status);
 		};
 	} else {
-		// MESG("dofile: 02");
 		if((bp->b_state & FS_ACTIVE)==0) {
 			activate_file(bp);
 			if ((status = file_read1(bp,fname)) != TRUE) {
