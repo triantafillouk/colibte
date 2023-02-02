@@ -332,7 +332,7 @@ double increase_val()
 {
  double v0;
 	TDS("increase_val");
-	MESG("increase_val:");
+	// MESG("increase_val:");
 	ex_vtype=VTYPE_NUM;
 	v0=add_value(1.0);
 	// NTOKEN2;
@@ -342,7 +342,7 @@ double increase_val()
 double decrease_val()
 {
 	TDS("decrease_val");
-	MESG("decrease_val:");
+	// MESG("decrease_val:");
 	ex_vtype=VTYPE_NUM;
 	add_value(-1.0);
 	NTOKEN2;
@@ -379,10 +379,12 @@ double increase_by()
 {
 	double v1,v0;
 	tok_data *sslot;
-	TDS("increase_val");
+	TDS("increase_by");
 	sslot=lsslot;
-	// MESG("increase_val: ind=%d type=%d",sslot->ind,sslot->vtype);
-	NTOKEN2;
+	// MESG("increase_by: of [%s]",tok_info(lsslot));
+	// MESG("increase_by: by [%s]",tok_info(tok));
+	// NTOKEN2;
+	// MESG("increase_by: start of lexpression [%s]",tok_info(tok));
 	v1=lexpression();
 	// MESG("increase by %f",v1);
 	if(sslot->vtype==VTYPE_NUM) {
@@ -1741,7 +1743,7 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_TILDA		,
 	increase_val,	// TOK_INCREASE	,
 	decrease_val,	// TOK_DECREASE	,
-	increase_by,	// TOK_INCREASEBY
+	factor_none,	// TOK_INCREASEBY
 	decrease_by,	// TOK_DECREASEBY
 	factor_none,	// TOK_BSLASH		,
 
@@ -1962,12 +1964,14 @@ double term_minus(double value)
 double num_term2()
 {
  TDS("num_term2");
- // MESG("num_term2: ttype=%d",tok->ttype);
+ // MESG("num_term2: [%s]",tok_info(tok));
  double v1 = FACTOR_FUNCTION;
 	 while(tok->tgroup==TOK_TERM2)
 	 {
+		// MESG("	num_term2: function of [%s]",tok_info(tok));
 		v1 = tok->term_function(v1);
 	 };
+	 // MESG("	num_term2:end [%s]",tok_info(tok));
  RTRN(v1);
 }
 
@@ -1975,12 +1979,14 @@ double num_term2()
 double num_term1()
 {
  TDS("num_term1");
- // MESG("num_term1: ttype=%d",tok->ttype);
+ // MESG("num_term1: [%s]",tok_info(tok));
  double v1 = num_term2();
+ // MESG("	num_term1: after term2 [%s]",tok_info(tok));
 	 while(tok->tgroup==TOK_TERM1)
 	 {
 		v1 = tok->term_function(v1);
 	 };
+	 // MESG("	num_term1: end [%s]",tok_info(tok));
  RTRN(v1);
 }
 
@@ -1989,7 +1995,7 @@ double num_expression()
 {
  double value;
  TDS("num_expression");
- // MESG(";num_expression: tnum=%d ttype=%d",tok->tnum,tok->ttype);
+ // MESG(";num_expression: [%s]",tok_info(tok));
  ex_vtype=VTYPE_NUM;
  ex_value=0;
  slval[0]=0;
@@ -2074,9 +2080,9 @@ double lexpression()
 {
  double value;
  TDS("lexpression");
- // MESG(";lexpression: ttype=%d",tok->ttype);
+ // MESG(";lexpression: [%s]",tok_info(tok));
  value = cexpression();
-// MESG("lexpression : [%s] cexpression result = %f",tok_info(tok),value);
+ // MESG("lexpression : [%s] cexpression result = %f",tok_info(tok),value);
  if(tok->tgroup == TOK_TERM0){
 	tok_struct *tok0=tok;
  	NTOKEN2;
@@ -2099,7 +2105,7 @@ double cexpression()
  double value;
  tok_struct *tok0;
  TDS("cexpression");
- // MESG(";cexpression ttype=%d",tok->ttype);
+ // MESG(";cexpression [%s]",tok_info(tok));
  value = num_expression();
 
  if(tok->tgroup!=TOK_COMPARE) RTRN(value);
@@ -2238,11 +2244,11 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 #include "mlang_parser.c"
 
 // skip next sentence in a list
-void skip_sentence1()
+void skip_sentence1(char *from)
 {
  int plevel=0;
  TDS("skip_sentence1");
-
+ // MESG("skip_sentence: %s",from);
  if(tok->ttype==TOK_LCURL) {
 		tok=tok->match_tok; 
 		NTOKEN2;
@@ -2251,6 +2257,7 @@ void skip_sentence1()
 
  for(;tok->ttype!=TOK_EOF;NTOKEN2)
  {
+ 	// MESG("	skip [%s]",tok_info(tok));
 	switch(tok->ttype) {
 		case TOK_DIR_ELSE:	/* this one starts a new sentence!!  */
 		case TOK_SEP:
@@ -2351,7 +2358,7 @@ double tok_dir_if()
 	if(val) {
 		val=tok->directive();
 	} else {
-		skip_sentence1();	/* at the begin of next blocl/sentence  */
+		skip_sentence1("else");	/* at the begin of next blocl/sentence  */
 		exec_else=1;
 	}
 	// check for else statement!
@@ -2360,7 +2367,7 @@ double tok_dir_if()
 		if(exec_else)	{
 			val=tok->directive();	/* eval else statement */
 		} else {
-			skip_sentence1();	/* skip else statement  */
+			skip_sentence1("else");	/* skip else statement  */
 		};
 	} else {
 //			NTOKEN2;
@@ -2379,14 +2386,17 @@ double tok_dir_for()
 //	MESG("-- start for loop: active = %d",current_active_flag);	
 	NTOKEN2;	/* go to next token after for */
 	NTOKEN2;	/* skip left parenthesis  */
+	// MESG("dir_for: initial");
 	lexpression();	/* initial   */
 	NTOKEN2;	/* skip separator! */
 	// set check_list
 	check_element=tok;
-	skip_sentence1();	/* skip check element  */
+	// MESG("for check element [%s]",tok_info(check_element));
+	skip_sentence1("check");	/* skip check element  */
 	// set loop_list
 	loop_element=tok;
-	skip_sentence1();	/* skip loop element  */
+	// MESG("for loop element  [%s]",tok_info(loop_element));
+	skip_sentence1("lopp");	/* skip loop element  */
 
 	NTOKEN2;	/* skip right parenthesis  */
 	// set block start
@@ -2396,10 +2406,12 @@ double tok_dir_for()
 		end_block=tok->match_tok; 
 		end_block++;
 	} else {
-		skip_sentence1();
+		skip_sentence1("for rest");
 		end_block=tok;
 	};
-
+#if	0
+	int safe_num=0;
+#endif
 	while(!is_break1) {
 		double val;
 		// check expression
@@ -2409,10 +2421,12 @@ double tok_dir_for()
 		if(val) {
 			tok=start_block;
 			tok->directive();
-//			MESG("before loop: break is %d active=%d",is_break1,current_active_flag);
 			tok=loop_element;
 			val=lexpression();	/* exec for loop  */
-//			MESG("loop value %f",val);
+#if	0
+			MESG("loop value %f",val);
+			if(safe_num++>5) break;
+#endif
 		} else {
 			break;
 		};
@@ -2465,7 +2479,7 @@ double tok_dir_fori()
 		end_block=tok->match_tok; 
 		end_block++;
 	} else {
-		skip_sentence1();
+		skip_sentence1("fori rest");
 		end_block=tok;
 	};
 	if(dinit==dmax) {
@@ -2514,7 +2528,7 @@ double tok_dir_while()
 	NTOKEN2;	/* skip left parenthesis  */
 
 	check_element=tok;	/* this is the check element!  */
-	skip_sentence1();	/* for now skip it  */
+	skip_sentence1("while");	/* for now skip it  */
 
 	NTOKEN2;	/* skip right parenthesis  */
 
@@ -2525,7 +2539,7 @@ double tok_dir_while()
 		end_block=tok->match_tok;
 		end_block++;
 	} else {
-		skip_sentence1();
+		skip_sentence1("while1");
 		end_block=tok;
 	};
 
@@ -2732,7 +2746,7 @@ int parse_check_current_buffer(int n)
  stage_level=0;
  // clear out buffer
  cls_fout("[out]");
- MESG("clear output");
+ // MESG("clear output");
  err_num=check_init(fp);
  
  if(err_num>0) {
@@ -2765,7 +2779,7 @@ int parse_buffer_show_tokens(int n)
  err_num=check_init(fp);
 
  tok_ind=fp->tok_table;
- MESG("Print token table to out buffer");
+ // MESG("Print token table to out buffer");
  if(tok_ind==NULL) {
 	msg_line("parsing buffer produced no table!");
 	return(0);
@@ -2854,7 +2868,7 @@ int show_parse_buffer(int n)
  tok_struct *tok_table,*tok_ind;
  fp=cbfp;
 
- MESG("show_parse_buffer:");
+ // MESG("show_parse_buffer:");
  if(!is_mlang(fp)) return 0;
 
  err_num=0;

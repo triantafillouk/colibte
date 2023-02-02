@@ -598,8 +598,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok->ttype==TOK_ASSIGN) { tok->tname=" = ";tok->tgroup=TOK_TERM0;};
 	if(tok->ttype==TOK_ASSIGNENV) { tok->tname=" setenv ";tok->tgroup=TOK_TERM0;};
 	if(tok->ttype==TOK_ASSIGNOPT) { tok->tname=" setoption ";tok->tgroup=TOK_TERM0;};
-	if(tok->ttype==TOK_INCREASEBY) { tok->tname=" += ";};
-	if(tok->ttype==TOK_DECREASEBY) { tok->tname=" -= ";};
+	if(tok->ttype==TOK_INCREASEBY) { tok->tname=" += ";tok->tgroup=TOK_TERM0;};
+	if(tok->ttype==TOK_DECREASEBY) { tok->tname=" -= ";tok->tgroup=TOK_TERM0;};
 	/* term1  */
 	if(tok->ttype==TOK_PLUS) {tok->tname=" + ";tok->tgroup=TOK_TERM;};
 	if(tok->ttype==TOK_MINUS) {tok->tname=" - ";tok->tgroup=TOK_TERM;};

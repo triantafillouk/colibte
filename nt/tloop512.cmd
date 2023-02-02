@@ -7,7 +7,7 @@ print(_time)	: "Wed Feb  1 13:47:48 2023"
 show_time("Start fori test loop 1",0)
 
 fori(i=1;101;1){ 
-	for(j=1;j<800001;j +=2) { 
+	for(j=1;j<800001; j+=1) { 
 		l = i*j+32.1;
 		p += l
 	} 
