@@ -1408,6 +1408,7 @@ void highlight_md(int c)
 	case '\t':
 		if(bold==1) { hquotem=0; prev_set=0;bold=0;};
 		if(hstate!=HS_LINESTART) hstate=HS_PREVSPACE;
+		if(hquotem==H_LINESEP) hquotem=0;
 		break;		
 	default: { 
 		prev_esc=0;
@@ -1421,7 +1422,8 @@ void highlight_md(int c)
 			// MESG(" set bold state to HS_SPEC=%d",hstate);
 		} 
 
-		else if(hstate!=HS_SPEC) hstate=0;		
+		else if(hstate!=HS_SPEC) hstate=0;
+		if(hquotem==H_LINESEP) hquotem=0;		
 	};
   };
 }
