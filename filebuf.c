@@ -216,7 +216,7 @@ int show_info(int n)
  char s1[256];
  FILEBUF *bp=cbfp;
  int i=0;
- int width=64;
+ int width=80;
  char **sm = malloc(128*sizeof(char *));
  int b_typ = bp->b_type % NOTE_TYPE;
  int stat;

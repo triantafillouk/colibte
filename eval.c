@@ -224,7 +224,7 @@ double get_env(int vnum)
 		case EVSEARCH:	strlcpy(svalue,search_pattern,MAXLLEN);break;
 		case EVREPLACE:	strlcpy(svalue,replace_pattern,MAXLLEN);break;
 		case EVCTIME:	strlcpy(svalue,time2a(),MAXLLEN);break;
-		case EVMATCH:	strlcpy(svalue,(patmatch == NULL)? "": patmatch,MAXLLEN);
+		case EVMATCH:	strlcpy(svalue,patmatch,MAXLLEN);
 		case EVCURCOL:	v1 = FColumn(cbfp,Offset()); break;
 		case EVCURLINE: v1 = getcline();break;
 		case EVCURPOS: v1 = Offset();	break;
