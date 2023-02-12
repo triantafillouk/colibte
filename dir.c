@@ -6,6 +6,7 @@
 
 	DIR mode functions 
 */
+#define	DTYPE1	1
 
 #include	"xe.h"
 #include	<sys/stat.h>
@@ -153,8 +154,9 @@ int stricmp1(const char *str1, const char *str2)
 // directory compare, first the directories, then the files
 int dir_cmp(struct kdirent *a, struct kdirent *b,int sort_mode)
 {
- if (((a->t.st_mode & S_IFMT) != S_IFDIR) && ((b->t.st_mode & S_IFMT) == S_IFDIR)) return 1;
- if (((a->t.st_mode & S_IFMT) == S_IFDIR) && ((b->t.st_mode & S_IFMT) != S_IFDIR)) return -1;
+ if( a->t.st_mode != b->t.st_mode) {
+	return(a->t.st_mode > b->t.st_mode? 1:-1);
+ };
  switch(sort_mode){
 	case 0: return(stricmp1((const char *) a->d_name,(const char *) b->d_name));
 	case 1: return(stricmp1((const char *) b->d_name,(const char *) a->d_name));
@@ -243,10 +245,11 @@ int change_sort_mode(int mouse_col)
 	return 0;
 }
 
+
 /* this is a local scandir. Not all operating systems use the BSD one! */
 int scandir2(char *dirname, struct kdirent ***namelist_a)
 {
- int num_of_files; /* no of files in directory */
+ int num_of_files=0; /* no of files in directory */
  struct kdirent **namelist;
  DIR *d1;
  struct dirent *df1;
@@ -259,10 +262,23 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
  d1 = opendir(dirname);
  if(d1==NULL) { return error_line("cant open dir %s",dirname);};
  if(chdir(dirname)) { return error_line("cant open dir %s",dirname);};
-
+#if	DTYPE1
+ while((df1=readdir(d1))!=NULL) num_of_files++;
+ namelist = (struct kdirent **)malloc(((num_of_files+1)*sizeof(struct kdirent)));
+ MESG("number_of_files %ld",num_of_files);
+ rewinddir(d1);
+#endif
+ 
  for(i=0;;i++) {
  	df1=readdir(d1);
-
+#if	DTYPE1
+	if(df1==NULL) { closedir(d1);break;};
+	MESG(" - %3d: %5d l=%d t=%d %d %d [%s]",i,df1->d_ino,df1->d_reclen,df1->d_type,sizeof(struct dirent),NAME_MAX,df1->d_name);
+	namelist[i]=(struct kdirent *)malloc(sizeof(struct kdirent)+strlen(df1->d_name)+1);
+	if(namelist[i]==NULL) exit(1);
+	strlcpy(namelist[i]->d_name,df1->d_name,strlen(df1->d_name)+1);
+	result=lstat(namelist[i]->d_name,&t);
+#else
 	if(i%256 == 0) {
 	 namelist = (struct kdirent **)realloc((void *)namelist, ((i+256)*sizeof(struct kdirent *)));
 	};
@@ -273,6 +289,76 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
 	if(namelist[i]==NULL) exit(1);
 	strlcpy(namelist[i]->d_name,df1->d_name,strlen(df1->d_name)+1);
 	result=lstat(namelist[i]->d_name,&t);
+#endif
+
+
+	if(result) {
+		ERROR("[%30s]Error    %d ",namelist[i]->d_name,errno);
+		t.st_dev=0;
+		t.st_ino=0;
+		t.st_mode=0;
+		t.st_uid=0;
+		t.st_blksize=0;
+		t.st_blocks=0;
+		t.st_atime=0;
+		t.st_ctime=0;
+		memcpy(&namelist[i]->t,&t,sizeof(struct stat));
+	} else {
+		memcpy(&namelist[i]->t,&t,sizeof(struct stat));
+	};
+ } ;
+   namelist[i]=NULL;
+   qsort_dir(namelist,num_of_files,current_sort_mode);
+   *namelist_a = namelist;
+ return(num_of_files);
+}
+
+/* this is a local scandir. Not all operating systems use the BSD one! */
+int scandir2_ori(char *dirname, struct kdirent ***namelist_a)
+{
+ int num_of_files=0; /* no of files in directory */
+ struct kdirent **namelist;
+ DIR *d1;
+ struct dirent *df1;
+ int i=0;
+ int result=0;
+ struct stat t;
+
+ namelist = NULL;
+ // MESG("scandir2: sizeof stat=%d dirent=%d",sizeof(struct stat),sizeof(struct kdirent));
+ d1 = opendir(dirname);
+ if(d1==NULL) { return error_line("cant open dir %s",dirname);};
+ if(chdir(dirname)) { return error_line("cant open dir %s",dirname);};
+#if	DTYPE1
+ while((df1=readdir(d1))!=NULL) num_of_files++;
+ namelist = (struct kdirent **)malloc(((num_of_files+1)*sizeof(struct kdirent)));
+ MESG("number_of_files %ld",num_of_files);
+ rewinddir(d1);
+#endif
+ 
+ for(i=0;;i++) {
+ 	df1=readdir(d1);
+#if	DTYPE1
+	if(df1==NULL) { closedir(d1);break;};
+
+	namelist[i]=(struct kdirent *)malloc(sizeof(struct kdirent)+strlen(df1->d_name)+1);
+	if(namelist[i]==NULL) exit(1);
+	strlcpy(namelist[i]->d_name,df1->d_name,strlen(df1->d_name)+1);
+	result=lstat(namelist[i]->d_name,&t);
+#else
+	if(i%256 == 0) {
+	 namelist = (struct kdirent **)realloc((void *)namelist, ((i+256)*sizeof(struct kdirent *)));
+	};
+	if(df1==NULL) { num_of_files=i; closedir(d1);break;};
+	if(namelist==NULL) { return error_line("cant create directory namelist");};
+
+	namelist[i]=(struct kdirent *)malloc(sizeof(struct kdirent)+strlen(df1->d_name)+1);
+	if(namelist[i]==NULL) exit(1);
+	strlcpy(namelist[i]->d_name,df1->d_name,strlen(df1->d_name)+1);
+	result=lstat(namelist[i]->d_name,&t);
+#endif
+
+
 	if(result) {
 		ERROR("[%30s]Error    %d ",namelist[i]->d_name,errno);
 		t.st_dev=0;
@@ -1732,7 +1818,7 @@ int insert_dir(FILEBUF *buf_dir,int retain)
  for(i=0;i<files_in_dir;i++)
  {
 	ff = namelist[i];
-  	fname=ff->d_name;
+  	fname=ff->d_name;// ff->
 	if(!strcmp(fname,".")) continue;
 	if(!strcmp(fname,"..")) continue;
 	istr *dir_istr;
