@@ -37,9 +37,7 @@ extern FILEBUF *cbfp;
 int list_dir(char *dir_name,FILEBUF *fp);
 void qsort_dir(struct kdirent **arr, int elements,int sort_mode);
 char **getdir(char *dirname,char *s_find,int *num);
-#if	DTYPE1
 char *str_efile(struct kdirent *entry);
-#endif
 char *str_tfile(struct stat *t,char *file_name,int maxsize);
 FILEBUF *get_dir_buffer(int flag,int dir_num);
 int dir_other_reload(int n);
@@ -47,7 +45,7 @@ void escape_file_name(char *fname);
 void delete_current_list_line();
 
 int pdline=-1;
-int current_sort_mode=-1;
+int current_sort_mode=0;
 
 typedef       int     (*Fintss)(const char *, const char *);
 
@@ -156,10 +154,16 @@ int stricmp1(const char *str1, const char *str2)
 // directory compare, first the directories, then the files
 int dir_cmp(struct kdirent *a, struct kdirent *b,int sort_mode)
 {
-#if	DTYPE1
+#if	1
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+#else
+// categorize by file mode
  if( a->st_mode != b->st_mode) {
 	return(a->st_mode > b->st_mode? 1:-1);
  };
+#endif
  switch(sort_mode){
 	case 0: return(stricmp1((const char *) a->d_name,(const char *) b->d_name));
 	case 1: return(stricmp1((const char *) b->d_name,(const char *) a->d_name));
@@ -167,30 +171,11 @@ int dir_cmp(struct kdirent *a, struct kdirent *b,int sort_mode)
 	case 3: return(a->st_size  < b->st_size? 1:-1);
 	case 4: return(a->mtime > b->mtime? 1:-1);	/* modification time  */
 	case 5: return(a->mtime < b->mtime? 1:-1);	/* reverse modification time  */
-
 	case 6: return(a->ctime > b->ctime? 1:-1);	/* status change time  */
 	case 7: return(a->ctime < b->ctime? 1:-1);	/* status change reverse time  */
 	case 8: return(a->atime > b->atime? 1:-1);	/* access time  */
 	case 9: return(a->atime < b->atime? 1:-1);	/* reverse access time  */
  };
-#else
- if( a->t.st_mode != b->t.st_mode) {
-	return(a->t.st_mode > b->t.st_mode? 1:-1);
- };
- switch(sort_mode){
-	case 0: return(stricmp1((const char *) a->d_name,(const char *) b->d_name));
-	case 1: return(stricmp1((const char *) b->d_name,(const char *) a->d_name));
-	case 2: return(a->t.st_size > b->t.st_size? 1:-1);
-	case 3: return(a->t.st_size < b->t.st_size? 1:-1);
-	case 4: return(a->t.st_mtime > b->t.st_mtime? 1:-1);	/* modification time  */
-	case 5: return(a->t.st_mtime < b->t.st_mtime? 1:-1);	/* reverse modification time  */
-
-	case 6: return(a->t.st_ctime > b->t.st_ctime? 1:-1);	/* status change time  */
-	case 7: return(a->t.st_ctime < b->t.st_ctime? 1:-1);	/* status change reverse time  */
-	case 8: return(a->t.st_atime > b->t.st_atime? 1:-1);	/* access time  */
-	case 9: return(a->t.st_atime < b->t.st_atime? 1:-1);	/* reverse access time  */
- };
-#endif
  return 0;
 }
 
@@ -224,19 +209,19 @@ char **getdir(char *dirname,char *s_find,int *num)
 
 int set_sort_mode(int mode)
 {
+ int old_sort_mode=current_sort_mode;
  int current_sort_mode=cwp->w_fp->sort_mode;
  // MESG("set_sort_mode: current=%d",current_sort_mode);
  if(!(cwp->w_fp->b_flag & FSDIRED)) return true;
-	if(mode==current_sort_mode) 
-	{	/* reverse sort  */
-		if(current_sort_mode%2) current_sort_mode-=1;
-		else current_sort_mode+=1;
-	} else {
-		current_sort_mode=mode;
-	} ;
+
+	if(mode==-1) {
+		if((current_sort_mode%2)==0) current_sort_mode++;
+		else current_sort_mode--;
+	} else current_sort_mode=mode;
+
 	cwp->w_fp->sort_mode=current_sort_mode;
 	// MESG("	new sort mode=%d",current_sort_mode);
-	// if(sort_mode != old_mode) 
+	if(current_sort_mode != old_sort_mode) 
 	{
 		dir_reload(1);
 	};
@@ -266,6 +251,20 @@ int change_sort_mode(int mouse_col)
 	return 0;
 }
 
+#if	NUSE
+int dir_size(char *dir_name)
+{
+ int num_of_files=0; /* no of files in directory */
+ DIR *d1;
+ struct dirent *df1;
+ d1 = opendir(dir_name);
+ if(d1==NULL) { return error_line("cant open dir %s",dir_name);return 0;};
+ // Find how many files in the dir
+ while((df1=readdir(d1))!=NULL) num_of_files++;
+ closedir(d1);
+ return num_of_files; 
+}
+#endif
 
 /* this is a local scandir. Not all operating systems use the BSD one! */
 int scandir2(char *dirname, struct kdirent ***namelist_a)
@@ -289,7 +288,7 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
  namelist = (struct kdirent **)malloc(((num_of_files+1)*sizeof(struct kdirent)));
  // MESG("number_of_files %ld",num_of_files);
  rewinddir(d1);
- show_time("scan_dir: start",0);
+ // show_time("scan_dir: start",0);
  for(i=0;;i++) {
  	df1=readdir(d1);
 
@@ -304,115 +303,26 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
 
 	if(result) {
 		ERROR("[%30s]Error    %d ",namelist[i]->d_name,errno);
-#if	DTYPE1
 		namelist[i]->st_mode=0;
 		namelist[i]->st_size=0;
 		namelist[i]->mtime=0;
 		namelist[i]->atime=0;
 		namelist[i]->ctime=0;
-#else	
-		t.st_dev=0;
-		t.st_ino=0;
-		t.st_mode=0;
-		t.st_uid=0;
-		t.st_blksize=0;
-		t.st_blocks=0;
-		t.st_atime=0;
-		t.st_ctime=0;
-#endif
+	} else {
+		namelist[i]->st_mode  = t.st_mode;
+		namelist[i]->mtime    = t.st_mtime;
+		namelist[i]->ctime    = t.st_ctime;
+		namelist[i]->atime    = t.st_atime;
+		namelist[i]->st_size  = t.st_size;
 	};
-#if	DTYPE1
-	namelist[i]->st_mode  = t.st_mode;
-	namelist[i]->mtime    = t.st_mtime;
-	namelist[i]->ctime    = t.st_ctime;
-	namelist[i]->atime    = t.st_atime;
-	namelist[i]->st_size  = t.st_size;
-#else
-	memcpy(&namelist[i]->t,&t,sizeof(struct stat));
-#endif
  } ;
- show_time("scan_dir: end",1);
+ // show_time("scan_dir: end",1);
   namelist[i]=NULL;
    qsort_dir(namelist,num_of_files,current_sort_mode);
    *namelist_a = namelist;
- show_time("after sort:",1);
+ // show_time("after sort:",1);
  return(num_of_files);
 }
-
-#if	NUSE
-/* this is a local scandir. Not all operating systems use the BSD one! */
-int scandir2_ori(char *dirname, struct kdirent ***namelist_a)
-{
- int num_of_files=0; /* no of files in directory */
- struct kdirent **namelist;
- DIR *d1;
- struct dirent *df1;
- int i=0;
- int result=0;
- struct stat t;
-
- namelist = NULL;
- // MESG("scandir2: sizeof stat=%d dirent=%d",sizeof(struct stat),sizeof(struct kdirent));
- d1 = opendir(dirname);
- if(d1==NULL) { return error_line("cant open dir %s",dirname);};
- if(chdir(dirname)) { return error_line("cant open dir %s",dirname);};
-
- while((df1=readdir(d1))!=NULL) num_of_files++;
- namelist = (struct kdirent **)malloc(((num_of_files+1)*sizeof(struct kdirent)));
- MESG("number_of_files %ld",num_of_files);
- rewinddir(d1);
- 
- for(i=0;;i++) {
- 	df1=readdir(d1);
-#if	DTYPE1
-	if(df1==NULL) { closedir(d1);break;};
-
-	namelist[i]=(struct kdirent *)malloc(sizeof(struct kdirent)+strlen(df1->d_name)+1);
-	if(namelist[i]==NULL) exit(1);
-	strlcpy(namelist[i]->d_name,df1->d_name,strlen(df1->d_name)+1);
-	result=lstat(namelist[i]->d_name,&t);
-#else
-	if(i%256 == 0) {
-	 namelist = (struct kdirent **)realloc((void *)namelist, ((i+256)*sizeof(struct kdirent *)));
-	};
-	if(df1==NULL) { num_of_files=i; closedir(d1);break;};
-	if(namelist==NULL) { return error_line("cant create directory namelist");};
-
-	namelist[i]=(struct kdirent *)malloc(sizeof(struct kdirent)+strlen(df1->d_name)+1);
-	if(namelist[i]==NULL) exit(1);
-	strlcpy(namelist[i]->d_name,df1->d_name,strlen(df1->d_name)+1);
-	result=lstat(namelist[i]->d_name,&t);
-#endif
-
-
-	if(result) {
-		ERROR("[%30s]Error    %d ",namelist[i]->d_name,errno);
-#if	DTYPE1
-#else	
-		t.st_dev=0;
-		t.st_ino=0;
-		t.st_mode=0;
-		t.st_uid=0;
-		t.st_blksize=0;
-		t.st_blocks=0;
-		t.st_atime=0;
-		t.st_ctime=0;
-#endif
-	};
-#if	DTYPE1
-	namelist[i]->mtime=t.st_mtime;
-	namelist[i]->ctime=t.st_ctime;
-	namelist[i]->atime=t.st_atime;
-#else
-	memcpy(&namelist[i]->t,&t,sizeof(struct stat));
-#endif
- } ;
-   namelist[i]=NULL;
-   qsort_dir(namelist,num_of_files,current_sort_mode);
-   *namelist_a = namelist;
- return(num_of_files);
-}
-#endif
 
 // quick sort a directory list
 void qsort_dir(struct kdirent **arr, int elements,int s_mode) 
@@ -1821,7 +1731,6 @@ if((t->st_mode & S_IXUSR \
  return str;
 }
 
-#if	DTYPE1
 char *str_efile(struct kdirent *entry)
 {
  static char str[256];
@@ -1905,7 +1814,6 @@ if((entry->st_mode & S_IXUSR \
  if(sstat>255) MESG("truncated 11"); 
  return str;
 }
-#endif
 
 // insert file list in an editor window
 int insert_dir(FILEBUF *buf_dir,int retain)
@@ -1942,13 +1850,8 @@ int insert_dir(FILEBUF *buf_dir,int retain)
 	if(!strcmp(fname,".")) continue;
 	if(!strcmp(fname,"..")) continue;
 	istr *dir_istr;
-#if	DTYPE1
+
 	fline=str_efile(ff);
-#else
-	struct stat t;
-	lstat(fname,&t); 
-	fline=str_tfile(&t,fname,255);
-#endif
 	dir_istr = (istr *)malloc(sizeof(istr)+strlen(fline));
 	memcpy(&dir_istr->start,fline,strlen(fline)+1);
 	dir_istr->index = dir_ind++;

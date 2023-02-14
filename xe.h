@@ -11,10 +11,9 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.58T30 (11/1/2023)"
+#define VERSION 	"#01.58T31 (14/1/2023)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
-#define	DTYPE1	1
 
 /* Test flags */
 #define NUSE		0	/* not used anymore */
@@ -790,7 +789,6 @@ typedef struct dir_l {
 	int cline;
  } dir_l;
 
-#if	DTYPE1
 struct kdirent {
 	// struct stat t;
 	long int mtime;
@@ -800,12 +798,6 @@ struct kdirent {
 	mode_t st_mode;
 	char d_name[1];
 };
-#else
-struct kdirent {
-	struct stat t;
-	char d_name[1];
-};
-#endif
 
 #define HEX	16
 #define DEC	10

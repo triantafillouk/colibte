@@ -1690,6 +1690,19 @@ int  show_position_info(int short_version)
 		sstat=snprintf(str,MAXSLEN,"%s",get_notes_status());
 	  };
 	} else
+#else
+	if(cbfp->b_flag & FSDIRED) 
+	{
+		// MESG("show dir info");
+		if(!short_version) {
+			char finfo[MAXFLEN];
+		
+			sstat=dir_getfile(finfo,2);
+			sstat=snprintf(str,MAXSLEN,"%6lld|%s",getcline()+1,finfo);
+		} else {
+			sstat=snprintf(str,MAXSLEN,"%6lld",getcline()+1);
+		};
+	} else
 #endif 
 	{
 	loffs=Offset()-LineBegin(Offset())+1;

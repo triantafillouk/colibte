@@ -11,9 +11,9 @@ XLIB=0
 GTK=0
 XPLOT=0
 EMBED_ICONS=0
-USE_GLIB=0
+USE_GLIB=1
 # include support for notes database in sqlite3
-TNOTES=0
+TNOTES=1
 GVERS := $(shell git log -1 --pretty=tformat:%h,%s)
 
 GTKINCLUDE3=`pkg-config gtk+-3.0 --cflags`
