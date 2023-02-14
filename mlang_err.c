@@ -100,7 +100,7 @@ char * tok_info2(tok_struct *tok)
 
 #define SHOW_STAGE(pos)	{ stage_level++;show_type='#';CHECK_TOK(pos);}
 
-#if	0
+#if	1
 #define	CHECK_TOK(pos) { xpos=pos ;}
 #define	NTOKEN_ERR(xxx)	{ tok++;show_type=';';CHECK_TOK(xxx);}
 #define TDSERR(description) {} 
