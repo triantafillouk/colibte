@@ -280,8 +280,12 @@ int dir_size(int n)
  d1 = opendir(dir_name);
  if(d1==NULL) { return error_line("cant open dir %s",dir_name);return 0;};
  // Find how many files in the dir
- while((df1=readdir(d1))!=NULL) num_of_files++;
+ while((df1=readdir(d1))!=NULL) {
+ 	num_of_files++;
+	if((num_of_files%500000)==0) msg_line("count %d",num_of_files); 
+ };
  closedir(d1);
+ num_of_files-=2;
  // MESG("dir size is %d",num_of_files);
  update_line(num_of_files);
  msg_line("dir size is %d",num_of_files);
@@ -342,6 +346,7 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
  // show_time("scan_dir: end",1);
   namelist[i]=NULL;
    if(num_of_files<100000)qsort_dir(namelist,num_of_files,current_sort_mode);
+   else msg_line("dir too big to short contains %d files",num_of_files);
    *namelist_a = namelist;
  // show_time("after sort:",1);
  return(num_of_files);
