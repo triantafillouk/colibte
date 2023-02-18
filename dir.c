@@ -251,20 +251,43 @@ int change_sort_mode(int mouse_col)
 	return 0;
 }
 
-#if	NUSE
-int dir_size(char *dir_name)
+int update_line(int size)
+{
+	istr **row_data = (istr **)array_data(cbfp->dir_list_str);
+	istr *current_str = row_data[cwp->current_note_line];
+	char *line_str = &current_str->start;
+	// MESG("update_line: [%s]",line_str);
+	char num[16];
+	sprintf(num,"%d",size);
+	memset(line_str+3,' ',10);
+	memcpy(line_str+(13-strlen(num)),num,strlen(num));
+	// MESG("update_line: [%s]",line_str);
+	set_update(cwp,UPD_EDIT);
+	return 0;
+}
+
+// count dir size
+int dir_size(int n)
 {
  int num_of_files=0; /* no of files in directory */
  DIR *d1;
  struct dirent *df1;
+ char dir_name[MAXFLEN];
+ int ftype = dir_getfile(dir_name,0);
+ msg_line("check dir_size");
+ // MESG("ftype=%d [%s]",ftype,dir_name);
+ if(ftype==2) {
  d1 = opendir(dir_name);
  if(d1==NULL) { return error_line("cant open dir %s",dir_name);return 0;};
  // Find how many files in the dir
  while((df1=readdir(d1))!=NULL) num_of_files++;
  closedir(d1);
+ // MESG("dir size is %d",num_of_files);
+ update_line(num_of_files);
+ msg_line("dir size is %d",num_of_files);
+ };
  return num_of_files; 
 }
-#endif
 
 /* this is a local scandir. Not all operating systems use the BSD one! */
 int scandir2(char *dirname, struct kdirent ***namelist_a)
@@ -318,7 +341,7 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
  } ;
  // show_time("scan_dir: end",1);
   namelist[i]=NULL;
-   qsort_dir(namelist,num_of_files,current_sort_mode);
+   if(num_of_files<100000)qsort_dir(namelist,num_of_files,current_sort_mode);
    *namelist_a = namelist;
  // show_time("after sort:",1);
  return(num_of_files);
@@ -1562,6 +1585,7 @@ int dir_getfile(char *fname,int flag)
 			snprintf(fname,MAXFLEN,"%s %4d:",s_perms,perms);
 		};
 	} else {
+
 	 	strlcpy(fname,f1,MAXFLEN);
 	};
  } else {
