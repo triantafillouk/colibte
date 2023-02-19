@@ -9,7 +9,7 @@
 #include	"xe.h"
 #include	<sys/stat.h>
 #include	<sys/types.h>
-// #include	<dirent.h>
+#include	<dirent.h>
 #include	<glib.h>
 #include	<pwd.h>
 #include	<grp.h>
@@ -179,6 +179,8 @@ int dir_cmp(struct kdirent *a, struct kdirent *b,int sort_mode)
  return 0;
 }
 
+
+
 /* returns the directory contents with filter in a string list */
 /* used mainly in open file,list_dir1 in curses/xlib */
 char **getdir(char *dirname,char *s_find,int *num)
@@ -293,6 +295,8 @@ int dir_size(int n)
  return num_of_files; 
 }
 
+#define MAXSTAT	100000
+
 /* this is a local scandir. Not all operating systems use the BSD one! */
 int scandir2(char *dirname, struct kdirent ***namelist_a)
 {
@@ -312,43 +316,54 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
 
  // Find how many files in the dir
  while((df1=readdir(d1))!=NULL) num_of_files++;
- namelist = (struct kdirent **)malloc(((num_of_files+1)*sizeof(struct kdirent)));
- // MESG("number_of_files %ld",num_of_files);
+ namelist = (struct kdirent **)malloc(((num_of_files+1)*sizeof(struct kdirent *)));
+ MESG("number_of_files %ld size %d",num_of_files,((num_of_files+1)*sizeof(struct kdirent *)));
  rewinddir(d1);
- // show_time("scan_dir: start",0);
+ show_time("scan_dir: start",0);
  for(i=0;;i++) {
  	df1=readdir(d1);
 
 	if(df1==NULL) { closedir(d1);break;};
 	// MESG(" - %3d: %5d l=%d t=%d %d %d [%s]",i,df1->d_ino,df1->d_reclen,df1->d_type,sizeof(struct stat),sizeof(struct kdirent),df1->d_name);
 	// MESG(" - %3d: %5d l=%d t=%d 0x%X 0x%X [%s]",i,df1->d_ino,df1->d_reclen,df1->d_type,DT_DIR << 12,S_IFDIR,df1->d_name);
-
-	namelist[i]=(struct kdirent *)malloc(sizeof(struct kdirent)+strlen(df1->d_name)+1);
+	int len=strlen(df1->d_name)+1;
+	namelist[i]=(struct kdirent *)malloc(sizeof(struct kdirent)+len);
 	if(namelist[i]==NULL) exit(1);
-	strlcpy(namelist[i]->d_name,df1->d_name,strlen(df1->d_name)+1);
-	result=lstat(namelist[i]->d_name,&t);
-
-	if(result) {
-		ERROR("[%30s]Error    %d ",namelist[i]->d_name,errno);
-		namelist[i]->st_mode=0;
-		namelist[i]->st_size=0;
+	strlcpy(namelist[i]->d_name,df1->d_name,len);
+	if(num_of_files>MAXSTAT) {
+		namelist[i]->st_mode=df1->d_type << 12;
+		namelist[i]->st_size=strlen(df1->d_name)+1;
 		namelist[i]->mtime=0;
 		namelist[i]->atime=0;
 		namelist[i]->ctime=0;
-	} else {
-		namelist[i]->st_mode  = t.st_mode;
-		namelist[i]->mtime    = t.st_mtime;
-		namelist[i]->ctime    = t.st_ctime;
-		namelist[i]->atime    = t.st_atime;
-		namelist[i]->st_size  = t.st_size;
-	};
+	} else {	
+		result=lstat(namelist[i]->d_name,&t);
+		if(result) {
+			ERROR("[%30s]Error    %d ",namelist[i]->d_name,errno);
+			namelist[i]->st_mode=0;
+			namelist[i]->st_size=0;
+			namelist[i]->mtime=0;
+			namelist[i]->atime=0;
+			namelist[i]->ctime=0;
+		} else {
+			namelist[i]->st_mode  = t.st_mode;
+			namelist[i]->mtime    = t.st_mtime;
+			namelist[i]->ctime    = t.st_ctime;
+			namelist[i]->atime    = t.st_atime;
+			namelist[i]->st_size  = t.st_size;
+		};
+	}
  } ;
- // show_time("scan_dir: end",1);
+ show_time("scan_dir: end",1);
   namelist[i]=NULL;
-   if(num_of_files<100000)qsort_dir(namelist,num_of_files,current_sort_mode);
-   else msg_line("dir too big to short contains %d files",num_of_files);
+#if	1
+	qsort_dir(namelist,num_of_files,current_sort_mode);
+#else
+   if(num_of_files<MAXSTAT)qsort_dir(namelist,num_of_files,current_sort_mode);
+   else msg_line("dir too big to sort contains %d files",num_of_files);
+#endif
    *namelist_a = namelist;
- // show_time("after sort:",1);
+ show_time("after sort:",1);
  return(num_of_files);
 }
 
