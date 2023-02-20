@@ -911,7 +911,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->err=-1;
 	bp->m_mode=0;
 	bp->dir_num=dir_num;
-	bp->sort_mode=-1;
+	bp->sort_mode=0;
 	bp->utf_accent=0;
 #if	CRYPT
 	bp->b_key[0]=0;

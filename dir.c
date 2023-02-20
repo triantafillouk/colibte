@@ -35,7 +35,12 @@ extern FILEBUF *cbfp;
 
 /* local function declarations */
 int list_dir(char *dir_name,FILEBUF *fp);
+typedef int (*DIR_CMPF)(struct kdirent *a,struct kdirent *b);
+#if	1
+void qsort_dir(struct kdirent **arr, int elements,DIR_CMPF dir_cmp) ;
+#else
 void qsort_dir(struct kdirent **arr, int elements,int sort_mode);
+#endif
 char **getdir(char *dirname,char *s_find,int *num);
 char *str_efile(struct kdirent *entry);
 char *str_tfile(struct stat *t,char *file_name,int maxsize);
@@ -43,6 +48,7 @@ FILEBUF *get_dir_buffer(int flag,int dir_num);
 int dir_other_reload(int n);
 void escape_file_name(char *fname);
 void delete_current_list_line();
+int stricmp1(const char *str1, const char *str2);
 
 int pdline=-1;
 int current_sort_mode=0;
@@ -51,6 +57,105 @@ typedef       int     (*Fintss)(const char *, const char *);
 
  /* This is used in dired mode dates */
 char *month[] = { "Jan", "Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","error",NULL };
+
+typedef int (*DIR_CMPF)(struct kdirent *a,struct kdirent *b);
+
+int dir_cmp_name(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(stricmp1((const char *) a->d_name,(const char *) b->d_name));
+}
+
+int dir_cmp_name_rev(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(stricmp1((const char *) b->d_name,(const char *) a->d_name));
+ return 0;
+}
+
+int dir_cmp_size(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(a->st_size > b->st_size ? 1:-1);	/* modification time  */
+ return 0;
+}
+
+int dir_cmp_size_rev(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(a->st_size < b->st_size ? 1:-1);	/* modification time  */
+ return 0;
+}
+
+int dir_cmp_mtime(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(a->mtime > b->mtime? 1:-1);	/* modification time  */
+ return 0;
+}
+
+int dir_cmp_mtime_rev(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(a->mtime < b->mtime? 1:-1);	/* modification time  */
+ return 0;
+}
+
+int dir_cmp_atime(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(a->atime > b->atime? 1:-1);	/* modification time  */
+ return 0;
+}
+
+int dir_cmp_atime_rev(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(a->atime < b->atime? 1:-1);	/* modification time  */
+ return 0;
+}
+
+int dir_cmp_ctime(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(a->ctime > b->ctime? 1:-1);	/* modification time  */
+ return 0;
+}
+
+int dir_cmp_ctime_rev(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(a->ctime < b->ctime? 1:-1);	/* modification time  */
+ return 0;
+}
+
+DIR_CMPF dir_cmp_array [] = {
+	dir_cmp_name,dir_cmp_name_rev,
+	dir_cmp_size,dir_cmp_size_rev,
+	dir_cmp_mtime,dir_cmp_mtime_rev,
+	dir_cmp_atime,dir_cmp_atime_rev,
+	dir_cmp_ctime,dir_cmp_ctime_rev
+};
 
 void convert_to_windows_name(char *fname)
 {
@@ -213,7 +318,7 @@ int set_sort_mode(int mode)
 {
  int old_sort_mode=current_sort_mode;
  int current_sort_mode=cwp->w_fp->sort_mode;
- // MESG("set_sort_mode: current=%d",current_sort_mode);
+ // MESG("set_sort_mode: current=%d mode=%d",current_sort_mode,mode);
  if(!(cwp->w_fp->b_flag & FSDIRED)) return true;
 
 	if(mode==-1) {
@@ -319,7 +424,7 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
  namelist = (struct kdirent **)malloc(((num_of_files+1)*sizeof(struct kdirent *)));
  // MESG("number_of_files %ld size %d",num_of_files,((num_of_files+1)*sizeof(struct kdirent *)));
  rewinddir(d1);
- // show_time("scan_dir: start",0);
+ show_time("scan_dir: start",0);
  for(i=0;;i++) {
  	df1=readdir(d1);
 
@@ -328,11 +433,14 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
 	// MESG(" - %3d: %5d l=%d t=%d 0x%X 0x%X [%s]",i,df1->d_ino,df1->d_reclen,df1->d_type,DT_DIR << 12,S_IFDIR,df1->d_name);
 	int len=strlen(df1->d_name)+1;
 	namelist[i]=(struct kdirent *)malloc(sizeof(struct kdirent)+len);
-	if(namelist[i]==NULL) exit(1);
+	if(namelist[i]==NULL) {
+			closedir(d1);
+			return(0);
+	};
 	strlcpy(namelist[i]->d_name,df1->d_name,len);
 	if(num_of_files>MAXSTAT) {
 		namelist[i]->st_mode=df1->d_type << 12;
-		namelist[i]->st_size=strlen(df1->d_name)+1;
+		namelist[i]->st_size=len;
 		namelist[i]->mtime=0;
 		namelist[i]->atime=0;
 		namelist[i]->ctime=0;
@@ -354,21 +462,27 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
 		};
 	}
  } ;
- // show_time("scan_dir: end",1);
+ show_time("scan_dir: end",1);
   namelist[i]=NULL;
+   MESG("current_sort_mode=%d",current_sort_mode);
 #if	1
-	qsort_dir(namelist,num_of_files,current_sort_mode);
+   if(num_of_files<MAXSTAT)qsort_dir(namelist,num_of_files,dir_cmp_array[current_sort_mode]);
+   else msg_line("dir too big to sort contains %d files",num_of_files);
 #else
    if(num_of_files<MAXSTAT)qsort_dir(namelist,num_of_files,current_sort_mode);
    else msg_line("dir too big to sort contains %d files",num_of_files);
 #endif
    *namelist_a = namelist;
- // show_time("after sort:",1);
+ show_time("after sort:",1);
  return(num_of_files);
 }
 
 // quick sort a directory list
+#if	1
+void qsort_dir(struct kdirent **arr, int elements,DIR_CMPF cmp_dir) 
+#else
 void qsort_dir(struct kdirent **arr, int elements,int s_mode) 
+#endif
 {
   struct kdirent  *piv;
   int *beg, *end;
@@ -383,11 +497,19 @@ void qsort_dir(struct kdirent **arr, int elements,int s_mode)
       piv=arr[L]; 
       while (L<R) {
         while (
+#if	1
+			cmp_dir(arr[R],piv) >= 0
+#else
 			dir_cmp( arr[R], piv,s_mode) >= 0
+#endif
 			&& L<R) R--; 
 		if (L<R) arr[L++]=arr[R];
         while (
+#if	1
+			cmp_dir( arr[L], piv) <= 0
+#else
 			dir_cmp( arr[L], piv,s_mode) <= 0
+#endif
 			&& L<R) L++; 
 		if (L<R) arr[R--]=arr[L]; 
 	  }
