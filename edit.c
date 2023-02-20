@@ -281,7 +281,12 @@ int goto_line(num n)
 	arg[0]=0;
 	if ((nextarg("Go to line : ", arg, MAXSLEN,true)) != TRUE) 	return(FALSE);
 	if(macro_exec!=MACRO_MODE2) n = get_val();
-	set_update(cwp,UPD_MOVE);
+	if(cbfp->b_flag & FSNLIST) {
+		cwp->current_note_line=n;
+		if(n>cbfp->b_notes) cwp->current_note_line=cbfp->b_notes-1;
+		set_update(cwp,UPD_MOVE);
+		return(OK_CLRSL);
+	}
 	return(igotolinecol(n,1,0));
 }
 
