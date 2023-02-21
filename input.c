@@ -939,11 +939,13 @@ void out_print(char *s,int nl)
 	FILEBUF *oldfp = cbfp;
 	// MESG("out_print: current buffer is [%s] discmd=%d",cbfp->b_fname,discmd);
 	if(s==NULL) return;
+#if	1
 	if(!discmd) {
-		if(nl) printf("%s\n",s);
-		else printf("%s",s);
+		if(nl) fprintf(stderr,"%s\n",s);
+		else fprintf(stderr,"%s",s);
 		return;
 	};
+#endif
 	if((bp=new_filebuf("[out]",0)) !=NULL) {
 		if(!activate_file(bp)) return;
 	} else {

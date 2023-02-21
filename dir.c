@@ -469,7 +469,6 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
  } ;
  show_time("scan_dir: end",1);
   namelist[i]=NULL;
-   MESG("current_sort_mode=%d",current_sort_mode);
    if(num_of_files<MAXSTAT)qsort_dir(namelist,num_of_files,current_sort_mode);
    else msg_line("dir too big to sort contains %d files",num_of_files);
 
@@ -487,7 +486,7 @@ void qsort_dir(struct kdirent **arr, int elements,int s_mode)
 #if	SORT_FUNC
   DIR_CMPF cmp_dir = dir_cmp_array[current_sort_mode];
 #endif
-//  MESG("qsort_dir: sort_mode=%d",s_mode);
+ MESG("qsort_dir: sort_mode=%d elements=%d",s_mode,elements);
   beg=(int *)malloc(sizeof(int)*(elements+1));
   end=(int *)malloc(sizeof(int)*(elements+1));
   beg[0]=0; end[0]=elements;
