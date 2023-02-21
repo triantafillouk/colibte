@@ -33,14 +33,15 @@ extern int dont_edit();
 extern alist *file_list;
 extern FILEBUF *cbfp;
 
+#define	SORT_FUNC	0
+
 /* local function declarations */
 int list_dir(char *dir_name,FILEBUF *fp);
+#if	SORT_FUNC
 typedef int (*DIR_CMPF)(struct kdirent *a,struct kdirent *b);
-#if	1
-void qsort_dir(struct kdirent **arr, int elements,DIR_CMPF dir_cmp) ;
-#else
-void qsort_dir(struct kdirent **arr, int elements,int sort_mode);
 #endif
+
+void qsort_dir(struct kdirent **arr, int elements,int sort_mode);
 char **getdir(char *dirname,char *s_find,int *num);
 char *str_efile(struct kdirent *entry);
 char *str_tfile(struct stat *t,char *file_name,int maxsize);
@@ -58,6 +59,7 @@ typedef       int     (*Fintss)(const char *, const char *);
  /* This is used in dired mode dates */
 char *month[] = { "Jan", "Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","error",NULL };
 
+#if	SORT_FUNC
 typedef int (*DIR_CMPF)(struct kdirent *a,struct kdirent *b);
 
 int dir_cmp_name(struct kdirent *a,struct kdirent *b)
@@ -66,6 +68,7 @@ int dir_cmp_name(struct kdirent *a,struct kdirent *b)
  if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
  if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
  return(stricmp1((const char *) a->d_name,(const char *) b->d_name));
+ return 0;
 }
 
 int dir_cmp_name_rev(struct kdirent *a,struct kdirent *b)
@@ -156,6 +159,7 @@ DIR_CMPF dir_cmp_array [] = {
 	dir_cmp_atime,dir_cmp_atime_rev,
 	dir_cmp_ctime,dir_cmp_ctime_rev
 };
+#endif
 
 void convert_to_windows_name(char *fname)
 {
@@ -256,6 +260,7 @@ int stricmp1(const char *str1, const char *str2)
     return 0 ;
 }
 
+#if	!SORT_FUNC
 // directory compare, first the directories, then the files
 int dir_cmp(struct kdirent *a, struct kdirent *b,int sort_mode)
 {
@@ -283,7 +288,7 @@ int dir_cmp(struct kdirent *a, struct kdirent *b,int sort_mode)
  };
  return 0;
 }
-
+#endif
 
 
 /* returns the directory contents with filter in a string list */
@@ -465,28 +470,23 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
  show_time("scan_dir: end",1);
   namelist[i]=NULL;
    MESG("current_sort_mode=%d",current_sort_mode);
-#if	1
-   if(num_of_files<MAXSTAT)qsort_dir(namelist,num_of_files,dir_cmp_array[current_sort_mode]);
-   else msg_line("dir too big to sort contains %d files",num_of_files);
-#else
    if(num_of_files<MAXSTAT)qsort_dir(namelist,num_of_files,current_sort_mode);
    else msg_line("dir too big to sort contains %d files",num_of_files);
-#endif
+
    *namelist_a = namelist;
  show_time("after sort:",1);
  return(num_of_files);
 }
 
 // quick sort a directory list
-#if	1
-void qsort_dir(struct kdirent **arr, int elements,DIR_CMPF cmp_dir) 
-#else
 void qsort_dir(struct kdirent **arr, int elements,int s_mode) 
-#endif
 {
   struct kdirent  *piv;
   int *beg, *end;
   int i=0, L, R ;
+#if	SORT_FUNC
+  cmp_dir = dir_cmp_array[current_sort_mode];
+#endif
 //  MESG("qsort_dir: sort_mode=%d",s_mode);
   beg=(int *)malloc(sizeof(int)*(elements+1));
   end=(int *)malloc(sizeof(int)*(elements+1));
@@ -497,7 +497,7 @@ void qsort_dir(struct kdirent **arr, int elements,int s_mode)
       piv=arr[L]; 
       while (L<R) {
         while (
-#if	1
+#if	SORT_FUNC
 			cmp_dir(arr[R],piv) >= 0
 #else
 			dir_cmp( arr[R], piv,s_mode) >= 0
@@ -505,7 +505,7 @@ void qsort_dir(struct kdirent **arr, int elements,int s_mode)
 			&& L<R) R--; 
 		if (L<R) arr[L++]=arr[R];
         while (
-#if	1
+#if	SORT_FUNC
 			cmp_dir( arr[L], piv) <= 0
 #else
 			dir_cmp( arr[L], piv,s_mode) <= 0
