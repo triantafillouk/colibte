@@ -33,7 +33,7 @@ extern int dont_edit();
 extern alist *file_list;
 extern FILEBUF *cbfp;
 
-#define	SORT_FUNC	0
+#define	SORT_FUNC	1
 
 /* local function declarations */
 int list_dir(char *dir_name,FILEBUF *fp);
@@ -485,7 +485,7 @@ void qsort_dir(struct kdirent **arr, int elements,int s_mode)
   int *beg, *end;
   int i=0, L, R ;
 #if	SORT_FUNC
-  cmp_dir = dir_cmp_array[current_sort_mode];
+  DIR_CMPF cmp_dir = dir_cmp_array[current_sort_mode];
 #endif
 //  MESG("qsort_dir: sort_mode=%d",s_mode);
   beg=(int *)malloc(sizeof(int)*(elements+1));
