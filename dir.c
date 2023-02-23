@@ -420,7 +420,7 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
  namelist = (struct kdirent **)malloc(((num_of_files+1)*sizeof(struct kdirent *)));
  // MESG("number_of_files %ld size %d",num_of_files,((num_of_files+1)*sizeof(struct kdirent *)));
  rewinddir(d1);
- show_time("scan_dir: start",0);
+ // show_time("scan_dir: start",0);
  for(i=0;;i++) {
  	df1=readdir(d1);
 
@@ -458,13 +458,13 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
 		};
 	}
  } ;
- show_time("scan_dir: end",1);
+ // show_time("scan_dir: end",1);
  namelist[i]=NULL;
  if(num_of_files<MAXSTAT)qsort_dir(namelist,num_of_files,current_sort_mode);
  else msg_line("dir too big to sort contains %d files",num_of_files);
 
  *namelist_a = namelist;
- show_time("after sort:",1);
+ // show_time("after sort:",1);
  return(num_of_files);
 }
 
