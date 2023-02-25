@@ -1618,7 +1618,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
 			*temp_used=1;
 		};
 		if(!strcmp(hts[FX_COMPRESS].file_extentions[tc],"gz")) {
-			snprintf(cmd,MAXLLEN,"zcat %s > /tmp/uncompressed 2>/tmp/err",fname);
+			snprintf(cmd,MAXLLEN,"gzcat %s > /tmp/uncompressed 2>/tmp/err",fname);
 			if(system(cmd)) strlcpy(fname,"/tmp/err",MAXFLEN);
 			else  strlcpy(fname,"/tmp/uncompressed",MAXFLEN);
 			*temp_used=2;

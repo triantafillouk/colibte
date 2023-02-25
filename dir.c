@@ -1125,7 +1125,7 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 		sstat=set_unique_tmp_file(wd,fname,MAXFLEN);
 		if(!sstat) return false;
 		/* This is a compressed file. Uncompress to a temporary first */
-		sstat=snprintf(cmd2,MAXLLEN,"zcat %s > %s 2>/tmp/err",fname,wd);
+		sstat=snprintf(cmd2,MAXLLEN,"gzcat %s > %s 2>/tmp/err",fname,wd);
 		// MESG("exec_ext: uncompress command $s",cmd2);
 		if(sstat<MAXLLEN) {
 			if(system(cmd2)) { return error_line("cannot decompress file");};
