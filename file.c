@@ -1616,43 +1616,15 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
 
 	int ftype = file_type(fname, &tc, oext);
 	bp->b_type |= ftype;
-	MESG("init_ftype: check tc %d b_type=%d [%s] [%s]",tc,bp->b_type,hts[FX_COMPRESS].file_extentions[tc],uncompress_command[tc]);
+	// MESG("init_ftype: check tc %d b_type=%d [%s] [%s] oext=[%s]",tc,bp->b_type,hts[FX_COMPRESS].file_extentions[tc],uncompress_command[tc],oext);
 
-#if	1
 	if(tc) {
 			snprintf(cmd,MAXLLEN,"%s %s > /tmp/uncompressed 2>/tmp/err",uncompress_command[tc],fname);
 			if(system(cmd)) strlcpy(fname,"/tmp/err",MAXFLEN);
 			else  strlcpy(fname,"/tmp/uncompressed",MAXFLEN);
 			*temp_used=tc;
 	};
-#else
-	if(tc) {
-		if(!strcmp(hts[FX_COMPRESS].file_extentions[tc],"zip")) {
-			snprintf(cmd,MAXLLEN,"unzip -l %s > /tmp/uncompressed 2>/tmp/err",fname);
-			if(system(cmd)) strlcpy(fname,"/tmp/err",MAXFLEN);
-			else  strlcpy(fname,"/tmp/uncompressed",MAXFLEN);
-			*temp_used=1;
-		};
-		if(!strcmp(hts[FX_COMPRESS].file_extentions[tc],"gz")) {
-			snprintf(cmd,MAXLLEN,"gzcat %s > /tmp/uncompressed 2>/tmp/err",fname);
-			if(system(cmd)) strlcpy(fname,"/tmp/err",MAXFLEN);
-			else  strlcpy(fname,"/tmp/uncompressed",MAXFLEN);
-			*temp_used=2;
-		};
-		if(!strcmp(hts[FX_COMPRESS].file_extentions[tc],"Z")) {
-			snprintf(cmd,MAXLLEN,"zcat %s > /tmp/uncompressed 2>/tmp/err",fname);
-			if(system(cmd)) strlcpy(fname,"/tmp/err",MAXFLEN);
-			else  strlcpy(fname,"/tmp/uncompressed",MAXFLEN);
-			*temp_used=3;
-		}
-		if(!strcmp(hts[FX_COMPRESS].file_extentions[tc],"bz2")) {
-			snprintf(cmd,MAXLLEN,"bzcat %s > /tmp/uncompressed 2>/tmp/err",fname);
-			if(system(cmd)) strlcpy(fname,"/tmp/err",MAXFLEN);
-			else  strlcpy(fname,"/tmp/uncompressed",MAXFLEN);
-			*temp_used=4;
-		};
-	};
-#endif
+
 	// open the file
 	bp->file_id = open(fname,O_RDONLY);
 	if(bp->file_id<3) {

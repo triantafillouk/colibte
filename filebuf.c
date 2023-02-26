@@ -1967,6 +1967,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	if(temp_used) {
 		// MESG("remove temporary %s",name);
 		unlink(name);
+		bf->b_state |= FS_VIEW;
 	};
 //	show_time("ifile: end ok",0);
 	bf->line_to = tp_line(bf->tp_text_end);
