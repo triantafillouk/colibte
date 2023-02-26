@@ -477,7 +477,7 @@ KEYTAB keytab_dir[] = {
 	{'x',		dir_exec,"x"},
 	{'v',		dir_view,"v"},
 	{'s',		script_exec,"s"},
-
+	{'z',		dir_size,"z"},
 	{SPEC1|'C',	dir_right,"Arrow right"},
 	{SPEC1|'D',	dir_left,"Arrow left"},
 	{SPEC|'C',	dir_right,"spec c"},

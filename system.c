@@ -118,8 +118,8 @@ int view_functions(int nused)
  // FILEBUF *old_cbfp;
  // struct stat st;
  int status;
- char tag_cmd[256];
- char tag_file[256];
+ char tag_cmd[1024];
+ char tag_file[MAXFLEN];
  char *kind="fs";
  char *title="Select tag";
  if(nused==2) { kind="f";title="Select function";};
@@ -129,12 +129,12 @@ int view_functions(int nused)
 	msg_line("view_functions");
 	events_flush();
 	// create the tag file
-	status=snprintf(tag_file,256,"%s.tag",cbfp->b_fname);
+	status=snprintf(tag_file,MAXFLEN,"%s.tag",cbfp->b_fname);
 	if(status>=256) { msg_line("string overflow 1 in view_functions");events_flush();return false;};
 
-	status=snprintf(tag_cmd,256,"ctags -x --c-kinds=%s %s 2>err1 | awk '{print $3,$6,$7 $8 $9}' > %s 2>/dev/null",kind,cbfp->b_fname,tag_file);
-	if(status>=256) { msg_line("string overflow 2 in view_functions");events_flush();return false;};
-	// MESG("tag_cmd=[%s]",tag_cmd);
+	status=snprintf(tag_cmd,MAXFLEN,"ctags -x --c-kinds=%s %s 2>err1 | awk '{printf \"%%4s %%s %%s %%s %%s %%s %%s\\n\", $3,$6,$7,$8,$9,$10,$11}' > %s 2>/dev/null",kind,cbfp->b_fname,tag_file);
+	if(status>255) { msg_line("string overflow 2 in view_functions");events_flush();return false;};
+
 	status=system(tag_cmd);
 	if(status!=0) {
 		// MESG("view_functions: status=%d",status);
@@ -146,7 +146,7 @@ int view_functions(int nused)
 	char **function_array=read_sarray(tag_file,&size);
 	// MESG("we have %ld functions",size);
 	if(size>0){
-	int j1=selectl(title,function_array,size,10,5,1,60,-1);
+	int j1=selectl(title,function_array,size,20,5,1,60,-1);
 	// MESG("selected %d",j1);
 
 	if(j1>=0) {

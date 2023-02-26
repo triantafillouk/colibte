@@ -425,7 +425,7 @@
 | ^Y              | toggle_mouse         |  ALT-Y
 | ALT-Z           | set_bg               |  ALT-Z
 | ALT->           | eof                  |  ALT->
-| ALT-<           | bof                  |  ALT-<
+| ALT-\<           | bof                  |  ALT-\<
 | ALT {           | both_up              |  ALT-{
 | ALT }           | both_down            |  ALT-}
 | ALT-=           | refresh_cline        |  ALT-=
@@ -470,8 +470,8 @@
 | ^XT             | set_bmark            |  ^XT
 | ^XU             | redo                 |  ^XU
 | ^XZ             | set_bg               |  ^XZ
-| ^X[             | prev_paragraph       |  ^X[
-| ^X]             | next_paragraph       |  ^X]
+| ^X\[             | prev_paragraph       |  ^X\[
+| ^X\]             | next_paragraph       |  ^X\]
 | ^X!             | exec                 |  ^X!
 | ^X#             | filter_buffer        |  ^X#
 | ^X&             | bg_cmd               |  ^X&

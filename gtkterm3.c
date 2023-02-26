@@ -259,9 +259,10 @@ create_parent (void)
   popup_select_off = create_top_menu( &m_select_off, parent, accel_group);
   popup_boxed_region = create_top_menu( &m_boxed_region, parent, accel_group);
   popup_sort_menu = create_top_menu( &m_sort, parent, accel_group);
+#if	0
   popup_tag_menu = create_top_menu( &m_notes_tag, parent, accel_group);
   popup_notes_menu = create_top_menu( &m_note_popup, parent, accel_group);
-
+#endif
   if((int)bt_dval("use_titlebar")){
 	  create_main_menu(parent_title_bar, parent, &m_topn,accel_group);
 //	  GtkWidget * tb = new_toolbar(parent,parent_title_bar,main_toolbar,0,GTK_ICON_SIZE_SMALL_TOOLBAR,2);

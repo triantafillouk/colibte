@@ -199,7 +199,7 @@ extern int h_type[];
 /* create message string */
 #define SMESG(format,...) { \
     stat=snprintf(s,width, format, ##__VA_ARGS__);\
-	s[stat]=0; /* this is needed because snprintf does not guarantee a 0 at the end of the string */ \
+	if(stat>width)	s[stat]=0; /* this is needed because snprintf does not guarantee a 0 at the end of the string */ \
 	sm[i++]=strdup(s);\
 	sm[i]=NULL;\
 	if(drv_type>0) MESG("show_info: %s",s);\
@@ -216,7 +216,7 @@ int show_info(int n)
  char s1[256];
  FILEBUF *bp=cbfp;
  int i=0;
- int width=64;
+ int width=80;
  char **sm = malloc(128*sizeof(char *));
  int b_typ = bp->b_type % NOTE_TYPE;
  int stat;
@@ -1116,8 +1116,9 @@ int clipboard_paste(ClipBoard *clip)
 
 void reset_region_textpoints()
 {
-	textpoint_set(cwp->w_smark,0);
-	textpoint_set(cwp->w_emark,0);
+	textpoint_set(cwp->w_smark,tp_offset(cwp->tp_current));
+	textpoint_set(cwp->w_emark,tp_offset(cwp->tp_current));
+	cwp->selection=0;
 }
 
 
@@ -1966,6 +1967,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	if(temp_used) {
 		// MESG("remove temporary %s",name);
 		unlink(name);
+		bf->b_state |= FS_VIEW;
 	};
 //	show_time("ifile: end ok",0);
 	bf->line_to = tp_line(bf->tp_text_end);

@@ -126,7 +126,8 @@ double  show_time(char *description,int init)
 	{
 	if(init==0) snprintf(sout,512,"[%35s] %d,%06d  %d,%06d --------",description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
 	else snprintf(sout,512,"[%35s] %d,%06d  %d,%06d",description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
-	if(xwin && discmd) MESG("%s",sout);
+	// if(xwin && discmd) MESG("%s",sout);
+	// MESG("%s",sout);
 	out_print(sout,1);
 	};
 

@@ -137,12 +137,9 @@ int main(int argc, char **argv)
 			) 	
 			{
 				dofile(startfile);
-				// MESG("startfile executed!");
 			};
 		} else {
-			MESG("do startfile");
 			dofile(startfile);
-			// MESG("startfile done!");
 		};
 		// MESG("show errors");
 		if(err_num) {	/* show any errors in start file!!  */

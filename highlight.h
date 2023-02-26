@@ -27,9 +27,23 @@ int comment_sql(int n);
 
 
 /* character states */
+#if	1
 #define HS_LINESTART	1
 #define HS_PREVAST		2
-#define HS_PREVACCENT	3
+#define HS_PREVSLASH	4
+#define HS_PREVESC		8
+#define HS_PSMALLER		16
+#define HS_END1			32
+#define HS_END2			64
+#define	HS_SPEC			128	// special
+#define HS_QMARK		256
+#define HS_ES2			512
+#define HS_LETTER		1024	// alpha
+#define HS_PREVSPACE	2048
+#define HS_TAG			4096
+#else
+#define HS_LINESTART	1
+#define HS_PREVAST		2
 #define HS_PREVSLASH	4
 #define HS_PREVESC		5
 #define HS_PSMALLER		6
@@ -37,15 +51,11 @@ int comment_sql(int n);
 #define HS_END2			8
 #define	HS_SPEC			9	// special
 #define HS_QMARK		10
-#define HS_Q1			11
-#define HS_S0			20
-#define	HS_S1			21
-#define HS_S2			22
-#define HS_S3			23
-#define HS_ES1			24
 #define HS_ES2			25
 #define HS_LETTER		30	// alpha
 #define HS_PREVSPACE	64
+#define HS_TAG			128
+#endif
 	/* inserted script language  */
 
 /* flags */
@@ -84,6 +94,7 @@ void highlight_ecl(int c);
 void highlight_sql(int c);
 void highlight_matlab(int c);
 void highlight_cmd(int c);
+void highlight_gtext(int c);
 void highlight_rust(int c);
 void highlight_tags(int c);
 void highlight_sln(int c);
@@ -271,7 +282,7 @@ char *pascal_extensions[] = {"PASCAL","pas",""};
 char *postscript_extensions[] = {"POSTSCRIPT","ps",""};
 char *python_extensions[] = {"PYTHON","py","pyw","wsgi",""};
 char *basic_extensions[] = {"BASIC","bas",""};
-char *jscript_extensions[] = {"JAVASCRIPT","js","jenkinsfile","cs","jsm","_js",""};
+char *jscript_extensions[] = {"JAVASCRIPT","js","jenkinsfile","cs","jsm","_js","ts",""};
 char *asp_extensions[] = {"ASP","asp",""};
 char *java_extensions[] = {"JAVA","java","jnlp",""};
 char *php_extensions[] = {"PHP","php","php3","php4","phtm","ctp",""};
@@ -314,7 +325,7 @@ SHLIGHT hts[] = {
  { "MAN",1,0,none_w,none_w, highlight_text,update_highlight,c_incword,man_extensions,comment_none },
  { "M4",0,0,none_w,none_w, highlight_text,update_highlight,c_incword,m4_extensions,comment_none },
  { "INFO",1,0,none_w,none_w, highlight_text,update_highlight,c_incword,info_extensions,comment_none },
- { "GTEXT",1,0,none_w,none_w, highlight_cmd,update_highlight_line,c_in_txt_word,gtxt_extensions,comment_perl },
+ { "GTEXT",1,0,none_w,none_w, highlight_gtext,update_highlight_line,c_in_txt_word,gtxt_extensions,comment_perl },
  { "PYTHON",0,1,python_w,python_w1, highlight_python,update_highlight,c_incword,python_extensions,comment_perl },
  { "BASIC",1,0,basic_w,basic_w1, highlight_other,update_highlight,c_incword,basic_extensions,comment_basic },
  { "WML",1,0,wml_w,wml_w1, highlight_html,update_highlight,c_incword,wml_extensions,comment_html },

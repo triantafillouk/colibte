@@ -9,6 +9,7 @@
 #include "xe.h"
 
 extern FILEBUF *cbfp;
+#define	MD_NOTES	1
 
 /* ----- other utility functions ------ */
 #if	TNOTES
@@ -20,15 +21,17 @@ extern int scratch_files[];
 notes_struct *init_note();
 int get_current_tag_id();
 char *get_current_tag_name();
-void show_token();
 
 int insert_preamble(FILEBUF *fp,int type)
 {
  char date_header[MAXSLEN];
  if(fp->b_note==NULL) fp->b_note=init_note();
 
- sprintf(date_header,"#Date: %s",date_string(2));
 
+#if	MD_NOTES
+	insert_string_nl(fp,"---");
+#endif
+	sprintf(date_header,"#Date: %s",date_string(2));
 	date_header[strlen(date_header)-1]=0;	/* remove new line at the end!  */
 	insert_string_nl(fp,date_header);
 
@@ -39,27 +42,39 @@ int insert_preamble(FILEBUF *fp,int type)
 			insert_string_nl(fp,"#Title: ");
 			insert_string_nl(fp,"#Category: ");	/* Directory!  */
 			insert_string_nl(fp,"#Tags: ");
+#if	!MD_NOTES
 			insert_string_nl(fp,"");
-			
+#endif			
 			};break;
 		case 2: {	/* calendar note */
 			strcpy(fp->b_note->n_name,fp->b_fname);
-			 strcat(fp->b_note->n_name,".cal");
+#if	MD_NOTES
+			strcat(fp->b_note->n_name,"_cal.md");
+#else
+			strcat(fp->b_note->n_name,".cal");
+#endif
 			strcpy(fp->b_note->n_date,fp->b_fname);
 			insert_string_nl(fp,"# ");
-//			insert_string_nl(fp,"");
 			};break;
 		case 3: {	/* todo note */
 			strcpy(fp->b_note->n_name,fp->b_fname);
-			 strcat(fp->b_note->n_name,".todo");
+#if	MD_NOTES
+			strcat(fp->b_note->n_name,"_todo.md");
+#else
+			strcat(fp->b_note->n_name,".todo");
+#endif
 			strcpy(fp->b_note->n_date,fp->b_fname);
 			insert_string_nl(fp,"#Title: ");
 			// strcpy(date_header,"#  ");
 			insert_string_nl(fp,"#Tags: todo");
+#if	!MD_NOTES
 			insert_string_nl(fp,"");
-			insert_string_nl(fp,"");
+#endif
 			};break;
 	};
+#if	MD_NOTES
+	insert_string_nl(fp,"---");
+#endif
 	return(true);
 }
 
@@ -81,7 +96,11 @@ int new_note(int type)
  if(type<2) type=1;
  if(type==1) snprintf(scratch_name,24,"[note %d]",scratch_ind);
  if(type==2) { 
+#if	MD_NOTES
+	res=snprintf(scratch_name,24,"%s_cal.md",date_string(3));
+#else
 	res=snprintf(scratch_name,24,"%s.cal",date_string(3));
+#endif
 	if(res==25) MESG("cal name truncated");
  };
  if(type==3) { 
@@ -96,21 +115,28 @@ int new_note(int type)
 	insert_preamble(cbfp,type);
 	// goto name field
 	goto_bof(1);
+
 	if(type==1) {
 		cbfp->b_type=NOTE_TYPE;
-		next_line(1);
-		goto_eol(1);
 	};
 	if(type==2) {
 		cbfp->b_type=NOTE_CAL_TYPE+highlight_type("cal");
-		next_line(1);
-		goto_eol(1);
 	};
 	if(type==3) {
 		cbfp->b_type=NOTE_TODO_TYPE+highlight_type("todo");
-		next_line(1);
-		goto_eol(1);
 	}
+
+#if	MD_NOTES
+	int type=0;
+	set_highlight(cbfp,highlight_index("MD",&type));
+#endif
+
+#if	MD_NOTES
+	next_line(2);
+#else
+	next_line(1);
+#endif
+	goto_eol(1);
 
 	// MESG("new_note: b_type=0x%X",cbfp->b_type);
 	set_hmark(0,"new_note:");
@@ -174,6 +200,74 @@ offs find_str_reol(FILEBUF *fp, offs start, char *needle_string, char *return_st
 	};
 	return ptr;
 }
+
+int c_in_tag(byte c)
+{
+	if(c=='#') return FALSE;
+	if(c=='_') return TRUE;
+	if(c>34 && c<39) return TRUE;
+	if(c>='a' && c<='z') return TRUE;
+	if(c>='A' && c<='Z') return TRUE;
+	if(c>=128 && c<255) return TRUE;
+	return FALSE;
+}
+
+void add_infile_tags(FILEBUF *fp, offs start, char *return_string,int max_len)
+{
+ offs ptr=start;
+ // int found_tags=0;
+ int len=strlen(return_string);
+ int prev_ok=1;
+ // MESG("add_infile_tags: start=%ld",start);
+ while(!FEofAt(fp,ptr)) {
+	byte ch=FCharAt(fp,ptr);
+	// MESG("	check %c at %ld",ch,ptr);
+	if(ch=='#' && prev_ok) {
+		// MESG("	found # at %ld",ptr);
+		ptr++;
+		if(!FEofAt(fp,ptr)) {
+			ch=FCharAt(fp,ptr);
+			// MESG("	found ch=%c at %ld",ch,ptr);
+			if(c_in_tag(ch) ) {
+				// add next word to tags;
+				// MESG("	add  %c to tag ptr=%ld",ch,ptr);
+				if(len>=max_len) return;
+				int len1=len;
+				if(len>0) return_string[len++]=',';
+				return_string[len++]=ch;
+				// MESG("	0 add [%c]",ch);
+				// found_tags++;
+				ptr++;
+				while(!FEofAt(fp,ptr)) {
+					ch=FCharAt(fp,ptr);
+					if(ch<33) { 
+						// MESG("	end if tag at %ld",ptr);
+						ptr++;
+						break;
+					};
+					if(!c_in_tag(ch)) {
+						ptr++;
+						return_string[len1]=0;
+						len=len1;
+						break;
+					};
+					if(len>max_len) { return_string[len1]=0;return;};
+					return_string[len++]=ch;
+					// MESG("	2 add [%c]",ch);
+					ptr++;
+				};
+				return_string[len]=0;
+				// MESG("	added tag -> [%s]",return_string);
+			} 
+		} else break;
+	} else {
+		ptr++; 
+		if(ch<33) prev_ok=1;else prev_ok=0;
+	};
+ };
+ // MESG("infile tags %d result [%s]",found_tags,return_string);
+}
+
 #endif
 
 #if	TNOTES
@@ -337,7 +431,7 @@ char *query_string(sqlite3 *db,char *sql,int *index)
  sqlite3_stmt *res;
  int step;
  static char return_string[512];
-// MESG("query string: [%s]",sql);
+ // MESG("query string: [%s]",sql);
  *index=0;
 
  stat = sqlite3_prepare_v2(db, sql, -1, &res, 0);
@@ -347,7 +441,7 @@ char *query_string(sqlite3 *db,char *sql,int *index)
 	if(step==SQLITE_ROW) {
 		strcpy(return_string,(char *)sqlite3_column_text(res,0));
 		*index = sqlite3_column_int(res,1);;
-		// MESG("query_string: result: %s row=%d",return_string,*index);
+		MESG("query_string: result: %s row=%d",return_string,*index);
 		sqlite3_finalize(res);
 		return return_string;
 	} else {
@@ -416,10 +510,12 @@ int sql_exec(sqlite3 *db, char *sql,int ignore)
  };
  return true;
 }
+int opened_files=0;
 
 void notes_db_close(sqlite3 *db)
 {
 	// MESG("notes_db_close:>");
+	opened_files--;
 	sqlite3_close(db);
 }
 
@@ -428,16 +524,18 @@ sqlite3 * notes_db_open()
  char db_file_name[256];
  sqlite3 *db;
  set_bfname(db_file_name,NOTES_DBFILE);
- // MESG("notes_db_open:<");
+ // MESG("notes_db_open:< [%s] opened=%d",db_file_name,opened_files);
  if(sqlite3_open(db_file_name,&db)!=SQLITE_OK) {
 	msg_line("Notes db [%s]: %s",db_file_name,sqlite3_errmsg(db));
-	notes_db_close(db);
-	init_notes_db(1);
-	if(sqlite3_open(db_file_name,&db)!=SQLITE_OK){
-		error_line("Cannot create Notes db [%s]: %s",db_file_name,sqlite3_errmsg(db));
-		return NULL;
-	};
- };
+	// notes_db_close(db);
+	return NULL;
+	if(init_notes_db(1)) {
+		if(sqlite3_open(db_file_name,&db)!=SQLITE_OK){
+			error_line("Cannot create Notes db [%s]: %s",db_file_name,sqlite3_errmsg(db));
+			return NULL;
+		};
+	} else return NULL;
+ } else opened_files++ ;
  return db;
 }
 
@@ -448,10 +546,11 @@ int save_to_db(notes_struct *note)
  int stat=false;
  int note_id=0;
  if((db=notes_db_open())==NULL) return false;
- // MESG("save_to_db: title [%s]",note->n_title);
+ MESG("save_to_db: title [%s] cat=[%s] name=[%s]",note->n_title,note->n_cat,note->n_name);
  // check if found
  if(snprintf(sql,1024,"SELECT Category,rowid from notes where Name = '%s';",note->n_name)>=1024) {
  	ERROR("%s","Notes name too long!");
+	notes_db_close(db);
 	return false ;
  };
 // MESG("	check if old, [%s]",sql);
@@ -466,7 +565,8 @@ int save_to_db(notes_struct *note)
 	//	MESG("--- new tag list ----");
 	while((tag = *ta++)!=NULL) {
 		string_2_nospaces(tag);
-//		MESG("	- new tag  [%s]",tag);
+		if(tag[0]=='#') tag++;
+		// MESG("	- new tag  [%s]",tag);
 	}; 
  
  // MESG("save_to_db: note_id=%d name=[%s] cat=[%s] new_cat=[%s]",note_id,note->n_name,note->n_cat,new_cat);
@@ -474,21 +574,25 @@ int save_to_db(notes_struct *note)
 	// MESG("same note file! update [%s]/[%s]",new_cat,note->n_name);
 
 	// delete all old tags (no check!!)
+	// MESG("	- Delete old tags!");
 	sprintf(sql,"delete from tags where note_id = %d;",note_id);
 	if(!sql_exec(db,sql,0)){
 		error_line("Cannot delete old tags!");
 	};
 
 	// save new tags
+	// MESG("	- Save new tags!");
 	ta = current_tag_array;
 	while((tag = *ta++)!=NULL) {
+		if(tag[0]=='#') tag++;
+		// MESG("	real! tag %s",tag);
 		save_tag(db,note_id,tag);
 	};
-	// update the title and date if changed!
+	// update the title and date if[MCP7 changed!
 	if(snprintf(sql,1024,"UPDATE notes set Title = \"%s\" where rowid = %d",note->n_title,note_id)>=1024) {
 		MESG("Title truncated!");
 	} ;
-	MESG("update title sql=[%s]",sql);
+	// MESG("update title sql=[%s]",sql);
 	if(!sql_exec(db,sql,0)){
 		error_line("Cannot update title");
 	};
@@ -524,8 +628,9 @@ int save_to_db(notes_struct *note)
  	if(new_note_id) {
 		char **ta=current_tag_array;
 		char *tag;
-
+		// MESG("create tags!");
 		while((tag = *ta++)!=NULL) {
+			if(tag[0]=='#') tag++;
 			save_tag(db,new_note_id,tag);
 		};
  	} else stat=false;
@@ -599,9 +704,13 @@ int parse_note(FILEBUF *fp)
 		// MESG("	--- NOTE_CAL_TYPE:fname=[%s]",fp->b_fname);
 		strcpy(note->n_name,fp->b_fname);
 		strcpy(note->n_date,fp->b_fname);
-		// MESG("parse_note: n_date=[%s]",note->n_date);
+		// MESG("parse_note: calendar:  n_date=[%s] n_name=[%s]",note->n_date,note->n_name);
 		if(strlen(note->n_name)==0)	{
+#if	MD_NOTES
+			if(snprintf(note->n_name,sizeof(note->n_name),"%s_cal.md",fp->b_fname)>sizeof(note->n_name)) MESG("note name truncated!");
+#else
 			if(snprintf(note->n_name,sizeof(note->n_name),"%s.cal",fp->b_fname)>sizeof(note->n_name)) MESG("note name truncated!");
+#endif
 		};
 		// MESG("parse_note:2 n_name=[%s]",note->n_name);
 		ptr = find_str_reol(fp,ptr,"# ",note->n_title,sizeof(note->n_title));
@@ -617,6 +726,8 @@ int parse_note(FILEBUF *fp)
 			if(strlen(note->n_tags)>0) strncat(note->n_tags,",",sizeof(note->n_tags));
 			strncat(note->n_tags,"calendar",sizeof(note->n_tags));
 		};
+		// MESG("start infile 1");
+		add_infile_tags(fp,ptr,note->n_tags,sizeof(note->n_tags));
 		return true;
 	};
 
@@ -627,28 +738,36 @@ int parse_note(FILEBUF *fp)
 			note=fp->b_note=init_note();
 			strcpy(note->n_name,fp->b_fname);
 			strcpy(note->n_date,fp->b_fname);
-			// MESG("parse_note:1 n_name=[%s]",note->n_name);
+			// MESG("parse_note: todo:  n_date=[%s] n_name=[%s]",note->n_date,note->n_name);
 		};
 
 		if(strlen(note->n_name)==0)	{
+#if	MD_NOTES
+			if(!strstr(fp->b_fname,"_todo.md")){
+				if(snprintf(note->n_name,sizeof(note->n_name),"%s_todo.md",fp->b_fname)>sizeof(note->n_name)) MESG("note name truncated!");
+			} else {
+				if(snprintf(note->n_name,sizeof(note->n_name),"%s",fp->b_fname)>sizeof(note->n_name)) MESG("note name truncated!");
+			};
+#else
 			if(snprintf(note->n_name,sizeof(note->n_name),"%s.todo",fp->b_fname)>sizeof(note->n_name)) MESG("note name truncated!");
+#endif
 		};
-		// ptr = find_str_reol(fp,ptr,"#Name: ",note->n_name,sizeof(note->n_name));
-
-		MESG("todo, name [%s]",note->n_name);
+		// MESG("todo, name [%s]",note->n_name);
 		ptr = find_str_reol(fp,ptr,"#Title: ",note->n_title,sizeof(note->n_title));
 		if(ptr==0) errors++;
-		MESG("	title = %s",note->n_title);
+		// MESG("	title = %s",note->n_title);
 		strcpy(note->n_cat,"todo/");
 		memcpy(note->n_cat+5,fp->b_fname,4);note->n_cat[9]=0;
-		MESG("	category [%s]",note->n_cat);
+		// MESG("	category 2 todo [%s]",note->n_cat);
 		note->n_tags[0]=0;
 		ptr = find_str_reol(fp,ptr,"#Tags:",note->n_tags,sizeof(note->n_tags));
 		if(!strstr(note->n_tags,"todo")){
 			if(strlen(note->n_tags)>0) strncat(note->n_tags,",",sizeof(note->n_tags));
 			strncat(note->n_tags,"todo",sizeof(note->n_tags));
 		};
-		MESG("	tags: [%s]",note->n_tags);
+		// MESG("	tags: [%s]",note->n_tags);
+		// MESG("start infile 2");
+		add_infile_tags(fp,ptr,note->n_tags,sizeof(note->n_tags));
 		return true;
 	};
 
@@ -658,17 +777,23 @@ int parse_note(FILEBUF *fp)
 		char *start_cat_name = NULL;
 		if((start_cat_name = strstr(fp->b_dname,"calendar")) !=NULL) {
 			sprintf(note->n_tags,"calendar");
-			if(strstr(fp->b_fname,".cal")) strcpy(note->n_name,fp->b_fname);
+			if(strstr(fp->b_fname,".cal")||strstr(fp->b_fname,"_cal.md")) strcpy(note->n_name,fp->b_fname);
 			// MESG("calendar note: date=[%s]",note->n_date);
 		} else 
 		if((start_cat_name = strstr(fp->b_dname,"todo")) !=NULL) {
 			sprintf(note->n_tags,"todo");
 			// MESG("todo note: %s",note->n_date);
+#if	1
+			strcpy(note->n_cat,"todo/");
+			memcpy(note->n_cat+5,fp->b_fname,4);note->n_cat[9]=0;
+			strcpy(note->n_name,fp->b_fname);
+#else
 			strcpy(note->n_cat,"todo");
 			if(strstr(fp->b_fname,"todo")) strcpy(note->n_name,fp->b_fname);
-			// MESG("	set n_cat=%s n_name=%s",note->n_cat,note->n_name);
+#endif
+			// MESG("	todo set n_cat=%s n_name=%s",note->n_cat,note->n_name);
 		} else { 
-			// MESG("not a note,calendar,todo!");
+			MESG("not a note,calendar,todo!");
 		};
 	if(ptr==0) {
 		errors++;
@@ -691,17 +816,21 @@ int parse_note(FILEBUF *fp)
 			MESG("### parse error, category is empty!");
 			return false;
 		};
-		// MESG(";set cat=%s name=%s errors=%d",note->n_cat,note->n_name,errors);
+		// MESG("	- parse_note:4 cat=%s name=%s errors=%d",note->n_cat,note->n_name,errors);
 		if(errors>2) return false;
+		// MESG("start infile 3");
+		add_infile_tags(fp,ptr,note->n_tags,sizeof(note->n_tags));
 		return(true);
 	};
-
+	// MESG("check name at %ld",ptr);
+	if(strlen(note->n_name)==0) {
 	ptr = find_str_reol(fp,ptr,"#Name: ",note->n_name,sizeof(note->n_name));
-	if(ptr==0 && (strlen(note->n_tags)==0)) {
-		MESG("!		name not found!, set to %s",fp->b_fname);
-		if(snprintf(note->n_name,sizeof(note->n_name),"%s",fp->b_fname)>=sizeof(note->n_name)) MESG("note name truncated");
+		if(ptr==0 && (strlen(note->n_tags)==0)) {
+			MESG("!		name not found!, set to %s",fp->b_fname);
+			if(snprintf(note->n_name,sizeof(note->n_name),"%s",fp->b_fname)>=sizeof(note->n_name)) MESG("note name truncated");
+		};
 	};
-
+	// MESG("check title at %ld",ptr);
 	ptr = find_str_reol(fp,ptr,"#Title: ",note->n_title,sizeof(note->n_title));
 	if(ptr==0 ) {
 		// MESG("	title not found!");
@@ -709,7 +838,7 @@ int parse_note(FILEBUF *fp)
 		if(ptr==0 ) {
 			strcpy(note->n_title,"No title");
 			if((strlen(note->n_tags)==0)) {
-				MESG("### parse error, No title, no tags!");
+				MESG("### parse error, No title!");
 				return false;
 			};
 		};
@@ -719,24 +848,26 @@ int parse_note(FILEBUF *fp)
 	if(ptr==0) {
 	errors++;
 	if(strlen(note->n_cat)==0) {
-		char *cat=strstr(fp->b_dname,"Notes");
+		char *cat=strstr(fp->b_dname,NOTES_DIR0);
+			// MESG("	cat 5 %s",cat);
 		if(cat-fp->b_dname==strlen(fp->b_dname)) {
 			MESG("wrong category dir name=[%s] category=[%s]",fp->b_dname,cat);
 			return false;
 		};
 		if(cat!=NULL) {
-			cat+=6;
+			cat+=strlen(NOTES_DIR0)+1;
 			strcpy(note->n_cat,cat);
+			// MESG("	cat 5 %s",note->n_cat);
 		};
 	}} else { 
 #if	1
 	// TODO . check if category is same as dir when recreating database!!!
-		char *cat=strstr(fp->b_dname,"Notes");
+		char *cat=strstr(fp->b_dname,NOTES_DIR0);
 		if(cat) {
-		cat+=6;
+		cat+=strlen(NOTES_DIR0)+1;
 		
 		if(strcmp(note->n_cat,cat)) {
-			MESG("	! dir=[%s] cat=[%s] cat will be %s",cat,note->n_cat,cat);
+			// MESG("	! cat 6 dir=[%s] cat=[%s] cat will be %s",cat,note->n_cat,cat);
 			strcpy(note->n_cat,cat);
 		};
 		};
@@ -744,6 +875,9 @@ int parse_note(FILEBUF *fp)
 	};
 	// MESG("parse_note: Category = [%s] dir=%s name=[%s]",note->n_cat,fp->b_dname,fp->b_fname);
 	ptr = find_str_reol(fp,ptr,"#Tags: ",note->n_tags,sizeof(note->n_tags));
+
+	// MESG("start infile 4");
+	add_infile_tags(fp,ptr,note->n_tags,sizeof(note->n_tags));
 
 	// MESG("parse_note: tags = [%s]",note->n_tags);
 	if(string_is_empty(note->n_cat)) {
@@ -758,7 +892,7 @@ int parse_note(FILEBUF *fp)
 	};
 
 	if(string_is_empty(note->n_tags)) {
-		MESG("!	parse_note: tags string is empty!");
+		// MESG("!	parse_note: tags string is empty!");
 #if	0
 		goto_bof(1);
 		next_line(4);goto_eol(1);
@@ -776,9 +910,12 @@ int parse_note(FILEBUF *fp)
 
 void set_notes_subdir(char *dname,char *subdir)
 {
+	// MESG("set_notes_subdir:[%s],[%s]",dname,subdir);
 	set_bfname(dname,NOTES_DIR);
-	strcat(dname,"/");
-	strcat(dname,subdir);
+	if(strlen(subdir)>0) {
+		strcat(dname,"/");
+		strcat(dname,subdir);
+	};
 }
 
 int save_note()
@@ -786,7 +923,7 @@ int save_note()
  int status=0;
  FILEBUF *fp=cbfp;
  notes_struct *note;
- MESG("save_note:");
+ // MESG("save_note:0");
 	if((!parse_note(fp))) {
 		// msg_line("%s not a note file!",fp->b_fname);
 		return false;
@@ -803,7 +940,7 @@ int save_note()
 	// create category subdir if not present!
 	set_notes_subdir(fp->b_dname,fp->b_note->n_cat);
 
-	MESG("save_note: dir path [%s][%s]",fp->b_dname,fp->b_fname);
+	// MESG("save_note:1 dir path [%s][%s]",fp->b_dname,fp->b_fname);
 	struct stat statd;
 	if(stat(fp->b_dname,&statd)) {
 		status=mkdirRecursive(fp->b_dname,S_IRWXU);
@@ -811,19 +948,21 @@ int save_note()
 			return error_line("cannot create notes dir!");
 		};
 	};
-	// MESG("save_note:1: b_fname=[%s]",fp->b_fname);
-	// MESG("save_note:2: n_name=[%s]",note->n_name);
-	// MESG("save_note:3: n_title=[%s]",note->n_title);
+	// MESG("save_note:2: b_fname=[%s]",fp->b_fname);
+	// MESG("save_note:3: n_name=[%s]",note->n_name);
+	// MESG("save_note:4: n_title=[%s]",note->n_title);
 	strcpy(fp->b_fname,note->n_name);
  	if(fp->b_fname[0]!=CHR_LBRA){
 		// MESG("save_note: add to recent!");
 		add_to_recent_list(get_buf_full_name(fp));
 	};
-	// MESG("save_note: dir=[%s]",fp->b_dname);
+	// MESG("save_note:5 dir=[%s]",fp->b_dname);
 	status=chdir(fp->b_dname);
 	if(writeu1(fp->b_fname,fp)) {
 		// MESG("test1 ------------- write1 ok!");
 		status=save_to_db(note);
+	} else {
+		MESG("cannot write file!");
 	};
 	return true;
 }
@@ -941,14 +1080,14 @@ int init_notes_db(int n)
 
 //	MESG("init_notes_db: sqlite3 version is %s",sqlite3_libversion());
 	if((db=notes_db_open())==NULL) return false;
-
+	// MESG("init_notes_db: db file opened!");
 	char *sql = "DROP TABLE IF EXISTS notes;"\
 				"CREATE TABLE notes(Id int primary key, Name TEXT, Title TEXT, Date TEXT, Category TEXT, Encrypt int);"\
 				"DROP TABLE IF EXISTS tag;"\
 				"CREATE TABLE tag(Id int primary key, Name TEXT unique);"\
 				"DROP TABLE IF EXISTS tags;"\
 				"CREATE TABLE tags(Tag_id int, Note_id int)";
-
+	// MESG("init sql is [%s]",sql);
 	stat = sqlite3_exec(db, sql, 0,0, &err_msg);
 	if(stat != SQLITE_OK) {
 		error_line("sql error: %s",err_msg);
@@ -985,7 +1124,7 @@ int recreate_notes_db(int n)
 	sprintf(tmp_file,"/tmp/notes_contents.out");
 	sprintf(cmd,"find -L %s  >%s 2>/dev/null",notes_dir,tmp_file);
 	status = system(cmd);
-	if(status!=0) { return error_line("cannot read notes directory!");};
+	if(status!=0) { return error_line("cannot read notes directory %s!",notes_dir);};
 	sync();
 	int size=0;
 	int dirs=0;
@@ -996,7 +1135,6 @@ int recreate_notes_db(int n)
 	for(i=0 ;notes_files[i]!=NULL;i++){
 		struct stat st;
 		// MESG("---- insert %d: [%s]",i,notes_files[i]);
-		// show_token();
 		if(!stat(notes_files[i],&st))
 		{
 			int flen=strlen(notes_files[i]);
@@ -1008,25 +1146,25 @@ int recreate_notes_db(int n)
 			};
 			if(!S_ISDIR(st.st_mode)) {
 				FILEBUF *bp;
-				// msg_line("!! %3d insert: [%s]",i,notes_files[i]);
+				MESG("  %3d insert: [%s]",i,notes_files[i]);
+				
 				notes_struct *s_note;
 				// FILEBUF *current_buffer=cbfp;
 				bp=new_filebuf(notes_files[i],0);
 				bp->b_note = init_note();
 				// select_filebuf(bp);
 				activate_file(bp);
-				// MESG("#%3d: go parse %s",i,notes_files[i]);
+				MESG("  #%3d: go parse %s",i,notes_files[i]);
 				if(!parse_note(bp)) {
 					msg_line(" file [%s] Not a note file !!!!!!!!!!!!",notes_files[i]);
 					delete_filebuf(bp,1);
 					// select_filebuf(current_buffer);
-					// show_token();
 					MESG("- skip file [%s]",notes_files[i]);
 					notes_skipped++;
 					continue;					
 				};
 				s_note=bp->b_note;
-				// MESG("%3d: add - n=[%s] title=[%s] cat=[%s] tags=[%s]",i,s_note->n_name,s_note->n_title,s_note->n_cat,s_note->n_tags);
+				MESG("  %3d: add - n=[%s] title=[%s] cat=[%s] tags=[%s]",i,s_note->n_name,s_note->n_title,s_note->n_cat,s_note->n_tags);
 				status=save_to_db(s_note);
 				notes_new++;
 				// select_filebuf(current_buffer);
@@ -1035,11 +1173,9 @@ int recreate_notes_db(int n)
 			} else {
 				dirs++;
 				// select_filebuf(current_buffer);
-				// show_token();
 				// MESG("- skip, %s this is dir",notes_files[i]);
 			};
 		} else {
-			// show_token();
 			MESG("- skip file that cannot stat file %s",notes_files[i]);
 			notes_skipped++;
 		};
@@ -1135,7 +1271,8 @@ int show_category_list(char *category)
 	sprintf(sql_get_todo_tag,"SELECT rowid from tag where name = '%s';",category);
 	tag_id = query_rowid(db,sql_get_todo_tag);
 	// MESG("category id %d",tag_id);
-	if(tag_id<1) return 0;
+	
+	if(tag_id<1) {notes_db_close(db);return 0;};
 	sprintf(sql,"SELECT rowid,DATE,TITLE FROM NOTES where rowid in (select note_id from tags where tag_id = %d);",tag_id);
 	if(strlen(category)>55) category[55]=0;
 	snprintf(buffer_name,64,"[%s view]",category);
@@ -1157,6 +1294,7 @@ int show_category_list(char *category)
 	cat_view->b_flag = FSNCALENDAR;
 
 	cat_view->dir_list_str = query_string_columns(db,sql,widths);
+	notes_db_close(db);
 	cat_view->b_notes = cat_view->dir_list_str->size;
 	// MESG("todo entries %d",cat_view->b_notes);
 	cat_view->b_state = FS_VIEW|FS_ACTIVE;
@@ -1201,6 +1339,7 @@ int show_tag_view(int n)
 	};
 	empty_list(tag_view->dir_list_str);
 	tag_view->dir_list_str = query_string_columns(db,sql_note_str("SELECT ROWID,NAME,CATEGORY,TITLE FROM NOTES"),notes_widths);
+	notes_db_close(db);
 
 	cwp->current_note_line=0;
 	cwp->top_note_line=0;
@@ -1478,6 +1617,7 @@ char *get_current_tag_name()
  sprintf(sql,"SELECT name,rowid from tag where rowid = %d",tag_id);
 
  tag_name = query_string(db,sql,&tag_id);
+ notes_db_close(db);
 
  return tag_name;
 }
@@ -1506,12 +1646,19 @@ char *get_current_note_name()
  // MESG("get_current_note_name: note_id=%d",note_id);
 
  sprintf(full_name,"SELECT category,rowid from notes where rowid = %d",note_id);
+ // MESG("	category,rowid = [%s]",full_name);
+ // MESG("	NOTES_DIR=[%s]",NOTES_DIR);
  if(snprintf(notes_name,1024,"%s/%s/",NOTES_DIR,query_string(db,full_name,&note_id))>=1024) {
  	ERROR("notes file name too long, truncated!"); ; 
  };
+ // MESG("	notes_name = [%s]",notes_name);
  sprintf(full_name,"SELECT name,rowid from notes where rowid = %d",note_id);
+ // MESG("	full_name = [%s]",full_name);
 
  strcat(notes_name,query_string(db,full_name,&note_id));
+ notes_db_close(db);
+
+ // MESG("	notes_name = [%s]",notes_name);
 
  set_bfname(full_name,notes_name);
  return full_name;
@@ -1520,7 +1667,7 @@ char *get_current_note_name()
 
 int edit_note(int n)
 {
- // MESG("edit_note:");
+  // MESG("edit_note:");
   char *full_name = get_current_note_name();
  
  if(full_name==NULL) {
@@ -1528,7 +1675,7 @@ int edit_note(int n)
 	return false;
  };
  FILEBUF *bp;
-	MESG("edit_note:[%s] n=%d b_type=%d",full_name,n,cbfp->b_type);
+	// MESG("edit_note:[%s] n=%d b_type=%d",full_name,n,cbfp->b_type);
 	if(edit_file(full_name)) return true;
 	
 	if((bp=new_filebuf(full_name,0))==NULL) {
@@ -1541,9 +1688,13 @@ int edit_note(int n)
 	bp->connect_line = cwp->current_tag_line;
 	bp->connect_column = cwp->current_note_line;
 	
-	if(!strncmp(".cal",bp->b_fname+(strlen(bp->b_fname)-4),4)){
+	if(!strncmp(".cal",bp->b_fname+(strlen(bp->b_fname)-4),4) 
+		|| !strncmp("_cal.md",bp->b_fname+(strlen(bp->b_fname)-7),7) 
+		){
 		bp->b_type|=NOTE_CAL_TYPE;
-	} else if(!strncmp(".todo",bp->b_fname+(strlen(bp->b_fname)-4),4)){
+	} else if(!strncmp(".todo",bp->b_fname+(strlen(bp->b_fname)-5),5)
+			||!strncmp("_todo.md",bp->b_fname+(strlen(bp->b_fname)-8),8))
+		{
 		bp->b_type|=NOTE_TODO_TYPE;
 	} else bp->b_type|=NOTE_TYPE;
 
@@ -1590,19 +1741,19 @@ int delete_noteid(int note_id)
 	// MESG("delete_noteid: %d",note_id);
 		if((db=notes_db_open())==NULL) return false;
 	
-			// delete note
-			sprintf(sql_str,"DELETE FROM NOTES WHERE rowid = %d",note_id);
-			// MESG("sql [%s]",sql_str);
-			if(!sql_exec(db,sql_str,0)) {
-				error_line("cannot delete note %d",note_id);
-			};
-			// in any case delete correspondig tags entries
-			sprintf(sql_str,"DELETE FROM TAGS WHERE note_id = %d",note_id);
-			if(!sql_exec(db,sql_str,0)) {
-				error_line("cannot delete note_id %d from tags!",note_id);
-			};
+		// delete note
+		sprintf(sql_str,"DELETE FROM NOTES WHERE rowid = %d",note_id);
+		// MESG("sql [%s]",sql_str);
+		if(!sql_exec(db,sql_str,0)) {
+			error_line("cannot delete note %d",note_id);
+		};
+		// in any case delete correspondig tags entries
+		sprintf(sql_str,"DELETE FROM TAGS WHERE note_id = %d",note_id);
+		if(!sql_exec(db,sql_str,0)) {
+			error_line("cannot delete note_id %d from tags!",note_id);
+		};
 
-			notes_db_close(db);
+		notes_db_close(db);
 
 		return true;
 	} else return false;
@@ -1744,7 +1895,7 @@ int set_notes_key(int n)
 	char b_key[MAXSLEN];
 	int status=1;
 	b_key[0]=0;
-	MESG("set_notes_key:");
+	// MESG("set_notes_key:");
 	status = nextarg("Notes Encryption String: ", b_key, MAXSLEN,false);
 //	disinp = odisinp;
 	if (status != TRUE)  return(status);

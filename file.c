@@ -26,6 +26,14 @@ extern MENUS m_sort;
 extern MENUS *start_menu;
 extern FILEBUF *cbfp;
 
+char *uncompress_command[] = {
+#if	DARWIN
+	"","gzcat","unzip -l","bzcat","gzcat","bzcat","bzcat","zcat -l",""
+#else
+	"","zcat","unzip -l","bzcat","gzcat","bzcat","bzcat","zcat -l",""
+#endif
+};
+
 /* local define functions */
 int add_to_recent_list(char *full_file_name);
 int is_encrypt(int file_id);
@@ -115,7 +123,7 @@ int next_file(int n)
 int activate_file(FILEBUF *bp)
 {
 	if(bp->b_dname[0]!=0) if(chdir(bp->b_dname)!=0) return false;
-	MESG("activate_file:[%s] b_type=%d b_flag=%X",bp->b_fname,bp->b_type,bp->b_flag);
+	// MESG("activate_file:[%s] b_type=%d b_flag=%X",bp->b_fname,bp->b_type,bp->b_flag);
 	if ((bp->b_state & FS_ACTIVE) ==0)
 	{	
 //		MESG("active_file: is not active, activate it!");
@@ -746,7 +754,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	int dir_num=0;
 	int is_scratch=0;
 	create_base_name(base_name,bname);
-	MESG("new_filebuf:base_name=[%s] bname=[%s]",base_name,bname);
+	// MESG("new_filebuf:base_name=[%s] bname=[%s]",base_name,bname);
 	dir_name[0]=0;
 	is_scratch = scratch_ind(base_name);
 
@@ -911,7 +919,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->err=-1;
 	bp->m_mode=0;
 	bp->dir_num=dir_num;
-	bp->sort_mode=-1;
+	bp->sort_mode=0;
 	bp->utf_accent=0;
 #if	CRYPT
 	bp->b_key[0]=0;
@@ -977,7 +985,7 @@ FILEBUF *cls_fout(char *bname)
  	lbegin(window_list);
 	while((wp=(WINDP *)lget(window_list))!=NULL) {
 		if(wp->w_fp==bp){
-			set_update(wp,UPD_FULL);
+			set_update(wp,UPD_EDIT);
 		};
 	};
 	return bp;
@@ -1120,7 +1128,7 @@ int open_file(int n)
  int err=0;
  int stat=0;
  int line=0;
- MESG("open_file: %d",n);
+ // MESG("open_file: %d",n);
 	fname[0]=0;
 	set_list_type(LDIR);
 	if(n>0) {
@@ -1608,34 +1616,15 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
 
 	int ftype = file_type(fname, &tc, oext);
 	bp->b_type |= ftype;
-	// MESG("init_ftype: check tc %d b_type=%d",tc,bp->b_type);
+	// MESG("init_ftype: check tc %d b_type=%d [%s] [%s] oext=[%s]",tc,bp->b_type,hts[FX_COMPRESS].file_extentions[tc],uncompress_command[tc],oext);
 
 	if(tc) {
-		if(!strcmp(hts[FX_COMPRESS].file_extentions[tc],"zip")) {
-			snprintf(cmd,MAXLLEN,"unzip -l %s > /tmp/uncompressed 2>/tmp/err",fname);
+			snprintf(cmd,MAXLLEN,"%s %s > /tmp/uncompressed 2>/tmp/err",uncompress_command[tc],fname);
 			if(system(cmd)) strlcpy(fname,"/tmp/err",MAXFLEN);
 			else  strlcpy(fname,"/tmp/uncompressed",MAXFLEN);
-			*temp_used=1;
-		};
-		if(!strcmp(hts[FX_COMPRESS].file_extentions[tc],"gz")) {
-			snprintf(cmd,MAXLLEN,"zcat %s > /tmp/uncompressed 2>/tmp/err",fname);
-			if(system(cmd)) strlcpy(fname,"/tmp/err",MAXFLEN);
-			else  strlcpy(fname,"/tmp/uncompressed",MAXFLEN);
-			*temp_used=2;
-		};
-		if(!strcmp(hts[FX_COMPRESS].file_extentions[tc],"Z")) {
-			snprintf(cmd,MAXLLEN,"zcat %s > /tmp/uncompressed 2>/tmp/err",fname);
-			if(system(cmd)) strlcpy(fname,"/tmp/err",MAXFLEN);
-			else  strlcpy(fname,"/tmp/uncompressed",MAXFLEN);
-			*temp_used=3;
-		}
-		if(!strcmp(hts[FX_COMPRESS].file_extentions[tc],"bz2")) {
-			snprintf(cmd,MAXLLEN,"bzcat %s > /tmp/uncompressed 2>/tmp/err",fname);
-			if(system(cmd)) strlcpy(fname,"/tmp/err",MAXFLEN);
-			else  strlcpy(fname,"/tmp/uncompressed",MAXFLEN);
-			*temp_used=4;
-		};
+			*temp_used=tc;
 	};
+
 	// open the file
 	bp->file_id = open(fname,O_RDONLY);
 	if(bp->file_id<3) {

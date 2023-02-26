@@ -224,7 +224,7 @@ double get_env(int vnum)
 		case EVSEARCH:	strlcpy(svalue,search_pattern,MAXLLEN);break;
 		case EVREPLACE:	strlcpy(svalue,replace_pattern,MAXLLEN);break;
 		case EVCTIME:	strlcpy(svalue,time2a(),MAXLLEN);break;
-		case EVMATCH:	strlcpy(svalue,(patmatch == NULL)? "": patmatch,MAXLLEN);
+		case EVMATCH:	strlcpy(svalue,patmatch,MAXLLEN);
 		case EVCURCOL:	v1 = FColumn(cbfp,Offset()); break;
 		case EVCURLINE: v1 = getcline();break;
 		case EVCURPOS: v1 = Offset();	break;
@@ -655,7 +655,7 @@ int exec_named_function(char *name)
 	/* construct the buffer name */
 	bufn[0] = CHR_LBRA;
 	strlcat(bufn, "]",MAXFLEN);
-//	MESG("exec_named_function: name=%s bufn=%s",name,bufn);	
+	// MESG("exec_named_function: name=%s bufn=%s",name,bufn);	
 	/* find the pointer to that buffer */
     if ((bp=get_filebuf(bufn,NULL,FSINVS)) == NULL) 
 	{
@@ -733,17 +733,14 @@ int dofile(char *fname)
 	if((bp=get_filebuf(bname,NULL,0))==NULL) { // file not in memory, load it!
 		if ((bp = new_filebuf(bname, 0)) == NULL) /* get the needed buffer */
 			return(FALSE);
-	// MESG("dofile: 01");
 
 	/* and try to read in the file to execute */
 		if(cbfp == NULL) cbfp=bp;
 		// MESG("dofile: 10 %s",fname);
 		if ((status = file_read1(bp,fname)) != TRUE) {
-			// MESG("dofile: status=%d",status);
 			return(status);
 		};
 	} else {
-		// MESG("dofile: 02");
 		if((bp->b_state & FS_ACTIVE)==0) {
 			activate_file(bp);
 			if ((status = file_read1(bp,fname)) != TRUE) {
@@ -1184,7 +1181,7 @@ int create_function_buffer(FILEBUF *pbuf,char *function_name,offs start_function
  char bname[MAXFLEN];
  char *function_block;
  int function_size=0;
-
+	// MESG("create_function_buffer:");
 	bname[0] = CHR_LBRA;
 	strlcpy(bname+1,function_name,250);
 	insert_bt_element(bt_table,bname+1,TOK_PROC,0);	/* insert in main table  */
@@ -1203,6 +1200,9 @@ int create_function_buffer(FILEBUF *pbuf,char *function_name,offs start_function
 	insert_string(macrobuf,function_block,function_size);
 	efree(function_block,"function_block");
 
+	// set buffer type to cmd
+	macrobuf->b_type=1;
+	// MESG("created sub file [%s] type %d",pbuf->b_fname,pbuf->b_type);
 	return(1);
 }
 

@@ -758,9 +758,8 @@ int text_mouse_function(int move)
 
 		if(wp) { 
 			if(wp!=cwp) {
-				set_current_window(wp,"text_mouse_function");
-				update_status();
-				update_screen(FALSE);
+				// MESG("mouse changed window!");
+				change_window(wp);
 				return -1;
 			} else {
 			// MESG("text_mouse_function: move=%X",move);
@@ -788,17 +787,17 @@ int text_mouse_function(int move)
 			return -1;
 		};
 	} else {
-	
-	set_current_window(wp,"mouse in window");
-
+	if(wp!=cwp) {
+		// MESG("change window with mouse!");
+		// reset_region_textpoints();
+		set_mark(0);
+		change_window(wp);
+	};
 	/* We are in an editors window */
 	mouse_window_row = mousey - wp->gwp->t_ypos;
 	mouse_window_col = mousex - wp->gwp->t_xpos - wp->w_infocol;
 	// MESG("	r=%d c=%d",mouse_window_row,mouse_window_col);
 	if(move>KMOUSE_RELEASE) {
-
-
-
 		mouse_started_in_rline=0;
 		start_line=0;
 		start_col=0;

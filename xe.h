@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.58T18 (14/12/2022)"
+#define VERSION 	"#01.58T37 (26/02/2023)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -249,6 +249,7 @@ typedef long long num;
 #define	CHR_RBRA	']'			/* right bracket  */
 #define	CHR_DQUOTE	'"'			/* double quote  */
 #define	CHR_SQUOTE	'\''		/* single quote  */
+#define CHR_BQUOTE	'`'			/* back single quote  */
 #define	CHR_BSLASH	'\\'		/* back slash  */
 #define CHR_PARL		'('
 #define CHR_PARR		')'
@@ -442,7 +443,8 @@ typedef struct MLQUOTES {
 #define	H_QUOTE10	512	/* light background, rest of the line  */
 #define	H_QUOTE11	1024/* toggle light background */
 #define H_QUOTE12	2048
-#define H_UTFERR	4096	/* Utf8 error  */
+#define H_LINESEP	4096
+#define H_UTFERR	8192	/* Utf8 error  */
 
 #define H_WORD1		10	/* found word type1  */
 #define	H_WORD2		11	/* found word type2  */
@@ -788,7 +790,12 @@ typedef struct dir_l {
  } dir_l;
 
 struct kdirent {
-	struct stat t;
+	// struct stat t;
+	long int mtime;
+	long int ctime;
+	long int atime;
+	off_t	st_size;
+	mode_t st_mode;
 	char d_name[1];
 };
 

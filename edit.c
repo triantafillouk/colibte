@@ -281,7 +281,12 @@ int goto_line(num n)
 	arg[0]=0;
 	if ((nextarg("Go to line : ", arg, MAXSLEN,true)) != TRUE) 	return(FALSE);
 	if(macro_exec!=MACRO_MODE2) n = get_val();
-	set_update(cwp,UPD_MOVE);
+	if(cbfp->b_flag & FSNLIST) {
+		cwp->current_note_line=n;
+		if(n>cbfp->b_notes) cwp->current_note_line=cbfp->b_notes-1;
+		set_update(cwp,UPD_MOVE);
+		return(OK_CLRSL);
+	}
 	return(igotolinecol(n,1,0));
 }
 
@@ -298,6 +303,7 @@ int goto_bof(int n)
 		set_update(cwp,UPD_WINDOW);
 		return (OK_RSTGOAL);
 	} else 
+#endif
 	if(cbfp->b_flag & FSNOTESN || cbfp->b_flag & FSNLIST) {
 		if(cwp->current_note_line==0) return FALSE;
 		cwp->current_note_line=0;
@@ -306,7 +312,6 @@ int goto_bof(int n)
 		msg_line(time2a());
 		return (OK_RSTGOAL);
 	};
-#endif
 	set_Offset(0);
 	undo_set_noglue();
 	if(execmd) return (OK_CLRSL);
@@ -328,10 +333,10 @@ int dont_edit()
 /*  Assigned to "ALT->".*/
 int goto_eof(int n)
 {
-// MESG("goto_eof: b_flag=%X",cbfp->b_flag);
-#if	TNOTES
 	int headline=(cbfp->b_header!=NULL);
 	int toline=0;
+// MESG("goto_eof: b_flag=%X",cbfp->b_flag);
+#if	TNOTES
 
 	if(cbfp->b_flag==FSNOTES) {
 		cwp->goal_column=0;
@@ -349,6 +354,8 @@ int goto_eof(int n)
 		set_update(cwp,UPD_WINDOW);
 		return (OK_CLRSL);
 	} else 
+	// MESG("next_page: toline=%d col=%d",toline,cwp->goal_column);
+#endif
 	if(cbfp->b_flag& FSNLIST) {
 		cwp->goal_column=0;
 		toline=cbfp->b_notes-headline;
@@ -358,8 +365,6 @@ int goto_eof(int n)
 		msg_line(time2a());
 		return (OK_CLRSL);
 	}
-	// MESG("next_page: toline=%d col=%d",toline,cwp->goal_column);
-#endif
 	set_Offset(FSize(cbfp));
 	if(execmd) return (OK_CLRSL);
 	undo_set_noglue();

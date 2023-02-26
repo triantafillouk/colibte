@@ -6,10 +6,10 @@
 
 	DIR mode functions 
 */
-
 #include	"xe.h"
 #include	<sys/stat.h>
 #include	<sys/types.h>
+#include	<dirent.h>
 #include	<glib.h>
 #include	<pwd.h>
 #include	<grp.h>
@@ -33,23 +33,125 @@ extern int dont_edit();
 extern alist *file_list;
 extern FILEBUF *cbfp;
 
+#define	SORT_FUNC	0	/* Use different functions for dir sorting  */
+#define MAXSTAT	100000	/* Do not sort dir if more files  */
+
 /* local function declarations */
 int list_dir(char *dir_name,FILEBUF *fp);
+
+#if	SORT_FUNC
+typedef int (*DIR_CMPF)(struct kdirent *a,struct kdirent *b);
+#endif
+
 void qsort_dir(struct kdirent **arr, int elements,int sort_mode);
 char **getdir(char *dirname,char *s_find,int *num);
+char *str_efile(struct kdirent *entry);
 char *str_tfile(struct stat *t,char *file_name,int maxsize);
 FILEBUF *get_dir_buffer(int flag,int dir_num);
 int dir_other_reload(int n);
 void escape_file_name(char *fname);
 void delete_current_list_line();
+int stricmp1(const char *str1, const char *str2);
 
 int pdline=-1;
-int current_sort_mode=-1;
+int current_sort_mode=0;
 
 typedef       int     (*Fintss)(const char *, const char *);
 
  /* This is used in dired mode dates */
-char *month[] = { "Jan", "Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","error" };
+char *month[] = { "Jan", "Feb","Mar","Apr", "May","Jun","Jul","Aug","Sep","Oct","Nov","Dec","error",NULL };
+
+#if	SORT_FUNC
+typedef int (*DIR_CMPF)(struct kdirent *a,struct kdirent *b);
+
+static int dir_cmp_name(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(stricmp1((const char *) a->d_name,(const char *) b->d_name));
+}
+
+static int dir_cmp_name_rev(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(stricmp1((const char *) b->d_name,(const char *) a->d_name));
+}
+
+static int dir_cmp_size(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(a->st_size > b->st_size ? 1:-1);	/* modification time  */
+}
+
+static int dir_cmp_size_rev(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(a->st_size < b->st_size ? 1:-1);	/* modification time  */
+}
+
+static int dir_cmp_mtime(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(a->mtime > b->mtime? 1:-1);	/* modification time  */
+}
+
+static int dir_cmp_mtime_rev(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(a->mtime < b->mtime? 1:-1);	/* modification time  */
+}
+
+static int dir_cmp_atime(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(a->atime > b->atime? 1:-1);	/* modification time  */
+}
+
+static int dir_cmp_atime_rev(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(a->atime < b->atime? 1:-1);	/* modification time  */
+}
+
+static int dir_cmp_ctime(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(a->ctime > b->ctime? 1:-1);	/* modification time  */
+}
+
+static int dir_cmp_ctime_rev(struct kdirent *a,struct kdirent *b)
+{
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+ return(a->ctime < b->ctime? 1:-1);	/* modification time  */
+}
+
+DIR_CMPF dir_cmp_array [] = {
+	dir_cmp_name,dir_cmp_name_rev,
+	dir_cmp_size,dir_cmp_size_rev,
+	dir_cmp_mtime,dir_cmp_mtime_rev,
+	dir_cmp_atime,dir_cmp_atime_rev,
+	dir_cmp_ctime,dir_cmp_ctime_rev
+};
+#endif
 
 void convert_to_windows_name(char *fname)
 {
@@ -150,26 +252,36 @@ int stricmp1(const char *str1, const char *str2)
     return 0 ;
 }
 
+#if	!SORT_FUNC
 // directory compare, first the directories, then the files
-int dir_cmp(struct kdirent *a, struct kdirent *b,int sort_mode)
+static inline int dir_cmp(struct kdirent *a, struct kdirent *b,int sort_mode)
 {
- if (((a->t.st_mode & S_IFMT) != S_IFDIR) && ((b->t.st_mode & S_IFMT) == S_IFDIR)) return 1;
- if (((a->t.st_mode & S_IFMT) == S_IFDIR) && ((b->t.st_mode & S_IFMT) != S_IFDIR)) return -1;
+#if	1
+// first the directories !
+ if (((a->st_mode & S_IFMT) != S_IFDIR) && ((b->st_mode & S_IFMT) == S_IFDIR)) return 1;
+ if (((a->st_mode & S_IFMT) == S_IFDIR) && ((b->st_mode & S_IFMT) != S_IFDIR)) return -1;
+#else
+// categorize by file mode
+ if( a->st_mode != b->st_mode) {
+	return(a->st_mode > b->st_mode? 1:-1);
+ };
+#endif
  switch(sort_mode){
 	case 0: return(stricmp1((const char *) a->d_name,(const char *) b->d_name));
 	case 1: return(stricmp1((const char *) b->d_name,(const char *) a->d_name));
-	case 2: return(a->t.st_size > b->t.st_size? 1:-1);
-	case 3: return(a->t.st_size < b->t.st_size? 1:-1);
-	case 4: return(a->t.st_mtime > b->t.st_mtime? 1:-1);	/* modification time  */
-	case 5: return(a->t.st_mtime < b->t.st_mtime? 1:-1);	/* reverse modification time  */
-
-	case 6: return(a->t.st_ctime > b->t.st_ctime? 1:-1);	/* status change time  */
-	case 7: return(a->t.st_ctime < b->t.st_ctime? 1:-1);	/* status change reverse time  */
-	case 8: return(a->t.st_atime > b->t.st_atime? 1:-1);	/* access time  */
-	case 9: return(a->t.st_atime < b->t.st_atime? 1:-1);	/* reverse access time  */
+	case 2: return(a->st_size  > b->st_size? 1:-1);
+	case 3: return(a->st_size  < b->st_size? 1:-1);
+	case 4: return(a->mtime > b->mtime? 1:-1);	/* modification time  */
+	case 5: return(a->mtime < b->mtime? 1:-1);	/* reverse modification time  */
+	case 6: return(a->ctime > b->ctime? 1:-1);	/* status change time  */
+	case 7: return(a->ctime < b->ctime? 1:-1);	/* status change reverse time  */
+	case 8: return(a->atime > b->atime? 1:-1);	/* access time  */
+	case 9: return(a->atime < b->atime? 1:-1);	/* reverse access time  */
  };
  return 0;
 }
+#endif
+
 
 /* returns the directory contents with filter in a string list */
 /* used mainly in open file,list_dir1 in curses/xlib */
@@ -201,19 +313,19 @@ char **getdir(char *dirname,char *s_find,int *num)
 
 int set_sort_mode(int mode)
 {
+ int old_sort_mode=current_sort_mode;
  int current_sort_mode=cwp->w_fp->sort_mode;
- // MESG("set_sort_mode: current=%d",current_sort_mode);
+ // MESG("set_sort_mode: current=%d mode=%d",current_sort_mode,mode);
  if(!(cwp->w_fp->b_flag & FSDIRED)) return true;
-	if(mode==current_sort_mode) 
-	{	/* reverse sort  */
-		if(current_sort_mode%2) current_sort_mode-=1;
-		else current_sort_mode+=1;
-	} else {
-		current_sort_mode=mode;
-	} ;
+
+	if(mode==-1) {
+		if((current_sort_mode%2)==0) current_sort_mode++;
+		else current_sort_mode--;
+	} else current_sort_mode=mode;
+
 	cwp->w_fp->sort_mode=current_sort_mode;
 	// MESG("	new sort mode=%d",current_sort_mode);
-	// if(sort_mode != old_mode) 
+	if(current_sort_mode != old_sort_mode) 
 	{
 		dir_reload(1);
 	};
@@ -243,10 +355,53 @@ int change_sort_mode(int mouse_col)
 	return 0;
 }
 
+int update_line(int size)
+{
+	istr **row_data = (istr **)array_data(cbfp->dir_list_str);
+	istr *current_str = row_data[cwp->current_note_line];
+	char *line_str = &current_str->start;
+	// MESG("update_line: [%s]",line_str);
+	char num[16];
+	sprintf(num,"%d",size);
+	memset(line_str+3,' ',10);
+	memcpy(line_str+(13-strlen(num)),num,strlen(num));
+	// MESG("update_line: [%s]",line_str);
+	set_update(cwp,UPD_EDIT);
+	return 0;
+}
+
+// count dir size
+int dir_size(int n)
+{
+ int num_of_files=0; /* no of files in directory */
+ DIR *d1;
+ struct dirent *df1;
+ char dir_name[MAXFLEN];
+ int ftype = dir_getfile(dir_name,0);
+ msg_line("check dir_size");
+ // MESG("ftype=%d [%s]",ftype,dir_name);
+ if(ftype==2) {
+ d1 = opendir(dir_name);
+ if(d1==NULL) { return error_line("cant open dir %s",dir_name);return 0;};
+ // Find how many files in the dir
+ while((df1=readdir(d1))!=NULL) {
+ 	num_of_files++;
+	if((num_of_files%500000)==0) msg_line("count %d",num_of_files); 
+ };
+ closedir(d1);
+ num_of_files-=2;
+ // MESG("dir size is %d",num_of_files);
+ update_line(num_of_files);
+ msg_line("dir size is %d",num_of_files);
+ };
+ return num_of_files; 
+}
+
+
 /* this is a local scandir. Not all operating systems use the BSD one! */
 int scandir2(char *dirname, struct kdirent ***namelist_a)
 {
- int num_of_files; /* no of files in directory */
+ int num_of_files=0; /* no of files in directory */
  struct kdirent **namelist;
  DIR *d1;
  struct dirent *df1;
@@ -260,37 +415,56 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
  if(d1==NULL) { return error_line("cant open dir %s",dirname);};
  if(chdir(dirname)) { return error_line("cant open dir %s",dirname);};
 
+ // Find how many files in the dir
+ while((df1=readdir(d1))!=NULL) num_of_files++;
+ namelist = (struct kdirent **)malloc(((num_of_files+1)*sizeof(struct kdirent *)));
+ // MESG("number_of_files %ld size %d",num_of_files,((num_of_files+1)*sizeof(struct kdirent *)));
+ rewinddir(d1);
+ // show_time("scan_dir: start",0);
  for(i=0;;i++) {
  	df1=readdir(d1);
 
-	if(i%256 == 0) {
-	 namelist = (struct kdirent **)realloc((void *)namelist, ((i+256)*sizeof(struct kdirent *)));
+	if(df1==NULL) { closedir(d1);break;};
+	// MESG(" - %3d: %5d l=%d t=%d %d %d [%s]",i,df1->d_ino,df1->d_reclen,df1->d_type,sizeof(struct stat),sizeof(struct kdirent),df1->d_name);
+	// MESG(" - %3d: %5d l=%d t=%d 0x%X 0x%X [%s]",i,df1->d_ino,df1->d_reclen,df1->d_type,DT_DIR << 12,S_IFDIR,df1->d_name);
+	int len=strlen(df1->d_name)+1;
+	namelist[i]=(struct kdirent *)malloc(sizeof(struct kdirent)+len);
+	if(namelist[i]==NULL) {
+			closedir(d1);
+			return(0);
 	};
-	if(df1==NULL) { num_of_files=i; closedir(d1);break;};
-	if(namelist==NULL) { return error_line("cant create directory namelist");};
-
-	namelist[i]=(struct kdirent *)malloc(sizeof(struct kdirent)+strlen(df1->d_name)+1);
-	if(namelist[i]==NULL) exit(1);
-	strlcpy(namelist[i]->d_name,df1->d_name,strlen(df1->d_name)+1);
-	result=lstat(namelist[i]->d_name,&t);
-	if(result) {
-		ERROR("[%30s]Error    %d ",namelist[i]->d_name,errno);
-		t.st_dev=0;
-		t.st_ino=0;
-		t.st_mode=0;
-		t.st_uid=0;
-		t.st_blksize=0;
-		t.st_blocks=0;
-		t.st_atime=0;
-		t.st_ctime=0;
-		memcpy(&namelist[i]->t,&t,sizeof(struct stat));
-	} else {
-		memcpy(&namelist[i]->t,&t,sizeof(struct stat));
-	};
+	strlcpy(namelist[i]->d_name,df1->d_name,len);
+	if(num_of_files>MAXSTAT) {
+		namelist[i]->st_mode=df1->d_type << 12;
+		namelist[i]->st_size=len;
+		namelist[i]->mtime=0;
+		namelist[i]->atime=0;
+		namelist[i]->ctime=0;
+	} else {	
+		result=lstat(namelist[i]->d_name,&t);
+		if(result) {
+			ERROR("[%30s]Error    %d ",namelist[i]->d_name,errno);
+			namelist[i]->st_mode=0;
+			namelist[i]->st_size=0;
+			namelist[i]->mtime=0;
+			namelist[i]->atime=0;
+			namelist[i]->ctime=0;
+		} else {
+			namelist[i]->st_mode  = t.st_mode;
+			namelist[i]->mtime    = t.st_mtime;
+			namelist[i]->ctime    = t.st_ctime;
+			namelist[i]->atime    = t.st_atime;
+			namelist[i]->st_size  = t.st_size;
+		};
+	}
  } ;
-   namelist[i]=NULL;
-   qsort_dir(namelist,num_of_files,current_sort_mode);
-   *namelist_a = namelist;
+ // show_time("scan_dir: end",1);
+ namelist[i]=NULL;
+ if(num_of_files<MAXSTAT)qsort_dir(namelist,num_of_files,current_sort_mode);
+ else msg_line("dir too big to sort contains %d files",num_of_files);
+
+ *namelist_a = namelist;
+ // show_time("after sort:",1);
  return(num_of_files);
 }
 
@@ -300,7 +474,10 @@ void qsort_dir(struct kdirent **arr, int elements,int s_mode)
   struct kdirent  *piv;
   int *beg, *end;
   int i=0, L, R ;
-//  MESG("qsort_dir: sort_mode=%d",s_mode);
+#if	SORT_FUNC
+  DIR_CMPF cmp_dir = dir_cmp_array[current_sort_mode];
+#endif
+ // MESG("qsort_dir: sort_mode=%d elements=%d",s_mode,elements);
   beg=(int *)malloc(sizeof(int)*(elements+1));
   end=(int *)malloc(sizeof(int)*(elements+1));
   beg[0]=0; end[0]=elements;
@@ -310,11 +487,19 @@ void qsort_dir(struct kdirent **arr, int elements,int s_mode)
       piv=arr[L]; 
       while (L<R) {
         while (
+#if	SORT_FUNC
+			cmp_dir(arr[R],piv) >= 0
+#else
 			dir_cmp( arr[R], piv,s_mode) >= 0
+#endif
 			&& L<R) R--; 
 		if (L<R) arr[L++]=arr[R];
         while (
+#if	SORT_FUNC
+			cmp_dir( arr[L], piv) <= 0
+#else
 			dir_cmp( arr[L], piv,s_mode) <= 0
+#endif
 			&& L<R) L++; 
 		if (L<R) arr[R--]=arr[L]; 
 	  }
@@ -940,7 +1125,7 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 		sstat=set_unique_tmp_file(wd,fname,MAXFLEN);
 		if(!sstat) return false;
 		/* This is a compressed file. Uncompress to a temporary first */
-		sstat=snprintf(cmd2,MAXLLEN,"zcat %s > %s 2>/tmp/err",fname,wd);
+		sstat=snprintf(cmd2,MAXLLEN,"gzcat %s > %s 2>/tmp/err",fname,wd);
 		// MESG("exec_ext: uncompress command $s",cmd2);
 		if(sstat<MAXLLEN) {
 			if(system(cmd2)) { return error_line("cannot decompress file");};
@@ -1024,7 +1209,11 @@ int dir_exec(int n)
   // MESG("dir_exec: ftype=%d",ftype);
 
   if(ftype==FTYPE_LINK || ftype<0) return FALSE;
-  status=exec_ext(fname,fname,FILE_EXEC);
+  if(ftype==FTYPE_DIRLINK || ftype==FTYPE_DIR) {
+	status = movein_dir(fname);
+  } else {
+	status=exec_ext(fname,fname,FILE_EXEC);
+  };
   return status;
 }
 
@@ -1528,6 +1717,7 @@ int dir_getfile(char *fname,int flag)
 			snprintf(fname,MAXFLEN,"%s %4d:",s_perms,perms);
 		};
 	} else {
+
 	 	strlcpy(fname,f1,MAXFLEN);
 	};
  } else {
@@ -1697,6 +1887,90 @@ if((t->st_mode & S_IXUSR \
  return str;
 }
 
+char *str_efile(struct kdirent *entry)
+{
+ static char str[256];
+ char lname[MAXLLEN];
+ char ssize[50];
+ char mt='?';
+ char mx1='-';
+ struct tm *t1;
+ int year;
+ int d_month;
+ int sstat=0;
+ 
+ mt='~';
+ lname[0]=0;
+// MESG("[%30s] st_mode=%d ifdir=%d",entry->d_name,t->st_mode & S_IFMT,S_IFDIR);
+ if((entry->st_mode & S_IFMT)==S_IFLNK) {
+ 	int i1;
+	memset(lname,0,MAXLLEN);
+	i1=readlink(entry->d_name,lname,MAXLLEN); 
+	if(i1>0){
+		struct stat t;
+		lname[i1]=0;
+		i1=stat(lname,&t);
+		if(i1<0) strlcat(lname," does not exist!",MAXLLEN);
+	} else {
+		snprintf(lname,MAXLLEN,"file error %d ...",errno);
+	};
+	mx1='l';
+ };
+
+ switch (entry->st_mode & S_IFMT) {
+ case S_IFLNK: mx1='l';break;
+ case S_IFBLK: mt='b';break;
+ case S_IFIFO: mt='f';break;
+ case S_IFREG: mt='-';break;
+ case S_IFDIR: mt='#';break;
+ case S_IFCHR: mt='c';break;
+#if	LINUX | FREEBSD | SOLARIS
+ case S_IFSOCK: mt='s';break;
+#endif
+ };
+
+if((entry->st_mode & S_IXUSR \
+ || entry->st_mode & S_IXGRP \
+ || entry->st_mode & S_IXOTH) && mx1=='-') mx1='x';
+
+ if(current_sort_mode>7) t1 = localtime(&entry->atime);
+ else if(current_sort_mode>5) t1 = localtime(&entry->ctime);
+ else t1 = localtime(&entry->mtime);
+ year = t1->tm_year;
+ if(year>99) year-=100;
+
+#if	LINUX | FREEBSD | SOLARIS
+ if(
+// 	mt=='?' || 
+ 	mt=='s') strcpy(ssize,"0");
+ else
+#endif
+ {
+	if(entry->st_size > 9999999999) {
+		double fsize=(double)entry->st_size/1000000000;
+		snprintf(ssize,50,"%.1f G",fsize);
+	} else 
+	if(entry->st_size > 9999999) {
+		double fsize=(double)entry->st_size/1000000;
+		snprintf(ssize,50,"%.1f M",fsize);
+	} else 
+ 	snprintf(ssize,50,"%llu",(unsigned long long)entry->st_size);
+ };
+ d_month=t1->tm_mon;
+ if(d_month>11) {
+	d_month=12;
+ };
+
+ if(lname[0]!=0) 
+ sstat=snprintf(str,255,"%c%c %10s %02d %3s %2d %02d.%02d %s --> %s",
+ 	mt,mx1,ssize,t1->tm_mday,month[d_month],year,t1->tm_hour,t1->tm_min,entry->d_name,lname);
+ else
+ sstat=snprintf(str,255,"%c%c %10s %02d %3s %2d %02d.%02d %s",
+ 	mt,mx1,ssize,t1->tm_mday,month[d_month],year,t1->tm_hour,t1->tm_min,entry->d_name);
+ if(sstat>255) MESG("truncated 11"); 
+ return str;
+}
+
 // insert file list in an editor window
 int insert_dir(FILEBUF *buf_dir,int retain)
 {
@@ -1728,21 +2002,19 @@ int insert_dir(FILEBUF *buf_dir,int retain)
  for(i=0;i<files_in_dir;i++)
  {
 	ff = namelist[i];
-  	fname=ff->d_name;
+  	fname=ff->d_name;// ff->
 	if(!strcmp(fname,".")) continue;
 	if(!strcmp(fname,"..")) continue;
 	istr *dir_istr;
-	fline=str_tfile(&ff->t,fname,250);
+
+	fline=str_efile(ff);
 	dir_istr = (istr *)malloc(sizeof(istr)+strlen(fline));
 	memcpy(&dir_istr->start,fline,strlen(fline)+1);
 	dir_istr->index = dir_ind++;
 	dir_istr->selected=0;
-#if	1
+
 	add_element_to_list((void *)dir_istr,dir_list_str);
-#else
-	insert_string(buf_dir,fline,strlen(fline));
-	if(i+1<files_in_dir) insert_newline(buf_dir);
-#endif
+
 	// MESG("[%s]",fline);
 	free(namelist[i]);	
  };

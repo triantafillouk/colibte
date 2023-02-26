@@ -823,6 +823,7 @@ char * resize_buffer(char *buffer,num old_size,num new_size)
  return new_allocation;
 }
 
+int line_sep=0;
 
 /* update line starting at offset start of specific window */
 offs vtline(WINDP *wp, offs tp_offs)
@@ -957,13 +958,14 @@ offs vtline(WINDP *wp, offs tp_offs)
 					snprintf(info_mask,11,"==");
 				}
 			};
-		}
+		};
+		line_sep=0;
 		if(syntaxh) 
 		{
 
 //	create mask for the whole line without tabs or special characters
 		offs p=ptr1;
-
+		
 		// col=0;
 		for(i=0;i<llen;i++) {
 			if(fp->b_lang == 0 && !utf8_error()) {
@@ -1158,11 +1160,16 @@ offs vtline(WINDP *wp, offs tp_offs)
 			vtputc(wp, FCharAt(fp,ptr1++));
 		}
 	};
-#if	0
-	if(get_selection()) {
-		bcol=COLOR_SELECT_BG;
+	// show a line separator (when highlight_md)
+	if(line_sep) {
+		VIDEO *vp=wp->vs[wp->vtrow];
+		for(wp->vtcol=first_column;wp->vtcol< wp->w_ntcols-first_column;wp->vtcol++){ 
+			vchar *vc = vp->v_text+wp->vtcol;
+
+			svwchar(vc,(utfchar *)"═",vc->bcolor,COLOR_COMMENT_FG);	/* double line separator */
+		};
 	};
-#endif
+
 	/* highlight according to evaluated mask */
 	if(syntaxh && slang)
 	{
@@ -1289,6 +1296,8 @@ void vtputwc(WINDP *wp, utfchar *uc)
 		return;
 	};
 
+	if(hquotem & H_LINESEP) line_sep=1;else line_sep=0;
+
 	if(syntaxh) {
 		wp->w_fp->hl->h_function(c); 
 	};
@@ -1393,6 +1402,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 				ctl_f=wp->w_fcolor;
 				break;			
 			case H_QUOTE11:
+				ctl_f=wp->w_fcolor;
 			case H_QUOTE11+H_QUOTE9:
 				ctl_b=COLOR_INACTIVE_BG;
 				break;		
@@ -1679,6 +1689,19 @@ int  show_position_info(int short_version)
 	  } else {
 		sstat=snprintf(str,MAXSLEN,"%s",get_notes_status());
 	  };
+	} else
+#else
+	if(cbfp->b_flag & FSDIRED) 
+	{
+		// MESG("show dir info");
+		if(!short_version) {
+			char finfo[MAXFLEN];
+		
+			sstat=dir_getfile(finfo,2);
+			sstat=snprintf(str,MAXSLEN,"%6lld|%s",getcline()+1,finfo);
+		} else {
+			sstat=snprintf(str,MAXSLEN,"%6lld",getcline()+1);
+		};
 	} else
 #endif 
 	{

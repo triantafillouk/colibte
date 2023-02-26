@@ -28,6 +28,7 @@ typedef struct tok_struct {
 		TFunction term_function;
 		EFunction cexpr_function;
 	};
+	FFunction directive;
 	union {	
 	struct BTNODE *tnode;
 	struct curl_struct *tcurl;
@@ -95,7 +96,7 @@ double lterm1_1();
 double lexpression_1();
 double assign1(int is_edenv);
 double command1();
-double exec_block1(int level);
+double exec_block1();
 double exec_sentence1();
 int check_next_token(int ind);
 int check_skip_token(int type);

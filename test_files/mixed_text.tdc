@@ -1,24 +1,26 @@
+# This is a text with code segments inside
 
+We must be able to correctly skip the document and parse the script parts
+The script starts and ends with 3 single back quotes at the start of the line
+For the moment the code parts are not correctly highlighted.
 
-# This is a comment in macro lang, not parses
-
-This is a mixed text document with embeded script portions.
-We must be able to correctly parse the document and the script parts
-; This apears with a different color (it starts with semicolon)
-! This also apears with a different color (it starts with !)
-
-{@
+```
 cls
-a=1
-a!=1	:   0.0
+a=1.1
+a!=1	:   1.0
 ;b=1	# This is else a comment, separator here is transparent
-! g=a+b:   2.0
-@}
+! g=a+b: 2.100000
+```
 
-This line is also not parsed! 
-# This line is partially parsed from here {@ b=33 @} to here!
+This line is not parsed, but part of the following line is.
 
-{@
-d=a+2*b:  67.0
-@}
-final result is 4
+# ` a=3.2 `
+# the second code segment in this example is below
+
+```
+d=a+2*b: 5.200000
+# this is a comment line in code
+print(d)
+```
+
+And this is also not considered as part of the code.

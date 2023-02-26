@@ -46,7 +46,7 @@ tok_struct *add_token(TLIST lex_parser,int tok_type,int cc,char *label)
 	tok=new_tok();
 	add_element_to_list((void *)tok,lex_parser);
 	tok->tnum=lex_parser->size-1;
-//	fprintf(stderr,"added token %3d: ind=%d type=[%s] [%s]\n",tok->tnum,cc,tok_name[tok_type],label);
+	// MESG("added token %3d: ind=%d type=[%s] [%s]",tok->tnum,cc,tok_name[tok_type],label);
  return tok;
 }
 
@@ -136,9 +136,13 @@ int getnstr1(FILEBUF *bf, int cc, char *str)
 	foffset++;
 	if(nc==CHR_BSLASH) { pbslash=1;continue;};
 	if(nc==cc && pbslash==0) break;
+	if(nc==CHR_LINE) break;
+	if(nc=='@') break;
+	// printf("%c %d ",nc,nc);
 	*s++ = nc;len++;
 	pbslash=0;
- }
+ };
+ // printf("\n");
  *s=0;
  return(len);
 }
@@ -210,7 +214,7 @@ double getnum1(FILEBUF *bf, int cc,tok_struct *tok)
 				return(vbd+vad);
 			}
 		} else { 
-			set_error(tok,104,"numeric error. variable cannot start with number");
+			set_error(tok,104,"wrong variable name, must start with a letter");
 			return(vbd+vad);
 		}
 		if(after_dot) {
@@ -263,7 +267,7 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 {
  double value=0;
- int cc;
+ int cc=0;
  char nword[256];
  int slen=0;
  int is_storelines=0;
@@ -286,12 +290,13 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int tok_type=0;
  int next_tok_type=0;
  int script_active=0;
+ // int bquotes=0;
 
-// MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
+ // MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
  if(
  	file_type_is("CMD",bf->b_type)
 	|| file_type_is("DOT",bf->b_type)
-	|| file_type_is("GTEXT",bf->b_type) 
+	// || file_type_is("GTEXT",bf->b_type) 
 	// || bf->b_type==0
  ) script_active=1;
 
@@ -332,22 +337,26 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
  while(getnc1(bf,&cc,&tok_type))
  {
- // MESG("	cc=%d type=%d %s ",cc,tok_type,tok_name[tok_type]);
+	if(script_active) {
+		if(tok_type==TOK_BQUOTE) { 
+			script_active=0;
+			continue;
+		}; 
+	} else {
+		if(tok_type==TOK_BQUOTE) {
+			script_active=1;
+			continue;
+		};
+		// if(tok_type==TOK_NL) {  MESG(" - newline in comment %d",tok_line);tok_line++;};
+		continue;
+	};
+#if	0
+ if(tok_type==TOK_NL) MESG(" - New line -------  type=%d %s line=%d",tok_type,tok_name[tok_type],tok_line);
+ MESG(" - %d [%c] type=%d %s line=%d",cc, cc,tok_type,tok_name[tok_type],tok_line);
+#endif
  if(err_num>0) return 0.0;
 	value=0;
 	nword[0]=0;
-#if	1
-	if(script_active==0) {
-		if(tok_type==TOK_LCURL) {
-			if(next_token_type(bf)==TOK_AT) {
-				getnc1(bf,&cc,&tok_type);
-				tok_type=TOK_START;
-				script_active=1;
-			} continue;
-		};
-		continue;
-	};
-#endif
 	switch(tok_type) {
 		case TOK_SEP:
 			if(is_now_sep) continue;
@@ -358,8 +367,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 
 		case TOK_NL: 
+			tok_line++;
 			if(cc!=';') {
-				tok_line++;
+				last_correct_line=tok_line;
 				skip_line1(bf,cc);
 				if(is_now_sep || after_rpar) continue;
 				is_now_sep=1;
@@ -379,18 +389,23 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			slen=getnword1(bf,cc,nword);
 			break;
 		case TOK_NUM:
+			// MESG("TOK_NUM: old num=%d type=%d name %s,new type %d ",tok->tnum,tok->ttype,tok->tname,tok_type);
 			value=getnum1(bf,cc,tok);
+			// MESG("TOK_NUM: num=%d type=%d val=%f",tok->tnum,tok->ttype,value);
+			// tok->tname = " numeric!! ";
 			if(err_num>0) return(0);
 			break;
 		case TOK_LCURL:
 			is_now_curl=1;
 			curl_level++;cc=0;
+			// MESG("left_curl: level=%d",curl_level);
 			break;
 		case TOK_RCURL:
 			{ 
 				curl_level--;cc=1;
 				if(curl_level<0) {err_num=102;err_str="curls dont match!";return(0);};
 				if(curl_level==store_level && is_storelines) {
+					// MESG(" TOK_RCURL: go create_function_buffer");
 					create_function_buffer(bf,proc_name,start_proc_offset,foffset);
 
 					tok->ttype=TOK_SEP;
@@ -409,6 +424,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 							break;
 						};
 						getnc1(bf,&cc,&tok_type);
+						if(tok_type==TOK_NL) tok_line++;
 					};
 					tok_type=TOK_RCURL;
 				};
@@ -435,6 +451,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			break;
 		case TOK_COMMENT:
 			skip_2nl(bf);
+			tok_line++;
 			continue;
 
 		case TOK_NOT:
@@ -462,14 +479,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				getnc1(bf,&cc,&tok_type);
 				tok_type=TOK_BIGGEREQ;
 			} break;
-#if	1
-		case TOK_AT:
-			if(next_token_type(bf)==TOK_RCURL) {
-				getnc1(bf,&cc,&tok_type);
-				tok_type=TOK_END;
-				script_active=0;
-			};continue;
-#endif
 		case TOK_AND:
 		case TOK_OR:
 		case TOK_XOR:
@@ -511,6 +520,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		case TOK_DIV:
 			break;
 		case TOK_ASSIGN:
+			// MESG("TOK_ASSIGN:");
 			if(next_token_type(bf)==TOK_ASSIGN) {
 				getnc1(bf,&cc,&tok_type);
 				tok_type=TOK_EQUAL;
@@ -524,13 +534,17 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				|| next_token_type(bf)==TOK_SPACE
 			) {
 				if(next_token_type(bf)==TOK_NL) tok_line++;
+				last_correct_line=tok_line;
 				getnc1(bf,&cc,&tok_type);
 				tok_type=TOK_COMMA;
 			};
 			};break;
-		case TOK_BQUOTE:
+		case TOK_AT:
 			slen=getnstr1(bf,cc,nword);
+			// printf("tok_at [%s] %d\n",nword, slen);
+			// printf("tok_at [%s]\n",(char *)tok->tname);
 			break;
+
 		case TOK_DOLAR:
 		case TOK_TILDA:
 		case TOK_BSLASH:
@@ -538,12 +552,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		default:
 			{
 			err_num=103;
-			err_line=tok_line;
+			if(tok_line) err_line=tok_line;else err_line=last_correct_line;
 			err_str="character unrecognised";
 			return(0);
 			};
 	};
-	// MESG("-- token type=%d %s",tok_type,tok_name[tok_type]);
+	// MESG("- token type=%d %s",tok_type,tok_name[tok_type]);
 	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {
 	if(!(is_now_sep && (tok_type==TOK_LCURL||tok_type==TOK_RCURL) )){
@@ -561,29 +575,31 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 	if(tok_type!=TOK_SEP) is_now_sep=0;
 	if(tok_type!=TOK_LCURL && tok_type!=TOK_RCURL) is_now_curl=0;
-	tok->tname=NULL;
+
 	tok->ttype=tok_type;
-//	tok->tind=cc;
 	tok->dval=value;
 	tok->tline=tok_line;
 	tok->level=curl_level;
+
 	if(tok->ttype==TOK_SHOW) {
 		tok->tname=(void *)new_textpoint_at(bf,TP_DDOT,ddot_offset-1);
 	};
 	if(tok->ttype==TOK_QUOTE) {
 		tok->tname=strdup(nword);
 	};
-	if(tok->ttype==TOK_BQUOTE) {
+	if(tok->ttype==TOK_AT) {
 		tok->tname=strdup(nword);
 	};
+
 	if(tok->ttype==TOK_LPAR) tok->tname=" ( ";
 	if(tok->ttype==TOK_RPAR) tok->tname=" ) ";
 	if(tok->ttype==TOK_SEP) tok->tname=" ; ";
+	if(tok->ttype==TOK_NUM) tok->tname="numeric";
 	if(tok->ttype==TOK_ASSIGN) { tok->tname=" = ";tok->tgroup=TOK_TERM0;};
 	if(tok->ttype==TOK_ASSIGNENV) { tok->tname=" setenv ";tok->tgroup=TOK_TERM0;};
 	if(tok->ttype==TOK_ASSIGNOPT) { tok->tname=" setoption ";tok->tgroup=TOK_TERM0;};
-	if(tok->ttype==TOK_INCREASEBY) { tok->tname=" += ";};
-	if(tok->ttype==TOK_DECREASEBY) { tok->tname=" -= ";};
+	if(tok->ttype==TOK_INCREASEBY) { tok->tname=" += ";tok->tgroup=TOK_TERM0;};
+	if(tok->ttype==TOK_DECREASEBY) { tok->tname=" -= ";tok->tgroup=TOK_TERM0;};
 	/* term1  */
 	if(tok->ttype==TOK_PLUS) {tok->tname=" + ";tok->tgroup=TOK_TERM;};
 	if(tok->ttype==TOK_MINUS) {tok->tname=" - ";tok->tgroup=TOK_TERM;};
@@ -593,7 +609,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	/* term3  */
 	if(tok->ttype==TOK_MOD) {tok->tname=" % ";tok->tgroup=TOK_TERM2;};
 	if(tok->ttype==TOK_POWER) {tok->tname=" ** "; tok->tgroup=TOK_TERM2;};
-	if(tok->ttype==TOK_INCREASE) { tok->tname=" INC ";};
+	if(tok->ttype==TOK_INCREASE) { tok->tname=" INC ";tok->tgroup=0;};
 	if(tok->ttype==TOK_DECREASE) { tok->tname=" DEC ";};
 	/* boolean tokens  */
 	if(tok->ttype==TOK_AND) { tok->tname=" AND ";tok->tgroup=TOK_TERM0;};
@@ -665,9 +681,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
 						switch(tok_type){
 							case TOK_NUM:
+								tok->tname="numeric2";
 								ADD_TOKEN;
 								value=getnum1(bf,cc,tok);
 								tok->ttype=TOK_NUM;
+								tok->tname="numeric3";
 								tok->dval=value;
 								break;
 							case TOK_LETTER:
@@ -744,25 +762,32 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 		};
 	};
-	if(err_num>0) {ERROR("ERROR: line=%d type=%d [%s]",err_line,err_num,err_str);break;};
+	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
-
+ // MESG("END of parsing! type=%d level=%d",tok_type,curl_level);
  {	/* add eof token!  */
-	if(tok_type!=TOK_SEP || tok_type==0) 
+	if(tok_type!=TOK_SEP) 
 	{	
-		ADD_TOKEN;
-		tok->ttype=TOK_SEP;
-		tok->tind=0;
-		tok->tline=tok_line;
+		if(tok_type==0) {
+			tok->ttype=TOK_SEP;
+			tok->tname="end 0";
+		} else {
+			ADD_TOKEN;
+			tok->ttype=TOK_SEP;
+			tok->tind=0;
+			tok->tline=tok_line;
+			tok->tname="end sep";
+		};
 	};
 	bf->end_token=tok;	/* save end token  */
 	ADD_TOKEN
 	tok->ttype=TOK_EOF;
 	tok->tind=0;
 	tok->tline=tok_line;
+	tok->tname="eof";
 	if(curl_level!=0 && err_num<1) set_error(tok,106,"parse error: invalid number of curls");
 	if(par_level!=0 && err_num<1) { 
-		err_num=104;err_line=0;err_str="parse error: invalid number of pars";
+		err_num=104;err_line=last_correct_line;err_str="parse error: invalid number of pars";
 		ERROR("parenthesis error: line %d",tok_line);
 	};
 	bf->m_mode=M_PARSED;	
@@ -771,13 +796,13 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	bf->symbol_tree->max_items = bf->symbol_tree->items+extra;
  };
 
-/* create token table from token list  */
+ // MESG("create token table from token list");
  set_tok_table(bf, lex_parser);
 
  free_list(lex_parser,"lex_parser");
  free_list(cstack,"cstack");
  stage_level=save_stage_level;
-
+ // MESG("parse_block1:[%s] end toke items %d",bf->b_fname,bf->symbol_tree->max_items);
  return(TRUE); 
 }
 

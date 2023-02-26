@@ -29,7 +29,12 @@ void mesg_out(const char *fmt, ...)
 char * tok_info2(tok_struct *tok)
 {
  static char stok[MAXLLEN];
-
+ // MESG("tok_info2: ");
+	if(tok){
+	// MESG("tok not null! %d",tok->ttype); 
+	if(tok->ttype>TOK_OTHER || tok->ttype==0) {
+		return("unknown type of token!");
+	};
 	if(tok->tname!=NULL){
 		switch(tok->ttype){
 			case TOK_SHOW:		
@@ -55,12 +60,16 @@ char * tok_info2(tok_struct *tok)
 				snprintf(stok,MAXLLEN,"%d:%d %s %s",tok->tline,tok->tnum,TNAME,(char *)tok->tname);
 		};
 	} else {
+		// MESG("token name is null! line %d type %d",last_correct_line,tok->ttype);
+		snprintf(stok,MAXLLEN,"type %d tname is null!",tok->ttype);
+		};
+	} else {
 			snprintf(stok,MAXLLEN,"%2d:%3d %s [%f]",tok->tline,tok->tnum,TNAME,tok->dval);
 	};
 	return stok;
 }
 
-#define	SYNTAX_DEBUG1	1
+#define	SYNTAX_DEBUG1	0
 
 #if	SYNTAX_DEBUG1	/* if debugging  */
 // Return with message
@@ -79,12 +88,10 @@ char * tok_info2(tok_struct *tok)
 
 // Return with message
 #define RT_MESG { \
-	if(err_num>0) mesg_out(" -[%s][%d] end with error %d position %d line %d",Tds,tok->tnum,err_num,xpos,tok->tline);\
 	stage_level--;return(err_num);\
 }
 
 #define RT_MESG1(pos) { \
-	CHECK_TOK(pos);\
 	stage_level--;return(err_num);\
 }
 
@@ -93,20 +100,28 @@ char * tok_info2(tok_struct *tok)
 
 #define SHOW_STAGE(pos)	{ stage_level++;show_type='#';CHECK_TOK(pos);}
 
+#if	1
+#define	CHECK_TOK(pos) { xpos=pos ;}
+#define	NTOKEN_ERR(xxx)	{ tok++;show_type=';';CHECK_TOK(xxx);}
+#define TDSERR(description) {} 
+#else
+
 #define	CHECK_TOK(pos) { xpos=pos;\
 		if(err_num>0) {\
 			show_type=' ';\
 			mesg_out("!err [%2d][%4d]%*s-%s: [%s]",stage_level,xpos,stage_level,"",Tds,tok_info2(tok));\
 			return(err_num);\
 		} else {\
-			if(show_stage==1) mesg_out(" %c[%2d][%4d]%*s-%s:[%s]",show_type,stage_level,xpos,stage_level,"",Tds,tok_info2(tok));\
+			if(show_stage==1) mesg_out(" %c[%2d][%4d][%4d]%*s-%s:[%s]",show_type,tok->tnum,stage_level,xpos,stage_level,"",Tds,tok_info2(tok));\
 			show_type=' ';\
+			MESG(" %c[%2d][%3d][%4d]%*s-%s:[%s]",show_type,stage_level,tok->tnum,xpos,stage_level,"",Tds,tok_info2(tok));\
 		}\
 }
 
 #define	NTOKEN_ERR(xxx)	{ tok++;show_type=';';CHECK_TOK(xxx);}
 
 #define TDSERR(description) char *Tds=description;
+#endif
 
 int parse_level=0;
 char show_type=' ';
@@ -167,7 +182,7 @@ int  err_eval_fun1(int fnum)
 	int i,ia;
 	int f_entry;
 	char err_message[512];
-
+	// MESG("err_eval_fun1:");
 	ia=m_functions[fnum].f_args;
 
 	f_entry=entry_mode;
@@ -187,6 +202,10 @@ int  err_eval_fun1(int fnum)
 		for(i=0;i< ia;i++) { 
 			NTOKEN_ERR(403);
 			err_num = err_lexpression();
+			if(err_num) {
+				MESG("function parameter error! %d",err_num);
+				return(err_num);
+			};
 			CHECK_TOK(405);
 		};
 		xpos=406;
@@ -201,6 +220,7 @@ int  err_eval_fun1(int fnum)
 		};
 	}
 	entry_mode=f_entry;
+	// MESG("now evaluate it!");
 	/* and now evaluate it! */
 	RT_MESG1(408);
 }
@@ -231,6 +251,7 @@ int  err_push_args_1(int *nargs)
 		break;
 	};
 	err_num = err_lexpression();
+	if(err_num) { MESG("error from lexpression %d",err_num);return err_num;};
 	CHECK_TOK(413);
 	num_args++;
 
@@ -375,7 +396,7 @@ int err_increase_val()
 	NTOKEN_ERR(444);
 	return(444);
  };
- NTOKEN_ERR(444);
+ // NTOKEN_ERR(444);
  RT_MESG1(444);
 }
 
@@ -410,7 +431,7 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 {
  TDSERR("exec_function");
  int save_stage_level=stage_level;
-
+ // MESG("err_exec_funtion:");
     FILEBUF *bp;		/* ptr to buffer to execute */
     char bufn[MAXFLEN+2];		/* name of buffer to execute */
 	int parsed;
@@ -475,25 +496,24 @@ int err_factor()
 	case TOK_MINUS:
 		pre_symbol++;
  };
- if(tok0->ttype==TOK_INCREASE) {
- 	MESG("increase %d ",tok0->tnum);
-	xpos=471;
-	RT_MESG1(xpos);
- };
- if(tok0->ttype==TOK_DECREASE) {
- 	MESG("decrease %d ",tok0->tnum);
-	xpos=472;
-	RT_MESG1(xpos);
- };
  NTOKEN_ERR(473);
+ // MESG("set factor function:");
+ // MESG("token type %d",tok0->ttype);
+ if(tok0->ttype > TOK_OTHER) {
+ 	MESG("unknown token type %d line %d %d",tok0->ttype,tok0->tline,last_correct_line);
+	err_num=4730;
+	return(err_num);
+ };
  tok0->factor_function = factor_funcs[tok0->ttype];
+
+ // MESG("switch: tok0 type=%d err=%d",tok0->ttype,err_num);
  switch(tok0->ttype) {
 	/*  the following ends factor  */
  	case TOK_SEP:
 		xpos=476;syntax_error("separator in factor!",xpos);
 		RT_MESG1(xpos);
 	case TOK_SHOW:
-		xpos=477;syntax_error(": in factor",xpos);
+		// xpos=477;syntax_error(": in factor",xpos);
 		RT_MESG1(xpos);
 	case TOK_LBRAKET:{	/* array definition  */
 		pre_symbol=0;
@@ -515,7 +535,7 @@ int err_factor()
 				continue;
 			};
 			err_num=err_num_expression();
-			
+			if(err_num) return err_num;
 			i++;if(i>cols) cols=i;
 			if(tok->ttype==TOK_RBRAKET) {
 				cdim=0;break;
@@ -540,12 +560,22 @@ int err_factor()
 	case TOK_RPAR:
 		xpos=479;
 		pnum--;
-		syntax_error("wrong argument number",xpos);
+		// syntax_error("wrong argument number",xpos);
 		RT_MESG1(480);
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
 		pre_symbol=0;
 		ex_nvars++;
+		if(tok->ttype==TOK_INCREASE) {
+			tok->dval=1;
+			tok->tgroup=TOK_INCREASE;
+			NTOKEN_ERR(498);
+		} else
+		if(tok->ttype==TOK_DECREASE) {
+			tok->tgroup=TOK_INCREASE;
+			tok->dval=-1;
+			NTOKEN_ERR(498);
+		};
 		RT_MESG1(493);}
 	case TOK_ARRAY1:{
 		err_num=err_factor(); 
@@ -553,6 +583,7 @@ int err_factor()
 		};
 	case TOK_ARRAY2:{
 		err_num=err_factor(); 
+		if(err_num) return(err_num);
 		err_num=err_factor(); 
 		RT_MESG1(4932);
 		};
@@ -584,6 +615,7 @@ int err_factor()
 	case TOK_NUM:
 		pre_symbol=0;
 		ex_nums++;
+		tok0->tname="numeric";
 		RT_MESG1(487);
 	case TOK_QUOTE:	 { // string 
 		xpos=488;
@@ -592,11 +624,11 @@ int err_factor()
 		ex_nquote++;
 		RT_MESG1(4882);
 	 	};
-	case TOK_BQUOTE: {
+	case TOK_AT: {
 		xpos=489;
 		ex_vtype=VTYPE_NUM;
 		RT_MESG1(4891);
-	};
+		};
 	case TOK_MINUS:
 	case TOK_PLUS:
 		if(pre_symbol>1) {
@@ -647,15 +679,19 @@ int err_factor()
 
 		if(tok->ttype!=TOK_SEP)
 		NTOKEN_ERR(502);	/* this is parenthesis or separator */
+		if(err_num) return(err_num);
+
 		/* function */
 		pre_symbol=0;
 
 		err_num = err_push_args_1(&nargs);
+		if(err_num) return(err_num);
 
 		tok0->tind=nargs;
 		CHECK_TOK(503);
 		after_proc=tok;
 		err_num=err_exec_function(tok0->tname,nargs,&bp);
+		if(err_num) return(err_num);
 		if(bp!=NULL) {
 			tok0->tbuf=bp;
 		};
@@ -708,6 +744,7 @@ int err_factor()
 			if(args>0){
 			for(i=0;i<args;i++){
 				err_num=err_num_expression();
+				if(err_num) return err_num;
 				CHECK_TOK(517);
 
 				if(!check_end && tok->ttype==TOK_RPAR) {
@@ -768,8 +805,7 @@ int err_factor()
 	case TOK_ASSIGN:
 	case TOK_INCREASEBY:
 	case TOK_DECREASEBY:
-	case TOK_INCREASE:
-	case TOK_DECREASE:
+		tok0->tname="asign";
 		RT_MESG1(527);
 	default:
 		xpos=527;
@@ -787,7 +823,8 @@ int err_num_term2()
 
  SHOW_STAGE(541);
  err_num = err_factor();
- 
+ if(err_num) RT_MESG1(err_num);
+
  if(tok->tgroup==TOK_TERM2) {
  	CHECK_TOK(543);
 	tok->term_function = factor_funcs[tok->ttype];
@@ -805,6 +842,7 @@ int err_num_term1()
  
  SHOW_STAGE(551);
  err_num=err_num_term2();
+ if(err_num) RT_MESG1(err_num);
  CHECK_TOK(552);
 
  while (tok->tgroup==TOK_TERM1) {
@@ -828,6 +866,7 @@ int err_num_expression()
 
  SHOW_STAGE(561);
  err_num = err_num_term1();
+ if(err_num) return(err_num);
 
  expression_type=ex_vtype;	// set local value
 
@@ -875,6 +914,7 @@ int err_lexpression()
 
 	SHOW_STAGE(701);
 	err_num = err_cexpression();
+	if(err_num) return err_num;
 	while(1)
 	{
 	CHECK_TOK(702);
@@ -927,12 +967,14 @@ int err_lexpression()
 		};
 		case TOK_INCREASEBY: {
 			tok->term_function = increase_by;
+			tok->tname = "+=";
 			NTOKEN_ERR(710);
 			err_num=err_increase_by();
 			RT_MESG1(714);
 		};
 		case TOK_DECREASEBY: {
 			tok->term_function = decrease_by;
+			tok->tname = "-=";
 			NTOKEN_ERR(710);
 			err_num=err_decrease_by();
 			RT_MESG1(714);
@@ -947,18 +989,6 @@ int err_lexpression()
 			NTOKEN_ERR(710);
 			err_num=err_assign_env();
 			RT_MESG1(7141);
-		case TOK_INCREASE:
-			// tok->factor_function = increase_val; 
-			tok->factor_function = factor_funcs[tok->ttype];
-			NTOKEN_ERR(710);
-			err_num=err_increase_val();
-			RT_MESG1(7142);
-		case TOK_DECREASE:
-			// tok->factor_function = increase_val; 
-			tok->factor_function = factor_funcs[tok->ttype];
-			NTOKEN_ERR(710);
-			err_num=err_decrease_val();
-			RT_MESG1(7142);
 		default:
 			RT_MESG1(715);
 	};
@@ -977,6 +1007,8 @@ int err_cexpression()
 	SHOW_STAGE(611);
 
 	err_num = err_num_expression();
+	if(err_num) return(err_num);
+
 	tok0=tok;
 	CHECK_TOK(612);
 
@@ -1004,6 +1036,7 @@ int err_check_sentence1()
 		break;
  	case TOK_LCURL:
 	{	
+		tok->directive = dir_lcurl;
 		NTOKEN_ERR(627);
 		CHECK_TOK(628);
 		err_num=err_check_block1(tok->level);
@@ -1013,6 +1046,7 @@ int err_check_sentence1()
 	case TOK_DIR_IF:
 		{
 //		int is_block=0;
+		tok->directive = tok_dir_if;
 		NTOKEN_ERR(631);	/* go to next token after if */
 		xpos=632;
 		check_skip_token_err1(TOK_LPAR,"tok_dir_if",xpos);
@@ -1042,6 +1076,7 @@ int err_check_sentence1()
 		tok_struct *start_block;	// element at block start
 		tok_struct *end_block;	/* at the block end  */
 		int is_block=0;
+		tok->directive = tok_dir_fori;
 		NTOKEN_ERR(640);	/* go to next token after for */
 		NTOKEN_ERR(6401);	/* skip left parenthesis  */
 		if(tok->ttype==TOK_VAR) {
@@ -1050,11 +1085,14 @@ int err_check_sentence1()
 		} else ERROR("6405:for i syntax error");
 		NTOKEN_ERR(64053);
 		err_num=err_num_expression();	/* initial   */
+		if(err_num) return(err_num);
 		CHECK_TOK(6406);
 		NTOKEN_ERR(6407);	/* skip separator! */
 		err_num=err_num_expression();
+		if(err_num) return(err_num);
 		NTOKEN_ERR(6408);
 		err_num=err_num_expression();
+		if(err_num) return(err_num);
 		CHECK_TOK(6409);
 		if(tok->ttype!=TOK_RPAR) ERROR("6409:for i: error ");
 		NTOKEN_ERR(64010);	/* skip right parenthesis  */
@@ -1074,7 +1112,7 @@ int err_check_sentence1()
 			err_num=err_check_sentence1();
 			CHECK_TOK(64015);
 			if(is_block) tok=end_block;
-			else skip_sentence1();
+			else skip_sentence1("fori_err");
 		};
 		CHECK_TOK(64020);
 		}; 
@@ -1082,6 +1120,7 @@ int err_check_sentence1()
 	case TOK_DIR_FOR:
 		{
 		tok_struct *start_block;	// element at block start
+		tok->directive=tok_dir_for;
 		NTOKEN_ERR(641);	/* go to next token after for */
 		check_skip_token_err1(TOK_LPAR,"tok_dir_for",xpos);
 		CHECK_TOK(6411);
@@ -1111,7 +1150,7 @@ int err_check_sentence1()
 		{
 			tok_struct *check_element; // check element pointer
 			tok_struct *start_block;	// element at block start
-
+			tok->directive=tok_dir_while;
 			NTOKEN_ERR(654);	/* go to next toke after while */
 			check_skip_token_err1(TOK_LPAR,"tok_dir_while",xpos);
 			CHECK_TOK(656);
@@ -1136,9 +1175,11 @@ int err_check_sentence1()
 		break;
 
 	case TOK_DIR_BREAK:
+		tok->directive = dir_break;
 		NTOKEN_ERR(663);
 		RT_MESG;
 	case TOK_DIR_RETURN:
+		tok->directive = dir_return;
 		NTOKEN_ERR(664);	/* skip left par, CHECK if no par!!, remove from parser!!  */
 		err_num=err_lexpression();
 		RT_MESG1(666);
@@ -1175,6 +1216,7 @@ int err_check_block1(int level)
 			RT_MESG1(6751);
 	};
  	err_num=err_check_sentence1();
+	if(err_num) return(err_num);
    };
 
  xpos=692;syntax_error("Null in block",xpos);

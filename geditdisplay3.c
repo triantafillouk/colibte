@@ -268,7 +268,7 @@ static gboolean mouse_wscroll (GtkWidget *widget,
        GdkEvent  *event,
        gpointer   user_data)
 {
-    printf("window scroll! \n");
+    // printf("window scroll! \n");
     return TRUE;
 }
 
