@@ -182,23 +182,6 @@ char *get_base_name(char *full_name)
 	return (cp1);
 }
 
-#if	NUSE
-// base name (creates a new string)
-char * base_name(char *full_name)
-{
- register char *cp1;
- register char *cp2;
- if(full_name==NULL) return NULL;
- cp1 = full_name;
- while (*cp1 != 0) ++cp1; // goto the end
-
- while (cp1!=full_name && cp1[-1]!='/')  --cp1;
- 
- cp2 = strdup(cp1);
- return cp2;
-}
-#endif
-
 /* 	creates the dir name from a full file name 
 	new area is allocated for the string
 */
@@ -297,39 +280,6 @@ char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_no
 	MESG("file [%s] not found!",fname);
 	return(NULL);
 }
-
-#if	NUSE
-// remove directory and extention, return dup string
-char *bname1_dup(char *fname)
-{
- char *b1;
- char *b2;
- char *s;
- char d;
- if(fname==NULL) return NULL;
- b1=get_base_name(fname);
- b2=b1;
- while(*b2!='.' && *b2!=0) b2++;
- d=*b2;
- *b2=0;
- s=strdup(b1);
- *b2=d;
- return s;
-}
-
-/* remove directory and extension , return basename pointer */
-char *bname1(char *fname) 
-{
- static char bb[512];
- char *b1;
- register int i;
- b1=get_base_name(fname);
-
- for(i=0;i<79 && *b1!='.' && *b1>31;i++) bb[i]=*b1++;
- bb[i]=0;
- return(bb);
-}
-#endif
 
 void msg_log(int priority,const char *fmt, ...)
 {

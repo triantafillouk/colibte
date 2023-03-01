@@ -2669,7 +2669,7 @@ void show_slide(WINDP *wp)
  int row;
 // char single_line[5] = { 0xE2,0x94,0x82,0,0};
 // █ ▓ │ ┃   ║ ▌ ░ ▒ ▓ ╳
- char double_line[5] = { 0xE2,0x95,0x91,0,0};
+ char double_vline[5] = { 0xE2,0x95,0x91,0,0};
 // char full_line[5] = { 0xE2,0x96,0x88,0,0};
 // char hatch_line[5] = { 0xE2,0x96,0x93,0,0};
 // char left_half[5] = { 0xE2,0x96,0x8C,0,0};
@@ -2707,7 +2707,7 @@ void show_slide(WINDP *wp)
 	if(row<start || row> end) {
 		wprintw(wp->gwp->vline,"%s"," ");
 	} else {
-		wprintw(wp->gwp->vline,"%s",double_line);
+		wprintw(wp->gwp->vline,"%s",double_vline);
 	};
  };
  wmove(wp->gwp->vline,wp->w_ntrows,0);

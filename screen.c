@@ -48,6 +48,8 @@ extern int CHEIGHTI;
 int	update_all  = TRUE;                 /* TRUE if screen is garbage	*/
 int	noupdate=1;		/* no need to update the screen , no display started */
 
+utfchar double_hline = { "═" };
+
 #if	NUSE
 int addutfvchar(char *str, vchar *vc, int pos, FILEBUF *w_fp)
 {
@@ -87,7 +89,7 @@ void svwchar(vchar *vc, utfchar *uc,int b_color,int f_color)
  vc->fcolor=f_color%256;
  if(f_color>255) {
  	vc->attr = f_color - (vc->fcolor);
-	MESG("! %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
+	// MESG("! %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
  } else {
  	vc->attr = current_scheme->color_style[vc->fcolor].color_attr;
 	// if(vc->uval[0]!=' ')
@@ -103,14 +105,8 @@ void svwchar(vchar *vc, utfchar *uc,int b_color,int f_color)
 /* set non utf char with color  */
 void  svchar(vchar *vc,int val,int b_color,int f_color)
 {
+ memset(vc->uval,0,8);
  vc->uval[0]=val;
- vc->uval[1]=0; 
- vc->uval[2]=0; 
- vc->uval[3]=0; 
- vc->uval[4]=0; 
- vc->uval[5]=0; 
- vc->uval[6]=0; 
- vc->uval[7]=0; 
  // if(vc->attr) MESG("svchar ul");
  vc->bcolor=b_color;
  vc->fcolor=f_color%256;
@@ -122,10 +118,6 @@ void  svchar(vchar *vc,int val,int b_color,int f_color)
 	// if(vc->uval[0]!=' ')
 	// MESG("- %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
  };
-#if	0
- vc->display_width=CLEN;
- vc->display_height=CHEIGHTI;
-#endif
 }
 
 /* set virtual color */
@@ -1166,7 +1158,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 		for(wp->vtcol=first_column;wp->vtcol< wp->w_ntcols-first_column;wp->vtcol++){ 
 			vchar *vc = vp->v_text+wp->vtcol;
 
-			svwchar(vc,(utfchar *)"═",vc->bcolor,COLOR_COMMENT_FG);	/* double line separator */
+			svwchar(vc,&double_hline,vc->bcolor,COLOR_COMMENT_FG);	/* double line separator */
 		};
 	};
 
