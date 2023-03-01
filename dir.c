@@ -1500,7 +1500,7 @@ int dir_left(int n)
 	num to_line=0;
 	num to_col=0;
 
-	// MESG("dir_left: quick_close");
+	MESG("dir_left: quick_close");
 	bf = cbfp->connect_buffer;
 	to_line = cbfp->connect_line;
 	to_col = cbfp->connect_column;
@@ -1525,6 +1525,10 @@ int dir_left(int n)
  	if(!(cbfp->b_flag & FSNLIST)) 
 	{ // we are in view mode!
 		vbuf=cbfp;
+#if	1
+		// if not at bol go one character left
+		if(cwp->tp_current->col > 0) return(prev_character(1));
+#endif
 		int connect_column=cbfp->connect_column;
 		// MESG("try get valid buffer!");
 		bf = get_valid_buffer(cbfp->connect_buffer);
