@@ -145,7 +145,8 @@ int color_scheme_save()
  FILE *f1;
  char *fname;
  int i;
- fname=find_file(NULL,".colors",0,1);
+ fname=find_file("",".colors",0,1);
+ MESG("color_scheme_save: ->[%s]",fname);
  f1=fopen(fname,"w");
 
  if(f1!=NULL) {
