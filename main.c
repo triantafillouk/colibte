@@ -124,7 +124,7 @@ int main(int argc, char **argv)
 		// MESG("init_exensions");
 		init_extensions();	// file extensions
 		if(startfile==NULL) {
-			startfile=find_file(NULL,APPLICATION_RC,1,0);
+			startfile=find_file("",APPLICATION_RC,1,0);
 		};
 	};
 	// MESG("execute statup file");
@@ -195,6 +195,7 @@ int main(int argc, char **argv)
 		cbfp = firstbp;
 	};
 	}
+	// MESG("call vtinit:");
 	vtinit(argc,argv);		/* Display */
 #if	TNOTES
 	if(mmnote){

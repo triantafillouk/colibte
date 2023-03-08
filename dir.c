@@ -434,13 +434,16 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
 			return(0);
 	};
 	strlcpy(namelist[i]->d_name,df1->d_name,len);
+#if	!SOLARIS
 	if(num_of_files>MAXSTAT) {
 		namelist[i]->st_mode=df1->d_type << 12;
 		namelist[i]->st_size=len;
 		namelist[i]->mtime=0;
 		namelist[i]->atime=0;
 		namelist[i]->ctime=0;
-	} else {	
+	} else 
+#endif
+	{	
 		result=lstat(namelist[i]->d_name,&t);
 		if(result) {
 			ERROR("[%30s]Error    %d ",namelist[i]->d_name,errno);
@@ -1024,7 +1027,7 @@ void init_extensions()
 
  set_start_dir(NULL);
 
- if((fname = find_file(NULL,APPLICATION_EXTENSIONS,1,0))==NULL) return;
+ if((fname = find_file("",APPLICATION_EXTENSIONS,1,0))==NULL) return;
 
  read_pairs(fname,'=',&f_extension,&f_extcmd);
  // MESG("init_extentions: file=[%s]",fname);

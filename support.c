@@ -217,9 +217,9 @@ char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_no
 	char *sp;	/* pointer into path spec */
 	static char fspec[MAXFLEN];	/* full path spec to search */
 	int slen=0;
-//	MESG("find_file:fname=[%s] in subdir=[%s] check_start_dir=%d [%s]",fname,subdir,check_start_dir,start_dir_val);	
+	MESG("find_file:fname=[%s] in subdir=[%s] check_start_dir=%d [%s]",fname,subdir,check_start_dir,start_dir_val);	
 	if(check_start_dir) { // check application's start dir
-		if(subdir!=NULL && subdir[0]!=0) slen=snprintf(fspec,MAXFLEN,"%s/%s/%s",start_dir_val,subdir,fname);
+		if(subdir[0]!=0) slen=snprintf(fspec,MAXFLEN,"%s/%s/%s",start_dir_val,subdir,fname);
 		else slen=snprintf(fspec,MAXFLEN,"%s/%s",get_start_dir(),fname);
 		if(slen>MAXFLEN) { MESG("truncated!");return NULL;};
 		if(file_exist(fspec)) {
@@ -229,7 +229,7 @@ char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_no
 	}; 
 	
 	// check the home dir under app dir
-	if(subdir!=NULL) snprintf(fspec,MAXFLEN,"%s/%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,subdir,fname);
+	if(subdir[0]!=0) snprintf(fspec,MAXFLEN,"%s/%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,subdir,fname);
 	else snprintf(fspec,MAXFLEN,"%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,fname);
 	if(file_exist(fspec)) {
 		MESG("	found [%s]",fspec);
@@ -237,7 +237,7 @@ char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_no
 	};
 
 	// check the home dir
-	if(subdir!=NULL) snprintf(fspec,MAXFLEN,"%s/%s/%s",getenv("HOME"),subdir,fname);
+	if(subdir[0]!=0) snprintf(fspec,MAXFLEN,"%s/%s/%s",getenv("HOME"),subdir,fname);
 	else snprintf(fspec,MAXFLEN,"%s/%s",getenv("HOME"),fname);
 	if(file_exist(fspec)) {
 		MESG("	found [%s]",fspec);

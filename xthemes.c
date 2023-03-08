@@ -63,10 +63,10 @@ int color_scheme_read()
  MESG("color_scheme_read: drv_colors=%d",drv_colors);
 #if	PCURSES
  if(drv_colors<16) {
-	 if((fname=find_file(NULL,".colors8",1,0))==NULL) return FALSE;
+	 if((fname=find_file("",".colors8",1,0))==NULL) return FALSE;
  } else 
 #endif
- if((fname=find_file(NULL,".colors",1,0))==NULL) return FALSE;
+ if((fname=find_file("",".colors",1,0))==NULL) return FALSE;
 
  f1=fopen(fname,"r");
  if(f1!=NULL) {

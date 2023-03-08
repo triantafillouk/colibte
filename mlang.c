@@ -6,6 +6,7 @@
 
  	An interpreter,embeded calulator by K.Triantafillou (2011,2020),
 */
+
 #include	<math.h>
 #include	<stdlib.h>
 #include	"xe.h"
@@ -576,6 +577,7 @@ int deq(double v1,double v2)
 
 void init_error()
 {
+ // MESG("init_error:");
  err_line=0;
  err_num=0;
  err_str=NULL;
@@ -583,6 +585,7 @@ void init_error()
 
 void init_exec_flags()
 {
+ // MESG("init_exec_flags:");
  init_error();
  is_break1=0;
  current_active_flag=1;
@@ -592,6 +595,7 @@ void init_exec_flags()
  pnum=0;
  stage_level=0;
  ex_nvars=0;ex_nquote=0;ex_nums=0;	/* initialize table counters  */
+ // MESG("init_exec_flags:end");
 }
 
 void show_error(char *from,char *name)
@@ -616,6 +620,7 @@ int check_init(FILEBUF *bf)
  {
  	// MESG("create token table [%s]",bf->b_fname);
 	parse_block1(bf,NULL,1,0);
+	// MESG("block parsed ok");
 	if(err_num>0) {
 		msg_line("found parsed errors: err_num=%d",err_num);
 		return(err_num);
@@ -2597,7 +2602,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	} else {
 		local_symbols=current_stable;	
 	}
-
+ // MESG("compute_block: call check_init");
  if(bp->m_mode<2)	/* if not already checked!  */
  {
 	if((err_num=check_init(bp))>0) {
@@ -2605,9 +2610,10 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		show_error("Check init",bp->b_fname);
 		return(0);
 	};
-
+	// MESG("compute_block: call init_exec_flags");
 	init_exec_flags();
 	tok=bp->tok_table;
+	// MESG("compute_block: call drv_start_checking_break");
 	drv_start_checking_break();
 	// MESG("exec block->");
 	val=exec_block1();
@@ -2680,6 +2686,7 @@ int refresh_current_buffer(int nused)
 		// mesg_out("syntax error %d line %d [%s]",err_num,err_line,err_str);
 		return(0);
 	};
+	// MESG("refresh_current_buffer: after check_init");
  	msg_line("evaluating ...");
 	init_exec_flags();
 	tok=fp->tok_table;
@@ -2724,7 +2731,7 @@ int parse_check_current_buffer(int n)
  cls_fout("[out]");
  // MESG("clear output");
  err_num=check_init(fp);
- 
+ // MESG("parse_check_current_buffer: after chek_init");
  if(err_num>0) {
 	macro_exec=0;
 	msg_line("syntax error %d line %d [%s]",err_num,err_line,err_str);

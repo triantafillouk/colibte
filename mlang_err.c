@@ -455,12 +455,14 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 		RT_MESG;
     };
 	*bf=bp;
-
+	// MESG("err_exec_function: call parse_block1");
 	parsed=parse_block1(bp,NULL,0,0);	/* do not init if already parsed!, returns 0 if parsed  */
+	// MESG("err_exec_function: return from parse_block1");
 	if(parsed==0) {	/* already parsed, no need to check again!  */
 		RT_MESG1(463);
 	};
 	/* and now execute it as asked */
+	// MESG("err_exec_function: call check_init");
 	if((check_init(bp))>0) {
 		ERROR("found syntax errors in function!");
 		RT_MESG1(464);

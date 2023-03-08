@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.58T39 (1/03/2023)"
+#define VERSION 	"#01.58T40 (8/03/2023)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -19,8 +19,11 @@
 #define NUSE		0	/* not used anymore */
 #define	RSESSION	1	/* record session */
 #define	CLASSIC_STATUS 	0
-
+#if	SOLARIS
+#define DOUBLE_ESC	1	/* use double escape for abort command else single  */
+#else
 #define DOUBLE_ESC	0	/* use double escape for abort command else single  */
+#endif
 
 #define	NEW_COLORS	1
 #define NEW_COLOR8	0

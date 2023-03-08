@@ -5,20 +5,23 @@
 	(or at your option) any later version.
 */
 
-#include <glib.h>
-#include <glib/gstdio.h>
 
 #include "xe.h"
 
 const char cfg_group[] = APPLICATION_NAME;
 extern alist *local_key_list;
 
+
+#if	NUSE
+
+#include <glib.h>
+#include <glib/gstdio.h>
+
 struct {
 	GKeyFile *cfg;
 	char *configfile;
 } app_cfg;
 
-#if	NUSE
 /* get a string from configuration */
 char * get_cfg_str(char *label, char *default_str)
 {
@@ -160,17 +163,21 @@ void load_config()
 #else
 extern VAR option_names[];
 
+char *find_file(char *subdir,char *fname,int cflag,int create_if_not_found);
+
 void load_config()
 {
  int i=0;
  MESG("load_config:");
- char *fname = find_file(NULL,CONFIGFILE,0,0);
+
+ char *fname = find_file("",CONFIGFILE,0,0);
 
  if(fname) {
  char **name_array;
  char **value_array;
  char *flag_name;
  int pair_nums=0;
+
  pair_nums=read_pairs(fname,'=',&name_array,&value_array);
  if(pair_nums) {
 	for(flag_name=name_array[i];(flag_name=name_array[i])!=NULL;i++){
@@ -232,7 +239,7 @@ void save_config()
 #else
 void save_config()
 {
- char *fname = find_file(NULL,CONFIGFILE,0,1);
+ char *fname = find_file("",CONFIGFILE,0,1);
  FILE *f = fopen(fname,"w");
  if(f) {
  int i=0;
@@ -261,7 +268,8 @@ int save_keys()
  char key_line[MAXLLEN];
  AKEYS *key;
 
- fname=find_file(NULL,APPLICATION_KEYS,0,1);
+ MESG("save_keys:");
+ fname=find_file("",APPLICATION_KEYS,0,1);
  f1=fopen(fname,"w");
  lbegin(local_key_list);
  while( (key=(AKEYS *)lget(local_key_list))!=NULL)

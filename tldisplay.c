@@ -114,7 +114,7 @@ void vtinit(int argc, char **argp)
 	drv_post_init();
 	resize_screen(2);
 	cwp = dublicate_window(0);	/* creates first window  */
-
+	// MESG("vtinit:end");
 	set_1window();
 }
 

@@ -491,7 +491,7 @@ int load_keys()
  static char name1[MAXFLEN];
 
  strcpy(name1,APPLICATION_KEYS);
- if((fname=find_file(NULL,name1,0,0)) == NULL) return FALSE;
+ if((fname=find_file("",name1,0,0)) == NULL) return FALSE;
 
  f1=fopen(fname,"r");
 

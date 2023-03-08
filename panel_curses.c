@@ -87,6 +87,7 @@ char *text_mouse_str=NULL;	/* text mouse terminfo kmous string */
 int extended_mouse=0;	/* 1 = ansi mouse, 0 = M mouse  */
 int mouse_button=0;
 int mouse_active=0;
+int drv_initialized=0;
 
 float CLEN=1.0;
 int CHEIGHTI=1;
@@ -559,24 +560,32 @@ void drv_size()
 
 void enable_key_mouse()
 {
+ mouse_active=1;
+#if	SOLARIS
+	return;
+#else
  mousemask(ALL_MOUSE_EVENTS|REPORT_MOUSE_POSITION,NULL);
  printf("\033[?1003h");	/* makes terminal report mouse mouvement  */
  if(extended_mouse) {
  	printf("\033[?1006h");	/* makes terminal extended report mouse mouvement  */
  }
  fflush(stdout);
- mouse_active=1;
+#endif
 }
 
 void disable_key_mouse()
 {
+ mouse_active=0;
+#if	SOLARIS
+	return;
+#else
  mousemask(0,NULL);
  printf("\033[?1003l");	/* makes terminal stop reporting mouse mouvement  */
  if(extended_mouse) {
  	printf("\033[?1006l");	/* makes terminal stop reporting mouse mouvement  */
  };
  fflush(stdout);
- mouse_active=0;
+#endif
 }
 
 int toggle_mouse(int n)
@@ -621,7 +630,9 @@ void drv_open()
 
  if(mcurflag){
 // keypad(stdscr,1);	/* no need for the moment, need a lot of changes!  */
+#if	!SOLARIS
 	mousemask(ALL_MOUSE_EVENTS|REPORT_MOUSE_POSITION,NULL);
+#endif
 	printf("\033[?1003h\n");	/* makes terminal report mouse mouvement  */
  };
 
@@ -652,6 +663,7 @@ void drv_open()
  // driver specific keyboard bindings
  drv_bindkeys();
  vswidth=1;
+ drv_initialized=1;
 // MESG("drv_open:end");
 }
 
@@ -1019,8 +1031,10 @@ void drv_init(int argc, char **argp)
 void drv_close()
 {
 	restore_original_colors();
+#if	!SOLARIS
 	use_default_colors();
 	disable_key_mouse();
+#endif
 	endwin();
 }
 
@@ -1065,20 +1079,24 @@ int drv_getc(int quote)
 	};
 }
 
-int checking_break_key=0;
+static int checking_break_key=0;
 
 void drv_start_checking_break()
 {
+#if	!SOLARIS
 	nodelay(stdscr,TRUE);
-	checking_break_key=1;
 	qiflush();
+#endif
+	if(drv_initialized) checking_break_key=1;
 }
 
 void drv_stop_checking_break()
 {
+#if	!SOLARIS
 	nodelay(stdscr,FALSE);
-	checking_break_key=0;
 	qiflush();
+#endif
+	checking_break_key=0;
 	utflen=0;
 	utfokey[0]=0;
 }
@@ -1414,7 +1432,9 @@ void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
  	attrib |=A_UNDERLINE;
  } else {
  	int a = current_scheme->color_style[fcolor].color_attr;
+#if	!SOLARIS
 	if(a & FONT_STYLE_ITALIC) attrib |= A_ITALIC;
+#endif
 	if(a & FONT_STYLE_BOLD) attrib |= A_BOLD;
 	if(a & FONT_STYLE_DIM) attrib |= A_DIM;
 	if(a & FONT_STYLE_REVERSE) attrib |= A_REVERSE;
