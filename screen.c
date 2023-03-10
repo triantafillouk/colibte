@@ -2279,10 +2279,6 @@ void allocate_virtual_window(WINDP *wp)
 		exit(1);
 	};
 	vp->v_flag=0;
-#if	PANGO_TEST0
-	vp->left_x_pos=0;
-	vp->continuation=0;
-#endif
 	wp->vs[i]=vp;
  };
  // set the last one as NULL to know till where to free!

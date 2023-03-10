@@ -217,13 +217,13 @@ char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_no
 	char *sp;	/* pointer into path spec */
 	static char fspec[MAXFLEN];	/* full path spec to search */
 	int slen=0;
-	MESG("find_file:fname=[%s] in subdir=[%s] check_start_dir=%d [%s]",fname,subdir,check_start_dir,start_dir_val);	
+	// MESG("find_file:fname=[%s] in subdir=[%s] check_start_dir=%d [%s]",fname,subdir,check_start_dir,start_dir_val);	
 	if(check_start_dir) { // check application's start dir
 		if(subdir[0]!=0) slen=snprintf(fspec,MAXFLEN,"%s/%s/%s",start_dir_val,subdir,fname);
 		else slen=snprintf(fspec,MAXFLEN,"%s/%s",get_start_dir(),fname);
 		if(slen>MAXFLEN) { MESG("truncated!");return NULL;};
 		if(file_exist(fspec)) {
-			MESG("	found [%s]",fspec);
+			// MESG("	found [%s]",fspec);
 			return(fspec);
 		};
 	}; 
@@ -232,7 +232,7 @@ char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_no
 	if(subdir[0]!=0) snprintf(fspec,MAXFLEN,"%s/%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,subdir,fname);
 	else snprintf(fspec,MAXFLEN,"%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,fname);
 	if(file_exist(fspec)) {
-		MESG("	found [%s]",fspec);
+		// MESG("	found [%s]",fspec);
 		return(fspec);
 	};
 
@@ -240,14 +240,14 @@ char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_no
 	if(subdir[0]!=0) snprintf(fspec,MAXFLEN,"%s/%s/%s",getenv("HOME"),subdir,fname);
 	else snprintf(fspec,MAXFLEN,"%s/%s",getenv("HOME"),fname);
 	if(file_exist(fspec)) {
-		MESG("	found [%s]",fspec);
+		// MESG("	found [%s]",fspec);
 		return(fspec);
 	};
 
 	snprintf(fspec,MAXFLEN,"%s/%s/%s",APPLICATION_DIR,subdir,fname);
 
 	if(file_exist(fspec)) {
-		MESG("	found [%s]",fspec);
+		// MESG("	found [%s]",fspec);
 		return(fspec);
 	};
 
@@ -266,7 +266,7 @@ char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_no
 			strcat(fspec, fname);
 			/* and try it out */
 			if(file_exist(fspec)) {
-				MESG("	found [%s]",fspec);
+				// MESG("	found [%s]",fspec);
 				return(fspec);
 			};
 			if (*path == PATHCHR) ++path;
@@ -274,7 +274,7 @@ char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_no
 	if(create_if_not_found) {	/* Create it in . home dir  */
 		if(subdir) 	slen=snprintf(fspec,MAXFLEN,"%s/%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,subdir,fname);
 		else slen=snprintf(fspec,MAXFLEN,"%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,fname);
-		MESG("create new file [%s]",fspec);
+		// MESG("create new file [%s]",fspec);
 		return(fspec);
 	} else
 	MESG("file [%s] not found!",fname);

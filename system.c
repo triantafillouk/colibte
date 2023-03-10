@@ -439,8 +439,14 @@ int grep_cmd(int  n)
 	static char filnam[MAXFLEN];	//  = "/tmp/command";
 	static char *search_dir;
 	int status=0;
+#if	SOLARIS
+	char *flag_str="-n";
+#else
+	char *flag_str="-nr";
+#endif
 
 	// MESG("grep_cmd: n=%d",n);
+
 	set_list_type(LSHELL);
 
 	if(is_scratch_buffer(cbfp)) {
@@ -480,13 +486,12 @@ int grep_cmd(int  n)
 	if(n>1) {
 #if	TNOTES
 		if(n==3) 
-			status=snprintf(line,MAXLLEN,"grep -nr \"%s\" * 2>/dev/null |grep -v Binary > %s 2> /dev/null",tline,filnam);
+			status=snprintf(line,MAXLLEN,"grep %s \"%s\" * 2>/dev/null |grep -v Binary > %s 2> /dev/null",flag_str,tline,filnam);
 		else
 #endif
-			status=snprintf(line,MAXLLEN,"grep -nr \"%s\" * 2>/dev/null |grep -v Binary > %s 2> /dev/null",tline,filnam);
+			status=snprintf(line,MAXLLEN,"grep %s \"%s\" * 2>/dev/null |grep -v Binary > %s 2> /dev/null",flag_str,tline,filnam);
 	} else {
-		status=snprintf(line,MAXLLEN,"grep -nr \"%s\" * 2>/dev/null |grep -v Binary > %s 2> /dev/null",tline,filnam);
-		// status=snprintf(line,MAXLLEN,"(grep -n \"%s\" %s |grep -v Binary > %s)  2> /dev/null",tline,extension_string(cbfp),filnam);
+		status=snprintf(line,MAXLLEN,"grep %s \"%s\" * 2>/dev/null |grep -v Binary > %s 2> /dev/null",flag_str,tline,filnam);
 	}
 //	MESG("grep: [%s]",line);
 	if(status>MAXFLEN) return FALSE;
