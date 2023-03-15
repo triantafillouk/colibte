@@ -1564,7 +1564,7 @@ void show_cursor_dl(int pos)
  if(entry_mode){
 	wmove(mesg_window,0,pos);
 	curs_set(1);
-	wnoutrefresh(mesg_window);
+	wrefresh(mesg_window);
  };
 }
 
