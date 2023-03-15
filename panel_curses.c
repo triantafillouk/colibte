@@ -1047,7 +1047,7 @@ void drv_flush()
 
 void drv_win_flush(WINDP *wp)
 {
-	wrefresh(wp->gwp->draw);
+	wnoutrefresh(wp->gwp->draw);
 }
 
 /*
@@ -1564,7 +1564,7 @@ void show_cursor_dl(int pos)
  if(entry_mode){
 	wmove(mesg_window,0,pos);
 	curs_set(1);
-	wrefresh(mesg_window);
+	wnoutrefresh(mesg_window);
  };
 }
 
@@ -1610,7 +1610,7 @@ void disp_box(char *box_title,int border,int y1,int x1,int y2,int x2)
  	wprintw(cbox->wnd,"%s",cbox->title);
  };
 
- wrefresh(cbox->wnd);
+ wnoutrefresh(cbox->wnd);
  top_panel(cbox->panel);
  update_panels();
  lpush(cbox,box_list);
@@ -1653,7 +1653,7 @@ void remove_box()
 // dummy function for xlib compatibility
 void xupdate_box()
 {
-	wrefresh(cbox->wnd);
+	wnoutrefresh(cbox->wnd);
 }
 
 #if	USE_GLIB
@@ -1945,7 +1945,7 @@ int check_w_sibling(WINDP *wp,int left,int top,int new_rows)
 // dummy function
 void expose_window(WINDP *wp)
 {
-	wrefresh(wp->gwp->draw);
+	wnoutrefresh(wp->gwp->draw);
 }
 
 /* Put virtual screen text on physical */
@@ -1984,6 +1984,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 		wclrtoeol(wp->gwp->draw);
 		wrefresh(wp->gwp->draw);
 	 	update_panels();
+		doupdate();
 	};
 
 	for(i=0;i<=imax;i++) {
@@ -1994,6 +1995,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 		drv_wcolor(wp->gwp->draw,fcolor,bcolor);
 		ch=v1->uval[0];
+		if(ch==0xF0) wp->w_fp->slow_display=1;
 		if(ch==0xFF) { 	/* skip in case of char len > 1  */
 			if(v1->uval[1]==0xFF) 
 			{ 
@@ -2040,8 +2042,12 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 	// MESG("row %d eol %d",row,i);
 
  // wclrtoeol(wp->gwp->draw);
- wrefresh(wp->gwp->draw);
- update_panels();
+	if(wp->w_fp->slow_display) {
+		wrefresh(wp->gwp->draw);
+		 update_panels();
+		 doupdate();
+	} else
+		wnoutrefresh(wp->gwp->draw);
 }
 
 
@@ -2066,7 +2072,7 @@ void xdab(int y,int b,char *st,int bcolor,int fcolor)
  for(;*s;x++,s++) {
 	if(b==*s) {
 		wmove(cbox->wnd,y,x);
-		wrefresh(cbox->wnd);
+		wnoutrefresh(cbox->wnd);
 		drv_wcolor(cbox->wnd,COLOR_CTRL_FG,bcolor);
 		waddch(cbox->wnd,b);
 		break;
@@ -2117,7 +2123,7 @@ void box_line_print(int line,int start,char *st, int w, int selected,int active_
  else wprintw(cbox->wnd," %s",string_to_show);
  // drv_wcolor(cbox->wnd,COLOR_MENU_BG,COLOR_MENU_FG);
 
- wrefresh(cbox->wnd);
+ wnoutrefresh(cbox->wnd);
 }
 
 void export_region(ClipBoard *clip)
@@ -2156,7 +2162,7 @@ void clear_hmenu()
  drv_wcolor(hmenu_window,COLOR_MENU_FG,COLOR_MENU_BG);
  wmove(hmenu_window,0,0);
  wprintw(hmenu_window,"%*s",drv_numcol,"  ");
- wrefresh(hmenu_window);
+ wnoutrefresh(hmenu_window);
 
  msg_line(time2a());
 }
@@ -2185,7 +2191,7 @@ void drv_msg_line(char *arg)
 	utf_string_break(arg,drv_numcol-1);
 	wprintw(mesg_window,"%s",(char *)str2out(arg));
 	if(strlen(arg)>0) wclrtoeol(mesg_window);
-	wrefresh(mesg_window);
+	wnoutrefresh(mesg_window);
 }
 
 /* displays a string at xy and return the real on screen length */
@@ -2215,7 +2221,7 @@ int dspv(WINDOW *disp_window,int x,int y,char *st)
  };
  getyx(disp_window,y_pos,x_pos);
  wclrtoeol(disp_window);
- wrefresh(disp_window);
+ wnoutrefresh(disp_window);
  return(x_pos - x);
 }
 
@@ -2358,7 +2364,7 @@ void hdab(int x,int b,char *s,int bcolor,int fcolor)
 		break;
 	};
  };
- wrefresh(hmenu_window);
+ wnoutrefresh(hmenu_window);
 }
 
 /* Mechanism to resize windows after a screen resize */
@@ -2718,12 +2724,13 @@ void show_slide(WINDP *wp)
 // MESG("show_slide: window=%d start=%d end=%d len=%d",wp->id,start,end,len);
 
  drv_wcolor(wp->gwp->vline,fg_color,bg_color);
-#if	CLEAR_BG
- wbkgd(wp->gwp->vline,color_pair(fg_color,bg_color));
-#endif
+ if(wp->w_fp->slow_display){
+ 	wbkgd(wp->gwp->vline,color_pair(fg_color,bg_color));
+	wrefresh(wp->gwp->vline);
+ };
  for(row=0;row<wp->w_ntrows-1;row++){
 	wmove(wp->gwp->vline,row,0);
-	wrefresh(wp->gwp->vline);
+	// wrefresh(wp->gwp->vline);
 	if(row<start || row> end) {
 		wprintw(wp->gwp->vline,"%s"," ");
 	} else {
@@ -2737,9 +2744,12 @@ void show_slide(WINDP *wp)
  	wprintw(wp->gwp->vline,"%s","*");
  } else wprintw(wp->gwp->vline,"%s"," ");
 
-// wrefresh(wp->gwp->vline);
-// update_panels();
-// doupdate();
+ if(wp->w_fp->slow_display){
+ 	wnoutrefresh(wp->gwp->vline);
+	update_panels();
+	doupdate();
+ } else
+	wnoutrefresh(wp->gwp->vline);
 }
 
 #include "xthemes.c"

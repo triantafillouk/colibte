@@ -489,7 +489,7 @@ void update_physical_windows()
 			draw_window(1,wp,"update_physical_windows");
 		};
 	};
-	drv_post_windows_update();
+	// drv_post_windows_update();
 	// MESG("update_physical_windows: end");
 }
 
@@ -656,8 +656,9 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		if(c>127) {
 			int size;
 			size=get_utf_length(&uc);
-			if(c==0xE0 && uc.uval[1]>=0xB0) { 	/* slow down for thai chars  */
+			if((c==0xE0 && uc.uval[1]>=0xB0) || c==0xF0) { 	/* slow down for thai chars  */
 				wp->w_fp->slow_display=1;
+				// MESG("set slow display");
 			}
 			col += size-1;
 			c='C';

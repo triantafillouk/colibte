@@ -1747,11 +1747,11 @@ int get_utf_length(utfchar *utf_char_str)
 	};
 	if(b1==0x9F) {
 		int b2=utf_char_str->uval[2];
-#if	WSL | DARWIN
+#if	DARWIN
 		if (b2==0x84) return 1;
 		if (b2==0xA6) return 1;	/* not shown in Dawrin  */
 #else
-		if (b2==0x84) return 1;
+		if (b2==0x84) return 3;
 #endif
 		return 2;
 	};

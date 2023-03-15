@@ -597,7 +597,7 @@ double compute_string(char *s,char *new_string)
 	initialize_vars();
 	insert_string(fp,s,strlen(s));
 	fp->b_type=1;
-	value=compute_block(fp,cbfp,1);
+	value=compute_block(fp,cbfp,0);
 
 	if(new_string) {
 		get_text_offs(fp,new_string,0,FLineEnd(fp,0));
