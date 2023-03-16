@@ -63,7 +63,7 @@ int goto_mark(BMARK *mark)
 				bp=new_filebuf(dir_name(dir_num),FSDIRED);
 				bp->dir_num=dir_num;
 			};
-			strcpy(bp->b_dname,mark->dname);
+			strlcpy(bp->b_dname,mark->dname,sizeof(bp->b_dname));
 			err=insert_dir(bp,0);
 			select_filebuf(bp);
 			igotolinecol(mark->line,mark->column,0);

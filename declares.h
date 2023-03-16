@@ -469,7 +469,6 @@ int getcmd();
 int getstring(char *prompt, char *st1,int maxlen,int disinp);
 int delchar(char *st,int pos);
 int inspace(char *st,int pos);
-// int dspv(int x,int y,char *st);
 int isspecialchar(char *st);
 int normalize(int);
 int xlate(int,int);

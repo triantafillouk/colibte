@@ -201,9 +201,9 @@ int exec_shell(char *tline)
 	char exec_dir[MAXFLEN];
 
 	if(cwp) {
-		strcpy(exec_dir,cwp->w_fp->b_dname);
+		strlcpy(exec_dir,cwp->w_fp->b_dname,MAXFLEN);
 	} else {
-		strcpy(exec_dir,get_start_dir());
+		strlcpy(exec_dir,get_start_dir(),MAXFLEN);
 	};
 	set_list_type(LSHELL);
 
@@ -213,10 +213,10 @@ int exec_shell(char *tline)
 	/* get the command  */
 	set_sval("");
 
-	strcat(tline," > ");	// output file
-	strcat(tline,filnam);
-	strcat(tline," 2> "); 	// error file
-	strcat(tline,filerr);
+	strlcat(tline," > ",MAXLLEN);	// output file
+	strlcat(tline,filnam,MAXLLEN);
+	strlcat(tline," 2> ",MAXLLEN); 	// error file
+	strlcat(tline,filerr,MAXLLEN);
 #if	0
 	if(!macro_exec){
 		
@@ -256,8 +256,8 @@ int exec_shell(char *tline)
 		ifile(bperr,filerr,0);
 		bperr->b_state &= ~FS_CHG;
 		set_Offset(0);
-		strcpy(bp->b_dname,exec_dir);
-		strcpy(bperr->b_dname,exec_dir);
+		strlcpy(bp->b_dname,exec_dir,sizeof(bp->b_dname));
+		strlcpy(bperr->b_dname,exec_dir,sizeof(bp->b_dname));
 		select_filebuf(bp);
 		goto_eof(1);
 		ifile(bp,filnam,0);
@@ -295,9 +295,9 @@ int shell_cmd1(int  nused)
 	char exec_dir[MAXFLEN];
 
 	if(cwp) {
-		strcpy(exec_dir,cwp->w_fp->b_dname);
+		strlcpy(exec_dir,cwp->w_fp->b_dname,MAXFLEN);
 	} else {
-		strcpy(exec_dir,get_start_dir());
+		strlcpy(exec_dir,get_start_dir(),MAXFLEN);
 	};
 	set_list_type(LSHELL);
 
@@ -309,10 +309,10 @@ int shell_cmd1(int  nused)
     if ((s=nextarg("!", tline, MAXLLEN,true)) != TRUE) return(s);
 	set_sval("");
 
-	strcat(tline," > ");	// output file
-	strcat(tline,filnam);
-	strcat(tline," 2> "); 	// error file
-	strcat(tline,filerr);
+	strlcat(tline," > ",MAXLLEN);	// output file
+	strlcat(tline,filnam,MAXLLEN);
+	strlcat(tline," 2> ",MAXLLEN); 	// error file
+	strlcat(tline,filerr,MAXLLEN);
 	if(!macro_exec){
 		
 	};
@@ -350,8 +350,8 @@ int shell_cmd1(int  nused)
 	ifile(bperr,filerr,0);
 	bperr->b_state &= ~FS_CHG;
 	set_Offset(0);
-	strcpy(bp->b_dname,exec_dir);
-	strcpy(bperr->b_dname,exec_dir);
+	strlcpy(bp->b_dname,exec_dir,sizeof(bp->b_dname));
+	strlcpy(bperr->b_dname,exec_dir,sizeof(bperr->b_dname));
 	select_filebuf(bp);
 	goto_eof(1);
 	ifile(bp,filnam,0);
@@ -399,12 +399,12 @@ int bg_cmd(int n)
 		if(line[i]=='f') {
 			if(line[i-1]=='%') {
 				line[i-1]=0;
-				if(fname[0]!='/') strcat(line,"./");
-				strcat(line,fname);
+				if(fname[0]!='/') strlcat(line,"./",MAXLLEN);
+				strlcat(line,fname,MAXLLEN);
 			}
 		};
 	}
-	strcat(line,"&");
+	strlcat(line,"&",MAXLLEN);
 	sysexec(line);
 	set_update(cwp,UPD_MOVE);
     return (TRUE);
@@ -518,7 +518,7 @@ int grep_cmd(int  n)
 	EmptyText(bp);
 	sync();
 	if(strncmp(bp->b_dname,search_dir,MAXFLEN)) {
-		strcpy(bp->b_dname,search_dir);
+		strlcpy(bp->b_dname,search_dir,sizeof(bp->b_dname));
 	};
 	select_filebuf(bp);
 	empty_filebuf(bp);
@@ -527,7 +527,7 @@ int grep_cmd(int  n)
 	ifile(bp,filnam,0);
 	bp->b_state &= ~FS_CHG;
 	if(strncmp(bp->b_dname,search_dir,MAXFLEN)) {
-		strcpy(bp->b_dname,search_dir);
+		strlcpy(bp->b_dname,search_dir,sizeof(bp->b_dname));
 	};
 
 	set_Offset(0);
@@ -573,16 +573,13 @@ int filter_buffer(int nuse)
 	/* setup the proper file names */
 	bp = cbfp;
 
-	strcat(tline," >");
-	strcat(tline,filnam2);
-	strcat(tline," < ");
-	strcat(tline,bp->b_dname);
-//	MESG("filter:[%s][%s]",tline,bp->b_dname);
-	strcat(tline,"/");
-	strcat(tline,bp->b_fname);
-//	MESG("filter:[%s][%s]",tline,bp->b_fname);
-	strcat(tline," 2> /dev/null");
-//	MESG("filter:[%s]",tline);
+	strlcat(tline," >",MAXLLEN);
+	strlcat(tline,filnam2,MAXLLEN);
+	strlcat(tline," < ",MAXLLEN);
+	strlcat(tline,bp->b_dname,MAXLLEN);
+	strlcat(tline,"/",MAXLLEN);
+	strlcat(tline,bp->b_fname,MAXLLEN);
+	strlcat(tline," 2> /dev/null",MAXLLEN);
 
 	s=sysexec(tline);
 
@@ -794,7 +791,7 @@ int mkdirRecursive(const char *path, mode_t mode)
 	int stat;
 	char *p;
 //	MESG("mkdirRecursive:path=[%s]",path);
-    strncpy(opath, path, sizeof(opath));
+    strlcpy(opath, path, sizeof(opath));
     opath[sizeof(opath) - 1] = '\0';
     len = strlen(opath);
 //	MESG("mkdirRecursive: opath=[%s]",opath);

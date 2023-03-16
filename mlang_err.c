@@ -444,8 +444,7 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 	strlcpy(bufn+1,name,MAXFLEN);
 
 	/* construct the buffer name */
-	bufn[0] = '[';
-	strcat(bufn, "]");
+	strcpy(bufn,"[]");
 	
 	/* find the pointer to that buffer */
     if ((bp=get_filebuf(bufn,NULL,0)) == NULL) 

@@ -1610,7 +1610,7 @@ void disp_box(char *box_title,int border,int y1,int x1,int y2,int x2)
  	wprintw(cbox->wnd,"%s",cbox->title);
  };
 
- wnoutrefresh(cbox->wnd);
+ wrefresh(cbox->wnd);
  top_panel(cbox->panel);
  update_panels();
  lpush(cbox,box_list);
@@ -1653,7 +1653,7 @@ void remove_box()
 // dummy function for xlib compatibility
 void xupdate_box()
 {
-	wnoutrefresh(cbox->wnd);
+	wrefresh(cbox->wnd);
 }
 
 #if	USE_GLIB
@@ -1945,7 +1945,7 @@ int check_w_sibling(WINDP *wp,int left,int top,int new_rows)
 // dummy function
 void expose_window(WINDP *wp)
 {
-	wnoutrefresh(wp->gwp->draw);
+	wrefresh(wp->gwp->draw);
 }
 
 /* Put virtual screen text on physical */
@@ -2072,13 +2072,12 @@ void xdab(int y,int b,char *st,int bcolor,int fcolor)
  for(;*s;x++,s++) {
 	if(b==*s) {
 		wmove(cbox->wnd,y,x);
-		wnoutrefresh(cbox->wnd);
 		drv_wcolor(cbox->wnd,COLOR_CTRL_FG,bcolor);
 		waddch(cbox->wnd,b);
 		break;
 	};
  };
-// wrefresh(cbox->wnd);
+ wrefresh(cbox->wnd);
 }
 
 /*
@@ -2123,7 +2122,7 @@ void box_line_print(int line,int start,char *st, int w, int selected,int active_
  else wprintw(cbox->wnd," %s",string_to_show);
  // drv_wcolor(cbox->wnd,COLOR_MENU_BG,COLOR_MENU_FG);
 
- wnoutrefresh(cbox->wnd);
+ wrefresh(cbox->wnd);
 }
 
 void export_region(ClipBoard *clip)
@@ -2191,7 +2190,7 @@ void drv_msg_line(char *arg)
 	utf_string_break(arg,drv_numcol-1);
 	wprintw(mesg_window,"%s",(char *)str2out(arg));
 	if(strlen(arg)>0) wclrtoeol(mesg_window);
-	wnoutrefresh(mesg_window);
+	wrefresh(mesg_window);
 }
 
 /* displays a string at xy and return the real on screen length */
@@ -2346,7 +2345,7 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
 
 void refresh_menu()
 {
-//	top_menu(1);
+	top_menu(1);
 	set_update(cwp,UPD_MOVE);
 }
 
@@ -2364,7 +2363,7 @@ void hdab(int x,int b,char *s,int bcolor,int fcolor)
 		break;
 	};
  };
- wnoutrefresh(hmenu_window);
+ wrefresh(hmenu_window);
 }
 
 /* Mechanism to resize windows after a screen resize */

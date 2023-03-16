@@ -1274,14 +1274,14 @@ int script_exec(int nuse)
 	/* setup the proper file names */
 	bp = cbfp;
 
-	strcpy(dir_name,bp->b_dname);
+	strlcpy(dir_name,bp->b_dname,MAXFLEN);
 	escape_file_name(dir_name);
 
 	if(bp->b_flag & FSDIRED) {
 		dir_getfile(script_name,1);
 //		MESG("dir: scrip=[%s]",script_name);
 	} else {
-		strcpy(script_name,bp->b_fname);
+		strlcpy(script_name,bp->b_fname,MAXFLEN);
 		escape_file_name(script_name);
 //		MESG("file: scrip=[%s]",script_name);
 	};

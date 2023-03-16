@@ -196,7 +196,7 @@ int show_key(int key)
 	if(ptr[0]!=0) { 
 		if(strcmp("execsub",ptr)==0) snprintf(st,MAXMLEN,"subroutine [%s]",xe_key_name(key));
 		else snprintf(st,MAXMLEN,"%s = %s,",xe_key_name(key),ptr);
-		strcat(st,d);
+		strlcat(st,d,MAXMLEN);
 	} else {
 		snprintf(st,MAXMLEN,"%s not assigned key=%X!",xe_key_name(key),key);
 	};
@@ -726,7 +726,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 			char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
 //				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
 			if(strlen((char *)uc.uval)>strlen(composed)) {
-				strcpy((char *)uc.uval,composed);
+				strncpy((char *)uc.uval,composed,sizeof(uc.uval));
 			} else {
 //					MESG("compose normalization failed [%s][%s]",uc.uval,composed);
 				// put a similar character without accent!
@@ -1118,7 +1118,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 				char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
 //				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
 				if(strlen((char *)uc.uval)>strlen(composed)) {
-					strcpy((char *)uc.uval,composed);
+					strncpy((char *)uc.uval,composed,sizeof(uc.uval));
 				} else {
 //					MESG("compose normalization failed [%s][%s]",uc.uval,composed);
 					// put a similar character without accent!

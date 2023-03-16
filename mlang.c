@@ -1034,7 +1034,7 @@ double eval_fun1(int fnum)
 			int ind;
 			ind=(int)vv[0];
 			if(ind<main_args->cols) {
-			strcpy(slval,main_args->sval[(int)vv[0]]);
+			strlcpy(slval,main_args->sval[(int)vv[0]],sizeof(slval));
 			ex_vtype=VTYPE_STRING;
 			return atof(slval);
 			} else {
@@ -1816,7 +1816,7 @@ double term_plus(double value)
 		d1=num_term1();
 		 /* catanate string */
 			if(ex_vtype==VTYPE_STRING) {	/* string catanate  */
-				strcat(svalue,slval);
+				strlcat(svalue,slval,sizeof(svalue));
 				value=atof(svalue);
 				strlcpy(slval,svalue,MAXLLEN);
 				return value;
@@ -1827,7 +1827,7 @@ double term_plus(double value)
 				l0=d1;
 				if(l0==d1)snprintf(slval,MAXLLEN,"%ld",l0);
 				else snprintf(slval,MAXLLEN,"%f",d1);
-				strcat(svalue,slval);
+				strlcat(svalue,slval,sizeof(svalue));
 				value=0;
 				strlcpy(slval,svalue,MAXLLEN);
 				return value;

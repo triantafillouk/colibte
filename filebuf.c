@@ -199,7 +199,7 @@ extern int h_type[];
 /* create message string */
 #define SMESG(format,...) { \
     stat=snprintf(s,width, format, ##__VA_ARGS__);\
-	if(stat>width)	s[stat]=0; /* this is needed because snprintf does not guarantee a 0 at the end of the string */ \
+	if(stat>=width)	s[stat]=0; /* this is needed because snprintf does not guarantee a 0 at the end of the string */ \
 	sm[i++]=strdup(s);\
 	sm[i]=NULL;\
 	if(drv_type>0) MESG("show_info: %s",s);\
@@ -241,26 +241,26 @@ int show_info(int n)
 	};
 	if(cbfp->b_mode) {
 		strcpy(s,"Buffer mode: ");	
-		if(cbfp->b_mode & EMCRYPT) strcat(s,"Encrypted ");
-		if(cbfp->b_mode & EMUNIX) strcat(s,"unix ");
-		if(cbfp->b_mode & EMMAC) strcat(s,"mac ");
-		if(cbfp->b_mode & EMDOS) strcat(s,"dos ");
+		if(cbfp->b_mode & EMCRYPT) strlcat(s,"Encrypted ",width);
+		if(cbfp->b_mode & EMUNIX)  strlcat(s,"unix ",width);
+		if(cbfp->b_mode & EMMAC)   strlcat(s,"mac ",width);
+		if(cbfp->b_mode & EMDOS)   strlcat(s,"dos ",width);
 		sm[i++]=strdup(s);sm[i]=0;
 	};
 	strcpy(s,"Buffer flags: ");
-	if(cbfp->b_state & FS_ACTIVE) strcat(s,"Active,");
-	if(cbfp->b_state & FS_CHG) strcat(s,"Changed,");
-	if(cbfp->b_state & FS_VIEW) strcat(s,"Read only,");
-	if(cbfp->b_flag & FSINVS) strcat(s,"Internal ");
-	if(cbfp->b_flag & FSDIRED) strcat(s,"Dir list,");
-	if(cbfp->b_flag & FSMMAP) strcat(s,"Memory mapped,");
-	if(cbfp->b_flag & FSFILTER) strcat(s,"Filtered");
+	if(cbfp->b_state & FS_ACTIVE) 	strlcat(s,"Active,",width);
+	if(cbfp->b_state & FS_CHG) 		strlcat(s,"Changed,",width);
+	if(cbfp->b_state & FS_VIEW) 	strlcat(s,"Read only,",width);
+	if(cbfp->b_flag & FSINVS) 		strlcat(s,"Internal ",width);
+	if(cbfp->b_flag & FSDIRED) 		strlcat(s,"Dir list,",width);
+	if(cbfp->b_flag & FSMMAP) 		strlcat(s,"Memory mapped,",width);
+	if(cbfp->b_flag & FSFILTER) 	strlcat(s,"Filtered",width);
 #if	TNOTES
-	if(cbfp->b_flag & FSNOTES) strcat(s,"Notes Tag column,");
-	if(cbfp->b_flag & FSNOTESN) strcat(s,"Notes Note column,");
+	if(cbfp->b_flag & FSNOTES) 		strlcat(s,"Notes Tag column,",width);
+	if(cbfp->b_flag & FSNOTESN) 	strlcat(s,"Notes Note column,",width);
 #endif
-	if(cbfp->b_flag & FSNLIST) strcat(s,"Note list");
-// 	if(cbfp->b_flag & FSNCALIST) strcat(s,"Calendar list view");
+	if(cbfp->b_flag & FSNLIST) 		strlcat(s,"Note list",width);
+// 	if(cbfp->b_flag & FSNCALIST) 	strlcat(s,"Calendar list view",width);
 	sm[i++]=strdup(s);sm[i]=0;
 
 	if(cbfp->slow_display) { SMESG("buffer slow!");} else { SMESG("buffer fast display");};
@@ -269,13 +269,13 @@ int show_info(int n)
 	};
 	if(cbfp->view_mode !=0) {
 		strcpy(s,"View mode: ");	
-		if(cbfp->view_mode & VMHEX) strcat(s,"HEX ");
-		if(cbfp->view_mode & VMINP) strcat(s,",Input ");
-		strcat(s,". show: ");
-		if(cbfp->view_mode & VMLINES) strcat(s,"lines ");
-		else if(cbfp->view_mode & VMOFFSET) strcat(s,"offset ");
-		else if(cbfp->view_mode & VMINFO) strcat(s,"info");
-		else strcat(s,"no info");
+		if(cbfp->view_mode & VMHEX) strlcat(s,"HEX ",width);
+		if(cbfp->view_mode & VMINP) strlcat(s,",Input ",width);
+		strlcat(s,". show: ",width);
+		if(cbfp->view_mode & VMLINES) strlcat(s,"lines ",width);
+		else if(cbfp->view_mode & VMOFFSET) strlcat(s,"offset ",width);
+		else if(cbfp->view_mode & VMINFO) 	strlcat(s,"info",width);
+		else strlcat(s,"no info",width);
 		sm[i++]=strdup(s);sm[i]=0;
 	};
 	if(cbfp->b_flag >= FSNOTES) {

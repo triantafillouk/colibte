@@ -233,7 +233,7 @@ void show_menu_line(int line,M_element *element,int bcolor,int fcolor)
 		// MESG("menu line: [%s]->[%c]",element->help,active);
 		sprintf(text_line,"%c%s",active,element->txt);	
 	} else {
-		strcpy(text_line,element->txt);
+		strlcpy(text_line,element->txt,sizeof(text_line));
 	};
 	xdab(line+1,element->high, text_line,bcolor,fcolor);
 }

@@ -677,7 +677,11 @@ void update_base_dir(char *dir_name,char *bname)
  if(lslash) {
 	int l=strlen(dir_name);
 	int ss=lslash-bname;
-	strcat(dir_name,"/");	/* OSNOSAFE!  */
+	strlcat(dir_name,"/",MAXFLEN);
+	if(l+1+ss>MAXFLEN) {
+		ss=MAXFLEN-l-1;
+		ERROR("filename too big!");
+	};
 	memcpy(dir_name+l+1,bname,ss);
 	dir_name[l+ss+1]=0;
  };
@@ -765,10 +769,10 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 		if(cbfp->b_dname[0]==0){
 			if(getcwd(dir_name,MAXFLEN)==NULL) return false;
 		} else {
-			strcpy(dir_name,cbfp->b_dname);
+			strlcpy(dir_name,cbfp->b_dname,MAXFLEN);
 		};
 		} else {
-			strcpy(dir_name,get_start_dir());
+			strlcpy(dir_name,get_start_dir(),MAXFLEN);
 		}
 	};
 
@@ -1234,7 +1238,7 @@ int set_buf_key(FILEBUF *bp)	/* reset encryption key of current file */
 
 	/* get the string to use as an encrytion string */
 	bp->b_key[0]=0;
-	MESG("set_buf_key: b_type=%d %d",bp->b_type,NOTE_TYPE);
+	MESG("set_buf_key: b_type=%d %d size=%d",bp->b_type,NOTE_TYPE,sizeof(bp->b_key));
 #if	TNOTES
 	if(bp->b_type & NOTE_TYPE
 		|| bp->b_type & NOTE_CAL_TYPE
@@ -1245,7 +1249,7 @@ int set_buf_key(FILEBUF *bp)	/* reset encryption key of current file */
 			set_notes_key(1);
 		};
 		if(get_notes_key()) {
-			strcpy(bp->b_key,get_notes_key());
+			strlcpy(bp->b_key,get_notes_key(),sizeof(bp->b_key));
 		} else return false;
 	} else 
 #endif
@@ -1656,11 +1660,11 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
  					MESG("get new notes key");
 					set_notes_key(1);
 					if(get_notes_key()) {
-						strcpy(bp->b_key,get_notes_key());
+						strlcpy(bp->b_key,get_notes_key(),sizeof(bp->b_key));
 					} else return false;
 				} else {
 					MESG("set key from notes key!");
-					strcpy(bp->b_key,get_notes_key());
+					strlcpy(bp->b_key,get_notes_key(),sizeof(bp->b_key));
 				};
 				s=true;
 			} else 

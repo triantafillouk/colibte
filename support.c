@@ -261,9 +261,9 @@ char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_no
 			while (*path && (*path != PATHCHR))
 				*sp++ = *path++;
 			*sp++ = PATHCHR; *sp = 0;
-			strcat(fspec,subdir);
-			strcat(fspec,DIRSEPSTR);
-			strcat(fspec, fname);
+			strlcat(fspec,subdir,MAXFLEN);
+			strlcat(fspec,DIRSEPSTR,MAXFLEN);
+			strlcat(fspec, fname,MAXFLEN);
 			/* and try it out */
 			if(file_exist(fspec)) {
 				// MESG("	found [%s]",fspec);
