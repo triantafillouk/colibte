@@ -870,6 +870,7 @@ int create_notes_db(int n);
 int show_calendar_list(int n);
 int show_todo_list(int n);
 char *get_notes_status();
+int reload_tag_view();
 #endif
 
 #if	!DARWIN

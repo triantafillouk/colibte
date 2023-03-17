@@ -10,6 +10,7 @@
 
 extern FILEBUF *cbfp;
 #define	MD_NOTES	1
+#define	TITLE_FIRST	1
 
 /* ----- other utility functions ------ */
 #if	TNOTES
@@ -1315,7 +1316,7 @@ int show_tag_view(int n)
 {
 	sqlite3 *db;
 	FILEBUF *tag_view;
-
+	// MESG("show_tag_view:");
 	if((db=notes_db_open())==NULL) return false;
 	if(n==2) {
 		tag_view = get_filebuf("[Tag view]",NULL,0);
@@ -1323,21 +1324,32 @@ int show_tag_view(int n)
 		tag_view = cls_fout("[Tag view]");
 	};
 	select_filebuf(tag_view);
-
+#if	TITLE_FIRST
+	cbfp->b_header=" TAG             | TITLE                                                   | CATEGORY           | NAME                ";
+#else
 	if(cbfp->b_lang==0) {
 		cbfp->b_header=" TAG             │ NAME                │ CATEGORY           │ TITLE                                                   │";
 	} else {
 		cbfp->b_header=" TAG             | NAME                | CATEGORY           | TITLE                                                   ";
 	};
-
+#endif
 	int tag_width[] = { 1,TAGS_WIDTH };
+#if	TITLE_FIRST
+	int notes_widths[] = { 3 ,55, 18, 25};
+#else
 	int notes_widths[] = { 3 ,19, 18, 55};
+#endif
 	if(n!=2){
 		empty_list(tag_view->b_tag_list);
 		tag_view->b_tag_list = query_string_columns(db,"SELECT ROWID,NAME FROM TAG",tag_width);
 	};
+
 	empty_list(tag_view->dir_list_str);
+#if	TITLE_FIRST
+	tag_view->dir_list_str = query_string_columns(db,sql_note_str("SELECT ROWID,TITLE,CATEGORY,NAME FROM NOTES"),notes_widths);
+#else
 	tag_view->dir_list_str = query_string_columns(db,sql_note_str("SELECT ROWID,NAME,CATEGORY,TITLE FROM NOTES"),notes_widths);
+#endif
 	notes_db_close(db);
 
 	cwp->current_note_line=0;
@@ -1354,6 +1366,22 @@ int show_tag_view(int n)
 	set_update(cwp,UPD_EDIT|UPD_WINDOW);
 	return 1;
 }
+
+int reload_tag_view()
+{
+	int b_flag=cbfp->b_flag;
+	int top_note_line=cwp->top_note_line;
+	int note_line=cwp->current_note_line;
+	int stat=show_tag_view(1);
+	cbfp->b_flag=b_flag;
+	if(note_line > cbfp->b_notes) note_line=cbfp->b_notes;
+	if(top_note_line > cbfp->b_notes) top_note_line=cbfp->b_notes;
+
+	cwp->current_note_line=note_line;
+	cwp->top_note_line=top_note_line;
+	return stat;
+}
+
 #endif
 
 int set_tag_view_position(int line,int column)

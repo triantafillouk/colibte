@@ -1075,7 +1075,9 @@ int reload_file(int n)
  // MESG("reload_file: %X",fp->b_flag);
 #if	TNOTES
 	switch(fp->b_flag) {
-		case FSNOTES: return show_tag_view(1);
+		case FSNOTES: 
+		case FSNOTESN:
+			return reload_tag_view();
 		case FSNTODO: return show_todo_list(1);
 		case FSNCALENDAR: return show_calendar_list(1);
 	};
