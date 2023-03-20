@@ -921,6 +921,7 @@ int dir_del1(int  n)
   status=chdir(cbfp->b_dname);
   
   status=dir_getfile(fname,1);
+  escape_file_name(fname);
   if(!confirm("Delete file",fname,0)) return FALSE;
 
   // MESG("dir_del1: [%s] ---------",fname);
@@ -1622,6 +1623,12 @@ void escape_file_name(char *fname)
   if(*c==' ') { *dest++ = '\\'; };	/* escape space  */
   if(*c=='(') { *dest++ = '\\'; };	/* escape left parenthesis  */
   if(*c==')') { *dest++ = '\\'; };	/* escape right parenthesis  */
+  if(*c=='\'') { *dest++ = '\\'; };	/* escape right parenthesis  */
+  if(*c=='!') { *dest++ = '\\'; };	/* escape right parenthesis  */
+  if(*c=='$') { *dest++ = '\\'; };	/* escape right parenthesis  */
+  if(*c=='&') { *dest++ = '\\'; };	/* escape right parenthesis  */
+  if(*c=='*') { *dest++ = '\\'; };	/* escape right parenthesis  */
+  if(*c=='`') { *dest++ = '\\'; };	/* escape right parenthesis  */
   *dest++ = *c;
  };*dest=0;
  strlcpy(fname,efname,MAXFLEN);
