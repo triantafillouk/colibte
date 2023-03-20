@@ -762,11 +762,12 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	else end_column=max_size+num_columns;
 	if(row>0) {	/* not for header!  */
 		if(index==row) {
-// 			bg_color=COLOR_SELECT_BG;
+			// bg_color=COLOR_SELECT_BG;
 			bg_color=COLOR_CODE_BG;
 			if(drv_colors==8) 
 				fg_color=COLOR_FG;
 			else if(selected>0) fg_color=COLOR_STANDOUT_FG;
+			if(wp==cwp) fg_color |= FONT_STYLE_UNDERLINE;
 		} else {
 			if(selected>0) {
 				if(drv_colors==8) bg_color=COLOR_SELECT_BG;
@@ -1485,7 +1486,10 @@ void vteeol(WINDP *wp, int selected,int inside)
 				}	// header
 				else if(selected==3)  { if(drv_colors>8)  ctl_b=COLOR_INACTIVE_BG;else ctl_b=COLOR_SELECT_BG;}	// just selected
 				else if(selected==-1) { if(drv_colors==8) ctl_b=COLOR_SELECT_BG ;}	// empty
-				else                  ctl_b=COLOR_CODE_BG;	// current line
+				else                  {
+					ctl_b=COLOR_CODE_BG;	// current line
+					if(wp==cwp) ctl_f |= FONT_STYLE_UNDERLINE;
+				};
 				svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,wp->w_ntcols-wp->vtcol);
 			} else {
 				// MESG("	from col=%d line_bcolor=%X %X width=%d",wp->vtcol,line_bcolor,ctl_b,wp->w_ntcols-wp->vtcol);
