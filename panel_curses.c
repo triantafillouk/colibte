@@ -1417,7 +1417,6 @@ int text_mouse_key(int *c)
 void drv_win_move(WINDP *wp,int row,int col)
 {
 	 wmove(stdscr,wp->gwp->t_ypos+row,wp->gwp->t_xpos+col);
-	//wmove(wp->gwp->draw,row,col);
 }
 
 void drv_move(int row, int col)

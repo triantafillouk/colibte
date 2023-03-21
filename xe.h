@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.58T46 (20/03/2023)"
+#define VERSION 	"#01.58T47 (21/03/2023)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -36,6 +36,7 @@
 #endif
 
 #define	_LARGEFILE64_SOURCE	1
+#define UNDERLINE_CURRENT_DIR_LINE	0
 
 /****************************************************************/
 #define	DRIVER_CURSES	0

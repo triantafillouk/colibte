@@ -781,7 +781,9 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 			if(drv_colors==8) 
 				fg_color=COLOR_FG;
 			else if(selected>0) fg_color=COLOR_STANDOUT_FG;
+#if	UNDERLINE_CURRENT_DIR_LINE
 			if(wp==cwp) fg_color |= FONT_STYLE_UNDERLINE;
+#endif
 		} else {
 			if(selected>0) {
 				if(drv_colors==8) bg_color=COLOR_SELECT_BG;
@@ -1512,7 +1514,9 @@ void vteeol(WINDP *wp, int selected,int inside)
 				else if(selected==-1) { if(drv_colors==8) ctl_b=COLOR_SELECT_BG ;}	// empty
 				else                  {
 					ctl_b=COLOR_CODE_BG;	// current line
+#if	UNDERLINE_CURRENT_DIR_LINE
 					if(wp==cwp) ctl_f |= FONT_STYLE_UNDERLINE;
+#endif
 				};
 				svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,wp->w_ntcols-wp->vtcol);
 			} else {
