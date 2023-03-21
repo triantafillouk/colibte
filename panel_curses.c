@@ -1992,7 +1992,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 	wmove(wp->gwp->draw,row,xcol);
 	imax=maxcol+1;
-#if	NUSE
+#if	USE_SLOW_DISPLAY
 	if(wp->w_fp->slow_display) 
 	{ /* a little bit slower but clears shadow text!  */
 		wclrtoeol(wp->gwp->draw);
@@ -2009,7 +2009,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 		drv_wcolor(wp->gwp->draw,fcolor,bcolor);
 		ch=v1->uval[0];
-#if	NUSE
+#if	USE_SLOW_DISPLAY
 		if(ch==0xF0) wp->w_fp->slow_display=1;
 #endif
 		if(ch==0xFF) { 	/* skip in case of char len > 1  */
@@ -2057,7 +2057,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 	};
 	// MESG("row %d eol %d",row,i);
 
-#if	NUSE
+#if	USE_SLOW_DISPLAY
 	if(wp->w_fp->slow_display) {
 		wrefresh(wp->gwp->draw);
 		 update_panels();
@@ -2740,7 +2740,7 @@ void show_slide(WINDP *wp)
 // MESG("show_slide: window=%d start=%d end=%d len=%d",wp->id,start,end,len);
 
  drv_wcolor(wp->gwp->vline,fg_color,bg_color);
-#if	NUSE
+#if	USE_SLOW_DISPLAY
  if(wp->w_fp->slow_display){
  	wbkgd(wp->gwp->vline,color_pair(fg_color,bg_color));
 	wrefresh(wp->gwp->vline);
@@ -2761,7 +2761,7 @@ void show_slide(WINDP *wp)
  	drv_wcolor(wp->gwp->vline,COLOR_CTRL_FG,bg_color);
  	wprintw(wp->gwp->vline,"%s","*");
  } else wprintw(wp->gwp->vline,"%s"," ");
-#if	NUSE
+#if	USE_SLOW_DISPLAY
  if(wp->w_fp->slow_display){
  	wnoutrefresh(wp->gwp->vline);
 	update_panels();

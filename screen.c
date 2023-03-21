@@ -669,7 +669,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 			size=get_utf_length(&uc);
 			if((c==0xE0 /* && uc.uval[1]>=0xB0 */) || c==0xF0) { 	/* slow down for thai chars  */
 				wp->vs[row]->slow_line=1;
-#if	NUSE
+#if	USE_SLOW_DISPLAY
 				wp->w_fp->slow_display=1;
 #endif
 				// MESG("set slow display");
@@ -1047,7 +1047,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 				size=get_utf_length(&uc);
 				if(c==0xE0 /* &&  uc.uval[1]>=0xB0 */ )  {
 					wp->vs[wp->vtrow]->slow_line=1;
-#if	NUSE
+#if	USE_SLOW_DISPLAY
 					fp->slow_display=1; /* slow down for thai chars  */
 #endif
 				};
@@ -1135,7 +1135,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 			c=uc.uval[0];
 			if(c==0xE0 /* && uc.uval[1]>=0xB0 */){
 				wp->vs[wp->vtrow]->slow_line=1;
-#if	NUSE
+#if	USE_SLOW_DISPLAY
 				fp->slow_display=1;	/* slow down for thai chars  */
 #endif
 			};
