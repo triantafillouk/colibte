@@ -24,6 +24,7 @@ void upd_move(WINDP *wp,char *from);
 void vteeol(WINDP *wp, int selected,int inside);
 int SUtfCharLen(char *utfstr,int offset,utfchar *uc);
 int line_bcolor=0;
+void drv_clear_line(WINDP *wp,int row);
 
 extern COLOR_SCHEME *current_scheme;
 
@@ -450,6 +451,16 @@ void draw_window(int flag, WINDP *wp,char *from)
 		/* for each line that needs to be updated*/
 		if ((wp->vs[i]->v_flag) ) 
 		{
+#if	1
+			if(wp->vs[i]->slow_line==1) wp->vs[i]->slow_line++;
+			else 
+			if(wp->vs[i]->slow_line==2) 
+			{
+				drv_clear_line(wp,i);
+				wp->vtcol=0;
+				wp->vs[i]->slow_line=0;
+			};
+#endif
 			draw_window_line(wp,i);
 			ulines++;
 		}
@@ -656,8 +667,11 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		if(c>127) {
 			int size;
 			size=get_utf_length(&uc);
-			if((c==0xE0 && uc.uval[1]>=0xB0) || c==0xF0) { 	/* slow down for thai chars  */
+			if((c==0xE0 /* && uc.uval[1]>=0xB0 */) || c==0xF0) { 	/* slow down for thai chars  */
+				wp->vs[row]->slow_line=1;
+#if	NUSE
 				wp->w_fp->slow_display=1;
+#endif
 				// MESG("set slow display");
 			}
 			col += size-1;
@@ -706,7 +720,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	};
 
 	// MESG("vt_str: num_columns=%d vtcol=%d w_infocol=%d",num_columns,wp->vtcol,wp->w_infocol);
-	for (; i <  llen && wp->vtcol < wp->w_ntcols; i++) 
+	for (; i <=  llen && wp->vtcol < wp->w_ntcols; i++) 
 	{	// this is the on screen shown area of the line
 		int display_size=0;
 		if(ptr1>=header_size) break;
@@ -736,7 +750,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 #endif
 		if(wp->vtcol==wp->w_ntcols-1 && display_size>1) { // do not show last double width character!
 			memset(uc.uval,0,8);
-			uc.uval[0]=0xFF;
+			uc.uval[0]=' ';
 			uc.uval[1]=0;
 			vtputwc(wp,&uc);
 		} else 
@@ -1029,7 +1043,12 @@ offs vtline(WINDP *wp, offs tp_offs)
 			if(c>127) {
 				int size;
 				size=get_utf_length(&uc);
-				if(c==0xE0 && uc.uval[1]>=0xB0)  fp->slow_display=1; /* slow down for thai chars  */
+				if(c==0xE0 /* &&  uc.uval[1]>=0xB0 */ )  {
+					wp->vs[wp->vtrow]->slow_line=1;
+#if	NUSE
+					fp->slow_display=1; /* slow down for thai chars  */
+#endif
+				};
 				col += size-1;
 				c='m';
 			};
@@ -1112,7 +1131,12 @@ offs vtline(WINDP *wp, offs tp_offs)
 			char_bytes = ptr1-char_bytes;
 			display_size=get_utf_length(&uc);
 			c=uc.uval[0];
-			if(c==0xE0 && uc.uval[1]>=0xB0)  fp->slow_display=1;	/* slow down for thai chars  */
+			if(c==0xE0 /* && uc.uval[1]>=0xB0 */){
+				wp->vs[wp->vtrow]->slow_line=1;
+#if	NUSE
+				fp->slow_display=1;	/* slow down for thai chars  */
+#endif
+			};
 #if USE_GLIB	// Convert to composed character if possible to view it!
 			// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
 			if(uc.uval[3]!=0)
@@ -1133,7 +1157,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 #endif
 			if(wp->vtcol==wp->w_ntcols-1 && display_size>1) { // do not show last double width character!
 				memset(uc.uval,0,8);
-				uc.uval[0]=0xFF;
+				uc.uval[0]=' ';
 				uc.uval[1]=0;
 				vtputwc(wp,&uc);
 			} else 
@@ -1193,7 +1217,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 	// in case of utf error show local chars with different color!
 	// if(slang)
 	if(fp->b_lang==0){
-		for(i0=0;i0<wp->w_ntcols-1;i0++) {
+		for(i0=0;i0<wp->w_ntcols;i0++) {
 			if(v_text[i0].uval[0]>128) 
 			{
 				if(v_text[i0].uval[1]==0) {
@@ -1740,7 +1764,6 @@ int  show_position_info(int short_version)
 					long value=utf_value_len(&size);
 					if(debug_flag()) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX %d",value,size);
 					else sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX",value);
-					// sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX %d",value,cwp->w_fp->slow_display);
 				};
 				if(strlen(str) < 10) short_version=1;
 			};
@@ -2285,6 +2308,7 @@ void allocate_virtual_window(WINDP *wp)
 		exit(1);
 	};
 	vp->v_flag=0;
+	vp->slow_line=0;
 	wp->vs[i]=vp;
  };
  // set the last one as NULL to know till where to free!

@@ -1416,7 +1416,8 @@ int text_mouse_key(int *c)
 
 void drv_win_move(WINDP *wp,int row,int col)
 {
-	wmove(stdscr,wp->gwp->t_ypos+row,wp->gwp->t_xpos+col);
+	 wmove(stdscr,wp->gwp->t_ypos+row,wp->gwp->t_xpos+col);
+	//wmove(wp->gwp->draw,row,col);
 }
 
 void drv_move(int row, int col)
@@ -1946,6 +1947,20 @@ int check_w_sibling(WINDP *wp,int left,int top,int new_rows)
 void expose_window(WINDP *wp)
 {
 	wrefresh(wp->gwp->draw);
+	doupdate();
+}
+
+void drv_clear_line(WINDP *wp,int row)
+{
+	wmove(wp->gwp->draw,row,0);
+	int i;
+	for(i=0;i<wp->w_ntcols;i++) {
+		waddstr(wp->gwp->draw,"-");
+	};
+	wrefresh(wp->gwp->draw);
+	doupdate();
+	wmove(wp->gwp->draw,row,0);
+	// MESG("drv_clear_line: %2d",row);
 }
 
 /* Put virtual screen text on physical */
@@ -1978,7 +1993,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 	wmove(wp->gwp->draw,row,xcol);
 	imax=maxcol+1;
-
+#if	NUSE
 	if(wp->w_fp->slow_display) 
 	{ /* a little bit slower but clears shadow text!  */
 		wclrtoeol(wp->gwp->draw);
@@ -1986,7 +2001,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 	 	update_panels();
 		doupdate();
 	};
-
+#endif
 	for(i=0;i<=imax;i++) {
 	 uint32_t ch;
 	 	if(v1->fcolor < 256) fcolor = v1->fcolor+v1->attr;
@@ -1995,7 +2010,9 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 		drv_wcolor(wp->gwp->draw,fcolor,bcolor);
 		ch=v1->uval[0];
+#if	NUSE
 		if(ch==0xF0) wp->w_fp->slow_display=1;
+#endif
 		if(ch==0xFF) { 	/* skip in case of char len > 1  */
 			if(v1->uval[1]==0xFF) 
 			{ 
@@ -2041,12 +2058,13 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 	};
 	// MESG("row %d eol %d",row,i);
 
- // wclrtoeol(wp->gwp->draw);
+#if	NUSE
 	if(wp->w_fp->slow_display) {
 		wrefresh(wp->gwp->draw);
 		 update_panels();
 		 doupdate();
 	} else
+#endif
 		wnoutrefresh(wp->gwp->draw);
 }
 
@@ -2723,10 +2741,12 @@ void show_slide(WINDP *wp)
 // MESG("show_slide: window=%d start=%d end=%d len=%d",wp->id,start,end,len);
 
  drv_wcolor(wp->gwp->vline,fg_color,bg_color);
+#if	NUSE
  if(wp->w_fp->slow_display){
  	wbkgd(wp->gwp->vline,color_pair(fg_color,bg_color));
 	wrefresh(wp->gwp->vline);
  };
+#endif
  for(row=0;row<wp->w_ntrows-1;row++){
 	wmove(wp->gwp->vline,row,0);
 	// wrefresh(wp->gwp->vline);
@@ -2742,12 +2762,13 @@ void show_slide(WINDP *wp)
  	drv_wcolor(wp->gwp->vline,COLOR_CTRL_FG,bg_color);
  	wprintw(wp->gwp->vline,"%s","*");
  } else wprintw(wp->gwp->vline,"%s"," ");
-
+#if	NUSE
  if(wp->w_fp->slow_display){
  	wnoutrefresh(wp->gwp->vline);
 	update_panels();
 	doupdate();
  } else
+#endif
 	wnoutrefresh(wp->gwp->vline);
 }
 

@@ -298,6 +298,7 @@ typedef struct vchar {
 
 typedef struct  VIDEO {
 	short int	v_flag;		/* line Flags */
+	short int	slow_line;
 	vchar v_text[1];
 }   VIDEO;
 
@@ -665,7 +666,9 @@ typedef struct  FILEBUF {
 	int err;	/* negative if not syntax checked  */
 	BTREE *symbol_tree;	/* local symbol table  */
 	tok_data *symbol_table;	/* instance of variables data  */
+#if	NUSE
 	int slow_display;
+#endif
 //	Notes structures
 #if	TNOTES
 	notes_struct *b_note;

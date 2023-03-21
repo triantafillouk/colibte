@@ -928,7 +928,9 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 #if	CRYPT
 	bp->b_key[0]=0;
 #endif
+#if	NUSE
 	bp->slow_display=0;
+#endif
 #if	TNOTES
 	bp->b_note=NULL;
 	bp->b_header=NULL;
