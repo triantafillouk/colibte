@@ -1478,10 +1478,10 @@ on_search_entry_ok_event (GtkWidget *widget,
 	MESG("search type is %d",search_type);
 //	gtk_widget_grab_focus(cwp->gwp->draw);
 	MESG("search input is [%s]",gtk_entry_get_text((GtkEntry *)search_input));
-	strcpy(search_pattern,gtk_entry_get_text((GtkEntry *)search_input));
+	strlcpy(search_pattern,gtk_entry_get_text((GtkEntry *)search_input),MAXLLEN);
 	MESG("search pattern [%s]",search_pattern);
 	if(search_type==2) {
-		strcpy(replace_pattern,gtk_entry_get_text((GtkEntry *)replace_input));
+		strlcpy(replace_pattern,gtk_entry_get_text((GtkEntry *)replace_input),MAXLLEN);
 	};
 	MESG("close window");
 	search_close(search_dialog);

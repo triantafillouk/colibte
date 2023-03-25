@@ -290,7 +290,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int tok_type=0;
  int next_tok_type=0;
  int script_active=0;
- // int bquotes=0;
 
  // MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
  if(
@@ -329,7 +328,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
  foffset=0;	/* goto to the beginning of the buffer  */
  cstack=new_list(0,"curles_stack"); // create curles stack 
- // MESG("before looping: script_active=%d",script_active);
+ // MESG("parse_block1: before looping: script_active=%d",script_active);
  err_num=0;
  err_line=0;
  tok_line=0;
@@ -764,7 +763,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
- // MESG("END of parsing! type=%d level=%d",tok_type,curl_level);
+ // MESG("parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
  {	/* add eof token!  */
 	if(tok_type!=TOK_SEP) 
 	{	
@@ -796,7 +795,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	bf->symbol_tree->max_items = bf->symbol_tree->items+extra;
  };
 
- // MESG("create token table from token list");
+ // MESG("parse_block1: create token table from token list");
  set_tok_table(bf, lex_parser);
 
  free_list(lex_parser,"lex_parser");

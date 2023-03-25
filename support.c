@@ -182,23 +182,6 @@ char *get_base_name(char *full_name)
 	return (cp1);
 }
 
-#if	NUSE
-// base name (creates a new string)
-char * base_name(char *full_name)
-{
- register char *cp1;
- register char *cp2;
- if(full_name==NULL) return NULL;
- cp1 = full_name;
- while (*cp1 != 0) ++cp1; // goto the end
-
- while (cp1!=full_name && cp1[-1]!='/')  --cp1;
- 
- cp2 = strdup(cp1);
- return cp2;
-}
-#endif
-
 /* 	creates the dir name from a full file name 
 	new area is allocated for the string
 */
@@ -234,37 +217,37 @@ char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_no
 	char *sp;	/* pointer into path spec */
 	static char fspec[MAXFLEN];	/* full path spec to search */
 	int slen=0;
-//	MESG("find_file:fname=[%s] in subdir=[%s] check_start_dir=%d [%s]",fname,subdir,check_start_dir,start_dir_val);	
+	// MESG("find_file:fname=[%s] in subdir=[%s] check_start_dir=%d [%s]",fname,subdir,check_start_dir,start_dir_val);	
 	if(check_start_dir) { // check application's start dir
-		if(subdir!=NULL && subdir[0]!=0) slen=snprintf(fspec,MAXFLEN,"%s/%s/%s",start_dir_val,subdir,fname);
+		if(subdir[0]!=0) slen=snprintf(fspec,MAXFLEN,"%s/%s/%s",start_dir_val,subdir,fname);
 		else slen=snprintf(fspec,MAXFLEN,"%s/%s",get_start_dir(),fname);
 		if(slen>MAXFLEN) { MESG("truncated!");return NULL;};
 		if(file_exist(fspec)) {
-			MESG("	found [%s]",fspec);
+			// MESG("	found [%s]",fspec);
 			return(fspec);
 		};
 	}; 
 	
 	// check the home dir under app dir
-	if(subdir!=NULL) snprintf(fspec,MAXFLEN,"%s/%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,subdir,fname);
+	if(subdir[0]!=0) snprintf(fspec,MAXFLEN,"%s/%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,subdir,fname);
 	else snprintf(fspec,MAXFLEN,"%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,fname);
 	if(file_exist(fspec)) {
-		MESG("	found [%s]",fspec);
+		// MESG("	found [%s]",fspec);
 		return(fspec);
 	};
 
 	// check the home dir
-	if(subdir!=NULL) snprintf(fspec,MAXFLEN,"%s/%s/%s",getenv("HOME"),subdir,fname);
+	if(subdir[0]!=0) snprintf(fspec,MAXFLEN,"%s/%s/%s",getenv("HOME"),subdir,fname);
 	else snprintf(fspec,MAXFLEN,"%s/%s",getenv("HOME"),fname);
 	if(file_exist(fspec)) {
-		MESG("	found [%s]",fspec);
+		// MESG("	found [%s]",fspec);
 		return(fspec);
 	};
 
 	snprintf(fspec,MAXFLEN,"%s/%s/%s",APPLICATION_DIR,subdir,fname);
 
 	if(file_exist(fspec)) {
-		MESG("	found [%s]",fspec);
+		// MESG("	found [%s]",fspec);
 		return(fspec);
 	};
 
@@ -278,12 +261,12 @@ char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_no
 			while (*path && (*path != PATHCHR))
 				*sp++ = *path++;
 			*sp++ = PATHCHR; *sp = 0;
-			strcat(fspec,subdir);
-			strcat(fspec,DIRSEPSTR);
-			strcat(fspec, fname);
+			strlcat(fspec,subdir,MAXFLEN);
+			strlcat(fspec,DIRSEPSTR,MAXFLEN);
+			strlcat(fspec, fname,MAXFLEN);
 			/* and try it out */
 			if(file_exist(fspec)) {
-				MESG("	found [%s]",fspec);
+				// MESG("	found [%s]",fspec);
 				return(fspec);
 			};
 			if (*path == PATHCHR) ++path;
@@ -291,45 +274,12 @@ char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_no
 	if(create_if_not_found) {	/* Create it in . home dir  */
 		if(subdir) 	slen=snprintf(fspec,MAXFLEN,"%s/%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,subdir,fname);
 		else slen=snprintf(fspec,MAXFLEN,"%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,fname);
-		MESG("create new file [%s]",fspec);
+		// MESG("create new file [%s]",fspec);
 		return(fspec);
 	} else
 	MESG("file [%s] not found!",fname);
 	return(NULL);
 }
-
-#if	NUSE
-// remove directory and extention, return dup string
-char *bname1_dup(char *fname)
-{
- char *b1;
- char *b2;
- char *s;
- char d;
- if(fname==NULL) return NULL;
- b1=get_base_name(fname);
- b2=b1;
- while(*b2!='.' && *b2!=0) b2++;
- d=*b2;
- *b2=0;
- s=strdup(b1);
- *b2=d;
- return s;
-}
-
-/* remove directory and extension , return basename pointer */
-char *bname1(char *fname) 
-{
- static char bb[512];
- char *b1;
- register int i;
- b1=get_base_name(fname);
-
- for(i=0;i<79 && *b1!='.' && *b1>31;i++) bb[i]=*b1++;
- bb[i]=0;
- return(bb);
-}
-#endif
 
 void msg_log(int priority,const char *fmt, ...)
 {

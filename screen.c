@@ -24,6 +24,7 @@ void upd_move(WINDP *wp,char *from);
 void vteeol(WINDP *wp, int selected,int inside);
 int SUtfCharLen(char *utfstr,int offset,utfchar *uc);
 int line_bcolor=0;
+void drv_clear_line(WINDP *wp,int row);
 
 extern COLOR_SCHEME *current_scheme;
 
@@ -47,6 +48,8 @@ extern int CHEIGHTI;
 
 int	update_all  = TRUE;                 /* TRUE if screen is garbage	*/
 int	noupdate=1;		/* no need to update the screen , no display started */
+
+utfchar double_hline = { "═" };
 
 #if	NUSE
 int addutfvchar(char *str, vchar *vc, int pos, FILEBUF *w_fp)
@@ -87,7 +90,7 @@ void svwchar(vchar *vc, utfchar *uc,int b_color,int f_color)
  vc->fcolor=f_color%256;
  if(f_color>255) {
  	vc->attr = f_color - (vc->fcolor);
-	MESG("! %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
+	// MESG("! %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
  } else {
  	vc->attr = current_scheme->color_style[vc->fcolor].color_attr;
 	// if(vc->uval[0]!=' ')
@@ -103,14 +106,8 @@ void svwchar(vchar *vc, utfchar *uc,int b_color,int f_color)
 /* set non utf char with color  */
 void  svchar(vchar *vc,int val,int b_color,int f_color)
 {
+ memset(vc->uval,0,8);
  vc->uval[0]=val;
- vc->uval[1]=0; 
- vc->uval[2]=0; 
- vc->uval[3]=0; 
- vc->uval[4]=0; 
- vc->uval[5]=0; 
- vc->uval[6]=0; 
- vc->uval[7]=0; 
  // if(vc->attr) MESG("svchar ul");
  vc->bcolor=b_color;
  vc->fcolor=f_color%256;
@@ -122,10 +119,6 @@ void  svchar(vchar *vc,int val,int b_color,int f_color)
 	// if(vc->uval[0]!=' ')
 	// MESG("- %1s f=%2d a=%X",vc->uval,vc->fcolor,vc->attr);
  };
-#if	0
- vc->display_width=CLEN;
- vc->display_height=CHEIGHTI;
-#endif
 }
 
 /* set virtual color */
@@ -204,7 +197,7 @@ int show_key(int key)
 	if(ptr[0]!=0) { 
 		if(strcmp("execsub",ptr)==0) snprintf(st,MAXMLEN,"subroutine [%s]",xe_key_name(key));
 		else snprintf(st,MAXMLEN,"%s = %s,",xe_key_name(key),ptr);
-		strcat(st,d);
+		strlcat(st,d,MAXMLEN);
 	} else {
 		snprintf(st,MAXMLEN,"%s not assigned key=%X!",xe_key_name(key),key);
 	};
@@ -458,6 +451,16 @@ void draw_window(int flag, WINDP *wp,char *from)
 		/* for each line that needs to be updated*/
 		if ((wp->vs[i]->v_flag) ) 
 		{
+#if	1
+			if(wp->vs[i]->slow_line==1) wp->vs[i]->slow_line++;
+			else 
+			if(wp->vs[i]->slow_line==2) 
+			{
+				drv_clear_line(wp,i);
+				wp->vtcol=0;
+				wp->vs[i]->slow_line=0;
+			};
+#endif
 			draw_window_line(wp,i);
 			ulines++;
 		}
@@ -497,7 +500,7 @@ void update_physical_windows()
 			draw_window(1,wp,"update_physical_windows");
 		};
 	};
-	drv_post_windows_update();
+	// drv_post_windows_update();
 	// MESG("update_physical_windows: end");
 }
 
@@ -664,8 +667,12 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		if(c>127) {
 			int size;
 			size=get_utf_length(&uc);
-			if(c==0xE0 && uc.uval[1]>=0xB0) { 	/* slow down for thai chars  */
+			if((c==0xE0 /* && uc.uval[1]>=0xB0 */) || c==0xF0) { 	/* slow down for thai chars  */
+				wp->vs[row]->slow_line=1;
+#if	USE_SLOW_DISPLAY
 				wp->w_fp->slow_display=1;
+#endif
+				// MESG("set slow display");
 			}
 			col += size-1;
 			c='C';
@@ -713,7 +720,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	};
 
 	// MESG("vt_str: num_columns=%d vtcol=%d w_infocol=%d",num_columns,wp->vtcol,wp->w_infocol);
-	for (; i <  llen && wp->vtcol < wp->w_ntcols; i++) 
+	for (; i <=  llen && wp->vtcol < wp->w_ntcols; i++) 
 	{	// this is the on screen shown area of the line
 		int display_size=0;
 		if(ptr1>=header_size) break;
@@ -733,7 +740,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 			char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
 //				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
 			if(strlen((char *)uc.uval)>strlen(composed)) {
-				strcpy((char *)uc.uval,composed);
+				strncpy((char *)uc.uval,composed,sizeof(uc.uval));
 			} else {
 //					MESG("compose normalization failed [%s][%s]",uc.uval,composed);
 				// put a similar character without accent!
@@ -743,7 +750,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 #endif
 		if(wp->vtcol==wp->w_ntcols-1 && display_size>1) { // do not show last double width character!
 			memset(uc.uval,0,8);
-			uc.uval[0]=0xFF;
+			uc.uval[0]=' ';
 			uc.uval[1]=0;
 			vtputwc(wp,&uc);
 		} else 
@@ -769,10 +776,14 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	else end_column=max_size+num_columns;
 	if(row>0) {	/* not for header!  */
 		if(index==row) {
-			bg_color=COLOR_SELECT_BG;
+			// bg_color=COLOR_SELECT_BG;
+			bg_color=COLOR_CODE_BG;
 			if(drv_colors==8) 
 				fg_color=COLOR_FG;
 			else if(selected>0) fg_color=COLOR_STANDOUT_FG;
+#if	UNDERLINE_CURRENT_DIR_LINE
+			if(wp==cwp) fg_color |= FONT_STYLE_UNDERLINE;
+#endif
 		} else {
 			if(selected>0) {
 				if(drv_colors==8) bg_color=COLOR_SELECT_BG;
@@ -1034,7 +1045,12 @@ offs vtline(WINDP *wp, offs tp_offs)
 			if(c>127) {
 				int size;
 				size=get_utf_length(&uc);
-				if(c==0xE0 && uc.uval[1]>=0xB0)  fp->slow_display=1; /* slow down for thai chars  */
+				if(c==0xE0 /* &&  uc.uval[1]>=0xB0 */ )  {
+					wp->vs[wp->vtrow]->slow_line=1;
+#if	USE_SLOW_DISPLAY
+					fp->slow_display=1; /* slow down for thai chars  */
+#endif
+				};
 				col += size-1;
 				c='m';
 			};
@@ -1117,7 +1133,12 @@ offs vtline(WINDP *wp, offs tp_offs)
 			char_bytes = ptr1-char_bytes;
 			display_size=get_utf_length(&uc);
 			c=uc.uval[0];
-			if(c==0xE0 && uc.uval[1]>=0xB0)  fp->slow_display=1;	/* slow down for thai chars  */
+			if(c==0xE0 /* && uc.uval[1]>=0xB0 */){
+				wp->vs[wp->vtrow]->slow_line=1;
+#if	USE_SLOW_DISPLAY
+				fp->slow_display=1;	/* slow down for thai chars  */
+#endif
+			};
 #if USE_GLIB	// Convert to composed character if possible to view it!
 			// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
 			if(uc.uval[3]!=0)
@@ -1125,7 +1146,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 				char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
 //				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
 				if(strlen((char *)uc.uval)>strlen(composed)) {
-					strcpy((char *)uc.uval,composed);
+					strncpy((char *)uc.uval,composed,sizeof(uc.uval));
 				} else {
 //					MESG("compose normalization failed [%s][%s]",uc.uval,composed);
 					// put a similar character without accent!
@@ -1138,7 +1159,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 #endif
 			if(wp->vtcol==wp->w_ntcols-1 && display_size>1) { // do not show last double width character!
 				memset(uc.uval,0,8);
-				uc.uval[0]=0xFF;
+				uc.uval[0]=' ';
 				uc.uval[1]=0;
 				vtputwc(wp,&uc);
 			} else 
@@ -1166,14 +1187,14 @@ offs vtline(WINDP *wp, offs tp_offs)
 		for(wp->vtcol=first_column;wp->vtcol< wp->w_ntcols-first_column;wp->vtcol++){ 
 			vchar *vc = vp->v_text+wp->vtcol;
 
-			svwchar(vc,(utfchar *)"═",vc->bcolor,COLOR_COMMENT_FG);	/* double line separator */
+			svwchar(vc,&double_hline,vc->bcolor,COLOR_COMMENT_FG);	/* double line separator */
 		};
 	};
 
 	/* highlight according to evaluated mask */
 	if(syntaxh && slang)
 	{
-		for(i0=num_columns;i0<= wp->w_ntcols;i0++){
+		for(i0=num_columns;i0< wp->w_ntcols;i0++){
 			if(i0+first_column > rlen+num_columns) break;
 			c1=vtlm[i0+first_column-num_columns];
 
@@ -1198,7 +1219,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 	// in case of utf error show local chars with different color!
 	// if(slang)
 	if(fp->b_lang==0){
-		for(i0=0;i0<wp->w_ntcols-1;i0++) {
+		for(i0=0;i0<wp->w_ntcols;i0++) {
 			if(v_text[i0].uval[0]>128) 
 			{
 				if(v_text[i0].uval[1]==0) {
@@ -1491,7 +1512,12 @@ void vteeol(WINDP *wp, int selected,int inside)
 				}	// header
 				else if(selected==3)  { if(drv_colors>8)  ctl_b=COLOR_INACTIVE_BG;else ctl_b=COLOR_SELECT_BG;}	// just selected
 				else if(selected==-1) { if(drv_colors==8) ctl_b=COLOR_SELECT_BG ;}	// empty
-				else                  ctl_b=COLOR_SELECT_BG;	// current line
+				else                  {
+					ctl_b=COLOR_CODE_BG;	// current line
+#if	UNDERLINE_CURRENT_DIR_LINE
+					if(wp==cwp) ctl_f |= FONT_STYLE_UNDERLINE;
+#endif
+				};
 				svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,wp->w_ntcols-wp->vtcol);
 			} else {
 				// MESG("	from col=%d line_bcolor=%X %X width=%d",wp->vtcol,line_bcolor,ctl_b,wp->w_ntcols-wp->vtcol);
@@ -1742,7 +1768,6 @@ int  show_position_info(int short_version)
 					long value=utf_value_len(&size);
 					if(debug_flag()) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX %d",value,size);
 					else sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX",value);
-					// sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX %d",value,cwp->w_fp->slow_display);
 				};
 				if(strlen(str) < 10) short_version=1;
 			};
@@ -2287,10 +2312,7 @@ void allocate_virtual_window(WINDP *wp)
 		exit(1);
 	};
 	vp->v_flag=0;
-#if	PANGO_TEST0
-	vp->left_x_pos=0;
-	vp->continuation=0;
-#endif
+	vp->slow_line=0;
 	wp->vs[i]=vp;
  };
  // set the last one as NULL to know till where to free!

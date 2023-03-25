@@ -87,6 +87,7 @@ char *text_mouse_str=NULL;	/* text mouse terminfo kmous string */
 int extended_mouse=0;	/* 1 = ansi mouse, 0 = M mouse  */
 int mouse_button=0;
 int mouse_active=0;
+int drv_initialized=0;
 
 float CLEN=1.0;
 int CHEIGHTI=1;
@@ -559,24 +560,32 @@ void drv_size()
 
 void enable_key_mouse()
 {
+ mouse_active=1;
+#if	SOLARIS
+	return;
+#else
  mousemask(ALL_MOUSE_EVENTS|REPORT_MOUSE_POSITION,NULL);
  printf("\033[?1003h");	/* makes terminal report mouse mouvement  */
  if(extended_mouse) {
  	printf("\033[?1006h");	/* makes terminal extended report mouse mouvement  */
  }
  fflush(stdout);
- mouse_active=1;
+#endif
 }
 
 void disable_key_mouse()
 {
+ mouse_active=0;
+#if	SOLARIS
+	return;
+#else
  mousemask(0,NULL);
  printf("\033[?1003l");	/* makes terminal stop reporting mouse mouvement  */
  if(extended_mouse) {
  	printf("\033[?1006l");	/* makes terminal stop reporting mouse mouvement  */
  };
  fflush(stdout);
- mouse_active=0;
+#endif
 }
 
 int toggle_mouse(int n)
@@ -621,7 +630,9 @@ void drv_open()
 
  if(mcurflag){
 // keypad(stdscr,1);	/* no need for the moment, need a lot of changes!  */
+#if	!SOLARIS
 	mousemask(ALL_MOUSE_EVENTS|REPORT_MOUSE_POSITION,NULL);
+#endif
 	printf("\033[?1003h\n");	/* makes terminal report mouse mouvement  */
  };
 
@@ -652,6 +663,7 @@ void drv_open()
  // driver specific keyboard bindings
  drv_bindkeys();
  vswidth=1;
+ drv_initialized=1;
 // MESG("drv_open:end");
 }
 
@@ -1019,8 +1031,10 @@ void drv_init(int argc, char **argp)
 void drv_close()
 {
 	restore_original_colors();
+#if	!SOLARIS
 	use_default_colors();
 	disable_key_mouse();
+#endif
 	endwin();
 }
 
@@ -1033,7 +1047,7 @@ void drv_flush()
 
 void drv_win_flush(WINDP *wp)
 {
-	wrefresh(wp->gwp->draw);
+	wnoutrefresh(wp->gwp->draw);
 }
 
 /*
@@ -1065,20 +1079,24 @@ int drv_getc(int quote)
 	};
 }
 
-int checking_break_key=0;
+static int checking_break_key=0;
 
 void drv_start_checking_break()
 {
+#if	!SOLARIS
 	nodelay(stdscr,TRUE);
-	checking_break_key=1;
 	qiflush();
+#endif
+	if(drv_initialized) checking_break_key=1;
 }
 
 void drv_stop_checking_break()
 {
+#if	!SOLARIS
 	nodelay(stdscr,FALSE);
-	checking_break_key=0;
 	qiflush();
+#endif
+	checking_break_key=0;
 	utflen=0;
 	utfokey[0]=0;
 }
@@ -1398,7 +1416,7 @@ int text_mouse_key(int *c)
 
 void drv_win_move(WINDP *wp,int row,int col)
 {
-	wmove(stdscr,wp->gwp->t_ypos+row,wp->gwp->t_xpos+col);
+	 wmove(stdscr,wp->gwp->t_ypos+row,wp->gwp->t_xpos+col);
 }
 
 void drv_move(int row, int col)
@@ -1414,7 +1432,9 @@ void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
  	attrib |=A_UNDERLINE;
  } else {
  	int a = current_scheme->color_style[fcolor].color_attr;
+#if	!SOLARIS
 	if(a & FONT_STYLE_ITALIC) attrib |= A_ITALIC;
+#endif
 	if(a & FONT_STYLE_BOLD) attrib |= A_BOLD;
 	if(a & FONT_STYLE_DIM) attrib |= A_DIM;
 	if(a & FONT_STYLE_REVERSE) attrib |= A_REVERSE;
@@ -1926,6 +1946,20 @@ int check_w_sibling(WINDP *wp,int left,int top,int new_rows)
 void expose_window(WINDP *wp)
 {
 	wrefresh(wp->gwp->draw);
+	doupdate();
+}
+
+void drv_clear_line(WINDP *wp,int row)
+{
+	wmove(wp->gwp->draw,row,0);
+	int i;
+	for(i=0;i<wp->w_ntcols;i++) {
+		waddstr(wp->gwp->draw,"-");
+	};
+	wrefresh(wp->gwp->draw);
+	doupdate();
+	wmove(wp->gwp->draw,row,0);
+	// MESG("drv_clear_line: %2d",row);
 }
 
 /* Put virtual screen text on physical */
@@ -1958,14 +1992,15 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 	wmove(wp->gwp->draw,row,xcol);
 	imax=maxcol+1;
-
+#if	USE_SLOW_DISPLAY
 	if(wp->w_fp->slow_display) 
 	{ /* a little bit slower but clears shadow text!  */
 		wclrtoeol(wp->gwp->draw);
 		wrefresh(wp->gwp->draw);
 	 	update_panels();
+		doupdate();
 	};
-
+#endif
 	for(i=0;i<=imax;i++) {
 	 uint32_t ch;
 	 	if(v1->fcolor < 256) fcolor = v1->fcolor+v1->attr;
@@ -1974,6 +2009,9 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 		drv_wcolor(wp->gwp->draw,fcolor,bcolor);
 		ch=v1->uval[0];
+#if	USE_SLOW_DISPLAY
+		if(ch==0xF0) wp->w_fp->slow_display=1;
+#endif
 		if(ch==0xFF) { 	/* skip in case of char len > 1  */
 			if(v1->uval[1]==0xFF) 
 			{ 
@@ -2019,9 +2057,14 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 	};
 	// MESG("row %d eol %d",row,i);
 
- // wclrtoeol(wp->gwp->draw);
- wrefresh(wp->gwp->draw);
- update_panels();
+#if	USE_SLOW_DISPLAY
+	if(wp->w_fp->slow_display) {
+		wrefresh(wp->gwp->draw);
+		 update_panels();
+		 doupdate();
+	} else
+#endif
+		wnoutrefresh(wp->gwp->draw);
 }
 
 
@@ -2046,13 +2089,12 @@ void xdab(int y,int b,char *st,int bcolor,int fcolor)
  for(;*s;x++,s++) {
 	if(b==*s) {
 		wmove(cbox->wnd,y,x);
-		wrefresh(cbox->wnd);
 		drv_wcolor(cbox->wnd,COLOR_CTRL_FG,bcolor);
 		waddch(cbox->wnd,b);
 		break;
 	};
  };
-// wrefresh(cbox->wnd);
+ wrefresh(cbox->wnd);
 }
 
 /*
@@ -2136,7 +2178,7 @@ void clear_hmenu()
  drv_wcolor(hmenu_window,COLOR_MENU_FG,COLOR_MENU_BG);
  wmove(hmenu_window,0,0);
  wprintw(hmenu_window,"%*s",drv_numcol,"  ");
- wrefresh(hmenu_window);
+ wnoutrefresh(hmenu_window);
 
  msg_line(time2a());
 }
@@ -2195,7 +2237,7 @@ int dspv(WINDOW *disp_window,int x,int y,char *st)
  };
  getyx(disp_window,y_pos,x_pos);
  wclrtoeol(disp_window);
- wrefresh(disp_window);
+ wnoutrefresh(disp_window);
  return(x_pos - x);
 }
 
@@ -2320,7 +2362,7 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
 
 void refresh_menu()
 {
-//	top_menu(1);
+	top_menu(1);
 	set_update(cwp,UPD_MOVE);
 }
 
@@ -2669,7 +2711,7 @@ void show_slide(WINDP *wp)
  int row;
 // char single_line[5] = { 0xE2,0x94,0x82,0,0};
 // █ ▓ │ ┃   ║ ▌ ░ ▒ ▓ ╳
- char double_line[5] = { 0xE2,0x95,0x91,0,0};
+ char double_vline[5] = { 0xE2,0x95,0x91,0,0};
 // char full_line[5] = { 0xE2,0x96,0x88,0,0};
 // char hatch_line[5] = { 0xE2,0x96,0x93,0,0};
 // char left_half[5] = { 0xE2,0x96,0x8C,0,0};
@@ -2698,16 +2740,19 @@ void show_slide(WINDP *wp)
 // MESG("show_slide: window=%d start=%d end=%d len=%d",wp->id,start,end,len);
 
  drv_wcolor(wp->gwp->vline,fg_color,bg_color);
-#if	CLEAR_BG
- wbkgd(wp->gwp->vline,color_pair(fg_color,bg_color));
+#if	USE_SLOW_DISPLAY
+ if(wp->w_fp->slow_display){
+ 	wbkgd(wp->gwp->vline,color_pair(fg_color,bg_color));
+	wrefresh(wp->gwp->vline);
+ };
 #endif
  for(row=0;row<wp->w_ntrows-1;row++){
 	wmove(wp->gwp->vline,row,0);
-	wrefresh(wp->gwp->vline);
+	// wrefresh(wp->gwp->vline);
 	if(row<start || row> end) {
 		wprintw(wp->gwp->vline,"%s"," ");
 	} else {
-		wprintw(wp->gwp->vline,"%s",double_line);
+		wprintw(wp->gwp->vline,"%s",double_vline);
 	};
  };
  wmove(wp->gwp->vline,wp->w_ntrows,0);
@@ -2716,10 +2761,14 @@ void show_slide(WINDP *wp)
  	drv_wcolor(wp->gwp->vline,COLOR_CTRL_FG,bg_color);
  	wprintw(wp->gwp->vline,"%s","*");
  } else wprintw(wp->gwp->vline,"%s"," ");
-
-// wrefresh(wp->gwp->vline);
-// update_panels();
-// doupdate();
+#if	USE_SLOW_DISPLAY
+ if(wp->w_fp->slow_display){
+ 	wnoutrefresh(wp->gwp->vline);
+	update_panels();
+	doupdate();
+ } else
+#endif
+	wnoutrefresh(wp->gwp->vline);
 }
 
 #include "xthemes.c"

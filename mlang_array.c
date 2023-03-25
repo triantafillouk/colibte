@@ -737,7 +737,7 @@ void print_array1(char *title,array_dat *adat)
 		snprintf(so,MAXLLEN,"#   :");
 		for(i=0;i< adat->cols;i++) { 
 			snprintf(s2,128,"%10d ",i);
-			strcat(so,s2);
+			strlcat(so,s2,MAXLLEN);
 		};
 		out_print(so,1);
 		for(j=0;j<adat->rows;j++){
@@ -745,7 +745,7 @@ void print_array1(char *title,array_dat *adat)
 			for(i=0;i<adat->cols;i++) {
 				if(adat->atype==VTYPE_ARRAY) snprintf(s2,128,"%7.3f ",adat->dval2[j][i]);
 				else snprintf(s2,128,"%10s ",adat->sval[j*adat->cols+i]);
-				strcat(so,s2);
+				strlcat(so,s2,MAXLLEN);
 			};
 			out_print(so,1);
 		};
@@ -760,7 +760,7 @@ void print_array1(char *title,array_dat *adat)
 			for(i=0;i<adat->cols;i++) {
 				if(adat->atype==VTYPE_ARRAY) snprintf(s2,128,"%05.3f(%d) ",adat->dval[i],i);
 				else snprintf(s2,128,"%10s(%d) ",adat->sval[i],i);
-				strcat(so,s2);
+				strlcat(so,s2,MAXLLEN);
 			};
 			out_print(so,1);
 		};		

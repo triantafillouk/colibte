@@ -870,37 +870,6 @@ int nextch(int dir)
 	};
 }
 
-#if	NUSE
-int next_utf8_char(int dir, utfchar *uc)
-{
-//	MESG("next_utf8_char: dir=%d o=%ld",dir,curoffs);
-	if (dir == FORWARD) {
-		if(curoffs>FSize(cbfp)) return -1;
-
-		if(EolAt(curoffs)) { 
-			curoffs+=cbfp->EolSize;
-			return '\n';
-		};
-		curoffs = FUtfCharAt(cbfp,curoffs,uc);	/*   */
-//		MESG("next_utf8_char: forw o=%ld c=%c",start,uc->uval[0]);
-		return uc->uval[0];
-	} else {
-		offs previous_char_offset;
-		if(BolAt(curoffs)) {
-			curoffs-=cbfp->EolSize;
-			if(curoffs<0) return -1;
-			return '\n';
-		};
-		if(curoffs<1) return -1;
-		previous_char_offset=FPrevUtfCharAt(cbfp,curoffs,uc);
-		curoffs=FUtfCharAt(cbfp,curoffs,uc);
-		curoffs=previous_char_offset;
-//		MESG("next_utf8_char: back o=%ld c=%c",start,uc->uval[0]);
-	};
-	return uc->uval[0];
-}
-#endif
-
 char *strcasestr(const char *haystack, const char *needle);;
 
 int forw_stat(int n)

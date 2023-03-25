@@ -469,7 +469,6 @@ int getcmd();
 int getstring(char *prompt, char *st1,int maxlen,int disinp);
 int delchar(char *st,int pos);
 int inspace(char *st,int pos);
-// int dspv(int x,int y,char *st);
 int isspecialchar(char *st);
 int normalize(int);
 int xlate(int,int);
@@ -871,6 +870,7 @@ int create_notes_db(int n);
 int show_calendar_list(int n);
 int show_todo_list(int n);
 char *get_notes_status();
+int reload_tag_view();
 #endif
 
 #if	!DARWIN

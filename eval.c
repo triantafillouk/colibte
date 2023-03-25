@@ -1047,7 +1047,7 @@ int load_session(int n)
  int status;
  static char fname[MAXFLEN];
 
- strcpy(fname,"session.keys");
+ strlcpy(fname,"session.keys",MAXFLEN);
  if ((status = nextarg("Session key file name: ", fname, MAXFLEN -1,true)) != TRUE){
 		return(status);
  } else {

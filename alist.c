@@ -1000,8 +1000,7 @@ int set_btsval(BTREE *bt, int type,char *name,char * sval,double val)
 
  if(btn->sval!=NULL) { free(btn->sval);btn->sval=NULL;};
  if(sval!=NULL){
-	btn->sval=malloc(strlen(sval)+1);
-	strcpy(btn->sval,sval);
+	btn->sval=strdup(sval);
  };
  btn->val=val;
  return(is_new);
@@ -1014,8 +1013,7 @@ int set_btnsval(BTNODE *btn, char * sval)
 
  if(btn->sval!=NULL) { free(btn->sval);btn->sval=NULL;};
  if(sval!=NULL){
-	btn->sval=malloc(strlen(sval)+1);
-	strcpy(btn->sval,sval);
+	btn->sval=strdup(sval);
  };
 // MESG("set_btsval: name[%s] [%s] index=%d type=%d sval=[%s] val=%f is_new=%d",name,btn->node_name,btn->node_index,btn->node_type,btn->sval,btn->val,is_new); 
  return(1);

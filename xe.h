@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.58T37 (26/02/2023)"
+#define VERSION 	"#01.58T48 (21/03/2023)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -19,18 +19,16 @@
 #define NUSE		0	/* not used anymore */
 #define	RSESSION	1	/* record session */
 #define	CLASSIC_STATUS 	0
-
+#if	SOLARIS
+#define DOUBLE_ESC	1	/* use double escape for abort command else single  */
+#else
 #define DOUBLE_ESC	0	/* use double escape for abort command else single  */
+#endif
 
-#define	NEW_COLORS	1
-#define NEW_COLOR8	0
-
-#define	PANGO_TEST	1
 #define	TARROWS		1	/* Use arrow menus in panel curses  */
 #define	USE_UTF8	1	/* Use utf8 characters  */
 
 #define	USE_FAST	1 & PCURSES	/* erase line for double width characters in panel_curses  */
-// #define	USE_GLIB	0
 
 #if	DARWIN
 #define	_FILE_OFFSET_BITS	64
@@ -38,6 +36,8 @@
 #endif
 
 #define	_LARGEFILE64_SOURCE	1
+#define UNDERLINE_CURRENT_DIR_LINE	0
+#define	USE_SLOW_DISPLAY	1
 
 /****************************************************************/
 #define	DRIVER_CURSES	0
@@ -292,7 +292,7 @@ typedef struct vchar {
 	short int  attr;
 	short int bcolor;	/* background  */
 	int fcolor;	/* foreground  */
-#if	0
+#if	NUSE
 	unsigned int display_width;
 	unsigned int display_height;
 #endif
@@ -300,14 +300,7 @@ typedef struct vchar {
 
 typedef struct  VIDEO {
 	short int	v_flag;		/* line Flags */
-#if	NUSE
-	short int	utf_error;	/* not valid utf8 char!  */
-#endif
-#if	PANGO_TEST0
-	int left_x_pos;
-	int start_column;
-	int continuation;
-#endif
+	short int	slow_line;
 	vchar v_text[1];
 }   VIDEO;
 
@@ -675,7 +668,9 @@ typedef struct  FILEBUF {
 	int err;	/* negative if not syntax checked  */
 	BTREE *symbol_tree;	/* local symbol table  */
 	tok_data *symbol_table;	/* instance of variables data  */
+#if	USE_SLOW_DISPLAY
 	int slow_display;
+#endif
 //	Notes structures
 #if	TNOTES
 	notes_struct *b_note;

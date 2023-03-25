@@ -677,7 +677,11 @@ void update_base_dir(char *dir_name,char *bname)
  if(lslash) {
 	int l=strlen(dir_name);
 	int ss=lslash-bname;
-	strcat(dir_name,"/");	/* OSNOSAFE!  */
+	strlcat(dir_name,"/",MAXFLEN);
+	if(l+1+ss>MAXFLEN) {
+		ss=MAXFLEN-l-1;
+		ERROR("filename too big!");
+	};
 	memcpy(dir_name+l+1,bname,ss);
 	dir_name[l+ss+1]=0;
  };
@@ -765,10 +769,10 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 		if(cbfp->b_dname[0]==0){
 			if(getcwd(dir_name,MAXFLEN)==NULL) return false;
 		} else {
-			strcpy(dir_name,cbfp->b_dname);
+			strlcpy(dir_name,cbfp->b_dname,MAXFLEN);
 		};
 		} else {
-			strcpy(dir_name,get_start_dir());
+			strlcpy(dir_name,get_start_dir(),MAXFLEN);
 		}
 	};
 
@@ -924,7 +928,9 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 #if	CRYPT
 	bp->b_key[0]=0;
 #endif
+#if	NUSE
 	bp->slow_display=0;
+#endif
 #if	TNOTES
 	bp->b_note=NULL;
 	bp->b_header=NULL;
@@ -1071,7 +1077,9 @@ int reload_file(int n)
  // MESG("reload_file: %X",fp->b_flag);
 #if	TNOTES
 	switch(fp->b_flag) {
-		case FSNOTES: return show_tag_view(1);
+		case FSNOTES: 
+		case FSNOTESN:
+			return reload_tag_view();
 		case FSNTODO: return show_todo_list(1);
 		case FSNCALENDAR: return show_calendar_list(1);
 	};
@@ -1234,7 +1242,7 @@ int set_buf_key(FILEBUF *bp)	/* reset encryption key of current file */
 
 	/* get the string to use as an encrytion string */
 	bp->b_key[0]=0;
-	MESG("set_buf_key: b_type=%d %d",bp->b_type,NOTE_TYPE);
+	MESG("set_buf_key: b_type=%d %d size=%d",bp->b_type,NOTE_TYPE,sizeof(bp->b_key));
 #if	TNOTES
 	if(bp->b_type & NOTE_TYPE
 		|| bp->b_type & NOTE_CAL_TYPE
@@ -1245,7 +1253,7 @@ int set_buf_key(FILEBUF *bp)	/* reset encryption key of current file */
 			set_notes_key(1);
 		};
 		if(get_notes_key()) {
-			strcpy(bp->b_key,get_notes_key());
+			strlcpy(bp->b_key,get_notes_key(),sizeof(bp->b_key));
 		} else return false;
 	} else 
 #endif
@@ -1656,11 +1664,11 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
  					MESG("get new notes key");
 					set_notes_key(1);
 					if(get_notes_key()) {
-						strcpy(bp->b_key,get_notes_key());
+						strlcpy(bp->b_key,get_notes_key(),sizeof(bp->b_key));
 					} else return false;
 				} else {
 					MESG("set key from notes key!");
-					strcpy(bp->b_key,get_notes_key());
+					strlcpy(bp->b_key,get_notes_key(),sizeof(bp->b_key));
 				};
 				s=true;
 			} else 
@@ -1709,7 +1717,8 @@ int menufile(int n)
  char **ddnames;
  char **ddvalue;
  char *exec_s;	/* execute string */
- if((fname = find_file(NULL,APPLICATION_USER_MENU,1,0))==NULL) return FALSE;
+
+ if((fname = find_file("",APPLICATION_USER_MENU,1,0))==NULL) return FALSE;
 
  nu=read_pairs(fname,';',&ddnames,&ddvalue);
  if(nu<1) { msg_line("user menu not found");return 0;};
@@ -1847,9 +1856,10 @@ int add_to_recent_list(char *full_file_name)
 int save_file_history(int n)
 {
  char *fname;
+
  if(bt_dval("save_history")==0) return 0;
 // MESG("save_file_history:");
- fname = find_file(NULL,APPLICATION_HISTORY,1,1);
+ fname = find_file("",APPLICATION_HISTORY,1,1);
 // MESG("save_file_history: %s",fname);
  return save_list_array(fname,recent_file_list);
 }
@@ -1858,7 +1868,7 @@ int read_file_history(int n)
 {
  char *fname;
 
- if((fname = find_file(NULL,APPLICATION_HISTORY,1,0))==NULL) return FALSE;
+ if((fname = find_file("",APPLICATION_HISTORY,1,0))==NULL) return FALSE;
  recent_file_list=new_list(0,"read_file_history");
 
 // MESG("read_file_history: from [%s]",fname);
@@ -1876,7 +1886,7 @@ int open_recent_file(int n)
  int lheight=20;
  int err;
 
- fname = find_file(NULL,APPLICATION_HISTORY,1,0);
+ fname = find_file("",APPLICATION_HISTORY,1,0);
  if(fname==NULL) return(0);
 
  recent_files = (char **)array_data(recent_file_list);

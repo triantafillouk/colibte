@@ -52,6 +52,10 @@ int confirm(char *title,char *prompt,int always) {
   return false;
 }
 
+void drv_clear_line(WINDP *wp,int row)
+{
+}
+
 void drv_open()
 {
  static int opened=0;

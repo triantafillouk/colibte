@@ -434,13 +434,16 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
 			return(0);
 	};
 	strlcpy(namelist[i]->d_name,df1->d_name,len);
+#if	!SOLARIS
 	if(num_of_files>MAXSTAT) {
 		namelist[i]->st_mode=df1->d_type << 12;
 		namelist[i]->st_size=len;
 		namelist[i]->mtime=0;
 		namelist[i]->atime=0;
 		namelist[i]->ctime=0;
-	} else {	
+	} else 
+#endif
+	{	
 		result=lstat(namelist[i]->d_name,&t);
 		if(result) {
 			ERROR("[%30s]Error    %d ",namelist[i]->d_name,errno);
@@ -918,6 +921,7 @@ int dir_del1(int  n)
   status=chdir(cbfp->b_dname);
   
   status=dir_getfile(fname,1);
+  escape_file_name(fname);
   if(!confirm("Delete file",fname,0)) return FALSE;
 
   // MESG("dir_del1: [%s] ---------",fname);
@@ -1024,7 +1028,7 @@ void init_extensions()
 
  set_start_dir(NULL);
 
- if((fname = find_file(NULL,APPLICATION_EXTENSIONS,1,0))==NULL) return;
+ if((fname = find_file("",APPLICATION_EXTENSIONS,1,0))==NULL) return;
 
  read_pairs(fname,'=',&f_extension,&f_extcmd);
  // MESG("init_extentions: file=[%s]",fname);
@@ -1271,14 +1275,14 @@ int script_exec(int nuse)
 	/* setup the proper file names */
 	bp = cbfp;
 
-	strcpy(dir_name,bp->b_dname);
+	strlcpy(dir_name,bp->b_dname,MAXFLEN);
 	escape_file_name(dir_name);
 
 	if(bp->b_flag & FSDIRED) {
 		dir_getfile(script_name,1);
 //		MESG("dir: scrip=[%s]",script_name);
 	} else {
-		strcpy(script_name,bp->b_fname);
+		strlcpy(script_name,bp->b_fname,MAXFLEN);
 		escape_file_name(script_name);
 //		MESG("file: scrip=[%s]",script_name);
 	};
@@ -1500,7 +1504,7 @@ int dir_left(int n)
 	num to_line=0;
 	num to_col=0;
 
-	// MESG("dir_left: quick_close");
+	MESG("dir_left: quick_close");
 	bf = cbfp->connect_buffer;
 	to_line = cbfp->connect_line;
 	to_col = cbfp->connect_column;
@@ -1525,6 +1529,10 @@ int dir_left(int n)
  	if(!(cbfp->b_flag & FSNLIST)) 
 	{ // we are in view mode!
 		vbuf=cbfp;
+#if	1
+		// if not at bol go one character left
+		if(cwp->tp_current->col > 0) return(prev_character(1));
+#endif
 		int connect_column=cbfp->connect_column;
 		// MESG("try get valid buffer!");
 		bf = get_valid_buffer(cbfp->connect_buffer);
@@ -1615,6 +1623,12 @@ void escape_file_name(char *fname)
   if(*c==' ') { *dest++ = '\\'; };	/* escape space  */
   if(*c=='(') { *dest++ = '\\'; };	/* escape left parenthesis  */
   if(*c==')') { *dest++ = '\\'; };	/* escape right parenthesis  */
+  if(*c=='\'') { *dest++ = '\\'; };	/* escape right parenthesis  */
+  if(*c=='!') { *dest++ = '\\'; };	/* escape right parenthesis  */
+  if(*c=='$') { *dest++ = '\\'; };	/* escape right parenthesis  */
+  if(*c=='&') { *dest++ = '\\'; };	/* escape right parenthesis  */
+  if(*c=='*') { *dest++ = '\\'; };	/* escape right parenthesis  */
+  if(*c=='`') { *dest++ = '\\'; };	/* escape right parenthesis  */
   *dest++ = *c;
  };*dest=0;
  strlcpy(fname,efname,MAXFLEN);

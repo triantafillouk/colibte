@@ -85,6 +85,9 @@ cteg2 : XPLOT=1
 cte  : PCURSES=1
 ce : PCURSES=1
 ce : TNOTES=0
+ce : GLIB_LIB=
+ce : USE_GLIB=0
+ce : SQLITE3=
 
 ifeq ($(TNOTES),1)
 SQLITE3=`pkg-config sqlite3 --libs`

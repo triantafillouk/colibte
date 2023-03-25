@@ -114,7 +114,7 @@ void vtinit(int argc, char **argp)
 	drv_post_init();
 	resize_screen(2);
 	cwp = dublicate_window(0);	/* creates first window  */
-
+	// MESG("vtinit:end");
 	set_1window();
 }
 
@@ -233,7 +233,7 @@ void show_menu_line(int line,M_element *element,int bcolor,int fcolor)
 		// MESG("menu line: [%s]->[%c]",element->help,active);
 		sprintf(text_line,"%c%s",active,element->txt);	
 	} else {
-		strcpy(text_line,element->txt);
+		strlcpy(text_line,element->txt,sizeof(text_line));
 	};
 	xdab(line+1,element->high, text_line,bcolor,fcolor);
 }
@@ -1747,11 +1747,11 @@ int get_utf_length(utfchar *utf_char_str)
 	};
 	if(b1==0x9F) {
 		int b2=utf_char_str->uval[2];
-#if	WSL | DARWIN
+#if	DARWIN
 		if (b2==0x84) return 1;
 		if (b2==0xA6) return 1;	/* not shown in Dawrin  */
 #else
-		if (b2==0x84) return 1;
+		if (b2==0x84) return 3;
 #endif
 		return 2;
 	};

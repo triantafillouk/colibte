@@ -490,8 +490,8 @@ int load_keys()
  char str_line[MAXLLEN];
  static char name1[MAXFLEN];
 
- strcpy(name1,APPLICATION_KEYS);
- if((fname=find_file(NULL,name1,0,0)) == NULL) return FALSE;
+ strlcpy(name1,APPLICATION_KEYS,MAXFLEN);
+ if((fname=find_file("",name1,0,0)) == NULL) return FALSE;
 
  f1=fopen(fname,"r");
 
@@ -654,7 +654,7 @@ int getckey()
 // command key to terminfo string
 char *cmd_to_tstr(int cmd)
 {
- static char tstr[64];
+ static char tstr[MAXSLEN];
  char st[2];
  int c0,c1;
  tstr[0]=0;
@@ -679,15 +679,15 @@ char *cmd_to_tstr(int cmd)
  	sprintf(tstr,"mouse %d",c0-KMOUS);
 	return(tstr);
  };
-// if(cmd & META) strcat(tstr,"ALT-");
- if(cmd & META)  strcat(tstr,"ALT-");
+// if(cmd & META) strlcat(tstr,"ALT-",MAXSLEN);
+ if(cmd & META)  strlcat(tstr,"ALT-",MAXSLEN);
  if(cmd & CTLX) {
  	sprintf(tstr,"^X%c",c0);
 	return(tstr);
  };
  if(cmd & CNTRL || cmd==128) { 
  	st[0]=normalize(c0);
- 	strcat(tstr,"CTRL-");
+ 	strlcat(tstr,"CTRL-",MAXSLEN);
  } else {
  	st[0]=c0;
  };
