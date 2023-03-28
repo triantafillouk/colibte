@@ -806,8 +806,8 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		for(i0=start_color_column;i0<= end_column;i0++) svcolor(v_text+i0,bg_color,fg_color);
 	} else 
 	{
-		if(drv_colors==8) { bg_color=COLOR_SELECT_BG;fg_color=COLOR_STANDOUT_FG+FONT_STYLE_UNDERLINE;}
-		else { bg_color=COLOR_CODE_BG;fg_color=COLOR_MENU_FG|FONT_STYLE_UNDERLINE;};
+		if(drv_colors==8) { bg_color=COLOR_SELECT_BG;fg_color=COLOR_FG+FONT_STYLE_UNDERLINE;}
+		else { bg_color=COLOR_CODE_BG;fg_color=COLOR_FG|FONT_STYLE_UNDERLINE;};
 		line_bcolor=bg_color;
 		for(i0=start_color_column;i0<= end_column;i0++)
 		{
@@ -1507,8 +1507,8 @@ void vteeol(WINDP *wp, int selected,int inside)
 			if(selected) {
 				if(selected==2)       { 	/* top line headers  */
 					if(drv_colors>8) { 
-						ctl_b=COLOR_CODE_BG;ctl_f=COLOR_MENU_FG|FONT_STYLE_UNDERLINE;
-					} else { ctl_b=COLOR_SELECT_BG;ctl_f=COLOR_MENU_FG|FONT_STYLE_UNDERLINE;};
+						ctl_b=COLOR_CODE_BG;ctl_f=COLOR_FG|FONT_STYLE_UNDERLINE;
+					} else { ctl_b=COLOR_SELECT_BG;ctl_f=COLOR_FG|FONT_STYLE_UNDERLINE;};
 				}	// header
 				else if(selected==3)  { if(drv_colors>8)  ctl_b=COLOR_INACTIVE_BG;else ctl_b=COLOR_SELECT_BG;}	// just selected
 				else if(selected==-1) { if(drv_colors==8) ctl_b=COLOR_SELECT_BG ;}	// empty
