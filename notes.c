@@ -55,7 +55,7 @@ int insert_preamble(FILEBUF *fp,int type)
 			strlcat(fp->b_note->n_name,".cal",sizeof(fp->b_note->n_name));
 #endif
 			strlcpy(fp->b_note->n_date,fp->b_fname,sizeof(fp->b_note->n_date));
-			insert_string_nl(fp,"# ");
+			insert_string_nl(fp,"# Untitled note");
 			};break;
 		case 3: {	/* todo note */
 			strlcpy(fp->b_note->n_name,fp->b_fname,sizeof(fp->b_note->n_name));

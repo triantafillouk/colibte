@@ -1544,14 +1544,13 @@ int save_file(int n)
 #if	TNOTES
 	if(is_scratch_buffer(cbfp)) {
 		// set file name
-		snprintf(fp->b_fname,24,"%s.cal",date_string(3));
+		snprintf(fp->b_fname,24,"%s.cal.md",date_string(3));
 		
 		// insert calendar header
 		goto_bof(1);
 		insert_preamble(fp,2);
-		prev_line(1);delete_line(1);
-		insert_string_nl(fp,"# Untitled note");
-		insert_string_nl(fp,"");
+		prev_line(2);
+		next_character(2);
 		
 		// check for title
 		

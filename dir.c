@@ -1248,6 +1248,8 @@ int dir_right(int n)
   } else {  // move in directory
 	status = movein_dir(fname_ns);
   };
+  cwp->goal_column=0;
+  cwp->w_lcol=0;
   set_update(cwp,UPD_STATUS);
   return(status);
 }
@@ -1439,7 +1441,7 @@ int view_next(int n)
 #if	TNOTES
  if(cbfp->b_flag==FSNOTES) return(0);
 #endif
- dir_left(1);
+ dir_left(0);
  // MESG("view_next: b_flag=%X",cbfp->b_flag);
  if(cbfp->b_flag & FSDIRED) {
  	dir_right(1);
@@ -1461,7 +1463,7 @@ int view_previous(int n)
 #if	TNOTES
  if(cbfp->b_flag==FSNOTES) return(0);
 #endif
- dir_left(1);
+ dir_left(0);
  // MESG("view_previous: b_flag=%X",cbfp->b_flag);
  prev_line(1);
  if(cbfp->b_flag & FSDIRED) {
@@ -1503,7 +1505,7 @@ int dir_left(int n)
 	num top_line=0;
 	num to_line=0;
 	num to_col=0;
-
+	if(cwp->tp_current->col > 0 && n==1) return(prev_character(1));
 	MESG("dir_left: quick_close");
 	bf = cbfp->connect_buffer;
 	to_line = cbfp->connect_line;
@@ -1531,7 +1533,7 @@ int dir_left(int n)
 		vbuf=cbfp;
 #if	1
 		// if not at bol go one character left
-		if(cwp->tp_current->col > 0) return(prev_character(1));
+		if(cwp->tp_current->col > 0 && n==1) return(prev_character(1));
 #endif
 		int connect_column=cbfp->connect_column;
 		// MESG("try get valid buffer!");

@@ -777,7 +777,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	if(row>0) {	/* not for header!  */
 		if(index==row) {
 			// bg_color=COLOR_SELECT_BG;
-			bg_color=COLOR_CODE_BG;
+			bg_color=COLOR_SELECT_BG;	/* code  */
 			if(drv_colors==8) 
 				fg_color=COLOR_FG;
 			else if(selected>0) fg_color=COLOR_STANDOUT_FG;
@@ -807,7 +807,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	} else 
 	{
 		if(drv_colors==8) { bg_color=COLOR_SELECT_BG;fg_color=COLOR_STANDOUT_FG+FONT_STYLE_UNDERLINE;}
-		else { bg_color=COLOR_INFO_BG;fg_color=COLOR_MENU_FG|FONT_STYLE_UNDERLINE;};
+		else { bg_color=COLOR_CODE_BG;fg_color=COLOR_MENU_FG|FONT_STYLE_UNDERLINE;};
 		line_bcolor=bg_color;
 		for(i0=start_color_column;i0<= end_column;i0++)
 		{
@@ -1402,7 +1402,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 				break;
 			case H_QUOTE12:
 				if(drv_colors==8) line_bcolor=COLOR_SELECT_BG;
-				else line_bcolor=COLOR_CODE_BG;
+				else line_bcolor=COLOR_INFO_BG;	/* code  */
 				ctl_b=line_bcolor;
 				break;
 			case H_QUOTE7:	/* next words in html tags  */
@@ -1507,13 +1507,13 @@ void vteeol(WINDP *wp, int selected,int inside)
 			if(selected) {
 				if(selected==2)       { 	/* top line headers  */
 					if(drv_colors>8) { 
-						ctl_b=COLOR_INFO_BG;ctl_f=COLOR_MENU_FG|FONT_STYLE_UNDERLINE;
+						ctl_b=COLOR_CODE_BG;ctl_f=COLOR_MENU_FG|FONT_STYLE_UNDERLINE;
 					} else { ctl_b=COLOR_SELECT_BG;ctl_f=COLOR_MENU_FG|FONT_STYLE_UNDERLINE;};
 				}	// header
 				else if(selected==3)  { if(drv_colors>8)  ctl_b=COLOR_INACTIVE_BG;else ctl_b=COLOR_SELECT_BG;}	// just selected
 				else if(selected==-1) { if(drv_colors==8) ctl_b=COLOR_SELECT_BG ;}	// empty
 				else                  {
-					ctl_b=COLOR_CODE_BG;	// current line
+					ctl_b=COLOR_SELECT_BG;	// current line, code
 #if	UNDERLINE_CURRENT_DIR_LINE
 					if(wp==cwp) ctl_f |= FONT_STYLE_UNDERLINE;
 #endif
