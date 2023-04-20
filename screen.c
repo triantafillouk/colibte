@@ -1401,8 +1401,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 				ctl_b=line_bcolor;
 				break;
 			case H_QUOTE12:
-				if(drv_colors==8) line_bcolor=COLOR_SELECT_BG;
-				else line_bcolor=COLOR_INFO_BG;	/* code  */
+				line_bcolor=COLOR_CODE_BG;	/* code  */
 				ctl_b=line_bcolor;
 				break;
 			case H_QUOTE7:	/* next words in html tags  */

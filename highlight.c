@@ -1258,6 +1258,7 @@ void highlight_md(int c)
 		bold=0;
 		break;
 	case '-':
+		if(hquotem & H_QUOTE12) break;
 		if(hstate==HS_LINESTART) {
 			line_set++;
 			if(line_set==2) {
