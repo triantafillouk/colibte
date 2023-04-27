@@ -1412,7 +1412,7 @@ int insert_date(int n)
 int del_char(int n)
 { 
  int s;
- if(cbfp->b_flag & FSDIRED) return(0);
+ if(cbfp->b_flag & FSDIRED) return(dir_del1(n));
  if(dont_edit()) return FALSE;
  if(cbfp->view_mode & VMINP) {
  	// get the character

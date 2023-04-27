@@ -36,6 +36,7 @@
 #define COL_BASIC	8
 #define COL_BOLD	A_BOLD
 #define CLEAR_BG	0
+#define	START_COLOR	17	// define our colors after the first basic 16 colors!
 
 #include "panel_curses.h"
 
@@ -157,7 +158,7 @@ int color_pair(int fg_color,int bg_color)
 	if(fg_color<BG_COLORS || fg_color>FG_COLORS+15) MESG("color pair fgcolor out of range %d",fg_color);
 	if(bg_color<0 || bg_color>BG_COLORS) MESG("color pair bgcolor out of range %d",bg_color);
 	if(drv_colors>8) {
-		cpair = COLOR_PAIR((fg_color-BG_COLORS)*FG_COLORS+bg_color+2);
+		cpair = COLOR_PAIR((fg_color-BG_COLORS)*FG_COLORS+bg_color+1);
 	} else {
 		int fg=current_scheme->color_style[fg_color].color_index%8;
 		int bg=current_scheme->color_style[bg_color].color_index%8;
@@ -2287,21 +2288,38 @@ void set_current_scheme(int scheme)
  
  if(drv_colors==0) return;
 	// MESG("init scheme3 %s colors=%d",current_scheme->scheme_name,drv_colors);
+
 	if(drv_colors>8) {
 		for(i=0;i<FG_COLORS+BG_COLORS;i++) {
 			refresh();
 			// MESG("	set color %d: %s",i,current_scheme->color_values[i]);
 			RGB_DEF *rv = get_rgb_values(current_scheme->color_style[i].color_value);
-			init_color(i,rv->r,rv->g,rv->b);
+			init_color(i+START_COLOR,rv->r,rv->g,rv->b);
 		};
 		for(i=0;i<FG_COLORS;i++) 
 			for(j=0;j<BG_COLORS;j++) {
 				// MESG(" - pair %3d: f=%d b=%d",i*FG_COLORS+j,i+BG_COLORS,j);
-				int pair=i*FG_COLORS+j+2;
-				init_pair(pair,i+BG_COLORS,j);
+				int pair=i*FG_COLORS+j+1;
+				init_pair(pair,i+BG_COLORS+START_COLOR,j+START_COLOR);
 				// MESG("init_pair : %d as (%d %d)",pair,i,j);
 			};
-	} else {
+	} else 
+	{
+#if	1
+		if(can_change_color()) {
+		int inited[8] = {0,0,0,0,0,0,0,0};
+		for(i=0;i<BG_COLORS+FG_COLORS;i++) {
+			int basic = current_scheme->color_style[i].color_index % 8;
+			if(inited[basic]==0 ) {
+				refresh();
+				RGB_DEF *rv = get_rgb_values(current_scheme->color_style[i].color_value);
+				init_color(basic,rv->r,rv->g,rv->b);
+				inited[basic]=1;
+				MESG("init color: %d (%d %d %d)",basic,rv->r,rv->g,rv->b);
+			};
+		};
+		}
+#endif
 		// 8 color terminals is supposed to not be able to change color values
 		// so we simple define all color pairs
 		for(i=0;i<drv_basic_colors;i++) 
