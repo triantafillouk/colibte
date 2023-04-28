@@ -286,12 +286,12 @@ int prev_hmark(int n)
  // MESG("prev_hmark:");
  if(cwp->w_fp->b_flag & FSDIRED){ /* In dir mode exit view or go to parent dir */
  	// MESG("prev_hmark: move left!");
-	dir_left(1);
+	dir_left(0);
 	return TRUE;
  }
  if(hmcurrent<1) return(FALSE);
  
- if(cbfp->b_state & FS_VIEW) return (dir_left(1));
+ if(cbfp->b_state & FS_VIEW) return (dir_left(0));
  rn = (hmstart+hmcurrent)%BKMAX;
 
  hmcurrent--;

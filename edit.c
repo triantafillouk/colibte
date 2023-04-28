@@ -1116,7 +1116,7 @@ int quick_close(int n)
 	if(cbfp->b_flag == FSDIRED && (cbfp->b_state & FS_VIEW) &&
 		cbfp->b_fname[0]!=CHR_LBRA){ 
 			delete_hmark(1);
-			return dir_left(1);
+			return dir_left(0);
 	}else {
 	// MESG("quick_close: close_file");
 		if(cbfp->connect_buffer!=NULL) {
@@ -1412,7 +1412,7 @@ int insert_date(int n)
 int del_char(int n)
 { 
  int s;
- if(cbfp->b_flag & FSDIRED) return(0);
+ if(cbfp->b_flag & FSDIRED) return(dir_del1(n));
  if(dont_edit()) return FALSE;
  if(cbfp->view_mode & VMINP) {
  	// get the character
@@ -1846,7 +1846,7 @@ int delete_line(int n)
 		|| cbfp->b_type & NOTE_TODO_TYPE) && dont_edit()
 	) {
 	if(confirm("Delete note","",0)) {	
-	 	dir_left(1);
+	 	dir_left(0);
 		delete_tagnote(1);
 	};
  };
