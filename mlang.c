@@ -183,6 +183,8 @@ m_function m_functions[] = {
 	{"atan",1},
 	{"log10",1},
 	{"log",1},
+	{"trunc",1},
+	{"round",1},
 	{"print",1},	/* out_print, print on out buffer, and stdout if in Xwindows mode  */
 	{"getpoint",0},
 	{"message_wait",1},
@@ -229,6 +231,8 @@ UFTAN,
 UFATAN,
 UFLOG10,
 UFLOGNAT,
+UFTRUNC,
+UFROUND,
 UFPRINT,
 UFGETPOINT,
 UFWAIT,
@@ -984,6 +988,14 @@ double eval_fun1(int fnum)
 				break;
 		case UFLOGNAT:
 				value=log(vv[0]);
+				ex_vtype=VTYPE_NUM;
+				break;
+		case UFTRUNC:
+				value=trunc(vv[0]);
+				ex_vtype=VTYPE_NUM;
+				break;
+		case UFROUND:
+				value=round(vv[0]);
 				ex_vtype=VTYPE_NUM;
 				break;
 		case UFPRINT:	// to stdio, be carefull CHECK !!!!
