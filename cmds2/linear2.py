@@ -9,53 +9,49 @@ class item:
     self.max = max
     self.number = number
 
-def frem(item=[], *a,max_size):
+def frem(level,m_remain,max_size, item=[], *a):
     ms = max_size
     array_len=len(item)
-    print("Frem function array size is ",len(item))
-    if array_len>1:
-        item[0].max = math.trunc(ms-item[1].len*item[1].min)/item[0].len
-        for x in range(item[0].min,item[0].max):
-            y1=(ms-x*item[0].len)/item[1].len
-            ty1=math.trunc(y1)
-            z=y1-ty1
-            if
-        print(item[0].len,item[1].len)
-        for x=item[0].min 
-        if array_len >2:
-            a = item[2:]
-            return frem(a,max_size=ms)
-    
+    # print("Frem function array size is %d size to fill=%2d" % (len(item),max_size))
+    if array_len < 1:
+        return 0
 
-l1 = item(52,1,100,1)
-l2 = item(183,1,100,1)
-l3 = item(44,1,100,1)
+    max1 = math.trunc(ms/item[0].len)
+    print("#%d: %d/%d = %d" % (level,ms,item[0].len,max1))
+    if max1<item[0].max:
+        item[0].max=max1
+    if item[0].min > item[0].max:
+        item[0].min = item[0].max
+    item[0].number = item[0].min
+
+    remain = ms - item[0].min * item[0].len
+    min_remain = m_remain
+    print("-- %d: %3d - %d x %d = %d" % (level,ms,item[0].min,item[0].len,remain))
+    if array_len>1:
+        a = item[1:]
+        print("     check level",level+1,"array remaning size is",len(a))
+        for x0 in range(item[0].min, item[0].max):
+            remain = frem(level+1,min_remain,ms - item[0].len*x0,a)
+            if remain < min_remain:
+                item[0].number = x0
+                min_remain = remain
+                print("%d: %2d x %3d = %3d remain %3d" % (level,x0,item[0].len,x0*item[0].len,remain))
+                if remain==0:
+                    return remain
+    else:
+        item[0].number = math.trunc(ms/item[0].len)
+        min_remain = ms - item[0].number*item[0].len
+
+    print ("another chunk of %2d of len %2d rest=%2d" % (item[0].number,item[0].len,min_remain))   
+    return min_remain
+
+l1 = item(5  ,1,100,1)
+l2 = item(52 ,2,100,1)
+l3 = item(183,2,100,1)
 
 ar = [l1,l2,l3]
 
-frem(ar,max_size=800)
+frem(0,800,800,ar)
 
-
-
-l1_len=52
-l2_len=183
-l1_min=1
-l2_min=1
-max_len=800
-rest=max_len
-
-
-l1_max=math.trunc((max_len-l2_len*l2_min)/l1_len)
-for x in range( l1_min, l1_max):
-    # print(x)
-    y1=(max_len-x*l1_len)/l2_len
-    ty1=math.trunc(y1)
-    z=y1-ty1
-    if z<=rest:
-        # print("!! x=",x,"y1=",ty1," z=",math.trunc(z*l2_len))
-        print("!! x=%2d y1=%2d  z=%2d " % (x,ty1, math.trunc(z*l2_len)))
-
-        rest=z
-    else:
-        # print("   x=",x,"y1=",ty1," z=",math.trunc(z*l2_len))
-        print("   x=%2d y1=%2d  z=%2d " % (x,ty1, math.trunc(z*l2_len)))
+for x in ar:
+    print(x.len,x.min,x.max,x.number)
