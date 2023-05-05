@@ -12,7 +12,7 @@ class item:
 def frem(level,m_remain,max_size, item=[], *a):
     ms = max_size
     array_len=len(item)
-    # print("%s :%d, m_remain %d, max %d, %d" % ("+".rjust(2*level,' '),level,m_remain,max_size,item[0].number))
+    print("%s :%d, m_remain %d, max %d, %d" % ("+".rjust(2*level,' '),level,m_remain,max_size,item[0].number))
     if array_len < 1:
         return 0
 
@@ -32,10 +32,9 @@ def frem(level,m_remain,max_size, item=[], *a):
         a = item[1:]
         # print("     check level",level+1,"array remaning size is",len(a))
         num_of_min_remain=0
-        for x0 in range(0, max1):
-            # print("%s %d: %3d - %d x %d = %d" % ("+".rjust(2*level,' '), level,ms,x0,item[0].len,remain))
-#            remain = frem(level+1,min_remain,ms - item[0].len*x0,a)
+        for x0 in range(0, max1+1):
             remain = frem(level+1,min_remain,ms - item[0].len*x0,a)
+            print("%s %d: %3d - %d x %d = %d %d" % ("<".rjust(2*level,' '), level,ms,x0,item[0].len,remain,min_remain))
             if remain < min_remain:
                 num_of_min_remain = x0
                 item[0].number = x0
@@ -43,9 +42,7 @@ def frem(level,m_remain,max_size, item=[], *a):
                 min_remain = remain
                 if remain==0:
                     return remain
-#            else:
-#                print("%s :%d, skip x0=%d remain %3d" % ("-".rjust(2*level,' '),level,x0,remain))
-        # item[0].number = num_of_min_remain
+            print("%s %d: %3d - %d x %d = %d %d" % (">".rjust(2*level,' '), level,ms,x0,item[0].len,remain,min_remain))
         return min_remain
     else:
         if ms>item[0].len:
@@ -60,13 +57,15 @@ def frem(level,m_remain,max_size, item=[], *a):
         return remain
 
 # define array with initial info (size, minimum, maximum, result number)
-l1 = item(184,2,100,0)
-l2 = item(52 ,2,100,0)
-l3 = item(24 ,4,100,0)
-l4 = item(5  ,1,7,  0)
-tsize = 800
+l1 = item(250,0,100,0)
+l2 = item(219,0,100,0)
+l3 = item(189,0,100,0)
+l4 = item(158,0,100,0)
+l5 = item(128,0,100,0)
+l6 = item(98,0,100,0)
+tsize = 658
 
-ar = [l1,l2,l3,l4]
+ar = [l1,l2,l3,l4,l5,l6]
 
 # remove known minimum requirements
 initial_min=0
