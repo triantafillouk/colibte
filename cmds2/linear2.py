@@ -12,46 +12,82 @@ class item:
 def frem(level,m_remain,max_size, item=[], *a):
     ms = max_size
     array_len=len(item)
-    # print("Frem function array size is %d size to fill=%2d" % (len(item),max_size))
+    # print("%s :%d, m_remain %d, max %d, %d" % ("+".rjust(2*level,' '),level,m_remain,max_size,item[0].number))
     if array_len < 1:
         return 0
 
-    max1 = math.trunc(ms/item[0].len)
-    print("#%d: %d/%d = %d" % (level,ms,item[0].len,max1))
-    if max1<item[0].max:
-        item[0].max=max1
-    if item[0].min > item[0].max:
-        item[0].min = item[0].max
-    item[0].number = item[0].min
+    max1 = math.trunc(m_remain/item[0].len)
+    if max1==0:
+        return m_remain
+    min1 = 0
+    if max1>item[0].max:
+        max1 = item[0].max
+    # print("#%d:remain=%d %d/%d = %d" % (level,m_remain,ms,item[0].len,max1))
 
-    remain = ms - item[0].min * item[0].len
-    min_remain = m_remain
-    print("-- %d: %3d - %d x %d = %d" % (level,ms,item[0].min,item[0].len,remain))
+    item_number = 0
+    remain = m_remain
+    min_remain = remain
+
     if array_len>1:
         a = item[1:]
-        print("     check level",level+1,"array remaning size is",len(a))
-        for x0 in range(item[0].min, item[0].max):
+        # print("     check level",level+1,"array remaning size is",len(a))
+        num_of_min_remain=0
+        for x0 in range(0, max1):
+            # print("%s %d: %3d - %d x %d = %d" % ("+".rjust(2*level,' '), level,ms,x0,item[0].len,remain))
+#            remain = frem(level+1,min_remain,ms - item[0].len*x0,a)
             remain = frem(level+1,min_remain,ms - item[0].len*x0,a)
             if remain < min_remain:
+                num_of_min_remain = x0
                 item[0].number = x0
+                # print("%s :%d, set %2d x %3d = %3d remain %3d" % ("#".rjust(2*level,' '),level,x0,item[0].len,x0*item[0].len,remain))
                 min_remain = remain
-                print("%d: %2d x %3d = %3d remain %3d" % (level,x0,item[0].len,x0*item[0].len,remain))
                 if remain==0:
                     return remain
+#            else:
+#                print("%s :%d, skip x0=%d remain %3d" % ("-".rjust(2*level,' '),level,x0,remain))
+        # item[0].number = num_of_min_remain
+        return min_remain
     else:
-        item[0].number = math.trunc(ms/item[0].len)
-        min_remain = ms - item[0].number*item[0].len
+        if ms>item[0].len:
+            item_number = math.trunc(ms/item[0].len)
+            if item_number > item[0].max - item[0].min:
+                item_number = item[0].max - item[0].min
+            remain = ms - item_number*item[0].len
+        if remain < min_remain:
+            min_remain=remain
+            item[0].number = item_number
+            # print("%s :%d, set %2d x %3d = %3d remain %3d" % ("#".rjust(2*level,' '),level,item[0].number,item[0].len,item[0].number*item[0].len,remain))
+        return remain
 
-    print ("another chunk of %2d of len %2d rest=%2d" % (item[0].number,item[0].len,min_remain))   
-    return min_remain
+# define array with initial info (size, minimum, maximum, result number)
+l1 = item(184,2,100,0)
+l2 = item(52 ,2,100,0)
+l3 = item(24 ,4,100,0)
+l4 = item(5  ,1,7,  0)
+tsize = 800
 
-l1 = item(5  ,1,100,1)
-l2 = item(52 ,2,100,1)
-l3 = item(183,2,100,1)
+ar = [l1,l2,l3,l4]
 
-ar = [l1,l2,l3]
-
-frem(0,800,800,ar)
-
+# remove known minimum requirements
+initial_min=0
 for x in ar:
-    print(x.len,x.min,x.max,x.number)
+    initial_min = initial_min+x.min*x.len
+
+if initial_min > tsize:
+    print("Minimum values over total size: %d > %d",initial_min,tsize)
+else:
+    print("Total size = %d, initial min = %d" % (tsize,initial_min))
+    frem(0,tsize-initial_min,tsize-initial_min,ar)
+
+# show results
+ind=1
+print("ind  len  min   max   num   total")
+total=0
+for x in ar:
+    total0 = (x.number+x.min)*x.len
+    total = total + total0
+    print("%d:  %3d  %3d   %3d   %3d    %4d   %4d" % (ind,x.len,x.min,x.max,x.number+x.min,total0,total))
+    ind=ind+1
+print("   remain is %3d - %3d = %3d" %(tsize,total,tsize-total)) 
+
+
