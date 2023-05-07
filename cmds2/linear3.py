@@ -34,7 +34,7 @@ def frem(level,m_remain,max_size, item=[], *a):
         for x0 in range(0, max1+1):
             item[level].test = x0
             # print("(%d->%2d) "%(level,x0) ,end='')
-            print("%s l=%d x0=%2d call max=%d"%(":".rjust(2*level,' '),level,x0,ms-item[level].len*x0))
+            print("%s l=%d x0=%d call max=%d"%(":".rjust(2*level,' '),level,x0,ms-item[level].len*x0))
             remain = frem(level+1,min_remain,ms - item[level].len*x0,item)
             # print("%s %d: %3d - %d x %d = %d %d" % ("<".rjust(2*level,' '), level,ms,x0,item[level].len,remain,min_remain))
             if remain < min_remain:
@@ -70,7 +70,7 @@ def frem(level,m_remain,max_size, item=[], *a):
 
 # define array with initial info (size, minimum, maximum, result number)
 l1 = item(250,0,100,0)
-l2 = item(219,0,100,0)
+l2 = item(218,0,100,0)
 l3 = item(189,0,100,0)
 l4 = item(158,0,100,0)
 l5 = item(128,0,100,0)
