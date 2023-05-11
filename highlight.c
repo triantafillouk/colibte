@@ -885,7 +885,7 @@ void highlight_rust(int c)
 		slang=1;
 		break;
 	/* single quotes */
-#if	1
+#if	0
 	case CHR_SQUOTE: 
 		if(hstate!=HS_PREVESC) {
 			if(hquotem) hquotem=0;
@@ -2690,6 +2690,7 @@ void highlight_gtext(int c)
 		prev_space=0;
 		break;
 	case CHR_SQUOTE: 
+		if(hquotem & H_QUOTE2) break;
 		if(hstate!=HS_PREVESC){
 		if(prev_space||hstate==HS_LINESTART)
 		{
@@ -2763,6 +2764,7 @@ void highlight_gtext(int c)
 		break;
 	case ' ':
 	case '\t':
+		if(hquotem & H_QUOTE2) break;
 		prev_space=1;
 		if(hstate==HS_TAG) hquotem=H_QUOTE6;
 		hstate = HS_PREVSPACE;
