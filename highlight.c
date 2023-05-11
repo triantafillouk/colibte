@@ -2764,6 +2764,7 @@ void highlight_gtext(int c)
 		break;
 	case ' ':
 	case '\t':
+		if(hquotem & H_QUOTE2) break;
 		prev_space=1;
 		if(hstate==HS_TAG) hquotem=H_QUOTE6;
 		hstate = HS_PREVSPACE;
