@@ -2287,7 +2287,7 @@ void highlight_shell(int c)
 		hstate=0;
 		break;
 	case '#': {
-//		if(hstate==HS_LINESTART) 
+		if(hstate!=HS_LINESTART) break;
 		if(!hquotem) hquotem=H_QUOTE6;
 		hstate=0;
 		break;

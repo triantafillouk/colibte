@@ -1505,8 +1505,9 @@ int dir_left(int n)
 	num top_line=0;
 	num to_line=0;
 	num to_col=0;
+
 	if(cwp->tp_current->col > 0 && n==1) return(prev_character(1));
-	MESG("dir_left: quick_close");
+	// MESG("dir_left: quick_close");
 	bf = cbfp->connect_buffer;
 	to_line = cbfp->connect_line;
 	to_col = cbfp->connect_column;
