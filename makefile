@@ -272,6 +272,9 @@ ce : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file
 gplotc.o: gplotc.c plot_cairo.c plot_commonc.c gplot.h
 	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o $*.o  $*.c
 
+cmp_slists: cmp_slists.c alist.c alist.h
+	${CC} cmp_slists.c alist.o -o cmp_slists
+ 
 #stroker: demos/stroker.c
 #	gcc demos/stroker.c -o stroker `pkg-config gtk+-3.0 --cflags --libs`
 
