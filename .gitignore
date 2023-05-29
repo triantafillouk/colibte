@@ -6,6 +6,7 @@ ctg2
 ctg3
 *.exe
 *~
+tags
 tagx.tags
 out1
 err

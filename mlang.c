@@ -2659,8 +2659,10 @@ int empty_tok_table(FILEBUF *fp)
  		if(tokdel->tname!=NULL) free(tokdel->tname);
 	};
  };
- free(table);
- fp->tok_table=NULL;
+ if(fp->tok_table) {
+	free(table);
+	fp->tok_table=NULL;
+ };
  fp->err=0;
  fp->m_mode=0;
  return(1);

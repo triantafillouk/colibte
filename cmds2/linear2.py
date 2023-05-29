@@ -110,7 +110,7 @@ def find_minimum_remain(tsize, ar=[]):
     
 
 # define array with initial info (size, minimum, maximum, result number)
-l1 = item(250,1,100,0)
+l1 = item(250,0,100,0)
 l2 = item(219,0,100,0)
 l3 = item(189,0,100,0)
 l4 = item(158,0,100,0)
@@ -129,5 +129,5 @@ find_minimum_remain(tsize,ar)
 # show results
 #print("   remain is %3d - %3d = %3d" %(tsize,total,tsize-total)) 
 
-show_final(tsize,ar)
+# show_final(tsize,ar)
 
