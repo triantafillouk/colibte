@@ -12,7 +12,7 @@ function ai1(n){
 
 cls
 
-a=function(3) :   4.0
+a=ai1(3) :   4.0
 print("test")
 
 `

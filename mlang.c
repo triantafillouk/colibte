@@ -550,18 +550,26 @@ tok_data *new_symbol_table(int size)
 }
 
 /* free symbol table after execute */
-void delete_symbol_table(tok_data *td, int size)
+void delete_symbol_table(tok_data *td, int size,int level)
 {
  int i;
  tok_data *sslot;
- // MESG("delete_symbol_table: size=%d",size);
+ MESG("delete_symbol_table: size=%d level=%d",size,level);
  if(td) {
  for(i=0;i<size;i++) {
+	tok_data *sslot;
  	sslot=&td[i];
+#if	1
+	if(sslot->vtype==VTYPE_STRING && level==0) {
+		MESG("delete_symbol_table:%d [%s] %X",i,sslot->sval,sslot->sval);
+		free(sslot->sval);
+	};
+#else
 	if(sslot->vtype>VTYPE_NUM)
  	if(sslot->sval!=NULL) {
 		free(sslot->sval);
 	};
+#endif
  };
  free(td);
  };
@@ -790,12 +798,13 @@ double eval_fun1(int fnum)
 	int f_entry;
 	int stat=0;
 	array_dat *arr=NULL;
+
 	TDS("eval_fun1");
-	// MESG(";eval_fun1: fnum=%d",fnum);
 	ia=m_functions[fnum].f_args;
 	
 	f_entry=entry_mode;
 	entry_mode=KNORMAL;
+	// MESG(";eval_fun1: fnum=%d %d ia=%d entry_mode=%d",fnum,UFMAINARGLEN,ia,entry_mode);
 
 	if(ia) {
 		/* if we have arguments, check for parenthesis, then get the arguments  */
@@ -818,6 +827,7 @@ double eval_fun1(int fnum)
 	slval[0]=0;
 	value=0.0;
 	entry_mode=f_entry;
+	// MESG(";eval_fun1: go eval! fnum=%d",fnum);
 	/* and now evaluate it! */
 	switch (fnum) {
 		case UFDETERMINANT:
@@ -1039,10 +1049,13 @@ double eval_fun1(int fnum)
 		case UFATEOL:
 			return(FEolAt(cbfp,Offset()));
 		case UFMAINARGLEN:
+			if(main_args) {
 			// MESG("argument size: rows=%d cols=%d",main_args->rows,main_args->cols);
 			ex_vtype=VTYPE_NUM;
 			return main_args->cols;
+			} else return 0;
 		case UFMAINARG: {
+			if(!main_args) return 0;
 			int ind;
 			ind=(int)vv[0];
 			if(ind<main_args->cols) {
@@ -1068,7 +1081,7 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	double value=0;
 	static long level=0;
 	level++;
-
+	// MESG("exec_function: nargs=%d level=%d",nargs,level);
 	tok_data *old_symbol_table=current_stable;
 
 	tok=bp->tok_table;	/* start of function  */
@@ -1085,11 +1098,12 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 
 	assign_args1(vargs,current_stable,nargs);
 	value=tok->directive();
-
+	// MESG("exec_function: before delete_symbol_table");
 	/* remove local variable tree and restore the old one  */
-	delete_symbol_table(current_stable,bp->symbol_tree->items);
+	delete_symbol_table(current_stable,bp->symbol_tree->items,level);
 	current_stable=old_symbol_table;
 
+	// MESG("exec_function: before clear_args");
 	clear_args(vargs,0);// allocated args already cleared above in delete_symbol_table!
 	level--;
 	return(value);
@@ -2212,6 +2226,7 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 			case VTYPE_NUM:
 				arg_dat->dval=va->dval;break;
 			case VTYPE_STRING:
+				// MESG("assign %d [%s] %X",i,va->sval,va->sval);
 				arg_dat->sval=va->sval;break;
 			case VTYPE_ARRAY:
 			case VTYPE_SARRAY:
@@ -2596,7 +2611,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  tok_data *local_symbols;
  tok_data *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
- // MESG(";compute_block: %s",bp->b_fname);
+ MESG(";compute_block: %s",bp->b_fname);
  if(use_fp->symbol_tree==NULL) {
 	// MESG("create new symbol_tree for use_fp!");
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);
@@ -2631,12 +2646,14 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	val=exec_block1();
 	drv_stop_checking_break();
 	// MESG("--- start=%d",start);
+#if	1
 	if(start) {
+		if(local_symbols)
 		if(bp->symbol_tree)
-		delete_symbol_table(local_symbols,bp->symbol_tree->items);
+		delete_symbol_table(local_symbols,bp->symbol_tree->items,0);
 		current_stable=old_symbol_table;
 	};
-
+#endif
 	if(ex_vtype==VTYPE_STRING) msg_line("Result is \"%s\"",slval);
 	if(ex_vtype==VTYPE_NUM) msg_line("Result is [%f]",val);
  } else {

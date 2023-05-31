@@ -1,4 +1,5 @@
 # show arguments
+cls
 l1 = args_size()
 a= args(0)
 
