@@ -553,15 +553,15 @@ tok_data *new_symbol_table(int size)
 void delete_symbol_table(tok_data *td, int size,int level)
 {
  int i;
- tok_data *sslot;
+ // tok_data *sslot;
  MESG("delete_symbol_table: size=%d level=%d",size,level);
  if(td) {
  for(i=0;i<size;i++) {
 	tok_data *sslot;
  	sslot=&td[i];
 #if	1
-	if(sslot->vtype==VTYPE_STRING && level==0) {
-		MESG("delete_symbol_table:%d [%s] %X",i,sslot->sval,sslot->sval);
+	if(sslot->vtype==VTYPE_STRING) {
+		MESG("delete_symbol_table:%d [%s] free %X",i,sslot->sval,sslot->sval);
 		free(sslot->sval);
 	};
 #else
@@ -1104,7 +1104,7 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	current_stable=old_symbol_table;
 
 	// MESG("exec_function: before clear_args");
-	clear_args(vargs,0);// allocated args already cleared above in delete_symbol_table!
+	//clear_args(vargs,0);/* allocated args already cleared above in delete_symbol_table! */
 	level--;
 	return(value);
 }
@@ -2159,7 +2159,7 @@ double assign_val(double none)
 	tok_data *sslot;
 	TDS("assign_val");
 	sslot=lsslot;
-	// MESG("assign_val: ind=%d type=%d",sslot->ind,sslot->vtype);
+	MESG("assign_val: ind=%d type=%d",sslot->ind,sslot->vtype);
 	v1=lexpression();
 	if(sslot->vtype!=ex_vtype){
 		if(sslot->vtype==VTYPE_STRING) {
@@ -2226,8 +2226,9 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 			case VTYPE_NUM:
 				arg_dat->dval=va->dval;break;
 			case VTYPE_STRING:
-				// MESG("assign %d [%s] %X",i,va->sval,va->sval);
-				arg_dat->sval=va->sval;break;
+				arg_dat->sval=va->sval;
+				MESG("assign %d [%s] offset is %X",i,va->sval,va->sval);
+				break;
 			case VTYPE_ARRAY:
 			case VTYPE_SARRAY:
 				arg_dat->adat=va->adat;break;
