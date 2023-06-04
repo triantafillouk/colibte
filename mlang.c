@@ -272,9 +272,12 @@ void init_btree_table()
 void clear_args(MVAR *va,int nargs)
 {
  int i;
+ MESG("clear_args: %d",nargs);
  if(va) {
 	 for(i=0;i<nargs;i++){
-		if(va[i].vtype>VTYPE_NUM){
+	 	MESG("	%d %d %X",i,va[i].vtype,va[i].sval);
+		if(va[i].vtype==VTYPE_STRING){
+			MESG("clear_args: free %X",va[i].sval);
 	 		free(va[i].sval);
 		}
 	 };
@@ -1104,7 +1107,7 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	current_stable=old_symbol_table;
 
 	// MESG("exec_function: before clear_args");
-	//clear_args(vargs,0);/* allocated args already cleared above in delete_symbol_table! */
+	// clear_args(vargs,nargs);	/* allocated args already cleared above in delete_symbol_table! */
 	level--;
 	return(value);
 }
@@ -1121,7 +1124,7 @@ double factor_line_array()
 	cdim=1;
 	ex_array=adat;
 	ex_name="Definition";
-	// MESG("factor_line_array:");
+	MESG("factor_line_array:");
 	allocate_array(ex_array);
 	NTOKEN2;
 	while(cdim>0){
@@ -1182,6 +1185,7 @@ double factor_variable()
 			RTRN(lsslot->dval);
 		case VTYPE_ARRAY:
 		case VTYPE_SARRAY:
+			MESG("factor_variable: [%s] array",tok->tname);
 			ex_array=lsslot->adat;
 			ex_name=tok->tname;
 			NTOKEN2;
@@ -1201,6 +1205,7 @@ double factor_array2()
 	double value=0;
 	tok_data *array_slot;
 	array_dat *adat;
+	MESG("factor_array2:");
 	array_slot=&current_stable[tok->tind];
 	adat=array_slot->adat;
 	ex_vtype=VTYPE_NUM;
@@ -1239,26 +1244,27 @@ double factor_array1()
 	double value=0;
 	tok_data *array_slot;
 	array_slot=&current_stable[tok->tind];
-	// MESG("factor_array1:ind=%d ",array_slot->ind);
 	NTOKEN2;
 	ind1=(int)FACTOR_FUNCTION;
 
+	MESG("factor_array1:ind=%d ind1=%d",array_slot->ind,ind1);
 	if(array_slot->adat == NULL) {
 		ex_nums=1;
 		array_slot->adat=new_array(ind1+1,1);
 		array_slot->vtype=VTYPE_ARRAY;
+		MESG("	array allocate:");
 		allocate_array(array_slot->adat);	/*   */
 	} else {
-		
+		MESG("	array already allocated");
 	};
 
 	dval = array_slot->adat->dval;
-
+	MESG("	index1=%d",ind1);
 	value=dval[ind1];
-		array_slot->pdval=&dval[ind1];
-		lsslot=array_slot;
+	array_slot->pdval=&dval[ind1];
+	lsslot=array_slot;
 	ex_vtype=VTYPE_NUM;
-	// MESG("factor_array1:ind1=%d lsslot ind=%d type=%d end!",ind1,lsslot->ind,lsslot->vtype);
+	MESG("factor_array1:ind1=%d lsslot ind=%d type=%d end!",ind1,lsslot->ind,lsslot->vtype);
 	return(value);
 }
 
@@ -2226,9 +2232,8 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 			case VTYPE_NUM:
 				arg_dat->dval=va->dval;break;
 			case VTYPE_STRING:
-				arg_dat->sval=va->sval;
-				MESG("assign %d [%s] offset is %X",i,va->sval,va->sval);
-				break;
+				// MESG("assign %d [%s] %X",i,va->sval,va->sval);
+				arg_dat->sval=va->sval;break;
 			case VTYPE_ARRAY:
 			case VTYPE_SARRAY:
 				arg_dat->adat=va->adat;break;
