@@ -1247,41 +1247,41 @@ double factor_array1()
 	NTOKEN2;
 	ind1=(int)FACTOR_FUNCTION;
 
-	MESG("factor_array1:ind=%d ind1=%d",array_slot->ind,ind1);
+	// MESG("factor_array1:ind=%d ind1=%d",array_slot->ind,ind1);
 	if(array_slot->adat == NULL) {
 		ex_nums=1;
 		array_slot->adat=new_array(ind1+1,1);
 		array_slot->vtype=VTYPE_ARRAY;
-		MESG("	array allocate:");
 		allocate_array(array_slot->adat);	/*   */
+		MESG("	array allocated:%X",array_slot->adat->dval);
 	} else {
 		if(array_slot->adat->rows<ind1 && array_slot->adat->cols<ind1) {
-#if	0
-			err_num=214;
-			err_line=tok->tline;
-#endif
+			double *dval_old = array_slot->adat->dval;
+			// MESG("+++ reallocate ind1=%d x %d %X",ind1,sizeof(double),dval_old);
 			if(array_slot->adat->cols > array_slot->adat->rows) 
 				array_slot->adat->cols=ind1;
 			else
 				array_slot->adat->rows=ind1;
-			array_slot->adat->dval = realloc(array_slot->adat->dval,ind1*sizeof(double));
-#if	0
-			ERROR("	array out of bound! at %d",err_line);
-			set_break();
-			return 0;
-#endif
-		} else {
-			MESG("	array already allocated %d (%d %d)",ind1,array_slot->adat->rows, array_slot->adat->cols);
-		}
+			double *dval_new = (double *)realloc((void *)(dval_old),(ind1+1)*sizeof(double));
+			if(dval_new==NULL) {
+				err_num=214;
+				err_line=tok->tline;
+				ERROR("	array cannot allocate dval at %d",err_line);
+				set_break();
+				return 0;
+			};
+			array_slot->adat->dval = dval_new; 
+			// MESG("	array reallocated:%X",array_slot->adat->dval);
+		};
 	};
 
 	dval = array_slot->adat->dval;
-	MESG("	index1=%d",ind1);
+	// MESG("	index1=%d",ind1);
 	value=dval[ind1];
 	array_slot->pdval=&dval[ind1];
 	lsslot=array_slot;
 	ex_vtype=VTYPE_NUM;
-	MESG("factor_array1:ind1=%d lsslot ind=%d type=%d end!",ind1,lsslot->ind,lsslot->vtype);
+	// MESG("	factor_array1:ind1=%d lsslot ind=%d type=%d end!",ind1,lsslot->ind,lsslot->vtype);
 	return(value);
 }
 
@@ -2182,7 +2182,7 @@ double assign_val(double none)
 	tok_data *sslot;
 	TDS("assign_val");
 	sslot=lsslot;
-	MESG("assign_val: ind=%d type=%d",sslot->ind,sslot->vtype);
+	// MESG("assign_val: ind=%d type=%d",sslot->ind,sslot->vtype);
 	v1=lexpression();
 	if(sslot->vtype!=ex_vtype){
 		if(sslot->vtype==VTYPE_STRING) {
