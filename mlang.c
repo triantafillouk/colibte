@@ -1150,7 +1150,7 @@ double factor_line_array()
 		if(tok->ttype==TOK_SHOW || tok->ttype==TOK_RBRAKET) {
 			cdim=0;break;
 		};
-		if(tok->ttype==TOK_COMMA) {
+		if(tok->ttype==TOK_COMMA||tok->ttype==TOK_SEP) {
 			i=0;
 			j++;
 			cdim++;if(cdim>rows) rows=cdim;

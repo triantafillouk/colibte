@@ -518,7 +518,7 @@ int err_factor()
 		// xpos=477;syntax_error(": in factor",xpos);
 		RT_MESG1(xpos);
 	case TOK_LBRAKET:{	/* array definition  */
-		MESG("TOK_LBRAKET");
+		// MESG("TOK_LBRAKET");
 		pre_symbol=0;
 		int i=0,j=0;
 		int cdim=0;
@@ -543,7 +543,7 @@ int err_factor()
 			if(tok->ttype==TOK_RBRAKET) {
 				cdim=0;break;
 			};
-			if(tok->ttype==TOK_COMMA) {
+			if(tok->ttype==TOK_COMMA||tok->ttype==TOK_SEP) {
 				i=0;j++;
 				cdim++;if(cdim>rows) rows=cdim;
 				NTOKEN2;
