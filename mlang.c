@@ -777,7 +777,7 @@ MVAR * push_args_1(int nargs)
 			break;
 		default:
 			ERROR("error: wrong type arg %d",ex_vtype);
-			err_num=202;
+			err_num=203;
 			clear_args(va,i); return(NULL);
 	}
 #endif
@@ -1157,7 +1157,7 @@ double factor_line_array()
 			NTOKEN2;};
 	};cdim--;
 	};
-	ex_array->astat=1;
+	ex_array->astat=ARRAY_LOCAL;
 	ex_vtype=adat->atype;
 	print_array1("",adat);
 	NTOKEN2;
@@ -1255,7 +1255,24 @@ double factor_array1()
 		MESG("	array allocate:");
 		allocate_array(array_slot->adat);	/*   */
 	} else {
-		MESG("	array already allocated");
+		if(array_slot->adat->rows<ind1 && array_slot->adat->cols<ind1) {
+#if	0
+			err_num=214;
+			err_line=tok->tline;
+#endif
+			if(array_slot->adat->cols > array_slot->adat->rows) 
+				array_slot->adat->cols=ind1;
+			else
+				array_slot->adat->rows=ind1;
+			array_slot->adat->dval = realloc(array_slot->adat->dval,ind1*sizeof(double));
+#if	0
+			ERROR("	array out of bound! at %d",err_line);
+			set_break();
+			return 0;
+#endif
+		} else {
+			MESG("	array already allocated %d (%d %d)",ind1,array_slot->adat->rows, array_slot->adat->cols);
+		}
 	};
 
 	dval = array_slot->adat->dval;
@@ -1502,7 +1519,7 @@ static double term2_power(double v1)
 		array_dat *loc_array = ex_array;
 		v2 = FACTOR_FUNCTION;
 		if(ex_vtype==VTYPE_NUM) {
-			if(loc_array->astat==1) loc_array=dup_array_power(loc_array,v2);
+			if(loc_array->astat==ARRAY_LOCAL) loc_array=dup_array_power(loc_array,v2);
 			else array_power(loc_array,v2);
 			ex_array=loc_array;
 			ex_vtype=VTYPE_ARRAY;
@@ -1530,7 +1547,7 @@ double v2;
 		v2 = FACTOR_FUNCTION;
 		if(v2>0) 
 		{
-			if(loc_array->astat==1) loc_array=dup_array_mod1(loc_array,v2);
+			if(loc_array->astat==ARRAY_LOCAL) loc_array=dup_array_mod1(loc_array,v2);
 			else array_mod1(loc_array,v2);
 			ex_array=loc_array;
 			ex_vtype=VTYPE_ARRAY;
@@ -1578,7 +1595,7 @@ static double term1_mul(double v1)
 		NTOKEN2;
 		v2 = num_term2();
 		if(ex_vtype==VTYPE_NUM) {
-			if(loc_array->astat==1) loc_array=dup_array_mul1(loc_array,v2);
+			if(loc_array->astat==ARRAY_LOCAL) loc_array=dup_array_mul1(loc_array,v2);
 			else array_mul1(loc_array,v2);
 			ex_array=loc_array;
 			ex_vtype=VTYPE_ARRAY;
@@ -1607,7 +1624,7 @@ static double term1_mul(double v1)
 				loc_array2=array_mul2(loc_array,ex_array);
 				ex_vtype=VTYPE_ARRAY;
 				
-				if(loc_array->astat==3) {	/* free this one!!  */
+				if(loc_array->astat==ARRAY_ALLOCATED) {	/* free this one!!  */
 				};
 				ex_array=loc_array2;
 				ex_name="Multiply to array";
@@ -1661,7 +1678,7 @@ static double term1_div(double v1)
 		};
 
 		if(ex_vtype==VTYPE_NUM) {
-			if(loc_array->astat==1) loc_array=dup_array_mul1(loc_array,1/v2);
+			if(loc_array->astat==ARRAY_LOCAL) loc_array=dup_array_mul1(loc_array,1/v2);
 			else array_mul1(loc_array,1/v2);
 			ex_array=loc_array;
 			ex_vtype=VTYPE_ARRAY;
@@ -1821,7 +1838,7 @@ double term_plus(double value)
 				return 0;
 				};
 			case VTYPE_ARRAY: { // num + array
-				if(ex_array->astat==1) {
+				if(ex_array->astat==ARRAY_LOCAL) {
 					ex_array=dup_array_add1(ex_array,value);
 					ex_name="New array,add to numeric";
 				} else {
@@ -1865,7 +1882,7 @@ double term_plus(double value)
 				return value;
 			};
 			if(ex_vtype==VTYPE_ARRAY) {
-				err_num=219;
+				err_num=218;
 				ERROR("Subtrsct array from string not supported err %d",err_num);
 				RTRN(value);				
 			};
@@ -1878,7 +1895,7 @@ double term_plus(double value)
 		 		NTOKEN2;
 				d1=num_term1();
 				if(ex_vtype==VTYPE_NUM) { // add numeric to array
-					if(loc_array->astat==1) {
+					if(loc_array->astat==ARRAY_LOCAL) {
 						loc_array=dup_array_add1(loc_array,d1);
 					} else {
 						array_add1(loc_array,d1);
@@ -1914,7 +1931,7 @@ double term_minus(double value)
 		return (value-d1);
 		};
 	case VTYPE_ARRAY: {
-		if(ex_array->astat==1) {
+		if(ex_array->astat==ARRAY_LOCAL) {
 			ex_array=dup_array_sub1(ex_array,value);
 			ex_name="New array,subtract from numeric";
 		} else {
@@ -1925,7 +1942,7 @@ double term_minus(double value)
 		return 0;
 		};
 	default:
-		err_num=218;
+		err_num=215;
 		err_line=tok->tline;
 		ERROR("operation not supported err %d",err_num);
 		RTRN(value);
@@ -1952,7 +1969,7 @@ double term_minus(double value)
 	NTOKEN2;
 	d1=num_term1();
 	if(ex_vtype==VTYPE_NUM) {	// subtruct numeric from array
-		if(loc_array->astat==1) {
+		if(loc_array->astat==ARRAY_LOCAL) {
 			loc_array=dup_array_add1(loc_array,-d1);
 			ex_name="new subtruct numeric";
 		} else {
@@ -2185,7 +2202,7 @@ double assign_val(double none)
 				// MESG("assign array to var!");
 				sslot->adat=ex_array;
 				sslot->vtype=ex_array->atype;
-				if(ex_array->astat==3) ex_array->astat=1;	/* make it local to variable  */
+				if(ex_array->astat==ARRAY_ALLOCATED) ex_array->astat=ARRAY_LOCAL;	/* make it local to variable  */
 			};
 		};
 		return(v1);		
@@ -2203,7 +2220,7 @@ double assign_val(double none)
 					// MESG("free string array!");
 				};
 				sslot->adat=ex_array;
-				if(ex_array->astat==3) ex_array->astat=1;	/* make it local to variable  */
+				if(ex_array->astat==ARRAY_ALLOCATED) ex_array->astat=ARRAY_LOCAL;	/* make it local to variable  */
 			};
 			return(v1);
 		};

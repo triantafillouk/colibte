@@ -346,7 +346,7 @@ int err_assign_val()
 {
  TDSERR("assign_val");
  SHOW_STAGE(440);
-	MESG("err_assign_val");
+	// MESG("err_assign_val");
 	if(!simple){
 		xpos=440;
 		syntax_error("bogus assignement!!!!",xpos);
@@ -500,7 +500,7 @@ int err_factor()
  };
  NTOKEN_ERR(473);
  // MESG("set factor function:");
- MESG("token type %d",tok0->ttype);
+ // MESG("token type %d",tok0->ttype);
  if(tok0->ttype > TOK_OTHER) {
  	MESG("unknown token type %d line %d %d",tok0->ttype,tok0->tline,last_correct_line);
 	err_num=4730;
