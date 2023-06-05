@@ -9,6 +9,10 @@
 
 #include "alist.h"
 
+#define	ARRAY_UNALLOCATED	0
+#define	ARRAY_LOCAL			1
+#define	ARRAY_ALLOCATED		3
+
 typedef	alist * TLIST;
 typedef double (*FFunction)();
 typedef double (*TFunction)(double v1);
@@ -53,7 +57,7 @@ typedef struct array_dat {
 	int anum;
 	int rows;
 	int cols;
-	int astat;
+	int astat;	/* array allocation status  */
 	union {
 		void *dat;
 		double *dval;

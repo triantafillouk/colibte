@@ -272,9 +272,12 @@ void init_btree_table()
 void clear_args(MVAR *va,int nargs)
 {
  int i;
+ MESG("clear_args: %d",nargs);
  if(va) {
 	 for(i=0;i<nargs;i++){
-		if(va[i].vtype>VTYPE_NUM){
+	 	MESG("	%d %d %X",i,va[i].vtype,va[i].sval);
+		if(va[i].vtype==VTYPE_STRING){
+			MESG("clear_args: free %X",va[i].sval);
 	 		free(va[i].sval);
 		}
 	 };
@@ -553,15 +556,15 @@ tok_data *new_symbol_table(int size)
 void delete_symbol_table(tok_data *td, int size,int level)
 {
  int i;
- tok_data *sslot;
+ // tok_data *sslot;
  MESG("delete_symbol_table: size=%d level=%d",size,level);
  if(td) {
  for(i=0;i<size;i++) {
 	tok_data *sslot;
  	sslot=&td[i];
 #if	1
-	if(sslot->vtype==VTYPE_STRING && level==0) {
-		MESG("delete_symbol_table:%d [%s] %X",i,sslot->sval,sslot->sval);
+	if(sslot->vtype==VTYPE_STRING) {
+		MESG("delete_symbol_table:%d [%s] free %X",i,sslot->sval,sslot->sval);
 		free(sslot->sval);
 	};
 #else
@@ -774,7 +777,7 @@ MVAR * push_args_1(int nargs)
 			break;
 		default:
 			ERROR("error: wrong type arg %d",ex_vtype);
-			err_num=202;
+			err_num=203;
 			clear_args(va,i); return(NULL);
 	}
 #endif
@@ -1104,7 +1107,7 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	current_stable=old_symbol_table;
 
 	// MESG("exec_function: before clear_args");
-	clear_args(vargs,0);// allocated args already cleared above in delete_symbol_table!
+	// clear_args(vargs,nargs);	/* allocated args already cleared above in delete_symbol_table! */
 	level--;
 	return(value);
 }
@@ -1121,7 +1124,7 @@ double factor_line_array()
 	cdim=1;
 	ex_array=adat;
 	ex_name="Definition";
-	// MESG("factor_line_array:");
+	MESG("factor_line_array:");
 	allocate_array(ex_array);
 	NTOKEN2;
 	while(cdim>0){
@@ -1147,14 +1150,14 @@ double factor_line_array()
 		if(tok->ttype==TOK_SHOW || tok->ttype==TOK_RBRAKET) {
 			cdim=0;break;
 		};
-		if(tok->ttype==TOK_COMMA) {
+		if(tok->ttype==TOK_COMMA||tok->ttype==TOK_SEP) {
 			i=0;
 			j++;
 			cdim++;if(cdim>rows) rows=cdim;
 			NTOKEN2;};
 	};cdim--;
 	};
-	ex_array->astat=1;
+	ex_array->astat=ARRAY_LOCAL;
 	ex_vtype=adat->atype;
 	print_array1("",adat);
 	NTOKEN2;
@@ -1182,6 +1185,7 @@ double factor_variable()
 			RTRN(lsslot->dval);
 		case VTYPE_ARRAY:
 		case VTYPE_SARRAY:
+			MESG("factor_variable: [%s] array",tok->tname);
 			ex_array=lsslot->adat;
 			ex_name=tok->tname;
 			NTOKEN2;
@@ -1201,6 +1205,7 @@ double factor_array2()
 	double value=0;
 	tok_data *array_slot;
 	array_dat *adat;
+	MESG("factor_array2:");
 	array_slot=&current_stable[tok->tind];
 	adat=array_slot->adat;
 	ex_vtype=VTYPE_NUM;
@@ -1239,26 +1244,44 @@ double factor_array1()
 	double value=0;
 	tok_data *array_slot;
 	array_slot=&current_stable[tok->tind];
-	// MESG("factor_array1:ind=%d ",array_slot->ind);
 	NTOKEN2;
 	ind1=(int)FACTOR_FUNCTION;
 
+	// MESG("factor_array1:ind=%d ind1=%d",array_slot->ind,ind1);
 	if(array_slot->adat == NULL) {
 		ex_nums=1;
 		array_slot->adat=new_array(ind1+1,1);
 		array_slot->vtype=VTYPE_ARRAY;
 		allocate_array(array_slot->adat);	/*   */
+		MESG("	array allocated:%X",array_slot->adat->dval);
 	} else {
-		
+		if(array_slot->adat->rows<ind1 && array_slot->adat->cols<ind1) {
+			double *dval_old = array_slot->adat->dval;
+			// MESG("+++ reallocate ind1=%d x %d %X",ind1,sizeof(double),dval_old);
+			if(array_slot->adat->cols > array_slot->adat->rows) 
+				array_slot->adat->cols=ind1;
+			else
+				array_slot->adat->rows=ind1;
+			double *dval_new = (double *)realloc((void *)(dval_old),(ind1+1)*sizeof(double));
+			if(dval_new==NULL) {
+				err_num=214;
+				err_line=tok->tline;
+				ERROR("	array cannot allocate dval at %d",err_line);
+				set_break();
+				return 0;
+			};
+			array_slot->adat->dval = dval_new; 
+			// MESG("	array reallocated:%X",array_slot->adat->dval);
+		};
 	};
 
 	dval = array_slot->adat->dval;
-
+	// MESG("	index1=%d",ind1);
 	value=dval[ind1];
-		array_slot->pdval=&dval[ind1];
-		lsslot=array_slot;
+	array_slot->pdval=&dval[ind1];
+	lsslot=array_slot;
 	ex_vtype=VTYPE_NUM;
-	// MESG("factor_array1:ind1=%d lsslot ind=%d type=%d end!",ind1,lsslot->ind,lsslot->vtype);
+	// MESG("	factor_array1:ind1=%d lsslot ind=%d type=%d end!",ind1,lsslot->ind,lsslot->vtype);
 	return(value);
 }
 
@@ -1496,7 +1519,7 @@ static double term2_power(double v1)
 		array_dat *loc_array = ex_array;
 		v2 = FACTOR_FUNCTION;
 		if(ex_vtype==VTYPE_NUM) {
-			if(loc_array->astat==1) loc_array=dup_array_power(loc_array,v2);
+			if(loc_array->astat==ARRAY_LOCAL) loc_array=dup_array_power(loc_array,v2);
 			else array_power(loc_array,v2);
 			ex_array=loc_array;
 			ex_vtype=VTYPE_ARRAY;
@@ -1524,7 +1547,7 @@ double v2;
 		v2 = FACTOR_FUNCTION;
 		if(v2>0) 
 		{
-			if(loc_array->astat==1) loc_array=dup_array_mod1(loc_array,v2);
+			if(loc_array->astat==ARRAY_LOCAL) loc_array=dup_array_mod1(loc_array,v2);
 			else array_mod1(loc_array,v2);
 			ex_array=loc_array;
 			ex_vtype=VTYPE_ARRAY;
@@ -1572,7 +1595,7 @@ static double term1_mul(double v1)
 		NTOKEN2;
 		v2 = num_term2();
 		if(ex_vtype==VTYPE_NUM) {
-			if(loc_array->astat==1) loc_array=dup_array_mul1(loc_array,v2);
+			if(loc_array->astat==ARRAY_LOCAL) loc_array=dup_array_mul1(loc_array,v2);
 			else array_mul1(loc_array,v2);
 			ex_array=loc_array;
 			ex_vtype=VTYPE_ARRAY;
@@ -1601,7 +1624,7 @@ static double term1_mul(double v1)
 				loc_array2=array_mul2(loc_array,ex_array);
 				ex_vtype=VTYPE_ARRAY;
 				
-				if(loc_array->astat==3) {	/* free this one!!  */
+				if(loc_array->astat==ARRAY_ALLOCATED) {	/* free this one!!  */
 				};
 				ex_array=loc_array2;
 				ex_name="Multiply to array";
@@ -1655,7 +1678,7 @@ static double term1_div(double v1)
 		};
 
 		if(ex_vtype==VTYPE_NUM) {
-			if(loc_array->astat==1) loc_array=dup_array_mul1(loc_array,1/v2);
+			if(loc_array->astat==ARRAY_LOCAL) loc_array=dup_array_mul1(loc_array,1/v2);
 			else array_mul1(loc_array,1/v2);
 			ex_array=loc_array;
 			ex_vtype=VTYPE_ARRAY;
@@ -1815,7 +1838,7 @@ double term_plus(double value)
 				return 0;
 				};
 			case VTYPE_ARRAY: { // num + array
-				if(ex_array->astat==1) {
+				if(ex_array->astat==ARRAY_LOCAL) {
 					ex_array=dup_array_add1(ex_array,value);
 					ex_name="New array,add to numeric";
 				} else {
@@ -1859,7 +1882,7 @@ double term_plus(double value)
 				return value;
 			};
 			if(ex_vtype==VTYPE_ARRAY) {
-				err_num=219;
+				err_num=218;
 				ERROR("Subtrsct array from string not supported err %d",err_num);
 				RTRN(value);				
 			};
@@ -1872,7 +1895,7 @@ double term_plus(double value)
 		 		NTOKEN2;
 				d1=num_term1();
 				if(ex_vtype==VTYPE_NUM) { // add numeric to array
-					if(loc_array->astat==1) {
+					if(loc_array->astat==ARRAY_LOCAL) {
 						loc_array=dup_array_add1(loc_array,d1);
 					} else {
 						array_add1(loc_array,d1);
@@ -1908,7 +1931,7 @@ double term_minus(double value)
 		return (value-d1);
 		};
 	case VTYPE_ARRAY: {
-		if(ex_array->astat==1) {
+		if(ex_array->astat==ARRAY_LOCAL) {
 			ex_array=dup_array_sub1(ex_array,value);
 			ex_name="New array,subtract from numeric";
 		} else {
@@ -1919,7 +1942,7 @@ double term_minus(double value)
 		return 0;
 		};
 	default:
-		err_num=218;
+		err_num=215;
 		err_line=tok->tline;
 		ERROR("operation not supported err %d",err_num);
 		RTRN(value);
@@ -1946,7 +1969,7 @@ double term_minus(double value)
 	NTOKEN2;
 	d1=num_term1();
 	if(ex_vtype==VTYPE_NUM) {	// subtruct numeric from array
-		if(loc_array->astat==1) {
+		if(loc_array->astat==ARRAY_LOCAL) {
 			loc_array=dup_array_add1(loc_array,-d1);
 			ex_name="new subtruct numeric";
 		} else {
@@ -2179,7 +2202,7 @@ double assign_val(double none)
 				// MESG("assign array to var!");
 				sslot->adat=ex_array;
 				sslot->vtype=ex_array->atype;
-				if(ex_array->astat==3) ex_array->astat=1;	/* make it local to variable  */
+				if(ex_array->astat==ARRAY_ALLOCATED) ex_array->astat=ARRAY_LOCAL;	/* make it local to variable  */
 			};
 		};
 		return(v1);		
@@ -2197,7 +2220,7 @@ double assign_val(double none)
 					// MESG("free string array!");
 				};
 				sslot->adat=ex_array;
-				if(ex_array->astat==3) ex_array->astat=1;	/* make it local to variable  */
+				if(ex_array->astat==ARRAY_ALLOCATED) ex_array->astat=ARRAY_LOCAL;	/* make it local to variable  */
 			};
 			return(v1);
 		};
