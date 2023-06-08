@@ -331,6 +331,54 @@ int comment_c()
 	return 1;
 }
 
+int comment_lua()
+{
+ FILEBUF *fp = cbfp;
+ offs pos;
+ offs s0;
+	// MESG("comment_c:");
+	if(cwp->selection) {
+		offs start=tp_offset(cwp->w_smark);
+		offs end=tp_offset(cwp->w_emark);
+		if(start>end) {
+			offs tmp=end;
+			end=start;start=tmp;
+		};
+		set_Offset(start);
+		// ToLineBegin();
+		s0=Offset();
+		pos = find_string_inline("--[[");
+		if(pos<s0) {
+			set_Offset(s0);
+			insert_string(fp,"--[[ ",3);
+			set_Offset(end+3);
+			// ToLineEnd();
+			insert_string(fp," --]]",3);
+		} else {
+			set_Offset(s0);
+			DeleteBlock(0,3);
+			set_Offset(end-6);
+			DeleteBlock(0,3);
+		};
+		setmark(0);
+	} else { 
+		ToLineBegin();
+		s0 = Offset();
+		pos = find_string_inline("--");
+		if(pos>=s0) {
+			set_Offset(pos+3);	
+		} else {
+			ToLineEnd();
+			pos = Offset();
+			insert_string(fp,"	-- ",4);
+			set_Offset(pos+4);
+		};
+	};
+	set_update(cwp,UPD_MOVE);
+	set_modified(cbfp);
+	return 1;
+}
+
 int comment_css2()
 {
  FILEBUF *fp = cbfp;
@@ -2128,6 +2176,7 @@ void highlight_python(int c)
 }
 
 
+
 void highlight_other(int c)
 {
 
@@ -2576,6 +2625,76 @@ void highlight_sql(int c)
 		if((c>='A' && c<='Z') || (c>='a' && c<='z') || c>128) hstate |= HS_LETTER;
 		else hstate=0;
 //		if(((c>='0' && c<='9') || c==';')  && !hquote2 ) prev_num=1;else prev_num=0;
+	};
+  };
+}
+
+
+void highlight_lua(int c)
+{
+  static int prev_set=-1;
+
+  if(highlight_note(c)) return;
+
+  if(prev_set>=0) { hquotem=prev_set;prev_set=-1;};
+
+  switch(c) {
+	case CHR_RESET:
+		hstate=0;
+		slang=LANG_SCRIPT;
+		break;
+	/* double quotes */
+	case CHR_SQUOTE: 
+		if(hstate!=HS_LETTER) {
+			if(hstate!=HS_PREVESC) {
+				hquotem = (hquotem)? hquotem & ~H_QUOTE1: H_QUOTE1;
+			}
+		} else {
+			hquotem &= ~H_QUOTE1;
+		};
+		hstate=0;
+		break;
+
+	case CHR_DQUOTE:
+		if(hstate!=HS_LETTER) {
+			if(hstate!=HS_PREVESC) hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
+		} else {
+			hquotem &= ~H_QUOTE2;
+		};
+		hstate=0;
+		break;
+
+	case '-':
+		if(hquotem&H_QUOTE1 || hquotem&H_QUOTE2) { hstate=0;break;};
+		{
+			if(hstate==HS_PREVSLASH) prev_set=H_QUOTE5;
+			else if(hstate==HS_PREVAST) hquotem &= ~H_QUOTEC;
+		};
+		if(hquotem!=H_QUOTEC && hquotem!=H_QUOTE5)  hstate=HS_PREVSLASH;
+		break;
+
+	case '[':
+		if(hquotem & H_QUOTE5) prev_set = H_QUOTEC;
+		break;
+	case ']':
+		if(hquotem & H_QUOTEC) {prev_set=0;hquotem=0;};
+		break;
+	case '\\':
+		hstate=(hstate==HS_PREVESC)?0:HS_PREVESC;
+		break;
+	case CHR_CR:
+	case CHR_LINE:
+		if(hquotem!=H_QUOTEC) hquotem = 0;
+		hstate=HS_LINESTART;
+		prev_set=-1;
+		break;
+	case ' ':
+	case '\t':
+		if(hstate!=HS_LINESTART) hstate=0;
+		break;		
+	default: { 
+		if((c>='A' && c<='Z') || (c>='a' && c<='z') || c>128) hstate |= HS_LETTER;
+		else hstate=0;
 	};
   };
 }
