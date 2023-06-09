@@ -537,13 +537,13 @@ int err_factor()
 				NTOKEN2;
 				continue;
 			};
-			err_num=err_num_expression();
+			err_num=err_cexpression();
 			if(err_num) return err_num;
 			i++;if(i>cols) cols=i;
 			if(tok->ttype==TOK_RBRAKET) {
 				cdim=0;break;
 			};
-			if(tok->ttype==TOK_COMMA||tok->ttype==TOK_SEP) {
+			if(tok->ttype==TOK_SEP) {	/* Add tok->ttype==TOK_COMMA for using comma to separate array items  */
 				i=0;j++;
 				cdim++;if(cdim>rows) rows=cdim;
 				NTOKEN2;

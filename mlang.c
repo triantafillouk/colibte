@@ -318,9 +318,12 @@ double add_value(double v1)
 		return(v0);
 	};
 	if(sslot->vtype==VTYPE_ARRAY) {
-			v0=*sslot->pdval;
-			*sslot->pdval+=v1;
-			return(v0);
+		v0=*sslot->pdval;
+		*sslot->pdval+=v1;
+		return(v0);
+	}
+	if(sslot->vtype==VTYPE_SARRAY) {
+		
 	}
 	return(v0);
 }
@@ -377,6 +380,7 @@ double increase_by()
 	TDS("increase_by");
 	sslot=lsslot;
 	// MESG("increase_by: of [%s]",tok_info(lsslot));
+	MESG("increase_by: type=%d",lsslot->vtype);
 	v1=lexpression();
 
 	if(sslot->vtype==VTYPE_NUM) {
@@ -390,6 +394,11 @@ double increase_by()
 		*sslot->pdval = v0+v1;
 		// MESG("array: %f -> %f",v0,*sslot->pdval);
 		return(v0+v1);
+	};
+	if(sslot->vtype==VTYPE_STRING || sslot->vtype==VTYPE_SARRAY) {
+		MESG("increase [%s] by [%s]",sslot->sval,slval);
+		strcat(sslot->sval,slval);
+		strcpy(slval,sslot->sval);
 	};
 	return(-1);
 }
@@ -1133,7 +1142,9 @@ double factor_line_array()
 			NTOKEN2;
 			continue;
 		};
-		value=num_expression();
+		value=lexpression();
+		if(slval!=NULL) adat->atype=VTYPE_SARRAY;
+		MESG("	[%d %d]: value=%f [%s]",j,i,value,slval);
 		if(adat->atype==VTYPE_ARRAY){
 			if(adat->rows>1 && adat->cols>1) {
 				adat->dval2[j][i]=value;
@@ -1143,14 +1154,14 @@ double factor_line_array()
 			};
 		};
 		if(adat->atype==VTYPE_SARRAY) {
-			// MESG("	add row %d col=%d [%s]",i,j,slval);
+			MESG("	add row %d col=%d [%s]",j,i,slval);
 			adat->sval[cols*j+i]=strdup(slval);
 		};
 		i++;if(i>cols) cols=i;
 		if(tok->ttype==TOK_SHOW || tok->ttype==TOK_RBRAKET) {
 			cdim=0;break;
 		};
-		if(tok->ttype==TOK_COMMA||tok->ttype==TOK_SEP) {
+		if(tok->ttype==TOK_SEP) {
 			i=0;
 			j++;
 			cdim++;if(cdim>rows) rows=cdim;
@@ -1247,7 +1258,7 @@ double factor_array1()
 	NTOKEN2;
 	ind1=(int)FACTOR_FUNCTION;
 
-	// MESG("factor_array1:ind=%d ind1=%d",array_slot->ind,ind1);
+	MESG("factor_array1:ind=%d ind1=%d type=%d",array_slot->ind,ind1,array_slot->vtype);
 	if(array_slot->adat == NULL) {
 		ex_nums=1;
 		array_slot->adat=new_array(ind1+1,1);
@@ -1274,13 +1285,20 @@ double factor_array1()
 			// MESG("	array reallocated:%X",array_slot->adat->dval);
 		};
 	};
-
-	dval = array_slot->adat->dval;
-	// MESG("	index1=%d",ind1);
-	value=dval[ind1];
-	array_slot->pdval=&dval[ind1];
+	if(array_slot->vtype==VTYPE_SARRAY) {
+		strlcpy(slval,array_slot->adat->sval[ind1],MAXLLEN);
+		MESG("	show string value![%s]",slval);
+		array_slot->sval = array_slot->adat->sval[ind1];
+		value=0;
+		ex_vtype=VTYPE_STRING;
+	} else {
+		dval = array_slot->adat->dval;
+		MESG("	index1=%d",ind1);
+		value=dval[ind1];
+		array_slot->pdval=&dval[ind1];
+		ex_vtype=VTYPE_NUM;
+	};
 	lsslot=array_slot;
-	ex_vtype=VTYPE_NUM;
 	// MESG("	factor_array1:ind1=%d lsslot ind=%d type=%d end!",ind1,lsslot->ind,lsslot->vtype);
 	return(value);
 }
@@ -2363,7 +2381,7 @@ void refresh_ddot_1(double value)
 	};
  } else if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
 	array_dat *adat = ex_array;
- 	stat=snprintf(sout,MAXLLEN,"array %d, slot %ld rows %d,cols %d",adat->anum,lsslot-current_stable,adat->rows,adat->cols);
+ 	stat=snprintf(sout,MAXLLEN,"array %d, slot %ld type=%d rows %d,cols %d",adat->anum,lsslot-current_stable,adat->atype,adat->rows,adat->cols);
 	print_array1(":",adat);
  };
  if(stat>MAXLLEN) MESG("truncated");
