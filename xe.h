@@ -28,6 +28,8 @@
 #define	TARROWS		1	/* Use arrow menus in panel curses  */
 #define	USE_UTF8	1	/* Use utf8 characters  */
 
+#define	USE_SARRAYS	1
+
 #define	USE_FAST	1 & PCURSES	/* erase line for double width characters in panel_curses  */
 
 #if	DARWIN
@@ -312,8 +314,14 @@ typedef struct  VIDEO {
 typedef struct tok_data {
 	int	ind;
 	int vtype;
+#if	USE_SARRAYS
+	union {
 	double *pdval;
 	char  **psval;
+	};
+#else
+	double *pdval;
+#endif
 	union {
 		double dval;
 		char *sval;

@@ -18,7 +18,6 @@
 #define	SYNTAX_DEBUG	0
 #define	NTOKEN2	tok++
 #define FACTOR_FUNCTION tok->factor_function()
-#define	USE_SARRAYS	1
 
 void mesg_out(const char *fmt, ...);
 extern FILEBUF *cbfp;
@@ -322,9 +321,11 @@ double add_value(double v1)
 		*sslot->pdval+=v1;
 		return(v0);
 	}
+#if	USE_SARRAYS
 	if(sslot->vtype==VTYPE_SARRAY) {
 		
 	}
+#endif
 	return(v0);
 }
 
@@ -400,6 +401,7 @@ double increase_by()
 		strcat(sslot->sval,slval);
 		strcpy(slval,sslot->sval);
 	};
+#if	USE_SARRAYS
 	if(sslot->vtype==VTYPE_SARRAY) {
 		MESG("concat strings [%s]+[%s]",slval,sslot->psval[0]);
 		sprintf(sslot->psval[0],"%s%s",sslot->psval[0],slval);
@@ -409,6 +411,7 @@ double increase_by()
 		// MESG("array: %f -> %f",v0,*sslot->pdval);
 		return(0);
 	};
+#endif
 	return(-1);
 }
 
@@ -1299,6 +1302,7 @@ double factor_array1()
 			// MESG("	array reallocated:%X",array_slot->adat->dval);
 		};
 	};
+#if	USE_SARRAYS
 	if(array_slot->vtype==VTYPE_SARRAY) {
 		char **sval = array_slot->adat->sval;
 		strlcpy(slval,array_slot->adat->sval[ind1],MAXLLEN);
@@ -1306,7 +1310,9 @@ double factor_array1()
 		array_slot->psval = &sval[ind1];
 		value=0;
 		ex_vtype=VTYPE_STRING;
-	} else {
+	} else 
+#endif
+	{
 		dval = array_slot->adat->dval;
 		value=dval[ind1];
 		array_slot->pdval=&dval[ind1];
