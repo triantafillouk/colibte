@@ -313,6 +313,7 @@ typedef struct tok_data {
 	int	ind;
 	int vtype;
 	double *pdval;
+	char  **psval;
 	union {
 		double dval;
 		char *sval;

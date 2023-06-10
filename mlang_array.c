@@ -21,12 +21,12 @@ void allocate_array(struct array_dat *adat);
 void init_array(struct array_dat *array, int rows,int cols)
 {
 	int ctype=VTYPE_ARRAY;	/* default is numeric!!  */
-	// MESG("init_array: ex_nums=%d ex_nquote=%d ex_nvars=%d",ex_nums,ex_nquote,ex_nvars);
+	MESG("init_array: ex_nums=%d ex_nquote=%d ex_nvars=%d",ex_nums,ex_nquote,ex_nvars);
 	if(ex_nums) ctype=VTYPE_ARRAY;
 	else if(ex_nquote) ctype=VTYPE_SARRAY;
 	else if(ex_nquote>0 && ex_nums>0) ctype=VTYPE_AMIXED;
 	else if(ex_nvars) ctype=VTYPE_DYNAMIC;
-	// MESG("ctype=%d",ctype);
+	MESG("ctype=%d",ctype);
 	array->rows=rows;
 	array->cols=cols;
 	array->atype=ctype;
@@ -43,6 +43,7 @@ struct array_dat * new_list_array(int cols)
 {
 	struct array_dat *sarray;
 	ex_nquote=1;
+	MESG("new_list_array:");
 	sarray = new_array(1,cols);
 	return sarray;
 }
@@ -89,7 +90,7 @@ void free_array(char *spos,struct array_dat *adat)
 void allocate_array(struct array_dat *adat)
 {
  int i;
- // MESG("allocate_array: astat=%d type=%d",adat->astat,adat->atype);
+ MESG("allocate_array: astat=%d type=%d",adat->astat,adat->atype);
  if(adat->astat==ARRAY_UNALLOCATED || adat->atype==VTYPE_DYNAMIC) {	/* new/renew  */
  	if(adat->atype==VTYPE_ARRAY) {	/* allocate num array  */
 
@@ -118,9 +119,9 @@ void allocate_array(struct array_dat *adat)
 
 	};
 	if(adat->atype==VTYPE_SARRAY) {	/* allocate string array  */
-		// MESG("	allocate string array %d rows, %d cols",adat->rows,adat->cols);
+		MESG("	allocate string array %d rows, %d cols",adat->rows,adat->cols);
 	 	if(adat->dat != NULL) free(adat->dat);	/* free string array  */
-		adat->sval=(char **)malloc(sizeof(char *)*adat->rows*adat->cols);
+		adat->sval=(char **)malloc(sizeof(char **)*adat->rows*adat->cols);
 		for(i=0;i< adat->rows*adat->cols;i++) adat->sval[i]=NULL;
 		adat->astat=ARRAY_ALLOCATED;
 	};
@@ -135,7 +136,7 @@ void allocate_array(struct array_dat *adat)
 struct array_dat *alloc_array()
 {
  static int array_num=0;
- // MESG("aloc_array:");
+ MESG("alloc_array:");
  array_dat *na=(array_dat *)malloc(sizeof(struct array_dat));
  na->anum = array_num++;
  return(na);
@@ -144,6 +145,7 @@ struct array_dat *alloc_array()
 struct array_dat *new_array_similar(array_dat *a)
 {
  array_dat *na;
+ MESG("new_array_similar:");
  na=alloc_array();
  na->rows=a->rows;
  na->cols=a->cols;
@@ -157,6 +159,7 @@ struct array_dat *new_array_similar(array_dat *a)
 struct array_dat *new_array(int rows,int cols)
 {
 	struct array_dat *array;
+	MESG("new_array:%d %d",rows,cols);
 	array=alloc_array();
 	init_array(array,rows,cols);
 	return(array);
