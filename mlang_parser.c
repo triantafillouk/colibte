@@ -673,7 +673,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					set_var(stree,tok,nword);
 
 					while(next_token_type(bf)==TOK_LBRAKET) {
-						MESG("array ");
+						// MESG("array ");
 						tok_var->ttype=TOK_ARRAY1+index;	/* set it as array index  */
 						getnc1(bf,&cc,&tok_type);// skip it
 						getnc1(bf,&cc,&tok_type);// get the index!
