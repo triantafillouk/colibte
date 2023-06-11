@@ -323,9 +323,18 @@ double add_value(double v1)
 	}
 #if	USE_SARRAYS
 	if(sslot->vtype==VTYPE_SARRAY) {
-		
-	}
+		char *stmp=malloc(strlen(slval)+strlen(sslot->psval[0]));
+
+		// MESG("add string [%s]+[%s]",slval,sslot->psval[0]);
+		sprintf(stmp,"%s%s",sslot->psval[0],slval);
+		strcpy(stmp,sslot->psval[0]);
+		strcat(stmp,slval);
+		strcpy(slval,stmp);
+		free(stmp);
+		return(0);
+	};
 #endif
+
 	return(v0);
 }
 
@@ -378,10 +387,10 @@ double increase_by()
 {
 	double v1,v0;
 	tok_data *sslot;
-	TDS("increase_by");
+	// TDS("increase_by");
 	sslot=lsslot;
-	// MESG("increase_by: of [%s]",tok_info(lsslot));
-	// MESG("increase_by: type=%d",lsslot->vtype);
+	// if(sslot->vtype==VTYPE_STRING) MESG("increase_by string [%s]",sslot->sval);
+	
 	v1=lexpression();
 
 	if(sslot->vtype==VTYPE_NUM) {
@@ -396,15 +405,24 @@ double increase_by()
 		// MESG("array: %f -> %f",v0,*sslot->pdval);
 		return(v0+v1);
 	};
-	if(sslot->vtype==VTYPE_STRING || sslot->vtype==VTYPE_SARRAY) {
-		// MESG("increase [%s] by [%s]",sslot->sval,slval);
+	if(sslot->vtype==VTYPE_STRING) {
+		// MESG("increase [%s] by [%s]",sslot->psval[0],slval);
+		
 		strcat(sslot->sval,slval);
 		strcpy(slval,sslot->sval);
 	};
 #if	USE_SARRAYS
 	if(sslot->vtype==VTYPE_SARRAY) {
-		// MESG("concat strings [%s]+[%s]",slval,sslot->psval[0]);
-		sprintf(sslot->psval[0],"%s%s",sslot->psval[0],slval);
+		char *stmp=malloc(strlen(slval)+strlen(sslot->psval[0]));
+		// MESG("concat strings1 [%s]+[%s]",sslot->psval[0],slval);
+		strcpy(stmp,sslot->psval[0]);
+		// MESG("part1[%s]",sslot->psval[0],strlen(sslot->psval[0]));
+		// MESG("part2[%s]",slval,strlen(slval));
+		strcat(stmp,slval);
+		// MESG("caoncatanated[%s]",stmp);
+		free(sslot->psval[0]);
+		sslot->psval[0]=stmp;
+
 		return(0);
 	};
 #endif
@@ -563,6 +581,10 @@ tok_data *new_symbol_table(int size)
  for(i=0;i<size;i++) {
 	td[i].ind=i;
  	td[i].vtype=VTYPE_NUM;
+	td[i].pdval=NULL;
+#if	USE_SARRAYS
+	td[i].psval=NULL;
+#endif
 	td[i].dval=0;
 	td[i].sval=NULL;
  };
@@ -1289,7 +1311,7 @@ double factor_array1()
 			if(dval_new==NULL) {
 				err_num=214;
 				err_line=tok->tline;
-				ERROR("	array cannot allocate dval at %d",err_line);
+				// ERROR("	array cannot allocate dval at %d",err_line);
 				set_break();
 				return 0;
 			};
@@ -1303,7 +1325,8 @@ double factor_array1()
 		char **sval = array_slot->adat->sval;
 		strlcpy(slval,array_slot->adat->sval[ind1],MAXLLEN);
 		// MESG("	show string value![%s]",slval);
-		array_slot->psval = &sval[ind1];
+		// array_slot->psval = &sval[ind1];
+		array_slot->psval=&sval[ind1];
 		value=0;
 		ex_vtype=VTYPE_STRING;
 	} else 
@@ -1315,7 +1338,7 @@ double factor_array1()
 		ex_vtype=VTYPE_NUM;
 	};
 	lsslot=array_slot;
-	// MESG("	factor_array1:ind1=%d lsslot ind=%d type=%d rows=%d cols=%d!",ind1,lsslot->ind,lsslot->vtype,lsslot->adat->rows,lsslot->adat->cols);
+	// MESG("	factor_array1:ind1=%d lsslot ind=%d type=%d rows=%d cols=%d [%s]!",ind1,lsslot->ind,lsslot->vtype,lsslot->adat->rows,lsslot->adat->cols,array_slot->psval[0]);
 	return(value);
 }
 
@@ -1859,6 +1882,7 @@ double term_plus(double value)
  if(ex_vtype==VTYPE_NUM) {
 	NTOKEN2;
 	d1=num_term1();
+	MESG("term_plus");
 		switch(ex_vtype) {
 			case VTYPE_NUM: {	/* numeric addition  */
 				return (value+d1);
@@ -2358,7 +2382,7 @@ void refresh_ddot_1(double value)
  TDS("refresh_ddot_1");
 
  if(!discmd) return;
- // MESG("refresh_ddot:");
+ MESG("refresh_ddot:");
  int precision=bt_dval("print_precision");
  int show_hex=bt_dval("show_hex");
  
@@ -2668,7 +2692,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  tok_data *local_symbols;
  tok_data *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
- MESG(";compute_block: %s",bp->b_fname);
+ // MESG(";compute_block: %s",bp->b_fname);
  if(use_fp->symbol_tree==NULL) {
 	// MESG("create new symbol_tree for use_fp!");
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);

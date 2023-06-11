@@ -519,7 +519,7 @@ int err_factor()
 		// xpos=477;syntax_error(": in factor",xpos);
 		RT_MESG1(xpos);
 	case TOK_LBRAKET:{	/* array definition  */
-		MESG("TOK_LBRAKET");
+		// MESG("TOK_LBRAKET");
 		pre_symbol=0;
 		int i=0,j=0;
 		int cdim=0;
