@@ -197,7 +197,7 @@ double getnum1(FILEBUF *bf, int cc,tok_struct *tok)
 	
 	nc=FCharAt(bf,foffset);
 	cmask=tok_mask[nc];
-	if(nc=='.') {
+	if(nc=='.'||nc==',') {
 		if(after_dot==0) {
 			after_dot=1;
 		} else { 
@@ -673,6 +673,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					set_var(stree,tok,nword);
 
 					while(next_token_type(bf)==TOK_LBRAKET) {
+						// MESG("array ");
 						tok_var->ttype=TOK_ARRAY1+index;	/* set it as array index  */
 						getnc1(bf,&cc,&tok_type);// skip it
 						getnc1(bf,&cc,&tok_type);// get the index!

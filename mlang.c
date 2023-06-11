@@ -18,7 +18,6 @@
 #define	SYNTAX_DEBUG	0
 #define	NTOKEN2	tok++
 #define FACTOR_FUNCTION tok->factor_function()
-#define	USE_SARRAYS	1
 
 void mesg_out(const char *fmt, ...);
 extern FILEBUF *cbfp;
@@ -272,12 +271,12 @@ void init_btree_table()
 void clear_args(MVAR *va,int nargs)
 {
  int i;
- MESG("clear_args: %d",nargs);
+ // MESG("clear_args: %d",nargs);
  if(va) {
 	 for(i=0;i<nargs;i++){
-	 	MESG("	%d %d %X",i,va[i].vtype,va[i].sval);
+	 	// MESG("	%d %d %X",i,va[i].vtype,va[i].sval);
 		if(va[i].vtype==VTYPE_STRING){
-			MESG("clear_args: free %X",va[i].sval);
+			// MESG("clear_args: free %X",va[i].sval);
 	 		free(va[i].sval);
 		}
 	 };
@@ -318,10 +317,24 @@ double add_value(double v1)
 		return(v0);
 	};
 	if(sslot->vtype==VTYPE_ARRAY) {
-			v0=*sslot->pdval;
-			*sslot->pdval+=v1;
-			return(v0);
+		v0=*sslot->pdval;
+		*sslot->pdval+=v1;
+		return(v0);
 	}
+#if	USE_SARRAYS
+	if(sslot->vtype==VTYPE_SARRAY) {
+		char *stmp=malloc(strlen(slval)+strlen(sslot->psval[0]));
+
+		// MESG("add string [%s]+[%s]",slval,sslot->psval[0]);
+		sprintf(stmp,"%s%s",sslot->psval[0],slval);
+		strcpy(stmp,sslot->psval[0]);
+		strcat(stmp,slval);
+		strcpy(slval,stmp);
+		free(stmp);
+		return(0);
+	};
+#endif
+
 	return(v0);
 }
 
@@ -374,9 +387,10 @@ double increase_by()
 {
 	double v1,v0;
 	tok_data *sslot;
-	TDS("increase_by");
+	// TDS("increase_by");
 	sslot=lsslot;
-	// MESG("increase_by: of [%s]",tok_info(lsslot));
+	// if(sslot->vtype==VTYPE_STRING) MESG("increase_by string [%s]",sslot->sval);
+	
 	v1=lexpression();
 
 	if(sslot->vtype==VTYPE_NUM) {
@@ -391,6 +405,27 @@ double increase_by()
 		// MESG("array: %f -> %f",v0,*sslot->pdval);
 		return(v0+v1);
 	};
+	if(sslot->vtype==VTYPE_STRING) {
+		// MESG("increase [%s] by [%s]",sslot->psval[0],slval);
+		
+		strcat(sslot->sval,slval);
+		strcpy(slval,sslot->sval);
+	};
+#if	USE_SARRAYS
+	if(sslot->vtype==VTYPE_SARRAY) {
+		char *stmp=malloc(strlen(slval)+strlen(sslot->psval[0]));
+		// MESG("concat strings1 [%s]+[%s]",sslot->psval[0],slval);
+		strcpy(stmp,sslot->psval[0]);
+		// MESG("part1[%s]",sslot->psval[0],strlen(sslot->psval[0]));
+		// MESG("part2[%s]",slval,strlen(slval));
+		strcat(stmp,slval);
+		// MESG("caoncatanated[%s]",stmp);
+		free(sslot->psval[0]);
+		sslot->psval[0]=stmp;
+
+		return(0);
+	};
+#endif
 	return(-1);
 }
 
@@ -546,6 +581,10 @@ tok_data *new_symbol_table(int size)
  for(i=0;i<size;i++) {
 	td[i].ind=i;
  	td[i].vtype=VTYPE_NUM;
+	td[i].pdval=NULL;
+#if	USE_SARRAYS
+	td[i].psval=NULL;
+#endif
 	td[i].dval=0;
 	td[i].sval=NULL;
  };
@@ -557,14 +596,14 @@ void delete_symbol_table(tok_data *td, int size,int level)
 {
  int i;
  // tok_data *sslot;
- MESG("delete_symbol_table: size=%d level=%d",size,level);
+ // MESG("delete_symbol_table: size=%d level=%d",size,level);
  if(td) {
  for(i=0;i<size;i++) {
 	tok_data *sslot;
  	sslot=&td[i];
 #if	1
 	if(sslot->vtype==VTYPE_STRING) {
-		MESG("delete_symbol_table:%d [%s] free %X",i,sslot->sval,sslot->sval);
+		// MESG("delete_symbol_table:%d [%s] free %X",i,sslot->sval,sslot->sval);
 		free(sslot->sval);
 	};
 #else
@@ -1124,7 +1163,7 @@ double factor_line_array()
 	cdim=1;
 	ex_array=adat;
 	ex_name="Definition";
-	MESG("factor_line_array:");
+	// MESG("factor_line_array:");
 	allocate_array(ex_array);
 	NTOKEN2;
 	while(cdim>0){
@@ -1133,7 +1172,9 @@ double factor_line_array()
 			NTOKEN2;
 			continue;
 		};
-		value=num_expression();
+		value=lexpression();
+		if(ex_vtype==VTYPE_STRING) adat->atype=VTYPE_SARRAY;
+		// MESG("	[%d %d]: value=%f [%s]",j,i,value,slval);
 		if(adat->atype==VTYPE_ARRAY){
 			if(adat->rows>1 && adat->cols>1) {
 				adat->dval2[j][i]=value;
@@ -1143,14 +1184,15 @@ double factor_line_array()
 			};
 		};
 		if(adat->atype==VTYPE_SARRAY) {
-			// MESG("	add row %d col=%d [%s]",i,j,slval);
-			adat->sval[cols*j+i]=strdup(slval);
+			int ind1=cols*j+i;
+			// MESG("	add row %d col=%d -> %d [%s]",j,i,ind1,slval);
+			adat->sval[ind1]=strdup(slval);
 		};
 		i++;if(i>cols) cols=i;
 		if(tok->ttype==TOK_SHOW || tok->ttype==TOK_RBRAKET) {
 			cdim=0;break;
 		};
-		if(tok->ttype==TOK_COMMA||tok->ttype==TOK_SEP) {
+		if(tok->ttype==TOK_SEP) {
 			i=0;
 			j++;
 			cdim++;if(cdim>rows) rows=cdim;
@@ -1185,7 +1227,7 @@ double factor_variable()
 			RTRN(lsslot->dval);
 		case VTYPE_ARRAY:
 		case VTYPE_SARRAY:
-			MESG("factor_variable: [%s] array",tok->tname);
+			// MESG("factor_variable: [%s] array",tok->tname);
 			ex_array=lsslot->adat;
 			ex_name=tok->tname;
 			NTOKEN2;
@@ -1205,7 +1247,7 @@ double factor_array2()
 	double value=0;
 	tok_data *array_slot;
 	array_dat *adat;
-	MESG("factor_array2:");
+	// MESG("factor_array2:");
 	array_slot=&current_stable[tok->tind];
 	adat=array_slot->adat;
 	ex_vtype=VTYPE_NUM;
@@ -1247,15 +1289,18 @@ double factor_array1()
 	NTOKEN2;
 	ind1=(int)FACTOR_FUNCTION;
 
-	// MESG("factor_array1:ind=%d ind1=%d",array_slot->ind,ind1);
+	// MESG("factor_array1:ind=%d ind1=%d type=%d",array_slot->ind,ind1,array_slot->vtype);
 	if(array_slot->adat == NULL) {
 		ex_nums=1;
 		array_slot->adat=new_array(ind1+1,1);
 		array_slot->vtype=VTYPE_ARRAY;
 		allocate_array(array_slot->adat);	/*   */
-		MESG("	array allocated:%X",array_slot->adat->dval);
+		// MESG("	array allocated:%X",array_slot->adat->dval);
 	} else {
+		// MESG("	2 vtype=%d %d",array_slot->vtype,VTYPE_ARRAY);
+		if(array_slot->vtype==VTYPE_ARRAY)
 		if(array_slot->adat->rows<ind1 && array_slot->adat->cols<ind1) {
+			 {
 			double *dval_old = array_slot->adat->dval;
 			// MESG("+++ reallocate ind1=%d x %d %X",ind1,sizeof(double),dval_old);
 			if(array_slot->adat->cols > array_slot->adat->rows) 
@@ -1266,22 +1311,34 @@ double factor_array1()
 			if(dval_new==NULL) {
 				err_num=214;
 				err_line=tok->tline;
-				ERROR("	array cannot allocate dval at %d",err_line);
+				// ERROR("	array cannot allocate dval at %d",err_line);
 				set_break();
 				return 0;
 			};
 			array_slot->adat->dval = dval_new; 
+			};
 			// MESG("	array reallocated:%X",array_slot->adat->dval);
 		};
 	};
-
-	dval = array_slot->adat->dval;
-	// MESG("	index1=%d",ind1);
-	value=dval[ind1];
-	array_slot->pdval=&dval[ind1];
+#if	USE_SARRAYS
+	if(array_slot->vtype==VTYPE_SARRAY) {
+		char **sval = array_slot->adat->sval;
+		strlcpy(slval,array_slot->adat->sval[ind1],MAXLLEN);
+		// MESG("	show string value![%s]",slval);
+		// array_slot->psval = &sval[ind1];
+		array_slot->psval=&sval[ind1];
+		value=0;
+		ex_vtype=VTYPE_STRING;
+	} else 
+#endif
+	{
+		dval = array_slot->adat->dval;
+		value=dval[ind1];
+		array_slot->pdval=&dval[ind1];
+		ex_vtype=VTYPE_NUM;
+	};
 	lsslot=array_slot;
-	ex_vtype=VTYPE_NUM;
-	// MESG("	factor_array1:ind1=%d lsslot ind=%d type=%d end!",ind1,lsslot->ind,lsslot->vtype);
+	// MESG("	factor_array1:ind1=%d lsslot ind=%d type=%d rows=%d cols=%d [%s]!",ind1,lsslot->ind,lsslot->vtype,lsslot->adat->rows,lsslot->adat->cols,array_slot->psval[0]);
 	return(value);
 }
 
@@ -1825,6 +1882,7 @@ double term_plus(double value)
  if(ex_vtype==VTYPE_NUM) {
 	NTOKEN2;
 	d1=num_term1();
+	MESG("term_plus");
 		switch(ex_vtype) {
 			case VTYPE_NUM: {	/* numeric addition  */
 				return (value+d1);
@@ -2324,7 +2382,7 @@ void refresh_ddot_1(double value)
  TDS("refresh_ddot_1");
 
  if(!discmd) return;
- // MESG("refresh_ddot:");
+ MESG("refresh_ddot:");
  int precision=bt_dval("print_precision");
  int show_hex=bt_dval("show_hex");
  
@@ -2363,7 +2421,7 @@ void refresh_ddot_1(double value)
 	};
  } else if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
 	array_dat *adat = ex_array;
- 	stat=snprintf(sout,MAXLLEN,"array %d, slot %ld rows %d,cols %d",adat->anum,lsslot-current_stable,adat->rows,adat->cols);
+ 	stat=snprintf(sout,MAXLLEN,"array %d, slot %ld type=%d rows %d,cols %d",adat->anum,lsslot-current_stable,adat->atype,adat->rows,adat->cols);
 	print_array1(":",adat);
  };
  if(stat>MAXLLEN) MESG("truncated");
@@ -2634,7 +2692,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  tok_data *local_symbols;
  tok_data *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
- MESG(";compute_block: %s",bp->b_fname);
+ // MESG(";compute_block: %s",bp->b_fname);
  if(use_fp->symbol_tree==NULL) {
 	// MESG("create new symbol_tree for use_fp!");
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);

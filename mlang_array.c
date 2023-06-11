@@ -43,6 +43,7 @@ struct array_dat * new_list_array(int cols)
 {
 	struct array_dat *sarray;
 	ex_nquote=1;
+	// MESG("new_list_array:");
 	sarray = new_array(1,cols);
 	return sarray;
 }
@@ -120,7 +121,7 @@ void allocate_array(struct array_dat *adat)
 	if(adat->atype==VTYPE_SARRAY) {	/* allocate string array  */
 		// MESG("	allocate string array %d rows, %d cols",adat->rows,adat->cols);
 	 	if(adat->dat != NULL) free(adat->dat);	/* free string array  */
-		adat->sval=(char **)malloc(sizeof(char *)*adat->rows*adat->cols);
+		adat->sval=(char **)malloc(sizeof(char **)*adat->rows*adat->cols);
 		for(i=0;i< adat->rows*adat->cols;i++) adat->sval[i]=NULL;
 		adat->astat=ARRAY_ALLOCATED;
 	};
@@ -135,7 +136,7 @@ void allocate_array(struct array_dat *adat)
 struct array_dat *alloc_array()
 {
  static int array_num=0;
- // MESG("aloc_array:");
+ // MESG("alloc_array:");
  array_dat *na=(array_dat *)malloc(sizeof(struct array_dat));
  na->anum = array_num++;
  return(na);
@@ -144,6 +145,7 @@ struct array_dat *alloc_array()
 struct array_dat *new_array_similar(array_dat *a)
 {
  array_dat *na;
+ // MESG("new_array_similar:");
  na=alloc_array();
  na->rows=a->rows;
  na->cols=a->cols;
@@ -157,6 +159,7 @@ struct array_dat *new_array_similar(array_dat *a)
 struct array_dat *new_array(int rows,int cols)
 {
 	struct array_dat *array;
+	// MESG("new_array:%d %d",rows,cols);
 	array=alloc_array();
 	init_array(array,rows,cols);
 	return(array);
