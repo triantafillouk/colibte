@@ -55,6 +55,7 @@ double assign_env(double none);
 void init_error();
 void get_lowercase_string(char *lower, char *string);
 void get_uppercase_string(char *lower, char *string);
+double cexpression();
 
 char * tok_info(tok_struct *tok);
 
@@ -1285,10 +1286,13 @@ double factor_array1()
 	double *dval=NULL;
 	double value=0;
 	tok_data *array_slot;
+	// MESG("factor_array1:");
 	array_slot=&current_stable[tok->tind];
 	NTOKEN2;
-	ind1=(int)FACTOR_FUNCTION;
-
+	// ind1=(int)FACTOR_FUNCTION;
+	ind1 = (int)num_expression();
+	NTOKEN2;
+	// if(tok->ttype==TOK_RBRAKET) { MESG("ends with rbracket!!");};
 	// MESG("factor_array1:ind=%d ind1=%d type=%d",array_slot->ind,ind1,array_slot->vtype);
 	if(array_slot->adat == NULL) {
 		ex_nums=1;
@@ -1338,6 +1342,7 @@ double factor_array1()
 		ex_vtype=VTYPE_NUM;
 	};
 	lsslot=array_slot;
+	// MESG("factor_array1: end");
 	// MESG("	factor_array1:ind1=%d lsslot ind=%d type=%d rows=%d cols=%d [%s]!",ind1,lsslot->ind,lsslot->vtype,lsslot->adat->rows,lsslot->adat->cols,array_slot->psval[0]);
 	return(value);
 }
@@ -1882,7 +1887,7 @@ double term_plus(double value)
  if(ex_vtype==VTYPE_NUM) {
 	NTOKEN2;
 	d1=num_term1();
-	MESG("term_plus");
+	// MESG("term_plus");
 		switch(ex_vtype) {
 			case VTYPE_NUM: {	/* numeric addition  */
 				return (value+d1);
@@ -2101,7 +2106,6 @@ double expression(char *title)
 	return num_expression();
 }
 
-double cexpression();
 
 double logical_or(double value)
 {
@@ -2380,9 +2384,11 @@ void refresh_ddot_1(double value)
  TextPoint *tp;
 
  TDS("refresh_ddot_1");
+ if(slval[0]!=0) MESG(": [%s]",slval);
+ else MESG(": %f ",value);
 
  if(!discmd) return;
- MESG("refresh_ddot:");
+
  int precision=bt_dval("print_precision");
  int show_hex=bt_dval("show_hex");
  

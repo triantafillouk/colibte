@@ -119,7 +119,7 @@ int getnword1(FILEBUF *bf, int cc,char *word)
 	foffset++;
  };
  *str=0;
-
+ // MESG("getnword [%s] len=%d cmask=%d",word,len,cmask);
  return(len);	// returns string length
 }
 
@@ -170,6 +170,7 @@ double getnum1(FILEBUF *bf, int cc,tok_struct *tok)
  double vad=0;
  double mul=DEC;
  int after_dot=0;
+ // MESG("getnum1: cc=%c",cc);
  if(cc=='0') {
  	if(!FEofAt(bf,foffset)){
 		nc=FCharAt(bf,foffset);
@@ -687,7 +688,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 								tok->ttype=TOK_NUM;
 								tok->tname="numeric3";
 								tok->dval=value;
-								break;
+								continue;
 							case TOK_LETTER:
 								slen=getnword1(bf,cc,nword);
 								{ // this must be a variable !!
@@ -700,7 +701,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 										set_var(stree,tok,nword);
 									}
 								}
-								break;
+								continue;
 							default:
 							// this is an ERROR !!
 							err_num=105;
