@@ -785,7 +785,7 @@ MVAR * push_args_1(int nargs)
 	
 	value = num_expression();
 	va_i->vtype=ex_vtype;
-#if	1
+
 	if(ex_vtype==VTYPE_NUM) {
 			va_i->dval=value;
 			va_i->vtype=VTYPE_NUM;
@@ -801,26 +801,7 @@ MVAR * push_args_1(int nargs)
 			err_num=202;
 			clear_args(va,i); return(NULL);
 	}
-#else
-	switch(ex_vtype) {
-		case VTYPE_NUM:
-			va_i->dval=value;
-			va_i->vtype=VTYPE_NUM;
-			break;
-		case VTYPE_STRING:
-			va_i->sval=strdup(slval);
-			break;
-		case VTYPE_ARRAY:
-		case VTYPE_SARRAY:
-			va_i->adat=ex_array;
-			va_i->vtype=ex_array->atype;
-			break;
-		default:
-			ERROR("error: wrong type arg %d",ex_vtype);
-			err_num=203;
-			clear_args(va,i); return(NULL);
-	}
-#endif
+
 	NTOKEN2; // skip separator or right parenthesis!
  };
  return(va);
@@ -1888,38 +1869,33 @@ double term_plus(double value)
 	NTOKEN2;
 	d1=num_term1();
 	// MESG("term_plus");
-		switch(ex_vtype) {
-			case VTYPE_NUM: {	/* numeric addition  */
-				return (value+d1);
-				};
-			case VTYPE_STRING: {	/* numeric + string  */
-				char svalue[MAXLLEN];
-				int stat;
-				stat=snprintf(svalue,MAXLLEN,"%f%s",value,slval);
-				if(stat>MAXLLEN) MESG("truncated 2");
-				strlcpy(slval,svalue,MAXLLEN);
-				return 0;
-				};
-			case VTYPE_ARRAY: { // num + array
-				if(ex_array->astat==ARRAY_LOCAL) {
-					ex_array=dup_array_add1(ex_array,value);
-					ex_name="New array,add to numeric";
-				} else {
-					array_add1(ex_array,value);
-					ex_name=tok->tname;
-				};
-				ex_vtype = VTYPE_ARRAY;
-				ex_name="Add to numeric";
-				return 0;
-				};
-			default: {
-				err_num=217;
-				err_line=tok->tline;
-				ERROR("operation not supported err %d",err_num);
-				RTRN(0);
-			};
+	if(ex_vtype==VTYPE_NUM) return value+d1;
+	if(ex_vtype==VTYPE_STRING) {
+		char svalue[MAXLLEN];
+		int stat;
+		stat=snprintf(svalue,MAXLLEN,"%f%s",value,slval);
+		if(stat>MAXLLEN) MESG("truncated 2");
+		strlcpy(slval,svalue,MAXLLEN);
+		return 0;
+	};
+	if(ex_vtype==VTYPE_ARRAY) { // num + array
+		if(ex_array->astat==ARRAY_LOCAL) {
+			ex_array=dup_array_add1(ex_array,value);
+			ex_name="New array,add to numeric";
+		} else {
+			array_add1(ex_array,value);
+			ex_name=tok->tname;
 		};
+		ex_vtype = VTYPE_ARRAY;
+		ex_name="Add to numeric";
+		return 0;
+	};
+	err_num=217;
+	err_line=tok->tline;
+	ERROR("operation not supported err %d",err_num);
+	RTRN(0);
  };
+
  if(ex_vtype==VTYPE_STRING) {	// set local value
 	char svalue[MAXLLEN];
 	strlcpy(svalue,slval,MAXLLEN);
@@ -1953,6 +1929,7 @@ double term_plus(double value)
 			ERROR("operation not supported err %d",err_num);
 			RTRN(value);				
  };
+
  if(ex_vtype==VTYPE_ARRAY) {
   	array_dat *loc_array=ex_array;
 		 		NTOKEN2;
@@ -1989,11 +1966,9 @@ double term_minus(double value)
  if(ex_vtype==VTYPE_NUM) {	/* numeric  !!  */
 	NTOKEN2;
 	d1=num_term1();
-	switch(ex_vtype) {
-	case VTYPE_NUM: { 
-		return (value-d1);
-		};
-	case VTYPE_ARRAY: {
+
+	if(ex_vtype==VTYPE_NUM) return value-d1;
+	if(ex_vtype==VTYPE_ARRAY) {
 		if(ex_array->astat==ARRAY_LOCAL) {
 			ex_array=dup_array_sub1(ex_array,value);
 			ex_name="New array,subtract from numeric";
@@ -2003,13 +1978,11 @@ double term_minus(double value)
 		};
 		ex_vtype = VTYPE_ARRAY;
 		return 0;
-		};
-	default:
-		err_num=215;
-		err_line=tok->tline;
-		ERROR("operation not supported err %d",err_num);
-		RTRN(value);
-	}
+	};
+	err_num=215;
+	err_line=tok->tline;
+	ERROR("operation not supported err %d",err_num);
+	RTRN(value);
  };
  if(ex_vtype==VTYPE_STRING) {	// set local value
 	char svalue[MAXLLEN];
@@ -2100,12 +2073,6 @@ double num_expression()
  // MESG(";num_expression:end ttnum=%d return value=%f slval=[%s]",tok->tnum,value,slval);
  return value;
 }
-
-double expression(char *title)
-{
-	return num_expression();
-}
-
 
 double logical_or(double value)
 {
