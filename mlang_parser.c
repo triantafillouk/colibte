@@ -688,7 +688,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 								tok->ttype=TOK_NUM;
 								tok->tname="numeric3";
 								tok->dval=value;
-								continue;
+								break;
 							case TOK_LETTER:
 								slen=getnword1(bf,cc,nword);
 								{ // this must be a variable !!
@@ -701,13 +701,14 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 										set_var(stree,tok,nword);
 									}
 								}
-								continue;
+								break;
 							default:
 							// this is an ERROR !!
 							err_num=105;
 							err_str="wrong character in table definition";
 							ERROR("wrong character on table definition !");
 						};
+						if(next_token_type(bf)!=TOK_RBRAKET) continue;
 						getnc1(bf,&cc,&tok_type);	/* this should be rbracket !  */
 						// MESG("tok: %c type=%d",cc,tok_type);
 
