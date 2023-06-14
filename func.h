@@ -293,6 +293,7 @@ FUNCS	ftable[] = {
 	{"save_as_note",0, save_as_note,""},
 	{"recreate_notes_db",1,recreate_notes_db,""},
 #endif
+	{"exec_lua",0,	exec_lua,""},
 	{"do_nothing",0,	do_nothing,"do nothing"},
 	{NULL,	0,		NULL}
 };

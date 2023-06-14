@@ -1,0 +1,2 @@
+cls
+exec_lua()

@@ -873,6 +873,8 @@ char *get_notes_status();
 int reload_tag_view();
 #endif
 
+int exec_lua(int n);
+
 #if	!DARWIN
 /*
  * '_cups_strlcat()' - Safely concatenate two strings.
