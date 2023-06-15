@@ -397,6 +397,10 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 			};
 		};
 	};
+	if(execf == abort_cmd) {
+		remove_box();
+		return execf;
+	};
 	if(execf!=0) {
 	 if( execf == next_line && orient == HORIZONTAL) execf=new_line;
 	 if( execf == new_line) { 
