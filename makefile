@@ -40,6 +40,7 @@ X11lib0= -lX11 -L/opt/X11/lib $(GLIB_LIB)
 EXTFILE=.$(APP_NAME)_ext_mac
 WSL:=0
 LUAinclude=-I/usr/local/include/lua
+LUAlibs=-llua
 #CC=clang -DGVERS='"$(GVERS)"'
 CC=gcc-12 -DGVERS='"$(GVERS)"'
 endif
@@ -52,7 +53,8 @@ OSYSTEM=LINUX
 X11include=-I/opt/X11/include/
 X11lib0=-L/usr/X11R6/lib -lX11 -L/opt/X11/lib 
 WSL:=`uname -a|grep "icrosoft" |wc -l`
-LUAinclude=-I/usr/include/lua
+LUAinclude=`pkg-config lua5.3 --cflags`
+LUAlibs=`pkg-config lua5.3 --libs`
 EXTFILE:=.$(APP_NAME)_ext_$(WSL)
 CC=gcc -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
 endif
@@ -274,7 +276,7 @@ cte : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o file
 	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o -o cte  $(GLIB_LIB) ${LPCURSES} -lm
 
 ctl : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o mlang_lua.o file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o xthemes.c
-	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o mlang_lua.o utf8_support.o notes.o -o ctl -L/usr/local/lib -llua $(GLIB_LIB) ${LPCURSES} -lm
+	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o mlang_lua.o utf8_support.o notes.o -o ctl -L/usr/local/lib $(LUAlibs) $(GLIB_LIB) ${LPCURSES} -lm
 
 ce : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o
 	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o -o ce  $(GLIB_LIB) ${LPCURSES} -lm

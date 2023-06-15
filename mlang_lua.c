@@ -1,3 +1,4 @@
+/* macro language lua connector */
 
 #include <lua.h>
 #include <lualib.h>
