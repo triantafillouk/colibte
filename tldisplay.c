@@ -193,7 +193,8 @@ int window_column_resize(int n)
 int describe_key(int n)	/* describe the command for a certain key */
 {
 	int c;		/* key to describe */
-	if(macro_exec) return 0;
+	if(!discmd) return (TRUE);
+ 	if(macro_exec) return 0;
 	/* prompt the user to type us a key to describe */
 	msg_line("Describe-key : ");
 
@@ -611,6 +612,7 @@ int execute_menu(int fixed)	/* execute menu */
 
 int menu_command(int n)
 {
+	if(!discmd) return (TRUE);
 	start_menu = &m_topn;
 	return execute_menu(1);
 }

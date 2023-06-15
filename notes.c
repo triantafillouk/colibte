@@ -1264,6 +1264,7 @@ int show_category_list(char *category)
 	char buffer_name[64];
 	int tag_id ;
 	FILEBUF *cat_view;
+	if(!discmd) return (TRUE);
 
 	if((db=notes_db_open())==NULL) return false;
 	// MESG("show_cagegory_list:%s",category);

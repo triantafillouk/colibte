@@ -194,7 +194,8 @@ void free_window_data(WINDP *wp)
 int one_window(int n)
 {
  WINDP *wp;
-
+ if(!discmd) return (TRUE);
+ 
  drv_flush();
  if(window_list->head->next == NULL) return(TRUE);	/* this is the only window */
 

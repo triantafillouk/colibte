@@ -1007,7 +1007,9 @@ int dir_view(int n)
 {
   int is_dir;
   char fname[512];
-  if(!(cbfp->b_flag & FSNLIST)) return FALSE;
+  if(!discmd) return (TRUE);
+
+ if(!(cbfp->b_flag & FSNLIST)) return FALSE;
   is_dir=dir_getfile(fname,0);
 
   if(is_dir<0) {
@@ -1438,6 +1440,8 @@ FILEBUF *get_dir_buffer(int flag,int dnum)
 
 int view_next(int n)
 {
+ if(!discmd) return (TRUE);
+
 #if	TNOTES
  if(cbfp->b_flag==FSNOTES) return(0);
 #endif
@@ -1460,6 +1464,8 @@ int view_next(int n)
 
 int view_previous(int n)
 {
+ if(!discmd) return (TRUE);
+
 #if	TNOTES
  if(cbfp->b_flag==FSNOTES) return(0);
 #endif

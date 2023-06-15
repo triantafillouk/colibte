@@ -451,7 +451,10 @@ int split_window(int n)
         register WINDP *wp;
         register int    ntru;
         register int    ntrl;
-        if (cwp->w_ntrows < 16) {
+ 
+		if(!discmd) return (TRUE);
+
+       if (cwp->w_ntrows < 16) {
                 msg_line("Cannot split a %d line window", cwp->w_ntrows);
                 return (true);
 		}
@@ -480,7 +483,7 @@ int vsplit_window(int n)
     WINDP *wp;
     int    ntl;
     int    ntr;
-	
+	if(execmd) return 0;
     if (cwp->w_ntcols < 40) {
             msg_line("Cannot split a %d column window", cwp->w_ntcols);
             return (true);
@@ -591,6 +594,8 @@ void disable_key_mouse()
 
 int toggle_mouse(int n)
 {
+	if(!discmd) return (TRUE);
+
 	if(mcurflag) mcurflag=FALSE;else mcurflag=TRUE;
 	if(mcurflag) {
 		enable_key_mouse();
@@ -1720,6 +1725,8 @@ int hresize_wind(int n)
  WINDP *wp=NULL;
  WINDP *wp1=NULL;
  int error=0;
+ 
+ if(!discmd) return (TRUE);
 
  if(cwp->w_ntrows+n<3) return false; 
  lbegin(window_list);
@@ -1820,6 +1827,7 @@ int vresize_wind(int n)
  WINDP *wp=NULL;
  WINDP *wp1=NULL;
  int error=0;
+ if(!discmd) return (TRUE);
 
  if(cwp->w_ntcols+n<10) return false; 
  lbegin(window_list);

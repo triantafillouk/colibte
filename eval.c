@@ -157,7 +157,8 @@ int nnarg=1;
 int set_arg(int n)
 {
 	char arg[MAXSLEN];
-	arg[0]=0;
+	if(!discmd) return (TRUE);
+ 	arg[0]=0;
 	if ((nextarg("Arg : ", arg, MAXSLEN,true)) != TRUE) 	return(FALSE);
 	nnarg=get_val();
 
@@ -629,7 +630,9 @@ int macro_line(int nused)
 {
 	char cmd_name[MAXLLEN];		/* string holding command to execute */
 	int status;
-	set_list_type(LMAC);
+
+	if(!discmd) return (TRUE);
+ 	set_list_type(LMAC);
 	cmd_name[0]=0;
 	/* get the line wanted */
 	status = nextarg("Macro: ", cmd_name, MAXLLEN,true);
@@ -986,6 +989,7 @@ int replay(int mode,int ntimes)
 
 int exec_macro(int ntimes)
 {
+ if(!discmd) return (TRUE);
  if (kbdmode != STOP) {
     msg_line("Macro already active");
     return(FALSE);
@@ -997,6 +1001,7 @@ int exec_macro(int ntimes)
 void record_session_key(short ks)
 {
  static int show_message=1;
+ if(!discmd) return;
  if(!record_session) return;
 // MESG("record_session_key: %3d ks=%d = 0x%X",kbdsession_end-&kbdm_session[0]+1,ks,ks);
  if(kbdsptr>kbdm_session+MAXSESSION-2) {
@@ -1221,7 +1226,8 @@ int refresh_current_line(int nused)
  int dsize=0;
  offs i;
  show_stage=0;
-
+ if(!discmd) return (TRUE);
+ 
 	tpo=tp_offset(cwp->tp_current);
 	
 	sl=FLineBegin(cbfp,tpo);

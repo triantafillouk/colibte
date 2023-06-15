@@ -559,6 +559,9 @@ int show_keys(int n)
 	int table;
 	char sline[MAXLLEN];
 	char *description;
+
+	if(!discmd) return (TRUE);
+ 
 	// int emulation = get_cfg_int("keyboard_emulation",0);
 	int emulation = (int) bt_dval("keyboard_emulation");
 	char *emulation_name[] = {"Native","Micro Emacs",NULL};

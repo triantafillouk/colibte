@@ -6,7 +6,8 @@ extern MENUS *start_menu;
 int work_menu(int n)
 {
  FILEBUF *fp=cbfp;
-	if(fp->b_flag & FSDIRED && fp->b_flag & FSNLIST) {
+ if(!discmd) return (TRUE);
+ 	if(fp->b_flag & FSDIRED && fp->b_flag & FSNLIST) {
 		if(fp->b_flag & FSNLIST) {
 			start_menu = &m_sort;	/* or a dir menu !!!!  */
 		} else {

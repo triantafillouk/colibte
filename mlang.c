@@ -2744,7 +2744,8 @@ int refresh_current_buffer(int nused)
  double val=0;
  FILEBUF *fp=cbfp;
  num curline = tp_line(cwp->tp_current);
-
+ if(!discmd) return (TRUE);
+ 
  if(!is_mlang(fp)) return 0;
  err_num=0;
  err_line=0;
@@ -2807,6 +2808,8 @@ int parse_check_current_buffer(int n)
  err_line=0;
  show_stage=1;
  // MESG("parse_check_current_buffer: %d",is_mlang(fp));
+  if(!discmd) return (TRUE);
+
  if(!is_mlang(fp)) return 0;
 
  /* clear parse list  */
@@ -2837,7 +2840,8 @@ int parse_buffer_show_tokens(int n)
  err_num=0;
  err_line=0;
  show_stage=2;
- if(!is_mlang(fp)) return 0;
+if(!discmd) return (TRUE);
+if(!is_mlang(fp)) return 0;
 
  /* clear parse list  */
  empty_tok_table(fp);
