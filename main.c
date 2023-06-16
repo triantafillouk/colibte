@@ -69,7 +69,7 @@ int scratch_files[100];
 extern int err_num;
 extern char *err_str;
 extern int max_colors;
-extern int drv_max_colors;
+int drv_max_colors=16;
 extern void main_loop();
 int driver_type;
 char *lc_lang;
