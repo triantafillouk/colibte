@@ -2410,12 +2410,12 @@ void refresh_ddot_1(double value)
  TextPoint *tp;
 
  TDS("refresh_ddot_1");
- MESG("refresh_ddot_1:");
+ // MESG("refresh_ddot_1:");
  if(saved_string) MESG("string: [%s]",saved_string);
  else MESG("num: %f ",value);
 
- if(!execmd) return;
- MESG("ddtot: 1");
+ if(!discmd) return;
+ // MESG("ddtot: 1");
  int precision=bt_dval("print_precision");
  int show_hex=bt_dval("show_hex");
  
@@ -2774,12 +2774,23 @@ int empty_tok_table(FILEBUF *fp)
  tok_struct *table= fp->tok_table;
  tok_struct *tokdel;
  if(table==NULL) return(0);
+ // MESG("empty_tok_table:");
  tokdel=table;
  for(tokdel=table;tokdel->ttype!=TOK_EOF;tokdel++){
 	if(tokdel->ttype==TOK_VAR || tokdel->ttype==TOK_QUOTE){
- 		if(tokdel->tname!=NULL) free(tokdel->tname);
+ 		if(tokdel->tname!=NULL) {
+			if(tokdel->ttype==TOK_QUOTE
+			||tokdel->ttype==TOK_AT
+			||tokdel->ttype==TOK_LETTER
+			||tokdel->ttype==TOK_SHOW
+			) {
+			// MESG("free tname %s",tokdel->tname);
+			free(tokdel->tname);
+			};
+		};
 	};
  };
+ // MESG("free the table");
  if(fp->tok_table) {
 	free(table);
 	fp->tok_table=NULL;
