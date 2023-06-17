@@ -72,7 +72,8 @@ int ex_nvars=0;	/* true is there are variables in the array definition  */
 int ex_nquote=0;	/* true if there are strings in the array definition  */
 int ex_nums=0;	/* true if array is only numeric  */
 char *ex_name=NULL;	/* variable name of the previous array  */
-static char slval[MAXLLEN];// saved string value
+// static char slval[MAXLLEN];/* saved string value */
+char *saved_string=NULL;
 
 /* error control variables  */
 int err_num=0;
@@ -283,6 +284,16 @@ void clear_args(MVAR *va,int nargs)
  };
 }
 
+void clean_saved_string(int new_size)
+{
+	if(saved_string) {
+		// MESG("clean_saved_string:%s",saved_string);
+		free(saved_string);
+	};
+	if(new_size>0) saved_string=(char *)malloc(new_size+1);
+	else saved_string=NULL;
+}
+
 curl_struct *new_curl(int level,int mline, struct _el *el)
 {
  struct curl_struct *lcurl; // left curl
@@ -322,14 +333,21 @@ double add_value(double v1)
 	}
 #if	USE_SARRAYS
 	if(sslot->vtype==VTYPE_SARRAY) {
-		char *stmp=malloc(strlen(slval)+strlen(sslot->psval[0]));
+#if	0
+		saved_string=realloc(saved_string,strlen(saved_string)+strlen(sslot->psval[0]));
+		
+#else
+
+		char *stmp=malloc(strlen(saved_string)+strlen(sslot->psval[0]));
 
 		// MESG("add string [%s]+[%s]",slval,sslot->psval[0]);
-		sprintf(stmp,"%s%s",sslot->psval[0],slval);
+		sprintf(stmp,"%s%s",sslot->psval[0],saved_string);
 		strcpy(stmp,sslot->psval[0]);
-		strcat(stmp,slval);
-		strcpy(slval,stmp);
-		free(stmp);
+		strcat(stmp,saved_string);
+		// strcpy(slval,stmp);
+		// free(stmp);
+		saved_string=stmp;
+#endif
 		return(0);
 	};
 #endif
@@ -407,17 +425,20 @@ double increase_by()
 	if(sslot->vtype==VTYPE_STRING) {
 		// MESG("increase [%s] by [%s]",sslot->psval[0],slval);
 		
-		strcat(sslot->sval,slval);
-		strcpy(slval,sslot->sval);
+		strcat(sslot->sval,saved_string);
+		free(saved_string);
+		// strcpy(slval,sslot->sval);
+		saved_string=strdup(sslot->sval);
 	};
 #if	USE_SARRAYS
 	if(sslot->vtype==VTYPE_SARRAY) {
-		char *stmp=malloc(strlen(slval)+strlen(sslot->psval[0]));
+		char *stmp=malloc(strlen(saved_string)+strlen(sslot->psval[0]));
 		// MESG("concat strings1 [%s]+[%s]",sslot->psval[0],slval);
 		strcpy(stmp,sslot->psval[0]);
 		// MESG("part1[%s]",sslot->psval[0],strlen(sslot->psval[0]));
 		// MESG("part2[%s]",slval,strlen(slval));
-		strcat(stmp,slval);
+		strcat(stmp,saved_string);
+		free(saved_string);
 		// MESG("caoncatanated[%s]",stmp);
 		free(sslot->psval[0]);
 		sslot->psval[0]=stmp;
@@ -783,7 +804,7 @@ MVAR * push_args_1(int nargs)
 			va_i->vtype=VTYPE_NUM;
 	} else
 	if(ex_vtype==VTYPE_STRING) {
-			va_i->sval=strdup(slval);
+			va_i->sval=strdup(saved_string);
 	} else 
 	if(ex_vtype==VTYPE_ARRAY||ex_vtype==VTYPE_SARRAY) {
 			va_i->adat=ex_array;
@@ -827,7 +848,7 @@ double eval_fun1(int fnum)
 		for(i=0;i< ia;i++) { 
 			NTOKEN2;
 			vv[i] = num_expression();
-			if(ex_vtype==VTYPE_STRING) strlcpy(arg[i],slval,MAXLLEN);
+			if(ex_vtype==VTYPE_STRING) strlcpy(arg[i],saved_string,MAXLLEN);
 			else if (ex_vtype==VTYPE_ARRAY||ex_vtype==VTYPE_SARRAY) arr=ex_array;
 			else arg[i][0]=0;
 		};
@@ -840,7 +861,8 @@ double eval_fun1(int fnum)
 		};
 	};
 
-	slval[0]=0;
+	// slval[0]=0;
+	clean_saved_string(0);
 	value=0.0;
 	entry_mode=f_entry;
 	// MESG(";eval_fun1: go eval! fnum=%d",fnum);
@@ -896,42 +918,58 @@ double eval_fun1(int fnum)
 				ex_vtype=VTYPE_NUM;
 				break;
 			};
-		case UFLEFT:	strlcpy(slval,arg[0],MAXLLEN);
-				if(vv[1]>0 && vv[1]<strlen(arg[0])) slval[(int)vv[1]]=0;
+		case UFLEFT:
+				clean_saved_string(vv[1]);
+				memcpy(saved_string,arg[0],vv[1]);
+				saved_string[(int)vv[1]]=0;
 				ex_vtype=VTYPE_STRING;
-				value = atof(slval);
+				value = 0;
 				break;
-		case UFRIGHT:	strlcpy(slval, &arg[0][strlen(arg[0])-(int)vv[1]],MAXLLEN);ex_vtype=VTYPE_STRING;
+		case UFRIGHT:	
+			int r1=(int)vv[1];
+			if(strlen(arg[0])>r1) r1=strlen(arg[0]);
+			clean_saved_string(r1);
+			memcpy(saved_string,arg[0]+(strlen(arg[0])-r1),r1);
+			saved_string[r1]=0;
+			ex_vtype=VTYPE_STRING;
 			break;
-		case UFMID:	strlcpy(slval, &arg[0][(int)vv[1]-1],MAXLLEN);
-				slval[(int)vv[2]]=0;
-				ex_vtype=VTYPE_STRING;
-				value = atof(slval);
-				break;
+		case UFMID:	
+			if(vv[1]>strlen(arg[0])) break;
+			clean_saved_string((int)vv[2]);
+			memcpy(saved_string,arg[0]+(int)vv[1]-1,vv[2]);
+			saved_string[(int)vv[2]]=0;
+			ex_vtype=VTYPE_STRING;
+			break;
 		case UFUPPER:{
-				get_uppercase_string(slval,arg[0]);
-				ex_vtype=VTYPE_STRING;
-				};
-				break;
+			clean_saved_string(strlen(arg[0]));
+			get_uppercase_string(saved_string,arg[0]);
+			ex_vtype=VTYPE_STRING;
+			};
+			break;
 		case UFLOWER:{
-				get_lowercase_string(slval,arg[0]);
-				ex_vtype=VTYPE_STRING;
-				};
+			clean_saved_string(strlen(arg[0]));
+			get_lowercase_string(saved_string,arg[0]);
+			ex_vtype=VTYPE_STRING;
+			};
+			break;
+		case UFASCII:	
+			 value=arg[0][0];ex_vtype=VTYPE_NUM;
 				break;
-		case UFASCII:	value=arg[0][0];ex_vtype=VTYPE_NUM;
-				break;
-		case UFCHR:	slval[0] = (int)vv[0];
-				slval[1] = 0;
-				value = vv[0];
-				ex_vtype=VTYPE_STRING;
-				break;
+		case UFCHR:	
+			clean_saved_string(1);
+			saved_string[0] = (int)vv[0];
+			saved_string[1] = 0;
+			value = vv[0];
+			ex_vtype=VTYPE_STRING;
+			break;
 		case UFGTKEY:
+			clean_saved_string(1);
 				if(execmd) {
-					slval[0]=getchar();
+					saved_string[0]=getchar();
 				} else {
-					slval[0] = getcmd();
+					saved_string[0] = getcmd();
 				};
-				slval[1] = 0;
+				saved_string[1] = 0;
 				ex_vtype=VTYPE_STRING;
 				break;
 		case UFRND:	/* returns big! int */
@@ -942,7 +980,8 @@ double eval_fun1(int fnum)
 				ex_vtype=VTYPE_NUM;
 				break;
 		case UFSTRING:	/* string of a value */
-				snprintf(slval,MAXLLEN,"%f",vv[0]);
+				clean_saved_string(20);
+				snprintf(saved_string,20,"%f",vv[0]);
 				ex_vtype=VTYPE_STRING;
 				value = vv[0];
 				break;
@@ -961,36 +1000,39 @@ double eval_fun1(int fnum)
 		case UFWAIT: 
 				if(arg[0][0] !=0 ) stat=snprintf(sout,MAXLLEN,"[%s] waiting.. ",arg[0]);
 				else stat=snprintf(sout,MAXLLEN,"<%f> wait for key",vv[0]);
+				clean_saved_string(1);
 				if(execmd) {
 					printf("%s",sout);
-					slval[0]=getc(stdin);
+					saved_string[0]=getc(stdin);
 				} else {
 					if(strlen(sout)>80) sout[79]=0;
 					msg_line(sout);
 					events_flush();
 					entry_mode=KENTRY;
-					slval[0] = getcmd();
+					saved_string[0] = getcmd();
 					entry_mode=KNORMAL;
 				};
-				slval[1] = 0;
-				ex_value=slval[0];
+				saved_string[1] = 0;
+				ex_value=saved_string[0];
 				ex_vtype=VTYPE_STRING;
 				break;
 		case UFINPUT:   
 				if(arg[0][0]==0) strlcpy(sout,"Input :",MAXLLEN);
 				else strlcpy(sout,arg[0],MAXLLEN);
 				entry_mode=KENTRY;	/* get input from screen */
-				getstring(sout,slval,80,true);
-				if(execmd) slval[strlen(slval)-1]=0;
+				clean_saved_string(80);
+				getstring(sout,saved_string,80,true);
+				if(execmd) saved_string[strlen(saved_string)-1]=0;
 				ex_vtype=VTYPE_STRING;
 				value=0;
 				break;
 		case UFDINPUT:
 				if(arg[0][0]==0) strlcpy(sout,"DInput :",MAXLLEN);else strlcpy(sout,arg[0],MAXLLEN);
 //				entry_mode=KENTRY;	/* get input from the screen */
-				getstring(sout,slval,80,true);
-				value=atof(slval);ex_vtype=VTYPE_NUM;
-				slval[0]=0;
+				clean_saved_string(80);
+				getstring(sout,saved_string,80,true);
+				value=atof(saved_string);ex_vtype=VTYPE_NUM;
+				clean_saved_string(0);
 				break;
 		case UFINIT:	initialize_vars();
 				break;
@@ -1031,8 +1073,9 @@ double eval_fun1(int fnum)
 					if(strlen(arg[0])>MAXLLEN-1) arg[0][MAXLLEN-1]=0;
 					strlcpy(sout,arg[0],MAXLLEN);
 					ex_vtype=VTYPE_STRING;
-					strlcpy(slval,arg[0],MAXLLEN);
-					if(xwin && !execmd) MESG(slval);
+					clean_saved_string(0);
+					saved_string=strdup(arg[0]);
+					if(xwin && !execmd) MESG(saved_string);
 				} else {
 					snprintf(sout,MAXLLEN,": %f",vv[0]); 
 					ex_vtype=VTYPE_NUM;
@@ -1045,8 +1088,9 @@ double eval_fun1(int fnum)
 		case UFGETPOINT:
 				break;
 		case UFSTIME:
-			strlcpy(slval,arg[0],MAXLLEN);
-			value=show_time(slval,vv[1]);
+			clean_saved_string(strlen(arg[0]));
+			strcpy(saved_string,arg[0]);
+			value=show_time(saved_string,vv[1]);
 			ex_vtype=VTYPE_NUM;
 			break;
 		case UFDEQ:
@@ -1075,9 +1119,10 @@ double eval_fun1(int fnum)
 			int ind;
 			ind=(int)vv[0];
 			if(ind<main_args->cols) {
-			strlcpy(slval,main_args->sval[(int)vv[0]],sizeof(slval));
-			ex_vtype=VTYPE_STRING;
-			return atof(slval);
+				clean_saved_string(0);
+				saved_string=strdup(main_args->sval[(int)vv[0]]);
+				ex_vtype=VTYPE_STRING;
+				return atof(saved_string);
 			} else {
 				ex_vtype=VTYPE_NUM;
 				return 0.0;
@@ -1160,7 +1205,7 @@ double factor_line_array()
 		if(adat->atype==VTYPE_SARRAY) {
 			int ind1=cols*j+i;
 			// MESG("	add row %d col=%d -> %d [%s]",j,i,ind1,slval);
-			adat->sval[ind1]=strdup(slval);
+			adat->sval[ind1]=strdup(saved_string);
 		};
 		i++;if(i>cols) cols=i;
 		if(tok->ttype==TOK_SHOW || tok->ttype==TOK_RBRAKET) {
@@ -1196,7 +1241,8 @@ double factor_variable()
 			RTRN(val);
 			};
 		case VTYPE_STRING:
-			strlcpy(slval,lsslot->sval,MAXLLEN);
+			clean_saved_string(0);
+			saved_string=strdup(lsslot->sval);
 			NTOKEN2;
 			RTRN(lsslot->dval);
 		case VTYPE_ARRAY:
@@ -1247,7 +1293,8 @@ double factor_option()
 	var_node=bte;
 	NTOKEN2;
 	if(bte->sval!=NULL) { /* there is a valid string value */
-		strlcpy(slval,bte->sval,MAXLLEN);
+		clean_saved_string(strlen(bte->sval));
+		strcpy(saved_string,bte->sval);
 		ex_vtype=VTYPE_STRING;
 	} else ex_vtype=VTYPE_NUM;
 	RTRN(bte->val);
@@ -1300,7 +1347,8 @@ double factor_array1()
 #if	USE_SARRAYS
 	if(array_slot->vtype==VTYPE_SARRAY) {
 		char **sval = array_slot->adat->sval;
-		strlcpy(slval,array_slot->adat->sval[ind1],MAXLLEN);
+		clean_saved_string(strlen(array_slot->adat->sval[ind1]));
+		strcpy(saved_string,array_slot->adat->sval[ind1]);
 		// MESG("	show string value![%s]",slval);
 		// array_slot->psval = &sval[ind1];
 		array_slot->psval=&sval[ind1];
@@ -1381,7 +1429,7 @@ double factor_cmd()
 	// MESG(";TOC_CMD: tnum=%d status=%d check_par=%d",tok->tnum,status,check_par);
 	ex_value=status;
 //	editor command returns a numeric value
-	slval[0]=0;
+	// slval[0]=0;
 	ex_vtype=VTYPE_NUM;
 
 	macro_exec = save_macro_exec;
@@ -1446,7 +1494,8 @@ static inline double factor_num()
 double factor_quote()
 {
 	ex_vtype=VTYPE_STRING;
-	strlcpy(slval,(char *)tok->tname,MAXLLEN);
+	saved_string=strdup(tok->tname);
+	// strlcpy(slval,(char *)tok->tname,MAXLLEN);
 	NTOKEN2;
 	RTRN(0);		/* 0 value for string variables  */
 }
@@ -1865,9 +1914,11 @@ double term_plus(double value)
 	if(ex_vtype==VTYPE_STRING) {
 		char svalue[MAXLLEN];
 		int stat;
-		stat=snprintf(svalue,MAXLLEN,"%f%s",value,slval);
+		stat=snprintf(svalue,MAXLLEN,"%f%s",value,saved_string);
 		if(stat>MAXLLEN) MESG("truncated 2");
-		strlcpy(slval,svalue,MAXLLEN);
+		clean_saved_string(0);
+		saved_string=strdup(svalue);
+		// strlcpy(slval,svalue,MAXLLEN);
 		return 0;
 	};
 	if(ex_vtype==VTYPE_ARRAY) { // num + array
@@ -1890,26 +1941,29 @@ double term_plus(double value)
 
  if(ex_vtype==VTYPE_STRING) {	// set local value
 	char svalue[MAXLLEN];
-	strlcpy(svalue,slval,MAXLLEN);
+	strlcpy(svalue,saved_string,MAXLLEN);
 
 		NTOKEN2;
 		d1=num_term1();
 		 /* catanate string */
 			if(ex_vtype==VTYPE_STRING) {	/* string catanate  */
-				strlcat(svalue,slval,sizeof(svalue));
+				strlcat(svalue,saved_string,sizeof(svalue));
 				value=atof(svalue);
-				strlcpy(slval,svalue,MAXLLEN);
+				clean_saved_string(0);
+				saved_string=strdup(svalue);
 				return value;
 			};
 			if(ex_vtype==VTYPE_NUM)	{	/* string, numeric catanate  */
 				long l0;
 				ex_vtype=VTYPE_STRING;
 				l0=d1;
-				if(l0==d1)snprintf(slval,MAXLLEN,"%ld",l0);
-				else snprintf(slval,MAXLLEN,"%f",d1);
-				strlcat(svalue,slval,sizeof(svalue));
+				clean_saved_string(80);
+				if(l0==d1)snprintf(saved_string,80,"%ld",l0);
+				else snprintf(saved_string,80,"%f",d1);
+				strlcat(svalue,saved_string,sizeof(svalue));
 				value=0;
-				strlcpy(slval,svalue,MAXLLEN);
+				clean_saved_string(0);
+				saved_string=strdup(svalue);
 				return value;
 			};
 			if(ex_vtype==VTYPE_ARRAY) {
@@ -1978,16 +2032,16 @@ double term_minus(double value)
  };
  if(ex_vtype==VTYPE_STRING) {	// set local value
 	char svalue[MAXLLEN];
-	strlcpy(svalue,slval,MAXLLEN);
+	strlcpy(svalue,saved_string,MAXLLEN);
 		NTOKEN2;
 		// operator on first chars of strings. numeric result
 			d1=num_term1();
 			if(ex_vtype==VTYPE_STRING) {
-				value=svalue[0]-slval[0];
-				slval[0]=0;
+				value=svalue[0]-saved_string[0];
+				// slval[0]=0;
 			} else {
 				value=svalue[0]-d1;
-				slval[0]=0;
+				// slval[0]=0;
 			};
 			ex_vtype=VTYPE_NUM;
 			return value;
@@ -2111,14 +2165,14 @@ double assign_option(double none)
 double	value=lexpression();
 		if(var_node->sval!=NULL) {free(var_node->sval);};
 		if(ex_vtype==VTYPE_STRING){
-			if(slval[0]!=0) var_node->sval=strdup(slval);
+			if(saved_string) var_node->sval=strdup(saved_string);
 			else {
 				err_num=2221;
 				ERROR("error: Null string ",err_num);
 				var_node->sval=NULL;
 			};
 		} else {
-			if(slval[0]!=0) {
+			if(saved_string) {
 				err_num=2222;
 				ERROR("error: no string and not free!");
 			};
@@ -2166,7 +2220,7 @@ double cexpression()
  if(ex_vtype==VTYPE_STRING) {
 	static char svalue[MAXLLEN];
 	 
-	strlcpy(svalue,slval,MAXLLEN);
+	strlcpy(svalue,saved_string,MAXLLEN);
 	num_expression();
 	if(ex_vtype!=VTYPE_STRING) {
 		syntax_error("string comparison error",223);
@@ -2174,8 +2228,8 @@ double cexpression()
 		RTRN(0);	/* it is an error to compare string with number  */
 	};
 	ex_vtype=VTYPE_NUM;
-	int lresult=scmp(svalue,slval);
-	strcpy(slval,"");
+	int lresult=scmp(svalue,saved_string);
+	clean_saved_string(0);
 	RTRN(tok0->cexpr_function(lresult,0));
  } else {
 	double v2;
@@ -2196,7 +2250,7 @@ double assign_env(double none)
 	TDS("assign_env");
 	left_index=var_node->node_index;
 	v1=lexpression();
-	set_env(left_index,slval,v1);
+	set_env(left_index,saved_string,v1);
 	var_node=NULL;
 	return(v1);
 }
@@ -2229,7 +2283,7 @@ double assign_val(double none)
 				return(v1);
 			};
 			if(ex_vtype==VTYPE_STRING) {
-				sslot->sval=strdup(slval);
+				sslot->sval=strdup(saved_string);
 				return(0);
 			};
 			if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
@@ -2260,7 +2314,7 @@ double assign_val(double none)
 		};
 		if(sslot->vtype==VTYPE_STRING) {
 			free(sslot->sval);
-			sslot->sval=strdup(slval);
+			sslot->sval=strdup(saved_string);
 			return(v1);
 		};
 		return(v1);
@@ -2356,11 +2410,12 @@ void refresh_ddot_1(double value)
  TextPoint *tp;
 
  TDS("refresh_ddot_1");
- // if(slval[0]!=0) MESG(": [%s]",slval);
- // else MESG(": %f ",value);
+ MESG("refresh_ddot_1:");
+ if(saved_string) MESG("string: [%s]",saved_string);
+ else MESG("num: %f ",value);
 
- if(!discmd) return;
-
+ if(!execmd) return;
+ MESG("ddtot: 1");
  int precision=bt_dval("print_precision");
  int show_hex=bt_dval("show_hex");
  
@@ -2381,10 +2436,9 @@ void refresh_ddot_1(double value)
  textpoint_set(buf->tp_current,ddot_position+1);
 
  if(ex_vtype==VTYPE_STRING) {	/* string value  */
- 	if(strlen(slval)>MAXSLEN-20) slval[MAXSLEN-20]=0;
-	if(value!=0) stat=snprintf(sout,MAXLLEN," <%5.5f>[%s]",value,slval);
-	else stat=snprintf(sout,MAXLLEN," \"%s\"",slval);
-	
+ 	// if(strlen(saved_string)>MAXSLEN-20) slval[MAXSLEN-20]=0;
+	if(value!=0) stat=snprintf(sout,MAXLLEN," <%5.5f>[%s]",value,saved_string);
+	else stat=snprintf(sout,MAXLLEN," \"%s\"",saved_string);
  }  else if(ex_vtype==VTYPE_NUM) {	/* numeric value  */
 	long int d = (long int)value;
 	if(d==value) {	/* an integer/double value!  */
@@ -2393,6 +2447,7 @@ void refresh_ddot_1(double value)
 	} else {	/* a decimal value!  */
 		stat=snprintf(sout,MAXLLEN," %5.*f",precision,value);
 	};
+
  } else if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
 	array_dat *adat = ex_array;
  	stat=snprintf(sout,MAXLLEN,"array %d, slot %ld type=%d rows %d,cols %d",adat->anum,lsslot-current_stable,adat->atype,adat->rows,adat->cols);
@@ -2703,7 +2758,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		current_stable=old_symbol_table;
 	};
 
-	if(ex_vtype==VTYPE_STRING) msg_line("Result is \"%s\"",slval);
+	if(ex_vtype==VTYPE_STRING) msg_line("Result is \"%s\"",saved_string);
 	if(ex_vtype==VTYPE_NUM) msg_line("Result is [%f]",val);
  } else {
  	msg_line("parse error %d on %s ",err_num,bp->b_fname);
@@ -2777,9 +2832,9 @@ int refresh_current_buffer(int nused)
 		// msg_line("Error %d [%s] at line %d",err_num,err_str,err_line);
 		// mesg_out("Error %d [%s] at line %d",err_num,err_str,err_line);
 	} else {
-		if(ex_vtype==VTYPE_STRING) msg_line("Result is \"%s\"",slval);
+		if(ex_vtype==VTYPE_STRING) msg_line("Result is \"%s\"",saved_string);
 		if(ex_vtype==VTYPE_NUM) msg_line("Result is [%f]",val);
-		msg_line("Result is [%s %f]",slval,val);
+		if(saved_string) msg_line("Result is [%s %f]",saved_string,val);
 	};
  } else {
  	msg_line("parse error %d line %d level %d [%s]",err_num,err_line+1,stage_level,err_str);
@@ -2940,7 +2995,7 @@ int show_parse_buffer(int n)
 char * key_str1()
 {
  ex_value=num_expression();
- return (slval);
+ return (saved_string);
 }
 
 double get_val()
@@ -2952,19 +3007,20 @@ double get_val()
 char *get_sval()
 {
 	// MESG("get_sval: tnum=%d",tok->tnum);
-	return(slval);
+	return(saved_string);
 }
 
 double next_value()
 {
  double v;
- v=atof(slval);
+ v=atof(saved_string);
  return(v);
 }
 
 void set_sval(char *s)
 {
- strlcpy(slval,s,MAXLLEN);
+ clean_saved_string(0);
+ saved_string=strdup(s);
 }
 
 void set_dval(double value)

@@ -9,7 +9,7 @@ function add3(a,b,c)
 
 cls
 
-result = add3(1,2,1)
+result = add3(1 ,2 ,1)
 result:   3.0
 
 `

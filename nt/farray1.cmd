@@ -1,7 +1,7 @@
 
 cls
 
-function test_array(a,l)
+function test_array(a ,l)
 {
 	b=a*1
 	for (i=0;i<l;i=i+1)
@@ -22,9 +22,9 @@ function test_string(s)
 a1 = [1.22 2.44 3.11]
 a1[1000]=5.3
 
-test_array(a1,3)
-test_array(a1,3)
-test_array(a1,3)
+test_array(a1 ,3)
+test_array(a1 ,3)
+test_array(a1 ,3)
 
 s0="kostas"
 test_string(s0)

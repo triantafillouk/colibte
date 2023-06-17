@@ -215,6 +215,7 @@ double getnum1(FILEBUF *bf, int cc,tok_struct *tok)
 				return(vbd+vad);
 			}
 		} else { 
+			MESG("nc = [%c]",nc);
 			set_error(tok,104,"wrong variable name, must start with a letter");
 			return(vbd+vad);
 		}
