@@ -1228,7 +1228,7 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
 #else
 	strlcpy(st1,st2,MAXLLEN);
 #endif
- 
+
  list_update(st2);
  kbdmode=saved_kbdmode;
  // record string

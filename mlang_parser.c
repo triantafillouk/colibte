@@ -198,7 +198,7 @@ double getnum1(FILEBUF *bf, int cc,tok_struct *tok)
 	
 	nc=FCharAt(bf,foffset);
 	cmask=tok_mask[nc];
-	if(nc=='.'||nc==',') {
+	if(nc=='.'/* ||nc==','*/) {
 		if(after_dot==0) {
 			after_dot=1;
 		} else { 

@@ -158,18 +158,18 @@ char *tok_name[] = {
 // function names with number of arguments
 m_function m_functions[] = {
 	{"len",1},        /* STRING LENGTH */
-	{"upper$",1},        /* UPPERCASE STRING */
-    {"lower$",1},        /* LOWER CASE STRING */
-	{"left$",2},
-	{"right$",2},
-	{"mid$",3},
+	{"upper",1},        /* UPPERCASE STRING */
+    {"lower",1},        /* LOWER CASE STRING */
+	{"left",2},
+	{"right",2},
+	{"mid",3},
     {"s_asc",1},	/* CHAR TO INTEGER CONVERSION */
-    {"chr$",1},		/* INTEGER TO CHAR CONVERSION */
+    {"chr",1},		/* INTEGER TO CHAR CONVERSION */
     {"getchar",0},	/* GET 1 CHARACTER */
     {"rand",0},        	/* GET A RANDOM NUMBER */
     {"abs",1},        	/* ABSOLUTE VALUE OF A NUMBER */
     {"s_index",2},      /* FIND THE INDEX OF ONE STRING IN ANOTHER */
-	{"str$",1},		/* string of a value */
+	{"str",1},		/* string of a value */
 	{"message",1},	/* show message on screen  */
 	{"error_log",1},	/* show message error  */
 	{"input",1},	/* string input from screen  */
@@ -426,9 +426,8 @@ double increase_by()
 		// MESG("increase [%s] by [%s]",sslot->psval[0],slval);
 		
 		strcat(sslot->sval,saved_string);
-		free(saved_string);
 		// strcpy(slval,sslot->sval);
-		saved_string=strdup(sslot->sval);
+		set_sval(sslot->sval);
 	};
 #if	USE_SARRAYS
 	if(sslot->vtype==VTYPE_SARRAY) {
@@ -481,7 +480,7 @@ void init_token_mask()
  int ind;
 
  for(ind=0;ind<255;ind++) {
- 	if((ind>='a' && ind<='z') ||(ind>='A' && ind<='Z') || ind=='_' || ind>=128 || ind=='$' || ind=='.' ) 
+ 	if((ind>='a' && ind<='z') ||(ind>='A' && ind<='Z') || ind=='_' || ind>=128 || ind=='.' ) 
  	tok_mask[ind]=TOK_LETTER;
 	else if(ind>='0'&&ind<='9') tok_mask[ind]=TOK_NUM;
 	else if(ind==' '||ind==9) tok_mask[ind]=TOK_SPACE;
@@ -862,7 +861,7 @@ double eval_fun1(int fnum)
 	};
 
 	// slval[0]=0;
-	clean_saved_string(0);
+	// clean_saved_string(0);
 	value=0.0;
 	entry_mode=f_entry;
 	// MESG(";eval_fun1: go eval! fnum=%d",fnum);
@@ -1073,8 +1072,7 @@ double eval_fun1(int fnum)
 					if(strlen(arg[0])>MAXLLEN-1) arg[0][MAXLLEN-1]=0;
 					strlcpy(sout,arg[0],MAXLLEN);
 					ex_vtype=VTYPE_STRING;
-					clean_saved_string(0);
-					saved_string=strdup(arg[0]);
+					set_sval(arg[0]);
 					if(xwin && !execmd) MESG(saved_string);
 				} else {
 					snprintf(sout,MAXLLEN,": %f",vv[0]); 
@@ -1119,8 +1117,7 @@ double eval_fun1(int fnum)
 			int ind;
 			ind=(int)vv[0];
 			if(ind<main_args->cols) {
-				clean_saved_string(0);
-				saved_string=strdup(main_args->sval[(int)vv[0]]);
+				set_sval(main_args->sval[(int)vv[0]]);
 				ex_vtype=VTYPE_STRING;
 				return atof(saved_string);
 			} else {
@@ -1241,8 +1238,7 @@ double factor_variable()
 			RTRN(val);
 			};
 		case VTYPE_STRING:
-			clean_saved_string(0);
-			saved_string=strdup(lsslot->sval);
+			set_sval(lsslot->sval);
 			NTOKEN2;
 			RTRN(lsslot->dval);
 		case VTYPE_ARRAY:
@@ -1494,7 +1490,7 @@ static inline double factor_num()
 double factor_quote()
 {
 	ex_vtype=VTYPE_STRING;
-	saved_string=strdup(tok->tname);
+	set_sval(tok->tname);
 	// strlcpy(slval,(char *)tok->tname,MAXLLEN);
 	NTOKEN2;
 	RTRN(0);		/* 0 value for string variables  */
@@ -1916,8 +1912,7 @@ double term_plus(double value)
 		int stat;
 		stat=snprintf(svalue,MAXLLEN,"%f%s",value,saved_string);
 		if(stat>MAXLLEN) MESG("truncated 2");
-		clean_saved_string(0);
-		saved_string=strdup(svalue);
+		set_sval(svalue);
 		// strlcpy(slval,svalue,MAXLLEN);
 		return 0;
 	};
@@ -1949,8 +1944,7 @@ double term_plus(double value)
 			if(ex_vtype==VTYPE_STRING) {	/* string catanate  */
 				strlcat(svalue,saved_string,sizeof(svalue));
 				value=atof(svalue);
-				clean_saved_string(0);
-				saved_string=strdup(svalue);
+				set_sval(svalue);
 				return value;
 			};
 			if(ex_vtype==VTYPE_NUM)	{	/* string, numeric catanate  */
@@ -1962,8 +1956,7 @@ double term_plus(double value)
 				else snprintf(saved_string,80,"%f",d1);
 				strlcat(svalue,saved_string,sizeof(svalue));
 				value=0;
-				clean_saved_string(0);
-				saved_string=strdup(svalue);
+				set_sval(svalue);
 				return value;
 			};
 			if(ex_vtype==VTYPE_ARRAY) {
@@ -2229,7 +2222,7 @@ double cexpression()
 	};
 	ex_vtype=VTYPE_NUM;
 	int lresult=scmp(svalue,saved_string);
-	clean_saved_string(0);
+	// clean_saved_string(0);
 	RTRN(tok0->cexpr_function(lresult,0));
  } else {
 	double v2;
@@ -3048,8 +3041,10 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 /* size of the buffer */
 {
 	/* if we are interactive, go get it! */
+	// MESG("nextarg:");
 	if (macro_exec == FALSE) {
 		if(getstring(prompt, buffer, size,show)!=FALSE) {
+			// MESG("nextarg: buffer=[%s]",buffer);
 			ex_value = atof(buffer);
 		} else {
 			set_update(cwp,UPD_MOVE);
