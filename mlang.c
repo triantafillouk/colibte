@@ -918,20 +918,20 @@ double eval_fun1(int fnum)
 				break;
 			};
 		case UFLEFT:
-				clean_saved_string(vv[1]);
-				memcpy(saved_string,arg[0],vv[1]);
-				saved_string[(int)vv[1]]=0;
-				ex_vtype=VTYPE_STRING;
-				value = 0;
-				break;
-		case UFRIGHT:	
+			clean_saved_string(vv[1]);
+			memcpy(saved_string,arg[0],vv[1]);
+			saved_string[(int)vv[1]]=0;
+			ex_vtype=VTYPE_STRING;
+			value = 0;
+			break;
+		case UFRIGHT:{
 			int r1=(int)vv[1];
 			if(strlen(arg[0])>r1) r1=strlen(arg[0]);
 			clean_saved_string(r1);
 			memcpy(saved_string,arg[0]+(strlen(arg[0])-r1),r1);
 			saved_string[r1]=0;
 			ex_vtype=VTYPE_STRING;
-			break;
+			};break;
 		case UFMID:	
 			if(vv[1]>strlen(arg[0])) break;
 			clean_saved_string((int)vv[2]);
