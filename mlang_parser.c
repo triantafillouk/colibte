@@ -198,7 +198,7 @@ double getnum1(FILEBUF *bf, int cc,tok_struct *tok)
 	
 	nc=FCharAt(bf,foffset);
 	cmask=tok_mask[nc];
-	if(nc=='.'||nc==',') {
+	if(nc=='.'/* ||nc==','*/) {
 		if(after_dot==0) {
 			after_dot=1;
 		} else { 
@@ -215,6 +215,7 @@ double getnum1(FILEBUF *bf, int cc,tok_struct *tok)
 				return(vbd+vad);
 			}
 		} else { 
+			MESG("nc = [%c]",nc);
 			set_error(tok,104,"wrong variable name, must start with a letter");
 			return(vbd+vad);
 		}

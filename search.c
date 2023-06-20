@@ -139,7 +139,7 @@ int forwsearch(int n)
 	};
 
 	if ( (status = readpattern("Search", search_pattern, TRUE))==TRUE ) { 
-//		MESG("forwsearch: pattern=%s",search_pattern);
+	// MESG("forwsearch: pattern=%s",search_pattern);
 		get_lowercase_string(search_lowercase_pattern,search_pattern);
 #if	TNOTES
 		if(cbfp->b_flag & FSNOTES) ToLineEnd();
@@ -148,7 +148,6 @@ int forwsearch(int n)
 	} else found=0;
 	
 
-//	MESG("forwsearch: n=%d [%s] found=%d FSNVTAG=%X b_flag=%X",n,search_pattern,found,FSNVTAG,cbfp->b_flag);
 #if	TNOTES
 	if(cbfp->b_flag & FSNOTES) update_tag_linecol();
 #endif
@@ -395,7 +394,7 @@ int	readpattern(char *prompt, char *apat, int srch)
 	int stat=0;
 
 	strlcpy(default_pattern,get_last_in_list(LSRC),MAXLLEN);
-//	MESG("readpattern:prompt[%s] pattern=[%s]",prompt,default_pattern);
+	// MESG("readpattern:prompt[%s] pattern=[%s]",prompt,default_pattern);
 	stat=snprintf(sprompt,256,"%s [%s]: ",prompt,default_pattern);
 	if(stat>=256) MESG("prompt is > 256 chars");
 
@@ -404,7 +403,7 @@ int	readpattern(char *prompt, char *apat, int srch)
 	if ((status = nextarg(sprompt, instr, MAXLLEN,true)) == TRUE)
 	{
 		if(instr[0]==0) strlcpy(instr,default_pattern,MAXLLEN); // if we press enter then get the previous pattern
-//		MESG("readpattern:1 [%s]",apat);
+		// MESG("readpattern:1 [%s]",apat);
 		return(setpattern(apat,instr,srch));
 	}
 //	MESG("readpattern:2 [%s]",apat);
@@ -1080,7 +1079,7 @@ int regexp_str(char *pattern, char *lower_pattern,REXP_PAT *rxpat,int dir )
  int list;
  int quote = FALSE;
  int quotectl = FALSE;
-// MESG("regexp_str: pat=%s dir=%d len=%d",pattern,dir,strlen(pattern));
+ // MESG("regexp_str: pat=%s dir=%d len=%d",pattern,dir,strlen(pattern));
  memset(rxpat,0,3*MAXLLEN);	// clear 
  list=0;
  for(i=0,j=0;i<strlen(pattern);i++) {
@@ -1120,6 +1119,7 @@ int regexp_str(char *pattern, char *lower_pattern,REXP_PAT *rxpat,int dir )
 	break;
     };
     case '$' :{
+		if(strlen(pattern)==1) break;
 		if((i==strlen(pattern)-1 && dir!=REVERSE) || (i==0 && dir==REVERSE) ) {
 				if(dir!=REVERSE) rxpat[j-1].t |= M_END;
 				else rxpat[j].t |=M_END;

@@ -245,7 +245,7 @@ int  err_push_args_1(int *nargs)
  
  while(1){
 	ex_vtype=VTYPE_NUM;
-	slval[0]=0;
+	// slval[0]=0;
 	xpos=412;
 	
 	if(tok->ttype==TOK_RPAR) {
@@ -870,7 +870,7 @@ int err_num_expression()
  int expression_type=VTYPE_NUM;
 
  ex_vtype=VTYPE_NUM;
- slval[0]=0;
+ // slval[0]=0;
  xpos=561;
 
  SHOW_STAGE(561);
@@ -918,7 +918,7 @@ int err_lexpression()
 {
  TDSERR("lexpression");
 
-	slval[0]=0;
+	// slval[0]=0;
 	simple=1;
 
 	SHOW_STAGE(701);
@@ -1010,7 +1010,7 @@ int err_cexpression()
  tok_struct *tok0;
  TDSERR("cexpression");
 
-	slval[0]=0;
+	// slval[0]=0;
 	simple=1;
 
 	SHOW_STAGE(611);

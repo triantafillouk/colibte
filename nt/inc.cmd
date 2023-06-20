@@ -1,3 +1,4 @@
-a=1
-a+=2
+cls
+a="kk"
+a=2
 print(a)
