@@ -7,4 +7,7 @@ mid(s,10,5)	:
 u=upper(s)		:
 l=lower(u)		:
 
+s+=" ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+s:
+
 
