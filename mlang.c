@@ -3117,6 +3117,16 @@ double next_value()
  return(v);
 }
 
+int vtype_is(int type)
+{
+	return type==ex_vtype;
+}
+
+void set_vtype(int type)
+{
+	ex_vtype=type;
+}
+
 void set_sval(char *s)
 {
 #if	SSVAL
