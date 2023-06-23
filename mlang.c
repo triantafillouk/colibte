@@ -419,7 +419,7 @@ double increase_by()
 	if(sslot->vtype==VTYPE_SARRAY) {
 		char *stmp=malloc(strlen(saved_string)+strlen(sslot->psval[0]));
 		strcpy(stmp,sslot->psval[0]);
-		strcat(stmp,saved_string);	/* check!! TODO  */
+		strcat(stmp,saved_string);
 		free(saved_string);
 		// MESG("caoncatanated[%s]",stmp);
 		free(sslot->psval[0]);
@@ -784,8 +784,8 @@ MVAR * push_args_1(int nargs)
 			va_i->dval=value;
 	} else
 	if(ex_vtype==VTYPE_STRING) {
-		va_i->sval=saved_string;
-		clean_saved_string(0);
+			va_i->sval=saved_string;
+			clean_saved_string(0);
 	} else 
 	if(ex_vtype==VTYPE_ARRAY||ex_vtype==VTYPE_SARRAY) {
 			va_i->adat=ex_array;
@@ -830,14 +830,14 @@ double eval_fun1(int fnum)
 			va[i].vtype=ex_vtype;
 			if(ex_vtype==VTYPE_STRING) { 
 				va[i].sval=saved_string;saved_string=NULL;
-				// MESG("%d: string: [%s]",i,va[i].sval);
+				MESG("%d: string: [%s]",i,va[i].sval);
 			} else if (ex_vtype==VTYPE_ARRAY||ex_vtype==VTYPE_SARRAY) {
 				va[i].adat=ex_array;
-				// MESG("%d: array",i);
+				MESG("%d: array",i);
 			}
 			else {
 				va[i].dval=value;
-				// MESG("%d: numeric %f",i,va[i].dval);
+				MESG("%d: numeric %f",i,va[i].dval);
 			};
 		};
 		NTOKEN2;
@@ -850,7 +850,6 @@ double eval_fun1(int fnum)
 
 	array_dat *arr=va[0].adat;
 	ex_vtype = va[0].vtype;
-
 	entry_mode=f_entry;
 	// MESG(";eval_fun1: go eval! fnum=%d",fnum);
 	/* and now evaluate it! */
@@ -915,13 +914,12 @@ double eval_fun1(int fnum)
 		case UFRIGHT:{
 			if(va[0].vtype==VTYPE_STRING && va[1].vtype==VTYPE_NUM ) {
 				int r1=(int)va[1].dval;
-				// MESG("right: r1=%d",r1);
+				MESG("right: r1=%d",r1);
 				if(strlen(va[0].sval)<r1) r1=strlen(va[0].sval);
 				clean_saved_string(r1);
 				memcpy(saved_string,va[0].sval+(strlen(va[0].sval)-r1),r1);
 				saved_string[r1]=0;
 			} else set_sval("");
-
 			ex_vtype=VTYPE_STRING;
 			};break;
 		case UFMID:	
@@ -941,18 +939,20 @@ double eval_fun1(int fnum)
 			break;
 		case UFUPPER:
 			if(va[0].vtype==VTYPE_STRING) {
-				clean_saved_string(strlen(va[0].sval));
-				get_uppercase_string(saved_string,va[0].sval);
+			clean_saved_string(strlen(va[0].sval));
+			get_uppercase_string(saved_string,va[0].sval);
 			} else set_sval("");
 			ex_vtype=VTYPE_STRING;
 			
 			break;
 		case UFLOWER:
 			if(va[0].vtype==VTYPE_STRING) {
-				clean_saved_string(strlen(va[0].sval));
-				get_lowercase_string(saved_string,va[0].sval);
+			clean_saved_string(strlen(va[0].sval));
+			get_lowercase_string(saved_string,va[0].sval);
+
 			} else set_sval("");
 			ex_vtype=VTYPE_STRING;
+			
 			break;
 		case UFASCII:	
 			if(va[0].vtype==VTYPE_STRING) {
@@ -969,16 +969,16 @@ double eval_fun1(int fnum)
 			break;
 		case UFGTKEY:
 			clean_saved_string(1);
-			if(execmd) {
-				saved_string[0]=getchar();
-			} else {
-				saved_string[0] = getcmd();
-			};
-			saved_string[1] = 0;
-			ex_vtype=VTYPE_STRING;
-			break;
+				if(execmd) {
+					saved_string[0]=getchar();
+				} else {
+					saved_string[0] = getcmd();
+				};
+				saved_string[1] = 0;
+				ex_vtype=VTYPE_STRING;
+				break;
 		case UFRND:	/* returns big! int */
-			value = rand();ex_vtype=VTYPE_NUM;break;
+				value = rand();ex_vtype=VTYPE_NUM;break;
 		case UFABS:	value = fabs(va[0].dval);ex_vtype=VTYPE_NUM;break;
 		case UFSINDEX:	/* segmentation */
 			if(va[0].vtype==VTYPE_STRING) {
@@ -1404,7 +1404,7 @@ double factor_array1()
 #if	USE_SARRAYS
 	if(array_slot->vtype==VTYPE_SARRAY) {
 		char **sval = array_slot->adat->sval;
-		clean_saved_string(strlen(array_slot->adat->sval[ind1]));	/* Check!! TODO  */
+		clean_saved_string(strlen(array_slot->adat->sval[ind1]));
 		strcpy(saved_string,array_slot->adat->sval[ind1]);
 		// MESG("	show string value![%s]",saved_string);
 		// array_slot->psval = &sval[ind1];
@@ -2278,7 +2278,6 @@ double cexpression()
 	};
 	ex_vtype=VTYPE_NUM;
 	int lresult=scmp(svalue,saved_string);
-
 	// clean_saved_string(0);
 	RTRN(tok0->cexpr_function(lresult,0));
  } else {
