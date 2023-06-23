@@ -941,8 +941,8 @@ void out_print(char *s,int nl)
 	if(s==NULL) return;
 #if	1
 	if(!discmd) {
-		if(nl) fprintf(stderr,"%s\n",s);
-		else fprintf(stderr,"%s",s);
+		if(nl) printf("%s\n",s);
+		else printf("%s",s);
 		return;
 	};
 #endif

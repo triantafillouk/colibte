@@ -60,8 +60,6 @@ double cexpression();
 
 char * tok_info(tok_struct *tok);
 
-char sout[MAXLLEN];	// used for messaging (msg_line), output print
-
 TLIST ctoklist=NULL;
 int is_break1=0;
 int tok_mask[256];
@@ -570,7 +568,7 @@ void initialize_vars()
 int is_mlang(FILEBUF *fp)
 {
  int bt=fp->b_type;
- char st[256];
+
  if(fp->b_flag & FSNLIST) {
  	msg_line("dir is not an mlang file! %X",fp->b_flag);
 	return 0;
@@ -582,8 +580,7 @@ int is_mlang(FILEBUF *fp)
 	!file_type_is("DOT",bt) &&
 	!file_type_is("GTEXT",bt)) 
  {
- 	snprintf(st,256,"Not an mlang file bt=%d",bt);
- 	msg_line(st);
+ 	msg_line("Not an mlang file bt=%d",bt);
 	return 0;	/* only allowed in selected types  */
  };
 
@@ -803,10 +800,14 @@ MVAR * push_args_1(int nargs)
 
 	if(ex_vtype==VTYPE_NUM) {
 			va_i->dval=value;
-			va_i->vtype=VTYPE_NUM;
 	} else
 	if(ex_vtype==VTYPE_STRING) {
+#if	SSVAL
 			va_i->sval=strdup(saved_string);
+#else
+			va_i->sval=saved_string;
+			clean_saved_string(0);
+#endif
 	} else 
 	if(ex_vtype==VTYPE_ARRAY||ex_vtype==VTYPE_SARRAY) {
 			va_i->adat=ex_array;
@@ -831,12 +832,16 @@ MVAR * push_args_1(int nargs)
 double eval_fun1(int fnum)
 {
 	static double value;
+#if	SSVAL
 	double vv[3];
 	char arg[3][MAXLLEN];
+	array_dat *arr=NULL;
+#else
+	MVAR va[3];
+#endif
 	int i,ia;
 	int f_entry;
 	int stat=0;
-	array_dat *arr=NULL;
 
 	TDS("eval_fun1");
 	ia=m_functions[fnum].f_args;
@@ -849,14 +854,32 @@ double eval_fun1(int fnum)
 		/* if we have arguments, check for parenthesis, then get the arguments  */
 		for(i=0;i< ia;i++) { 
 			NTOKEN2;
+#if	SSVAL
 			vv[i] = num_expression();
 			if(ex_vtype==VTYPE_STRING) strlcpy(arg[i],saved_string,MAXLLEN);
 			else if (ex_vtype==VTYPE_ARRAY||ex_vtype==VTYPE_SARRAY) arr=ex_array;
 			else arg[i][0]=0;
+#else
+			value = num_expression();
+			va[i].vtype=ex_vtype;
+			if(ex_vtype==VTYPE_STRING) { 
+				va[i].sval=saved_string;saved_string=NULL;
+				MESG("%d: string: [%s]",i,va[i].sval);
+			} else if (ex_vtype==VTYPE_ARRAY||ex_vtype==VTYPE_SARRAY) {
+				va[i].adat=ex_array;
+				MESG("%d: array",i);
+			}
+			else {
+				va[i].dval=value;
+				MESG("%d: numeric %f",i,va[i].dval);
+			};
+#endif
 		};
 		NTOKEN2;
 	} else {;
+#if	SSVAL
 		arg[0][0]=arg[1][0]=arg[2][0]=0;
+#endif
 		if(tok->ttype==TOK_LPAR) {
 				NTOKEN2;
 				NTOKEN2;
@@ -866,6 +889,9 @@ double eval_fun1(int fnum)
 #if	SSVAL
 	saved_string[0]=0;
 	value=0.0;
+#else
+	array_dat *arr=va[0].adat;
+	ex_vtype = va[0].vtype;
 #endif
 	entry_mode=f_entry;
 	// MESG(";eval_fun1: go eval! fnum=%d",fnum);
@@ -906,7 +932,7 @@ double eval_fun1(int fnum)
 		case UFTRANSPOSE:
 				if(ex_vtype==VTYPE_ARRAY) {
 					array_dat *tarray;
-					tarray = transpose(ex_array);
+					tarray = transpose(arr);
 					ex_array=tarray;
 					ex_name="Tranpose";
 				} else {
@@ -915,20 +941,20 @@ double eval_fun1(int fnum)
 				};
 				break;
 		case UFLENGTH:	
-			if(ex_vtype==VTYPE_STRING) { value =strlen(arg[0]);ex_vtype=VTYPE_NUM;break;};
-			if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
-				value=ex_array->rows*ex_array->cols;
-				ex_vtype=VTYPE_NUM;
-				break;
-			};
+			if(va[0].vtype==VTYPE_STRING) { value =strlen(va[0].sval);}
+			else if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
+				value=arr->rows*arr->cols;
+			} else value=0;
+			ex_vtype=VTYPE_NUM;
+			break;			
 		case UFLEFT:
 #if	SSVAL
 			strlcpy(saved_string,arg[0],MAXLLEN);
 			if(vv[1]>0 && vv[1]<strlen(arg[0])) saved_string[(int)vv[1]]=0;
 #else
-			clean_saved_string(vv[1]);
-			memcpy(saved_string,arg[0],vv[1]);
-			saved_string[(int)vv[1]]=0;
+			if(va[0].vtype==VTYPE_STRING && va[1].vtype==VTYPE_NUM ) {
+			set_sval(va[0].sval);
+			} else set_sval("");
 #endif
 			value = 0;
 			ex_vtype=VTYPE_STRING;
@@ -937,11 +963,14 @@ double eval_fun1(int fnum)
 #if	SSVAL
 			strlcpy(saved_string, &arg[0][strlen(arg[0])-(int)vv[1]],MAXLLEN);
 #else
-			int r1=(int)vv[1];
-			if(strlen(arg[0])>r1) r1=strlen(arg[0]);
-			clean_saved_string(r1);
-			memcpy(saved_string,arg[0]+(strlen(arg[0])-r1),r1);
-			saved_string[r1]=0;
+			if(va[0].vtype==VTYPE_STRING && va[1].vtype==VTYPE_NUM ) {
+				int r1=(int)va[1].dval;
+				MESG("right: r1=%d",r1);
+				if(strlen(va[0].sval)<r1) r1=strlen(va[0].sval);
+				clean_saved_string(r1);
+				memcpy(saved_string,va[0].sval+(strlen(va[0].sval)-r1),r1);
+				saved_string[r1]=0;
+			} else set_sval("");
 #endif
 			ex_vtype=VTYPE_STRING;
 			};break;
@@ -950,41 +979,55 @@ double eval_fun1(int fnum)
 			strlcpy(saved_string, &arg[0][(int)vv[1]-1],MAXLLEN);
 			saved_string[(int)vv[2]]=0;
 #else
-			if(vv[1]>strlen(arg[0])) break;
-			clean_saved_string((int)vv[2]);
-			memcpy(saved_string,arg[0]+(int)vv[1]-1,vv[2]);
-			saved_string[(int)vv[2]]=0;
+			if(va[0].vtype==VTYPE_STRING && va[1].vtype==VTYPE_NUM && va[2].vtype==VTYPE_NUM) {
+			if((int)va[1].dval>strlen(va[0].sval) || va[2].dval==0) {
+				set_sval("");
+			} else {
+				clean_saved_string((int)va[2].dval);
+				memcpy(saved_string,va[0].sval+(int)va[1].dval,va[2].dval);
+				saved_string[(int)va[2].dval]=0;
+			};
+			} else {
+				set_sval("");
+			};
 #endif
 			value = 0;
 			ex_vtype=VTYPE_STRING;
 			break;
-		case UFUPPER:{
+		case UFUPPER:
+			if(va[0].vtype==VTYPE_STRING) {
 #if	!SSVAL
-			clean_saved_string(strlen(arg[0]));
+			clean_saved_string(strlen(va[0].sval));
 #endif
-			get_uppercase_string(saved_string,arg[0]);
+			get_uppercase_string(saved_string,va[0].sval);
+			} else set_sval("");
 			ex_vtype=VTYPE_STRING;
-			};
+			
 			break;
-		case UFLOWER:{
+		case UFLOWER:
+			if(va[0].vtype==VTYPE_STRING) {
 #if	!SSVAL
-			clean_saved_string(strlen(arg[0]));
+			clean_saved_string(strlen(va[0].sval));
 #endif
-			get_lowercase_string(saved_string,arg[0]);
+			get_lowercase_string(saved_string,va[0].sval);
 
+			} else set_sval("");
 			ex_vtype=VTYPE_STRING;
-			};
+			
 			break;
 		case UFASCII:	
-			 value=arg[0][0];ex_vtype=VTYPE_NUM;
-				break;
+			if(va[0].vtype==VTYPE_STRING) {
+			 value=va[0].sval[0];
+			} else value=0;
+			ex_vtype=VTYPE_NUM;
+			break;
 		case UFCHR:
 #if	!SSVAL
 			clean_saved_string(1);
 #endif
-			saved_string[0] = (int)vv[0];
+			saved_string[0] = (int)va[0].dval;
 			saved_string[1] = 0;
-			value = vv[0];
+			value = va[0].dval;
 			ex_vtype=VTYPE_STRING;
 			break;
 		case UFGTKEY:
@@ -1001,45 +1044,42 @@ double eval_fun1(int fnum)
 				break;
 		case UFRND:	/* returns big! int */
 				value = rand();ex_vtype=VTYPE_NUM;break;
-		case UFABS:	value = fabs(vv[0]);ex_vtype=VTYPE_NUM;break;
+		case UFABS:	value = fabs(va[0].dval);ex_vtype=VTYPE_NUM;break;
 		case UFSINDEX:	/* segmentation */
-				value = sindex(arg[0], arg[1]);
-				ex_vtype=VTYPE_NUM;
-				break;
+			if(va[0].vtype==VTYPE_STRING) {
+				value = sindex(va[0].sval, va[1].sval);
+			} else value=0;
+			ex_vtype=VTYPE_NUM;
+			break;
 		case UFSTRING:	/* string of a value */
+			if(va[0].vtype==VTYPE_NUM) {
 #if	SSVAL
 				snprintf(saved_string,MAXLLEN,"%f",vv[0]);
 #else
 				clean_saved_string(20);
-				snprintf(saved_string,20,"%f",vv[0]);
+				snprintf(saved_string,20,"%f",va[0].dval);
 #endif
-				ex_vtype=VTYPE_STRING;
-				value = vv[0];
-				break;
-		case UFMESSAGE: if(arg[0][0] !=0 ) stat=snprintf(sout,MAXLLEN,"[%s]",arg[0]);
-				else stat=snprintf(sout,MAXLLEN,"<%f>",vv[0]);
-				if(strlen(sout)>80) sout[79]=0;
-				msg_line(sout);
+				value = va[0].dval;
+			} else set_sval("");
+			ex_vtype=VTYPE_STRING;
+			break;
+		case UFMESSAGE: if(va[0].vtype==VTYPE_STRING) msg_line("[%s]",va[0].sval);
+				else msg_line("<%f>",va[0].dval);
 				events_flush();
 				break;
-		case UFERROR: if(arg[0][0] !=0 ) stat=snprintf(sout,MAXLLEN,"[%s]",arg[0]);
-				else stat=snprintf(sout,MAXLLEN,"<%f>",vv[0]);
-				if(strlen(sout)>80) sout[79]=0;
-				error_line(sout);
+		case UFERROR: if(va[0].vtype==VTYPE_STRING) error_line("[%s]",va[0].sval);
+				else error_line("<%f>",va[0].dval);
 				events_flush();
 				break;
 		case UFWAIT: 
-				if(arg[0][0] !=0 ) stat=snprintf(sout,MAXLLEN,"[%s] waiting.. ",arg[0]);
-				else stat=snprintf(sout,MAXLLEN,"<%f> wait for key",vv[0]);
+				if(va[0].vtype==VTYPE_STRING) msg_line("[%s] waiting.. ",va[0].sval);
+				else msg_line("<%f> wait for key",va[0].dval);
 #if	!SSVAL
 				clean_saved_string(1);
 #endif
 				if(execmd) {
-					printf("%s",sout);
 					saved_string[0]=getc(stdin);
 				} else {
-					if(strlen(sout)>80) sout[79]=0;
-					msg_line(sout);
 					events_flush();
 					entry_mode=KENTRY;
 					saved_string[0] = getcmd();
@@ -1050,100 +1090,157 @@ double eval_fun1(int fnum)
 				ex_vtype=VTYPE_STRING;
 				break;
 		case UFINPUT:   
-				if(arg[0][0]==0) strlcpy(sout,"Input :",MAXLLEN);
-				else strlcpy(sout,arg[0],MAXLLEN);
 				entry_mode=KENTRY;	/* get input from screen */
 #if	!SSVAL
 				clean_saved_string(80);
 #endif
-				getstring(sout,saved_string,80,true);
+				if(va[0].vtype!=VTYPE_STRING) getstring("Input :",saved_string,80,true);
+				else getstring(va[0].sval,saved_string,80,true);
 				if(execmd) saved_string[strlen(saved_string)-1]=0;
 				ex_vtype=VTYPE_STRING;
 				value=0;
 				break;
 		case UFDINPUT:
-				if(arg[0][0]==0) strlcpy(sout,"DInput :",MAXLLEN);else strlcpy(sout,arg[0],MAXLLEN);
-//				entry_mode=KENTRY;	/* get input from the screen */
-#if	SSVAL
-				getstring(sout,saved_string,80,true);
+#if	!SSVAL
+				clean_saved_string(80);
+#endif
+				if(va[0].vtype!=VTYPE_STRING) getstring("DInput :",saved_string,80,true);
+				getstring(va[0].sval,saved_string,80,true);
 				value=atof(saved_string);
+#if	SSVAL
 				saved_string[0]=0;
 #else
-				clean_saved_string(80);
-				getstring(sout,saved_string,80,true);
-				value=atof(saved_string);
 				clean_saved_string(0);
 #endif
 				ex_vtype=VTYPE_NUM;
 				break;
 		case UFINIT:	initialize_vars();
 				break;
-		case UFVAL:	value=atof(arg[0]);ex_vtype=VTYPE_NUM;
-				break;
-		case UFSQRT: value=sqrt(vv[0]);ex_vtype=VTYPE_NUM;
-				break;
+		case UFVAL:	
+			if(va[0].vtype==VTYPE_STRING) 
+				value=atof(va[0].sval);
+			else value=0;
+			ex_vtype=VTYPE_NUM;
+			break;
+		case UFSQRT: 
+			if(va[0].vtype==VTYPE_NUM) 
+				value=sqrt(va[0].dval);
+			else value=0;
+			ex_vtype=VTYPE_NUM;
+			break;
 		case UFSIN: 
-				value=sin(vv[0]);ex_vtype=VTYPE_NUM;
-				break;
-		case UFCOS: value=cos(vv[0]);ex_vtype=VTYPE_NUM;
-				break;
-		case UFTAN: value=tan(vv[0]);ex_vtype=VTYPE_NUM;
+			if(va[0].vtype==VTYPE_NUM)	
+				value=sin(va[0].dval);
+			else {
+				syntax_error("math error in sin",305);
+				value=0;
+			}
+			ex_vtype=VTYPE_NUM;
+			break;
+		case UFCOS: 
+			if(va[0].vtype==VTYPE_NUM)	
+			value=cos(va[0].dval);
+			else {
+				syntax_error("math error in cos",306);
+				value=1;
+			}
+			ex_vtype=VTYPE_NUM;
+			break;
+		case UFTAN: 
+			if(va[0].vtype==VTYPE_NUM)	
+				value=tan(va[0].dval);
+			else {
+				syntax_error("math error in tan",307);
+				value=0;
+			};
+				ex_vtype=VTYPE_NUM;
 				break;
 		case UFLOG10: 
-				value=log10(vv[0]);
-				ex_vtype=VTYPE_NUM;
-				break;
+			if(va[0].vtype==VTYPE_NUM)
+				value=log10(va[0].dval);
+			else {
+				syntax_error("math error in log10",308);
+				value=0;
+			};
+			ex_vtype=VTYPE_NUM;
+			break;
+
 		case UFATAN:
-				 value=atan(vv[0]);ex_vtype=VTYPE_NUM;
-				break;
+			if(va[0].vtype==VTYPE_NUM) 
+				 value=atan(va[0].dval);
+			else {
+				syntax_error("math error in atan",309);
+				value=0;
+			};
+			 ex_vtype=VTYPE_NUM;
+			break;
 		case UFLOGNAT:
-				value=log(vv[0]);
-				ex_vtype=VTYPE_NUM;
-				break;
+			if(va[0].vtype==VTYPE_NUM) 
+				value=log(va[0].dval);
+			else {
+				syntax_error("math error in lognat",310);
+				value=0;
+			};
+			ex_vtype=VTYPE_NUM;
+			break;
 		case UFTRUNC:
-				value=trunc(vv[0]);
-				ex_vtype=VTYPE_NUM;
-				break;
+			if(va[0].vtype==VTYPE_NUM) 
+				value=trunc(va[0].dval);
+			else {
+				syntax_error("math error in trunc",311);
+				value=0;
+			};
+			ex_vtype=VTYPE_NUM;
+			break;
 		case UFROUND:
-				value=round(vv[0]);
+			if(va[0].vtype==VTYPE_NUM) 
+				value=round(va[0].dval);
+			else {
+				syntax_error("math error in round",312);
+				value=0;
+			};
 				ex_vtype=VTYPE_NUM;
 				break;
 		case UFPRINT:	// to stdio, be carefull CHECK !!!!
-				if(arr) print_array1("",arr);
+				if(va[0].vtype==VTYPE_ARRAY) print_array1("",arr);
 				else {
-				if(arg[0][0] !=0 ) {
-					if(strlen(arg[0])>MAXLLEN-1) arg[0][MAXLLEN-1]=0;
-					strlcpy(sout,arg[0],MAXLLEN);
+				char *p_out;
+				if(va[0].vtype==VTYPE_STRING) {
+					p_out=strdup(va[0].sval);
 					ex_vtype=VTYPE_STRING;
 #if	SSVAL
 					strlcpy(saved_string,arg[0],MAXLLEN);
 #else
-					set_sval(arg[0]);
+					set_sval(va[0].sval);
 #endif
 					if(xwin && !execmd) MESG(saved_string);
 				} else {
-					snprintf(sout,MAXLLEN,": %f",vv[0]); 
+					p_out=(char *)malloc(128);
+					snprintf(p_out,128,": %f",va[0].dval); 
 					ex_vtype=VTYPE_NUM;
-					value=vv[0];
-					if(xwin && !execmd) MESG(": %f",vv[0]);
+					value=va[0].dval;
 				};
-				out_print(sout,1);
+				out_print(p_out,1);
+				free(p_out);
 				};
 				break;
 		case UFGETPOINT:
 				break;
 		case UFSTIME:
+			if(va[0].vtype==VTYPE_STRING) {
 #if	SSVAL
 			strlcpy(saved_string,arg[0],MAXLLEN);
 #else
-			clean_saved_string(strlen(arg[0]));
-			strcpy(saved_string,arg[0]);
+			set_sval(va[0].sval);
 #endif
-			value=show_time(saved_string,vv[1]);
+			value=show_time(saved_string,va[1].dval);
+			} else {
+				syntax_error("error in stime",312);
+			}
 			ex_vtype=VTYPE_NUM;
 			break;
 		case UFDEQ:
-			value=deq(vv[0],vv[1]);
+			value=deq(va[0].dval,va[1].dval);
 			ex_vtype=VTYPE_NUM;
 			break;
 		case UFCLS:
@@ -1166,12 +1263,12 @@ double eval_fun1(int fnum)
 		case UFMAINARG: {
 			if(!main_args) return 0;
 			int ind;
-			ind=(int)vv[0];
+			ind=(int)va[0].dval;
 			if(ind<main_args->cols) {
 #if	SSVAL
 				strlcpy(saved_string,main_args->sval[(int)vv[0]],sizeof(saved_string));
 #else
-				set_sval(main_args->sval[(int)vv[0]]);
+				set_sval(main_args->sval[(int)va[0].dval]);
 #endif
 				ex_vtype=VTYPE_STRING;
 				return atof(saved_string);
@@ -1272,7 +1369,7 @@ double factor_line_array()
 	};
 	ex_array->astat=ARRAY_LOCAL;
 	ex_vtype=adat->atype;
-	print_array1("",adat);
+	// print_array1("",adat);
 	NTOKEN2;
 	RTRN(1.2);
 }
@@ -1616,7 +1713,7 @@ double factor_proc()
 	tok=after_proc;
 
 	current_active_flag=1;	/* start checking again  */
-
+	free(vargs);
 	RTRN(value);
 }
 
@@ -2500,14 +2597,18 @@ void refresh_ddot_1(double value)
 
  TDS("refresh_ddot_1");
  // MESG("refresh_ddot_1:");
- if(saved_string) MESG("string: [%s]",saved_string);
- else MESG("num: %f ",value);
+ if(execmd) {
+	// MESG("vtype: %d",ex_vtype);
+	 if(ex_vtype==VTYPE_NUM) printf(";num: %f\n",value);
+	 else if(ex_vtype==VTYPE_STRING) printf(";string: [%s]\n",saved_string);
+	 else if(ex_vtype==VTYPE_ARRAY) print_array1(":",ex_array);
+	 return;
+ };
+ // if(!discmd) return;
 
- if(!discmd) return;
- // MESG("ddtot: 1");
  int precision=bt_dval("print_precision");
  int show_hex=bt_dval("show_hex");
- 
+ char *ddot_out = (char *)malloc(128);
  tp=(TextPoint *)tok->tname;
  buf=tp->fp;
 
@@ -2526,30 +2627,31 @@ void refresh_ddot_1(double value)
 
  if(ex_vtype==VTYPE_STRING) {	/* string value  */
  	// if(strlen(saved_string)>MAXSLEN-20) saved_string[MAXSLEN-20]=0;
-	if(value!=0) stat=snprintf(sout,MAXLLEN," <%5.5f>[%s]",value,saved_string);
-	else stat=snprintf(sout,MAXLLEN," \"%s\"",saved_string);
+	if(value!=0) stat=snprintf(ddot_out,128," <%5.5f>[%s]",value,saved_string);
+	else stat=snprintf(ddot_out,128," \"%s\"",saved_string);
  }  else if(ex_vtype==VTYPE_NUM) {	/* numeric value  */
 	long int d = (long int)value;
 	if(d==value) {	/* an integer/double value!  */
-		if(show_hex) stat=snprintf(sout,MAXLLEN," %5.0f | 0x%llX | 0o%llo",value,(unsigned long long)value,(unsigned long long)value);
-		else stat=snprintf(sout,MAXLLEN," %5.*f",1,value);
+		if(show_hex) stat=snprintf(ddot_out,128," %5.0f | 0x%llX | 0o%llo",value,(unsigned long long)value,(unsigned long long)value);
+		else stat=snprintf(ddot_out,128," %5.*f",1,value);
 	} else {	/* a decimal value!  */
-		stat=snprintf(sout,MAXLLEN," %5.*f",precision,value);
+		stat=snprintf(ddot_out,128," %5.*f",precision,value);
 	};
 
  } else if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
 	array_dat *adat = ex_array;
- 	stat=snprintf(sout,MAXLLEN,"array %d, slot %ld type=%d rows %d,cols %d",adat->anum,lsslot-current_stable,adat->atype,adat->rows,adat->cols);
+ 	stat=snprintf(ddot_out,128,"array %d, slot %ld type=%d rows %d,cols %d",adat->anum,lsslot-current_stable,adat->atype,adat->rows,adat->cols);
 	print_array1(":",adat);
  };
  if(stat>MAXLLEN) MESG("truncated");
 // replace text
  DeleteBlock(0,dsize);
- insert_string(cbfp,sout,strlen(sout));
+ insert_string(cbfp,ddot_out,strlen(ddot_out));
  if(err_num>0) {
  	insert_string(cbfp," ,err ",6);
 	if(err_str!=NULL) insert_string(cbfp,err_str,strlen(err_str));
  };
+ free(ddot_out);
  sfb(old_fp);
 }
 

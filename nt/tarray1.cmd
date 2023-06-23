@@ -14,12 +14,11 @@ c=[1 2
 
 for(i=0;i<10;i=i+1){
 print("loop "+i);
-c:array 28, slot 1 type=2 rows 3,cols 4
 d=c*(10+i)
 #a:
-d:array 40, slot 3 type=2 rows 3,cols 4
+d:
 }
 print("check determinant")
-b=[1 2 3 ; 0 5 6 ; 7 8 9]	:array 30, slot 4 type=2 rows 3,cols 3
+b=[1 2 3 ; 0 5 6 ; 7 8 9]
 DET(b)	: -24.0
 print("ok!")

@@ -169,6 +169,7 @@ void set_error(tok_struct *tok,int err,char *description)
  err_line=tok->tline;
  err_num=err;
  err_str=strdup(description);
+ if(execmd) fprintf(stderr,"%s line %d\n",err_str,err_line);
 }
 
 void syntax_error(char *description,int err)

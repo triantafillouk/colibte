@@ -718,6 +718,7 @@ array_dat *cofactor2inverse(array_dat *faca, double det)
  return(inversea);
 }
 
+/* print array, fix for better TODO */
 void print_array1(char *title,array_dat *adat)
 {
 	char so[MAXLLEN];
@@ -737,9 +738,9 @@ void print_array1(char *title,array_dat *adat)
 	strcpy(so,"");
 	if(adat->astat!=ARRAY_UNALLOCATED) {
 	if(adat->rows>1 && adat->cols>1) {
-		snprintf(so,MAXLLEN,"#   :");
+		snprintf(so,MAXLLEN,"#");
 		for(i=0;i< adat->cols;i++) { 
-			snprintf(s2,128,"%10d ",i);
+			snprintf(s2,128,"%8d ",i);
 			strlcat(so,s2,MAXLLEN);
 		};
 		out_print(so,1);
