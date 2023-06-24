@@ -1122,7 +1122,7 @@ int err_check_sentence1()
 			err_num=err_check_sentence1();
 			CHECK_TOK(64015);
 			if(is_block) tok=end_block;
-			else skip_sentence1("fori_err");
+			else skip_sentence1();
 		};
 		CHECK_TOK(64020);
 		}; 

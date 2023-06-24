@@ -813,7 +813,7 @@ double eval_fun1(int fnum)
 	MVAR va[3];
 	int i,ia;
 	int f_entry;
-	int stat=0;
+	// int stat=0;
 
 	TDS("eval_fun1");
 	ia=m_functions[fnum].f_args;
@@ -859,7 +859,7 @@ double eval_fun1(int fnum)
 				if(ex_vtype==VTYPE_ARRAY) {
 					if(arr->rows==arr->cols) value=determinant(arr);
 					else {
-						MESG("wrong dimensions!");
+						// MESG("wrong dimensions!");
 						syntax_error("wrong dimensions for determinant",203);
 						value=0;
 					};
@@ -1056,7 +1056,7 @@ double eval_fun1(int fnum)
 			else {
 				syntax_error("math error in sin",305);
 				value=0;
-			}
+			};
 			ex_vtype=VTYPE_NUM;
 			break;
 		case UFCOS: 
@@ -1131,7 +1131,7 @@ double eval_fun1(int fnum)
 					p_out=strdup(va[0].sval);
 					ex_vtype=VTYPE_STRING;
 					set_sval(va[0].sval);
-					if(xwin && !execmd) MESG(saved_string);
+					// if(xwin && !execmd) MESG(saved_string);
 				} else {
 					p_out=(char *)malloc(128);
 					snprintf(p_out,128,": %f",va[0].dval); 
@@ -1191,7 +1191,7 @@ double eval_fun1(int fnum)
 			value=0.0;
 			ex_vtype=VTYPE_NUM;
 	};
-	if(stat>MAXLLEN) MESG("truncated string eval function");
+	// if(stat>MAXLLEN) MESG("truncated string eval function");
 	RTRN(value);
 }
 
@@ -1364,7 +1364,7 @@ double factor_array1()
 	double *dval=NULL;
 	double value=0;
 	tok_data *array_slot;
-	MESG("factor_array1:");
+	// MESG("factor_array1:");
 	array_slot=&current_stable[tok->tind];
 	NTOKEN2;
 	// ind1=(int)FACTOR_FUNCTION;
