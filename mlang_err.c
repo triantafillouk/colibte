@@ -583,14 +583,16 @@ int err_factor()
 		};
 		RT_MESG1(493);}
 	case TOK_ARRAY1:{
-		// MESG("	err tok_array1");
-		// err_num=err_factor();
-		err_num=err_cexpression(); 
+		MESG("	err tok_array1");
+		err_num=err_factor();
+		// err_num=err_cexpression(); 
 		RT_MESG1(4931);
 		};
+#if	0
 	case TOK_RBRAKET:
 		// MESG("	err: rbracket");
 		RT_MESG1(5931);
+#endif
 	case TOK_ARRAY2:{
 		err_num=err_factor(); 
 		if(err_num) return(err_num);

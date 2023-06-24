@@ -709,10 +709,13 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 							err_str="wrong character in table definition";
 							ERROR("wrong character on table definition !");
 						};
+#if	1
+						getnc1(bf,&cc,&tok_type);
+#else
 						if(next_token_type(bf)!=TOK_RBRAKET) continue;
 						getnc1(bf,&cc,&tok_type);	/* this should be rbracket !  */
 						// MESG("tok: %c type=%d",cc,tok_type);
-
+#endif
 						index++;	/* array dimension  */
 						if(index>1) break;	/* for the moment only 2 dimensional arrays!!  */
 					};
