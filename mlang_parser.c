@@ -19,6 +19,7 @@ int getnc1(FILEBUF *bf, int *cc, int *cmask)
 	*cmask=tok_mask[*cc];
 
 	if(*cc==0) return(0);
+	// MESG("	get nc1 [%c] type=%d",*cc,*cmask);
 	return(1);
  } else {
  	return(0);
@@ -293,7 +294,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int next_tok_type=0;
  int script_active=0;
 
- MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
+ // MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
  if(
  	file_type_is("CMD",bf->b_type)
 	|| file_type_is("DOT",bf->b_type)
@@ -351,6 +352,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		// if(tok_type==TOK_NL) {  MESG(" - newline in comment %d",tok_line);tok_line++;};
 		continue;
 	};
+	// MESG("parse- cc=%d %c type=%d",cc,cc,tok_type);
 #if	0
  if(tok_type==TOK_NL) MESG(" - New line -------  type=%d %s line=%d",tok_type,tok_name[tok_type],tok_line);
  MESG(" - %d [%c] type=%d %s line=%d",cc, cc,tok_type,tok_name[tok_type],tok_line);
@@ -388,12 +390,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			continue;
 		case TOK_LETTER: 
 			slen=getnword1(bf,cc,nword);
+			// MESG("parse: TOK_LETTER %s",nword);
 			break;
 		case TOK_NUM:
 			// MESG("TOK_NUM: old num=%d type=%d name %s,new type %d ",tok->tnum,tok->ttype,tok->tname,tok_type);
 			value=getnum1(bf,cc,tok);
-			// MESG("TOK_NUM: num=%d type=%d val=%f",tok->tnum,tok->ttype,value);
-			// tok->tname = " numeric!! ";
+			// MESG("parse: TOK_NUM: num=%d type=%d val=%f",tok->tnum,tok->ttype,value);
 			if(err_num>0) return(0);
 			break;
 		case TOK_LCURL:
@@ -558,7 +560,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			return(0);
 			};
 	};
-	MESG("- token type=%d %s",tok_type,tok_name[tok_type]);
+
+	// MESG("- token type=%d %s",tok_type,tok_name[tok_type]);
 	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {
 	if(!(is_now_sep && (tok_type==TOK_LCURL||tok_type==TOK_RCURL) )){
@@ -675,10 +678,14 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					set_var(stree,tok,nword);
 
 					while(next_token_type(bf)==TOK_LBRAKET) {
-						MESG("parse: array ");
+						// MESG("parse: array ");
 						tok_var->ttype=TOK_ARRAY1+index;	/* set it as array index  */
+						// MESG("parse: array2");
 						getnc1(bf,&cc,&tok_type);// skip it
+						// MESG("parse: array3");
+						// parse numeric expression!
 						getnc1(bf,&cc,&tok_type);// get the index!
+						// MESG("parse: array4");
 
 
 						switch(tok_type){
@@ -689,6 +696,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 								tok->ttype=TOK_NUM;
 								tok->tname="numeric3";
 								tok->dval=value;
+								// MESG("	TOK_NUM: numeric3 %f",tok->dval);
 								break;
 							case TOK_LETTER:
 								slen=getnword1(bf,cc,nword);
@@ -709,20 +717,19 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 							err_str="wrong character in table definition";
 							ERROR("wrong character on table definition !");
 						};
-#if	1
-						getnc1(bf,&cc,&tok_type);
+
+						// MESG("	array1: 2");
+						if(next_token_type(bf)==TOK_SPACE) getnc1(bf,&cc,&tok_type);
+
 						if(tok_type==TOK_RBRAKET) {
 							ADD_TOKEN;
 							tok->ttype=TOK_RBRAKET;
 						};
-#else
-						if(next_token_type(bf)!=TOK_RBRAKET) continue;
-						getnc1(bf,&cc,&tok_type);	/* this should be rbracket !  */
-						// MESG("tok: %c type=%d",cc,tok_type);
-#endif
+
 						index++;	/* array dimension  */
 						if(index>1) break;	/* for the moment only 2 dimensional arrays!!  */
 					};
+					// MESG("	array1: end! index=%d",index);
 				}
 			} else { // we have a directive
 				tok->tname=tok->tnode->node_name;
@@ -769,7 +776,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
- MESG("parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
+ // MESG("parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
  {	/* add eof token!  */
 	if(tok_type!=TOK_SEP) 
 	{	
