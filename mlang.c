@@ -3091,7 +3091,12 @@ double get_val()
 
 char *get_sval()
 {
-	// MESG("get_sval: tnum=%d",tok->tnum);
+// 	MESG("get_sval: tnum=%d type=%d %f ex_value=%f",tok->tnum,tok->ttype,tok->dval,ex_value);
+	if(saved_string==NULL) {
+		saved_string=(char *)malloc(16);
+		snprintf(saved_string,16,"%f",ex_value);
+		// MESG("get_sval: new saved_string! [%s]",saved_string);
+	};
 	return(saved_string);
 }
 
@@ -3132,10 +3137,10 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 /* size of the buffer */
 {
 	/* if we are interactive, go get it! */
-	// MESG("nextarg:");
+	MESG("nextarg:");
 	if (macro_exec == FALSE) {
 		if(getstring(prompt, buffer, size,show)!=FALSE) {
-			// MESG("nextarg: buffer=[%s]",buffer);
+			MESG("nextarg: buffer=[%s]",buffer);
 			ex_value = atof(buffer);
 		} else {
 			set_update(cwp,UPD_MOVE);
@@ -3143,7 +3148,7 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 		};
 	} else {
 		/* slval has already the next argument */
-		// MESG("nextarg: slval=%s",get_sval());	
+		MESG("nextarg: slval=%s",get_sval());	
 		strlcpy(buffer,get_sval(),size);
 	};
 	return(TRUE);
