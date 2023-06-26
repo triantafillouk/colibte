@@ -496,7 +496,7 @@ int err_factor()
  SHOW_STAGE(470);
  tok0=tok;
  switch(tok0->ttype) {
- 	case TOK_PLUS:
+ 	// case TOK_PLUS:
 	case TOK_MINUS:
 		pre_symbol++;
  };
@@ -520,7 +520,7 @@ int err_factor()
 		// xpos=477;syntax_error(": in factor",xpos);
 		RT_MESG1(xpos);
 	case TOK_LBRAKET:{	/* array definition  */
-		// MESG("TOK_LBRAKET");
+		MESG("err: TOK_LBRAKET");
 		pre_symbol=0;
 		int i=0,j=0;
 		int cdim=0;
@@ -584,8 +584,9 @@ int err_factor()
 		RT_MESG1(493);}
 	case TOK_ARRAY1:{
 		MESG("	err tok_array1");
-		err_num=err_factor();
-		// err_num=err_cexpression(); 
+		// err_num=err_factor();
+		err_num=err_cexpression(); 
+		MESG("	err tok_array1: after tok=%d",tok->ttype);
 		RT_MESG1(4931);
 		};
 #if	0
@@ -814,6 +815,8 @@ int err_factor()
 		xpos=526;
 		set_error(tok,xpos,"else without if error");
 		RT_MESG1(5261);
+	case TOK_RBRAKET:
+		RT_MESG1(5262);
 	case TOK_ASSIGN:
 	case TOK_INCREASEBY:
 	case TOK_DECREASEBY:

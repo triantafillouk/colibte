@@ -293,7 +293,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int next_tok_type=0;
  int script_active=0;
 
- // MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
+ MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
  if(
  	file_type_is("CMD",bf->b_type)
 	|| file_type_is("DOT",bf->b_type)
@@ -558,7 +558,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			return(0);
 			};
 	};
-	// MESG("- token type=%d %s",tok_type,tok_name[tok_type]);
+	MESG("- token type=%d %s",tok_type,tok_name[tok_type]);
 	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {
 	if(!(is_now_sep && (tok_type==TOK_LCURL||tok_type==TOK_RCURL) )){
@@ -675,7 +675,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					set_var(stree,tok,nword);
 
 					while(next_token_type(bf)==TOK_LBRAKET) {
-						// MESG("array ");
+						MESG("parse: array ");
 						tok_var->ttype=TOK_ARRAY1+index;	/* set it as array index  */
 						getnc1(bf,&cc,&tok_type);// skip it
 						getnc1(bf,&cc,&tok_type);// get the index!
@@ -711,6 +711,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 						};
 #if	1
 						getnc1(bf,&cc,&tok_type);
+						if(tok_type==TOK_RBRAKET) {
+							ADD_TOKEN;
+							tok->ttype=TOK_RBRAKET;
+						};
 #else
 						if(next_token_type(bf)!=TOK_RBRAKET) continue;
 						getnc1(bf,&cc,&tok_type);	/* this should be rbracket !  */
@@ -765,7 +769,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
- // MESG("parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
+ MESG("parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
  {	/* add eof token!  */
 	if(tok_type!=TOK_SEP) 
 	{	

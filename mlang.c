@@ -1364,15 +1364,16 @@ double factor_array1()
 	double *dval=NULL;
 	double value=0;
 	tok_data *array_slot;
-	MESG("factor_array1:");
+	MESG("factor_array1: ttype=%d %d",tok->ttype,TOK_LBRAKET);
 	array_slot=&current_stable[tok->tind];
 	NTOKEN2;
-#if	1
+#if	0
 	ind1=(int)FACTOR_FUNCTION;
 #else
-	// ind1 = (int)num_expression();
+	ind1 = (int)num_expression();
 #endif
 	// NTOKEN2;
+	MESG("factor_array1: ind1=%d",ind1);
 	if(tok->ttype==TOK_RBRAKET) { NTOKEN2;MESG("ends with rbracket!!");};
 	// MESG("factor_array1:ind=%d ind1=%d type=%d",array_slot->ind,ind1,array_slot->vtype);
 	if(array_slot->adat == NULL) {
