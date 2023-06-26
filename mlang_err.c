@@ -595,9 +595,15 @@ int err_factor()
 		RT_MESG1(5931);
 #endif
 	case TOK_ARRAY2:{
+#if	1
+		err_num=err_num_expression(); 
+		if(err_num) return(err_num);
+		err_num=err_num_expression(); 
+#else
 		err_num=err_factor(); 
 		if(err_num) return(err_num);
 		err_num=err_factor(); 
+#endif
 		RT_MESG1(4932);
 		};
 	case TOK_LPAR:

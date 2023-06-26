@@ -676,11 +676,13 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					tok_struct *tok_var=tok;
 					int index=0;
 					set_var(stree,tok,nword);
-
+					if(next_token_type(bf)==TOK_LBRAKET) {
+						MESG("start array indexing ??");
+					};
 					while(next_token_type(bf)==TOK_LBRAKET) {
 						// MESG("parse: array ");
 						tok_var->ttype=TOK_ARRAY1+index;	/* set it as array index  */
-						// MESG("parse: array2");
+						MESG("parse: array2 set type %d",tok_var->ttype);
 						getnc1(bf,&cc,&tok_type);// skip it
 						// MESG("parse: array3");
 						// parse numeric expression!
@@ -696,7 +698,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 								tok->ttype=TOK_NUM;
 								tok->tname="numeric3";
 								tok->dval=value;
-								// MESG("	TOK_NUM: numeric3 %f",tok->dval);
+								MESG("	TOK_NUM: numeric3 %f",tok->dval);
 								break;
 							case TOK_LETTER:
 								slen=getnword1(bf,cc,nword);
@@ -719,17 +721,36 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 						};
 
 						// MESG("	array1: 2");
-						if(next_token_type(bf)==TOK_SPACE) getnc1(bf,&cc,&tok_type);
-
+						if(next_token_type(bf)==TOK_SPACE) {
+							getnc1(bf,&cc,&tok_type);
+						};
 						if(tok_type==TOK_RBRAKET) {
+							MESG("	add rbraket1!");
 							ADD_TOKEN;
 							tok->ttype=TOK_RBRAKET;
+							tok->tname=strdup("RB1");
 						};
+						MESG("next is : %d index=%d",next_token_type(bf),index);
+
 
 						index++;	/* array dimension  */
-						if(index>1) break;	/* for the moment only 2 dimensional arrays!!  */
+
+#if	1
+						if(next_token_type(bf)==TOK_RBRAKET) {
+							getnc1(bf,&cc,&tok_type);
+							ADD_TOKEN;
+							tok->ttype=TOK_RBRAKET;
+							tok->tname=strdup("RB2");
+							MESG("	add rbracket2!");
+						};
+#endif
+						if(index>1) {
+							break;	/* for the moment only 2 dimensional arrays!!  */
+						} else {
+							MESG("	get next dim");
+						};
 					};
-					// MESG("	array1: end! index=%d",index);
+					MESG("	array1: end! index=%d",index);
 				}
 			} else { // we have a directive
 				tok->tname=tok->tnode->node_name;

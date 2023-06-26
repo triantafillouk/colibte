@@ -1320,7 +1320,8 @@ double factor_variable()
 
 double factor_array2()
 {
-	int ind1,ind2;
+	int ind1=0;
+	int ind2=0;
 	double **dval2;
 	double value=0;
 	tok_data *array_slot;
@@ -1332,8 +1333,19 @@ double factor_array2()
 	if(adat!=NULL) {
 		dval2 = adat->dval2;
 		NTOKEN2;
+#if	1
+		ind1=(int)num_expression();
+		NTOKEN2;
+		ind2=(int)num_expression();
+		NTOKEN2;
+#else
 		ind1=(int)FACTOR_FUNCTION;
+		NTOKEN2;
 		ind2=(int)FACTOR_FUNCTION;
+		NTOKEN2;
+#endif
+// 		MESG("	index1=%d",ind1);
+		// MESG("	index2=%d",ind2);
 		value=dval2[ind1][ind2];
 		array_slot->pdval=&dval2[ind1][ind2];
 	} else {
@@ -1859,7 +1871,6 @@ FFunction factor_funcs[] = {
 	factor_sep,		// TOK_SEP
 	factor_none,	// TOK_SPACE
 	factor_none,	// TOK_LETTER
-	
 	factor_none,	// TOK_LCURL	,
 	factor_rcurl,	// TOK_RCURL	,
 	factor_quote,	// TOK_QUOTE
