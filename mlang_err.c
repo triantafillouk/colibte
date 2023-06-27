@@ -520,7 +520,7 @@ int err_factor()
 		// xpos=477;syntax_error(": in factor",xpos);
 		RT_MESG1(xpos);
 	case TOK_LBRAKET:{	/* array definition  */
-		// MESG("err: TOK_LBRAKET");
+		MESG("err: TOK_LBRAKET, array definition");
 		pre_symbol=0;
 		int i=0,j=0;
 		int cdim=0;
@@ -536,23 +536,28 @@ int err_factor()
 				RT_MESG1(xpos);
 			};
 			if(tok->ttype==TOK_SEP) {
+				MESG("	new row");
 				NTOKEN2;
 				continue;
 			};
-			err_num=err_cexpression();
+			err_num=err_num_expression();
+			MESG("	ex_value=%f err_num=%d",ex_value,err_num);
 			if(err_num) return err_num;
 			i++;if(i>cols) cols=i;
 			if(tok->ttype==TOK_RBRAKET) {
+				MESG("	tok_rbraket: end definition");
 				cdim=0;break;
 			};
 			if(tok->ttype==TOK_SEP) {	/* Add tok->ttype==TOK_COMMA for using comma to separate array items  */
 				i=0;j++;
 				cdim++;if(cdim>rows) rows=cdim;
+				MESG("	new row2");
 				NTOKEN2;
 				continue;
 			};
 		};cdim--;
 		};
+		MESG("set array dat! rows=%d cols=%d",rows,cols);
 		// set array dat
 		if(tok0->adat) {
 			free(tok0->adat);
@@ -583,10 +588,11 @@ int err_factor()
 		};
 		RT_MESG1(493);}
 	case TOK_ARRAY1:{
-		// MESG("	err tok_array1");
+		MESG("	err use of tok_array1 -----------");
 		// err_num=err_factor();
 		err_num=err_num_expression(); 
 		// MESG("	err tok_array1: after tok=%d",tok->ttype);
+		NTOKEN_ERR(499);
 		RT_MESG1(4931);
 		};
 #if	0
@@ -595,10 +601,18 @@ int err_factor()
 		RT_MESG1(5931);
 #endif
 	case TOK_ARRAY2:{
+		// if(!(tok->adat) tok->adat=new
 #if	1
+		MESG("	err use of tok_array2 -----------");
 		err_num=err_num_expression(); 
-		if(err_num) return(err_num);
+		MESG("	err_array2:1 t=%d",tok->ttype);
+		NTOKEN_ERR(500);
+		MESG("	err_array2:2 t=%d",tok->ttype);
+		// if(err_num) return(err_num);
 		err_num=err_num_expression(); 
+		MESG("err_array2:3 t=%d",tok->ttype);
+		NTOKEN_ERR(500);
+		MESG("err_array2:4 t=%d",tok->ttype);
 #else
 		err_num=err_factor(); 
 		if(err_num) return(err_num);
@@ -620,8 +634,13 @@ int err_factor()
 			};
 			err_num = err_lexpression();
 			CHECK_TOK(484);
+			if(tok->ttype==TOK_LBRAKET) {
+				MESG("	err_tok_lpar: we have a left braket, continue!");
+				RT_MESG;
+			};
 			if(tok->ttype !=TOK_RPAR) {
 				xpos=485;
+				MESG("ttype=%d",tok->ttype);
 				syntax_error(" FAC1_err: No closing parenthesis",xpos);
 				RT_MESG1(485);
 			} else { 
@@ -921,6 +940,7 @@ int err_num_expression()
 		}
 	};
  };
+ // MESG("end expression: ttype=%d",tok->ttype);
  RT_MESG1(599);
 }
 

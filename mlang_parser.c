@@ -47,7 +47,7 @@ tok_struct *add_token(TLIST lex_parser,int tok_type,int cc,char *label)
 	tok=new_tok();
 	add_element_to_list((void *)tok,lex_parser);
 	tok->tnum=lex_parser->size-1;
-	// MESG("added token %3d: ind=%d type=[%s] [%s]",tok->tnum,cc,tok_name[tok_type],label);
+	MESG("	; add token %3d: ind=%d type=[%s] [%s]",tok->tnum,cc,tok_name[tok_type],label);
  return tok;
 }
 
@@ -251,7 +251,7 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 {
  int ind;
  	tok->ttype=TOK_VAR;
-	// MESG("set_var: name=%s",name);
+	MESG("	set_var: name=%s",name);
 	ind=add_to_symbol_tree(stree,name);
 	ex_edenv=TOK_VAR;
 	if(ind>0) { 	/* this is a new one  */
@@ -279,6 +279,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int is_now_sep=0;
  int is_now_curl=0;
  int par_level=0;
+ int braket_level=0;
+ int array_cols=0;
+ int array_rows=0;
+ int array_max_cols=0;
  int after_rpar=0;
  TLIST cstack; // curl stack
  int store_level=0;
@@ -289,6 +293,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  alist *lex_parser=NULL;
  BTREE *stree=use_stree;
  tok_struct *tok=NULL;
+ tok_struct *tok_tbassigned=NULL;
 
  int tok_type=0;
  int next_tok_type=0;
@@ -336,7 +341,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  err_line=0;
  tok_line=0;
  save_stage_level=stage_level;
-
+ MESG("--- Start parsing block loop --------------------");
  while(getnc1(bf,&cc,&tok_type))
  {
 	if(script_active) {
@@ -352,7 +357,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		// if(tok_type==TOK_NL) {  MESG(" - newline in comment %d",tok_line);tok_line++;};
 		continue;
 	};
-	// MESG("parse- cc=%d %c type=%d",cc,cc,tok_type);
+	MESG("parse- cc=%d %c type=%3d [%s]",cc,cc,tok_type,token_name[tok_type]);
 #if	0
  if(tok_type==TOK_NL) MESG(" - New line -------  type=%d %s line=%d",tok_type,tok_name[tok_type],tok_line);
  MESG(" - %d [%c] type=%d %s line=%d",cc, cc,tok_type,tok_name[tok_type],tok_line);
@@ -366,6 +371,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			else {
 				if(is_now_curl) continue;
 				is_now_sep=1;
+				MESG("TOK_SEP");
+				if(braket_level) {
+					array_rows++;
+					array_cols=0;
+					MESG("add table row1 %d",array_rows);
+				};
 				break;
 			};
 
@@ -377,6 +388,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				if(is_now_sep || after_rpar) continue;
 				is_now_sep=1;
 				tok_type=TOK_SEP;
+				MESG("TOK_NL->TOK_SEP");
+				if(braket_level) {
+					array_rows++;
+					array_cols=0;
+					MESG("add table row2 %d",array_rows);
+				};
 				break;
 			} ;
 			if(is_now_sep) continue;
@@ -390,11 +407,21 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			continue;
 		case TOK_LETTER: 
 			slen=getnword1(bf,cc,nword);
-			// MESG("parse: TOK_LETTER %s",nword);
+			MESG("parse: TOK_LETTER %s",nword);
+			if(braket_level) {
+				array_cols++;
+				if(array_cols>array_max_cols) array_max_cols=array_cols;
+				MESG("add column with variable %d %d",array_cols,array_max_cols);
+			};
 			break;
 		case TOK_NUM:
 			// MESG("TOK_NUM: old num=%d type=%d name %s,new type %d ",tok->tnum,tok->ttype,tok->tname,tok_type);
 			value=getnum1(bf,cc,tok);
+			if(braket_level) {
+				array_cols++;
+				if(array_cols>array_max_cols) array_max_cols=array_cols;
+				MESG("add column with numeric %d %d",array_cols,array_max_cols);
+			};
 			// MESG("parse: TOK_NUM: num=%d type=%d val=%f",tok->tnum,tok->ttype,value);
 			if(err_num>0) return(0);
 			break;
@@ -440,9 +467,21 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			par_level--;
 			cc=1;break;
 		case TOK_LBRAKET:
+			braket_level++;
+			array_cols=0;
+			array_rows=1;
 			cc=0;
 			break;
 		case TOK_RBRAKET:
+			braket_level--;
+			MESG("end of array definition cols=%d rows=%d",array_max_cols,array_rows);
+#if	1
+			if(tok_tbassigned) {
+				MESG("	tok_tbassigned: [%s] type [%s]",tok_tbassigned->tname,tok_name[tok_tbassigned->ttype]);
+				// if(array_rows>1) tok_tbassigned->ttype=TOK_ARRAY2;
+				// else tok_tbassigned->ttype=TOK_ARRAY1;
+			};
+#endif
 			cc=1;
 			break;
 		case TOK_QUOTE: // string start
@@ -523,7 +562,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		case TOK_DIV:
 			break;
 		case TOK_ASSIGN:
-			// MESG("TOK_ASSIGN:");
+			MESG("TOK_ASSIGN:");
 			if(next_token_type(bf)==TOK_ASSIGN) {
 				getnc1(bf,&cc,&tok_type);
 				tok_type=TOK_EQUAL;
@@ -561,7 +600,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 	};
 
-	// MESG("- token type=%d %s",tok_type,tok_name[tok_type]);
+	MESG("	- token type=%d %s",tok_type,tok_name[tok_type]);
 	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {
 	if(!(is_now_sep && (tok_type==TOK_LCURL||tok_type==TOK_RCURL) )){
@@ -654,6 +693,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 	
 	if(tok_type==TOK_LETTER) {
+		MESG("	check element in bt [%s]",nword);
 		tok->tnode = find_bt_element(nword); // check main table
 		
 		if(is_storelines && proc_name==NULL && tok->tnode!=NULL) {	/* function already register!  */
@@ -666,15 +706,26 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				};
 			};
 			tok->tnode=find_btnode(directiv_table,nword);
-			if(tok->tnode==NULL){	/* this is a variable  */
+			if(tok->tnode==NULL){	/* not a directive but a variable  */
 				tok->tname=strdup(nword);
 				tok->tind=slen;
+				MESG("	this is a variable! [%s] slen=%d",nword,slen);
 				if(is_storelines) {
 					tok->ttype=TOK_PROC;
 				}
 				else {
-					tok_struct *tok_var=tok;
 					int index=0;
+					tok_struct *tok_var=tok;
+#if	1
+					tok_struct *tok_var1 = (tok_struct *)find_btnode(stree,nword);
+					if(tok_var1) {
+						MESG("	variable %s found, type is %d !!",nword,tok_var1->ttype);
+					} else MESG("this is a new variable!");
+					if(next_token_type(bf)==TOK_ASSIGN) {
+						tok_tbassigned=tok;
+						MESG("set token to be assigned!");
+					};
+#endif
 					set_var(stree,tok,nword);
 					if(next_token_type(bf)==TOK_LBRAKET) {
 						MESG("start array indexing ??");
@@ -682,6 +733,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					while(next_token_type(bf)==TOK_LBRAKET) {
 						// MESG("parse: array ");
 						tok_var->ttype=TOK_ARRAY1+index;	/* set it as array index  */
+						braket_level++;
 						MESG("parse: array2 set type %d",tok_var->ttype);
 						getnc1(bf,&cc,&tok_type);// skip it
 						// MESG("parse: array3");
@@ -726,6 +778,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 						};
 						if(tok_type==TOK_RBRAKET) {
 							MESG("	add rbraket1!");
+							braket_level--;
 							ADD_TOKEN;
 							tok->ttype=TOK_RBRAKET;
 							tok->tname=strdup("RB1");
@@ -750,7 +803,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 							MESG("	get next dim");
 						};
 					};
-					MESG("	array1: end! index=%d",index);
+					// MESG("	array1_indexing!: end! index=%d",index);
 				}
 			} else { // we have a directive
 				tok->tname=tok->tnode->node_name;
@@ -767,7 +820,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 		} else {
 			tok->tname=tok->tnode->node_name;
-
+			MESG("	token name [%s] found!!!!",tok->tname);
 			switch(tok->tnode->node_type) {
 				case TOK_VAR:	/* 0  */
 					tok->ttype=TOK_VAR; 
@@ -797,7 +850,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
- // MESG("parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
+ 
+// MESG("parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
  {	/* add eof token!  */
 	if(tok_type!=TOK_SEP) 
 	{	

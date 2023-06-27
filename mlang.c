@@ -1241,7 +1241,7 @@ double factor_line_array()
 	cdim=1;
 	ex_array=adat;
 	ex_name="Definition";
-	// MESG("factor_line_array:");
+	MESG("factor_line_array:");
 	allocate_array(ex_array);
 	NTOKEN2;
 	while(cdim>0){
@@ -1344,8 +1344,8 @@ double factor_array2()
 		ind2=(int)FACTOR_FUNCTION;
 		NTOKEN2;
 #endif
-// 		MESG("	index1=%d",ind1);
-		// MESG("	index2=%d",ind2);
+		MESG("	index1=%d",ind1);
+		MESG("	index2=%d",ind2);
 		value=dval2[ind1][ind2];
 		array_slot->pdval=&dval2[ind1][ind2];
 	} else {
@@ -2509,9 +2509,9 @@ void refresh_ddot_1(double value)
  textpoint_set(buf->tp_current,ddot_position+1);
 
  if(ex_vtype==VTYPE_STRING) {	/* string value  */
- 	// if(strlen(saved_string)>MAXSLEN-20) saved_string[MAXSLEN-20]=0;
-	if(value!=0) stat=snprintf(ddot_out,128," <%5.5f>[%s]",value,saved_string);
-	else stat=snprintf(ddot_out,128," \"%s\"",saved_string);
+// 	if(value!=0) stat=snprintf(ddot_out,128," <%5.5f>[%s]",value,saved_string);
+	// else 
+	stat=snprintf(ddot_out,128," \"%s\"",saved_string);
  }  else if(ex_vtype==VTYPE_NUM) {	/* numeric value  */
 	long int d = (long int)value;
 	if(d==value) {	/* an integer/double value!  */
@@ -2810,11 +2810,15 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  // MESG("compute_block: call check_init");
  if(bp->m_mode<2)	/* if not already checked!  */
  {
-	if((err_num=check_init(bp))>0) {
-// 		mesg_out("Error %d %s line %d ex_vtype=%d ex_value=%f slval=[%s]!",err_num,err_str,err_line,ex_vtype,ex_value,saved_string);
+	err_num=check_init(bp);
+#if	0
+	if(err_num>0) 
+	{
+		mesg_out("Error %d %s line %d ex_vtype=%d ex_value=%f slval=[%s]!",err_num,err_str,err_line,ex_vtype,ex_value,saved_string);
 		show_error("Check init",bp->b_fname);
 		return(0);
 	};
+#endif
 	// MESG("compute_block: call init_exec_flags");
 	init_exec_flags();
 	tok=bp->tok_table;
