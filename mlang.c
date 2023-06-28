@@ -257,6 +257,87 @@ char *directives[] = {
  "for","function","fori",NULL
 };
 
+
+char *token_name[] = {
+    "TOK_NONE       ",
+    "TOK_SEP        ",
+    "TOK_SPACE      ",
+    "TOK_LETTER     ",
+    "TOK_LCURL      ",
+    "TOK_RCURL      ",
+    "TOK_QUOTE      ",
+    "TOK_LPAR       ",
+    "TOK_RPAR       ",
+    "TOK_SHOW       ",
+    "TOK_COMMENT    ",
+    "TOK_VAR        ",  // level 0 variable
+    "TOK_OPTION     ",  // editor option
+    "TOK_CMD        ",  // editor commands
+    "TOK_FUNC       ",  // function
+    "TOK_PROC       ",
+    "TOK_ENV        ",  // editor environment function
+    "TOK_TERM0      ",  // term0 group
+    "TOK_TERM       ",  // term operators (+,-)
+    "TOK_TERM1      ",  // term2 operators (*,/) 
+    "TOK_TERM2      ",  // term1 operators (%,^)
+    "TOK_ASSIGN     ",  // assignment
+    "TOK_EOF        ",  // end of file token
+    "TOK_NUM        ",  // numeric
+    "TOK_DIR        ",  // directive
+    "TOK_DIR_IF     ",  // dir if
+    "TOK_DIR_ELSE   ",  // dir else
+    "TOK_DIR_BREAK  ",
+    "TOK_DIR_RETURN ",
+    "TOK_DIR_WHILE  ",
+    "TOK_DIR_FOR    ",
+    "TOK_COMMA      ",
+    "TOK_DIR_FORI   ",
+    "TOK_COMPARE    ",
+    "TOK_NOTEQUAL   ",
+    "TOK_SMALLER    ",  /* <  */
+    "TOK_BIGGER     ",  /* >  */
+    "TOK_EQUAL      ",  /* ==  */
+    "TOK_SMALLEREQ  ",  /* <=  */
+    "TOK_BIGGEREQ   ",  /* >=  */
+    "TOK_BOOL       ",
+    "TOK_AND        ",  /* &  */
+    "TOK_OR         ",  /* |  */
+    "TOK_NOT        ",  /* !  */
+    "TOK_NAND       ",  /* !&  */
+    "TOK_NOR        ",  /* !|  */
+    "TOK_XOR        ",  /* ^  */
+    "TOK_PLUS       ",
+    "TOK_MINUS      ",
+    "TOK_POWER      ",
+    "TOK_MOD        ",
+    "TOK_MUL        ",
+    "TOK_DIV        ",
+    "TOK_LBRAKET    ",
+    "TOK_RBRAKET    ",
+    "TOK_SQUOTE     ",
+    "TOK_AT         ",
+    "TOK_RANGE      ",
+    "TOK_BQUOTE     ",
+    "TOK_DOLAR      ",
+    "TOK_TILDA      ",
+    "TOK_INCREASE   ",
+    "TOK_DECREASE   ",
+    "TOK_INCREASEBY ",
+    "TOK_DECREASEBY ",
+    "TOK_BSLASH     ",
+    "TOK_NL         ",
+    "TOK_CONTINUE   ",
+    "TOK_FOREACH    ",
+    "TOK_ARRAY1     ",
+    "TOK_ARRAY2     ",
+    "TOK_ARRAY3     ",
+    "TOK_ASSIGNENV  ",
+    "TOK_ASSIGNOPT  ",
+    "TOK_START      ",
+    "TOK_END        ",  
+    "TOK_OTHER      "
+};
+
 array_dat *transpose(array_dat *array1);
 
 void init_btree_table()
@@ -443,6 +524,7 @@ tok_struct *new_tok()
  tok->dval=0;
  tok->ttype=0;
  tok->tgroup=0;
+ tok->tatype=0;
  tok->factor_function=factor_none;
  tok->directive=lexpression;
  tok->tnode=NULL;
@@ -1336,7 +1418,7 @@ double factor_array2()
 #if	1
 		ind1=(int)num_expression();
 		NTOKEN2;
-		NTOKEN2;
+		// NTOKEN2;
 		ind2=(int)num_expression();
 		NTOKEN2;
 #else
@@ -3022,7 +3104,15 @@ char * tok_info(tok_struct *tok)
 	if(tok->adat) dat=2;
 
 	if(tok->tname!=NULL){
-
+		if(tok->ttype==TOK_ARRAY1 || tok->ttype==TOK_ARRAY2) {
+			int rows=0;
+			int cols=0;
+			if(tok->adat) {
+				rows=tok->adat->rows;
+				cols=tok->adat->cols;
+			};
+			snprintf(stok,MAXLLEN,"4-%3d %4d %3d  %3d   [%2d=%12s] [%s] rows=%d cols=%d",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,rows,cols);
+		} else 
 		if(tok->ttype==TOK_SHOW) { snprintf(stok,MAXLLEN,"1-%3d %4d %3d  %3d   [%2d=%12s] [:]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME);
 		} else
 		if(tok->ttype==TOK_LCURL||tok->ttype==TOK_RCURL) {
@@ -3030,7 +3120,7 @@ char * tok_info(tok_struct *tok)
 		} else
 				if(tok->tgroup>0)
 					snprintf(stok,MAXLLEN,"3-%3d %4d %3d  %3d   [%2d=%12s] [%s] group [%d:%s]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tok_name[tok->tgroup]);
-				else snprintf(stok,MAXLLEN,"4-%3d %4d %3d  %3d   [%2d=%12s] [%s]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname);
+				else snprintf(stok,MAXLLEN,"4-%3d %4d %3d  %3d   [%2d=%12s] [%s] %f",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->dval);
 	} else {
 		if(tok->ttype==TOK_LBRAKET||tok->ttype==TOK_RBRAKET) {
 			snprintf(stok,MAXLLEN,"5-%3d %4d %3d  %3d   [%2d=%12s] dat=%d",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,dat);

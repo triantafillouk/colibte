@@ -26,6 +26,12 @@ int getnc1(FILEBUF *bf, int *cc, int *cmask)
  };
 }
 
+void set_tatype(tok_struct *tok,int type)
+{
+	tok->tatype=type;
+	MESG("	set_tatype of %d %s to %d",tok->tind,tok->tname,tok->tatype);
+}
+
 /* Find next token type  */
 int next_token_type(FILEBUF *bf)
 {
@@ -251,14 +257,15 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 {
  int ind;
  	tok->ttype=TOK_VAR;
-	MESG("	set_var: name=%s",name);
 	ind=add_to_symbol_tree(stree,name);
 	ex_edenv=TOK_VAR;
 	if(ind>0) { 	/* this is a new one  */
 		tok->tind=ind-1;
+		MESG("	set_var: new name=%s tind=%d",name,tok->tind);
 		if(stree->max_items<ind) ERROR("exceeded item list of %d !! CHECK!",stree->max_items);
 	} else {	/* found  */
 		tok->tind = -ind-1;
+		MESG("	set_var: found name=%s tind=%d",name,tok->tind);
 	};
 //	tok->tdata = &current_stable[tok->tind];
 }
@@ -476,12 +483,14 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		case TOK_RBRAKET:
 			braket_level--;
 			MESG("end of array definition cols=%d rows=%d",array_max_cols,array_rows);
-			if(tok_tbassigned) {
-				MESG("	tok_tbassigned: [%s] type [%s]",tok_tbassigned->tname,tok_name[tok_tbassigned->ttype]);
-#if	0
-				if(array_rows>1) tok_tbassigned->ttype=TOK_ARRAY2;
-				else tok_tbassigned->ttype=TOK_ARRAY1;
-#endif
+			MESG("braket level is %d",braket_level);
+			if(tok_tbassigned && braket_level==0) {
+				if(array_rows>1) {
+					// tok_tbassigned->tatype =TOK_ARRAY2;
+					set_tatype(tok_tbassigned,TOK_ARRAY2);
+				};
+				MESG("	tok_tbassigned: %d [%s] type [%s] g=%d tatype=%d a2=%d",tok_tbassigned->tnum,tok_tbassigned->tname,tok_name[tok_tbassigned->ttype],
+					tok_tbassigned->tgroup,tok_tbassigned->tatype,TOK_ARRAY2);
 			};
 			cc=1;
 			break;
@@ -729,24 +738,26 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				}
 				else {
 					int index=0;
+					set_var(stree,tok,nword);
 					tok_struct *tok_var=tok;
 #if	1
-					tok_struct *tok_var1 = (tok_struct *)find_btnode(stree,nword);
-					if(tok_var1) {
-						MESG("	variable %s found, type is %d !!",nword,tok_var1->ttype);
+					// tok_struct *tok_var1 = (tok_struct *)find_btnode(stree,nword);
+					if(tok_var) {
+						MESG("	variable1 %s %d %s found, ttype=%d tatype=%d!! a2=%d",
+							nword,tok_var->tind,tok_var->tname,tok_var->ttype,tok_var->tatype,TOK_ARRAY2);
 					} else MESG("this is a new variable!");
 					if(next_token_type(bf)==TOK_ASSIGN) {
 						tok_tbassigned=tok;
 						MESG("set token to be assigned!");
 					};
 #endif
-					set_var(stree,tok,nword);
 					if(next_token_type(bf)==TOK_LBRAKET) {
-						MESG("start array indexing ??");
+						MESG("start finding array indexes");
 					};
+					
 					while(next_token_type(bf)==TOK_LBRAKET) {
 						tok_var->ttype=TOK_ARRAY1+index;	/* set it as array index  */
-						braket_level++;
+						// braket_level++;
 						MESG("parse: array2 set type %d",tok_var->ttype);
 						getnc1(bf,&cc,&tok_type);// skip it
 						// MESG("parse: array3");
@@ -757,13 +768,13 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
 						switch(tok_type){
 							case TOK_NUM:
-								tok->tname="numeric2";
 								ADD_TOKEN;
 								value=getnum1(bf,cc,tok);
 								tok->ttype=TOK_NUM;
-								tok->tname="numeric3";
+								if(index==0) tok->tname="index1";
+								if(index==1) tok->tname="index2";
 								tok->dval=value;
-								MESG("	TOK_NUM: numeric3 %f",tok->dval);
+								// MESG("	TOK_NUM: numeric3 %f",tok->dval);
 								break;
 							case TOK_LETTER:
 								slen=getnword1(bf,cc,nword);
@@ -790,7 +801,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 							getnc1(bf,&cc,&tok_type);
 						};
 						if(tok_type==TOK_RBRAKET) {
-							MESG("	add rbraket1!");
+							MESG("	add rbracket1!");
 							braket_level--;
 							ADD_TOKEN;
 							tok->ttype=TOK_RBRAKET;

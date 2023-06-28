@@ -502,7 +502,7 @@ int err_factor()
  };
  NTOKEN_ERR(473);
  // MESG("set factor function:");
- MESG("	err_factor: [%s]",tok_info(tok0));
+ // MESG("	err_factor: [%s]",tok_info(tok0));
  if(tok0->ttype > TOK_OTHER) {
  	MESG("unknown token type %d line %d %d",tok0->ttype,tok0->tline,last_correct_line);
 	err_num=4730;
@@ -536,22 +536,22 @@ int err_factor()
 				RT_MESG1(xpos);
 			};
 			if(tok->ttype==TOK_SEP) {
-				MESG("	new row");
+				// MESG("	new row");
 				NTOKEN2;
 				continue;
 			};
 			err_num=err_num_expression();
-			MESG("	ex_value=%f err_num=%d",ex_value,err_num);
+			// MESG("	ex_value=%f err_num=%d",ex_value,err_num);
 			if(err_num) return err_num;
 			i++;if(i>cols) cols=i;
 			if(tok->ttype==TOK_RBRAKET) {
-				MESG("	tok_rbraket: end definition");
+				// MESG("	tok_rbraket: end definition");
 				cdim=0;break;
 			};
 			if(tok->ttype==TOK_SEP) {	/* Add tok->ttype==TOK_COMMA for using comma to separate array items  */
 				i=0;j++;
 				cdim++;if(cdim>rows) rows=cdim;
-				MESG("	new row2");
+				// MESG("	new row2");
 				NTOKEN2;
 				continue;
 			};
@@ -563,7 +563,7 @@ int err_factor()
 			free(tok0->adat);
 		};
 		tok0->adat = new_array(rows,cols);
-		MESG("	array type is %d ?= %d",tok0->ttype,TOK_ARRAY2);
+		// MESG("	array type is %d ?= %d",tok0->ttype,TOK_ARRAY2);
 		// set end
 		NTOKEN_ERR(4789)
 		RT_MESG1(4789);
@@ -589,7 +589,7 @@ int err_factor()
 		};
 		RT_MESG1(493);}
 	case TOK_ARRAY1:{
-		MESG("	err use of tok_array1 -----------");
+		MESG("	err use of tok_array1 [%s]",tok_info(tok0));
 		// err_num=err_factor();
 		err_num=err_num_expression(); 
 		// MESG("	err tok_array1: after tok=%d",tok->ttype);
@@ -604,11 +604,11 @@ int err_factor()
 	case TOK_ARRAY2:{
 		// if(!(tok->adat) tok->adat=new
 #if	1
-		MESG("	err use of tok_array2 -----------");
+		MESG("	err use of tok_array2 [%s]",tok_info(tok0));
 		err_num=err_num_expression(); 
 		MESG("	err_array2:1 t=%d",tok->ttype);
 		NTOKEN_ERR(500);
-		NTOKEN_ERR(500);
+		// NTOKEN_ERR(500);
 		MESG("	err_array2:2 t=%d",tok->ttype);
 		// if(err_num) return(err_num);
 		err_num=err_num_expression(); 

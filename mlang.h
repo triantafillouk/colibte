@@ -26,6 +26,7 @@ typedef struct tok_struct {
 	void *tname;	// token name or string value
 	double dval;	// double value
 	int ttype;	/* token type */
+	int tatype;	/* array type  */
 	int tgroup;	/* token group  */
 	union {
 		FFunction factor_function;
@@ -200,83 +201,4 @@ enum {
 	TOK_OTHER,
 };
 
-char *token_name[] = {
-    "TOK_NONE       ",
-    "TOK_SEP        ",
-    "TOK_SPACE      ",
-    "TOK_LETTER     ",
-    "TOK_LCURL      ",
-    "TOK_RCURL      ",
-    "TOK_QUOTE      ",
-    "TOK_LPAR       ",
-    "TOK_RPAR       ",
-    "TOK_SHOW       ",
-    "TOK_COMMENT    ",
-    "TOK_VAR        ",  // level 0 variable
-    "TOK_OPTION     ",  // editor option
-    "TOK_CMD        ",  // editor commands
-    "TOK_FUNC       ",  // function
-    "TOK_PROC       ",
-    "TOK_ENV        ",  // editor environment function
-    "TOK_TERM0      ",  // term0 group
-    "TOK_TERM       ",  // term operators (+,-)
-    "TOK_TERM1      ",  // term2 operators (*,/) 
-    "TOK_TERM2      ",  // term1 operators (%,^)
-    "TOK_ASSIGN     ",  // assignment
-    "TOK_EOF        ",  // end of file token
-    "TOK_NUM        ",  // numeric
-    "TOK_DIR        ",  // directive
-    "TOK_DIR_IF     ",  // dir if
-    "TOK_DIR_ELSE   ",  // dir else
-    "TOK_DIR_BREAK  ",
-    "TOK_DIR_RETURN ",
-    "TOK_DIR_WHILE  ",
-    "TOK_DIR_FOR    ",
-    "TOK_COMMA      ",
-    "TOK_DIR_FORI   ",
-    "TOK_COMPARE    ",
-    "TOK_NOTEQUAL   ",
-    "TOK_SMALLER    ",  /* <  */
-    "TOK_BIGGER     ",  /* >  */
-    "TOK_EQUAL      ",  /* ==  */
-    "TOK_SMALLEREQ  ",  /* <=  */
-    "TOK_BIGGEREQ   ",  /* >=  */
-    "TOK_BOOL       ",
-    "TOK_AND        ",  /* &  */
-    "TOK_OR         ",  /* |  */
-    "TOK_NOT        ",  /* !  */
-    "TOK_NAND       ",  /* !&  */
-    "TOK_NOR        ",  /* !|  */
-    "TOK_XOR        ",  /* ^  */
-    "TOK_PLUS       ",
-    "TOK_MINUS      ",
-    "TOK_POWER      ",
-    "TOK_MOD        ",
-    "TOK_MUL        ",
-    "TOK_DIV        ",
-    "TOK_LBRAKET    ",
-    "TOK_RBRAKET    ",
-    "TOK_SQUOTE     ",
-    "TOK_AT         ",
-    "TOK_RANGE      ",
-    "TOK_BQUOTE     ",
-    "TOK_DOLAR      ",
-    "TOK_TILDA      ",
-    "TOK_INCREASE   ",
-    "TOK_DECREASE   ",
-    "TOK_INCREASEBY ",
-    "TOK_DECREASEBY ",
-    "TOK_BSLASH     ",
-    "TOK_NL         ",
-    "TOK_CONTINUE   ",
-    "TOK_FOREACH    ",
-    "TOK_ARRAY1     ",
-    "TOK_ARRAY2     ",
-    "TOK_ARRAY3     ",
-    "TOK_ASSIGNENV  ",
-    "TOK_ASSIGNOPT  ",
-    "TOK_START      ",
-    "TOK_END        ",  
-    "TOK_OTHER      "
-};
 
