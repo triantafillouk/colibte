@@ -502,7 +502,7 @@ int err_factor()
  };
  NTOKEN_ERR(473);
  // MESG("set factor function:");
- // MESG("token type %d",tok0->ttype);
+ MESG("	err_factor: [%s]",tok_info(tok0));
  if(tok0->ttype > TOK_OTHER) {
  	MESG("unknown token type %d line %d %d",tok0->ttype,tok0->tline,last_correct_line);
 	err_num=4730;
@@ -557,12 +557,13 @@ int err_factor()
 			};
 		};cdim--;
 		};
-		MESG("set array dat! rows=%d cols=%d",rows,cols);
+		MESG("set array dat! [%s] rows=%d cols=%d",tok0->tname,rows,cols);
 		// set array dat
 		if(tok0->adat) {
 			free(tok0->adat);
 		};
 		tok0->adat = new_array(rows,cols);
+		MESG("	array type is %d ?= %d",tok0->ttype,TOK_ARRAY2);
 		// set end
 		NTOKEN_ERR(4789)
 		RT_MESG1(4789);
@@ -606,6 +607,7 @@ int err_factor()
 		MESG("	err use of tok_array2 -----------");
 		err_num=err_num_expression(); 
 		MESG("	err_array2:1 t=%d",tok->ttype);
+		NTOKEN_ERR(500);
 		NTOKEN_ERR(500);
 		MESG("	err_array2:2 t=%d",tok->ttype);
 		// if(err_num) return(err_num);
@@ -845,10 +847,11 @@ int err_factor()
 	case TOK_ASSIGN:
 	case TOK_INCREASEBY:
 	case TOK_DECREASEBY:
-		tok0->tname="asign";
+		tok0->tname="assign";
 		RT_MESG1(527);
 	default:
 		xpos=527;
+		MESG(" default: error_factor: %s",tok_info(tok));
 		set_error(tok,3000+tok->ttype,"factor :wrong character found:");
 		RT_MESG1(5271);
  }

@@ -294,6 +294,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  BTREE *stree=use_stree;
  tok_struct *tok=NULL;
  tok_struct *tok_tbassigned=NULL;
+ tok_struct *previous_token=NULL;
 
  int tok_type=0;
  int next_tok_type=0;
@@ -475,13 +476,13 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		case TOK_RBRAKET:
 			braket_level--;
 			MESG("end of array definition cols=%d rows=%d",array_max_cols,array_rows);
-#if	1
 			if(tok_tbassigned) {
 				MESG("	tok_tbassigned: [%s] type [%s]",tok_tbassigned->tname,tok_name[tok_tbassigned->ttype]);
-				// if(array_rows>1) tok_tbassigned->ttype=TOK_ARRAY2;
-				// else tok_tbassigned->ttype=TOK_ARRAY1;
-			};
+#if	0
+				if(array_rows>1) tok_tbassigned->ttype=TOK_ARRAY2;
+				else tok_tbassigned->ttype=TOK_ARRAY1;
 #endif
+			};
 			cc=1;
 			break;
 		case TOK_QUOTE: // string start
@@ -600,22 +601,33 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 	};
 
+	if(previous_token) MESG("	- previous token is %s",tok_name[previous_token->ttype]);
 	MESG("	- token type=%d %s",tok_type,tok_name[tok_type]);
 	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {
 	if(!(is_now_sep && (tok_type==TOK_LCURL||tok_type==TOK_RCURL) )){
 			/* check for else statement!!  */
 		if(!(tok_type==TOK_LETTER && !strcmp(nword,"else"))){
-			ADD_TOKEN;
+			// MESG("add 1");
+			if(tok_type==TOK_LBRAKET && previous_token->ttype==TOK_RBRAKET){
+				MESG("skip tok_lbraket!");
+				continue;
+			} else {
+				ADD_TOKEN;
+			};
 		} else {
 			if(is_now_sep) {
 				tok_type=TOK_DIR_ELSE;
 				is_now_sep=0;
 			} else {
+			// MESG("add 2");
 				ADD_TOKEN;
 			};
 		};
 	};
+	previous_token=tok;
+	MESG("	2 - token type=%d %s",tok_type,tok_name[tok_type]);
+
 	if(tok_type!=TOK_SEP) is_now_sep=0;
 	if(tok_type!=TOK_LCURL && tok_type!=TOK_RCURL) is_now_curl=0;
 
@@ -634,6 +646,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		tok->tname=strdup(nword);
 	};
 
+	if(tok->ttype==TOK_LBRAKET) tok->tname=" [ ";
+	if(tok->ttype==TOK_RBRAKET) tok->tname=" ] ";
 	if(tok->ttype==TOK_LPAR) tok->tname=" ( ";
 	if(tok->ttype==TOK_RPAR) tok->tname=" ) ";
 	if(tok->ttype==TOK_SEP) tok->tname=" ; ";
@@ -731,7 +745,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 						MESG("start array indexing ??");
 					};
 					while(next_token_type(bf)==TOK_LBRAKET) {
-						// MESG("parse: array ");
 						tok_var->ttype=TOK_ARRAY1+index;	/* set it as array index  */
 						braket_level++;
 						MESG("parse: array2 set type %d",tok_var->ttype);
@@ -848,6 +861,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 		};
 	};
+	MESG("parse: end token switch!");
 	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
  
@@ -889,7 +903,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  free_list(lex_parser,"lex_parser");
  free_list(cstack,"cstack");
  stage_level=save_stage_level;
- // MESG("parse_block1:[%s] end toke items %d",bf->b_fname,bf->symbol_tree->max_items);
+ MESG("parse_block1:[%s] end token items %d",bf->b_fname,bf->symbol_tree->max_items);
  return(TRUE); 
 }
 
@@ -917,6 +931,7 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
 		tok_to->match_tok = tok_table + tok_to->tcurl->num;
 	};
 	tlist->current=tlist->current->next;
+	MESG(";%3d: t=[%s] ",isize,tok_info(tok));
 	isize++;
 	tok_to++;
  };
