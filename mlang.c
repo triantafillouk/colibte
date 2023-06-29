@@ -3111,20 +3111,20 @@ char * tok_info(tok_struct *tok)
 				rows=tok->adat->rows;
 				cols=tok->adat->cols;
 			};
-			snprintf(stok,MAXLLEN,"4-%3d %4d %3d  %3d   [%2d=%12s] [%s] rows=%d cols=%d",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,rows,cols);
+			snprintf(stok,MAXLLEN,"%lX -%3d %4d %3d  %3d   [%2d=%12s] [%s] rows=%d cols=%d",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,rows,cols);
 		} else 
-		if(tok->ttype==TOK_SHOW) { snprintf(stok,MAXLLEN,"1-%3d %4d %3d  %3d   [%2d=%12s] [:]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME);
+		if(tok->ttype==TOK_SHOW) { snprintf(stok,MAXLLEN,"%lX -%3d %4d %3d  %3d   [%2d=%12s] [:]",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME);
 		} else
 		if(tok->ttype==TOK_LCURL||tok->ttype==TOK_RCURL) {
-				snprintf(stok,MAXLLEN,"2-%3d %4d %3d  %3d   [%2d=%12s] %s other is %d",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum);
+				snprintf(stok,MAXLLEN,"%lX -%3d %4d %3d  %3d   [%2d=%12s] %s other is %d",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum);
 		} else
 				if(tok->tgroup>0)
-					snprintf(stok,MAXLLEN,"3-%3d %4d %3d  %3d   [%2d=%12s] [%s] group [%d:%s]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tok_name[tok->tgroup]);
-				else snprintf(stok,MAXLLEN,"4-%3d %4d %3d  %3d   [%2d=%12s] [%s] %f",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->dval);
+					snprintf(stok,MAXLLEN,"%lX -%3d %4d %3d  %3d   [%2d=%12s] [%s] group [%d:%s]",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tok_name[tok->tgroup]);
+				else snprintf(stok,MAXLLEN,"%lX -%3d %4d %3d  %3d   [%2d=%12s] [%s] %f",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->dval);
 	} else {
 		if(tok->ttype==TOK_LBRAKET||tok->ttype==TOK_RBRAKET) {
-			snprintf(stok,MAXLLEN,"5-%3d %4d %3d  %3d   [%2d=%12s] dat=%d",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,dat);
-		} else snprintf(stok,MAXLLEN,"6-%3d %4d %3d  %3d   [%2d=%12s] [%f]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,tok->dval);
+			snprintf(stok,MAXLLEN,"%lX -%3d %4d %3d  %3d   [%2d=%12s] dat=%d",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,dat);
+		} else snprintf(stok,MAXLLEN,"%lX -%3d %4d %3d  %3d   [%2d=%12s] [%f]",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,tok->dval);
 	};
 	return stok;
 }

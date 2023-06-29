@@ -29,7 +29,7 @@ int getnc1(FILEBUF *bf, int *cc, int *cmask)
 void set_tatype(tok_struct *tok,int type)
 {
 	tok->tatype=type;
-	MESG("	set_tatype of %d %s to %d",tok->tind,tok->tname,tok->tatype);
+	MESG("	set_tatype %s -> %d",tok_info(tok),tok->tatype);
 }
 
 /* Find next token type  */
@@ -489,8 +489,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					// tok_tbassigned->tatype =TOK_ARRAY2;
 					set_tatype(tok_tbassigned,TOK_ARRAY2);
 				};
-				MESG("	tok_tbassigned: %d [%s] type [%s] g=%d tatype=%d a2=%d",tok_tbassigned->tnum,tok_tbassigned->tname,tok_name[tok_tbassigned->ttype],
-					tok_tbassigned->tgroup,tok_tbassigned->tatype,TOK_ARRAY2);
+				MESG("	tok_tbassigned: [%s] tatype=%d",tok_info(tok_tbassigned),tok_tbassigned->tatype);
 			};
 			cc=1;
 			break;
@@ -743,12 +742,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 #if	1
 					// tok_struct *tok_var1 = (tok_struct *)find_btnode(stree,nword);
 					if(tok_var) {
-						MESG("	variable1 %s %d %s found, ttype=%d tatype=%d!! a2=%d",
-							nword,tok_var->tind,tok_var->tname,tok_var->ttype,tok_var->tatype,TOK_ARRAY2);
+						// MESG("	variable1 %s tatype=%d",tok_info(tok_var),tok_var->tatype);
 					} else MESG("this is a new variable!");
 					if(next_token_type(bf)==TOK_ASSIGN) {
 						tok_tbassigned=tok;
-						MESG("set token to be assigned!");
+						MESG("set token to be assigned! %s",tok_info(tok_tbassigned));
 					};
 #endif
 					if(next_token_type(bf)==TOK_LBRAKET) {
