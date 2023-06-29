@@ -1324,7 +1324,7 @@ double factor_line_array()
 	cdim=1;
 	ex_array=adat;
 	ex_name="Definition";
-	MESG("factor_line_array:");
+	// MESG("factor_line_array:");
 	allocate_array(ex_array);
 	NTOKEN2;
 	while(cdim>0){
@@ -1409,27 +1409,23 @@ double factor_array2()
 	double value=0;
 	tok_data *array_slot;
 	array_dat *adat;
-	MESG("factor_array2:");
+	// MESG("factor_array2:");
 	array_slot=&current_stable[tok->tind];
 	adat=array_slot->adat;
 	ex_vtype=VTYPE_NUM;
 	if(adat!=NULL) {
 		dval2 = adat->dval2;
 		NTOKEN2;
-#if	1
+
+// 		ind1=(int)FACTOR_FUNCTION;
 		ind1=(int)num_expression();
 		NTOKEN2;
-		// NTOKEN2;
+// 		ind2=(int)FACTOR_FUNCTION;
 		ind2=(int)num_expression();
 		NTOKEN2;
-#else
-		ind1=(int)FACTOR_FUNCTION;
-		NTOKEN2;
-		ind2=(int)FACTOR_FUNCTION;
-		NTOKEN2;
-#endif
-		MESG("	index1=%d",ind1);
-		MESG("	index2=%d",ind2);
+
+		// MESG("	index1=%d",ind1);
+		// MESG("	index2=%d",ind2);
 		value=dval2[ind1][ind2];
 		array_slot->pdval=&dval2[ind1][ind2];
 	} else {
@@ -2415,7 +2411,7 @@ double assign_val(double none)
 	tok_data *sslot;
 	TDS("assign_val");
 	sslot=lsslot;
-	MESG("assign_val: ind=%d type=%d",sslot->ind,sslot->vtype);
+	// MESG("assign_val: ind=%d type=%d",sslot->ind,sslot->vtype);
 	v1=lexpression();
 	if(sslot->vtype!=ex_vtype){ /* we should ?? consider is as an error ? */
 		if(sslot->vtype==VTYPE_STRING) {

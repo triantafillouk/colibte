@@ -520,7 +520,7 @@ int err_factor()
 		// xpos=477;syntax_error(": in factor",xpos);
 		RT_MESG1(xpos);
 	case TOK_LBRAKET:{	/* array definition  */
-		MESG("err: TOK_LBRAKET, array definition");
+		// MESG("err: TOK_LBRAKET, array definition");
 		pre_symbol=0;
 		int i=0,j=0;
 		int cdim=0;
@@ -557,7 +557,7 @@ int err_factor()
 			};
 		};cdim--;
 		};
-		MESG("set array dat! [%s] rows=%d cols=%d",tok0->tname,rows,cols);
+		// MESG("set array dat! [%s] rows=%d cols=%d",tok0->tname,rows,cols);
 		// set array dat
 		if(tok0->adat) {
 			free(tok0->adat);
@@ -589,7 +589,7 @@ int err_factor()
 		};
 		RT_MESG1(493);}
 	case TOK_ARRAY1:{
-		MESG("	err use of tok_array1 [%s]",tok_info(tok0));
+		// MESG("	err use of tok_array1 [%s]",tok_info(tok0));
 		// err_num=err_factor();
 		err_num=err_num_expression(); 
 		// MESG("	err tok_array1: after tok=%d",tok->ttype);
@@ -602,7 +602,7 @@ int err_factor()
 		if(tok->ttype==TOK_RBRAKET) {
 			tok0->ttype=TOK_ARRAY2;
 			tok0->factor_function=factor_array2;
-			MESG("	set 2 dimensional array!!!!!!!!");
+			// MESG("	set 2 dimensional array!!!!!!!!");
 			NTOKEN_ERR(500);
 		} else {
 			tok = save_tok;
@@ -615,24 +615,16 @@ int err_factor()
 		RT_MESG1(5931);
 #endif
 	case TOK_ARRAY2:{
-		// if(!(tok->adat) tok->adat=new
-#if	1
-		MESG("	err use of tok_array2 [%s]",tok_info(tok0));
+		// MESG("	err use of tok_array2 [%s]",tok_info(tok0));
 		err_num=err_num_expression(); 
-		MESG("	err_array2:1 t=%d",tok->ttype);
+		// MESG("	err_array2:1 t=%d",tok->ttype);
 		NTOKEN_ERR(500);
-		// NTOKEN_ERR(500);
-		MESG("	err_array2:2 t=%d",tok->ttype);
+		// MESG("	err_array2:2 t=%d",tok->ttype);
 		// if(err_num) return(err_num);
 		err_num=err_num_expression(); 
-		MESG("err_array2:3 t=%d",tok->ttype);
+		// MESG("err_array2:3 t=%d",tok->ttype);
 		NTOKEN_ERR(500);
-		MESG("err_array2:4 t=%d",tok->ttype);
-#else
-		err_num=err_factor(); 
-		if(err_num) return(err_num);
-		err_num=err_factor(); 
-#endif
+		// MESG("err_array2:4 t=%d",tok->ttype);
 		RT_MESG1(4932);
 		};
 	case TOK_LPAR:
@@ -1254,7 +1246,7 @@ int err_check_block1(int level)
 {
  TDSERR("block");
    SHOW_STAGE(671);
-   MESG("err_check_block1: --------------------------------");
+   // MESG("err_check_block1: --------------------------------");
    while(1) {
 	CHECK_TOK(672);
 	switch(tok->ttype) {
