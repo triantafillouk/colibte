@@ -633,7 +633,7 @@ void initialize_vars()
 int is_mlang(FILEBUF *fp)
 {
  int bt=fp->b_type;
-
+ MESG("check macro file!");
  if(fp->b_flag & FSNLIST) {
  	msg_line("dir is not an mlang file! %X",fp->b_flag);
 	return 0;
@@ -645,6 +645,7 @@ int is_mlang(FILEBUF *fp)
 	!file_type_is("DOT",bt) &&
 	!file_type_is("GTEXT",bt)) 
  {
+	MESG("this is NOT a macro file!!!!!!!!!!!!!!");
  	msg_line("Not an mlang file bt=%d",bt);
 	return 0;	/* only allowed in selected types  */
  };
@@ -653,7 +654,7 @@ int is_mlang(FILEBUF *fp)
  	msg_line("cannot check [out] buffer!!");
 	return 0;
  };
-
+ MESG("this is a macro file!");
  return 1; 
 }
 
@@ -2247,6 +2248,7 @@ double num_term1()
 	 while(tok->tgroup==TOK_TERM1)
 	 {
 		v1 = tok->term_function(v1);
+		if(err_num) break;
 	 };
  RTRN(v1);
 }
@@ -2869,7 +2871,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  tok_data *local_symbols;
  tok_data *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
- // MESG(";compute_block: %s",bp->b_fname);
+ MESG(";compute_block: %s",bp->b_fname);
  if(use_fp->symbol_tree==NULL) {
 	// MESG("create new symbol_tree for use_fp!");
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);

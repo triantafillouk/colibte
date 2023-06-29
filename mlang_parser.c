@@ -301,12 +301,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int script_active=0;
 
  // MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
- if(
- 	file_type_is("CMD",bf->b_type)
-	|| file_type_is("DOT",bf->b_type)
-	// || file_type_is("GTEXT",bf->b_type) 
-	// || bf->b_type==0
- ) script_active=1;
+ if(is_mlang(bf)) script_active=1;
 
  if(bf->tok_table !=NULL && init==0) 
  {

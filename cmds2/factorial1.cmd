@@ -25,7 +25,7 @@ f=3
 print("call fact("+f+")")
 n=fact(f,"test ")
 
-n:     6
+n:   6.0
 print("fact("+f+") is "+n)
 print("end test") 
 if(n==6) print("result is correct!")

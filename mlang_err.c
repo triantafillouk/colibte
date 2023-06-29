@@ -168,8 +168,9 @@ void set_error(tok_struct *tok,int err,char *description)
  };
  err_line=tok->tline;
  err_num=err;
+ MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
  err_str=strdup(description);
- if(execmd) fprintf(stderr,"%s line %d\n",err_str,err_line);
+ if(execmd) fprintf(stderr,"%s tok %s line %d\n",(char *)tok->tname,err_str,err_line);
 }
 
 void syntax_error(char *description,int err)

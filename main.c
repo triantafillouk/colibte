@@ -139,6 +139,7 @@ int main(int argc, char **argv)
 				dofile(startfile);
 			};
 		} else {
+			MESG("dofile: [%s]",startfile);
 			dofile(startfile);
 		};
 		// MESG("show errors");
