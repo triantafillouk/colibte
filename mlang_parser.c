@@ -26,11 +26,13 @@ int getnc1(FILEBUF *bf, int *cc, int *cmask)
  };
 }
 
+#if	0
 void set_tatype(tok_struct *tok,int type)
 {
 	tok->tatype=type;
 	MESG("	set_tatype %s -> %d",tok_info(tok),tok->tatype);
 }
+#endif
 
 /* Find next token type  */
 int next_token_type(FILEBUF *bf)
@@ -53,7 +55,7 @@ tok_struct *add_token(TLIST lex_parser,int tok_type,int cc,char *label)
 	tok=new_tok();
 	add_element_to_list((void *)tok,lex_parser);
 	tok->tnum=lex_parser->size-1;
-	MESG("	; add token %3d: ind=%d type=[%s] [%s]",tok->tnum,cc,tok_name[tok_type],label);
+	MESG("	; add token %3d: ind=%d type=[%s] [%s]",tok->tnum,cc,tname(tok_type),label);
  return tok;
 }
 
@@ -300,7 +302,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  alist *lex_parser=NULL;
  BTREE *stree=use_stree;
  tok_struct *tok=NULL;
- tok_struct *tok_tbassigned=NULL;
+ // tok_struct *tok_tbassigned=NULL;
  tok_struct *previous_token=NULL;
 
  int tok_type=0;
@@ -365,10 +367,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		// if(tok_type==TOK_NL) {  MESG(" - newline in comment %d",tok_line);tok_line++;};
 		continue;
 	};
-	MESG("parse- cc=%d %c type=%3d [%s]",cc,cc,tok_type,token_name[tok_type]);
+	MESG("parse- cc=%d %c type=%3d [%10s]",cc,cc,tok_type,tname(tok_type));
 #if	0
- if(tok_type==TOK_NL) MESG(" - New line -------  type=%d %s line=%d",tok_type,tok_name[tok_type],tok_line);
- MESG(" - %d [%c] type=%d %s line=%d",cc, cc,tok_type,tok_name[tok_type],tok_line);
+ if(tok_type==TOK_NL) MESG(" - New line -------  type=%d %s line=%d",tok_type,tname(tok_type),tok_line);
+ MESG(" - %d [%c] type=%d %s line=%d",cc, cc,tok_type,tname(tok_type),tok_line);
 #endif
  if(err_num>0) return 0.0;
 	value=0;
@@ -484,13 +486,15 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			braket_level--;
 			MESG("end of array definition cols=%d rows=%d",array_max_cols,array_rows);
 			MESG("braket level is %d",braket_level);
+#if	0
 			if(tok_tbassigned && braket_level==0) {
 				if(array_rows>1) {
 					// tok_tbassigned->tatype =TOK_ARRAY2;
-					set_tatype(tok_tbassigned,TOK_ARRAY2);
+					// set_tatype(tok_tbassigned,TOK_ARRAY2);
 				};
 				MESG("	tok_tbassigned: [%s] tatype=%d",tok_info(tok_tbassigned),tok_tbassigned->tatype);
 			};
+#endif
 			cc=1;
 			break;
 		case TOK_QUOTE: // string start
@@ -609,8 +613,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 	};
 
-	if(previous_token) MESG("	- previous token is %s",tok_name[previous_token->ttype]);
-	MESG("	- token type=%d %s",tok_type,tok_name[tok_type]);
+	if(previous_token) MESG("	- previous token is %s",tname(previous_token->ttype));
+	MESG("	- token type=%d %s",tok_type,tname(tok_type));
 	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {
 	if(!(is_now_sep && (tok_type==TOK_LCURL||tok_type==TOK_RCURL) )){
@@ -634,7 +638,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		};
 	};
 	previous_token=tok;
-	MESG("	2 - token type=%d %s",tok_type,tok_name[tok_type]);
+	MESG("	2 - token type=%d %s",tok_type,tname(tok_type));
 
 	if(tok_type!=TOK_SEP) is_now_sep=0;
 	if(tok_type!=TOK_LCURL && tok_type!=TOK_RCURL) is_now_curl=0;
@@ -654,8 +658,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		tok->tname=strdup(nword);
 	};
 
-	if(tok->ttype==TOK_LBRAKET) tok->tname=" [ ";
-	if(tok->ttype==TOK_RBRAKET) tok->tname=" ] ";
+	if(tok->ttype==TOK_LBRAKET) tok->tname=" LB ";
+	if(tok->ttype==TOK_RBRAKET) tok->tname=" RB ";
 	if(tok->ttype==TOK_LPAR) tok->tname=" ( ";
 	if(tok->ttype==TOK_RPAR) tok->tname=" ) ";
 	if(tok->ttype==TOK_SEP) tok->tname=" ; ";
@@ -739,7 +743,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					int index=0;
 					set_var(stree,tok,nword);
 					tok_struct *tok_var=tok;
-#if	1
+#if	0
 					// tok_struct *tok_var1 = (tok_struct *)find_btnode(stree,nword);
 					if(tok_var) {
 						// MESG("	variable1 %s tatype=%d",tok_info(tok_var),tok_var->tatype);

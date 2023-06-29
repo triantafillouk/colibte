@@ -20,13 +20,13 @@ typedef double (*EFunction)(double v1,double v2);
 
 typedef struct tok_struct {
 	short level;		// curl level
-	short tind;	/* token subtype  */
+	short tind;	/* token subtype and variable number */
 	short tline;	/* line for debugging  */
 	short tnum;	/* token number for debugging  */
 	void *tname;	// token name or string value
 	double dval;	// double value
 	int ttype;	/* token type */
-	int tatype;	/* array type  */
+	// int tatype;	/* array type  */
 	int tgroup;	/* token group  */
 	union {
 		FFunction factor_function;

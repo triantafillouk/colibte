@@ -593,7 +593,20 @@ int err_factor()
 		// err_num=err_factor();
 		err_num=err_num_expression(); 
 		// MESG("	err tok_array1: after tok=%d",tok->ttype);
-		NTOKEN_ERR(499);
+		xpos=499;
+		check_skip_token_err1(TOK_RBRAKET,"array error",xpos);
+		// NTOKEN_ERR(499);
+		tok_struct *save_tok = tok;
+		// check for second index
+		err_num=err_num_expression();
+		if(tok->ttype==TOK_RBRAKET) {
+			tok0->ttype=TOK_ARRAY2;
+			tok0->factor_function=factor_array2;
+			MESG("	set 2 dimensional array!!!!!!!!");
+			NTOKEN_ERR(500);
+		} else {
+			tok = save_tok;
+		};
 		RT_MESG1(4931);
 		};
 #if	0
@@ -1241,7 +1254,7 @@ int err_check_block1(int level)
 {
  TDSERR("block");
    SHOW_STAGE(671);
-
+   MESG("err_check_block1: --------------------------------");
    while(1) {
 	CHECK_TOK(672);
 	switch(tok->ttype) {

@@ -257,7 +257,7 @@ char *directives[] = {
  "for","function","fori",NULL
 };
 
-
+#if	0
 char *token_name[] = {
     "TOK_NONE       ",
     "TOK_SEP        ",
@@ -337,6 +337,7 @@ char *token_name[] = {
     "TOK_END        ",  
     "TOK_OTHER      "
 };
+#endif
 
 array_dat *transpose(array_dat *array1);
 
@@ -524,7 +525,7 @@ tok_struct *new_tok()
  tok->dval=0;
  tok->ttype=0;
  tok->tgroup=0;
- tok->tatype=0;
+ // tok->tatype=0;
  tok->factor_function=factor_none;
  tok->directive=lexpression;
  tok->tnode=NULL;
@@ -751,7 +752,7 @@ int check_init(FILEBUF *bf)
  {
  	// MESG("create token table [%s]",bf->b_fname);
 	parse_block1(bf,NULL,1,0);
-	// MESG("block parsed ok");
+	MESG("block parsed ok");
 	if(err_num>0) {
 		msg_line("found parsed errors: err_num=%d",err_num);
 		return(err_num);
@@ -1408,7 +1409,7 @@ double factor_array2()
 	double value=0;
 	tok_data *array_slot;
 	array_dat *adat;
-	// MESG("factor_array2:");
+	MESG("factor_array2:");
 	array_slot=&current_stable[tok->tind];
 	adat=array_slot->adat;
 	ex_vtype=VTYPE_NUM;
@@ -1459,7 +1460,7 @@ double factor_array1()
 	double *dval=NULL;
 	double value=0;
 	tok_data *array_slot;
-	// MESG("factor_array1: ttype=%d %d",tok->ttype,TOK_LBRAKET);
+	MESG("factor_array1: ttype=%d %d",tok->ttype,TOK_LBRAKET);
 	array_slot=&current_stable[tok->tind];
 	NTOKEN2;
 #if	0
@@ -3099,10 +3100,10 @@ int parse_buffer_show_tokens(int n)
 char * tok_info(tok_struct *tok)
 {
  static char stok[MAXLLEN];
- int dat=0;
+#if	0
 	if(tok->tnode!=NULL) dat=1;
 	if(tok->adat) dat=2;
-
+#endif
 	if(tok->tname!=NULL){
 		if(tok->ttype==TOK_ARRAY1 || tok->ttype==TOK_ARRAY2) {
 			int rows=0;
@@ -3111,20 +3112,18 @@ char * tok_info(tok_struct *tok)
 				rows=tok->adat->rows;
 				cols=tok->adat->cols;
 			};
-			snprintf(stok,MAXLLEN,"%lX -%3d %4d %3d  %3d   [%2d=%12s] [%s] rows=%d cols=%d",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,rows,cols);
+			snprintf(stok,MAXLLEN,"%lX %3d: l=%4d i%3d  %3d   [%2d=%12s] [%s] rows=%d cols=%d",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,rows,cols);
 		} else 
-		if(tok->ttype==TOK_SHOW) { snprintf(stok,MAXLLEN,"%lX -%3d %4d %3d  %3d   [%2d=%12s] [:]",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME);
+		if(tok->ttype==TOK_SHOW) { snprintf(stok,MAXLLEN,"%lX %3d: l=%4d i%3d  %3d   [%2d=%12s] [:]",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME);
 		} else
 		if(tok->ttype==TOK_LCURL||tok->ttype==TOK_RCURL) {
-				snprintf(stok,MAXLLEN,"%lX -%3d %4d %3d  %3d   [%2d=%12s] %s other is %d",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum);
+				snprintf(stok,MAXLLEN,"%lX %3d: l=%4d i%3d  %3d   [%2d=%12s] %s other is %d",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum);
 		} else
-				if(tok->tgroup>0)
-					snprintf(stok,MAXLLEN,"%lX -%3d %4d %3d  %3d   [%2d=%12s] [%s] group [%d:%s]",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tok_name[tok->tgroup]);
-				else snprintf(stok,MAXLLEN,"%lX -%3d %4d %3d  %3d   [%2d=%12s] [%s] %f",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->dval);
+		if(tok->tgroup>0)
+			snprintf(stok,MAXLLEN,"%lX %3d: l=%4d i%3d  %3d   [%2d=%12s] [%s] group [%d:%s]",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup));
+		else snprintf(stok,MAXLLEN,"%lX %3d: l=%4d i%3d  %3d   [%2d=%12s] [%s] %f",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->dval);
 	} else {
-		if(tok->ttype==TOK_LBRAKET||tok->ttype==TOK_RBRAKET) {
-			snprintf(stok,MAXLLEN,"%lX -%3d %4d %3d  %3d   [%2d=%12s] dat=%d",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,dat);
-		} else snprintf(stok,MAXLLEN,"%lX -%3d %4d %3d  %3d   [%2d=%12s] [%f]",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,tok->dval);
+		     snprintf(stok,MAXLLEN,"%lX %3d: l=%4d i%3d  %3d   [%2d=%12s] [%f]",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,tok->dval);
 	};
 	return stok;
 }
