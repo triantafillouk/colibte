@@ -168,9 +168,9 @@ void set_error(tok_struct *tok,int err,char *description)
  };
  err_line=tok->tline;
  err_num=err;
- MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
+ // MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
  err_str=strdup(description);
- if(execmd) fprintf(stderr,"%s tok %s line %d\n",(char *)tok->tname,err_str,err_line);
+ if(execmd) fprintf(stderr,"[%s] tok %s line %d\n",(char *)tok->tname,err_str,err_line);
 }
 
 void syntax_error(char *description,int err)
@@ -643,12 +643,12 @@ int err_factor()
 			err_num = err_lexpression();
 			CHECK_TOK(484);
 			if(tok->ttype==TOK_LBRAKET) {
-				MESG("	err_tok_lpar: we have a left braket, continue!");
+				// MESG("	err_tok_lpar: we have a left braket, continue!");
 				RT_MESG;
 			};
 			if(tok->ttype !=TOK_RPAR) {
 				xpos=485;
-				MESG("ttype=%d",tok->ttype);
+				// MESG("ttype=%d",tok->ttype);
 				syntax_error(" FAC1_err: No closing parenthesis",xpos);
 				RT_MESG1(485);
 			} else { 
@@ -857,7 +857,7 @@ int err_factor()
 		RT_MESG1(527);
 	default:
 		xpos=527;
-		MESG(" default: error_factor: %s",tok_info(tok));
+		// MESG(" default: error_factor: %s",tok_info(tok));
 		set_error(tok,3000+tok->ttype,"factor :wrong character found:");
 		RT_MESG1(5271);
  }

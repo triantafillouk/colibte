@@ -335,7 +335,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  // MESG("parse_block1: before looping: script_active=%d",script_active);
  err_num=0;
  err_line=0;
- tok_line=0;
+
  save_stage_level=stage_level;
  // MESG("--- Start parsing block loop --------------------");
  while(getnc1(bf,&cc,&tok_type))
@@ -350,7 +350,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			script_active=1;
 			continue;
 		};
-		// if(tok_type==TOK_NL) {  MESG(" - newline in comment %d",tok_line);tok_line++;};
 		continue;
 	};
 // 	MESG("parse- cc=%d %c type=%3d [%10s]",cc,cc,tok_type,tname(tok_type));
@@ -480,7 +479,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			break;
 		case TOK_COMMENT:
 			skip_2nl(bf);
-			tok_line++;
+			// tok_line++;
 			continue;
 
 		case TOK_NOT:

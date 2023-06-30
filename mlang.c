@@ -633,7 +633,7 @@ void initialize_vars()
 int is_mlang(FILEBUF *fp)
 {
  int bt=fp->b_type;
- MESG("check macro file!");
+ // MESG("check macro file!");
  if(fp->b_flag & FSNLIST) {
  	msg_line("dir is not an mlang file! %X",fp->b_flag);
 	return 0;
@@ -645,7 +645,7 @@ int is_mlang(FILEBUF *fp)
 	!file_type_is("DOT",bt) &&
 	!file_type_is("GTEXT",bt)) 
  {
-	MESG("this is NOT a macro file!!!!!!!!!!!!!!");
+	// MESG("this is NOT a macro file!!!!!!!!!!!!!!");
  	msg_line("Not an mlang file bt=%d",bt);
 	return 0;	/* only allowed in selected types  */
  };
@@ -654,7 +654,7 @@ int is_mlang(FILEBUF *fp)
  	msg_line("cannot check [out] buffer!!");
 	return 0;
  };
- MESG("this is a macro file!");
+ // MESG("this is a macro file!");
  return 1; 
 }
 
@@ -753,7 +753,7 @@ int check_init(FILEBUF *bf)
  {
  	// MESG("create token table [%s]",bf->b_fname);
 	parse_block1(bf,NULL,1,0);
-	MESG("block parsed ok");
+	// MESG("block parsed ok");
 	if(err_num>0) {
 		msg_line("found parsed errors: err_num=%d",err_num);
 		return(err_num);
@@ -1457,15 +1457,11 @@ double factor_array1()
 	double *dval=NULL;
 	double value=0;
 	tok_data *array_slot;
-	MESG("factor_array1: ttype=%d %d",tok->ttype,TOK_LBRAKET);
+	// MESG("factor_array1: ttype=%d %d",tok->ttype,TOK_LBRAKET);
 	array_slot=&current_stable[tok->tind];
 	NTOKEN2;
-#if	0
-	ind1=(int)FACTOR_FUNCTION;
-#else
+	// ind1=(int)FACTOR_FUNCTION;
 	ind1 = (int)num_expression();
-#endif
-	// NTOKEN2;
 	// MESG("factor_array1: ind1=%d",ind1);
 	if(tok->ttype==TOK_RBRAKET) { 
 		NTOKEN2;
@@ -1619,6 +1615,8 @@ double factor_env()
 void set_break()
 {
 	is_break1=1;
+	tok->tgroup=TOK_END;
+	tok->ttype=TOK_EOF;
 	current_active_flag=0;
 }
 
@@ -1815,6 +1813,7 @@ static double term1_mul(double v1)
 {
  double v2;
  TDS("term1_mul");
+ // MESG("term1_mul: ex_vtype=%d",ex_vtype);
 	if(ex_vtype==VTYPE_NUM){
 		NTOKEN2;
 		v2=num_term2();
@@ -1825,7 +1824,7 @@ static double term1_mul(double v1)
 				return v1;
 			case VTYPE_ARRAY:	// numeric * array
 				ex_array = dup_array_mul1(ex_array,v1);
-				ex_name = "Multiply to numeric";
+				ex_name = "numeric * array";
 				ex_vtype=VTYPE_ARRAY;
 				return 1;
 		};
@@ -1839,7 +1838,7 @@ static double term1_mul(double v1)
 			else array_mul1(loc_array,v2);
 			ex_array=loc_array;
 			ex_vtype=VTYPE_ARRAY;
-			ex_name="array multiply numeric";
+			ex_name="array * numeric";
 			return 1;
 		};
 		if(ex_vtype==VTYPE_ARRAY) {
@@ -1853,10 +1852,10 @@ static double term1_mul(double v1)
 					ex_vtype=VTYPE_NUM;
 					// free old ex_array ???
 					ex_array=NULL;
-					ex_name="--";
+					ex_name="array * array";
 					RTRN(v1);
 				};
-				syntax_error("array error",213);
+				syntax_error("array multiply error",213);
 				ex_vtype=VTYPE_NUM;
 				RTRN(v1);
 			} else {
@@ -1873,7 +1872,7 @@ static double term1_mul(double v1)
 			return v1;
 		};
 	};
-	syntax_error("wrong multiply ",2101);
+	syntax_error("wrong multiply type",2101);
 	set_break();
 	return(1);
 }
@@ -1882,10 +1881,8 @@ static double term1_div(double v1)
 {
  double v2;
 	if(ex_vtype==VTYPE_NUM){
-//		MESG("term1_div:1 [%s]",tok_info(tok));
 		NTOKEN2;
 		v2=num_term2();
-//		MESG("term1_div:2 [%s] v2=%f",tok_info(tok),v2);
 			switch(ex_vtype)
 			{
 				case VTYPE_NUM:	// numeric * numeric
@@ -1900,7 +1897,7 @@ static double term1_div(double v1)
 					RTRN(v1);
 				case VTYPE_ARRAY:	// numeric * array
 					ex_array = dup_array_mul1(ex_array,1/v1);
-					ex_name = "Multiply to numeric";
+					ex_name = "numeric / array";
 					ex_vtype=VTYPE_ARRAY;
 					return 1;
 			};
@@ -1922,7 +1919,7 @@ static double term1_div(double v1)
 			else array_mul1(loc_array,1/v2);
 			ex_array=loc_array;
 			ex_vtype=VTYPE_ARRAY;
-			ex_name="array multiply numeric";
+			ex_name="array / numeric";
 			return 1;
 		};
 		if(ex_vtype==VTYPE_ARRAY) {
@@ -1930,10 +1927,7 @@ static double term1_div(double v1)
 				RTRN(v1);
 		};
 	};
-	err_num=216;
-	err_line=tok->tline;
-	set_break();
-	ERROR("division operation not_supported err %d",err_num);
+	set_error(tok,216,"division op not supported");
 	RTRN(v1);
 }
 
@@ -2248,7 +2242,7 @@ double num_term1()
 	 while(tok->tgroup==TOK_TERM1)
 	 {
 		v1 = tok->term_function(v1);
-		if(err_num) break;
+		// if(err_num) break;
 	 };
  RTRN(v1);
 }
@@ -2851,14 +2845,14 @@ double exec_block1()
 	if(tok->ttype==TOK_SHOW) {
 		refresh_ddot_1(val);NTOKEN2;continue;
 	};
-
+#if	0
 	if(drv_check_break_key()) {
 		syntax_error("user interruption",100);
 		if(is_break1) return 0;
 	};
-
+#endif
  	val=tok->directive();
-	if(!current_active_flag) return(val);
+	// if(!current_active_flag) return(val);
    };
 	return(val);
 }
@@ -2871,7 +2865,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  tok_data *local_symbols;
  tok_data *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
- MESG(";compute_block: %s",bp->b_fname);
+ // MESG(";compute_block: %s",bp->b_fname);
  if(use_fp->symbol_tree==NULL) {
 	// MESG("create new symbol_tree for use_fp!");
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);
@@ -3229,10 +3223,10 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 /* size of the buffer */
 {
 	/* if we are interactive, go get it! */
-	MESG("nextarg:");
+	// MESG("nextarg:");
 	if (macro_exec == FALSE) {
 		if(getstring(prompt, buffer, size,show)!=FALSE) {
-			MESG("nextarg: buffer=[%s]",buffer);
+			// MESG("nextarg: buffer=[%s]",buffer);
 			ex_value = atof(buffer);
 		} else {
 			set_update(cwp,UPD_MOVE);
@@ -3240,7 +3234,7 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 		};
 	} else {
 		/* slval has already the next argument */
-		MESG("nextarg: slval=%s",get_sval());	
+		// MESG("nextarg: slval=%s",get_sval());	
 		strlcpy(buffer,get_sval(),size);
 	};
 	return(TRUE);
