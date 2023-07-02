@@ -136,7 +136,7 @@ void allocate_array(struct array_dat *adat)
 struct array_dat *alloc_array()
 {
  static int array_num=0;
- // MESG("alloc_array:");
+ MESG("alloc_array:");
  array_dat *na=(array_dat *)malloc(sizeof(struct array_dat));
  na->anum = array_num++;
  return(na);
@@ -159,7 +159,7 @@ struct array_dat *new_array_similar(array_dat *a)
 struct array_dat *new_array(int rows,int cols)
 {
 	struct array_dat *array;
-	// MESG("new_array:%d %d",rows,cols);
+	MESG("new_array:%d %d",rows,cols);
 	array=alloc_array();
 	init_array(array,rows,cols);
 	return(array);

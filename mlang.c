@@ -1410,29 +1410,49 @@ double factor_array2()
 	double value=0;
 	tok_data *array_slot;
 	array_dat *adat;
-	// MESG("factor_array2:");
+	tok_struct *tok0 = tok;
+	MESG("factor_array2: %s",tok->tname);
 	array_slot=&current_stable[tok->tind];
 	adat=array_slot->adat;
 	ex_vtype=VTYPE_NUM;
-	if(adat!=NULL) {
-		dval2 = adat->dval2;
+	if(adat==NULL) {
+		syntax_error("no data in the array!!",209);
 		NTOKEN2;
 
-// 		ind1=(int)FACTOR_FUNCTION;
 		ind1=(int)num_expression();
 		NTOKEN2;
-// 		ind2=(int)FACTOR_FUNCTION;
 		ind2=(int)num_expression();
 		NTOKEN2;
 
-		// MESG("	index1=%d",ind1);
-		// MESG("	index2=%d",ind2);
-		value=dval2[ind1][ind2];
-		array_slot->pdval=&dval2[ind1][ind2];
+		adat = new_array(ind1+1,ind2+1);
+
+		array_slot->adat = adat;
+		tok0->adat = adat;
+		print_array1("new array created",adat);
+		dval2 = adat->dval2;
+
+		MESG("new rows=%d cols=%d",adat->rows,adat->cols);
+// 		NTOKEN2;
+			// value=dval2[ind1][ind2];
+			// array_slot->pdval=&dval2[ind1][ind2];
 	} else {
-		syntax_error("no data in the array!!",209);
 		NTOKEN2;
-	}
+
+		ind1=(int)num_expression();
+		NTOKEN2;
+		ind2=(int)num_expression();
+		NTOKEN2;
+		dval2 = adat->dval2;
+
+		if((ind1 >= adat->cols) || (ind2 >= adat->rows)) {
+			// syntax_error("array indexes out of bound!",209);
+			set_error(tok0,209,"array indexes out of bound!");
+		} else {
+			value=dval2[ind1][ind2];
+			array_slot->pdval=&dval2[ind1][ind2];
+		};
+	};
+	MESG("end factor_array2");
 	return(value);
 }
 
