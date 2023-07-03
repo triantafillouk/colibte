@@ -142,7 +142,7 @@ char *tok_name[] = {
 	"bool and","bool or","bool not","bool nand","bool nor","bool xor",
 	"plus","minus","power","modulo","multiply","divide",
 	"left braket","right braket","squote","at","range","back quote","dolar","tilda",
-	"increase","decrease","increase by","decrease by","backslash",
+	"increase","decrease","increase by","mul_by", "decrease by","backslash",
 	"new line",
 	"continue",
 	"foreach",
@@ -508,6 +508,41 @@ double increase_by()
 		sslot->psval[0]=stmp;
 
 		return(0);
+	};
+#endif
+	return(-1);
+}
+
+double mul_by()
+{
+	double v1,v0;
+	tok_data *sslot;
+	// TDS("increase_by");
+	sslot=lsslot;
+	// if(sslot->vtype==VTYPE_STRING) MESG("increase_by string [%s]",sslot->sval);
+	
+	v1=num_expression();
+
+	if(sslot->vtype==VTYPE_NUM) {
+		v0=sslot->dval;
+		sslot->dval = v0*v1;
+		return(sslot->dval);
+	};
+#if	0
+	if(sslot->vtype==VTYPE_ARRAY) {
+		v0=*sslot->pdval;
+		
+		*sslot->pdval = v0+v1;
+		// MESG("array: %f -> %f",v0,*sslot->pdval);
+		return(v0+v1);
+	};
+#endif
+#if	0
+	if(sslot->vtype==VTYPE_STRING) {
+		// MESG("increase by:");
+		sslot->sval=(char *)realloc(sslot->sval,strlen(sslot->sval)+strlen(saved_string)+1);
+		strcat(sslot->sval,saved_string);
+		set_sval(sslot->sval);
 	};
 #endif
 	return(-1);
@@ -1423,7 +1458,7 @@ double factor_array2()
 		NTOKEN2;
 		ind2=(int)num_expression();
 		NTOKEN2;
-
+		MESG("factor_array2:1");
 		adat = new_array(ind1+1,ind2+1);
 
 		array_slot->adat = adat;
@@ -1477,8 +1512,9 @@ double factor_array1()
 	double *dval=NULL;
 	double value=0;
 	tok_data *array_slot;
-	// MESG("factor_array1: ttype=%d %d",tok->ttype,TOK_LBRAKET);
+	MESG("factor_array1: ttype=%d %d",tok->ttype,TOK_LBRAKET);
 	array_slot=&current_stable[tok->tind];
+	MESG("	array1: vtype=%d",array_slot->vtype);
 	NTOKEN2;
 	// ind1=(int)FACTOR_FUNCTION;
 	ind1 = (int)num_expression();
@@ -1487,7 +1523,7 @@ double factor_array1()
 		NTOKEN2;
 		// MESG("ends with rbracket!!");
 	};
-	// MESG("factor_array1:ind=%d ind1=%d type=%d",array_slot->ind,ind1,array_slot->vtype);
+	MESG("factor_array1:ind=%d ind1=%d type=%d",array_slot->ind,ind1,array_slot->vtype);
 	if(array_slot->adat == NULL) {
 		ex_nums=1;
 		array_slot->adat=new_array(ind1+1,1);
@@ -2032,6 +2068,7 @@ FFunction factor_funcs[] = {
 	increase_val,	// TOK_INCREASE	,
 	decrease_val,	// TOK_DECREASE	,
 	factor_none,	// TOK_INCREASEBY
+	mul_by,	// TOK_MULBY
 	decrease_by,	// TOK_DECREASEBY
 	factor_none,	// TOK_BSLASH		,
 

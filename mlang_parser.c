@@ -543,6 +543,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			if(next_token_type(bf)==TOK_MUL) {
 				getnc1(bf,&cc,&tok_type);
 				tok_type=TOK_POWER;
+				break;
+			} else
+			if(next_token_type(bf)==TOK_ASSIGN) {
+				getnc1(bf,&cc,&tok_type);
+				tok_type=TOK_MULBY;
+				break;
 			};
 			break;
 		case TOK_DIV:
@@ -639,6 +645,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok->ttype==TOK_ASSIGNENV) { tok->tname=" setenv ";tok->tgroup=TOK_TERM0;};
 	if(tok->ttype==TOK_ASSIGNOPT) { tok->tname=" setoption ";tok->tgroup=TOK_TERM0;};
 	if(tok->ttype==TOK_INCREASEBY) { tok->tname=" += ";tok->tgroup=TOK_TERM0;};
+	if(tok->ttype==TOK_MULBY) { tok->tname=" *= ";tok->tgroup=TOK_TERM0;};
 	if(tok->ttype==TOK_DECREASEBY) { tok->tname=" -= ";tok->tgroup=TOK_TERM0;};
 	/* term1  */
 	if(tok->ttype==TOK_PLUS) {tok->tname=" + ";tok->tgroup=TOK_TERM;};

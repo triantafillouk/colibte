@@ -254,7 +254,7 @@ int  err_push_args_1(int *nargs)
 		break;
 	};
 	err_num = err_lexpression();
-	if(err_num) { MESG("error from lexpression %d",err_num);return err_num;};
+	if(err_num) { MESG("error in push_args_1 from lexpression %d",err_num);return err_num;};
 	CHECK_TOK(413);
 	num_args++;
 
@@ -370,7 +370,22 @@ int err_increase_by()
 		syntax_error("bogus assignement!!!!",xpos);
 		RT_MESG1(443);
 	};
-	err_num=err_lexpression();
+	err_num=err_cexpression();
+
+	RT_MESG1(443);
+}
+
+int err_mul_by()
+{
+ TDSERR("mul_by");
+ SHOW_STAGE(443);
+
+	if(!simple){
+		xpos=443;
+		syntax_error("bogus assignement!!!!",xpos);
+		RT_MESG1(443);
+	};
+	err_num=err_num_expression();
 
 	RT_MESG1(443);
 }
@@ -385,7 +400,7 @@ int err_decrease_by()
 		syntax_error("bogus assignement!!!!",xpos);
 		RT_MESG1(443);
 	};
-	err_num=err_lexpression();
+	err_num=err_num_expression();
 
 	RT_MESG1(443);
 }
@@ -852,6 +867,7 @@ int err_factor()
 		RT_MESG1(5262);
 	case TOK_ASSIGN:
 	case TOK_INCREASEBY:
+	case TOK_MULBY:
 	case TOK_DECREASEBY:
 		tok0->tname="assign";
 		RT_MESG1(527);
@@ -1020,6 +1036,13 @@ int err_lexpression()
 			tok->tname = "+=";
 			NTOKEN_ERR(710);
 			err_num=err_increase_by();
+			RT_MESG1(714);
+		};
+		case TOK_MULBY: {
+			tok->term_function = mul_by;
+			tok->tname = "*=";
+			NTOKEN_ERR(710);
+			err_num=err_mul_by();
 			RT_MESG1(714);
 		};
 		case TOK_DECREASEBY: {
