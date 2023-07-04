@@ -257,88 +257,6 @@ char *directives[] = {
  "for","function","fori",NULL
 };
 
-#if	0
-char *token_name[] = {
-    "TOK_NONE       ",
-    "TOK_SEP        ",
-    "TOK_SPACE      ",
-    "TOK_LETTER     ",
-    "TOK_LCURL      ",
-    "TOK_RCURL      ",
-    "TOK_QUOTE      ",
-    "TOK_LPAR       ",
-    "TOK_RPAR       ",
-    "TOK_SHOW       ",
-    "TOK_COMMENT    ",
-    "TOK_VAR        ",  // level 0 variable
-    "TOK_OPTION     ",  // editor option
-    "TOK_CMD        ",  // editor commands
-    "TOK_FUNC       ",  // function
-    "TOK_PROC       ",
-    "TOK_ENV        ",  // editor environment function
-    "TOK_TERM0      ",  // term0 group
-    "TOK_TERM       ",  // term operators (+,-)
-    "TOK_TERM1      ",  // term2 operators (*,/) 
-    "TOK_TERM2      ",  // term1 operators (%,^)
-    "TOK_ASSIGN     ",  // assignment
-    "TOK_EOF        ",  // end of file token
-    "TOK_NUM        ",  // numeric
-    "TOK_DIR        ",  // directive
-    "TOK_DIR_IF     ",  // dir if
-    "TOK_DIR_ELSE   ",  // dir else
-    "TOK_DIR_BREAK  ",
-    "TOK_DIR_RETURN ",
-    "TOK_DIR_WHILE  ",
-    "TOK_DIR_FOR    ",
-    "TOK_COMMA      ",
-    "TOK_DIR_FORI   ",
-    "TOK_COMPARE    ",
-    "TOK_NOTEQUAL   ",
-    "TOK_SMALLER    ",  /* <  */
-    "TOK_BIGGER     ",  /* >  */
-    "TOK_EQUAL      ",  /* ==  */
-    "TOK_SMALLEREQ  ",  /* <=  */
-    "TOK_BIGGEREQ   ",  /* >=  */
-    "TOK_BOOL       ",
-    "TOK_AND        ",  /* &  */
-    "TOK_OR         ",  /* |  */
-    "TOK_NOT        ",  /* !  */
-    "TOK_NAND       ",  /* !&  */
-    "TOK_NOR        ",  /* !|  */
-    "TOK_XOR        ",  /* ^  */
-    "TOK_PLUS       ",
-    "TOK_MINUS      ",
-    "TOK_POWER      ",
-    "TOK_MOD        ",
-    "TOK_MUL        ",
-    "TOK_DIV        ",
-    "TOK_LBRAKET    ",
-    "TOK_RBRAKET    ",
-    "TOK_SQUOTE     ",
-    "TOK_AT         ",
-    "TOK_RANGE      ",
-    "TOK_BQUOTE     ",
-    "TOK_DOLAR      ",
-    "TOK_TILDA      ",
-    "TOK_INCREASE   ",
-    "TOK_DECREASE   ",
-    "TOK_INCREASEBY ",
-    "TOK_DECREASEBY ",
-    "TOK_BSLASH     ",
-    "TOK_NL         ",
-    "TOK_CONTINUE   ",
-    "TOK_FOREACH    ",
-    "TOK_ARRAY1     ",
-    "TOK_ARRAY2     ",
-    "TOK_ARRAY3     ",
-    "TOK_ASSIGNENV  ",
-    "TOK_ASSIGNOPT  ",
-    "TOK_START      ",
-    "TOK_END        ",  
-    "TOK_OTHER      "
-};
-#endif
-
 array_dat *transpose(array_dat *array1);
 
 void init_btree_table()
@@ -1364,12 +1282,12 @@ double factor_line_array()
 	allocate_array(ex_array);
 	NTOKEN2;
 	while(cdim>0){
-	while(tok->ttype!=TOK_END) {
+	while(tok->ttype!=TOK_EOF) {
 		if(tok->ttype==TOK_SEP) { 
 			NTOKEN2;
 			continue;
 		};
-		value=lexpression();
+		value=cexpression();
 		if(ex_vtype==VTYPE_STRING) adat->atype=VTYPE_SARRAY;
 		// MESG("	[%d %d]: value=%f [%s]",j,i,value,saved_string);
 		if(adat->atype==VTYPE_ARRAY){
@@ -1403,9 +1321,16 @@ double factor_line_array()
 	RTRN(1.2);
 }
 
+tok_data *get_left_slot(int ind)
+{
+	// MESG("get_left_slot: ind=%d",ind);
+	return &current_stable[ind];
+}
+
 double factor_variable()
 {
-	lsslot=&current_stable[tok->tind];	/* symbol table variable's slot  */
+	// lsslot=&current_stable[tok->tind];	/* symbol table variable's slot  */
+	lsslot= get_left_slot(tok->tind);
 	ex_vtype=lsslot->vtype;
 	// MESG("	factor_variable: ind=%d type=%d",lsslot->ind,lsslot->vtype);
 	switch(lsslot->vtype) {
@@ -1446,19 +1371,23 @@ double factor_array2()
 	tok_data *array_slot;
 	array_dat *adat;
 	tok_struct *tok0 = tok;
-	MESG("factor_array2: %s",tok->tname);
-	array_slot=&current_stable[tok->tind];
+	// MESG("factor_array2: %s",tok->tname);
+	// array_slot=&current_stable[tok->tind];
+	array_slot=get_left_slot(tok->tind);
 	adat=array_slot->adat;
 	ex_vtype=VTYPE_NUM;
 	if(adat==NULL) {
-		syntax_error("no data in the array!!",209);
+#if	1
+		set_error(tok0,209,"array indexes out of bound!");
+		return(0);
+#else
+		/* No data in the array, allocate new ones!  */
 		NTOKEN2;
 
 		ind1=(int)num_expression();
 		NTOKEN2;
 		ind2=(int)num_expression();
 		NTOKEN2;
-		MESG("factor_array2:1");
 		adat = new_array(ind1+1,ind2+1);
 
 		array_slot->adat = adat;
@@ -1466,10 +1395,11 @@ double factor_array2()
 		print_array1("new array created",adat);
 		dval2 = adat->dval2;
 
-		MESG("new rows=%d cols=%d",adat->rows,adat->cols);
+		// MESG("new rows=%d cols=%d",adat->rows,adat->cols);
 // 		NTOKEN2;
 			// value=dval2[ind1][ind2];
 			// array_slot->pdval=&dval2[ind1][ind2];
+#endif
 	} else {
 		NTOKEN2;
 
@@ -1487,7 +1417,7 @@ double factor_array2()
 			array_slot->pdval=&dval2[ind1][ind2];
 		};
 	};
-	MESG("end factor_array2");
+	// MESG("end factor_array2: lsslot=%X",(void *)lsslot);
 	return(value);
 }
 
@@ -1512,9 +1442,9 @@ double factor_array1()
 	double *dval=NULL;
 	double value=0;
 	tok_data *array_slot;
-	MESG("factor_array1: ttype=%d %d",tok->ttype,TOK_LBRAKET);
+	// MESG("factor_array1: ttype=%d %d",tok->ttype,TOK_LBRAKET);
 	array_slot=&current_stable[tok->tind];
-	MESG("	array1: vtype=%d",array_slot->vtype);
+	// MESG("	array1: vtype=%d",array_slot->vtype);
 	NTOKEN2;
 	// ind1=(int)FACTOR_FUNCTION;
 	ind1 = (int)num_expression();
@@ -1523,7 +1453,7 @@ double factor_array1()
 		NTOKEN2;
 		// MESG("ends with rbracket!!");
 	};
-	MESG("factor_array1:ind=%d ind1=%d type=%d",array_slot->ind,ind1,array_slot->vtype);
+	// MESG("factor_array1:ind=%d ind1=%d type=%d",array_slot->ind,ind1,array_slot->vtype);
 	if(array_slot->adat == NULL) {
 		ex_nums=1;
 		array_slot->adat=new_array(ind1+1,1);
@@ -1671,7 +1601,7 @@ double factor_env()
 void set_break()
 {
 	is_break1=1;
-	tok->tgroup=TOK_END;
+	tok->tgroup=TOK_EOF;
 	tok->ttype=TOK_EOF;
 	current_active_flag=0;
 }
@@ -1997,6 +1927,12 @@ double factor_sep(){
 	return 0.0;
 }
 
+double factor_eof(){
+	MESG("factor_eof!!!!");
+	current_active_flag=0;
+	return 0.0;
+}
+
 FFunction factor_funcs[] = {
 	factor_none,	// TOK_NONE
 	factor_sep,		// TOK_SEP
@@ -2020,7 +1956,7 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_TERM1	,	// term1 operators (%,^)
 	factor_none,	// TOK_TERM2	,	// term2 operators (*,/)
 	factor_none,	// TOK_ASSIGN	,	// assignment
-	factor_none,	// TOK_EOF		,	// end of file token
+	factor_eof,		// TOK_EOF		,	// end of file token
 	factor_num,		// TOK_NUM, numeric value
 
 	factor_none,	// TOK_DIR		,	// directive
@@ -2285,6 +2221,7 @@ double num_term2()
  double v1 = FACTOR_FUNCTION;
 	 while(tok->tgroup==TOK_TERM2)
 	 {
+		// MESG("while: TERM2");
 		v1 = tok->term_function(v1);
 	 };
  RTRN(v1);
@@ -2298,6 +2235,7 @@ double num_term1()
  double v1 = num_term2();
 	 while(tok->tgroup==TOK_TERM1)
 	 {
+		// MESG("while: TERM1");
 		v1 = tok->term_function(v1);
 		// if(err_num) break;
 	 };
@@ -2314,6 +2252,7 @@ double num_expression()
  ex_value=0;
  value = num_term1();
  while(tok->tgroup==TOK_TERM) {
+	// MESG("while: TERM");
 	value = tok->term_function(value);
  };
  // MESG(";num_expression:end ttnum=%d return value=%f slval=[%s]",tok->tnum,value,saved_string);
@@ -2396,6 +2335,7 @@ double lexpression()
 	RTRN(tok0->term_function(value));
  };
  while(tok->tgroup==TOK_BOOL){
+	// MESG("while: BOOL");
 	tok_struct *tok0=tok;
 //	MESG("lexpression in loop!: [%s] value=%f",tok_info(tok),value);
  	NTOKEN2;
@@ -2403,7 +2343,7 @@ double lexpression()
 //	MESG("lexression result is %f",value);
 	ex_vtype = VTYPE_NUM;
  };
-//	MESG("lexpression return value %f",value);	
+	// MESG("lexpression return value %f [%s]",value,tok_info(tok));	
 	RTRN(value);
 }
 
@@ -2463,9 +2403,11 @@ double assign_val(double none)
 	double v1;
 	tok_data *sslot;
 	TDS("assign_val");
+	// MESG("assign_val: lsslot=%X",(void *)lsslot);
 	sslot=lsslot;
 	// MESG("assign_val: ind=%d type=%d",sslot->ind,sslot->vtype);
 	v1=lexpression();
+	// MESG("assign_val: after lexpression!\n");
 	if(sslot->vtype!=ex_vtype){ /* we should ?? consider is as an error ? */
 		if(sslot->vtype==VTYPE_STRING) {
 			if(sslot->sval) free(sslot->sval);
@@ -2477,8 +2419,10 @@ double assign_val(double none)
 				return(v1);
 			};
 		} else {
-			if(sslot->vtype!=VTYPE_ARRAY && sslot->vtype!=VTYPE_SARRAY)	/* added to handle arrays (v698l) but CHECK!!!!  */
+			if(sslot->vtype!=VTYPE_ARRAY && sslot->vtype!=VTYPE_SARRAY)	{/* added to handle arrays (v698l) but CHECK!!!!  */
+				if(is_break1) return(0);
 				sslot->vtype=ex_vtype;
+			};
 			if(ex_vtype==VTYPE_NUM) {
 				// MESG("set new as num");
 				*sslot->pdval=v1;
@@ -2620,7 +2564,6 @@ void refresh_ddot_1(double value)
 	 else if(ex_vtype==VTYPE_ARRAY) print_array1(":",ex_array);
 	 return;
  };
- // if(!discmd) return;
 
  int precision=bt_dval("print_precision");
  int show_hex=bt_dval("show_hex");
@@ -2902,15 +2845,9 @@ double exec_block1()
 	if(tok->ttype==TOK_SHOW) {
 		refresh_ddot_1(val);NTOKEN2;continue;
 	};
-#if	0
-	if(drv_check_break_key()) {
-		syntax_error("user interruption",100);
-		if(is_break1) return 0;
-	};
-#endif
  	val=tok->directive();
-	// if(!current_active_flag) return(val);
    };
+   // MESG("exec_block1: end!");
 	return(val);
 }
 

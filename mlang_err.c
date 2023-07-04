@@ -161,6 +161,7 @@ void error_skip_token(int index,char *description)
 
 void set_error(tok_struct *tok,int err,char *description)
 {
+ is_break1=1;
  if(tok==NULL) {
 	err_num=err;
 	err_str=description;
@@ -171,6 +172,12 @@ void set_error(tok_struct *tok,int err,char *description)
  // MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
  err_str=strdup(description);
  if(execmd) fprintf(stderr,"Error: [%s] tok %s line %d\n",(char *)tok->tname,err_str,err_line);
+ current_active_flag=0;
+ tok->ttype=TOK_EOF;
+ tok->directive=factor_eof;
+ tok->tgroup=TOK_EOF;
+ // NTOKEN2;
+ // tok->ttype=TOK_END;
 }
 
 void syntax_error(char *description,int err)
@@ -441,7 +448,7 @@ int err_assign_env()
 		syntax_error("bogus assignement!!!!",xpos);
 		RT_MESG1(451);
 	};xpos=452;
-	err_num=err_lexpression();
+	err_num=err_cexpression();
 	RT_MESG1(453);
 }
 
@@ -503,6 +510,7 @@ int err_factor()
 {
  static int pre_symbol=0;
  TDSERR("factor");
+ // MESG("err_factor:");
  int save_macro_exec;
  tok_struct *tok0; 
 
