@@ -1879,7 +1879,6 @@ static double term1_div(double v1)
 					/* RT error  */
 					syntax_error("Division by zero",212);
 					v1 = 9999999999.9;
-					current_active_flag=0;
 					RTRN(v1);
 				case VTYPE_ARRAY:	// numeric * array
 					ex_array = dup_array_mul1(ex_array,1/v1);
@@ -1896,7 +1895,6 @@ static double term1_div(double v1)
 			/* RT error  */
 			syntax_error("Division by zero",215);
 			v1 = 9999999999.9;
-			current_active_flag=0;
 			RTRN(v1);
 		};
 
@@ -2420,7 +2418,7 @@ double assign_val(double none)
 			};
 		} else {
 			if(sslot->vtype!=VTYPE_ARRAY && sslot->vtype!=VTYPE_SARRAY)	{/* added to handle arrays (v698l) but CHECK!!!!  */
-				if(is_break1) return(0);
+				// if(is_break1) return(0);
 				sslot->vtype=ex_vtype;
 			};
 			if(ex_vtype==VTYPE_NUM) {
