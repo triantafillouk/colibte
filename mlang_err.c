@@ -161,6 +161,7 @@ void error_skip_token(int index,char *description)
 
 void set_error(tok_struct *tok,int err,char *description)
 {
+ is_break1=1;
  if(tok==NULL) {
 	err_num=err;
 	err_str=description;
@@ -168,7 +169,15 @@ void set_error(tok_struct *tok,int err,char *description)
  };
  err_line=tok->tline;
  err_num=err;
+ // MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
  err_str=strdup(description);
+ if(execmd) fprintf(stderr,"Error: [%s] tok %s line %d\n",(char *)tok->tname,err_str,err_line);
+ current_active_flag=0;
+ tok->ttype=TOK_EOF;
+ tok->directive=factor_eof;
+ tok->tgroup=TOK_EOF;
+ // NTOKEN2;
+ // tok->ttype=TOK_END;
 }
 
 void syntax_error(char *description,int err)
@@ -252,7 +261,7 @@ int  err_push_args_1(int *nargs)
 		break;
 	};
 	err_num = err_lexpression();
-	if(err_num) { MESG("error from lexpression %d",err_num);return err_num;};
+	if(err_num) { MESG("error in push_args_1 from lexpression %d",err_num);return err_num;};
 	CHECK_TOK(413);
 	num_args++;
 
@@ -368,7 +377,22 @@ int err_increase_by()
 		syntax_error("bogus assignement!!!!",xpos);
 		RT_MESG1(443);
 	};
-	err_num=err_lexpression();
+	err_num=err_cexpression();
+
+	RT_MESG1(443);
+}
+
+int err_mul_by()
+{
+ TDSERR("mul_by");
+ SHOW_STAGE(443);
+
+	if(!simple){
+		xpos=443;
+		syntax_error("bogus assignement!!!!",xpos);
+		RT_MESG1(443);
+	};
+	err_num=err_num_expression();
 
 	RT_MESG1(443);
 }
@@ -383,7 +407,7 @@ int err_decrease_by()
 		syntax_error("bogus assignement!!!!",xpos);
 		RT_MESG1(443);
 	};
-	err_num=err_lexpression();
+	err_num=err_num_expression();
 
 	RT_MESG1(443);
 }
@@ -424,7 +448,7 @@ int err_assign_env()
 		syntax_error("bogus assignement!!!!",xpos);
 		RT_MESG1(451);
 	};xpos=452;
-	err_num=err_lexpression();
+	err_num=err_cexpression();
 	RT_MESG1(453);
 }
 
@@ -486,6 +510,7 @@ int err_factor()
 {
  static int pre_symbol=0;
  TDSERR("factor");
+ // MESG("err_factor:");
  int save_macro_exec;
  tok_struct *tok0; 
 
@@ -495,13 +520,13 @@ int err_factor()
  SHOW_STAGE(470);
  tok0=tok;
  switch(tok0->ttype) {
- 	case TOK_PLUS:
+ 	// case TOK_PLUS:
 	case TOK_MINUS:
 		pre_symbol++;
  };
  NTOKEN_ERR(473);
  // MESG("set factor function:");
- // MESG("token type %d",tok0->ttype);
+ // MESG("	err_factor: [%s]",tok_info(tok0));
  if(tok0->ttype > TOK_OTHER) {
  	MESG("unknown token type %d line %d %d",tok0->ttype,tok0->tline,last_correct_line);
 	err_num=4730;
@@ -519,7 +544,7 @@ int err_factor()
 		// xpos=477;syntax_error(": in factor",xpos);
 		RT_MESG1(xpos);
 	case TOK_LBRAKET:{	/* array definition  */
-		// MESG("TOK_LBRAKET");
+		// MESG("err: TOK_LBRAKET, array definition");
 		pre_symbol=0;
 		int i=0,j=0;
 		int cdim=0;
@@ -535,28 +560,34 @@ int err_factor()
 				RT_MESG1(xpos);
 			};
 			if(tok->ttype==TOK_SEP) {
+				// MESG("	new row");
 				NTOKEN2;
 				continue;
 			};
-			err_num=err_cexpression();
+			err_num=err_num_expression();
+			// MESG("	ex_value=%f err_num=%d",ex_value,err_num);
 			if(err_num) return err_num;
 			i++;if(i>cols) cols=i;
 			if(tok->ttype==TOK_RBRAKET) {
+				// MESG("	tok_rbraket: end definition");
 				cdim=0;break;
 			};
 			if(tok->ttype==TOK_SEP) {	/* Add tok->ttype==TOK_COMMA for using comma to separate array items  */
 				i=0;j++;
 				cdim++;if(cdim>rows) rows=cdim;
+				// MESG("	new row2");
 				NTOKEN2;
 				continue;
 			};
 		};cdim--;
 		};
+		// MESG("set array dat! [%s] rows=%d cols=%d",tok0->tname,rows,cols);
 		// set array dat
 		if(tok0->adat) {
 			free(tok0->adat);
 		};
 		tok0->adat = new_array(rows,cols);
+		// MESG("	array type is %d ?= %d",tok0->ttype,TOK_ARRAY2);
 		// set end
 		NTOKEN_ERR(4789)
 		RT_MESG1(4789);
@@ -582,18 +613,42 @@ int err_factor()
 		};
 		RT_MESG1(493);}
 	case TOK_ARRAY1:{
-		// MESG("	err tok_array1");
+		// MESG("	err use of tok_array1 [%s]",tok_info(tok0));
 		// err_num=err_factor();
-		err_num=err_cexpression(); 
+		err_num=err_num_expression(); 
+		// MESG("	err tok_array1: after tok=%d",tok->ttype);
+		xpos=499;
+		check_skip_token_err1(TOK_RBRAKET,"array error",xpos);
+		// NTOKEN_ERR(499);
+		tok_struct *save_tok = tok;
+		// check for second index
+		err_num=err_num_expression();
+		if(tok->ttype==TOK_RBRAKET) {
+			tok0->ttype=TOK_ARRAY2;
+			tok0->factor_function=factor_array2;
+			// MESG("	set 2 dimensional array!!!!!!!!");
+			NTOKEN_ERR(500);
+		} else {
+			tok = save_tok;
+		};
 		RT_MESG1(4931);
 		};
+#if	0
 	case TOK_RBRAKET:
 		// MESG("	err: rbracket");
 		RT_MESG1(5931);
+#endif
 	case TOK_ARRAY2:{
-		err_num=err_factor(); 
-		if(err_num) return(err_num);
-		err_num=err_factor(); 
+		// MESG("	err use of tok_array2 [%s]",tok_info(tok0));
+		err_num=err_num_expression(); 
+		// MESG("	err_array2:1 t=%d",tok->ttype);
+		NTOKEN_ERR(500);
+		// MESG("	err_array2:2 t=%d",tok->ttype);
+		// if(err_num) return(err_num);
+		err_num=err_num_expression(); 
+		// MESG("err_array2:3 t=%d",tok->ttype);
+		NTOKEN_ERR(500);
+		// MESG("err_array2:4 t=%d",tok->ttype);
 		RT_MESG1(4932);
 		};
 	case TOK_LPAR:
@@ -610,8 +665,13 @@ int err_factor()
 			};
 			err_num = err_lexpression();
 			CHECK_TOK(484);
+			if(tok->ttype==TOK_LBRAKET) {
+				// MESG("	err_tok_lpar: we have a left braket, continue!");
+				RT_MESG;
+			};
 			if(tok->ttype !=TOK_RPAR) {
 				xpos=485;
+				// MESG("ttype=%d",tok->ttype);
 				syntax_error(" FAC1_err: No closing parenthesis",xpos);
 				RT_MESG1(485);
 			} else { 
@@ -811,13 +871,17 @@ int err_factor()
 		xpos=526;
 		set_error(tok,xpos,"else without if error");
 		RT_MESG1(5261);
+	case TOK_RBRAKET:
+		RT_MESG1(5262);
 	case TOK_ASSIGN:
 	case TOK_INCREASEBY:
+	case TOK_MULBY:
 	case TOK_DECREASEBY:
-		tok0->tname="asign";
+		tok0->tname="assign";
 		RT_MESG1(527);
 	default:
 		xpos=527;
+		// MESG(" default: error_factor: %s",tok_info(tok));
 		set_error(tok,3000+tok->ttype,"factor :wrong character found:");
 		RT_MESG1(5271);
  }
@@ -909,6 +973,7 @@ int err_num_expression()
 		}
 	};
  };
+ // MESG("end expression: ttype=%d",tok->ttype);
  RT_MESG1(599);
 }
 
@@ -979,6 +1044,13 @@ int err_lexpression()
 			tok->tname = "+=";
 			NTOKEN_ERR(710);
 			err_num=err_increase_by();
+			RT_MESG1(714);
+		};
+		case TOK_MULBY: {
+			tok->term_function = mul_by;
+			tok->tname = "*=";
+			NTOKEN_ERR(710);
+			err_num=err_mul_by();
 			RT_MESG1(714);
 		};
 		case TOK_DECREASEBY: {
@@ -1121,7 +1193,7 @@ int err_check_sentence1()
 			err_num=err_check_sentence1();
 			CHECK_TOK(64015);
 			if(is_block) tok=end_block;
-			else skip_sentence1("fori_err");
+			else skip_sentence1();
 		};
 		CHECK_TOK(64020);
 		}; 
@@ -1206,7 +1278,7 @@ int err_check_block1(int level)
 {
  TDSERR("block");
    SHOW_STAGE(671);
-
+   // MESG("err_check_block1: --------------------------------");
    while(1) {
 	CHECK_TOK(672);
 	switch(tok->ttype) {

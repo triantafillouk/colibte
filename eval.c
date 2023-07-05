@@ -36,6 +36,8 @@ extern int record_session;
 #endif
 
 int dofile(char *fname);
+void set_vtype(int type);
+int vtype_is(int type);
 
 // Editor variables
 char *fvars[] = {
@@ -146,7 +148,7 @@ void set_error(tok_struct *tok,int index,char *description);
 void init_error();
 
 extern char slval[];
-extern int ex_vtype;
+// extern int ex_vtype;
 extern int ex_edenv;
 extern int err_num;
 extern char *err_str;
@@ -264,7 +266,7 @@ double get_env(int vnum)
 	};
 	value=v1;
 	if(svalue[0]!=0) { 
-		ex_vtype=VTYPE_STRING;
+		set_vtype(VTYPE_STRING);
 		set_sval(svalue);	
 		value=next_value();
 	};
@@ -1247,7 +1249,7 @@ int refresh_current_line(int nused)
 	if(err_num>0) 
  		msg_line("Error[%d]=%s :: 0x%lX = %12.3f",err_num,err_str,(int)value,value);
  	else {
- 		if(ex_vtype==VTYPE_STRING) msg_line(" %15.3f,[%s]",value,get_sval());
+ 		if(vtype_is(VTYPE_STRING)) msg_line(" %15.3f,[%s]",value,get_sval());
 		else {
 			msg_line(" %15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
 		}

@@ -20,12 +20,13 @@ typedef double (*EFunction)(double v1,double v2);
 
 typedef struct tok_struct {
 	short level;		// curl level
-	short tind;	/* token subtype  */
+	short tind;	/* token subtype and variable number */
 	short tline;	/* line for debugging  */
 	short tnum;	/* token number for debugging  */
 	void *tname;	// token name or string value
 	double dval;	// double value
 	int ttype;	/* token type */
+	// int tatype;	/* array type  */
 	int tgroup;	/* token group  */
 	union {
 		FFunction factor_function;
@@ -174,7 +175,6 @@ enum {
 	TOK_MOD			,
 	TOK_MUL			,
 	TOK_DIV			,
-
 	TOK_LBRAKET		,
 	TOK_RBRAKET		,
 	TOK_SQUOTE		,
@@ -186,21 +186,20 @@ enum {
 	TOK_INCREASE	,
 	TOK_DECREASE	,
 	TOK_INCREASEBY	,
+	TOK_MULBY		,
 	TOK_DECREASEBY	,
 	TOK_BSLASH		,
-
 	TOK_NL				,
 	TOK_DIR_CONTINUE	,
 	TOK_DIR_FOREACH		,
-
 	TOK_ARRAY1		,
 	TOK_ARRAY2		,
 	TOK_ARRAY3		,
 	TOK_ASSIGNENV	,
 	TOK_ASSIGNOPT	,
-//	TOK_END_ARG,	// end of function arguments
 	TOK_START,	/* <@ */
 	TOK_END,	/* @> */
 	TOK_OTHER,
 };
+
 

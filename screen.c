@@ -218,7 +218,7 @@ void msg_line(char *fmt, ...)
     va_end(args);
 	
 	if(execmd) {
-		if(strlen(mline)>0 && mline[0]!=' ') fprintf(stderr,"%s\n",mline);
+		if(strlen(mline)>0 && mline[0]!=' ') printf("%s\n",mline);
 	} else { 
 		if(app_error || debug_flag()) 
 		{ 

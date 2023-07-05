@@ -48,7 +48,7 @@ int new_in_key_list=0;
 
 void init_lists()
 {
- MESG("init_lists:");
+ // MESG("init_lists:");
  file_list=new_list(0,"file_list");
  window_list=new_list(0,"window_list");
  var_list=new_list(0,"var_list");
@@ -163,7 +163,7 @@ int main(int argc, char **argv)
 // 		view_note(1);
 		// activate_file(cbfp);
 		set_update(cwp,UPD_EDIT);
-		MESG("selected tag view cfbp=%s",cbfp->b_fname);
+		// MESG("selected tag view cfbp=%s",cbfp->b_fname);
 	} else 
 	if(mmtodo) {
 		edinit("[todo view]");
@@ -171,7 +171,7 @@ int main(int argc, char **argv)
 		set_update(cwp,UPD_EDIT);
 // 		view_note(1);
 		// set_update(cwp,UPD_EDIT);
-		MESG("selected todo view %f",cbfp->b_fname);		
+		// MESG("selected todo view %f",cbfp->b_fname);		
 	} else 
 	if(mmcal) {
 		edinit("[calendar view]");
@@ -201,7 +201,7 @@ int main(int argc, char **argv)
 	if(mmnote){
 		show_tag_view(1);
 		select_filebuf(cbfp);
-		MESG("selected tag view 2 cfbp=%s",cbfp->b_fname);
+		// MESG("selected tag view 2 cfbp=%s",cbfp->b_fname);
 	} else
 	if(mmtodo) {
 		show_todo_list(0);
@@ -211,13 +211,13 @@ int main(int argc, char **argv)
 		// view_note(1);
 		// activate_file(cbfp);
 		set_update(cwp,UPD_EDIT);
-		MESG("todo view 2");
+		// MESG("todo view 2");
 	} else
 	if(mmcal) {
 		show_calendar_list(0);
 		select_filebuf(cbfp);	
 		set_update(cwp,UPD_EDIT);
-		MESG("calendar view 2");
+		// MESG("calendar view 2");
 	} else
 #endif
 	{
@@ -238,7 +238,7 @@ int main(int argc, char **argv)
 	/* setup to process commands */
 	
 	init_highlight();
-	MESG("main: start main_loop:");
+	// MESG("main: start main_loop:");
 	main_loop();
 	return(0);
 }

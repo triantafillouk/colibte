@@ -1,7 +1,7 @@
 
 function scale_perc1(num)
 {
- scale=[14000 4, 3000 20, 3000 35, 5000 37, 100000 20]
+ scale=[14000 4; 3000 20; 3000 35; 5000 37; 100000 20]
  ptotal=0
  ind=0
  val=0
@@ -52,11 +52,11 @@ function scale_perc2(scale,num)
 
 cls
 
-auto_scale=[14000 4, 3000 20, 3000 35, 5000 37, 100000 20]
+auto_scale=[14000 4; 3000 20; 3000 35; 5000 37; 100000 20]
 
 b=scale_perc2(auto_scale,10302)
-b: 412.080000
+b:
 
-a=scale_perc1(10301): 412.040000
+a=scale_perc1(10301):
 
-a: 412.040000
+a:
