@@ -49,6 +49,7 @@ extern array_dat *main_args;
 
 int err_check_block1(int level);
 int check_skip_token1( int type);
+void clean_saved_string(int new_size);
 
 double assign_val(double none);
 double assign_env(double none);
@@ -152,6 +153,7 @@ char *tok_name[] = {
 	NULL
 };
 
+#if	!SEP_FUNCTIONS
 // function names with number of arguments
 m_function m_functions[] = {
 	{"len",1},        /* STRING LENGTH */
@@ -199,8 +201,12 @@ m_function m_functions[] = {
 	{"args",1},	/* main  argument at position */
 	{NULL,0}
 };
+#endif
 
-/* Function enumerator definitions */
+/* Function definitions */
+#if	SEP_FUNCTIONS
+#include "mlang_functions.c"
+#else
 enum {
 UFLENGTH,	/* strlen */
 UFUPPER,	/* upper */
@@ -246,6 +252,7 @@ UFATEOL,
 UFMAINARGLEN,
 UFMAINARG
 };
+#endif
 
 /* directives */
 char *directives[] = {
@@ -841,6 +848,7 @@ MVAR * push_args_1(int nargs)
  	return(NULL);
 }
 
+#if	!SEP_FUNCTIONS
 /*	evaluate an internal function 
 	tlist is at the start of token list
 */
@@ -1231,7 +1239,7 @@ double eval_fun1(int fnum)
 	// if(stat>MAXLLEN) MESG("truncated string eval function");
 	RTRN(value);
 }
-
+#endif
 
 double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 {
@@ -1694,13 +1702,19 @@ double factor_proc()
 
 double factor_func()
 {
-	BTNODE *bte; 
+	// BTNODE *bte; 
 	double value;
-	// MESG(";factor_func: [%s]",tok);
+	MESG(";factor_func: [%s] %lX",tok_info(tok),(long)tok->factor_function);
 	ex_vtype=VTYPE_NUM;
-	bte=tok->tnode;
+	tok_struct *tok0=tok;
+	// bte=tok->tnode;
 	NTOKEN2;	/* skip left parenthesis  */
+#if	SEP_FUNCTIONS
+	// value = m_functions[bte->node_index].ffunction();
+	value = tok0->factor_function();
+#else
 	value = eval_fun1(bte->node_index);
+#endif
 	// MESG(";factor_func: end tnum=%d v=%f",tok->tnum,value);
 	RTRN(value);
 }

@@ -822,6 +822,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					break;
 				case TOK_FUNC:	/* 2  */
 					tok->ttype=TOK_FUNC; // editor functions
+					// MESG("TOK_FUNC: %s",tok->tname);
+					// BTNODE *bte=tok->tnode;
+					// MESG("TOK_FUNC: index=%d",bte->node_index);
+					// tok->factor_function = m_functions[bte->node_index].ffunction;
+					// tok->factor_function = factor_func;
 					break;
 				case TOK_CMD:	/* 3  */
 					tok->ttype=TOK_CMD;	// editor commands

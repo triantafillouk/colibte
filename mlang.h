@@ -77,11 +77,21 @@ typedef struct curl_struct {
 	struct _el *ocurl;
 } curl_struct;
 
+#define SEP_FUNCTIONS	1
+
 /*	list of recognized user type functions	*/
+#if	SEP_FUNCTIONS
+typedef struct m_function {
+	char *f_name;	/* function name  */
+	int f_args;	/* number of function arguments  */
+	FFunction ffunction;
+} m_function;
+#else
 typedef struct m_function  {
 	char *f_name;	/* function name  */
 	int f_args;	/* number of function arguments  */
 } m_function;
+#endif
 
 typedef struct term_type {
 	char *term_name;

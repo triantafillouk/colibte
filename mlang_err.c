@@ -534,7 +534,7 @@ int err_factor()
  };
  tok0->factor_function = factor_funcs[tok0->ttype];
 
- // MESG("switch: tok0 type=%d err=%d",tok0->ttype,err_num);
+ // MESG("switch: tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
  switch(tok0->ttype) {
 	/*  the following ends factor  */
  	case TOK_SEP:
@@ -737,6 +737,9 @@ int err_factor()
 		var_node=tok0->tnode;
 		pre_symbol=0;
 		CHECK_TOK(496);
+		// MESG("err_TOK_FUNC ind=%d",var_node->node_index);
+		tok0->factor_function = m_functions[var_node->node_index].ffunction;
+		// tok->factor_function = m_functions[bte->node_index].ffunction;
 		err_num= err_eval_fun1(var_node->node_index);
 		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)
