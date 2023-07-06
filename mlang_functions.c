@@ -1,7 +1,7 @@
 /* editor functions */
 MVAR va[3];
 
-MVAR * get_function_args (int number_of_args)
+void get_function_args (int number_of_args)
 {
 	int i;
 	int f_entry;
@@ -40,39 +40,28 @@ MVAR * get_function_args (int number_of_args)
 	};
 
 	entry_mode=f_entry;
-	return va;
+// 	return va;
 }
 
 // MVAR va[3];
 
-MVAR * get_numeric_args (int number_of_args)
+void get_numeric_args (int number_of_args)
 {
 	int i;
-// 	int f_entry;
-	MVAR *va=NULL;
-
-// 	f_entry=entry_mode;
-// 	entry_mode=KNORMAL;
 	// MESG("get_numeric_args: %d",number_of_args);
 	NTOKEN2;
-		/* if we have arguments, check for parenthesis, then get the arguments  */
-		va = (MVAR *)malloc(sizeof(MVAR)*number_of_args);
-		MVAR *vai = va;
-		for(i=0;i< number_of_args;i++,vai++ ) { 
-			NTOKEN2;
-			double value = num_expression();
-			vai->vtype=ex_vtype;
-			vai->dval=value;
-		};
+	for(i=0;i< number_of_args;i++ ) { 
 		NTOKEN2;
-
-// 	entry_mode=f_entry;
-return va;
+		double value = num_expression();
+		va[i].vtype=ex_vtype;
+		va[i].dval=value;
+	};
+	NTOKEN2;
 }
 
 double uf_len()
 {
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 	double value=0;
 	if(va->vtype==VTYPE_STRING) { value =strlen(va->sval);}
 	else if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
@@ -98,7 +87,7 @@ double uf_cls()
 double uf_determinant()
 {
 	double value=0;
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 	if(va->vtype==VTYPE_ARRAY) {
 		array_dat *arr = va->adat;
 
@@ -118,7 +107,7 @@ double uf_determinant()
 double uf_inverse()
 {
 	double value=0;
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 
 	if(ex_vtype==VTYPE_ARRAY) {
 		array_dat *arr = va->adat;
@@ -143,7 +132,7 @@ double uf_inverse()
 
 double uf_transpose()
 {
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 	double value=0;
 	if(ex_vtype==VTYPE_ARRAY) {
 		array_dat *arr  = va->adat;
@@ -161,7 +150,7 @@ double uf_transpose()
 
 double uf_left()
 {
-	MVAR *va=get_function_args(2);
+	get_function_args(2);
 
 	if(va[0].vtype==VTYPE_STRING && va[1].vtype==VTYPE_NUM ) {
 	set_sval(va[0].sval);
@@ -172,7 +161,7 @@ double uf_left()
 
 double uf_right()
 {
-	MVAR *va=get_function_args(2);
+	get_function_args(2);
 
 	if(va[0].vtype==VTYPE_STRING && va[1].vtype==VTYPE_NUM ) {
 		int r1=(int)va[1].dval;
@@ -189,7 +178,7 @@ double uf_right()
 
 double uf_mid()
 {
-	MVAR *va=get_function_args(3);
+	get_function_args(3);
 
 		if(va[0].vtype==VTYPE_STRING && va[1].vtype==VTYPE_NUM && va[2].vtype==VTYPE_NUM) 
 		{
@@ -210,7 +199,7 @@ double uf_mid()
 double uf_print()
 {
 	// MESG("uf_print:");
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 	double value=0;
 	if(va[0].vtype==VTYPE_ARRAY) {
 		print_array1("",va[0].adat);
@@ -237,7 +226,7 @@ double uf_print()
 
 double uf_show_time()
 {
-	MVAR *va=get_function_args(2);
+	get_function_args(2);
 	double value=0;
 	if(va[0].vtype==VTYPE_STRING) {
 		set_sval(va[0].sval);
@@ -253,7 +242,7 @@ double uf_show_time()
 
 double uf_upper()
 {
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 	if(va[0].vtype==VTYPE_STRING) {
 		clean_saved_string(strlen(va[0].sval));
 		get_uppercase_string(saved_string,va[0].sval);
@@ -265,7 +254,7 @@ double uf_upper()
 
 double uf_lower()
 {
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 	if(va[0].vtype==VTYPE_STRING) {
 		clean_saved_string(strlen(va[0].sval));
 		get_lowercase_string(saved_string,va[0].sval);
@@ -277,7 +266,7 @@ double uf_lower()
 
 double uf_ascii()
 {
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 	double value=0;
 	if(va[0].vtype==VTYPE_STRING) {
 	 value=va[0].sval[0];
@@ -289,7 +278,7 @@ double uf_ascii()
 
 double uf_chr()
 {
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 	clean_saved_string(1);
 	saved_string[0] = (int)va[0].dval;
 	saved_string[1] = 0;
@@ -301,7 +290,6 @@ double uf_chr()
 
 double uf_getchar()
 {
-	// MVAR *va=get_function_args(1);
 
 	clean_saved_string(1);
 	if(execmd) {
@@ -312,7 +300,6 @@ double uf_getchar()
 	saved_string[1] = 0;
 
 	ex_vtype=VTYPE_STRING;
-	// free(va);
 	return 0;
 }
 
@@ -325,7 +312,7 @@ double uf_rand()
 
 double uf_abs()
 {
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 	double value= fabs(va[0].dval);
 	// free(va);
 	return value;
@@ -335,7 +322,7 @@ double uf_abs()
 double uf_sindex()
 {
 	double value=0;
-	MVAR *va=get_function_args(2);
+	get_function_args(2);
 	if(va[0].vtype==VTYPE_STRING) {
 		value = sindex(va[0].sval, va[1].sval);
 	};
@@ -348,7 +335,7 @@ double uf_sindex()
 /* string of a value */
 double uf_string()
 {
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 	if(va[0].vtype==VTYPE_NUM) {
 		// MESG("uf_string: %f",va[0].dval);
 		clean_saved_string(20);
@@ -363,7 +350,7 @@ double uf_string()
 
 double uf_message()
 {
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 	if(va[0].vtype==VTYPE_STRING) {
 		msg_line("[%s]",va[0].sval);
 	} else msg_line("<%f>",va[0].dval);
@@ -374,7 +361,7 @@ double uf_message()
 
 double uf_error()
 {
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 	if(va[0].vtype==VTYPE_STRING) 
 		error_line("[%s]",va[0].sval);
 	else error_line("<%f>",va[0].dval);
@@ -387,7 +374,7 @@ double uf_wait()
 {
 	int f_entry=entry_mode;
 	entry_mode=KENTRY;
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 	if(va[0].vtype==VTYPE_STRING) msg_line("[%s] waiting.. ",va[0].sval);
 	else msg_line("<%f> wait for key",va[0].dval);
 	clean_saved_string(1);
@@ -411,7 +398,7 @@ double uf_wait()
 double uf_input()
 {
 	int f_entry=entry_mode;
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 	entry_mode=KENTRY;	/* get input from screen */
 	clean_saved_string(80);
 	if(va[0].vtype!=VTYPE_STRING) getstring("Input :",saved_string,80,true);
@@ -425,7 +412,7 @@ double uf_input()
 
 double uf_dinput()
 {
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 	clean_saved_string(80);
 	if(va[0].vtype!=VTYPE_STRING) getstring("DInput :",saved_string,80,true);
 	getstring(va[0].sval,saved_string,80,true);
@@ -446,7 +433,7 @@ double uf_init()
 double uf_val()
 {
 	double value=0;
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 	if(va[0].vtype==VTYPE_STRING) 
 		value=atof(va[0].sval);
 
@@ -458,7 +445,8 @@ double uf_val()
 double uf_sqrt()
 {
 	double value=0;
-	MVAR *va=get_function_args(1);
+
+	get_numeric_args(1);
 	if(va[0].vtype==VTYPE_STRING) 
 		value=atof(va[0].sval);
 	ex_vtype=VTYPE_NUM;
@@ -469,7 +457,7 @@ double uf_sqrt()
 
 double uf_sin()
 {
-	MVAR *va=get_function_args(1);
+	get_numeric_args(1);
 	double value=0;
 	if(va[0].vtype==VTYPE_NUM)	
 		value=sin(va[0].dval);
@@ -483,7 +471,7 @@ double uf_sin()
 
 double uf_cos()
 {
-	MVAR *va=get_function_args(1);
+	get_numeric_args(1);
 	double value=0;
 	if(va[0].vtype==VTYPE_NUM)	
 		value=cos(va[0].dval);
@@ -497,7 +485,7 @@ double uf_cos()
 
 double uf_tan()
 {
-	MVAR *va=get_function_args(1);
+	get_numeric_args(1);
 	double value=0;
 	if(va[0].vtype==VTYPE_NUM)	
 		value=tan(va[0].dval);
@@ -512,7 +500,7 @@ double uf_tan()
 
 double uf_log10()
 {
-	MVAR *va=get_function_args(1);
+	get_numeric_args(1);
 	double value=0;
 	if(va[0].vtype==VTYPE_NUM)	
 		value=log10(va[0].dval);
@@ -526,7 +514,7 @@ double uf_log10()
 
 double uf_atan()
 {
-	MVAR *va=get_function_args(1);
+	get_numeric_args(1);
 	double value=0;
 	if(va[0].vtype==VTYPE_NUM)	
 		value=atan(va[0].dval);
@@ -540,7 +528,7 @@ double uf_atan()
 
 double uf_log()
 {
-	MVAR *va=get_function_args(1);
+	get_numeric_args(1);
 	double value=0;
 	if(va[0].vtype==VTYPE_NUM)	
 		value=log(va[0].dval);
@@ -554,7 +542,7 @@ double uf_log()
 
 double uf_trunc()
 {
-	MVAR *va=get_function_args(1);
+	get_numeric_args(1);
 	double value=0;
 	if(va[0].vtype==VTYPE_NUM)	
 		value=trunc(va[0].dval);
@@ -568,7 +556,7 @@ double uf_trunc()
 
 double uf_round()
 {
-	MVAR *va=get_function_args(1);
+	get_numeric_args(1);
 	double value=0;
 	if(va[0].vtype==VTYPE_NUM)	
 		value=round(va[0].dval);
@@ -587,7 +575,7 @@ double uf_getpoint()
 
 double uf_time()
 {
-	MVAR *va=get_function_args(1);
+	get_function_args(2);
 	double value=0;
 	if(va[0].vtype==VTYPE_STRING) {
 	set_sval(va[0].sval);
@@ -603,7 +591,7 @@ double uf_time()
 
 double uf_deq()
 {
-	MVAR *va=get_function_args(2);
+	get_numeric_args(2);
 	double value = deq(va[0].dval,va[1].dval);
 	ex_vtype=VTYPE_NUM;
 	// free(va);
@@ -643,7 +631,7 @@ double uf_mainarg()
 {
 	if(!main_args) return 0;
 
-	MVAR *va=get_function_args(1);
+	get_function_args(1);
 	int ind;
 	double value=0;
 	ind=(int)va[0].dval;
