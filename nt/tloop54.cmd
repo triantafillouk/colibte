@@ -8,7 +8,7 @@ show_time("Start fori test loop 1",0)
 
 fori(i=1;101;1){ 
 	fori(j=1;800001;1) { 
-		l = i*j+tan(1.32)
+		l = i*j+tan(3.71)
 		p += l
 	} 
 #	show_time("loop:"+i+" p="+p,1);
