@@ -50,6 +50,7 @@ extern array_dat *main_args;
 int err_check_block1(int level);
 int check_skip_token1( int type);
 void clean_saved_string(int new_size);
+int deq(double v1,double v2);
 
 double assign_val(double none);
 double assign_env(double none);
@@ -1700,14 +1701,18 @@ double factor_proc()
 	RTRN(value);
 }
 
+#if	!SEP_FUNCTIONS
 double factor_func()
 {
-	// BTNODE *bte; 
 	double value;
 	MESG(";factor_func: [%s] %lX",tok_info(tok),(long)tok->factor_function);
 	ex_vtype=VTYPE_NUM;
+#if	SEP_FUNCTIONS
 	tok_struct *tok0=tok;
-	// bte=tok->tnode;
+#else
+	BTNODE *bte; 
+	bte=tok->tnode;
+#endif
 	NTOKEN2;	/* skip left parenthesis  */
 #if	SEP_FUNCTIONS
 	// value = m_functions[bte->node_index].ffunction();
@@ -1718,6 +1723,7 @@ double factor_func()
 	// MESG(";factor_func: end tnum=%d v=%f",tok->tnum,value);
 	RTRN(value);
 }
+#endif
 
 double cexpr_notequal(double v1,double v2)
 {
@@ -1960,7 +1966,11 @@ FFunction factor_funcs[] = {
 	factor_variable,	// TOK_VAR	level 0 variable
 	factor_option,	// TOK_OPTION	,	// editor option
 	factor_cmd,		// TOK_CMD		,	// editor commands
+#if	SEP_FUNCTIONS
+	factor_none,	// TOK_FUNC	,	// function
+#else
 	factor_func,	// TOK_FUNC	,	// function
+#endif
 	factor_proc,	// TOK_PROC	,
 	factor_env,		// TOK_ENV		,	// editor environment function
 	factor_none,	// TOK_TERM0	term0 group
@@ -3095,13 +3105,37 @@ int parse_buffer_show_tokens(int n)
  };
 }
 
+#if	1
 char * tok_info(tok_struct *tok)
 {
  static char stok[MAXLLEN];
-#if	0
-	if(tok->tnode!=NULL) dat=1;
-	if(tok->adat) dat=2;
-#endif
+	if(tok->tname!=NULL){
+		if(tok->ttype==TOK_ARRAY1 || tok->ttype==TOK_ARRAY2) {
+			int rows=0;
+			int cols=0;
+			if(tok->adat) {
+				rows=tok->adat->rows;
+				cols=tok->adat->cols;
+			};
+			snprintf(stok,MAXLLEN,"%3d:%4d %3d  %3d   [%2d=%12s] [%s] rows=%d cols=%d",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,rows,cols);
+		} else 
+		if(tok->ttype==TOK_SHOW) { snprintf(stok,MAXLLEN,"%3d:%4d %3d  %3d   [%2d=%12s] [:]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME);
+		} else
+		if(tok->ttype==TOK_LCURL||tok->ttype==TOK_RCURL) {
+				snprintf(stok,MAXLLEN,"%3d:%4d %3d  %3d   [%2d=%12s] %s other is %d",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum);
+		} else
+		if(tok->tgroup>0)
+			snprintf(stok,MAXLLEN,"%3d:%4d %3d  %3d   [%2d=%12s] [%s] group [%d:%s]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup));
+		else snprintf(stok,MAXLLEN,"%3d:%4d %3d  %3d   [%2d=%12s] [%s] %f",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->dval);
+	} else {
+		     snprintf(stok,MAXLLEN,"%3d:%4d %3d  %3d   [%2d=%12s] [%f]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,tok->dval);
+	};
+	return stok;
+}
+#else
+char * tok_info(tok_struct *tok)
+{
+ static char stok[MAXLLEN];
 	if(tok->tname!=NULL){
 		if(tok->ttype==TOK_ARRAY1 || tok->ttype==TOK_ARRAY2) {
 			int rows=0;
@@ -3125,6 +3159,7 @@ char * tok_info(tok_struct *tok)
 	};
 	return stok;
 }
+#endif
 
 int show_parse_buffer(int n)
 {

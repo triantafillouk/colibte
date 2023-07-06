@@ -738,8 +738,9 @@ int err_factor()
 		pre_symbol=0;
 		CHECK_TOK(496);
 		// MESG("err_TOK_FUNC ind=%d",var_node->node_index);
+#if	SEP_FUNCTIONS
 		tok0->factor_function = m_functions[var_node->node_index].ffunction;
-		// tok->factor_function = m_functions[bte->node_index].ffunction;
+#endif
 		err_num= err_eval_fun1(var_node->node_index);
 		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)

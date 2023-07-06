@@ -77,7 +77,7 @@ typedef struct curl_struct {
 	struct _el *ocurl;
 } curl_struct;
 
-#define SEP_FUNCTIONS	1
+#define SEP_FUNCTIONS	0
 
 /*	list of recognized user type functions	*/
 #if	SEP_FUNCTIONS

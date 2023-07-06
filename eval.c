@@ -518,6 +518,7 @@ int sindex(char *source, char *pattern)	/* find pattern within source */
 	register char *sp;	/* ptr to current position to scan */
 	register char *csp;	/* ptr to source string during comparison */
 	register char *ct;
+	MESG("sindex, position of [%s] in [%s]",pattern,source);
 	/* scanning through the source string */
 	for(sp=source;*sp;sp++) {
 		/* scan through the pattern */
