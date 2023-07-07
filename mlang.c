@@ -1526,6 +1526,38 @@ FFunction factor_funcs[] = {
 	factor_none		// TOK_OTHER,
 };
 
+void set_tok_function(tok_struct *tok, int type, int index)
+{
+	switch(type) {
+		case 0:
+			if(tok->ttype==TOK_FUNC) {
+				int findex = tok->tnode->node_index;
+				// MESG(" F tok %2d: %s type [%d %s] set factor function %d",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype],findex);
+				tok->factor_function = m_functions[findex].ffunction;
+			} else {
+	 			tok->factor_function = factor_funcs[tok->ttype];
+				// MESG(" f tok %2d: %s type [%d %s] set factor function",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype]);
+			};
+			break;
+		case 1:
+			tok->cexpr_function = factor_funcs[tok->ttype];
+			// MESG(" c tok %2d: %s type [%d %s] set cepr function",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype]);
+
+	};
+}
+
+void set_tok_directive(tok_struct *tok, FFunction directive)
+{
+	tok->directive = directive;
+	// MESG(" d tok %2d: %s set directive function",tok->tnum,tok->tname);
+}
+
+void set_term_function(tok_struct *tok, TFunction term_function)
+{
+	tok->term_function = term_function;
+	// MESG(" t tok %2d: %s set term function",tok->tnum,tok->tname);
+}
+
 // Directove functions
 
 static double inline dir_lcurl()
@@ -2031,7 +2063,8 @@ void skip_sentence1()
 	switch(tok->ttype) {
 		case TOK_DIR_ELSE:	/* this one starts a new sentence!!  */
 		case TOK_SEP:
-			tok->cexpr_function=factor_funcs[tok->ttype];
+			// tok->cexpr_function=factor_funcs[tok->ttype];
+			set_tok_function(tok,1,1);
 			NTOKEN2;
 			return;
 		case TOK_LPAR:
@@ -2341,7 +2374,7 @@ double exec_block1()
  TDS("exec_block1");
    while(tok->ttype!=TOK_EOF) 
    {
-	// MESG(";exec_block: ttype=%d",tok->ttype);
+	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
 	// if(tok->ttype==TOK_RPAR) { exit(1);};
 	if(tok->ttype==TOK_SEP){ NTOKEN2;continue;	};
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;return(val);};

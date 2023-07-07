@@ -13,6 +13,8 @@
 #define	ARRAY_LOCAL			1
 #define	ARRAY_ALLOCATED		3
 
+#define	TFUNC	1
+
 typedef	alist * TLIST;
 typedef double (*FFunction)();
 typedef double (*TFunction)(double v1);
@@ -26,7 +28,6 @@ typedef struct tok_struct {
 	void *tname;	// token name or string value
 	double dval;	// double value
 	int ttype;	/* token type */
-	// int tatype;	/* array type  */
 	int tgroup;	/* token group  */
 	union {
 		FFunction factor_function;
@@ -35,12 +36,11 @@ typedef struct tok_struct {
 	};
 	FFunction directive;
 	union {	
-	struct BTNODE *tnode;
-	struct curl_struct *tcurl;
-	struct tok_struct *match_tok;
-	struct array_dat *adat;
-	struct FILEBUF *tbuf;
-//	struct tok_data *tdata;
+		struct BTNODE *tnode;
+		struct curl_struct *tcurl;
+		struct tok_struct *match_tok;
+		struct array_dat *adat;
+		struct FILEBUF *tbuf;
 	};
 } tok_struct;
 
