@@ -13,8 +13,6 @@
 #define	ARRAY_LOCAL			1
 #define	ARRAY_ALLOCATED		3
 
-#define	TFUNC	1
-
 typedef	alist * TLIST;
 typedef double (*FFunction)();
 typedef double (*TFunction)(double v1);
