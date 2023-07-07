@@ -152,6 +152,7 @@ char *tok_name[] = {
 	NULL
 };
 
+#if	0
 // function names with number of arguments
 m_function m_functions[] = {
 	{"len",1},        /* STRING LENGTH */
@@ -199,6 +200,8 @@ m_function m_functions[] = {
 	{"args",1},	/* main  argument at position */
 	{NULL,0}
 };
+#endif
+#include "mlang_functions.c"
 
 /* Function enumerator definitions */
 enum {
