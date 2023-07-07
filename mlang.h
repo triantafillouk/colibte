@@ -13,6 +13,8 @@
 #define	ARRAY_LOCAL			1
 #define	ARRAY_ALLOCATED		3
 
+#define	TEST1	0
+
 typedef	alist * TLIST;
 typedef double (*FFunction)();
 typedef double (*TFunction)(double v1);
@@ -83,7 +85,9 @@ typedef struct curl_struct {
 typedef struct m_function {
 	char *f_name;	/* function name  */
 	int f_args;	/* number of function arguments  */
+#if	TEST1
 	FFunction ffunction;
+#endif
 } m_function;
 
 typedef struct term_type {

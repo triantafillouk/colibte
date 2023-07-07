@@ -152,55 +152,6 @@ char *tok_name[] = {
 	NULL
 };
 
-#if	0
-// function names with number of arguments
-m_function m_functions[] = {
-	{"len",1},        /* STRING LENGTH */
-	{"upper",1},        /* UPPERCASE STRING */
-    {"lower",1},        /* LOWER CASE STRING */
-	{"left",2},
-	{"right",2},
-	{"mid",3},
-    {"s_asc",1},	/* CHAR TO INTEGER CONVERSION */
-    {"chr",1},		/* INTEGER TO CHAR CONVERSION */
-    {"getchar",0},	/* GET 1 CHARACTER */
-    {"rand",0},        	/* GET A RANDOM NUMBER */
-    {"abs",1},        	/* ABSOLUTE VALUE OF A NUMBER */
-    {"s_index",2},      /* FIND THE INDEX OF ONE STRING IN ANOTHER */
-	{"str",1},		/* string of a value */
-	{"message",1},	/* show message on screen  */
-	{"error_log",1},	/* show message error  */
-	{"input",1},	/* string input from screen  */
-	{"initialize",0},	/* variables init */
-	{"s_val",1},	/* numerical string value  */
-	{"sqrt",1},
-	{"sin",1},
-	{"cos",1},
-	{"tan",1},
-	{"atan",1},
-	{"log10",1},
-	{"log",1},
-	{"trunc",1},
-	{"round",1},
-	{"print",1},	/* out_print, print on out buffer, and stdout if in Xwindows mode  */
-	{"getpoint",0},
-	{"message_wait",1},
-	{"dinput",1},
-	{"show_time",2},	/* show elapsed time in nanoseconds  */
-	{"deq",2},	/* compare double with limited precission */
-	{"cls",0},	/* clear output buffer  */
-	{"DET",1},	/* determinant  */
-	{"INV",1},	/* inverse  */
-	{"T",1},	/* transpose  */
-	{"at_bof",0},	/* if at begin of file  */
-	{"at_eof",0},	/* if at end of file  */
-	{"at_bol",0},	/* if at begin of line  */
-	{"at_eol",0},	/* if at end of line  */
-	{"args_size",0},	/* main arguments list size  */
-	{"args",1},	/* main  argument at position */
-	{NULL,0}
-};
-#endif
 #include "mlang_functions.c"
 
 /* Function enumerator definitions */
