@@ -80,6 +80,18 @@ void get_numeric_args (int number_of_args)
 	ntoken();
 }
 
+double get_numeric_arg ()
+{
+	// MESG("get_numeric_args: %d",number_of_args);
+	ntoken();
+		ntoken();
+		double value = num_expression();
+		// va[0].vtype=ex_vtype;
+		// va[0].dval=value;
+	ntoken();
+	return value;
+}
+
 double uf_len()
 {
 	get_function_args(1);
@@ -506,24 +518,26 @@ double uf_cos()
 
 double uf_tan()
 {
-	get_numeric_args(1);
-	double value=0;
-	if(va[0].vtype==VTYPE_NUM)	
-		value=tan(va[0].dval);
+	double value=get_numeric_arg();
+#if	1
+	return tan(value);
+#else
+	if(ex_vtype==VTYPE_NUM)	
+		value=tan(value);
 	else {
 		syntax_error("math error in tan",305);
+		ex_vtype=VTYPE_NUM;
 	};
 
-	ex_vtype=VTYPE_NUM;
-	// free(va);
 	return value;
+#endif
 }
 
 double uf_log10()
 {
 	get_numeric_args(1);
-	double value=0;
-	if(va[0].vtype==VTYPE_NUM)	
+	double value=get_numeric_arg();
+	if(ex_vtype==VTYPE_NUM)	
 		value=log10(va[0].dval);
 	else {
 		syntax_error("math error in log10",305);

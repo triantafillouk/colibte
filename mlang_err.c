@@ -534,7 +534,7 @@ int err_factor()
 	return(err_num);
  };
 #if	1
- set_tok_function(tok0,0,tok0->ttype);
+ set_tok_function(tok0,0);
 #else
  tok0->factor_function = factor_funcs[tok0->ttype];
 #endif

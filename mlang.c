@@ -1526,7 +1526,7 @@ FFunction factor_funcs[] = {
 	factor_none		// TOK_OTHER,
 };
 
-void set_tok_function(tok_struct *tok, int type, int index)
+void set_tok_function(tok_struct *tok, int type)
 {
 	switch(type) {
 		case 0:
@@ -2064,7 +2064,7 @@ void skip_sentence1()
 		case TOK_DIR_ELSE:	/* this one starts a new sentence!!  */
 		case TOK_SEP:
 			// tok->cexpr_function=factor_funcs[tok->ttype];
-			set_tok_function(tok,1,1);
+			set_tok_function(tok,1);
 			NTOKEN2;
 			return;
 		case TOK_LPAR:

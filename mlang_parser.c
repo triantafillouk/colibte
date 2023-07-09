@@ -673,7 +673,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok->ttype==TOK_BIGGEREQ ) {tok->tname=" >= ";tok->tgroup=TOK_COMPARE;};
 	if(tok->tgroup==TOK_COMPARE) {
 		// tok->cexpr_function = factor_funcs[tok->ttype];
-		set_tok_function(tok,1,1);
+		set_tok_function(tok,1);
 	};
 	if(tok->ttype==TOK_LCURL) {
 		struct curl_struct *tcl;
