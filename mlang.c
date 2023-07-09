@@ -1120,8 +1120,8 @@ double factor_env()
 void set_break()
 {
 	is_break1=1;
-	tok->tgroup=TOK_EOF;
-	tok->ttype=TOK_EOF;
+	// tok->tgroup=TOK_EOF;
+	// tok->ttype=TOK_EOF;
 	current_active_flag=0;
 }
 
@@ -1418,6 +1418,7 @@ static double term1_div(double v1)
 		};
 	};
 	set_error(tok,216,"division op not supported");
+	set_break();
 	RTRN(v1);
 }
 
@@ -1773,7 +1774,7 @@ double num_term1()
 	 {
 		// MESG("while: TERM1");
 		v1 = tok->term_function(v1);
-		// if(err_num) break;
+		if(err_num) break;
 	 };
  RTRN(v1);
 }
@@ -2372,7 +2373,7 @@ double exec_block1()
  double val=0;
  stage_level=0;
  TDS("exec_block1");
-   while(tok->ttype!=TOK_EOF) 
+   while(tok->ttype!=TOK_EOF && current_active_flag) 
    {
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
 	// if(tok->ttype==TOK_RPAR) { exit(1);};
@@ -2382,6 +2383,13 @@ double exec_block1()
 	if(tok->ttype==TOK_SHOW) {
 		refresh_ddot_1(val);NTOKEN2;continue;
 	};
+#if	0
+	if(drv_check_break_key()){
+		syntax_error("user interruption",100);
+		if(is_break1) return 0;
+	};
+#endif
+	if(!current_active_flag) return(val);
  	val=tok->directive();
    };
    // MESG("exec_block1: end!");
