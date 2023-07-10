@@ -58,7 +58,7 @@ void init_error();
 void get_lowercase_string(char *lower, char *string);
 void get_uppercase_string(char *lower, char *string);
 double cexpression();
-
+double exec_block1_break();
 char * tok_info(tok_struct *tok);
 
 TLIST ctoklist=NULL;
@@ -1567,6 +1567,12 @@ static double inline dir_lcurl()
 	return exec_block1();
 }
 
+static double inline dir_lcurl_break()
+{
+	NTOKEN2;
+	return exec_block1_break();
+}
+
 static double inline dir_break()
 {
 	NTOKEN2;
@@ -2389,7 +2395,32 @@ double exec_block1()
 		if(is_break1) return 0;
 	};
 #endif
-	if(!current_active_flag) return(val);
+	// if(!current_active_flag) return(val);
+ 	val=tok->directive();
+   };
+   // MESG("exec_block1: end!");
+	return(val);
+}
+
+double exec_block1_break()
+{
+ double val=0;
+ stage_level=0;
+ TDS("exec_block1");
+   while(tok->ttype!=TOK_EOF && current_active_flag) 
+   {
+	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
+	// if(tok->ttype==TOK_RPAR) { exit(1);};
+	if(tok->ttype==TOK_SEP){ NTOKEN2;continue;	};
+	if(tok->ttype==TOK_RCURL) { NTOKEN2;return(val);};
+	if(tok->ttype==TOK_COMMA) { NTOKEN2;};
+	if(tok->ttype==TOK_SHOW) {
+		refresh_ddot_1(val);NTOKEN2;continue;
+	};
+	if(drv_check_break_key()){
+		syntax_error("user interruption",100);
+		if(is_break1) return 0;
+	};
  	val=tok->directive();
    };
    // MESG("exec_block1: end!");
@@ -2440,7 +2471,8 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	// MESG("compute_block: call drv_start_checking_break");
 	drv_start_checking_break();
 	// MESG("exec block->");
-	val=exec_block1();
+	if(execmd) val=exec_block1();
+	else val=exec_block1_break();
 	drv_stop_checking_break();
 	// MESG("--- start=%d",start);
 
@@ -2529,7 +2561,7 @@ int refresh_current_buffer(int nused)
  	msg_line("evaluating ...");
 	init_exec_flags();
 	tok=fp->tok_table;
-	val=exec_block1();
+	val=exec_block1_break();
 	drv_stop_checking_break();
 	if(err_num>0) {
 		show_error("refresh buffer",fp->b_fname);

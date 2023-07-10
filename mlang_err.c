@@ -1139,7 +1139,8 @@ int err_check_sentence1()
  	case TOK_LCURL:
 	{	
 		// tok->directive = dir_lcurl;
-		set_tok_directive(tok,dir_lcurl);
+		if(execmd) set_tok_directive(tok,dir_lcurl);
+		else set_tok_directive(tok,dir_lcurl_break);
 		NTOKEN_ERR(627);
 		CHECK_TOK(628);
 		err_num=err_check_block1(tok->level);
