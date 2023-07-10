@@ -3,14 +3,19 @@
 function add3(a,b,c)
 {
  print("-args:a="+a+" b="+b+" c="+c)
- if(c==0) { return (0) }
- d=a+b+add3(a,b,c-1)
+ if(c==0) { 
+ 	print("add3: c=0")
+	return (0) 
+ } else { 
+ d=a+b
+ print("add3: d="+d)
  return(d)
+ }
 }
 
 cls
 
-result = add3(1 ,2 ,5)
+result = add3(1 ,2 ,0)
 result:   3.0
 
 `

@@ -26,7 +26,6 @@ typedef struct tok_struct {
 	void *tname;	// token name or string value
 	double dval;	// double value
 	int ttype;	/* token type */
-	// int tatype;	/* array type  */
 	int tgroup;	/* token group  */
 	union {
 		FFunction factor_function;
@@ -35,12 +34,11 @@ typedef struct tok_struct {
 	};
 	FFunction directive;
 	union {	
-	struct BTNODE *tnode;
-	struct curl_struct *tcurl;
-	struct tok_struct *match_tok;
-	struct array_dat *adat;
-	struct FILEBUF *tbuf;
-//	struct tok_data *tdata;
+		struct BTNODE *tnode;
+		struct curl_struct *tcurl;
+		struct tok_struct *match_tok;
+		struct array_dat *adat;
+		struct FILEBUF *tbuf;
 	};
 } tok_struct;
 
@@ -77,10 +75,13 @@ typedef struct curl_struct {
 	struct _el *ocurl;
 } curl_struct;
 
+// #define SEP_FUNCTIONS	1
+
 /*	list of recognized user type functions	*/
-typedef struct m_function  {
+typedef struct m_function {
 	char *f_name;	/* function name  */
 	int f_args;	/* number of function arguments  */
+	FFunction ffunction;
 } m_function;
 
 typedef struct term_type {

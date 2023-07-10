@@ -249,7 +249,7 @@ char *dir_w1[] = { "/home","Downloads","Desktop","" };
 char *tag_w[] = { NULL,NULL,NULL,NULL,NULL};
 char *tag_w1[] = { NULL,NULL,NULL,NULL,NULL};
 
-char *lua_w[] = { "function","while","do","elseif","in","if","else","for","end","return",NULL };
+char *lua_w[] = { "function","while","do","elseif","in","if","then","else","for","end","return",NULL };
 char *lua_w1[] = { "print","local","ipairs","true","false","cooroutine","pairs","type","nil","setmetatable",NULL};
 
 /* extensions defined  */

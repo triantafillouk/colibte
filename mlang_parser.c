@@ -672,7 +672,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok->ttype==TOK_BIGGER ) {tok->tname=" > ";tok->tgroup=TOK_COMPARE;};
 	if(tok->ttype==TOK_BIGGEREQ ) {tok->tname=" >= ";tok->tgroup=TOK_COMPARE;};
 	if(tok->tgroup==TOK_COMPARE) {
-		tok->cexpr_function = factor_funcs[tok->ttype];
+		// tok->cexpr_function = factor_funcs[tok->ttype];
+		set_tok_function(tok,1);
 	};
 	if(tok->ttype==TOK_LCURL) {
 		struct curl_struct *tcl;
@@ -822,6 +823,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					break;
 				case TOK_FUNC:	/* 2  */
 					tok->ttype=TOK_FUNC; // editor functions
+					// MESG("TOK_FUNC: %s",tok->tname);
+					// BTNODE *bte=tok->tnode;
+					// MESG("TOK_FUNC: index=%d",bte->node_index);
+					// tok->factor_function = m_functions[bte->node_index].ffunction;
+					// tok->factor_function = factor_func;
 					break;
 				case TOK_CMD:	/* 3  */
 					tok->ttype=TOK_CMD;	// editor commands
