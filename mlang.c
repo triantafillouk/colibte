@@ -1043,7 +1043,7 @@ double factor_cmd()
 	NTOKEN2;
 	save_macro_exec=macro_exec;
 	macro_exec=MACRO_MODE2;
-	MESG(";ed_command: args=%d",ed_command->arg);
+	// MESG(";ed_command: args=%d",ed_command->arg);
 	if(ed_command->arg) {
 		if(ed_command->arg>2 || ed_command->arg<0) {
 			NTOKEN2;	/* skip parenthesis  */
@@ -1069,7 +1069,6 @@ double factor_cmd()
 
 	} else {	/* no argument  */
 		if(tok->ttype==TOK_LPAR) {	/* we can have parenthesis or not. */
-			MESG("	factor_cmd: TOK_LPAR skip");
 			NTOKEN2;
 			check_par=1;
 		};
@@ -1137,7 +1136,6 @@ double factor_error()
 static inline double factor_lpar()
 {
  double value;
- MESG("factor_lpar");
  NTOKEN2;
  value = lexpression();
  NTOKEN2;	/* skip corresponding right parenthesis!  */
@@ -1531,21 +1529,20 @@ FFunction factor_funcs[] = {
 
 void set_tok_function(tok_struct *tok, int type)
 {
-	// MESG("set_tok_function:[%s] type %d",tok->tname,type);
 	switch(type) {
 		case 0:
 			if(tok->ttype==TOK_FUNC) {
 				int findex = tok->tnode->node_index;
-				MESG(" F tok %2d: %s set_tok_function [%d %s] factor function [%d %s]",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype],findex,m_functions[findex].f_name);
+				// MESG(" F tok %2d: %s type [%d %s] set factor function %d",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype],findex);
 				tok->factor_function = m_functions[findex].ffunction;
 			} else {
 	 			tok->factor_function = factor_funcs[tok->ttype];
-				MESG(" f tok %2d: %s set_tok_function [%d %s]",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype]);
+				// MESG(" f tok %2d: %s type [%d %s] set factor function",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype]);
 			};
 			break;
 		case 1:
 			tok->cexpr_function = factor_funcs[tok->ttype];
-			MESG(" c tok %2d: %s type [%d %s] set cepr function",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype]);
+			// MESG(" c tok %2d: %s type [%d %s] set cepr function",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype]);
 
 	};
 }
@@ -1553,13 +1550,13 @@ void set_tok_function(tok_struct *tok, int type)
 void set_tok_directive(tok_struct *tok, FFunction directive)
 {
 	tok->directive = directive;
-	MESG(" d tok %2d: %s set directive function",tok->tnum,tok->tname);
+	// MESG(" d tok %2d: %s set directive function",tok->tnum,tok->tname);
 }
 
 void set_term_function(tok_struct *tok, TFunction term_function)
 {
 	tok->term_function = term_function;
-	MESG(" t tok %2d: %s set term function",tok->tnum,tok->tname);
+	// MESG(" t tok %2d: %s set term function",tok->tnum,tok->tname);
 }
 
 // Directove functions
@@ -2078,7 +2075,6 @@ void skip_sentence1()
 			NTOKEN2;
 			return;
 		case TOK_LPAR:
-			MESG("	skip_sentence: TOK_LPAR");
 			plevel++;
 			break;
 		case TOK_RPAR:
@@ -2440,11 +2436,6 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  tok_data *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
  // MESG(";compute_block: %s",bp->b_fname);
- if(show_tokens) {
-	parse_buffer_show_tokens(1);
-	return(0);	
- };
-
  if(use_fp->symbol_tree==NULL) {
 	// MESG("create new symbol_tree for use_fp!");
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);

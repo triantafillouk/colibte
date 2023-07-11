@@ -1,4 +1,4 @@
-#include "xe.h"
+	#include "xe.h"
 #include "mlang.h"
 
 extern char *saved_string;
@@ -34,7 +34,7 @@ void get_function_args (int number_of_args)
 	entry_mode=KNORMAL;
 	MESG("get_function_args: %d [%d %s]",number_of_args,tok->tnum,tok->tname);
 	ex_vtype=VTYPE_NUM;
-#if	NO_LPAR
+#if	!NO_LPAR
 	ntoken();
 #endif
 	if(number_of_args) {
@@ -74,7 +74,7 @@ void get_function_args (int number_of_args)
 void get_numeric_args (int number_of_args)
 {
 	int i;
-	MESG("get_numeric_args: %d",number_of_args);
+	// MESG("get_numeric_args: %d",number_of_args);
 #if	!NO_LPAR
 	ntoken();
 #endif
@@ -89,7 +89,7 @@ void get_numeric_args (int number_of_args)
 
 double get_numeric_arg ()
 {
-	MESG("get_numeric_arg:");
+	// MESG("get_numeric_args: %d",number_of_args);
 	ntoken();
 #if	!NO_LPAR
 		ntoken();

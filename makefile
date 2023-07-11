@@ -184,7 +184,7 @@ config_init.o: config_init.c
 
 mlang.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang_functions.c mlang.h alist.h xe.h func.h
 
-mlangf.o: mlangf.c mlangf.h mlang.h
+mlangf.o: xe.h mlangf.c mlangf.h mlang.h
 
 mlangg.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang_functions.c mlang.h alist.h xe.h
 	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char mlang.c -o mlangg.o
