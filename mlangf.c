@@ -9,6 +9,8 @@ extern array_dat *main_args;
 extern char *ex_name;
 extern FILEBUF *cbfp;
 
+tok_struct *current_token();
+
 void ntoken();
 int check_token(int type);
 double determinant(array_dat *aa);
@@ -27,12 +29,14 @@ void get_function_args (int number_of_args)
 	int i;
 	int f_entry;
 	// MVAR *va=NULL;
-
+	tok_struct *tok = current_token();
 	f_entry=entry_mode;
 	entry_mode=KNORMAL;
-	// MESG("get_function_args: %d",number_of_args);
+	MESG("get_function_args: %d [%d %s]",number_of_args,tok->tnum,tok->tname);
 	ex_vtype=VTYPE_NUM;
+#if	NO_LPAR
 	ntoken();
+#endif
 	if(number_of_args) {
 		/* if we have arguments, check for parenthesis, then get the arguments  */
 		// va = (MVAR *)malloc(sizeof(MVAR)*number_of_args);
@@ -55,6 +59,7 @@ void get_function_args (int number_of_args)
 		ntoken();
 	} else {;
 		if(check_token(TOK_LPAR)) {
+			MESG("	get_function_args: TOK_LPAR");
 				ntoken();
 				ntoken();
 		};
@@ -69,8 +74,10 @@ void get_function_args (int number_of_args)
 void get_numeric_args (int number_of_args)
 {
 	int i;
-	// MESG("get_numeric_args: %d",number_of_args);
+	MESG("get_numeric_args: %d",number_of_args);
+#if	!NO_LPAR
 	ntoken();
+#endif
 	for(i=0;i< number_of_args;i++ ) { 
 		ntoken();
 		double value = num_expression();
@@ -82,9 +89,11 @@ void get_numeric_args (int number_of_args)
 
 double get_numeric_arg ()
 {
-	// MESG("get_numeric_args: %d",number_of_args);
+	MESG("get_numeric_arg:");
 	ntoken();
+#if	!NO_LPAR
 		ntoken();
+#endif
 		double value = num_expression();
 		// va[0].vtype=ex_vtype;
 		// va[0].dval=value;

@@ -453,8 +453,14 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 			break;
 		case TOK_LPAR:
+			MESG("parse: TOK_LPAR");
 			par_level++;
-			cc=0;break;
+			cc=0;
+#if	NO_LPAR
+			continue;
+#else			
+			break;
+#endif
 		case TOK_RPAR:
 			par_level--;
 			cc=1;break;
@@ -593,7 +599,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 
 	// if(previous_token) MESG("	- previous token is %s",tname(previous_token->ttype));
-	// MESG("	- token type=%d %s",tok_type,tname(tok_type));
+	MESG("	- token type=%d %s",tok_type,tname(tok_type));
 	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {
 	if(!(is_now_sep && (tok_type==TOK_LCURL||tok_type==TOK_RCURL) )){
@@ -637,7 +643,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
 	if(tok->ttype==TOK_LBRAKET) tok->tname=" LB ";
 	if(tok->ttype==TOK_RBRAKET) tok->tname=" RB ";
-	if(tok->ttype==TOK_LPAR) tok->tname=" ( ";
+	if(tok->ttype==TOK_LPAR) {
+		MESG("parse: TOK_LPAR set name");
+		tok->tname=" ( ";
+	};
 	if(tok->ttype==TOK_RPAR) tok->tname=" ) ";
 	if(tok->ttype==TOK_SEP) tok->tname=" ; ";
 	if(tok->ttype==TOK_NUM) tok->tname="numeric";

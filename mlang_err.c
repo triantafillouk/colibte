@@ -202,29 +202,40 @@ int  err_eval_fun1(int fnum)
 	SHOW_STAGE(401);
 
 	if(ia) {
+		MESG("err_eval_fun1: function with args!");
 		/* if we have arguments, check for parenthesis, then get the arguments  */
+#if	!NO_LPAR
 		if(tok->ttype!=TOK_LPAR) {
 			snprintf(err_message,512,"function [%s] with %d arguments without left parenthesis!",m_functions[fnum].f_name,m_functions[fnum].f_args);
 			xpos=402;
 			syntax_error(err_message,xpos);
 			RT_MESG;
 		} ;
-
+#endif
 		for(i=0;i< ia;i++) { 
+#if	!NO_LPAR
 			NTOKEN_ERR(403);
+#endif
 			err_num = err_lexpression();
 			if(err_num) {
 				MESG("function parameter error! %d",err_num);
 				return(err_num);
 			};
+#if	NO_LPAR
+			NTOKEN_ERR(403);
+#endif
 			CHECK_TOK(405);
 		};
+#if	!NO_LPAR
 		xpos=406;
 		check_skip_token_err1(TOK_RPAR,"eval_fun1: error closing parenthesis",xpos);
 		CHECK_TOK(406);
+#endif
 	} else {;
+		MESG("err_eval_fun1: no lpar!");
 		CHECK_TOK(407);
 		if(tok->ttype==TOK_LPAR){
+			MESG(" err eval_funct1: TOK_LPAR");
 			NTOKEN_ERR(4071);
 			if(tok->ttype!=TOK_RPAR) syntax_error("missing right parenthesis",xpos);
 			else NTOKEN_ERR(4072);
@@ -309,7 +320,7 @@ int err_assign_args1(int nargs)
  if(nargs!=0) {
 	xpos=421;
 	if(tok->ttype!=TOK_LPAR) err_num=xpos;
-
+	MESG("err_assign_args: TOK_LPAR");
 	NTOKEN_ERR(4211);	/* skip left parenthesis  */
 	for(i=0;i<nargs;i++) {
 		xpos=422;
@@ -506,12 +517,46 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 	RT_MESG1(467);
 }
 
+int err_check_lpar()
+{
+	MESG(" err_factor: check_lpar: TOK_LPAR ----------------");
+	pnum++;
+	CHECK_TOK(481);
+	{
+#if	NO_LPAR
+		if(tok->ttype==TOK_SEP || tok->ttype==TOK_RPAR)
+#else
+		if(tok->ttype==TOK_RPAR) 
+#endif
+		{	/* null expression  */
+			pnum--;
+			NTOKEN_ERR(483);
+			RT_MESG;	/* return right after right parenthesis  */
+		};
+	};
+	err_num = err_lexpression();
+	CHECK_TOK(484);
+	if(tok->ttype==TOK_LBRAKET) {
+		// MESG("	err_tok_lpar: we have a left braket, continue!");
+		RT_MESG;
+	};
+	if(tok->ttype !=TOK_RPAR) {
+		xpos=485;
+		// MESG("ttype=%d",tok->ttype);
+		syntax_error(" FAC1_err: No closing parenthesis",xpos);
+		RT_MESG1(485);
+	} else { 
+		pnum--;
+		NTOKEN_ERR(4851);
+	};
+	RT_MESG1(486);
+}
 
 int err_factor()
 {
  static int pre_symbol=0;
  TDSERR("factor");
- // MESG("err_factor:");
+ MESG("\nerr_factor:");
  int save_macro_exec;
  tok_struct *tok0; 
 
@@ -533,16 +578,14 @@ int err_factor()
 	err_num=4730;
 	return(err_num);
  };
-#if	1
  set_tok_function(tok0,0);
-#else
- tok0->factor_function = factor_funcs[tok0->ttype];
-#endif
- // MESG("switch: tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
  switch(tok0->ttype) {
 	/*  the following ends factor  */
  	case TOK_SEP:
-		xpos=476;syntax_error("separator in factor!",xpos);
+		xpos=476;
+#if	!NO_LPAR
+		syntax_error("separator in factor!",xpos);
+#endif
 		RT_MESG1(xpos);
 	case TOK_SHOW:
 		// xpos=477;syntax_error(": in factor",xpos);
@@ -655,36 +698,25 @@ int err_factor()
 		// MESG("err_array2:4 t=%d",tok->ttype);
 		RT_MESG1(4932);
 		};
+#if	!NO_LPAR
 	case TOK_LPAR:
-		{
-			pnum++;
-			pre_symbol=0;
-			CHECK_TOK(481);
-			{
-				if(tok->ttype==TOK_RPAR) {	/* null expression  */
-					pnum--;
-					NTOKEN_ERR(483);
-					RT_MESG;	/* return right after right parenthesis  */
-				};
-			};
-			err_num = err_lexpression();
-			CHECK_TOK(484);
-			if(tok->ttype==TOK_LBRAKET) {
-				// MESG("	err_tok_lpar: we have a left braket, continue!");
-				RT_MESG;
-			};
-			if(tok->ttype !=TOK_RPAR) {
-				xpos=485;
-				// MESG("ttype=%d",tok->ttype);
-				syntax_error(" FAC1_err: No closing parenthesis",xpos);
-				RT_MESG1(485);
-			} else { 
-				pnum--;
-				NTOKEN_ERR(4851);
-			};
-			RT_MESG1(486);
-	 	};
-		break;	
+		pre_symbol=0;
+		int stat=err_check_lpar();
+		if(stat) return stat;
+		break;
+#endif	
+	case TOK_FUNC:	// 2 editor function 
+		/* variable's name in tok0->tname */
+		var_node=tok0->tnode;
+		pre_symbol=0;
+		CHECK_TOK(496);
+#if	NO_LPAR
+		int stat=err_check_lpar();
+		if(stat) return stat;
+#endif
+		MESG("err_TOK_FUNC ind=%d",var_node->node_index);
+		err_num= err_eval_fun1(var_node->node_index);
+		RT_MESG1(497);
 	case TOK_NUM:
 		pre_symbol=0;
 		ex_nums++;
@@ -736,15 +768,6 @@ int err_factor()
 		pre_symbol=0;
 		ex_nvars++;
 		RT_MESG1(495);
-	case TOK_FUNC:	// 2 editor function 
-		/* variable's name in tok0->tname */
-		var_node=tok0->tnode;
-		pre_symbol=0;
-		CHECK_TOK(496);
-		// MESG("err_TOK_FUNC ind=%d",var_node->node_index);
-// 		tok0->factor_function = m_functions[var_node->node_index].ffunction;
-		err_num= err_eval_fun1(var_node->node_index);
-		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)
 		int nargs=0;
 		FILEBUF *bp;
@@ -789,6 +812,7 @@ int err_factor()
 		if(ftable[var_index].arg==0) check_par=0;else check_par=1;
 		if(check_par) 
 		{	xpos=507;
+			MESG("tok_cmd: check par: TOK_LPAR");
 			check_skip_token_err1(TOK_LPAR,"tok_cmd:0",xpos);
 			CHECK_TOK(xpos);
 			pnum++;
@@ -799,6 +823,7 @@ int err_factor()
 			};
 		} else {
 			CHECK_TOK(509);
+			MESG("tok_cmd: no par: TOK_LPAR");
 			if(tok->ttype==TOK_LPAR) { /* no arguments but still LPAR */
 				NTOKEN_ERR(510);
 			}
