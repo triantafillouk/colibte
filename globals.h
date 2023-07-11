@@ -40,6 +40,7 @@ int gmode_over = 0;
 int	macro_exec	= FALSE;		/* command line execution flag	*/
 int	discmd	= TRUE;			/* display command flag		*/
 int execmd	= FALSE;	/* exec the file  */
+int show_tokens = FALSE;
 int mcurflag = TRUE;	/* mouse curses flag  */
 int	kbdmode = STOP;		/* current keyboard macro mode	*/
 
@@ -59,6 +60,7 @@ extern int syntaxh;
 extern int entry_mode;
 extern int xwin;
 extern int execmd;
+extern int show_tokens;
 extern int default_lang;
 extern int default_local_codepage;
 extern char *codepage_str[];
