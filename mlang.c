@@ -2164,7 +2164,9 @@ double tok_dir_if()
 	int exec_else=0;
 
 	NTOKEN2;	/* go to next token after if */
+#if	!NO_LPAR
 	NTOKEN2;	/* skip left parenthesis  */
+#endif
 	val=lexpression();
 
 	NTOKEN2;	/* skip right parenthesis  */
@@ -2198,8 +2200,9 @@ double tok_dir_for()
 
 //	MESG("-- start for loop: active = %d",current_active_flag);	
 	NTOKEN2;	/* go to next token after for */
+#if	!NO_LPAR
 	NTOKEN2;	/* skip left parenthesis  */
-
+#endif
 	lexpression();	/* initial   */
 	NTOKEN2;	/* skip separator! */
 	// set check_list
@@ -2256,7 +2259,9 @@ double tok_dir_fori()
 	double *pdval;
 
 	NTOKEN2;	/* go to next token after for */
+#if	!NO_LPAR
 	NTOKEN2;	/* skip left parenthesis  */
+#endif
 	if(tok->ttype==TOK_VAR) {
 		index=&current_stable[tok->tind];
 		if(index->vtype!=VTYPE_NUM) {err_num=224;ERROR("for i syntax error %d",err_num);};
@@ -2332,8 +2337,9 @@ double tok_dir_while()
 	int old_active_flag=current_active_flag;
 
 	NTOKEN2;	/* go to next token after while */
+#if	!NO_LPAR
 	NTOKEN2;	/* skip left parenthesis  */
-
+#endif
 	check_element=tok;	/* this is the check element!  */
 	skip_sentence1();	/* for now skip it  */
 

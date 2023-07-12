@@ -203,24 +203,32 @@ int  err_eval_fun1(int fnum)
 
 	if(ia) {
 		/* if we have arguments, check for parenthesis, then get the arguments  */
+#if	!NO_LPAR
 		if(tok->ttype!=TOK_LPAR) {
 			snprintf(err_message,512,"function [%s] with %d arguments without left parenthesis!",m_functions[fnum].f_name,m_functions[fnum].f_args);
 			xpos=402;
 			syntax_error(err_message,xpos);
 			RT_MESG;
 		} ;
-
+#endif
 		for(i=0;i< ia;i++) { 
+#if	!NO_LPAR
 			NTOKEN_ERR(403);
+#endif
 			err_num = err_lexpression();
 			if(err_num) {
 				MESG("function parameter error! %d",err_num);
 				return(err_num);
 			};
+#if	NO_LPAR
+			NTOKEN_ERR(403);
+#endif
 			CHECK_TOK(405);
 		};
 		xpos=406;
+#if	!NO_LPAR
 		check_skip_token_err1(TOK_RPAR,"eval_fun1: error closing parenthesis",xpos);
+#endif
 		CHECK_TOK(406);
 	} else {;
 		CHECK_TOK(407);
@@ -309,8 +317,9 @@ int err_assign_args1(int nargs)
  if(nargs!=0) {
 	xpos=421;
 	if(tok->ttype!=TOK_LPAR) err_num=xpos;
-
+#if	!NO_LPAR
 	NTOKEN_ERR(4211);	/* skip left parenthesis  */
+#endif
 	for(i=0;i<nargs;i++) {
 		xpos=422;
 		if(tok->ttype==TOK_RPAR) {
@@ -538,7 +547,7 @@ int err_factor()
 #else
  tok0->factor_function = factor_funcs[tok0->ttype];
 #endif
- // MESG("switch: tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
+ MESG("switch: tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
  switch(tok0->ttype) {
 	/*  the following ends factor  */
  	case TOK_SEP:
@@ -751,9 +760,11 @@ int err_factor()
 		tok_struct *after_proc;	// this is needed for recursive functions
 		xpos=501;
 		ex_nvars++;
-
+		MESG("_err: TOK_PROC");
+#if	!NO_LPAR
 		if(tok->ttype!=TOK_SEP)
 		NTOKEN_ERR(502);	/* this is parenthesis or separator */
+#endif
 		if(err_num) return(err_num);
 
 		/* function */
@@ -887,7 +898,7 @@ int err_factor()
 		RT_MESG1(527);
 	default:
 		xpos=527;
-		// MESG(" default: error_factor: %s",tok_info(tok));
+		MESG(" default: error_factor: %s",tok_info(tok));
 		set_error(tok,3000+tok->ttype,"factor :wrong character found:");
 		RT_MESG1(5271);
  }
@@ -1152,9 +1163,11 @@ int err_check_sentence1()
 		// tok->directive = tok_dir_if;
 		set_tok_directive(tok,tok_dir_if);
 		NTOKEN_ERR(631);	/* go to next token after if */
+#if	!NO_LPAR
 		xpos=632;
 		check_skip_token_err1(TOK_LPAR,"tok_dir_if",xpos);
 		CHECK_TOK(6321);
+#endif
 		err_num=err_lexpression();
 		CHECK_TOK(633);
 
