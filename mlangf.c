@@ -74,7 +74,7 @@ void get_function_args (int number_of_args)
 void get_numeric_args (int number_of_args)
 {
 	int i;
-	// MESG("get_numeric_args: %d",number_of_args);
+	MESG("get_numeric_args: %d",number_of_args);
 #if	!NO_LPAR
 	ntoken();
 #endif
@@ -89,7 +89,7 @@ void get_numeric_args (int number_of_args)
 
 double get_numeric_arg ()
 {
-	// MESG("get_numeric_args: %d",number_of_args);
+	MESG("get_numeric_args:");
 	ntoken();
 #if	!NO_LPAR
 		ntoken();

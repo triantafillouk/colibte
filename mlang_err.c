@@ -203,32 +203,44 @@ int  err_eval_fun1(int fnum)
 
 	if(ia) {
 		/* if we have arguments, check for parenthesis, then get the arguments  */
+#if	!NO_LPAR
 		if(tok->ttype!=TOK_LPAR) {
 			snprintf(err_message,512,"function [%s] with %d arguments without left parenthesis!",m_functions[fnum].f_name,m_functions[fnum].f_args);
 			xpos=402;
 			syntax_error(err_message,xpos);
 			RT_MESG;
 		} ;
-
+#endif
 		for(i=0;i< ia;i++) { 
+#if	!NO_LPAR
 			NTOKEN_ERR(403);
+#endif
 			err_num = err_lexpression();
 			if(err_num) {
 				MESG("function parameter error! %d",err_num);
 				return(err_num);
 			};
+#if	NO_LPAR
+			NTOKEN_ERR(403);
+#endif
 			CHECK_TOK(405);
 		};
 		xpos=406;
+#if	!NO_LPAR
 		check_skip_token_err1(TOK_RPAR,"eval_fun1: error closing parenthesis",xpos);
+#endif
 		CHECK_TOK(406);
 	} else {;
 		CHECK_TOK(407);
+#if	NO_LPAR
+		if(tok->ttype==TOK_RPAR) NTOKEN_ERR(4071);
+#else
 		if(tok->ttype==TOK_LPAR){
 			NTOKEN_ERR(4071);
 			if(tok->ttype!=TOK_RPAR) syntax_error("missing right parenthesis",xpos);
 			else NTOKEN_ERR(4072);
 		};
+#endif
 	}
 	entry_mode=f_entry;
 	// MESG("now evaluate it!");
@@ -789,8 +801,10 @@ int err_factor()
 		if(ftable[var_index].arg==0) check_par=0;else check_par=1;
 		if(check_par) 
 		{	xpos=507;
+#if	!NO_LPAR
 			check_skip_token_err1(TOK_LPAR,"tok_cmd:0",xpos);
 			CHECK_TOK(xpos);
+#endif
 			pnum++;
 
 			if(pnum>10) {

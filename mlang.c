@@ -1037,22 +1037,27 @@ double factor_cmd()
 	FUNCS *ed_command;
 
 	ex_vtype=VTYPE_NUM;
-	// MESG(";factor_cmd: ttype=%d",tok->ttype);
+	MESG(";factor_cmd: ttype=%d command=%d",tok->ttype,tok->tnode->node_index);
 	var_index = tok->tnode->node_index;
 	ed_command = ftable+var_index;
+
 	NTOKEN2;
 	save_macro_exec=macro_exec;
 	macro_exec=MACRO_MODE2;
-	// MESG(";ed_command: args=%d",ed_command->arg);
+	MESG(";ed_command: [%s] args=%d",ed_command->n_name,ed_command->arg);
 	if(ed_command->arg) {
+#if	!NO_LPAR
 		if(ed_command->arg>2 || ed_command->arg<0) {
 			NTOKEN2;	/* skip parenthesis  */
 			return ed_command->n_func(1);
 		};
+#endif
 		check_par=1;	/* we need parenthesis if arguments.  */
+#if	!NO_LPAR
 		NTOKEN2;
-
+#endif
 		value=num_expression();
+		MESG(";	ed_command: value=%f ex_vtype=%d s=[%s]",value,ex_vtype,saved_string);
 		ex_value=value;
 		switch(ed_command->arg) {
 			case 1:{ /* one argument */
@@ -1062,44 +1067,55 @@ double factor_cmd()
 			case 2:	/* two arguments  */
 			{
 				NTOKEN2;
-				value=1;
+#if	0
+				value=num_expression();
+				MESG(";	ed_command:arg2 value=%f ex_vtype=%d s=[%s]",value,ex_vtype,saved_string);
+#endif
+				MESG(";ed_command: second token! type=%d ",tok->ttype);
 				break;
 			};
 		};
 
 	} else {	/* no argument  */
+
+#if	0
 		if(tok->ttype==TOK_LPAR) {	/* we can have parenthesis or not. */
 			NTOKEN2;
 			check_par=1;
 		};
 		value=1;
+#endif
 	};
-
 	macro_exec = MACRO_MODE2;
 
 	err_num=0;
 	err_line=tok->tline;
 	err_str=NULL;
-	tok_struct *tok1=tok;
-	// MESG(";factor_cmd: execute function! tnum=%d",tok->tnum);
+	// tok_struct *tok1=tok;
+	MESG(";factor_cmd: execute function! current token is [%s] tnum=%d",tok->tname,tok->tnum);
 	status=ed_command->n_func((int)value);
 	// MESG("toknum1 = %d",tok1->tnum);
-	tok=tok1;
-	// MESG(";TOC_CMD: tnum=%d status=%d check_par=%d",tok->tnum,status,check_par);
+	// tok=tok1;
+	MESG(";TOC_CMD: tnum=%d status=%d check_par=%d",tok->tnum,status,check_par);
 	ex_value=status;
 //	editor command returns a numeric value
 	ex_vtype=VTYPE_NUM;
 
 	macro_exec = save_macro_exec;
 
-	if(check_par) { NTOKEN2;};
+	if(check_par) { 
+		if(check_rparenthesis()) {
+			NTOKEN2;
+			MESG("right parenthesis skipped!");
+		};
+	};
 
 	if(err_num>0) {
 		// ERROR("error %d after function [%s] at line %d: %s",err_num,ftable[var_index].n_name,err_line,err_str);
 		show_error("Factor","factor_cmd");
 		RTRN(status);
 	};
-	// MESG(";factor_cmd:end tnum=%d value=%f ex_value=%f",tok->tnum,value,ex_value);
+	MESG(";factor_cmd:end tnum=%d value=%f ex_value=%f",tok->tnum,value,ex_value);
 	RTRN(ex_value);
 }
 
@@ -1153,6 +1169,7 @@ static inline double factor_num()
 /* string  */
 double factor_quote()
 {
+	MESG("factor_quote: tnum=%d tname=%s",tok->tnum,tok->tname);
 	ex_vtype=VTYPE_STRING;
 	set_sval(tok->tname);
 	NTOKEN2;
@@ -1760,13 +1777,15 @@ double term_minus(double value)
 double num_term2()
 {
  TDS("num_term2");
- // MESG("num_term2: [%s]",tok_info(tok));
+ MESG("num_term2: [%s]",tok_info(tok));
  double v1 = FACTOR_FUNCTION;
+ MESG("factor function executed!");
 	 while(tok->tgroup==TOK_TERM2)
 	 {
 		// MESG("while: TERM2");
 		v1 = tok->term_function(v1);
 	 };
+ MESG("term2 end");
  RTRN(v1);
 }
 
@@ -1774,7 +1793,7 @@ double num_term2()
 double num_term1()
 {
  TDS("num_term1");
- // MESG("num_term1: [%s]",tok_info(tok));
+ MESG("num_term1: [%s]",tok_info(tok));
  double v1 = num_term2();
 	 while(tok->tgroup==TOK_TERM1)
 	 {
@@ -1790,7 +1809,7 @@ double num_expression()
 {
  double value;
  TDS("num_expression");
- // MESG(";num_expression: [%s]",tok_info(tok));
+ MESG(";num_expression: [%s]",tok_info(tok));
  ex_vtype=VTYPE_NUM;
  ex_value=0;
  value = num_term1();
@@ -2767,7 +2786,9 @@ int show_parse_buffer(int n)
 /* return string results from an expression */
 char * key_str1()
 {
+ MESG("key_str1: tnum=%d ttype=%d",tok->tnum,tok->ttype);
  ex_value=num_expression();
+ MESG("key_str1: ex_vtype=%d ex_value=%f [%s]",ex_vtype,ex_value,saved_string);
  return (saved_string);
 }
 
