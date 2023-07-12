@@ -2436,6 +2436,12 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  tok_data *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
  // MESG(";compute_block: %s",bp->b_fname);
+
+ if(show_tokens) {
+	parse_buffer_show_tokens(1);
+	return(0);	
+ };
+
  if(use_fp->symbol_tree==NULL) {
 	// MESG("create new symbol_tree for use_fp!");
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);
