@@ -1777,15 +1777,15 @@ double term_minus(double value)
 double num_term2()
 {
  TDS("num_term2");
- MESG("num_term2: [%s]",tok_info(tok));
+ // MESG("num_term2: [%s]",tok_info(tok));
  double v1 = FACTOR_FUNCTION;
- MESG("factor function executed!");
+ // MESG("factor function executed!");
 	 while(tok->tgroup==TOK_TERM2)
 	 {
 		// MESG("while: TERM2");
 		v1 = tok->term_function(v1);
 	 };
- MESG("term2 end");
+ // MESG("term2 end");
  RTRN(v1);
 }
 
@@ -1793,7 +1793,7 @@ double num_term2()
 double num_term1()
 {
  TDS("num_term1");
- MESG("num_term1: [%s]",tok_info(tok));
+ // MESG("num_term1: [%s]",tok_info(tok));
  double v1 = num_term2();
 	 while(tok->tgroup==TOK_TERM1)
 	 {
@@ -1809,7 +1809,7 @@ double num_expression()
 {
  double value;
  TDS("num_expression");
- MESG(";num_expression: [%s]",tok_info(tok));
+ // MESG(";num_expression: [%s]",tok_info(tok));
  ex_vtype=VTYPE_NUM;
  ex_value=0;
  value = num_term1();
@@ -2275,7 +2275,9 @@ double tok_dir_fori()
 	double *pdval;
 
 	NTOKEN2;	/* go to next token after for */
+#if	!NO_LPAR
 	NTOKEN2;	/* skip left parenthesis  */
+#endif
 	if(tok->ttype==TOK_VAR) {
 		index=&current_stable[tok->tind];
 		if(index->vtype!=VTYPE_NUM) {err_num=224;ERROR("for i syntax error %d",err_num);};
@@ -2351,8 +2353,9 @@ double tok_dir_while()
 	int old_active_flag=current_active_flag;
 
 	NTOKEN2;	/* go to next token after while */
+#if	!NO_LPAR
 	NTOKEN2;	/* skip left parenthesis  */
-
+#endif
 	check_element=tok;	/* this is the check element!  */
 	skip_sentence1();	/* for now skip it  */
 

@@ -457,7 +457,17 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			par_level++;
 			cc=0;
 #if	NO_LPAR
+			if(previous_token->ttype==TOK_DIR_IF
+			||previous_token->ttype==TOK_FUNC
+			||previous_token->ttype==TOK_DIR_ELSE
+			||previous_token->ttype==TOK_DIR_WHILE
+			||previous_token->ttype==TOK_DIR_FOR
+			||previous_token->ttype==TOK_PROC
+			||previous_token->ttype==TOK_CMD
+			||previous_token->ttype==TOK_DIR_FORI
+			)
 			continue;
+			else break;
 #else			
 			break;
 #endif

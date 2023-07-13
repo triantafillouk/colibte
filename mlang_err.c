@@ -192,7 +192,9 @@ int  err_eval_fun1(int fnum)
 	TDSERR("eval_fun1");
 	int i,ia;
 	int f_entry;
+#if	!NO_LPAR
 	char err_message[512];
+#endif
 	// MESG("err_eval_fun1:");
 	ia=m_functions[fnum].f_args;
 
@@ -763,9 +765,10 @@ int err_factor()
 		tok_struct *after_proc;	// this is needed for recursive functions
 		xpos=501;
 		ex_nvars++;
-
+#if	!NO_LPAR
 		if(tok->ttype!=TOK_SEP)
 		NTOKEN_ERR(502);	/* this is parenthesis or separator */
+#endif
 		if(err_num) return(err_num);
 
 		/* function */
@@ -1197,7 +1200,9 @@ int err_check_sentence1()
 		// tok->directive = tok_dir_fori;
 		set_tok_directive(tok,tok_dir_fori);
 		NTOKEN_ERR(640);	/* go to next token after for */
+#if	!NO_LPAR
 		NTOKEN_ERR(6401);	/* skip left parenthesis  */
+#endif
 		if(tok->ttype==TOK_VAR) {
 			NTOKEN_ERR(6403);
 			if(tok->ttype!=TOK_ASSIGN) ERROR("6404:for i error");
@@ -1242,8 +1247,10 @@ int err_check_sentence1()
 		// tok->directive=tok_dir_for;
 		set_tok_directive(tok,tok_dir_for);
 		NTOKEN_ERR(641);	/* go to next token after for */
+#if	!NO_LPAR
 		check_skip_token_err1(TOK_LPAR,"tok_dir_for",xpos);
 		CHECK_TOK(6411);
+#endif
 		err_num=err_lexpression();	/* check initial  */
 		NTOKEN_ERR(643);	/* skip separator! */
 		
@@ -1273,8 +1280,10 @@ int err_check_sentence1()
 			// tok->directive=tok_dir_while;
 			set_tok_directive(tok,tok_dir_while);
 			NTOKEN_ERR(654);	/* go to next toke after while */
+#if	NO_LPAR
 			check_skip_token_err1(TOK_LPAR,"tok_dir_while",xpos);
 			CHECK_TOK(656);
+#endif
 			// set check_list
 			check_element=tok;
 			err_num=err_check_sentence1();
