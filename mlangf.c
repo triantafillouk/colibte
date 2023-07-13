@@ -28,11 +28,10 @@ void get_function_args (int number_of_args)
 {
 	int i;
 	int f_entry;
-	// MVAR *va=NULL;
-	tok_struct *tok = current_token();
+	// tok_struct *tok = current_token();
 	f_entry=entry_mode;
 	entry_mode=KNORMAL;
-	MESG("get_function_args: %d [%d %s]",number_of_args,tok->tnum,tok->tname);
+	// MESG("get_function_args: %d [%d %s]",number_of_args,tok->tnum,tok->tname);
 	ex_vtype=VTYPE_NUM;
 #if	!NO_LPAR
 	ntoken();

@@ -120,49 +120,49 @@ void allocate_array(struct array_dat *adat);
 
 // Token type enumerator
 enum {
-	TOK_NONE	,
-	TOK_SEP		,
-	TOK_SPACE	,
-	TOK_LETTER	,
+	TOK_NONE	,	// 0
+	TOK_SEP		,	// 1
+	TOK_SPACE	,	// 2
+	TOK_LETTER	,	
 	TOK_LCURL	,
-	TOK_RCURL	,
+	TOK_RCURL	,	// 5
 	TOK_QUOTE	,
-	TOK_LPAR	,
-	TOK_RPAR	,
-	TOK_SHOW	,
-	TOK_COMMENT	,
-	TOK_VAR		,	// level 0 variable
-	TOK_OPTION	,	// editor option
-	TOK_CMD		,	// editor commands
-	TOK_FUNC	,	// function
-	TOK_PROC	,
+	TOK_LPAR	,	// 7
+	TOK_RPAR	,	// 8
+	TOK_SHOW	,	// 9
+	TOK_COMMENT	,	// 10
+	TOK_VAR		,	// 11 level 0 variable
+	TOK_OPTION	,	// 12 editor option
+	TOK_CMD		,	// 13 editor commands
+	TOK_FUNC	,	// 14 function
+	TOK_PROC	,	// 15
 	TOK_ENV		,	// editor environment function
 	TOK_TERM0	,	// term0 group
 	TOK_TERM	,	// term operators (+,-)
-	TOK_TERM1	,	// term2 operators (*,/) 
-	TOK_TERM2	,	// term1 operators (%,^)
-	TOK_ASSIGN	,	// assignment
-	TOK_EOF		,	// end of file token
-	TOK_NUM		,	// numeric
-	TOK_DIR		,	// directive
-	TOK_DIR_IF	,	// dir if
-	TOK_DIR_ELSE	,	// dir else
-	TOK_DIR_BREAK	,
-	TOK_DIR_RETURN	,
-	TOK_DIR_WHILE	,
-	TOK_DIR_FOR		,
-	TOK_COMMA		,
-	TOK_DIR_FORI	,
+	TOK_TERM1	,	// 19 term2 operators (*,/) 
+	TOK_TERM2	,	// 20 term1 operators (%,^)
+	TOK_ASSIGN	,	// 21 assignment
+	TOK_EOF		,	// 22 end of file token
+	TOK_NUM		,	// 23 numeric
+	TOK_DIR		,	// 24 directive
+	TOK_DIR_IF	,	// 25 dir if
+	TOK_DIR_ELSE	,	// 26 dir else
+	TOK_DIR_BREAK	,	// 27
+	TOK_DIR_RETURN	,	// 28
+	TOK_DIR_WHILE	,	// 29
+	TOK_DIR_FOR		,	// 30
+	TOK_COMMA		,	// 31
+	TOK_DIR_FORI	,	// 32
 	/* compare operators  */
-	TOK_COMPARE		,
-	TOK_NOTEQUAL	,
+	TOK_COMPARE		,	// 33
+	TOK_NOTEQUAL	,	// 34
 	TOK_SMALLER		,	/* <  */
 	TOK_BIGGER		,	/* >  */
 	TOK_EQUAL		,	/* ==  */
 	TOK_SMALLEREQ	,	/* <=  */
 	TOK_BIGGEREQ	,	/* >=  */
 	/* Bool operators  */
-	TOK_BOOL		,
+	TOK_BOOL		,	// 40
 	TOK_AND			,	/* &  */
 	TOK_OR			,	/* |  */
 	TOK_NOT			,	/* !  */
@@ -170,36 +170,36 @@ enum {
 	TOK_NOR			,	/* !|  */
 	TOK_XOR			,	/* ^  */
 	/* term operators  */
-	TOK_PLUS		,
-	TOK_MINUS		,
-	TOK_POWER		,
-	TOK_MOD			,
-	TOK_MUL			,
-	TOK_DIV			,
-	TOK_LBRAKET		,
-	TOK_RBRAKET		,
-	TOK_SQUOTE		,
-	TOK_AT			,
-	TOK_RANGE		,
-	TOK_BQUOTE		,
-	TOK_DOLAR		,
-	TOK_TILDA		,
-	TOK_INCREASE	,
+	TOK_PLUS		,	// 47
+	TOK_MINUS		,	// 48
+	TOK_POWER		,	// 49
+	TOK_MOD			,	// 50
+	TOK_MUL			,	// 51
+	TOK_DIV			,	// 52
+	TOK_LBRAKET		,	// 53
+	TOK_RBRAKET		,	// 54
+	TOK_SQUOTE		,	// 55
+	TOK_AT			,	// 56
+	TOK_RANGE		,	// 57
+	TOK_BQUOTE		,	// 58
+	TOK_DOLAR		,	// 59
+	TOK_TILDA		,	// 60
+	TOK_INCREASE	,	
 	TOK_DECREASE	,
 	TOK_INCREASEBY	,
 	TOK_MULBY		,
-	TOK_DECREASEBY	,
+	TOK_DECREASEBY	,	// 65
 	TOK_BSLASH		,
 	TOK_NL				,
 	TOK_DIR_CONTINUE	,
 	TOK_DIR_FOREACH		,
-	TOK_ARRAY1		,
+	TOK_ARRAY1		,	// 70
 	TOK_ARRAY2		,
 	TOK_ARRAY3		,
 	TOK_ASSIGNENV	,
 	TOK_ASSIGNOPT	,
-	TOK_START,	/* <@ */
-	TOK_END,	/* @> */
+	TOK_START,			/* 75 <@ */
+	TOK_END,			/* @> */
 	TOK_OTHER,
 };
 

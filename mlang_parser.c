@@ -305,7 +305,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
  if(bf->tok_table !=NULL && init==0) 
  {
-	return(0);	// no change, already parsed
+	// MESG("	no change, already parsed!");
+	return(0);
  } 
  if(init && bf->tok_table!=NULL) {
  	/* we must free the previous parse  */
@@ -453,7 +454,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 			break;
 		case TOK_LPAR:
-			MESG("parse: TOK_LPAR");
 			par_level++;
 			cc=0;
 #if	NO_LPAR
@@ -465,8 +465,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			||previous_token->ttype==TOK_PROC
 			||previous_token->ttype==TOK_CMD
 			||previous_token->ttype==TOK_DIR_FORI
-			)
-			continue;
+			||previous_token->ttype==TOK_DIR_RETURN
+			) {
+				// MESG("parse: TOK_LPAR skip");
+				continue;
+			}
 			else break;
 #else			
 			break;
@@ -609,7 +612,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 
 	// if(previous_token) MESG("	- previous token is %s",tname(previous_token->ttype));
-	MESG("	- token type=%d %s",tok_type,tname(tok_type));
+	// MESG("	- token type=%d %s",tok_type,tname(tok_type));
 	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {
 	if(!(is_now_sep && (tok_type==TOK_LCURL||tok_type==TOK_RCURL) )){
@@ -653,10 +656,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
 	if(tok->ttype==TOK_LBRAKET) tok->tname=" LB ";
 	if(tok->ttype==TOK_RBRAKET) tok->tname=" RB ";
-	if(tok->ttype==TOK_LPAR) {
-		MESG("parse: TOK_LPAR set name");
-		tok->tname=" ( ";
-	};
+	if(tok->ttype==TOK_LPAR) {	tok->tname=" ( ";};
 	if(tok->ttype==TOK_RPAR) tok->tname=" ) ";
 	if(tok->ttype==TOK_SEP) tok->tname=" ; ";
 	if(tok->ttype==TOK_NUM) tok->tname="numeric";
@@ -918,16 +918,16 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
  tok_struct *tok_table=NULL;
  int isize=0;
  if(bf->tok_table != NULL) free(bf->tok_table);
-// fprintf(stderr,"token list size = %d\n",lex_parser->size);
  tok_table=(void *)malloc(sizeof(struct tok_struct)*(lex_parser->size+1));
  bf->tok_table = (void *) tok_table;
-
+ // MESG("set_tok_table: bf=[%s]",bf->b_fname);
  lbegin(lex_parser);
  tlist=lex_parser;
  tok_to = tok_table;
  while(tlist->current)
  {
 	tok=(tok_struct *)tlist->current->data;
+	// MESG("	%d: [%s] %d",tok->tnum,tok->tname,tok->ttype);
 	memcpy((void *)tok_to,(void *)tok,sizeof(tok_struct));
 	if(tok->ttype==TOK_LCURL || tok->ttype==TOK_RCURL) {
 		tok_to->match_tok = tok_table + tok_to->tcurl->num;
