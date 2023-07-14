@@ -2077,10 +2077,13 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
  } else { // we send no arguments!
 	// skip till end parenthesis setting default values for arguments!!??
 	while(tok->ttype!=TOK_RPAR && tok->ttype!=TOK_END) NTOKEN2;
+#if	NO_LPAR
+ 	NTOKEN2;
+#endif
  };
-// #if	!NO_LPAR
+#if	!NO_LPAR
  NTOKEN2;
-// #endif
+#endif
  // MESG("assign_args1: end! pos5 after args tok=[%s] %d",tok->tname,tok->ttype);
  return(1);
 }
