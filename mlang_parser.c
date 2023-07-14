@@ -294,7 +294,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  alist *lex_parser=NULL;
  BTREE *stree=use_stree;
  tok_struct *tok=NULL;
- tok_struct *previous_token=NULL;
+ // tok_struct *previous_token=NULL;
+ int previous_ttype=0;
 
  int tok_type=0;
  int next_tok_type=0;
@@ -457,15 +458,15 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			par_level++;
 			cc=0;
 #if	NO_LPAR
-			if(previous_token->ttype==TOK_DIR_IF
-			||previous_token->ttype==TOK_FUNC
-			||previous_token->ttype==TOK_DIR_ELSE
-			||previous_token->ttype==TOK_DIR_WHILE
-			||previous_token->ttype==TOK_DIR_FOR
-			||previous_token->ttype==TOK_PROC
-			||previous_token->ttype==TOK_CMD
-			||previous_token->ttype==TOK_DIR_FORI
-			||previous_token->ttype==TOK_DIR_RETURN
+			if(previous_ttype==TOK_DIR_IF
+			 ||previous_ttype==TOK_FUNC
+			 ||previous_ttype==TOK_DIR_ELSE
+			 ||previous_ttype==TOK_DIR_WHILE
+			 ||previous_ttype==TOK_DIR_FOR
+			 ||previous_ttype==TOK_PROC
+			 ||previous_ttype==TOK_CMD
+			 ||previous_ttype==TOK_DIR_FORI
+			 ||previous_ttype==TOK_DIR_RETURN
 			) {
 				// MESG("parse: TOK_LPAR skip");
 				continue;
@@ -611,14 +612,13 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 	};
 
-	// if(previous_token) MESG("	- previous token is %s",tname(previous_token->ttype));
-	// MESG("	- token type=%d %s",tok_type,tname(tok_type));
+	// MESG("	- token type=[%d %s] previous token is [%d %s]",tok_type,tname(tok_type),previous_ttype,tname(previous_ttype));
 	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {
 	if(!(is_now_sep && (tok_type==TOK_LCURL||tok_type==TOK_RCURL) )){
 			/* check for else statement!!  */
 		if(!(tok_type==TOK_LETTER && !strcmp(nword,"else"))){
-			if(tok_type==TOK_LBRAKET && previous_token->ttype==TOK_RBRAKET){
+			if(tok_type==TOK_LBRAKET && previous_ttype==TOK_RBRAKET){
 				// MESG("skip tok_lbraket!");
 				continue;
 			} else {
@@ -633,7 +633,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 		};
 	};
-	previous_token=tok;
+	previous_ttype=tok_type;
 	// MESG("	2 - token type=%d %s",tok_type,tname(tok_type));
 
 	if(tok_type!=TOK_SEP) is_now_sep=0;
@@ -864,6 +864,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		};
 	};
 	// MESG("parse: end token switch!");
+	previous_ttype=tok->ttype;
 	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
  
