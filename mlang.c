@@ -773,7 +773,7 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	};
 
 	assign_args1(vargs,current_stable,nargs);
-	// MESG("exec_function: [%s] ttype=%d",tok->tname,tok->ttype);
+	// MESG("exec_function: after assign_args1 [%s] ttype=%d",tok->tname,tok->ttype);
 	value=tok->directive();
 	// MESG("exec_function: before delete_symbol_table, ex_value=%f",ex_value);
 	/* remove local variable tree and restore the old one  */
@@ -1221,11 +1221,13 @@ double factor_proc()
 #endif
 	/* function */
 	MVAR *vargs = NULL;
+	// MESG("factor_proc: tok0 [%d %s]",tok0->tnum,tok0->tname);
 	vargs = push_args_1(tok0->tind);
-
+	// MESG("factor_proc: vargs=%d",vargs);
 	after_proc=tok;
+	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
 	value=exec_function(tok0->tbuf,vargs,tok0->tind);
-	// MESG("factor_proc: val=%f",value);
+	// MESG("factor_proc: return val=%f",value);
 	tok=after_proc;
 
 	current_active_flag=1;	/* start checking again  */
@@ -2076,9 +2078,9 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 	// skip till end parenthesis setting default values for arguments!!??
 	while(tok->ttype!=TOK_RPAR && tok->ttype!=TOK_END) NTOKEN2;
  };
-#if	!NO_LPAR
+// #if	!NO_LPAR
  NTOKEN2;
-#endif
+// #endif
  // MESG("assign_args1: end! pos5 after args tok=[%s] %d",tok->tname,tok->ttype);
  return(1);
 }

@@ -411,7 +411,7 @@ int assign_sub(int n)
 	int(*kfunc)(int);
 	int s;
 	funname[0]=0;
-	MESG("assign_sub:");
+	// MESG("assign_sub:");
 	if((s = nextarg("Assign: subroutine name :", funname, 32,true))!=TRUE) return(s);
 //	show_token(cbfp->parser,"assign_sub: after nextarg!");
 	kfunc = execsub;
@@ -641,7 +641,7 @@ int show_keys(int n)
 int getckey()
 {
 	int c;
-	MESG("getckey: macro_exec=%d",macro_exec);
+	// MESG("getckey: macro_exec=%d",macro_exec);
 	if (macro_exec) {
 		strlcpy(key_string,key_str1(),128);
 		return (tstr_to_command(key_string));
@@ -711,7 +711,7 @@ int (*key_function(int c,int f))()
 {
 	KEYTAB *ktp;
 	FILEBUF *fp=cbfp;
-	// MESG("key_function: c=%X f=%d b_flag=%X %X",c,f,fp->b_flag,fp->b_state);
+	MESG("key_function: c=%X f=%d b_flag=%X %X",c,f,fp->b_flag,fp->b_state);
 	if( fp->b_flag & FSDIRED && f && fp->b_flag & FSNLIST) {
 		ktp = key_item(keytab_dir,c);
 		if(ktp->k_fp !=NULL && ktp->k_fp!=NOFUNCTION) return(ktp->k_fp);
