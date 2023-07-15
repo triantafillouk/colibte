@@ -495,6 +495,15 @@ double uf_sqrt()
 	return value;
 }
 
+double uf_dbg_message()
+{
+	get_function_args(1);
+	if(va[0].vtype==VTYPE_STRING) 
+		MESG(saved_string);
+	ex_vtype=VTYPE_NUM;
+	return 0;
+}
+
 double uf_sin()
 {
 	double value=get_numeric_arg();

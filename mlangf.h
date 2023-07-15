@@ -13,6 +13,7 @@ double uf_print();
 double uf_show_time();
 double uf_upper();
 double uf_lower();
+double uf_dbg_message();
 double uf_ascii();
 double uf_chr();
 double uf_getchar();

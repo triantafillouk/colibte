@@ -55,5 +55,6 @@ m_function m_functions[] = {
 	{"at_eol",0,uf_ateol},	/* if at end of line  */
 	{"args_size",0,uf_mainargsize},	/* main arguments list size  */
 	{"args",1,uf_mainarg},	/* main  argument at position */
-	{NULL,0}
+	{"dbg_message",1,uf_dbg_message},	/* show debug message  */
+	{NULL,0,NULL}
 };
