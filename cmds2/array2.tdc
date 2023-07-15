@@ -7,3 +7,4 @@ b = [ 1 2
 	  3 4 a[0]]
 b:array 5, slot 1 rows 1,cols 5
 print("finished")
+b[1][2]:

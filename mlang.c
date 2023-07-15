@@ -929,7 +929,7 @@ double factor_array2()
 		NTOKEN2;
 		dval2 = adat->dval2;
 
-		if((ind1 >= adat->cols) || (ind2 >= adat->rows)) {
+		if((ind1 >= adat->rows) || (ind2 >= adat->cols)) {
 			// syntax_error("array indexes out of bound!",209);
 			set_error(tok0,209,"array indexes out of bound!");
 		} else {
