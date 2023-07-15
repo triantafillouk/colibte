@@ -498,8 +498,7 @@ double uf_sqrt()
 double uf_dbg_message()
 {
 	get_function_args(1);
-	if(va[0].vtype==VTYPE_STRING) 
-		MESG(saved_string);
+	if(va[0].vtype==VTYPE_STRING) MESG(":%s",va[0].sval);
 	ex_vtype=VTYPE_NUM;
 	return 0;
 }
