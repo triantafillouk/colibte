@@ -1214,16 +1214,16 @@ double factor_proc()
 	tok_struct *after_proc;
 	tok_struct *tok0=tok;
 	double value;
-	// MESG("factor_proc:");
+	MESG("factor_proc:");
 	NTOKEN2;
 #if	!NO_LPAR
 	NTOKEN2;	/* this is left parenthesis */
 #endif
 	/* function */
 	MVAR *vargs = NULL;
-	// MESG("factor_proc: tok0 [%d %s]",tok0->tnum,tok0->tname);
+	MESG("factor_proc: tok0 [%d %s]",tok0->tnum,tok0->tname);
 	vargs = push_args_1(tok0->tind);
-	// MESG("factor_proc: vargs=%d",vargs);
+	MESG("factor_proc: vargs=%d",vargs);
 	after_proc=tok;
 	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
 	value=exec_function(tok0->tbuf,vargs,tok0->tind);
@@ -1607,7 +1607,8 @@ static double inline dir_break()
 static double inline dir_return()
 {	double val;
 	NTOKEN2;
-	val=lexpression();
+	if(tok->ttype==TOK_SEP || tok->ttype==TOK_RPAR) { val=0;ex_vtype=VTYPE_NUM;}
+	else val=lexpression();
 	current_active_flag=0;	/* skip rest of function  */
 	return(val);
 }
@@ -2044,9 +2045,9 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 
  if(va) {
 	int i;
-	// MESG("assign_args1: pos1 tok=[%s] %d",tok->tname,tok->ttype);
+	MESG("assign_args1: pos1 tok=[%s] %d",tok->tname,tok->ttype);
 	NTOKEN2;
-	// MESG("assign_args1: pos2 tok=[%s] %d",tok->tname,tok->ttype);
+	MESG("assign_args1: pos2 tok=[%s] %d",tok->tname,tok->ttype);
 	for(i=0;i<nargs;i++,va++) {
 		tok_data *arg_dat=&symbols[tok->tind];
 		arg_dat->vtype=va->vtype;
@@ -2066,9 +2067,9 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 				arg_dat->sval="";
 				arg_dat->dval=0;
 		};
-		// MESG("assign_args1: pos3 after args tok=[%s] %d",tok->tname,tok->ttype);
+		MESG("assign_args1: pos3 after args tok=[%s] %d",tok->tname,tok->ttype);
 		NTOKEN2;	/* skip separator or end parenthesis */
-		// MESG("assign_args1: pos4 tok=[%s] %d",tok->tname,tok->ttype);
+		MESG("assign_args1: pos4 tok=[%s] %d",tok->tname,tok->ttype);
 #if	!NO_LPAR
 		if(tok->ttype==TOK_RPAR) break;
 		NTOKEN2;
@@ -2078,13 +2079,13 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 	// skip till end parenthesis setting default values for arguments!!??
 	while(tok->ttype!=TOK_RPAR && tok->ttype!=TOK_END) NTOKEN2;
 #if	NO_LPAR
- 	NTOKEN2;
+ 	// NTOKEN2;
 #endif
  };
 #if	!NO_LPAR
  NTOKEN2;
 #endif
- // MESG("assign_args1: end! pos5 after args tok=[%s] %d",tok->tname,tok->ttype);
+ MESG("assign_args1: end! pos5 after args tok=[%s] %d",tok->tname,tok->ttype);
  return(1);
 }
 

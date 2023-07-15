@@ -597,13 +597,14 @@ int err_factor()
 				// MESG("	tok_rbraket: end definition");
 				cdim=0;break;
 			};
-			if(tok->ttype==TOK_SEP) {	/* Add tok->ttype==TOK_COMMA for using comma to separate array items  */
+			if(tok->ttype==TOK_SEP ||tok->ttype==TOK_COMMA) {	/* Add tok->ttype==TOK_COMMA for using comma to separate array items  */
 				i=0;j++;
 				cdim++;if(cdim>rows) rows=cdim;
 				// MESG("	new row2");
 				NTOKEN2;
 				continue;
 			};
+			// MESG("ttype=%d %s",tok->ttype,tname(tok->ttype));
 		};cdim--;
 		};
 		// MESG("set array dat! [%s] rows=%d cols=%d",tok0->tname,rows,cols);
@@ -762,7 +763,7 @@ int err_factor()
 		var_node=tok0->tnode;
 		pre_symbol=0;
 		CHECK_TOK(496);
-		// MESG("err_TOK_FUNC ind=%d",var_node->node_index);
+		MESG("err_TOK_FUNC ind=%d",var_node->node_index);
 // 		tok0->factor_function = m_functions[var_node->node_index].ffunction;
 		err_num= err_eval_fun1(var_node->node_index);
 		RT_MESG1(497);
@@ -1332,8 +1333,9 @@ int err_check_sentence1()
 		set_tok_directive(tok,dir_return);
 		// MESG(" err TOK_DIR_RetURN");
 
-		NTOKEN_ERR(664);	
-		err_num=err_lexpression();
+		NTOKEN_ERR(664);
+		if(tok->ttype!=TOK_SEP&&tok->ttype!=TOK_RPAR) 	
+			err_num=err_lexpression();
 		check_skip_token1(TOK_RPAR);
 		// MESG(" err TOK_FIR_RETURN: after lexpression: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype); 
 		RT_MESG1(666);

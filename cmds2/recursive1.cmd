@@ -47,6 +47,7 @@ function fact2(num)
 }
 
 #_debug=20
+print("start")
 
 b=doll(10)
 
