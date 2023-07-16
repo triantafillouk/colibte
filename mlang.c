@@ -773,7 +773,7 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	};
 
 	assign_args1(vargs,current_stable,nargs);
-	// MESG("exec_function: after assign_args1 [%s] ttype=%d",tok->tname,tok->ttype);
+	// MESG("exec_function: after assign_args1 [%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
 	value=tok->directive();
 	// MESG("exec_function: before delete_symbol_table, ex_value=%f",ex_value);
 	/* remove local variable tree and restore the old one  */
@@ -2042,12 +2042,14 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
  TDS("assign_args1");
 
  NTOKEN2; /* skip name */
-
+ // MESG("assign_args1: nargs=%d",nargs);
  if(va) {
 	int i;
-	// MESG("assign_args1: pos1 tok=[%s] %d",tok->tname,tok->ttype);
+	// MESG("assign_args1: pos1 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
+#if	!NO_LPAR
 	NTOKEN2;
-	// MESG("assign_args1: pos2 tok=[%s] %d",tok->tname,tok->ttype);
+#endif
+	// MESG("assign_args1: pos2 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
 	for(i=0;i<nargs;i++,va++) {
 		tok_data *arg_dat=&symbols[tok->tind];
 		arg_dat->vtype=va->vtype;
