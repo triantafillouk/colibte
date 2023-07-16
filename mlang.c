@@ -2106,6 +2106,7 @@ void skip_sentence1()
  	// MESG("	skip [%s]",tok_info(tok));
 	switch(tok->ttype) {
 		case TOK_DIR_ELSE:	/* this one starts a new sentence!!  */
+
 		case TOK_SEP:
 			// tok->cexpr_function=factor_funcs[tok->ttype];
 			set_tok_function(tok,1);
@@ -2237,8 +2238,9 @@ double tok_dir_for()
 
 //	MESG("-- start for loop: active = %d",current_active_flag);	
 	NTOKEN2;	/* go to next token after for */
+#if	!NO_LPAR
 	NTOKEN2;	/* skip left parenthesis  */
-
+#endif
 	lexpression();	/* initial   */
 	NTOKEN2;	/* skip separator! */
 	// set check_list

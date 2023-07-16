@@ -460,7 +460,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 #if	NO_LPAR
 			if(previous_ttype==TOK_DIR_IF
 			 ||previous_ttype==TOK_FUNC
-			 ||previous_ttype==TOK_DIR_ELSE
+			 // ||previous_ttype==TOK_DIR_ELSE
 			 ||previous_ttype==TOK_DIR_WHILE
 			 ||previous_ttype==TOK_DIR_FOR
 			 ||previous_ttype==TOK_PROC
