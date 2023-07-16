@@ -2045,14 +2045,15 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
  // MESG("assign_args1: nargs=%d",nargs);
  if(va) {
 	int i;
-	// MESG("assign_args1: pos1 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
-#if	!NO_LPAR
+	MESG("assign_args1: pos1 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
+#if	1 	/* 1 works array5, 0 works nr/f1  */
 	NTOKEN2;
 #endif
 	// MESG("assign_args1: pos2 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
 	for(i=0;i<nargs;i++,va++) {
 		tok_data *arg_dat=&symbols[tok->tind];
 		arg_dat->vtype=va->vtype;
+		MESG("assign_args1:arg %d: pos2 tok=[%d %s] %d",i,tok->tnum,tok->tname,tok->ttype);
 		switch(va->vtype) {
 			case VTYPE_NUM:
 				arg_dat->dval=va->dval;
@@ -2069,9 +2070,8 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 				arg_dat->sval="";
 				arg_dat->dval=0;
 		};
-		// MESG("assign_args1: pos3 after args tok=[%s] %d",tok->tname,tok->ttype);
 		NTOKEN2;	/* skip separator or end parenthesis */
-		// MESG("assign_args1: pos4 tok=[%s] %d",tok->tname,tok->ttype);
+		MESG("assign_args1:arg %d: pos3 after args tok=[%s] %d",i,tok->tname,tok->ttype);
 #if	!NO_LPAR
 		NTOKEN2;
 		if(tok->ttype==TOK_RPAR) break;
