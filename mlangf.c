@@ -114,6 +114,24 @@ double uf_len()
 	return value;
 }
 
+double uf_array_cols()
+{
+	get_function_args(1);
+	ex_vtype=VTYPE_NUM;
+	if(va->vtype==VTYPE_ARRAY||va->vtype==VTYPE_SARRAY) {
+		return va->adat->cols;
+	} else return 0;
+}
+
+double uf_array_rows()
+{
+	get_function_args(1);
+	ex_vtype=VTYPE_NUM;
+	if(va->vtype==VTYPE_ARRAY||va->vtype==VTYPE_SARRAY) {
+		return va->adat->rows;
+	} else return 0;
+}
+
 /* clear output buffer */
 double uf_cls()
 {

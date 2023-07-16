@@ -2,6 +2,8 @@
 void get_function_args (int number_of_args);
 void get_numeric_args (int number_of_args);
 double uf_len();
+double uf_array_cols();
+double uf_array_rows();
 double uf_cls();
 double uf_determinant();
 double uf_inverse();

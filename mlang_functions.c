@@ -55,6 +55,8 @@ m_function m_functions[] = {
 	{"at_eol",0,uf_ateol},	/* if at end of line  */
 	{"args_size",0,uf_mainargsize},	/* main arguments list size  */
 	{"args",1,uf_mainarg},	/* main  argument at position */
+	{"array_cols",1,uf_array_cols},	/* columns of an an array  */
+	{"array_rows",1,uf_array_rows},	/* rows of an an array  */
 	{"dbg_message",1,uf_dbg_message},	/* show debug message  */
 	{NULL,0,NULL}
 };
