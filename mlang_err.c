@@ -145,7 +145,7 @@ int check_skip_token_err1(int type,char *mesg,int err)
 		NTOKEN2;
  		return(0);
  	} else {
-		MESG("err %d [%s] token wrong type %d != %d",err,mesg,type,tok->ttype);
+		ERROR("err %d [%s] token wrong type %d != %d",err,mesg,type,tok->ttype);
 		err_str=mesg;
 		err_num=err;
 	};
@@ -220,7 +220,7 @@ int  err_eval_fun1(int fnum)
 #endif
 			err_num = err_lexpression();
 			if(err_num) {
-				MESG("function parameter error! %d",err_num);
+				ERROR("function parameter error! %d",err_num);
 				return(err_num);
 			};
 #if	NO_LPAR
@@ -279,7 +279,7 @@ int  err_push_args_1(int *nargs)
 	};
 	err_num = err_lexpression();
 	// MESG("err after expression t_type=%d err=%d",tok->ttype,err_num);
-	if(err_num) { MESG("error in push_args_1 from lexpression %d",err_num);return err_num;};
+	if(err_num) { ERROR("error in push_args_1 from lexpression %d",err_num);return err_num;};
 	CHECK_TOK(413);
 	num_args++;
 
@@ -763,7 +763,7 @@ int err_factor()
 		var_node=tok0->tnode;
 		pre_symbol=0;
 		CHECK_TOK(496);
-		MESG("err_TOK_FUNC ind=%d",var_node->node_index);
+		// MESG("err_TOK_FUNC ind=%d",var_node->node_index);
 // 		tok0->factor_function = m_functions[var_node->node_index].ffunction;
 		err_num= err_eval_fun1(var_node->node_index);
 		RT_MESG1(497);

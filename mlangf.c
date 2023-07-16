@@ -137,7 +137,7 @@ double uf_cls()
 {
 	ntoken();
 	cls_fout("[out]");
-	// MESG("clear screen!");
+	MESG("<------------------------------------------------------------------>");
 	return 0;
 }
 

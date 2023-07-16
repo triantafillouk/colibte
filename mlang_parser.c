@@ -301,12 +301,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int next_tok_type=0;
  int script_active=0;
 
- MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
+ // MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
  if(is_mlang(bf)) script_active=1;
 
  if(bf->tok_table !=NULL && init==0) 
  {
-	MESG("	no change, already parsed!");
+	// MESG("	no change, already parsed!");
 	return(0);
  } 
  if(init && bf->tok_table!=NULL) {
@@ -902,7 +902,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	bf->symbol_tree->max_items = bf->symbol_tree->items+extra;
  };
 
- MESG("parse_block1: create token table from token list");
+ // MESG("parse_block1: create token table from token list");
  set_tok_table(bf, lex_parser);
 
  free_list(lex_parser,"lex_parser");
