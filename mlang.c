@@ -488,7 +488,7 @@ void init_hash()
 
 void initialize_vars()
 {
- // MESG("initialize_vars");
+ MESG("initialize_vars");
 }
 
 
@@ -757,11 +757,11 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	double value=0;
 	static long level=0;
 	level++;
-	// MESG("exec_function: bp=[%s] nargs=%d level=%d",bp->b_fname,nargs,level);
+	MESG("exec_function: bp=[%s] nargs=%d level=%d",bp->b_fname,nargs,level);
 	tok_data *old_symbol_table=current_stable;
-
+	MESG("exec_function:2");
 	tok=bp->tok_table;	/* start of function  */
-	// MESG("exec_function: first token is [%s] type=%d",tok->tname,tok->ttype);
+	MESG("exec_function: first token is [%s] type=%d",tok->tname,tok->ttype);
 	current_stable=new_symbol_table(bp->symbol_tree->items);	/* create new symbol table  */
 
 	if(current_stable==NULL) { 
@@ -773,7 +773,7 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	};
 
 	assign_args1(vargs,current_stable,nargs);
-	// MESG("exec_function: after assign_args1 [%s] ttype=%d",tok->tname,tok->ttype);
+	MESG("exec_function: after assign_args1 [%s] ttype=%d",tok->tname,tok->ttype);
 	value=tok->directive();
 	// MESG("exec_function: before delete_symbol_table, ex_value=%f",ex_value);
 	/* remove local variable tree and restore the old one  */
@@ -1221,13 +1221,13 @@ double factor_proc()
 #endif
 	/* function */
 	MVAR *vargs = NULL;
-	MESG("factor_proc: tok0 [%d %s]",tok0->tnum,tok0->tname);
+	MESG("factor_proc: tok0 [%d %s] args=%d",tok0->tnum,tok0->tname,tok0->tind);
 	vargs = push_args_1(tok0->tind);
-	MESG("factor_proc: vargs=%d",vargs);
+	// MESG("factor_proc: vargs=%d",vargs);
 	after_proc=tok;
-	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
+	MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
 	value=exec_function(tok0->tbuf,vargs,tok0->tind);
-	// MESG("factor_proc: return val=%f",value);
+	MESG("factor_proc: return val=%f",value);
 	tok=after_proc;
 
 	current_active_flag=1;	/* start checking again  */
@@ -2071,8 +2071,8 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 		NTOKEN2;	/* skip separator or end parenthesis */
 		MESG("assign_args1: pos4 tok=[%s] %d",tok->tname,tok->ttype);
 #if	!NO_LPAR
-		if(tok->ttype==TOK_RPAR) break;
 		NTOKEN2;
+		if(tok->ttype==TOK_RPAR) break;
 #endif
 	};
  } else { // we send no arguments!
@@ -2082,9 +2082,7 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
  	// NTOKEN2;
 #endif
  };
-#if	!NO_LPAR
  NTOKEN2;
-#endif
  MESG("assign_args1: end! pos5 after args tok=[%s] %d",tok->tname,tok->ttype);
  return(1);
 }

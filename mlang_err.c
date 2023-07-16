@@ -1299,7 +1299,7 @@ int err_check_sentence1()
 			// tok->directive=tok_dir_while;
 			set_tok_directive(tok,tok_dir_while);
 			NTOKEN_ERR(654);	/* go to next toke after while */
-#if	NO_LPAR
+#if	!NO_LPAR
 			check_skip_token_err1(TOK_LPAR,"tok_dir_while",xpos);
 			CHECK_TOK(656);
 #endif

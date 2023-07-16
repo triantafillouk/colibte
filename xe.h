@@ -29,7 +29,7 @@
 #define	USE_UTF8	1	/* Use utf8 characters  */
 
 #define	USE_SARRAYS	1
-#define	NO_LPAR		0
+#define	NO_LPAR		1
 
 #define	USE_FAST	1 & PCURSES	/* erase line for double width characters in panel_curses  */
 

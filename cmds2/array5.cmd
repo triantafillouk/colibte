@@ -30,9 +30,11 @@ function scale_perc2(scale,num)
  ptotal=0
  ind=0
  val=0
+ print("scale_perc2: ")
  while(ptotal<num) {
 	pptotal=ptotal
 	ptotal += scale[ind][0]
+	print(" ptotal="+ptotal+" pptotal="+pprotal)
 	print("index ="+ind+" up to "+ptotal)
 	perc = scale[ind][1]
 	if(num>ptotal) {
@@ -51,12 +53,14 @@ function scale_perc2(scale,num)
 }
 
 cls
+print("find scales")
 
 auto_scale=[14000 4; 3000 20; 3000 35; 5000 37; 100000 20]
-
+print(auto_scale)
 b=scale_perc2(auto_scale,10302)
-b:
+print("b="+b)
+b: 41208.0
 
-a=scale_perc1(10301):
+#a=scale_perc1(10301): 41204.0
 
-a:
+#a: 41204.0
