@@ -12,8 +12,8 @@ function fact(num)
 
 }
 
-i=3
-a=fact(i)
+i=1
+a=fact(i+2)
 print("fact("+i+") is "+a)
 
 

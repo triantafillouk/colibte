@@ -1221,11 +1221,11 @@ double factor_proc()
 #endif
 	/* function */
 	MVAR *vargs = NULL;
-	// MESG("factor_proc: tok0 [%d %s] args=%d",tok0->tnum,tok0->tname,tok0->tind);
+	MESG("factor_proc: tok0 [%d %s] args=%d",tok0->tnum,tok0->tname,tok0->tind);
 	vargs = push_args_1(tok0->tind);
 	// MESG("factor_proc: vargs=%d",vargs);
 	after_proc=tok;
-	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
+	MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
 	value=exec_function(tok0->tbuf,vargs,tok0->tind);
 	// MESG("factor_proc: return val=%f",value);
 	tok=after_proc;
@@ -2040,14 +2040,15 @@ double assign_val(double none)
 int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 {
  TDS("assign_args1");
-
+ MESG("\n# assign_args1: tok=[%d %s] %d nargs=%d",tok->tnum,tok->tname,tok->ttype,nargs);
  NTOKEN2; /* skip name */
- // MESG("assign_args1: nargs=%d",nargs);
+ MESG("		ntoken");
  if(va) {
 	int i;
 	MESG("assign_args1: pos1 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
-#if	1 	/* 1 works array5, 0 works nr/f1  */
+#if	!NO_LPAR 	/* 1 works array5, 0 works nr/f1  */
 	NTOKEN2;
+	MESG("		ntoken");
 #endif
 	// MESG("assign_args1: pos2 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
 	for(i=0;i<nargs;i++,va++) {
@@ -2057,24 +2058,26 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 		switch(va->vtype) {
 			case VTYPE_NUM:
 				arg_dat->dval=va->dval;
-				// MESG("	assign_args1: dval=%f",va->dval);
+				MESG("		nuneric arg: dval=%f",va->dval);
 				break;
 			case VTYPE_STRING:
-				// MESG("assign %d [%s] %X",i,va->sval,va->sval);
+				MESG("		string arg: %d [%s] %X",i,va->sval,va->sval);
 				arg_dat->sval=va->sval;break;
 			case VTYPE_ARRAY:
 			case VTYPE_SARRAY:
 				arg_dat->adat=va->adat;break;
 			default:
-				ERROR("assign_args:[%d] type is wrong! (%d)",i,va->vtype);
+				ERROR("		array argn_args:[%d] type is wrong! (%d)",i,va->vtype);
 				arg_dat->sval="";
 				arg_dat->dval=0;
 		};
-		NTOKEN2;	/* skip separator or end parenthesis */
 		MESG("assign_args1:arg %d: pos3 after args tok=[%s] %d",i,tok->tname,tok->ttype);
-#if	!NO_LPAR
-		NTOKEN2;
+		NTOKEN2;	/* skip separator or end parenthesis */
 		if(tok->ttype==TOK_RPAR) break;
+		MESG("		ntoken");
+#if	!NO_LPAR
+	NTOKEN2;
+	MESG("		ntoken");
 #endif
 	};
  } else { // we send no arguments!
@@ -2085,7 +2088,8 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 #endif
  };
  NTOKEN2;
- // MESG("assign_args1: end! pos5 after args tok=[%s] %d",tok->tname,tok->ttype);
+ MESG("		ntoken");
+ MESG("assign_args1: end! pos5 after args tok=[%s] %d",tok->tname,tok->ttype);
  return(1);
 }
 
