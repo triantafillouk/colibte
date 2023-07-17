@@ -714,7 +714,9 @@ MVAR * push_args_1(int nargs)
 
  TDS("push_args");
 
- err_num=-1;
+ err_num=0;
+ // MESG("push_args: args=%d",nargs);
+
  if(tok->ttype!=TOK_RPAR && nargs!=0)
  {
 
@@ -723,18 +725,20 @@ MVAR * push_args_1(int nargs)
  if(va){
  MVAR *va_i=va;
  for(i=0;i<nargs;i++,va_i++){
-	
+	// MESG("	evaluate arg %d, tok=[%d %s]",i,tok->tnum,tok->tname);
 	value = num_expression();
 	va_i->vtype=ex_vtype;
-
 	if(ex_vtype==VTYPE_NUM) {
+			// MESG("	arg:%d numeric %f",value);
 			va_i->dval=value;
 	} else
 	if(ex_vtype==VTYPE_STRING) {
-		va_i->sval=saved_string;
+		// MESG("	arg:%d string [%s]",i,saved_string);
+		va_i->sval=strdup(saved_string);
 		clean_saved_string(0);
 	} else 
 	if(ex_vtype==VTYPE_ARRAY||ex_vtype==VTYPE_SARRAY) {
+			// MESG("	arg:%d array type %d",i,ex_array->atype);
 			va_i->adat=ex_array;
 			va_i->vtype=ex_array->atype;
 	} else {
@@ -1222,8 +1226,8 @@ double factor_proc()
 	/* function */
 	MVAR *vargs = NULL;
 	// MESG("factor_proc: tok0 [%d %s] args=%d",tok0->tnum,tok0->tname,tok0->tind);
+	// MESG("factor_proc: tok  [%d %s] %d ",tok->tnum,tok->tname,tok->tind);
 	vargs = push_args_1(tok0->tind);
-	// MESG("factor_proc: vargs=%d",vargs);
 	after_proc=tok;
 	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
 	value=exec_function(tok0->tbuf,vargs,tok0->tind);
@@ -2075,6 +2079,9 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 		NTOKEN2;	/* skip separator or end parenthesis */
 		if(tok->ttype==TOK_RPAR) break;
 		// MESG("		ntoken");
+#if	NO_LPAR
+		if(nargs>0) NTOKEN2;
+#endif
 #if	!NO_LPAR
 	NTOKEN2;
 	// MESG("		ntoken");
@@ -2429,7 +2436,7 @@ double exec_block1()
  double val=0;
  stage_level=0;
  TDS("exec_block1");
- MESG("exec_block1: starting at tok %d type=%d err=%d",tok->tnum,tok->ttype,err_num);
+ // MESG("exec_block1: starting at tok %d type=%d err=%d",tok->tnum,tok->ttype,err_num);
    while(tok->ttype!=TOK_EOF && current_active_flag) 
    {
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);

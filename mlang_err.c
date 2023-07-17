@@ -225,12 +225,13 @@ int  err_eval_fun1(int fnum)
 				return(err_num);
 			};
 #if	NO_LPAR
+			// MESG("	function after arg %d tok=[%d %s]",i,tok->tnum,tok->tname);
 			NTOKEN_ERR(403);
 #endif
 			CHECK_TOK(405);
 		};
 		xpos=406;
-#if	1
+#if	!NO_LPAR
 		if(check_skip_token_err1(TOK_RPAR,"eval_fun1: error closing parenthesis",xpos)) {
 			return err_num;
 		};
@@ -1034,7 +1035,7 @@ int err_lexpression()
 
 	// slval[0]=0;
 	simple=1;
-	MESG("err_lexpression: [%s]",tok_info(tok));
+	// MESG("err_lexpression: [%s]",tok_info(tok));
 	SHOW_STAGE(701);
 	err_num = err_cexpression();
 	if(err_num) return err_num;

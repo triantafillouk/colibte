@@ -892,8 +892,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	tok->tline=tok_line;
 	tok->tname="eof";
 	if(curl_level!=0 && err_num<1) set_error(tok,106,"parse error: invalid number of curls");
+
 	if(par_level!=0 && err_num<1) { 
-		err_num=104;err_line=last_correct_line;err_str="parse error: invalid number of pars";
+		err_num=1014;err_line=last_correct_line;err_str="parse error: invalid number of pars";
 		ERROR("parenthesis error: line %d",tok_line);
 	};
 	bf->m_mode=M_PARSED;	
