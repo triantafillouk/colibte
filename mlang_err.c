@@ -145,9 +145,10 @@ int check_skip_token_err1(int type,char *mesg,int err)
 		NTOKEN2;
  		return(0);
  	} else {
-		ERROR("err %d [%s] token wrong type %d != %d",err,mesg,type,tok->ttype);
-		err_str=mesg;
-		err_num=err;
+		syntax_error(mesg,err);
+		// ERROR("err %d [%s] token wrong type %d != %d",err,mesg,type,tok->ttype);
+		// err_str=mesg;
+		// err_num=err;
 	};
 
   return(err_num);
@@ -229,8 +230,10 @@ int  err_eval_fun1(int fnum)
 			CHECK_TOK(405);
 		};
 		xpos=406;
-#if	!NO_LPAR
-		check_skip_token_err1(TOK_RPAR,"eval_fun1: error closing parenthesis",xpos);
+#if	1
+		if(check_skip_token_err1(TOK_RPAR,"eval_fun1: error closing parenthesis",xpos)) {
+			return err_num;
+		};
 #endif
 		CHECK_TOK(406);
 	} else {;
@@ -965,6 +968,7 @@ int err_num_term1()
 	CHECK_TOK(553);
 	NTOKEN_ERR(5531);
 	err_num=err_num_term2();
+	if(err_num) RT_MESG1(5531);
 	CHECK_TOK(554);
  };
  RT_MESG1(558);
@@ -992,6 +996,7 @@ int err_num_expression()
 		set_term_function(tok,term_plus);
 		NTOKEN_ERR(568);
 		err_num=err_num_term1();
+		if(err_num) return (err_num);
 		CHECK_TOK(569);
 		simple=0;
 		/* check validity of operation combinations   */
@@ -1029,7 +1034,7 @@ int err_lexpression()
 
 	// slval[0]=0;
 	simple=1;
-	// MESG("err_lexpression: [%s]",tok_info(tok));
+	MESG("err_lexpression: [%s]",tok_info(tok));
 	SHOW_STAGE(701);
 	err_num = err_cexpression();
 	if(err_num) return err_num;
@@ -1042,6 +1047,7 @@ int err_lexpression()
 			set_term_function(tok,logical_or);
 			NTOKEN_ERR(704);
 			err_num=err_lexpression();
+			if(err_num) return err_num;
 			CHECK_TOK(706);
 			simple=0;
 			continue;
@@ -1051,6 +1057,7 @@ int err_lexpression()
 			set_term_function(tok,logical_xor);
 			NTOKEN_ERR(709);
 			err_num=err_lexpression();
+			if(err_num) return err_num;
 			CHECK_TOK(712);
 			simple=0;
 			continue;
@@ -1060,6 +1067,7 @@ int err_lexpression()
 			set_term_function(tok,logical_nor);
 			NTOKEN_ERR(7091);
 			err_num=err_lexpression();
+			if(err_num) return err_num;
 			CHECK_TOK(712);
 			simple=0;
 			continue;
@@ -1069,6 +1077,7 @@ int err_lexpression()
 			set_term_function(tok,logical_and);
 			NTOKEN_ERR(709);
 			err_num=err_lexpression();
+			if(err_num) return err_num;
 			CHECK_TOK(712);
 			simple=0;
 			continue;
@@ -1078,6 +1087,7 @@ int err_lexpression()
 			set_term_function(tok,logical_nand);
 			NTOKEN_ERR(7092);
 			err_num=err_lexpression();
+			if(err_num) return err_num;
 			CHECK_TOK(712);
 			simple=0;
 			continue;
@@ -1193,7 +1203,7 @@ int err_check_sentence1()
 #endif
 		err_num=err_lexpression();
 		CHECK_TOK(633);
-
+		if(err_num) return err_num;
 		check_skip_token_err1(TOK_RPAR,"tok_dir_if",xpos);
 
 		CHECK_TOK(634);

@@ -17,7 +17,7 @@ lmargin = 10
 a = lmargin	:    10
 seed = 33
 b = seed	:    33
-b1 = rand()	: 1457850878
+b1 = rand(1000)	: 1457850878
 #message_wait(rand())
 print("test end")
 

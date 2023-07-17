@@ -20,6 +20,7 @@ double uf_ascii();
 double uf_chr();
 double uf_getchar();
 double uf_rand();
+double uf_seed();
 double uf_abs();
 double uf_sindex();
 double uf_string();

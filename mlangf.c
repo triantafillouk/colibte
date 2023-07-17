@@ -355,7 +355,7 @@ double uf_chr()
 
 double uf_getchar()
 {
-
+	ntoken();
 	clean_saved_string(1);
 	if(execmd) {
 		saved_string[0]=getchar();
@@ -371,9 +371,23 @@ double uf_getchar()
 /* returns big! int */
 double uf_rand()
 {
+ // static long =
+ long max=(long) get_numeric_arg();
  ex_vtype=VTYPE_NUM;
- return rand();
+ long value=random() % max;
+ // MESG("uf_rand:%ld",value);
+ // ex_value=23.33;
+ return (double)value;
 }
+
+double uf_seed()
+{
+	long seed=(long) get_numeric_arg();
+	ex_vtype=VTYPE_NUM;
+	srand(seed);
+	return 0;
+}
+
 
 double uf_abs()
 {
@@ -591,6 +605,7 @@ double uf_round()
 
 double uf_getpoint()
 {
+	ntoken();
 	return 0.0;
 }
 
@@ -619,30 +634,35 @@ double uf_deq()
 
 double uf_atbof()
 {
+	ntoken();
 	ex_vtype=VTYPE_NUM;
 	return (FBof(cbfp));
 }
 
 double uf_ateof()
 {
+	ntoken();
 	ex_vtype=VTYPE_NUM;
 	return (FEof(cbfp));
 }
 
 double uf_atbol()
 {
+	ntoken();
 	ex_vtype=VTYPE_NUM;
 	return (FBolAt(cbfp,Offset()));
 }
 
 double uf_ateol()
 {
+	ntoken();
 	ex_vtype=VTYPE_NUM;
 	return (FEolAt(cbfp,Offset()));
 }
 
 double uf_mainargsize()
 {
+	ntoken();
 	if(main_args) {
 	// MESG("argument size: rows=%d cols=%d",main_args->rows,main_args->cols);
 		ex_vtype=VTYPE_NUM;
@@ -652,7 +672,7 @@ double uf_mainargsize()
 
 double uf_mainarg()
 {
-	if(!main_args) return 0;
+	if(!main_args) { ntoken();return 0;};
 
 	get_function_args(1);
 	int ind;

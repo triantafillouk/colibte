@@ -74,13 +74,13 @@ char (12) :
 lmargin = 10
 a = lmargin	:
 # Random value
-i = rand	:
+i = rand(100)	:
 # random seed
 seed = 33
 b = seed	:
-b1 = rand	:
+b1 = rand(100)	:
 b1	:
-message(rand)
+message(rand(100))
 getchar()
 # All the variables are global. That means that they are valid till the are
 # changed, the editor ends or the initialize function is used !
