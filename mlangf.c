@@ -41,6 +41,10 @@ void get_function_args (int number_of_args)
 		// va = (MVAR *)malloc(sizeof(MVAR)*number_of_args);
 		for(i=0;i< number_of_args;i++) { 
 			ntoken();
+#if	0
+			tok=current_token();
+			MESG("get_function_args:%d: [%d %s]",i,tok->tnum,tok->tname);
+#endif
 			double value = num_expression();
 			va[i].vtype=ex_vtype;
 			if(ex_vtype==VTYPE_STRING) { 
@@ -55,6 +59,10 @@ void get_function_args (int number_of_args)
 				// MESG("%d: numeric %f",i,va[i].dval);
 			};
 		};
+#if	0
+		tok=current_token();
+		MESG("	%d:after [%d %s]",i,tok->tnum,tok->tname);
+#endif
 		ntoken();
 	} else {;
 		if(check_token(TOK_LPAR)) {
@@ -259,14 +267,16 @@ double uf_mid()
 
 double uf_print()
 {
-	// MESG("uf_print:");
+	// MESG("uf_print: ex_vtype=%d",ex_vtype);
 	get_function_args(1);
+	// MESG("	uf_print:pos1: ex_vtype=%d",ex_vtype);
 	double value=0;
 	if(va[0].vtype==VTYPE_ARRAY) {
 		print_array1("",va[0].adat);
 	} else {
 		char *p_out;
 		if(va[0].vtype==VTYPE_STRING) {
+			// MESG("	uf_print:pos2: [%s]",va[0].sval);
 			p_out=strdup(va[0].sval);
 			ex_vtype=VTYPE_STRING;
 			set_sval(va[0].sval);

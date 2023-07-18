@@ -23,7 +23,7 @@ typedef struct tok_struct {
 	short tind;	/* token subtype and variable number */
 	short tline;	/* line for debugging  */
 	short tnum;	/* token number for debugging  */
-	void *tname;	// token name or string value
+	char *tname;	// token name or string value
 	double dval;	// double value
 	int ttype;	/* token type */
 	int tgroup;	/* token group  */

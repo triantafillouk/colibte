@@ -83,7 +83,9 @@ static tok_struct *tok;	/* current token!!  */
 char *err_str;
 BTNODE *var_node=NULL;
 
+tok_struct *lstoken=NULL;
 tok_data *lsslot=NULL;
+int firt_var=1;
 tok_data *current_stable=NULL; 	/* current symbol table ...  */
 int stage_level=0;	/* stage level  */
 
@@ -601,7 +603,7 @@ void show_error(char *from,char *name)
  if(var_index>=0)
 	ERROR("%s error %d file %s after function [%s] after line %d: [%s]",from,err_num,name,ftable[var_index].n_name,last_correct_line,err_str);
  else {
-	ERROR("%s error %d file %s before line %d: [%s]",from,err_num,name,last_correct_line,err_str);
+	ERROR("%s error %d file %s line %d: [%s]",from,err_num,name,err_line,err_str);
  };
 }
 
@@ -855,6 +857,12 @@ double factor_variable()
 {
 	// lsslot=&current_stable[tok->tind];	/* symbol table variable's slot  */
 	lsslot= get_left_slot(tok->tind);
+#if	0
+	if(lstoken==NULL) {
+		MESG("variable [%s] ex_vtype=%d",tok->tname,ex_vtype);
+		lstoken=tok;
+	};
+#endif
 	ex_vtype=lsslot->vtype;
 	// MESG("	factor_variable: ind=%d type=%d",lsslot->ind,lsslot->vtype);
 	switch(lsslot->vtype) {
@@ -1041,7 +1049,7 @@ double factor_cmd()
 	double value=1;
 	FUNCS *ed_command;
 
-	ex_vtype=VTYPE_NUM;
+	// ex_vtype=VTYPE_NUM;
 	// MESG(";factor_cmd: ttype=%d command=%d",tok->ttype,tok->tnode->node_index);
 	var_index = tok->tnode->node_index;
 	ed_command = ftable+var_index;
@@ -1451,7 +1459,9 @@ static double term1_div(double v1)
 }
 
 double factor_rcurl(){
+	// MESG("RCURL");
 	NTOKEN2;
+	lstoken=NULL;
 	return -1;
 }
 
@@ -2134,6 +2144,11 @@ void skip_sentence1()
 				return;
 			};
 			break;
+#if	NO_LPAR
+		case TOK_DIR_IF:
+			plevel++;
+			break;
+#endif
 		case TOK_RCURL:
 			return;
 	};
@@ -2151,12 +2166,18 @@ void refresh_ddot_1(double value)
  TextPoint *tp;
 
  TDS("refresh_ddot_1");
- // MESG("refresh_ddot_1:");
+ 
  if(execmd) {
-	// MESG("vtype: %d",ex_vtype);
-	 if(ex_vtype==VTYPE_NUM) printf(";num: %f\n",value);
-	 else if(ex_vtype==VTYPE_STRING) printf(";string: [%s]\n",saved_string);
-	 else if(ex_vtype==VTYPE_ARRAY) print_array1(":",ex_array);
+	 if(ex_vtype==VTYPE_NUM) {
+		if(lstoken) {
+			printf(";%s	: %.3f\n",lstoken->tname,value);
+		} else printf(";	: %.3f\n",value);
+	 } else if(ex_vtype==VTYPE_STRING) {
+	 	if(lstoken) {
+			printf(";%s	: %s\n",lstoken->tname,saved_string);
+		} else printf(";	: '%s'\n",saved_string);
+	 } else if(ex_vtype==VTYPE_ARRAY) print_array1(";",ex_array);
+	 lstoken=NULL;
 	 return;
  };
 
@@ -2180,8 +2201,6 @@ void refresh_ddot_1(double value)
  textpoint_set(buf->tp_current,ddot_position+1);
 
  if(ex_vtype==VTYPE_STRING) {	/* string value  */
-// 	if(value!=0) stat=snprintf(ddot_out,128," <%5.5f>[%s]",value,saved_string);
-	// else 
 	stat=snprintf(ddot_out,128," \"%s\"",saved_string);
  }  else if(ex_vtype==VTYPE_NUM) {	/* numeric value  */
 	long int d = (long int)value;
@@ -2441,18 +2460,17 @@ double exec_block1()
    {
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
 	// if(tok->ttype==TOK_RPAR) { exit(1);};
-	if(tok->ttype==TOK_SEP){ NTOKEN2;continue;	};
-	if(tok->ttype==TOK_RCURL) { NTOKEN2;return(val);};
+	if(tok->ttype==TOK_SEP){ NTOKEN2;
+		// MESG("factor_sep: [%s %d]",tok->tname,tok->ttype);
+		if(tok->ttype==TOK_VAR) lstoken=tok;
+		else lstoken=NULL;
+		continue;
+	};
+	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(val);};
 	if(tok->ttype==TOK_COMMA) { NTOKEN2;};
 	if(tok->ttype==TOK_SHOW) {
 		refresh_ddot_1(val);NTOKEN2;continue;
 	};
-#if	0
-	if(drv_check_break_key()){
-		syntax_error("user interruption",100);
-		if(is_break1) return 0;
-	};
-#endif
 	// if(!current_active_flag) return(val);
  	val=tok->directive();
    };

@@ -219,9 +219,16 @@ int  err_eval_fun1(int fnum)
 #if	!NO_LPAR
 			NTOKEN_ERR(403);
 #endif
-			err_num = err_lexpression();
+			err_num = err_num_expression();
+			// MESG("err eval_function: after arg %d [%s %d]",i,tok->tname,tok->ttype);
+
 			if(err_num) {
 				ERROR("function parameter error! %d",err_num);
+				return(err_num);
+			};
+			// MESG("tok [%s %d]",tok->tname,tok->ttype);
+			if(tok->ttype!=TOK_RPAR && tok->ttype !=TOK_COMMA) {
+				syntax_error("function arguments error",4031);
 				return(err_num);
 			};
 #if	NO_LPAR
@@ -342,7 +349,7 @@ int err_assign_args1(int nargs)
 		}
 		xpos=423;	/* this should be a var token  */
 #if	1
-		err_lexpression();
+		err_num_expression();
 #else
 		NTOKEN_ERR(424);	/* skip semicolon or end parenthesis */
 #endif
@@ -783,7 +790,6 @@ int err_factor()
 		NTOKEN_ERR(502);	/* this is left parenthesis or separator */
 		if(err_num) return(err_num);
 #endif
-
 		/* function */
 		pre_symbol=0;
 
@@ -818,7 +824,7 @@ int err_factor()
 		xpos=506;
 		var_node=tok0->tnode;
 		var_index = var_node->node_index;
-
+		// MESG("err: TOK_CMD");
 		pre_symbol=0;
 		if(ftable[var_index].arg==0) check_par=0;else check_par=1;
 		if(check_par) 
@@ -859,11 +865,20 @@ int err_factor()
 				err_num=err_num_expression();
 				if(err_num) return err_num;
 				CHECK_TOK(517);
-
+				// MESG("arg %d tok=[%s %d]",i,tok->tname,tok->ttype);
+#if	1
+				if(!check_end) {
+					if(tok->ttype==TOK_RPAR || tok->ttype==TOK_SEP) break;
+					else {
+						syntax_error("argument not correct!",xpos);
+					};
+				}
+#else
 				if(!check_end && tok->ttype==TOK_RPAR) {
 					CHECK_TOK(5171);
 					break;
 				};
+#endif
 				if(i<args-1) {	/* check for a comma  */
 					CHECK_TOK(5172);
 					if(tok->ttype==TOK_COMMA || check_end==0) {
