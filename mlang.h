@@ -19,7 +19,6 @@ typedef double (*TFunction)(double v1);
 typedef double (*EFunction)(double v1,double v2);
 
 typedef struct tok_struct {
-	short level;		// curl level
 	short tind;	/* token subtype and variable number */
 	short tline;	/* line for debugging  */
 	short tnum;	/* token number for debugging  */
@@ -36,7 +35,10 @@ typedef struct tok_struct {
 	union {	
 		struct BTNODE *tnode;
 		struct curl_struct *tcurl;
-		struct tok_struct *match_tok;
+		struct tok_struct *match_tok;	/* for curl, parenthesis, bracket  */
+#if	TEST_SKIP
+		struct tok_struct *next_tok;	/* for directives  */
+#endif
 		struct array_dat *adat;
 		struct FILEBUF *tbuf;
 	};
@@ -68,10 +70,12 @@ typedef struct array_dat {
 
 typedef struct curl_struct {
 	int level;
+#if	0
 	int type;
 	int mline;
-	int num;	
 	int active;
+#endif
+	int num;	
 	struct _el *ocurl;
 } curl_struct;
 

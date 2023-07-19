@@ -47,7 +47,7 @@ extern array_dat *main_args;
 #endif
 
 
-int err_check_block1(int level);
+int err_check_block1();
 int check_skip_token1( int type);
 void clean_saved_string(int new_size);
 int deq(double v1,double v2);
@@ -208,10 +208,12 @@ curl_struct *new_curl(int level,int mline, struct _el *el)
  struct curl_struct *lcurl; // left curl
  lcurl=(curl_struct *)malloc(sizeof(struct curl_struct));
  lcurl->level=level;
+#if	0
  lcurl->mline=mline;
+ lcurl->active=1;
+#endif
  lcurl->ocurl=el;
  lcurl->num=0;
- lcurl->active=1;
  return(lcurl);
 }
 
@@ -382,7 +384,9 @@ tok_struct *new_tok()
 {
  tok_struct *tok;
  tok=(struct tok_struct *) malloc(sizeof(struct tok_struct));
+#if	0
  tok->level=0;
+#endif
  tok->tind=0;
  tok->tline=0;
  tok->tnum=0;
@@ -635,7 +639,7 @@ int check_init(FILEBUF *bf)
 	tok=bf->tok_table;
 	if(!(bf->m_mode & M_CHECKED))	/* not checked  */
 	{
-		err=err_check_block1(0);
+		err=err_check_block1();
 		bf->err=err;
 		bf->m_mode |= M_CHECKED;
 	};
@@ -2228,6 +2232,30 @@ void refresh_ddot_1(double value)
  sfb(old_fp);
 }
 
+#if	TEST_SKIP
+double tok_dir_if()
+{
+ double val=0;
+	tok_struct *tok0=tok;
+	NTOKEN2;	/* go to next token after if */
+#if	!NO_LPAR
+	NTOKEN2;	/* skip left parenthesis  */
+#endif
+	val=lexpression();
+	NTOKEN2;	/* skip right parenthesis  */
+	if(val) {
+		val=tok->directive();
+		if(tok->ttype==TOK_DIR_ELSE) tok=tok->next_tok;
+		return val;
+	} else {
+		tok=tok0->next_tok;
+		if(check_skip_token1(TOK_DIR_ELSE)) {
+			val=tok->directive();
+		};
+	}
+	return(val);
+}
+#else
 double tok_dir_if()
 {
  double val=0;
@@ -2259,6 +2287,7 @@ double tok_dir_if()
 	};
 	return(val);
 }
+#endif
 
 double tok_dir_for()
 {
@@ -2723,7 +2752,7 @@ int parse_buffer_show_tokens(int n)
  out_print("|-------- Token list -----------------------------------",1);
  while(1)
  {
-	if((ind%25)==0)  out_print("Num Line Ind Level  Type               Val        Group",1);
+	if((ind%25)==0)  out_print("Num Line Ind Type               Val        Group",1);
 	out_print(tok_info(tok_ind),1);
 	if(tok_ind->ttype==TOK_EOF) break;
 	tok_ind++;
@@ -2742,7 +2771,6 @@ int parse_buffer_show_tokens(int n)
  };
 }
 
-#if	1
 char * tok_info(tok_struct *tok)
 {
  static char stok[MAXLLEN];
@@ -2754,49 +2782,25 @@ char * tok_info(tok_struct *tok)
 				rows=tok->adat->rows;
 				cols=tok->adat->cols;
 			};
-			snprintf(stok,MAXLLEN,"%3d:%4d %3d  %3d   [%2d=%12s] [%s] rows=%d cols=%d",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,rows,cols);
+			snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s] rows=%d cols=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,rows,cols);
 		} else 
-		if(tok->ttype==TOK_SHOW) { snprintf(stok,MAXLLEN,"%3d:%4d %3d  %3d   [%2d=%12s] [:]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME);
+		if(tok->ttype==TOK_SHOW) { snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [:]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME);
 		} else
 		if(tok->ttype==TOK_LCURL||tok->ttype==TOK_RCURL) {
-				snprintf(stok,MAXLLEN,"%3d:%4d %3d  %3d   [%2d=%12s] %s other is %d",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum);
+				snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] %s other is %d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum);
 		} else
 		if(tok->tgroup>0)
-			snprintf(stok,MAXLLEN,"%3d:%4d %3d  %3d   [%2d=%12s] [%s] group [%d:%s]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup));
-		else snprintf(stok,MAXLLEN,"%3d:%4d %3d  %3d   [%2d=%12s] [%s] %f",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->dval);
+			snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s] group [%d:%s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup));
+		else 
+		if(tok->ttype==TOK_NUM) snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] %f",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);
+		else if(tok->ttype==TOK_QUOTE) snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] \"%s\"",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
+		else snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
+// 			
 	} else {
-		     snprintf(stok,MAXLLEN,"%3d:%4d %3d  %3d   [%2d=%12s] [%f]",tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,tok->dval);
+		     snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%f]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);
 	};
 	return stok;
 }
-#else
-char * tok_info(tok_struct *tok)
-{
- static char stok[MAXLLEN];
-	if(tok->tname!=NULL){
-		if(tok->ttype==TOK_ARRAY1 || tok->ttype==TOK_ARRAY2) {
-			int rows=0;
-			int cols=0;
-			if(tok->adat) {
-				rows=tok->adat->rows;
-				cols=tok->adat->cols;
-			};
-			snprintf(stok,MAXLLEN,"%lX %3d: l=%4d i%3d  %3d   [%2d=%12s] [%s] rows=%d cols=%d",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,rows,cols);
-		} else 
-		if(tok->ttype==TOK_SHOW) { snprintf(stok,MAXLLEN,"%lX %3d: l=%4d i%3d  %3d   [%2d=%12s] [:]",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME);
-		} else
-		if(tok->ttype==TOK_LCURL||tok->ttype==TOK_RCURL) {
-				snprintf(stok,MAXLLEN,"%lX %3d: l=%4d i%3d  %3d   [%2d=%12s] %s other is %d",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum);
-		} else
-		if(tok->tgroup>0)
-			snprintf(stok,MAXLLEN,"%lX %3d: l=%4d i%3d  %3d   [%2d=%12s] [%s] group [%d:%s]",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup));
-		else snprintf(stok,MAXLLEN,"%lX %3d: l=%4d i%3d  %3d   [%2d=%12s] [%s] %f",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,(char *)tok->tname,tok->dval);
-	} else {
-		     snprintf(stok,MAXLLEN,"%lX %3d: l=%4d i%3d  %3d   [%2d=%12s] [%f]",(long)tok,tok->tnum,tok->tline,tok->tind,tok->level,tok->ttype,TNAME,tok->dval);
-	};
-	return stok;
-}
-#endif
 
 int show_parse_buffer(int n)
 {

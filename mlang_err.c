@@ -10,7 +10,7 @@
 int err_lexpression();
 int err_num_expression();
 int err_cexpression();
-int err_check_block1(int level);
+int err_check_block1();
 int err_check_sentence1();
 int err_assign_val();
 int err_assign_env();
@@ -1203,13 +1203,15 @@ int err_check_sentence1()
 		else set_tok_directive(tok,dir_lcurl_break);
 		NTOKEN_ERR(627);
 		CHECK_TOK(628);
-		err_num=err_check_block1(tok->level);
+		err_num=err_check_block1();
 		RT_MESG1(629);	/* at the start of next sentence  */
 	};
 
 	case TOK_DIR_IF:
 		{
-		// tok->directive = tok_dir_if;
+#if	TEST_SKIP
+		tok_struct *tok0=tok;
+#endif
 		set_tok_directive(tok,tok_dir_if);
 		NTOKEN_ERR(631);	/* go to next token after if */
 		xpos=632;
@@ -1221,20 +1223,32 @@ int err_check_sentence1()
 		CHECK_TOK(633);
 		if(err_num) return err_num;
 		check_skip_token_err1(TOK_RPAR,"tok_dir_if",xpos);
-
 		CHECK_TOK(634);
 //		if(tok->ttype==TOK_LCURL) is_block=1; 
 		err_num=err_check_sentence1();	/* body of if  */
 		CHECK_TOK(635);
-
+#if	TEST_SKIP
+		tok0->next_tok=tok;
+#endif
 		// MUST: No separator before else, handle this in parser !!!!! CHECK
 		// check for else statement!
+#if	TEST_SKIP
+		if(tok->ttype==TOK_DIR_ELSE) {
+			tok0=tok;
+			NTOKEN2;
+			err_num=err_check_sentence1();	/* body of else  */
+			xpos=638;
+			tok0->next_tok=tok;
+		} else {
+			xpos=639;
+		};
+#else
 		if(check_skip_token1(TOK_DIR_ELSE))
 		{
 			err_num=err_check_sentence1();	/* body of else  */
 			xpos=638;
 		} else xpos=639;
-
+#endif
 		RT_MESG1(xpos);
 		};
 	case TOK_DIR_FORI:
@@ -1375,7 +1389,7 @@ int err_check_sentence1()
  RT_MESG1(669); 
 }
 
-int err_check_block1(int level)
+int err_check_block1()
 {
  TDSERR("block");
    SHOW_STAGE(671);
