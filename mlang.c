@@ -208,7 +208,7 @@ curl_struct *new_curl(int level,int mline, struct _el *el)
  struct curl_struct *lcurl; // left curl
  lcurl=(curl_struct *)malloc(sizeof(struct curl_struct));
  lcurl->level=level;
-#if	0
+#if	!SLIM_ON
  lcurl->mline=mline;
  lcurl->active=1;
 #endif
@@ -384,7 +384,7 @@ tok_struct *new_tok()
 {
  tok_struct *tok;
  tok=(struct tok_struct *) malloc(sizeof(struct tok_struct));
-#if	0
+#if	!SLIM_ON
  tok->level=0;
 #endif
  tok->tind=0;
@@ -2133,9 +2133,7 @@ void skip_sentence1()
  	// MESG("	skip [%s]",tok_info(tok));
 	switch(tok->ttype) {
 		case TOK_DIR_ELSE:	/* this one starts a new sentence!!  */
-
 		case TOK_SEP:
-			// tok->cexpr_function=factor_funcs[tok->ttype];
 			set_tok_function(tok,1);
 			NTOKEN2;
 			return;
@@ -2149,11 +2147,17 @@ void skip_sentence1()
 			};
 			break;
 #if	NO_LPAR
+		case TOK_CMD:
+		case TOK_FUNC:
 		case TOK_DIR_IF:
+		case TOK_DIR_FORI:
+		case TOK_DIR_FOR:
+		case TOK_DIR_WHILE:
 			plevel++;
 			break;
 #endif
 		case TOK_RCURL:
+			NTOKEN2;
 			return;
 	};
  };
@@ -2317,13 +2321,9 @@ double tok_dir_for()
 	// set block start
 	start_block=tok;
 
-	if(tok->ttype==TOK_LCURL) {
-		end_block=tok->match_tok; 
-		end_block++;
-	} else {
-		skip_sentence1();
-		end_block=tok;
-	};
+	// find token after the end of block
+	skip_sentence1();
+	end_block=tok;
 
 	while(!is_break1) {
 		double val;
@@ -2386,13 +2386,10 @@ double tok_dir_fori()
 	// set block start
 	start_block=tok;	/* this is a block start or a simple sentence  */
 
-	if(tok->ttype==TOK_LCURL) {
-		end_block=tok->match_tok; 
-		end_block++;
-	} else {
-		skip_sentence1();
-		end_block=tok;
-	};
+	// find token after the end of block
+	skip_sentence1();
+	end_block=tok;
+
 	if(dinit==dmax) {
 		tok=end_block;
 		current_active_flag=old_active_flag;
@@ -2446,14 +2443,10 @@ double tok_dir_while()
 
 	// this is the start of a simple sentence or a curl
 	start_block=tok;
-	// find the start and end of block
-	if(tok->ttype==TOK_LCURL) {
-		end_block=tok->match_tok;
-		end_block++;
-	} else {
-		skip_sentence1();
-		end_block=tok;
-	};
+
+	// find token after the end of block
+	skip_sentence1();
+	end_block=tok;
 
 	// set tok pointer here
 	do {

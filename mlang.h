@@ -19,13 +19,16 @@ typedef double (*TFunction)(double v1);
 typedef double (*EFunction)(double v1,double v2);
 
 typedef struct tok_struct {
+#if	!SLIM_ON
+	short level;
+#endif
 	short tind;	/* token subtype and variable number */
 	short tline;	/* line for debugging  */
 	short tnum;	/* token number for debugging  */
+	short ttype;	/* token type */
+	short tgroup;	/* token group  */
 	char *tname;	// token name or string value
 	double dval;	// double value
-	int ttype;	/* token type */
-	int tgroup;	/* token group  */
 	union {
 		FFunction factor_function;
 		TFunction term_function;
@@ -45,7 +48,7 @@ typedef struct tok_struct {
 } tok_struct;
 
 typedef struct MVAR {
-	int	vtype;
+	short	vtype;
 	union {
 		double dval;
 		char *sval;
@@ -54,11 +57,11 @@ typedef struct MVAR {
 } MVAR;
 
 typedef struct array_dat {
-	int atype;
-	int anum;
-	int rows;
-	int cols;
-	int astat;	/* array allocation status  */
+	short atype;
+	short anum;
+	short rows;
+	short cols;
+	short astat;	/* array allocation status  */
 	union {
 		void *dat;
 		double *dval;
@@ -69,13 +72,13 @@ typedef struct array_dat {
 } array_dat;
 
 typedef struct curl_struct {
-	int level;
-#if	0
-	int type;
-	int mline;
-	int active;
+	short level;
+#if	!SLIM_ON
+	short type;
+	short mline;
+	short active;
 #endif
-	int num;	
+	short num;	
 	struct _el *ocurl;
 } curl_struct;
 
@@ -84,7 +87,7 @@ typedef struct curl_struct {
 /*	list of recognized user type functions	*/
 typedef struct m_function {
 	char *f_name;	/* function name  */
-	int f_args;	/* number of function arguments  */
+	short f_args;	/* number of function arguments  */
 	FFunction ffunction;
 } m_function;
 

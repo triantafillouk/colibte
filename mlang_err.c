@@ -124,6 +124,7 @@ char * tok_info2(tok_struct *tok)
 #define TDSERR(description) char *Tds=description;
 #endif
 
+
 int parse_level=0;
 char show_type=' ';
 

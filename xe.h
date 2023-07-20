@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.58T80 (19/07/2023)"
+#define VERSION 	"#01.58T81 (20/07/2023)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -31,6 +31,7 @@
 #define	USE_SARRAYS	1
 #define	NO_LPAR		1
 #define	TEST_SKIP	1
+#define	SLIM_ON		1	/* remove no needed elements in structure constructs  */
 
 #define	USE_FAST	1 & PCURSES	/* erase line for double width characters in panel_curses  */
 

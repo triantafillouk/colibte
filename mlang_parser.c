@@ -643,7 +643,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	tok->ttype=tok_type;
 	tok->dval=value;
 	tok->tline=tok_line;
-#if	0
+#if	!SLIM_ON
 	tok->level=curl_level;
 #endif
 	if(tok->ttype==TOK_SHOW) {
@@ -706,14 +706,14 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	} else
 	if(tok->ttype==TOK_RCURL) {
 		struct curl_struct *tcl,*tcr;
-#if	0
+#if	!SLIM_ON
 		struct _el *tt;
 #endif
 			tcr=new_curl(curl_level,tok_line,lex_parser->last);
 			tcl=(curl_struct *)lpop(cstack);
 			tok->tcurl=tcr;
 			tok->tname="}";
-#if	0
+#if	!SLIM_ON
 			// swap curl pointers
 			tt=tcl->ocurl;tcl->ocurl=tcr->ocurl;tcr->ocurl=tt;
 #endif
