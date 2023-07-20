@@ -777,7 +777,7 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	if(current_stable==NULL) { 
 		err_num=208;
 		ERROR("cannot create new symbol table! proc level is %ld",level);
-		is_break1=1;
+		set_break();
 		level=0;
 		return 0;
 	};
@@ -2325,7 +2325,9 @@ double tok_dir_for()
 	skip_sentence1();
 	end_block=tok;
 
-	while(!is_break1) {
+	// while(!is_break1) 
+	while(current_active_flag)
+	{
 		double val;
 		// check expression
 		tok=check_element;
