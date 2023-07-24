@@ -267,30 +267,44 @@ double uf_mid()
 
 double uf_print()
 {
-	// MESG("uf_print: ex_vtype=%d",ex_vtype);
-	get_function_args(1);
-	// MESG("	uf_print:pos1: ex_vtype=%d",ex_vtype);
+	tok_struct *tok=current_token();
+	int args=tok->number_of_args;
+	// MESG("uf_print: ex_vtype=%d tnum=%d args=%d",ex_vtype,tok->tnum,tok->number_of_args);
+	int i;
 	double value=0;
-	if(va[0].vtype==VTYPE_ARRAY) {
-		print_array1("",va[0].adat);
-	} else {
-		char *p_out;
-		if(va[0].vtype==VTYPE_STRING) {
-			// MESG("	uf_print:pos2: [%s]",va[0].sval);
-			p_out=strdup(va[0].sval);
-			ex_vtype=VTYPE_STRING;
-			set_sval(va[0].sval);
-			// if(xwin && !execmd) MESG(saved_string);
-		} else {
-			p_out=(char *)malloc(128);
-			snprintf(p_out,128,": %f",va[0].dval); 
-			ex_vtype=VTYPE_NUM;
-			value=va[0].dval;
+	for(i=0;i<args;i++) {
+		ntoken();
+		tok=current_token();
+		// MESG("	eval arg %d tnum=%d ttype=%d",i,tok->tnum,tok->ttype);
+		value=num_expression();
+		// MESG("		val=%f s='%s'",value,saved_string);
+		switch(ex_vtype) {
+			case VTYPE_ARRAY:
+			case VTYPE_SARRAY:
+				if(i>0) out_print("",1);
+				print_array1("",ex_array);break;
+			case VTYPE_NUM:{
+				char *p_out=(char *)malloc(128);
+				long l0=value;
+				if(l0==value) snprintf(p_out,80,"%ld",l0);
+				else snprintf(p_out,128,"%f",value); 
+				out_print(p_out,0);
+				free(p_out);
+				break;
+			};
+			case VTYPE_STRING:{
+				char *p_out=strdup(saved_string);
+				ex_vtype=VTYPE_STRING;
+				out_print(p_out,0);
+				free(p_out);
+			};
 		};
-		out_print(p_out,1);
-		free(p_out);
+		// MESG("	after switch!");
+		tok=current_token();
+		// MESG("	after switch tnum=%d ttype=%d",tok->tnum,tok->ttype);
 	};
-
+	out_print("",1);
+	ntoken();
 	return value;
 }
 

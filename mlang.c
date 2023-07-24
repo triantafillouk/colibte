@@ -1140,7 +1140,6 @@ double factor_env()
 {
 	BTNODE *bte;
 	double value=0;
-	ex_vtype=VTYPE_NUM;
 	bte=tok->tnode;
 	var_node=bte;
 	value = get_env(bte->node_index);
@@ -2121,7 +2120,7 @@ void skip_sentence1()
 {
  int plevel=0;
  TDS("skip_sentence1");
- // MESG("skip_sentence:");
+ MESG("skip_sentence: ttype=%d",tok->ttype);
  if(tok->ttype==TOK_LCURL) {
 		tok=tok->match_tok; 
 		NTOKEN2;
@@ -2241,18 +2240,22 @@ double tok_dir_if()
 {
  double val=0;
 	tok_struct *tok0=tok;
+	// MESG("tok_dir_if: n=%d",tok->tnum);
 	NTOKEN2;	/* go to next token after if */
 #if	!NO_LPAR
 	NTOKEN2;	/* skip left parenthesis  */
 #endif
 	val=lexpression();
-	NTOKEN2;	/* skip right parenthesis  */
 	if(val) {
+		NTOKEN2;	/* skip right parenthesis  */
+		// MESG("	execute if at %d",tok->tnum);
 		val=tok->directive();
 		if(tok->ttype==TOK_DIR_ELSE) tok=tok->next_tok;
+		// MESG("skip else up to %d",tok->tnum);
 		return val;
 	} else {
 		tok=tok0->next_tok;
+		// MESG("	execute else at %d",tok->tnum);
 		if(check_skip_token1(TOK_DIR_ELSE)) {
 			val=tok->directive();
 		};
@@ -2495,7 +2498,6 @@ double exec_block1()
 	if(tok->ttype==TOK_SHOW) {
 		refresh_ddot_1(val);NTOKEN2;continue;
 	};
-	// if(!current_active_flag) return(val);
  	val=tok->directive();
    };
    // MESG("exec_block1: end!");

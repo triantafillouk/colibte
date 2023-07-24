@@ -40,7 +40,7 @@ m_function m_functions[] = {
 	{"log",1,uf_log},
 	{"trunc",1,uf_trunc},
 	{"round",1,uf_round},
-	{"print",1,uf_print},	/* out_print, print on out buffer, and stdout if in Xwindows mode  */
+	{"print",-1,uf_print},	/* out_print, print on out buffer, and stdout if in Xwindows mode  */
 	{"getpoint",0,uf_getpoint},
 	{"message_wait",1,uf_wait},
 	{"dinput",1,uf_dinput},

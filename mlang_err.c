@@ -190,22 +190,49 @@ void syntax_error(char *description,int err)
  set_error(tok,err,description);
 }
 
+#if	1
+int	err_eval_fun1(tok_struct *tok0)
+#else
 int  err_eval_fun1(int fnum)
+#endif
 {
 	TDSERR("eval_fun1");
-	int i,ia;
+	
+	int ia;
+	int ia0;
 	int f_entry;
+#if	1
+	BTNODE 	*var_node = tok0->tnode;
+	int fnum = var_node->node_index;
+#endif
 #if	!NO_LPAR
 	char err_message[512];
 #endif
-	// MESG("err_eval_fun1:");
-	ia=m_functions[fnum].f_args;
+	ia0=m_functions[fnum].f_args;
+	// MESG("err_eval_fun1: [%s] args=%d tnum=%d ttype=%d",m_functions[fnum].f_name,ia,tok->tnum,tok->ttype);
 
 	f_entry=entry_mode;
 	entry_mode=KNORMAL;
 
 	SHOW_STAGE(401);
 
+#if	1
+	ia=0;
+	while(1){
+		// MESG("function arg tnum=%d ttype=%d %d",tok->tnum,tok->ttype,ia);
+		if(tok->ttype==TOK_RPAR||tok->ttype==TOK_SEP) break;
+		if(tok->ttype==TOK_COMMA) NTOKEN_ERR(403);
+		ia++;
+		err_num=err_num_expression();
+	}
+	if(ia0>=0) {
+		if(ia0!=ia) syntax_error("function arguments error",4031);
+		return(err_num);
+	};
+	tok0->number_of_args=ia;
+	// MESG("function args are %d",ia);
+#else
+	if(ia<0) ia=-ia;
 	if(ia) {
 		/* if we have arguments, check for parenthesis, then get the arguments  */
 #if	!NO_LPAR
@@ -216,6 +243,8 @@ int  err_eval_fun1(int fnum)
 			RT_MESG;
 		} ;
 #endif
+
+
 		for(i=0;i< ia;i++) { 
 #if	!NO_LPAR
 			NTOKEN_ERR(403);
@@ -257,6 +286,7 @@ int  err_eval_fun1(int fnum)
 		};
 #endif
 	}
+#endif
 	entry_mode=f_entry;
 	// MESG("now evaluate it!");
 	/* and now evaluate it! */
@@ -772,12 +802,16 @@ int err_factor()
 		RT_MESG1(495);
 	case TOK_FUNC:	// 2 editor function 
 		/* variable's name in tok0->tname */
-		var_node=tok0->tnode;
 		pre_symbol=0;
+#if	1
+		err_num=err_eval_fun1(tok0);
+#else
+		var_node=tok0->tnode;
 		CHECK_TOK(496);
-		// MESG("err_TOK_FUNC ind=%d",var_node->node_index);
+		MESG("err_TOK_FUNC ind=%d tnum=%d ttype=%d",var_node->node_index,tok->tnum,tok->ttype);
 // 		tok0->factor_function = m_functions[var_node->node_index].ffunction;
 		err_num= err_eval_fun1(var_node->node_index);
+#endif
 		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)
 		int nargs=0;
