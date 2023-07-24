@@ -174,7 +174,10 @@ void set_error(tok_struct *tok,int err,char *description)
  err_num=err;
  // MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
  err_str=strdup(description);
- if(execmd) fprintf(stderr,"Error:%d [%s] tok %s line %d\n",err,(char *)tok->tname,err_str,err_line);
+ if(execmd) {
+	if(tok->tname==NULL) fprintf(stderr,"Error:%d tnum=%d ttype=%d %s line %d\n",err,tok->tnum,tok->ttype,err_str,err_line);
+ 	else fprintf(stderr,"Error:%d [%s] tnum=%d ttype=%d %s line %d\n",err,(char *)tok->tname,tok->tnum,tok->ttype,err_str,err_line);
+ };
  current_active_flag=0;
  tok->ttype=TOK_EOF;
  // tok->directive=factor_eof;
@@ -190,21 +193,16 @@ void syntax_error(char *description,int err)
  set_error(tok,err,description);
 }
 
-#if	1
 int	err_eval_fun1(tok_struct *tok0)
-#else
-int  err_eval_fun1(int fnum)
-#endif
 {
 	TDSERR("eval_fun1");
 	
 	int ia;
 	int ia0;
 	int f_entry;
-#if	1
 	BTNODE 	*var_node = tok0->tnode;
 	int fnum = var_node->node_index;
-#endif
+
 #if	!NO_LPAR
 	char err_message[512];
 #endif
@@ -216,7 +214,6 @@ int  err_eval_fun1(int fnum)
 
 	SHOW_STAGE(401);
 
-#if	1
 	ia=0;
 	while(1){
 		// MESG("function arg tnum=%d ttype=%d %d",tok->tnum,tok->ttype,ia);
@@ -231,62 +228,7 @@ int  err_eval_fun1(int fnum)
 	};
 	tok0->number_of_args=ia;
 	// MESG("function args are %d",ia);
-#else
-	if(ia<0) ia=-ia;
-	if(ia) {
-		/* if we have arguments, check for parenthesis, then get the arguments  */
-#if	!NO_LPAR
-		if(tok->ttype!=TOK_LPAR) {
-			snprintf(err_message,512,"function [%s] with %d arguments without left parenthesis!",m_functions[fnum].f_name,m_functions[fnum].f_args);
-			xpos=402;
-			syntax_error(err_message,xpos);
-			RT_MESG;
-		} ;
-#endif
 
-
-		for(i=0;i< ia;i++) { 
-#if	!NO_LPAR
-			NTOKEN_ERR(403);
-#endif
-			err_num = err_num_expression();
-			// MESG("err eval_function: after arg %d [%s %d]",i,tok->tname,tok->ttype);
-
-			if(err_num) {
-				ERROR("function parameter error! %d",err_num);
-				return(err_num);
-			};
-			// MESG("tok [%s %d]",tok->tname,tok->ttype);
-			if(tok->ttype!=TOK_RPAR && tok->ttype !=TOK_COMMA) {
-				syntax_error("function arguments error",4031);
-				return(err_num);
-			};
-#if	NO_LPAR
-			// MESG("	function after arg %d tok=[%d %s]",i,tok->tnum,tok->tname);
-			NTOKEN_ERR(403);
-#endif
-			CHECK_TOK(405);
-		};
-		xpos=406;
-#if	!NO_LPAR
-		if(check_skip_token_err1(TOK_RPAR,"eval_fun1: error closing parenthesis",xpos)) {
-			return err_num;
-		};
-#endif
-		CHECK_TOK(406);
-	} else {;
-		CHECK_TOK(407);
-#if	NO_LPAR
-		if(tok->ttype==TOK_RPAR) NTOKEN_ERR(4071);
-#else
-		if(tok->ttype==TOK_LPAR){
-			NTOKEN_ERR(4071);
-			if(tok->ttype!=TOK_RPAR) syntax_error("missing right parenthesis",xpos);
-			else NTOKEN_ERR(4072);
-		};
-#endif
-	}
-#endif
 	entry_mode=f_entry;
 	// MESG("now evaluate it!");
 	/* and now evaluate it! */
@@ -302,14 +244,11 @@ int  err_push_args_1(int *nargs)
  SHOW_STAGE(410);
  // MESG("err_push_args:");
  if(tok->ttype!=TOK_RPAR) {
-#if	1
- if(tok->ttype==TOK_SEP) {
+	if(tok->ttype==TOK_SEP) {
 		*nargs=0;
 		set_error(tok,411,"no parenthesis on function call!");
-//		NTOKEN_ERR(411);
 		return(err_num);
- };
-#endif
+	};
  
  while(1){
 	ex_vtype=VTYPE_NUM;

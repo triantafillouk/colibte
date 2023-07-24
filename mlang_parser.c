@@ -655,7 +655,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok->ttype==TOK_AT) {
 		tok->tname=strdup(nword);
 	};
-
+	if(tok->ttype==TOK_SHOW) tok->tname=":";
 	if(tok->ttype==TOK_LBRAKET) tok->tname=" LB ";
 	if(tok->ttype==TOK_RBRAKET) tok->tname=" RB ";
 	if(tok->ttype==TOK_LPAR) {	tok->tname=" ( ";};
