@@ -2617,6 +2617,7 @@ int empty_tok_table(FILEBUF *fp)
 	if(tokdel->ttype==TOK_VAR || tokdel->ttype==TOK_QUOTE){
  		if(tokdel->tname!=NULL) free(tokdel->tname);
 	};
+ };
  if(fp->tok_table) {
 	 // MESG("free the table");
 	free(fp->tok_table);
