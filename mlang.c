@@ -2614,12 +2614,9 @@ int empty_tok_table(FILEBUF *fp)
  tokdel=table;
  for(tokdel=table;tokdel->ttype!=TOK_EOF;tokdel++){
 	// MESG("delete token %d type=%d",tokdel->tnum,tokdel->ttype);
-	if(tokdel->ttype==TOK_VAR || tokdel->ttype==TOK_QUOTE||tokdel->ttype==TOK_LETTER){
+	if(tokdel->ttype==TOK_VAR || tokdel->ttype==TOK_QUOTE){
  		if(tokdel->tname!=NULL) free(tokdel->tname);
 	};
-	// if(tokdel->ttype==TOK_SHOW) free(tokdel->ddot);	/* these are freed while cleaning the textpoints!  */
-	if(tokdel->ttype==TOK_LCURL||tokdel->ttype==TOK_RCURL) free(tokdel->tcurl);
- };
  if(fp->tok_table) {
 	 // MESG("free the table");
 	free(fp->tok_table);
