@@ -2191,7 +2191,7 @@ void refresh_ddot_1(double value)
  int precision=bt_dval("print_precision");
  int show_hex=bt_dval("show_hex");
  char *ddot_out = (char *)malloc(128);
- tp=(TextPoint *)tok->tname;
+ tp=tok->ddot;
  buf=tp->fp;
 
  ddot_position=tp_offset(tp);
@@ -2606,26 +2606,24 @@ int empty_tok_table(FILEBUF *fp)
 {
  tok_struct *table= fp->tok_table;
  tok_struct *tokdel;
- if(table==NULL) return(0);
  // MESG("empty_tok_table:");
+ if(table==NULL) {
+ 	// MESG("empty_tok_table: already clean!");
+	return(0);
+ };
  tokdel=table;
  for(tokdel=table;tokdel->ttype!=TOK_EOF;tokdel++){
-	if(tokdel->ttype==TOK_VAR || tokdel->ttype==TOK_QUOTE){
- 		if(tokdel->tname!=NULL) {
-			if(tokdel->ttype==TOK_QUOTE
-			||tokdel->ttype==TOK_AT
-			||tokdel->ttype==TOK_LETTER
-			||tokdel->ttype==TOK_SHOW
-			) {
-			// MESG("free tname %s",tokdel->tname);
-			free(tokdel->tname);
-			};
-		};
+	// MESG("delete token %d type=%d",tokdel->tnum,tokdel->ttype);
+	if(tokdel->ttype==TOK_VAR || tokdel->ttype==TOK_QUOTE||tokdel->ttype==TOK_LETTER){
+ 		if(tokdel->tname!=NULL) free(tokdel->tname);
 	};
+	// if(tokdel->ttype==TOK_SHOW) free(tokdel->ddot);	/* these are freed while cleaning the textpoints!  */
+	if(tokdel->ttype==TOK_LCURL||tokdel->ttype==TOK_RCURL) free(tokdel->tcurl);
  };
- // MESG("free the table");
  if(fp->tok_table) {
-	free(table);
+	 // MESG("free the table");
+	free(fp->tok_table);
+	// MESG("empty_tok_table: set NULL!");
 	fp->tok_table=NULL;
  };
  fp->err=0;
@@ -2647,9 +2645,10 @@ int refresh_current_buffer(int nused)
  stage_level=0;
 
  /* clear parse list  */
+ // MESG("refresh_current_buffer: call empty_tok_table: [%s]",fp->b_fname);
  empty_tok_table(fp);
  fp->err=-1;
- // MESG("refresh_current_buffer:[%s] %d",fp->b_fname,fp->b_type);
+ // MESG("refresh_current_buffer:1 [%s] %d",fp->b_fname,fp->b_type);
  parse_block1(fp,fp->symbol_tree,1,100);	/* init tree,extra 100 symbols  */
 
  if(err_num<1){	/* if no errors  */

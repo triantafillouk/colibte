@@ -43,6 +43,7 @@ typedef struct tok_struct {
 #if	TEST_SKIP
 		struct tok_struct *next_tok;	/* for directives  */
 #endif
+		TextPoint *ddot;				/* ddot text point  */
 		struct array_dat *adat;
 		struct FILEBUF *tbuf;
 	};

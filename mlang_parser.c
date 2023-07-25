@@ -311,6 +311,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  } 
  if(init && bf->tok_table!=NULL) {
  	/* we must free the previous parse  */
+	// MESG("parse_block1: table is not NULL, free it!");
 	free(bf->tok_table);
 	bf->tok_table=NULL;
  };
@@ -322,7 +323,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	stree=bf->symbol_tree;
 	stree->max_items=999999;
  };
- 
+ // MESG("parse_block1: pos2");
  {	/* clear ddot textpoints  */
 	TextPoint *scan,*nscan;
 	for(scan=bf->tp_last; scan;) {
@@ -647,7 +648,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	tok->level=curl_level;
 #endif
 	if(tok->ttype==TOK_SHOW) {
-		tok->tname=(void *)new_textpoint_at(bf,TP_DDOT,ddot_offset-1);
+		tok->ddot=new_textpoint_at(bf,TP_DDOT,ddot_offset-1);
+		tok->tname=":";
 	};
 	if(tok->ttype==TOK_QUOTE) {
 		tok->tname=strdup(nword);
@@ -655,7 +657,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok->ttype==TOK_AT) {
 		tok->tname=strdup(nword);
 	};
-	if(tok->ttype==TOK_SHOW) tok->tname=":";
 	if(tok->ttype==TOK_LBRAKET) tok->tname=" LB ";
 	if(tok->ttype==TOK_RBRAKET) tok->tname=" RB ";
 	if(tok->ttype==TOK_LPAR) {	tok->tname=" ( ";};
@@ -875,7 +876,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
  
-// MESG("parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
+ // MESG("parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
  {	/* add eof token!  */
 	if(tok_type!=TOK_SEP) 
 	{	
@@ -899,8 +900,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(curl_level!=0 && err_num<1) set_error(tok,106,"parse error: invalid number of curls");
 
 	if(par_level!=0 && err_num<1) { 
-		err_num=1014;err_line=last_correct_line;err_str="parse error: invalid number of pars";
-		ERROR("parenthesis error: line %d",tok_line);
+		err_num=1014;err_line=tok->tline;err_str="parse error: invalid number of pars";
+		// ERROR("parenthesis error: line %d",tok_line);
 	};
 	bf->m_mode=M_PARSED;	
  };
@@ -926,7 +927,11 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
  tok_struct *tok;
  tok_struct *tok_table=NULL;
  int isize=0;
- if(bf->tok_table != NULL) free(bf->tok_table);
+
+ if(bf->tok_table != NULL) {
+	// MESG("set_tok_table: tok_table not NULL, free it!");
+ 	free(bf->tok_table);
+ };
  tok_table=(void *)malloc(sizeof(struct tok_struct)*(lex_parser->size+1));
  bf->tok_table = (void *) tok_table;
  // MESG("set_tok_table: bf=[%s]",bf->b_fname);

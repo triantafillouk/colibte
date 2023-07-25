@@ -711,7 +711,7 @@ int (*key_function(int c,int f))()
 {
 	KEYTAB *ktp;
 	FILEBUF *fp=cbfp;
-	MESG("key_function: c=%X f=%d b_flag=%X %X",c,f,fp->b_flag,fp->b_state);
+	// MESG("key_function: c=%X f=%d b_flag=%X %X",c,f,fp->b_flag,fp->b_state);
 	if( fp->b_flag & FSDIRED && f && fp->b_flag & FSNLIST) {
 		ktp = key_item(keytab_dir,c);
 		if(ktp->k_fp !=NULL && ktp->k_fp!=NOFUNCTION) return(ktp->k_fp);
