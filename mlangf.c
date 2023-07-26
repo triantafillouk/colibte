@@ -33,9 +33,6 @@ void get_function_args (int number_of_args)
 	entry_mode=KNORMAL;
 	// MESG("get_function_args: %d [%d %s]",number_of_args,tok->tnum,tok->tname);
 	ex_vtype=VTYPE_NUM;
-#if	!NO_LPAR
-	ntoken();
-#endif
 	if(number_of_args) {
 		/* if we have arguments, check for parenthesis, then get the arguments  */
 		// va = (MVAR *)malloc(sizeof(MVAR)*number_of_args);
@@ -82,9 +79,6 @@ void get_numeric_args (int number_of_args)
 {
 	int i;
 	// MESG("get_numeric_args: %d",number_of_args);
-#if	!NO_LPAR
-	ntoken();
-#endif
 	for(i=0;i< number_of_args;i++ ) { 
 		ntoken();
 		double value = num_expression();
@@ -98,12 +92,7 @@ double get_numeric_arg ()
 {
 	// MESG("get_numeric_args:");
 	ntoken();
-#if	!NO_LPAR
-		ntoken();
-#endif
-		double value = num_expression();
-		// va[0].vtype=ex_vtype;
-		// va[0].dval=value;
+	double value = num_expression();
 	ntoken();
 	return value;
 }

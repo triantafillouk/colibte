@@ -203,9 +203,6 @@ int	err_eval_fun1(tok_struct *tok0)
 	BTNODE 	*var_node = tok0->tnode;
 	int fnum = var_node->node_index;
 
-#if	!NO_LPAR
-	char err_message[512];
-#endif
 	ia0=m_functions[fnum].f_args;
 	// MESG("err_eval_fun1: [%s] args=%d tnum=%d ttype=%d",m_functions[fnum].f_name,ia,tok->tnum,tok->ttype);
 
@@ -308,10 +305,6 @@ int err_assign_args1(int nargs)
  // MESG("err_assign_args1: nargs=%d",nargs); 
  if(nargs!=0) {
 	xpos=421;
-#if	!NO_LPAR
-	if(tok->ttype!=TOK_LPAR) { err_num=xpos;return err_num;};
-	NTOKEN_ERR(4211);	/* skip left parenthesis  */
-#endif
 	for(i=0;i<nargs;i++) {
 		xpos=422;
 		if(tok->ttype==TOK_RPAR) {
@@ -759,11 +752,7 @@ int err_factor()
 		xpos=501;
 		// MESG("err TOK_PROC:");
 		ex_nvars++;
-#if	!NO_LPAR
-		if(tok->ttype!=TOK_SEP)
-		NTOKEN_ERR(502);	/* this is left parenthesis or separator */
-		if(err_num) return(err_num);
-#endif
+
 		/* function */
 		pre_symbol=0;
 
@@ -803,24 +792,14 @@ int err_factor()
 		if(ftable[var_index].arg==0) check_par=0;else check_par=1;
 		if(check_par) 
 		{	xpos=507;
-#if	!NO_LPAR
-			check_skip_token_err1(TOK_LPAR,"tok_cmd:0",xpos);
-			CHECK_TOK(xpos);
-#endif
 			pnum++;
 
 			if(pnum>10) {
 				CHECK_TOK(508);
 				return xpos;	/* recursion should not be checked at this stage  */
 			};
-		} else {
-#if	!NO_LPAR
-			CHECK_TOK(509);
-			if(tok->ttype==TOK_LPAR) { /* no arguments but still LPAR */
-				NTOKEN_ERR(510);
-			}
-#endif
 		};
+
 		xpos=5152;
 		save_macro_exec=macro_exec;
 		macro_exec=MACRO_MODE2;
@@ -1183,16 +1162,11 @@ int err_check_sentence1()
 
 	case TOK_DIR_IF:
 		{
-#if	TEST_SKIP
 		tok_struct *tok0=tok;
-#endif
 		set_tok_directive(tok,tok_dir_if);
 		NTOKEN_ERR(631);	/* go to next token after if */
 		xpos=632;
-#if	!NO_LPAR
-		check_skip_token_err1(TOK_LPAR,"tok_dir_if",xpos);
-		CHECK_TOK(6321);
-#endif
+
 		err_num=err_lexpression();
 		CHECK_TOK(633);
 		if(err_num) return err_num;
@@ -1201,12 +1175,10 @@ int err_check_sentence1()
 //		if(tok->ttype==TOK_LCURL) is_block=1; 
 		err_num=err_check_sentence1();	/* body of if  */
 		CHECK_TOK(635);
-#if	TEST_SKIP
 		tok0->next_tok=tok;
-#endif
 		// MUST: No separator before else, handle this in parser !!!!! CHECK
 		// check for else statement!
-#if	TEST_SKIP
+
 		if(tok->ttype==TOK_DIR_ELSE) {
 			tok0=tok;
 			NTOKEN2;
@@ -1216,13 +1188,6 @@ int err_check_sentence1()
 		} else {
 			xpos=639;
 		};
-#else
-		if(check_skip_token1(TOK_DIR_ELSE))
-		{
-			err_num=err_check_sentence1();	/* body of else  */
-			xpos=638;
-		} else xpos=639;
-#endif
 		RT_MESG1(xpos);
 		};
 	case TOK_DIR_FORI:
@@ -1233,9 +1198,7 @@ int err_check_sentence1()
 		// tok->directive = tok_dir_fori;
 		set_tok_directive(tok,tok_dir_fori);
 		NTOKEN_ERR(640);	/* go to next token after for */
-#if	!NO_LPAR
-		NTOKEN_ERR(6401);	/* skip left parenthesis  */
-#endif
+
 		if(tok->ttype==TOK_VAR) {
 			NTOKEN_ERR(6403);
 			if(tok->ttype!=TOK_ASSIGN) ERROR("6404:for i error");
@@ -1280,10 +1243,7 @@ int err_check_sentence1()
 		// tok->directive=tok_dir_for;
 		set_tok_directive(tok,tok_dir_for);
 		NTOKEN_ERR(641);	/* go to next token after for */
-#if	!NO_LPAR
-		check_skip_token_err1(TOK_LPAR,"tok_dir_for",xpos);
-		CHECK_TOK(6411);
-#endif
+
 		err_num=err_lexpression();	/* check initial  */
 		NTOKEN_ERR(643);	/* skip separator! */
 		
@@ -1313,10 +1273,7 @@ int err_check_sentence1()
 			// tok->directive=tok_dir_while;
 			set_tok_directive(tok,tok_dir_while);
 			NTOKEN_ERR(654);	/* go to next toke after while */
-#if	!NO_LPAR
-			check_skip_token_err1(TOK_LPAR,"tok_dir_while",xpos);
-			CHECK_TOK(656);
-#endif
+
 			// set check_list
 			check_element=tok;
 			err_num=err_check_sentence1();

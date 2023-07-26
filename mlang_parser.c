@@ -458,7 +458,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		case TOK_LPAR:
 			par_level++;
 			cc=0;
-#if	NO_LPAR
+
 			if(previous_ttype==TOK_DIR_IF
 			 ||previous_ttype==TOK_FUNC
 			 // ||previous_ttype==TOK_DIR_ELSE
@@ -474,9 +474,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				continue;
 			}
 			else break;
-#else			
-			break;
-#endif
 		case TOK_RPAR:
 			par_level--;
 			cc=1;break;
@@ -644,9 +641,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	tok->ttype=tok_type;
 	tok->dval=value;
 	tok->tline=tok_line;
-#if	!SLIM_ON
-	tok->level=curl_level;
-#endif
 	if(tok->ttype==TOK_SHOW) {
 		tok->ddot=new_textpoint_at(bf,TP_DDOT,ddot_offset-1);
 		tok->tname=":";
@@ -707,17 +701,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	} else
 	if(tok->ttype==TOK_RCURL) {
 		struct curl_struct *tcl,*tcr;
-#if	!SLIM_ON
-		struct _el *tt;
-#endif
 			tcr=new_curl(curl_level,tok_line,lex_parser->last);
 			tcl=(curl_struct *)lpop(cstack);
 			tok->tcurl=tcr;
 			tok->tname="}";
-#if	!SLIM_ON
-			// swap curl pointers
-			tt=tcl->ocurl;tcl->ocurl=tcr->ocurl;tcr->ocurl=tt;
-#endif
 			tcr->num=tcl->num;
 			tcl->num=tok->tnum;
 	};

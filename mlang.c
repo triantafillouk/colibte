@@ -208,10 +208,6 @@ curl_struct *new_curl(int level,int mline, struct _el *el)
  struct curl_struct *lcurl; // left curl
  lcurl=(curl_struct *)malloc(sizeof(struct curl_struct));
  lcurl->level=level;
-#if	!SLIM_ON
- lcurl->mline=mline;
- lcurl->active=1;
-#endif
  lcurl->ocurl=el;
  lcurl->num=0;
  return(lcurl);
@@ -384,9 +380,6 @@ tok_struct *new_tok()
 {
  tok_struct *tok;
  tok=(struct tok_struct *) malloc(sizeof(struct tok_struct));
-#if	!SLIM_ON
- tok->level=0;
-#endif
  tok->tind=0;
  tok->tline=0;
  tok->tnum=0;
@@ -1063,16 +1056,8 @@ double factor_cmd()
 	macro_exec=MACRO_MODE2;
 	// MESG(";ed_command: [%s] args=%d",ed_command->n_name,ed_command->arg);
 	if(ed_command->arg) {
-#if	!NO_LPAR
-		if(ed_command->arg>2 || ed_command->arg<0) {
-			NTOKEN2;	/* skip parenthesis  */
-			return ed_command->n_func(1);
-		};
-#endif
 		check_par=1;	/* we need parenthesis if arguments.  */
-#if	!NO_LPAR
-		NTOKEN2;
-#endif
+
 		value=num_expression();
 		// MESG(";	ed_command: value=%f ex_vtype=%d s=[%s]",value,ex_vtype,saved_string);
 		ex_value=value;
@@ -1093,16 +1078,8 @@ double factor_cmd()
 			};
 		};
 
-	} else {	/* no argument  */
-
-#if	0
-		if(tok->ttype==TOK_LPAR) {	/* we can have parenthesis or not. */
-			NTOKEN2;
-			check_par=1;
-		};
-		value=1;
-#endif
 	};
+
 	macro_exec = MACRO_MODE2;
 
 	err_num=0;
@@ -1231,9 +1208,6 @@ double factor_proc()
 	double value;
 	// MESG("factor_proc:");
 	NTOKEN2;
-#if	!NO_LPAR
-	NTOKEN2;	/* this is left parenthesis */
-#endif
 	/* function */
 	MVAR *vargs = NULL;
 	// MESG("factor_proc: tok0 [%d %s] args=%d",tok0->tnum,tok0->tname,tok0->tind);
@@ -2059,15 +2033,9 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
  TDS("assign_args1");
  // MESG("\n# assign_args1: tok=[%d %s] %d nargs=%d",tok->tnum,tok->tname,tok->ttype,nargs);
  NTOKEN2; /* skip name */
- // MESG("		ntoken");
  if(va) {
 	int i;
 	// MESG("assign_args1: pos1 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
-#if	!NO_LPAR 	/* 1 works array5, 0 works nr/f1  */
-	NTOKEN2;
-	// MESG("		ntoken");
-#endif
-	// MESG("assign_args1: pos2 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
 	for(i=0;i<nargs;i++,va++) {
 		tok_data *arg_dat=&symbols[tok->tind];
 		arg_dat->vtype=va->vtype;
@@ -2092,23 +2060,13 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 		NTOKEN2;	/* skip separator or end parenthesis */
 		if(tok->ttype==TOK_RPAR) break;
 		// MESG("		ntoken");
-#if	NO_LPAR
 		if(nargs>0) NTOKEN2;
-#endif
-#if	!NO_LPAR
-	NTOKEN2;
-	// MESG("		ntoken");
-#endif
 	};
  } else { // we send no arguments!
 	// skip till end parenthesis setting default values for arguments!!??
 	while(tok->ttype!=TOK_RPAR && tok->ttype!=TOK_END) NTOKEN2;
-#if	NO_LPAR
- 	// NTOKEN2;
-#endif
  };
  NTOKEN2;
- // MESG("		ntoken");
  // MESG("assign_args1: end! pos5 after args tok=[%s] %d",tok->tname,tok->ttype);
  return(1);
 }
@@ -2120,7 +2078,7 @@ void skip_sentence1()
 {
  int plevel=0;
  TDS("skip_sentence1");
- MESG("skip_sentence: ttype=%d",tok->ttype);
+ // MESG("skip_sentence: ttype=%d",tok->ttype);
  if(tok->ttype==TOK_LCURL) {
 		tok=tok->match_tok; 
 		NTOKEN2;
@@ -2145,7 +2103,6 @@ void skip_sentence1()
 				return;
 			};
 			break;
-#if	NO_LPAR
 		case TOK_CMD:
 		case TOK_FUNC:
 		case TOK_DIR_IF:
@@ -2154,7 +2111,6 @@ void skip_sentence1()
 		case TOK_DIR_WHILE:
 			plevel++;
 			break;
-#endif
 		case TOK_RCURL:
 			NTOKEN2;
 			return;
@@ -2235,16 +2191,13 @@ void refresh_ddot_1(double value)
  sfb(old_fp);
 }
 
-#if	TEST_SKIP
 double tok_dir_if()
 {
  double val=0;
 	tok_struct *tok0=tok;
 	// MESG("tok_dir_if: n=%d",tok->tnum);
 	NTOKEN2;	/* go to next token after if */
-#if	!NO_LPAR
-	NTOKEN2;	/* skip left parenthesis  */
-#endif
+
 	val=lexpression();
 	if(val) {
 		NTOKEN2;	/* skip right parenthesis  */
@@ -2262,39 +2215,6 @@ double tok_dir_if()
 	}
 	return(val);
 }
-#else
-double tok_dir_if()
-{
- double val=0;
-	int exec_else=0;
-
-	NTOKEN2;	/* go to next token after if */
-#if	!NO_LPAR
-	NTOKEN2;	/* skip left parenthesis  */
-#endif
-	val=lexpression();
-
-	NTOKEN2;	/* skip right parenthesis  */
-	if(val) {
-		val=tok->directive();
-	} else {
-		skip_sentence1();	/* at the begin of next blocl/sentence  */
-		exec_else=1;
-	}
-	// check for else statement!
-	if(check_skip_token1(TOK_DIR_ELSE))
-	{
-		if(exec_else)	{
-			val=tok->directive();	/* eval else statement */
-		} else {
-			skip_sentence1();	/* skip else statement  */
-		};
-	} else {
-//			NTOKEN2;
-	};
-	return(val);
-}
-#endif
 
 double tok_dir_for()
 {
@@ -2306,9 +2226,7 @@ double tok_dir_for()
 
 //	MESG("-- start for loop: active = %d",current_active_flag);	
 	NTOKEN2;	/* go to next token after for */
-#if	!NO_LPAR
-	NTOKEN2;	/* skip left parenthesis  */
-#endif
+
 	lexpression();	/* initial   */
 	NTOKEN2;	/* skip separator! */
 	// set check_list
@@ -2363,9 +2281,7 @@ double tok_dir_fori()
 	double *pdval;
 
 	NTOKEN2;	/* go to next token after for */
-#if	!NO_LPAR
-	NTOKEN2;	/* skip left parenthesis  */
-#endif
+
 	if(tok->ttype==TOK_VAR) {
 		index=&current_stable[tok->tind];
 		if(index->vtype!=VTYPE_NUM) {err_num=224;ERROR("for i syntax error %d",err_num);};
@@ -2438,9 +2354,7 @@ double tok_dir_while()
 	int old_active_flag=current_active_flag;
 
 	NTOKEN2;	/* go to next token after while */
-#if	!NO_LPAR
-	NTOKEN2;	/* skip left parenthesis  */
-#endif
+
 	check_element=tok;	/* this is the check element!  */
 	skip_sentence1();	/* for now skip it  */
 
