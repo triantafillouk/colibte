@@ -1,4 +1,4 @@
-#include "xe.h"
+	#include "xe.h"
 #include "mlang.h"
 
 extern char *saved_string;
@@ -8,6 +8,8 @@ extern array_dat *ex_array;
 extern array_dat *main_args;
 extern char *ex_name;
 extern FILEBUF *cbfp;
+
+tok_struct *current_token();
 
 void ntoken();
 int check_token(int type);
@@ -26,18 +28,20 @@ void get_function_args (int number_of_args)
 {
 	int i;
 	int f_entry;
-	// MVAR *va=NULL;
-
+	// tok_struct *tok = current_token();
 	f_entry=entry_mode;
 	entry_mode=KNORMAL;
-	// MESG("get_function_args: %d",number_of_args);
+	// MESG("get_function_args: %d [%d %s]",number_of_args,tok->tnum,tok->tname);
 	ex_vtype=VTYPE_NUM;
-	ntoken();
 	if(number_of_args) {
 		/* if we have arguments, check for parenthesis, then get the arguments  */
 		// va = (MVAR *)malloc(sizeof(MVAR)*number_of_args);
 		for(i=0;i< number_of_args;i++) { 
 			ntoken();
+#if	0
+			tok=current_token();
+			MESG("get_function_args:%d: [%d %s]",i,tok->tnum,tok->tname);
+#endif
 			double value = num_expression();
 			va[i].vtype=ex_vtype;
 			if(ex_vtype==VTYPE_STRING) { 
@@ -52,9 +56,14 @@ void get_function_args (int number_of_args)
 				// MESG("%d: numeric %f",i,va[i].dval);
 			};
 		};
+#if	0
+		tok=current_token();
+		MESG("	%d:after [%d %s]",i,tok->tnum,tok->tname);
+#endif
 		ntoken();
 	} else {;
 		if(check_token(TOK_LPAR)) {
+			// MESG("	get_function_args: TOK_LPAR");
 				ntoken();
 				ntoken();
 		};
@@ -70,7 +79,6 @@ void get_numeric_args (int number_of_args)
 {
 	int i;
 	// MESG("get_numeric_args: %d",number_of_args);
-	ntoken();
 	for(i=0;i< number_of_args;i++ ) { 
 		ntoken();
 		double value = num_expression();
@@ -82,12 +90,9 @@ void get_numeric_args (int number_of_args)
 
 double get_numeric_arg ()
 {
-	// MESG("get_numeric_args: %d",number_of_args);
+	// MESG("get_numeric_args:");
 	ntoken();
-		ntoken();
-		double value = num_expression();
-		// va[0].vtype=ex_vtype;
-		// va[0].dval=value;
+	double value = num_expression();
 	ntoken();
 	return value;
 }
@@ -106,12 +111,30 @@ double uf_len()
 	return value;
 }
 
+double uf_array_cols()
+{
+	get_function_args(1);
+	ex_vtype=VTYPE_NUM;
+	if(va->vtype==VTYPE_ARRAY||va->vtype==VTYPE_SARRAY) {
+		return va->adat->cols;
+	} else return 0;
+}
+
+double uf_array_rows()
+{
+	get_function_args(1);
+	ex_vtype=VTYPE_NUM;
+	if(va->vtype==VTYPE_ARRAY||va->vtype==VTYPE_SARRAY) {
+		return va->adat->rows;
+	} else return 0;
+}
+
 /* clear output buffer */
 double uf_cls()
 {
 	ntoken();
 	cls_fout("[out]");
-	// MESG("clear screen!");
+	MESG("<------------------------------------------------------------------>");
 	return 0;
 }
 
@@ -233,28 +256,44 @@ double uf_mid()
 
 double uf_print()
 {
-	// MESG("uf_print:");
-	get_function_args(1);
+	tok_struct *tok=current_token();
+	int args=tok->number_of_args;
+	// MESG("uf_print: ex_vtype=%d tnum=%d args=%d",ex_vtype,tok->tnum,tok->number_of_args);
+	int i;
 	double value=0;
-	if(va[0].vtype==VTYPE_ARRAY) {
-		print_array1("",va[0].adat);
-	} else {
-		char *p_out;
-		if(va[0].vtype==VTYPE_STRING) {
-			p_out=strdup(va[0].sval);
-			ex_vtype=VTYPE_STRING;
-			set_sval(va[0].sval);
-			// if(xwin && !execmd) MESG(saved_string);
-		} else {
-			p_out=(char *)malloc(128);
-			snprintf(p_out,128,": %f",va[0].dval); 
-			ex_vtype=VTYPE_NUM;
-			value=va[0].dval;
+	for(i=0;i<args;i++) {
+		ntoken();
+		tok=current_token();
+		// MESG("	eval arg %d tnum=%d ttype=%d",i,tok->tnum,tok->ttype);
+		value=num_expression();
+		// MESG("		val=%f s='%s'",value,saved_string);
+		switch(ex_vtype) {
+			case VTYPE_ARRAY:
+			case VTYPE_SARRAY:
+				if(i>0) out_print("",1);
+				print_array1("",ex_array);break;
+			case VTYPE_NUM:{
+				char *p_out=(char *)malloc(128);
+				long l0=value;
+				if(l0==value) snprintf(p_out,80,"%ld",l0);
+				else snprintf(p_out,128,"%f",value); 
+				out_print(p_out,0);
+				free(p_out);
+				break;
+			};
+			case VTYPE_STRING:{
+				char *p_out=strdup(saved_string);
+				ex_vtype=VTYPE_STRING;
+				out_print(p_out,0);
+				free(p_out);
+			};
 		};
-		out_print(p_out,1);
-		free(p_out);
+		// MESG("	after switch!");
+		tok=current_token();
+		// MESG("	after switch tnum=%d ttype=%d",tok->tnum,tok->ttype);
 	};
-
+	out_print("",1);
+	ntoken();
 	return value;
 }
 
@@ -329,7 +368,7 @@ double uf_chr()
 
 double uf_getchar()
 {
-
+	ntoken();
 	clean_saved_string(1);
 	if(execmd) {
 		saved_string[0]=getchar();
@@ -345,9 +384,23 @@ double uf_getchar()
 /* returns big! int */
 double uf_rand()
 {
+ // static long =
+ long max=(long) get_numeric_arg();
  ex_vtype=VTYPE_NUM;
- return rand();
+ long value=random() % max;
+ // MESG("uf_rand:%ld",value);
+ // ex_value=23.33;
+ return (double)value;
 }
+
+double uf_seed()
+{
+	long seed=(long) get_numeric_arg();
+	ex_vtype=VTYPE_NUM;
+	srand(seed);
+	return 0;
+}
+
 
 double uf_abs()
 {
@@ -463,6 +516,7 @@ double uf_dinput()
 
 double uf_init()
 {
+	ntoken();
 	initialize_vars();
 	return 0;
 }
@@ -485,6 +539,14 @@ double uf_sqrt()
 	else syntax_error("aqrt: wrong argument",305);
 
 	return value;
+}
+
+double uf_dbg_message()
+{
+	get_function_args(1);
+	if(va[0].vtype==VTYPE_STRING) MESG(":%s",va[0].sval);
+	ex_vtype=VTYPE_NUM;
+	return 0;
 }
 
 double uf_sin()
@@ -556,6 +618,7 @@ double uf_round()
 
 double uf_getpoint()
 {
+	ntoken();
 	return 0.0;
 }
 
@@ -584,30 +647,35 @@ double uf_deq()
 
 double uf_atbof()
 {
+	ntoken();
 	ex_vtype=VTYPE_NUM;
 	return (FBof(cbfp));
 }
 
 double uf_ateof()
 {
+	ntoken();
 	ex_vtype=VTYPE_NUM;
 	return (FEof(cbfp));
 }
 
 double uf_atbol()
 {
+	ntoken();
 	ex_vtype=VTYPE_NUM;
 	return (FBolAt(cbfp,Offset()));
 }
 
 double uf_ateol()
 {
+	ntoken();
 	ex_vtype=VTYPE_NUM;
 	return (FEolAt(cbfp,Offset()));
 }
 
 double uf_mainargsize()
 {
+	ntoken();
 	if(main_args) {
 	// MESG("argument size: rows=%d cols=%d",main_args->rows,main_args->cols);
 		ex_vtype=VTYPE_NUM;
@@ -617,7 +685,7 @@ double uf_mainargsize()
 
 double uf_mainarg()
 {
-	if(!main_args) return 0;
+	if(!main_args) { ntoken();return 0;};
 
 	get_function_args(1);
 	int ind;

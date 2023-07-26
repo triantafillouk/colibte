@@ -148,8 +148,7 @@ void set_error(tok_struct *tok,int index,char *description);
 void init_error();
 
 extern char slval[];
-// extern int ex_vtype;
-extern int ex_edenv;
+extern int ex_vtype;
 extern int err_num;
 extern char *err_str;
 
@@ -211,8 +210,6 @@ double get_env(int vnum)
 	int v1=0;
 	svalue[0]=0;
 
-	ex_edenv=TOK_ENV;
-
 	/* fetch the appropriate value */
 	if(cbfp == NULL) return(0.0);
 	switch (vnum) {
@@ -261,15 +258,15 @@ double get_env(int vnum)
 			strlcpy(svalue,VERSION,MAXLLEN);break;
 		default:
 			ERROR("GET_ENV: Not a valid function err=503");
-			ex_edenv=0;
 			return value;
 	};
 	value=v1;
 	if(svalue[0]!=0) { 
 		set_vtype(VTYPE_STRING);
 		set_sval(svalue);	
-		value=next_value();
-	};
+		ex_vtype=VTYPE_STRING;
+		// value=next_value();
+	} else ex_vtype=VTYPE_NUM;
 	return(value);
 }
 

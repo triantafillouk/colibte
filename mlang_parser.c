@@ -294,7 +294,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  alist *lex_parser=NULL;
  BTREE *stree=use_stree;
  tok_struct *tok=NULL;
- tok_struct *previous_token=NULL;
+ // tok_struct *previous_token=NULL;
+ int previous_ttype=0;
 
  int tok_type=0;
  int next_tok_type=0;
@@ -305,10 +306,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
  if(bf->tok_table !=NULL && init==0) 
  {
-	return(0);	// no change, already parsed
+	// MESG("	no change, already parsed!");
+	return(0);
  } 
  if(init && bf->tok_table!=NULL) {
  	/* we must free the previous parse  */
+	// MESG("parse_block1: table is not NULL, free it!");
 	free(bf->tok_table);
 	bf->tok_table=NULL;
  };
@@ -320,7 +323,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	stree=bf->symbol_tree;
 	stree->max_items=999999;
  };
- 
+ // MESG("parse_block1: pos2");
  {	/* clear ddot textpoints  */
 	TextPoint *scan,*nscan;
 	for(scan=bf->tp_last; scan;) {
@@ -454,7 +457,23 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			break;
 		case TOK_LPAR:
 			par_level++;
-			cc=0;break;
+			cc=0;
+
+			if(previous_ttype==TOK_DIR_IF
+			 ||previous_ttype==TOK_FUNC
+			 // ||previous_ttype==TOK_DIR_ELSE
+			 ||previous_ttype==TOK_DIR_WHILE
+			 ||previous_ttype==TOK_DIR_FOR
+			 ||previous_ttype==TOK_PROC
+			 ||previous_ttype==TOK_CMD
+			 ||previous_ttype==TOK_DIR_FORI
+			 ||previous_ttype==TOK_DIR_RETURN
+			) {
+				// MESG("parse: TOK_LPAR skip");
+				previous_ttype=0;
+				continue;
+			}
+			else break;
 		case TOK_RPAR:
 			par_level--;
 			cc=1;break;
@@ -592,14 +611,13 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 	};
 
-	// if(previous_token) MESG("	- previous token is %s",tname(previous_token->ttype));
-	// MESG("	- token type=%d %s",tok_type,tname(tok_type));
+	// MESG("	- token type=[%d %s] previous token is [%d %s]",tok_type,tname(tok_type),previous_ttype,tname(previous_ttype));
 	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {
 	if(!(is_now_sep && (tok_type==TOK_LCURL||tok_type==TOK_RCURL) )){
 			/* check for else statement!!  */
 		if(!(tok_type==TOK_LETTER && !strcmp(nword,"else"))){
-			if(tok_type==TOK_LBRAKET && previous_token->ttype==TOK_RBRAKET){
+			if(tok_type==TOK_LBRAKET && previous_ttype==TOK_RBRAKET){
 				// MESG("skip tok_lbraket!");
 				continue;
 			} else {
@@ -614,7 +632,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 		};
 	};
-	previous_token=tok;
+	previous_ttype=tok_type;
 	// MESG("	2 - token type=%d %s",tok_type,tname(tok_type));
 
 	if(tok_type!=TOK_SEP) is_now_sep=0;
@@ -623,10 +641,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	tok->ttype=tok_type;
 	tok->dval=value;
 	tok->tline=tok_line;
-	tok->level=curl_level;
-
 	if(tok->ttype==TOK_SHOW) {
-		tok->tname=(void *)new_textpoint_at(bf,TP_DDOT,ddot_offset-1);
+		tok->ddot=new_textpoint_at(bf,TP_DDOT,ddot_offset-1);
+		tok->tname=":";
 	};
 	if(tok->ttype==TOK_QUOTE) {
 		tok->tname=strdup(nword);
@@ -634,10 +651,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok->ttype==TOK_AT) {
 		tok->tname=strdup(nword);
 	};
-
 	if(tok->ttype==TOK_LBRAKET) tok->tname=" LB ";
 	if(tok->ttype==TOK_RBRAKET) tok->tname=" RB ";
-	if(tok->ttype==TOK_LPAR) tok->tname=" ( ";
+	if(tok->ttype==TOK_LPAR) {	tok->tname=" ( ";};
 	if(tok->ttype==TOK_RPAR) tok->tname=" ) ";
 	if(tok->ttype==TOK_SEP) tok->tname=" ; ";
 	if(tok->ttype==TOK_NUM) tok->tname="numeric";
@@ -685,13 +701,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	} else
 	if(tok->ttype==TOK_RCURL) {
 		struct curl_struct *tcl,*tcr;
-		struct _el *tt;
 			tcr=new_curl(curl_level,tok_line,lex_parser->last);
 			tcl=(curl_struct *)lpop(cstack);
 			tok->tcurl=tcr;
 			tok->tname="}";
-			// swap curl pointers
-			tt=tcl->ocurl;tcl->ocurl=tcr->ocurl;tcr->ocurl=tt;
 			tcr->num=tcl->num;
 			tcl->num=tok->tnum;
 	};
@@ -834,6 +847,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					break;
 				case TOK_PROC:	/* 4  */
 					tok->ttype=TOK_PROC;	// 
+					// MESG("TOK_PROC");
 					break;
 				case TOK_OPTION:	/* 5  */
 					tok->ttype=TOK_OPTION; // editor options
@@ -845,10 +859,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		};
 	};
 	// MESG("parse: end token switch!");
+	previous_ttype=tok->ttype;
 	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
  
-// MESG("parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
+ // MESG("parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
  {	/* add eof token!  */
 	if(tok_type!=TOK_SEP) 
 	{	
@@ -870,9 +885,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	tok->tline=tok_line;
 	tok->tname="eof";
 	if(curl_level!=0 && err_num<1) set_error(tok,106,"parse error: invalid number of curls");
+
 	if(par_level!=0 && err_num<1) { 
-		err_num=104;err_line=last_correct_line;err_str="parse error: invalid number of pars";
-		ERROR("parenthesis error: line %d",tok_line);
+		err_num=1014;err_line=tok->tline;err_str="parse error: invalid number of pars";
+		// ERROR("parenthesis error: line %d",tok_line);
 	};
 	bf->m_mode=M_PARSED;	
  };
@@ -898,17 +914,21 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
  tok_struct *tok;
  tok_struct *tok_table=NULL;
  int isize=0;
- if(bf->tok_table != NULL) free(bf->tok_table);
-// fprintf(stderr,"token list size = %d\n",lex_parser->size);
+
+ if(bf->tok_table != NULL) {
+	// MESG("set_tok_table: tok_table not NULL, free it!");
+ 	free(bf->tok_table);
+ };
  tok_table=(void *)malloc(sizeof(struct tok_struct)*(lex_parser->size+1));
  bf->tok_table = (void *) tok_table;
-
+ // MESG("set_tok_table: bf=[%s]",bf->b_fname);
  lbegin(lex_parser);
  tlist=lex_parser;
  tok_to = tok_table;
  while(tlist->current)
  {
 	tok=(tok_struct *)tlist->current->data;
+	// MESG("	%d: [%s] %d",tok->tnum,tok->tname,tok->ttype);
 	memcpy((void *)tok_to,(void *)tok,sizeof(tok_struct));
 	if(tok->ttype==TOK_LCURL || tok->ttype==TOK_RCURL) {
 		tok_to->match_tok = tok_table + tok_to->tcurl->num;

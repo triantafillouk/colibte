@@ -14,6 +14,7 @@ extern alist *window_list;
 extern int *color;
 extern FILEBUF *cbfp;
 extern int color_scheme_ind;
+extern int drv_initialized;
 
 GWINDP * drv_new_twinp();
 
@@ -124,7 +125,7 @@ void set_current_window(WINDP *new_wp,char *title)
 int next_window(int n)
 {
 	register WINDP *wp;
-
+	if(!drv_initialized) return false;
 	lfind_data((void *)cwp,window_list);
 	lmove_to_next(window_list,1);
 	wp=(WINDP *)lget_current(window_list);
@@ -139,7 +140,7 @@ int next_window(int n)
 int prev_window(int n)
 {
 	register WINDP *wp;
-
+	if(!drv_initialized) return false;
 	lfind_data((void *)cwp,window_list);
 	lmove_to_previous(window_list,1);
 	wp=(WINDP *)lget_current(window_list);
@@ -151,7 +152,7 @@ int prev_window(int n)
 int move_window(int n)
 {
 	offs curoffs;
-
+	if(!drv_initialized) return false;
 	if(n==0) return FALSE;
 
 	curoffs = LineBegin(tp_offset(cwp->tp_hline));
@@ -195,6 +196,7 @@ int one_window(int n)
 {
  WINDP *wp;
 
+ if(!drv_initialized) return false;
  drv_flush();
  if(window_list->head->next == NULL) return(TRUE);	/* this is the only window */
 
@@ -223,6 +225,7 @@ int buffer_in_view(int n)
  WINDP *view_window;
  char bname[MAXFLEN];
  int s1;
+ if(!drv_initialized) return false;
  if((s1 = nextarg("buffer name: ",bname,MAXFLEN,true)) !=TRUE) return FALSE;
  view_buffer=get_filebuf(bname,NULL,0);
  if(view_buffer) {

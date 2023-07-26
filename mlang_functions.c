@@ -21,7 +21,8 @@ m_function m_functions[] = {
     {"s_asc",1,uf_ascii},	/* CHAR TO INTEGER CONVERSION */
     {"chr",1,uf_chr},		/* INTEGER TO CHAR CONVERSION */
     {"getchar",0,uf_getchar},	/* GET 1 CHARACTER */
-    {"rand",0,uf_rand},        	/* GET A RANDOM NUMBER */
+    {"rand",1,uf_rand},        	/* GET A RANDOM NUMBER */
+	{"seed",1,uf_seed},			/* set sedd for random function  */
     {"abs",1,uf_abs},        	/* ABSOLUTE VALUE OF A NUMBER */
     {"s_index",2,uf_sindex},     /* FIND THE INDEX OF ONE STRING IN ANOTHER */
 	{"str",1,uf_string},		/* string of a value */
@@ -39,7 +40,7 @@ m_function m_functions[] = {
 	{"log",1,uf_log},
 	{"trunc",1,uf_trunc},
 	{"round",1,uf_round},
-	{"print",1,uf_print},	/* out_print, print on out buffer, and stdout if in Xwindows mode  */
+	{"print",-1,uf_print},	/* out_print, print on out buffer, and stdout if in Xwindows mode  */
 	{"getpoint",0,uf_getpoint},
 	{"message_wait",1,uf_wait},
 	{"dinput",1,uf_dinput},
@@ -55,5 +56,8 @@ m_function m_functions[] = {
 	{"at_eol",0,uf_ateol},	/* if at end of line  */
 	{"args_size",0,uf_mainargsize},	/* main arguments list size  */
 	{"args",1,uf_mainarg},	/* main  argument at position */
-	{NULL,0}
+	{"array_cols",1,uf_array_cols},	/* columns of an an array  */
+	{"array_rows",1,uf_array_rows},	/* rows of an an array  */
+	{"dbg_message",1,uf_dbg_message},	/* show debug message  */
+	{NULL,0,NULL}
 };

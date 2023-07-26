@@ -1,7 +1,11 @@
 # recursion test
 # test with factorial , doll function
 
-initialize()
+print("start");
+
+cls
+# initialize
+print("after init!")
 
 function doll(size)
 {
@@ -47,6 +51,7 @@ function fact2(num)
 }
 
 #_debug=20
+print("start")
 
 b=doll(10)
 

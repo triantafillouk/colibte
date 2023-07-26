@@ -24,6 +24,7 @@ int get_menu_index_from_mouse();
 void utf_string_break(char *utf_string, int column);
 int noop(int);
 
+extern int drv_initialized;
 extern FILEBUF *cbfp;
 extern int clen_error;
 extern WINDOW *mesg_window;	/* message line curses window  */
@@ -150,6 +151,7 @@ void clear_message_line()
 int window_row_resize(int n)
 {
 	char slines[80];
+ 	if(!drv_initialized) return 0;
 
 	/* must have a non-default argument, else ignore call */
 	slines[0]=0;
@@ -160,26 +162,31 @@ int window_row_resize(int n)
 
 int window_row_increase(int n)
 {
+	if(!drv_initialized) return 0;
 	return(hresize_wind(5));
 }
 
 int window_column_increase(int n)
 {
+	if(!drv_initialized) return 0;
 	return(vresize_wind(5));
 }
 
 int window_row_decrease(int n)
 {
+	if(!drv_initialized) return 0;
 	return(hresize_wind(-5));
 }
 
 int window_column_decrease(int n)
 {
+	if(!drv_initialized) return 0;
 	return(vresize_wind(-5));
 }
 
 int window_column_resize(int n)
 {
+	if(!drv_initialized) return 0;
 	char slines[80];
 
 	/* must have a non-default argument, else ignore call */

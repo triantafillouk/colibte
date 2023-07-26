@@ -46,6 +46,8 @@ int split_window(int n)
  GWINDP *gwnew;	// new window
  WINDP *wpnew;
  // MESG("/nsplit_window: %d",cwp->id);
+
+ if(!drv_initialized) return 0;
  if(cwp->w_ntrows < 15) {
  	msg_line("too small to horizontal split!");
 	return(FALSE);
@@ -67,6 +69,7 @@ int vsplit_window(int n)
 {
  GWINDP *gwnew;	// new window
  WINDP *wpnew;
+if(!drv_initialized) return 0;
  if(cwp->w_ntcols < 40) {
 //	MESG("vsplit_window: cols=%d",cwp->w_ntcols);
  	msg_line("too small for vertical split!");
@@ -89,6 +92,8 @@ int delete_window(int n)
 {	/* new gtk version! */
 	WINDP *new_wp;	/* window to go and receive deleted space */
 	WINDP *to_delete=cwp;
+
+	if(!drv_initialized) return 0;
 	if(window_list->size==1) return(TRUE);	/* this is the only window */
 
 

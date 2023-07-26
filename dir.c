@@ -32,6 +32,7 @@ char **f_extension;
 extern int dont_edit();
 extern alist *file_list;
 extern FILEBUF *cbfp;
+extern int drv_initialized;
 
 #define	SORT_FUNC	0	/* Use different functions for dir sorting  */
 #define MAXSTAT	100000	/* Do not sort dir if more files  */
@@ -2077,6 +2078,7 @@ int listdir(int dtype)
  int stat;
  char go_name[MAXFLEN];
 
+ if(!drv_initialized) return false;
  if(is_scratch_buffer(cbfp)) {
  	if(chdir(get_start_dir())) return false;
  };

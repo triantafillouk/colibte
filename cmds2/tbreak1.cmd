@@ -26,4 +26,4 @@ while(i>0)
 }
 
 print("end of test, i="+i+" j="+j)
-if((j==4) & (i==4)) print("test ok!")
+if((j==4) & (i==4)) {print("test ok!")}

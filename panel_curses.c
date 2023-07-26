@@ -451,7 +451,8 @@ int split_window(int n)
         register WINDP *wp;
         register int    ntru;
         register int    ntrl;
-        if (cwp->w_ntrows < 16) {
+ 		if(!drv_initialized) return 0;
+       if (cwp->w_ntrows < 16) {
                 msg_line("Cannot split a %d line window", cwp->w_ntrows);
                 return (true);
 		}
@@ -481,6 +482,7 @@ int vsplit_window(int n)
     int    ntl;
     int    ntr;
 	
+ 	if(!drv_initialized) return 0;
     if (cwp->w_ntcols < 40) {
             msg_line("Cannot split a %d column window", cwp->w_ntcols);
             return (true);

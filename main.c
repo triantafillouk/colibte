@@ -291,6 +291,9 @@ void parse_command_line(int argc, char **argv)
 				case 'b':	/* open as binary file  */
 					binflag=1;
 					break;
+				case 't':
+					show_tokens=1;
+					MESG("show_tokens!");
 				case 'x':	/* execute file and quit */
 					execmd=1;
 				case 'X':	/* execute file as statrup */
