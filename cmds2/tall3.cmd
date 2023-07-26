@@ -5,7 +5,7 @@ ok=1
 start=0
 # test if,else
 level=0
-bool=ok & level>=start	: <    1 | 0x1 | 0o1>
+bool=ok & level>=start	:
  print("start")
 
 if(ok & level>=start)

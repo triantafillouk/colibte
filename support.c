@@ -47,7 +47,7 @@ void set_start_dir(char *start)
  }
  else 
  strlcpy(start_dir_val,start,MAXFLEN);
- MESG("set_start_dir: to [%s]",start_dir_val);
+ // MESG("set_start_dir: to [%s]",start_dir_val);
 }
 
 void set_working_dir(char *dir)

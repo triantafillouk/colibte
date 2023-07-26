@@ -2,6 +2,7 @@
 
 function add3(a,b,c)
 {
+ print("-args:a="+a+" b="+b+" c="+c)
  if(c==0) { return (0) }
  d=a+b+add3(a,b,c-1)
  return(d)
@@ -9,7 +10,7 @@ function add3(a,b,c)
 
 cls
 
-result = add3(1,2,1)
+result = add3(1 ,2 ,5)
 result:   3.0
 
 `

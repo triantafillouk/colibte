@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.58T54 (15/05/2023)"
+#define VERSION 	"#01.58T86 (26/07/2023)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -27,6 +27,10 @@
 
 #define	TARROWS		1	/* Use arrow menus in panel curses  */
 #define	USE_UTF8	1	/* Use utf8 characters  */
+
+#define	USE_SARRAYS	1
+#define	NO_LPAR		1
+#define	SLIM_ON		1	/* remove no needed elements in structure constructs  */
 
 #define	USE_FAST	1 & PCURSES	/* erase line for double width characters in panel_curses  */
 
@@ -312,7 +316,14 @@ typedef struct  VIDEO {
 typedef struct tok_data {
 	int	ind;
 	int vtype;
+#if	USE_SARRAYS
+	union {
 	double *pdval;
+	char  **psval;
+	};
+#else
+	double *pdval;
+#endif
 	union {
 		double dval;
 		char *sval;

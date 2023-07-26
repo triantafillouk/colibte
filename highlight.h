@@ -24,7 +24,7 @@ int comment_matlab(int n);
 int comment_none(int n);
 int comment_basic(int n);
 int comment_sql(int n);
-
+int comment_lua();
 
 /* character states */
 #if	1
@@ -99,6 +99,7 @@ void highlight_rust(int c);
 void highlight_tags(int c);
 void highlight_sln(int c);
 void highlight_md(int c);
+void highlight_lua(int c);
 
 char *c_w[] = { "if","else","do","while","switch","case","for","return","break","goto","continue","typedef",
 	"namespace","this","throw","try","catch","@property","" };
@@ -247,6 +248,9 @@ char *dir_w1[] = { "/home","Downloads","Desktop","" };
 
 char *tag_w[] = { NULL,NULL,NULL,NULL,NULL};
 char *tag_w1[] = { NULL,NULL,NULL,NULL,NULL};
+
+char *lua_w[] = { "function","while","do","elseif","in","if","then","else","for","end","return",NULL };
+char *lua_w1[] = { "print","local","ipairs","true","false","cooroutine","pairs","type","nil","setmetatable",NULL};
 
 /* extensions defined  */
 char *no_extensions[] = {"" };
@@ -303,6 +307,7 @@ char *dir_extensions[] = { "" };
 char *tag_extensions[] = { "tag",""};
 char *sln_extensions[] = { "SLN","sln",""};
 char *terraform_extensions[] = {"tfvars","tf",""};
+char *lua_extensions[] = {"lua",""};
 
 SHLIGHT hts[] = {
  { "NONE",0,0,none_w,none_w, highlight_text,update_highlight_none,c_in_txt_word,no_extensions,comment_perl },
@@ -359,6 +364,7 @@ SHLIGHT hts[] = {
  { "JULIA",0,0,julia_w,julia_w1,highlight_julia,update_highlight,c_incword,julia_extensions,comment_perl },
  { "CAL",1,0,none_w,none_w, highlight_cmd,update_highlight_line,c_in_txt_word,gtxt_extensions,comment_perl },
  { "MD",0,0,none_w,none_w, highlight_md, update_highlight, c_in_txt_word,md_extensions,comment_html },
+ { "LUA",0,0,lua_w,lua_w1,highlight_lua,update_highlight,c_incword,lua_extensions,comment_lua },
  { NULL,0,0,NULL,NULL,NULL,NULL,NULL }
 };
 

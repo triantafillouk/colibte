@@ -32,6 +32,7 @@ char **f_extension;
 extern int dont_edit();
 extern alist *file_list;
 extern FILEBUF *cbfp;
+extern int drv_initialized;
 
 #define	SORT_FUNC	0	/* Use different functions for dir sorting  */
 #define MAXSTAT	100000	/* Do not sort dir if more files  */
@@ -1507,7 +1508,7 @@ int dir_left(int n)
 	num to_col=0;
 
 	if(cwp->tp_current->col > 0 && n==1) return(prev_character(1));
-	MESG("dir_left: quick_close");
+	// MESG("dir_left: quick_close");
 	bf = cbfp->connect_buffer;
 	to_line = cbfp->connect_line;
 	to_col = cbfp->connect_column;
@@ -2077,6 +2078,7 @@ int listdir(int dtype)
  int stat;
  char go_name[MAXFLEN];
 
+ if(!drv_initialized) return false;
  if(is_scratch_buffer(cbfp)) {
  	if(chdir(get_start_dir())) return false;
  };

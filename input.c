@@ -417,7 +417,7 @@ int assign_sub(int n)
 	kfunc = execsub;
 	msg_line("Press the key to assign!");
 	c = getckey();
-//	show_token(cbfp->parser,"assign_sub: after getkey!");
+	// show_token(cbfp->parser,"assign_sub: after getkey!");
 
 	// msg_line(xe_key_name(c));
 	return(set_key_function(kfunc,c,funname));
@@ -641,7 +641,7 @@ int show_keys(int n)
 int getckey()
 {
 	int c;
-
+	// MESG("getckey: macro_exec=%d",macro_exec);
 	if (macro_exec) {
 		strlcpy(key_string,key_str1(),128);
 		return (tstr_to_command(key_string));
@@ -941,8 +941,8 @@ void out_print(char *s,int nl)
 	if(s==NULL) return;
 #if	1
 	if(!discmd) {
-		if(nl) fprintf(stderr,"%s\n",s);
-		else fprintf(stderr,"%s",s);
+		if(nl) printf("%s\n",s);
+		else printf("%s",s);
 		return;
 	};
 #endif

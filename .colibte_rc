@@ -138,7 +138,7 @@ while(test)
  else
  {
 	message ("cleared "+found+" results!)")
-	unmark_buffer
+	# unmark_buffer
 	break
  }
 }

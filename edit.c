@@ -1148,9 +1148,11 @@ int abort_cmd(int n)
 {
 	kbdmode = STOP;
 //	MESG("abort_cmd:");
+	if(!execmd) {
 	clear_message_line();
 	set_update(cwp,UPD_STATUS);
 	drv_flush();
+	};
     return(false);
 }
 

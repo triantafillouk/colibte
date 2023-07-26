@@ -31,14 +31,14 @@ if(ok & level>=start)
 	t=t+1
  }
 
- t	: <    2 | 0x2 | 0o2>
+ t	:
  print("level "+level+" (if,else test) result should be 2, is "+t)
  if(t==2) 
  {
 	ok=2.2
  }
 }
-ok	: <2.200000>
+ok	:
 
 # test for loop
 print("start test for loop , ok="+ok)
@@ -62,7 +62,7 @@ if(ok==1 & level>=start)
 }
 
 
-ok	: <2.200000>
+ok	:
 # test while loop
 print("start test while loop , ok="+ok)
 level=2
@@ -86,7 +86,7 @@ if(ok==1 & level>=start)
  }
 
 }
-ok: <2.200000>
+ok:
 
  print("test again if loop ok="+ok)
 ok=1
@@ -94,7 +94,7 @@ ok=1
 if(ok)
 {
  print("ok="+ok)
- a: <    1 | 0x1 | 0o1>
+ a:
 }
 else
 {

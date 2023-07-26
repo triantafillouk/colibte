@@ -16,7 +16,7 @@ fori(i=1;101;1){
 		p = p+l
 	  }
 	} 
-	show_time("loop:"+i+" p="+p,1);
+#	show_time("loop:"+i+" p="+p,1);
 }
 _time	: "Wed Feb 24 19:48:43 2016"
 #message(_version+" i<"+i+" and j< "+j+" sets p="+p)

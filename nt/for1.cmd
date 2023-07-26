@@ -1,4 +1,11 @@
-for(i=0;i<10;i+=2)
+cls
+
+for(i=0;i<10;i+=1)
 {
-	print(i)
+	print(" f:"+i)
+}
+
+fori(i=0;10;1)
+{
+	print("fii:"+i)
 }

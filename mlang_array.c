@@ -21,16 +21,15 @@ void allocate_array(struct array_dat *adat);
 void init_array(struct array_dat *array, int rows,int cols)
 {
 	int ctype=VTYPE_ARRAY;	/* default is numeric!!  */
-	// MESG("init_array: ex_nums=%d ex_nquote=%d ex_nvars=%d",ex_nums,ex_nquote,ex_nvars);
 	if(ex_nums) ctype=VTYPE_ARRAY;
 	else if(ex_nquote) ctype=VTYPE_SARRAY;
 	else if(ex_nquote>0 && ex_nums>0) ctype=VTYPE_AMIXED;
 	else if(ex_nvars) ctype=VTYPE_DYNAMIC;
-	// MESG("ctype=%d",ctype);
+	// MESG("init_array: ex_nums=%d ex_nquote=%d ex_nvars=%d ->ctype=%d",ex_nums,ex_nquote,ex_nvars,ctype);
 	array->rows=rows;
 	array->cols=cols;
 	array->atype=ctype;
-	array->astat=0;
+	array->astat=ARRAY_UNALLOCATED;
 	array->dat=NULL;
 	ex_vtype=ctype;
 	/* init again after use the ex values!  */
@@ -43,6 +42,7 @@ struct array_dat * new_list_array(int cols)
 {
 	struct array_dat *sarray;
 	ex_nquote=1;
+	// MESG("new_list_array: cols=%d",cols);
 	sarray = new_array(1,cols);
 	return sarray;
 }
@@ -54,7 +54,7 @@ void free_array_dat(struct array_dat *adat)
  	err_str="free_array_dat: array is already NULL!!";
 	return;
  };
- if(adat->astat==0) { 
+ if(adat->astat==ARRAY_UNALLOCATED) { 
  	err_num=252;
 	err_str="free_array_dat: astat is already zero !!!!!!!";
  };
@@ -75,7 +75,7 @@ void free_array_dat(struct array_dat *adat)
 	};
 	free(adat->dval2);
  };
- adat->astat=0;
+ adat->astat=ARRAY_UNALLOCATED;
  return;
 }
 
@@ -90,7 +90,7 @@ void allocate_array(struct array_dat *adat)
 {
  int i;
  // MESG("allocate_array: astat=%d type=%d",adat->astat,adat->atype);
- if(adat->astat==0 || adat->atype==VTYPE_DYNAMIC) {	/* new/renew  */
+ if(adat->astat==ARRAY_UNALLOCATED || adat->atype==VTYPE_DYNAMIC) {	/* new/renew  */
  	if(adat->atype==VTYPE_ARRAY) {	/* allocate num array  */
 
  if(adat->rows >1 && adat->cols>1) {
@@ -104,7 +104,7 @@ void allocate_array(struct array_dat *adat)
 		adat->dval2[j]=(double *)malloc(sizeof(double)*adat->cols);
 		for(i=0;i<adat->cols;i++) adat->dval2[j][i]=0;
 	};
-	adat->astat=3;
+	adat->astat=ARRAY_ALLOCATED;
  } else {
 	int dim=1;
 	int i;
@@ -113,16 +113,16 @@ void allocate_array(struct array_dat *adat)
 	if(adat->rows > 1) dim=adat->rows; else dim=adat->cols;
  	adat->dval=(double *)malloc(sizeof(double)*dim);
 	for(i=0;i<dim;i++) adat->dval[i]=0;
-	adat->astat=3;
+	adat->astat=ARRAY_ALLOCATED;
  };
 
 	};
 	if(adat->atype==VTYPE_SARRAY) {	/* allocate string array  */
 		// MESG("	allocate string array %d rows, %d cols",adat->rows,adat->cols);
 	 	if(adat->dat != NULL) free(adat->dat);	/* free string array  */
-		adat->sval=(char **)malloc(sizeof(char *)*adat->rows*adat->cols);
+		adat->sval=(char **)malloc(sizeof(char **)*adat->rows*adat->cols);
 		for(i=0;i< adat->rows*adat->cols;i++) adat->sval[i]=NULL;
-		adat->astat=3;
+		adat->astat=ARRAY_ALLOCATED;
 	};
 	if(adat->atype==VTYPE_AMIXED || adat->atype==VTYPE_DYNAMIC) {	/* new mixed  */
 		if(adat->mval!=NULL) free(adat->mval);
@@ -135,7 +135,7 @@ void allocate_array(struct array_dat *adat)
 struct array_dat *alloc_array()
 {
  static int array_num=0;
- // MESG("aloc_array:");
+ // MESG("alloc_array:");
  array_dat *na=(array_dat *)malloc(sizeof(struct array_dat));
  na->anum = array_num++;
  return(na);
@@ -144,11 +144,12 @@ struct array_dat *alloc_array()
 struct array_dat *new_array_similar(array_dat *a)
 {
  array_dat *na;
+ // MESG("new_array_similar:");
  na=alloc_array();
  na->rows=a->rows;
  na->cols=a->cols;
  na->atype=a->atype;
- na->astat=0;
+ na->astat=ARRAY_UNALLOCATED;
  na->dat=NULL;
  allocate_array(na);
  return(na); 
@@ -157,6 +158,7 @@ struct array_dat *new_array_similar(array_dat *a)
 struct array_dat *new_array(int rows,int cols)
 {
 	struct array_dat *array;
+	// MESG("new_array: rows=%d cols=%d",rows,cols);
 	array=alloc_array();
 	init_array(array,rows,cols);
 	return(array);
@@ -165,6 +167,7 @@ struct array_dat *new_array(int rows,int cols)
 array_dat * dup_array_add1(array_dat *a,double plus)
 {
  array_dat *na;	/* new array  */
+ // MESG("dup_array_add1:");
  na=new_array_similar(a);
  	if(na->atype==VTYPE_ARRAY) {	/* allocate num array  */
 		int i,j,dim=1;
@@ -176,13 +179,14 @@ array_dat * dup_array_add1(array_dat *a,double plus)
 			for(i=0;i<dim;i++) na->dval[i]= a->dval[i]+plus;
 		};
 	};
- na->astat=3;
+ na->astat=ARRAY_ALLOCATED;
  return(na);
 }
 	/* subtruct array from variable  */
 array_dat * dup_array_sub1(array_dat *a,double plus)
 {
  array_dat *na;	/* new array  */
+ // MESG("dup_array_sub1:");
  na=new_array_similar(a);
  	if(na->atype==VTYPE_ARRAY) {	/* allocate num array  */
 		int i,j,dim=1;
@@ -194,13 +198,14 @@ array_dat * dup_array_sub1(array_dat *a,double plus)
 			for(i=0;i<dim;i++) na->dval[i]=plus - a->dval[i];
 		};
 	};
- na->astat=3;
+ na->astat=ARRAY_ALLOCATED;
  return(na);
 }
 
 array_dat * dup_array_mul1(array_dat *a,double num)
 {
  array_dat *na;	/* new array  */
+ // MESG("dup_array_mul1:");
  na=new_array_similar(a);
  	if(na->atype==VTYPE_ARRAY) {	/* allocate num array  */
 		int i,j,dim=1;
@@ -212,13 +217,14 @@ array_dat * dup_array_mul1(array_dat *a,double num)
 			for(i=0;i<dim;i++) na->dval[i]=a->dval[i]*num;
 		};
 	};
- na->astat=3;
+ na->astat=ARRAY_ALLOCATED;
  return(na);
 }
 
 array_dat * dup_array_mod1(array_dat *a,double num)
 {
  array_dat *na;	/* new array  */
+ // MESG("dup_array_mod1:");
  na=new_array_similar(a);
  	if(na->atype==VTYPE_ARRAY) {	/* allocate num array  */
 		int i,j,dim=1;
@@ -230,13 +236,14 @@ array_dat * dup_array_mod1(array_dat *a,double num)
 			for(i=0;i<dim;i++) na->dval[i]=modulo(a->dval[i],num);
 		};
 	};
- na->astat=3;
+ na->astat=ARRAY_ALLOCATED;
  return(na);
 }
 
 array_dat * dup_array_power(array_dat *a,double num)
 {
  array_dat *na;	/* new array  */
+ // MESG("dup_array_power:");
  na=new_array_similar(a);
  	if(na->atype==VTYPE_ARRAY) {	/* allocate num array  */
 		int i,j,dim=1;
@@ -248,7 +255,7 @@ array_dat * dup_array_power(array_dat *a,double num)
 			for(i=0;i<dim;i++) na->dval[i]=pow(a->dval[i],num);
 		};
 	};
- na->astat=3;
+ na->astat=ARRAY_ALLOCATED;
  return(na);
 }
 
@@ -292,7 +299,7 @@ array_dat * array_mul2(array_dat *aa,array_dat *ba)
 					};
 				}
 			}
-			na->astat=3;
+			na->astat=ARRAY_ALLOCATED;
 		//	print_array1("mul2 result is ",na);
 			return(na);
 		} else {
@@ -307,6 +314,7 @@ array_dat * array_add2(array_dat *aa,array_dat *ba)
 {
  array_dat *na;	/* new array  */
  if(aa->rows==ba->rows && aa->cols==ba->cols){
+ // MESG("array_add2:");
  na=new_array_similar(aa);
  	if(na->atype==VTYPE_ARRAY) {	/* allocate num array  */
 		int i,j;
@@ -321,7 +329,7 @@ array_dat * array_add2(array_dat *aa,array_dat *ba)
 			};
 		}
 	};
-	na->astat=3;
+	na->astat=ARRAY_ALLOCATED;
 	return(na);
  } else {
  	err_num=254;
@@ -348,7 +356,7 @@ array_dat * array_sub2(array_dat *aa,array_dat *ba)
 			};
 		}
 	};
-	na->astat=3;
+	na->astat=ARRAY_ALLOCATED;
 	return(na);
  } else {
  	err_num=255;
@@ -359,7 +367,7 @@ array_dat * array_sub2(array_dat *aa,array_dat *ba)
 
 void array_add1(array_dat *na,double plus)
 {
- if(na->astat!=3) {
+ if(na->astat!=ARRAY_ALLOCATED) {
  	err_num=256;
  	err_str="error: cannot add to non defined array!";
 	return;
@@ -379,7 +387,7 @@ void array_add1(array_dat *na,double plus)
 
 void array_sub1(array_dat *na,double plus)
 {
- if(na->astat!=3) {
+ if(na->astat!=ARRAY_ALLOCATED) {
  	err_num=257;
 	err_str="error: cannot sub to non defined array!";
 	return;
@@ -399,7 +407,7 @@ void array_sub1(array_dat *na,double plus)
 void array_mul1(array_dat *na,double num)
 {
  if(na==NULL) { err_num=258;ERROR("array_mul1: NULL array!");return;};
- if(na->astat!=3) {
+ if(na->astat!=ARRAY_ALLOCATED) {
  	err_num=259;
  	ERROR("error: cannot mul to non defined array! astat=%d",na->astat);
 	return;
@@ -419,7 +427,7 @@ void array_mul1(array_dat *na,double num)
 void array_mod1(array_dat *na,double num)
 {
  if(na==NULL) { err_num=258;ERROR("array_mul1: NULL array!");return;};
- if(na->astat!=3) {
+ if(na->astat!=ARRAY_ALLOCATED) {
  	err_num=259;
  	ERROR("error: cannot mul to non defined array! astat=%d",na->astat);
 	return;
@@ -439,7 +447,7 @@ void array_mod1(array_dat *na,double num)
 void array_power(array_dat *na,double num)
 {
  if(na==NULL) { err_num=258;ERROR("array_power: NULL array!");return;};
- if(na->astat!=3) {
+ if(na->astat!=ARRAY_ALLOCATED) {
  	err_num=259;
  	ERROR("error: cannot power to non defined array! astat=%d",na->astat);
 	return;
@@ -466,7 +474,7 @@ double determinant(array_dat *aa)
   k=aa->rows-1;
   ex_nvars=0;
   ex_nums=1;	/* this is a numerical array!  */
-//  print_array1("find determinant",aa);
+  // MESG("determinant:");
   if (k==1)
     {
 	det=a[0][0]*a[1][1]-a[0][1]*a[1][0];
@@ -505,6 +513,7 @@ array_dat * cofactor2(array_dat *numa,double det)
  dim=numa->rows;
  num=numa->dval2;
  ex_nums=1;	/* this is a numerical array!  */
+ // MESG("coactor2:");
   faca=new_array(dim,dim);allocate_array(faca);
   fac=faca->dval2;
 
@@ -581,6 +590,7 @@ array_dat * cofactor(array_dat *numa,double det)
  dim=numa->rows;
  num=numa->dval2;
  ex_nums=1;	/* a numerical array!  */
+ // MESG("coactor:");
   faca=new_array(dim,dim);allocate_array(faca);
   fac=faca->dval2;
 
@@ -655,6 +665,7 @@ array_dat *transpose2(array_dat *numa,array_dat *faca, double det)
   int dim=numa->rows;
   fac=faca->dval2;
   ex_nums=1;	/* a numerical array  */
+  // MESG("transpose2:");
   inversea=new_array(dim,dim); allocate_array(inversea);
   inverse = inversea->dval2;
 
@@ -674,6 +685,7 @@ array_dat *transpose(array_dat *array1)
 {
   array_dat *tarray;
   ex_nums=1;	/* a numerical array  */
+  // MESG("transpose:");
   tarray=new_array(array1->cols,array1->rows);
   allocate_array(tarray);
   if(array1->rows==1 || array1->cols==1) {
@@ -701,6 +713,7 @@ array_dat *cofactor2inverse(array_dat *faca, double det)
   int dim=faca->rows;
   fac=faca->dval2;
   ex_nums=1;	/* a numerical array  */
+  // MESG("cofactor2inverse:");
   inversea=new_array(dim,dim); allocate_array(inversea);
   inverse = inversea->dval2;
 
@@ -715,6 +728,7 @@ array_dat *cofactor2inverse(array_dat *faca, double det)
  return(inversea);
 }
 
+/* print array, fix for better TODO */
 void print_array1(char *title,array_dat *adat)
 {
 	char so[MAXLLEN];
@@ -732,11 +746,11 @@ void print_array1(char *title,array_dat *adat)
 	snprintf(so,MAXLLEN,"# %s Array %s, %d rows=%d cols=%d astat=%d type=%d",title,ex_name,adat->anum,adat->rows,adat->cols,adat->astat,adat->atype);
 	out_print(so,1);
 	strcpy(so,"");
-	if(adat->astat!=0) {
+	if(adat->astat!=ARRAY_UNALLOCATED) {
 	if(adat->rows>1 && adat->cols>1) {
-		snprintf(so,MAXLLEN,"#   :");
+		snprintf(so,MAXLLEN,"#");
 		for(i=0;i< adat->cols;i++) { 
-			snprintf(s2,128,"%10d ",i);
+			snprintf(s2,128,"%8d ",i);
 			strlcat(so,s2,MAXLLEN);
 		};
 		out_print(so,1);
