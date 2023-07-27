@@ -482,6 +482,9 @@ void init_hash()
 	tnode->node_type = term_types[i].term_group;
 //	tnode->val = i+1;
  };
+ // show_bt_table_ordered(directiv_table);
+ // show_bt_table_ordered(bt_table);
+
  init_common();
 }
 

@@ -831,6 +831,7 @@ BTNODE *new_btnode()
 {
  BTNODE *btn;
  btn=(BTNODE *)malloc(sizeof(struct BTNODE));
+ // MESG("new_btnode: size is %ld %ld %ld %ld %ld",sizeof(struct BTNODE),sizeof(short),sizeof(int),sizeof(double),sizeof(void *));
  btn->left=NULL;
  btn->right=NULL;
  btn->node_name=NULL;
@@ -1277,18 +1278,22 @@ void show_subtree(BTNODE *node)
 void show_ordered_subtree(BTNODE *node)
 {
  static int depth=0;
-// char *left="",*right="";
+char *left="",*right="";
  depth++;
-// MESG("node:[%s] id=%d type=%d val=%f balance=%d sval=%s",node->node_name,node->node_index,node->node_type,node->val,node->balance,node->sval);
-// if(node->left) left = node->left->node_name;
-// if(node->right) right = node->right->node_name;
-// if(node->left || node->right) fprintf(stdout,"%d:node[%s] -> [%s] - [%s]",depth,node->node_name,left,right);
+ // printf("- node:[%s] id=%d type=%d val=%f balance=%d sval=%s",node->node_name,node->node_index,node->node_type,node->val,node->balance,node->sval);
  if(node->left) {
-	if(node->left) show_ordered_subtree(node->left);
- };
-	if(depth>max_depth) max_depth=depth;
-// 	fprintf(stdout,"%d:node[%s] -> [%s] - [%s]",depth,node->node_name,left,right);
- if(node->right) show_ordered_subtree(node->right);
+ 	show_ordered_subtree(node->left);
+	if(node->left) left = node->left->node_name;
+	if(node->right) right = node->right->node_name;
+	fprintf(stdout,"%03d:node[%-20s] l=[%-20s] r=[%s]\n",depth,node->node_name,left,right);
+	if(node->right) show_ordered_subtree(node->right);
+ } else {
+	if(node->left) left = node->left->node_name;
+	if(node->right) right = node->right->node_name;
+ 	fprintf(stdout,"%03d:node[%-20s] l=[%-20s] r=[%s]\n",depth,node->node_name,left,right);
+	if(node->right) show_ordered_subtree(node->right);
+ } 
+
  depth--;
 }
 
