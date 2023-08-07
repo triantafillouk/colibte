@@ -46,6 +46,8 @@ typedef struct tok_struct {
 
 typedef struct MVAR {
 	short	vtype;
+	short	vgroup;	/* ??? possible use ??  */
+	int		vlen;	/* ??? possible use ??  */
 	union {
 		double dval;
 		char *sval;
@@ -56,8 +58,8 @@ typedef struct MVAR {
 typedef struct array_dat {
 	short atype;
 	short anum;
-	short rows;
-	short cols;
+	int rows;
+	int cols;
 	short astat;	/* array allocation status  */
 	union {
 		void *dat;

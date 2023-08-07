@@ -2400,6 +2400,7 @@ double exec_block1()
  stage_level=0;
  TDS("exec_block1");
  // MESG("exec_block1: starting at tok %d type=%d err=%d",tok->tnum,tok->ttype,err_num);
+// 	MESG("exec_block1: size of tok_struct is %d",sizeof(tok_struct));
    while(tok->ttype!=TOK_EOF && current_active_flag) 
    {
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
