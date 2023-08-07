@@ -128,13 +128,14 @@ typedef struct BTNODE {
 	struct BTNODE *up;	/* for rb trees  */
 	int color;	/* for rb trees  */
 #endif
-	char *node_name;
-	int node_index;
-	int node_type;
-	double val;
+	short node_type;
+	short node_index;
+	short node_vtype;
 #if	AVL_BALANCE
-	int balance;	/* for avl trees  */
+	short balance;	/* for avl trees  */
 #endif
+	char *node_name;
+	double val;
 	char *sval;
 } BTNODE;
 
