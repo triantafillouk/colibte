@@ -157,6 +157,7 @@ char *tok_name[] = {
 #if	0
 	"new_list","new_index","new_stack","new_queue",
 #endif
+	"start",
 	"end arg",
 	"other",
 	NULL
@@ -879,6 +880,7 @@ double factor_variable()
 	switch(lsslot->vtype) {
 		case VTYPE_NUM:{
 			double val=lsslot->dval; 
+			MESG("		>> val=%f",val);
 			NTOKEN2;
 			if(tok->tgroup==TOK_INCREASE) {
 				lsslot->dval += tok->dval;
@@ -1006,7 +1008,7 @@ double factor_array1()
 		allocate_array(array_slot->adat);	/*   */
 		// MESG("	array allocated:%X",array_slot->adat->dval);
 	} else {
-		// MESG("	2 vtype=%d %d",array_slot->vtype,VTYPE_ARRAY);
+		MESG("	2 vtype=%d %d",array_slot->vtype,VTYPE_ARRAY);
 		if(array_slot->vtype==VTYPE_ARRAY)
 		if(array_slot->adat->rows<ind1 && array_slot->adat->cols<ind1) {
 			 {
@@ -1028,25 +1030,43 @@ double factor_array1()
 			};
 			// MESG("	array reallocated:%X",array_slot->adat->dval);
 		};
-	};
+		if(array_slot->vtype==VTYPE_AMIXED) {
+			ex_vtype = array_slot->adat->mval[ind1].vtype;
+			MESG("get indexed value from mixed array ind1=%d type=%d",ind1,ex_vtype);
+			if(ex_vtype==VTYPE_NUM) {
+				value=array_slot->adat->mval[ind1].dval;
+				MESG("	value=%f",value);
+				array_slot->pdval=&array_slot->adat->mval[ind1].dval;
+			} else {
+				value=0;
+				clean_saved_string(strlen(array_slot->adat->mval[ind1].sval));
+				strcpy(saved_string,array_slot->adat->mval[ind1].sval);
+				// MESG("	show string value![%s]",saved_string);
+				// array_slot->psval = &sval[ind1];
+				array_slot->psval=&array_slot->adat->mval[ind1].sval;
+			};
+		}
 #if	USE_SARRAYS
-	if(array_slot->vtype==VTYPE_SARRAY) {
-		char **sval = array_slot->adat->sval;
-		clean_saved_string(strlen(array_slot->adat->sval[ind1]));	/* Check!! TODO  */
-		strcpy(saved_string,array_slot->adat->sval[ind1]);
-		// MESG("	show string value![%s]",saved_string);
-		// array_slot->psval = &sval[ind1];
-		array_slot->psval=&sval[ind1];
-		value=0;
-		ex_vtype=VTYPE_STRING;
-	} else 
+		if(array_slot->vtype==VTYPE_SARRAY) {
+			char **sval = array_slot->adat->sval;
+			clean_saved_string(strlen(array_slot->adat->sval[ind1]));	/* Check!! TODO  */
+			strcpy(saved_string,array_slot->adat->sval[ind1]);
+			// MESG("	show string value![%s]",saved_string);
+			// array_slot->psval = &sval[ind1];
+			array_slot->psval=&sval[ind1];
+			value=0;
+			ex_vtype=VTYPE_STRING;
+		}
 #endif
-	{
+	}
+#if	0
+	else {
 		dval = array_slot->adat->dval;
 		value=dval[ind1];
 		array_slot->pdval=&dval[ind1];
 		ex_vtype=VTYPE_NUM;
 	};
+#endif
 	lsslot=array_slot;
 	// MESG("factor_array1: end");
 	// MESG("	factor_array1:ind1=%d lsslot ind=%d type=%d rows=%d cols=%d [%s]!",ind1,lsslot->ind,lsslot->vtype,lsslot->adat->rows,lsslot->adat->cols,array_slot->psval[0]);
@@ -1989,7 +2009,7 @@ double assign_val(double none)
 	double v1;
 	tok_data *sslot;
 	TDS("assign_val");
-	MESG("assign_val: lsslot=%X",(void *)lsslot);
+	MESG("assign_val: ind=%d vtype=%d",lsslot->ind,lsslot->vtype);
 	sslot=lsslot;
 	// MESG("assign_val: ind=%d type=%d",sslot->ind,sslot->vtype);
 	v1=lexpression();

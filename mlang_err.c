@@ -536,9 +536,11 @@ int err_factor()
  MESG("switch: tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
  switch(tok0->ttype) {
 	/*  the following ends factor  */
+#if	1
  	case TOK_SEP:
 		xpos=476;syntax_error("separator in factor!",xpos);
 		RT_MESG1(xpos);
+#endif
 	case TOK_SHOW:
 		// xpos=477;syntax_error(": in factor",xpos);
 		RT_MESG1(xpos);
@@ -617,10 +619,11 @@ int err_factor()
 		// MESG("	err use of tok_array1 [%s]",tok_info(tok0));
 		// err_num=err_factor();
 		err_num=err_num_expression(); 
-		// MESG("	err tok_array1: after tok=%d",tok->ttype);
+		MESG("	err tok_array1: after tok=%d",tok->ttype);
 		xpos=499;
 		check_skip_token_err1(TOK_RBRAKET,"array error",xpos);
 		// NTOKEN_ERR(499);
+#if	1
 		tok_struct *save_tok = tok;
 		// check for second index
 		err_num=err_num_expression();
@@ -632,6 +635,7 @@ int err_factor()
 		} else {
 			tok = save_tok;
 		};
+#endif
 		RT_MESG1(4931);
 		};
 #if	0

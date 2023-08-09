@@ -193,18 +193,22 @@ enum {
 	TOK_BSLASH		,
 	TOK_NL				,
 	TOK_DIR_CONTINUE	,
+#if	0
 	TOK_DIR_FOREACH		,
 	TOK_DIR_TYPE,
 	TOK_DIR_IN,
+#endif
 	TOK_ARRAY1		,	// 72
 	TOK_ARRAY2		,
 	TOK_ARRAY3		,
 	TOK_ASSIGNENV	,
 	TOK_ASSIGNOPT	,
+#if	0
 	TOK_LIST,
 	TOK_INDEX,
 	TOK_STACK,
 	TOK_QUEUE,
+#endif
 	TOK_START,			/* 79 <@ */
 	TOK_END,			/* @> */
 	TOK_OTHER,
