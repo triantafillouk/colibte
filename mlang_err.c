@@ -510,7 +510,7 @@ int err_factor()
 {
  static int pre_symbol=0;
  TDSERR("factor");
- MESG("# err_factor: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
+ // MESG("# err_factor: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
  int save_macro_exec;
  tok_struct *tok0; 
 
@@ -533,7 +533,7 @@ int err_factor()
 	return(err_num);
  };
  set_tok_function(tok0,0);
- MESG("switch: tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
+ // MESG("switch: tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
  switch(tok0->ttype) {
 	/*  the following ends factor  */
 #if	1
@@ -545,7 +545,7 @@ int err_factor()
 		// xpos=477;syntax_error(": in factor",xpos);
 		RT_MESG1(xpos);
 	case TOK_LBRAKET:{	/* array definition  */
-		MESG("err: TOK_LBRAKET, array definition");
+		// MESG("err: TOK_LBRAKET, array definition");
 		pre_symbol=0;
 		int i=0,j=0;
 		int cdim=0;
@@ -570,7 +570,7 @@ int err_factor()
 			if(err_num) return err_num;
 			i++;if(i>cols) cols=i;
 			if(tok->ttype==TOK_RBRAKET) {
-				MESG("	tok_rbraket: end definition");
+				// MESG("	tok_rbraket: end definition");
 				cdim=0;break;
 			};
 			if(tok->ttype==TOK_SEP ||tok->ttype==TOK_COMMA) {	/* Add tok->ttype==TOK_COMMA for using comma to separate array items  */
@@ -601,7 +601,7 @@ int err_factor()
 		RT_MESG1(480);
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
-		MESG("TOK_VAR");
+		// MESG("TOK_VAR");
 		pre_symbol=0;
 		ex_nvars++;
 		if(tok->ttype==TOK_INCREASE) {
@@ -619,11 +619,11 @@ int err_factor()
 		// MESG("	err use of tok_array1 [%s]",tok_info(tok0));
 		// err_num=err_factor();
 		err_num=err_num_expression(); 
-		MESG("	err tok_array1: after tok=%d",tok->ttype);
+		// MESG("	err tok_array1: after tok=%d",tok->ttype);
 		xpos=499;
 		check_skip_token_err1(TOK_RBRAKET,"array error",xpos);
 		// NTOKEN_ERR(499);
-#if	1
+#if	0
 		tok_struct *save_tok = tok;
 		// check for second index
 		err_num=err_num_expression();
@@ -745,7 +745,7 @@ int err_factor()
 #else
 		var_node=tok0->tnode;
 		CHECK_TOK(496);
-		MESG("err_TOK_FUNC ind=%d tnum=%d ttype=%d",var_node->node_index,tok->tnum,tok->ttype);
+		// MESG("err_TOK_FUNC ind=%d tnum=%d ttype=%d",var_node->node_index,tok->tnum,tok->ttype);
 // 		tok0->factor_function = m_functions[var_node->node_index].ffunction;
 		err_num= err_eval_fun1(var_node->node_index);
 #endif
@@ -889,7 +889,7 @@ int err_factor()
 		set_error(tok,xpos,"else without if error");
 		RT_MESG1(5261);
 	case TOK_RBRAKET:
-		MESG("tok_rbtacket");
+		// MESG("tok_rbtacket");
 		RT_MESG1(5262);
 	case TOK_ASSIGN:
 	case TOK_INCREASEBY:

@@ -471,10 +471,7 @@ typedef struct MLQUOTES {
 #define	VTYPE_STRING	8	/* string  */
 #define	VTYPE_BUFFER	9	/* file buffer  */
 #define	VTYPE_AMIXED	12	/* mixed array  */
-#define	VTYPE_STRUCT	13	/* structure type  */
-// #define	VTYPE_LIST		14	/* list type  */
-#define	VTYPE_TARRAY	15	/* structure type array */
-#define VTYPE_DYNAMIC	16	/* dynamic array -> list ? */
+#define VTYPE_DYNAMIC	16	/* dynamic array  */
 #define	VTYPE_TREE		32	/* btree pairs  */
 
 /* textpoint */

@@ -478,7 +478,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			par_level--;
 			cc=1;break;
 		case TOK_LBRAKET:
-			MESG("	parser: TOK_LBRAKET");
+			// MESG("	parser: TOK_LBRAKET");
 			braket_level++;
 			array_cols=0;
 			array_rows=1;
@@ -619,7 +619,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			/* check for else statement!!  */
 		if(!(tok_type==TOK_LETTER && !strcmp(nword,"else"))){
 			if(tok_type==TOK_LBRAKET && previous_ttype==TOK_RBRAKET){
-				MESG("skip tok_lbraket!");
+				// MESG("skip tok_lbraket!");
 				continue;
 			} else {
 				ADD_TOKEN;
@@ -712,7 +712,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 	
 	if(tok_type==TOK_LETTER) {
-		MESG("	parser: TOK_LETTER: check element in bt [%s]",nword);
+		// MESG("	parser: TOK_LETTER: check element in bt [%s]",nword);
 		tok->tnode = find_bt_element(nword); // check main table
 		
 		if(is_storelines && proc_name==NULL && tok->tnode!=NULL) {	/* function already register!  */
@@ -728,7 +728,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			if(tok->tnode==NULL){	/* not a directive but a variable  */
 				tok->tname=strdup(nword);
 				tok->tind=slen;
-				MESG("	this is a variable! [%s] slen=%d",nword,slen);
+				// MESG("	this is a variable! [%s] slen=%d",nword,slen);
 				if(is_storelines) {
 					tok->ttype=TOK_PROC;
 				}
@@ -742,7 +742,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					};
 #endif			
 					while(next_token_type(bf)==TOK_LBRAKET) {
-						MESG("		set it as array index");
+						// MESG("		set it as array index");
 						tok_var->ttype=TOK_ARRAY1+index;	/* set it as array index  */
 						// MESG("parse: array2 set type %d",tok_var->ttype);
 						getnc1(bf,&cc,&tok_type);// skip it
