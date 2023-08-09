@@ -49,3 +49,4 @@ double uf_atbol();
 double uf_ateol();
 double uf_mainargsize();
 double uf_mainarg();
+double uf_index();

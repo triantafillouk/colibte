@@ -536,9 +536,11 @@ int err_factor()
  // MESG("switch: tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
  switch(tok0->ttype) {
 	/*  the following ends factor  */
+#if	1
  	case TOK_SEP:
 		xpos=476;syntax_error("separator in factor!",xpos);
 		RT_MESG1(xpos);
+#endif
 	case TOK_SHOW:
 		// xpos=477;syntax_error(": in factor",xpos);
 		RT_MESG1(xpos);
@@ -599,6 +601,7 @@ int err_factor()
 		RT_MESG1(480);
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
+		// MESG("TOK_VAR");
 		pre_symbol=0;
 		ex_nvars++;
 		if(tok->ttype==TOK_INCREASE) {
@@ -620,6 +623,7 @@ int err_factor()
 		xpos=499;
 		check_skip_token_err1(TOK_RBRAKET,"array error",xpos);
 		// NTOKEN_ERR(499);
+#if	0
 		tok_struct *save_tok = tok;
 		// check for second index
 		err_num=err_num_expression();
@@ -631,6 +635,7 @@ int err_factor()
 		} else {
 			tok = save_tok;
 		};
+#endif
 		RT_MESG1(4931);
 		};
 #if	0
@@ -740,7 +745,7 @@ int err_factor()
 #else
 		var_node=tok0->tnode;
 		CHECK_TOK(496);
-		MESG("err_TOK_FUNC ind=%d tnum=%d ttype=%d",var_node->node_index,tok->tnum,tok->ttype);
+		// MESG("err_TOK_FUNC ind=%d tnum=%d ttype=%d",var_node->node_index,tok->tnum,tok->ttype);
 // 		tok0->factor_function = m_functions[var_node->node_index].ffunction;
 		err_num= err_eval_fun1(var_node->node_index);
 #endif
@@ -884,6 +889,7 @@ int err_factor()
 		set_error(tok,xpos,"else without if error");
 		RT_MESG1(5261);
 	case TOK_RBRAKET:
+		// MESG("tok_rbtacket");
 		RT_MESG1(5262);
 	case TOK_ASSIGN:
 	case TOK_INCREASEBY:
