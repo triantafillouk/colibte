@@ -138,6 +138,14 @@ double uf_cls()
 	return 0;
 }
 
+double uf_index()
+{
+	ntoken();
+	MESG("new index!");
+	ex_vtype=VTYPE_TREE;
+	return 0;
+}
+
 /* get array determinant */
 double uf_determinant()
 {
@@ -254,11 +262,12 @@ double uf_mid()
 	return 0;	
 }
 
+
 double uf_print()
 {
 	tok_struct *tok=current_token();
 	int args=tok->number_of_args;
-	// MESG("uf_print: ex_vtype=%d tnum=%d args=%d",ex_vtype,tok->tnum,tok->number_of_args);
+	MESG("uf_print: ex_vtype=%d tnum=%d args=%d",ex_vtype,tok->tnum,tok->number_of_args);
 	int i;
 	double value=0;
 	for(i=0;i<args;i++) {
@@ -270,6 +279,7 @@ double uf_print()
 		switch(ex_vtype) {
 			case VTYPE_ARRAY:
 			case VTYPE_SARRAY:
+			case VTYPE_AMIXED:
 				if(i>0) out_print("",1);
 				print_array1("",ex_array);break;
 			case VTYPE_NUM:{

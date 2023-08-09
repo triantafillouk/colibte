@@ -510,7 +510,7 @@ int err_factor()
 {
  static int pre_symbol=0;
  TDSERR("factor");
- // MESG("# err_factor: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
+ MESG("# err_factor: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
  int save_macro_exec;
  tok_struct *tok0; 
 
@@ -533,7 +533,7 @@ int err_factor()
 	return(err_num);
  };
  set_tok_function(tok0,0);
- // MESG("switch: tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
+ MESG("switch: tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
  switch(tok0->ttype) {
 	/*  the following ends factor  */
  	case TOK_SEP:
@@ -543,7 +543,7 @@ int err_factor()
 		// xpos=477;syntax_error(": in factor",xpos);
 		RT_MESG1(xpos);
 	case TOK_LBRAKET:{	/* array definition  */
-		// MESG("err: TOK_LBRAKET, array definition");
+		MESG("err: TOK_LBRAKET, array definition");
 		pre_symbol=0;
 		int i=0,j=0;
 		int cdim=0;
@@ -568,7 +568,7 @@ int err_factor()
 			if(err_num) return err_num;
 			i++;if(i>cols) cols=i;
 			if(tok->ttype==TOK_RBRAKET) {
-				// MESG("	tok_rbraket: end definition");
+				MESG("	tok_rbraket: end definition");
 				cdim=0;break;
 			};
 			if(tok->ttype==TOK_SEP ||tok->ttype==TOK_COMMA) {	/* Add tok->ttype==TOK_COMMA for using comma to separate array items  */
@@ -599,6 +599,7 @@ int err_factor()
 		RT_MESG1(480);
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
+		MESG("TOK_VAR");
 		pre_symbol=0;
 		ex_nvars++;
 		if(tok->ttype==TOK_INCREASE) {
@@ -884,6 +885,7 @@ int err_factor()
 		set_error(tok,xpos,"else without if error");
 		RT_MESG1(5261);
 	case TOK_RBRAKET:
+		MESG("tok_rbtacket");
 		RT_MESG1(5262);
 	case TOK_ASSIGN:
 	case TOK_INCREASEBY:

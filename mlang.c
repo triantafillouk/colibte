@@ -149,9 +149,15 @@ char *tok_name[] = {
 	"increase","decrease","increase by","mul_by", "decrease by","backslash",
 	"new line",
 	"continue",
+#if	0
 	"foreach",
+	"type","in",
+#endif
 	"array","array2","array3","assign env","assign option",
-//	"end arg",
+#if	0
+	"new_list","new_index","new_stack","new_queue",
+#endif
+	"end arg",
 	"other",
 	NULL
 };
@@ -387,7 +393,6 @@ tok_struct *new_tok()
  tok->dval=0;
  tok->ttype=0;
  tok->tgroup=0;
- // tok->tatype=0;
  tok->factor_function=factor_none;
  tok->directive=lexpression;
  tok->tnode=NULL;
@@ -739,7 +744,7 @@ MVAR * push_args_1(int nargs)
 		va_i->sval=strdup(saved_string);
 		clean_saved_string(0);
 	} else 
-	if(ex_vtype==VTYPE_ARRAY||ex_vtype==VTYPE_SARRAY) {
+	if(ex_vtype==VTYPE_ARRAY||ex_vtype==VTYPE_SARRAY||ex_vtype==VTYPE_AMIXED) {
 			// MESG("	arg:%d array type %d",i,ex_array->atype);
 			va_i->adat=ex_array;
 			va_i->vtype=ex_array->atype;
@@ -804,7 +809,7 @@ double factor_line_array()
 	cdim=1;
 	ex_array=adat;
 	ex_name="Definition";
-	// MESG("factor_line_array:");
+	MESG("factor_line_array:");
 	allocate_array(ex_array);
 	NTOKEN2;
 	while(cdim>0){
@@ -814,8 +819,8 @@ double factor_line_array()
 			continue;
 		};
 		value=cexpression();
-		if(ex_vtype==VTYPE_STRING) adat->atype=VTYPE_SARRAY;
-		// MESG("	[%d %d]: value=%f [%s]",j,i,value,saved_string);
+		if(ex_vtype==VTYPE_STRING && adat->atype!=VTYPE_AMIXED) adat->atype=VTYPE_SARRAY;
+		MESG("	[%d %d]: value=%f [%s] %d",j,i,value,saved_string,ex_vtype);
 		if(adat->atype==VTYPE_ARRAY){
 			if(adat->rows>1 && adat->cols>1) {
 				adat->dval2[j][i]=value;
@@ -828,6 +833,12 @@ double factor_line_array()
 			int ind1=cols*j+i;
 			// MESG("	add row %d col=%d -> %d [%s]",j,i,ind1,saved_string);
 			adat->sval[ind1]=strdup(saved_string);
+		};
+		if(adat->atype==VTYPE_AMIXED) {
+			int ind1=cols*j+i;
+			adat->mval[ind1].vtype=ex_vtype;
+			if(ex_vtype==VTYPE_NUM) adat->mval[ind1].dval=value;
+			else if(ex_vtype==VTYPE_STRING) adat->mval[ind1].sval=strdup(saved_string);
 		};
 		i++;if(i>cols) cols=i;
 		if(tok->ttype==TOK_SHOW || tok->ttype==TOK_RBRAKET) {
@@ -864,7 +875,7 @@ double factor_variable()
 	};
 #endif
 	ex_vtype=lsslot->vtype;
-	// MESG("	factor_variable: ind=%d type=%d",lsslot->ind,lsslot->vtype);
+	MESG("	factor_variable: ind=%d type=%d",lsslot->ind,lsslot->vtype);
 	switch(lsslot->vtype) {
 		case VTYPE_NUM:{
 			double val=lsslot->dval; 
@@ -881,9 +892,11 @@ double factor_variable()
 			RTRN(lsslot->dval);
 		case VTYPE_ARRAY:
 		case VTYPE_SARRAY:
-			// MESG("factor_variable: [%s] array",tok->tname);
+		// case VTYPE_DYNAMIC:
+		case VTYPE_AMIXED:
 			ex_array=lsslot->adat;
 			ex_name=tok->tname;
+			MESG("factor_variable: [%s] array type=%d",tok->tname,ex_array->atype);
 			NTOKEN2;
 			RTRN(lsslot->dval);
 		default:
@@ -903,7 +916,7 @@ double factor_array2()
 	tok_data *array_slot;
 	array_dat *adat;
 	tok_struct *tok0 = tok;
-	// MESG("factor_array2: %s",tok->tname);
+	MESG("factor_array2: %s",tok->tname);
 	// array_slot=&current_stable[tok->tind];
 	array_slot=get_left_slot(tok->tind);
 	adat=array_slot->adat;
@@ -974,7 +987,7 @@ double factor_array1()
 	double *dval=NULL;
 	double value=0;
 	tok_data *array_slot;
-	// MESG("factor_array1: ttype=%d %d",tok->ttype,TOK_LBRAKET);
+	MESG("factor_array1: ttype=%d %d",tok->ttype,TOK_LBRAKET);
 	array_slot=&current_stable[tok->tind];
 	// MESG("	array1: vtype=%d",array_slot->vtype);
 	NTOKEN2;
@@ -1533,14 +1546,23 @@ FFunction factor_funcs[] = {
 
 	factor_none,	// TOK_NL				,
 	factor_none,	// TOK_DIR_CONTINUE	,
+#if	0
 	factor_none,	// TOK_DIR_FOREACH		,
-
+	factor_none,	// TOK_DIR_TYPE,
+	factor_none,	// TOK_DIR_IN,
+#endif
 	factor_array1,	// TOK_ARRAY1
 	factor_array2,	// TOK_ARRAY2
 	factor_none,	// TOK_ARRAY3
 	factor_none,	// TOK_ASSIGNENV	,
 	factor_none,	// TOK_ASSIGNOPT	,
-	factor_none,	// TOK_START,
+#if	0
+	factor_none,	// TOK_LIST,
+	factor_none,	// TOK_INDEX
+	factor_none,	// TOK_STACK,
+	factor_none,	// TOK_QUEUE,
+#endif
+//	factor_none,	// TOK_START,
 	factor_none,	// TOK_END,
 	factor_none		// TOK_OTHER,
 };
@@ -1967,7 +1989,7 @@ double assign_val(double none)
 	double v1;
 	tok_data *sslot;
 	TDS("assign_val");
-	// MESG("assign_val: lsslot=%X",(void *)lsslot);
+	MESG("assign_val: lsslot=%X",(void *)lsslot);
 	sslot=lsslot;
 	// MESG("assign_val: ind=%d type=%d",sslot->ind,sslot->vtype);
 	v1=lexpression();
@@ -1996,7 +2018,7 @@ double assign_val(double none)
 				sslot->sval=strdup(saved_string);
 				return(0);
 			};
-			if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
+			if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY||ex_vtype==VTYPE_AMIXED) {
 				// MESG("assign array to var!");
 				sslot->adat=ex_array;
 				sslot->vtype=ex_array->atype;
@@ -2053,6 +2075,7 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 				arg_dat->sval=va->sval;break;
 			case VTYPE_ARRAY:
 			case VTYPE_SARRAY:
+			case VTYPE_AMIXED:
 				arg_dat->adat=va->adat;break;
 			default:
 				ERROR("		array argn_args:[%d] type is wrong! (%d)",i,va->vtype);
@@ -2177,7 +2200,7 @@ void refresh_ddot_1(double value)
 		stat=snprintf(ddot_out,128," %5.*f",precision,value);
 	};
 
- } else if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
+ } else if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY || ex_vtype==VTYPE_AMIXED) {
 	array_dat *adat = ex_array;
  	stat=snprintf(ddot_out,128,"array %d, slot %ld type=%d rows %d,cols %d",adat->anum,lsslot-current_stable,adat->atype,adat->rows,adat->cols);
 	print_array1(":",adat);
