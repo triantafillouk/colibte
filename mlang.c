@@ -85,6 +85,7 @@ BTNODE *var_node=NULL;
 
 tok_struct *lstoken=NULL;
 tok_data *lsslot=NULL;
+MVAR *lmvar=NULL;
 int firt_var=1;
 tok_data *current_stable=NULL; 	/* current symbol table ...  */
 int stage_level=0;	/* stage level  */
@@ -895,12 +896,18 @@ double factor_variable()
 		case VTYPE_ARRAY:
 		case VTYPE_SARRAY:
 		// case VTYPE_DYNAMIC:
-		case VTYPE_AMIXED:
 			ex_array=lsslot->adat;
 			ex_name=tok->tname;
 			// MESG("factor_variable: [%s] array type=%d",tok->tname,ex_array->atype);
 			NTOKEN2;
 			RTRN(lsslot->dval);
+		case VTYPE_AMIXED:
+			ex_array=lsslot->adat;
+			ex_name=tok->tname;
+			MESG("factor_variable: [%s] array type=%d",tok->tname,ex_array->atype);
+			NTOKEN2;
+			RTRN(lsslot->dval);
+		
 		default:
 		// error !!
 		syntax_error("no data in the array!!",2081);
@@ -988,7 +995,7 @@ double factor_array1()
 	double *dval=NULL;
 	double value=0;
 	tok_data *array_slot;
-	// MESG("factor_array1: ttype=%d %d",tok->ttype,TOK_LBRAKET);
+	MESG("factor_array1: ttype=%d %d",tok->ttype,TOK_LBRAKET);
 	array_slot=&current_stable[tok->tind];
 	// MESG("	array1: vtype=%d",array_slot->vtype);
 	NTOKEN2;
@@ -1031,10 +1038,11 @@ double factor_array1()
 		};
 		if(array_slot->vtype==VTYPE_AMIXED) {
 			ex_vtype = array_slot->adat->mval[ind1].vtype;
-			// MESG("get indexed value from mixed array ind1=%d type=%d",ind1,ex_vtype);
+			lmvar = &array_slot->adat->mval[ind1];
+			MESG("get indexed value from mixed array ind1=%d type=%d",ind1,ex_vtype);
 			if(ex_vtype==VTYPE_NUM) {
 				value=array_slot->adat->mval[ind1].dval;
-				// MESG("	value=%f",value);
+				MESG("	value=%f",value);
 				array_slot->pdval=&array_slot->adat->mval[ind1].dval;
 			} else {
 				value=0;
@@ -1044,6 +1052,7 @@ double factor_array1()
 				// array_slot->psval = &sval[ind1];
 				array_slot->psval=&array_slot->adat->mval[ind1].sval;
 			};
+			
 		}
 		if(array_slot->vtype==VTYPE_SARRAY) {
 			char **sval = array_slot->adat->sval;
@@ -2009,8 +2018,8 @@ double assign_val(double none)
 	sslot=lsslot;
 	// MESG("assign_val: ind=%d type=%d",sslot->ind,sslot->vtype);
 	v1=lexpression();
-	// MESG("assign_val: after lexpression!\n");
-	if(sslot->vtype!=ex_vtype){ /* we should ?? consider is as an error ? */
+	// MESG("assign_val: after lexpression! ex_vtype=%d\n",ex_vtype);
+	if(sslot->vtype!=ex_vtype){ 
 		if(sslot->vtype==VTYPE_STRING) {
 			if(sslot->sval) free(sslot->sval);
 			sslot->sval=NULL;
@@ -2022,8 +2031,21 @@ double assign_val(double none)
 			};
 		} else {
 			if(sslot->vtype!=VTYPE_ARRAY && sslot->vtype!=VTYPE_SARRAY)	{/* added to handle arrays (v698l) but CHECK!!!!  */
-				// if(is_break1) return(0);
-				sslot->vtype=ex_vtype;
+				if(sslot->vtype==VTYPE_AMIXED) {
+					// MESG("we are here! %f",*sslot->pdval);
+					// MESG("-- t=%d",lmvar->vtype);
+
+					if(lmvar->vtype==VTYPE_STRING) free(lmvar->sval);
+					lmvar->vtype=ex_vtype;
+					if(ex_vtype==VTYPE_STRING) {
+						lmvar->sval=strdup(saved_string);					
+					};
+					if(ex_vtype==VTYPE_NUM) {
+						lmvar->dval=v1;
+					}
+					return (v1);
+				};
+				// sslot->vtype=ex_vtype;
 			};
 			if(ex_vtype==VTYPE_NUM) {
 				// MESG("set new as num");
@@ -2043,7 +2065,7 @@ double assign_val(double none)
 		};
 		return(v1);		
 	} else {
-		if(sslot->vtype==VTYPE_NUM ) {
+		if(ex_vtype==VTYPE_NUM ) {
 			sslot->dval=v1;
 			return(v1);
 		};
@@ -2060,7 +2082,13 @@ double assign_val(double none)
 			};
 			return(v1);
 		};
-		if(sslot->vtype==VTYPE_STRING) {
+#if	0
+		if(ex_vtype==VTYPE_AMIXED) {
+			MESG("deep copy mixed array!");
+			return(v1);
+		};
+#endif
+		if(ex_vtype==VTYPE_STRING) {
 			free(sslot->sval);
 			sslot->sval=strdup(saved_string);
 			return(v1);
