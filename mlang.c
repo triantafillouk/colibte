@@ -999,27 +999,29 @@ double factor_array1()
 	double value=0;
 	tok_data *array_slot;
 	array_slot=&current_stable[tok->tind];
-	// MESG("factor_array1:----------- vtype=%d atype=%d",array_slot->vtype,array_slot->adat->atype);
+	array_dat *adat = array_slot->adat;
+	// MESG("factor_array1:----------- vtype=%d",array_slot->vtype);
 	NTOKEN2;
-	// ind1=(int)FACTOR_FUNCTION;
 	ind1 = (int)num_expression();
-	// MESG("factor_array1: ind1=%d",ind1);
+
+	if(adat==NULL) {	/* this must not happen!!!  */
+		// MESG("array adat is NULL allocate new one !!!!!!!!!!!!");
+		ex_nums=1;
+		adat=new_array(ind1+1,1);
+		array_slot->adat=adat;
+		array_slot->vtype=VTYPE_ARRAY;
+		allocate_array(array_slot->adat);	/*   */
+	};
+
 	if(tok->ttype==TOK_RBRAKET) { 
 		NTOKEN2;
 		// MESG("ends with rbracket!!");
 	};
 	// MESG("factor_array1:ind=%d ind1=%d type=%d",array_slot->ind,ind1,array_slot->vtype);
-	if(array_slot->adat == NULL) {
-		ex_nums=1;
-		array_slot->adat=new_array(ind1+1,1);
-		array_slot->vtype=VTYPE_ARRAY;
-		allocate_array(array_slot->adat);	/*   */
-		// MESG("	array allocated:%X",array_slot->adat->dval);
-	} else {
+
 		// MESG("	2 vtype=%d %d",array_slot->vtype,VTYPE_ARRAY);
 		if(array_slot->vtype==VTYPE_ARRAY)
 		if(array_slot->adat->rows<ind1 && array_slot->adat->cols<ind1) {
-			 {
 			double *dval_old = array_slot->adat->dval;
 			// MESG("+++ reallocate ind1=%d x %d %X",ind1,sizeof(double),dval_old);
 			if(array_slot->adat->cols > array_slot->adat->rows) 
@@ -1035,7 +1037,6 @@ double factor_array1()
 				return 0;
 			};
 			array_slot->adat->dval = dval_new; 
-			};
 			// MESG("	array reallocated:%X",array_slot->adat->dval);
 		};
 		if(array_slot->vtype==VTYPE_AMIXED) {
@@ -1067,15 +1068,16 @@ double factor_array1()
 			ex_vtype=VTYPE_STRING;
 		};
 
-	};
 	if(array_slot->vtype==VTYPE_ARRAY) {
 		dval = array_slot->adat->dval;
+
 		value=dval[ind1];
+		// MESG("	value [%d]=%f",ind1,value);
 		array_slot->pdval=&dval[ind1];
 		ex_vtype=VTYPE_NUM;
 	};
 	lsslot=array_slot;
-	// MESG("factor_array1: end");
+	// MESG("        : >>>> end");
 	// MESG("	factor_array1:ind1=%d lsslot ind=%d type=%d rows=%d cols=%d [%s]!",ind1,lsslot->ind,lsslot->vtype,lsslot->adat->rows,lsslot->adat->cols,array_slot->psval[0]);
 	return(value);
 }
@@ -2051,12 +2053,15 @@ double assign_val(double none)
 			if(ex_vtype==VTYPE_NUM) {
 				// MESG("set new as num");
 				*sslot->pdval=v1;
-				sslot->vtype=VTYPE_NUM;
+				// sslot->vtype=VTYPE_NUM;
 				return(v1);
 			};
 			if(ex_vtype==VTYPE_STRING) {
 				sslot->sval=strdup(saved_string);
-				sslot->vtype=VTYPE_STRING;
+				/* !!!!! to change type beware!!!!!!  */
+				if(sslot->vtype!=VTYPE_SARRAY)
+					sslot->vtype=VTYPE_STRING;
+				// MESG("set string!");
 				return(0);
 			};
 			if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY||ex_vtype==VTYPE_AMIXED) {
