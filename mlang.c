@@ -820,7 +820,9 @@ double factor_line_array()
 			NTOKEN2;
 			continue;
 		};
+		// MESG("factor_line_array: tok name=[%s]",tok->tname);
 		value=cexpression();
+		// MESG("	factor_line_array: set type=%d",ex_vtype);
 		if(ex_vtype==VTYPE_STRING && adat->atype!=VTYPE_AMIXED) adat->atype=VTYPE_SARRAY;
 		// MESG("	[%d %d]: value=%f [%s] %d",j,i,value,saved_string,ex_vtype);
 		if(adat->atype==VTYPE_ARRAY){
@@ -838,6 +840,7 @@ double factor_line_array()
 		};
 		if(adat->atype==VTYPE_AMIXED) {
 			int ind1=cols*j+i;
+			// MESG("factor_line_array: set [%d] ex_vtype=%d",ind1,ex_vtype);
 			adat->mval[ind1].vtype=ex_vtype;
 			if(ex_vtype==VTYPE_NUM) adat->mval[ind1].dval=value;
 			else if(ex_vtype==VTYPE_STRING) adat->mval[ind1].sval=strdup(saved_string);
@@ -860,7 +863,7 @@ double factor_line_array()
 	RTRN(1.2);
 }
 
-tok_data *get_left_slot(int ind)
+inline tok_data *get_left_slot(int ind)
 {
 	// MESG("get_left_slot: ind=%d",ind);
 	return &current_stable[ind];
@@ -904,7 +907,7 @@ double factor_variable()
 		case VTYPE_AMIXED:
 			ex_array=lsslot->adat;
 			ex_name=tok->tname;
-			MESG("factor_variable: [%s] array type=%d",tok->tname,ex_array->atype);
+			// MESG("factor_variable: [%s] array type=%d",tok->tname,ex_array->atype);
 			NTOKEN2;
 			RTRN(lsslot->dval);
 		
@@ -2015,9 +2018,8 @@ double assign_val(double none)
 	TDS("assign_val");
 	// MESG("assign_val: ind=%d vtype=%d",lsslot->ind,lsslot->vtype);
 	sslot=lsslot;
-	// MESG("assign_val: ind=%d type=%d",sslot->ind,sslot->vtype);
 	v1=lexpression();
-	// MESG("assign_val: after lexpression! ex_vtype=%d\n",ex_vtype);
+	// MESG("assign_val: after lexpression! slot vtype=%d ex_vtype=%d\n",sslot->vtype,ex_vtype);
 	if(sslot->vtype!=ex_vtype){ 
 		if(sslot->vtype==VTYPE_STRING) {
 			if(sslot->sval) free(sslot->sval);
@@ -2049,10 +2051,12 @@ double assign_val(double none)
 			if(ex_vtype==VTYPE_NUM) {
 				// MESG("set new as num");
 				*sslot->pdval=v1;
+				sslot->vtype=VTYPE_NUM;
 				return(v1);
 			};
 			if(ex_vtype==VTYPE_STRING) {
 				sslot->sval=strdup(saved_string);
+				sslot->vtype=VTYPE_STRING;
 				return(0);
 			};
 			if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY||ex_vtype==VTYPE_AMIXED) {
