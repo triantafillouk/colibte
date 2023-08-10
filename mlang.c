@@ -995,9 +995,8 @@ double factor_array1()
 	double *dval=NULL;
 	double value=0;
 	tok_data *array_slot;
-	MESG("factor_array1: ttype=%d %d",tok->ttype,TOK_LBRAKET);
 	array_slot=&current_stable[tok->tind];
-	// MESG("	array1: vtype=%d",array_slot->vtype);
+	// MESG("factor_array1:----------- vtype=%d atype=%d",array_slot->vtype,array_slot->adat->atype);
 	NTOKEN2;
 	// ind1=(int)FACTOR_FUNCTION;
 	ind1 = (int)num_expression();
@@ -1039,10 +1038,10 @@ double factor_array1()
 		if(array_slot->vtype==VTYPE_AMIXED) {
 			ex_vtype = array_slot->adat->mval[ind1].vtype;
 			lmvar = &array_slot->adat->mval[ind1];
-			MESG("get indexed value from mixed array ind1=%d type=%d",ind1,ex_vtype);
+			// MESG("get indexed value from mixed array ind1=%d type=%d",ind1,ex_vtype);
 			if(ex_vtype==VTYPE_NUM) {
 				value=array_slot->adat->mval[ind1].dval;
-				MESG("	value=%f",value);
+				// MESG("	value=%f",value);
 				array_slot->pdval=&array_slot->adat->mval[ind1].dval;
 			} else {
 				value=0;
