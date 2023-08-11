@@ -402,7 +402,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			continue;
 		case TOK_LETTER: 
 			slen=getnword1(bf,cc,nword);
-			// MESG("parse: TOK_LETTER %s",nword);
+			MESG("parse: TOK_LETTER %s",nword);
 			if(braket_level) {
 				array_cols++;
 				if(array_cols>array_max_cols) array_max_cols=array_cols;
@@ -478,7 +478,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			par_level--;
 			cc=1;break;
 		case TOK_LBRAKET:
-			// MESG("	parser: TOK_LBRAKET");
+			MESG("	parser: TOK_LBRAKET");
 			braket_level++;
 			array_cols=0;
 			array_rows=1;
@@ -486,8 +486,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			break;
 		case TOK_RBRAKET:
 			braket_level--;
-			// MESG("end of array definition cols=%d rows=%d",array_max_cols,array_rows);
-			// MESG("braket level is %d",braket_level);
+			MESG("end of array definition cols=%d rows=%d",array_max_cols,array_rows);
+			MESG("braket level is %d",braket_level);
 			cc=1;
 			break;
 		case TOK_QUOTE: // string start
@@ -612,7 +612,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 	};
 
-	// MESG("	- token type=[%d %s] previous token is [%d %s]",tok_type,tname(tok_type),previous_ttype,tname(previous_ttype));
+	MESG("	- token type=[%d %s] previous token is [%d %s]",tok_type,tname(tok_type),previous_ttype,tname(previous_ttype));
 	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {
 	if(!(is_now_sep && (tok_type==TOK_LCURL||tok_type==TOK_RCURL) )){
@@ -823,6 +823,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					store_level=curl_level;
 					start_proc_offset=foffset;
 				};
+				if(tok->tind==TOK_DIR_TYPE) {
+					MESG("this is type definition");
+					ADD_TOKEN;
+					type_definition=1;
+				};
 			};
 		} else {
 			tok->tname=tok->tnode->node_name;
@@ -865,7 +870,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
  
- // MESG("parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
+ MESG("parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
  {	/* add eof token!  */
 	if(tok_type!=TOK_SEP) 
 	{	

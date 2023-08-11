@@ -1318,6 +1318,24 @@ int err_check_sentence1()
 		RT_MESG1(666);
 	case TOK_SEP:
 		RT_MESG;
+	case TOK_DIR_TYPE:
+		{
+		// tok_struct *tok0=tok;
+		set_tok_directive(tok,tok_dir_type);
+		NTOKEN_ERR(671);	// this is the type name
+		check_skip_token1(TOK_LPAR);
+		while(!check_skip_token1(TOK_RPAR)) {
+			if(tok->ttype==TOK_END) {
+				syntax_error("type error",671);
+				RT_MESG1(671);
+			};
+			if(tok->ttype!=TOK_LETTER) {
+				syntax_error("type define error",672);
+				RT_MESG1(671);
+			};
+		};
+		xpos=632;
+	};break;
 	default:
 		CHECK_TOK(623);
 		err_num=err_lexpression();

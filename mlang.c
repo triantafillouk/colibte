@@ -122,6 +122,8 @@ term_type term_types[] = {
 	{"for",TOK_DIR_FOR,TOK_DIR},
 	{"function",TOK_PROC,TOK_DIR},
 	{"fori", TOK_DIR_FORI,TOK_DIR},
+	{"foreach", TOK_DIR_FOREACH,TOK_DIR},
+	{"type", TOK_DIR_TYPE,TOK_DIR},
 	{"xor" ,TOK_XOR, TOK_BOOL},
 	{"or"  ,TOK_OR,  TOK_BOOL},
 	{"and" ,TOK_AND, TOK_BOOL},
@@ -150,10 +152,8 @@ char *tok_name[] = {
 	"increase","decrease","increase by","mul_by", "decrease by","backslash",
 	"new line",
 	"continue",
-#if	0
 	"foreach",
-	"type","in",
-#endif
+	"type",
 	"array","array2","array3","assign env","assign option",
 #if	0
 	"new_list","new_index","new_stack","new_queue",
@@ -1576,8 +1576,8 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_NL				,
 	factor_none,	// TOK_DIR_CONTINUE	,
 	factor_none,	// TOK_DIR_FOREACH		,
-#if	0
 	factor_none,	// TOK_DIR_TYPE,
+#if	0
 	factor_none,	// TOK_DIR_IN,
 #endif
 	factor_array1,	// TOK_ARRAY1
@@ -2267,6 +2267,11 @@ void refresh_ddot_1(double value)
  };
  free(ddot_out);
  sfb(old_fp);
+}
+
+double tok_dir_type()
+{
+	return 0;
 }
 
 double tok_dir_if()

@@ -194,12 +194,13 @@ enum {
 	TOK_NL				,
 	TOK_DIR_CONTINUE	,
 	TOK_DIR_FOREACH		,
-	TOK_ARRAY1		,	// 70
+	TOK_DIR_TYPE		,
+	TOK_ARRAY1		,	// 71
 	TOK_ARRAY2		,
 	TOK_ARRAY3		,
 	TOK_ASSIGNENV	,
 	TOK_ASSIGNOPT	,
-	TOK_START,			/* 75 <@ */
+	TOK_START,			/* 76 <@ */
 	TOK_END,			/* @> */
 	TOK_OTHER,
 };
