@@ -643,6 +643,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok->ttype==TOK_AT) {
 		tok->tname=strdup(nword);
 	};
+#if	1
+	if(tok->ttype!=TOK_VAR&&tok->ttype!=TOK_QUOTE)
+		tok->tname=token_table[tok->ttype].tok_name;
+	tok->tgroup=token_table[tok->ttype].tok_group;
+#else
 	if(tok->ttype==TOK_LBRAKET) tok->tname=" LB ";
 	if(tok->ttype==TOK_RBRAKET) tok->tname=" RB ";
 	if(tok->ttype==TOK_LPAR) {	tok->tname=" ( ";};
@@ -679,6 +684,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok->ttype==TOK_SMALLEREQ ) {tok->tname=" <= ";tok->tgroup=TOK_COMPARE;};
 	if(tok->ttype==TOK_BIGGER ) {tok->tname=" > ";tok->tgroup=TOK_COMPARE;};
 	if(tok->ttype==TOK_BIGGEREQ ) {tok->tname=" >= ";tok->tgroup=TOK_COMPARE;};
+#endif
+
 	if(tok->tgroup==TOK_COMPARE) {
 		// tok->cexpr_function = factor_funcs[tok->ttype];
 		set_tok_function(tok,1);

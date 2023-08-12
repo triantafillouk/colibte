@@ -14,6 +14,7 @@
 #include	"alist.h"
 #include	"mlang.h"
 #include	"func.h"
+#include	"token_table.h"
 
 #define	SYNTAX_DEBUG	0
 #define	NTOKEN2	tok++
