@@ -255,6 +255,23 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 //	tok->tdata = &current_stable[tok->tind];
 }
 
+int change_script_state(int tok_type,int *script_active) 
+{
+	if(*script_active) {
+		if(tok_type==TOK_BQUOTE) { 
+			*script_active=0;
+			return 1;
+		}; 
+	} else {
+		if(tok_type==TOK_BQUOTE) {
+			*script_active=1;
+			return 1;
+		};
+		return 1;
+	};
+	return 0;
+}
+
 /*
  parse a file buffer,
  create/renew the alist of tokens found
@@ -292,14 +309,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int next_tok_type=0;
  int script_active=0;
 
- // MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
- if(is_mlang(bf)) script_active=1;
+ // return if already parsed and not forced to parse
+ if(bf->tok_table !=NULL && init==0) return (0);
 
- if(bf->tok_table !=NULL && init==0) 
- {
-	// MESG("	no change, already parsed!");
-	return(0);
- } 
+ // MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
+ if(is_mlang(bf)) script_active=1;	/* initial script state  */
+
  if(init && bf->tok_table!=NULL) {
  	/* we must free the previous parse  */
 	// MESG("parse_block1: table is not NULL, free it!");
@@ -334,21 +349,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  // MESG("--- Start parsing block loop --------------------");
  while(getnc1(bf,&cc,&tok_type))
  {
-	if(script_active) {
-		if(tok_type==TOK_BQUOTE) { 
-			script_active=0;
-			continue;
-		}; 
-	} else {
-		if(tok_type==TOK_BQUOTE) {
-			script_active=1;
-			continue;
-		};
-		continue;
-	};
+	if(change_script_state(tok_type,&script_active)) continue;
+
 // 	MESG("parse- cc=%d %c type=%3d [%10s]",cc,cc,tok_type,tname(tok_type));
 
- if(err_num>0) return 0.0;
+	if(err_num>0) return 0.0;
+
 	value=0;
 	nword[0]=0;
 	switch(tok_type) {
@@ -368,26 +374,27 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
 		case TOK_NL: 
 			tok_line++;
-			if(cc!=';') {
-				last_correct_line=tok_line;
-				skip_line1(bf,cc);
-				if(is_now_sep || after_rpar) continue;
-				is_now_sep=1;
-				tok_type=TOK_SEP;
-				// MESG("TOK_NL->TOK_SEP");
-				if(braket_level) {
-					array_rows++;
-					array_cols=0;
-					// MESG("add table row2 %d",array_rows);
-				};
-				break;
-			} ;
+			// MESG("		line %d [%c]",tok_line,cc);
+			last_correct_line=tok_line;
+			skip_line1(bf,cc);
+			if(is_now_sep || after_rpar) continue;
+			is_now_sep=1;
+			tok_type=TOK_SEP;
+			// MESG("TOK_NL->TOK_SEP");
+			if(braket_level) {
+				array_rows++;
+				array_cols=0;
+				// MESG("add table row2 %d",array_rows);
+			};
+			break;
+#if	0
 			if(is_now_sep) continue;
 			else {
 				if(is_now_curl) continue;
 				is_now_sep=1;
 				break;
 			};
+#endif
 		case TOK_SPACE: 
 			skip_space1(bf);
 			continue;
@@ -452,7 +459,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
 			if(previous_ttype==TOK_DIR_IF
 			 ||previous_ttype==TOK_FUNC
-			 // ||previous_ttype==TOK_DIR_ELSE
 			 ||previous_ttype==TOK_DIR_WHILE
 			 ||previous_ttype==TOK_DIR_FOR
 			 ||previous_ttype==TOK_PROC
@@ -490,7 +496,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			break;
 		case TOK_COMMENT:
 			skip_2nl(bf);
-			// tok_line++;
 			continue;
 
 		case TOK_NOT:
@@ -827,7 +832,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  };
  
  // MESG("parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
- {	/* add eof token!  */
+ 	/* add eof token!  */
 	if(tok_type!=TOK_SEP) 
 	{	
 		if(tok_type==0) {
@@ -853,8 +858,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		err_num=1014;err_line=tok->tline;err_str="parse error: invalid number of pars";
 		// ERROR("parenthesis error: line %d",tok_line);
 	};
-	bf->m_mode=M_PARSED;	
- };
+	bf->m_mode=M_PARSED;
+
  if(init) {
 	bf->symbol_tree->max_items = bf->symbol_tree->items+extra;
  };

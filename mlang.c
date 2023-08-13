@@ -129,6 +129,7 @@ term_type term_types[] = {
 	{"or"  ,TOK_OR,  TOK_BOOL},
 	{"and" ,TOK_AND, TOK_BOOL},
 	{"nand",TOK_NAND,TOK_BOOL},
+	{"nor",TOK_NOR,TOK_BOOL},
 	{NULL,0,0}
 };
 
@@ -1888,21 +1889,20 @@ double logical_xor(double value)
  int v2;
 	v2=(int) lexpression();
 //	MESG("%d XOR %d = %d",value,v2,value^v2);
+	ex_vtype = VTYPE_NUM;
 	return ((int)value)^v2;
 }
 
 double logical_nor(double value)
 {
- int v2;
-	v2=(int) lexpression();
-//	MESG("%d XOR %d = %d",value,v2,value^v2);
-	return !(((int)value)^v2);
+ int v2=(int) lexpression() >0;;
+	ex_vtype = VTYPE_NUM;
+	return (!((value>0) || v2));
 }
 
 double logical_and(double value)
 {
- int v2;
-	v2=(int) lexpression();
+ int v2=(int) lexpression() >0;
 	ex_vtype = VTYPE_NUM;
 	return v2 && (int)value;
 }
