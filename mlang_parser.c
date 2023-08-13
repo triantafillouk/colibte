@@ -643,48 +643,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok->ttype==TOK_AT) {
 		tok->tname=strdup(nword);
 	};
-#if	1
+
+	/* set token name, group  */
 	if(tok->ttype!=TOK_VAR&&tok->ttype!=TOK_QUOTE)
 		tok->tname=token_table[tok->ttype].tok_name;
 	tok->tgroup=token_table[tok->ttype].tok_group;
-#else
-	if(tok->ttype==TOK_LBRAKET) tok->tname=" LB ";
-	if(tok->ttype==TOK_RBRAKET) tok->tname=" RB ";
-	if(tok->ttype==TOK_LPAR) {	tok->tname=" ( ";};
-	if(tok->ttype==TOK_RPAR) tok->tname=" ) ";
-	if(tok->ttype==TOK_SEP) tok->tname=" ; ";
-	if(tok->ttype==TOK_NUM) tok->tname="numeric";
-	if(tok->ttype==TOK_ASSIGN) { tok->tname=" = ";tok->tgroup=TOK_TERM0;};
-	if(tok->ttype==TOK_ASSIGNENV) { tok->tname=" setenv ";tok->tgroup=TOK_TERM0;};
-	if(tok->ttype==TOK_ASSIGNOPT) { tok->tname=" setoption ";tok->tgroup=TOK_TERM0;};
-	if(tok->ttype==TOK_INCREASEBY) { tok->tname=" += ";tok->tgroup=TOK_TERM0;};
-	if(tok->ttype==TOK_MULBY) { tok->tname=" *= ";tok->tgroup=TOK_TERM0;};
-	if(tok->ttype==TOK_DECREASEBY) { tok->tname=" -= ";tok->tgroup=TOK_TERM0;};
-	/* term1  */
-	if(tok->ttype==TOK_PLUS) {tok->tname=" + ";tok->tgroup=TOK_TERM;};
-	if(tok->ttype==TOK_MINUS) {tok->tname=" - ";tok->tgroup=TOK_TERM;};
-	/* term2  */
-	if(tok->ttype==TOK_DIV) {tok->tname=" / ";tok->tgroup=TOK_TERM1;};
-	if(tok->ttype==TOK_MUL) {tok->tname=" * "; tok->tgroup=TOK_TERM1;};
-	/* term3  */
-	if(tok->ttype==TOK_MOD) {tok->tname=" % ";tok->tgroup=TOK_TERM2;};
-	if(tok->ttype==TOK_POWER) {tok->tname=" ** "; tok->tgroup=TOK_TERM2;};
-	if(tok->ttype==TOK_INCREASE) { tok->tname=" INC ";tok->tgroup=0;};
-	if(tok->ttype==TOK_DECREASE) { tok->tname=" DEC ";};
-	/* boolean tokens  */
-	if(tok->ttype==TOK_AND) { tok->tname=" AND ";tok->tgroup=TOK_TERM0;};
-	if(tok->ttype==TOK_OR) { tok->tname=" OR ";tok->tgroup=TOK_BOOL;};
-	if(tok->ttype==TOK_XOR) { tok->tname=" XOR ";tok->tgroup=TOK_BOOL;};
-	if(tok->ttype==TOK_NAND) { tok->tname=" NAND ";tok->tgroup=TOK_TERM0;};
-	if(tok->ttype==TOK_NOR) { tok->tname=" NOR ";tok->tgroup=TOK_TERM0;};
-	/* comparison tokens  */
-	if(tok->ttype==TOK_EQUAL) {tok->tname=" == ";tok->tgroup=TOK_COMPARE;};
-	if(tok->ttype==TOK_NOTEQUAL ) {tok->tname=" != ";tok->tgroup=TOK_COMPARE;};
-	if(tok->ttype==TOK_SMALLER ) {tok->tname=" < ";tok->tgroup=TOK_COMPARE;};
-	if(tok->ttype==TOK_SMALLEREQ ) {tok->tname=" <= ";tok->tgroup=TOK_COMPARE;};
-	if(tok->ttype==TOK_BIGGER ) {tok->tname=" > ";tok->tgroup=TOK_COMPARE;};
-	if(tok->ttype==TOK_BIGGEREQ ) {tok->tname=" >= ";tok->tgroup=TOK_COMPARE;};
-#endif
 
 	if(tok->tgroup==TOK_COMPARE) {
 		// tok->cexpr_function = factor_funcs[tok->ttype];
