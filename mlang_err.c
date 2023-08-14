@@ -30,7 +30,7 @@ void mesg_out(const char *fmt, ...)
 char * tok_info2(tok_struct *tok)
 {
  static char stok[MAXLLEN];
- // MESG("tok_info2: ");
+ MESG("tok_info2: ");
 	if(tok){
 	// MESG("tok not null! %d",tok->ttype); 
 	if(tok->ttype>TOK_OTHER || tok->ttype==0) {
@@ -1347,6 +1347,13 @@ int err_check_sentence1()
 				NTOKEN_ERR(671);
 				MESG("set type to %s",tok->tname);
 				NTOKEN_ERR(671);
+			} else {
+				if(tok->ttype!=TOK_VAR && tok->ttype!=TOK_RPAR) {
+					MESG("type_define error2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+					syntax_error("type define error2",673);
+					err_num=673;
+					RT_MESG1(673);					
+				};
 			};
 		};
 		xpos=632;

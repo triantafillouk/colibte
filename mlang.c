@@ -2754,9 +2754,10 @@ int parse_buffer_show_tokens(int n)
  
  if(err_num>0) {
 	macro_exec=0;
-	show_error("parse_buffer_show_token",fp->b_fname);
+	show_error("parse_buffer_show_tokens",fp->b_fname);
+	// MESG("error go to line %d",err_line);
 	// msg_line("syntax error %d line %d [%s]",err_num,err_line,err_str);
-	igotolinecol(err_line+1,1,1);
+	if(!execmd) igotolinecol(err_line,1,1);
  	return(0);
  } else {
  	msg_line("No errors!");
