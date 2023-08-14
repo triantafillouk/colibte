@@ -133,6 +133,7 @@ term_type term_types[] = {
 	{NULL,0,0}
 };
 
+#if	0
 // token type names
 char *tok_name[] = {
 	"none",
@@ -162,9 +163,11 @@ char *tok_name[] = {
 #endif
 	"start",
 	"end arg",
+	"define_type",
 	"other",
 	NULL
 };
+#endif
 
 /* Function definitions */
 #include "mlang_functions.c"
@@ -409,7 +412,8 @@ tok_struct *new_tok()
 char *tname(int type)
 {
  int ind=type%1000;
-	return(tok_name[ind]);
+	// return(tok_name[ind]);
+	return(token_table[ind].tok_name);
 }
 
 void init_token_mask()
