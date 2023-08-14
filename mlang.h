@@ -202,6 +202,7 @@ enum {
 	TOK_ASSIGNOPT	,
 	TOK_START,			/* 76 <@ */
 	TOK_END,			/* @> */
+	TOK_DEFINE_TYPE,
 	TOK_OTHER,
 };
 

@@ -1322,16 +1322,31 @@ int err_check_sentence1()
 		{
 		// tok_struct *tok0=tok;
 		set_tok_directive(tok,tok_dir_type);
+		MESG("--> TOK_DIR_TYPE:");
 		NTOKEN_ERR(671);	// this is the type name
-		check_skip_token1(TOK_LPAR);
-		while(!check_skip_token1(TOK_RPAR)) {
+		MESG("-->	1	%d %s",tok->ttype,tok->tname);
+		NTOKEN_ERR(671);	// this is =
+		MESG("-->	2	%d %s",tok->ttype,tok->tname);
+		// check_skip_token1(TOK_LPAR);
+		NTOKEN_ERR(671);
+		MESG("-->	3	%d %s",tok->ttype,tok->tname);
+		NTOKEN_ERR(671);
+		int e=1;
+		while(tok->ttype!=TOK_RPAR) {
+			MESG("-->	4: %2d %d %s",e++,tok->ttype,tok->tname);
 			if(tok->ttype==TOK_END) {
 				syntax_error("type error",671);
 				RT_MESG1(671);
 			};
-			if(tok->ttype!=TOK_LETTER) {
+			if(tok->ttype!=TOK_VAR) {
 				syntax_error("type define error",672);
-				RT_MESG1(671);
+				RT_MESG1(672);
+			};
+			NTOKEN_ERR(671);
+			if(tok->ttype==TOK_DEFINE_TYPE) {
+				NTOKEN_ERR(671);
+				MESG("set type to %s",tok->tname);
+				NTOKEN_ERR(671);
 			};
 		};
 		xpos=632;

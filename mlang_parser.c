@@ -47,7 +47,7 @@ tok_struct *add_token(TLIST lex_parser,int tok_type,int cc,char *label)
 	tok=new_tok();
 	add_element_to_list((void *)tok,lex_parser);
 	tok->tnum=lex_parser->size-1;
-	// MESG("	; add token %3d: ind=%d type=[%s] [%s]",tok->tnum,cc,tname(tok_type),label);
+	MESG("	; add token %3d: ind=%d type=[%s] [%s]",tok->tnum,cc,tname(tok_type),label);
  return tok;
 }
 
@@ -491,6 +491,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			slen=getnstr1(bf,cc,nword);
 			break;
 		case TOK_SHOW:
+			if(next_token_type(bf)==TOK_SHOW) {
+				getnc1(bf,&cc,&tok_type);
+				tok_type=TOK_DEFINE_TYPE;
+				break;
+			};
 			ddot_offset=foffset;
 			skip_2nl(bf);
 			break;
@@ -639,6 +644,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	tok->dval=value;
 	tok->tline=tok_line;
 	if(tok->ttype==TOK_SHOW) {
+		MESG("	TOK_SHOW");
 		tok->ddot=new_textpoint_at(bf,TP_DDOT,ddot_offset-1);
 		tok->tname=":";
 	};
@@ -648,7 +654,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok->ttype==TOK_AT) {
 		tok->tname=strdup(nword);
 	};
-
+	MESG("	set token name: %d",tok->ttype);
 	/* set token name, group  */
 	if(tok->ttype!=TOK_VAR&&tok->ttype!=TOK_QUOTE)
 		tok->tname=token_table[tok->ttype].tok_name;
@@ -889,14 +895,14 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
  };
  tok_table=(void *)malloc(sizeof(struct tok_struct)*(lex_parser->size+1));
  bf->tok_table = (void *) tok_table;
- // MESG("set_tok_table: bf=[%s]",bf->b_fname);
+ MESG("----> set_tok_table: bf=[%s]",bf->b_fname);
  lbegin(lex_parser);
  tlist=lex_parser;
  tok_to = tok_table;
  while(tlist->current)
  {
 	tok=(tok_struct *)tlist->current->data;
-	// MESG("	%d: [%s] %d",tok->tnum,tok->tname,tok->ttype);
+	MESG(" ++	%2d: %3d [%s] %d",tok->tnum,tok->tline,tok->tname,tok->ttype);
 	memcpy((void *)tok_to,(void *)tok,sizeof(tok_struct));
 	if(tok->ttype==TOK_LCURL || tok->ttype==TOK_RCURL) {
 		tok_to->match_tok = tok_table + tok_to->tcurl->num;
