@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.58T89 (14/08/2023)"
+#define VERSION 	"#01.58T90 (16/08/2023)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -461,7 +461,8 @@ typedef struct MLQUOTES {
 
 #define H_SELECT	128
 
-#define	VTYPE_NUM		1
+#define	VTYPE_NONE		0	/* type not defined yet  */
+#define	VTYPE_NUM		1	/* numeric value  */
 #define	VTYPE_ARRAY		2	/* numeric array  */
 #define	VTYPE_SARRAY	3	/* string array  */
 #define	VTYPE_LIST		4	/* numeric list  */

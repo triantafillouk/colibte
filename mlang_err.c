@@ -223,6 +223,10 @@ int	err_eval_fun1(tok_struct *tok0)
 		if(ia0!=ia) syntax_error("function arguments error",4031);
 		return(err_num);
 	};
+	if(tok->ttype==TOK_RPAR) {
+		// MESG("err_eval_fun1: skip RPAR!!");
+		NTOKEN_ERR(404);
+	};
 	tok0->number_of_args=ia;
 	// MESG("function args are %d",ia);
 
@@ -885,8 +889,10 @@ int err_factor()
 		RT_MESG1(524);
 	};
 	case TOK_DIR_ELSE:
+#if	0
 		xpos=526;
 		set_error(tok,xpos,"else without if error");
+#endif
 		RT_MESG1(5261);
 	case TOK_RBRAKET:
 		// MESG("tok_rbtacket");
@@ -1169,23 +1175,33 @@ int err_check_sentence1()
 	case TOK_DIR_IF:
 		{
 		tok_struct *tok0=tok;
+		// MESG("err: TOK_DIR_IF!");
 		set_tok_directive(tok,tok_dir_if);
 		NTOKEN_ERR(631);	/* go to next token after if */
 		xpos=632;
 
 		err_num=err_lexpression();
+		// MESG("err: TOK_DIR_IF! after lexpr");
 		CHECK_TOK(633);
-		if(err_num) return err_num;
+		if(err_num) { 
+			// MESG("err: TOK_DIR_IF! error!!");
+			return err_num;
+		};
+		// MESG("err: TOK_DIR_IF! check rpar! of %d",tok->tnum);
 		check_skip_token_err1(TOK_RPAR,"tok_dir_if",xpos);
 		CHECK_TOK(634);
 //		if(tok->ttype==TOK_LCURL) is_block=1; 
 		err_num=err_check_sentence1();	/* body of if  */
+		// MESG("	after body of if [%s]",tok_info(tok));
+		// check_skip_token1(TOK_RPAR);	/* ???????????  */
+		// NTOKEN_ERR(635);	/* go after sentence  */
 		CHECK_TOK(635);
 		tok0->next_tok=tok;
 		// MUST: No separator before else, handle this in parser !!!!! CHECK
 		// check for else statement!
-
+		
 		if(tok->ttype==TOK_DIR_ELSE) {
+			// MESG("we have an else statement!");
 			tok0=tok;
 			NTOKEN2;
 			err_num=err_check_sentence1();	/* body of else  */

@@ -298,12 +298,17 @@ double uf_print()
 				free(p_out);
 			};
 		};
-		// MESG("	after switch!");
-		tok=current_token();
-		// MESG("	after switch tnum=%d ttype=%d",tok->tnum,tok->ttype);
+		// MESG("	if: after switch!");
+		// tok=current_token();
+		// MESG("	if: after switch tnum=%d ttype=%d",tok->tnum,tok->ttype);
 	};
 	out_print("",1);
+	// MESG("uf_print: skip function right parenthesis");
 	ntoken();
+	// tok=current_token();
+	// MESG("end of if_print: show current token!");
+	// MESG("end of uf_print: num=%d",tok->tnum);
+	// MESG("uf_print: >>");
 	return value;
 }
 

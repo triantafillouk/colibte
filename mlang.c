@@ -133,54 +133,8 @@ term_type term_types[] = {
 	{NULL,0,0}
 };
 
-#if	0
-// token type names
-char *tok_name[] = {
-	"none",
-	"separator","space","letter","left curl","right curl",
-	"dquote",
-	"left par","right par","show","comment","variable",
-	"ed option","ed command","ed function","macro proc","ed env",
-	"term0","term","term1","term2",
-	"assingment","eof","numeric",
-	"directive","dir if","dir else","dir break","dir return",
-	"dir while","dir for","comma",
-	"for i",
-	"compare","not equal",
-	"smaller","bigger","equals","smaller or equal","bigger or equal",
-	"bool",
-	"bool and","bool or","bool not","bool nand","bool nor","bool xor",
-	"plus","minus","power","modulo","multiply","divide",
-	"left braket","right braket","squote","at","range","back quote","dolar","tilda",
-	"increase","decrease","increase by","mul_by", "decrease by","backslash",
-	"new line",
-	"continue",
-	"foreach",
-	"type",
-	"array","array2","array3","assign env","assign option",
-#if	0
-	"new_list","new_index","new_stack","new_queue",
-#endif
-	"start",
-	"end arg",
-	"define_type",
-	"other",
-	NULL
-};
-#endif
-
 /* Function definitions */
 #include "mlang_functions.c"
-
-/* directives */
-char *directives[] = {
- "{","}",
- "if","else",
- "break",
- "return",
- "while",
- "for","function","fori",NULL
-};
 
 array_dat *transpose(array_dat *array1);
 
@@ -1373,6 +1327,7 @@ static double term1_mul(double v1)
 	if(ex_vtype==VTYPE_NUM){
 		NTOKEN2;
 		v2=num_term2();
+		// MESG("term1_mul: second type=%d",ex_vtype);
 		switch(ex_vtype)
 		{
 			case VTYPE_NUM:	// numeric * numeric
@@ -2276,6 +2231,8 @@ void refresh_ddot_1(double value)
 
 double tok_dir_type()
 {
+	MESG("dir_type");
+	NTOKEN2;
 	return 0;
 }
 
@@ -2288,11 +2245,15 @@ double tok_dir_if()
 
 	val=lexpression();
 	if(val) {
+		// MESG("err_if: ttype=%d tnum=%f",tok->ttype,tok->tnum);
 		NTOKEN2;	/* skip right parenthesis  */
 		// MESG("	execute if at %d",tok->tnum);
 		val=tok->directive();
-		if(tok->ttype==TOK_DIR_ELSE) tok=tok->next_tok;
-		// MESG("skip else up to %d",tok->tnum);
+		// MESG("tok_dir_if: num=%d",tok->tnum);
+		if(tok->ttype==TOK_DIR_ELSE) {
+			tok=tok->next_tok;
+			// MESG("skip else up to %d",tok->tnum);
+		};
 		return val;
 	} else {
 		tok=tok0->next_tok;
