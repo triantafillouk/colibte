@@ -872,11 +872,83 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					tok->ttype=TOK_PROC;
 				} else {
 					set_var(stree,tok,nword);
-
+#if	0
 					if(next_token_type(bf)==TOK_LBRAKET) {
 						array_definition(bf,lex_parser,stree,tok);
 					};
+#else
+					int index=0;
+					tok_struct *tok_var=tok;
 
+					while(next_token_type(bf)==TOK_LBRAKET) {
+						// MESG("		set it as array index");
+						tok_var->ttype=TOK_ARRAY1+index;	/* set it as array index  */
+						// MESG("parse: array2 set type %d",tok_var->ttype);
+						getnc1(bf,&cc,&tok_type);// skip it
+						// parse numeric expression!
+						getnc1(bf,&cc,&tok_type);// get the index!
+
+						switch(tok_type){
+							case TOK_NUM:
+								ADD_TOKEN;
+								value=getnum1(bf,cc,tok);
+								tok->ttype=TOK_NUM;
+								if(index==0) tok->tname="index1";
+								if(index==1) tok->tname="index2";
+								tok->dval=value;
+								// MESG("	TOK_NUM: numeric3 %f",tok->dval);
+								break;
+							case TOK_LETTER:
+								slen=getnword1(bf,cc,nword);
+								{ // this must be a variable !!
+								ADD_TOKEN;
+								tok->tnode=find_btnode(directiv_table,nword);
+								if(tok->tnode!=NULL) { break;}  // this is an error ;
+									{ // this is a variable , we normally should check for an existing one!!
+										tok->tname=strdup(nword);
+										tok->tind=slen;
+										set_var(stree,tok,nword);
+									}
+								}
+								break;
+							default:
+							// this is an ERROR !!
+							err_num=105;
+							err_str="wrong character in table definition";
+							ERROR("wrong character on table definition !");
+						};
+
+						// MESG("	array1: 2");
+						if(next_token_type(bf)==TOK_SPACE) {
+							getnc1(bf,&cc,&tok_type);
+						};
+						if(tok_type==TOK_RBRAKET) {
+							// MESG("	add rbracket1!");
+							braket_level--;
+							ADD_TOKEN;
+							tok->ttype=TOK_RBRAKET;
+							tok->tname=strdup("RB1");
+						};
+						// MESG("next is : %d index=%d",next_token_type(bf),index);
+
+
+						index++;	/* array dimension  */
+
+						if(next_token_type(bf)==TOK_RBRAKET) {
+							getnc1(bf,&cc,&tok_type);
+							ADD_TOKEN;
+							tok->ttype=TOK_RBRAKET;
+							tok->tname=strdup("RB2");
+							// MESG("	add rbracket2!");
+						};
+
+						if(index>1) {
+							break;	/* for the moment only 2 dimensional arrays!!  */
+						} else {
+							// MESG("	get next dim");
+						};
+					};
+#endif
 				}
 			} else { // we have a directive
 				MESG("	parser:	directive found!");

@@ -770,7 +770,7 @@ double factor_line_array()
 	cdim=1;
 	ex_array=adat;
 	ex_name="Definition";
-	// MESG("factor_line_array:");
+	MESG("factor_line_array:");
 	allocate_array(ex_array);
 	NTOKEN2;
 	while(cdim>0){
@@ -779,11 +779,11 @@ double factor_line_array()
 			NTOKEN2;
 			continue;
 		};
-		// MESG("factor_line_array: tok name=[%s]",tok->tname);
+		MESG("factor_line_array: tok name=[%s]",tok->tname);
 		value=cexpression();
-		// MESG("	factor_line_array: set type=%d",ex_vtype);
+		MESG("	factor_line_array: set type=%d",ex_vtype);
 		if(ex_vtype==VTYPE_STRING && adat->atype!=VTYPE_AMIXED) adat->atype=VTYPE_SARRAY;
-		// MESG("	[%d %d]: value=%f [%s] %d",j,i,value,saved_string,ex_vtype);
+		MESG("	[%d %d]: value=%f [%s] %d",j,i,value,saved_string,ex_vtype);
 		if(adat->atype==VTYPE_ARRAY){
 			if(adat->rows>1 && adat->cols>1) {
 				adat->dval2[j][i]=value;
@@ -808,7 +808,7 @@ double factor_line_array()
 		if(tok->ttype==TOK_SHOW || tok->ttype==TOK_RBRAKET) {
 			cdim=0;break;
 		};
-		if(tok->ttype==TOK_SEP) {
+		if(tok->ttype==TOK_SEP/* ||tok->ttype==TOK_COMMA */) {
 			i=0;
 			j++;
 			cdim++;if(cdim>rows) rows=cdim;
