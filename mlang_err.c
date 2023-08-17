@@ -1330,7 +1330,7 @@ int err_check_sentence1()
 		if(tok->ttype!=TOK_SEP&&tok->ttype!=TOK_RPAR) 	
 			err_num=err_lexpression();
 		check_skip_token1(TOK_RPAR);
-		// MESG(" err TOK_FIR_RETURN: after lexpression: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype); 
+		// MESG(" err TOK_DIR_RETURN: after lexpression: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype); 
 		RT_MESG1(666);
 	case TOK_SEP:
 		RT_MESG;
@@ -1340,6 +1340,7 @@ int err_check_sentence1()
 		set_tok_directive(tok,tok_dir_type);
 		MESG("--> TOK_DIR_TYPE:");
 		NTOKEN_ERR(671);	// this is the type name
+#if	1
 		MESG("-->	1	%d %s",tok->ttype,tok->tname);
 		NTOKEN_ERR(671);	// this is =
 		MESG("-->	2	%d %s",tok->ttype,tok->tname);
@@ -1372,6 +1373,7 @@ int err_check_sentence1()
 				};
 			};
 		};
+#endif
 		xpos=632;
 	};break;
 	default:

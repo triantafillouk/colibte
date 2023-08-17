@@ -135,7 +135,7 @@ typedef struct BTNODE {
 	short balance;	/* for avl trees  */
 #endif
 	char *node_name;
-	double val;
+	double node_val;
 	char *sval;
 } BTNODE;
 

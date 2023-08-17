@@ -447,7 +447,6 @@ void init_hash()
 	tnode = set_btdval(directiv_table,term_types[i].term_name,i);
 	tnode->node_index = term_types[i].term_type;
 	tnode->node_type = term_types[i].term_group;
-//	tnode->val = i+1;
  };
  // show_bt_table_ordered(directiv_table);
  // show_bt_table_ordered(bt_table);
@@ -949,7 +948,7 @@ double factor_option()
 		strcpy(saved_string,bte->sval);
 		ex_vtype=VTYPE_STRING;
 	} else ex_vtype=VTYPE_NUM;
-	RTRN(bte->val);
+	RTRN(bte->node_val);
 }
 
 double factor_array1()
@@ -1893,7 +1892,7 @@ double	value=lexpression();
 			};
 			var_node->sval=NULL;
 		}
-		var_node->val=value;
+		var_node->node_val=value;
 	RTRN(value);
 }
 

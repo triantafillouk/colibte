@@ -837,7 +837,7 @@ BTNODE *new_btnode()
  btn->node_name=NULL;
  btn->node_type=0;
  btn->node_index=0;
- btn->val=0;
+ btn->node_val=0;
  btn->sval=NULL;
 #if	RB_BALANCE
  btn->up=NULL;
@@ -865,7 +865,7 @@ BTNODE * insert_bt_element(BTREE *bt,char *name,int type,int index)
 	if(bt->new_flag) {
 		node->node_type=type;
 		node->node_index=index;
-		node->val=0;
+		node->node_val=0;
 		node->sval=NULL;
 		bt->new_flag=0;
 //		MESG("insert:b index=%d: type=%d [%s]",index,type,value);
@@ -952,7 +952,7 @@ double btndval(BTREE *bt, char *name)
 // MESG("check directive: %s",name);
  btn = find_btnode(bt,name);
  if(btn) {
- 	return(btn->val);
+ 	return(btn->node_val);
  } else {
  	return(0);
  };
@@ -976,11 +976,11 @@ BTNODE *set_btdval(BTREE *bt, char *name,double value)
  BTNODE *btn;
  btn = find_btnode(bt,name);
  if(btn) {
-	btn->val=value;
+	btn->node_val=value;
 	btn->sval=NULL;
  } else {
 	btn=add_btnode(bt,name);
-	btn->val=value;
+	btn->node_val=value;
 	btn->sval=NULL;
  };
  return(btn);
@@ -1003,7 +1003,7 @@ int set_btsval(BTREE *bt, int type,char *name,char * sval,double val)
  if(sval!=NULL){
 	btn->sval=strdup(sval);
  };
- btn->val=val;
+ btn->node_val=val;
  return(is_new);
 }
 
@@ -1016,14 +1016,14 @@ int set_btnsval(BTNODE *btn, char * sval)
  if(sval!=NULL){
 	btn->sval=strdup(sval);
  };
-// MESG("set_btsval: name[%s] [%s] index=%d type=%d sval=[%s] val=%f is_new=%d",name,btn->node_name,btn->node_index,btn->node_type,btn->sval,btn->val,is_new); 
+// MESG("set_btsval: name[%s] [%s] index=%d type=%d sval=[%s] val=%f is_new=%d",name,btn->node_name,btn->node_index,btn->node_type,btn->sval,btn->node_val,is_new); 
  return(1);
 }
 
 int set_btndval(BTNODE *btn,double val)
 {
  if(btn==NULL) return(0);
- btn->val=val;
+ btn->node_val=val;
  return(1);
 }
 
@@ -1261,14 +1261,14 @@ void show_subtree(BTNODE *node)
  static int depth=0;
  char *left="",*right="";
  depth++;
-// MESG("node:[%s] id=%d type=%d val=%f balance=%d sval=%s",node->node_name,node->node_index,node->node_type,node->val,node->balance,node->sval);
+// MESG("node:[%s] id=%d type=%d val=%f balance=%d sval=%s",node->node_name,node->node_index,node->node_type,node->node_val,node->balance,node->sval);
  if(node->left) left = node->left->node_name;
  if(node->right) right = node->right->node_name;
  if(node->left || node->right) {
 //	fprintf(stdout,"%d:node[%s] -> [%s] - [%s]\n",depth,node->node_name,left,right);
 	if(depth>max_depth) max_depth=depth;
-	if(node->sval!=NULL) fprintf(stdout,"%d:node[%s] -> [%s] - [%s] index=%d type=%d val=%f sval=[%s]\n",depth,node->node_name,left,right,node->node_index,node->node_type,node->val,node->sval);
-	else fprintf(stdout,"%d:node[%s] -> [%s] - [%s] index=%d type=%d val=%f\n",depth,node->node_name,left,right,node->node_index,node->node_type,node->val);
+	if(node->sval!=NULL) fprintf(stdout,"%d:node[%s] -> [%s] - [%s] index=%d type=%d val=%f sval=[%s]\n",depth,node->node_name,left,right,node->node_index,node->node_type,node->node_val,node->sval);
+	else fprintf(stdout,"%d:node[%s] -> [%s] - [%s] index=%d type=%d val=%f\n",depth,node->node_name,left,right,node->node_index,node->node_type,node->node_val);
  };
  if(node->left) show_subtree(node->left);
  if(node->right) show_subtree(node->right);
@@ -1280,7 +1280,7 @@ void show_ordered_subtree(BTNODE *node)
  static int depth=0;
 char *left="",*right="";
  depth++;
- // printf("- node:[%s] id=%d type=%d val=%f balance=%d sval=%s",node->node_name,node->node_index,node->node_type,node->val,node->balance,node->sval);
+ // printf("- node:[%s] id=%d type=%d val=%f balance=%d sval=%s",node->node_name,node->node_index,node->node_type,node->node_val,node->balance,node->sval);
  if(node->left) {
  	show_ordered_subtree(node->left);
 	if(node->left) left = node->left->node_name;

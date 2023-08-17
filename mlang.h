@@ -76,6 +76,11 @@ typedef struct curl_struct {
 	struct _el *ocurl;
 } curl_struct;
 
+typedef struct key_type {
+	char *name;
+	short atype;
+} key_type;
+
 // #define SEP_FUNCTIONS	1
 
 /*	list of recognized user type functions	*/

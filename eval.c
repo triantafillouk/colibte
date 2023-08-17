@@ -293,7 +293,7 @@ int set_option(int n)
  {
 	btn=find_btnode(bt_table,option_names[nv].name);
  	if(btn->sval != NULL) snprintf(prompt,80,"%-10s:[%-5s]",option_names[nv].name,btn->sval);
-	else snprintf(prompt,80,"%-10s:[%d]",option_names[nv].name,(int)btn->val);
+	else snprintf(prompt,80,"%-10s:[%d]",option_names[nv].name,(int)btn->node_val);
 	
 	utf_string_break(prompt,20);
 	option_list[nv]=strdup(prompt);
@@ -307,9 +307,9 @@ int set_option(int n)
 	BTNODE *btn;
 	btn=find_btnode(bt_table,option_names[nv].name);
 	if(btn->sval!=NULL) snprintf(prompt,80,"%s [%s] : ",btn->node_name,btn->sval);
-	else snprintf(prompt,80,"%s [%d]: ",btn->node_name,(int)btn->val);
+	else snprintf(prompt,80,"%s [%d]: ",btn->node_name,(int)btn->node_val);
 	if(btn->sval!=NULL) strlcpy(value,btn->sval,MAXSLEN);
-	else snprintf(value,MAXSLEN,"%d",(int)btn->val);
+	else snprintf(value,MAXSLEN,"%d",(int)btn->node_val);
 
 	getstring(prompt,value,MAXSLEN,true);
 	
