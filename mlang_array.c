@@ -22,9 +22,9 @@ void init_array(struct array_dat *array, int rows,int cols)
 {
 	int ctype=VTYPE_ARRAY;	/* default is numeric!!  */
 	if(ex_nvars) ctype=VTYPE_AMIXED;
-	else if(ex_nums) ctype=VTYPE_ARRAY;
-	else if(ex_nquote) ctype=VTYPE_SARRAY;
 	else if(ex_nquote>0 && ex_nums>0) ctype=VTYPE_AMIXED;
+	else if(ex_nums) ctype=VTYPE_ARRAY;
+	else ctype=VTYPE_SARRAY;
 	// MESG("init_array: ex_nums=%d ex_nquote=%d ex_nvars=%d ->ctype=%d",ex_nums,ex_nquote,ex_nvars,ctype);
 	array->rows=rows;
 	array->cols=cols;
@@ -89,7 +89,7 @@ void free_array(char *spos,struct array_dat *adat)
 void allocate_array(struct array_dat *adat)
 {
  int i;
- // MESG("allocate_array: astat=%d type=%d",adat->astat,adat->atype);
+ // MESG("allocate_array: rows=%d cols=%d astat=%d type=%d",adat->rows,adat->cols,adat->astat,adat->atype);
  if(adat->astat==ARRAY_UNALLOCATED || adat->atype==VTYPE_AMIXED) {	/* new/renew  */
  	if(adat->atype==VTYPE_ARRAY) {	/* allocate num array  */
 

@@ -559,15 +559,21 @@ int err_factor()
 		ex_array=NULL;
 		while(cdim>0){
 		while(1) {
+			// MESG("	err: lbra: type=%d [%s] %f",tok->ttype,tok->tname,tok->dval);
 			if(tok->ttype==TOK_EOF||tok->ttype==TOK_SHOW) {
 				xpos=4777;
 				syntax_error(" FAC1_err: No closing braket",xpos);
 				RT_MESG1(xpos);
 			};
-			if(tok->ttype==TOK_SEP) {
-				// MESG("	new row");
+			if(tok->ttype==TOK_SEP || tok->ttype==TOK_COMMA) {
+				// MESG("	tok_sep [%s]",tok->tname);
 				NTOKEN2;
 				continue;
+			};
+			if(tok->ttype!=TOK_NUM && tok->ttype!=TOK_VAR && tok->ttype!=TOK_MINUS && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_PLUS && tok->ttype!=TOK_QUOTE) {
+				xpos=4778;
+				syntax_error(" wrong separator in table definition!",xpos);
+				RT_MESG1(xpos);
 			};
 			err_num=err_num_expression();
 			// MESG("	ex_value=%f err_num=%d",ex_value,err_num);
@@ -577,10 +583,10 @@ int err_factor()
 				// MESG("	tok_rbraket: end definition");
 				cdim=0;break;
 			};
-			if(tok->ttype==TOK_SEP ||tok->ttype==TOK_COMMA) {	/* Add tok->ttype==TOK_COMMA for using comma to separate array items  */
+			if(tok->ttype==TOK_SEP) {	/* Add tok->ttype==TOK_COMMA for using comma to separate array items  */
 				i=0;j++;
 				cdim++;if(cdim>rows) rows=cdim;
-				// MESG("	new row2");
+				// MESG("		new row2");
 				NTOKEN2;
 				continue;
 			};
@@ -592,6 +598,7 @@ int err_factor()
 		if(tok0->adat) {
 			free(tok0->adat);
 		};
+		// MESG("	err: CREATE new array [%d %d]",rows,cols);
 		tok0->adat = new_array(rows,cols);
 		// MESG("	array type is %d ?= %d",tok0->ttype,TOK_ARRAY2);
 		// set end

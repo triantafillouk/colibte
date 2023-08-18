@@ -770,7 +770,7 @@ double factor_line_array()
 	cdim=1;
 	ex_array=adat;
 	ex_name="Definition";
-	MESG("factor_line_array:");
+	// MESG("factor_line_array: ------------");
 	allocate_array(ex_array);
 	NTOKEN2;
 	while(cdim>0){
@@ -779,11 +779,14 @@ double factor_line_array()
 			NTOKEN2;
 			continue;
 		};
-		MESG("factor_line_array: tok name=[%s]",tok->tname);
+		// MESG("	[%d][%d] tok_type=%d",j,i,tok->ttype);
 		value=cexpression();
-		MESG("	factor_line_array: set type=%d",ex_vtype);
+		// MESG("	factor_line_array: set type=%d",ex_vtype);
 		if(ex_vtype==VTYPE_STRING && adat->atype!=VTYPE_AMIXED) adat->atype=VTYPE_SARRAY;
-		MESG("	[%d %d]: value=%f [%s] %d",j,i,value,saved_string,ex_vtype);
+		// MESG("	[%d %d]: value=%f [%s] %d",j,i,value,saved_string,ex_vtype);
+
+		if(tok->ttype == TOK_COMMA) { NTOKEN2;};
+
 		if(adat->atype==VTYPE_ARRAY){
 			if(adat->rows>1 && adat->cols>1) {
 				adat->dval2[j][i]=value;
@@ -1187,14 +1190,28 @@ double factor_at()
 
 static inline double factor_plus()
 {
+	// MESG(" + + + + factor_plus!");
 	NTOKEN2;
-	return FACTOR_FUNCTION;
+#if	1
+	return ( FACTOR_FUNCTION );
+#else
+	double value = FACTOR_FUNCTION;
+	MESG("	value=%f",value);
+	return value;
+#endif
 }
 
 static inline double factor_minus()
 {
+	// MESG(" - - - - factor_minus!");
 	NTOKEN2;
+#if	1
 	return (- FACTOR_FUNCTION);
+#else
+	double value = FACTOR_FUNCTION;
+	MESG("	value=%f",value);
+	return (- value);
+#endif
 }
 
 static inline double factor_not()

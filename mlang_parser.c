@@ -355,16 +355,18 @@ int array_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *t
  char nword[256];
  int slen=0;
  int braket_level=1;
- MESG("call array_definition line %d type %d",tok->tline,tok->ttype);
+ tok_struct *tok;
+
+ // MESG("call array_definition line %d type %d",tok_var->tline,tok_var->ttype);
 
  while(next_token_type(bf)==TOK_LBRAKET) {
 	// MESG("		set it as array index");
 	tok_var->ttype=TOK_ARRAY1+index;	/* set it as array index  */
-	// MESG("parse: array2 set type %d",tok_var->ttype);
+	// MESG("	array_definition: set array type to %d",tok_var->ttype);
 	getnc1(bf,&cc,&tok_type);// skip it
-	// parse numeric expression!
+	// MESG("	array_definition: skip left bracket [%c] ttype=%d",cc,tok_type);
 	getnc1(bf,&cc,&tok_type);// get the index!
-
+	// MESG("	array_definition: index: [%c] type=%d",cc,tok_type);
 	switch(tok_type){
 		case TOK_NUM:
 			ADD_TOKEN;
@@ -386,7 +388,8 @@ int array_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *t
 					tok->tind=slen;
 					set_var(stree,tok,nword);
 				}
-			}
+			};
+			// MESG("	TOK_LETTER: [%s]",nword);
 			break;
 		default:
 		// this is an ERROR !!
@@ -850,7 +853,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			continue;
 		};
 #endif
-		MESG("	parser: TOK_LETTER: check element in bt [%s]",nword);
+		// MESG("	parser: TOK_LETTER: check element in bt [%s]",nword);
 		tok->tnode = find_bt_element(nword); // check main table
 		
 		if(is_storelines && proc_name==NULL && tok->tnode!=NULL) {	/* function already register!  */
@@ -862,7 +865,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					proc_name=strdup(nword);
 				};
 			};
-			MESG("	parser:		check in directive_table");
+			// MESG("	parser:		check in directive_table");
 			tok->tnode=find_btnode(directiv_table,nword);
 			if(tok->tnode==NULL){	/* not a directive but a variable  */
 				tok->tname=strdup(nword);
@@ -872,7 +875,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					tok->ttype=TOK_PROC;
 				} else {
 					set_var(stree,tok,nword);
-#if	0
+#if	1
 					if(next_token_type(bf)==TOK_LBRAKET) {
 						array_definition(bf,lex_parser,stree,tok);
 					};
@@ -1076,7 +1079,7 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
  };
  tok_table=(void *)malloc(sizeof(struct tok_struct)*(lex_parser->size+1));
  bf->tok_table = (void *) tok_table;
- MESG("----> set_tok_table: bf=[%s]",bf->b_fname);
+ // MESG("----> set_tok_table: bf=[%s]",bf->b_fname);
  lbegin(lex_parser);
  tlist=lex_parser;
  tok_to = tok_table;
