@@ -21,10 +21,12 @@ void allocate_array(struct array_dat *adat);
 void init_array(struct array_dat *array, int rows,int cols)
 {
 	int ctype=VTYPE_ARRAY;	/* default is numeric!!  */
+
 	if(ex_nvars) ctype=VTYPE_AMIXED;
 	else if(ex_nquote>0 && ex_nums>0) ctype=VTYPE_AMIXED;
-	else if(ex_nums) ctype=VTYPE_ARRAY;
-	else ctype=VTYPE_SARRAY;
+	else if(ex_nquote) ctype=VTYPE_SARRAY;
+	else ctype=VTYPE_ARRAY;
+
 	// MESG("init_array: ex_nums=%d ex_nquote=%d ex_nvars=%d ->ctype=%d",ex_nums,ex_nquote,ex_nvars,ctype);
 	array->rows=rows;
 	array->cols=cols;
@@ -737,7 +739,7 @@ void print_array1(char *title,array_dat *adat)
 	char s2[128];
 	int i,j;
 	so[0]=0;
-	MESG("print_array1: --------------- %s",title);
+	// MESG("print_array1: --------------- %s",title);
 	if(adat==NULL) {
 		err_num=260;
 		err_str="%s: NULL array!!!!!!!!!!!!!!!!!!";
