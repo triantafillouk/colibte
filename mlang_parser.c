@@ -954,7 +954,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 #endif
 				}
 			} else { // we have a directive
-				MESG("	parser:	directive found!");
+				// MESG("	parser:	directive found!");
 				tok->tname=tok->tnode->node_name;
 				tok->tgroup=tok->tnode->node_type;
 				tok->tind = tok->tnode->node_index;

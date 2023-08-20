@@ -170,21 +170,25 @@ void set_error(tok_struct *tok,int err,char *description)
 	err_str=description;
 	return;
  };
+ // MESG("set_error:----------------");
  err_line=tok->tline;
  err_num=err;
  // MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
  err_str=strdup(description);
+#if	1
  if(execmd) {
 	if(tok->tname==NULL) fprintf(stderr,"Error:%d tnum=%d ttype=%d %s line %d\n",err,tok->tnum,tok->ttype,err_str,err_line);
  	else fprintf(stderr,"Error:%d [%s] tnum=%d ttype=%d %s line %d\n",err,(char *)tok->tname,tok->tnum,tok->ttype,err_str,err_line);
  };
+#endif
  current_active_flag=0;
+ NTOKEN2;NTOKEN2;
  tok->ttype=TOK_EOF;
  // tok->directive=factor_eof;
  set_tok_directive(tok,factor_eof);
  tok->tgroup=TOK_EOF;
  // NTOKEN2;
- // tok->ttype=TOK_END;
+ tok->ttype=TOK_END;
 }
 
 void syntax_error(char *description,int err)
