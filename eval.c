@@ -726,16 +726,17 @@ int dofile(char *fname)
 	int status;	/* results of various calls */
 	char bname[MAXFLEN];
 	snprintf(bname,MAXFLEN,"[%s]",fname);
-	// MESG("dofile:[%s]",fname);
+	// MESG("dofile:fname=[%s]",fname);
 	show_stage=0;
 	set_screen_update(false);
 	if((bp=get_filebuf(bname,NULL,0))==NULL) { // file not in memory, load it!
+		// MESG("	bname=[%s]",bname);
 		if ((bp = new_filebuf(bname, 0)) == NULL) /* get the needed buffer */
 			return(FALSE);
 
 	/* and try to read in the file to execute */
 		if(cbfp == NULL) cbfp=bp;
-		// MESG("dofile: 10 %s",fname);
+		// MESG("dofile: 10 %s,%s",fname,bp->b_fname);
 		if ((status = file_read1(bp,fname)) != TRUE) {
 			return(status);
 		};

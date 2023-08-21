@@ -3,7 +3,6 @@
 
 extern char *saved_string;
 extern int ex_vtype;
-//extern tok_struct *tok;
 extern array_dat *ex_array;
 extern array_dat *main_args;
 extern char *ex_name;
@@ -134,7 +133,7 @@ double uf_cls()
 {
 	ntoken();
 	cls_fout("[out]");
-	MESG("<- %s ------------------------------------------------------------->",VERSION);
+	// MESG("<-%s: %s ------------------------------------------------------------->",cbfp->b_fname,VERSION);
 	return 0;
 }
 

@@ -297,8 +297,6 @@ double increase_by()
 		char *stmp=malloc(strlen(saved_string)+strlen(sslot->psval[0]));
 		strcpy(stmp,sslot->psval[0]);
 		strcat(stmp,saved_string);	/* check!! TODO  */
-		free(saved_string);
-		// MESG("caoncatanated[%s]",stmp);
 		free(sslot->psval[0]);
 		sslot->psval[0]=stmp;
 
@@ -1190,28 +1188,14 @@ double factor_at()
 
 static inline double factor_plus()
 {
-	// MESG(" + + + + factor_plus!");
 	NTOKEN2;
-#if	1
 	return ( FACTOR_FUNCTION );
-#else
-	double value = FACTOR_FUNCTION;
-	MESG("	value=%f",value);
-	return value;
-#endif
 }
 
 static inline double factor_minus()
 {
-	// MESG(" - - - - factor_minus!");
 	NTOKEN2;
-#if	1
 	return (- FACTOR_FUNCTION);
-#else
-	double value = FACTOR_FUNCTION;
-	MESG("	value=%f",value);
-	return (- value);
-#endif
 }
 
 static inline double factor_not()
@@ -2541,29 +2525,27 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	} else {
 		local_symbols=current_stable;	
 	}
- // MESG("compute_block: call check_init");
+	MESG("<- [%-15s %s ------------------------------------------------------------->",bp->b_fname,VERSION);
  if(bp->m_mode<2)	/* if not already checked!  */
  {
 	err_num=check_init(bp);
-#if	1
 	if(err_num>0) 
 	{
 		// mesg_out("Error %d %s line %d ex_vtype=%d ex_value=%f slval=[%s]!",err_num,err_str,err_line,ex_vtype,ex_value,saved_string);
 		// show_error("Check init",bp->b_fname);
 		return(0);
 	};
-#endif
-	// MESG("compute_block: call init_exec_flags err=%d",err_num);
 	init_exec_flags();
 	tok=bp->tok_table;
-	// MESG("compute_block: call drv_start_checking_break");
+
 	drv_start_checking_break();
-	// MESG("exec block->");
+
 	if(execmd) val=exec_block1();
 	else val=exec_block1_break();
-	drv_stop_checking_break();
-	// MESG("--- start=%d",start);
 
+	drv_stop_checking_break();
+
+	/* cleaning  */
 	if(start) {
 		if(local_symbols)
 		if(bp->symbol_tree)
