@@ -182,7 +182,8 @@ void set_error(tok_struct *tok,int err,char *description)
  };
 #endif
  current_active_flag=0;
- NTOKEN2;NTOKEN2;
+ // NTOKEN2;NTOKEN2;
+ tok=cbfp->end_token;
  tok->ttype=TOK_EOF;
  // tok->directive=factor_eof;
  set_tok_directive(tok,factor_eof);
