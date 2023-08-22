@@ -881,7 +881,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->npoints=0;
 	bp->symbol_tree=NULL;
 	bp->symbol_table=NULL;
-
+	bp->type_list=NULL;
 	bp->tp_base = textpoint_new(bp,TP_BASE,0);
 	bp->tp_text_end = textpoint_new(bp,TP_TEXT_END,0);
 	bp->tp_text_o = textpoint_new(bp,TP_TEXT_END,0);

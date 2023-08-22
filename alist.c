@@ -54,6 +54,9 @@ alist *new_list(int id1,char *title)
  li->head = NULL;
  li->last = NULL;
  li->current = NULL;
+#if	LIST_HAS_NAME
+ li->name=strdup(title);
+#endif
  if(id1!=0) li->id = id1;
  else { 
  	id++;
@@ -636,6 +639,9 @@ void empty_list(alist *list)
  list->head=NULL;
  list->last=NULL;
  list->current=NULL;
+#if	LIST_HAS_NAME
+ if(list->name) free(list->name);
+#endif
  list->size=0;
  list->array_valid=0;
 }
@@ -656,6 +662,9 @@ void empty_list1(alist *list,int (*ff)(void *))
  list->last=NULL;
  list->current=NULL;
  list->size=0;
+#if	LIST_HAS_NAME
+ if(list->name) free(list->name);
+#endif
  list->array_valid=0;
 // printf("empty_list1:id=%d\n",list->id);
 }
@@ -1275,22 +1284,38 @@ void show_subtree(BTNODE *node)
  depth--;
 }
 
+
+void show_node(BTNODE *node,int depth,char *left,char *right)
+{
+// 	fprintf(stdout,"%03d:node[%-15s] l=[%-15s] r=[%s]\n",depth,node->node_name,left,right);
+
+	if(node->node_vtype==1) 
+		fprintf(stdout,"%03d:node[%-10s] l=[%-10s] r=[%-10s] numeric %f\n",depth,node->node_name,left,right,node->node_val);
+	else if(node->node_vtype==8)
+		fprintf(stdout,"%03d:node[%-10s] l=[%-10s] r=[%-10s] string  \"%s\"\n",depth,node->node_name,left,right,node->sval);
+	else
+		fprintf(stdout,"%03d:node[%-10s] l=[%-10s] r=[%-10s] other type\n",depth,node->node_name,left,right);
+}
+
 void show_ordered_subtree(BTNODE *node)
 {
  static int depth=0;
 char *left="",*right="";
  depth++;
- // printf("- node:[%s] id=%d type=%d val=%f balance=%d sval=%s",node->node_name,node->node_index,node->node_type,node->node_val,node->balance,node->sval);
+
+ // printf("- node:[%s] id=%d type=%d val=%f balance=%d sval=%s\n",node->node_name,node->node_index,node->node_type,node->node_val,node->balance,node->sval);
  if(node->left) {
  	show_ordered_subtree(node->left);
 	if(node->left) left = node->left->node_name;
 	if(node->right) right = node->right->node_name;
-	fprintf(stdout,"%03d:node[%-20s] l=[%-20s] r=[%s]\n",depth,node->node_name,left,right);
+	// fprintf(stdout,"%03d:node[%-20s] l=[%-20s] r=[%s]\n",depth,node->node_name,left,right);
+	show_node(node,depth,left,right);
 	if(node->right) show_ordered_subtree(node->right);
  } else {
 	if(node->left) left = node->left->node_name;
 	if(node->right) right = node->right->node_name;
- 	fprintf(stdout,"%03d:node[%-20s] l=[%-20s] r=[%s]\n",depth,node->node_name,left,right);
+ 	// fprintf(stdout,"%03d:node[%-20s] l=[%-20s] r=[%s]\n",depth,node->node_name,left,right);
+	show_node(node,depth,left,right);
 	if(node->right) show_ordered_subtree(node->right);
  } 
 

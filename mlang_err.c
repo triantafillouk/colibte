@@ -1350,19 +1350,19 @@ int err_check_sentence1()
 		{
 		// tok_struct *tok0=tok;
 		set_tok_directive(tok,tok_dir_type);
-		MESG("--> TOK_DIR_TYPE:");
+		MESG("--> err: TOK_DIR_TYPE: %s",tok->tname);
 		NTOKEN_ERR(671);	// this is the type name
-#if	1
-		MESG("-->	1	%d %s",tok->ttype,tok->tname);
+#if	0
+		MESG("	-->	1	%d %s",tok->ttype,tok->tname);
 		NTOKEN_ERR(671);	// this is =
-		MESG("-->	2	%d %s",tok->ttype,tok->tname);
+		MESG("	-->	2	%d %s",tok->ttype,tok->tname);
 		// check_skip_token1(TOK_LPAR);
 		NTOKEN_ERR(671);
-		MESG("-->	3	%d %s",tok->ttype,tok->tname);
+		MESG("	-->	3	%d %s",tok->ttype,tok->tname);
 		NTOKEN_ERR(671);
 		int e=1;
 		while(tok->ttype!=TOK_RPAR) {
-			MESG("-->	4: %2d %d %s",e++,tok->ttype,tok->tname);
+			MESG("	-->	4: %2d %d %s",e++,tok->ttype,tok->tname);
 			if(tok->ttype==TOK_END) {
 				syntax_error("type error",671);
 				RT_MESG1(671);

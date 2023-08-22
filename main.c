@@ -48,7 +48,7 @@ int new_in_key_list=0;
 
 void init_lists()
 {
- // MESG("init_lists:");
+ // fprintf(stderr,"init_lists: size of struct list=%ld\n",sizeof(struct alist));
  file_list=new_list(0,"file_list");
  window_list=new_list(0,"window_list");
  var_list=new_list(0,"var_list");

@@ -20,6 +20,7 @@
 #define A_DEBUG	0
 #define	_ASTACK	0
 #define	FULL		0
+#define LIST_HAS_NAME	0
 
 typedef struct _el
 {
@@ -42,13 +43,16 @@ typedef struct sstack {
 
 typedef struct alist
 {
- int id;	// list id
+ short id;	// list id
+ short array_valid;
+ int size;
+#if	LIST_HAS_NAME
+ char *name;
+#endif
  struct _el *head;
  struct _el *last;
  struct _el *current;
- unsigned int size;
  void **data;
- int array_valid;
 #if	_ASTACK
  astack *cstack;	// current stack
 #endif

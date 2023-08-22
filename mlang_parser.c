@@ -288,12 +288,13 @@ int type_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *to
  // skip_space1(bf);
  tok_type=next_token_type(bf);
  if(tok_type!=TOK_LETTER) { MESG("next is not letter! %d",tok_type);return 0;};
-
+ 
  getnc1(bf,&cc,&tok_type);
  // MESG("	ttd 1 type=%d",cc);
  slen=getnword1(bf,cc,nword);	/* this is the type name  */
 
  BTREE *type_dat = new_btree(nword,100);
+ add_element_to_list(type_dat,bf->type_list);
 
  // MESG("	ttd 2: %d [%s]",slen,nword);
 #if	1
@@ -314,6 +315,7 @@ int type_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *to
  getnc1(bf,&cc,&tok_type);
  if(tok_type!=TOK_LPAR) { MESG("	left par not found");return 0; };
  // MESG("		while!");
+ int ind=0;
  while(next_token_type(bf)!=TOK_RPAR) {
  	getnc1(bf,&cc,&tok_type);
 	// MESG("	w: cc=[%c] type=%d",cc,tok_type);
@@ -321,6 +323,9 @@ int type_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *to
 	slen=getnword1(bf,cc,nword);
 	
 	MESG("	type add element [%s]",nword);
+	BTNODE *node = add_btnode(type_dat,nword);
+	node->node_index = ind++;
+	if(type_dat->new_flag==0) MESG("error: dublicate definition!");
 	getnc1(bf,&cc,&tok_type);
 	// MESG("	w: %d [%c]",tok_type,cc);
 	if(cc==':')  {
@@ -333,9 +338,13 @@ int type_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *to
 		if(tok_type==TOK_NUM) {
 			double val=getnum1(bf,cc,tok);
 			MESG("	element numeric %f",val);
+			node->node_vtype=VTYPE_NUM;
+			node->node_val=val;			
 		} else if (tok_type==TOK_QUOTE) {
 			getnstr1(bf,cc,nword);
 			MESG("	element string [%s]",nword);
+			node->node_vtype=VTYPE_STRING;
+			node->sval=strdup(nword);
 		} else {
 			MESG("	parse type definition error!");
 			return 0;
@@ -343,6 +352,7 @@ int type_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *to
 	} else if(cc!=' '&&cc!=9) { return 0;}; 
  };
  getnc1(bf,&cc,&tok_type);
+ show_bt_table_ordered(type_dat);
  return 1;
 }
 
@@ -454,7 +464,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int array_rows=0;
  int array_max_cols=0;
  int after_rpar=0;
- TLIST cstack; // curl stack
+ TLIST curl_stack; // curl stack
  int store_level=0;
  int save_stage_level;
  offs start_proc_offset=0;
@@ -501,7 +511,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  };
 
  foffset=0;	/* goto to the beginning of the buffer  */
- cstack=new_list(0,"curles_stack"); // create curles stack 
+ curl_stack=new_list(0,"curles_stack"); // create curles stack 
  // MESG("parse_block1: before looping: script_active=%d",script_active);
  err_num=0;
  err_line=0;
@@ -831,13 +841,13 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			tcl=new_curl(curl_level,tok_line,lex_parser->last);
 			tcl->num=tok->tnum;
 			tok->tname="{";
-			lpush(tcl,cstack);
+			lpush(tcl,curl_stack);
 			tok->tcurl=tcl;
 	} else
 	if(tok->ttype==TOK_RCURL) {
 		struct curl_struct *tcl,*tcr;
 			tcr=new_curl(curl_level,tok_line,lex_parser->last);
-			tcl=(curl_struct *)lpop(cstack);
+			tcl=(curl_struct *)lpop(curl_stack);
 			tok->tcurl=tcr;
 			tok->tname="}";
 			tcr->num=tcl->num;
@@ -1058,7 +1068,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  set_tok_table(bf, lex_parser);
 
  free_list(lex_parser,"lex_parser");
- free_list(cstack,"cstack");
+ free_list(curl_stack,"cstack");
  stage_level=save_stage_level;
  // MESG("parse_block1:[%s] end token items %d",bf->b_fname,bf->symbol_tree->max_items);
  return(TRUE); 

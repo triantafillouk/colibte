@@ -2501,7 +2501,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  tok_data *local_symbols;
  tok_data *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
- // MESG(";compute_block: %s",bp->b_fname);
+	MESG("<- [%-15s %s ------------------------------------------------------------->",bp->b_fname,VERSION);
 
  if(show_tokens) {
 	parse_buffer_show_tokens(1);
@@ -2513,6 +2513,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);
 	extra=100;
 	use_fp->symbol_tree->max_items=extra;
+	use_fp->type_list=new_list(0,"type_list");
  };
 	if(current_stable==NULL) {
 		current_stable=new_symbol_table(use_fp->symbol_tree->max_items);
@@ -2525,7 +2526,6 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	} else {
 		local_symbols=current_stable;	
 	}
-	MESG("<- [%-15s %s ------------------------------------------------------------->",bp->b_fname,VERSION);
  if(bp->m_mode<2)	/* if not already checked!  */
  {
 	err_num=check_init(bp);
@@ -2548,8 +2548,12 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	/* cleaning  */
 	if(start) {
 		if(local_symbols)
-		if(bp->symbol_tree)
-		delete_symbol_table(local_symbols,bp->symbol_tree->items,0);
+		if(bp->symbol_tree){
+			delete_symbol_table(local_symbols,bp->symbol_tree->items,0);
+			bp->symbol_tree=NULL;
+			free_list(bp->type_list,"type_list");
+			bp->type_list=NULL;
+		};
 		current_stable=old_symbol_table;
 	};
 

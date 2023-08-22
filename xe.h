@@ -679,6 +679,7 @@ typedef struct  FILEBUF {
 	struct tok_struct *end_token;	/* the last (EOF) token in tok_table  */
 	int err;	/* negative if not syntax checked  */
 	BTREE *symbol_tree;	/* local symbol table  */
+	struct alist *type_list;	/* type table list  */
 	tok_data *symbol_table;	/* instance of variables data  */
 #if	USE_SLOW_DISPLAY
 	int slow_display;
