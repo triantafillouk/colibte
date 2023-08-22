@@ -699,7 +699,7 @@ char *cmd_to_tstr(int cmd)
 int set_key_emulation(int emulation)
 {
 	MESG("set_key_emulation: %d",emulation);
-	set_btval("keyboard_emulation",-1,NULL,emulation);
+	set_bt_num_val("keyboard_emulation",emulation);
 	if(emulation == 1) key_table = keytab_emacs;
 	else key_table = keytab_win;
 	return emulation;

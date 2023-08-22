@@ -19,7 +19,7 @@ void set_current_scheme(int scheme)
  MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
 
  color_scheme_ind=scheme-1;
- set_btval("color_scheme",-1,NULL,color_scheme_ind+1); 
+ set_bt_num_val("color_scheme",color_scheme_ind+1); 
 
  current_scheme = get_scheme_by_index(color_scheme_ind);
 
@@ -1470,7 +1470,6 @@ toggle_button (GtkWidget *widget,
 
 // MESG("Toggle button %d %s toggle status=%d name=[%s] = [%s]",type,option_name,status,option_name,option_names[type].name);
  
-// set_btval(option_name,-1,NULL,status);
  switch(type) {
  	case EMCCASE: {
 		gmode_exact_case = status;

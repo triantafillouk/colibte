@@ -437,8 +437,6 @@ void init_hash()
 	set_btval(option_names[i].name,TOK_OPTION,option_names[i].sval,option_names[i].dval);
  };
 
- // set_btval("args",TOK_VAR,"",0);
-
  for(i=0;term_types[i].term_name!=NULL;i++)
  {
 	BTNODE *tnode;
@@ -2909,6 +2907,14 @@ char * bt_sval(char *name)
 void set_btval(char *name,int type,char *sval,double val)
 {
  set_btsval(bt_table,type,name,sval,val);
+}
+
+/* set type, numeric value for a node named name of main table  */
+void set_bt_num_val(char *name,double val)
+{
+ BTNODE *node = set_btdval(bt_table,name,val);
+ node->node_type=-1;
+ node->node_vtype=VTYPE_NUM;
 }
 
 /* -- */

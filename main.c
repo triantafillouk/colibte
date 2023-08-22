@@ -328,7 +328,7 @@ void parse_command_line(int argc, char **argv)
 					break;
 #endif
 				case 'p':
-					set_btval("reset_position",-1,NULL,1);
+					set_bt_num_val("reset_position",1);
 					break;
 #if	RSESSION
 				case 'r':

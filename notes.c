@@ -1114,11 +1114,11 @@ int recreate_notes_db(int n)
  char tmp_file[256];
  char **notes_files;
  // FILEBUF *current_buffer=cbfp;
-	MESG("--- recreate_notes_db: ---- n=%d",n);
-	set_btval("notes_recreate",1,"",1);
+	// MESG("--- recreate_notes_db: ---- n=%d",n);
+	set_bt_num_val("notes_recreate",1);
 	// create notes db
 	if(n){
-		MESG("recreate_note_db: Initialize database!");
+		// MESG("recreate_note_db: Initialize database!");
 		status = init_notes_db(1);
 	};
 	set_bfname(notes_dir,NOTES_DIR);
@@ -1183,7 +1183,7 @@ int recreate_notes_db(int n)
 		};
 		
 	};
-	set_btval("notes_recreate",1,"",0);
+	set_bt_num_val("notes_recreate",0);
 	free_sarray(notes_files);
 	// select_filebuf(current_buffer);
 	msg_line("# recreated_notes_db: new %d, dirs %d, skipped %d",notes_new,dirs,notes_skipped);

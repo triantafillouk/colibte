@@ -115,10 +115,10 @@ int on_parent_configure              (GtkWidget       *widget,
 	set_cfg_int("x11_x",event->x);
 	set_cfg_int("x11_y",event->y);
 #else
-	set_btval("x11_x",-1,NULL,event->x);
-	set_btval("x11_y",-1,NULL,event->y);
-	set_btval("x11_width",-1,NULL,p_width);
-	set_btval("x11_height",-1,NULL,p_height);
+	set_bt_num_val("x11_x",event->x);
+	set_bt_num_val("x11_y",event->y);
+	set_bt_num_val("x11_width",p_width);
+	set_bt_num_val("x11_height",p_height);
 #endif
 //	MESG("on_parent_configure: [%d,%d]",event->width,event->height);
   return(FALSE);

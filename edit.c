@@ -64,8 +64,8 @@ int do_nothing(int n)
 void toggle_val(char *name){
 //	if(name==NULL) return;
 	if((int)bt_dval(name)) {
-		set_btval(name,-1,NULL,0);
-	} else set_btval(name,-1,NULL,1);
+		set_bt_num_val(name,0);
+	} else set_bt_num_val(name,1);
 //	MESG("new value of [%s] is %d",name,(int)bt_dval(name));
 }
 

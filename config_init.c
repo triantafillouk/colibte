@@ -35,7 +35,8 @@ void load_config()
  if(pair_nums) {
 	for(flag_name=name_array[i];(flag_name=name_array[i])!=NULL;i++){
 		// MESG("	- set [%s] to %d",flag_name,atoi(value_array[i]));
-		set_btval(flag_name,-1,NULL,atoi(value_array[i]));
+		// set_btval(flag_name,-1,NULL,atoi(value_array[i]));
+		set_bt_num_val(flag_name,atoi(value_array[i]));
 	};
 	MESG("configuration loaded! (%d) pairs",pair_nums);
  };

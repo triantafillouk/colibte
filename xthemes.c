@@ -213,7 +213,7 @@ int change_color_scheme(int  scheme)
  if(scheme<1 || scheme> color_scheme_list->size) scheme=1;
  set_current_scheme(scheme);
  if(!discmd) return (TRUE);
- set_btval("xcolor_scheme",-1,NULL,color_scheme_ind); 
+ set_bt_num_val("xcolor_scheme",color_scheme_ind); 
  set_update(cwp,UPD_ALL);
  // update also the vertical window separator lines
  drv_back_color();

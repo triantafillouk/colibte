@@ -171,6 +171,7 @@ void set_btval(char *name,int type,char *sval,double val);
 BTNODE *set_btdval(BTREE *bt, char *name,double value);
 
 int set_btsval(BTREE *bt, int type,char *name,char * sval,double val);
+void set_bt_num_val(char *name,double val);
 void init_btvars();
 int set_btnsval(BTNODE *btn, char * sval);
 int set_btndval(BTNODE *btn, double val);

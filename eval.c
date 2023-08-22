@@ -343,29 +343,29 @@ int set_option_val(int vnum,char *svalue)
 // MESG("set_option_val: vnum=%d [%s]",vnum,svalue);
 		switch (vnum) {
 		case EMFILLCOL:	{
-			set_btval("fillcol",-1,NULL,v1);
+			set_bt_num_val("fillcol",v1);
 			break;
 			};
-		case EMLMARGIN:	set_btval("lmargin",-1,NULL,v1);break;
+		case EMLMARGIN:	set_bt_num_val("lmargin",v1);break;
 		case EMTABSIZE: 
-			set_btval("tabsize",-1,NULL,v1);
+			set_bt_num_val("tabsize",v1);
 			set_env(EVTABSIZE1,"",v1);
 			break;
-		case EMPRECISION: set_btval("print_precision",-1,NULL,v1);break;
-		case EMSHOWHEX: set_btval("show_hex",-1,NULL,v1);break;
+		case EMPRECISION: set_bt_num_val("print_precision",v1);break;
+		case EMSHOWHEX: set_bt_num_val("show_hex",v1);break;
 		case EMKEYEMUL: {
 			set_key_emulation(v1);
 			break;
 			}
-		case EMBACKUP: set_btval("make_backup",-1,NULL,v1);break;
-		case EMBEDICONS: set_btval("embed_icons",-1,NULL,v1);break;
+		case EMBACKUP: set_bt_num_val("make_backup",v1);break;
+		case EMBEDICONS: set_bt_num_val("embed_icons",v1);break;
 		case EMSHOWPOS: {
-			set_btval("show_position",-1,NULL,v1);
+			set_bt_num_val("show_position",v1);
 			break;
 			};
 		case EMVINFOCOL: {
 			WINDP *wp;
-			set_btval("show_vinfo",-1,NULL,v1);
+			set_bt_num_val("show_vinfo",v1);
 
 			if(v1>0) {
 				lbegin(window_list);
@@ -381,15 +381,15 @@ int set_option_val(int vnum,char *svalue)
 			break;
 			};
 		case EMVLINES: {
-			set_btval("show_vmlines",-1,NULL,v1);
+			set_bt_num_val("show_vmlines",v1);
 			break;
 			};
 		case EMCOFFSET: {
-			set_btval("show_coffset",-1,NULL,v1);
+			set_bt_num_val("show_coffset",v1);
 			break;
 			};
 		case EMCDATA: {
-			set_btval("show_cdata",-1,NULL,v1);
+			set_bt_num_val("show_cdata",v1);
 			break;
 			};
 		case EMCCASE: {
@@ -402,23 +402,23 @@ int set_option_val(int vnum,char *svalue)
 			gmode_reg_exp=v1;
 			};break;
 		 case EMSAVHIST: {
-		 	set_btval("save_history",-1,NULL,v1);
+		 	set_bt_num_val("save_history",v1);
 			break;
 		 };
 		  case EMLARGEICONS: {
-		  	set_btval("large_toolbar_icons",-1,NULL,v1);
+		  	set_bt_num_val("large_toolbar_icons",v1);
 		  	break;
 		  };
 		  case EMSAFEOPS: {
-		  	set_btval("safe_ops",-1,NULL,v1);
+		  	set_bt_num_val("safe_ops",v1);
 		  	break;
 		  };
 		  case EMCOLORSCHEME: {
-		  	set_btval("color_scheme",-1,NULL,v1);
+		  	set_bt_num_val("color_scheme",v1);
 		  	break;
 		  };
 		  case EMXCOLORSCHEME: {
-		  	set_btval("xcolor_scheme",-1,NULL,v1);
+		  	set_bt_num_val("xcolor_scheme",v1);
 		  	break;
 		  };
 		}
@@ -503,7 +503,7 @@ void set_env(int vnum,char *svalue,double value)
 		case EVTABSIZE1:
 			if(value>1) {
 				tabsize=value;
-				set_btval("tabsize",-1,NULL,tabsize);
+				set_bt_num_val("tabsize",tabsize);
 			};
 			break;
 		};
