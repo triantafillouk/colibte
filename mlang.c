@@ -488,6 +488,7 @@ int is_mlang(FILEBUF *fp)
 tok_data *new_symbol_table(int size)
 {
  int i;
+ MESG("new_symbol_table: %d",size);
  tok_data *td=malloc(sizeof(struct tok_data)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
  for(i=0;i<size;i++) {
@@ -2696,11 +2697,11 @@ int parse_buffer_show_tokens(int n)
 
  /* clear parse list  */
  empty_tok_table(fp);
+ fp->type_list=new_list(0,"type_list");
  stage_level=0;
  // clear out buffer
  cls_fout("[out]");
  err_num=check_init(fp);
-
  tok_ind=fp->tok_table;
  // MESG("Print token table to out buffer");
  if(tok_ind==NULL) {

@@ -147,7 +147,7 @@ typedef struct BTREE {
 	struct BTNODE *root;
 	char *tree_name;
 	int	new_flag;
-	int level;
+	// int level;
 	long items;
 	long max_items;
 } BTREE;

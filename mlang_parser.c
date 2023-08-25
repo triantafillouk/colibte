@@ -258,7 +258,6 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 	ex_edenv=tok->ttype;
 		// MESG("	set_var: new name=%s tind=%d",name,tok->tind);
 	if(stree->max_items < tok->tind) ERROR("exceeded item list of %d !! CHECK!",stree->max_items);
-//	tok->tdata = &current_stable[tok->tind];
 }
 
 int change_script_state(int tok_type,int *script_active) 
@@ -284,7 +283,7 @@ int type_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *to
  int cc=0;
  char nword[256];
  int slen=0;
- MESG("type_definition: num=%d name=%s",token_var->tind,token_var->tname);
+ // MESG("type_definition: num=%d name=%s",token_var->tind,token_var->tname);
  // skip_space1(bf);
  tok_type=next_token_type(bf);
  if(tok_type!=TOK_LETTER) { MESG("next is not letter! %d",tok_type);return 0;};
@@ -292,27 +291,31 @@ int type_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *to
  getnc1(bf,&cc,&tok_type);
  // MESG("	ttd 1 type=%d",cc);
  slen=getnword1(bf,cc,nword);	/* this is the type name  */
-
+ if(show_tokens){
+	out_print("---- type definition [",0);
+	out_print(nword,0);
+	out_print("] ---------",1);
+ };
  BTREE *type_dat = new_btree(nword,100);
  add_element_to_list(type_dat,bf->type_list);
 
  // MESG("	ttd 2: %d [%s]",slen,nword);
 #if	1
  tok_type==next_token_type(bf);
- MESG(" ttd 3: %d",tok_type);
+ // MESG(" ttd 3: %d",tok_type);
 #else
  skip_space1(bf);
 #endif
  getnc1(bf,&cc,&tok_type);
 
- MESG(" ttd 3: type=%d cc=[%c]",tok_type,cc);
+ // MESG(" ttd 3: type=%d cc=[%c]",tok_type,cc);
  // MESG("	ttd 3: %d [%c]",tok_type,cc);
  if(tok_type == TOK_ASSIGN) {
  	getnc1(bf,&cc,&tok_type);	/* '=' set to optional ??  */
 	skip_space1(bf);
+	 // MESG("	ttd 4");
+	getnc1(bf,&cc,&tok_type);
  };
- // MESG("	ttd 4");
- getnc1(bf,&cc,&tok_type);
  if(tok_type!=TOK_LPAR) { MESG("	left par not found");return 0; };
  // MESG("		while!");
  int ind=0;
@@ -322,8 +325,12 @@ int type_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *to
 	if(tok_type!=TOK_LETTER) { MESG("		type not literal! %d",tok_type);return 0;};
 	slen=getnword1(bf,cc,nword);
 	
-	MESG("	type add element [%s]",nword);
+	// MESG("	type add element [%s]",nword);
 	BTNODE *node = add_btnode(type_dat,nword);
+	if(show_tokens) {
+		out_print(nword,0);
+		out_print("		",0);
+	};
 	node->node_index = ind++;
 	if(type_dat->new_flag==0) MESG("error: dublicate definition!");
 	getnc1(bf,&cc,&tok_type);
@@ -337,12 +344,14 @@ int type_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *to
 		// MESG("	w3: %d [%c]",tok_type,cc);
 		if(tok_type==TOK_NUM) {
 			double val=getnum1(bf,cc,tok);
-			MESG("	element numeric %f",val);
+			// MESG("	element numeric %f",val);
+			if(show_tokens) out_print("numeric",1);
 			node->node_vtype=VTYPE_NUM;
 			node->node_val=val;			
 		} else if (tok_type==TOK_QUOTE) {
 			getnstr1(bf,cc,nword);
-			MESG("	element string [%s]",nword);
+			// MESG("	element string [%s]",nword);
+			if(show_tokens) out_print("string",1);
 			node->node_vtype=VTYPE_STRING;
 			node->sval=strdup(nword);
 		} else {
@@ -352,7 +361,8 @@ int type_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *to
 	} else if(cc!=' '&&cc!=9) { return 0;}; 
  };
  getnc1(bf,&cc,&tok_type);
- show_bt_table_ordered(type_dat);
+ if(show_tokens) out_print("----------------------------------------",1);
+ // show_bt_table_ordered(type_dat);
  return 1;
 }
 
