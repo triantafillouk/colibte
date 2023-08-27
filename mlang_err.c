@@ -165,9 +165,12 @@ void error_skip_token(int index,char *description)
 void set_error(tok_struct *tok,int err,char *description)
 {
  is_break1=1;
+ 
  if(tok==NULL) {
+ 	fprintf(stderr,"error: %d %s\n",err,description);
 	err_num=err;
 	err_str=description;
+	
 	return;
  };
  // MESG("set_error:----------------");
@@ -182,13 +185,11 @@ void set_error(tok_struct *tok,int err,char *description)
  };
 #endif
  current_active_flag=0;
- // NTOKEN2;NTOKEN2;
  tok=cbfp->end_token;
+ if(tok==NULL) return;
  tok->ttype=TOK_EOF;
- // tok->directive=factor_eof;
  set_tok_directive(tok,factor_eof);
  tok->tgroup=TOK_EOF;
- // NTOKEN2;
  tok->ttype=TOK_END;
 }
 

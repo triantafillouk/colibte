@@ -2444,7 +2444,7 @@ double exec_block1()
  double val=0;
  stage_level=0;
  TDS("exec_block1");
- // MESG("exec_block1: starting at tok %d type=%d err=%d",tok->tnum,tok->ttype,err_num);
+ MESG("exec_block1: starting at tok %d type=%d err=%d",tok->tnum,tok->ttype,err_num);
 // 	MESG("exec_block1: size of tok_struct is %d",sizeof(tok_struct));
    while(tok->ttype!=TOK_EOF && current_active_flag) 
    {
@@ -2472,6 +2472,7 @@ double exec_block1_break()
  double val=0;
  stage_level=0;
  TDS("exec_block1");
+ MESG("exec_block1_break:");
    while(tok->ttype!=TOK_EOF && current_active_flag) 
    {
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
@@ -2501,7 +2502,6 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  tok_data *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
 	MESG("<- [%-15s %s ------------------------------------------------------------->",bp->b_fname,VERSION);
-
  if(show_tokens) {
 	parse_buffer_show_tokens(1);
 	return(0);	
@@ -2517,8 +2517,9 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	if(current_stable==NULL) {
 		current_stable=new_symbol_table(use_fp->symbol_tree->max_items);
 	};
+	// MESG("compute_block: before calling parse_block1");
 	parse_block1(bp,use_fp->symbol_tree,start,extra);
-
+	// MESG("parse_blocke: ended!");
 	if(start) {
 		local_symbols=new_symbol_table(bp->symbol_tree->max_items);
 		current_stable=local_symbols;
@@ -2530,7 +2531,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	err_num=check_init(bp);
 	if(err_num>0) 
 	{
-		// mesg_out("Error %d %s line %d ex_vtype=%d ex_value=%f slval=[%s]!",err_num,err_str,err_line,ex_vtype,ex_value,saved_string);
+		mesg_out("Error %d %s line %d ex_vtype=%d ex_value=%f slval=[%s]!",err_num,err_str,err_line,ex_vtype,ex_value,saved_string);
 		// show_error("Check init",bp->b_fname);
 		return(0);
 	};

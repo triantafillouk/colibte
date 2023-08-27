@@ -1,7 +1,7 @@
 # check directive type
 
-# type human = (name::int surname::string age::int bdate::date salary::num)
-type  human1 (name::"Name" surname:"Surname" age::0 bdate::0 salary::1 age::1)
+type  human1 = [name::"Name" surname:"Surname" age::0 bdate::0 salary::1 age::1)
+type  human2 (name:"Name", surname:"Surname", age::0 bdate::0 salary::1 age::1@
 #print("ok")
 #human = type (...)
 #list1 = list ()
@@ -10,3 +10,8 @@ type  human1 (name::"Name" surname:"Surname" age::0 bdate::0 salary::1 age::1)
 #α = array []
 # 2023:08:05:15:35:55
 # a = human1 ("Kostas","Tr",55,20,100)
+# human1 a = ("Kostas","Tr",55,20,100)
+
+# human1 a = (name:"Kostas" surname:"tr")
+# a = human1[100]
+# print(a[22].name)
