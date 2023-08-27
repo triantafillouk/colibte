@@ -277,7 +277,7 @@ int change_script_state(int tok_type,int *script_active)
 	return 0;
 }
 
-int type_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *token_var)
+int type_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *tok_var)
 {
  int tok_type=TOK_NONE;
  int cc=0;
@@ -287,7 +287,7 @@ int type_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *to
 
  tok_type=next_token_type(bf);
  if(tok_type!=TOK_LETTER) { 
-	set_error(tok,109,"type_definition parse error");
+	set_error(tok_var,109,"type_definition parse error");
  	;return 0;
  };
  
@@ -314,17 +314,18 @@ int type_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *to
 	getnc1(bf,&cc,&tok_type);
  };
  if(tok_type!=TOK_LPAR && tok_type!=TOK_LBRAKET) { 
- 	set_error(tok,110,"type_definition left par,left braket");
+ 	set_error(tok_var,110,"type_definition left par,left braket");
  	return 0; 
  };
-//  int type_l = tok_type;
+ int end_type=0;
+ if(tok_type==TOK_LPAR) end_type=TOK_RPAR;else end_type=TOK_RBRAKET;
 
  int ind=0;
- while(next_token_type(bf)!=TOK_RPAR) {
+ while(next_token_type(bf)!=end_type) {
  	getnc1(bf,&cc,&tok_type);
 	// MESG("	w: cc=[%c] type=%d",cc,tok_type);
 	if(tok_type!=TOK_LETTER) { 
-		set_error(tok,111,"type_definition name not letter!");
+		set_error(tok_var,111,"type_definition name not letter or closing error!");
 	return 0;};
 	slen=getnword1(bf,cc,nword);
 	
@@ -336,7 +337,7 @@ int type_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *to
 	};
 	node->node_index = ind++;
 	if(type_dat->new_flag==0) {
-		set_error(tok,112,"type_definition: dublicate definition!");
+		set_error(tok_var,112,"type_definition: dublicate definition!");
 		return 0;
 	};
 	getnc1(bf,&cc,&tok_type);
@@ -362,15 +363,16 @@ int type_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *to
 			node->sval=strdup(nword);
 		} else {
 			MESG("	parse type definition error!");
-			set_error(tok,113,"type_definition parse error");
+			set_error(tok_var,113,"type_definition parse error");
 			return 0;
 		};
 		if(next_token_type(bf)==TOK_COMMA) getnc1(bf,&cc,&tok_type);
 	} else if(cc!=' '&&cc!=9 && cc!=',') { return 0;}; 
  };
  getnc1(bf,&cc,&tok_type);
- if(tok_type!=TOK_RPAR && tok_type!=TOK_RBRAKET) {
- 	set_error(tok,114,"type_definition rpar,rbracket not found!");
+ if(tok_type != end_type) 
+ {
+ 	set_error(tok_var,114,"type_definition rpar,rbracket not found!");
 	return 0;
  }
  if(show_tokens) out_print("----------------------------------------",1);
