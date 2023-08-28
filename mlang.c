@@ -583,7 +583,7 @@ int check_init(FILEBUF *bf)
 	parse_block1(bf,NULL,1,0);
 	// MESG("block parsed ok");
 	if(err_num>0) {
-		msg_line("found parsed errors: err_num=%d",err_num);
+		msg_line("found parsed errors: err_num=%d %s",err_num,err_str);
 		return(err_num);
 	}
 	tok_table=bf->tok_table;
@@ -2531,8 +2531,8 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	err_num=check_init(bp);
 	if(err_num>0) 
 	{
-		mesg_out("Error %d %s line %d ex_vtype=%d ex_value=%f slval=[%s]!",err_num,err_str,err_line,ex_vtype,ex_value,saved_string);
-		// show_error("Check init",bp->b_fname);
+		// mesg_out("Error %d %s line %d ex_vtype=%d ex_value=%f slval=[%s]!",err_num,err_str,err_line,ex_vtype,ex_value,saved_string);
+		show_error("Check init",bp->b_fname);
 		return(0);
 	};
 	init_exec_flags();
