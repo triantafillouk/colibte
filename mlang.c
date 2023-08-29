@@ -434,7 +434,13 @@ void init_hash()
 
 /* option variables  */
  for(i=0;option_names[i].name!=NULL;i++) {
-	set_btval(option_names[i].name,TOK_OPTION,option_names[i].sval,option_names[i].dval);
+ 	BTNODE *tnode;
+	if(option_names[i].sval!=NULL) {
+		tnode=set_btsval(bt_table,option_names[i].name,option_names[i].sval);
+	} else {
+		tnode=set_btdval(bt_table,option_names[i].name,option_names[i].dval);
+	};
+	tnode->node_type=TOK_OPTION;
  };
 
  for(i=0;term_types[i].term_name!=NULL;i++)
@@ -828,19 +834,15 @@ inline tok_data *get_left_slot(int ind)
 	return &current_stable[ind];
 }
 
+
 double factor_variable()
 {
 	// lsslot=&current_stable[tok->tind];	/* symbol table variable's slot  */
 	lsslot= get_left_slot(tok->tind);
-#if	0
-	if(lstoken==NULL) {
-		MESG("variable [%s] ex_vtype=%d",tok->tname,ex_vtype);
-		lstoken=tok;
-	};
-#endif
 	ex_vtype=lsslot->vtype;
+
 	// MESG("	factor_variable: ind=%d type=%d",lsslot->ind,lsslot->vtype);
-	switch(lsslot->vtype) {
+	switch(ex_vtype) {
 		case VTYPE_NUM:{
 			double val=lsslot->dval; 
 			// MESG("		>> val=%f",val);
@@ -943,12 +945,23 @@ double factor_option()
 	bte=tok->tnode;
 	var_node=bte;
 	NTOKEN2;
+#if	1
+	ex_vtype = bte->node_vtype;
+	if(bte->node_vtype==VTYPE_STRING) { /* there is a valid string value */
+		clean_saved_string(strlen(bte->node_sval));
+		strcpy(saved_string,bte->node_sval);
+		return 0;
+	} else {
+		return(bte->node_dval);
+	};
+#else
 	if(bte->sval!=NULL) { /* there is a valid string value */
 		clean_saved_string(strlen(bte->sval));
 		strcpy(saved_string,bte->sval);
 		ex_vtype=VTYPE_STRING;
 	} else ex_vtype=VTYPE_NUM;
 	RTRN(bte->node_val);
+#endif
 }
 
 double factor_array1()
@@ -1876,6 +1889,24 @@ double logical_nand(double value)
 double assign_option(double none)
 {
 double	value=lexpression();
+#if	1
+	MESG("assign_option:");
+		if(var_node->node_vtype==VTYPE_STRING) {free(var_node->node_sval);};
+		if(ex_vtype==VTYPE_STRING){
+			var_node->node_vtype=VTYPE_STRING;
+			if(saved_string) var_node->node_sval=strdup(saved_string);
+			else {
+				err_num=2221;
+				ERROR("error: saved string is Null string!! ",err_num);
+				var_node->node_sval=strdup("");
+			};
+		} else {
+			// CHECK !!!!!!!!
+			var_node->node_vtype=VTYPE_NUM;
+			var_node->node_dval=value;
+		}
+		
+#else
 		if(var_node->sval!=NULL) {free(var_node->sval);};
 		if(ex_vtype==VTYPE_STRING){
 			if(saved_string) var_node->sval=strdup(saved_string);
@@ -1893,6 +1924,7 @@ double	value=lexpression();
 			var_node->sval=NULL;
 		}
 		var_node->node_val=value;
+#endif
 	RTRN(value);
 }
 
@@ -1981,7 +2013,7 @@ double assign_val(double none)
 	sslot=lsslot;
 	v1=lexpression();
 	// MESG("assign_val: after lexpression! slot vtype=%d ex_vtype=%d\n",sslot->vtype,ex_vtype);
-	if(sslot->vtype!=ex_vtype){ 
+	if(sslot->vtype!=ex_vtype){
 		if(sslot->vtype==VTYPE_STRING) {
 			if(sslot->sval) free(sslot->sval);
 			sslot->sval=NULL;
@@ -2444,7 +2476,7 @@ double exec_block1()
  double val=0;
  stage_level=0;
  TDS("exec_block1");
- MESG("exec_block1: starting at tok %d type=%d err=%d",tok->tnum,tok->ttype,err_num);
+ // MESG("exec_block1: starting at tok %d type=%d err=%d",tok->tnum,tok->ttype,err_num);
 // 	MESG("exec_block1: size of tok_struct is %d",sizeof(tok_struct));
    while(tok->ttype!=TOK_EOF && current_active_flag) 
    {
@@ -2903,12 +2935,6 @@ double bt_dval(char *name)
 char * bt_sval(char *name)
 {
  return(btnsval(bt_table,name));
-}
-
-/* set type,double and string values for a node named name of main table  */
-void set_btval(char *name,int type,char *sval,double val)
-{
- set_btsval(bt_table,type,name,sval,val);
 }
 
 /* set type, numeric value for a node named name of main table  */

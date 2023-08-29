@@ -15,6 +15,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#define	VTYPE_NUM		1
+#define	VTYPE_STRING	8
+
 #if	defined _MESG_DEFINED
 void MESG(const char *fmt, ...);
 #else
@@ -847,8 +850,13 @@ BTNODE *new_btnode()
  btn->node_name=NULL;
  btn->node_type=0;
  btn->node_index=0;
+#if	1
+ btn->node_vtype=VTYPE_NUM;
+ btn->node_dval=0;
+#else
  btn->node_val=0;
  btn->sval=NULL;
+#endif
 #if	RB_BALANCE
  btn->up=NULL;
 #endif
@@ -875,8 +883,13 @@ BTNODE * insert_bt_element(BTREE *bt,char *name,int type,int index)
 	if(bt->new_flag) {
 		node->node_type=type;
 		node->node_index=index;
+#if	1
+		node->node_vtype=VTYPE_NUM;
+		node->node_dval=0;
+#else
 		node->node_val=0;
 		node->sval=NULL;
+#endif
 		bt->new_flag=0;
 //		MESG("insert:b index=%d: type=%d [%s]",index,type,value);
 	};
@@ -962,7 +975,7 @@ double btndval(BTREE *bt, char *name)
 // MESG("check directive: %s",name);
  btn = find_btnode(bt,name);
  if(btn) {
- 	return(btn->node_val);
+ 	return(btn->node_dval);
  } else {
  	return(0);
  };
@@ -974,66 +987,67 @@ char * btnsval(BTREE *bt, char *name)
  BTNODE *btn;
  btn = find_btnode(bt,name);
  if(btn) {
- 	return(btn->sval);
- } else {
- 	return(NULL);
+	if(btn->node_vtype==VTYPE_STRING) return(btn->node_sval);
  };
+ return(NULL);
 }
 
 /* set double value for a node named name of main table  */
 BTNODE *set_btdval(BTREE *bt, char *name,double value)
 {
  BTNODE *btn;
+ // MESG("set_btdval: %s",name);
  btn = find_btnode(bt,name);
  if(btn) {
-	btn->node_val=value;
-	btn->sval=NULL;
+	if(btn->node_vtype==VTYPE_STRING) {free(btn->node_sval);btn->node_vtype=VTYPE_NUM;};
+	btn->node_dval=value;
  } else {
 	btn=add_btnode(bt,name);
-	btn->node_val=value;
-	btn->sval=NULL;
+	btn->node_dval=value;
  };
+ btn->node_vtype=VTYPE_NUM;
  return(btn);
 }
 
-/* set type,double and string values for a node named name */
-int set_btsval(BTREE *bt, int type,char *name,char * sval,double val)
+BTNODE *set_btsval(BTREE *bt, char *name,char *sval)
 {
  BTNODE *btn;
- int is_new=0;
+ // MESG("set_btdval: %s",name);
  btn = find_btnode(bt,name);
- if(btn==NULL) {
- 	btn=add_btnode(bt,name);
-	is_new=1;
-	btn->node_type=type;
-	btn->sval=NULL;
+ if(btn) {
+	if(btn->node_vtype==VTYPE_STRING) {free(btn->node_sval);} else { btn->node_vtype=VTYPE_STRING;};
+ } else {
+	btn=add_btnode(bt,name);
+	btn->node_vtype=VTYPE_STRING;
  };
-
- if(btn->sval!=NULL) { free(btn->sval);btn->sval=NULL;};
- if(sval!=NULL){
-	btn->sval=strdup(sval);
- };
- btn->node_val=val;
- return(is_new);
+ btn->node_sval=strdup(sval);
+ return(btn);
 }
 
 /* set the string value for a node */
 int set_btnsval(BTNODE *btn, char * sval)
 {
+ // MESG("set_btnsval: %s",sval);
  if(btn==NULL) return(0);
-
- if(btn->sval!=NULL) { free(btn->sval);btn->sval=NULL;};
+ if(btn->node_vtype==VTYPE_STRING) {
+	if(btn->node_sval!=NULL) { free(btn->node_sval);};
+ } else btn->node_vtype=VTYPE_STRING;
  if(sval!=NULL){
-	btn->sval=strdup(sval);
- };
-// MESG("set_btsval: name[%s] [%s] index=%d type=%d sval=[%s] val=%f is_new=%d",name,btn->node_name,btn->node_index,btn->node_type,btn->sval,btn->node_val,is_new); 
+	btn->node_sval=strdup(sval);
+ } else btn->node_sval=NULL;
+// MESG("set_btnsval: name[%s] [%s] index=%d type=%d sval=[%s] val=%f is_new=%d",name,btn->node_name,btn->node_index,btn->node_type,btn->sval,btn->node_val,is_new); 
  return(1);
 }
 
 int set_btndval(BTNODE *btn,double val)
 {
+ // MESG("set_btndval: %f",val);
  if(btn==NULL) return(0);
- btn->node_val=val;
+ if(btn->node_vtype==VTYPE_STRING) {
+	if(btn->node_sval!=NULL) { free(btn->node_sval);};
+	btn->node_vtype=VTYPE_NUM;
+ };
+ btn->node_dval=val;
  return(1);
 }
 
@@ -1277,8 +1291,8 @@ void show_subtree(BTNODE *node)
  if(node->left || node->right) {
 //	fprintf(stdout,"%d:node[%s] -> [%s] - [%s]\n",depth,node->node_name,left,right);
 	if(depth>max_depth) max_depth=depth;
-	if(node->sval!=NULL) fprintf(stdout,"%d:node[%s] -> [%s] - [%s] index=%d type=%d val=%f sval=[%s]\n",depth,node->node_name,left,right,node->node_index,node->node_type,node->node_val,node->sval);
-	else fprintf(stdout,"%d:node[%s] -> [%s] - [%s] index=%d type=%d val=%f\n",depth,node->node_name,left,right,node->node_index,node->node_type,node->node_val);
+	if(node->node_vtype==VTYPE_STRING) fprintf(stdout,"%d:node[%s] -> [%s] - [%s] index=%d type=%d sval=[%s]\n",depth,node->node_name,left,right,node->node_index,node->node_type,node->node_sval);
+	else fprintf(stdout,"%d:node[%s] -> [%s] - [%s] index=%d type=%d val=%f\n",depth,node->node_name,left,right,node->node_index,node->node_type,node->node_dval);
  };
  if(node->left) show_subtree(node->left);
  if(node->right) show_subtree(node->right);
@@ -1290,10 +1304,10 @@ void show_node(BTNODE *node,int depth,char *left,char *right)
 {
 // 	fprintf(stdout,"%03d:node[%-15s] l=[%-15s] r=[%s]\n",depth,node->node_name,left,right);
 
-	if(node->node_vtype==1) 
-		fprintf(stdout,"%03d:node[%-10s] l=[%-10s] r=[%-10s] numeric %f\n",depth,node->node_name,left,right,node->node_val);
-	else if(node->node_vtype==8)
-		fprintf(stdout,"%03d:node[%-10s] l=[%-10s] r=[%-10s] string  \"%s\"\n",depth,node->node_name,left,right,node->sval);
+	if(node->node_vtype==VTYPE_NUM) 
+		fprintf(stdout,"%03d:node[%-10s] l=[%-10s] r=[%-10s] numeric %f\n",depth,node->node_name,left,right,node->node_dval);
+	else if(node->node_vtype==VTYPE_STRING)
+		fprintf(stdout,"%03d:node[%-10s] l=[%-10s] r=[%-10s] string  \"%s\"\n",depth,node->node_name,left,right,node->node_sval);
 	else
 		fprintf(stdout,"%03d:node[%-10s] l=[%-10s] r=[%-10s] other type\n",depth,node->node_name,left,right);
 }

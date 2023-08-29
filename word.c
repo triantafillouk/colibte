@@ -258,7 +258,7 @@ int fillpara (int n)	/* Fill the current paragraph according to the current fill
 	char *pbuf,*p0;
 
 	if(dont_edit()) return FALSE;
-	if (bt_dval("fillcol") == 0) set_btval("fillcol",100,NULL,76);
+	if (bt_dval("fillcol") == 0) set_bt_num_val("fillcol",76);
 	maxcol = bt_dval("fillcol");
 
 	if(n==2||n==0) maxcol += bt_dval("lmargin");

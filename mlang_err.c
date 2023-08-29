@@ -633,7 +633,7 @@ int err_factor()
 		};
 		RT_MESG1(493);}
 	case TOK_ARRAY1:{
-		// MESG("	err use of tok_array1 [%s]",tok_info(tok0));
+		MESG("	err use of tok_array1 [%s]",tok_info(tok0));
 		// err_num=err_factor();
 		err_num=err_num_expression(); 
 		// MESG("	err tok_array1: after tok=%d",tok->ttype);
@@ -692,9 +692,11 @@ int err_factor()
 				RT_MESG;
 			};
 			if(tok->ttype !=TOK_RPAR) {
-				xpos=485;
-				// MESG("ttype=%d",tok->ttype);
-				syntax_error(" FAC1_err: No closing parenthesis",xpos);
+				xpos=4850;
+				MESG(" +++++++++++ lpar: %d -> %d type=%d",tok0->tnum,tok->tnum,tok->ttype);
+
+				set_error(tok0,xpos,"FAC1_err: No closing parenthesis");
+				// syntax_error(" FAC1_err: No closing parenthesis",xpos);
 				RT_MESG1(485);
 			} else { 
 				pnum--;
@@ -743,9 +745,13 @@ int err_factor()
 		var_node=tok0->tnode;
 
 		ex_edenv=0;
+#if	1
+		ex_vtype = var_node->node_vtype;
+#else
 		if(var_node->sval!=NULL) { /* there is a valid string value CHECK !!*/
 			ex_vtype=VTYPE_STRING;
 		} else ex_vtype=VTYPE_NUM;
+#endif
 		pre_symbol=0;
 		RT_MESG1(xpos);
 	case TOK_ENV:	// 1 editor env var

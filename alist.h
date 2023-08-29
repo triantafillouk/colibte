@@ -139,8 +139,11 @@ typedef struct BTNODE {
 	short balance;	/* for avl trees  */
 #endif
 	char *node_name;
-	double node_val;
-	char *sval;
+	union {
+		double node_dval;
+		char *node_sval;
+		void *node_dat;
+	};
 } BTNODE;
 
 typedef struct BTREE {
@@ -169,8 +172,8 @@ void set_btval(char *name,int type,char *sval,double val);
 #endif
 
 BTNODE *set_btdval(BTREE *bt, char *name,double value);
+BTNODE *set_btsval(BTREE *bt, char *name,char *sval);
 
-int set_btsval(BTREE *bt, int type,char *name,char * sval,double val);
 void set_bt_num_val(char *name,double val);
 void init_btvars();
 int set_btnsval(BTNODE *btn, char * sval);
