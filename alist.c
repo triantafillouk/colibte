@@ -878,8 +878,8 @@ void btn_free(BTNODE *btn)
 BTNODE * insert_bt_element(BTREE *bt,char *name,int type,int index)
 {
  BTNODE *node;
-//	MESG("insert_bt_element: name=[%s] type=%d index=%d",name,type,index); 
 	node = add_btnode(bt,name);
+	// MESG("insert_bt_element: name=[%s] type=%d index=%d new=%d",name,type,index,bt->new_flag); 
 	if(bt->new_flag) {
 		node->node_type=type;
 		node->node_index=index;

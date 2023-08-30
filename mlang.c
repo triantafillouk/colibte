@@ -494,7 +494,7 @@ int is_mlang(FILEBUF *fp)
 tok_data *new_symbol_table(int size)
 {
  int i;
- MESG("new_symbol_table: %d",size);
+ // MESG("new_symbol_table: %d",size);
  tok_data *td=malloc(sizeof(struct tok_data)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
  for(i=0;i<size;i++) {

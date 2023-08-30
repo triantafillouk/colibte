@@ -214,7 +214,7 @@ BTNODE * add_btnode(BTREE *tree, char *name)
 	BTNODE *res = NULL;
 
 	res=find_btnode(tree,name);
-	if(res) return(res);
+	if(res) { tree->new_flag=0;return(res);};
 
 	/* perform insert */
 	if (tree->root)
