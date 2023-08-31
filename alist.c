@@ -17,6 +17,7 @@
 
 #define	VTYPE_NUM		1
 #define	VTYPE_STRING	8
+#define VTYPE_TREE		32
 
 #if	defined _MESG_DEFINED
 void MESG(const char *fmt, ...);
@@ -870,6 +871,8 @@ void btn_free(BTNODE *btn)
 {
 	if(btn){
 		if(btn->node_name) free(btn->node_name);
+		if(btn->node_vtype==VTYPE_TREE) btn_free(btn->node_dat);
+		else if(btn->node_vtype>VTYPE_STRING) free(btn->node_sval); 
 		free(btn);
 	};
 }

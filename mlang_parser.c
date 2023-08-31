@@ -287,7 +287,7 @@ int change_script_state(int tok_type,int *script_active)
 	return 0;
 }
 
-int type_init_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *tok_var)
+int type_init_definition(FILEBUF *bf, alist *lex_parser, tok_struct *tok_var)
 {
  int tok_type=TOK_NONE;
  int cc=0;
@@ -297,8 +297,8 @@ int type_init_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struc
 
  tok_type=next_token_type(bf);
  if(tok_type!=TOK_LETTER) { 
-	set_error(tok_var,109,"type_init_definition parse error");
- 	;return 0;
+	set_error(tok_var,108,"type_init_definition parse error");
+ 	return 0;
  };
  
  getnc1(bf,&cc,&tok_type);
@@ -310,7 +310,17 @@ int type_init_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struc
 	out_print("] ---------",1);
  };
  BTREE *type_dat = new_btree(nword,100);
- add_element_to_list(type_dat,bf->type_list);
+
+ BTNODE *type_node = add_btnode(bf->type_tree,nword);
+ MESG("Add new type named [%s]",nword);
+ if(type_node && bf->type_tree->new_flag) {
+ 	type_node->node_vtype=VTYPE_TREE;
+	type_node->node_dat = type_dat;
+	bf->type_tree->new_flag=0;
+ } else {
+ 	set_error(tok_var,108,"duplicate type or other error");
+	return 0;
+ };
 
  // MESG("	ttd 2: %d [%s]",slen,nword);
  skip_space1(bf);
@@ -389,92 +399,6 @@ int type_init_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struc
  // show_bt_table_ordered(type_dat);
  return 1;
 }
-
-#if	0
-int array_index_definition(FILEBUF *bf, alist *lex_parser, BTREE *stree, tok_struct *tok_var)
-{
- int tok_type=TOK_NONE;
- int index=0;
- double value=0.0;
- int cc=0;
- char nword[256];
- int slen=0;
- tok_struct *tok;
-
- MESG("call array_index_definition line %d type %d tnum=%d",tok_var->tline,tok_var->ttype,tok_var->tnum);
- 
- while(next_token_type(bf)==TOK_LBRAKET) {
-	// MESG("		set it as array index");
-	tok_var->ttype=TOK_ARRAY1+index;	/* set it as array index  */
-	// MESG("	array_index_definition: set array type to %d",tok_var->ttype);
-	getnc1(bf,&cc,&tok_type);// skip left bracket!
-	// MESG("	array_index_definition: skip left bracket [%c] ttype=%d",cc,tok_type);
-	getnc1(bf,&cc,&tok_type);// get the index!
-	// MESG("	array_index_definition: index: [%c] type=%d",cc,tok_type);
-	switch(tok_type){
-		case TOK_NUM:
-			ADD_TOKEN;
-			value=getnum1(bf,cc,tok);
-			tok->ttype=TOK_NUM;
-			if(index==0) tok->tname="index1";
-			if(index==1) tok->tname="index2";
-			tok->dval=value;
-			// MESG("	TOK_NUM: numeric3 %f",tok->dval);
-			break;
-		case TOK_LETTER:
-			slen=getnword1(bf,cc,nword);
-			{ // this must be a variable !!
-			
-			ADD_TOKEN;
-			tok->tnode=find_btnode(directiv_table,nword);
-			if(tok->tnode!=NULL) { MESG("error: directive in array index!");break;}  // this is an error ;
-				{ // this is a variable , we normally should check for an existing one!!
-					tok->tname=strdup(nword);
-					tok->tind=slen;
-					set_var(stree,tok,nword);
-				}
-			};
-			// MESG("	TOK_LETTER: [%s]",nword);
-			break;
-		default:
-		// this is an ERROR !!
-		err_num=105;
-		err_str="wrong character in table definition";
-		ERROR("wrong character on table definition !");
-	};
-
-	// MESG("	array1: 2");
-	if(next_token_type(bf)==TOK_SPACE) {
-		getnc1(bf,&cc,&tok_type);
-	};
-	if(tok_type==TOK_RBRAKET) {
-		// MESG("	add rbracket1!");
-		ADD_TOKEN;
-		tok->ttype=TOK_RBRAKET;
-		tok->tname=strdup("RB1");
-	};
-	// MESG("next is : %d index=%d",next_token_type(bf),index);
-
-
-	index++;	/* array dimension  */
-
-	if(next_token_type(bf)==TOK_RBRAKET) {
-		getnc1(bf,&cc,&tok_type);
-		ADD_TOKEN;
-		tok->ttype=TOK_RBRAKET;
-		tok->tname=strdup("RB2");
-		// MESG("	add rbracket2!");
-	};
-
-	if(index>1) {
-		break;	/* for the moment only 2 dimensional arrays!!  */
-	} else {
-		// MESG("	get next dim");
-	};
- };
- return 1;
-}
-#endif
 
 /*
  parse a file buffer,
@@ -937,7 +861,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
 				if(tok->ttype == TOK_DIR_TYPE) {
 					// MESG("	found type_definition!");
-					if(!type_init_definition(bf,lex_parser,stree,tok)) {
+					if(!type_init_definition(bf,lex_parser,tok)) {
 						// set_error(tok,111,"type_definition parse error");
 						// MESG("after setting 111 error");
 						return 0;

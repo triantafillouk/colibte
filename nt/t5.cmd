@@ -1,7 +1,7 @@
 # check directive type
 
-type  human1 = [name::"Name" surname:"Surname" age::0 bdate::0 salary::1 age::1]
-type  human2 (name:"Name", surname:"Surname", age::0 bdate::0 salary::1 age::1)
+type  human1 = [name::"Name" surname:"Surname" age::0 bdate::0 salary::1 age2::1]
+type  human2 (name:"Name", surname:"Surname", age::0 bdate::0 salary::1 age2::1)
 #print("ok")
 #human = type (...)
 #list1 = list ()

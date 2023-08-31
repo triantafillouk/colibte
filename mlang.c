@@ -136,6 +136,13 @@ term_type term_types[] = {
 /* Function definitions */
 #include "mlang_functions.c"
 
+
+void delete_type_tree(BTREE *type_tree)
+{
+	free_btnode(type_tree->root);
+	free(type_tree);
+}
+
 array_dat *transpose(array_dat *array1);
 
 void init_btree_table()
@@ -2544,7 +2551,11 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);
 	extra=100;
 	use_fp->symbol_tree->max_items=extra;
+#if	1
+ 	use_fp->type_tree=new_btree("type_tree",0);
+#else
 	use_fp->type_list=new_list(0,"type_list");
+#endif
  };
 	if(current_stable==NULL) {
 		current_stable=new_symbol_table(use_fp->symbol_tree->max_items);
@@ -2583,8 +2594,9 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		if(bp->symbol_tree){
 			delete_symbol_table(local_symbols,bp->symbol_tree->items,0);
 			bp->symbol_tree=NULL;
-			free_list(bp->type_list,"type_list");
-			bp->type_list=NULL;
+			/* delete the type tree  */
+			delete_type_tree(bp->type_tree);
+			bp->type_tree=NULL;
 		};
 		current_stable=old_symbol_table;
 	};
@@ -2730,7 +2742,11 @@ int parse_buffer_show_tokens(int n)
 
  /* clear parse list  */
  empty_tok_table(fp);
+#if	1
+ fp->type_tree=new_btree("type_tree",0);
+#else
  fp->type_list=new_list(0,"type_list");
+#endif
  stage_level=0;
  // clear out buffer
  cls_fout("[out]");
