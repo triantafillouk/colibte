@@ -454,16 +454,18 @@ int close_file(int n)
 int delete_filebuf(FILEBUF *bp,int force)
 {
 	int stat;
+	// MESG("delete_filebuf:");
     if (bp->b_nwnd > 0) {                  /* Error if on screen.  */
             msg_line("File is on screen");
             return (FALSE);
     };
 	stat = remove_from_list((void *)bp,file_list);
-	if(stat || force) 
+	if((stat || force) && execmd==0) 
 	{
 		EmptyText(bp);
 		if(bp->main_undo) efree(bp->main_undo,"delete_filebuf, main_undo");
 		bp->main_undo=NULL;
+
 		textpoint_free(bp->tp_base);
 		textpoint_free(bp->tp_text_end);
 		textpoint_free(bp->tp_text_o);

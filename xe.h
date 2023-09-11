@@ -33,6 +33,7 @@
 #define	SLIM_ON		1	/* remove no needed elements in structure constructs  */
 
 #define	USE_FAST	1 & PCURSES	/* erase line for double width characters in panel_curses  */
+#define TEST_TYPE	1
 
 #if	DARWIN
 #define	_FILE_OFFSET_BITS	64
@@ -679,7 +680,7 @@ typedef struct  FILEBUF {
 	struct tok_struct *end_token;	/* the last (EOF) token in tok_table  */
 	int err;	/* negative if not syntax checked  */
 	BTREE *symbol_tree;	/* local symbol table  */
-#if	1
+#if	TEST_TYPE0
 	BTREE *type_tree;	/* local type table  */
 #else
 	struct alist *type_list;	/* type table list  */

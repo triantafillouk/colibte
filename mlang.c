@@ -594,7 +594,7 @@ int check_init(FILEBUF *bf)
  {
  	// MESG("create token table [%s]",bf->b_fname);
 	parse_block1(bf,NULL,1,0);
-	// MESG("block parsed ok");
+	// MESG("block parsed err = %d",err_num);
 	if(err_num>0) {
 		msg_line("found parsed errors: err_num=%d %s",err_num,err_str);
 		return(err_num);
@@ -2551,10 +2551,8 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);
 	extra=100;
 	use_fp->symbol_tree->max_items=extra;
-#if	1
+#if	TEST_TYPE0
  	use_fp->type_tree=new_btree("type_tree",0);
-#else
-	use_fp->type_list=new_list(0,"type_list");
 #endif
  };
 	if(current_stable==NULL) {
@@ -2562,7 +2560,8 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	};
 	// MESG("compute_block: before calling parse_block1");
 	parse_block1(bp,use_fp->symbol_tree,start,extra);
-	// MESG("parse_blocke: ended!");
+	// MESG("parse_blocke: ended! err=%d",err_num);
+	if(err_num) return(0);
 	if(start) {
 		local_symbols=new_symbol_table(bp->symbol_tree->max_items);
 		current_stable=local_symbols;
@@ -2594,9 +2593,11 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		if(bp->symbol_tree){
 			delete_symbol_table(local_symbols,bp->symbol_tree->items,0);
 			bp->symbol_tree=NULL;
+#if	TEST_TYPE0
 			/* delete the type tree  */
 			delete_type_tree(bp->type_tree);
 			bp->type_tree=NULL;
+#endif
 		};
 		current_stable=old_symbol_table;
 	};
@@ -2742,10 +2743,8 @@ int parse_buffer_show_tokens(int n)
 
  /* clear parse list  */
  empty_tok_table(fp);
-#if	1
+#if	TEST_TYPE0
  fp->type_tree=new_btree("type_tree",0);
-#else
- fp->type_list=new_list(0,"type_list");
 #endif
  stage_level=0;
  // clear out buffer

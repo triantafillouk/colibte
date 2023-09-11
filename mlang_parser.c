@@ -311,14 +311,16 @@ int type_init_definition(FILEBUF *bf, alist *lex_parser, tok_struct *tok_var)
  };
  BTREE *type_dat = new_btree(nword,100);
 
- BTNODE *type_node = add_btnode(bf->type_tree,nword);
- MESG("Add new type named [%s]",nword);
- if(type_node && bf->type_tree->new_flag) {
+ BTNODE *type_node = add_btnode(bf->symbol_tree,nword);
+ if(type_node && bf->symbol_tree->new_flag) {
+	MESG("Add new type named [%s]",nword);
  	type_node->node_vtype=VTYPE_TREE;
 	type_node->node_dat = type_dat;
-	bf->type_tree->new_flag=0;
+	bf->symbol_tree->new_flag=0;
  } else {
+	// MESG("	new type named [%s] is dublicate",nword);
  	set_error(tok_var,108,"duplicate type or other error");
+	show_error("type_init",nword);
 	return 0;
  };
 
@@ -345,11 +347,11 @@ int type_init_definition(FILEBUF *bf, alist *lex_parser, tok_struct *tok_var)
  	getnc1(bf,&cc,&tok_type);
 	// MESG("	w: cc=[%c] type=%d",cc,tok_type);
 	if(tok_type!=TOK_LETTER) { 
-		set_error(tok_var,111,"type_init_definition name not letter or closing error!");
+		set_error(tok_var,111,"type_init name not letter or closing error!");
 	return 0;};
 	slen=getnword1(bf,cc,nword);
 	
-	// MESG("	type add element [%s]",nword);
+	MESG("		add element [%s]",nword);
 	BTNODE *node = add_btnode(type_dat,nword);
 	if(show_tokens) {
 		out_print(nword,0);
@@ -357,7 +359,10 @@ int type_init_definition(FILEBUF *bf, alist *lex_parser, tok_struct *tok_var)
 	};
 	node->node_index = ind++;
 	if(type_dat->new_flag==0) {
-		set_error(tok_var,112,"type_init_definition: dublicate definition!");
+		// MESG("dublicate error");
+		set_error(tok_var,112,"type_init_definition: dublicate element!");
+		show_error("type_init",nword);
+		// MESG("dublicate error1");
 		return 0;
 	};
 	getnc1(bf,&cc,&tok_type);
@@ -382,8 +387,9 @@ int type_init_definition(FILEBUF *bf, alist *lex_parser, tok_struct *tok_var)
 			node->node_vtype=VTYPE_STRING;
 			node->node_sval=strdup(nword);
 		} else {
-			MESG("	parse type definition error!");
-			set_error(tok_var,113,"type_init_definition parse error");
+			// MESG("	parse type definition error!");
+			set_error(tok_var,113,"type_init, parse error");
+			show_error("type_init","");
 			return 0;
 		};
 		if(next_token_type(bf)==TOK_COMMA) getnc1(bf,&cc,&tok_type);
@@ -863,7 +869,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					// MESG("	found type_definition!");
 					if(!type_init_definition(bf,lex_parser,tok)) {
 						// set_error(tok,111,"type_definition parse error");
-						// MESG("after setting 111 error");
+						MESG("after setting 111 error");
 						return 0;
 					};
 					// MESG("after check type definition!");
