@@ -287,7 +287,7 @@ int change_script_state(int tok_type,int *script_active)
 	return 0;
 }
 
-int type_init_definition(FILEBUF *bf, alist *lex_parser, tok_struct *tok_var)
+int type_init_definition(FILEBUF *bf, BTREE *stree, alist *lex_parser, tok_struct *tok_var)
 {
  int tok_type=TOK_NONE;
  int cc=0;
@@ -310,14 +310,26 @@ int type_init_definition(FILEBUF *bf, alist *lex_parser, tok_struct *tok_var)
 	out_print("] ---------",1);
  };
  BTREE *type_dat = new_btree(nword,100);
-
+#if	1
+ BTNODE *type_node = add_btnode(stree,nword);
+ if(type_node && stree->new_flag) 
+ {
+	MESG("Add new type named [%s]",nword);
+ 	type_node->node_vtype=VTYPE_TREE;
+	type_node->node_dat = type_dat;
+	stree->new_flag=0;
+ } 
+#else
  BTNODE *type_node = add_btnode(bf->symbol_tree,nword);
- if(type_node && bf->symbol_tree->new_flag) {
+ if(type_node && bf->symbol_tree->new_flag) 
+ {
 	MESG("Add new type named [%s]",nword);
  	type_node->node_vtype=VTYPE_TREE;
 	type_node->node_dat = type_dat;
 	bf->symbol_tree->new_flag=0;
- } else {
+ } 
+#endif
+ else {
 	// MESG("	new type named [%s] is dublicate",nword);
  	set_error(tok_var,108,"duplicate type or other error");
 	show_error("type_init",nword);
@@ -335,12 +347,13 @@ int type_init_definition(FILEBUF *bf, alist *lex_parser, tok_struct *tok_var)
 	 // MESG("		found assing, skipped!");
 	getnc1(bf,&cc,&tok_type);
  };
- if(tok_type!=TOK_LPAR && tok_type!=TOK_LBRAKET) { 
+ if(tok_type!=TOK_LPAR && tok_type!=TOK_LBRAKET && tok_type!=TOK_LCURL) { 
  	set_error(tok_var,110,"type_init_definition left par,left braket");
  	return 0; 
  };
  int end_type=0;
- if(tok_type==TOK_LPAR) end_type=TOK_RPAR;else end_type=TOK_RBRAKET;
+ if(tok_type==TOK_LPAR) end_type=TOK_RPAR;else if(tok_type==TOK_LBRAKET) end_type=TOK_RBRAKET;
+ else end_type=TOK_RCURL;
 
  int ind=0;
  while(next_token_type(bf)!=end_type) {
@@ -351,7 +364,7 @@ int type_init_definition(FILEBUF *bf, alist *lex_parser, tok_struct *tok_var)
 	return 0;};
 	slen=getnword1(bf,cc,nword);
 	
-	MESG("		add element [%s]",nword);
+	// MESG("		add element [%s]",nword);
 	BTNODE *node = add_btnode(type_dat,nword);
 	if(show_tokens) {
 		out_print(nword,0);
@@ -377,12 +390,13 @@ int type_init_definition(FILEBUF *bf, alist *lex_parser, tok_struct *tok_var)
 		if(tok_type==TOK_NUM) {
 			double val=getnum1(bf,cc,tok);
 			// MESG("	element numeric %f",val);
+			MESG("		add element [%s]:numeric default:%f",nword,val);
 			if(show_tokens) out_print("numeric",1);
 			node->node_vtype=VTYPE_NUM;
 			node->node_dval=val;			
 		} else if (tok_type==TOK_QUOTE) {
 			getnstr1(bf,cc,nword);
-			// MESG("	element string [%s]",nword);
+			MESG("		add element [%s]:string default [%s]",node->node_name,nword);
 			if(show_tokens) out_print("string",1);
 			node->node_vtype=VTYPE_STRING;
 			node->node_sval=strdup(nword);
@@ -797,19 +811,23 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 	
 	if(tok_type==TOK_LETTER) {
-		// MESG("	parser: TOK_LETTER: check element in bt [%s]",nword);
+		MESG("	parser: TOK_LETTER: check element in bt [%s]",nword);
 		tok->tnode = find_bt_element(nword); // check main table
-#if	TEST_PARSER
+#if	1
 		if(tok->tnode==NULL) {
 			BTNODE *var_node = find_btnode(stree,nword);
 			if(var_node!=NULL) MESG("		[%s] found variable in stree index = %d type=%d vtype=%d",nword,var_node->node_index,var_node->node_type,var_node->node_vtype);
 			else MESG("		[%s] not found!!! in stree",nword);
+		} else {
+			MESG("	node found in main table");
 		}
 #endif
 		if(is_storelines && proc_name==NULL && tok->tnode!=NULL) {	/* function already register!  */
 			proc_name=strdup(nword);
 		};
+		MESG("	check 2");
 		if(tok->tnode==NULL) { // a NEW variable name or directive
+			MESG("	new variable name or directove");
 			if(is_storelines) {
 				if(proc_name==NULL) {
 					proc_name=strdup(nword);
@@ -867,7 +885,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
 				if(tok->ttype == TOK_DIR_TYPE) {
 					// MESG("	found type_definition!");
-					if(!type_init_definition(bf,lex_parser,tok)) {
+					if(!type_init_definition(bf,stree,lex_parser,tok)) {
 						// set_error(tok,111,"type_definition parse error");
 						MESG("after setting 111 error");
 						return 0;
@@ -878,7 +896,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 		} else {
 			tok->tname=tok->tnode->node_name;
-			// MESG("	token name is old [%s] found!!!!",tok->tname);
+			MESG("	token name is old [%s] found!!!!",tok->tname);
 			switch(tok->tnode->node_type) {
 				case TOK_VAR:	/* 0  */
 					tok->ttype=TOK_VAR; 
