@@ -501,16 +501,14 @@ int is_mlang(FILEBUF *fp)
 tok_data *new_symbol_table(int size)
 {
  int i;
- // MESG("new_symbol_table: %d",size);
+ MESG("Initialize new_symbol_table: size %d",size);
  tok_data *td=malloc(sizeof(struct tok_data)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
  for(i=0;i<size;i++) {
 	td[i].ind=i;
  	td[i].vtype=VTYPE_NUM;
 	td[i].pdval=NULL;
-#if	USE_SARRAYS
 	td[i].psval=NULL;
-#endif
 	td[i].dval=0;
 	td[i].sval=NULL;
  };
@@ -848,7 +846,7 @@ double factor_variable()
 	lsslot= get_left_slot(tok->tind);
 	ex_vtype=lsslot->vtype;
 
-	// MESG("	factor_variable: ind=%d type=%d",lsslot->ind,lsslot->vtype);
+	MESG("	factor_variable:[%s] ind=%d type=%d",tok->tname,lsslot->ind,lsslot->vtype);
 	switch(ex_vtype) {
 		case VTYPE_NUM:{
 			double val=lsslot->dval; 
@@ -2790,7 +2788,8 @@ char * tok_info(tok_struct *tok)
 				rows=tok->adat->rows;
 				cols=tok->adat->cols;
 			};
-			snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s] rows=%d cols=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,rows,cols);
+			snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s] rows=%d cols=%d",
+				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,rows,cols);
 		} else 
 		if(tok->ttype==TOK_SHOW) { snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [:]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME);
 		} else
@@ -2802,7 +2801,20 @@ char * tok_info(tok_struct *tok)
 		else 
 		if(tok->ttype==TOK_NUM) snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] %f",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);
 		else if(tok->ttype==TOK_QUOTE) snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] \"%s\"",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
-		else snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
+		else if(tok->ttype==TOK_VAR) {
+			int size=0;
+			char *var_type="numeric";
+			int vtype=0;
+			MESG("tok_info var! ind=[%d] group=%d vtype=%d",tok->tind,tok->tgroup,tok->tvtype);
+			if(tok->tvtype==VTYPE_TREE) {
+				BTNODE *tok_node=tok->tnode;
+				BTREE *type_tree=(BTREE *)tok_node->node_dat;
+				size = type_tree->items;
+				var_type="btree type";
+				vtype=tok->tvtype;
+			};
+			snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s] type %s %d size %d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,var_type,vtype,size);
+		} else snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
 // 			
 	} else {
 		     snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%f]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);

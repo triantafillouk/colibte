@@ -24,6 +24,7 @@ typedef struct tok_struct {
 	short tnum;	/* token number for debugging  */
 	short ttype;	/* token type */
 	short tgroup;	/* token group  */
+	short tvtype;
 	char *tname;	// token name or string value
 	double dval;	// double value
 	union {

@@ -293,9 +293,9 @@ int type_init_definition(FILEBUF *bf, BTREE *stree, alist *lex_parser, tok_struc
  int cc=0;
  char nword[256];
  char line[256];
- char e_name[256];
+ char e_name[128];
  int slen=0;
- // MESG("type_init_definition: num=%d name=%s",token_var->tind,token_var->tname);
+ MESG("type_init_definition: num=%d name=%s",tok_var->tind,tok_var->tname);
 
  tok_type=next_token_type(bf);
  if(tok_type!=TOK_LETTER) { 
@@ -306,7 +306,7 @@ int type_init_definition(FILEBUF *bf, BTREE *stree, alist *lex_parser, tok_struc
  getnc1(bf,&cc,&tok_type);
 
  slen=getnword1(bf,cc,nword);	/* this is the type name  */
- MESG("-- define type [%s]",nword);
+ MESG("-- define type [%s] len=%d",nword,slen);
  if(show_tokens){
 	out_print("---- type definition [",0);
 	out_print(nword,0);
@@ -322,7 +322,14 @@ int type_init_definition(FILEBUF *bf, BTREE *stree, alist *lex_parser, tok_struc
 	type_node->node_dat = type_dat;
 	type_node->node_type=TOK_VAR;
 	stree->new_flag=0;
- } 
+
+	tok_var->tnode = type_node;
+	tok_var->tname = strdup(nword);
+	tok_var->ttype = TOK_VAR;
+	tok_var->tvtype = VTYPE_TREE;
+	tok_var->tind = stree->items-1;
+ 	MESG("	new items=%d type TREE", stree->items);;
+} 
  else {
 	MESG("	new type named [%s] is dublicate",nword);
  	set_error(tok_var,108,"duplicate type or other error");
@@ -387,7 +394,8 @@ int type_init_definition(FILEBUF *bf, BTREE *stree, alist *lex_parser, tok_struc
 			double val=getnum1(bf,cc,tok);
 			// MESG("	element numeric %f",val);
 			// MESG("	- add element [%s]:numeric default:%f",nword,val);
-			sprintf(line,"%-15snumeric :%f",e_name,val);
+			slen=snprintf(line,255,"%-15snumeric :%f",e_name,val);
+			if(slen>255) MESG("name out of size!");
 			if(show_tokens) {
 				out_print(line,1);
 			};
@@ -396,7 +404,8 @@ int type_init_definition(FILEBUF *bf, BTREE *stree, alist *lex_parser, tok_struc
 		} else if (tok_type==TOK_QUOTE) {
 			getnstr1(bf,cc,nword);
 			// MESG("	- add element [%s]:string default [%s]",node->node_name,nword);
-			sprintf(line,"%-15sstring  :'%s'",e_name,nword);
+			slen=snprintf(line,255,"%-15sstring  :'%s'",e_name,nword);
+			if(slen>255) MESG("name out of size!");
 			if(show_tokens) {
 				out_print(line,1);
 			};
@@ -439,8 +448,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int is_now_sep=0;
  int is_now_curl=0;
  int par_level=0;
- int list_elements=0;
- int in_type_definition=0;
+ // int list_elements=0;
+ // int in_type_definition=0;
  int after_rpar=0;
  TLIST curl_stack; // curl stack
  int store_level=0;
@@ -819,8 +828,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 #if	1
 		if(tok->tnode==NULL) {
 			BTNODE *var_node = find_btnode(stree,nword);
-			if(var_node!=NULL) MESG("		[%s] found variable in stree index = %d type=%d vtype=%d",nword,var_node->node_index,var_node->node_type,var_node->node_vtype);
-			else MESG("		[%s] not found!!! in stree",nword);
+			if(var_node!=NULL) {
+				MESG("		[%s] found variable in stree index = %d type=%d vtype=%d",nword,var_node->node_index,var_node->node_type,var_node->node_vtype);
+				tok->tvtype = var_node->node_vtype;
+			} else MESG("		[%s] not found!!! in stree",nword);
 		} else {
 			MESG("	node found in main table");
 		}
@@ -830,7 +841,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		};
 		MESG("	check 2");
 		if(tok->tnode==NULL) { // a NEW variable name or directive
-			MESG("	new variable name or directove");
+			MESG("	new variable name or directive [%s]",nword);
 			if(is_storelines) {
 				if(proc_name==NULL) {
 					proc_name=strdup(nword);
@@ -851,17 +862,24 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				if(is_storelines) {
 					tok->ttype=TOK_PROC;
 				} else {
-					set_var(stree,tok,nword);
-#if	TEST_PARSER
+					// set_var(stree,tok,nword);
+#if	1
 					{
 						BTNODE *var_node = find_btnode(stree,nword);
 						if(var_node!=NULL) {
-							MESG("	[%s] found ADDED variable in stree index = %d type=%d vtype=%d",nword,var_node->node_index,var_node->node_type,var_node->node_vtype);
+							MESG("	[%s] found ADDED variable in stree index = %d type=%d vtype=%d",
+								nword,var_node->node_index,var_node->node_type,var_node->node_vtype);
 							if(!strcmp("b",nword)) {
 								var_node->node_vtype=TOK_ARRAY2;
 								MESG("	set b to type TOK_ARRAY2");
 							};
-						} else MESG("		[%s] not found!!! in stree",nword);
+							tok->tind = var_node->node_index;
+							tok->ttype=TOK_VAR;
+							tok->tnode=var_node;
+						} else {
+							MESG("		[%s] not found!!! in stree",nword);
+							set_var(stree,tok,nword);
+						};
 					}
 #endif
 					if(next_token_type(bf)==TOK_LBRAKET) {
@@ -899,11 +917,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 		} else {
 			tok->tname=tok->tnode->node_name;
-			MESG("	token name is old [%s] found!!!!",tok->tname);
+			MESG("	token name is old [%s] found type %d!!!!",tok->tname,tok->tnode->node_type);
 			switch(tok->tnode->node_type) {
 				case TOK_VAR:	/* 0  */
 					tok->ttype=TOK_VAR; 
 					ex_edenv=TOK_VAR;
+					MESG("	TOK_VAR");
 					break;
 				case TOK_ENV:	/* 1  */
 					tok->ttype=TOK_ENV; // editor env variables
@@ -989,7 +1008,7 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
  tok_struct *tok;
  tok_struct *tok_table=NULL;
  int isize=0;
-
+ MESG("set_tok_table: create token table from token list size of %d!",lex_parser->size);
  if(bf->tok_table != NULL) {
 	// MESG("set_tok_table: tok_table not NULL, free it!");
  	free(bf->tok_table);
@@ -1003,7 +1022,7 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
  while(tlist->current)
  {
 	tok=(tok_struct *)tlist->current->data;
-	// MESG(" ++	%2d: %3d [%s] %d",tok->tnum,tok->tline,tok->tname,tok->ttype);
+	MESG(" ++	%10s %2d: %3d [%s] %d",tok->tname,tok->tnum,tok->tline,tok->tname,tok->ttype);
 	memcpy((void *)tok_to,(void *)tok,sizeof(tok_struct));
 	if(tok->ttype==TOK_LCURL || tok->ttype==TOK_RCURL) {
 		tok_to->match_tok = tok_table + tok_to->tcurl->num;

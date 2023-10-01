@@ -266,7 +266,7 @@ double uf_print()
 {
 	tok_struct *tok=current_token();
 	int args=tok->number_of_args;
-	// MESG("uf_print: ex_vtype=%d tnum=%d args=%d",ex_vtype,tok->tnum,tok->number_of_args);
+	MESG("uf_print: ex_vtype=%d tnum=%d args=%d",ex_vtype,tok->tnum,tok->number_of_args);
 	int i;
 	double value=0;
 	for(i=0;i<args;i++) {
