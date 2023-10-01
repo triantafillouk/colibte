@@ -266,7 +266,7 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 	tok->tind=btn->node_index;
 	tok->ttype=btn->node_type;
 	ex_edenv=tok->ttype;
-		// MESG("	set_var: new name=%s tind=%d",name,tok->tind);
+		MESG("	set_var: new name=%s tind=%d",name,tok->tind);
 	if(stree->max_items < tok->tind) ERROR("exceeded item list of %d !! CHECK!",stree->max_items);
 }
 
@@ -292,6 +292,8 @@ int type_init_definition(FILEBUF *bf, BTREE *stree, alist *lex_parser, tok_struc
  int tok_type=TOK_NONE;
  int cc=0;
  char nword[256];
+ char line[256];
+ char e_name[256];
  int slen=0;
  // MESG("type_init_definition: num=%d name=%s",token_var->tind,token_var->tname);
 
@@ -304,33 +306,25 @@ int type_init_definition(FILEBUF *bf, BTREE *stree, alist *lex_parser, tok_struc
  getnc1(bf,&cc,&tok_type);
 
  slen=getnword1(bf,cc,nword);	/* this is the type name  */
+ MESG("-- define type [%s]",nword);
  if(show_tokens){
 	out_print("---- type definition [",0);
 	out_print(nword,0);
 	out_print("] ---------",1);
  };
  BTREE *type_dat = new_btree(nword,100);
-#if	1
+ MESG("add a var [%s]",nword);
  BTNODE *type_node = add_btnode(stree,nword);
  if(type_node && stree->new_flag) 
  {
-	MESG("Add new type named [%s]",nword);
+	MESG("Add new type named [%s] in stree",nword);
  	type_node->node_vtype=VTYPE_TREE;
 	type_node->node_dat = type_dat;
+	type_node->node_type=TOK_VAR;
 	stree->new_flag=0;
  } 
-#else
- BTNODE *type_node = add_btnode(bf->symbol_tree,nword);
- if(type_node && bf->symbol_tree->new_flag) 
- {
-	MESG("Add new type named [%s]",nword);
- 	type_node->node_vtype=VTYPE_TREE;
-	type_node->node_dat = type_dat;
-	bf->symbol_tree->new_flag=0;
- } 
-#endif
  else {
-	// MESG("	new type named [%s] is dublicate",nword);
+	MESG("	new type named [%s] is dublicate",nword);
  	set_error(tok_var,108,"duplicate type or other error");
 	show_error("type_init",nword);
 	return 0;
@@ -358,18 +352,20 @@ int type_init_definition(FILEBUF *bf, BTREE *stree, alist *lex_parser, tok_struc
  int ind=0;
  while(next_token_type(bf)!=end_type) {
  	getnc1(bf,&cc,&tok_type);
-	// MESG("	w: cc=[%c] type=%d",cc,tok_type);
+	// MESG("-------	w: cc=[%c] type=%d",cc,tok_type);
 	if(tok_type!=TOK_LETTER) { 
 		set_error(tok_var,111,"type_init name not letter or closing error!");
 	return 0;};
 	slen=getnword1(bf,cc,nword);
-	
+	strcpy(e_name,nword);
 	// MESG("		add element [%s]",nword);
 	BTNODE *node = add_btnode(type_dat,nword);
+#if	0
 	if(show_tokens) {
 		out_print(nword,0);
 		out_print("		",0);
 	};
+#endif
 	node->node_index = ind++;
 	if(type_dat->new_flag==0) {
 		// MESG("dublicate error");
@@ -390,14 +386,20 @@ int type_init_definition(FILEBUF *bf, BTREE *stree, alist *lex_parser, tok_struc
 		if(tok_type==TOK_NUM) {
 			double val=getnum1(bf,cc,tok);
 			// MESG("	element numeric %f",val);
-			MESG("		add element [%s]:numeric default:%f",nword,val);
-			if(show_tokens) out_print("numeric",1);
+			// MESG("	- add element [%s]:numeric default:%f",nword,val);
+			sprintf(line,"%-15snumeric :%f",e_name,val);
+			if(show_tokens) {
+				out_print(line,1);
+			};
 			node->node_vtype=VTYPE_NUM;
 			node->node_dval=val;			
 		} else if (tok_type==TOK_QUOTE) {
 			getnstr1(bf,cc,nword);
-			MESG("		add element [%s]:string default [%s]",node->node_name,nword);
-			if(show_tokens) out_print("string",1);
+			// MESG("	- add element [%s]:string default [%s]",node->node_name,nword);
+			sprintf(line,"%-15sstring  :'%s'",e_name,nword);
+			if(show_tokens) {
+				out_print(line,1);
+			};
 			node->node_vtype=VTYPE_STRING;
 			node->node_sval=strdup(nword);
 		} else {
@@ -408,6 +410,7 @@ int type_init_definition(FILEBUF *bf, BTREE *stree, alist *lex_parser, tok_struc
 		};
 		if(next_token_type(bf)==TOK_COMMA) getnc1(bf,&cc,&tok_type);
 	} else if(cc!=' '&&cc!=9 && cc!=',') { return 0;}; 
+ 	// MESG("	end of element");
  };
  getnc1(bf,&cc,&tok_type);
  if(tok_type != end_type) 
@@ -833,7 +836,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					proc_name=strdup(nword);
 				};
 			};
-			// MESG("	parser:		check in directiv_table");
+			MESG("	parser:		check %s in directiv_table",nword);
 
 			tok->tnode=find_btnode(directiv_table,nword);
 			if(tok->tnode==NULL){	/* not a directive but a variable  */
@@ -869,7 +872,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					};
 				}
 			} else { // we have a directive
-				// MESG("	parser:	directive [%s] found!",nword);
+				MESG("	parser:	directive [%s] found!",nword);
 				tok->tname=tok->tnode->node_name;
 				tok->tgroup=tok->tnode->node_type;
 				tok->tind = tok->tnode->node_index;

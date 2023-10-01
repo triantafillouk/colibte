@@ -208,7 +208,8 @@ enum {
 	TOK_START,			/* 76 <@ */
 	TOK_END,			/* @> */
 	TOK_DEFINE_TYPE,
-	TOK_OTHER,
+	TOK_ASSIGN_TYPE,
+	TOK_OTHER
 };
 
 

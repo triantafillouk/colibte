@@ -631,7 +631,7 @@ int err_factor()
 			tok->dval=-1;
 			NTOKEN_ERR(498);
 		};
-		MESG("	tOK_VAR: return");
+		MESG("	TOK_VAR: return [%s]",tok_info(tok));
 		RT_MESG1(493);}
 	case TOK_ARRAY1:{
 		MESG("	err use of tok_array1 [%s]",tok_info(tok0));
@@ -918,6 +918,7 @@ int err_factor()
 		// MESG("tok_rbtacket");
 		RT_MESG1(5262);
 	case TOK_ASSIGN:
+		MESG("TOK_ASSIGN");
 	case TOK_INCREASEBY:
 	case TOK_MULBY:
 	case TOK_DECREASEBY:
@@ -925,7 +926,7 @@ int err_factor()
 		RT_MESG1(527);
 	default:
 		xpos=527;
-		MESG(" default: error_factor0: %s %d",tok_info(tok0),tok0->tind);
+		MESG(" default: error_factor0: %s tind=%d ttype=%d TOK_VAR=%d",tok_info(tok0),tok0->tind,tok0->ttype,TOK_VAR);
 		MESG(" default: error_factor : %s",tok_info(tok));
 		set_error(tok,3000+tok->ttype,"factor :wrong character found:");
 		RT_MESG1(5271);

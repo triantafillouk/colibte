@@ -84,5 +84,6 @@ TOK_TAB token_table[]= {
 	{TOK_START			,"START",0},
 	{TOK_END			,"END",0},
 	{TOK_DEFINE_TYPE	,"::",0},
+	{TOK_ASSIGN_TYPE	,"=type",0},
 	{TOK_OTHER			,"OTHER",0}
 };
