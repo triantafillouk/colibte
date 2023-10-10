@@ -548,6 +548,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		case TOK_NUM:
 			// MESG("TOK_NUM: old num=%d type=%d name %s,new type %d ",tok->tnum,tok->ttype,tok->tname,tok_type);
 			value=getnum1(bf,cc,tok);
+			// tok->tvtype=VTYPE_NUM;
+			// tok->tname="num";
 			// MESG("parse: TOK_NUM: num=%d type=%d val=%f",tok->tnum,tok->ttype,value);
 			if(err_num>0) return(0);
 			break;
@@ -627,6 +629,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			break;
 		case TOK_QUOTE: // string start
 			slen=getnstr1(bf,cc,nword);
+			// tok->tvtype=VTYPE_STRING;
 			break;
 		case TOK_SHOW:
 			if(next_token_type(bf)==TOK_SHOW) {
@@ -807,7 +810,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		struct curl_struct *tcl;
 			tcl=new_curl(curl_level,tok_line,lex_parser->last);
 			tcl->num=tok->tnum;
-			tok->tname="{";
+			tok->tname=" LCURL";
 			lpush(tcl,curl_stack);
 			tok->tcurl=tcl;
 	} else
@@ -816,7 +819,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			tcr=new_curl(curl_level,tok_line,lex_parser->last);
 			tcl=(curl_struct *)lpop(curl_stack);
 			tok->tcurl=tcr;
-			tok->tname="}";
+			tok->tname=" RCURL";
 			tcr->num=tcl->num;
 			tcl->num=tok->tnum;
 	};
@@ -831,6 +834,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			if(var_node!=NULL) {
 				MESG("		[%s] found variable in stree index = %d type=%d vtype=%d",nword,var_node->node_index,var_node->node_type,var_node->node_vtype);
 				tok->tvtype = var_node->node_vtype;
+				// tok->vtype = var_node->node_vtype;
 			} else MESG("		[%s] not found!!! in stree",nword);
 		} else {
 			MESG("	node found in main table");
@@ -876,6 +880,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 							tok->tind = var_node->node_index;
 							tok->ttype=TOK_VAR;
 							tok->tnode=var_node;
+							tok->tvtype = var_node->node_vtype;
 						} else {
 							MESG("		[%s] not found!!! in stree",nword);
 							set_var(stree,tok,nword);
@@ -890,13 +895,13 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					};
 				}
 			} else { // we have a directive
-				MESG("	parser:	directive [%s] found!",nword);
+				// MESG("	parser:	directive [%s] found!",nword);
 				tok->tname=tok->tnode->node_name;
 				tok->tgroup=tok->tnode->node_type;
 				tok->tind = tok->tnode->node_index;
-				tok->ttype=tok->tnode->node_index;
+				tok->ttype = tok->tnode->node_index;
 
-				// MESG("directiv:0:[%s] ttype=%d, tind=%d, tgroup=%d",tok->tname,tok->ttype,tok->tind,tok->tgroup);
+				MESG("	directiv:0:[%s] ttype=%d, tind=%d, tgroup=%d",tok->tname,tok->ttype,tok->tind,tok->tgroup);
 				if(tok->tind==TOK_PROC) 
 				{
 					is_storelines=1;
@@ -1022,7 +1027,11 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
  while(tlist->current)
  {
 	tok=(tok_struct *)tlist->current->data;
-	MESG(" ++	%10s %2d: %3d [%s] %d",tok->tname,tok->tnum,tok->tline,tok->tname,tok->ttype);
+	if(tok->ttype==TOK_VAR && tok->tvtype==VTYPE_TREE) {
+		BTNODE *node=tok->tnode;
+		MESG(" ++	%10s %2d: %3d [%s] %d node_vtype=%d",tok->tname,tok->tnum,tok->tline,tok->tname,tok->ttype,tok->tvtype);
+	} else
+ 		MESG(" ++	%10s %2d: %3d [%s] type=%d vtype=%d",tok->tname,tok->tnum,tok->tline,tok->tname,tok->ttype,tok->tvtype);
 	memcpy((void *)tok_to,(void *)tok,sizeof(tok_struct));
 	if(tok->ttype==TOK_LCURL || tok->ttype==TOK_RCURL) {
 		tok_to->match_tok = tok_table + tok_to->tcurl->num;

@@ -456,6 +456,7 @@ void init_hash()
 	tnode = set_btdval(directiv_table,term_types[i].term_name,i);
 	tnode->node_index = term_types[i].term_type;
 	tnode->node_type = term_types[i].term_group;
+	tnode->node_vtype=1000;
  };
  // show_bt_table_ordered(directiv_table);
  // show_bt_table_ordered(bt_table);
@@ -841,12 +842,15 @@ inline tok_data *get_left_slot(int ind)
 
 
 double factor_variable()
-{
-	// lsslot=&current_stable[tok->tind];	/* symbol table variable's slot  */
+{	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d node type=%d",
+		// tok->tname,lsslot->ind,ex_vtype,tok->ttype,tok->tvtype,tok_node->node_vtype);
 	lsslot= get_left_slot(tok->tind);
 	ex_vtype=lsslot->vtype;
-
-	MESG("	factor_variable:[%s] ind=%d type=%d",tok->tname,lsslot->ind,lsslot->vtype);
+	// BTNODE *tok_node = tok->tnode;
+	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d node type=%d",
+		// tok->tname,lsslot->ind,ex_vtype,tok->ttype,tok->tvtype,tok_node->node_vtype);
+	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d",
+		// tok->tname,lsslot->ind,ex_vtype,tok->ttype,tok->tvtype);
 	switch(ex_vtype) {
 		case VTYPE_NUM:{
 			double val=lsslot->dval; 
