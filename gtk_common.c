@@ -13,6 +13,7 @@ extern FILEBUF *cbfp;
 
 GtkWidget *wlist;
 COLOR_SCHEME *get_scheme_by_index(int scheme_num);
+int drv_initialized=0;
 
 void set_current_scheme(int scheme)
 {
@@ -79,6 +80,7 @@ void drv_open()
 	MESG("parent showed!");
 	gtk_widget_grab_focus(cwp->gwp->draw);
 	MESG("drv_open: end");
+	drv_initialized=1;
 }
 
 void show_cursor_dl(int pos)

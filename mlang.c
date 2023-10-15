@@ -509,9 +509,9 @@ tok_data *new_symbol_table(FILEBUF *fp)
 	td[i].ind=i;
  	td[i].vtype=VTYPE_NUM;
 	td[i].pdval=NULL;
-	td[i].psval=NULL;
+	// td[i].psval=NULL;
 	td[i].dval=0;
-	td[i].sval=NULL;
+	// td[i].sval=NULL;
  };
  return td;
 }
