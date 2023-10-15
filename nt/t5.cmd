@@ -8,7 +8,7 @@ print(human2)
 #list1 = list ()
 #keys = keys ()
 #andrew = human "Ανδρεας","Πέτρου",33,2022,900)
-#α = array []
+α = 1:
 # 2023:08:05:15:35:55
 # a = human1 ("Kostas","Tr",55,20,100)
 #a.name:

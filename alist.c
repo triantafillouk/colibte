@@ -19,7 +19,7 @@
 #define	VTYPE_STRING	8
 #define VTYPE_TREE		32
 
-#if	defined _MESG_DEFINED
+#if	1
 void MESG(const char *fmt, ...);
 #else
 #define MESG(format,...) { \
@@ -762,7 +762,7 @@ void **array_data(alist *list)
 {
  int i;
  _el *pel;
-
+ MESG("array_data:");
  if(!list->array_valid) {
  	if(list->data!=NULL) free(list->data);
 	list->data = (void **) malloc(sizeof(void*)*(list->size+1));

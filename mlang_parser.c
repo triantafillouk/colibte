@@ -826,32 +826,33 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 	
 	if(tok_type==TOK_LETTER) {
-		MESG("	parser: TOK_LETTER: check element in bt [%s]",nword);
+		// MESG("	parser: TOK_LETTER: check element in bt [%s]",nword);
 		tok->tnode = find_bt_element(nword); // check main table
 #if	1
 		if(tok->tnode==NULL) {
 			BTNODE *var_node = find_btnode(stree,nword);
 			if(var_node!=NULL) {
-				MESG("		[%s] found variable in stree index = %d type=%d vtype=%d",nword,var_node->node_index,var_node->node_type,var_node->node_vtype);
+				// MESG("		[%s] found variable in stree index = %d type=%d vtype=%d",nword,var_node->node_index,var_node->node_type,var_node->node_vtype);
 				tok->tvtype = var_node->node_vtype;
 				// tok->vtype = var_node->node_vtype;
-			} else MESG("		[%s] not found!!! in stree",nword);
+			} else {
+				// MESG("		[%s] not found!!! in stree",nword);
+			};
 		} else {
-			MESG("	node found in main table");
+			// MESG("	node found in main table");
 		}
 #endif
 		if(is_storelines && proc_name==NULL && tok->tnode!=NULL) {	/* function already register!  */
 			proc_name=strdup(nword);
 		};
-		MESG("	check 2");
 		if(tok->tnode==NULL) { // a NEW variable name or directive
-			MESG("	new variable name or directive [%s]",nword);
+			// MESG("	new variable name or directive [%s]",nword);
 			if(is_storelines) {
 				if(proc_name==NULL) {
 					proc_name=strdup(nword);
 				};
 			};
-			MESG("	parser:		check %s in directiv_table",nword);
+			// MESG("	parser:		check %s in directiv_table",nword);
 
 			tok->tnode=find_btnode(directiv_table,nword);
 			if(tok->tnode==NULL){	/* not a directive but a variable  */
@@ -867,26 +868,22 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					tok->ttype=TOK_PROC;
 				} else {
 					// set_var(stree,tok,nword);
-#if	1
-					{
-						BTNODE *var_node = find_btnode(stree,nword);
-						if(var_node!=NULL) {
-							MESG("	[%s] found ADDED variable in stree index = %d type=%d vtype=%d",
-								nword,var_node->node_index,var_node->node_type,var_node->node_vtype);
-							if(!strcmp("b",nword)) {
-								var_node->node_vtype=TOK_ARRAY2;
-								MESG("	set b to type TOK_ARRAY2");
-							};
-							tok->tind = var_node->node_index;
-							tok->ttype=TOK_VAR;
-							tok->tnode=var_node;
-							tok->tvtype = var_node->node_vtype;
-						} else {
-							MESG("		[%s] not found!!! in stree",nword);
-							set_var(stree,tok,nword);
+					BTNODE *var_node = find_btnode(stree,nword);
+					if(var_node!=NULL) {
+						MESG("	[%s] found variable in stree index = %d type=%d vtype=%d",
+							nword,var_node->node_index,var_node->node_type,var_node->node_vtype);
+						if(!strcmp("b",nword)) {
+							var_node->node_vtype=TOK_ARRAY2;
+							MESG("	set b to type TOK_ARRAY2");
 						};
-					}
-#endif
+						tok->tind = var_node->node_index;
+						tok->ttype=TOK_VAR;
+						tok->tnode=var_node;
+						tok->tvtype = var_node->node_vtype;
+					} else {
+						MESG("		[%s] not found!!! in stree",nword);
+						set_var(stree,tok,nword);
+					};
 					if(next_token_type(bf)==TOK_LBRAKET) {
 						// MESG("	parser: next is TOK_LBRAKET !!!!");
 						array_tok=tok;	/* variable to set as array!  */
@@ -927,7 +924,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				case TOK_VAR:	/* 0  */
 					tok->ttype=TOK_VAR; 
 					ex_edenv=TOK_VAR;
-					MESG("	TOK_VAR");
+					// MESG("	TOK_VAR");
 					break;
 				case TOK_ENV:	/* 1  */
 					tok->ttype=TOK_ENV; // editor env variables
@@ -1013,7 +1010,7 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
  tok_struct *tok;
  tok_struct *tok_table=NULL;
  int isize=0;
- MESG("set_tok_table: create token table from token list size of %d!",lex_parser->size);
+ // MESG("set_tok_table: create token table from token list size of %d!",lex_parser->size);
  if(bf->tok_table != NULL) {
 	// MESG("set_tok_table: tok_table not NULL, free it!");
  	free(bf->tok_table);
@@ -1027,11 +1024,13 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
  while(tlist->current)
  {
 	tok=(tok_struct *)tlist->current->data;
+#if	0
 	if(tok->ttype==TOK_VAR && tok->tvtype==VTYPE_TREE) {
-		BTNODE *node=tok->tnode;
 		MESG(" ++	%10s %2d: %3d [%s] %d node_vtype=%d",tok->tname,tok->tnum,tok->tline,tok->tname,tok->ttype,tok->tvtype);
-	} else
+	} else {
  		MESG(" ++	%10s %2d: %3d [%s] type=%d vtype=%d",tok->tname,tok->tnum,tok->tline,tok->tname,tok->ttype,tok->tvtype);
+	};
+#endif
 	memcpy((void *)tok_to,(void *)tok,sizeof(tok_struct));
 	if(tok->ttype==TOK_LCURL || tok->ttype==TOK_RCURL) {
 		tok_to->match_tok = tok_table + tok_to->tcurl->num;

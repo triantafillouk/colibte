@@ -13,7 +13,7 @@
 #define	__ALIST_KT__
 /* list structure definitions */
 
-#define	_MESG_DEFINED	1
+// #define	_MESG_DEFINED	1
 #define _BTREE	1
 #define	RB_BALANCE	0
 #define	AVL_BALANCE	1

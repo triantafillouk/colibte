@@ -196,10 +196,10 @@ static inline double factor_none()
 
 double add_value(double v1)
 {
-	tok_data *sslot;
+	tok_data *sslot=lsslot;
 	double v0=0;
 	TDS("add_value");
-	sslot=lsslot;
+	// sslot=lsslot;
 	// MESG("add_val: ind=%d type=%d ex_vtype=%d",sslot->ind,sslot->vtype,ex_vtype);
 
 	if(sslot->vtype==VTYPE_NUM ) {
@@ -250,9 +250,9 @@ double decrease_val()
 double decrease_by()
 {
 	double v1,v0;
-	tok_data *sslot;
+	tok_data *sslot=lsslot;
 	TDS("decrease_val");
-	sslot=lsslot;
+	// sslot=lsslot;
 	// MESG("decrease_by: of [%s]",tok_info(lsslot));
 	v1=lexpression();
 
@@ -274,9 +274,9 @@ double decrease_by()
 double increase_by()
 {
 	double v1,v0;
-	tok_data *sslot;
+	tok_data *sslot=lsslot;
 	// TDS("increase_by");
-	sslot=lsslot;
+	// sslot=lsslot;
 	// if(sslot->vtype==VTYPE_STRING) MESG("increase_by string [%s]",sslot->sval);
 	
 	v1=lexpression();
@@ -316,9 +316,8 @@ double increase_by()
 double mul_by()
 {
 	double v1,v0;
-	tok_data *sslot;
+	tok_data *sslot=lsslot;
 	// TDS("increase_by");
-	sslot=lsslot;
 	// if(sslot->vtype==VTYPE_STRING) MESG("increase_by string [%s]",sslot->sval);
 	
 	v1=num_expression();
@@ -499,10 +498,11 @@ int is_mlang(FILEBUF *fp)
  return 1; 
 }
 
-tok_data *new_symbol_table(int size)
+tok_data *new_symbol_table(FILEBUF *fp)
 {
  int i;
- MESG("Initialize new_symbol_table: size %d",size);
+ int size=fp->symbol_tree->items;
+ MESG("Initialize new_symbol_table:[%s] size %d",fp->b_fname,size);
  tok_data *td=malloc(sizeof(struct tok_data)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
  for(i=0;i<size;i++) {
@@ -743,7 +743,7 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	// MESG("exec_function:2");
 	tok=bp->tok_table;	/* start of function  */
 	// MESG("exec_function: first token is [%s] type=%d",tok->tname,tok->ttype);
-	current_stable=new_symbol_table(bp->symbol_tree->items);	/* create new symbol table  */
+	current_stable=new_symbol_table(bp);	/* create new symbol table  */
 
 	if(current_stable==NULL) { 
 		err_num=208;
@@ -844,7 +844,7 @@ inline tok_data *get_left_slot(int ind)
 double factor_variable()
 {	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d node type=%d",
 		// tok->tname,lsslot->ind,ex_vtype,tok->ttype,tok->tvtype,tok_node->node_vtype);
-	lsslot= get_left_slot(tok->tind);
+ 	lsslot = get_left_slot(tok->tind);
 	ex_vtype=lsslot->vtype;
 	// BTNODE *tok_node = tok->tnode;
 	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d node type=%d",
@@ -2553,19 +2553,16 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);
 	extra=100;
 	use_fp->symbol_tree->max_items=extra;
-#if	TEST_TYPE0
- 	use_fp->type_tree=new_btree("type_tree",0);
-#endif
  };
 	if(current_stable==NULL) {
-		current_stable=new_symbol_table(use_fp->symbol_tree->max_items);
+		current_stable=new_symbol_table(use_fp);
 	};
 	// MESG("compute_block: before calling parse_block1");
 	parse_block1(bp,use_fp->symbol_tree,start,extra);
 	// MESG("parse_blocke: ended! err=%d",err_num);
 	if(err_num) return(0);
 	if(start) {
-		local_symbols=new_symbol_table(bp->symbol_tree->max_items);
+		local_symbols=new_symbol_table(bp);
 		current_stable=local_symbols;
 	} else {
 		local_symbols=current_stable;	
@@ -2663,7 +2660,7 @@ int refresh_current_buffer(int nused)
  parse_block1(fp,fp->symbol_tree,1,100);	/* init tree,extra 100 symbols  */
 
  if(err_num<1){	/* if no errors  */
-	fp->symbol_table=new_symbol_table(fp->symbol_tree->max_items);
+	fp->symbol_table=new_symbol_table(fp);
 	current_stable=fp->symbol_table;
 
  	msg_line("checking ...");
