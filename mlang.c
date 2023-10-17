@@ -498,11 +498,11 @@ int is_mlang(FILEBUF *fp)
  return 1; 
 }
 
-tok_data *new_symbol_table(FILEBUF *fp)
+tok_data *new_symbol_table(int size)
 {
  int i;
- int size=fp->symbol_tree->items;
- MESG("Initialize new_symbol_table:[%s] size %d",fp->b_fname,size);
+ // int size=fp->symbol_tree->items;
+ // MESG("Initialize new_symbol_table:[%s] size %d",fp->b_fname,size);
  tok_data *td=malloc(sizeof(struct tok_data)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
  for(i=0;i<size;i++) {
@@ -743,7 +743,7 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	// MESG("exec_function:2");
 	tok=bp->tok_table;	/* start of function  */
 	// MESG("exec_function: first token is [%s] type=%d",tok->tname,tok->ttype);
-	current_stable=new_symbol_table(bp);	/* create new symbol table  */
+	current_stable=new_symbol_table(bp->symbol_tree->items+nargs);	/* create new symbol table  */
 
 	if(current_stable==NULL) { 
 		err_num=208;
@@ -2551,18 +2551,18 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  if(use_fp->symbol_tree==NULL) {
 	// MESG("create new symbol_tree for use_fp!");
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);
-	extra=100;
-	use_fp->symbol_tree->max_items=extra;
+	// extra=100;
+	// use_fp->symbol_tree->max_items=extra;
  };
 	if(current_stable==NULL) {
-		current_stable=new_symbol_table(use_fp);
+		current_stable=new_symbol_table(use_fp->symbol_tree->items);
 	};
 	// MESG("compute_block: before calling parse_block1");
 	parse_block1(bp,use_fp->symbol_tree,start,extra);
 	// MESG("parse_blocke: ended! err=%d",err_num);
 	if(err_num) return(0);
 	if(start) {
-		local_symbols=new_symbol_table(bp);
+		local_symbols=new_symbol_table(bp->symbol_tree->items);
 		current_stable=local_symbols;
 	} else {
 		local_symbols=current_stable;	
@@ -2660,7 +2660,7 @@ int refresh_current_buffer(int nused)
  parse_block1(fp,fp->symbol_tree,1,100);	/* init tree,extra 100 symbols  */
 
  if(err_num<1){	/* if no errors  */
-	fp->symbol_table=new_symbol_table(fp);
+	fp->symbol_table=new_symbol_table(fp->symbol_tree->items);
 	current_stable=fp->symbol_table;
 
  	msg_line("checking ...");

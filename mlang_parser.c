@@ -267,7 +267,7 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 	tok->ttype=btn->node_type;
 	ex_edenv=tok->ttype;
 		MESG("	set_var: new name=%s tind=%d",name,tok->tind);
-	if(stree->max_items < tok->tind) ERROR("exceeded item list of %d !! CHECK!",stree->max_items);
+	// if(stree->max_items < tok->tind) ERROR("exceeded item list of %d !! CHECK!",stree->max_items);
 }
 
 int change_script_state(int tok_type,int *script_active) 
@@ -487,7 +487,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(bf->symbol_tree) free_btree(bf->symbol_tree);
 	bf->symbol_tree=new_btree(bf->b_fname,0);
 	stree=bf->symbol_tree;
-	stree->max_items=999999;
+	// stree->max_items=999999;
  };
  // MESG("parse_block1: pos2");
  {	/* clear ddot textpoints  */
@@ -989,7 +989,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	bf->m_mode=M_PARSED;
 
  if(init) {
-	bf->symbol_tree->max_items = bf->symbol_tree->items+extra;
+	// bf->symbol_tree->max_items = bf->symbol_tree->items+extra;
  };
 
  // MESG("parse_block1: create token table from token list");

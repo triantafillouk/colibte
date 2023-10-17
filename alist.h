@@ -152,7 +152,7 @@ typedef struct BTREE {
 	int	new_flag;
 	// int level;
 	long items;
-	long max_items;
+	// long max_items;
 } BTREE;
 
 // Initialize a btree table
