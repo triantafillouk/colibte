@@ -315,8 +315,8 @@ typedef struct  VIDEO {
 #define HEX_LINE_LEN	16
 
 typedef struct tok_data {
-	int	ind;
-	int vtype;
+	short int ind;
+	short int vtype;
 #if	USE_SARRAYS
 	union {
 	double *pdval;

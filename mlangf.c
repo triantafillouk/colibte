@@ -1,4 +1,4 @@
-	#include "xe.h"
+#include "xe.h"
 #include "mlang.h"
 
 extern char *saved_string;
@@ -713,4 +713,21 @@ double uf_mainarg()
 		ex_vtype=VTYPE_NUM;
 	};
 	return value;
+}
+
+extern tok_data *current_stable;
+extern FILEBUF *exe_buffer;
+double uf_show_vars()
+{
+	ntoken();
+	tok_data *var = current_stable;
+	MESG("DEBUG varables %d -----------",exe_buffer->symbol_tree->items);
+	for(int i=0;i< exe_buffer->symbol_tree->items;i++){
+		var = &current_stable[i];
+		if(var->vtype==1) 
+			MESG("%3d: 		%2d	%2d %f",i,var->ind,var->vtype,var->dval);
+		else if(var->vtype==8)
+			MESG("%3d: 		%2d	%2d %s",i,var->ind,var->vtype,var->sval);
+	};
+	return 0;
 }

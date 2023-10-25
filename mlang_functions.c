@@ -60,5 +60,6 @@ m_function m_functions[] = {
 	{"array_rows",1,uf_array_rows},	/* rows of an an array  */
 	{"dbg_message",1,uf_dbg_message},	/* show debug message  */
 	{"index",0,uf_index},	/* new index  */
+	{"show_vars",0,uf_show_vars},	/* show local vars  */
 	{NULL,0,NULL}
 };

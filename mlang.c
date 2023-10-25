@@ -23,6 +23,7 @@
 void mesg_out(const char *fmt, ...);
 extern FILEBUF *cbfp;
 extern array_dat *main_args;
+FILEBUF *exe_buffer=NULL;
 
 #if	SYNTAX_DEBUG
 #define	SHOWTOK {if(discmd) { MESG("  [%2d][%*s-%s][%d]  %s",stage_level,stage_level,"",Tds,tok->tnum,tok_name[tok->ttype]);};}
@@ -842,9 +843,10 @@ inline tok_data *get_left_slot(int ind)
 
 
 double factor_variable()
-{	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d node type=%d",
-		// tok->tname,lsslot->ind,ex_vtype,tok->ttype,tok->tvtype,tok_node->node_vtype);
+{	
  	lsslot = get_left_slot(tok->tind);
+	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d ind=%d",
+		// tok->tname,lsslot->ind,ex_vtype,tok->ttype,tok->tvtype,tok->tind);
 	ex_vtype=lsslot->vtype;
 	// BTNODE *tok_node = tok->tnode;
 	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d node type=%d",
@@ -1241,6 +1243,7 @@ double factor_proc()
 	vargs = push_args_1(tok0->tind);
 	after_proc=tok;
 	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
+	exe_buffer=tok0->tbuf;
 	value=exec_function(tok0->tbuf,vargs,tok0->tind);
 	// MESG("factor_proc: return val=%f",value);
 	tok=after_proc;
@@ -2116,7 +2119,7 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 	for(i=0;i<nargs;i++,va++) {
 		tok_data *arg_dat=&symbols[tok->tind];
 		arg_dat->vtype=va->vtype;
-		// MESG("assign_args1:arg %d: pos2 tok=[%d %s] %d",i,tok->tnum,tok->tname,tok->ttype);
+		MESG("assign_args1:arg %d: pos2 tok=[%d %s] ttype=%d tind=%d",i,tok->tnum,tok->tname,tok->ttype,tok->tind);
 		switch(va->vtype) {
 			case VTYPE_NUM:
 				arg_dat->dval=va->dval;

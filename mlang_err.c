@@ -1410,7 +1410,7 @@ int err_check_block1()
 {
  TDSERR("block");
    SHOW_STAGE(671);
-   // MESG("err_check_block1: --------------------------------");
+   MESG("err_check_block1: --------------------------------");
    while(1) {
 	CHECK_TOK(672);
 	switch(tok->ttype) {
