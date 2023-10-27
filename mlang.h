@@ -46,9 +46,9 @@ typedef struct tok_struct {
 } tok_struct;
 
 typedef struct MVAR {
-	short	vtype;
-	short	vgroup;	/* ??? possible use ??  */
-	int		vlen;	/* ??? possible use ??  */
+	short	var_type;
+	short	var_index;	/* ??? possible use ??  */
+	int		var_len;	/* ??? possible use ??  */
 	union {
 		double dval;
 		char *sval;

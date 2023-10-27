@@ -130,7 +130,7 @@ void allocate_array(struct array_dat *adat)
 		// MESG("allocate array amixed or dynamic!");
 		if(adat->mval!=NULL) free(adat->mval);
 		adat->mval=(struct MVAR *)malloc(sizeof(struct MVAR)*adat->rows*adat->cols);
-		for(i=0;i< adat->rows*adat->cols;i++) {adat->mval[i].dval=0;adat->mval[i].vtype=VTYPE_NUM;};
+		for(i=0;i< adat->rows*adat->cols;i++) {adat->mval[i].dval=0;adat->mval[i].var_type=VTYPE_NUM;};
 		// MESG("dynamic array initialized! type=%d",adat->atype);
 	};
  }
@@ -774,7 +774,7 @@ void print_array1(char *title,array_dat *adat)
 				if(adat->atype==VTYPE_ARRAY) snprintf(so,128," %3d: %f",i,adat->dval[i]);
 				else if(adat->atype==VTYPE_SARRAY) snprintf(so,128," %3d: %s",i,adat->sval[i]);
 				else if(adat->atype==VTYPE_AMIXED) {
-					if(adat->mval[i].vtype==VTYPE_NUM) snprintf(so,128," %3d: %f",i,adat->mval[i].dval);
+					if(adat->mval[i].var_type==VTYPE_NUM) snprintf(so,128," %3d: %f",i,adat->mval[i].dval);
 					else snprintf(so,128," %3d: %s",i,adat->mval[i].sval);
 				};
 				out_print(so,1);
@@ -784,7 +784,7 @@ void print_array1(char *title,array_dat *adat)
 				if(adat->atype==VTYPE_ARRAY) snprintf(s2,128,"%05.3f(%d) ",adat->dval[i],i);
 				else if(adat->atype==VTYPE_SARRAY) snprintf(s2,128,"%10s(%d) ",adat->sval[i],i);
 				else if(adat->atype==VTYPE_AMIXED) {
-					if(adat->mval[i].vtype==VTYPE_NUM) snprintf(s2,128,"%05.3f(%d) ",adat->mval[i].dval,i);
+					if(adat->mval[i].var_type==VTYPE_NUM) snprintf(s2,128,"%05.3f(%d) ",adat->mval[i].dval,i);
 					else snprintf(s2,128,"%10s(%d) ",adat->mval[i].sval,i);
 				};
 				strlcat(so,s2,MAXLLEN);

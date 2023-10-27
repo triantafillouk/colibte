@@ -158,8 +158,8 @@ void clear_args(MVAR *va,int nargs)
  // MESG("clear_args: %d",nargs);
  if(va) {
 	 for(i=0;i<nargs;i++){
-	 	// MESG("	%d %d %X",i,va[i].vtype,va[i].sval);
-		if(va[i].vtype==VTYPE_STRING){
+	 	// MESG("	%d %d %X",i,va[i].var_type,va[i].sval);
+		if(va[i].var_type==VTYPE_STRING){
 			// MESG("clear_args: free %X",va[i].sval);
 	 		free(va[i].sval);
 		}
@@ -705,7 +705,7 @@ MVAR * push_args_1(int nargs)
  for(i=0;i<nargs;i++,va_i++){
 	// MESG("	evaluate arg %d, tok=[%d %s]",i,tok->tnum,tok->tname);
 	value = num_expression();
-	va_i->vtype=ex_vtype;
+	va_i->var_type=ex_vtype;
 	if(ex_vtype==VTYPE_NUM) {
 			// MESG("	arg:%d numeric %f",value);
 			va_i->dval=value;
@@ -718,7 +718,7 @@ MVAR * push_args_1(int nargs)
 	if(ex_vtype==VTYPE_ARRAY||ex_vtype==VTYPE_SARRAY||ex_vtype==VTYPE_AMIXED) {
 			// MESG("	arg:%d array type %d",i,ex_array->atype);
 			va_i->adat=ex_array;
-			va_i->vtype=ex_array->atype;
+			va_i->var_type=ex_array->atype;
 	} else {
 			ERROR("error: wrong type arg %d",ex_vtype);
 			err_num=202;
@@ -813,7 +813,7 @@ double factor_line_array()
 		if(adat->atype==VTYPE_AMIXED) {
 			int ind1=cols*j+i;
 			// MESG("factor_line_array: set [%d] ex_vtype=%d",ind1,ex_vtype);
-			adat->mval[ind1].vtype=ex_vtype;
+			adat->mval[ind1].var_type=ex_vtype;
 			if(ex_vtype==VTYPE_NUM) adat->mval[ind1].dval=value;
 			else if(ex_vtype==VTYPE_STRING) adat->mval[ind1].sval=strdup(saved_string);
 		};
@@ -1023,7 +1023,7 @@ double factor_array1()
 			// MESG("	array reallocated:%X",array_slot->adat->dval);
 		};
 		if(array_slot->vtype==VTYPE_AMIXED) {
-			ex_vtype = array_slot->adat->mval[ind1].vtype;
+			ex_vtype = array_slot->adat->mval[ind1].var_type;
 			lmvar = &array_slot->adat->mval[ind1];
 			// MESG("get indexed value from mixed array ind1=%d type=%d",ind1,ex_vtype);
 			if(ex_vtype==VTYPE_NUM) {
@@ -1244,7 +1244,7 @@ double factor_proc()
 	after_proc=tok;
 	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
 	exe_buffer=tok0->tbuf;
-	value=exec_function(tok0->tbuf,vargs,tok0->tind);
+	value=exec_function(exe_buffer,vargs,tok0->tind);
 	// MESG("factor_proc: return val=%f",value);
 	tok=after_proc;
 
@@ -2041,8 +2041,8 @@ double assign_val(double none)
 					// MESG("we are here! %f",*sslot->pdval);
 					// MESG("-- t=%d",lmvar->vtype);
 
-					if(lmvar->vtype==VTYPE_STRING) free(lmvar->sval);
-					lmvar->vtype=ex_vtype;
+					if(lmvar->var_type==VTYPE_STRING) free(lmvar->sval);
+					lmvar->var_type=ex_vtype;
 					if(ex_vtype==VTYPE_STRING) {
 						lmvar->sval=strdup(saved_string);					
 					};
@@ -2118,9 +2118,9 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 	// MESG("assign_args1: pos1 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
 	for(i=0;i<nargs;i++,va++) {
 		tok_data *arg_dat=&symbols[tok->tind];
-		arg_dat->vtype=va->vtype;
+		arg_dat->vtype=va->var_type;
 		MESG("assign_args1:arg %d: pos2 tok=[%d %s] ttype=%d tind=%d",i,tok->tnum,tok->tname,tok->ttype,tok->tind);
-		switch(va->vtype) {
+		switch(va->var_type) {
 			case VTYPE_NUM:
 				arg_dat->dval=va->dval;
 				// MESG("		nuneric arg: dval=%f",va->dval);
@@ -2133,7 +2133,7 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 			case VTYPE_AMIXED:
 				arg_dat->adat=va->adat;break;
 			default:
-				ERROR("		array argn_args:[%d] type is wrong! (%d)",i,va->vtype);
+				ERROR("		array argn_args:[%d] type is wrong! (%d)",i,va->var_type);
 				arg_dat->sval="";
 				arg_dat->dval=0;
 		};

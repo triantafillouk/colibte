@@ -42,7 +42,7 @@ void get_function_args (int number_of_args)
 			MESG("get_function_args:%d: [%d %s]",i,tok->tnum,tok->tname);
 #endif
 			double value = num_expression();
-			va[i].vtype=ex_vtype;
+			va[i].var_type=ex_vtype;
 			if(ex_vtype==VTYPE_STRING) { 
 				va[i].sval=saved_string;saved_string=NULL;
 				// MESG("%d: string: [%s]",i,va[i].sval);
@@ -81,7 +81,7 @@ void get_numeric_args (int number_of_args)
 	for(i=0;i< number_of_args;i++ ) { 
 		ntoken();
 		double value = num_expression();
-		va[i].vtype=ex_vtype;
+		va[i].var_type=ex_vtype;
 		va[i].dval=value;
 	};
 	ntoken();
@@ -100,7 +100,7 @@ double uf_len()
 {
 	get_function_args(1);
 	double value=0;
-	if(va->vtype==VTYPE_STRING) { value =strlen(va->sval);}
+	if(va->var_type==VTYPE_STRING) { value =strlen(va->sval);}
 	else if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
 		array_dat *arr=va->adat;		
 		value=arr->rows*arr->cols;
@@ -114,7 +114,7 @@ double uf_array_cols()
 {
 	get_function_args(1);
 	ex_vtype=VTYPE_NUM;
-	if(va->vtype==VTYPE_ARRAY||va->vtype==VTYPE_SARRAY) {
+	if(va->var_type==VTYPE_ARRAY||va->var_type==VTYPE_SARRAY) {
 		return va->adat->cols;
 	} else return 0;
 }
@@ -123,7 +123,7 @@ double uf_array_rows()
 {
 	get_function_args(1);
 	ex_vtype=VTYPE_NUM;
-	if(va->vtype==VTYPE_ARRAY||va->vtype==VTYPE_SARRAY) {
+	if(va->var_type==VTYPE_ARRAY||va->var_type==VTYPE_SARRAY) {
 		return va->adat->rows;
 	} else return 0;
 }
@@ -150,7 +150,7 @@ double uf_determinant()
 {
 	double value=0;
 	get_function_args(1);
-	if(va->vtype==VTYPE_ARRAY) {
+	if(va->var_type==VTYPE_ARRAY) {
 		array_dat *arr = va->adat;
 
 		if(arr->rows==arr->cols) value=determinant(arr);
@@ -213,7 +213,7 @@ double uf_left()
 {
 	get_function_args(2);
 
-	if(va[0].vtype==VTYPE_STRING && va[1].vtype==VTYPE_NUM ) {
+	if(va[0].var_type==VTYPE_STRING && va[1].var_type==VTYPE_NUM ) {
 	set_sval(va[0].sval);
 	} else set_sval("");
 	ex_vtype=VTYPE_STRING;
@@ -224,7 +224,7 @@ double uf_right()
 {
 	get_function_args(2);
 
-	if(va[0].vtype==VTYPE_STRING && va[1].vtype==VTYPE_NUM ) {
+	if(va[0].var_type==VTYPE_STRING && va[1].var_type==VTYPE_NUM ) {
 		int r1=(int)va[1].dval;
 		// MESG("right: r1=%d",r1);
 		if(strlen(va[0].sval)<r1) r1=strlen(va[0].sval);
@@ -244,7 +244,7 @@ double uf_mid()
 {
 	get_function_args(3);
 
-		if(va[0].vtype==VTYPE_STRING && va[1].vtype==VTYPE_NUM && va[2].vtype==VTYPE_NUM) 
+		if(va[0].var_type==VTYPE_STRING && va[1].var_type==VTYPE_NUM && va[2].var_type==VTYPE_NUM) 
 		{
 		if((int)va[1].dval>strlen(va[0].sval) || va[2].dval==0) {
 			set_sval("");
@@ -315,7 +315,7 @@ double uf_show_time()
 {
 	get_function_args(2);
 	double value=0;
-	if(va[0].vtype==VTYPE_STRING) {
+	if(va[0].var_type==VTYPE_STRING) {
 		set_sval(va[0].sval);
 		value=show_time(saved_string,va[1].dval);
 	} else {
@@ -329,7 +329,7 @@ double uf_show_time()
 double uf_upper()
 {
 	get_function_args(1);
-	if(va[0].vtype==VTYPE_STRING) {
+	if(va[0].var_type==VTYPE_STRING) {
 		clean_saved_string(strlen(va[0].sval));
 		get_uppercase_string(saved_string,va[0].sval);
 	} else {
@@ -343,7 +343,7 @@ double uf_upper()
 double uf_lower()
 {
 	get_function_args(1);
-	if(va[0].vtype==VTYPE_STRING) {
+	if(va[0].var_type==VTYPE_STRING) {
 		clean_saved_string(strlen(va[0].sval));
 		get_lowercase_string(saved_string,va[0].sval);
 	} else {
@@ -358,7 +358,7 @@ double uf_ascii()
 {
 	get_function_args(1);
 	double value=0;
-	if(va[0].vtype==VTYPE_STRING) {
+	if(va[0].var_type==VTYPE_STRING) {
 	 value=va[0].sval[0];
 	} else {
 		syntax_error("ascii: wrong_type of args",100);
@@ -428,7 +428,7 @@ double uf_sindex()
 {
 	double value=0;
 	get_function_args(2);
-	if(va[0].vtype==VTYPE_STRING) {
+	if(va[0].var_type==VTYPE_STRING) {
 		value = sindex(va[0].sval, va[1].sval);
 	} else {
 		syntax_error("s_index: wrong_type of args",100);
@@ -443,7 +443,7 @@ double uf_sindex()
 double uf_string()
 {
 	get_function_args(1);
-	if(va[0].vtype==VTYPE_NUM) {
+	if(va[0].var_type==VTYPE_NUM) {
 		// MESG("uf_string: %f",va[0].dval);
 		clean_saved_string(20);
 		snprintf(saved_string,20,"%f",va[0].dval);
@@ -460,7 +460,7 @@ double uf_string()
 double uf_message()
 {
 	get_function_args(1);
-	if(va[0].vtype==VTYPE_STRING) {
+	if(va[0].var_type==VTYPE_STRING) {
 		msg_line("[%s]",va[0].sval);
 	} else msg_line("<%f>",va[0].dval);
 	events_flush();
@@ -470,7 +470,7 @@ double uf_message()
 double uf_error()
 {
 	get_function_args(1);
-	if(va[0].vtype==VTYPE_STRING) 
+	if(va[0].var_type==VTYPE_STRING) 
 		error_line("[%s]",va[0].sval);
 	else error_line("<%f>",va[0].dval);
 	events_flush();
@@ -482,7 +482,7 @@ double uf_wait()
 	int f_entry=entry_mode;
 	entry_mode=KENTRY;
 	get_function_args(1);
-	if(va[0].vtype==VTYPE_STRING) msg_line("[%s] waiting.. ",va[0].sval);
+	if(va[0].var_type==VTYPE_STRING) msg_line("[%s] waiting.. ",va[0].sval);
 	else msg_line("<%f> wait for key",va[0].dval);
 	clean_saved_string(1);
 	if(execmd) {
@@ -507,7 +507,7 @@ double uf_input()
 	get_function_args(1);
 	entry_mode=KENTRY;	/* get input from screen */
 	clean_saved_string(80);
-	if(va[0].vtype!=VTYPE_STRING) getstring("Input :",saved_string,80,true);
+	if(va[0].var_type!=VTYPE_STRING) getstring("Input :",saved_string,80,true);
 	else getstring(va[0].sval,saved_string,80,true);
 	if(execmd) saved_string[strlen(saved_string)-1]=0;
 	ex_vtype=VTYPE_STRING;
@@ -519,7 +519,7 @@ double uf_dinput()
 {
 	get_function_args(1);
 	clean_saved_string(80);
-	if(va[0].vtype!=VTYPE_STRING) getstring("DInput :",saved_string,80,true);
+	if(va[0].var_type!=VTYPE_STRING) getstring("DInput :",saved_string,80,true);
 	getstring(va[0].sval,saved_string,80,true);
 	double value=atof(saved_string);
 	clean_saved_string(0);
@@ -539,7 +539,7 @@ double uf_val()
 {
 	double value=0;
 	get_function_args(1);
-	if(va[0].vtype==VTYPE_STRING) 
+	if(va[0].var_type==VTYPE_STRING) 
 		value=atof(va[0].sval);
 	else syntax_error("val: wrong_type of args",100);
 	ex_vtype=VTYPE_NUM;
@@ -558,7 +558,7 @@ double uf_sqrt()
 double uf_dbg_message()
 {
 	get_function_args(1);
-	if(va[0].vtype==VTYPE_STRING) MESG(":%s",va[0].sval);
+	if(va[0].var_type==VTYPE_STRING) MESG(":%s",va[0].sval);
 	ex_vtype=VTYPE_NUM;
 	return 0;
 }
@@ -640,7 +640,7 @@ double uf_time()
 {
 	get_function_args(2);
 	double value=0;
-	if(va[0].vtype==VTYPE_STRING) {
+	if(va[0].var_type==VTYPE_STRING) {
 		set_sval(va[0].sval);
 		value=show_time(saved_string,va[1].dval);
 	} else {
