@@ -764,15 +764,7 @@ int err_factor()
 	case TOK_FUNC:	// 2 editor function 
 		/* variable's name in tok0->tname */
 		pre_symbol=0;
-#if	1
 		err_num=err_eval_fun1(tok0);
-#else
-		var_node=tok0->tnode;
-		CHECK_TOK(496);
-		// MESG("err_TOK_FUNC ind=%d tnum=%d ttype=%d",var_node->node_index,tok->tnum,tok->ttype);
-// 		tok0->factor_function = m_functions[var_node->node_index].ffunction;
-		err_num= err_eval_fun1(var_node->node_index);
-#endif
 		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)
 		int nargs=0;
@@ -788,7 +780,7 @@ int err_factor()
 		err_num = err_push_args_1(&nargs);
 		if(err_num) return(err_num);
 		// MESG("err TOK_PROC: args=%d",nargs);
-		tok0->tind=nargs;
+		tok0->t_nargs=nargs;
 		CHECK_TOK(503);
 		after_proc=tok;
 		// MESG("err TOK_PROC: set after_proc [%s] ttype=%d",tok->tname,tok->ttype);

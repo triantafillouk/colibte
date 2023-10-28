@@ -327,7 +327,7 @@ int type_init_definition(FILEBUF *bf, BTREE *stree, alist *lex_parser, tok_struc
 	tok_var->tname = strdup(nword);
 	tok_var->ttype = TOK_VAR;
 	tok_var->tvtype = VTYPE_TREE;
-	tok_var->tind = stree->items-1;
+	tok_var->t_nargs = stree->items-1;
  	MESG("	new items=%d type TREE", stree->items);;
 } 
  else {
@@ -899,7 +899,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				tok->ttype = tok->tnode->node_index;
 
 				MESG("	directiv:0:[%s] ttype=%d, tind=%d, tgroup=%d",tok->tname,tok->ttype,tok->tind,tok->tgroup);
-				if(tok->tind==TOK_PROC) 
+				if(tok->ttype==TOK_PROC) 
 				{
 					is_storelines=1;
 					store_level=curl_level;

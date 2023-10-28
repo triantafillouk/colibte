@@ -1,7 +1,10 @@
 
-function sv(a,b,c)
+f1=2
+
+function sv(b,a,c)
 {
  k=a+b
+ h="test 123"
  l=b+c
  show_vars()
  return(k+l)

@@ -19,7 +19,10 @@ typedef double (*TFunction)(double v1);
 typedef double (*EFunction)(double v1,double v2);
 
 typedef struct tok_struct {
+	union {
 	short tind;	/* token subtype and variable number */
+	short t_nargs; 	/* number of arguments  */
+	};
 	short tline;	/* line for debugging  */
 	short tnum;	/* token number for debugging  */
 	short ttype;	/* token type */

@@ -60,7 +60,7 @@ void init_error();
 void get_lowercase_string(char *lower, char *string);
 void get_uppercase_string(char *lower, char *string);
 double cexpression();
-double exec_block1_break();
+double exec_block1_break(FILEBUF *fp);
 char * tok_info(tok_struct *tok);
 
 TLIST ctoklist=NULL;
@@ -695,7 +695,8 @@ MVAR * push_args_1(int nargs)
  err_num=0;
  // MESG("push_args: args=%d",nargs);
 
- if(tok->ttype!=TOK_RPAR && nargs!=0)
+ // if(tok->ttype!=TOK_RPAR && nargs!=0)
+ if(nargs>0)
  {
 
  va=(MVAR *) malloc(sizeof(MVAR)*(nargs));
@@ -727,10 +728,9 @@ MVAR * push_args_1(int nargs)
 
 	NTOKEN2; // skip separator or right parenthesis!
  };
- return(va);
  }
  };
- 	return(NULL);
+ return(va);
 }
 
 
@@ -1234,22 +1234,25 @@ double factor_proc()
 	tok_struct *after_proc;
 	tok_struct *tok0=tok;
 	double value;
-	// MESG("factor_proc:");
+	// MESG("factor_proc:----------------");
+	FILEBUF *cbuf=exe_buffer;
+	exe_buffer=tok0->tbuf;
+	// MESG("factor_proc: cbuf=%s ----------------",cbuf);
+	// MESG("factor_proc: filebuf=%s",exe_buffer->b_fname);
 	NTOKEN2;
 	/* function */
 	MVAR *vargs = NULL;
 	// MESG("factor_proc: tok0 [%d %s] args=%d",tok0->tnum,tok0->tname,tok0->tind);
 	// MESG("factor_proc: tok  [%d %s] %d ",tok->tnum,tok->tname,tok->tind);
-	vargs = push_args_1(tok0->tind);
+	vargs = push_args_1(tok0->t_nargs);
 	after_proc=tok;
 	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
-	exe_buffer=tok0->tbuf;
-	value=exec_function(exe_buffer,vargs,tok0->tind);
+	value=exec_function(exe_buffer,vargs,tok0->t_nargs);
 	// MESG("factor_proc: return val=%f",value);
 	tok=after_proc;
-
 	current_active_flag=1;	/* start checking again  */
 	free(vargs);
+	exe_buffer=cbuf;
 	RTRN(value);
 }
 
@@ -1618,13 +1621,13 @@ void set_term_function(tok_struct *tok, TFunction term_function)
 static double inline dir_lcurl()
 {
 	NTOKEN2;
-	return exec_block1();
+	return exec_block1(exe_buffer);
 }
 
 static double inline dir_lcurl_break()
 {
 	NTOKEN2;
-	return exec_block1_break();
+	return exec_block1_break(exe_buffer);
 }
 
 static double inline dir_break()
@@ -2113,13 +2116,14 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
  TDS("assign_args1");
  // MESG("\n# assign_args1: tok=[%d %s] %d nargs=%d",tok->tnum,tok->tname,tok->ttype,nargs);
  NTOKEN2; /* skip name */
- if(va) {
+ if(va) 
+ {
 	int i;
 	// MESG("assign_args1: pos1 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
 	for(i=0;i<nargs;i++,va++) {
 		tok_data *arg_dat=&symbols[tok->tind];
 		arg_dat->vtype=va->var_type;
-		MESG("assign_args1:arg %d: pos2 tok=[%d %s] ttype=%d tind=%d",i,tok->tnum,tok->tname,tok->ttype,tok->tind);
+		// MESG("assign_args1:arg %d: pos2 tok=[%d %s] ttype=%d tind=%d",i,tok->tnum,tok->tname,tok->ttype,tok->tind);
 		switch(va->var_type) {
 			case VTYPE_NUM:
 				arg_dat->dval=va->dval;
@@ -2483,13 +2487,14 @@ double tok_dir_while()
 }
 
 /* exec multiple sentences at the same level */
-double exec_block1()
+double exec_block1(FILEBUF *fp)
 {
  double val=0;
  stage_level=0;
  TDS("exec_block1");
  // MESG("exec_block1: starting at tok %d type=%d err=%d",tok->tnum,tok->ttype,err_num);
-// 	MESG("exec_block1: size of tok_struct is %d",sizeof(tok_struct));
+	exe_buffer=fp;
+	// MESG("exec_block1:[%s] size of tok_struct is %d",fp->b_fname,sizeof(tok_struct));
    while(tok->ttype!=TOK_EOF && current_active_flag) 
    {
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
@@ -2511,12 +2516,13 @@ double exec_block1()
 	return(val);
 }
 
-double exec_block1_break()
+double exec_block1_break(FILEBUF *fp)
 {
  double val=0;
  stage_level=0;
  TDS("exec_block1");
- MESG("exec_block1_break:");
+ // MESG("exec_block1_break:");
+ exe_buffer=fp;
    while(tok->ttype!=TOK_EOF && current_active_flag) 
    {
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
@@ -2550,7 +2556,6 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	parse_buffer_show_tokens(1);
 	return(0);	
  };
-
  if(use_fp->symbol_tree==NULL) {
 	// MESG("create new symbol_tree for use_fp!");
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);
@@ -2584,8 +2589,8 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 
 	drv_start_checking_break();
 
-	if(execmd) val=exec_block1();
-	else val=exec_block1_break();
+	if(execmd) val=exec_block1(bp);
+	else val=exec_block1_break(bp);
 
 	drv_stop_checking_break();
 
@@ -2679,7 +2684,7 @@ int refresh_current_buffer(int nused)
  	msg_line("evaluating ...");
 	init_exec_flags();
 	tok=fp->tok_table;
-	val=exec_block1_break();
+	val=exec_block1_break(fp);
 	drv_stop_checking_break();
 	if(err_num>0) {
 		show_error("refresh buffer",fp->b_fname);

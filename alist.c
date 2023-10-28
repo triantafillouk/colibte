@@ -1279,7 +1279,7 @@ void show_bt_table_ordered(BTREE *bt)
 //	MESG("show_bt_table:");
 	max_depth=0;
 	show_ordered_subtree(bt->root);
-	MESG("maximum depth is %d",max_depth);
+	// MESG("maximum depth is %d",max_depth);
 }
 
 
@@ -1308,11 +1308,11 @@ void show_node(BTNODE *node,int depth,char *left,char *right)
 // 	fprintf(stdout,"%03d:node[%-15s] l=[%-15s] r=[%s]\n",depth,node->node_name,left,right);
 
 	if(node->node_vtype==VTYPE_NUM) 
-		fprintf(stdout,"%03d:node[%-10s] l=[%-10s] r=[%-10s] numeric %f\n",depth,node->node_name,left,right,node->node_dval);
+		fprintf(stdout,"%03d:%3d:node[%-10s] l=[%-10s] r=[%-10s] numeric %f\n",node->node_index,depth,node->node_name,left,right,node->node_dval);
 	else if(node->node_vtype==VTYPE_STRING)
-		fprintf(stdout,"%03d:node[%-10s] l=[%-10s] r=[%-10s] string  \"%s\"\n",depth,node->node_name,left,right,node->node_sval);
+		fprintf(stdout,"%03d:%3d:node[%-10s] l=[%-10s] r=[%-10s] string  \"%s\"\n",node->node_index,depth,node->node_name,left,right,node->node_sval);
 	else
-		fprintf(stdout,"%03d:node[%-10s] l=[%-10s] r=[%-10s] other type\n",depth,node->node_name,left,right);
+		fprintf(stdout,"%03d:%3d:node[%-10s] l=[%-10s] r=[%-10s] other type\n",node->node_index,depth,node->node_name,left,right);
 }
 
 void show_ordered_subtree(BTNODE *node)
