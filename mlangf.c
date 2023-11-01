@@ -718,7 +718,7 @@ double uf_mainarg()
 extern tok_data *current_stable;
 extern FILEBUF *exe_buffer;
 
-void show_var_node(BTNODE *node,int depth,char *left,char *right)
+void show_var_node(BTNODE *node)
 {
 	tok_data *var = current_stable;
 	var = &current_stable[node->node_index];
@@ -733,29 +733,13 @@ void show_var_node(BTNODE *node,int depth,char *left,char *right)
 		MESG("%03d %-10s  other type",node->node_index,node->node_name);
 }
 
-void show_ordered_vartree(BTNODE *node)
+void eval_ordered_btree(BTNODE *node,void do_func(BTNODE *))
 {
- static int depth=0;
-char *left="",*right="";
- depth++;
-
- // printf("- node:[%s] id=%d type=%d val=%f balance=%d sval=%s\n",node->node_name,node->node_index,node->node_type,node->node_val,node->balance,node->sval);
  if(node->left) {
- 	show_ordered_vartree(node->left);
-	if(node->left) left = node->left->node_name;
-	if(node->right) right = node->right->node_name;
-	// fprintf(stdout,"%03d:node[%-20s] l=[%-20s] r=[%s]\n",depth,node->node_name,left,right);
-	show_var_node(node,depth,left,right);
-	if(node->right) show_ordered_vartree(node->right);
- } else {
-	if(node->left) left = node->left->node_name;
-	if(node->right) right = node->right->node_name;
- 	// fprintf(stdout,"%03d:node[%-20s] l=[%-20s] r=[%s]\n",depth,node->node_name,left,right);
-	show_var_node(node,depth,left,right);
-	if(node->right) show_ordered_vartree(node->right);
- } 
-
- depth--;
+ 	eval_ordered_btree(node->left,do_func);
+ }
+ do_func(node);
+ if(node->right) eval_ordered_btree(node->right,do_func);
 }
 
 
@@ -763,17 +747,8 @@ double uf_show_vars()
 {
 	ntoken();
 	MESG("Ind Name        Type    Value",exe_buffer->symbol_tree->items);
-#if	0
-	tok_data *var = current_stable;
-	for(int i=0;i< exe_buffer->symbol_tree->items;i++){
-		var = &current_stable[i];
-		if(var->vtype==1) 
-			MESG("%3d: 		%2d	%2d %f",i,var->ind,var->vtype,var->dval);
-		else if(var->vtype==8)
-			MESG("%3d: 		%2d	%2d %s",i,var->ind,var->vtype,var->sval);
-	};
-#endif
+
 	// show_bt_table_ordered(exe_buffer->symbol_tree);
-	show_ordered_vartree(exe_buffer->symbol_tree->root);
+	eval_ordered_btree(exe_buffer->symbol_tree->root,show_var_node);
 	return 0;
 }

@@ -14,3 +14,4 @@ print(human2)
 #a.name:
 # a = human1[100]
 # print(a[22].name)
+show_vars()
