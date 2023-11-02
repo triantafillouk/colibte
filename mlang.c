@@ -482,6 +482,7 @@ int is_mlang(FILEBUF *fp)
 
  if(!file_type_is("NONE",bt) && 
     !file_type_is("CMD",bt) &&
+    !file_type_is("MD",bt) &&
 	!file_type_is("TEXT",bt) &&
 	!file_type_is("DOT",bt) &&
 	!file_type_is("GTEXT",bt)) 

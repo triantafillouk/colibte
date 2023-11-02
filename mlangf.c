@@ -718,7 +718,7 @@ double uf_mainarg()
 extern tok_data *current_stable;
 extern FILEBUF *exe_buffer;
 
-void show_var_node(BTNODE *node)
+void show_var_node(BTNODE *node,int depth)
 {
 	tok_data *var = current_stable;
 	var = &current_stable[node->node_index];
@@ -733,22 +733,11 @@ void show_var_node(BTNODE *node)
 		MESG("%03d %-10s  other type",node->node_index,node->node_name);
 }
 
-void eval_ordered_btree(BTNODE *node,void do_func(BTNODE *))
-{
- if(node->left) {
- 	eval_ordered_btree(node->left,do_func);
- }
- do_func(node);
- if(node->right) eval_ordered_btree(node->right,do_func);
-}
-
-
 double uf_show_vars()
 {
 	ntoken();
 	MESG("Ind Name        Type    Value",exe_buffer->symbol_tree->items);
 
-	// show_bt_table_ordered(exe_buffer->symbol_tree);
-	eval_ordered_btree(exe_buffer->symbol_tree->root,show_var_node);
+	eval_ordered_btree(exe_buffer->symbol_tree->root,0,show_var_node);
 	return 0;
 }

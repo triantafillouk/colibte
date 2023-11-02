@@ -190,6 +190,8 @@ void free_btnode(BTNODE *btn);
 BTNODE *new_btnode();
 BTNODE *find_btnode(BTREE *t,char *name);
 void btn_free(BTNODE *btn);
+void eval_ordered_btree(BTNODE *node,int depth,void do_func(BTNODE *n,int d));
+void show_node(BTNODE *node,int depth);
 #if	NUSE
 void delete_avl_node(BTNODE *node);
 #endif
