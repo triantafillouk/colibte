@@ -1252,78 +1252,31 @@ void free_btree(BTREE *bt)
 
 int max_depth=0;
 
-int show_bt_table(BTREE *bt)
+
+void print_node(BTNODE *node)
 {
-//	MESG("show_bt_table:");
-	max_depth=0;
-	if(bt) {
-	show_subtree(bt->root);
-	eval_ordered_btree(bt->root,0,show_node);
-#if	AVL_BALANCE
-//	MESG("AVL maximum depth is %d",max_depth);
-#else
-#if	RB_BALANCE
-//	MESG("RB maximum depth is %d",max_depth);
-#else
-//	MESG("NO balance maximum depth is %d",max_depth);
-#endif
-#endif
-	};
- return max_depth;
-}
-
-
-void show_bt_table_ordered(BTREE *bt)
-{
-//	MESG("show_bt_table:");
-	max_depth=0;
-	eval_ordered_btree(bt->root,0,show_node);
-	// MESG("maximum depth is %d",max_depth);
-}
-
-
-void show_subtree(BTNODE *node)
-{
- static int depth=0;
- char *left="",*right="";
- depth++;
-// MESG("node:[%s] id=%d type=%d val=%f balance=%d sval=%s",node->node_name,node->node_index,node->node_type,node->node_val,node->balance,node->sval);
- if(node->left) left = node->left->node_name;
- if(node->right) right = node->right->node_name;
- if(node->left || node->right) {
-//	fprintf(stdout,"%d:node[%s] -> [%s] - [%s]\n",depth,node->node_name,left,right);
-	if(depth>max_depth) max_depth=depth;
-	if(node->node_vtype==VTYPE_STRING) fprintf(stdout,"%d:node[%s] -> [%s] - [%s] index=%d type=%d sval=[%s]\n",depth,node->node_name,left,right,node->node_index,node->node_type,node->node_sval);
-	else fprintf(stdout,"%d:node[%s] -> [%s] - [%s] index=%d type=%d val=%f\n",depth,node->node_name,left,right,node->node_index,node->node_type,node->node_dval);
- };
- if(node->left) show_subtree(node->left);
- if(node->right) show_subtree(node->right);
- depth--;
-}
-
-
-void show_node(BTNODE *node,int depth)
-{
-// 	fprintf(stdout,"%03d:node[%-15s] l=[%-15s] r=[%s]\n",depth,node->node_name,left,right);
 	char *left_key="";
 	char *right_key="";
+
 	if(node->left) left_key=node->left->node_name;
 	if(node->right) right_key=node->right->node_name;
+
 	if(node->node_vtype==VTYPE_NUM) 
-		fprintf(stdout,"%03d:%3d:node[%-10s] l=[%-10s] r=[%-10s] numeric %f\n",node->node_index,depth,node->node_name,left_key,right_key,node->node_dval);
+		fprintf(stdout,"%03d:[%-22s] l=[%-22s] r=[%-22s] val %f\n",node->node_index,node->node_name,left_key,right_key,node->node_dval);
 	else if(node->node_vtype==VTYPE_STRING)
-		fprintf(stdout,"%03d:%3d:node[%-10s] l=[%-10s] r=[%-10s] string  \"%s\"\n",node->node_index,depth,node->node_name,left_key,right_key,node->node_sval);
+		fprintf(stdout,"%03d:[%-22s] l=[%-22s] r=[%-22s] val  \"%s\"\n",node->node_index,node->node_name,left_key,right_key,node->node_sval);
 	else
-		fprintf(stdout,"%03d:%3d:node[%-10s] l=[%-10s] r=[%-10s] other type\n",node->node_index,depth,node->node_name,left_key,right_key);
+		fprintf(stdout,"%03d:[%-22s] l=[%-22s] r=[%-22s] other type\n",node->node_index,node->node_name,left_key,right_key);
 }
 
-void eval_ordered_btree(BTNODE *node,int depth,void do_func(BTNODE *n,int d))
+/* Iterate btree node applying a function to it   */
+void eval_btree(BTNODE *node,void do_func(BTNODE *n))
 {
  if(node->left) {
- 	eval_ordered_btree(node->left,depth+1,do_func);
+ 	eval_btree(node->left,do_func);
  }
- do_func(node,depth);
- if(node->right) eval_ordered_btree(node->right,depth+1,do_func);
+ do_func(node);
+ if(node->right) eval_btree(node->right,do_func);
 }
 
 #endif

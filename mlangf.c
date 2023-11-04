@@ -718,7 +718,7 @@ double uf_mainarg()
 extern tok_data *current_stable;
 extern FILEBUF *exe_buffer;
 
-void show_var_node(BTNODE *node,int depth)
+void show_var_node(BTNODE *node)
 {
 	tok_data *var = current_stable;
 	var = &current_stable[node->node_index];
@@ -738,6 +738,6 @@ double uf_show_vars()
 	ntoken();
 	MESG("Ind Name        Type    Value",exe_buffer->symbol_tree->items);
 
-	eval_ordered_btree(exe_buffer->symbol_tree->root,0,show_var_node);
+	eval_btree(exe_buffer->symbol_tree->root,show_var_node);
 	return 0;
 }

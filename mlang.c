@@ -449,6 +449,7 @@ void init_hash()
 	};
 	tnode->node_type=TOK_OPTION;
  };
+	// eval_btree(bt_table->root,print_node);
 
  for(i=0;term_types[i].term_name!=NULL;i++)
  {
@@ -456,11 +457,9 @@ void init_hash()
 	tnode = set_btdval(directiv_table,term_types[i].term_name,i);
 	tnode->node_index = term_types[i].term_type;
 	tnode->node_type = term_types[i].term_group;
-	tnode->node_vtype=1000;
+	tnode->node_vtype=VTYPE_NUM;	/* to show the index in value if needed!  */
  };
- // show_bt_table_ordered(directiv_table);
- // show_bt_table_ordered(bt_table);
-
+	// eval_btree(directiv_table->root,print_node);
  init_common();
 }
 
