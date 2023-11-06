@@ -106,6 +106,7 @@ extern VAR option_names[];
 
 BTREE *bt_table;
 BTREE *directiv_table;
+BTREE *types_tree;
 
 int simple=0;
 
@@ -2556,6 +2557,9 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	parse_buffer_show_tokens(1);
 	return(0);	
  };
+ if(start) {
+ 	types_tree = new_btree("types",0);
+ }; 
  if(use_fp->symbol_tree==NULL) {
 	// MESG("create new symbol_tree for use_fp!");
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);

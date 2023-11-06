@@ -287,7 +287,7 @@ int change_script_state(int tok_type,int *script_active)
 	return 0;
 }
 
-int type_init_definition(FILEBUF *bf, BTREE *stree, alist *lex_parser, tok_struct *tok_var)
+int type_init_definition(FILEBUF *bf, BTREE *types_tree, alist *lex_parser, tok_struct *tok_var)
 {
  int tok_type=TOK_NONE;
  int cc=0;
@@ -314,21 +314,21 @@ int type_init_definition(FILEBUF *bf, BTREE *stree, alist *lex_parser, tok_struc
  };
  BTREE *type_dat = new_btree(nword,100);
  MESG("add a var [%s]",nword);
- BTNODE *type_node = add_btnode(stree,nword);
- if(type_node && stree->new_flag) 
+ BTNODE *type_node = add_btnode(types_tree,nword);
+ if(type_node && types_tree->new_flag) 
  {
-	MESG("Add new type named [%s] in stree",nword);
+	MESG("Add new type named [%s] in types_tree",nword);
  	type_node->node_vtype=VTYPE_TREE;
 	type_node->node_dat = type_dat;
 	type_node->node_type=TOK_VAR;
-	stree->new_flag=0;
+	types_tree->new_flag=0;
 
 	tok_var->tnode = type_node;
 	tok_var->tname = strdup(nword);
 	tok_var->ttype = TOK_VAR;
 	tok_var->tvtype = VTYPE_TREE;
-	tok_var->t_nargs = stree->items-1;
- 	MESG("	new items=%d type TREE", stree->items);;
+	tok_var->t_nargs = types_tree->items-1;
+ 	MESG("	new items=%d type TREE", types_tree->items);;
 } 
  else {
 	MESG("	new type named [%s] is dublicate",nword);
@@ -827,7 +827,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	
 	if(tok_type==TOK_LETTER) {
 		// MESG("	parser: TOK_LETTER: check element in bt [%s]",nword);
-		tok->tnode = find_bt_element(nword); // check main table
+		tok->tnode  = find_btnode(bt_table,nword); // check main table
 #if	1
 		if(tok->tnode==NULL) {
 			BTNODE *var_node = find_btnode(stree,nword);

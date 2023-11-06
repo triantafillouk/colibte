@@ -11,6 +11,7 @@ function sv(b,a,c)
 }
 
 r=sv(1.2,1.3,1.4)
-
+if(1) {
 r:
+}
 show_vars()
