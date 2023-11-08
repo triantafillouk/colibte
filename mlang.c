@@ -19,6 +19,7 @@
 #define	SYNTAX_DEBUG	0
 #define	NTOKEN2	tok++
 #define FACTOR_FUNCTION tok->factor_function()
+#define GTYPES 0
 
 void mesg_out(const char *fmt, ...);
 extern FILEBUF *cbfp;
@@ -615,6 +616,7 @@ int check_init(FILEBUF *bf)
 		err=err_check_block1();
 		bf->err=err;
 		bf->m_mode |= M_CHECKED;
+		MESG("Block checked! err=%d",err);
 	};
  };
 
@@ -2592,7 +2594,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	tok=bp->tok_table;
 
 	drv_start_checking_break();
-
+	MESG("	call exec_block1");
 	if(execmd) val=exec_block1(bp);
 	else val=exec_block1_break(bp);
 
@@ -2729,7 +2731,7 @@ int parse_check_current_buffer(int n)
  cls_fout("[out]");
  // MESG("clear output");
  err_num=check_init(fp);
- // MESG("parse_check_current_buffer: after chek_init");
+ MESG("parse_check_current_buffer: after chek_init");
  if(err_num>0) {
 	macro_exec=0;
 	msg_line("syntax error %d line %d [%s]",err_num,err_line,err_str);

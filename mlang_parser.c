@@ -287,7 +287,11 @@ int change_script_state(int tok_type,int *script_active)
 	return 0;
 }
 
-int type_init_definition(FILEBUF *bf, BTREE *types_tree, alist *lex_parser, tok_struct *tok_var)
+#if	GTYPES
+int type_init_definition(FILEBUF *bf,alist *lex_parser, tok_struct *tok_var)
+#else
+int type_init_definition(FILEBUF *bf,BTREE *types_tree,alist *lex_parser, tok_struct *tok_var)
+#endif
 {
  int tok_type=TOK_NONE;
  int cc=0;
@@ -826,7 +830,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 	
 	if(tok_type==TOK_LETTER) {
-		// MESG("	parser: TOK_LETTER: check element in bt [%s]",nword);
+		MESG("	parser: TOK_LETTER: check element in bt [%s]",nword);
 		tok->tnode  = find_btnode(bt_table,nword); // check main table
 #if	1
 		if(tok->tnode==NULL) {
@@ -836,7 +840,16 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				tok->tvtype = var_node->node_vtype;
 				// tok->vtype = var_node->node_vtype;
 			} else {
-				// MESG("		[%s] not found!!! in stree",nword);
+#if	GTYPES
+				MESG("	check %s in types_tree",nword);
+				tok->tnode=find_btnode(types_tree,nword);
+				if(tok->tnode) { 
+					MESG("	found!! in types_tree!!!");
+					tok->tvtype = tok->tnode->node_vtype;
+					
+					MESG("	we found a typed variable [%s] tvtype=%d",nword,tok->tvtype);
+				};
+#endif
 			};
 		} else {
 			// MESG("	node found in main table");
@@ -855,9 +868,14 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			// MESG("	parser:		check %s in directiv_table",nword);
 
 			tok->tnode=find_btnode(directiv_table,nword);
+#if	GTYPES
+			if(tok->tnode==NULL) {	/* check types_tree  */
+				tok->tnode=find_btnode(types_tree,nword);
+				if(tok->tnode!=NULL) MESG("	we found a typed variable [%s]",nword);
+			};
+#endif
+			tok->tnode=find_btnode(directiv_table,nword);
 			if(tok->tnode==NULL){	/* not a directive but a variable  */
-
-				// CHECK for type variable in bf->type_*** !!!
 
 				// MESG("		[%s] is a variable !!!!!!!!!!",nword);
 
@@ -891,7 +909,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 						skip_token=1;
 					};
 				}
-			} else { // we have a directive
+			} else { // we have a directive or a type
 				// MESG("	parser:	directive [%s] found!",nword);
 				tok->tname=tok->tnode->node_name;
 				tok->tgroup=tok->tnode->node_type;
@@ -908,7 +926,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
 				if(tok->ttype == TOK_DIR_TYPE) {
 					// MESG("	found type_definition!");
-					if(!type_init_definition(bf,stree,lex_parser,tok)) {
+#if	GTYPES
+					if(!type_init_definition(bf,lex_parser,tok)) 
+#else
+					if(!type_init_definition(bf,stree,lex_parser,tok)) 
+#endif
+					{
 						// set_error(tok,111,"type_definition parse error");
 						MESG("after setting 111 error");
 						return 0;

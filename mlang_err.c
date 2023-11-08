@@ -1405,8 +1405,10 @@ int err_check_block1()
    MESG("err_check_block1: --------------------------------");
    while(1) {
 	CHECK_TOK(672);
+	MESG(" - %3d: %3d %s",tok->tnum,tok->ttype,tok->tname);
 	switch(tok->ttype) {
 		case TOK_EOF: 
+			MESG(">>>>>>>>>>>>>>> end error_check!");
 			RT_MESG1(673);
 		case TOK_SEP:
 		case TOK_COMMA:
@@ -1423,7 +1425,6 @@ int err_check_block1()
  	err_num=err_check_sentence1();
 	if(err_num) return(err_num);
    };
-
  xpos=692;syntax_error("Null in block",xpos);
  RT_MESG1(6921);
 }
