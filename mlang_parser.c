@@ -838,7 +838,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			if(var_node!=NULL) {
 				// MESG("		[%s] found variable in stree index = %d type=%d vtype=%d",nword,var_node->node_index,var_node->node_type,var_node->node_vtype);
 				tok->tvtype = var_node->node_vtype;
-				// tok->vtype = var_node->node_vtype;
 			} else {
 #if	GTYPES
 				MESG("	check %s in types_tree",nword);
@@ -874,7 +873,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				if(tok->tnode!=NULL) MESG("	we found a typed variable [%s]",nword);
 			};
 #endif
-			tok->tnode=find_btnode(directiv_table,nword);
 			if(tok->tnode==NULL){	/* not a directive but a variable  */
 
 				// MESG("		[%s] is a variable !!!!!!!!!!",nword);
@@ -936,7 +934,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 						MESG("after setting 111 error");
 						return 0;
 					};
-					// MESG("after check type definition!");
+					MESG("after check type type_init_definition! ttype=%d",tok->ttype);
 				};
 				// MESG("this is a directive: [%s]",nword);
 			};

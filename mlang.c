@@ -850,7 +850,9 @@ double factor_variable()
  	lsslot = get_left_slot(tok->tind);
 	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d ind=%d",
 		// tok->tname,lsslot->ind,ex_vtype,tok->ttype,tok->tvtype,tok->tind);
-	ex_vtype=lsslot->vtype;
+	// if(tok->tvtype==VTYPE_TREE) ex_vtype=tok->tvtype;
+	// else 
+		ex_vtype=lsslot->vtype;
 	// BTNODE *tok_node = tok->tnode;
 	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d node type=%d",
 		// tok->tname,lsslot->ind,ex_vtype,tok->ttype,tok->tvtype,tok_node->node_vtype);
@@ -885,7 +887,13 @@ double factor_variable()
 			// MESG("factor_variable: [%s] array type=%d",tok->tname,ex_array->atype);
 			NTOKEN2;
 			RTRN(lsslot->dval);
-		
+#if	GTYPE
+		case VTYPE_TREE:
+			MESG("found BTREE variable");
+			ex_vtype=1;
+			NTOKEN2;
+			RTRN(0);
+#endif
 		default:
 		// error !!
 		syntax_error("no data in the array!!",2081);
