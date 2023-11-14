@@ -206,7 +206,7 @@ int	err_eval_fun1(tok_struct *tok0)
 	int ia;
 	int ia0;
 	int f_entry;
-	BTNODE 	*var_node = tok0->tnode;
+	BTNODE 	*var_node = tok0->tok_node;
 	int fnum = var_node->node_index;
 
 	ia0=m_functions[fnum].f_args;
@@ -743,7 +743,7 @@ int err_factor()
 		/* variable's name in tok0->tname */
 		xpos=494;
 		ex_nvars++;
-		var_node=tok0->tnode;
+		var_node=tok0->tok_node;
 
 		ex_edenv=0;
 #if	1
@@ -757,7 +757,7 @@ int err_factor()
 		RT_MESG1(xpos);
 	case TOK_ENV:	// 1 editor env var
 		/* variable's name in tok0->tname */
-		var_node=tok0->tnode;
+		var_node=tok0->tok_node;
 		pre_symbol=0;
 		ex_nvars++;
 		RT_MESG1(495);
@@ -806,7 +806,7 @@ int err_factor()
 
 		/* variable's name in tok0->tname */
 		xpos=506;
-		var_node=tok0->tnode;
+		var_node=tok0->tok_node;
 		var_index = var_node->node_index;
 		// MESG("err: TOK_CMD");
 		pre_symbol=0;

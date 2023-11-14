@@ -143,6 +143,7 @@ typedef struct BTNODE {
 		double node_dval;
 		char *node_sval;
 		void *node_dat;
+		struct array_dat *adat;
 	};
 } BTNODE;
 

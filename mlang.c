@@ -354,7 +354,7 @@ tok_struct *new_tok()
  tok->tgroup=0;
  tok->factor_function=factor_none;
  tok->directive=lexpression;
- tok->tnode=NULL;
+ tok->tok_node=NULL;
  // MESG("new_tok:");
  return(tok);
 }
@@ -434,23 +434,23 @@ void init_hash()
 
 /* option variables  */
  for(i=0;option_names[i].name!=NULL;i++) {
- 	BTNODE *tnode;
+ 	BTNODE *option_node;
 	if(option_names[i].sval!=NULL) {
-		tnode=set_btsval(bt_table,option_names[i].name,option_names[i].sval);
+		option_node=set_btsval(bt_table,option_names[i].name,option_names[i].sval);
 	} else {
-		tnode=set_btdval(bt_table,option_names[i].name,option_names[i].dval);
+		option_node=set_btdval(bt_table,option_names[i].name,option_names[i].dval);
 	};
-	tnode->node_type=TOK_OPTION;
+	option_node->node_type=TOK_OPTION;
  };
 	// eval_btree(bt_table->root,print_node);
 
  for(i=0;term_types[i].term_name!=NULL;i++)
  {
-	BTNODE *tnode;
-	tnode = set_btdval(directiv_table,term_types[i].term_name,i);
-	tnode->node_index = term_types[i].term_type;
-	tnode->node_type = term_types[i].term_group;
-	tnode->node_vtype=VTYPE_NUM;	/* to show the index in value if needed!  */
+	BTNODE *term_node;
+	term_node = set_btdval(directiv_table,term_types[i].term_name,i);
+	term_node->node_index = term_types[i].term_type;
+	term_node->node_type = term_types[i].term_group;
+	term_node->node_vtype=VTYPE_NUM;	/* to show the index in value if needed!  */
  };
 	// eval_btree(directiv_table->root,print_node);
  init_common();
@@ -568,7 +568,7 @@ void init_exec_flags()
 void show_error(char *from,char *name)
 {
  int var_index=-1;
- if(tok) if(tok->tnode) var_index=tok->tnode->node_index;
+ if(tok) if(tok->tok_node) var_index=tok->tok_node->node_index;
  if(var_index>=0)
 	ERROR("%s error %d file %s after function [%s] after line %d: [%s]",from,err_num,name,ftable[var_index].n_name,last_correct_line,err_str);
  else {
@@ -955,7 +955,7 @@ double factor_option()
 {
  BTNODE *bte; 
 /* variable's name in tok0->tname */
-	bte=tok->tnode;
+	bte=tok->tok_node;
 	var_node=bte;
 	NTOKEN2;
 #if	1
@@ -1077,8 +1077,8 @@ double factor_cmd()
 	FUNCS *ed_command;
 
 	// ex_vtype=VTYPE_NUM;
-	// MESG(";factor_cmd: ttype=%d command=%d",tok->ttype,tok->tnode->node_index);
-	var_index = tok->tnode->node_index;
+	// MESG(";factor_cmd: ttype=%d command=%d",tok->ttype,tok->tok_node->node_index);
+	var_index = tok->tok_node->node_index;
 	ed_command = ftable+var_index;
 
 	NTOKEN2;
@@ -1147,7 +1147,7 @@ double factor_env()
 {
 	BTNODE *bte;
 	double value=0;
-	bte=tok->tnode;
+	bte=tok->tok_node;
 	var_node=bte;
 	value = get_env(bte->node_index);
 	ex_value = value;
@@ -1591,7 +1591,7 @@ void set_tok_function(tok_struct *tok, int type)
 	switch(type) {
 		case 0:
 			if(tok->ttype==TOK_FUNC) {
-				int findex = tok->tnode->node_index;
+				int findex = tok->tok_node->node_index;
 				// MESG(" F tok %2d: %s type [%d %s] set factor function %d",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype],findex);
 				tok->factor_function = m_functions[findex].ffunction;
 			} else {
@@ -2376,26 +2376,20 @@ double tok_dir_fori()
 	int old_active_flag=current_active_flag;
 	tok_data *index=NULL;
 	double dinit,dmax,dstep;
-	double *pdval;
+	double *iterrator_val;
 
 	NTOKEN2;	/* go to next token after for */
 
-	if(tok->ttype==TOK_VAR) {
-		index=&current_stable[tok->tind];
-		if(index->vtype!=VTYPE_NUM) {err_num=224;ERROR("for i syntax error %d",err_num);};
-		ex_vtype=index->vtype;
-		NTOKEN2;
-		if(tok->ttype!=TOK_ASSIGN) { err_num=225; ERROR("for i error %d",err_num);};
-	} else { err_num=226;ERROR("for i syntax error %d",err_num);};
+	index=&current_stable[tok->tind];
+	if(index->vtype!=VTYPE_NUM) {err_num=224;ERROR("for i syntax error %d",err_num);};
+	ex_vtype=index->vtype;
 
-	NTOKEN2;
-#if	0
-	dinit=FACTOR_FUNCTION;
-#else
+	NTOKEN2; // next
+	NTOKEN2; // skip equal sign
+
 	dinit=num_expression();	/* initial   */
-#endif
-	pdval=&index->dval;
-	*pdval=dinit;
+	iterrator_val=&index->dval;
+	*iterrator_val=dinit;
 	NTOKEN2;	/* skip separator! */
 
 	dmax=num_expression();
@@ -2417,8 +2411,8 @@ double tok_dir_fori()
 		current_active_flag=old_active_flag;
 		return 1;
 	};
-	if(dstep>0 && dmax > *pdval) {
-		for(;*pdval < dmax; *pdval +=dstep) {
+	if(dstep>0 && dmax > *iterrator_val) {
+		for(;*iterrator_val < dmax; *iterrator_val +=dstep) {
 
 			tok=start_block;
 			tok->directive();
@@ -2427,8 +2421,8 @@ double tok_dir_fori()
 				break;
 			};
 		};
-	} else if(dstep<0 && dmax< *pdval) {
-		for(; *pdval > dmax; *pdval +=dstep) {
+	} else if(dstep<0 && dmax< *iterrator_val) {
+		for(; *iterrator_val > dmax; *iterrator_val +=dstep) {
 
 			tok=start_block;
 			tok->directive();
@@ -2824,7 +2818,7 @@ char * tok_info(tok_struct *tok)
 			int vtype=0;
 			MESG("tok_info var! ind=[%d] group=%d vtype=%d",tok->tind,tok->tgroup,tok->tvtype);
 			if(tok->tvtype==VTYPE_TREE) {
-				BTNODE *tok_node=tok->tnode;
+				BTNODE *tok_node=tok->tok_node;
 				BTREE *type_tree=(BTREE *)tok_node->node_dat;
 				size = type_tree->items;
 				var_type="btree type";
