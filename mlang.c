@@ -331,15 +331,6 @@ double mul_by()
 		return(sslot->dval);
 	};
 #if	0
-	if(sslot->vtype==VTYPE_ARRAY) {
-		v0=*sslot->pdval;
-		
-		*sslot->pdval = v0+v1;
-		// MESG("array: %f -> %f",v0,*sslot->pdval);
-		return(v0+v1);
-	};
-#endif
-#if	0
 	if(sslot->vtype==VTYPE_STRING) {
 		// MESG("increase by:");
 		sslot->sval=(char *)realloc(sslot->sval,strlen(sslot->sval)+strlen(saved_string)+1);
@@ -2398,8 +2389,11 @@ double tok_dir_fori()
 	} else { err_num=226;ERROR("for i syntax error %d",err_num);};
 
 	NTOKEN2;
+#if	0
+	dinit=FACTOR_FUNCTION;
+#else
 	dinit=num_expression();	/* initial   */
-
+#endif
 	pdval=&index->dval;
 	*pdval=dinit;
 	NTOKEN2;	/* skip separator! */
