@@ -38,7 +38,7 @@ typedef struct tok_struct {
 	FFunction directive;
 	union {	
 		int	number_of_args;
-		struct BTNODE *tnode;
+		struct BTNODE *tok_node;
 		struct curl_struct *tcurl;
 		struct tok_struct *match_tok;	/* for curl, parenthesis, bracket  */
 		struct tok_struct *next_tok;	/* for directives  */

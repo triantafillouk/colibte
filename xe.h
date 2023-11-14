@@ -329,6 +329,7 @@ typedef struct tok_data {
 		double dval;
 		char *sval;
 		struct array_dat *adat;
+		struct BTREE *btree1;
 	};
 } tok_data;
 

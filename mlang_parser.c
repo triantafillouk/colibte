@@ -327,7 +327,7 @@ int type_init_definition(FILEBUF *bf,BTREE *types_tree,alist *lex_parser, tok_st
 	type_node->node_type=TOK_VAR;
 	types_tree->new_flag=0;
 
-	tok_var->tnode = type_node;
+	tok_var->tok_node = type_node;
 	tok_var->tname = strdup(nword);
 	tok_var->ttype = TOK_VAR;
 	tok_var->tvtype = VTYPE_TREE;
@@ -831,9 +831,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	
 	if(tok_type==TOK_LETTER) {
 		MESG("	parser: TOK_LETTER: check element in bt [%s]",nword);
-		tok->tnode  = find_btnode(bt_table,nword); // check main table
+		tok->tok_node  = find_btnode(bt_table,nword); // check main table
 #if	1
-		if(tok->tnode==NULL) {
+		if(tok->tok_node==NULL) {
 			BTNODE *var_node = find_btnode(stree,nword);
 			if(var_node!=NULL) {
 				// MESG("		[%s] found variable in stree index = %d type=%d vtype=%d",nword,var_node->node_index,var_node->node_type,var_node->node_vtype);
@@ -841,10 +841,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			} else {
 #if	GTYPES
 				MESG("	check %s in types_tree",nword);
-				tok->tnode=find_btnode(types_tree,nword);
-				if(tok->tnode) { 
+				tok->tok_node=find_btnode(types_tree,nword);
+				if(tok->tok_node) { 
 					MESG("	found!! in types_tree!!!");
-					tok->tvtype = tok->tnode->node_vtype;
+					tok->tvtype = tok->tok_node->node_vtype;
 					
 					MESG("	we found a typed variable [%s] tvtype=%d",nword,tok->tvtype);
 				};
@@ -854,10 +854,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			// MESG("	node found in main table");
 		}
 #endif
-		if(is_storelines && proc_name==NULL && tok->tnode!=NULL) {	/* function already register!  */
+		if(is_storelines && proc_name==NULL && tok->tok_node!=NULL) {	/* function already register!  */
 			proc_name=strdup(nword);
 		};
-		if(tok->tnode==NULL) { // a NEW variable name or directive
+		if(tok->tok_node==NULL) { // a NEW variable name or directive
 			// MESG("	new variable name or directive [%s]",nword);
 			if(is_storelines) {
 				if(proc_name==NULL) {
@@ -866,14 +866,14 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 			// MESG("	parser:		check %s in directiv_table",nword);
 
-			tok->tnode=find_btnode(directiv_table,nword);
+			tok->tok_node=find_btnode(directiv_table,nword);
 #if	GTYPES
-			if(tok->tnode==NULL) {	/* check types_tree  */
-				tok->tnode=find_btnode(types_tree,nword);
-				if(tok->tnode!=NULL) MESG("	we found a typed variable [%s]",nword);
+			if(tok->tok_node==NULL) {	/* check types_tree  */
+				tok->tok_node=find_btnode(types_tree,nword);
+				if(tok->tok_node!=NULL) MESG("	we found a typed variable [%s]",nword);
 			};
 #endif
-			if(tok->tnode==NULL){	/* not a directive but a variable  */
+			if(tok->tok_node==NULL){	/* not a directive but a variable  */
 
 				// MESG("		[%s] is a variable !!!!!!!!!!",nword);
 
@@ -894,7 +894,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 						};
 						tok->tind = var_node->node_index;
 						tok->ttype=TOK_VAR;
-						tok->tnode=var_node;
+						tok->tok_node=var_node;
 						tok->tvtype = var_node->node_vtype;
 					} else {
 						MESG("		[%s] not found!!! in stree",nword);
@@ -909,10 +909,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				}
 			} else { // we have a directive or a type
 				// MESG("	parser:	directive [%s] found!",nword);
-				tok->tname=tok->tnode->node_name;
-				tok->tgroup=tok->tnode->node_type;
-				tok->tind = tok->tnode->node_index;
-				tok->ttype = tok->tnode->node_index;
+				tok->tname=tok->tok_node->node_name;
+				tok->tgroup=tok->tok_node->node_type;
+				tok->tind = tok->tok_node->node_index;
+				tok->ttype = tok->tok_node->node_index;
 
 				MESG("	directiv:0:[%s] ttype=%d, tind=%d, tgroup=%d",tok->tname,tok->ttype,tok->tind,tok->tgroup);
 				if(tok->ttype==TOK_PROC) 
@@ -939,9 +939,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				// MESG("this is a directive: [%s]",nword);
 			};
 		} else {
-			tok->tname=tok->tnode->node_name;
-			MESG("	token name is old [%s] found type %d!!!!",tok->tname,tok->tnode->node_type);
-			switch(tok->tnode->node_type) {
+			tok->tname=tok->tok_node->node_name;
+			MESG("	token name is old [%s] found type %d!!!!",tok->tname,tok->tok_node->node_type);
+			switch(tok->tok_node->node_type) {
 				case TOK_VAR:	/* 0  */
 					tok->ttype=TOK_VAR; 
 					ex_edenv=TOK_VAR;
@@ -954,7 +954,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				case TOK_FUNC:	/* 2  */
 					tok->ttype=TOK_FUNC; // editor functions
 					// MESG("TOK_FUNC: %s",tok->tname);
-					// BTNODE *bte=tok->tnode;
+					// BTNODE *bte=tok->tok_node;
 					// MESG("TOK_FUNC: index=%d",bte->node_index);
 					// tok->factor_function = m_functions[bte->node_index].ffunction;
 					// tok->factor_function = factor_func;
