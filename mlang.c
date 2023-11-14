@@ -2380,20 +2380,17 @@ double tok_dir_fori()
 
 	NTOKEN2;	/* go to next token after for */
 
-	if(tok->ttype==TOK_VAR) {
+	// if(tok->ttype==TOK_VAR) {
 		index=&current_stable[tok->tind];
 		if(index->vtype!=VTYPE_NUM) {err_num=224;ERROR("for i syntax error %d",err_num);};
 		ex_vtype=index->vtype;
 		NTOKEN2;
-		if(tok->ttype!=TOK_ASSIGN) { err_num=225; ERROR("for i error %d",err_num);};
-	} else { err_num=226;ERROR("for i syntax error %d",err_num);};
+		// if(tok->ttype!=TOK_ASSIGN) { err_num=225; ERROR("for i error %d",err_num);};
+	// } else { err_num=226;ERROR("for i syntax error %d",err_num);};
 
 	NTOKEN2;
-#if	0
-	dinit=FACTOR_FUNCTION;
-#else
 	dinit=num_expression();	/* initial   */
-#endif
+
 	pdval=&index->dval;
 	*pdval=dinit;
 	NTOKEN2;	/* skip separator! */
