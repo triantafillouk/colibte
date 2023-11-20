@@ -495,17 +495,29 @@ int is_mlang(FILEBUF *fp)
 tok_data *new_symbol_table(int size)
 {
  int i;
- // int size=fp->symbol_tree->items;
- // MESG("Initialize new_symbol_table:[%s] size %d",fp->b_fname,size);
+ // MESG("Initialize new_symbol_table: size %d",size);
  tok_data *td=malloc(sizeof(struct tok_data)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
  for(i=0;i<size;i++) {
 	td[i].ind=i;
  	td[i].vtype=VTYPE_NUM;
 	td[i].pdval=NULL;
-	// td[i].psval=NULL;
 	td[i].dval=0;
-	// td[i].sval=NULL;
+ };
+ return td;
+}
+
+tok_data *realloc_symbol_table(tok_data *td,int size,int old_size)
+{
+ int i;
+ // MESG("Initialize new_symbol_table: size %d",size);
+ td=realloc(td,sizeof(struct tok_data)*(size+1));
+ if(td==NULL) { err_num=101;return NULL;};
+ for(i=old_size;i<size;i++) {
+	td[i].ind=i;
+ 	td[i].vtype=VTYPE_NUM;
+	td[i].pdval=NULL;
+	td[i].dval=0;
  };
  return td;
 }
@@ -2555,28 +2567,27 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	parse_buffer_show_tokens(1);
 	return(0);	
  };
- if(start) {
- 	types_tree = new_btree("types",0);
- }; 
+
  if(use_fp->symbol_tree==NULL) {
 	// MESG("create new symbol_tree for use_fp!");
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);
-	// extra=100;
-	// use_fp->symbol_tree->max_items=extra;
  };
-	if(current_stable==NULL) {
-		current_stable=new_symbol_table(use_fp->symbol_tree->items);
+ int old_items=0;
+	if(start==0 && current_stable!=NULL) {
+		old_items=use_fp->symbol_tree->items;
 	};
-	// MESG("compute_block: before calling parse_block1");
 	parse_block1(bp,use_fp->symbol_tree,start,extra);
-	// MESG("parse_blocke: ended! err=%d",err_num);
+	MESG("parse_blocke: ended! err=%d start=%d",err_num,start);
 	if(err_num) return(0);
-	if(start) {
-		local_symbols=new_symbol_table(bp->symbol_tree->items);
-		current_stable=local_symbols;
+	if(start || current_stable==NULL) {
+		MESG("new current_stable with %d items",use_fp->symbol_tree->items);
+		local_symbols=new_symbol_table(use_fp->symbol_tree->items);
 	} else {
-		local_symbols=current_stable;	
+		MESG("use current_stable new items = %d",use_fp->symbol_tree->items);
+		local_symbols=realloc_symbol_table(current_stable,use_fp->symbol_tree->items,old_items);
 	}
+	current_stable=local_symbols;
+
  if(bp->m_mode<2)	/* if not already checked!  */
  {
 	err_num=check_init(bp);
