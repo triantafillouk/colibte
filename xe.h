@@ -317,14 +317,11 @@ typedef struct  VIDEO {
 typedef struct tok_data {
 	short int ind;
 	short int vtype;
-#if	USE_SARRAYS
+
 	union {
 	double *pdval;
 	char  **psval;
 	};
-#else
-	double *pdval;
-#endif
 	union {
 		double dval;
 		char *sval;

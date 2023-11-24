@@ -2084,13 +2084,13 @@ double assign_val(double none)
 				// MESG("set string!");
 				return(0);
 			};
+		};
 			if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY||ex_vtype==VTYPE_AMIXED) {
 				// MESG("assign array to var!");
 				sslot->adat=ex_array;
 				sslot->vtype=ex_array->atype;
 				if(ex_array->astat==ARRAY_ALLOCATED) ex_array->astat=ARRAY_LOCAL;	/* make it local to variable  */
 			};
-		};
 		return(v1);		
 	} else {
 		if(ex_vtype==VTYPE_NUM ) {

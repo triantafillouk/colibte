@@ -77,19 +77,14 @@ BTNODE * add_to_symbol_tree(BTREE *stable,char *name,int type)
 {
 	BTNODE *btn=NULL;
 	/* create the variable in the symbol_table!  */
-	// MESG("add_to_symbol_tree: %s table items=%d",name,stable->items);
+	MESG("add_to_symbol_tree:[%s] %s table items=%d",stable->tree_name,name,stable->items);
 	btn=add_btnode(stable,name);
 	if(stable->new_flag) {
 		btn->node_type=type;
-#if	1
+
 		btn->node_vtype=VTYPE_NUM;
 		btn->node_dval=0;
 		btn->node_index=stable->items-1;	/*  variable index  */
-#else
-		btn->node_val=0;
-		btn->node_index=stable->items-1;	/*  variable index  */
-		btn->sval=NULL;
-#endif
 		stable->new_flag=0;
 		// MESG("- this is new! index=%d",btn->node_index+1);
 	};

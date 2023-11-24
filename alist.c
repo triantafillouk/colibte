@@ -834,9 +834,7 @@ BTREE *new_btree(char *name,int level)
  bt=(BTREE *)malloc(sizeof(struct BTREE));
  bt->root=NULL;
  bt->tree_name=strdup(name);
- // bt->level=level;
  bt->items=0;
- // bt->max_items=999999;
  return(bt);
 }
 
