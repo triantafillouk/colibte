@@ -2032,6 +2032,11 @@ double assign_env(double none)
 	return(v1);
 }
 
+void free_sslot(tok_data *sslot)
+{
+	int a=1;
+}
+
 
 double assign_val(double none)
 {
@@ -2042,6 +2047,10 @@ double assign_val(double none)
 	sslot=lsslot;
 	v1=lexpression();
 	// MESG("assign_val: after lexpression! slot vtype=%d ex_vtype=%d\n",sslot->vtype,ex_vtype);
+	if(sslot->vtype==ex_vtype && ex_vtype==VTYPE_NUM) {
+			sslot->dval=v1;
+			return(v1);
+	};
 	if(sslot->vtype!=ex_vtype){
 		if(sslot->vtype==VTYPE_STRING) {
 			if(sslot->sval) free(sslot->sval);
@@ -2093,10 +2102,12 @@ double assign_val(double none)
 			};
 		return(v1);		
 	} else {
+#if	0
 		if(ex_vtype==VTYPE_NUM ) {
 			sslot->dval=v1;
 			return(v1);
 		};
+#endif
 		if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
 //				print_array1("assign array ",ex_array);
 //				print_array1("to array",sslot->adat);
