@@ -1514,10 +1514,8 @@ double factor_eof(){
 	return 0.0;
 }
 
-#if	0
+#if	1
 #include "assign_func.c"
-
-VFunction assign_val_function=assign_none;
 
 VFunction assign_functions[] = {
 	assign_none,
@@ -2068,7 +2066,7 @@ double assign_env(double none)
 	return(v1);
 }
 
-#if	0
+#if	1
 double assign_val(double none)
 {
 	tok_data *sslot=lsslot;
@@ -2076,6 +2074,7 @@ double assign_val(double none)
 	// MESG("assign_val: sslot->vtype=%d ex_vtype=%d",sslot->vtype,ex_vtype);
 
 	if(sslot->vtype!=0 && ex_vtype!=sslot->vtype){
+		MESG("wrong assign: ex_vtype=%d sslot->vtype=%d",ex_vtype,sslot->vtype);
 		set_error(tok,3,"assign val");
 		ERROR("assign value! ind=%d vtype=%d ex_vtype=%d",sslot->ind,sslot->vtype,ex_vtype);
 		set_break();
@@ -2083,7 +2082,7 @@ double assign_val(double none)
 	};
 
 	if(sslot->vtype==0) sslot->vtype=ex_vtype;
-	return assign_val_function(v1,sslot);
+	return assign_functions[ex_vtype](v1,sslot);
 }
 #else
 double assign_val(double none)

@@ -22,7 +22,18 @@ double assign_num(double v1,tok_data *sslot)
 
 double assign_array(double v1,tok_data *sslot)
 {
-	return 1;
+	if(sslot->adat!=NULL){
+	if(ex_array->anum != sslot->adat->anum) {
+			if(sslot->adat->dval) free_array("assign",sslot->adat);
+		if(sslot->adat->sval) {
+			// MESG("free string array!");
+		};
+		sslot->adat=ex_array;
+		if(ex_array->astat==ARRAY_ALLOCATED) ex_array->astat=ARRAY_LOCAL;	/* make it local to variable  */
+	};} else {
+		sslot->adat=ex_array;
+	};
+	return v1;
 }
 
 double assign_sarray(double v1,tok_data *sslot)
