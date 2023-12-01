@@ -17,6 +17,7 @@ typedef	alist * TLIST;
 typedef double (*FFunction)();
 typedef double (*TFunction)(double v1);
 typedef double (*EFunction)(double v1,double v2);
+typedef double (*VFunction)(double v1,tok_data *sslot);
 
 typedef struct tok_struct {
 	union {

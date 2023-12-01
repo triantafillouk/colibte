@@ -148,7 +148,6 @@ void set_error(tok_struct *tok,int index,char *description);
 void init_error();
 
 extern char slval[];
-extern int ex_vtype;
 extern int err_num;
 extern char *err_str;
 
@@ -264,9 +263,8 @@ double get_env(int vnum)
 	if(svalue[0]!=0) { 
 		set_vtype(VTYPE_STRING);
 		set_sval(svalue);	
-		ex_vtype=VTYPE_STRING;
 		// value=next_value();
-	} else ex_vtype=VTYPE_NUM;
+	} else set_vtype(VTYPE_NUM);
 	return(value);
 }
 
@@ -1259,7 +1257,7 @@ int refresh_current_line(int nused)
 	};
 
 	if(err_num>0) 
- 		msg_line("Error[%d]=%s :: 0x%lX = %12.3f",err_num,err_str,(int)value,value);
+ 		msg_line("Error[%d]=%s :: value 0x%lX = %12.3f",err_num,err_str,(int)value,value);
  	else {
  		if(vtype_is(VTYPE_STRING)) msg_line(" %15.3f,[%s]",value,get_sval());
 		else {

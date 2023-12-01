@@ -185,7 +185,7 @@ void set_error(tok_struct *tok,int err,char *description)
  };
 #endif
  current_active_flag=0;
- tok=cbfp->end_token;
+ //tok=cbfp->end_token;
  if(tok==NULL) return;
  tok->ttype=TOK_EOF;
  set_tok_directive(tok,factor_eof);

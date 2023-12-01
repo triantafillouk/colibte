@@ -17,7 +17,7 @@
 
 #define	VTYPE_NUM		1
 #define	VTYPE_STRING	8
-#define VTYPE_TREE		32
+#define VTYPE_TREE		13
 
 #if	1
 void MESG(const char *fmt, ...);

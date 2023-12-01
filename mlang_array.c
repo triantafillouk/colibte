@@ -33,7 +33,7 @@ void init_array(struct array_dat *array, int rows,int cols)
 	array->atype=ctype;
 	array->astat=ARRAY_UNALLOCATED;
 	array->dat=NULL;
-	ex_vtype=ctype;
+	set_vtype(ctype);
 	/* init again after use the ex values!  */
 	ex_nums=0;ex_nquote=0;ex_nvars=0;
 	// MESG("init_array: type=%d",ex_vtype);
