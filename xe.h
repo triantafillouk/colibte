@@ -315,12 +315,13 @@ typedef struct  VIDEO {
 #define HEX_LINE_LEN	16
 
 typedef struct tok_data {
-	short int ind;
+	// short int ind;
 	short int vtype;
 
 	union {
 	double *pdval;
 	char  **psval;
+	void *pval;
 	};
 	union {
 		double dval;
