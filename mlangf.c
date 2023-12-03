@@ -2,13 +2,16 @@
 #include "mlang.h"
 
 extern char *saved_string;
-extern int ex_vtype;
+extern tok_data ex_var;
+
 extern array_dat *ex_array;
 extern array_dat *main_args;
 extern char *ex_name;
 extern FILEBUF *cbfp;
 
 tok_struct *current_token();
+void set_vtype(int type);
+int vtype_is(int type);
 
 void ntoken();
 int check_token(int type);
@@ -31,7 +34,7 @@ void get_function_args (int number_of_args)
 	f_entry=entry_mode;
 	entry_mode=KNORMAL;
 	// MESG("get_function_args: %d [%d %s]",number_of_args,tok->tnum,tok->tname);
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 	if(number_of_args) {
 		/* if we have arguments, check for parenthesis, then get the arguments  */
 		// va = (MVAR *)malloc(sizeof(MVAR)*number_of_args);
@@ -42,11 +45,11 @@ void get_function_args (int number_of_args)
 			MESG("get_function_args:%d: [%d %s]",i,tok->tnum,tok->tname);
 #endif
 			double value = num_expression();
-			va[i].var_type=ex_vtype;
-			if(ex_vtype==VTYPE_STRING) { 
+			va[i].var_type=ex_var.vtype;
+			if(vtype_is(VTYPE_STRING)) { 
 				va[i].sval=saved_string;saved_string=NULL;
 				// MESG("%d: string: [%s]",i,va[i].sval);
-			} else if (ex_vtype==VTYPE_ARRAY||ex_vtype==VTYPE_SARRAY) {
+			} else if (vtype_is(VTYPE_ARRAY)||vtype_is(VTYPE_SARRAY)) {
 				va[i].adat=ex_array;
 				// MESG("%d: array",i);
 			}
@@ -81,7 +84,7 @@ void get_numeric_args (int number_of_args)
 	for(i=0;i< number_of_args;i++ ) { 
 		ntoken();
 		double value = num_expression();
-		va[i].var_type=ex_vtype;
+		va[i].var_type=ex_var.vtype;
 		va[i].dval=value;
 	};
 	ntoken();
@@ -101,11 +104,11 @@ double uf_len()
 	get_function_args(1);
 	double value=0;
 	if(va->var_type==VTYPE_STRING) { value =strlen(va->sval);}
-	else if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY) {
+	else if(vtype_is(VTYPE_ARRAY) || vtype_is(VTYPE_SARRAY)) {
 		array_dat *arr=va->adat;		
 		value=arr->rows*arr->cols;
 	};
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 
 	return value;
 }
@@ -113,7 +116,7 @@ double uf_len()
 double uf_array_cols()
 {
 	get_function_args(1);
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 	if(va->var_type==VTYPE_ARRAY||va->var_type==VTYPE_SARRAY) {
 		return va->adat->cols;
 	} else return 0;
@@ -122,7 +125,7 @@ double uf_array_cols()
 double uf_array_rows()
 {
 	get_function_args(1);
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 	if(va->var_type==VTYPE_ARRAY||va->var_type==VTYPE_SARRAY) {
 		return va->adat->rows;
 	} else return 0;
@@ -141,7 +144,7 @@ double uf_index()
 {
 	ntoken();
 	MESG("new index!");
-	ex_vtype=VTYPE_TREE;
+	set_vtype(VTYPE_TREE);
 	return 0;
 }
 
@@ -161,7 +164,7 @@ double uf_determinant()
 	} else {
 		syntax_error("Not an array!",204);
 	};
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 	// free(va);
 	return value;
 }
@@ -171,7 +174,7 @@ double uf_inverse()
 	double value=0;
 	get_function_args(1);
 
-	if(ex_vtype==VTYPE_ARRAY) {
+	if(vtype_is(VTYPE_ARRAY)) {
 		array_dat *arr = va->adat;
 
 		if(arr->rows==arr->cols) {
@@ -195,7 +198,7 @@ double uf_transpose()
 {
 	get_function_args(1);
 	double value=0;
-	if(ex_vtype==VTYPE_ARRAY) {
+	if(vtype_is(VTYPE_ARRAY)) {
 		array_dat *arr  = va->adat;
 		array_dat *tarray;
 		tarray = transpose(arr);
@@ -216,7 +219,7 @@ double uf_left()
 	if(va[0].var_type==VTYPE_STRING && va[1].var_type==VTYPE_NUM ) {
 	set_sval(va[0].sval);
 	} else set_sval("");
-	ex_vtype=VTYPE_STRING;
+	set_vtype(VTYPE_STRING);
 	return 0;
 }
 
@@ -236,7 +239,7 @@ double uf_right()
 		set_sval("");
 	};
 
-	ex_vtype=VTYPE_STRING;
+	set_vtype(VTYPE_STRING);
 	return 0;
 }
 
@@ -257,7 +260,7 @@ double uf_mid()
 			syntax_error("mid: wrong_type of args",100);
 			set_sval("");
 		};
-		ex_vtype=VTYPE_STRING;
+		set_vtype(VTYPE_STRING);
 	return 0;	
 }
 
@@ -266,7 +269,7 @@ double uf_print()
 {
 	tok_struct *tok=current_token();
 	int args=tok->number_of_args;
-	MESG("uf_print: ex_vtype=%d tnum=%d args=%d",ex_vtype,tok->tnum,tok->number_of_args);
+	MESG("uf_print: ex_vtype=%d tnum=%d args=%d",ex_var.vtype,tok->tnum,tok->number_of_args);
 	int i;
 	double value=0;
 	for(i=0;i<args;i++) {
@@ -275,7 +278,7 @@ double uf_print()
 		// MESG("	eval arg %d tnum=%d ttype=%d",i,tok->tnum,tok->ttype);
 		value=num_expression();
 		// MESG("		val=%f s='%s'",value,saved_string);
-		switch(ex_vtype) {
+		switch(ex_var.vtype) {
 			case VTYPE_ARRAY:
 			case VTYPE_SARRAY:
 			case VTYPE_AMIXED:
@@ -292,7 +295,7 @@ double uf_print()
 			};
 			case VTYPE_STRING:{
 				char *p_out=strdup(saved_string);
-				ex_vtype=VTYPE_STRING;
+				set_vtype(VTYPE_STRING);
 				out_print(p_out,0);
 				free(p_out);
 			};
@@ -336,7 +339,7 @@ double uf_upper()
 		syntax_error("upper: wrong_type of args",100);
 		set_sval("");	
 	};
-	ex_vtype=VTYPE_STRING;
+	set_vtype(VTYPE_STRING);
 	return 0;
 }
 
@@ -350,7 +353,7 @@ double uf_lower()
 		syntax_error("lower: wrong_type of args",100);
 		set_sval("");
 	};
-	ex_vtype=VTYPE_STRING;
+	set_vtype(VTYPE_STRING);
 	return 0;
 }
 
@@ -363,7 +366,7 @@ double uf_ascii()
 	} else {
 		syntax_error("ascii: wrong_type of args",100);
 	};
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 	// free(va);
 	return value;
 }
@@ -375,7 +378,7 @@ double uf_chr()
 	saved_string[0] = (int)va[0].dval;
 	saved_string[1] = 0;
 
-	ex_vtype=VTYPE_STRING;
+	set_vtype(VTYPE_STRING);
 	// free(va);
 	return 0;
 }
@@ -391,7 +394,7 @@ double uf_getchar()
 	};
 	saved_string[1] = 0;
 
-	ex_vtype=VTYPE_STRING;
+	set_vtype(VTYPE_STRING);
 	return 0;
 }
 
@@ -400,17 +403,16 @@ double uf_rand()
 {
  // static long =
  long max=(long) get_numeric_arg();
- ex_vtype=VTYPE_NUM;
+ set_vtype(VTYPE_NUM);
  long value=random() % max;
  // MESG("uf_rand:%ld",value);
- // ex_value=23.33;
  return (double)value;
 }
 
 double uf_seed()
 {
 	long seed=(long) get_numeric_arg();
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 	srand(seed);
 	return 0;
 }
@@ -433,7 +435,7 @@ double uf_sindex()
 	} else {
 		syntax_error("s_index: wrong_type of args",100);
 	};
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 
 	// free(va);
 	return value;
@@ -452,7 +454,7 @@ double uf_string()
 		syntax_error("string: wrong_type of args",100);
 		set_sval("");
 	};
-	ex_vtype=VTYPE_STRING;
+	set_vtype(VTYPE_STRING);
 
 	return 0;
 }
@@ -496,7 +498,7 @@ double uf_wait()
 	entry_mode=f_entry;
 	saved_string[1] = 0;
 	double value=saved_string[0];
-	ex_vtype=VTYPE_STRING;
+	set_vtype(VTYPE_STRING);
 
 	return value;
 }
@@ -510,7 +512,7 @@ double uf_input()
 	if(va[0].var_type!=VTYPE_STRING) getstring("Input :",saved_string,80,true);
 	else getstring(va[0].sval,saved_string,80,true);
 	if(execmd) saved_string[strlen(saved_string)-1]=0;
-	ex_vtype=VTYPE_STRING;
+	set_vtype(VTYPE_STRING);
 	entry_mode=f_entry;
 	return 0;
 }
@@ -523,7 +525,7 @@ double uf_dinput()
 	getstring(va[0].sval,saved_string,80,true);
 	double value=atof(saved_string);
 	clean_saved_string(0);
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 
 	return value;
 }
@@ -542,14 +544,14 @@ double uf_val()
 	if(va[0].var_type==VTYPE_STRING) 
 		value=atof(va[0].sval);
 	else syntax_error("val: wrong_type of args",100);
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 	return value;
 }
 
 double uf_sqrt()
 {
 	double value=get_numeric_arg();
-	if(ex_vtype==VTYPE_NUM) value=sqrt(va[0].dval);
+	if(vtype_is(VTYPE_NUM)) value=sqrt(va[0].dval);
 	else syntax_error("aqrt: wrong argument",305);
 
 	return value;
@@ -559,14 +561,14 @@ double uf_dbg_message()
 {
 	get_function_args(1);
 	if(va[0].var_type==VTYPE_STRING) MESG(":%s",va[0].sval);
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 	return 0;
 }
 
 double uf_sin()
 {
 	double value=get_numeric_arg();
-	if(ex_vtype==VTYPE_NUM)	
+	if(vtype_is(VTYPE_NUM))	
 		value=sin(value);
 	else {
 		syntax_error("sin: wrong argument",305);
@@ -577,7 +579,7 @@ double uf_sin()
 double uf_cos()
 {
 	double value=get_numeric_arg();
-	if(ex_vtype==VTYPE_NUM)	value=cos(va[0].dval);
+	if(vtype_is(VTYPE_NUM))	value=cos(va[0].dval);
 	else syntax_error("cos: wrong argument",305);
 	return value;
 }
@@ -585,7 +587,7 @@ double uf_cos()
 double uf_tan()
 {
 	double value=get_numeric_arg();
-	if(ex_vtype==VTYPE_NUM) value=tan(value);
+	if(vtype_is(VTYPE_NUM)) value=tan(value);
 	else syntax_error("tan: wrong arguments",100);
 	return value;
 }
@@ -593,7 +595,7 @@ double uf_tan()
 double uf_log10()
 {
 	double value=get_numeric_arg();
-	if(ex_vtype==VTYPE_NUM)	value=log10(va[0].dval);
+	if(vtype_is(VTYPE_NUM))	value=log10(va[0].dval);
 	else syntax_error("log10: wrong argument",305);
 	return value;
 }
@@ -601,7 +603,7 @@ double uf_log10()
 double uf_atan()
 {
 	double value=get_numeric_arg();
-	if(ex_vtype==VTYPE_NUM)	value=atan(va[0].dval);
+	if(vtype_is(VTYPE_NUM))	value=atan(va[0].dval);
 	else syntax_error("atan: wrong argument",305);
 	return value;
 }
@@ -609,7 +611,7 @@ double uf_atan()
 double uf_log()
 {
 	double value=get_numeric_arg();
-	if(ex_vtype==VTYPE_NUM)	value=log(va[0].dval);
+	if(vtype_is(VTYPE_NUM))	value=log(va[0].dval);
 	else syntax_error("log: wrong argument",305);
 	return value;
 }
@@ -617,7 +619,7 @@ double uf_log()
 double uf_trunc()
 {
 	double value=get_numeric_arg();
-	if(ex_vtype==VTYPE_NUM)	value=trunc(va[0].dval);
+	if(vtype_is(VTYPE_NUM))	value=trunc(va[0].dval);
 	else syntax_error("trunc: wrong argument",305);
 	return value;
 }
@@ -625,7 +627,7 @@ double uf_trunc()
 double uf_round()
 {
 	double value=get_numeric_arg();
-	if(ex_vtype==VTYPE_NUM)	value=round(va[0].dval);
+	if(vtype_is(VTYPE_NUM))	value=round(va[0].dval);
 	else syntax_error("round: wrong argument",305);
 	return value;
 }
@@ -647,7 +649,7 @@ double uf_time()
 		syntax_error("error in stime",312);
 	}
 
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 	return value;
 }
 
@@ -655,35 +657,35 @@ double uf_deq()
 {
 	get_numeric_args(2);
 	double value = deq(va[0].dval,va[1].dval);
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 	return value;
 }
 
 double uf_atbof()
 {
 	ntoken();
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 	return (FBof(cbfp));
 }
 
 double uf_ateof()
 {
 	ntoken();
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 	return (FEof(cbfp));
 }
 
 double uf_atbol()
 {
 	ntoken();
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 	return (FBolAt(cbfp,Offset()));
 }
 
 double uf_ateol()
 {
 	ntoken();
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 	return (FEolAt(cbfp,Offset()));
 }
 
@@ -692,7 +694,7 @@ double uf_mainargsize()
 	ntoken();
 	if(main_args) {
 	// MESG("argument size: rows=%d cols=%d",main_args->rows,main_args->cols);
-		ex_vtype=VTYPE_NUM;
+		set_vtype(VTYPE_NUM);
 		return main_args->cols;
 	} else return 0;
 }
@@ -707,10 +709,10 @@ double uf_mainarg()
 	ind=(int)va[0].dval;
 	if(ind<main_args->cols) {
 		set_sval(main_args->sval[(int)va[0].dval]);
-		ex_vtype=VTYPE_STRING;
+		set_vtype(VTYPE_STRING);
 		value=atof(saved_string);
 	} else {
-		ex_vtype=VTYPE_NUM;
+		set_vtype(VTYPE_NUM);
 	};
 	return value;
 }

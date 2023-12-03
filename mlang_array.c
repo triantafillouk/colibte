@@ -33,10 +33,10 @@ void init_array(struct array_dat *array, int rows,int cols)
 	array->atype=ctype;
 	array->astat=ARRAY_UNALLOCATED;
 	array->dat=NULL;
-	ex_vtype=ctype;
+	set_vtype(ctype);
 	/* init again after use the ex values!  */
 	ex_nums=0;ex_nquote=0;ex_nvars=0;
-	// MESG("init_array: type=%d",ex_vtype);
+	// MESG("init_array: type=%d",ex_var.vtype);
 }
 
 /* List array is one dimensional string array  */
@@ -371,7 +371,8 @@ array_dat * array_sub2(array_dat *aa,array_dat *ba)
 
 void array_add1(array_dat *na,double plus)
 {
- if(na->astat!=ARRAY_ALLOCATED) {
+ // MESG("array_add1: type=%d stat=%d %d",na->atype,na->astat,ARRAY_ALLOCATED);
+ if(na->astat==ARRAY_UNALLOCATED) {
  	err_num=256;
  	err_str="error: cannot add to non defined array!";
 	return;
@@ -383,6 +384,7 @@ void array_add1(array_dat *na,double plus)
 				na->dval2[j][i] += plus;
 		} else {
 			if(na->rows > 1) dim=na->rows; else dim=na->cols;
+			
 			for(i=0;i<dim;i++) na->dval[i] += plus;
 		};
 	};
@@ -391,7 +393,7 @@ void array_add1(array_dat *na,double plus)
 
 void array_sub1(array_dat *na,double plus)
 {
- if(na->astat!=ARRAY_ALLOCATED) {
+ if(na->astat==ARRAY_UNALLOCATED) {
  	err_num=257;
 	err_str="error: cannot sub to non defined array!";
 	return;
@@ -411,7 +413,7 @@ void array_sub1(array_dat *na,double plus)
 void array_mul1(array_dat *na,double num)
 {
  if(na==NULL) { err_num=258;ERROR("array_mul1: NULL array!");return;};
- if(na->astat!=ARRAY_ALLOCATED) {
+ if(na->astat==ARRAY_UNALLOCATED) {
  	err_num=259;
  	ERROR("error: cannot mul to non defined array! astat=%d",na->astat);
 	return;
@@ -431,7 +433,7 @@ void array_mul1(array_dat *na,double num)
 void array_mod1(array_dat *na,double num)
 {
  if(na==NULL) { err_num=258;ERROR("array_mul1: NULL array!");return;};
- if(na->astat!=ARRAY_ALLOCATED) {
+ if(na->astat==ARRAY_UNALLOCATED) {
  	err_num=259;
  	ERROR("error: cannot mul to non defined array! astat=%d",na->astat);
 	return;
@@ -451,7 +453,7 @@ void array_mod1(array_dat *na,double num)
 void array_power(array_dat *na,double num)
 {
  if(na==NULL) { err_num=258;ERROR("array_power: NULL array!");return;};
- if(na->astat!=ARRAY_ALLOCATED) {
+ if(na->astat==ARRAY_UNALLOCATED) {
  	err_num=259;
  	ERROR("error: cannot power to non defined array! astat=%d",na->astat);
 	return;
