@@ -49,6 +49,7 @@ FILEBUF *exe_buffer=NULL;
 
 #endif
 
+
 int err_check_block1();
 int check_skip_token1( int type);
 void clean_saved_string(int new_size);
@@ -73,7 +74,6 @@ int is_break1=0;
 int tok_mask[256];
 
 int ex_vtype=0; 	/* type of previous expression */
-int ex_edenv=0;	/* true after encount an editor env variable */
 
 tok_data ex_var; 	/* value of previous expression */
 
@@ -291,7 +291,7 @@ double increase_by()
 	// MESG("increase_by:");
 	// sslot=lsslot;
 	// if(sslot->vtype==VTYPE_STRING) MESG("increase_by string [%s]",sslot->sval);
-	MESG("increase by: type=%d",sslot->vtype);
+	// MESG("increase by: type=%d",sslot->vtype);
 	v1=lexpression();
 
 	if(sslot->vtype==VTYPE_NUM) {
@@ -545,7 +545,7 @@ void delete_symbol_table(tok_data *td, int size,int level)
 {
  int i;
  // tok_data *sslot;
- MESG("delete_symbol_table: size=%d level=%d",size,level);
+ // MESG("delete_symbol_table: size=%d level=%d",size,level);
  if(td) {
  for(i=0;i<size;i++) {
 	tok_data *sslot;

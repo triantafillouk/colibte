@@ -12,6 +12,7 @@ extern FILEBUF *cbfp;
 tok_struct *current_token();
 void set_vtype(int type);
 int vtype_is(int type);
+int get_vtype();
 
 void ntoken();
 int check_token(int type);
@@ -45,7 +46,7 @@ void get_function_args (int number_of_args)
 			MESG("get_function_args:%d: [%d %s]",i,tok->tnum,tok->tname);
 #endif
 			double value = num_expression();
-			va[i].var_type=ex_var.vtype;
+			va[i].var_type=get_vtype();
 			if(vtype_is(VTYPE_STRING)) { 
 				va[i].sval=saved_string;saved_string=NULL;
 				// MESG("%d: string: [%s]",i,va[i].sval);
@@ -84,7 +85,7 @@ void get_numeric_args (int number_of_args)
 	for(i=0;i< number_of_args;i++ ) { 
 		ntoken();
 		double value = num_expression();
-		va[i].var_type=ex_var.vtype;
+		va[i].var_type=get_vtype();
 		va[i].dval=value;
 	};
 	ntoken();
@@ -269,7 +270,7 @@ double uf_print()
 {
 	tok_struct *tok=current_token();
 	int args=tok->number_of_args;
-	MESG("uf_print: ex_vtype=%d tnum=%d args=%d",ex_var.vtype,tok->tnum,tok->number_of_args);
+	MESG("uf_print: ex_vtype=%d tnum=%d args=%d",get_vtype(),tok->tnum,tok->number_of_args);
 	int i;
 	double value=0;
 	for(i=0;i<args;i++) {
@@ -278,7 +279,7 @@ double uf_print()
 		// MESG("	eval arg %d tnum=%d ttype=%d",i,tok->tnum,tok->ttype);
 		value=num_expression();
 		// MESG("		val=%f s='%s'",value,saved_string);
-		switch(ex_var.vtype) {
+		switch(get_vtype()) {
 			case VTYPE_ARRAY:
 			case VTYPE_SARRAY:
 			case VTYPE_AMIXED:
