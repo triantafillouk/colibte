@@ -798,7 +798,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 // 	if(tok->ttype==TOK_INCREASE || tok->ttype==TOK_DECREASE) {
 		// MESG("	found TOK_INCREASE !!!!!!!!!!!!!!!!!!!");
-// 		set_tok_function(tok,1);
+		set_tok_function(tok,1);
 	// };
 	// MESG("	set token name: %d %s",tok->ttype,token_table[tok->ttype].tok_name);
 	/* ------- set token name, group ----------- */

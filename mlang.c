@@ -208,6 +208,7 @@ static inline double factor_none()
 	return 0.0;	/* continue  */
 }
 
+#if	0
 double add_value(double v1)
 {
 	tok_data *sslot=lsslot;
@@ -238,24 +239,14 @@ double add_value(double v1)
 
 	return(v0);
 }
+#endif
 
-double increase_val()
+double update_val()
 {
- double v0;
-	// MESG("increase_val:");
+ double v0=lsslot->dval;
+	// MESG("update_val: from %f by %f",v0,tok->dval);
 	set_vtype(VTYPE_NUM);
-	v0=add_value(1.0);
-	NTOKEN2;
-	return(v0);
-}
-
-double decrease_val()
-{
- double v0;
-	TDS("decrease_val");
-	// MESG("decrease_val:");
-	set_vtype(VTYPE_NUM);
-	v0=add_value(-1.0);
+	lsslot->dval += tok->dval;
 	NTOKEN2;
 	return(v0);
 }
@@ -893,11 +884,9 @@ double factor_variable()
 			double val=lsslot->dval; 
 			// MESG("		>> val=%f",val);
 			NTOKEN2;
-#if	0
+#if	1
 			if(tok->tgroup==TOK_INCREASE) {
-				MESG("	increase: type=%d group=%d",tok->ttype,tok->tgroup);
-				// lsslot->dval += tok->dval;
-				// NTOKEN2;
+				return(update_val());
 			};
 #endif
 			RTRN(val);
@@ -1598,8 +1587,8 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_BQUOTE
 	factor_none,	// TOK_DOLAR		,
 	factor_none,	// TOK_TILDA		,
-	increase_val,	// TOK_INCREASE	,
-	decrease_val,	// TOK_DECREASE	,
+	update_val,	// TOK_INCREASE	,
+	update_val,	// TOK_DECREASE	,
 	factor_none,	// TOK_INCREASEBY
 	mul_by,	// TOK_MULBY
 	decrease_by,	// TOK_DECREASEBY
