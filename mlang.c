@@ -49,11 +49,12 @@ FILEBUF *exe_buffer=NULL;
 
 #endif
 
-
 int err_check_block1();
 int check_skip_token1( int type);
 void clean_saved_string(int new_size);
 int deq(double v1,double v2);
+void set_vtype(int type);
+int vtype_is(int type);
 
 double assign_val(double none);
 double assign_env(double none);
@@ -70,16 +71,21 @@ int get_vtype();
 TLIST ctoklist=NULL;
 int is_break1=0;
 int tok_mask[256];
+
 int ex_vtype=0; 	/* type of previous expression */
 int ex_edenv=0;	/* true after encount an editor env variable */
 
+tok_data ex_var; 	/* value of previous expression */
+
 double ex_value;	// saved double value
 array_dat *ex_array=NULL;
+char *saved_string=NULL;
+
+int ex_edenv=0;	/* true after encount an editor env variable */
 int ex_nvars=0;	/* true is there are variables in the array definition  */
 int ex_nquote=0;	/* true if there are strings in the array definition  */
 int ex_nums=0;	/* true if array is only numeric  */
 char *ex_name=NULL;	/* variable name of the previous array  */
-char *saved_string=NULL;
 
 /* error control variables  */
 int err_num=0;
@@ -236,7 +242,7 @@ double add_value(double v1)
 double increase_val()
 {
  double v0;
-	MESG("increase_val:");
+	// MESG("increase_val:");
 	set_vtype(VTYPE_NUM);
 	v0=add_value(1.0);
 	NTOKEN2;
@@ -285,7 +291,7 @@ double increase_by()
 	// MESG("increase_by:");
 	// sslot=lsslot;
 	// if(sslot->vtype==VTYPE_STRING) MESG("increase_by string [%s]",sslot->sval);
-	
+	MESG("increase by: type=%d",sslot->vtype);
 	v1=lexpression();
 
 	if(sslot->vtype==VTYPE_NUM) {
@@ -293,6 +299,12 @@ double increase_by()
 		sslot->dval = v0+v1;
 		return(sslot->dval);
 	};
+#if	1
+	if(sslot->vtype==VTYPE_ARRAY) {
+		array_add1(sslot->adat,v1);
+		return(v1);
+	};
+#else
 	if(sslot->vtype==VTYPE_ARRAY) {
 		v0=*sslot->pdval;
 		
@@ -300,6 +312,7 @@ double increase_by()
 		// MESG("array: %f -> %f",v0,*sslot->pdval);
 		return(v0+v1);
 	};
+#endif
 	if(sslot->vtype==VTYPE_STRING) {
 		// MESG("increase by:");
 		sslot->sval=(char *)realloc(sslot->sval,strlen(sslot->sval)+strlen(saved_string)+1);
@@ -503,10 +516,11 @@ tok_data *new_symbol_table(int size)
  tok_data *td=malloc(sizeof(struct tok_data)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
  for(i=0;i<size;i++) {
-	td[i].ind=i;
+	// td[i].ind=i;
  	td[i].vtype=VTYPE_NUM;
-	td[i].pdval=NULL;
+	// td[i].pdval=NULL;
 	td[i].dval=0;
+	// td[i].pval = &td[i].dval;
  };
  return td;
 }
@@ -514,11 +528,11 @@ tok_data *new_symbol_table(int size)
 tok_data *realloc_symbol_table(tok_data *td,int size,int old_size)
 {
  int i;
- // MESG("Initialize new_symbol_table: size %d",size);
+ // MESG("realloc_symbol_table: size %d",size);
  td=realloc(td,sizeof(struct tok_data)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
  for(i=old_size;i<size;i++) {
-	td[i].ind=i;
+	// td[i].ind=i;
  	td[i].vtype=VTYPE_NUM;
 	td[i].pdval=NULL;
 	td[i].dval=0;
@@ -531,7 +545,7 @@ void delete_symbol_table(tok_data *td, int size,int level)
 {
  int i;
  // tok_data *sslot;
- // MESG("delete_symbol_table: size=%d level=%d",size,level);
+ MESG("delete_symbol_table: size=%d level=%d",size,level);
  if(td) {
  for(i=0;i<size;i++) {
 	tok_data *sslot;
@@ -541,6 +555,14 @@ void delete_symbol_table(tok_data *td, int size,int level)
 		// MESG("delete_symbol_table:%d [%s] free %X",i,sslot->sval,sslot->sval);
 		 	if(sslot->sval!=NULL)  free(sslot->sval);
 	};
+#if	1
+	if(sslot->vtype==VTYPE_ARRAY) {
+		if(sslot->adat!=NULL) {
+			free_array_dat(sslot->adat);
+			free(sslot->adat);
+		};
+	};
+#endif
  };
  free(td);
  };
@@ -566,6 +588,13 @@ void init_error()
  err_str=NULL;
 }
 
+void init_ex_var()
+{
+	ex_var.vtype=VTYPE_NUM;
+	ex_var.pval = &ex_var.dval;
+	ex_var.dval=0;
+}
+
 void init_exec_flags()
 {
  // MESG("init_exec_flags:");
@@ -574,6 +603,7 @@ void init_exec_flags()
  current_active_flag=1;
  set_vtype(0);
  set_dval(0.0);
+ init_ex_var();
  var_node=NULL;
  pnum=0;
  stage_level=0;
@@ -1113,7 +1143,7 @@ double factor_cmd()
 				NTOKEN2;
 #if	0
 				value=num_expression();
-				// MESG(";	ed_command:arg2 value=%f ex_vtype=%d s=[%s]",value,ex_vtype,saved_string);
+				// MESG(";	ed_command:arg2 value=%f ex_var.vtype=%d s=[%s]",value,ex_var.vtype,saved_string);
 #endif
 				// MESG(";ed_command: second token! type=%d ",tok->ttype);
 				break;
@@ -2933,8 +2963,8 @@ int get_vtype()
 
 int vtype_is(int type)
 {
-	// ex_var.vtype=ex_vtype;
 	return type==ex_vtype;
+	// return type==ex_var.vtype;
 }
 
 void set_vtype(int type)
