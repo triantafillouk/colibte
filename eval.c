@@ -607,15 +607,17 @@ double compute_string(char *s,char *new_string)
  	init_error();
 	initialize_vars();
 	insert_string(fp,s,strlen(s));
+	MESG("compute_string [%s]",s);
 	fp->b_type=1;
 	value=compute_block(fp,cbfp,0);
+	MESG("compute_string new_string=[%s]",new_string);
 
 	if(new_string) {
 		get_text_offs(fp,new_string,0,FLineEnd(fp,0));
 	};
 
 	delete_filebuf(fp,0);
-//	MESG("compute_string: [%s] result=%f",s,value);
+	MESG("compute_string: [%s] result=%f",s,value);
 	return(value);
 }
 
@@ -1231,6 +1233,7 @@ int refresh_current_line(int nused)
  offs tpo;	// current offset
  offs sl,el; // start, end of line
  int dsize=0;
+ int ddot_pos;
  offs i;
  show_stage=0;
 
@@ -1240,16 +1243,22 @@ int refresh_current_line(int nused)
 
 	el=FLineEnd(cbfp,tpo);
 	dsize=el-sl;
+	ddot_pos=dsize;
 	for(i=sl;i<el;i++) {
-		if(CharAt(i)==':') { is_ddot=!(cbfp->b_state & FS_VIEW);break;};
+		if(CharAt(i)==':') { 
+			is_ddot=!(cbfp->b_state & FS_VIEW);
+			ddot_pos=i-sl+1;break;};
 	};
-
+	
 	// goto the begining of the line
+	set_Offset(sl+ddot_pos);
+	if(is_ddot) DeleteBlock(0,dsize-ddot_pos);
 	set_Offset(sl);
 	get_text_offs(cbfp,text_line,sl,MAXLLEN);
-
-	if(is_ddot) DeleteBlock(0,dsize);	/* clear the line!  */
-
+	set_Offset(sl);
+	if(is_ddot) DeleteBlock(0,ddot_pos);	/* clear the line!  */
+	set_Offset(sl);
+	// MESG("refresh_current_line:[%s] %d",text_line,ddot_pos);
 	value = compute_string(text_line,text_line);
 
 	if(is_ddot) {

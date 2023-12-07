@@ -2234,7 +2234,7 @@ void refresh_ddot_1(double value)
  TextPoint *tp;
 
  TDS("refresh_ddot_1");
- 
+ MESG("refresh_ddot:");
  if(execmd) {
 	 if(vtype_is(VTYPE_NUM)) {
 		if(lstoken) {
@@ -2258,15 +2258,15 @@ void refresh_ddot_1(double value)
  ddot_position=tp_offset(tp);
  
  line_end=FLineEnd(buf,ddot_position);
-
+ // MESG("	ddot_pos=%d end=%d todel=%d",ddot_position,line_end,line_end-ddot_position);
  if(buf->b_state & FS_VIEW) return; // no refresh in view mode
 
  old_fp=cbfp; // keep the old buffer just in case
 
  sfb(buf);
- dsize=line_end-ddot_position-1;
+ dsize=line_end-(ddot_position+1);
 
- textpoint_set(buf->tp_current,ddot_position+1);
+ textpoint_set(buf->tp_current,ddot_position);
 
  if(vtype_is(VTYPE_STRING)) {	/* string value  */
 	stat=snprintf(ddot_out,128," \"%s\"",saved_string);
@@ -2286,6 +2286,7 @@ void refresh_ddot_1(double value)
  };
  if(stat>MAXLLEN) MESG("truncated");
 // replace text
+ textpoint_set(buf->tp_current,ddot_position+1);
  DeleteBlock(0,dsize);
  insert_string(cbfp,ddot_out,strlen(ddot_out));
  if(err_num>0) {
