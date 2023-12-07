@@ -258,7 +258,7 @@ int  err_push_args_1(int *nargs)
 	};
  
  while(1){
-	ex_vtype=VTYPE_NUM;
+	set_vtype(VTYPE_NUM);
 	// slval[0]=0;
 	xpos=412;
 	
@@ -425,7 +425,7 @@ int err_increase_val()
 {
  TDSERR("increase_val");
  SHOW_STAGE(444);
- if(ex_vtype!=VTYPE_NUM) {
+ if(!vtype_is(VTYPE_NUM)) {
 	set_error(tok,444,"increase_val not numeric!");
 	NTOKEN_ERR(444);
 	return(444);
@@ -438,7 +438,7 @@ int err_decrease_val()
 {
  TDSERR("decrease_val");
  SHOW_STAGE(446);
- if(ex_vtype!=VTYPE_NUM) {
+ if(!vtype_is(VTYPE_NUM)) {
 	set_error(tok,446,"decrease_val not numeric!");
 	NTOKEN_ERR(446);
 	return(446);
@@ -524,7 +524,7 @@ int err_factor()
  int save_macro_exec;
  tok_struct *tok0; 
 
- ex_vtype=VTYPE_NUM;
+ set_vtype(VTYPE_NUM);
  ex_edenv=0;
 
  SHOW_STAGE(470);
@@ -714,13 +714,13 @@ int err_factor()
 	case TOK_QUOTE:	 { // string 
 		xpos=488;
 		if(pre_symbol) { syntax_error("symbol before string",xpos);RT_MESG1(4881);};
-		ex_vtype=VTYPE_STRING;
+		set_vtype(VTYPE_STRING);
 		ex_nquote++;
 		RT_MESG1(4882);
 	 	};
 	case TOK_AT: {
 		xpos=489;
-		ex_vtype=VTYPE_NUM;
+		set_vtype(VTYPE_NUM);
 		RT_MESG1(4891);
 		};
 	case TOK_MINUS:
@@ -747,11 +747,11 @@ int err_factor()
 
 		ex_edenv=0;
 #if	1
-		ex_vtype = var_node->node_vtype;
+		set_vtype(var_node->node_vtype);
 #else
 		if(var_node->sval!=NULL) { /* there is a valid string value CHECK !!*/
-			ex_vtype=VTYPE_STRING;
-		} else ex_vtype=VTYPE_NUM;
+			set_vtype(VTYPE_STRING);
+		} else set_vtype(VTYPE_NUM);
 #endif
 		pre_symbol=0;
 		RT_MESG1(xpos);
@@ -974,7 +974,7 @@ int err_num_expression()
  TDSERR("num_expression");
  int expression_type=VTYPE_NUM;
 
- ex_vtype=VTYPE_NUM;
+ set_vtype(VTYPE_NUM);
  // slval[0]=0;
  xpos=561;
 
@@ -982,7 +982,7 @@ int err_num_expression()
  err_num = err_num_term1();
  if(err_num) return(err_num);
 
- expression_type=ex_vtype;	// set local value
+ expression_type=get_vtype();	// set local value
 
  while (tok->tgroup==TOK_TERM) {
    CHECK_TOK(563);
@@ -996,9 +996,10 @@ int err_num_expression()
 		simple=0;
 		/* check validity of operation combinations   */
 		if(expression_type==VTYPE_STRING) { /* catanate string */
-			if(ex_vtype) {
+			if(get_vtype()) {
 			} else {
-				expression_type=ex_vtype=VTYPE_STRING;
+				set_vtype(VTYPE_STRING);
+				expression_type=get_vtype();
 			}
 		} else {
 		}

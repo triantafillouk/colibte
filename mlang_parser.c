@@ -511,7 +511,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  {
 	if(change_script_state(tok_type,&script_active)) continue;
 
-// 	MESG("parse- cc=%d %c type=%3d [%10s]",cc,cc,tok_type,tname(tok_type));
+	MESG("parse- cc=%d %c type=%3d [%10s]",cc,cc,tok_type,tname(tok_type));
 
 	if(err_num>0) return 0.0;
 
@@ -686,6 +686,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 		case TOK_PLUS:
 			if(next_token_type(bf)==TOK_PLUS) {
+				// MESG("	TOK_PLUS PLUS");
 				getnc1(bf,&cc,&tok_type);
 				tok_type=TOK_INCREASE;
 				break;
@@ -783,6 +784,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	tok->ttype=tok_type;
 	tok->dval=value;
 	tok->tline=tok_line;
+
 	if(tok->ttype==TOK_SHOW) {
 		// MESG("	TOK_SHOW");
 		tok->ddot=new_textpoint_at(bf,TP_DDOT,ddot_offset-1);
@@ -794,17 +796,19 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok->ttype==TOK_AT) {
 		tok->tname=strdup(nword);
 	};
-
+// 	if(tok->ttype==TOK_INCREASE || tok->ttype==TOK_DECREASE) {
+		// MESG("	found TOK_INCREASE !!!!!!!!!!!!!!!!!!!");
+// 		set_tok_function(tok,1);
+	// };
 	// MESG("	set token name: %d %s",tok->ttype,token_table[tok->ttype].tok_name);
 	/* ------- set token name, group ----------- */
 	if(tok->ttype!=TOK_VAR&&tok->ttype!=TOK_QUOTE&&tok->ttype!=TOK_NUM)
 		tok->tname=token_table[tok->ttype].tok_name;
 	tok->tgroup=token_table[tok->ttype].tok_group;
 
-	if(tok->tgroup==TOK_COMPARE) {
-		// tok->cexpr_function = factor_funcs[tok->ttype];
+	// if(tok->tgroup==TOK_COMPARE || tok->tgroup==TOK_INCREASE) {
 		set_tok_function(tok,1);
-	};
+	// };
 	if(tok->ttype==TOK_LCURL) {
 		struct curl_struct *tcl;
 			tcl=new_curl(curl_level,tok_line,lex_parser->last);
