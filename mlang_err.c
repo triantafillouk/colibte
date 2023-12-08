@@ -624,14 +624,14 @@ int err_factor()
 		ex_nvars++;
 		if(tok->ttype==TOK_INCREASE) {
 			tok->dval=1;
-			tok->tgroup=TOK_INCREASE;
-			set_tok_function(tok,0);
+			// tok->tgroup=TOK_TERM2;
+			// set_tok_function(tok,0);
 			NTOKEN_ERR(498);
 		} else
 		if(tok->ttype==TOK_DECREASE) {
-			tok->tgroup=TOK_INCREASE;
+			// tok->tgroup=TOK_TERM2;
 			tok->dval=-1;
-			set_tok_function(tok,0);
+			// set_tok_function(tok,0);
 			NTOKEN_ERR(498);
 		};
 		// MESG("	TOK_VAR: return [%s]",tok_info(tok));

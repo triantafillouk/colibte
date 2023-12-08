@@ -4,7 +4,7 @@
 	GNU LESSER GENERAL PUBLIC LICENSE version 2 
 	(or at your option) any later version.
 
- 	An interpreter,embeded calulator by K.Triantafillou (2011,2020),
+ 	An interpreter,embeded calculator by K.Triantafillou (2011,2020),
 */
 
 #include	<math.h>
@@ -72,12 +72,15 @@ int get_vtype();
 TLIST ctoklist=NULL;
 int is_break1=0;
 int tok_mask[256];
+#define	USE_VAR	1
 
+#if	USE_VAR
+static tok_data ex_var; 	/* value of previous expression */
+#else
 int ex_vtype=0; 	/* type of previous expression */
-
-tok_data ex_var; 	/* value of previous expression */
-
 double ex_value;	// saved double value
+#endif
+
 array_dat *ex_array=NULL;
 char *saved_string=NULL;
 
@@ -96,7 +99,6 @@ static tok_struct *tok;	/* current token!!  */
 char *err_str;
 BTNODE *var_node=NULL;
 
-tok_data ex_var;
 tok_struct *lstoken=NULL;
 tok_data *lsslot=NULL;
 MVAR *lmvar=NULL;
@@ -245,7 +247,7 @@ double update_val()
 {
  double v0=lsslot->dval;
 	// MESG("update_val: from %f by %f",v0,tok->dval);
-	set_vtype(VTYPE_NUM);
+	// set_vtype(VTYPE_NUM);
 	lsslot->dval += tok->dval;
 	NTOKEN2;
 	return(v0);
@@ -579,12 +581,14 @@ void init_error()
  err_str=NULL;
 }
 
+#if	USE_VAR
 void init_ex_var()
 {
 	ex_var.vtype=VTYPE_NUM;
 	ex_var.pval = &ex_var.dval;
 	ex_var.dval=0;
 }
+#endif
 
 void init_exec_flags()
 {
@@ -594,7 +598,9 @@ void init_exec_flags()
  current_active_flag=1;
  set_vtype(0);
  set_dval(0.0);
+#if	EX_VAR
  init_ex_var();
+#endif
  var_node=NULL;
  pnum=0;
  stage_level=0;
@@ -879,12 +885,12 @@ double factor_variable()
 	set_vtype(lsslot->vtype);
 	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d",
 		// tok->tname,lsslot->ind,get_vtype(),tok->ttype,tok->tvtype);
-	switch(ex_vtype) {
+	switch(get_vtype()) {
 		case VTYPE_NUM:{
 			double val=lsslot->dval; 
 			// MESG("		>> val=%f",val);
 			NTOKEN2;
-#if	1
+#if	0
 			if(tok->tgroup==TOK_INCREASE) {
 				return(update_val());
 			};
@@ -1619,7 +1625,7 @@ FFunction factor_funcs[] = {
 
 void set_tok_function(tok_struct *tok, int type)
 {
-	MESG("set_tok_function: type=%d ttype=%d",type,tok->ttype);
+	// MESG("set_tok_function: type=%d ttype=%d",type,tok->ttype);
 	switch(type) {
 		case 0:
 			if(tok->ttype==TOK_FUNC) {
@@ -2923,7 +2929,11 @@ char * key_str1()
 
 double get_val()
 {
+#if	USE_VAR
+	return ex_var.dval;
+#else
 	return (ex_value);
+#endif
 }
 
 
@@ -2947,19 +2957,29 @@ double next_value()
 
 int get_vtype()
 {
+#if	USE_VAR
+	return ex_var.vtype;
+#else
 	return ex_vtype;
+#endif
 }
 
 int vtype_is(int type)
 {
+#if	USE_VAR
+	return type==ex_var.vtype;
+#else
 	return type==ex_vtype;
-	// return type==ex_var.vtype;
+#endif
 }
 
 void set_vtype(int type)
 {
+#if	USE_VAR
+	ex_var.vtype=type;
+#else
 	ex_vtype=type;
-	// ex_var.vtype=type;
+#endif
 }
 
 void set_sval(char *s)
@@ -2970,7 +2990,11 @@ void set_sval(char *s)
 
 void set_dval(double value)
 {
- ex_value = value;
+#if	USE_VAR
+	ex_var.dval=value;
+#else
+	ex_value = value;
+#endif
 }
 
 #include "mlang_err.c"
