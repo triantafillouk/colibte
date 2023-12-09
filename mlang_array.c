@@ -415,7 +415,7 @@ void array_mul1(array_dat *na,double num)
  if(na==NULL) { err_num=258;ERROR("array_mul1: NULL array!");return;};
  if(na->astat==ARRAY_UNALLOCATED) {
  	err_num=259;
- 	ERROR("error: cannot mul to non defined array! astat=%d",na->astat);
+ 	ERROR("error: cannot mul to unallocated array! astat=%d type=%d",na->astat,na->atype);
 	return;
  };
  	if(na->atype==VTYPE_ARRAY) {	/* allocate num array  */
@@ -432,10 +432,10 @@ void array_mul1(array_dat *na,double num)
 
 void array_mod1(array_dat *na,double num)
 {
- if(na==NULL) { err_num=258;ERROR("array_mul1: NULL array!");return;};
+ if(na==NULL) { err_num=258;ERROR("array_mod1: NULL array!");return;};
  if(na->astat==ARRAY_UNALLOCATED) {
  	err_num=259;
- 	ERROR("error: cannot mul to non defined array! astat=%d",na->astat);
+ 	ERROR("error: cannot mod to non defined array! astat=%d",na->astat);
 	return;
  };
  	if(na->atype==VTYPE_ARRAY) {	/* allocate num array  */

@@ -2,9 +2,8 @@
 #include "mlang.h"
 
 extern char *saved_string;
-extern tok_data ex_var;
 
-extern array_dat *ex_array;
+// extern array_dat *ex_array;
 extern array_dat *main_args;
 extern char *ex_name;
 extern FILEBUF *cbfp;
@@ -13,6 +12,8 @@ tok_struct *current_token();
 void set_vtype(int type);
 int vtype_is(int type);
 int get_vtype();
+void set_array(array_dat *a);
+array_dat *get_array(char *);
 
 void ntoken();
 int check_token(int type);
@@ -51,7 +52,7 @@ void get_function_args (int number_of_args)
 				va[i].sval=saved_string;saved_string=NULL;
 				// MESG("%d: string: [%s]",i,va[i].sval);
 			} else if (vtype_is(VTYPE_ARRAY)||vtype_is(VTYPE_SARRAY)) {
-				va[i].adat=ex_array;
+				va[i].adat=get_array("101");
 				// MESG("%d: array",i);
 			}
 			else {
@@ -186,7 +187,7 @@ double uf_inverse()
 		if(value!=0) {
 			array_dat *inverse;
 			inverse=cofactor2(arr,value);
-			ex_array=inverse;
+			set_array(inverse);
 			ex_name="Inverse";
 		};
 	} else {
@@ -203,7 +204,7 @@ double uf_transpose()
 		array_dat *arr  = va->adat;
 		array_dat *tarray;
 		tarray = transpose(arr);
-		ex_array=tarray;
+		set_array(tarray);
 		ex_name="Tranpose";
 		value=1;
 	} else {
@@ -284,7 +285,7 @@ double uf_print()
 			case VTYPE_SARRAY:
 			case VTYPE_AMIXED:
 				if(i>0) out_print("",1);
-				print_array1("",ex_array);break;
+				print_array1("",get_array("102"));break;
 			case VTYPE_NUM:{
 				char *p_out=(char *)malloc(128);
 				long l0=value;

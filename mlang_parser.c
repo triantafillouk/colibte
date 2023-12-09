@@ -511,7 +511,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  {
 	if(change_script_state(tok_type,&script_active)) continue;
 
-	MESG("parse- cc=%d %c type=%3d [%10s]",cc,cc,tok_type,tname(tok_type));
+	// MESG("parse- cc=%d %c type=%3d [%10s]",cc,cc,tok_type,tname(tok_type));
 
 	if(err_num>0) return 0.0;
 
