@@ -505,7 +505,7 @@ tok_data *new_symbol_table(int size)
  tok_data *td=malloc(sizeof(struct tok_data)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
  for(i=0;i<size;i++) {
-	td[i].ind=i;
+	// td[i].ind=i;
  	td[i].vtype=VTYPE_NUM;
 	td[i].pdval=NULL;
 	td[i].dval=0;
@@ -520,7 +520,7 @@ tok_data *realloc_symbol_table(tok_data *td,int size,int old_size)
  td=realloc(td,sizeof(struct tok_data)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
  for(i=old_size;i<size;i++) {
-	td[i].ind=i;
+	// td[i].ind=i;
  	td[i].vtype=VTYPE_NUM;
 	td[i].pdval=NULL;
 	td[i].dval=0;

@@ -126,7 +126,7 @@ void allocate_array(struct array_dat *adat)
 		for(i=0;i< adat->rows*adat->cols;i++) adat->sval[i]=NULL;
 		adat->astat=ARRAY_ALLOCATED;
 	};
-	if(adat->atype==VTYPE_AMIXED || adat->atype==VTYPE_DYNAMIC) {	/* new mixed  */
+	if(adat->atype==VTYPE_AMIXED) {	/* new mixed  */
 		// MESG("allocate array amixed or dynamic!");
 		if(adat->mval!=NULL) free(adat->mval);
 		adat->mval=(struct MVAR *)malloc(sizeof(struct MVAR)*adat->rows*adat->cols);
