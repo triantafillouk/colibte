@@ -796,19 +796,19 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok->ttype==TOK_AT) {
 		tok->tname=strdup(nword);
 	};
-// 	if(tok->ttype==TOK_INCREASE || tok->ttype==TOK_DECREASE) {
+	if(tok->ttype==TOK_INCREASE || tok->ttype==TOK_DECREASE) {
 		// MESG("	found TOK_INCREASE !!!!!!!!!!!!!!!!!!!");
 		set_tok_function(tok,1);
-	// };
+	};
 	// MESG("	set token name: %d %s",tok->ttype,token_table[tok->ttype].tok_name);
 	/* ------- set token name, group ----------- */
 	if(tok->ttype!=TOK_VAR&&tok->ttype!=TOK_QUOTE&&tok->ttype!=TOK_NUM)
 		tok->tname=token_table[tok->ttype].tok_name;
 	tok->tgroup=token_table[tok->ttype].tok_group;
 
-	// if(tok->tgroup==TOK_COMPARE || tok->tgroup==TOK_INCREASE) {
+	if(tok->tgroup==TOK_COMPARE) {
 		set_tok_function(tok,1);
-	// };
+	};
 	if(tok->ttype==TOK_LCURL) {
 		struct curl_struct *tcl;
 			tcl=new_curl(curl_level,tok_line,lex_parser->last);

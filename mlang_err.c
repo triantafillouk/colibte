@@ -543,7 +543,7 @@ int err_factor()
 	return(err_num);
  };
  set_tok_function(tok0,0);
- set_tok_function(tok,0);
+ // set_tok_function(tok,0);
  // MESG("switch: tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
  switch(tok0->ttype) {
 	/*  the following ends factor  */
@@ -625,13 +625,13 @@ int err_factor()
 		if(tok->ttype==TOK_INCREASE) {
 			tok->dval=1;
 			// tok->tgroup=TOK_TERM2;
-			// set_tok_function(tok,0);
+			set_tok_function(tok,0);
 			NTOKEN_ERR(498);
 		} else
 		if(tok->ttype==TOK_DECREASE) {
 			// tok->tgroup=TOK_TERM2;
 			tok->dval=-1;
-			// set_tok_function(tok,0);
+			set_tok_function(tok,0);
 			NTOKEN_ERR(498);
 		};
 		// MESG("	TOK_VAR: return [%s]",tok_info(tok));
