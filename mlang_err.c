@@ -623,11 +623,13 @@ int err_factor()
 		ex_nvars++;
 		if(tok->ttype==TOK_INCREASE) {
 			tok->dval=1;
-			tok->tgroup=TOK_INCREASE;
+			// tok->tgroup=TOK_INCREASE;
+			set_tok_function(tok,1);
 			NTOKEN_ERR(498);
 		} else
 		if(tok->ttype==TOK_DECREASE) {
-			tok->tgroup=TOK_INCREASE;
+			// tok->tgroup=TOK_INCREASE;
+			set_tok_function(tok,1);
 			tok->dval=-1;
 			NTOKEN_ERR(498);
 		};

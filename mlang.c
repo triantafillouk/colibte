@@ -203,6 +203,7 @@ static inline double factor_none()
 	return 0.0;	/* continue  */
 }
 
+#if	0
 double add_value(double v1)
 {
 	tok_data *sslot=lsslot;
@@ -234,26 +235,16 @@ double add_value(double v1)
 
 	return(v0);
 }
+#endif
 
-double increase_val()
+double update_val()
 {
- double v0;
-	TDS("increase_val");
-	// MESG("increase_val:");
-	set_vtype(VTYPE_NUM);
-	v0=add_value(1.0);
-	// NTOKEN2;
-	return(v0);
-}
-
-double decrease_val()
-{
-	TDS("decrease_val");
-	// MESG("decrease_val:");
-	set_vtype(VTYPE_NUM);
-	add_value(-1.0);
+ double v0=lsslot->dval;
+	// MESG("update_val: from %f by %f",v0,tok->dval);
+	// set_vtype(VTYPE_NUM);
+	lsslot->dval += tok->dval;
 	NTOKEN2;
-	return(lsslot->dval);
+	return(v0);
 }
 
 double decrease_by()
@@ -857,14 +848,7 @@ inline tok_data *get_left_slot(int ind)
 double factor_variable()
 {	
  	lsslot = get_left_slot(tok->tind);
-	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d ind=%d",
-		// tok->tname,lsslot->ind,get_vtype(),tok->ttype,tok->tvtype,tok->tind);
-	// if(tok->tvtype==VTYPE_TREE) ex_vtype=tok->tvtype;
-	// else 
-		set_vtype(lsslot->vtype);
-	// BTNODE *tok_node = tok->tnode;
-	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d node type=%d",
-		// tok->tname,lsslot->ind,get_vtype(),tok->ttype,tok->tvtype,tok_node->node_vtype);
+	set_vtype(lsslot->vtype);
 	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d",
 		// tok->tname,lsslot->ind,get_vtype(),tok->ttype,tok->tvtype);
 	switch(get_vtype()) {
@@ -872,10 +856,11 @@ double factor_variable()
 			double val=lsslot->dval; 
 			// MESG("		>> val=%f",val);
 			NTOKEN2;
+#if	0
 			if(tok->tgroup==TOK_INCREASE) {
-				lsslot->dval += tok->dval;
-				NTOKEN2;
+				return(update_val());
 			};
+#endif
 			RTRN(val);
 			};
 		case VTYPE_STRING:
@@ -1574,8 +1559,8 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_BQUOTE
 	factor_none,	// TOK_DOLAR		,
 	factor_none,	// TOK_TILDA		,
-	increase_val,	// TOK_INCREASE	,
-	decrease_val,	// TOK_DECREASE	,
+	update_val,		// TOK_INCREASE	,
+	update_val,		// TOK_DECREASE	,
 	factor_none,	// TOK_INCREASEBY
 	mul_by,	// TOK_MULBY
 	decrease_by,	// TOK_DECREASEBY

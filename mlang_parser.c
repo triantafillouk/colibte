@@ -794,7 +794,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok->ttype==TOK_AT) {
 		tok->tname=strdup(nword);
 	};
-
+	// set_tok_function(tok,1);
 	// MESG("	set token name: %d %s",tok->ttype,token_table[tok->ttype].tok_name);
 	/* ------- set token name, group ----------- */
 	if(tok->ttype!=TOK_VAR&&tok->ttype!=TOK_QUOTE&&tok->ttype!=TOK_NUM)
