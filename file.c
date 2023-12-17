@@ -1138,8 +1138,15 @@ int open_file(int n)
  int err=0;
  int stat=0;
  int line=0;
- // MESG("open_file: %d",n);
+ // MESG("open_file: %d [%s]",n,get_sval());
 	fname[0]=0;
+	if(macro_exec){
+		// MESG("	open_file_named");
+		err=open_file_named(get_sval());
+		err=goto_file(get_sval());
+		// igotolinecol(line,1,-1);
+		return(err);
+	}
 	set_list_type(LDIR);
 	if(n>0) {
 		if(n==3) {
@@ -1170,7 +1177,7 @@ int open_file(int n)
 
 	stat=snprintf(prompt,MAXFLEN,"Open file [%s] : ",tname);
 	if(stat>=MAXFLEN) MESG("truncated prompt when opening file!");
-
+	// MESG("	get the file name from nextarg!");
     if (nextarg(prompt, tname, MAXFLEN,true) != TRUE){
 		set_Offset(o1);
 		set_update(cwp,UPD_WINDOW);

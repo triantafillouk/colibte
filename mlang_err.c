@@ -164,19 +164,18 @@ void error_skip_token(int index,char *description)
 
 void set_error(tok_struct *tok,int err,char *description)
 {
- is_break1=1;
- 
+ set_break();
+
  if(tok==NULL) {
- 	fprintf(stderr,"error: %d %s\n",err,description);
+ 	fprintf(stderr,"error: tok is NULL, %d %s\n",err,description);
 	err_num=err;
 	err_str=description;
-	
 	return;
  };
  // MESG("set_error:----------------");
  err_line=tok->tline;
  err_num=err;
- // MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
+ MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
  err_str=strdup(description);
 #if	0
  if(execmd) {
@@ -184,7 +183,6 @@ void set_error(tok_struct *tok,int err,char *description)
  	else fprintf(stderr,"Error:%d [%s] tnum=%d ttype=%d %s line %d\n",err,(char *)tok->tname,tok->tnum,tok->ttype,err_str,err_line);
  };
 #endif
- current_active_flag=0;
  tok=cbfp->end_token;
  if(tok==NULL) return;
  tok->ttype=TOK_EOF;

@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.58T94 (30/08/2023)"
+#define VERSION 	"#01.58T95 (17/12/2023)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -34,6 +34,8 @@
 
 #define	USE_FAST	1 & PCURSES	/* erase line for double width characters in panel_curses  */
 #define TEST_TYPE	1
+
+#define NEW	1	/* new tested code!  */
 
 #if	DARWIN
 #define	_FILE_OFFSET_BITS	64

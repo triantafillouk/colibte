@@ -219,7 +219,7 @@ double uf_left()
 	get_function_args(2);
 
 	if(va[0].var_type==VTYPE_STRING && va[1].var_type==VTYPE_NUM ) {
-	set_sval(va[0].sval);
+		set_sval(va[0].sval);
 	} else set_sval("");
 	set_vtype(VTYPE_STRING);
 	return 0;

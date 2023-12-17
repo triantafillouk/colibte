@@ -306,7 +306,7 @@ void ERROR(const char *fmt, ...)
 		va_end(args);
 		msg_log(1,mline);
 		msg_line(mline);
-		if(debug_flag()) fprintf(stderr,"Error: %s\n",mline);
+		// if(debug_flag()) fprintf(stderr,"Error: %s\n",mline);
     }
 }
 

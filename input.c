@@ -820,11 +820,12 @@ int istring(int n)
 {
 	register int status;	/* status return code */
 	char tstring[MAXLLEN];	/* string to add */
-
+	// MESG("istring: n=%d",n);
 	if (n < 0)	return FALSE;
 	/* ask for string to insert */
 	tstring[0]=0;
 	status = nextarg("String to insert: ", tstring, MAXLLEN,true);
+	// MESG("	string to insert [%s] status=%d",tstring,status);
 	if (status != TRUE)	return(status);
 
 	/* insert it, no newlines allowed */

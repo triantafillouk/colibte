@@ -206,7 +206,7 @@ double get_env(int vnum)
 	char *getkill();
 	static double value=0;
 	char svalue[MAXLLEN];
-	int v1=0;
+	long v1=0;
 	svalue[0]=0;
 
 	/* fetch the appropriate value */
@@ -261,10 +261,8 @@ double get_env(int vnum)
 	};
 	value=v1;
 	if(svalue[0]!=0) { 
-		set_vtype(VTYPE_STRING);
-		set_sval(svalue);	
-		// value=next_value();
-	} else set_vtype(VTYPE_NUM);
+		set_vsval(svalue);	
+	} else set_vdval(value);
 	return(value);
 }
 
@@ -768,7 +766,7 @@ int dofile(char *fname)
 	/* go execute it! */
 	int backup_caf=current_active_flag;
 	double d = compute_block(bp,bp,1);
-	set_dval(d);
+	set_vdval(d);
 	current_active_flag=backup_caf;
 	/* if not displayed, remove the now unneeded macro buffer and exit */
 	if (bp->b_nwnd == 0) 

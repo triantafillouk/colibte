@@ -1386,7 +1386,7 @@ int new_line(int n)
 	if(cbfp->b_flag & FSDIRED) return(0);
 	if(dont_edit()) return FALSE;
 	if (n < 1) return (FALSE);
-
+	// MESG("new_line: lines %d",n);
 	cbfp->line_from=GetLine();
 	/* insert some lines */
 	while (n--) {
