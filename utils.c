@@ -138,6 +138,7 @@ double  show_time(char *description,int init)
 	} else {
 		vtime=diff_start_sec+diff_start_usec*0.000001;
 	}
+	set_vdval(vtime);
 	return vtime;
 }
 

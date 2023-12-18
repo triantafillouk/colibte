@@ -261,7 +261,7 @@ double get_env(int vnum)
 	};
 	value=v1;
 	if(svalue[0]!=0) { 
-		set_vsval(svalue);	
+		set_sval(svalue);	
 	} else set_vdval(value);
 	return(value);
 }

@@ -319,7 +319,9 @@ typedef struct  VIDEO {
 typedef struct tok_data {
 	// short int ind;
 	short int vtype;
-
+#if	0
+	char *tok_name;
+#endif
 	union {
 	double *pdval;
 	char  **psval;

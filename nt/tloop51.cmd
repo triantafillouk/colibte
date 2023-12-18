@@ -17,4 +17,5 @@ _time	: "Wed Feb 24 19:48:43 2016"
 #message(_version+" i<"+i+" and j< "+j+" sets p="+p)
 print(_time)	: "Wed Feb 24 19:48:43 2016"
 tdif=show_time("End test",2)
+tdif:
 print(_version+": p="+p+" Test concluded in "+tdif+" seconds")

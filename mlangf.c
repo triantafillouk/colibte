@@ -1,9 +1,6 @@
 #include "xe.h"
 #include "mlang.h"
 
-extern char *saved_string;
-
-// extern array_dat *ex_array;
 extern array_dat *main_args;
 extern char *ex_name;
 extern FILEBUF *cbfp;
@@ -14,6 +11,7 @@ int vtype_is(int type);
 int get_vtype();
 void set_array(array_dat *a);
 array_dat *get_array(char *);
+void set_nsval(char *,int);
 
 void ntoken();
 int check_token(int type);
@@ -49,7 +47,8 @@ void get_function_args (int number_of_args)
 			double value = num_expression();
 			va[i].var_type=get_vtype();
 			if(vtype_is(VTYPE_STRING)) { 
-				va[i].sval=saved_string;saved_string=NULL;
+				va[i].sval=strdup(get_sval());
+				clean_saved_string(0);
 				// MESG("%d: string: [%s]",i,va[i].sval);
 			} else if (vtype_is(VTYPE_ARRAY)||vtype_is(VTYPE_SARRAY)) {
 				va[i].adat=get_array("101");
@@ -219,9 +218,8 @@ double uf_left()
 	get_function_args(2);
 
 	if(va[0].var_type==VTYPE_STRING && va[1].var_type==VTYPE_NUM ) {
-		set_sval(va[0].sval);
+		set_nsval(va[0].sval,(int)va[1].dval);
 	} else set_sval("");
-	set_vtype(VTYPE_STRING);
 	return 0;
 }
 
@@ -233,9 +231,7 @@ double uf_right()
 		int r1=(int)va[1].dval;
 		// MESG("right: r1=%d",r1);
 		if(strlen(va[0].sval)<r1) r1=strlen(va[0].sval);
-		clean_saved_string(r1);
-		memcpy(saved_string,va[0].sval+(strlen(va[0].sval)-r1),r1);
-		saved_string[r1]=0;
+		set_sval(va[0].sval+(strlen(va[0].sval)-r1));
 	} else {
 		syntax_error("right: wrong type of args",206);
 		set_sval("");
@@ -254,9 +250,13 @@ double uf_mid()
 		if((int)va[1].dval>strlen(va[0].sval) || va[2].dval==0) {
 			set_sval("");
 		} else {
+#if	NEW
+			set_nsval(va[0].sval+(int)va[1].dval,(int)va[2].dval);
+#else
 			clean_saved_string((int)va[2].dval);
 			memcpy(saved_string,va[0].sval+(int)va[1].dval,va[2].dval);
 			saved_string[(int)va[2].dval]=0;
+#endif
 		};
 		} else {
 			syntax_error("mid: wrong_type of args",100);
@@ -279,7 +279,7 @@ double uf_print()
 		tok=current_token();
 		// MESG("	eval arg %d tnum=%d ttype=%d",i,tok->tnum,tok->ttype);
 		value=num_expression();
-		// MESG("		val=%f s='%s'",value,saved_string);
+		// MESG("		val=%f s='%s'",value,get_sval());
 		switch(get_vtype()) {
 			case VTYPE_ARRAY:
 			case VTYPE_SARRAY:
@@ -296,7 +296,7 @@ double uf_print()
 				break;
 			};
 			case VTYPE_STRING:{
-				char *p_out=strdup(saved_string);
+				char *p_out=strdup(get_sval());
 				set_vtype(VTYPE_STRING);
 				out_print(p_out,0);
 				free(p_out);
@@ -322,7 +322,7 @@ double uf_show_time()
 	double value=0;
 	if(va[0].var_type==VTYPE_STRING) {
 		set_sval(va[0].sval);
-		value=show_time(saved_string,va[1].dval);
+		value=show_time(get_sval(),va[1].dval);
 	} else {
 		syntax_error("error in stime",312);
 	}
@@ -336,7 +336,7 @@ double uf_upper()
 	get_function_args(1);
 	if(va[0].var_type==VTYPE_STRING) {
 		clean_saved_string(strlen(va[0].sval));
-		get_uppercase_string(saved_string,va[0].sval);
+		get_uppercase_string(get_sval(),va[0].sval);
 	} else {
 		syntax_error("upper: wrong_type of args",100);
 		set_sval("");	
@@ -350,7 +350,7 @@ double uf_lower()
 	get_function_args(1);
 	if(va[0].var_type==VTYPE_STRING) {
 		clean_saved_string(strlen(va[0].sval));
-		get_lowercase_string(saved_string,va[0].sval);
+		get_lowercase_string(get_sval(),va[0].sval);
 	} else {
 		syntax_error("lower: wrong_type of args",100);
 		set_sval("");
@@ -377,8 +377,9 @@ double uf_chr()
 {
 	get_function_args(1);
 	clean_saved_string(1);
-	saved_string[0] = (int)va[0].dval;
-	saved_string[1] = 0;
+	char *slocal=get_sval();
+	slocal[0] = (int)va[0].dval;
+	slocal[1] = 0;
 
 	set_vtype(VTYPE_STRING);
 	// free(va);
@@ -389,12 +390,13 @@ double uf_getchar()
 {
 	ntoken();
 	clean_saved_string(1);
+	char *slocal=get_sval();
 	if(execmd) {
-		saved_string[0]=getchar();
+		slocal[0]=getchar();
 	} else {
-		saved_string[0] = getcmd();
+		slocal[0] = getcmd();
 	};
-	saved_string[1] = 0;
+	slocal[1] = 0;
 
 	set_vtype(VTYPE_STRING);
 	return 0;
@@ -450,8 +452,9 @@ double uf_string()
 	if(va[0].var_type==VTYPE_NUM) {
 		// MESG("uf_string: %f",va[0].dval);
 		clean_saved_string(20);
-		snprintf(saved_string,20,"%f",va[0].dval);
-		// MESG("uf_string: [%s]",saved_string);
+		char *slocal=get_sval();
+		snprintf(slocal,20,"%f",va[0].dval);
+		// MESG("uf_string: [%s]",get_sval());
 	} else {
 		syntax_error("string: wrong_type of args",100);
 		set_sval("");
@@ -489,17 +492,18 @@ double uf_wait()
 	if(va[0].var_type==VTYPE_STRING) msg_line("[%s] waiting.. ",va[0].sval);
 	else msg_line("<%f> wait for key",va[0].dval);
 	clean_saved_string(1);
+	char *slocal=get_sval();
 	if(execmd) {
-		saved_string[0]=getc(stdin);
+		slocal[0]=getc(stdin);
 	} else {
 		events_flush();
 		// entry_mode=KENTRY;
-		saved_string[0] = getcmd();
+		slocal[0] = getcmd();
 		// entry_mode=KNORMAL;
 	};
 	entry_mode=f_entry;
-	saved_string[1] = 0;
-	double value=saved_string[0];
+	slocal[1] = 0;
+	double value=slocal[0];
 	set_vtype(VTYPE_STRING);
 
 	return value;
@@ -511,9 +515,10 @@ double uf_input()
 	get_function_args(1);
 	entry_mode=KENTRY;	/* get input from screen */
 	clean_saved_string(80);
-	if(va[0].var_type!=VTYPE_STRING) getstring("Input :",saved_string,80,true);
-	else getstring(va[0].sval,saved_string,80,true);
-	if(execmd) saved_string[strlen(saved_string)-1]=0;
+	char *slocal=get_sval();
+	if(va[0].var_type!=VTYPE_STRING) getstring("Input :",get_sval(),80,true);
+	else getstring(va[0].sval,get_sval(),80,true);
+	if(execmd) slocal[strlen(get_sval())-1]=0;
 	set_vtype(VTYPE_STRING);
 	entry_mode=f_entry;
 	return 0;
@@ -523,9 +528,9 @@ double uf_dinput()
 {
 	get_function_args(1);
 	clean_saved_string(80);
-	if(va[0].var_type!=VTYPE_STRING) getstring("DInput :",saved_string,80,true);
-	getstring(va[0].sval,saved_string,80,true);
-	double value=atof(saved_string);
+	if(va[0].var_type!=VTYPE_STRING) getstring("DInput :",get_sval(),80,true);
+	getstring(va[0].sval,get_sval(),80,true);
+	double value=atof(get_sval());
 	clean_saved_string(0);
 	set_vtype(VTYPE_NUM);
 
@@ -646,7 +651,7 @@ double uf_time()
 	double value=0;
 	if(va[0].var_type==VTYPE_STRING) {
 		set_sval(va[0].sval);
-		value=show_time(saved_string,va[1].dval);
+		value=show_time(get_sval(),va[1].dval);
 	} else {
 		syntax_error("error in stime",312);
 	}
@@ -712,7 +717,7 @@ double uf_mainarg()
 	if(ind<main_args->cols) {
 		set_sval(main_args->sval[(int)va[0].dval]);
 		set_vtype(VTYPE_STRING);
-		value=atof(saved_string);
+		value=atof(get_sval());
 	} else {
 		set_vtype(VTYPE_NUM);
 	};
