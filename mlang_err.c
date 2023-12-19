@@ -217,15 +217,18 @@ int	err_eval_fun1(tok_struct *tok0)
 
 	ia=0;
 	while(1){
-		// MESG("function arg tnum=%d ttype=%d %d",tok->tnum,tok->ttype,ia);
+		MESG("function arg tnum=%d ttype=%d ia=%d",tok->tnum,tok->ttype,ia);
 		if(tok->ttype==TOK_RPAR||tok->ttype==TOK_SEP) break;
 		if(tok->ttype==TOK_COMMA) NTOKEN_ERR(403);
 		ia++;
 		err_num=err_num_expression();
 	}
-#if	0
-	if(ia0>=0) {
-		if(ia0!=ia) syntax_error("function arguments error",4031);
+#if	0	// Check, this sould not happen!
+	{
+		if(ia0!=ia) {
+			MESG("Error in number of args: %d != %d",ia0,ia);
+			syntax_error("function arguments error",4031);
+		};
 		return(err_num);
 	};
 #endif
@@ -1356,42 +1359,8 @@ int err_check_sentence1()
 		{
 		// tok_struct *tok0=tok;
 		set_tok_directive(tok,tok_dir_type);
-		MESG("--> err: TOK_DIR_TYPE: %s",tok->tname);
+		// MESG("--> err: TOK_DIR_TYPE: %s",tok->tname);
 		NTOKEN_ERR(671);	// this is the type name
-#if	0
-		MESG("	-->	1	%d %s",tok->ttype,tok->tname);
-		NTOKEN_ERR(671);	// this is =
-		MESG("	-->	2	%d %s",tok->ttype,tok->tname);
-		// check_skip_token1(TOK_LPAR);
-		NTOKEN_ERR(671);
-		MESG("	-->	3	%d %s",tok->ttype,tok->tname);
-		NTOKEN_ERR(671);
-		int e=1;
-		while(tok->ttype!=TOK_RPAR) {
-			MESG("	-->	4: %2d %d %s",e++,tok->ttype,tok->tname);
-			if(tok->ttype==TOK_END) {
-				syntax_error("type error",671);
-				RT_MESG1(671);
-			};
-			if(tok->ttype!=TOK_VAR) {
-				syntax_error("type define error",672);
-				RT_MESG1(672);
-			};
-			NTOKEN_ERR(671);
-			if(tok->ttype==TOK_DEFINE_TYPE) {
-				NTOKEN_ERR(671);
-				MESG("set type to %s",tok->tname);
-				NTOKEN_ERR(671);
-			} else {
-				if(tok->ttype!=TOK_VAR && tok->ttype!=TOK_RPAR) {
-					MESG("type_define error2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-					syntax_error("type define error2",673);
-					err_num=673;
-					RT_MESG1(673);					
-				};
-			};
-		};
-#endif
 		xpos=632;
 	};break;
 	default:

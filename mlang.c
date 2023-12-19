@@ -780,7 +780,7 @@ double factor_line_array()
 	array_dat *adat=tok->adat;
 	cdim=1;
 	ex_name="Definition";
-	MESG("factor_line_array: Array definition ------------");
+	// MESG("factor_line_array: Array definition ------------");
 	allocate_array(adat);
 	NTOKEN2;
 	while(cdim>0){
@@ -957,7 +957,7 @@ double factor_option()
 	bte=tok->tok_node;
 	var_node=bte;
 	NTOKEN2;
-#if	1
+
 	set_vtype(bte->node_vtype);
 	if(bte->node_vtype==VTYPE_STRING) { /* there is a valid string value */
 		clean_saved_string(strlen(bte->node_sval));
@@ -966,14 +966,6 @@ double factor_option()
 	} else {
 		return(bte->node_dval);
 	};
-#else
-	if(bte->sval!=NULL) { /* there is a valid string value */
-		clean_saved_string(strlen(bte->sval));
-		strcpy(saved_string,bte->sval);
-		set_vtype(VTYPE_STRING);
-	} else set_vtype(VTYPE_NUM);
-	RTRN(bte->node_val);
-#endif
 }
 
 double factor_array1()
@@ -1033,12 +1025,8 @@ double factor_array1()
 				array_slot->pdval=&array_slot->adat->mval[ind1].dval;
 			} else {
 				value=0;
-#if	NEW
 				set_sval(array_slot->adat->mval[ind1].sval);
-#else
-				clean_saved_string(strlen(array_slot->adat->mval[ind1].sval));
-				strcpy(saved_string,array_slot->adat->mval[ind1].sval);
-#endif
+
 				// MESG("	show string value![%s]",saved_string);
 				// array_slot->psval = &sval[ind1];
 				array_slot->psval=&array_slot->adat->mval[ind1].sval;
@@ -1914,7 +1902,7 @@ double assign_option(double none)
 {
 double	value=lexpression();
 #if	1
-	MESG("assign_option:");
+	// MESG("assign_option:");
 		if(var_node->node_vtype==VTYPE_STRING) {free(var_node->node_sval);};
 		if(vtype_is(VTYPE_STRING)){
 			var_node->node_vtype=VTYPE_STRING;
@@ -2139,9 +2127,7 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 		tok_data *arg_dat=&symbols[tok->tind];
 		arg_dat->vtype=va->var_type;
 		// MESG("assign_args1:arg %d: pos2 tok=[%d %s] ttype=%d tind=%d",i,tok->tnum,tok->tname,tok->ttype,tok->tind);
-#if	0
-		arg_dat->dval=va->dval;
-#else
+
 		switch(va->var_type) {
 			case VTYPE_NUM:
 				arg_dat->dval=va->dval;
@@ -2159,7 +2145,7 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 				arg_dat->sval="";
 				arg_dat->dval=0;
 		};
-#endif
+
 		// MESG("assign_args1:arg %d: pos3 after args tok=[%s] %d",i,tok->tname,tok->ttype);
 		NTOKEN2;	/* skip separator or end parenthesis */
 		if(tok->ttype==TOK_RPAR) break;
@@ -2259,7 +2245,6 @@ void update_ddot_line(char *ddot_out)
  sfb(old_fp);
 }
 
-#if	1
 void refresh_ddot_1(double value)
 {
  TDS("refresh_ddot_1");
@@ -2308,80 +2293,6 @@ void refresh_ddot_1(double value)
 
  update_ddot_line(ddot_out);
 }
-#else
-void refresh_ddot_1(double value)
-{
- offs line_end,ddot_position=0;
- int dsize=0;
- int stat=0;
- FILEBUF *old_fp; 
- FILEBUF *buf;
- TextPoint *tp;
-
- TDS("refresh_ddot_1");
- // MESG("refresh_ddot:");
- if(execmd) {
-	 if(vtype_is(VTYPE_NUM)) {
-		if(lstoken) {
-			printf(";%s	: %.3f\n",lstoken->tname,value);
-		} else printf(";	: %.3f\n",value);
-	 } else if(vtype_is(VTYPE_STRING)) {
-	 	if(lstoken) {
-			printf(";%s	: %s\n",lstoken->tname,get_sval());
-		} else printf(";	: '%s'\n",get_sval());
-	 } else if(vtype_is(VTYPE_ARRAY)) print_array1(";",get_array("36"));
-	 lstoken=NULL;
-	 return;
- };
-
- int precision=bt_dval("print_precision");
- int show_hex=bt_dval("show_hex");
- char *ddot_out = (char *)malloc(128);
- tp=tok->ddot;
- buf=tp->fp;
-
- ddot_position=tp_offset(tp);
- 
- line_end=FLineEnd(buf,ddot_position);
- // MESG("	ddot_pos=%d end=%d todel=%d",ddot_position,line_end,line_end-ddot_position);
- if(buf->b_state & FS_VIEW) return; // no refresh in view mode
-
- old_fp=cbfp; // keep the old buffer just in case
-
- sfb(buf);
- dsize=line_end-(ddot_position+1);
-
- textpoint_set(buf->tp_current,ddot_position);
-
- if(vtype_is(VTYPE_STRING)) {	/* string value  */
-	stat=snprintf(ddot_out,128," \"%s\"",get_sval());
- }  else if(vtype_is(VTYPE_NUM)) {	/* numeric value  */
-	long int d = (long int)value;
-	if(d==value) {	/* an integer/double value!  */
-		if(show_hex) stat=snprintf(ddot_out,128," %5.0f | 0x%llX | 0o%llo",value,(unsigned long long)value,(unsigned long long)value);
-		else stat=snprintf(ddot_out,128," %5.*f",1,value);
-	} else {	/* a decimal value!  */
-		stat=snprintf(ddot_out,128," %5.*f",precision,value);
-	};
-
- } else if(vtype_is(VTYPE_ARRAY) || vtype_is(VTYPE_SARRAY) || vtype_is(VTYPE_AMIXED)) {
-	array_dat *adat = get_array("37");
- 	stat=snprintf(ddot_out,128,"array %d, slot %ld type=%d rows %d,cols %d",adat->anum,lsslot-current_stable,adat->atype,adat->rows,adat->cols);
-	print_array1(":",adat);
- };
- if(stat>MAXLLEN) MESG("truncated");
-// replace text
- textpoint_set(buf->tp_current,ddot_position+1);
- DeleteBlock(0,dsize);
- insert_string(cbfp,ddot_out,strlen(ddot_out));
- if(err_num>0) {
- 	insert_string(cbfp," ,err ",6);
-	if(err_str!=NULL) insert_string(cbfp,err_str,strlen(err_str));
- };
- free(ddot_out);
- sfb(old_fp);
-}
-#endif
 
 double tok_dir_type()
 {
@@ -2517,8 +2428,8 @@ double tok_dir_fori()
 		return 1;
 	};
 	if(dstep>0 && dmax > *iterrator_val) {
-		for(;*iterrator_val < dmax; *iterrator_val +=dstep) {
 
+		for(;*iterrator_val < dmax; *iterrator_val +=dstep) {
 			tok=start_block;
 			tok->directive();
 			if(current_active_flag==0) {
@@ -2528,7 +2439,6 @@ double tok_dir_fori()
 		};
 	} else if(dstep<0 && dmax< *iterrator_val) {
 		for(; *iterrator_val > dmax; *iterrator_val +=dstep) {
-
 			tok=start_block;
 			tok->directive();
 			if(current_active_flag==0) {
@@ -2831,7 +2741,7 @@ int parse_check_current_buffer(int n)
  cls_fout("[out]");
  // MESG("clear output");
  err_num=check_init(fp);
- MESG("parse_check_current_buffer: after chek_init");
+ MESG("parse_check_current_buffer: after check_init");
  if(err_num>0) {
 	macro_exec=0;
 	msg_line("syntax error %d line %d [%s]",err_num,err_line,err_str);
@@ -2982,7 +2892,7 @@ int show_parse_buffer(int n)
 /* return string results from an expression */
 char * key_str1()
 {
- MESG("key_str1: tnum=%d ttype=%d",tok->tnum,tok->ttype);
+ // MESG("key_str1: tnum=%d ttype=%d",tok->tnum,tok->ttype);
  num_expression();
  // MESG("key_str1: ex_vtype=%d ex_value=%f [%s]",get_vtype(),ex_value,get_sval());
  return (get_sval());
