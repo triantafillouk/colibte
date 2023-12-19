@@ -142,6 +142,7 @@ while(test)
 	break
  }
 }
+ test = search_forward("AbraCatabra")
  goto_line(line1)
 
 }

@@ -2223,6 +2223,92 @@ void skip_sentence1()
 }
 
 
+void update_ddot_line(char *ddot_out)
+{
+ FILEBUF *old_fp;
+ TextPoint *tp = tok->ddot;
+ FILEBUF *buf = tp->fp;
+ int dsize=0;
+ int is_ddot=0;
+ offs ddot_pos=tp_offset(tp);
+ offs i,sl,el; // current offset, start,end of line
+ old_fp=cbfp;
+ 
+ sfb(buf);
+ el=FLineEnd(buf,ddot_pos);
+ sl=FLineBegin(buf,ddot_pos);
+
+ dsize=el-sl;
+ ddot_pos=el-sl;
+	for(i=sl;i<el;i++) {
+		if(CharAt(i)==':') { 
+			is_ddot=!(cbfp->b_state & FS_VIEW);
+			ddot_pos=i-sl+1;break;};
+	};
+  
+// replace text
+ textpoint_set(buf->tp_current,sl+ddot_pos);
+ if(is_ddot) DeleteBlock(0,dsize-ddot_pos);
+
+ insert_string(cbfp,ddot_out,strlen(ddot_out));
+ if(err_num>0) {
+ 	insert_string(cbfp," ,err ",6);
+	if(err_str!=NULL) insert_string(cbfp,err_str,strlen(err_str));
+ };
+ free(ddot_out);
+ sfb(old_fp);
+}
+
+#if	1
+void refresh_ddot_1(double value)
+{
+ TDS("refresh_ddot_1");
+ int stat=0;
+ TextPoint *tp = tok->ddot;
+ FILEBUF *buf = tp->fp;
+ // MESG("refresh_ddot:");
+ if(execmd) {
+	 if(vtype_is(VTYPE_NUM)) {
+		if(lstoken) {
+			printf(";%s	: %.3f\n",lstoken->tname,value);
+		} else printf(";	: %.3f\n",value);
+	 } else if(vtype_is(VTYPE_STRING)) {
+	 	if(lstoken) {
+			printf(";%s	: %s\n",lstoken->tname,get_sval());
+		} else printf(";	: '%s'\n",get_sval());
+	 } else if(vtype_is(VTYPE_ARRAY)) print_array1(";",get_array("36"));
+	 lstoken=NULL;
+	 return;
+ };
+
+ int precision=bt_dval("print_precision");
+ int show_hex=bt_dval("show_hex");
+ char *ddot_out = (char *)malloc(128);
+
+ // MESG("	ddot_pos=%d end=%d todel=%d",ddot_position,line_end,line_end-ddot_position);
+ if(buf->b_state & FS_VIEW) return; // no refresh in view mode
+
+ if(vtype_is(VTYPE_STRING)) {	/* string value  */
+	stat=snprintf(ddot_out,128," \"%s\"",get_sval());
+ }  else if(vtype_is(VTYPE_NUM)) {	/* numeric value  */
+	long int d = (long int)value;
+	if(d==value) {	/* an integer/double value!  */
+		if(show_hex) stat=snprintf(ddot_out,128," %5.0f | 0x%llX | 0o%llo",value,(unsigned long long)value,(unsigned long long)value);
+		else stat=snprintf(ddot_out,128," %5.*f",1,value);
+	} else {	/* a decimal value!  */
+		stat=snprintf(ddot_out,128," %5.*f",precision,value);
+	};
+
+ } else if(vtype_is(VTYPE_ARRAY) || vtype_is(VTYPE_SARRAY) || vtype_is(VTYPE_AMIXED)) {
+	array_dat *adat = get_array("37");
+ 	stat=snprintf(ddot_out,128,"array %d, slot %ld type=%d rows %d,cols %d",adat->anum,lsslot-current_stable,adat->atype,adat->rows,adat->cols);
+	print_array1(":",adat);
+ };
+ if(stat>MAXLLEN) MESG("truncated");
+
+ update_ddot_line(ddot_out);
+}
+#else
 void refresh_ddot_1(double value)
 {
  offs line_end,ddot_position=0;
@@ -2295,6 +2381,7 @@ void refresh_ddot_1(double value)
  free(ddot_out);
  sfb(old_fp);
 }
+#endif
 
 double tok_dir_type()
 {
@@ -3009,8 +3096,8 @@ void set_dval(double value)
 {
 #if	USE_VAR
 	// MESG("set_dval: %f",value);
-	ex_var.vtype=VTYPE_NUM;
-	// ex_var.dval=value;
+	// ex_var.vtype=VTYPE_NUM;
+	ex_var.dval=value;
 #else
 	ex_value = value;
 #endif
