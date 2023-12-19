@@ -223,10 +223,12 @@ int	err_eval_fun1(tok_struct *tok0)
 		ia++;
 		err_num=err_num_expression();
 	}
+#if	0
 	if(ia0>=0) {
 		if(ia0!=ia) syntax_error("function arguments error",4031);
 		return(err_num);
 	};
+#endif
 	if(tok->ttype==TOK_RPAR) {
 		// MESG("err_eval_fun1: skip RPAR!!");
 		NTOKEN_ERR(404);
