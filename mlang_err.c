@@ -200,14 +200,13 @@ void syntax_error(char *description,int err)
 int	err_eval_fun1(tok_struct *tok0)
 {
 	TDSERR("eval_fun1");
-	
 	int ia;
 	int ia0;
 	int f_entry;
 	BTNODE 	*var_node = tok0->tok_node;
 	int fnum = var_node->node_index;
-
 	ia0=m_functions[fnum].f_args;
+	// MESG("err_eval_fun1: <<  args=%d",ia0);
 	// MESG("err_eval_fun1: [%s] args=%d tnum=%d ttype=%d",m_functions[fnum].f_name,ia,tok->tnum,tok->ttype);
 
 	f_entry=entry_mode;
@@ -217,31 +216,28 @@ int	err_eval_fun1(tok_struct *tok0)
 
 	ia=0;
 	while(1){
-		MESG("function arg tnum=%d ttype=%d ia=%d",tok->tnum,tok->ttype,ia);
+		// MESG("function arg tnum=%d ttype=%d ia=%d",tok->tnum,tok->ttype,ia);
 		if(tok->ttype==TOK_RPAR||tok->ttype==TOK_SEP) break;
 		if(tok->ttype==TOK_COMMA) NTOKEN_ERR(403);
 		ia++;
 		err_num=err_num_expression();
-	}
-#if	0	// Check, this sould not happen!
-	{
-		if(ia0!=ia) {
-			MESG("Error in number of args: %d != %d",ia0,ia);
-			syntax_error("function arguments error",4031);
-		};
+	};
+
+	// Check for correct number of args, this sould not happen!
+	if(ia0>=0 && ia0!=ia) {
+		MESG("Error in number of args: %d != %d",ia0,ia);
+		syntax_error("function arguments error",4031);
 		return(err_num);
 	};
-#endif
+
 	if(tok->ttype==TOK_RPAR) {
 		// MESG("err_eval_fun1: skip RPAR!!");
 		NTOKEN_ERR(404);
 	};
 	tok0->number_of_args=ia;
-	// MESG("function args are %d",ia);
 
 	entry_mode=f_entry;
-	// MESG("now evaluate it!");
-	/* and now evaluate it! */
+	// MESG("err_eval_fun1: END >> args=%d %d",ia0,ia);
 	RT_MESG1(408);
 }
 

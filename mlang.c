@@ -2980,7 +2980,7 @@ void set_nsval(char *s,int max)
  clean_saved_string(max);
  memcpy(saved_string,s,max);
  saved_string[max]=0;
- MESG(";set_nsval:s=[%s] [%s] %d",s,saved_string,max);
+ // MESG(";set_nsval:s=[%s] [%s] %d",s,saved_string,max);
  ex_var.vtype=VTYPE_STRING;
 }
 
