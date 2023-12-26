@@ -122,7 +122,7 @@ extern VAR option_names[];
 
 BTREE *bt_table;
 BTREE *directiv_table;
-BTREE *types_tree;
+BTREE *global_types_tree;
 
 int simple=0;
 
@@ -167,6 +167,7 @@ void init_btree_table()
 {
 	bt_table=new_btree("table",0);
 	directiv_table=new_btree("directives",0);
+	global_types_tree=new_btree("types",0);
 }
 
 void clear_args(MVAR *va,int nargs)
@@ -346,10 +347,11 @@ void init_token_mask()
  int ind;
 
  for(ind=0;ind<255;ind++) {
- 	if((ind>='a' && ind<='z') ||(ind>='A' && ind<='Z') || ind=='_' || ind>=128 || ind=='.' ) 
+ 	if((ind>='a' && ind<='z') ||(ind>='A' && ind<='Z') || ind=='_' || ind>=128) 
  	tok_mask[ind]=TOK_LETTER;
 	else if(ind>='0'&&ind<='9') tok_mask[ind]=TOK_NUM;
 	else if(ind==' '||ind==9) tok_mask[ind]=TOK_SPACE;
+	else if(ind=='.') tok_mask[ind]=TOK_DOT;
 	else if(ind=='{') tok_mask[ind]=TOK_LCURL;
 	else if(ind=='}') tok_mask[ind]=TOK_RCURL;
 	else if(ind==12||ind==10||ind==13) tok_mask[ind]=TOK_NL;
@@ -890,6 +892,23 @@ double factor_variable()
 		NTOKEN2;
 		RTRN(lsslot->dval);
 	};
+}
+
+double factor_assign_type()
+{
+	tok_data *type_slot=lsslot;
+	tok_data var_type;
+	MESG("factor_assign_type: $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+	MESG("	>> name=[%s] type %d tvtype=%d",tok->tname,tok->ttype,tok->tvtype);
+	var_type.vtype=VTYPE_TREE;
+	BTREE *var_tree = tok->tok_node->node_dat;
+	int size = var_tree->items;
+	MESG("	>> items %d",size);
+	NTOKEN2;
+	if(check_token(TOK_LPAR)) {
+	
+	}; /* else default values!  */
+	return 1;
 }
 
 double factor_array2()
@@ -1557,22 +1576,16 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_DIR_CONTINUE	,
 	factor_none,	// TOK_DIR_FOREACH		,
 	factor_none,	// TOK_DIR_TYPE,
-#if	0
-	factor_none,	// TOK_DIR_IN,
-#endif
 	factor_array1,	// TOK_ARRAY1
 	factor_array2,	// TOK_ARRAY2
 	factor_none,	// TOK_ARRAY3
 	factor_none,	// TOK_ASSIGNENV	,
 	factor_none,	// TOK_ASSIGNOPT	,
-#if	0
-	factor_none,	// TOK_LIST,
-	factor_none,	// TOK_INDEX
-	factor_none,	// TOK_STACK,
-	factor_none,	// TOK_QUEUE,
-#endif
-//	factor_none,	// TOK_START,
 	factor_none,	// TOK_END,
+	factor_none,	// TOK_DEFINE_TYPE,
+	factor_assign_type,	// TOK_ASSIGN_TYPE,
+	factor_none,	// TOK_TYPE_ELEMENT
+	factor_none,	// TOK_DOT,
 	factor_none		// TOK_OTHER,
 };
 

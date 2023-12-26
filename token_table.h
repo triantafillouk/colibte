@@ -27,7 +27,7 @@ TOK_TAB token_table[]= {
 	{TOK_TERM1			,"term1",0},	// 19 term2 operators (*,/) 
 	{TOK_TERM2			,"term2",0},	// 20 term1 operators (%,^)
 	{TOK_ASSIGN			," = ", TOK_TERM0},	// 21 assignment
-	{TOK_EOF			," EOF ",0},	// 22 end of file token
+	{TOK_EOF			,"EOF",0},	// 22 end of file token
 	{TOK_NUM			,"numeric",0},	// 23 numeric
 	{TOK_DIR			,"dir",0},	// 24 directive
 	{TOK_DIR_IF			,"if",0},	// 25 dir if
@@ -81,9 +81,10 @@ TOK_TAB token_table[]= {
 	{TOK_ARRAY3			,"array3",0},
 	{TOK_ASSIGNENV		,"setenv",TOK_TERM0},
 	{TOK_ASSIGNOPT		,"setoption",TOK_TERM0},
-	{TOK_START			,"START",0},
 	{TOK_END			,"END",0},
 	{TOK_DEFINE_TYPE	,"::",0},
-	{TOK_ASSIGN_TYPE	,"=type",0},
+	{TOK_ASSIGN_TYPE	,"=type",TOK_TERM0},
+	{TOK_TYPE_ELEMENT	,"TYPE_EL",0},
+	{TOK_DOT			," . ",0},
 	{TOK_OTHER			,"OTHER",0}
 };

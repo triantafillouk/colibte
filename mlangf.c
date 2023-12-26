@@ -4,6 +4,7 @@
 extern array_dat *main_args;
 extern char *ex_name;
 extern FILEBUF *cbfp;
+extern BTREE *global_types_tree;
 
 tok_struct *current_token();
 void set_vtype(int type);
@@ -748,5 +749,8 @@ double uf_show_vars()
 	MESG("Ind Name        Type    Value",exe_buffer->symbol_tree->items);
 
 	eval_btree(exe_buffer->symbol_tree->root,show_var_node);
+	if(global_types_tree->root)
+		eval_btree(global_types_tree->root,show_var_node);
+	else MESG("global_types_tree: empty!");
 	return 0;
 }

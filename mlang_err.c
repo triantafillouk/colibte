@@ -30,7 +30,7 @@ void mesg_out(const char *fmt, ...)
 char * tok_info2(tok_struct *tok)
 {
  static char stok[MAXLLEN];
- MESG("tok_info2: ");
+ // MESG("tok_info2: ");
 	if(tok){
 	// MESG("tok not null! %d",tok->ttype); 
 	if(tok->ttype>TOK_OTHER || tok->ttype==0) {
@@ -918,6 +918,9 @@ int err_factor()
 	case TOK_DECREASEBY:
 		tok0->tname="assign";
 		RT_MESG1(527);
+	case TOK_ASSIGN_TYPE:
+		MESG("TOK_ASSIGN_TYPE");
+		RT_MESG1(528);
 	default:
 		xpos=527;
 		MESG(" default: error_factor0: %s tind=%d ttype=%d TOK_VAR=%d",tok_info(tok0),tok0->tind,tok0->ttype,TOK_VAR);
