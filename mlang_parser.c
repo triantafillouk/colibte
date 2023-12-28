@@ -873,11 +873,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
 #if	1
 		if(tok->tok_node==NULL) {
-			// BTNODE *var_node = NULL;
+			MESG("		: not found in bt, check global_types!");
 			BTNODE *var_node = find_btnode(global_types_tree,nword);
 			if(var_node!=NULL) {
 				MESG("	%s found in global types tree! ==========================",nword);
 				tok->tok_node = var_node;
+				tok->tind=var_node->node_index;
 				tok->ttype = TOK_ASSIGN_TYPE;
 			} else {
 				var_node = find_btnode(stree,nword);
@@ -904,7 +905,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		};		
 
 		if(tok->tok_node==NULL) { // a NEW variable name or directive
-
+			MESG("		check if directive!");
 			tok->tok_node=find_btnode(directiv_table,nword);
 			if(tok->tok_node!=NULL) { 	/* set directive!  */
 				MESG("	parser:	directive [%s] found!",nword);
@@ -933,9 +934,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				};
 				// MESG("this is a directive: [%s]",nword);
 			};			
-#if	1
+#if	0
 			if(tok->tok_node==NULL) {	/* check global_types_tree  */
-				
+					
 				BTNODE *type_node=find_btnode(global_types_tree,nword);
 				if(type_node!=NULL) {
 					MESG("	we found a global typed variable [%s]",nword);
@@ -948,7 +949,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 #endif
 			if(tok->tok_node==NULL){	/* not a directive or typed var but a normal variable  */
-
+				MESG("		check for variable!");
 				// MESG("		[%s] is a variable !!!!!!!!!!",nword);
 
 				tok->tname=strdup(nword);
@@ -1013,6 +1014,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				case TOK_OPTION:	/* 5  */
 					tok->ttype=TOK_OPTION; // editor options
 					ex_edenv=TOK_OPTION;
+					break;
+				case TOK_ASSIGN_TYPE:
 					break;
 				default:
 				tok->ttype=TOK_LETTER;

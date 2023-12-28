@@ -4,7 +4,7 @@
 	GNU LESSER GENERAL PUBLIC LICENSE version 2 
 	(or at your option) any later version.
 
- 	An interpreter,embeded calculator by K.Triantafillou (2011,2020),
+ 	An interpreter,embeded calulator by K.Triantafillou (2011,2020),
 */
 
 #include	<math.h>
@@ -25,6 +25,7 @@ void mesg_out(const char *fmt, ...);
 extern FILEBUF *cbfp;
 extern array_dat *main_args;
 FILEBUF *exe_buffer=NULL;
+void set_vtype(int type);
 
 #if	SYNTAX_DEBUG
 #define	SHOWTOK {if(discmd) { MESG("  [%2d][%*s-%s][%d]  %s",stage_level,stage_level,"",Tds,tok->tnum,tok_name[tok->ttype]);};}
@@ -54,8 +55,6 @@ int err_check_block1();
 int check_skip_token1( int type);
 void clean_saved_string(int new_size);
 int deq(double v1,double v2);
-void set_vtype(int type);
-int vtype_is(int type);
 
 double assign_val(double none);
 double assign_env(double none);
@@ -65,32 +64,19 @@ void get_uppercase_string(char *lower, char *string);
 double cexpression();
 double exec_block1_break(FILEBUF *fp);
 char * tok_info(tok_struct *tok);
-void set_vtype(int type);
-int vtype_is(int type);
-int get_vtype();
 
 TLIST ctoklist=NULL;
 int is_break1=0;
 int tok_mask[256];
-#define	USE_VAR	1
-
-#if	USE_VAR
-static tok_data ex_var; 	/* value of previous expression */
-#else
-int ex_vtype=0; 	/* type of previous expression */
-double ex_value;	// saved double value
-#endif
-array_dat *get_array(char *);
-void set_array(array_dat *);
-
-array_dat *ex_array=NULL;
-char *saved_string=NULL;
-
+int ex_vtype=VTYPE_NONE; 	/* type of previous expression */
 int ex_edenv=0;	/* true after encount an editor env variable */
+static double ex_value;	// saved double value
+array_dat *ex_array=NULL;
 int ex_nvars=0;	/* true is there are variables in the array definition  */
 int ex_nquote=0;	/* true if there are strings in the array definition  */
 int ex_nums=0;	/* true if array is only numeric  */
 char *ex_name=NULL;	/* variable name of the previous array  */
+char *saved_string=NULL;
 
 /* error control variables  */
 int err_num=0;
@@ -104,7 +90,6 @@ BTNODE *var_node=NULL;
 tok_struct *lstoken=NULL;
 tok_data *lsslot=NULL;
 MVAR *lmvar=NULL;
-int firt_var=1;
 tok_data *current_stable=NULL; 	/* current symbol table ...  */
 int stage_level=0;	/* stage level  */
 
@@ -122,7 +107,7 @@ extern VAR option_names[];
 
 BTREE *bt_table;
 BTREE *directiv_table;
-BTREE *global_types_tree;
+BTREE *types_tree;
 
 int simple=0;
 
@@ -167,7 +152,6 @@ void init_btree_table()
 {
 	bt_table=new_btree("table",0);
 	directiv_table=new_btree("directives",0);
-	global_types_tree=new_btree("types",0);
 }
 
 void clear_args(MVAR *va,int nargs)
@@ -206,22 +190,63 @@ curl_struct *new_curl(int level,int mline, struct _el *el)
  return(lcurl);
 }
 
-
 static inline double factor_none()
 {
 	NTOKEN2;
 	return 0.0;	/* continue  */
 }
 
-double update_val()
+double add_value(double v1)
 {
- double v0=lsslot->dval;
-	// MESG("update_val: from %f by %f",v0,tok->dval);
-	// set_vtype(VTYPE_NUM);
-	if(!vtype_is(VTYPE_NUM)) { set_error(tok,222,"cannot update non numeric value!");NTOKEN2;return(0);};
-	lsslot->dval += tok->dval;
-	NTOKEN2;
+	tok_data *sslot=lsslot;
+	double v0=0;
+	TDS("add_value");
+	// sslot=lsslot;
+	// MESG("add_val: ind=%d type=%d ex_vtype=%d",sslot->ind,sslot->vtype,ex_vtype);
+
+	if(sslot->vtype==VTYPE_NUM ) {
+		v0=sslot->dval;
+		sslot->dval+=v1;
+		return(v0);
+	};
+	if(sslot->vtype==VTYPE_ARRAY) {
+		v0=*sslot->pdval;
+		*sslot->pdval+=v1;
+		return(v0);
+	}
+#if	USE_SARRAYS
+	if(sslot->vtype==VTYPE_SARRAY) {
+		char *stmp=malloc(strlen(saved_string)+strlen(sslot->psval[0]));
+		sprintf(stmp,"%s%s",sslot->psval[0],saved_string);
+		strcpy(stmp,sslot->psval[0]);
+		strcat(stmp,saved_string);
+		saved_string=stmp;
+		return(0);
+	};
+#endif
+
 	return(v0);
+}
+
+double increase_val()
+{
+ double v0;
+	TDS("increase_val");
+	// MESG("increase_val:");
+	set_vtype(VTYPE_NUM);
+	v0=add_value(1.0);
+	// NTOKEN2;
+	return(v0);
+}
+
+double decrease_val()
+{
+	TDS("decrease_val");
+	// MESG("decrease_val:");
+	set_vtype(VTYPE_NUM);
+	add_value(-1.0);
+	NTOKEN2;
+	return(lsslot->dval);
 }
 
 double decrease_by()
@@ -252,10 +277,10 @@ double increase_by()
 {
 	double v1,v0;
 	tok_data *sslot=lsslot;
-	// MESG("increase_by:");
+	// TDS("increase_by");
 	// sslot=lsslot;
 	// if(sslot->vtype==VTYPE_STRING) MESG("increase_by string [%s]",sslot->sval);
-	// MESG("increase by: type=%d",sslot->vtype);
+	
 	v1=lexpression();
 
 	if(sslot->vtype==VTYPE_NUM) {
@@ -263,24 +288,24 @@ double increase_by()
 		sslot->dval = v0+v1;
 		return(sslot->dval);
 	};
-#if	1
 	if(sslot->vtype==VTYPE_ARRAY) {
-		array_add1(sslot->adat,v1);
-		set_array(sslot->adat);
-		return(v1);
+		v0=*sslot->pdval;
+		
+		*sslot->pdval = v0+v1;
+		// MESG("array: %f -> %f",v0,*sslot->pdval);
+		return(v0+v1);
 	};
-#endif
 	if(sslot->vtype==VTYPE_STRING) {
 		// MESG("increase by:");
-		sslot->sval=(char *)realloc(sslot->sval,strlen(sslot->sval)+strlen(get_sval())+1);
-		strcat(sslot->sval,get_sval());
+		sslot->sval=(char *)realloc(sslot->sval,strlen(sslot->sval)+strlen(saved_string)+1);
+		strcat(sslot->sval,saved_string);
 		set_sval(sslot->sval);
 	};
 #if	USE_SARRAYS
 	if(sslot->vtype==VTYPE_SARRAY) {
-		char *stmp=malloc(strlen(get_sval())+strlen(sslot->psval[0]));
+		char *stmp=malloc(strlen(saved_string)+strlen(sslot->psval[0]));
 		strcpy(stmp,sslot->psval[0]);
-		strcat(stmp,get_sval());	/* check!! TODO  */
+		strcat(stmp,saved_string);	/* check!! TODO  */
 		free(sslot->psval[0]);
 		sslot->psval[0]=stmp;
 
@@ -307,8 +332,8 @@ double mul_by()
 #if	0
 	if(sslot->vtype==VTYPE_STRING) {
 		// MESG("increase by:");
-		sslot->sval=(char *)realloc(sslot->sval,strlen(sslot->sval)+strlen(get_sval())+1);
-		strcat(sslot->sval,get_sval());
+		sslot->sval=(char *)realloc(sslot->sval,strlen(sslot->sval)+strlen(saved_string)+1);
+		strcat(sslot->sval,saved_string);
 		set_sval(sslot->sval);
 	};
 #endif
@@ -347,11 +372,10 @@ void init_token_mask()
  int ind;
 
  for(ind=0;ind<255;ind++) {
- 	if((ind>='a' && ind<='z') ||(ind>='A' && ind<='Z') || ind=='_' || ind>=128) 
+ 	if((ind>='a' && ind<='z') ||(ind>='A' && ind<='Z') || ind=='_' || ind>=128 || ind=='.' ) 
  	tok_mask[ind]=TOK_LETTER;
 	else if(ind>='0'&&ind<='9') tok_mask[ind]=TOK_NUM;
 	else if(ind==' '||ind==9) tok_mask[ind]=TOK_SPACE;
-	else if(ind=='.') tok_mask[ind]=TOK_DOT;
 	else if(ind=='{') tok_mask[ind]=TOK_LCURL;
 	else if(ind=='}') tok_mask[ind]=TOK_RCURL;
 	else if(ind==12||ind==10||ind==13) tok_mask[ind]=TOK_NL;
@@ -474,11 +498,10 @@ tok_data *new_symbol_table(int size)
  tok_data *td=malloc(sizeof(struct tok_data)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
  for(i=0;i<size;i++) {
-	// td[i].ind=i;
- 	td[i].vtype=VTYPE_NUM;
-	// td[i].pdval=NULL;
+	td[i].ind=i;
+ 	td[i].vtype=VTYPE_NONE;
+	td[i].pdval=NULL;
 	td[i].dval=0;
-	// td[i].pval = &td[i].dval;
  };
  return td;
 }
@@ -486,12 +509,12 @@ tok_data *new_symbol_table(int size)
 tok_data *realloc_symbol_table(tok_data *td,int size,int old_size)
 {
  int i;
- // MESG("realloc_symbol_table: size %d",size);
+ // MESG("Initialize new_symbol_table: size %d",size);
  td=realloc(td,sizeof(struct tok_data)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
  for(i=old_size;i<size;i++) {
-	// td[i].ind=i;
- 	td[i].vtype=VTYPE_NUM;
+	td[i].ind=i;
+ 	td[i].vtype=VTYPE_NONE;
 	td[i].pdval=NULL;
 	td[i].dval=0;
  };
@@ -499,13 +522,13 @@ tok_data *realloc_symbol_table(tok_data *td,int size,int old_size)
 }
 
 /* free symbol table after execute */
-void delete_symbol_table(tok_data *td, int size,int level,int nargs)
+void delete_symbol_table(tok_data *td, int size,int level)
 {
  int i;
  // tok_data *sslot;
  // MESG("delete_symbol_table: size=%d level=%d",size,level);
  if(td) {
- for(i=nargs;i<size;i++) {
+ for(i=0;i<size;i++) {
 	tok_data *sslot;
  	sslot=&td[i];
 
@@ -513,14 +536,6 @@ void delete_symbol_table(tok_data *td, int size,int level,int nargs)
 		// MESG("delete_symbol_table:%d [%s] free %X",i,sslot->sval,sslot->sval);
 		 	if(sslot->sval!=NULL)  free(sslot->sval);
 	};
-#if	1
-	if(sslot->vtype==VTYPE_ARRAY) {
-		if(sslot->adat!=NULL) {
-			free_array_dat(sslot->adat);
-			free(sslot->adat);
-		};
-	};
-#endif
  };
  free(td);
  };
@@ -546,25 +561,14 @@ void init_error()
  err_str=NULL;
 }
 
-#if	USE_VAR
-void init_ex_var()
-{
-	ex_var.vtype=VTYPE_NUM;
-	ex_var.pval = &ex_var.dval;
-	ex_var.dval=0;
-}
-#endif
-
 void init_exec_flags()
 {
  // MESG("init_exec_flags:");
  init_error();
  is_break1=0;
  current_active_flag=1;
- set_vdval(0.0);
-#if	EX_VAR
- init_ex_var();
-#endif
+ set_vtype(-2);
+ ex_value=0.0;
  var_node=NULL;
  pnum=0;
  stage_level=0;
@@ -705,30 +709,28 @@ MVAR * push_args_1(int nargs)
  if(va){
  MVAR *va_i=va;
  for(i=0;i<nargs;i++,va_i++){
+	// MESG("	evaluate arg %d, tok=[%d %s]",i,tok->tnum,tok->tname);
 	value = num_expression();
-	va_i->var_type=get_vtype();
-	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
-	if(vtype_is(VTYPE_NUM)) {
+	va_i->var_type=ex_vtype;
+	if(ex_vtype==VTYPE_NUM) {
 			// MESG("	arg:%d numeric %f",value);
 			va_i->dval=value;
 	} else
-	if(vtype_is(VTYPE_STRING)) {
-		// MESG("	arg:%d string [%s]",i,get_sval());
-		va_i->sval=strdup(get_sval());
+	if(ex_vtype==VTYPE_STRING) {
+		// MESG("	arg:%d string [%s]",i,saved_string);
+		va_i->sval=strdup(saved_string);
 		clean_saved_string(0);
 	} else 
-	if(vtype_is(VTYPE_ARRAY)||vtype_is(VTYPE_SARRAY)||vtype_is(VTYPE_AMIXED)) {
-			va_i->adat=get_array("1");
-			// MESG("	arg:%d array type %d",i,va_i->adat->atype);
-			// va_i->var_type=va_i->adat->atype;
-			va_i->var_type=get_vtype();
-			// MESG("	pushed array type=%d stat=%d",va_i->var_type,va_i->adat->astat);
+	if(ex_vtype==VTYPE_ARRAY||ex_vtype==VTYPE_SARRAY||ex_vtype==VTYPE_AMIXED) {
+			// MESG("	arg:%d array type %d",i,ex_array->atype);
+			va_i->adat=ex_array;
+			va_i->var_type=ex_array->atype;
 	} else {
-			ERROR("error: wrong type arg %d",get_vtype());
+			ERROR("error: wrong type arg %d",ex_vtype);
 			err_num=202;
 			clear_args(va,i); return(NULL);
 	}
-	// MESG("		vtype is %d",va_i->var_type);
+
 	NTOKEN2; // skip separator or right parenthesis!
  };
  }
@@ -762,7 +764,7 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	value=tok->directive();
 	// MESG("exec_function: before delete_symbol_table, ex_value=%f",ex_value);
 	/* remove local variable tree and restore the old one  */
-	delete_symbol_table(current_stable,bp->symbol_tree->items,level,nargs);
+	delete_symbol_table(current_stable,bp->symbol_tree->items,level);
 	current_stable=old_symbol_table;
 
 	// MESG("exec_function: before clear_args");
@@ -781,9 +783,10 @@ double factor_line_array()
 	int rows=0,cols=0;
 	array_dat *adat=tok->adat;
 	cdim=1;
+	ex_array=adat;
 	ex_name="Definition";
-	// MESG("factor_line_array: Array definition ------------");
-	allocate_array(adat);
+	// MESG("factor_line_array: ------------");
+	allocate_array(ex_array);
 	NTOKEN2;
 	while(cdim>0){
 	while(tok->ttype!=TOK_EOF) {
@@ -793,9 +796,9 @@ double factor_line_array()
 		};
 		// MESG("	[%d][%d] tok_type=%d",j,i,tok->ttype);
 		value=cexpression();
-		// MESG("	factor_line_array: set type=%d",get_vtype());
-		if(vtype_is(VTYPE_STRING) && adat->atype!=VTYPE_AMIXED) adat->atype=VTYPE_SARRAY;
-		// MESG("	[%d %d]: value=%f [%s] %d",j,i,value,get_sval(),get_vtype());
+		// MESG("	factor_line_array: set type=%d",ex_vtype);
+		if(ex_vtype==VTYPE_STRING && adat->atype!=VTYPE_AMIXED) adat->atype=VTYPE_SARRAY;
+		// MESG("	[%d %d]: value=%f [%s] %d",j,i,value,saved_string,ex_vtype);
 
 		if(tok->ttype == TOK_COMMA) { NTOKEN2;};
 
@@ -809,15 +812,15 @@ double factor_line_array()
 		};
 		if(adat->atype==VTYPE_SARRAY) {
 			int ind1=cols*j+i;
-			// MESG("	add row %d col=%d -> %d [%s]",j,i,ind1,get_sval());
-			adat->sval[ind1]=strdup(get_sval());
+			// MESG("	add row %d col=%d -> %d [%s]",j,i,ind1,saved_string);
+			adat->sval[ind1]=strdup(saved_string);
 		};
 		if(adat->atype==VTYPE_AMIXED) {
 			int ind1=cols*j+i;
-			// MESG("factor_line_array: set [%d] ex_vtype=%d",ind1,get_vtype());
-			adat->mval[ind1].var_type=get_vtype();
-			if(vtype_is(VTYPE_NUM)) adat->mval[ind1].dval=value;
-			else if(vtype_is(VTYPE_STRING)) adat->mval[ind1].sval=strdup(get_sval());
+			// MESG("factor_line_array: set [%d] ex_vtype=%d",ind1,ex_vtype);
+			adat->mval[ind1].var_type=ex_vtype;
+			if(ex_vtype==VTYPE_NUM) adat->mval[ind1].dval=value;
+			else if(ex_vtype==VTYPE_STRING) adat->mval[ind1].sval=strdup(saved_string);
 		};
 		i++;if(i>cols) cols=i;
 		if(tok->ttype==TOK_SHOW || tok->ttype==TOK_RBRAKET) {
@@ -830,10 +833,9 @@ double factor_line_array()
 			NTOKEN2;};
 	};cdim--;
 	};
-	adat->astat=ARRAY_LOCAL;
-	// set_vtype(adat->atype);
+	ex_array->astat=ARRAY_LOCAL;
+	set_vtype(adat->atype);
 	// print_array1("",adat);
-	set_array(adat);
 	NTOKEN2;
 	RTRN(1.2);
 }
@@ -848,19 +850,41 @@ inline tok_data *get_left_slot(int ind)
 double factor_variable()
 {	
  	lsslot = get_left_slot(tok->tind);
-#if	0
-	lsslot->tok_name = tok->tname;
-	// if(lsslot->vtype!=get_vtype()) MESG("factor_variable: diferent var type! [%s]=%d, [%s]=%d",tok->tname,lsslot->vtype,ex_var.tok_name,get_vtype());
-#endif
 	set_vtype(lsslot->vtype);
+	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d ind=%d",
+		// tok->tname,lsslot->ind,ex_vtype,tok->ttype,tok->tvtype,tok->tind);
+	// if(tok->tvtype==VTYPE_TREE) ex_vtype=tok->tvtype;
+	// else 
+	// BTNODE *tok_node = tok->tnode;
+	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d node type=%d",
+		// tok->tname,lsslot->ind,ex_vtype,tok->ttype,tok->tvtype,tok_node->node_vtype);
 	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d",
-		// tok->tname,lsslot->ind,get_vtype(),tok->ttype,tok->tvtype);
-	switch(get_vtype()) {
+		// tok->tname,lsslot->ind,ex_vtype,tok->ttype,tok->tvtype);
+	switch(ex_vtype) {
 		case VTYPE_NUM:{
 			double val=lsslot->dval; 
 			// MESG("		>> val=%f",val);
 			NTOKEN2;
+			if(tok->tgroup==TOK_INCREASE) {
+				lsslot->dval += tok->dval;
+				NTOKEN2;
+			};
+			// MESG(" factor_variable: end! %d %d",ex_vtype,lsslot->vtype);
 			RTRN(val);
+			};
+		case VTYPE_NONE:{
+			// MESG("		>> val=%f",val);
+			NTOKEN2;
+#if	0
+			if(tok->tgroup==TOK_INCREASE) {
+				lsslot->dval += tok->dval;
+				NTOKEN2;
+			};
+#endif
+			// lsslot->vtype=VTYPE_NUM;
+			// set_vtype(VTYPE_NUM);
+			// MESG(" factor_variable: end! %d %d",ex_vtype,lsslot->vtype);
+			RTRN(0);
 			};
 		case VTYPE_STRING:
 			set_sval(lsslot->sval);
@@ -868,15 +892,16 @@ double factor_variable()
 			RTRN(lsslot->dval);
 		case VTYPE_ARRAY:
 		case VTYPE_SARRAY:
-			set_array(lsslot->adat);
+		// case VTYPE_DYNAMIC:
+			ex_array=lsslot->adat;
 			ex_name=tok->tname;
-			// MESG("factor_variable: [%s] array type=%d",tok->tname,lsslot->adat->atype);
+			// MESG("factor_variable: [%s] array type=%d",tok->tname,ex_array->atype);
 			NTOKEN2;
 			RTRN(lsslot->dval);
 		case VTYPE_AMIXED:
-			set_array(lsslot->adat);
+			ex_array=lsslot->adat;
 			ex_name=tok->tname;
-			// MESG("factor_variable: [%s] array type=%d",tok->tname,lsslot->adat->atype);
+			// MESG("factor_variable: [%s] array type=%d",tok->tname,ex_array->atype);
 			NTOKEN2;
 			RTRN(lsslot->dval);
 #if	GTYPE
@@ -894,23 +919,6 @@ double factor_variable()
 	};
 }
 
-double factor_assign_type()
-{
-	tok_data *type_slot=lsslot;
-	tok_data var_type;
-	MESG("factor_assign_type: $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-	MESG("	>> name=[%s] type %d tvtype=%d line=%d",tok->tname,tok->ttype,tok->tvtype,tok->tline);
-	var_type.vtype=VTYPE_TREE;
-	BTREE *var_tree = tok->tok_node->node_dat;
-	int size = var_tree->items;
-	MESG("	>> items %d",size);
-	NTOKEN2;
-	if(check_token(TOK_LPAR)) {
-		MESG("	assign with parenthessis!");
-	}; /* else default values!  */
-	return 1;
-}
-
 double factor_array2()
 {
 	int ind1=0;
@@ -926,7 +934,7 @@ double factor_array2()
 	set_vtype(VTYPE_NUM);
 	if(adat==NULL) {
 #if	1
-		set_error(tok,209,"array indexes out of bound!");
+		set_error(tok0,209,"array indexes out of bound!");
 		return(0);
 #else
 		/* No data in the array, allocate new ones!  */
@@ -976,7 +984,7 @@ double factor_option()
 	bte=tok->tok_node;
 	var_node=bte;
 	NTOKEN2;
-
+#if	1
 	set_vtype(bte->node_vtype);
 	if(bte->node_vtype==VTYPE_STRING) { /* there is a valid string value */
 		clean_saved_string(strlen(bte->node_sval));
@@ -985,6 +993,14 @@ double factor_option()
 	} else {
 		return(bte->node_dval);
 	};
+#else
+	if(bte->sval!=NULL) { /* there is a valid string value */
+		clean_saved_string(strlen(bte->sval));
+		strcpy(saved_string,bte->sval);
+		set_vtype(VTYPE_STRING);
+	} else set_vtype(VTYPE_NUM);
+	RTRN(bte->node_val);
+#endif
 }
 
 double factor_array1()
@@ -1037,15 +1053,15 @@ double factor_array1()
 		if(array_slot->vtype==VTYPE_AMIXED) {
 			set_vtype(array_slot->adat->mval[ind1].var_type);
 			lmvar = &array_slot->adat->mval[ind1];
-			// MESG("get indexed value from mixed array ind1=%d type=%d",ind1,get_vtype());
-			if(vtype_is(VTYPE_NUM)) {
+			// MESG("get indexed value from mixed array ind1=%d type=%d",ind1,ex_vtype);
+			if(ex_vtype==VTYPE_NUM) {
 				value=array_slot->adat->mval[ind1].dval;
 				// MESG("	value=%f",value);
 				array_slot->pdval=&array_slot->adat->mval[ind1].dval;
 			} else {
 				value=0;
-				set_sval(array_slot->adat->mval[ind1].sval);
-
+				clean_saved_string(strlen(array_slot->adat->mval[ind1].sval));
+				strcpy(saved_string,array_slot->adat->mval[ind1].sval);
 				// MESG("	show string value![%s]",saved_string);
 				// array_slot->psval = &sval[ind1];
 				array_slot->psval=&array_slot->adat->mval[ind1].sval;
@@ -1082,7 +1098,7 @@ double factor_cmd()
 	int var_index;
 	int check_par=0;
 	int save_macro_exec;
-	double status=1;
+	int status=1;
 	double value=1;
 	FUNCS *ed_command;
 
@@ -1099,12 +1115,11 @@ double factor_cmd()
 		check_par=1;	/* we need parenthesis if arguments.  */
 
 		value=num_expression();
-		// MESG(";	ed_command: value=%f %f ex_vtype=%d s=[%s] arg=%d",value,get_val(),get_vtype(),get_sval(),ed_command->arg);
-		set_dval(value);
+		// MESG(";	ed_command: value=%f ex_vtype=%d s=[%s]",value,ex_vtype,saved_string);
+		ex_value=value;
 		switch(ed_command->arg) {
 			case 1:{ /* one argument */
-				// MESG("	one argument type=%d",get_vtype());
-				if(vtype_is(VTYPE_STRING)) { value=1;};
+				if(ex_vtype==VTYPE_STRING) { value=1;};
 				break;
 			};
 			case 2:	/* two arguments  */
@@ -1112,7 +1127,7 @@ double factor_cmd()
 				NTOKEN2;
 #if	0
 				value=num_expression();
-				// MESG(";	ed_command:arg2 value=%f ex_var.vtype=%d s=[%s]",value,ex_var.vtype,get_sval());
+				// MESG(";	ed_command:arg2 value=%f ex_vtype=%d s=[%s]",value,ex_vtype,saved_string);
 #endif
 				// MESG(";ed_command: second token! type=%d ",tok->ttype);
 				break;
@@ -1127,12 +1142,14 @@ double factor_cmd()
 	err_line=tok->tline;
 	err_str=NULL;
 	// tok_struct *tok1=tok;
-	// MESG(";factor_cmd: execute function! current token is [%s] tnum=%d value=%d",tok->tname,tok->tnum,(int)value);
+	// MESG(";factor_cmd: execute function! current token is [%s] tnum=%d",tok->tname,tok->tnum);
 	status=ed_command->n_func((int)value);
 	// MESG("toknum1 = %d",tok1->tnum);
 	// tok=tok1;
 	// MESG(";TOC_CMD: tnum=%d status=%d check_par=%d",tok->tnum,status,check_par);
-	set_vdval(status);
+	ex_value=status;
+//	editor command returns a numeric value
+	set_vtype(VTYPE_NUM);
 
 	macro_exec = save_macro_exec;
 
@@ -1149,7 +1166,7 @@ double factor_cmd()
 		RTRN(status);
 	};
 	// MESG(";factor_cmd:end tnum=%d value=%f ex_value=%f",tok->tnum,value,ex_value);
-	RTRN(status);
+	RTRN(ex_value);
 }
 
 double factor_env()
@@ -1159,6 +1176,7 @@ double factor_env()
 	bte=tok->tok_node;
 	var_node=bte;
 	value = get_env(bte->node_index);
+	ex_value = value;
 	NTOKEN2;
 	RTRN(value);
 }
@@ -1201,6 +1219,7 @@ static inline double factor_num()
 double factor_quote()
 {
 	// MESG("factor_quote: tnum=%d tname=%s",tok->tnum,tok->tname);
+	set_vtype(VTYPE_STRING);
 	set_sval(tok->tname);
 	NTOKEN2;
 	RTRN(0);		/* 0 value for string variables  */
@@ -1299,14 +1318,14 @@ static double term2_power(double v1)
 {
  double v2;
 	NTOKEN2;
-	if(vtype_is(VTYPE_ARRAY)){
-		array_dat *loc_array = get_array("7");
+	if(ex_vtype==VTYPE_ARRAY){
+		array_dat *loc_array = ex_array;
 		v2 = FACTOR_FUNCTION;
-		if(vtype_is(VTYPE_NUM)) {
+		if(ex_vtype==VTYPE_NUM) {
 			if(loc_array->astat==ARRAY_LOCAL) loc_array=dup_array_power(loc_array,v2);
 			else array_power(loc_array,v2);
-			set_array(loc_array);
-			// set_vtype(VTYPE_ARRAY);
+			ex_array=loc_array;
+			set_vtype(VTYPE_ARRAY);
 			ex_name="array power numeric";
 		} else {
 			syntax_error("wrong power on table",2101);
@@ -1326,15 +1345,15 @@ static double term2_modulo(double v1)
 {
 double v2;
 	NTOKEN2;
-	if(vtype_is(VTYPE_ARRAY)){
-		array_dat *loc_array = get_array("8");
+	if(ex_vtype==VTYPE_ARRAY){
+		array_dat *loc_array = ex_array;
 		v2 = FACTOR_FUNCTION;
 		if(v2>0) 
 		{
 			if(loc_array->astat==ARRAY_LOCAL) loc_array=dup_array_mod1(loc_array,v2);
 			else array_mod1(loc_array,v2);
-			set_array(loc_array);
-			// set_vtype(VTYPE_ARRAY);
+			ex_array=loc_array;
+			set_vtype(VTYPE_ARRAY);
 			ex_name="array modulo numeric";
 		} else {
 			syntax_error("wrong modulo on table",2102);
@@ -1360,47 +1379,45 @@ static double term1_mul(double v1)
  double v2;
  TDS("term1_mul");
  // MESG("term1_mul: ex_vtype=%d",ex_vtype);
-	if(vtype_is(VTYPE_NUM)){
+	if(ex_vtype==VTYPE_NUM){
 		NTOKEN2;
 		v2=num_term2();
 		// MESG("term1_mul: second type=%d",ex_vtype);
-		switch(get_vtype())
+		switch(ex_vtype)
 		{
 			case VTYPE_NUM:	// numeric * numeric
 				v1=v1*v2;
 				return v1;
-
 			case VTYPE_ARRAY:	// numeric * array
-				set_array(dup_array_mul1(get_array("9"),v1));
+				ex_array = dup_array_mul1(ex_array,v1);
 				ex_name = "numeric * array";
-				// set_vtype(VTYPE_ARRAY);
+				set_vtype(VTYPE_ARRAY);
 				return 1;
 		};
 	};
-	if(vtype_is(VTYPE_ARRAY)){
-		array_dat *loc_array = get_array("10");
+	if(ex_vtype==VTYPE_ARRAY){
+		array_dat *loc_array = ex_array;
 		NTOKEN2;
 		v2 = num_term2();
-		if(vtype_is(VTYPE_NUM)) {
+		if(ex_vtype==VTYPE_NUM) {
 			if(loc_array->astat==ARRAY_LOCAL) loc_array=dup_array_mul1(loc_array,v2);
 			else array_mul1(loc_array,v2);
-			set_array(loc_array);
-			// set_vtype(VTYPE_ARRAY);
+			ex_array=loc_array;
+			set_vtype(VTYPE_ARRAY);
 			ex_name="array * numeric";
 			return 1;
 		};
-		if(vtype_is(VTYPE_ARRAY)) {
-			array_dat *new_array = get_array("11");
-			if(loc_array->rows==1 && new_array->cols==1) {
-				if(loc_array->cols== new_array->rows) {
+		if(ex_vtype==VTYPE_ARRAY) {
+			if(loc_array->rows==1 && ex_array->cols==1) {
+				if(loc_array->cols==ex_array->rows) {
 					int i;
 					v1=0;
 					for(i=0;i<loc_array->cols;i++){
-						v1 += loc_array->dval[i]*new_array->dval[i];
+						v1 += loc_array->dval[i]*ex_array->dval[i];
 					};
 					set_vtype(VTYPE_NUM);
 					// free old ex_array ???
-					set_array(NULL);
+					ex_array=NULL;
 					ex_name="array * array";
 					RTRN(v1);
 				};
@@ -1409,12 +1426,12 @@ static double term1_mul(double v1)
 				RTRN(v1);
 			} else {
 				array_dat *loc_array2;
-				loc_array2=array_mul2(loc_array,get_array("14"));
+				loc_array2=array_mul2(loc_array,ex_array);
 				set_vtype(VTYPE_ARRAY);
 				
 				if(loc_array->astat==ARRAY_ALLOCATED) {	/* free this one!!  */
 				};
-				set_array(loc_array2);
+				ex_array=loc_array2;
 				ex_name="Multiply to array";
 				RTRN(v1);
 			};
@@ -1429,10 +1446,10 @@ static double term1_mul(double v1)
 static double term1_div(double v1)
 {
  double v2;
-	if(vtype_is(VTYPE_NUM)){
+	if(ex_vtype==VTYPE_NUM){
 		NTOKEN2;
 		v2=num_term2();
-			switch(get_vtype())
+			switch(ex_vtype)
 			{
 				case VTYPE_NUM:	// numeric * numeric
 					if(v2!=0){
@@ -1444,14 +1461,14 @@ static double term1_div(double v1)
 					v1 = 9999999999.9;
 					RTRN(v1);
 				case VTYPE_ARRAY:	// numeric * array
-					set_array(dup_array_mul1(get_array("15"),1/v1));
+					ex_array = dup_array_mul1(ex_array,1/v1);
 					ex_name = "numeric / array";
-					// set_vtype(VTYPE_ARRAY);
+					set_vtype(VTYPE_ARRAY);
 					return 1;
 			};
 	};
-	if(vtype_is(VTYPE_ARRAY)){
-		array_dat *loc_array = get_array("16");
+	if(ex_vtype==VTYPE_ARRAY){
+		array_dat *loc_array = ex_array;
 		NTOKEN2;
 		v2 = num_term2();
 		if(v2==0) {
@@ -1461,15 +1478,15 @@ static double term1_div(double v1)
 			RTRN(v1);
 		};
 
-		if(vtype_is(VTYPE_NUM)) {
+		if(ex_vtype==VTYPE_NUM) {
 			if(loc_array->astat==ARRAY_LOCAL) loc_array=dup_array_mul1(loc_array,1/v2);
 			else array_mul1(loc_array,1/v2);
-			set_array(loc_array);
-			// set_vtype(VTYPE_ARRAY);
+			ex_array=loc_array;
+			set_vtype(VTYPE_ARRAY);
 			ex_name="array / numeric";
 			return 1;
 		};
-		if(vtype_is(VTYPE_ARRAY)) {
+		if(ex_vtype==VTYPE_ARRAY) {
 				ERROR("div arrays not implemmented yet!");
 				RTRN(v1);
 		};
@@ -1496,6 +1513,26 @@ double factor_eof(){
 	current_active_flag=0;
 	return 0.0;
 }
+
+#if	1
+#include "assign_func.c"
+
+VFunction assign_functions[] = {
+	assign_none,
+	assign_num,
+	assign_array,
+	assign_sarray,
+	assign_list,
+	assign_slist,
+	assign_alist,
+	assign_string,
+	assign_buffer,
+	assign_amixed,
+	assign_dynamic,
+	assign_tree,
+	assign_type
+};
+#endif
 
 FFunction factor_funcs[] = {
 	factor_none,	// TOK_NONE
@@ -1565,8 +1602,8 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_BQUOTE
 	factor_none,	// TOK_DOLAR		,
 	factor_none,	// TOK_TILDA		,
-	update_val,	// TOK_INCREASE	,
-	update_val,	// TOK_DECREASE	,
+	increase_val,	// TOK_INCREASE	,
+	decrease_val,	// TOK_DECREASE	,
 	factor_none,	// TOK_INCREASEBY
 	mul_by,	// TOK_MULBY
 	decrease_by,	// TOK_DECREASEBY
@@ -1576,22 +1613,27 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_DIR_CONTINUE	,
 	factor_none,	// TOK_DIR_FOREACH		,
 	factor_none,	// TOK_DIR_TYPE,
+#if	0
+	factor_none,	// TOK_DIR_IN,
+#endif
 	factor_array1,	// TOK_ARRAY1
 	factor_array2,	// TOK_ARRAY2
 	factor_none,	// TOK_ARRAY3
 	factor_none,	// TOK_ASSIGNENV	,
 	factor_none,	// TOK_ASSIGNOPT	,
+#if	0
+	factor_none,	// TOK_LIST,
+	factor_none,	// TOK_INDEX
+	factor_none,	// TOK_STACK,
+	factor_none,	// TOK_QUEUE,
+#endif
+//	factor_none,	// TOK_START,
 	factor_none,	// TOK_END,
-	factor_none,	// TOK_DEFINE_TYPE,
-	factor_assign_type,	// TOK_ASSIGN_TYPE,
-	factor_none,	// TOK_TYPE_ELEMENT
-	factor_none,	// TOK_DOT,
 	factor_none		// TOK_OTHER,
 };
 
 void set_tok_function(tok_struct *tok, int type)
 {
-	// MESG("set_tok_function: type=%d ttype=%d",type,tok->ttype);
 	switch(type) {
 		case 0:
 			if(tok->ttype==TOK_FUNC) {
@@ -1655,26 +1697,25 @@ static double inline dir_return()
 double term_plus(double value)
 {
  double d1;
- if(vtype_is(VTYPE_NUM)) {
+ if(ex_vtype==VTYPE_NUM) {
 	NTOKEN2;
 	d1=num_term1();
 	// MESG("term_plus");
-	if(vtype_is(VTYPE_NUM)) return value+d1;
-	if(vtype_is(VTYPE_STRING)) {
+	if(ex_vtype==VTYPE_NUM) return value+d1;
+	if(ex_vtype==VTYPE_STRING) {
 		char svalue[MAXLLEN];
 		int stat;
-		stat=snprintf(svalue,MAXLLEN,"%f%s",value,get_sval());
+		stat=snprintf(svalue,MAXLLEN,"%f%s",value,saved_string);
 		if(stat>MAXLLEN) MESG("truncated 2");
 		set_sval(svalue);
 		return 0;
 	};
-	if(vtype_is(VTYPE_ARRAY)) { // num + array
-		array_dat *new_array = get_array("18");
-		if(new_array->astat==ARRAY_LOCAL) {
-			set_array(dup_array_add1(new_array,value));
+	if(ex_vtype==VTYPE_ARRAY) { // num + array
+		if(ex_array->astat==ARRAY_LOCAL) {
+			ex_array=dup_array_add1(ex_array,value);
 			ex_name="New array,add to numeric";
 		} else {
-			array_add1(new_array,value);
+			array_add1(ex_array,value);
 			ex_name=tok->tname;
 		};
 		set_vtype(VTYPE_ARRAY);
@@ -1687,34 +1728,34 @@ double term_plus(double value)
 	RTRN(0);
  };
 
- if(vtype_is(VTYPE_STRING)) {	// set local value
+ if(ex_vtype==VTYPE_STRING) {	// set local value
 	char svalue[MAXLLEN];
-	strlcpy(svalue,get_sval(),MAXLLEN);
+	strlcpy(svalue,saved_string,MAXLLEN);
 
 		NTOKEN2;
 		d1=num_term1();
 		 /* catanate string */
-			if(vtype_is(VTYPE_STRING)) {	/* string catanate  */
-				strlcat(svalue,get_sval(),sizeof(svalue));
+			if(ex_vtype==VTYPE_STRING) {	/* string catanate  */
+				strlcat(svalue,saved_string,sizeof(svalue));
 				value=atof(svalue);
 				set_sval(svalue);
 				return value;
 			};
-			if(vtype_is(VTYPE_NUM))	{	/* string, numeric catanate  */
+			if(ex_vtype==VTYPE_NUM)	{	/* string, numeric catanate  */
 				long l0;
 				set_vtype(VTYPE_STRING);
 				l0=d1;
 				clean_saved_string(80);
 				if(l0==d1)snprintf(saved_string,80,"%ld",l0);
 				else snprintf(saved_string,80,"%f",d1);
-				strlcat(svalue,get_sval(),sizeof(svalue));
+				strlcat(svalue,saved_string,sizeof(svalue));
 				value=0;
 				set_sval(svalue);
 				return value;
 			};
-			if(vtype_is(VTYPE_ARRAY)) {
+			if(ex_vtype==VTYPE_ARRAY) {
 				err_num=218;
-				ERROR("Add array to string not supported err %d",err_num);
+				ERROR("Subtrsct array from string not supported err %d",err_num);
 				RTRN(value);				
 			};
 			err_num=219;
@@ -1722,25 +1763,25 @@ double term_plus(double value)
 			RTRN(value);				
  };
 
- if(vtype_is(VTYPE_ARRAY)) {
-  	array_dat *loc_array=get_array("20");
+ if(ex_vtype==VTYPE_ARRAY) {
+  	array_dat *loc_array=ex_array;
 		 		NTOKEN2;
 				d1=num_term1();
-				if(vtype_is(VTYPE_NUM)) { // add numeric to array
+				if(ex_vtype==VTYPE_NUM) { // add numeric to array
 					if(loc_array->astat==ARRAY_LOCAL) {
 						loc_array=dup_array_add1(loc_array,d1);
 					} else {
 						array_add1(loc_array,d1);
 					};
 					set_vtype(VTYPE_ARRAY);
-					set_array(loc_array);
+					ex_array=loc_array;
 					ex_name="Add to numeric";
 					return 0;
-				} else if(vtype_is(VTYPE_ARRAY)) {	// array addition
+				} else if(ex_vtype==VTYPE_ARRAY) {	// array addition
 					array_dat *loc_array2;
-					loc_array2=array_add2(loc_array,get_array("21"));
+					loc_array2=array_add2(loc_array,ex_array);
 					set_vtype(VTYPE_ARRAY);
-					set_array(loc_array2);
+					ex_array=loc_array2;
 					ex_name="Add to array";
 					RTRN(value);
 				} else {
@@ -1749,27 +1790,23 @@ double term_plus(double value)
 					RTRN(value);
 				};		
  };
-	// ERROR("term_plus: operation not supported!, vtype=%d line %d",ex_var.vtype,tok->tline);
-	NTOKEN2;
-	set_error(tok,221,"operation not supported");
  return 0;
 }
 
 double term_minus(double value)
 {
  double d1;
- if(vtype_is(VTYPE_NUM)) {	/* numeric  !!  */
+ if(ex_vtype==VTYPE_NUM) {	/* numeric  !!  */
 	NTOKEN2;
 	d1=num_term1();
 
-	if(vtype_is(VTYPE_NUM)) return value-d1;
-	if(vtype_is(VTYPE_ARRAY)) {
-		array_dat *new_array=get_array("22");
-		if(new_array->astat==ARRAY_LOCAL) {
-			set_array(dup_array_sub1(new_array,value));
+	if(ex_vtype==VTYPE_NUM) return value-d1;
+	if(ex_vtype==VTYPE_ARRAY) {
+		if(ex_array->astat==ARRAY_LOCAL) {
+			ex_array=dup_array_sub1(ex_array,value);
 			ex_name="New array,subtract from numeric";
 		} else {
-			array_sub1(new_array,value);
+			array_sub1(ex_array,value);
 			ex_name="Subtract from numeric";
 		};
 		set_vtype(VTYPE_ARRAY);
@@ -1780,13 +1817,13 @@ double term_minus(double value)
 	ERROR("operation not supported err %d",err_num);
 	RTRN(value);
  };
- if(vtype_is(VTYPE_STRING)) {	// set local value
+ if(ex_vtype==VTYPE_STRING) {	// set local value
 	char svalue[MAXLLEN];
-	strlcpy(svalue,get_sval(),MAXLLEN);
+	strlcpy(svalue,saved_string,MAXLLEN);
 		NTOKEN2;
 		// operator on first chars of strings. numeric result
 			d1=num_term1();
-			if(vtype_is(VTYPE_STRING)) {
+			if(ex_vtype==VTYPE_STRING) {
 				value=svalue[0]-saved_string[0];
 			} else {
 				value=svalue[0]-d1;
@@ -1794,11 +1831,11 @@ double term_minus(double value)
 			set_vtype(VTYPE_NUM);
 			return value;
  };
- if(vtype_is(VTYPE_ARRAY)) {
-  	array_dat *loc_array=get_array("25");
+ if(ex_vtype==VTYPE_ARRAY) {
+  	array_dat *loc_array=ex_array;
 	NTOKEN2;
 	d1=num_term1();
-	if(vtype_is(VTYPE_NUM)) {	// subtruct numeric from array
+	if(ex_vtype==VTYPE_NUM) {	// subtruct numeric from array
 		if(loc_array->astat==ARRAY_LOCAL) {
 			loc_array=dup_array_add1(loc_array,-d1);
 			ex_name="new subtruct numeric";
@@ -1806,14 +1843,14 @@ double term_minus(double value)
 			array_add1(loc_array,-d1);
 			ex_name="subtruct numeric";
 		};
-		// set_vtype(VTYPE_ARRAY);
-		set_array(loc_array);
+		set_vtype(VTYPE_ARRAY);
+		ex_array=loc_array;
 		return(value);
-	} else if(vtype_is(VTYPE_ARRAY)) {	// array subtruction
+	} else if(ex_vtype==VTYPE_ARRAY) {	// array subtruction
 		array_dat *loc_array2;
-		loc_array2=array_sub2(loc_array,get_array("26"));
-		// set_vtype(VTYPE_ARRAY);
-		set_array(loc_array2);
+		loc_array2=array_sub2(loc_array,ex_array);
+		set_vtype(VTYPE_ARRAY);
+		ex_array=loc_array2;
 		ex_name="Subtruct from array";
 		RTRN(value);
 	} else {
@@ -1831,7 +1868,7 @@ double num_term2()
  TDS("num_term2");
  // MESG("num_term2: [%s]",tok_info(tok));
  double v1 = FACTOR_FUNCTION;
- // MESG("		factor function executed! v1=%f",v1);
+ // MESG("factor function executed!");
 	 while(tok->tgroup==TOK_TERM2)
 	 {
 		// MESG("while: TERM2");
@@ -1862,13 +1899,14 @@ double num_expression()
  double value;
  TDS("num_expression");
  // MESG(";num_expression: [%s]",tok_info(tok));
- // set_vdval(0);
+ set_vtype(VTYPE_NUM);
+ ex_value=0;
  value = num_term1();
  while(tok->tgroup==TOK_TERM) {
 	// MESG("while: TERM");
 	value = tok->term_function(value);
  };
- // MESG(";num_expression:end ttnum=%d return value=%f slval=[%s]",tok->tnum,value,get_sval());
+ // MESG(";num_expression:end ttnum=%d return value=%f slval=[%s]",tok->tnum,value,saved_string);
  return value;
 }
 
@@ -1885,21 +1923,21 @@ double logical_xor(double value)
  int v2;
 	v2=(int) lexpression();
 //	MESG("%d XOR %d = %d",value,v2,value^v2);
-	// set_vtype(VTYPE_NUM);
+	set_vtype(VTYPE_NUM);
 	return ((int)value)^v2;
 }
 
 double logical_nor(double value)
 {
  int v2=(int) lexpression() >0;;
-	// set_vtype(VTYPE_NUM);
+	set_vtype(VTYPE_NUM);
 	return (!((value>0) || v2));
 }
 
 double logical_and(double value)
 {
  int v2=(int) lexpression() >0;
-	// set_vtype(VTYPE_NUM);
+	set_vtype(VTYPE_NUM);
 	return v2 && (int)value;
 }
 
@@ -1907,7 +1945,7 @@ double logical_nand(double value)
 {
  int v2;
 	v2=(int) lexpression();
-	// set_vtype(VTYPE_NUM);
+	set_vtype(VTYPE_NUM);
 	return !(v2 && (int)value);
 }
 
@@ -1915,11 +1953,11 @@ double assign_option(double none)
 {
 double	value=lexpression();
 #if	1
-	// MESG("assign_option:");
+	MESG("assign_option:");
 		if(var_node->node_vtype==VTYPE_STRING) {free(var_node->node_sval);};
-		if(vtype_is(VTYPE_STRING)){
+		if(ex_vtype==VTYPE_STRING){
 			var_node->node_vtype=VTYPE_STRING;
-			if(get_sval()) var_node->node_sval=strdup(get_sval());
+			if(saved_string) var_node->node_sval=strdup(saved_string);
 			else {
 				err_num=2221;
 				ERROR("error: saved string is Null string!! ",err_num);
@@ -1933,15 +1971,15 @@ double	value=lexpression();
 		
 #else
 		if(var_node->sval!=NULL) {free(var_node->sval);};
-		if(vtype_is(VTYPE_STRING)){
-			if(get_sval()) var_node->sval=strdup(get_sval());
+		if(ex_vtype==VTYPE_STRING){
+			if(saved_string) var_node->sval=strdup(saved_string);
 			else {
 				err_num=2221;
 				ERROR("error: Null string ",err_num);
 				var_node->sval=NULL;
 			};
 		} else {
-			if(get_sval()) 
+			if(saved_string) 
 			{
 				err_num=2222;
 				ERROR("error: no string and not free!");
@@ -1989,18 +2027,18 @@ double cexpression()
  if(tok->tgroup!=TOK_COMPARE) RTRN(value);
  tok0=tok;
  NTOKEN2;
- if(vtype_is(VTYPE_STRING)) {
+ if(ex_vtype==VTYPE_STRING) {
 	static char svalue[MAXLLEN];
 	 
-	strlcpy(svalue,get_sval(),MAXLLEN);
+	strlcpy(svalue,saved_string,MAXLLEN);
 	num_expression();
-	if(!vtype_is(VTYPE_STRING)) {
+	if(ex_vtype!=VTYPE_STRING) {
 		syntax_error("string comparison error",223);
 		set_vtype(VTYPE_NUM);
 		RTRN(0);	/* it is an error to compare string with number  */
 	};
 	set_vtype(VTYPE_NUM);
-	int lresult=scmp(svalue,get_sval());
+	int lresult=scmp(svalue,saved_string);
 
 	// clean_saved_string(0);
 	RTRN(tok0->cexpr_function(lresult,0));
@@ -2023,109 +2061,80 @@ double assign_env(double none)
 	TDS("assign_env");
 	left_index=var_node->node_index;
 	v1=lexpression();
-	set_env(left_index,get_sval(),v1);
+	set_env(left_index,saved_string,v1);
 	var_node=NULL;
 	return(v1);
 }
 
+#if	1
+double assign_val(double none)
+{
+	tok_data *sslot=lsslot;
+	double v1=lexpression();
+	// MESG("assign_val: sslot->vtype=%d ex_vtype=%d",sslot->vtype,ex_vtype);
+
+	if(sslot->vtype!=0 && ex_vtype!=sslot->vtype){
+		MESG("wrong assign: ex_vtype=%d sslot->vtype=%d",ex_vtype,sslot->vtype);
+		set_error(tok,3,"assign val");
+		ERROR("assign value! ind=%d vtype=%d ex_vtype=%d",sslot->ind,sslot->vtype,ex_vtype);
+		set_break();
+		return v1;
+	};
+
+	if(sslot->vtype==0) sslot->vtype=ex_vtype;
+	return assign_functions[ex_vtype](v1,sslot);
+}
+#else
 double assign_val(double none)
 {
 	double v1;
-	tok_data *sslot;
-	TDS("assign_val");
-	// MESG("assign_val: ind=%d vtype=%d",lsslot->ind,lsslot->vtype);
-	sslot=lsslot;
+	tok_data *sslot=lsslot;
+	// MESG("assign_val: ind=%d lsslot->vtype=%d",lsslot->ind,lsslot->vtype);
 	v1=lexpression();
 	// MESG("assign_val: after lexpression! slot vtype=%d ex_vtype=%d\n",sslot->vtype,ex_vtype);
-	if(vtype_is(sslot->vtype) && vtype_is(VTYPE_NUM)) {
-			sslot->dval=v1;
-			return(v1);
+	if(sslot->vtype!=0 && sslot->vtype!=ex_vtype) {
+		set_error(tok,3,"assign val");
+		ERROR("assign value! ind=%d vtype=%d ex_vtype=%d",sslot->ind,sslot->vtype,ex_vtype);
+		set_break();
+		return(v1);
 	};
-	if(!vtype_is(sslot->vtype)){
-		if(sslot->vtype==VTYPE_STRING) {
-			if(sslot->sval) free(sslot->sval);
-			sslot->sval=NULL;
-			if(vtype_is(VTYPE_NUM)) {
-				// MESG("set new as num");
-				sslot->dval=v1;
-				sslot->vtype=VTYPE_NUM;
-				return(v1);
-			};
-		} else {
-			if(sslot->vtype!=VTYPE_ARRAY && sslot->vtype!=VTYPE_SARRAY)	{/* added to handle arrays (v698l) but CHECK!!!!  */
-				if(sslot->vtype==VTYPE_AMIXED) {
-					// MESG("we are here! %f",*sslot->pdval);
-					// MESG("-- t=%d",lmvar->vtype);
+	if(sslot->vtype==0) sslot->vtype=ex_vtype;
 
-					if(lmvar->var_type==VTYPE_STRING) free(lmvar->sval);
-					lmvar->var_type=get_vtype();
-					if(vtype_is(VTYPE_STRING)) {
-						lmvar->sval=strdup(get_sval());					
-					};
-					if(vtype_is(VTYPE_NUM)) {
-						lmvar->dval=v1;
-					}
-					return (v1);
-				};
-				// sslot->vtype=get_vtype();
-			};
-			if(vtype_is(VTYPE_NUM)) {
-				// MESG("set new as num");
-				*sslot->pdval=v1;
-				// sslot->vtype=VTYPE_NUM;
-				return(v1);
-			};
-			if(vtype_is(VTYPE_STRING)) {
-				sslot->sval=strdup(get_sval());
-				/* !!!!! to change type beware!!!!!!  */
-				if(sslot->vtype!=VTYPE_SARRAY)
-					sslot->vtype=VTYPE_STRING;
-				// MESG("set string!");
-				return(0);
-			};
-		};
-			if(vtype_is(VTYPE_ARRAY) || vtype_is(VTYPE_SARRAY)||vtype_is(VTYPE_AMIXED)) {
-				// MESG("assign array to var!");
-				sslot->adat=get_array("27");
-				sslot->vtype=sslot->adat->atype;
-				if(sslot->adat->astat==ARRAY_ALLOCATED) sslot->adat->astat=ARRAY_LOCAL;	/* make it local to variable  */
-			};
-		return(v1);		
-	} else {
-#if	0
-		if(vtype_is(VTYPE_NUM) ) {
+	switch(ex_vtype){
+		case VTYPE_NUM:  {
 			sslot->dval=v1;
 			return(v1);
 		};
-#endif
-		if(vtype_is(VTYPE_ARRAY) || vtype_is(VTYPE_SARRAY)) {
-//				print_array1("assign array ",get_array("31"));
+		case VTYPE_ARRAY:
+		case VTYPE_SARRAY: {
+//				print_array1("assign array ",ex_array);
 //				print_array1("to array",sslot->adat);
-			array_dat *new_array = get_array("32");
-			if(new_array->anum != sslot->adat->anum) {
+			if(sslot->adat!=NULL){
+			if(ex_array->anum != sslot->adat->anum) {
  				if(sslot->adat->dval) free_array("assign",sslot->adat);
 				if(sslot->adat->sval) {
 					// MESG("free string array!");
 				};
-				sslot->adat=new_array;
-				if(new_array->astat==ARRAY_ALLOCATED) new_array->astat=ARRAY_LOCAL;	/* make it local to variable  */
+				sslot->adat=ex_array;
+				if(ex_array->astat==ARRAY_ALLOCATED) ex_array->astat=ARRAY_LOCAL;	/* make it local to variable  */
+			};} else {
+				sslot->adat=ex_array;
 			};
 			return(v1);
 		};
-#if	0
-		if(vtype_is(VTYPE_AMIXED)) {
+		case VTYPE_AMIXED: {
 			MESG("deep copy mixed array!");
 			return(v1);
 		};
-#endif
-		if(vtype_is(VTYPE_STRING)) {
+		case VTYPE_STRING: {
 			free(sslot->sval);
-			sslot->sval=strdup(get_sval());
+			sslot->sval=strdup(saved_string);
 			return(v1);
 		};
-		return(v1);
 	};
+	return(v1);
 }
+#endif
 
 int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 {
@@ -2140,7 +2149,6 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 		tok_data *arg_dat=&symbols[tok->tind];
 		arg_dat->vtype=va->var_type;
 		// MESG("assign_args1:arg %d: pos2 tok=[%d %s] ttype=%d tind=%d",i,tok->tnum,tok->tname,tok->ttype,tok->tind);
-
 		switch(va->var_type) {
 			case VTYPE_NUM:
 				arg_dat->dval=va->dval;
@@ -2158,7 +2166,6 @@ int assign_args1(MVAR *va,tok_data *symbols,int nargs)
 				arg_dat->sval="";
 				arg_dat->dval=0;
 		};
-
 		// MESG("assign_args1:arg %d: pos3 after args tok=[%s] %d",i,tok->tname,tok->ttype);
 		NTOKEN2;	/* skip separator or end parenthesis */
 		if(tok->ttype==TOK_RPAR) break;
@@ -2222,33 +2229,69 @@ void skip_sentence1()
 }
 
 
-void update_ddot_line(char *ddot_out)
+void refresh_ddot_1(double value)
 {
- FILEBUF *old_fp;
- TextPoint *tp = tok->ddot;
- FILEBUF *buf = tp->fp;
+ offs line_end,ddot_position=0;
  int dsize=0;
- int is_ddot=0;
- offs ddot_pos=tp_offset(tp);
- offs i,sl,el; // current offset, start,end of line
- old_fp=cbfp;
+ int stat=0;
+ FILEBUF *old_fp; 
+ FILEBUF *buf;
+ TextPoint *tp;
+
+ TDS("refresh_ddot_1");
  
+ if(execmd) {
+	 if(ex_vtype==VTYPE_NUM) {
+		if(lstoken) {
+			printf(";%s	: %.3f\n",lstoken->tname,value);
+		} else printf(";	: %.3f\n",value);
+	 } else if(ex_vtype==VTYPE_STRING) {
+	 	if(lstoken) {
+			printf(";%s	: %s\n",lstoken->tname,saved_string);
+		} else printf(";	: '%s'\n",saved_string);
+	 } else if(ex_vtype==VTYPE_ARRAY) print_array1(";",ex_array);
+	 lstoken=NULL;
+	 return;
+ };
+
+ int precision=bt_dval("print_precision");
+ int show_hex=bt_dval("show_hex");
+ char *ddot_out = (char *)malloc(128);
+ tp=tok->ddot;
+ buf=tp->fp;
+
+ ddot_position=tp_offset(tp);
+ 
+ line_end=FLineEnd(buf,ddot_position);
+
+ if(buf->b_state & FS_VIEW) return; // no refresh in view mode
+
+ old_fp=cbfp; // keep the old buffer just in case
+
  sfb(buf);
- el=FLineEnd(buf,ddot_pos);
- sl=FLineBegin(buf,ddot_pos);
+ dsize=line_end-ddot_position-1;
 
- dsize=el-sl;
- ddot_pos=el-sl;
-	for(i=sl;i<el;i++) {
-		if(CharAt(i)==':') { 
-			is_ddot=!(cbfp->b_state & FS_VIEW);
-			ddot_pos=i-sl+1;break;};
+ textpoint_set(buf->tp_current,ddot_position+1);
+
+ if(ex_vtype==VTYPE_STRING) {	/* string value  */
+	stat=snprintf(ddot_out,128," \"%s\"",saved_string);
+ }  else if(ex_vtype==VTYPE_NUM) {	/* numeric value  */
+	long int d = (long int)value;
+	if(d==value) {	/* an integer/double value!  */
+		if(show_hex) stat=snprintf(ddot_out,128," %5.0f | 0x%llX | 0o%llo",value,(unsigned long long)value,(unsigned long long)value);
+		else stat=snprintf(ddot_out,128," %5.*f",1,value);
+	} else {	/* a decimal value!  */
+		stat=snprintf(ddot_out,128," %5.*f",precision,value);
 	};
-  
-// replace text
- textpoint_set(buf->tp_current,sl+ddot_pos);
- if(is_ddot) DeleteBlock(0,dsize-ddot_pos);
 
+ } else if(ex_vtype==VTYPE_ARRAY || ex_vtype==VTYPE_SARRAY || ex_vtype==VTYPE_AMIXED) {
+	array_dat *adat = ex_array;
+ 	stat=snprintf(ddot_out,128,"array %d, slot %ld type=%d rows %d,cols %d",adat->anum,lsslot-current_stable,adat->atype,adat->rows,adat->cols);
+	print_array1(":",adat);
+ };
+ if(stat>MAXLLEN) MESG("truncated");
+// replace text
+ DeleteBlock(0,dsize);
  insert_string(cbfp,ddot_out,strlen(ddot_out));
  if(err_num>0) {
  	insert_string(cbfp," ,err ",6);
@@ -2258,58 +2301,9 @@ void update_ddot_line(char *ddot_out)
  sfb(old_fp);
 }
 
-void refresh_ddot_1(double value)
-{
- TDS("refresh_ddot_1");
- int stat=0;
- TextPoint *tp = tok->ddot;
- FILEBUF *buf = tp->fp;
- // MESG("refresh_ddot:");
- if(execmd) {
-	 if(vtype_is(VTYPE_NUM)) {
-		if(lstoken) {
-			printf(";%s	: %.3f\n",lstoken->tname,value);
-		} else printf(";	: %.3f\n",value);
-	 } else if(vtype_is(VTYPE_STRING)) {
-	 	if(lstoken) {
-			printf(";%s	: %s\n",lstoken->tname,get_sval());
-		} else printf(";	: '%s'\n",get_sval());
-	 } else if(vtype_is(VTYPE_ARRAY)) print_array1(";",get_array("36"));
-	 lstoken=NULL;
-	 return;
- };
-
- int precision=bt_dval("print_precision");
- int show_hex=bt_dval("show_hex");
- char *ddot_out = (char *)malloc(128);
-
- // MESG("	ddot_pos=%d end=%d todel=%d",ddot_position,line_end,line_end-ddot_position);
- if(buf->b_state & FS_VIEW) return; // no refresh in view mode
-
- if(vtype_is(VTYPE_STRING)) {	/* string value  */
-	stat=snprintf(ddot_out,128," \"%s\"",get_sval());
- }  else if(vtype_is(VTYPE_NUM)) {	/* numeric value  */
-	long int d = (long int)value;
-	if(d==value) {	/* an integer/double value!  */
-		if(show_hex) stat=snprintf(ddot_out,128," %5.0f | 0x%llX | 0o%llo",value,(unsigned long long)value,(unsigned long long)value);
-		else stat=snprintf(ddot_out,128," %5.*f",1,value);
-	} else {	/* a decimal value!  */
-		stat=snprintf(ddot_out,128," %5.*f",precision,value);
-	};
-
- } else if(vtype_is(VTYPE_ARRAY) || vtype_is(VTYPE_SARRAY) || vtype_is(VTYPE_AMIXED)) {
-	array_dat *adat = get_array("37");
- 	stat=snprintf(ddot_out,128,"array %d, slot %ld type=%d rows %d,cols %d",adat->anum,lsslot-current_stable,adat->atype,adat->rows,adat->cols);
-	print_array1(":",adat);
- };
- if(stat>MAXLLEN) MESG("truncated");
-
- update_ddot_line(ddot_out);
-}
-
 double tok_dir_type()
 {
-	// MESG("dir_type");
+	MESG("dir_type");
 	NTOKEN2;
 	return 0;
 }
@@ -2410,8 +2404,9 @@ double tok_dir_fori()
 	NTOKEN2;	/* go to next token after for */
 
 	index=&current_stable[tok->tind];
-	if(index->vtype!=VTYPE_NUM) {err_num=224;ERROR("for i syntax error %d",err_num);};
-	set_vtype(index->vtype);
+	index->vtype=VTYPE_NUM;
+	// if(index->vtype!=VTYPE_NONE) {err_num=224;ERROR("for i syntax error %d",err_num);};
+	set_vtype(VTYPE_NUM);
 
 	NTOKEN2; // next
 	NTOKEN2; // skip equal sign
@@ -2441,8 +2436,8 @@ double tok_dir_fori()
 		return 1;
 	};
 	if(dstep>0 && dmax > *iterrator_val) {
-
 		for(;*iterrator_val < dmax; *iterrator_val +=dstep) {
+
 			tok=start_block;
 			tok->directive();
 			if(current_active_flag==0) {
@@ -2452,6 +2447,7 @@ double tok_dir_fori()
 		};
 	} else if(dstep<0 && dmax< *iterrator_val) {
 		for(; *iterrator_val > dmax; *iterrator_val +=dstep) {
+
 			tok=start_block;
 			tok->directive();
 			if(current_active_flag==0) {
@@ -2593,13 +2589,13 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		old_items=use_fp->symbol_tree->items;
 	};
 	parse_block1(bp,use_fp->symbol_tree,start,extra);
-	MESG("parse_block: ended! err=%d start=%d",err_num,start);
+	MESG("parse_blocke: ended! err=%d start=%d",err_num,start);
 	if(err_num) return(0);
 	if(start || current_stable==NULL) {
-		// MESG("new current_stable with %d items",use_fp->symbol_tree->items);
+		MESG("new current_stable with %d items",use_fp->symbol_tree->items);
 		local_symbols=new_symbol_table(use_fp->symbol_tree->items);
 	} else {
-		// MESG("use current_stable new items = %d",use_fp->symbol_tree->items);
+		MESG("use current_stable new items = %d",use_fp->symbol_tree->items);
 		local_symbols=realloc_symbol_table(current_stable,use_fp->symbol_tree->items,old_items);
 	}
 	current_stable=local_symbols;
@@ -2609,7 +2605,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	err_num=check_init(bp);
 	if(err_num>0) 
 	{
-		// mesg_out("Error %d %s line %d ex_vtype=%d ex_value=%f slval=[%s]!",err_num,err_str,err_line,get_vtype(),ex_value,get_sval());
+		// mesg_out("Error %d %s line %d ex_vtype=%d ex_value=%f slval=[%s]!",err_num,err_str,err_line,ex_vtype,ex_value,saved_string);
 		show_error("Check init",bp->b_fname);
 		return(0);
 	};
@@ -2627,7 +2623,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	if(start) {
 		if(local_symbols)
 		if(bp->symbol_tree){
-			delete_symbol_table(local_symbols,bp->symbol_tree->items,0,0);
+			delete_symbol_table(local_symbols,bp->symbol_tree->items,0);
 			bp->symbol_tree=NULL;
 #if	TEST_TYPE0
 			/* delete the type tree  */
@@ -2638,8 +2634,8 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		current_stable=old_symbol_table;
 	};
 
-	if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
-	if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
+	if(ex_vtype==VTYPE_STRING) msg_line("Result is \"%s\"",saved_string);
+	if(ex_vtype==VTYPE_NUM) msg_line("Result is [%f]",val);
  } else {
  	msg_line("parse error %d on %s ",err_num,bp->b_fname);
 	val=0;
@@ -2720,9 +2716,9 @@ int refresh_current_buffer(int nused)
 		// msg_line("Error %d [%s] at line %d",err_num,err_str,err_line);
 		// mesg_out("Error %d [%s] at line %d",err_num,err_str,err_line);
 	} else {
-		if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
-		if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
-		if(get_sval()) msg_line("Result is [%s %f]",get_sval(),val);
+		if(ex_vtype==VTYPE_STRING) msg_line("Result is \"%s\"",saved_string);
+		if(ex_vtype==VTYPE_NUM) msg_line("Result is [%f]",val);
+		if(saved_string) msg_line("Result is [%s %f]",saved_string,val);
 	};
  } else {
  	msg_line("parse error %d line %d level %d [%s]",err_num,err_line+1,stage_level,err_str);
@@ -2754,7 +2750,7 @@ int parse_check_current_buffer(int n)
  cls_fout("[out]");
  // MESG("clear output");
  err_num=check_init(fp);
- MESG("parse_check_current_buffer: after check_init");
+ MESG("parse_check_current_buffer: after chek_init");
  if(err_num>0) {
 	macro_exec=0;
 	msg_line("syntax error %d line %d [%s]",err_num,err_line,err_str);
@@ -2906,49 +2902,23 @@ int show_parse_buffer(int n)
 char * key_str1()
 {
  // MESG("key_str1: tnum=%d ttype=%d",tok->tnum,tok->ttype);
- num_expression();
- // MESG("key_str1: ex_vtype=%d ex_value=%f [%s]",get_vtype(),ex_value,get_sval());
- return (get_sval());
+ ex_value=num_expression();
+ // MESG("key_str1: ex_vtype=%d ex_value=%f [%s]",ex_vtype,ex_value,saved_string);
+ return (saved_string);
 }
 
 double get_val()
 {
-#if	USE_VAR
-	return ex_var.dval;
-#else
 	return (ex_value);
-#endif
 }
 
-array_dat *get_array(char *pos)
-{
-	// MESG("get_array:[%s] type=%d tok [%s]  ind=%d num=%d type=%d",pos,ex_var.vtype,tok->tname,tok->tind,tok->tnum,tok->ttype);
-#if	USE_VAR
-	// if(ex_var.vtype==1) return NULL;
-	return ex_var.adat;
-#else
-	if(ex_array==NULL) MESG("	return null!");	
-	return ex_array;
-#endif
-}
-
-void set_array(array_dat *a)
-{
-#if	USE_VAR
-	// MESG("set_array:");
-	ex_var.adat=a;
-	ex_var.vtype=a->atype;
-#else
-	ex_array=a;
-#endif
-}
 
 char *get_sval()
 {
 // 	MESG("get_sval: tnum=%d type=%d %f ex_value=%f",tok->tnum,tok->ttype,tok->dval,ex_value);
 	if(saved_string==NULL) {
 		saved_string=(char *)malloc(16);
-		snprintf(saved_string,16,"%f",get_val());
+		snprintf(saved_string,16,"%f",ex_value);
 		// MESG("get_sval: new saved_string! [%s]",saved_string);
 	};
 	return(saved_string);
@@ -2957,73 +2927,32 @@ char *get_sval()
 double next_value()
 {
  double v;
- v=atof(get_sval());
+ v=atof(saved_string);
  return(v);
-}
-
-int get_vtype()
-{
-#if	USE_VAR
-	return ex_var.vtype;
-#else
-	return ex_vtype;
-#endif
 }
 
 int vtype_is(int type)
 {
-#if	USE_VAR
-	return type==ex_var.vtype;
-#else
 	return type==ex_vtype;
-#endif
 }
 
 void set_vtype(int type)
 {
-#if	USE_VAR
-	ex_var.vtype=type;
-#else
+#if	1
 	ex_vtype=type;
+	// assign_val_function = assign_functions[type];
 #endif
-}
-
-void set_nsval(char *s,int max)
-{
- clean_saved_string(max);
- memcpy(saved_string,s,max);
- saved_string[max]=0;
- // MESG(";set_nsval:s=[%s] [%s] %d",s,saved_string,max);
- ex_var.vtype=VTYPE_STRING;
 }
 
 void set_sval(char *s)
 {
  clean_saved_string(0);
  saved_string=strdup(s);
- ex_var.vtype=VTYPE_STRING;
-}
-
-void set_vdval(double value){
-#if	USE_VAR
-	// MESG("set_vdval: %f",value);
-	ex_var.vtype=VTYPE_NUM;
-	ex_var.dval=value;
-#else
-	ex_vtype = VTYPE_NUM;
-	ex_value = value;
-#endif
 }
 
 void set_dval(double value)
 {
-#if	USE_VAR
-	// MESG("set_dval: %f",value);
-	// ex_var.vtype=VTYPE_NUM;
-	ex_var.dval=value;
-#else
-	ex_value = value;
-#endif
+ ex_value = value;
 }
 
 #include "mlang_err.c"
@@ -3039,7 +2968,7 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 	if (macro_exec == FALSE) {
 		if(getstring(prompt, buffer, size,show)!=FALSE) {
 			// MESG("nextarg: buffer=[%s]",buffer);
-			set_dval(atof(buffer));
+			ex_value = atof(buffer);
 		} else {
 			set_update(cwp,UPD_MOVE);
 			return(FALSE);

@@ -241,6 +241,26 @@ int	err_eval_fun1(tok_struct *tok0)
 	RT_MESG1(408);
 }
 
+int err_skip_type_args(int args)
+{
+ int stat=0;
+ MESG("err_skip_type_args:");
+ if(tok->ttype==TOK_LPAR) {
+ 	MESG("	there is an LPAR type=%d name=%s",tok->ttype,tok->tname);
+	int nargs=0;
+	while(tok->ttype!=TOK_RPAR){
+		nargs++;
+		if(nargs>args) return 667;
+		MESG("	nargs=%d type=%d name=[%s]",nargs,tok->ttype,tok->tname);
+		NTOKEN_ERR(668);
+		stat=lexpression();
+	};
+	if(nargs!=args) return 668;
+	NTOKEN_ERR(669);
+ };
+ return stat;
+}
+
 int  err_push_args_1(int *nargs)
 {
  int i=0;
@@ -691,12 +711,18 @@ int err_factor()
 			err_num = err_lexpression();
 			CHECK_TOK(484);
 			if(tok->ttype==TOK_LBRAKET) {
-				// MESG("	err_tok_lpar: we have a left braket, continue!");
+				MESG("	(((((( err_tok_lpar: we have a left braket, continue!");
 				RT_MESG;
 			};
+#if	0
+			if(tok->ttype ==TOK_LPAR) {
+				NTOKEN_ERR(1841);
+				RT_MESG;
+			};
+#endif
 			if(tok->ttype !=TOK_RPAR) {
 				xpos=4850;
-				MESG(" +++++++++++ lpar: %d -> %d type=%d",tok0->tnum,tok->tnum,tok->ttype);
+				MESG(" +++++++++++  %s: %d -> %d type=%d",tok->tname,tok->tnum,tok->tnum,tok->ttype);
 
 				set_error(tok0,xpos,"FAC1_err: No closing parenthesis");
 				// syntax_error(" FAC1_err: No closing parenthesis",xpos);
@@ -918,9 +944,18 @@ int err_factor()
 	case TOK_DECREASEBY:
 		tok0->tname="assign";
 		RT_MESG1(527);
-	case TOK_ASSIGN_TYPE:
-		MESG("TOK_ASSIGN_TYPE");
+	case TOK_ASSIGN_TYPE:{
+		MESG("TOK_ASSIGN_TYPE: [%s]",tok0->tname);
+		BTNODE *nod0=tok0->tok_node;
+		BTREE *nb = (BTREE *)nod0->node_dat;
+		int args0=nb->items;
+		MESG("	items=%d",args0);
+
+		if(err_skip_type_args(args0)) {
+			set_error(tok0,2000,"`TOK_ASSIGN_TYPE: wrong number of args");
+		};
 		RT_MESG1(528);
+		};
 	default:
 		xpos=527;
 		MESG(" default: error_factor0: %s tind=%d ttype=%d TOK_VAR=%d",tok_info(tok0),tok0->tind,tok0->ttype,TOK_VAR);
