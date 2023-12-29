@@ -241,21 +241,29 @@ int	err_eval_fun1(tok_struct *tok0)
 	RT_MESG1(408);
 }
 
-int err_skip_type_args(int args)
+int err_skip_type_args(tok_struct *tok0)
 {
  int stat=0;
+ BTNODE *nod0=tok0->tok_node;
+ BTREE *nb = (BTREE *)nod0->node_dat;
+ int args0=nb->items;
+ // MESG("	items=%d",args0);
+
  MESG("err_skip_type_args:");
  if(tok->ttype==TOK_LPAR) {
- 	MESG("	there is an LPAR type=%d name=%s",tok->ttype,tok->tname);
+ 	// MESG("	there is an LPAR type=%d name=%s",tok->ttype,tok->tname);
 	int nargs=0;
 	while(tok->ttype!=TOK_RPAR){
 		nargs++;
-		if(nargs>args) return 667;
+		if(nargs>args0) return 661;
 		MESG("	nargs=%d type=%d name=[%s]",nargs,tok->ttype,tok->tname);
+		if(tok->ttype!=TOK_COMMA && tok->ttype!=TOK_LPAR) { 
+			return 662;
+		};
 		NTOKEN_ERR(668);
 		stat=lexpression();
 	};
-	if(nargs!=args) return 668;
+	if(nargs!=args0) return 663;
 	NTOKEN_ERR(669);
  };
  return stat;
@@ -946,13 +954,9 @@ int err_factor()
 		RT_MESG1(527);
 	case TOK_ASSIGN_TYPE:{
 		MESG("TOK_ASSIGN_TYPE: [%s]",tok0->tname);
-		BTNODE *nod0=tok0->tok_node;
-		BTREE *nb = (BTREE *)nod0->node_dat;
-		int args0=nb->items;
-		MESG("	items=%d",args0);
 
-		if(err_skip_type_args(args0)) {
-			set_error(tok0,2000,"`TOK_ASSIGN_TYPE: wrong number of args");
+		if(err_skip_type_args(tok0)) {
+			set_error(tok0,2000,"`TOK_ASSIGN_TYPE: error in argument list");
 		};
 		RT_MESG1(528);
 		};
