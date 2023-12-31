@@ -261,7 +261,7 @@ int err_skip_type_args(tok_struct *tok0)
 			return 662;
 		};
 		NTOKEN_ERR(668);
-		stat=lexpression();
+		stat=err_lexpression();
 	};
 	if(nargs!=args0) return 663;
 	NTOKEN_ERR(669);

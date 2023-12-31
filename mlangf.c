@@ -728,6 +728,7 @@ double uf_mainarg()
 extern tok_data *current_stable;
 extern FILEBUF *exe_buffer;
 
+
 void show_var_node(BTNODE *node)
 {
 	tok_data *var = current_stable;
