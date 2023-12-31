@@ -218,8 +218,17 @@ double update_val()
  double v0=lsslot->dval;
 	// MESG("update_val: from %f by %f",v0,tok->dval);
 	// set_vtype(VTYPE_NUM);
-	if(!vtype_is(VTYPE_NUM)) { set_error(tok,222,"cannot update non numeric value!");NTOKEN2;return(0);};
-	lsslot->dval += tok->dval;
+	if(vtype_is(VTYPE_NUM)) {
+		lsslot->dval += tok->dval;
+		NTOKEN2;
+		return(v0);
+	};
+	if(vtype_is(VTYPE_ARRAY)) {
+		array_add1(lsslot->adat,tok->dval);
+		NTOKEN2;
+		return(v0);
+	};
+	set_error(tok,222,"cannot update non numeric value!");NTOKEN2;return(0);
 	NTOKEN2;
 	return(v0);
 }
@@ -230,20 +239,18 @@ double decrease_by()
 	tok_data *sslot=lsslot;
 	TDS("decrease_val");
 	// sslot=lsslot;
-	// MESG("decrease_by: of [%s]",tok_info(lsslot));
+	// MESG("decrease_by: ");
 	v1=lexpression();
-
+	// MESG("	after lexpression: v1=%f",v1);
 	if(sslot->vtype==VTYPE_NUM) {
 		v0=sslot->dval;
 		sslot->dval =v0-v1;
 		return(sslot->dval);
 	};
 	if(sslot->vtype==VTYPE_ARRAY) {
-		v0=*sslot->pdval;
-		
-		*sslot->pdval = v0-v1;
-		// MESG("array: %f -> %f",v0,*sslot->pdval);
-		return(v0-v1);
+		MESG("	array decrease_by");
+		array_add1(sslot->adat,-v1);
+		return(-v1);
 	};
 	return(-1);
 }
@@ -476,9 +483,7 @@ tok_data *new_symbol_table(int size)
  for(i=0;i<size;i++) {
 	td[i].ind=i;
  	td[i].vtype=VTYPE_NUM;
-	// td[i].pdval=NULL;
 	td[i].dval=0;
-	// td[i].pval = &td[i].dval;
  };
  return td;
 }
@@ -987,7 +992,6 @@ double factor_array2()
 		// MESG("new rows=%d cols=%d",adat->rows,adat->cols);
 // 		NTOKEN2;
 			// value=dval2[ind1][ind2];
-			// array_slot->pdval=&dval2[ind1][ind2];
 #endif
 	} else {
 		NTOKEN2;
@@ -1233,7 +1237,7 @@ static inline double factor_lpar()
 static inline double factor_num()
 {
 	double val=tok->dval;
-	MESG("factor_num:");
+	// MESG("factor_num:");
 	set_vtype(VTYPE_NUM);
 	NTOKEN2;
 	RTRN(val);
@@ -1242,7 +1246,7 @@ static inline double factor_num()
 /* string  */
 double factor_quote()
 {
-	MESG("factor_quote: tnum=%d tname=%s",tok->tnum,tok->tname);
+	// MESG("factor_quote: tnum=%d tname=%s",tok->tnum,tok->tname);
 	set_sval(tok->tname);
 	NTOKEN2;
 	RTRN(0);		/* 0 value for string variables  */
@@ -1870,15 +1874,15 @@ double term_minus(double value)
 double num_term2()
 {
  TDS("num_term2");
- MESG("		num_term2: [%s]",tok_info(tok));
+ // MESG("		num_term2: [%s]",tok_info(tok));
  double v1 = FACTOR_FUNCTION;
- MESG("		factor function executed! v1=%f",v1);
+ // MESG("		factor function executed! v1=%f",v1);
 	 while(tok->tgroup==TOK_TERM2)
 	 {
 		// MESG("while: TERM2");
 		v1 = tok->term_function(v1);
 	 };
- MESG("		term2 end %f",v1);
+ // MESG("		term2 end %f",v1);
  RTRN(v1);
 }
 
@@ -1886,7 +1890,7 @@ double num_term2()
 double num_term1()
 {
  TDS("num_term1");
- MESG("	num_term1: [%s]",tok_info(tok));
+ // MESG("	num_term1: [%s]",tok_info(tok));
  double v1 = num_term2();
 	 while(tok->tgroup==TOK_TERM1)
 	 {
@@ -1894,7 +1898,7 @@ double num_term1()
 		v1 = tok->term_function(v1);
 		if(err_num) break;
 	 };
-	MESG("	num_term1: end %f",v1);
+	// MESG("	num_term1: end %f",v1);
  RTRN(v1);
 }
 
@@ -1903,14 +1907,14 @@ double num_expression()
 {
  double value;
  TDS("num_expression");
- MESG(";num_expression: [%s]",tok_info(tok));
+ // MESG(";num_expression: [%s]",tok_info(tok));
  // set_vdval(0);
  value = num_term1();
  while(tok->tgroup==TOK_TERM) {
 	// MESG("while: TERM");
 	value = tok->term_function(value);
  };
- MESG(";num_expression:end ttnum=%d type=%d return value=%f slval=[%s]",tok->tnum,get_vtype(),value,get_sval());
+ // MESG(";num_expression:end ttnum=%d type=%d return value=%f slval=[%s]",tok->tnum,get_vtype(),value,get_sval());
  return value;
 }
 
@@ -3024,7 +3028,7 @@ int vtype_is(int type)
 void set_vtype(int type)
 {
 #if	USE_VAR
-	MESG("set_vtype:");
+	// MESG("set_vtype:");
 	ex_var.vtype=type;
 #else
 	ex_vtype=type;
@@ -3038,7 +3042,7 @@ void set_nsval(char *s,int max)
  saved_string[max]=0;
  // MESG(";set_nsval:s=[%s] [%s] %d",s,saved_string,max);
 #if	USE_VAR
- MESG("set_nsval:");
+ // MESG("set_nsval:");
  ex_var.vtype=VTYPE_STRING;
 #else
  ex_vtype=VTYPE_STRING;
@@ -3050,7 +3054,7 @@ void set_sval(char *s)
  clean_saved_string(0);
  saved_string=strdup(s);
 #if	USE_VAR
- MESG("set_sval:");
+ // MESG("set_sval:");
  ex_var.vtype=VTYPE_STRING;
 #else
  ex_vtype=VTYPE_STRING;
@@ -3059,7 +3063,7 @@ void set_sval(char *s)
 
 void set_vdval(double value){
 #if	USE_VAR
-	MESG("set_vdval: %f",value);
+	// MESG("set_vdval: %f",value);
 	ex_var.vtype=VTYPE_NUM;
 	ex_var.dval=value;
 #else
@@ -3071,8 +3075,7 @@ void set_vdval(double value){
 void set_dval(double value)
 {
 #if	USE_VAR
-	MESG("set_dval: %f",value);
-	// ex_var.vtype=VTYPE_NUM;
+	// MESG("set_dval: %f",value);
 	ex_var.dval=value;
 #else
 	ex_value = value;
