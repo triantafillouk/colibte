@@ -1277,5 +1277,11 @@ void eval_btree(BTNODE *node,void do_func(BTNODE *n))
  if(node->right) eval_btree(node->right,do_func);
 }
 
+BTREE *dup_btree(BTREE *old)
+{
+ BTREE *new_btree(old->tree_name,0);
+ 
+}
+
 #endif
 

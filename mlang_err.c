@@ -249,19 +249,19 @@ int err_skip_type_args(tok_struct *tok0)
  int args0=nb->items;
  // MESG("	items=%d",args0);
 
- MESG("err_skip_type_args:");
+ // MESG("err_skip_type_args:");
  if(tok->ttype==TOK_LPAR) {
  	// MESG("	there is an LPAR type=%d name=%s",tok->ttype,tok->tname);
 	int nargs=0;
 	while(tok->ttype!=TOK_RPAR){
 		nargs++;
 		if(nargs>args0) return 661;
-		MESG("	nargs=%d type=%d name=[%s]",nargs,tok->ttype,tok->tname);
+		// MESG("	nargs=%d type=%d name=[%s]",nargs,tok->ttype,tok->tname);
 		if(tok->ttype!=TOK_COMMA && tok->ttype!=TOK_LPAR) { 
 			return 662;
 		};
 		NTOKEN_ERR(668);
-		stat=err_lexpression();
+		stat=err_cexpression();
 	};
 	if(nargs!=args0) return 663;
 	NTOKEN_ERR(669);
