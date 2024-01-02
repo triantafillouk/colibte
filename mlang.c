@@ -919,6 +919,31 @@ void type_init_vals(BTNODE *node)
 	};	
 }
 #endif
+void eval_btree1(BTNODE *node,void do_func(BTNODE *n,void *p),void *p);
+
+void node_to_mvar(BTNODE *node,void *p)
+{
+ int index=node->node_index;
+ MVAR *mvar_array = (MVAR *)p;
+	mvar_array[index].var_type=node->node_vtype;
+	mvar_array[index].var_index=node->node_index;
+	if(node->node_vtype==VTYPE_NUM) {
+		mvar_array[index].dval=node->node_dval;
+		mvar_array[index].var_len=0;
+		printf("![%10s] ind=%2d type=%d %f\n",node->node_name,index,node->node_vtype,node->node_dval);
+	} else {
+		mvar_array[index].sval=strdup(node->node_sval);
+		mvar_array[index].var_len=strlen(node->node_sval);
+		printf("![%10s] ind=%2d type=%d %s\n",node->node_name,index,node->node_vtype,node->node_sval);
+	};	
+}
+
+MVAR *btree_to_mvar(BTREE *bt)
+{
+ MVAR *mvar_array = malloc(sizeof(struct MVAR)*bt->items);
+ eval_btree1(bt->root,node_to_mvar,(void *)mvar_array);
+ return mvar_array;
+}
 
 double factor_assign_type()
 {
@@ -937,9 +962,10 @@ double factor_assign_type()
 	BTREE *nbt = dup_btree(var_tree);
 	NTOKEN2;
 	
-	MVAR *svar = malloc(sizeof(struct MVAR)*var_tree->items);
+	// MVAR *svar = malloc(sizeof(struct MVAR)*var_tree->items);
+	MVAR *svar = btree_to_mvar(var_tree);
 	slot_var=svar;
-	eval_btree(var_tree->root,type_init_vals);
+	// eval_btree(var_tree->root,type_init_vals);
 
 	if(check_token(TOK_LPAR)) {
 		MESG("	assign with parenthessis!");
@@ -950,8 +976,10 @@ double factor_assign_type()
 			if(ex_var.vtype==VTYPE_STRING) {
 				printf("%2d: type=%d val=[%s]\n",i,ex_var.vtype,get_sval());
 				// set_btsval(nbt,ex_var
+				svar[i].sval=get_sval();
 			} else {
 				printf("%2d: type=%d val=%f %f\n",i,ex_var.vtype,ex_var.dval,value);
+				svar[i].dval=get_val();
 			};
 			// MESG("next toke type is %s",tok_info(tok));
 			NTOKEN2;
