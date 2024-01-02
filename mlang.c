@@ -934,6 +934,7 @@ double factor_assign_type()
 	BTREE *var_tree = tok->tok_node->node_dat;
 	int size = var_tree->items;
 	MESG("	>> items %d",size);
+	BTREE *nbt = dup_btree(var_tree);
 	NTOKEN2;
 	
 	MVAR *svar = malloc(sizeof(struct MVAR)*var_tree->items);
@@ -946,10 +947,12 @@ double factor_assign_type()
 		NTOKEN2;
 		for(i=0;i<size;i++) {
 			value=num_expression();
-			if(ex_var.vtype==VTYPE_STRING) 
+			if(ex_var.vtype==VTYPE_STRING) {
 				printf("%2d: type=%d val=[%s]\n",i,ex_var.vtype,get_sval());
-			else
+				// set_btsval(nbt,ex_var
+			} else {
 				printf("%2d: type=%d val=%f %f\n",i,ex_var.vtype,ex_var.dval,value);
+			};
 			// MESG("next toke type is %s",tok_info(tok));
 			NTOKEN2;
 		};

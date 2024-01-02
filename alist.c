@@ -999,13 +999,17 @@ BTNODE *set_btdval(BTREE *bt, char *name,double value)
  // MESG("set_btdval: %s",name);
  btn = find_btnode(bt,name);
  if(btn) {
-	if(btn->node_vtype==VTYPE_STRING) {free(btn->node_sval);btn->node_vtype=VTYPE_NUM;};
+	if(btn->node_vtype==VTYPE_STRING) {
+		printf("free string \n");
+		free(btn->node_sval);btn->node_vtype=VTYPE_NUM;
+		btn->node_vtype=VTYPE_NUM;
+	};
 	btn->node_dval=value;
  } else {
 	btn=add_btnode(bt,name);
 	btn->node_dval=value;
+	btn->node_vtype=VTYPE_NUM;
  };
- btn->node_vtype=VTYPE_NUM;
  return(btn);
 }
 
@@ -1277,11 +1281,36 @@ void eval_btree(BTNODE *node,void do_func(BTNODE *n))
  if(node->right) eval_btree(node->right,do_func);
 }
 
-BTREE *dup_btree(BTREE *old)
+/* Iterate btree node applying a function to it   */
+void eval_btree1(BTNODE *node,void do_func(BTNODE *n,void *p),void *p)
 {
- BTREE *new_btree(old->tree_name,0);
- 
+ if(node->left) {
+ 	eval_btree1(node->left,do_func,p);
+ }
+ do_func(node,p);
+ if(node->right) eval_btree1(node->right,do_func,p);
 }
 
+void dup_bt_node(BTNODE *node_orig,void *btree)
+{
+ BTNODE *node = insert_bt_element((BTREE *)btree,node_orig->node_name,node_orig->node_type,node_orig->node_index);
+ // printf("	! add [%10s] type %d index %d\n",node_orig->node_name,node_orig->node_vtype,node_orig->node_index);
+ node->node_vtype=node_orig->node_vtype;
+ if(node->node_vtype==VTYPE_NUM) {
+ 	node->node_dval = node_orig->node_dval;
+	printf("	! add [%10s] type %d index %d %f\n",node->node_name,node->node_vtype,node->node_index,node->node_dval);
+ };
+ if(node->node_vtype==VTYPE_STRING) {
+ 	node->node_sval=strdup(node_orig->node_sval);
+	printf("	! add [%10s] type %d index %d %s\n",node->node_name,node->node_vtype,node->node_index,node->node_sval);
+ };
+}
+
+BTREE *dup_btree(BTREE *bt_orig)
+{
+ BTREE *new_bt = new_btree(bt_orig->tree_name,0);
+ eval_btree1(bt_orig->root,dup_bt_node,(void *)new_bt);
+ return new_bt;
+}
 #endif
 

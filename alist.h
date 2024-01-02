@@ -185,6 +185,7 @@ double btndval(BTREE *bt, char *name);
 char * btnsval(BTREE *bt, char *name);
 
 BTREE *new_btree(char *name,int level);
+BTREE *dup_btree(BTREE *bt_orig);
 void free_btree(BTREE *);
 int delete_btnn(BTREE *bt, char *name);
 void free_btnode(BTNODE *btn);
