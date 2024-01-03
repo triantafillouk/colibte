@@ -1243,7 +1243,8 @@ int refresh_current_line(int nused)
 	dsize=el-sl;
 	ddot_pos=dsize;
 	for(i=sl;i<el;i++) {
-		if(CharAt(i)==':') { 
+		if(CharAt(i)==':') {
+			if(CharAt(i+1)==':') { i++;continue;}; 
 			is_ddot=!(cbfp->b_state & FS_VIEW);
 			ddot_pos=i-sl+1;break;};
 	};

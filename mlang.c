@@ -930,66 +930,58 @@ void node_to_mvar(BTNODE *node,void *p)
 	if(node->node_vtype==VTYPE_NUM) {
 		mvar_array[index].dval=node->node_dval;
 		mvar_array[index].var_len=0;
-		MESG("![%10s] ind=%2d type=%d %f",node->node_name,index,node->node_vtype,node->node_dval);
+		// MESG("![%10s] ind=%2d type=%d %f",node->node_name,index,node->node_vtype,node->node_dval);
 	} else {
 		mvar_array[index].sval=strdup(node->node_sval);
 		mvar_array[index].var_len=strlen(node->node_sval);
-		MESG("![%10s] ind=%2d type=%d %s",node->node_name,index,node->node_vtype,node->node_sval);
+		// MESG("![%10s] ind=%2d type=%d %s",node->node_name,index,node->node_vtype,node->node_sval);
 	};	
 }
 
 MVAR *btree_to_mvar(BTREE *bt)
 {
  MVAR *mvar_array = malloc(sizeof(struct MVAR)*bt->items);
+ // MESG("-btree_to_mvar: items=%d",bt->items);
  eval_btree1(bt->root,node_to_mvar,(void *)mvar_array);
  return mvar_array;
 }
 
 double factor_assign_type()
 {
-	tok_data *type_slot=lsslot;
-
-	// tok_data var_type;
-
 	double value=0;
-	MESG("factor_assign_type: $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-	if(type_slot!=NULL)
-		MESG("  >> lsslot: ind=%d type=%d",type_slot->ind,type_slot->vtype);
-	else MESG("	no lsslot!");
-	MESG("	>> name=[%s] type %d tvtype=%d line=%d",tok->tname,tok->ttype,tok->tvtype,tok->tline);
-	// var_type.vtype=VTYPE_TREE;
+
 	BTREE *var_tree = tok->tok_node->node_dat;
 
 	int size = var_tree->items;
 	MVAR *svar = btree_to_mvar(var_tree);
+	// MESG(" factor_assign_type: $$$$$ name=[%s] type %d tvtype=%d line=%d size=%d",tok->tname,tok->ttype,tok->tvtype,tok->tline,size);
 
 	array_dat *adat=alloc_array();
 	adat->rows=1;
 	adat->cols=size;
 	adat->atype=VTYPE_AMIXED;
-	adat->dat=svar;
+	adat->mval=svar;
 	adat->astat=ARRAY_ALLOCATED;
 
-	MESG("	>> items %d",size);
-	// BTREE *nbt = dup_btree(var_tree);
+	// MESG("	>> items %d",size);
 	NTOKEN2;
 	
-	// MVAR *svar = malloc(sizeof(struct MVAR)*var_tree->items);
-	slot_var=svar;
-	// eval_btree(var_tree->root,type_init_vals);
-
 	if(check_token(TOK_LPAR)) {
-		MESG("	assign with parenthessis!");
+		// MESG("	assign with parenthessis!");
 		int i;
 		NTOKEN2;
 		for(i=0;i<size;i++) {
-			value=num_expression();
+			value=lexpression();
+			if(ex_var.vtype!=svar[i].var_type) {
+				set_error(tok,1022,"type mismatch!");
+				return(0);
+			};
 			if(ex_var.vtype==VTYPE_STRING) {
-				MESG("%2d: type=%d val=[%s]",i,ex_var.vtype,get_sval());
-				svar[i].sval=get_sval();
+				// MESG("%2d: type=%d val=[%s]",i,ex_var.vtype,get_sval());
+				svar[i].sval=strdup(get_sval());
 			} else {
-				MESG("%2d: type=%d val=%f %f",i,ex_var.vtype,ex_var.dval,value);
-				svar[i].dval=get_val();
+				// MESG("%2d: type=%d val=%f %f",i,ex_var.vtype,ex_var.dval,value);
+				svar[i].dval=value;
 			};
 			// MESG("next toke type is %s",tok_info(tok));
 			NTOKEN2;
@@ -2061,8 +2053,10 @@ double lexpression()
  	NTOKEN2;
 	value =tok0->term_function(value);
 //	MESG("lexression result is %f",value);
-	set_vtype(VTYPE_NUM);
+	// set_vtype(VTYPE_NUM);
+	set_vdval(value);
  };
+ 
 	// MESG("lexpression return value %f [%s]",value,tok_info(tok));	
 	RTRN(value);
 }

@@ -664,8 +664,7 @@ int err_factor()
 		// MESG("	TOK_VAR: return [%s]",tok_info(tok));
 		RT_MESG1(493);}
 	case TOK_ARRAY1:{
-		MESG("	err use of tok_array1 [%s]",tok_info(tok0));
-		// err_num=err_factor();
+		// MESG("	err use of tok_array1 [%s]",tok_info(tok0));
 		err_num=err_num_expression(); 
 		// MESG("	err tok_array1: after tok=%d",tok->ttype);
 		xpos=499;

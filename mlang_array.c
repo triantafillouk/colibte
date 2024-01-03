@@ -787,7 +787,7 @@ void print_array1(char *title,array_dat *adat)
 				else if(adat->atype==VTYPE_SARRAY) snprintf(s2,128,"%10s(%d) ",adat->sval[i],i);
 				else if(adat->atype==VTYPE_AMIXED) {
 					if(adat->mval[i].var_type==VTYPE_NUM) snprintf(s2,128,"%05.3f(%d) ",adat->mval[i].dval,i);
-					else snprintf(s2,128,"%10s(%d) ",adat->mval[i].sval,i);
+					else snprintf(s2,128,"[%10s](%d) ",adat->mval[i].sval,i);
 				};
 				strlcat(so,s2,MAXLLEN);
 			};
