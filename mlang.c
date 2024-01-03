@@ -930,11 +930,11 @@ void node_to_mvar(BTNODE *node,void *p)
 	if(node->node_vtype==VTYPE_NUM) {
 		mvar_array[index].dval=node->node_dval;
 		mvar_array[index].var_len=0;
-		printf("![%10s] ind=%2d type=%d %f\n",node->node_name,index,node->node_vtype,node->node_dval);
+		MESG("![%10s] ind=%2d type=%d %f",node->node_name,index,node->node_vtype,node->node_dval);
 	} else {
 		mvar_array[index].sval=strdup(node->node_sval);
 		mvar_array[index].var_len=strlen(node->node_sval);
-		printf("![%10s] ind=%2d type=%d %s\n",node->node_name,index,node->node_vtype,node->node_sval);
+		MESG("![%10s] ind=%2d type=%d %s",node->node_name,index,node->node_vtype,node->node_sval);
 	};	
 }
 
@@ -985,10 +985,10 @@ double factor_assign_type()
 		for(i=0;i<size;i++) {
 			value=num_expression();
 			if(ex_var.vtype==VTYPE_STRING) {
-				printf("%2d: type=%d val=[%s]\n",i,ex_var.vtype,get_sval());
+				MESG("%2d: type=%d val=[%s]",i,ex_var.vtype,get_sval());
 				svar[i].sval=get_sval();
 			} else {
-				printf("%2d: type=%d val=%f %f\n",i,ex_var.vtype,ex_var.dval,value);
+				MESG("%2d: type=%d val=%f %f",i,ex_var.vtype,ex_var.dval,value);
 				svar[i].dval=get_val();
 			};
 			// MESG("next toke type is %s",tok_info(tok));

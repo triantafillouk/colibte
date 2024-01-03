@@ -1000,7 +1000,7 @@ BTNODE *set_btdval(BTREE *bt, char *name,double value)
  btn = find_btnode(bt,name);
  if(btn) {
 	if(btn->node_vtype==VTYPE_STRING) {
-		printf("free string \n");
+		MESG("set_btdval: free string");
 		free(btn->node_sval);btn->node_vtype=VTYPE_NUM;
 		btn->node_vtype=VTYPE_NUM;
 	};
@@ -1298,11 +1298,11 @@ void dup_bt_node(BTNODE *node_orig,void *btree)
  node->node_vtype=node_orig->node_vtype;
  if(node->node_vtype==VTYPE_NUM) {
  	node->node_dval = node_orig->node_dval;
-	printf("	! add [%10s] type %d index %d %f\n",node->node_name,node->node_vtype,node->node_index,node->node_dval);
+	MESG("	! add [%10s] type %d index %d %f",node->node_name,node->node_vtype,node->node_index,node->node_dval);
  };
  if(node->node_vtype==VTYPE_STRING) {
  	node->node_sval=strdup(node_orig->node_sval);
-	printf("	! add [%10s] type %d index %d %s\n",node->node_name,node->node_vtype,node->node_index,node->node_sval);
+	MESG("	! add [%10s] type %d index %d %s",node->node_name,node->node_vtype,node->node_index,node->node_sval);
  };
 }
 

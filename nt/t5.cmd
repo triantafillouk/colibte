@@ -11,7 +11,9 @@ a = human1("kostas"+" maria","tr",33,45,22,23):   0.0
 #a = human1:   0.0
 a:
 # a = human1 ("Kostas","Tr",55,20,100)
-a.name:
+a[0]:
+a[1]:
+human1[0]:
 # print(human1)
 # a = human1[100]
 # print(a[22].name)
