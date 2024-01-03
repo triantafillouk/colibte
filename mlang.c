@@ -948,22 +948,33 @@ MVAR *btree_to_mvar(BTREE *bt)
 double factor_assign_type()
 {
 	tok_data *type_slot=lsslot;
-	tok_data var_type;
+
+	// tok_data var_type;
+
 	double value=0;
 	MESG("factor_assign_type: $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 	if(type_slot!=NULL)
 		MESG("  >> lsslot: ind=%d type=%d",type_slot->ind,type_slot->vtype);
 	else MESG("	no lsslot!");
 	MESG("	>> name=[%s] type %d tvtype=%d line=%d",tok->tname,tok->ttype,tok->tvtype,tok->tline);
-	var_type.vtype=VTYPE_TREE;
+	// var_type.vtype=VTYPE_TREE;
 	BTREE *var_tree = tok->tok_node->node_dat;
+
 	int size = var_tree->items;
+	MVAR *svar = btree_to_mvar(var_tree);
+
+	array_dat *adat=alloc_array();
+	adat->rows=1;
+	adat->cols=size;
+	adat->atype=VTYPE_AMIXED;
+	adat->dat=svar;
+	adat->astat=ARRAY_ALLOCATED;
+
 	MESG("	>> items %d",size);
-	BTREE *nbt = dup_btree(var_tree);
+	// BTREE *nbt = dup_btree(var_tree);
 	NTOKEN2;
 	
 	// MVAR *svar = malloc(sizeof(struct MVAR)*var_tree->items);
-	MVAR *svar = btree_to_mvar(var_tree);
 	slot_var=svar;
 	// eval_btree(var_tree->root,type_init_vals);
 
@@ -975,7 +986,6 @@ double factor_assign_type()
 			value=num_expression();
 			if(ex_var.vtype==VTYPE_STRING) {
 				printf("%2d: type=%d val=[%s]\n",i,ex_var.vtype,get_sval());
-				// set_btsval(nbt,ex_var
 				svar[i].sval=get_sval();
 			} else {
 				printf("%2d: type=%d val=%f %f\n",i,ex_var.vtype,ex_var.dval,value);
@@ -985,6 +995,8 @@ double factor_assign_type()
 			NTOKEN2;
 		};
 	};
+	set_array(adat);
+	
 	return 1;
 }
 
