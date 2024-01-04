@@ -646,7 +646,7 @@ int err_factor()
 		RT_MESG1(480);
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
-		// MESG("TOK_VAR: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
+		MESG("TOK_VAR: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
 		pre_symbol=0;
 		ex_nvars++;
 		if(tok->ttype==TOK_INCREASE) {
@@ -661,6 +661,13 @@ int err_factor()
 			set_tok_function(tok,0);
 			NTOKEN_ERR(498);
 		};
+#if	1
+		if(tok->ttype==TOK_TYPE_ELEMENT) {
+			MESG("err tok_type_element: %s",tok->tname);
+			set_tok_function(tok,0);
+			NTOKEN_ERR(498);
+		};
+#endif
 		// MESG("	TOK_VAR: return [%s]",tok_info(tok));
 		RT_MESG1(493);}
 	case TOK_ARRAY1:{
@@ -959,6 +966,11 @@ int err_factor()
 		};
 		RT_MESG1(528);
 		};
+#if	1
+	case TOK_TYPE_ELEMENT:
+		MESG("TOK_TYPE_ELEMENT: [%s]",tok0->tname);
+		RT_MESG1(529);
+#endif
 	default:
 		xpos=527;
 		MESG(" default: error_factor0: %s tind=%d ttype=%d TOK_VAR=%d",tok_info(tok0),tok0->tind,tok0->ttype,TOK_VAR);

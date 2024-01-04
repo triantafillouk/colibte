@@ -254,8 +254,10 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 	BTNODE *btn=add_to_symbol_tree(stree,name,TOK_VAR);
 	tok->tind=btn->node_index;
 	tok->ttype=btn->node_type;
+	tok->tvtype=VTYPE_NONE;
 	ex_edenv=tok->ttype;
-	MESG("	set_var: new variable name=%s tind=%d",name,tok->tind);
+	btn->node_vtype=VTYPE_NONE;
+	MESG("	set_var: new variable name=%s tind=%d ttype=%d",name,tok->tind,tok->ttype);
 	// if(stree->max_items < tok->tind) ERROR("exceeded item list of %d !! CHECK!",stree->max_items);
 }
 
@@ -269,6 +271,9 @@ void set_dot_var(FILEBUF *bf,tok_struct *tok)
 	int cc=FCharAt(bf,foffset++);
 	getnword1(bf,cc,nword);
 	MESG("set_dot_var: found subtype [%s]",nword);
+	tok->ttype=TOK_TYPE_ELEMENT;
+	tok->tvtype=TOK_NONE;
+	tok->tname=strdup(nword);
 	// check if valid subtype!
 }
 
@@ -945,6 +950,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 						tok->tok_node=var_node;
 						tok->tvtype = var_node->node_vtype;
 						if(next_token_type(bf)==TOK_DOT) {
+							NTOKEN2;
+							ADD_TOKEN("dot");
 							set_dot_var(bf,tok);
 							// continue;
 						};
@@ -957,6 +964,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 						array_tok=tok;	/* variable to set as array!  */
 						array_tok->ttype=TOK_ARRAY1;
 						skip_token=1;
+					};
+					if(next_token_type(bf)==TOK_DOT) {
+						
+					
 					};
 				}
 			};

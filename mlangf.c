@@ -5,6 +5,9 @@ extern array_dat *main_args;
 extern char *ex_name;
 extern FILEBUF *cbfp;
 extern BTREE *global_types_tree;
+extern char *vtype_names[];
+
+void mesg_out(const char *fmt, ...);
 
 tok_struct *current_token();
 void set_vtype(int type);
@@ -733,25 +736,26 @@ void show_var_node(BTNODE *node)
 {
 	tok_data *var = current_stable;
 	var = &current_stable[node->node_index];
-
+	// mesg_out("type %d",var->vtype);
+	// mesg_out("type name %s",vtype_names[var->vtype]);
 	if(var->vtype==VTYPE_NUM) 
-		MESG("%03d %-10s  numeric %f",
-			node->node_index,node->node_name,var->dval);
+		mesg_out("%03d %-10s %2d(%12s) %f",
+			node->node_index,node->node_name,var->vtype,vtype_names[var->vtype],var->dval);
 	else if(var->vtype==VTYPE_STRING)
-		MESG("%03d %-10s  string  \"%s\"",
-			node->node_index,node->node_name,var->sval);
+		mesg_out("%03d %-10s %2d(%12s) \"%s\"",
+			node->node_index,node->node_name,var->vtype,vtype_names[var->vtype],var->sval);
 	else
-		MESG("%03d %-10s  other type",node->node_index,node->node_name);
+		mesg_out("%03d %-10s %2d(%12s)",node->node_index,node->node_name,var->vtype,vtype_names[var->vtype]);
 }
 
 double uf_show_vars()
 {
 	ntoken();
-	MESG("Ind Name        Type    Value",exe_buffer->symbol_tree->items);
+	mesg_out("Ind Name        Type    Value",exe_buffer->symbol_tree->items);
 
 	eval_btree(exe_buffer->symbol_tree->root,show_var_node);
 	if(global_types_tree->root)
 		eval_btree(global_types_tree->root,show_var_node);
-	else MESG("global_types_tree: empty!");
+	else mesg_out("global_types_tree: empty!");
 	return 0;
 }

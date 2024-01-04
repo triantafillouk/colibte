@@ -142,6 +142,7 @@ struct array_dat *alloc_array()
  // MESG("alloc_array:");
  array_dat *na=(array_dat *)malloc(sizeof(struct array_dat));
  na->anum = array_num++;
+ na->var_tree=NULL;
  return(na);
 }
 
@@ -390,6 +391,17 @@ void array_add1(array_dat *na,double plus)
 	};
 }
 
+void sarray_add1(array_dat *na,char *s)
+{
+ if(na->astat==ARRAY_UNALLOCATED) {
+ 	err_num=256;
+ 	err_str="error: cannot add to non defined array!";
+	return;
+ };
+ if(na->atype==VTYPE_SARRAY) {
+ }
+	
+}
 
 void array_sub1(array_dat *na,double plus)
 {

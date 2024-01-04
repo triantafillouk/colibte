@@ -322,8 +322,10 @@ typedef struct tok_data {
 #if	0
 	char *tok_name;
 #endif
+#if	0
 	short int free_len;
-	short int size;
+	// short int size;
+#endif
 	union {
 	double *pdval;
 	char  **psval;

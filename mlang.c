@@ -151,6 +151,13 @@ term_type term_types[] = {
 	{NULL,0,0}
 };
 
+char *vtype_names[] = {
+	"NONE","NUMERIC","ARRAY","SARRAY","LIST",
+	"SLIST","ALIST","ASLIST","STRING","BUFFER",
+	"ARRAY_EL1","ARRAY_EL2","TREE","TREE_EL",
+	"AMIXED","MIXEDEL",NULL
+};
+
 /* Function definitions */
 #include "mlang_functions.c"
 
@@ -216,7 +223,7 @@ static inline double factor_none()
 double update_val()
 {
  double v0=lsslot->dval;
-	// MESG("update_val: from %f by %f",v0,tok->dval);
+	MESG("update_val: from %f by %f",v0,tok->dval);
 	// set_vtype(VTYPE_NUM);
 	if(vtype_is(VTYPE_NUM)) {
 		lsslot->dval += tok->dval;
@@ -238,7 +245,6 @@ double decrease_by()
 	double v1,v0;
 	tok_data *sslot=lsslot;
 	TDS("decrease_val");
-	// sslot=lsslot;
 	// MESG("decrease_by: ");
 	v1=lexpression();
 	// MESG("	after lexpression: v1=%f",v1);
@@ -248,7 +254,7 @@ double decrease_by()
 		return(sslot->dval);
 	};
 	if(sslot->vtype==VTYPE_ARRAY) {
-		MESG("	array decrease_by");
+		// MESG("	array decrease_by");
 		array_add1(sslot->adat,-v1);
 		return(-v1);
 	};
@@ -259,10 +265,10 @@ double increase_by()
 {
 	double v1,v0;
 	tok_data *sslot=lsslot;
-	// MESG("increase_by:");
+	MESG("increase_by:");
 	// sslot=lsslot;
 	// if(sslot->vtype==VTYPE_STRING) MESG("increase_by string [%s]",sslot->sval);
-	// MESG("increase by: type=%d",sslot->vtype);
+	MESG("increase by: type=%d",sslot->vtype);
 	v1=lexpression();
 
 	if(sslot->vtype==VTYPE_NUM) {
@@ -285,12 +291,14 @@ double increase_by()
 	};
 #if	USE_SARRAYS
 	if(sslot->vtype==VTYPE_SARRAY) {
+		MESG("increase sarray! %d",get_vtype());
+		if(vtype_is(VTYPE_STRING)) {
 		char *stmp=malloc(strlen(get_sval())+strlen(sslot->psval[0]));
 		strcpy(stmp,sslot->psval[0]);
 		strcat(stmp,get_sval());	/* check!! TODO  */
 		free(sslot->psval[0]);
 		sslot->psval[0]=stmp;
-
+		};
 		return(0);
 	};
 #endif
@@ -849,6 +857,15 @@ inline tok_data *get_left_slot(int ind)
 	return &current_stable[ind];
 }
 
+double factor_type_element()
+{
+ int ind=0;
+ MESG("factor_type_element:");
+ MESG("	lsslot %d tvtype=%d (%s)",lsslot->ind,lsslot->vtype,vtype_names[lsslot->vtype]);
+ MESG("	element [%s]",tok->tname);
+ NTOKEN2;
+ return ind;
+}
 
 double factor_variable()
 {	
@@ -858,8 +875,8 @@ double factor_variable()
 	// if(lsslot->vtype!=get_vtype()) MESG("factor_variable: diferent var type! [%s]=%d, [%s]=%d",tok->tname,lsslot->vtype,ex_var.tok_name,get_vtype());
 #endif
 	set_vtype(lsslot->vtype);
-	// MESG("	factor_variable:[%s] ind=%d ex_vtype=%d ttype=%d tvtype=%d",
-		// tok->tname,lsslot->ind,get_vtype(),tok->ttype,tok->tvtype);
+	MESG("	factor_variable:[%s] tind=%d ,var ind=%d ex_vtype=%d ttype=%d tvtype=%d",
+		tok->tname,tok->tnum,lsslot->ind,get_vtype(),tok->ttype,tok->tvtype);
 	switch(get_vtype()) {
 		case VTYPE_NUM:{
 			double val=lsslot->dval; 
@@ -954,7 +971,7 @@ double factor_assign_type()
 
 	int size = var_tree->items;
 	MVAR *svar = btree_to_mvar(var_tree);
-	// MESG(" factor_assign_type: $$$$$ name=[%s] type %d tvtype=%d line=%d size=%d",tok->tname,tok->ttype,tok->tvtype,tok->tline,size);
+	MESG(" factor_assign_type: $$$$$ name=[%s] type %d tvtype=%d line=%d size=%d",tok->tname,tok->ttype,tok->tvtype,tok->tline,size);
 
 	array_dat *adat=alloc_array();
 	adat->rows=1;
@@ -963,6 +980,7 @@ double factor_assign_type()
 	adat->mval=svar;
 	adat->astat=ARRAY_ALLOCATED;
 
+	adat->var_tree = var_tree;
 	// MESG("	>> items %d",size);
 	NTOKEN2;
 	
@@ -1664,7 +1682,7 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_END,
 	factor_none,	// TOK_DEFINE_TYPE,
 	factor_assign_type,	// TOK_ASSIGN_TYPE,
-	factor_none,	// TOK_TYPE_ELEMENT
+	factor_type_element,	// TOK_TYPE_ELEMENT
 	factor_none,	// TOK_DOT,
 	factor_none		// TOK_OTHER,
 };

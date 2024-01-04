@@ -66,6 +66,10 @@ typedef struct array_dat {
 	int cols;
 	short astat;	/* array allocation status  */
 	union {
+		char *array_name;
+		BTREE *var_tree;
+	};
+	union {
 		void *dat;
 		double *dval;
 		double **dval2;
