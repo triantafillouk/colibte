@@ -21,7 +21,7 @@ void allocate_array(struct array_dat *adat);
 void init_array(struct array_dat *array, int rows,int cols)
 {
 	int ctype=VTYPE_ARRAY;	/* default is numeric!!  */
-
+	// MESG("init_array: ex_nvars=%d ex_nquote=%d",ex_nvars,ex_nquote);
 	if(ex_nvars) ctype=VTYPE_AMIXED;
 	else if(ex_nquote>0 && ex_nums>0) ctype=VTYPE_AMIXED;
 	else if(ex_nquote) ctype=VTYPE_SARRAY;
@@ -106,7 +106,6 @@ void allocate_array(struct array_dat *adat)
 		adat->dval2[j]=(double *)malloc(sizeof(double)*adat->cols);
 		for(i=0;i<adat->cols;i++) adat->dval2[j][i]=0;
 	};
-	adat->astat=ARRAY_ALLOCATED;
  } else {
 	int dim=1;
 	int i;
@@ -115,7 +114,6 @@ void allocate_array(struct array_dat *adat)
 	if(adat->rows > 1) dim=adat->rows; else dim=adat->cols;
  	adat->dval=(double *)malloc(sizeof(double)*dim);
 	for(i=0;i<dim;i++) adat->dval[i]=0;
-	adat->astat=ARRAY_ALLOCATED;
  };
 
 	};
@@ -123,17 +121,22 @@ void allocate_array(struct array_dat *adat)
 		// MESG("	allocate string array %d rows, %d cols",adat->rows,adat->cols);
 	 	if(adat->dat != NULL) free(adat->dat);	/* free string array  */
 		adat->sval=(char **)malloc(sizeof(char **)*adat->rows*adat->cols);
-		for(i=0;i< adat->rows*adat->cols;i++) adat->sval[i]=NULL;
-		adat->astat=ARRAY_ALLOCATED;
+		for(i=0;i< adat->rows*adat->cols;i++) {
+			adat->sval[i]=NULL;
+		};
 	};
 	if(adat->atype==VTYPE_AMIXED) {	/* new mixed  */
 		// MESG("allocate array amixed or dynamic!");
 		if(adat->mval!=NULL) free(adat->mval);
 		adat->mval=(struct MVAR *)malloc(sizeof(struct MVAR)*adat->rows*adat->cols);
-		for(i=0;i< adat->rows*adat->cols;i++) {adat->mval[i].dval=0;adat->mval[i].var_type=VTYPE_NUM;};
+		for(i=0;i< adat->rows*adat->cols;i++) {
+			adat->mval[i].dval=0;
+			adat->mval[i].var_type=VTYPE_NUM;};
 		// MESG("dynamic array initialized! type=%d",adat->atype);
 	};
- }
+ };
+ adat->astat=ARRAY_ALLOCATED;
+ // MESG("	array %d allocated , type=%d!",adat->anum,adat->atype);
 }
 
 struct array_dat *alloc_array()
@@ -398,9 +401,21 @@ void sarray_add1(array_dat *na,char *s)
  	err_str="error: cannot add to non defined array!";
 	return;
  };
- if(na->atype==VTYPE_SARRAY) {
+
+ // MESG("sarray_add1: array %d astat=%d atype=%d %d",na->anum,na->astat,na->atype,VTYPE_SARRAY);
+ if(na->atype==VTYPE_SARRAY) 
+ {
+ 	// MESG("String [%s] add to string array!",s);
+	int i;
+	for(i=0;i<na->rows*na->cols;i++) {
+		char *sval = na->sval[i];
+		char *stmp=malloc(strlen(s)+strlen(sval));
+		strcpy(stmp,sval);
+		strcat(stmp,s);
+		free(na->sval[i]);
+		na->sval[i]=stmp;
+	};
  }
-	
 }
 
 void array_sub1(array_dat *na,double plus)

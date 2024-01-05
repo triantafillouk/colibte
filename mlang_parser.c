@@ -48,7 +48,7 @@ tok_struct *add_token(TLIST lex_parser,int tok_type,int cc,char *label,char *fro
 	tok=new_tok();
 	add_element_to_list((void *)tok,lex_parser);
 	tok->tnum=lex_parser->size-1;
-	MESG("	; [%s] add token %3d: ind=%d type=[%s] [%s]",from,tok->tnum,cc,tname(tok_type),label);
+	// MESG("	; [%s] add token %3d: ind=%d type=[%s] [%s]",from,tok->tnum,cc,tname(tok_type),label);
 	return tok;
 }
 
@@ -566,8 +566,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		case TOK_NUM:
 			// MESG("TOK_NUM: old num=%d type=%d name %s,new type %d ",tok->tnum,tok->ttype,tok->tname,tok_type);
 			value=getnum1(bf,cc,tok);
-			// tok->tvtype=VTYPE_NUM;
-			// tok->tname="num";
 			// MESG("parse: TOK_NUM: num=%d type=%d val=%f",tok->tnum,tok->ttype,value);
 			if(err_num>0) return(0);
 			break;
@@ -647,7 +645,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			break;
 		case TOK_QUOTE: // string start
 			slen=getnstr1(bf,cc,nword);
-			// tok->tvtype=VTYPE_STRING;
 			break;
 		case TOK_SHOW:
 			if(next_token_type(bf)==TOK_SHOW) {
@@ -1081,13 +1078,7 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
  while(tlist->current)
  {
 	tok=(tok_struct *)tlist->current->data;
-#if	0
-	if(tok->ttype==TOK_VAR && tok->tvtype==VTYPE_TREE) {
-		MESG(" ++	%10s %2d: %3d [%s] %d node_vtype=%d",tok->tname,tok->tnum,tok->tline,tok->tname,tok->ttype,tok->tvtype);
-	} else {
- 		MESG(" ++	%10s %2d: %3d [%s] type=%d vtype=%d",tok->tname,tok->tnum,tok->tline,tok->tname,tok->ttype,tok->tvtype);
-	};
-#endif
+
 	memcpy((void *)tok_to,(void *)tok,sizeof(tok_struct));
 	if(tok->ttype==TOK_LCURL || tok->ttype==TOK_RCURL) {
 		tok_to->match_tok = tok_table + tok_to->tcurl->num;
