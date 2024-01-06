@@ -153,7 +153,7 @@ term_type term_types[] = {
 };
 
 char *vtype_names[] = {
-	"NONE","NUMERIC","ARRAY","SARRAY","LIST",
+	"UNDEFINED","NUMERIC","ARRAY","SARRAY","LIST",
 	"SLIST","ALIST","ASLIST","STRING","BUFFER",
 	"ARRAY_EL1","ARRAY_EL2","TREE","TREE_EL",
 	"AMIXED","MIXEDEL",NULL
@@ -270,7 +270,6 @@ double increase_by()
 	int ori_type=TOK_VAR;
 	// MESG("increase by: vtype=%d ",sslot->vtype);
 	if(lstoken) {
-		// MESG("	lstoken name=%s vtype=%d ttype=%d",lstoken->tname,lstoken->tvtype,lstoken->ttype);
 		ori_type=lstoken->ttype;
 	} else MESG("	lstoken undefined!");
 	v1=lexpression();
@@ -869,7 +868,7 @@ double factor_type_element()
 {
  int ind=0;
  MESG("factor_type_element:");
- MESG("	lsslot %d tvtype=%d (%s)",lsslot->ind,lsslot->vtype,vtype_names[lsslot->vtype]);
+ MESG("	lsslot %d vtype=%d (%s)",lsslot->ind,lsslot->vtype,vtype_names[lsslot->vtype]);
  MESG("	element [%s]",tok->tname);
  NTOKEN2;
  return ind;
@@ -2954,16 +2953,17 @@ char * tok_info(tok_struct *tok)
 		else if(tok->ttype==TOK_QUOTE) snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] \"%s\"",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
 		else if(tok->ttype==TOK_VAR) {
 			int size=0;
-			char *var_type="numeric";
+			// char *var_type="numeric";
 #if	1
+			int vtype=VTYPE_NONE;
 			struct tok_data *var_slot=get_left_slot(tok->tind);
-			int vtype=var_slot->vtype;
+			if(var_slot) vtype=var_slot->vtype;
 			// MESG("tok_info var! ind=[%d] group=%d vtype=%d",tok->tind,tok->tgroup,tok->tvtype);
 			if(vtype==VTYPE_TREE) {
 				BTNODE *tok_node=tok->tok_node;
 				BTREE *type_tree=(BTREE *)tok_node->node_dat;
 				size = type_tree->items;
-				var_type="btree type";
+				// var_type="btree type";
 			};
 #else
 			int vtype=0;
@@ -2972,11 +2972,11 @@ char * tok_info(tok_struct *tok)
 				BTNODE *tok_node=tok->tok_node;
 				BTREE *type_tree=(BTREE *)tok_node->node_dat;
 				size = type_tree->items;
-				var_type="btree type";
+				// var_type="btree type";
 				vtype=tok->tvtype;
 			};
 #endif
-			snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s] type %s %d size %d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,var_type,vtype,size);
+			snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s] type %s %d size %d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,vtype_names[vtype],vtype,size);
 		} else snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
 // 			
 	} else {
