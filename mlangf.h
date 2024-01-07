@@ -51,3 +51,5 @@ double uf_mainargsize();
 double uf_mainarg();
 double uf_index();
 double uf_show_vars();
+double uf_list_tokens();
+

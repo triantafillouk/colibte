@@ -16,6 +16,7 @@ int get_vtype();
 void set_array(array_dat *a);
 array_dat *get_array(char *);
 void set_nsval(char *,int);
+char * tok_info(tok_struct *tok);
 
 void ntoken();
 int check_token(int type);
@@ -759,3 +760,20 @@ double uf_show_vars()
 	else mesg_out("global_types_tree: empty!");
 	return 0;
 }
+
+double uf_list_tokens()
+{
+ ntoken();
+
+ tok_struct *ltok=exe_buffer->tok_table;
+ out_print("Num: line ind [type     name ] value ------- ",1);
+ while(ltok->ttype!=TOK_EOF) {
+ 	out_print(tok_info(ltok),1);
+	// mesg_out("	show token info",1);
+	ltok++;
+ };	
+ out_print("|-------------------------------------------|",1);
+
+ return 0;
+}
+

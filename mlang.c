@@ -2936,6 +2936,7 @@ int parse_buffer_show_tokens(int n)
 char * tok_info(tok_struct *tok)
 {
  static char stok[MAXLLEN];
+	MESG("tok_info: start");
 	MESG("tok_info: ttype=%d",tok->ttype);
 	if(tok->tname!=NULL){
 		if(tok->ttype==TOK_ARRAY1 || tok->ttype==TOK_ARRAY2) {
@@ -2946,7 +2947,7 @@ char * tok_info(tok_struct *tok)
 				rows=tok->tok_adat->rows;
 				cols=tok->tok_adat->cols;
 			};
-			snprintf(stok,MAXLLEN,"!! %3d:%4d %3d [%2d=%12s] [%s] rows=%d cols=%d",
+			snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s] rows=%d cols=%d",
 				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,rows,cols);
 		} else 
 		if(tok->ttype==TOK_SHOW) { snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [:]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME);
@@ -2981,6 +2982,7 @@ char * tok_info(tok_struct *tok)
 	} else {
 		     snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%f]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);
 	};
+	MESG("tok_info: end");
 	return stok;
 }
 

@@ -61,5 +61,6 @@ m_function m_functions[] = {
 	{"dbg_message",1,uf_dbg_message},	/* show debug message  */
 	{"index",0,uf_index},	/* new index  */
 	{"show_vars",0,uf_show_vars},	/* show local vars  */
+	{"list_tokens",0,uf_list_tokens},	/* list_tokens  */
 	{NULL,0,NULL}
 };
