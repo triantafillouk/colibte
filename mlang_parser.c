@@ -254,7 +254,7 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 	BTNODE *btn=add_to_symbol_tree(stree,name,TOK_VAR);
 	tok->tind=btn->node_index;
 	tok->ttype=btn->node_type;
-	tok->tvtype=VTYPE_NONE;
+	// tok->tvtype=VTYPE_NONE;
 	ex_edenv=tok->ttype;
 	btn->node_vtype=VTYPE_NONE;
 	MESG("	set_var: new variable name=%s tind=%d ttype=%d",name,tok->tind,tok->ttype);
@@ -266,13 +266,13 @@ void set_dot_var(FILEBUF *bf,tok_struct *tok)
 	char nword[256];
 	MESG("set_dot_var:");
 	MESG("set_dot_var: name %s",tok->tname);
-	MESG("set_dot_var: type %d",tok->tvtype);
+	// MESG("set_dot_var: type %d",tok->tvtype);
 	foffset++;	// skip dot
 	int cc=FCharAt(bf,foffset++);
 	getnword1(bf,cc,nword);
 	MESG("set_dot_var: found subtype [%s]",nword);
 	tok->ttype=TOK_TYPE_ELEMENT;
-	tok->tvtype=TOK_NONE;
+	// tok->tvtype=TOK_NONE;
 	tok->tname=strdup(nword);
 	// check if valid subtype!
 }
@@ -311,7 +311,7 @@ void set_global_type(BTNODE *node,BTREE *type_dat,char *name,tok_struct *tok_var
 	tok_var->tok_node = node;
 	tok_var->tname = strdup(name);
 	tok_var->ttype = TOK_ASSIGN_TYPE;
-	tok_var->tvtype = VTYPE_TREE;
+	// tok_var->tvtype = VTYPE_TREE;
 	tok_var->t_nargs = global_types_tree->items-1;
 }
 
@@ -862,7 +862,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				if(var_node!=NULL) {
 					// tok->tok_node = var_node;
 					MESG("	%d: [%s] found in stree",tok->tnum,nword);
-					tok->tvtype = var_node->node_vtype;
+					// tok->tvtype = var_node->node_vtype;
 				};
 			}
 		} else {
@@ -938,7 +938,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 						tok->tind = var_node->node_index;
 						tok->ttype=TOK_VAR;
 						tok->tok_node=var_node;
-						tok->tvtype = var_node->node_vtype;
+						// tok->tvtype = var_node->node_vtype;
 						if(next_token_type(bf)==TOK_DOT) {
 							NTOKEN2;
 							ADD_TOKEN("dot");
@@ -994,7 +994,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 					ex_edenv=TOK_OPTION;
 					break;
 				case TOK_ASSIGN_TYPE:
-					tok->tvtype=VTYPE_TREE;
+					// tok->tvtype=VTYPE_TREE;
 					break;
 				default:
 				tok->ttype=TOK_LETTER;

@@ -224,7 +224,7 @@ static inline double factor_none()
 double update_val()
 {
  double v0=lsslot->dval;
-	MESG("update_val: from %f by %f",v0,tok->dval);
+	// MESG("update_val: from %f by %f",v0,tok->dval);
 	// set_vtype(VTYPE_NUM);
 	if(vtype_is(VTYPE_NUM)) {
 		lsslot->dval += tok->dval;
@@ -267,11 +267,7 @@ double increase_by()
 	double v1,v0;
 	tok_data *sslot=lsslot;
 	// MESG("increase_by: slot_index=%d",sslot->ind);
-	int ori_type=TOK_VAR;
-	// MESG("increase by: vtype=%d ",sslot->vtype);
-	if(lstoken) {
-		ori_type=lstoken->ttype;
-	} else MESG("	lstoken undefined!");
+	int ori_type=lstoken->ttype;
 	v1=lexpression();
 
 	if(sslot->vtype==VTYPE_NUM) {
@@ -279,13 +275,19 @@ double increase_by()
 		sslot->dval = v0+v1;
 		return(sslot->dval);
 	};
-#if	1
+
 	if(sslot->vtype==VTYPE_ARRAY) {
-		array_add1(sslot->adat,v1);
-		set_array(sslot->adat);
-		return(v1);
+		if(ori_type!=TOK_VAR) {
+			v0=*sslot->pdval;
+			*sslot->pdval = v0+v1;
+			return(v0+v1);
+		} else {
+			array_add1(sslot->adat,v1);
+			set_array(sslot->adat);
+			return(v1);
+		};
 	};
-#endif
+
 	if(sslot->vtype==VTYPE_STRING) {
 		// MESG("increase by:");
 		sslot->sval=(char *)realloc(sslot->sval,strlen(sslot->sval)+strlen(get_sval())+1);
@@ -881,8 +883,8 @@ double factor_variable()
 	lstoken = tok;
 
 	set_vtype(lsslot->vtype);
-	// MESG("	factor_variable:[%s] tind=%d ,var ind=%d ex_vtype=%d ttype=%d tvtype=%d",
-		// tok->tname,tok->tnum,lsslot->ind,get_vtype(),tok->ttype,tok->tvtype);
+	// MESG("	factor_variable:[%s] tind=%d ,var ind=%d ex_vtype=%d ttype=%d vtype=%d",
+		// tok->tname,tok->tnum,lsslot->ind,get_vtype(),tok->ttype,lsslot->vtype);
 	switch(get_vtype()) {
 		case VTYPE_NUM:{
 			double val=lsslot->dval; 
@@ -980,7 +982,8 @@ double factor_assign_type()
 
 	int size = var_tree->items;
 	MVAR *svar = btree_to_mvar(var_tree);
-	MESG(" factor_assign_type: $$$$$ name=[%s] type %d tvtype=%d line=%d size=%d",tok->tname,tok->ttype,tok->tvtype,tok->tline,size);
+	tok_data *var_slot=get_left_slot(tok->tind);
+	MESG(" factor_assign_type: $$$$$ name=[%s] type %d vtype=%d line=%d size=%d",tok->tname,tok->ttype,var_slot->vtype,tok->tline,size);
 
 	array_dat *adat=alloc_array();
 	adat->rows=1;
@@ -2953,29 +2956,17 @@ char * tok_info(tok_struct *tok)
 		else if(tok->ttype==TOK_QUOTE) snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] \"%s\"",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
 		else if(tok->ttype==TOK_VAR) {
 			int size=0;
-			// char *var_type="numeric";
-#if	1
 			int vtype=VTYPE_NONE;
 			struct tok_data *var_slot=get_left_slot(tok->tind);
 			if(var_slot) vtype=var_slot->vtype;
-			// MESG("tok_info var! ind=[%d] group=%d vtype=%d",tok->tind,tok->tgroup,tok->tvtype);
+			MESG("tok_info var! ind=[%d] group=%d vtype=%d",tok->tind,tok->tgroup,var_slot->vtype);
 			if(vtype==VTYPE_TREE) {
 				BTNODE *tok_node=tok->tok_node;
 				BTREE *type_tree=(BTREE *)tok_node->node_dat;
 				size = type_tree->items;
 				// var_type="btree type";
 			};
-#else
-			int vtype=0;
-			// MESG("tok_info var! ind=[%d] group=%d vtype=%d",tok->tind,tok->tgroup,tok->tvtype);
-			if(tok->tvtype==VTYPE_TREE) {
-				BTNODE *tok_node=tok->tok_node;
-				BTREE *type_tree=(BTREE *)tok_node->node_dat;
-				size = type_tree->items;
-				// var_type="btree type";
-				vtype=tok->tvtype;
-			};
-#endif
+
 			snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s] type %s %d size %d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,vtype_names[vtype],vtype,size);
 		} else snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
 // 			

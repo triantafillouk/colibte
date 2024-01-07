@@ -1427,10 +1427,9 @@ int err_check_block1()
    MESG("err_check_block1: --------------------------------");
    while(1) {
 	CHECK_TOK(672);
-	if(tok->ttype==11)  {
-		BTNODE *var_node=tok->tok_node;
-		if(tok->tvtype==32) MESG(" - %3d: var %s node_name=%s type=%d",tok->tnum,tok->tname,var_node->node_name,var_node->node_type);
-		else MESG(" - %3d: %3d %s",tok->tnum,tok->ttype,tok->tname);
+	if(tok->ttype==TOK_VAR)  {
+		tok_data *var_slot=get_left_slot(tok->tind);
+		MESG(" - %3d: VAR %s  type=%d %s",tok->tnum,tok->tname,var_slot->vtype,vtype_names[var_slot->vtype]);
 	} else MESG(" - %3d: %3d %s",tok->tnum,tok->ttype,tok->tname);
 	switch(tok->ttype) {
 		case TOK_EOF: 
