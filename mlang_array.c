@@ -166,9 +166,9 @@ struct array_dat *new_array_similar(array_dat *a)
 struct array_dat *new_array(int rows,int cols)
 {
 	struct array_dat *array;
-	// MESG("new_array: rows=%d cols=%d",rows,cols);
 	array=alloc_array();
 	init_array(array,rows,cols);
+	// MESG("new_array:%d rows=%d cols=%d",array->anum,rows,cols);
 	return(array);
 }
 

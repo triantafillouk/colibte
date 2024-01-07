@@ -300,8 +300,8 @@ void parse_command_line(int argc, char **argv)
 					carg++;
 					startfile=argv[carg];
 					if(execmd) 
-					{	/* initialize array  */
-						// MESG("initialize array starting at %d",carg);
+					{	/* initialize arument list array  */
+						// MESG("initialize argument array starting at %d",carg);
 						main_args = new_list_array(argc-carg-1);
 						allocate_array(main_args);
 						a_arg=0;

@@ -583,7 +583,7 @@ int err_factor()
 		// xpos=477;syntax_error(": in factor",xpos);
 		RT_MESG1(xpos);
 	case TOK_LBRAKET:{	/* array definition  */
-		// MESG("err: TOK_LBRAKET, array definition");
+		// MESG("err: TOK_LBRAKET, array definition for [%s]",tok0->tname);
 		pre_symbol=0;
 		int i=0,j=0;
 		int cdim=0;
@@ -629,13 +629,12 @@ int err_factor()
 		};
 		// MESG("set array dat! [%s] rows=%d cols=%d",tok0->tname,rows,cols);
 		// set array dat
-		if(tok0->adat) {
-			free(tok0->adat);
+		if(tok0->tok_adat) {	/* this should never hapen!  */
+			MESG("err_lb: free array!");
+			free(tok0->tok_adat);
 		};
-		// MESG("	err: CREATE new array [%d %d]",rows,cols);
-		tok0->adat = new_array(rows,cols);
-		// MESG("	array type is %d ?= %d",tok0->ttype,TOK_ARRAY2);
-		// set end
+		tok0->tok_adat = new_array(rows,cols);
+		// MESG("	err: CREATED new array %d [%d %d]",tok0->tok_adat->anum,rows,cols);
 		NTOKEN_ERR(4789)
 		RT_MESG1(4789);
 		};
@@ -1425,12 +1424,10 @@ int err_check_block1()
  TDSERR("block");
    SHOW_STAGE(671);
    MESG("err_check_block1: --------------------------------");
+   MESG("   num: name          ttype tind");
    while(1) {
 	CHECK_TOK(672);
-	if(tok->ttype==TOK_VAR)  {
-		tok_data *var_slot=get_left_slot(tok->tind);
-		MESG(" - %3d: VAR %s  type=%d %s",tok->tnum,tok->tname,var_slot->vtype,vtype_names[var_slot->vtype]);
-	} else MESG(" - %3d: %3d %s",tok->tnum,tok->ttype,tok->tname);
+	MESG(" - %3d: %-15s %3d %3d",tok->tnum,tok->tname,tok->ttype,tok->tind);
 	switch(tok->ttype) {
 		case TOK_EOF: 
 			MESG(">>>>>>>>>>>>>>> end error_check!");

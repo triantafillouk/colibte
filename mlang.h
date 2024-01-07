@@ -42,7 +42,7 @@ typedef struct tok_struct {
 		struct tok_struct *match_tok;	/* for curl, parenthesis, bracket  */
 		struct tok_struct *next_tok;	/* for directives  */
 		TextPoint *ddot;				/* ddot text point  */
-		struct array_dat *adat;
+		struct array_dat *tok_adat;
 		struct FILEBUF *tbuf;
 	};
 } tok_struct;

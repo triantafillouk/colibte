@@ -801,10 +801,13 @@ double factor_line_array()
 	int i=0,j=0;
 	int cdim=0;
 	int rows=0,cols=0;
-	array_dat *adat=tok->adat;
+	array_dat *adat=tok->tok_adat;
 	cdim=1;
 	ex_name="Definition";
-	// MESG("factor_line_array: Array definition ------------");
+	MESG("factor_line_array:%d Array definition ------------",adat->anum);
+#if	1
+	MESG("	tok info: %s array cols=%d rows=%d",tok_info(tok),adat->cols,adat->rows);
+#endif
 	allocate_array(adat);
 	NTOKEN2;
 	while(cdim>0){
@@ -2148,7 +2151,7 @@ double assign_val(double none)
 	tok_data *sslot;
 	TDS("assign_val");
 	// MESG("assign_val: ind=%d vtype=%d",lsslot->ind,lsslot->vtype);
-	// MESG("assign_val: token name=[%s]",tok->tname);
+	MESG("assign_val: token name=[%s]",tok->tname);
 	sslot=lsslot;
 	v1=lexpression();
 	// MESG("assign_val: after lexpression! slot vtype=%d ex_vtype=%d\n",sslot->vtype,ex_vtype);
@@ -2933,15 +2936,17 @@ int parse_buffer_show_tokens(int n)
 char * tok_info(tok_struct *tok)
 {
  static char stok[MAXLLEN];
+	MESG("tok_info: ttype=%d",tok->ttype);
 	if(tok->tname!=NULL){
 		if(tok->ttype==TOK_ARRAY1 || tok->ttype==TOK_ARRAY2) {
 			int rows=0;
 			int cols=0;
-			if(tok->adat) {
-				rows=tok->adat->rows;
-				cols=tok->adat->cols;
+			
+			if(tok->tok_adat) {
+				rows=tok->tok_adat->rows;
+				cols=tok->tok_adat->cols;
 			};
-			snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s] rows=%d cols=%d",
+			snprintf(stok,MAXLLEN,"!! %3d:%4d %3d [%2d=%12s] [%s] rows=%d cols=%d",
 				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,rows,cols);
 		} else 
 		if(tok->ttype==TOK_SHOW) { snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [:]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME);
@@ -2955,11 +2960,14 @@ char * tok_info(tok_struct *tok)
 		if(tok->ttype==TOK_NUM) snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] %f",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);
 		else if(tok->ttype==TOK_QUOTE) snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] \"%s\"",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
 		else if(tok->ttype==TOK_VAR) {
+			// MESG("TOK_VAR:");
 			int size=0;
 			int vtype=VTYPE_NONE;
-			struct tok_data *var_slot=get_left_slot(tok->tind);
-			if(var_slot) vtype=var_slot->vtype;
-			MESG("tok_info var! ind=[%d] group=%d vtype=%d",tok->tind,tok->tgroup,var_slot->vtype);
+			if(current_stable) {
+				struct tok_data *var_slot=get_left_slot(tok->tind);
+				if(var_slot) vtype=var_slot->vtype;
+			};
+			// MESG("tok_info var! ind=[%d] group=%d vtype=%d",tok->tind,tok->tgroup,vtype);
 			if(vtype==VTYPE_TREE) {
 				BTNODE *tok_node=tok->tok_node;
 				BTREE *type_tree=(BTREE *)tok_node->node_dat;
