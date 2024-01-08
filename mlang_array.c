@@ -418,6 +418,23 @@ void sarray_add1(array_dat *na,char *s)
  }
 }
 
+void sarray_mul1(array_dat *sarray, double factor)
+{
+ if(factor>0)
+ if(sarray->atype==VTYPE_SARRAY) 
+ {
+ 	// MESG("String [%s] add to string array!",s);
+	int i;
+	for(i=0;i<sarray->rows*sarray->cols;i++) {
+		char *sval = sarray->sval[i];
+		char *stmp=str_mul(sval,factor);
+
+		free(sarray->sval[i]);
+		sarray->sval[i]=stmp;
+	};
+ }
+}
+
 void array_sub1(array_dat *na,double plus)
 {
  if(na->astat==ARRAY_UNALLOCATED) {

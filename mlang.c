@@ -56,6 +56,7 @@ void clean_saved_string(int new_size);
 int deq(double v1,double v2);
 void set_vtype(int type);
 int vtype_is(int type);
+char *str_mul(char *sval, double v1);
 
 double assign_val(double none);
 double assign_env(double none);
@@ -315,11 +316,14 @@ double increase_by()
 	return(-1);
 }
 
+void sarray_mul1(array_dat *sarray, double factor);
+
 double mul_by()
 {
 	double v1,v0;
 	tok_data *sslot=lsslot;
 	// TDS("mul_by");
+	int ori_type=lstoken->ttype;
 	
 	v1=num_expression();
 
@@ -328,14 +332,40 @@ double mul_by()
 		sslot->dval = v0*v1;
 		return(sslot->dval);
 	};
-#if	0
+	if(sslot->vtype==VTYPE_ARRAY) {
+		if(ori_type!=TOK_VAR) {
+			v0=*sslot->pdval;
+			*sslot->pdval = v0*v1;
+			return(v0+v1);
+		} else {
+			array_mul1(sslot->adat,v1);
+			set_array(sslot->adat);
+			return(v1);
+		};
+	};
 	if(sslot->vtype==VTYPE_STRING) {
 		// MESG("increase by:");
-		sslot->sval=(char *)realloc(sslot->sval,strlen(sslot->sval)+strlen(get_sval())+1);
-		strcat(sslot->sval,get_sval());
-		set_sval(sslot->sval);
+		set_sval(str_mul(sslot->sval,v1));
+		return(0);
+	};
+#if	USE_SARRAYS
+	if(sslot->vtype==VTYPE_SARRAY) {
+		if(vtype_is(VTYPE_NUM) && v1>0) {
+		if(ori_type!=TOK_VAR) {
+			// MESG("	increase string val");
+			char *stmp=str_mul(sslot->psval[0],v1);
+
+			free(sslot->psval[0]);
+			sslot->psval[0]=stmp;
+		} else {
+			// MESG("	increase sarray! sslot ind=%d %d %s",sslot->ind,get_vtype(),get_sval());
+			sarray_mul1(sslot->adat,v1);
+		};
+		};
+		return(0);
 	};
 #endif
+
 	return(-1);
 }
 
@@ -1470,6 +1500,20 @@ double v2;
 	RTRN(v1);
 }
 
+char *str_mul(char *sval, double v1)
+{
+ if(v1>0) {
+	int mul_size=v1;
+	int string_size=strlen(sval);
+	char *new_string=malloc(mul_size*string_size+1);
+	
+	for(int i=0;i<mul_size;i++) {
+		memcpy(new_string+string_size*(i),sval,string_size);
+	};new_string[string_size*mul_size]=0;
+ 	return new_string;
+ } else return sval;
+}
+
 static double term1_mul(double v1)
 {
  double v2;
@@ -1490,6 +1534,19 @@ static double term1_mul(double v1)
 				ex_name = "numeric * array";
 				// set_vtype(VTYPE_ARRAY);
 				return 1;
+		};
+	};
+	if(vtype_is(VTYPE_STRING)) {
+		char *sval=strdup(get_sval());
+		NTOKEN2;
+		v2=num_term2();
+		MESG(";; sval %s",sval);
+		if(vtype_is(VTYPE_NUM)) {
+			char *news=str_mul(sval,v2);
+			MESG(";; news=%s",news);
+			set_sval(news);
+			MESG("ok!");
+			return v2;
 		};
 	};
 	if(vtype_is(VTYPE_ARRAY)){
