@@ -321,10 +321,12 @@ void sarray_mul1(array_dat *sarray, double factor);
 double mul_by()
 {
 	double v1,v0;
+	// MESG("mul_by:");
 	tok_data *sslot=lsslot;
 	// TDS("mul_by");
 	int ori_type=lstoken->ttype;
-	
+	tok_struct *ltok = tok;
+	// MESG("mul_by: ori_type=%d vtype=%d",ori_type,sslot->vtype);
 	v1=num_expression();
 
 	if(sslot->vtype==VTYPE_NUM) {
@@ -336,7 +338,7 @@ double mul_by()
 		if(ori_type!=TOK_VAR) {
 			v0=*sslot->pdval;
 			*sslot->pdval = v0*v1;
-			return(v0+v1);
+			return(v0*v1);
 		} else {
 			array_mul1(sslot->adat,v1);
 			set_array(sslot->adat);
@@ -352,7 +354,7 @@ double mul_by()
 	if(sslot->vtype==VTYPE_SARRAY) {
 		if(vtype_is(VTYPE_NUM) && v1>0) {
 		if(ori_type!=TOK_VAR) {
-			// MESG("	increase string val");
+			MESG("	increase string val");
 			char *stmp=str_mul(sslot->psval[0],v1);
 
 			free(sslot->psval[0]);
@@ -365,7 +367,32 @@ double mul_by()
 		return(0);
 	};
 #endif
+	if(sslot->vtype==VTYPE_AMIXED) {
+		if(vtype_is(VTYPE_NUM)) {
+			// MESG("	VTYPE_NUM sslot vtype=%d %d",VTYPE_AMIXED,VTYPE_NUM);
+			// MESG("	lmvar type=%d",lmvar->var_type);
 
+			if(ori_type!=TOK_VAR) {
+				if(lmvar->var_type==VTYPE_STRING) {
+					char *tmp_s= str_mul(lmvar->sval,v1);
+					// MESG("mul_by: mixed string1 %s",tmp_s);
+					lmvar->sval = tmp_s;
+				} else {
+					lmvar->dval *= v1;
+				};
+			return(v1);
+		};	
+		if(vtype_is(VTYPE_STRING)) {
+			char *tmp_s= str_mul(lmvar->sval,v1);
+			// MESG("mul_by: mixed string2 %s",tmp_s);
+			lmvar->sval = tmp_s;
+			// MESG("	result [%s]",lmvar->sval);
+			return v1;
+		};
+	 };
+	};
+	MESG("error token [%s] ind=%d line=%d type=%d",ltok->tname,ltok->tind,ltok->tline,ltok->ttype);
+	set_error(ltok,1023,"multiply operation not supported!");
 	return(-1);
 }
 
@@ -629,7 +656,8 @@ void show_error(char *from,char *name)
  int var_index=-1;
  if(tok) if(tok->tok_node) var_index=tok->tok_node->node_index;
  if(var_index>=0)
-	ERROR("%s error %d file %s after function [%s] after line %d: [%s]",from,err_num,name,ftable[var_index].n_name,last_correct_line,err_str);
+	ERROR("%s error %d file %s after function [%s] after line %d: [%s]",
+		from,err_num,name,ftable[var_index].n_name,err_line,err_str);
  else {
 	ERROR("%s error %d file %s line %d: [%s]",from,err_num,name,err_line,err_str);
  };
@@ -1059,15 +1087,16 @@ double factor_array2()
 {
 	int ind1=0;
 	int ind2=0;
-	double **dval2;
 	double value=0;
 	tok_data *array_slot;
 	array_dat *adat;
 	tok_struct *tok0 = tok;
-	MESG("factor_array2: %s",tok->tname);
+	// MESG("factor_array2: %s",tok->tname);
 	array_slot=get_left_slot(tok->tind);
 	adat=array_slot->adat;
-	set_vtype(VTYPE_NUM);
+	lstoken=tok;
+	// MESG("factor_array2: type %d",adat->atype);
+	
 	if(adat==NULL) {
 #if	1
 		set_error(tok,209,"array indexes out of bound!");
@@ -1075,7 +1104,6 @@ double factor_array2()
 #else
 		/* No data in the array, allocate new ones!  */
 		NTOKEN2;
-
 		ind1=(int)num_expression();
 		NTOKEN2;
 		ind2=(int)num_expression();
@@ -1093,19 +1121,49 @@ double factor_array2()
 #endif
 	} else {
 		NTOKEN2;
-
 		ind1=(int)num_expression();
 		NTOKEN2;
 		ind2=(int)num_expression();
 		NTOKEN2;
-		dval2 = adat->dval2;
 
 		if((ind1 >= adat->rows) || (ind2 >= adat->cols)) {
 			// syntax_error("array indexes out of bound!",209);
 			set_error(tok0,209,"array indexes out of bound!");
 		} else {
-			value=dval2[ind1][ind2];
-			array_slot->pdval=&dval2[ind1][ind2];
+			if(adat->atype==VTYPE_ARRAY) {
+				double **dval2 = adat->dval2;
+				set_vtype(VTYPE_NUM);
+				value=dval2[ind1][ind2];
+				array_slot->pdval=&dval2[ind1][ind2];
+				return(value);
+			} else if(adat->atype==VTYPE_SARRAY) {
+				char **sval = adat->sval;
+				int ind=adat->cols*ind1+ind2;
+				clean_saved_string(strlen(adat->sval[ind]));	/* Check!! TODO  */
+				strcpy(saved_string,adat->sval[ind]);
+				// MESG("	show string value![%s]",saved_string);
+				array_slot->psval=&sval[ind];
+				value=0;
+				set_vtype(VTYPE_STRING);
+			} else if(adat->atype==VTYPE_AMIXED) {
+				// MESG("factor_array2: AMIXED v1=%d v2=%d",ind1,ind2);
+				int ind=adat->cols*ind1+ind2;
+				set_vtype(adat->mval[ind].var_type);
+				lmvar = &adat->mval[ind];
+				if(adat->mval[ind].var_type==VTYPE_NUM) {
+					value=array_slot->adat->mval[ind].dval;
+					// MESG("	num: val=%f",value);
+					array_slot->pdval=&array_slot->adat->mval[ind].dval;
+					return(value);
+				} else {
+					// MESG("	string: at %d",ind);
+					// MESG("	string: val=[%s]",adat->mval[ind].sval);
+					set_sval(adat->mval[ind].sval);
+					// MESG("	string: val=[%s]",adat->mval[ind].sval);
+					value=0;
+					return(0);
+				};
+			};
 		};
 	};
 	// MESG("end factor_array2: lsslot=%X",(void *)lsslot);
@@ -2205,11 +2263,11 @@ double assign_env(double none)
 double assign_val(double none)
 {
 	double v1;
-	tok_data *sslot;
 	TDS("assign_val");
 	// MESG("assign_val: ind=%d vtype=%d",lsslot->ind,lsslot->vtype);
-	MESG("assign_val: token name=[%s]",tok->tname);
-	sslot=lsslot;
+	// MESG("assign_val: token name=[%s]",tok->tname);
+	tok_struct *lstok=lstoken;
+	tok_data *sslot=lsslot;
 	v1=lexpression();
 	// MESG("assign_val: after lexpression! slot vtype=%d ex_vtype=%d\n",sslot->vtype,ex_vtype);
 	if(vtype_is(sslot->vtype) && vtype_is(VTYPE_NUM)) {
@@ -2217,6 +2275,7 @@ double assign_val(double none)
 			return(v1);
 	};
 	if(!vtype_is(sslot->vtype)){
+		// MESG("assign_val: different type %d != %d",get_vtype(),sslot->vtype);
 		if(sslot->vtype==VTYPE_STRING) {
 			if(sslot->sval) free(sslot->sval);
 			sslot->sval=NULL;
@@ -2263,16 +2322,11 @@ double assign_val(double none)
 				// MESG("assign array to var!");
 				sslot->adat=get_array("27");
 				sslot->vtype=sslot->adat->atype;
-				if(sslot->adat->astat==ARRAY_ALLOCATED) sslot->adat->astat=ARRAY_LOCAL;	/* make it local to variable  */
+				sslot->adat->array_name=strdup(lstok->tname);
+				if(sslot->adat->astat==ARRAY_ALLOCATED) sslot->adat->astat=ARRAY_LOCAL;
 			};
 		return(v1);		
 	} else {
-#if	0
-		if(vtype_is(VTYPE_NUM) ) {
-			sslot->dval=v1;
-			return(v1);
-		};
-#endif
 		if(vtype_is(VTYPE_ARRAY) || vtype_is(VTYPE_SARRAY)) {
 //				print_array1("assign array ",get_array("31"));
 //				print_array1("to array",sslot->adat);
@@ -2439,7 +2493,7 @@ void refresh_ddot_1(double value)
  int stat=0;
  TextPoint *tp = tok->ddot;
  FILEBUF *buf = tp->fp;
- // MESG("refresh_ddot:");
+ MESG("refresh_ddot:");
  if(execmd) {
 	 if(vtype_is(VTYPE_NUM)) {
 		if(lstoken) {
@@ -2449,7 +2503,7 @@ void refresh_ddot_1(double value)
 	 	if(lstoken) {
 			printf(";%s	: %s\n",lstoken->tname,get_sval());
 		} else printf(";	: '%s'\n",get_sval());
-	 } else if(vtype_is(VTYPE_ARRAY)) print_array1(";",get_array("36"));
+	 } else if(vtype_is(VTYPE_ARRAY)||vtype_is(VTYPE_SARRAY)||vtype_is(VTYPE_AMIXED)) print_array1(";",get_array("36"));
 	 lstoken=NULL;
 	 return;
  };
@@ -2474,7 +2528,10 @@ void refresh_ddot_1(double value)
 
  } else if(vtype_is(VTYPE_ARRAY) || vtype_is(VTYPE_SARRAY) || vtype_is(VTYPE_AMIXED)) {
 	array_dat *adat = get_array("37");
- 	stat=snprintf(ddot_out,128,"array %d, slot %ld type=%d rows %d,cols %d",adat->anum,lsslot-current_stable,adat->atype,adat->rows,adat->cols);
+	MESG("refresh_ddot: array: type=%d name=(%s)",adat->atype,adat->array_name);
+
+ 	stat=snprintf(ddot_out,128,"array %d:[%s] type [%s] , slot %ld type=%d rows %d,cols %d",adat->anum,
+	adat->array_name,vtype_names[adat->atype],lsslot-current_stable,adat->atype,adat->rows,adat->cols);
 	print_array1(":",adat);
  };
  if(stat>MAXLLEN) MESG("truncated");

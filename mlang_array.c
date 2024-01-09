@@ -16,7 +16,7 @@ void print_array1(char *title,array_dat *adat);
 struct array_dat *new_array(int rows,int cols);
 struct array_dat *new_array_similar(array_dat *a);
 void allocate_array(struct array_dat *adat);
-
+extern char *vtype_names[];
 
 void init_array(struct array_dat *array, int rows,int cols)
 {
@@ -785,7 +785,7 @@ void print_array1(char *title,array_dat *adat)
 	char s2[128];
 	int i,j;
 	so[0]=0;
-	// MESG("print_array1: --------------- %s",title);
+	MESG("print_array1: --------------- title \"%s\"",title);
 	if(adat==NULL) {
 		err_num=260;
 		err_str="%s: NULL array!!!!!!!!!!!!!!!!!!";
@@ -794,22 +794,27 @@ void print_array1(char *title,array_dat *adat)
 		return;
 	};
 	
-	snprintf(so,MAXLLEN,"# %s Array %s, %d rows=%d cols=%d astat=%d type=%d",title,ex_name,adat->anum,adat->rows,adat->cols,adat->astat,adat->atype);
+	snprintf(so,MAXLLEN,"# %s Array %s,%d:(%s) rows=%d cols=%d astat=%d",title,ex_name,adat->anum,vtype_names[adat->atype],adat->rows,adat->cols,adat->astat);
 	out_print(so,1);
 	strcpy(so,"");
 	if(adat->astat!=ARRAY_UNALLOCATED) {
 	if(adat->rows>1 && adat->cols>1) {
-		snprintf(so,MAXLLEN,"#");
+		snprintf(so,MAXLLEN,"#  ");
 		for(i=0;i< adat->cols;i++) { 
-			snprintf(s2,128,"%8d ",i);
+			snprintf(s2,128,"%10d ",i);
 			strlcat(so,s2,MAXLLEN);
 		};
 		out_print(so,1);
 		for(j=0;j<adat->rows;j++){
-			snprintf(so,128," %3d: ",j);
+			snprintf(so,128,"%3d: ",j);
 			for(i=0;i<adat->cols;i++) {
-				if(adat->atype==VTYPE_ARRAY) snprintf(s2,128,"%7.3f ",adat->dval2[j][i]);
-				else snprintf(s2,128,"%10s ",adat->sval[j*adat->cols+i]);
+				if(adat->atype==VTYPE_ARRAY) snprintf(s2,128,"[%10.3f] ",adat->dval2[j][i]);
+				else if(adat->atype==VTYPE_SARRAY) snprintf(s2,128,"[%10s] ",adat->sval[j*adat->cols+i]);
+				else {
+					int ind=j*adat->cols+i;
+					if(adat->mval[ind].var_type==VTYPE_NUM) snprintf(s2,128,"[%10.3f] ",adat->mval[ind].dval);
+					else snprintf(s2,128,"[%10s] ",adat->mval[ind].sval);
+				};
 				strlcat(so,s2,MAXLLEN);
 			};
 			out_print(so,1);
