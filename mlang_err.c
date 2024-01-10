@@ -664,6 +664,7 @@ int err_factor()
 		if(tok->ttype==TOK_TYPE_ELEMENT) {
 			MESG("err tok_type_element: %s",tok->tname);
 			set_tok_function(tok,0);
+			tok->dval=-1;
 			NTOKEN_ERR(498);
 		};
 #endif
@@ -968,6 +969,7 @@ int err_factor()
 #if	1
 	case TOK_TYPE_ELEMENT:
 		MESG("TOK_TYPE_ELEMENT: [%s]",tok0->tname);
+		tok0->tgroup=TOK_TERM2;
 		RT_MESG1(529);
 #endif
 	default:

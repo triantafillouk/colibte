@@ -146,7 +146,8 @@ struct array_dat *alloc_array()
  array_dat *na=(array_dat *)malloc(sizeof(struct array_dat));
  na->anum = array_num++;
  na->var_tree=NULL;
- return(na);
+ na->array_name=NULL;
+return(na);
 }
 
 struct array_dat *new_array_similar(array_dat *a)
