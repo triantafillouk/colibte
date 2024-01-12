@@ -141,8 +141,10 @@ int check_skip_token1( int type)
 
 int check_skip_token_err1(int type,char *mesg,int err)
 {
+	MESG("	check_skip_token_err: (%s)",tok_info(tok));
  	if(tok->ttype==type) 
- 	{ 
+ 	{
+		MESG("	check_skip_token_err: %s type=%d",tok->tname,tok->ttype);
 		NTOKEN2;
  		return(0);
  	} else {
@@ -548,6 +550,7 @@ int err_factor()
  static int pre_symbol=0;
  TDSERR("factor");
  // MESG("# err_factor: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
+ MESG("# err_factor: %s",tok_info(tok));
  int save_macro_exec;
  tok_struct *tok0; 
 
@@ -562,15 +565,13 @@ int err_factor()
 		pre_symbol++;
  };
  NTOKEN_ERR(473);
- // MESG("set factor function:");
- // MESG("	err_factor: [%s]",tok_info(tok0));
+ MESG("	>> : next tok (%s)",tok_info(tok));
  if(tok0->ttype > TOK_OTHER) {
  	// MESG("unknown token type %d line %d %d",tok0->ttype,tok0->tline,last_correct_line);
 	err_num=4730;
 	return(err_num);
  };
  set_tok_function(tok0,0);
- // set_tok_function(tok,0);
  // MESG("switch: tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
  switch(tok0->ttype) {
 	/*  the following ends factor  */
@@ -670,26 +671,37 @@ int err_factor()
 #endif
 		// MESG("	TOK_VAR: return [%s]",tok_info(tok));
 		RT_MESG1(493);}
-	case TOK_ARRAY1:{
-		// MESG("	err use of tok_array1 [%s]",tok_info(tok0));
-		err_num=err_num_expression(); 
-		// MESG("	err tok_array1: after tok=%d",tok->ttype);
-		xpos=499;
-		check_skip_token_err1(TOK_RBRAKET,"array error",xpos);
-		// NTOKEN_ERR(499);
-#if	0
-		tok_struct *save_tok = tok;
-		// check for second index
-		err_num=err_num_expression();
-		if(tok->ttype==TOK_RBRAKET) {
-			tok0->ttype=TOK_ARRAY2;
-			tok0->factor_function=factor_array2;
-			// MESG("	set 2 dimensional array!!!!!!!!");
-			NTOKEN_ERR(500);
-		} else {
-			tok = save_tok;
+	case TOK_ARRAY_L1:{	// 0 variable
+		MESG("TOK_ARRAY_L1: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
+		pre_symbol=0;
+		ex_nvars++;
+		NTOKEN_ERR(499);
 		};
-#endif
+		if(tok->ttype==TOK_INCREASE) {
+			tok->dval=1;
+			// tok->tgroup=TOK_TERM2;
+			set_tok_function(tok,0);
+			NTOKEN_ERR(498);
+		} else
+		if(tok->ttype==TOK_DECREASE) {
+			// tok->tgroup=TOK_TERM2;
+			tok->dval=-1;
+			set_tok_function(tok,0);
+			NTOKEN_ERR(498);
+		};
+		RT_MESG1(494);
+	case TOK_ARRAY1:{
+		MESG("	err use of tok_array1 [%s]",tok_info(tok0));
+		err_num=err_num_expression(); 
+		MESG("	err tok_array1: after [%s]",tok_info(tok));
+		xpos=499;
+		if(!check_skip_token_err1(TOK_RBRAKET,"array error",xpos)){
+			MESG("	RBRAKET found!");
+			// check_skip_token(TOK_INCREASE);
+			if(tok->ttype==TOK_INCREASE) NTOKEN2;
+		} else {
+			MESG("	No rbracket found!");
+		};
 		RT_MESG1(4931);
 		};
 #if	0

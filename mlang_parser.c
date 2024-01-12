@@ -940,6 +940,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 						tok->tok_node=var_node;
 						// tok->tvtype = var_node->node_vtype;
 						if(next_token_type(bf)==TOK_DOT) {
+							tok->ttype=TOK_ARRAY_L1;
 							NTOKEN2;
 							ADD_TOKEN("dot");
 							set_dot_var(bf,tok);

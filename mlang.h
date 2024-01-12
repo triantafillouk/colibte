@@ -209,7 +209,7 @@ enum {
 	TOK_DIR_TYPE		,
 	TOK_ARRAY1		,	// 71
 	TOK_ARRAY2		,
-	TOK_ARRAY3		,
+	TOK_ARRAY_L1	,
 	TOK_ASSIGNENV	,
 	TOK_ASSIGNOPT	,
 	TOK_END,			/* @> */

@@ -225,10 +225,15 @@ static inline double factor_none()
 double update_val()
 {
  double v0=lsslot->dval;
-	// MESG("update_val: from %f by %f",v0,tok->dval);
+	MESG("update_val: from %f by %f vtype=%d ttype=%d",v0,tok->dval,get_vtype(),lstoken->ttype);
 	// set_vtype(VTYPE_NUM);
 	if(vtype_is(VTYPE_NUM)) {
-		lsslot->dval += tok->dval;
+		if(lstoken->ttype==TOK_ARRAY_L1 || lstoken->ttype==TOK_ARRAY1) {
+			MESG("array1 element! %d",*lsslot->pdval);
+			*lsslot->pdval += tok->dval;
+		} else {
+			lsslot->dval += tok->dval;
+		};
 		NTOKEN2;
 		return(v0);
 	};
@@ -930,10 +935,9 @@ inline tok_data *get_left_slot(int ind)
 double factor_type_element()
 {
  double value=0;
- // MESG("factor_type_element:----------");
  array_dat *adat = lsslot->adat;
  MESG("	lsslot %d [%s] array name=[%s] vtype=%d (%s)",lsslot->ind,lstoken->tname,adat->array_name,lsslot->vtype,vtype_names[lsslot->vtype]);
- // MESG(" token value = %f",tok->dval);
+ // MESG("factor_type_element: ------- token value = %f",tok->dval);
  MESG("	type_element [%s]",tok->tname);
  if(adat->var_tree) {
  	int ind;
@@ -1306,12 +1310,59 @@ double factor_array1()
 		dval = array_slot->adat->dval;
 
 		value=dval[ind1];
-		// MESG("	value [%d]=%f",ind1,value);
+		MESG("	pdval value [%d]=%f",ind1,value);
 		array_slot->pdval=&dval[ind1];
 		set_vtype(VTYPE_NUM);
 	};
 	lsslot=array_slot;
 	// MESG("        : >>>> end");
+	// MESG("	factor_array1:ind1=%d lsslot ind=%d type=%d rows=%d cols=%d [%s]!",ind1,lsslot->ind,lsslot->vtype,lsslot->adat->rows,lsslot->adat->cols,array_slot->psval[0]);
+	return(value);
+}
+
+double factor_array_l1()
+{
+	int ind1;
+	double value=0;
+	tok_data *array_slot;
+	array_slot=&current_stable[tok->tind];
+	array_dat *adat = array_slot->adat;
+	lstoken=tok;
+	NTOKEN2;
+	MESG("factor_array_l1:--------> %s . %s",lstoken->tname,tok->tname);
+
+	if(adat->var_tree) {
+		BTNODE *el_node = find_btnode(adat->var_tree,tok->tname);
+		if(el_node) {
+			ind1 = (int)(el_node->node_index);
+			tok->dval=ind1;
+		} else {
+			MESG("error element not found!");
+			set_error(tok,501,"element not found!");
+			return(0);
+		};
+	} else {
+		MESG("No var_tree!");
+		set_error(lstoken,502,"No var_tree");
+		return(0);
+	};
+
+	MESG("	ind = %d",ind1);
+	if(adat->mval[ind1].var_type==VTYPE_NUM) {
+		set_vtype(VTYPE_NUM);
+		value=adat->mval[ind1].dval;
+		array_slot->pdval = &adat->mval[ind1].dval;
+		set_dval(value);
+		MESG("	return type dval %f",value);
+	} else {
+		set_vtype(VTYPE_STRING);
+		set_sval(adat->mval[ind1].sval);
+		array_slot->psval = &adat->mval[ind1].sval;
+		MESG("	return type sval [%s]",adat->mval[ind1].sval);
+	};
+	NTOKEN2;
+	lsslot=array_slot;
+	MESG("        : >>>> end");
 	// MESG("	factor_array1:ind1=%d lsslot ind=%d type=%d rows=%d cols=%d [%s]!",ind1,lsslot->ind,lsslot->vtype,lsslot->adat->rows,lsslot->adat->cols,array_slot->psval[0]);
 	return(value);
 }
@@ -1844,7 +1895,7 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_DIR_TYPE,
 	factor_array1,	// TOK_ARRAY1
 	factor_array2,	// TOK_ARRAY2
-	factor_none,	// TOK_ARRAY3
+	factor_array_l1,// TOK_ARRAY_L1
 	factor_none,	// TOK_ASSIGNENV	,
 	factor_none,	// TOK_ASSIGNOPT	,
 	factor_none,	// TOK_END,
