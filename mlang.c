@@ -225,20 +225,19 @@ static inline double factor_none()
 
 double update_val()
 {
- double v0=lsslot->dval;
-	MESG("update_val: from %f by %f vtype=%d ttype=%d",v0,tok->dval,get_vtype(),lstoken->ttype);
-	MESG("	>>      : ind=%d type=%d pdval=%f",lsslot->ind,lsslot->vtype,*lsslot->pdval);
-
+	MESG("update_val:");
+#if	0
 	if(lsslot->vtype==VTYPE_ARRAY) {
-		v0=*lsslot->pdval;
-		MESG(" >>	: VTYPE_ARRAY: pdval=%f %f",v0,tok->dval);
+		double v0=*lsslot->pdval;
+		// MESG(" >>	: VTYPE_ARRAY: pdval=%f %f",v0,tok->dval);
 		*lsslot->pdval += tok->dval;
 		
 		NTOKEN2;
 		return(v0);
 	};
-
+#endif
 	if(vtype_is(VTYPE_NUM)) {
+		double v0;
 		if(lstoken->ttype==TOK_ARRAY_L1 || lstoken->ttype==TOK_ARRAY1) {
 			// MESG("array1 element! %d",*lsslot->pdval);
 			v0=*lsslot->pdval;
@@ -254,11 +253,11 @@ double update_val()
 	if(vtype_is(VTYPE_ARRAY)) {
 		array_add1(lsslot->adat,tok->dval);
 		NTOKEN2;
-		return(v0);
+		return(0);
 	};
-	set_error(tok,222,"cannot update non numeric value!");NTOKEN2;return(0);
+	set_error(tok,222,"cannot update non numeric value!");
 	NTOKEN2;
-	return(v0);
+	return(0);
 }
 
 double decrease_by()
@@ -288,6 +287,7 @@ double increase_by()
 	tok_data *sslot=lsslot;
 	// MESG("increase_by: slot_index=%d ",sslot->ind);
 	int ori_type=lstoken->ttype;
+	tok_struct *lstok=lstoken;
 	v1=lexpression();
 	// MESG("		>>   : by %f",v1);
 	if(sslot->vtype==VTYPE_NUM) {
@@ -337,12 +337,17 @@ double increase_by()
 
 	// MESG("		return -1 sslot->vtype=%d vtype=%d",sslot->vtype,get_vtype());
 	if(sslot->vtype==VTYPE_AMIXED) {
-		if(lmvar->var_type==VTYPE_NUM) lmvar->dval+=v1;
-		if(lmvar->var_type==VTYPE_STRING) {
+		if(lmvar->var_type==VTYPE_NUM) {
+			double v0=lmvar->dval;
+			lmvar->dval+=v1;
+			return v0;
+		} if(lmvar->var_type==VTYPE_STRING) {
 			// MESG("	string cat");
 			lmvar->sval=str_cat(lmvar->sval,get_sval());
+			return 0;
 		}
 	};
+	set_error(lstok,1024,"increase operation not supported!");
 	return(v1);
 }
 
