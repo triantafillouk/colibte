@@ -690,6 +690,7 @@ int err_factor()
 			NTOKEN_ERR(498);
 		};
 		RT_MESG1(494);
+	// case TOK_INCREASE:
 	case TOK_ARRAY1:{
 		MESG("	err use of tok_array1 [%s]",tok_info(tok0));
 		err_num=err_num_expression(); 
@@ -698,10 +699,27 @@ int err_factor()
 		if(!check_skip_token_err1(TOK_RBRAKET,"array error",xpos)){
 			MESG("	RBRAKET found!");
 			// check_skip_token(TOK_INCREASE);
-			if(tok->ttype==TOK_INCREASE) NTOKEN2;
+			// if(tok->ttype==TOK_INCREASE) NTOKEN2;
 		} else {
 			MESG("	No rbracket found!");
 		};
+		if(tok->ttype==TOK_INCREASE) {
+			MESG("	err TOK_INCREASE: %s",tok_info(tok));
+			tok->dval=1;
+			// tok->tgroup=TOK_TERM2;
+			set_tok_function(tok,0);
+			NTOKEN_ERR(498);
+		} else
+		if(tok->ttype==TOK_DECREASE) {
+			// tok->tgroup=TOK_TERM2;
+			tok->dval=-1;
+			set_tok_function(tok,0);
+			NTOKEN_ERR(498);
+		} else {
+			MESG("----------no increase! %s",tok_info(tok));
+		};
+
+
 		RT_MESG1(4931);
 		};
 #if	0
