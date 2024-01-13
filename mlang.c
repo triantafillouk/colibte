@@ -57,6 +57,7 @@ int deq(double v1,double v2);
 void set_vtype(int type);
 int vtype_is(int type);
 char *str_mul(char *sval, double v1);
+char *str_cat(char *sval, char *add);
 
 double assign_val(double none);
 double assign_env(double none);
@@ -225,12 +226,12 @@ static inline double factor_none()
 double update_val()
 {
  double v0=lsslot->dval;
-	// MESG("update_val: from %f by %f vtype=%d ttype=%d",v0,tok->dval,get_vtype(),lstoken->ttype);
-	// MESG("	>>      : ind=%d type=%d pdval=%f",lsslot->ind,lsslot->vtype,*lsslot->pdval);
+	MESG("update_val: from %f by %f vtype=%d ttype=%d",v0,tok->dval,get_vtype(),lstoken->ttype);
+	MESG("	>>      : ind=%d type=%d pdval=%f",lsslot->ind,lsslot->vtype,*lsslot->pdval);
 
 	if(lsslot->vtype==VTYPE_ARRAY) {
 		v0=*lsslot->pdval;
-		// MESG(" >>	: VTYPE_ARRAY: pdval=%f %f",v0,tok->dval);
+		MESG(" >>	: VTYPE_ARRAY: pdval=%f %f",v0,tok->dval);
 		*lsslot->pdval += tok->dval;
 		
 		NTOKEN2;
@@ -240,9 +241,11 @@ double update_val()
 	if(vtype_is(VTYPE_NUM)) {
 		if(lstoken->ttype==TOK_ARRAY_L1 || lstoken->ttype==TOK_ARRAY1) {
 			// MESG("array1 element! %d",*lsslot->pdval);
+			v0=*lsslot->pdval;
 			*lsslot->pdval += tok->dval;
 		} else {
 			// MESG("	numeric");
+			v0=lsslot->dval;
 			lsslot->dval += tok->dval;
 		};
 		NTOKEN2;
@@ -283,17 +286,19 @@ double increase_by()
 {
 	double v1,v0;
 	tok_data *sslot=lsslot;
-	// MESG("increase_by: slot_index=%d",sslot->ind);
+	// MESG("increase_by: slot_index=%d ",sslot->ind);
 	int ori_type=lstoken->ttype;
 	v1=lexpression();
-
+	// MESG("		>>   : by %f",v1);
 	if(sslot->vtype==VTYPE_NUM) {
+		// MESG("		VTYPE_NUM:");
 		v0=sslot->dval;
 		sslot->dval = v0+v1;
 		return(sslot->dval);
 	};
 
 	if(sslot->vtype==VTYPE_ARRAY) {
+		// MESG("		VTYPE_ARRAY:");
 		if(ori_type!=TOK_VAR) {
 			v0=*sslot->pdval;
 			*sslot->pdval = v0+v1;
@@ -310,8 +315,9 @@ double increase_by()
 		sslot->sval=(char *)realloc(sslot->sval,strlen(sslot->sval)+strlen(get_sval())+1);
 		strcat(sslot->sval,get_sval());
 		set_sval(sslot->sval);
+		return(v1);
 	};
-#if	USE_SARRAYS
+
 	if(sslot->vtype==VTYPE_SARRAY) {
 		if(vtype_is(VTYPE_STRING)) {
 		if(ori_type!=TOK_VAR) {
@@ -328,8 +334,16 @@ double increase_by()
 		};
 		return(0);
 	};
-#endif
-	return(-1);
+
+	// MESG("		return -1 sslot->vtype=%d vtype=%d",sslot->vtype,get_vtype());
+	if(sslot->vtype==VTYPE_AMIXED) {
+		if(lmvar->var_type==VTYPE_NUM) lmvar->dval+=v1;
+		if(lmvar->var_type==VTYPE_STRING) {
+			// MESG("	string cat");
+			lmvar->sval=str_cat(lmvar->sval,get_sval());
+		}
+	};
+	return(v1);
 }
 
 void sarray_mul1(array_dat *sarray, double factor);
@@ -1091,7 +1105,6 @@ double factor_assign_type()
 
 	int size = var_tree->items;
 	MVAR *svar = btree_to_mvar(var_tree);
-	tok_data *var_slot=get_left_slot(tok->tind);
 	// MESG("factor_assign_type: -- var_slot in=%d vtype=%d",var_slot->ind,var_slot->vtype);
 	// MESG(" factor_assign_type: $$$$$ name=[%s] type %d vtype=%d line=%d size=%d",tok->tname,tok->ttype,var_slot->vtype,tok->tline,size);
 
@@ -1670,6 +1683,15 @@ char *str_mul(char *sval, double v1)
  } else return sval;
 }
 
+char *str_cat(char *sval, char *add)
+{
+	int add_size=strlen(add);
+	int string_size=strlen(sval);
+	sval=realloc(sval,add_size+string_size+1);
+	memcpy(sval+string_size,add,add_size);
+ return sval;
+}
+
 static double term1_mul(double v1)
 {
  double v2;
@@ -1696,10 +1718,10 @@ static double term1_mul(double v1)
 		char *sval=strdup(get_sval());
 		NTOKEN2;
 		v2=num_term2();
-		MESG(";; sval %s",sval);
+		// MESG(";; sval %s",sval);
 		if(vtype_is(VTYPE_NUM)) {
 			char *news=str_mul(sval,v2);
-			MESG(";; news=%s",news);
+			// MESG(";; news=%s",news);
 			set_sval(news);
 			MESG("ok!");
 			return v2;

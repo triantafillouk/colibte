@@ -141,17 +141,14 @@ int check_skip_token1( int type)
 
 int check_skip_token_err1(int type,char *mesg,int err)
 {
-	MESG("	check_skip_token_err: (%s)",tok_info(tok));
+	// MESG("	check_skip_token_err: (%s)",tok_info(tok));
  	if(tok->ttype==type) 
  	{
-		MESG("	check_skip_token_err: %s type=%d",tok->tname,tok->ttype);
+		// MESG("	check_skip_token_err: %s type=%d",tok->tname,tok->ttype);
 		NTOKEN2;
  		return(0);
  	} else {
 		syntax_error(mesg,err);
-		// ERROR("err %d [%s] token wrong type %d != %d",err,mesg,type,tok->ttype);
-		// err_str=mesg;
-		// err_num=err;
 	};
 
   return(err_num);
@@ -177,7 +174,7 @@ void set_error(tok_struct *tok,int err,char *description)
  // MESG("set_error:----------------");
  err_line=tok->tline;
  err_num=err;
- MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
+ // MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
  err_str=strdup(description);
 #if	0
  if(execmd) {
@@ -550,7 +547,7 @@ int err_factor()
  static int pre_symbol=0;
  TDSERR("factor");
  // MESG("# err_factor: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
- MESG("# err_factor: %s",tok_info(tok));
+ // MESG("# err_factor: %s",tok_info(tok));
  int save_macro_exec;
  tok_struct *tok0; 
 
@@ -565,7 +562,7 @@ int err_factor()
 		pre_symbol++;
  };
  NTOKEN_ERR(473);
- MESG("	>> : next tok (%s)",tok_info(tok));
+ // MESG("	>> : next tok (%s)",tok_info(tok));
  if(tok0->ttype > TOK_OTHER) {
  	// MESG("unknown token type %d line %d %d",tok0->ttype,tok0->tline,last_correct_line);
 	err_num=4730;
@@ -631,7 +628,7 @@ int err_factor()
 		// MESG("set array dat! [%s] rows=%d cols=%d",tok0->tname,rows,cols);
 		// set array dat
 		if(tok0->tok_adat) {	/* this should never hapen!  */
-			MESG("err_lb: free array!");
+			// MESG("err_lb: free array!");
 			free(tok0->tok_adat);
 		};
 		tok0->tok_adat = new_array(rows,cols);
@@ -646,7 +643,7 @@ int err_factor()
 		RT_MESG1(480);
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
-		MESG("TOK_VAR: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
+		// MESG("TOK_VAR: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
 		pre_symbol=0;
 		ex_nvars++;
 		if(tok->ttype==TOK_INCREASE) {
@@ -663,7 +660,7 @@ int err_factor()
 		};
 #if	1
 		if(tok->ttype==TOK_TYPE_ELEMENT) {
-			MESG("err tok_type_element: %s",tok->tname);
+			// MESG("err tok_type_element: %s",tok->tname);
 			set_tok_function(tok,0);
 			tok->dval=-1;
 			NTOKEN_ERR(498);
@@ -672,7 +669,7 @@ int err_factor()
 		// MESG("	TOK_VAR: return [%s]",tok_info(tok));
 		RT_MESG1(493);}
 	case TOK_ARRAY_L1:{	// 0 variable
-		MESG("TOK_ARRAY_L1: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
+		// MESG("TOK_ARRAY_L1: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
 		pre_symbol=0;
 		ex_nvars++;
 		NTOKEN_ERR(499);
@@ -692,19 +689,17 @@ int err_factor()
 		RT_MESG1(494);
 	// case TOK_INCREASE:
 	case TOK_ARRAY1:{
-		MESG("	err use of tok_array1 [%s]",tok_info(tok0));
+		// MESG("	err use of tok_array1 [%s]",tok_info(tok0));
 		err_num=err_num_expression(); 
-		MESG("	err tok_array1: after [%s]",tok_info(tok));
+		// MESG("	err tok_array1: after [%s]",tok_info(tok));
 		xpos=499;
 		if(!check_skip_token_err1(TOK_RBRAKET,"array error",xpos)){
-			MESG("	RBRAKET found!");
-			// check_skip_token(TOK_INCREASE);
-			// if(tok->ttype==TOK_INCREASE) NTOKEN2;
+			// MESG("	RBRAKET found!");
 		} else {
 			MESG("	No rbracket found!");
 		};
 		if(tok->ttype==TOK_INCREASE) {
-			MESG("	err TOK_INCREASE: %s",tok_info(tok));
+			// MESG("	err TOK_INCREASE: %s",tok_info(tok));
 			tok->dval=1;
 			// tok->tgroup=TOK_TERM2;
 			set_tok_function(tok,0);
@@ -715,10 +710,7 @@ int err_factor()
 			tok->dval=-1;
 			set_tok_function(tok,0);
 			NTOKEN_ERR(498);
-		} else {
-			MESG("----------no increase! %s",tok_info(tok));
 		};
-
 
 		RT_MESG1(4931);
 		};
@@ -982,14 +974,14 @@ int err_factor()
 		// MESG("tok_rbtacket");
 		RT_MESG1(5262);
 	case TOK_ASSIGN:
-		MESG("TOK_ASSIGN");
+		// MESG("TOK_ASSIGN");
 	case TOK_INCREASEBY:
 	case TOK_MULBY:
 	case TOK_DECREASEBY:
 		tok0->tname="assign";
 		RT_MESG1(527);
 	case TOK_ASSIGN_TYPE:{
-		MESG("TOK_ASSIGN_TYPE: [%s]",tok0->tname);
+		// MESG("TOK_ASSIGN_TYPE: [%s]",tok0->tname);
 
 		if(err_skip_type_args(tok0)) {
 			set_error(tok0,2000,"`TOK_ASSIGN_TYPE: error in argument list");
@@ -998,7 +990,7 @@ int err_factor()
 		};
 #if	1
 	case TOK_TYPE_ELEMENT:
-		MESG("TOK_TYPE_ELEMENT: [%s]",tok0->tname);
+		// MESG("TOK_TYPE_ELEMENT: [%s]",tok0->tname);
 		tok0->tgroup=TOK_TERM2;
 		RT_MESG1(529);
 #endif
@@ -1455,14 +1447,14 @@ int err_check_block1()
 {
  TDSERR("block");
    SHOW_STAGE(671);
-   MESG("err_check_block1: --------------------------------");
-   MESG("   num: name          ttype tind");
+   // MESG("err_check_block1: --------------------------------");
+   // MESG("   num: name          ttype tind");
    while(1) {
 	CHECK_TOK(672);
-	MESG(" - %3d: %-15s %3d %3d",tok->tnum,tok->tname,tok->ttype,tok->tind);
+	// MESG(" - %3d: %-15s %3d %3d",tok->tnum,tok->tname,tok->ttype,tok->tind);
 	switch(tok->ttype) {
 		case TOK_EOF: 
-			MESG(">>>>>>>>>>>>>>> end error_check!");
+			// MESG(">>>>>>>>>>>>>>> end error_check!");
 			RT_MESG1(673);
 		case TOK_SEP:
 		case TOK_COMMA:

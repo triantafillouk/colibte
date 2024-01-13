@@ -19,7 +19,7 @@ a:array 1:[a] type [AMIXED] , slot 0 type=14 rows 1,cols 6
 	a.name: "kostas maria"
 	a.age:  33.0
 	a.age=77:
-	a.age++
+	a.age+=2
 	a.age:  34.0
 
 #	a1=a.age:   0.0

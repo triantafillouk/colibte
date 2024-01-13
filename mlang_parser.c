@@ -72,7 +72,7 @@ BTNODE * add_to_symbol_tree(BTREE *stable,char *name,int type)
 {
 	BTNODE *btn=NULL;
 	/* create the variable in the symbol_table!  */
-	MESG("add_to_symbol_tree:[%s] [%s] table items=%d",stable->tree_name,name,stable->items);
+	// MESG("add_to_symbol_tree:[%s] [%s] table items=%d",stable->tree_name,name,stable->items);
 	btn=add_btnode(stable,name);
 	if(stable->new_flag) {
 		btn->node_type=type;
