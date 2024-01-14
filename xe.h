@@ -34,6 +34,7 @@
 
 #define	USE_FAST	1 & PCURSES	/* erase line for double width characters in panel_curses  */
 #define TEST_TYPE	1
+#define	LSPSVAL		0
 
 #define NEW	1	/* new tested code!  */
 
@@ -326,12 +327,14 @@ typedef struct tok_data {
 	short int free_len;
 	// short int size;
 #endif
+#if	!LSPSVAL
 	union {
 	double *pdval;
 	char  **psval;
-	void *pval;
+	// void *pval;
 	// MVAR *pmval;
 	};
+#endif
 	union {
 		double dval;
 		char *sval;
