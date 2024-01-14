@@ -47,16 +47,6 @@ typedef struct tok_struct {
 	};
 } tok_struct;
 
-typedef struct MVAR {
-	short	var_type;
-	short	var_index;	/* ??? possible use ??  */
-	int		var_len;	/* ??? possible use ??  */
-	union {
-		double dval;
-		char *sval;
-		struct array_dat *adat;
-	};
-} MVAR;
 
 typedef struct array_dat {
 	short atype;
@@ -64,7 +54,7 @@ typedef struct array_dat {
 	int rows;
 	int cols;
 	short astat;	/* array allocation status  */
-		char *array_name;
+	char *array_name;
 	union {
 		BTREE *var_tree;
 	};
@@ -106,7 +96,7 @@ typedef struct term_type {
 void init_token_mask();
 double assign(int is_edenv);
 int parse_block1(FILEBUF *bf,BTREE *stree,int start,int extra);
-int assign_args1( MVAR *va,tok_data *td,int nargs);
+int assign_args1( MVAR *va,MVAR *td,int nargs);
 double factor_1();
 double term1_1();
 double term2_1();

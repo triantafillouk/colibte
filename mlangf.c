@@ -729,24 +729,24 @@ double uf_mainarg()
 	return value;
 }
 
-extern tok_data *current_stable;
+extern MVAR *current_stable;
 extern FILEBUF *exe_buffer;
 
 
 void show_var_node(BTNODE *node)
 {
-	tok_data *var = current_stable;
+	MVAR *var = current_stable;
 	var = &current_stable[node->node_index];
-	// mesg_out("type %d",var->vtype);
-	// mesg_out("type name %s",vtype_names[var->vtype]);
-	if(var->vtype==VTYPE_NUM) 
+	// mesg_out("type %d",var->var_type);
+	// mesg_out("type name %s",vtype_names[var->var_type]);
+	if(var->var_type==VTYPE_NUM) 
 		mesg_out("%03d %-10s %2d(%12s) %f",
-			node->node_index,node->node_name,var->vtype,vtype_names[var->vtype],var->dval);
-	else if(var->vtype==VTYPE_STRING)
+			node->node_index,node->node_name,var->var_type,vtype_names[var->var_type],var->dval);
+	else if(var->var_type==VTYPE_STRING)
 		mesg_out("%03d %-10s %2d(%12s) \"%s\"",
-			node->node_index,node->node_name,var->vtype,vtype_names[var->vtype],var->sval);
+			node->node_index,node->node_name,var->var_type,vtype_names[var->var_type],var->sval);
 	else
-		mesg_out("%03d %-10s %2d(%12s)",node->node_index,node->node_name,var->vtype,vtype_names[var->vtype]);
+		mesg_out("%03d %-10s %2d(%12s)",node->node_index,node->node_name,var->var_type,vtype_names[var->var_type]);
 }
 
 double uf_show_vars()

@@ -1,17 +1,17 @@
 /* Assign_val function definitions */
-double assign_none(double,tok_data *);
-double assign_int(double,tok_data *);
-double assign_string(double,tok_data *);
-double assign_array(double,tok_data *);
-double assign_sarray(double,tok_data *);
-double assign_list(double,tok_data *);
-double assign_slist(double,tok_data *);
-double assign_alist(double,tok_data *);
-double assign_string(double,tok_data *);
-double assign_buffer(double,tok_data *);
-double assign_amixed(double,tok_data *);
-double assign_dynamic(double,tok_data *);
-double assign_tree(double,tok_data *);
-double assign_type(double,tok_data *);
+double assign_none(double,MVAR *);
+double assign_int(double,MVAR *);
+double assign_string(double,MVAR *);
+double assign_array(double,MVAR *);
+double assign_sarray(double,MVAR *);
+double assign_list(double,MVAR *);
+double assign_slist(double,MVAR *);
+double assign_alist(double,MVAR *);
+double assign_string(double,MVAR *);
+double assign_buffer(double,MVAR *);
+double assign_amixed(double,MVAR *);
+double assign_dynamic(double,MVAR *);
+double assign_tree(double,MVAR *);
+double assign_type(double,MVAR *);
 
 

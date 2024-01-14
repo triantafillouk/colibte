@@ -34,7 +34,6 @@
 
 #define	USE_FAST	1 & PCURSES	/* erase line for double width characters in panel_curses  */
 #define TEST_TYPE	1
-#define	LSPSVAL		0
 
 #define NEW	1	/* new tested code!  */
 
@@ -317,31 +316,17 @@ typedef struct  VIDEO {
 #define	HSTART			59
 #define HEX_LINE_LEN	16
 
-typedef struct tok_data {
-	short int ind;
-	short int vtype;
-#if	0
-	char *tok_name;
-#endif
-#if	0
-	short int free_len;
-	// short int size;
-#endif
-#if	!LSPSVAL
-	union {
-	double *pdval;
-	char  **psval;
-	// void *pval;
-	// MVAR *pmval;
-	};
-#endif
+typedef struct MVAR {
+	short	var_index;
+	short	var_type;
+	char *var_name;
 	union {
 		double dval;
 		char *sval;
 		struct array_dat *adat;
 		struct BTREE *btree1;
 	};
-} tok_data;
+} MVAR;
 
 #if	GTK
 /* keep gtk part of windows */
@@ -699,7 +684,7 @@ typedef struct  FILEBUF {
 #else
 	struct alist *type_list;	/* type table list  */
 #endif
-	tok_data *symbol_table;	/* instance of variables data  */
+	MVAR *symbol_table;	/* instance of variables data  */
 #if	USE_SLOW_DISPLAY
 	int slow_display;
 #endif
