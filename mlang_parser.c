@@ -257,7 +257,7 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 	// tok->tvtype=VTYPE_NONE;
 	ex_edenv=tok->ttype;
 	btn->node_vtype=VTYPE_NONE;
-	MESG("	set_var: new variable name=%s tind=%d ttype=%d",name,tok->tind,tok->ttype);
+	// MESG("	set_var: new variable name=%s tind=%d ttype=%d",name,tok->tind,tok->ttype);
 	// if(stree->max_items < tok->tind) ERROR("exceeded item list of %d !! CHECK!",stree->max_items);
 }
 
@@ -861,7 +861,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				var_node = find_btnode(stree,nword);
 				if(var_node!=NULL) {
 					// tok->tok_node = var_node;
-					MESG("	%d: [%s] found in stree",tok->tnum,nword);
+					// MESG("	%d: [%s] found in stree",tok->tnum,nword);
 					// tok->tvtype = var_node->node_vtype;
 				};
 			}
@@ -964,7 +964,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			};
 		} else {
 			tok->tname=tok->tok_node->node_name;
-			MESG("	%d: token name [%s] found in bt, type %d  !!!!",tok->tnum,tok->tname,tok->tok_node->node_type);
+			// MESG("	%d: token name [%s] found in bt, type %d  !!!!",tok->tnum,tok->tname,tok->tok_node->node_type);
 			switch(tok->tok_node->node_type) {
 				case TOK_VAR:	/* 0  */
 					tok->ttype=TOK_VAR; 

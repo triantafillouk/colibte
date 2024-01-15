@@ -285,6 +285,8 @@ void parse_command_line(int argc, char **argv)
 					drv_max_colors=8;
 					break;
 #endif
+				case 'd':
+					show_no_time=1;
 				case 'D':
 					set_debug(1);
 					break;

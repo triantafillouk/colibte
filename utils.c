@@ -18,8 +18,10 @@
 #include "support.h"
 
 int scmp(const char* s, const char* t);
+void set_vdval(double value);
 
 extern int discmd;
+extern int show_no_time;
 
 /* list of two elements  */
 typedef struct delement 
@@ -122,14 +124,17 @@ double  show_time(char *description,int init)
 		}
 	};
 
-	if(1) 
+	if(show_no_time)
 	{
-	if(init==0) snprintf(sout,512,"[%35s] %d,%06d  %d,%06d --------",description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
-	else snprintf(sout,512,"[%35s] %d,%06d  %d,%06d",description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
+		if(init==0) snprintf(sout,512,"[%35s] %d,%06d  %d,%06d --------",description,0,0,0,0);
+		else        snprintf(sout,512,"[%35s] %d,%06d  %d,%06d",description,1,0,0,0);
+	} else 	{
+		if(init==0) snprintf(sout,512,"[%35s] %d,%06d  %d,%06d --------",description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
+		else        snprintf(sout,512,"[%35s] %d,%06d  %d,%06d",description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
 	// if(xwin && discmd) MESG("%s",sout);
 	// MESG("%s",sout);
-	out_print(sout,1);
 	};
+	out_print(sout,1);
 
 	prev_usec=usec1;
 	prev_sec=sec1;
@@ -139,6 +144,7 @@ double  show_time(char *description,int init)
 		vtime=diff_start_sec+diff_start_usec*0.000001;
 	}
 	set_vdval(vtime);
+	if(show_no_time) return 1;
 	return vtime;
 }
 

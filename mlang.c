@@ -2614,7 +2614,7 @@ void refresh_ddot_1(double value)
 	array_dat *adat = get_array("37");
 	// MESG("refresh_ddot: array: type=%d name=(%s)",adat->atype,adat->array_name);
 
- 	stat=snprintf(ddot_out,128,"array %d:[%s] type [%s] , slot %ld type=%d rows %d,cols %d",adat->anum,
+ 	stat=snprintf(ddot_out,128," array %d:[%s] type [%s] , slot %ld type=%d rows %d,cols %d",adat->anum,
 	adat->array_name,vtype_names[adat->atype],lsslot-current_stable,adat->atype,adat->rows,adat->cols);
 	print_array1(":",adat);
  };
