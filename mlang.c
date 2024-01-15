@@ -259,8 +259,7 @@ double decrease_by()
 	MVAR *sslot=lsslot;
 	TDS("decrease_val");
 	// MESG("decrease_by: ");
-	v1=lexpression();
-	// MESG("	after lexpression: v1=%f",v1);
+	v1=num_expression();
 	if(sslot->var_type==VTYPE_NUM) {
 		v0=sslot->dval;
 		sslot->dval =v0-v1;
@@ -281,7 +280,7 @@ double increase_by()
 	// MESG("increase_by: slot_index=%d ",sslot->var_index);
 	int ori_type=lstoken->ttype;
 	tok_struct *lstok=lstoken;
-	v1=lexpression();
+	v1=num_expression();
 	// MESG("		>>   : by %f",v1);
 	if(sslot->var_type==VTYPE_NUM) {
 		// MESG("		VTYPE_NUM:");
@@ -378,7 +377,7 @@ double mul_by()
 		set_sval(str_mul(sslot->sval,v1));
 		return(0);
 	};
-#if	USE_SARRAYS
+
 	if(sslot->var_type==VTYPE_SARRAY) {
 		if(vtype_is(VTYPE_NUM) && v1>0) {
 		if(ori_type!=TOK_VAR) {
@@ -393,7 +392,7 @@ double mul_by()
 		};
 		return(0);
 	};
-#endif
+
 	if(sslot->var_type==VTYPE_AMIXED) {
 		if(vtype_is(VTYPE_NUM)) {
 			// MESG("	VTYPE_NUM sslot vtype=%d %d",VTYPE_AMIXED,VTYPE_NUM);
@@ -2235,42 +2234,22 @@ double logical_nand(double value)
 double assign_option(double none)
 {
 double	value=lexpression();
-#if	1
 	// MESG("assign_option:");
-		if(var_node->node_vtype==VTYPE_STRING) {free(var_node->node_sval);};
-		if(vtype_is(VTYPE_STRING)){
-			var_node->node_vtype=VTYPE_STRING;
-			if(get_sval()) var_node->node_sval=strdup(get_sval());
-			else {
-				err_num=2221;
-				ERROR("error: saved string is Null string!! ",err_num);
-				var_node->node_sval=strdup("");
-			};
-		} else {
-			// CHECK !!!!!!!!
-			var_node->node_vtype=VTYPE_NUM;
-			var_node->node_dval=value;
-		}
+	if(var_node->node_vtype==VTYPE_STRING) {free(var_node->node_sval);};
+	if(vtype_is(VTYPE_STRING)){
+		var_node->node_vtype=VTYPE_STRING;
+		if(get_sval()) var_node->node_sval=strdup(get_sval());
+		else {
+			err_num=2221;
+			ERROR("error: saved string is Null string!! ",err_num);
+			var_node->node_sval=strdup("");
+		};
+	} else {
+		// CHECK !!!!!!!!
+		var_node->node_vtype=VTYPE_NUM;
+		var_node->node_dval=value;
+	}
 		
-#else
-		if(var_node->sval!=NULL) {free(var_node->sval);};
-		if(vtype_is(VTYPE_STRING)){
-			if(get_sval()) var_node->sval=strdup(get_sval());
-			else {
-				err_num=2221;
-				ERROR("error: Null string ",err_num);
-				var_node->sval=NULL;
-			};
-		} else {
-			if(get_sval()) 
-			{
-				err_num=2222;
-				ERROR("error: no string and not free!");
-			};
-			var_node->sval=NULL;
-		}
-		var_node->node_val=value;
-#endif
 	RTRN(value);
 }
 
@@ -2332,11 +2311,6 @@ double cexpression()
 	v2=num_expression();
 	RTRN(tok0->cexpr_function(value,v2));
  }
-}
-
-double expression(char *title)
-{
-	return num_expression();
 }
 
 double assign_env(double none)
