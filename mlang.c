@@ -1071,30 +1071,46 @@ MVAR *btree_to_mvar(BTREE *bt)
 double factor_assign_type()
 {
 	double value=0;
-
+	tok_struct *tok0 = tok;
 	BTREE *var_tree = tok->tok_node->node_dat;
 
-	int size = var_tree->items;
+	int columns = var_tree->items;
 	MVAR *svar = btree_to_mvar(var_tree);
+	int size2=1;
 	// MESG("factor_assign_type: -- var_slot in=%d vtype=%d",var_slot->var_index,var_slot->var_type);
 	// MESG(" factor_assign_type: $$$$$ name=[%s] type %d vtype=%d line=%d size=%d",tok->tname,tok->ttype,var_slot->var_type,tok->tline,size);
 
+	NTOKEN2;
+
+	if(check_token(TOK_LBRAKET)) {
+		MESG("	type double array!");
+		NTOKEN2;
+		size2 = (int)num_expression();
+		NTOKEN2;
+		MESG("	end: size2=%d [%s]",size2,tok_info(tok));
+	};
+
 	array_dat *adat=alloc_array();
-	adat->rows=1;
-	adat->cols=size;
+	adat->rows=size2;
+	adat->cols=columns;
 	adat->atype=VTYPE_AMIXED;
-	adat->mval=svar;
+	if(size2==1) adat->mval=svar;
+	else 
+		adat->mval=(struct MVAR *)malloc(sizeof(struct MVAR)*adat->rows*adat->cols);
 	adat->astat=ARRAY_ALLOCATED;
-	adat->array_name=strdup(tok->tname);
+	adat->array_name=strdup(tok0->tname);
 	adat->var_tree = var_tree;
 	// MESG("	>> items %d",size);
-	NTOKEN2;
+
 	
 	if(check_token(TOK_LPAR)) {
 		// MESG("	assign with parenthessis!");
 		int i;
+		int row=0;
 		NTOKEN2;
-		for(i=0;i<size;i++) {
+		for(row=0;row<size2;row++) {
+		MVAR *row_var=&adat->mval[row*columns];
+		for(i=0;i<columns;i++) {
 			value=lexpression();
 			if(ex_var.var_type!=svar[i].var_type) {
 				set_error(tok,1022,"type mismatch!");
@@ -1102,17 +1118,19 @@ double factor_assign_type()
 			};
 			if(ex_var.var_type==VTYPE_STRING) {
 				// MESG("%2d: type=%d val=[%s]",i,ex_var.var_type,get_sval());
-				svar[i].sval=strdup(get_sval());
+				row_var[i].sval=strdup(get_sval());
 			} else {
 				// MESG("%2d: type=%d val=%f %f",i,ex_var.var_type,ex_var.dval,value);
-				svar[i].dval=value;
+				row_var[i].dval=value;
 			};
 			// MESG("next toke type is %s",tok_info(tok));
-			NTOKEN2;
+			NTOKEN2;	// skip end parenthesis or separator
+		};
 		};
 	};
+
+
 	set_array(adat);
-	
 	return 1;
 }
 

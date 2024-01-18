@@ -24,6 +24,8 @@ a: array 3:[a] type [AMIXED] , slot 0 type=14 rows 1,cols 6
 #	s1=a.salary: 
 #}
 # print(human1)
-# a = human1[100]
+k=20
+b = human1[k*(k+2)]
+c = human1[2]("kostas"+" maria","tr",33,45,22,23; "kostas"+" maria","tr",33,45,22,23)
 # print(a[22].name)
 # show_vars()
