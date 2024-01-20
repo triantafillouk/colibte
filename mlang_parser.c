@@ -634,14 +634,23 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			cc=0;
 			break;
 		case TOK_RBRAKET:
-			// MESG("end of array definition cols=%d rows=%d",array_max_cols,array_rows);
+			MESG("end of array definition ");
 			cc=1;
 			if(next_token_type(bf)==TOK_LBRAKET) {
 				// if(array_tok->ttype==TOK_ARRAY2) 
+				MESG("	next is LBRAKET");
 				array_tok->ttype=TOK_ARRAY2;
 				array_tok->tname="index2";
 				skip_token=1;
 			};
+			if(next_token_type(bf)==TOK_DOT) {
+				MESG("	next is DOT L2!");
+				array_tok->ttype=TOK_ARRAY_L2;
+				NTOKEN2;
+				ADD_TOKEN("dot2");
+				set_dot_var(bf,tok);
+				// array_tok->tname="dot";
+			}; 
 			break;
 		case TOK_QUOTE: // string start
 			slen=getnstr1(bf,cc,nword);

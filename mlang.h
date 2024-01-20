@@ -200,6 +200,7 @@ enum {
 	TOK_ARRAY1		,	// 71
 	TOK_ARRAY2		,
 	TOK_ARRAY_L1	,
+	TOK_ARRAY_L2	,
 	TOK_ASSIGNENV	,
 	TOK_ASSIGNOPT	,
 	TOK_END,			/* @> */

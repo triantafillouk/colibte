@@ -1378,6 +1378,54 @@ double factor_array_l1()
 	return(value);
 }
 
+double factor_array_l2()
+{
+	int ind1;
+	double value=0;
+	MVAR *array_slot;
+	array_slot=&current_stable[tok->tind];
+	array_dat *adat = array_slot->adat;
+	lstoken=tok;
+	NTOKEN2;
+	MESG("factor_array_l2:--------> %s . %s",lstoken->tname,tok->tname);
+
+	if(adat->var_tree) {
+		BTNODE *el_node = find_btnode(adat->var_tree,tok->tname);
+		if(el_node) {
+			ind1 = (int)(el_node->node_index);
+			tok->dval=ind1;
+		} else {
+			MESG("error element not found!");
+			set_error(tok,501,"element not found!");
+			return(0);
+		};
+	} else {
+		MESG("No var_tree!");
+		set_error(lstoken,502,"No var_tree");
+		return(0);
+	};
+
+	// MESG("	ind = %d",ind1);
+	lmvar=&adat->mval[ind1];
+	if(adat->mval[ind1].var_type==VTYPE_NUM) {
+		set_vtype(VTYPE_NUM);
+		value=adat->mval[ind1].dval;
+		ls_pdval = &adat->mval[ind1].dval;
+		set_dval(value);
+		// MESG("	return type dval %f",value);
+	} else {
+		set_vtype(VTYPE_STRING);
+		set_sval(adat->mval[ind1].sval);
+		ls_psval = &adat->mval[ind1].sval;
+		// MESG("	return type sval [%s]",adat->mval[ind1].sval);
+	};
+	NTOKEN2;
+	lsslot=array_slot;
+	// MESG("        : >>>> end");
+	// MESG("	factor_array1:ind1=%d lsslot ind=%d type=%d rows=%d cols=%d [%s]!",ind1,lsslot->var_index,lsslot->var_type,lsslot->adat->rows,lsslot->adat->cols,array_slot->psval[0]);
+	return(value);
+}
+
 double factor_cmd()
 { // 3 editor command
 	int var_index;
@@ -1916,6 +1964,7 @@ FFunction factor_funcs[] = {
 	factor_array1,	// TOK_ARRAY1
 	factor_array2,	// TOK_ARRAY2
 	factor_array_l1,// TOK_ARRAY_L1
+	factor_array_l2,// TOK_ARRAY_L2
 	factor_none,	// TOK_ASSIGNENV	,
 	factor_none,	// TOK_ASSIGNOPT	,
 	factor_none,	// TOK_END,
