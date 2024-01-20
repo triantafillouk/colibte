@@ -677,8 +677,8 @@ void show_error(char *from,char *name)
  int var_index=-1;
  if(tok) if(tok->tok_node) var_index=tok->tok_node->node_index;
  if(var_index>=0)
-	ERROR("%s error %d file %s after function [%s] after line %d: [%s]",
-		from,err_num,name,ftable[var_index].n_name,err_line,err_str);
+	ERROR("%s error %d file %s tok=%s var_index=%d after line %d: [%s]",
+		from,err_num,name,tok->tname,var_index,err_line,err_str);
  else {
 	ERROR("%s error %d file %s line %d: [%s]",from,err_num,name,err_line,err_str);
  };
@@ -2943,7 +2943,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	err_num=check_init(bp);
 	if(err_num>0) 
 	{
-		// mesg_out("Error %d %s line %d ex_vtype=%d ex_value=%f slval=[%s]!",err_num,err_str,err_line,get_vtype(),ex_value,get_sval());
+		// mesg_out("Error %d %s line %d ex_vtype=%d ex_value=%f slval=[%s]!",err_num,err_str,err_line,get_vtype(),get_val(),get_sval());
 		show_error("Check init",bp->b_fname);
 		return(0);
 	};
