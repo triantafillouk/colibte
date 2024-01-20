@@ -25,7 +25,9 @@ a: array 3:[a] type [AMIXED] , slot 0 type=14 rows 1,cols 6
 #}
 # print(human1)
 k=20
-b = human1[k*(k+2)]
-c = human1[2]("kostas"+" maria","tr",33,45,22,23; "kostas"+" maria","tr",33,45,22,23)
+#b = human1[k*(k+2)]
+c = human1[2]("kostas","tr",33,45,22,23; " maria","tr",33,45,22,23)
+c[1][0]:
+c[1][1]:
 # print(a[22].name)
 # show_vars()

@@ -246,24 +246,41 @@ int err_skip_type_args(tok_struct *tok0)
  BTNODE *nod0=tok0->tok_node;
  BTREE *nb = (BTREE *)nod0->node_dat;
  int args0=nb->items;
+ MESG("err_skip_type_args: items=%d",args0);
  // MESG("	items=%d",args0);
-
- // MESG("err_skip_type_args:");
+ if(tok->ttype==TOK_LBRAKET) {
+ 	MESG("	skip index");
+	NTOKEN_ERR(661);
+	stat=err_cexpression();
+	NTOKEN_ERR(662);
+ };
  if(tok->ttype==TOK_LPAR) {
  	// MESG("	there is an LPAR type=%d name=%s",tok->ttype,tok->tname);
 	int nargs=0;
+	int rows=0;
+
 	while(tok->ttype!=TOK_RPAR){
+		MESG("-- start of loop [%s]",tok->tname);
 		nargs++;
-		if(nargs>args0) return 661;
-		// MESG("	nargs=%d type=%d name=[%s]",nargs,tok->ttype,tok->tname);
-		if(tok->ttype!=TOK_COMMA && tok->ttype!=TOK_LPAR) { 
+		if(nargs>args0) {
+			MESG("	?? nargs?args0 %d>%d",nargs,args0);
+			return 661;
+		};
+		MESG("	nargs=%d type=%d name=[%s]",nargs,tok->ttype,tok->tname);
+		if(tok->ttype!=TOK_COMMA && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_SEP) { 
+			MESG("	??????? [%s] ttype=%d",tok->tname,tok->ttype);
 			return 662;
 		};
 		NTOKEN_ERR(668);
 		stat=err_cexpression();
+		MESG("	next token in loop is [%s] tnum=%d",tok->tname,tok->tnum);
+		if(tok->ttype==TOK_SEP) {
+			rows++;nargs=0;
+			// NTOKEN_ERR(669);
+		};	
 	};
-	if(nargs!=args0) return 663;
-	NTOKEN_ERR(669);
+	NTOKEN_ERR(670);
+	MESG("	err_skip_type_args: end");
  };
  return stat;
 }
@@ -981,11 +998,12 @@ int err_factor()
 		tok0->tname="assign";
 		RT_MESG1(527);
 	case TOK_ASSIGN_TYPE:{
-		// MESG("TOK_ASSIGN_TYPE: [%s]",tok0->tname);
-
+		MESG("TOK_ASSIGN_TYPE: tok0 [%s] tnum=%d ttype=%d",tok0->tname,tok0->tnum,tok0->ttype);
+		MESG("	tok [%s] tnum %d ttype %d",tok->tname,tok->tnum,tok->ttype);
 		if(err_skip_type_args(tok0)) {
 			set_error(tok0,2000,"`TOK_ASSIGN_TYPE: error in argument list");
 		};
+		MESG("	TOK_ASSIGN_TYPE: end tnum=%d",tok->tnum);
 		RT_MESG1(528);
 		};
 #if	1

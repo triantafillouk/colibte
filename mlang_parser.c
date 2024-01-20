@@ -264,13 +264,13 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 void set_dot_var(FILEBUF *bf,tok_struct *tok)
 {
 	char nword[256];
-	MESG("set_dot_var:");
-	MESG("set_dot_var: name %s",tok->tname);
+	// MESG("set_dot_var:");
+	// MESG("set_dot_var: name %s",tok->tname);
 	// MESG("set_dot_var: type %d",tok->tvtype);
 	foffset++;	// skip dot
 	int cc=FCharAt(bf,foffset++);
 	getnword1(bf,cc,nword);
-	MESG("set_dot_var: found subtype [%s]",nword);
+	// MESG("set_dot_var: found subtype [%s]",nword);
 	tok->ttype=TOK_TYPE_ELEMENT;
 	// tok->tvtype=TOK_NONE;
 	tok->tname=strdup(nword);
