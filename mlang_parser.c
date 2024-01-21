@@ -48,7 +48,7 @@ tok_struct *add_token(TLIST lex_parser,int tok_type,int cc,char *label,char *fro
 	tok=new_tok();
 	add_element_to_list((void *)tok,lex_parser);
 	tok->tnum=lex_parser->size-1;
-	// MESG("	; [%s] add token %3d: ind=%d type=[%s] [%s]",from,tok->tnum,cc,tname(tok_type),label);
+	MESG("	; [%s] add token %3d: ind=%d type=[%s] [%s]",from,tok->tnum,cc,tname(tok_type),label);
 	return tok;
 }
 
@@ -264,13 +264,20 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 void set_dot_var(FILEBUF *bf,tok_struct *tok)
 {
 	char nword[256];
-	// MESG("set_dot_var:");
+	
+	MESG("set_dot_var:");
 	// MESG("set_dot_var: name %s",tok->tname);
 	// MESG("set_dot_var: type %d",tok->tvtype);
-	foffset++;	// skip dot
-	int cc=FCharAt(bf,foffset++);
+	int cc=FCharAt(bf,foffset);	// skip dot
+	if(cc!='.') MESG("no DOT!!!!!!!!!!!!");
+	else {
+		MESG("	we have a dot!");
+		foffset++;
+	}
+	cc=FCharAt(bf,foffset++);
+	MESG("	first letter of arg is %c",cc);
 	getnword1(bf,cc,nword);
-	// MESG("set_dot_var: found subtype [%s]",nword);
+	MESG("	found subtype [%s]",nword);
 	tok->ttype=TOK_TYPE_ELEMENT;
 	// tok->tvtype=TOK_NONE;
 	tok->tname=strdup(nword);
@@ -530,7 +537,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  {
 	if(change_script_state(tok_type,&script_active)) continue;
 
-	// MESG("parse- cc=%d %c type=%3d [%10s]",cc,cc,tok_type,tname(tok_type));
+	MESG("parse- cc=%d %c type=%3d [%10s]",cc,cc,tok_type,tname(tok_type));
 
 	if(err_num>0) return 0.0;
 
@@ -626,7 +633,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			par_level--;
 			cc=1;break;
 		case TOK_LBRAKET:
-			// MESG("	parser: TOK_LBRAKET skip=%d",skip_token);
+			MESG("	parser: TOK_LBRAKET skip=%d",skip_token);
 			if(skip_token) {
 				skip_token=0;
 				continue;
@@ -634,7 +641,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			cc=0;
 			break;
 		case TOK_RBRAKET:
-			MESG("end of array definition ");
+			MESG("end of array definition tnum=%d ",tok->tnum);
 			cc=1;
 			if(next_token_type(bf)==TOK_LBRAKET) {
 				// if(array_tok->ttype==TOK_ARRAY2) 
@@ -646,11 +653,15 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			if(next_token_type(bf)==TOK_DOT) {
 				MESG("	next is DOT L2!");
 				array_tok->ttype=TOK_ARRAY_L2;
-				NTOKEN2;
-				ADD_TOKEN("dot2");
-				set_dot_var(bf,tok);
-				// array_tok->tname="dot";
-			}; 
+				array_tok->tname="dot el2";
+			};			
+			break;
+
+		case TOK_DOT:
+			if(previous_ttype==TOK_LBRAKET){
+			MESG("TOK_DOT: previous type is %d",previous_ttype);
+			set_dot_var(bf,tok);
+			};
 			break;
 		case TOK_QUOTE: // string start
 			slen=getnstr1(bf,cc,nword);
@@ -789,6 +800,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				// MESG("skip tok_lbraket!");
 				continue;
 			} else {
+				if(tok_type==TOK_DOT && previous_ttype==TOK_RBRAKET){
+					ADD_TOKEN("token dot!"); 
+					set_dot_var(bf,tok);
+					continue;
+				} else
 				ADD_TOKEN("letter");
 			};
 		} else {
