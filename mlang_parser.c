@@ -500,7 +500,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  // return if already parsed and not forced to parse
  if(bf->tok_table !=NULL && init==0) return (0);
 
- // MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
+ MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
  if(is_mlang(bf)) script_active=1;	/* initial script state  */
 
  if(init && bf->tok_table!=NULL) {
@@ -661,7 +661,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
 		case TOK_DOT:
 			if(previous_ttype==TOK_LBRAKET){
-			MESG("TOK_DOT: previous type is %d",previous_ttype);
+			// MESG("TOK_DOT: previous type is %d",previous_ttype);
 			set_dot_var(bf,tok);
 			tok->tline=tok_line;
 			};
@@ -1054,6 +1054,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		err_num=1014;err_line=tok->tline;err_str="parse error: invalid number of pars";
 		// ERROR("parenthesis error: line %d",tok_line);
 	};
+
 	bf->m_mode=M_PARSED;
 
  if(init) {
@@ -1065,10 +1066,13 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
  free_list(lex_parser,"lex_parser");
  free_list(curl_stack,"cstack");
+
 #if	DEBUG_SYNTAX
  stage_level=save_stage_level;
 #endif
- MESG(": parse_block1:[%s] > end. Number of tokens %d",bf->b_fname,bf->symbol_tree->items);
+// 	MESG("	end: %s",bf->b_fname);
+	if(bf->symbol_tree==NULL)MESG(": parse_block1:[%s] > end.",bf->b_fname);
+	else MESG(": parse_block1:[%s] > end. Number of tokens %d",bf->b_fname,bf->symbol_tree->items);
  return(TRUE); 
 }
 

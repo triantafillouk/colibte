@@ -1371,7 +1371,7 @@ double factor_array_l1()
 	array_dat *adat = array_slot->adat;
 	lstoken=tok;
 	NTOKEN2;
-	MESG("factor_array_l1: ind=%d num=%d --------> %s . %s",tok->tind,tok->tnum,lstoken->tname,tok->tname);
+	// MESG("factor_array_l1: ind=%d num=%d --------> %s . %s",tok->tind,tok->tnum,lstoken->tname,tok->tname);
 
 	if(adat->var_tree) {
 		BTNODE *el_node = find_btnode(adat->var_tree,tok->tname);
@@ -2649,7 +2649,6 @@ void update_ddot_line(char *ddot_out)
  offs ddot_pos=tp_offset(tp);
  offs i,sl,el; // current offset, start,end of line
  old_fp=cbfp;
- 
  sfb(buf);
  el=FLineEnd(buf,ddot_pos);
  sl=FLineBegin(buf,ddot_pos);
@@ -2661,7 +2660,7 @@ void update_ddot_line(char *ddot_out)
 			is_ddot=!(cbfp->b_state & FS_VIEW);
 			ddot_pos=i-sl+1;break;};
 	};
-  
+ 
 // replace text
  textpoint_set(buf->tp_current,sl+ddot_pos);
  if(is_ddot) DeleteBlock(0,dsize-ddot_pos);
@@ -2681,7 +2680,7 @@ void refresh_ddot_1(double value)
  int stat=0;
  TextPoint *tp = tok->ddot;
  FILEBUF *buf = tp->fp;
- // MESG("refresh_ddot:");
+ // MESG("refresh_ddot: %d",get_vtype());
  if(execmd) {
 	 if(vtype_is(VTYPE_NUM)) {
 		if(lstoken) {
