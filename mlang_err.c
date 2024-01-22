@@ -73,6 +73,9 @@ char * tok_info2(tok_struct *tok)
 #define	SYNTAX_DEBUG1	0
 
 #if	SYNTAX_DEBUG1	/* if debugging  */
+
+#define TDSERR(description) char *Tds=description;MESG("#%*s",stage_level,Tds);
+
 // Return with message
 #define RT_MESG { \
 		if(err_num>0) mesg_out(" >[%s][%d] end with error %d position %d line %d",Tds,tok->tnum,err_num,xpos,tok->tline);\
@@ -87,24 +90,25 @@ char * tok_info2(tok_struct *tok)
 
 #else	/* No debugging macros  */
 
+#define TDSERR(description) {}
+
 // Return with message
 #define RT_MESG { \
-	stage_level--;return(err_num);\
+	;return(err_num);\
 }
 
 #define RT_MESG1(pos) { \
-	stage_level--;return(err_num);\
+	;return(err_num);\
 }
 
 #endif
 
 
-#define SHOW_STAGE(pos)	{ stage_level++;show_type='#';CHECK_TOK(pos);}
+#define SHOW_STAGE(pos)	{ show_type='#';CHECK_TOK(pos);}
 
 #if	1
 #define	CHECK_TOK(pos) { xpos=pos ;}
 #define	NTOKEN_ERR(xxx)	{ tok++;show_type=';';CHECK_TOK(xxx);}
-#define TDSERR(description) {} 
 #else
 
 #define	CHECK_TOK(pos) { xpos=pos;\
@@ -121,7 +125,6 @@ char * tok_info2(tok_struct *tok)
 
 #define	NTOKEN_ERR(xxx)	{ tok++;show_type=';';CHECK_TOK(xxx);}
 
-#define TDSERR(description) char *Tds=description;
 #endif
 
 
@@ -507,7 +510,9 @@ int err_assign_env()
 int err_exec_function(char *name,int nargs,FILEBUF **bf)
 {
  TDSERR("exec_function");
+#if	DEBUG1
  int save_stage_level=stage_level;
+#endif
  	// MESG("err_exec_funtion: %s",name);
     FILEBUF *bp;		/* ptr to buffer to execute */
     char bufn[MAXFLEN+2];		/* name of buffer to execute */
@@ -545,9 +550,9 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 		ERROR("found syntax errors in function!");
 		RT_MESG1(464);
 	};
-
+#if	DEBUG1
 	stage_level=save_stage_level;
-	
+#endif
 	CHECK_TOK(465);
 	tok=bp->tok_table;
 	err_num=err_assign_args1(nargs);

@@ -19,27 +19,32 @@
 #define	SYNTAX_DEBUG	0
 #define	NTOKEN2	tok++
 #define FACTOR_FUNCTION tok->factor_function()
-#define GTYPES 0
-
 void mesg_out(const char *fmt, ...);
 extern FILEBUF *cbfp;
 extern array_dat *main_args;
 FILEBUF *exe_buffer=NULL;
 
 #if	SYNTAX_DEBUG
+
+int stage_level=0;	/* stage level  */
+
+#define INIT_STAGE	stage_level=0;
+
 #define	SHOWTOK {if(discmd) { MESG("  [%2d][%*s-%s][%d]  %s",stage_level,stage_level,"",Tds,tok->tnum,tok_name[tok->ttype]);};}
 
 #define	TDS(name)   char *Tds=name;\
 	if(discmd){ stage_level++;\
 		MESG("-- level %d type=%d",stage_level,tok->tnum);\
 		if(tok!=NULL) {\
-			MESG("#+[%2d][%*s-%s][%d]  %s",stage_level,stage_level,"",Tds,tok->tnum,tok_name[tok->ttype]);\
+			MESG("#+[%2d][%*s-%s][%d]  %s",stage_level,stage_level,"",Tds,tok->tnum,token_table[tok->ttype].tok_name);\
 		}\
 	} 
 
 #define RTRN(val)	{ stage_level--;return(val);}
 
 #else	/* SYNTAX_DEBUG  */
+
+#define INIT_STAGE	;
 
 #define	SHOWTOK ;
 
@@ -105,7 +110,6 @@ double *ls_pdval=NULL;
 MVAR *lmvar=NULL;
 int firt_var=1;
 MVAR *current_stable=NULL; 	/* current symbol table ...  */
-int stage_level=0;	/* stage level  */
 
 int show_stage=0;
 int xpos=0;		/* stage position  */
@@ -655,12 +659,10 @@ void init_exec_flags()
  is_break1=0;
  current_active_flag=1;
  set_vdval(0.0);
-#if	EX_VAR
  init_ex_var();
-#endif
  var_node=NULL;
  pnum=0;
- stage_level=0;
+ INIT_STAGE;
  ex_nvars=0;ex_nquote=0;ex_nums=0;	/* initialize table counters  */
  // MESG("init_exec_flags:end");
 }
@@ -682,7 +684,7 @@ int check_init(FILEBUF *bf)
 {
  tok_struct *tok_table=bf->tok_table;
  int err=0;
- stage_level=0;
+ INIT_STAGE;
  // MESG("check_init: [%s] %d",bf->b_fname,bf->b_type);
  if(tok_table==NULL) 
  {
@@ -2935,7 +2937,7 @@ double tok_dir_while()
 double exec_block1(FILEBUF *fp)
 {
  double val=0;
- stage_level=0;
+ INIT_STAGE;
  TDS("exec_block1");
  // MESG("exec_block1: starting at tok %d type=%d err=%d",tok->tnum,tok->ttype,err_num);
 	exe_buffer=fp;
@@ -2964,7 +2966,7 @@ double exec_block1(FILEBUF *fp)
 double exec_block1_break(FILEBUF *fp)
 {
  double val=0;
- stage_level=0;
+ INIT_STAGE;
  TDS("exec_block1");
  // MESG("exec_block1_break:");
  exe_buffer=fp;
@@ -3011,7 +3013,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		old_items=use_fp->symbol_tree->items;
 	};
 	parse_block1(bp,use_fp->symbol_tree,start,extra);
-	MESG("parse_block: ended! err=%d start=%d",err_num,start);
+	// MESG("parse_block: ended! err=%d start=%d",err_num,start);
 	if(err_num) return(0);
 	if(start || current_stable==NULL) {
 		// MESG("new current_stable with %d items",use_fp->symbol_tree->items);
@@ -3035,7 +3037,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	tok=bp->tok_table;
 
 	drv_start_checking_break();
-	MESG("	call exec_block1");
+	// MESG("	call exec_block1");
 	if(execmd) val=exec_block1(bp);
 	else val=exec_block1_break(bp);
 
@@ -3105,7 +3107,7 @@ int refresh_current_buffer(int nused)
  err_line=0;
  is_break1=0;
  show_stage=0;
- stage_level=0;
+ INIT_STAGE;
 
  /* clear parse list  */
  // MESG("refresh_current_buffer: call empty_tok_table: [%s]",fp->b_fname);
@@ -3143,7 +3145,7 @@ int refresh_current_buffer(int nused)
 		if(get_sval()) msg_line("Result is [%s %f]",get_sval(),val);
 	};
  } else {
- 	msg_line("parse error %d line %d level %d [%s]",err_num,err_line+1,stage_level,err_str);
+ 	msg_line("parse error %d line %d [%s]",err_num,err_line+1,err_str);
 	return(0);
  };
 
@@ -3167,7 +3169,7 @@ int parse_check_current_buffer(int n)
 
  /* clear parse list  */
  empty_tok_table(fp);
- stage_level=0;
+ INIT_STAGE;
  // clear out buffer
  cls_fout("[out]");
  // MESG("clear output");
@@ -3200,7 +3202,7 @@ int parse_buffer_show_tokens(int n)
 #if	TEST_TYPE0
  fp->type_tree=new_btree("type_tree",0);
 #endif
- stage_level=0;
+ INIT_STAGE;
  // clear out buffer
  cls_fout("[out]");
  err_num=check_init(fp);

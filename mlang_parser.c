@@ -331,7 +331,7 @@ int type_init_definition(FILEBUF *bf,BTREE *types_tree,alist *lex_parser, tok_st
  char line[256];
  char e_name[128];
  int slen=0;
- MESG("type_init_definition: num=%d name=%s",tok_var->tind,tok_var->tname);
+ // MESG("type_init_definition: num=%d name=%s",tok_var->tind,tok_var->tname);
 
  tok_type=next_token_type(bf);
  if(tok_type!=TOK_LETTER) { 
@@ -479,7 +479,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int after_rpar=0;
  TLIST curl_stack; // curl stack
  int store_level=0;
+#if	DEBUG_SYNTAX
  int save_stage_level;
+#endif
  offs start_proc_offset=0;
  offs ddot_offset=0;
  char *proc_name=NULL;
@@ -530,9 +532,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  // MESG("parse_block1: before looping: script_active=%d",script_active);
  err_num=0;
  err_line=0;
-
+#if	DEBUG_SYNTAX
  save_stage_level=stage_level;
-
+#endif
  MESG("--- Start parsing block loop <--------------------");
  while(getnc1(bf,&cc,&tok_type))
  {
@@ -934,20 +936,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				};
 				// MESG("this is a directive: [%s]",nword);
 			};			
-#if	0
-			if(tok->tok_node==NULL) {	/* check global_types_tree  */
-					
-				BTNODE *type_node=find_btnode(global_types_tree,nword);
-				if(type_node!=NULL) {
-					MESG("	we found a global typed variable [%s]",nword);
-					tok->tname=strdup(nword);
-					tok->tind=type_node->node_index;
-					tok->ttype=TOK_ASSIGN_TYPE;
-					tok->tok_node=type_node;
-					get_type_args(bf,tok);
-				};
-			};
-#endif
+
 			if(tok->tok_node==NULL){	/* not a directive or typed var but a normal variable  */
 				// MESG("		check for variable!");
 				// MESG("		[%s] is a variable !!!!!!!!!!",nword);
@@ -969,7 +958,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 						// tok->tvtype = var_node->node_vtype;
 						if(next_token_type(bf)==TOK_DOT) {
 							if(array_tok) {
-							MESG("	next tok_dot: tok_array num=%d",array_tok->tnum);
+								// MESG("	next tok_dot: tok_array num=%d",array_tok->tnum);
 							};
 							tok->ttype=TOK_ARRAY_L1;
 							NTOKEN2;
@@ -1076,8 +1065,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
  free_list(lex_parser,"lex_parser");
  free_list(curl_stack,"cstack");
+#if	DEBUG_SYNTAX
  stage_level=save_stage_level;
- MESG("parse_block1:[%s] > end token items %d",bf->b_fname,bf->symbol_tree->items);
+#endif
+ MESG(": parse_block1:[%s] > end. Number of tokens %d",bf->b_fname,bf->symbol_tree->items);
  return(TRUE); 
 }
 
