@@ -752,12 +752,14 @@ void show_var_node(BTNODE *node)
 double uf_show_vars()
 {
 	ntoken();
-	mesg_out("Ind Name        Type    Value",exe_buffer->symbol_tree->items);
 
+	mesg_out("Ind Name       Type             Value      local vars",exe_buffer->symbol_tree->items);
 	eval_btree(exe_buffer->symbol_tree->root,show_var_node);
-	if(global_types_tree->root)
+
+	if(global_types_tree->root) {
+	mesg_out("Ind Name       Type             Value      global vars/types",exe_buffer->symbol_tree->items);
 		eval_btree(global_types_tree->root,show_var_node);
-	else mesg_out("global_types_tree: empty!");
+	} else mesg_out("global_types_tree: empty!");
 	return 0;
 }
 

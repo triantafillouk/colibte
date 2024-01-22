@@ -1078,18 +1078,18 @@ double factor_assign_type()
 	MVAR *svar = btree_to_mvar(var_tree);
 	int size2=1;
 	MESG("factor_assign_type: [%s]",tok_info(tok));
-	if(lsslot) MESG("lsslot ind=%d type=%d",lsslot->var_index,lsslot->var_type);
+	if(lsslot) MESG("	lsslot ind=%d type=%d",lsslot->var_index,lsslot->var_type);
 	// MESG("factor_assign_type: -- var_slot ind=%d vtype=%d",var_slot->var_index,var_slot->var_type);
 	// MESG(" factor_assign_type: $$$$$ name=[%s] type %d vtype=%d line=%d size=%d",tok->tname,tok->ttype,var_slot->var_type,tok->tline,size);
 
 	NTOKEN2;
 
 	if(check_token(TOK_LBRAKET)) {
-		MESG("	type double array!");
+		// MESG("	type double array!");
 		NTOKEN2;
 		size2 = (int)num_expression();
 		NTOKEN2;
-		MESG("	end: size2=%d [%s]",size2,tok_info(tok));
+		// MESG("	end: size2=%d [%s]",size2,tok_info(tok));
 	};
 
 	array_dat *adat=alloc_array();
@@ -1097,12 +1097,15 @@ double factor_assign_type()
 	adat->cols=columns;
 	adat->atype=VTYPE_AMIXED;
 	if(size2==1) adat->mval=svar;
-	else 
-		adat->mval=(struct MVAR *)malloc(sizeof(struct MVAR)*adat->rows*adat->cols);
+	else {
+		int asize=adat->rows*adat->cols;
+		adat->mval=(struct MVAR *)malloc(sizeof(struct MVAR)*asize);
+		MESG("	allocate %d elements in mval",asize);
+	};
 	adat->astat=ARRAY_ALLOCATED;
 	adat->array_name=strdup(tok0->tname);
 	adat->var_tree = var_tree;
-	// MESG("	>> items %d",size);
+	// MESG("	>> items %d",size2);
 
 	
 	if(check_token(TOK_LPAR)) {
@@ -1110,29 +1113,62 @@ double factor_assign_type()
 		int i;
 		int row=0;
 		NTOKEN2;
+#if	0
+		MVAR *avars=adat->mval;
+		MESG("	avars addr=%Xl",(long)avars);
+		for(row=0;row<size2;row++) {
+		for(i=0;i<columns;i++) {
+			value=lexpression();
+			int ind=columns*row+i;
+			if(ex_var.var_type!=svar[i].var_type) {
+				MESG("type mismatch %d !=%d ",ex_var.var_type,svar[ind].var_type);
+				set_error(tok,1022,"type mismatch!");
+				return(0);
+			};
+			avars[ind].var_type=ex_var.var_type;
+			if(ex_var.var_type==VTYPE_STRING) {
+				MESG("	%2d: type=%d val=[%s]",ind,ex_var.var_type,get_sval());
+				avars[ind].sval=strdup(get_sval());
+			} else {
+				MESG("	%2d: type=%d val=%f %f",ind,ex_var.var_type,ex_var.dval,value);
+				avars[ind].dval=value;
+			};
+			// MESG("next toke type is %s",tok_info(tok));
+			NTOKEN2;	// skip end parenthesis or separator
+		};
+		};
+#else
 		for(row=0;row<size2;row++) {
 		MVAR *row_var=&adat->mval[row*columns];
 		for(i=0;i<columns;i++) {
 			value=lexpression();
 			if(ex_var.var_type!=svar[i].var_type) {
+				MESG("type mismatch %d !=%d ",ex_var.var_type,svar[i].var_type);
 				set_error(tok,1022,"type mismatch!");
 				return(0);
 			};
+			row_var[i].var_type=ex_var.var_type;
 			if(ex_var.var_type==VTYPE_STRING) {
-				// MESG("%2d: type=%d val=[%s]",i,ex_var.var_type,get_sval());
+				// MESG("	%2d: type=%d val=[%s]",i,ex_var.var_type,get_sval());
 				row_var[i].sval=strdup(get_sval());
 			} else {
-				// MESG("%2d: type=%d val=%f %f",i,ex_var.var_type,ex_var.dval,value);
+				// MESG("	%2d: type=%d val=%f %f",i,ex_var.var_type,ex_var.dval,value);
 				row_var[i].dval=value;
 			};
 			// MESG("next toke type is %s",tok_info(tok));
 			NTOKEN2;	// skip end parenthesis or separator
 		};
 		};
+#endif
 	};
 
-
+	if(var_slot) {
+		MESG("	add var_type to array!");
+		var_slot->var_type=VTYPE_AMIXED;
+		var_slot->adat = adat;
+	};
 	set_array(adat);
+	print_array1("type array",adat);
 	return 1;
 }
 
@@ -1390,6 +1426,9 @@ double factor_array_l2()
 	array_dat *adat = array_slot->adat;
 	lstoken=tok;
 	NTOKEN2;
+	value=cexpression();
+	MESG("	index1=%f",value);
+	NTOKEN2;	/* skip rbraket  */
 	MESG("factor_array_l2:ind=%d tnum %d --------> %s . %s",tok->tind,tok->tnum,lstoken->tname,tok->tname);
 
 	if(adat->var_tree) {
@@ -3315,8 +3354,8 @@ double get_val()
 
 array_dat *get_array(char *pos)
 {
-	// MESG("get_array:[%s] num=%d type=%d tok [%s]  ind=%d num=%d type=%d atype=%d",
-		// pos,ex_var.adat->anum,ex_var.var_type,tok->tname,tok->tind,tok->tnum,tok->ttype,ex_var.adat->atype);
+	MESG("get_array:[%s] num=%d type=%d tok [%s]  ind=%d num=%d type=%d atype=%d",
+		pos,ex_var.adat->anum,ex_var.var_type,tok->tname,tok->tind,tok->tnum,tok->ttype,ex_var.adat->atype);
 #if	USE_VAR
 	// if(ex_var.var_type==1) return NULL;
 	return ex_var.adat;
@@ -3329,7 +3368,7 @@ array_dat *get_array(char *pos)
 void set_array(array_dat *a)
 {
 #if	USE_VAR
-	// MESG("set_array:num=%d type %d allocated=%d name=%s",a->anum,a->atype,a->astat,a->array_name);
+	MESG("set_array:num=%d type %d allocated=%d name=%s",a->anum,a->atype,a->astat,a->array_name);
 	ex_var.adat=a;
 	ex_var.var_type=a->atype;
 #else

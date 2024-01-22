@@ -794,27 +794,39 @@ void print_array1(char *title,array_dat *adat)
 		out_print("Null array!",1);
 		return;
 	};
-	
-	snprintf(so,MAXLLEN,"# %s Array %s,%d:(%s) rows=%d cols=%d astat=%d",title,ex_name,adat->anum,vtype_names[adat->atype],adat->rows,adat->cols,adat->astat);
+	if(adat->var_tree) snprintf(so,MAXLLEN,"# %s Array %s,%d:(%s) rows=%d cols=%d astat=%d with var_tree",title,ex_name,adat->anum,vtype_names[adat->atype],adat->rows,adat->cols,adat->astat);
+	else snprintf(so,MAXLLEN,"# %s Array %s,%d:(%s) rows=%d cols=%d astat=%d",title,ex_name,adat->anum,vtype_names[adat->atype],adat->rows,adat->cols,adat->astat);
 	out_print(so,1);
 	strcpy(so,"");
 	if(adat->astat!=ARRAY_UNALLOCATED) {
 	if(adat->rows>1 && adat->cols>1) {
 		snprintf(so,MAXLLEN,"#  ");
 		for(i=0;i< adat->cols;i++) { 
-			snprintf(s2,128,"%10d ",i);
+			snprintf(s2,128," %10d  |",i);
 			strlcat(so,s2,MAXLLEN);
 		};
 		out_print(so,1);
+		MVAR *avars=adat->mval;
+		// MESG("	avars addr=%Xl",(long)avars);
 		for(j=0;j<adat->rows;j++){
 			snprintf(so,128,"%3d: ",j);
 			for(i=0;i<adat->cols;i++) {
-				if(adat->atype==VTYPE_ARRAY) snprintf(s2,128,"[%10.3f] ",adat->dval2[j][i]);
-				else if(adat->atype==VTYPE_SARRAY) snprintf(s2,128,"[%10s] ",adat->sval[j*adat->cols+i]);
+				if(adat->atype==VTYPE_ARRAY) snprintf(s2,128," %10.3f |",adat->dval2[j][i]);
+				else if(adat->atype==VTYPE_SARRAY) snprintf(s2,128," %10s] |",adat->sval[j*adat->cols+i]);
 				else {
 					int ind=j*adat->cols+i;
-					if(adat->mval[ind].var_type==VTYPE_NUM) snprintf(s2,128,"[%10.3f] ",adat->mval[ind].dval);
-					else snprintf(s2,128,"[%10s] ",adat->mval[ind].sval);
+					// MESG("i=%d j=%d ind=%d type %d",i,j,ind,avars[ind].var_type);
+#if	0
+					snprintf(s2,128,"(i=%d j=%d ind=%d)",i,j,ind);
+#else
+					if(avars[ind].var_type==VTYPE_NUM) {
+						MESG("	ind=%d %f",ind,avars[ind].dval);
+						snprintf(s2,128," %10.3f] |",avars[ind].dval);
+					} else {
+						MESG("	ind=%d %s",ind,avars[ind].sval);
+						snprintf(s2,128," %10s |",avars[ind].sval);
+					};
+#endif
 				};
 				strlcat(so,s2,MAXLLEN);
 			};
@@ -836,8 +848,8 @@ void print_array1(char *title,array_dat *adat)
 				if(adat->atype==VTYPE_ARRAY) snprintf(s2,128,"%05.3f(%d) ",adat->dval[i],i);
 				else if(adat->atype==VTYPE_SARRAY) snprintf(s2,128,"%10s(%d) ",adat->sval[i],i);
 				else if(adat->atype==VTYPE_AMIXED) {
-					if(adat->mval[i].var_type==VTYPE_NUM) snprintf(s2,128,"%05.3f(%d) ",adat->mval[i].dval,i);
-					else snprintf(s2,128,"[%10s](%d) ",adat->mval[i].sval,i);
+					if(adat->mval[i].var_type==VTYPE_NUM) snprintf(s2,128,"%05.3f ",adat->mval[i].dval);
+					else snprintf(s2,128,"[%10s] ",adat->mval[i].sval);
 				};
 				strlcat(so,s2,MAXLLEN);
 			};
