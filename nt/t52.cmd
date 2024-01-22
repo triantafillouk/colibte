@@ -7,6 +7,17 @@ print(c)
 #c[1][1]:
 print("---2")
 c[1].surname:
+s1=c[1].surname
+s1:
+print("------- surname now s1 is ",s1)
+print("surname now is ",c[1].surname)
+s2="new surname"
+print("set the new surname!")
+c[1].surname=s2
+print("this must be the new surname! ",c[1].surname)
+c[1].surname:
+s3=c1[1].surname
+print("this is copied from new surname ",s3)
 print("end")
 # print(a[22].name)
-# show_vars()
+show_vars()

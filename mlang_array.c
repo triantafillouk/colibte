@@ -786,7 +786,7 @@ void print_array1(char *title,array_dat *adat)
 	char s2[128];
 	int i,j;
 	so[0]=0;
-	MESG("print_array1: --------------- title \"%s\"",title);
+	// MESG("print_array1: --------------- title \"%s\"",title);
 	if(adat==NULL) {
 		err_num=260;
 		err_str="%s: NULL array!!!!!!!!!!!!!!!!!!";
@@ -816,17 +816,13 @@ void print_array1(char *title,array_dat *adat)
 				else {
 					int ind=j*adat->cols+i;
 					// MESG("i=%d j=%d ind=%d type %d",i,j,ind,avars[ind].var_type);
-#if	0
-					snprintf(s2,128,"(i=%d j=%d ind=%d)",i,j,ind);
-#else
 					if(avars[ind].var_type==VTYPE_NUM) {
-						MESG("	ind=%d %f",ind,avars[ind].dval);
+						// MESG("	ind=%d %f",ind,avars[ind].dval);
 						snprintf(s2,128," %10.3f] |",avars[ind].dval);
 					} else {
-						MESG("	ind=%d %s",ind,avars[ind].sval);
+						// MESG("	ind=%d %s",ind,avars[ind].sval);
 						snprintf(s2,128," %10s |",avars[ind].sval);
 					};
-#endif
 				};
 				strlcat(so,s2,MAXLLEN);
 			};

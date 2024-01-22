@@ -176,7 +176,7 @@ void set_error(tok_struct *tok,int err,char *description)
  err_num=err;
  // MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
  err_str=strdup(description);
-#if	0
+#if	1
  if(execmd) {
 	if(tok->tname==NULL) fprintf(stderr,"Error:%d tnum=%d ttype=%d %s line %d\n",err,tok->tnum,tok->ttype,err_str,err_line);
  	else fprintf(stderr,"Error:%d [%s] tnum=%d ttype=%d %s line %d\n",err,(char *)tok->tname,tok->tnum,tok->ttype,err_str,err_line);
@@ -249,7 +249,7 @@ int err_skip_type_args(tok_struct *tok0)
  // MESG("err_skip_type_args: items=%d",args0);
  // MESG("	items=%d",args0);
  if(tok->ttype==TOK_LBRAKET) {
- 	MESG("	skip index");
+ 	// MESG("	skip index");
 	NTOKEN_ERR(661);
 	stat=err_cexpression();
 	NTOKEN_ERR(662);
@@ -280,7 +280,7 @@ int err_skip_type_args(tok_struct *tok0)
 		};	
 	};
 	NTOKEN_ERR(670);
-	MESG("err_skip_type_args: Data definition of [%s] at line %d rows=%d args=%d",tok0->tname,tok0->tline,rows+1,args0);
+	// MESG("err_skip_type_args: Data definition of [%s] at line %d rows=%d args=%d",tok0->tname,tok0->tline,rows+1,args0);
  };
  return stat;
 }
@@ -686,7 +686,7 @@ int err_factor()
 		// MESG("	TOK_VAR: return [%s]",tok_info(tok));
 		RT_MESG1(493);}
 	case TOK_ARRAY_L2:{
-		MESG("TOK_ARRAY_L2:");
+		// MESG("TOK_ARRAY_L2:");
 		err_num=err_num_expression(); 
 		if(!check_skip_token_err1(TOK_RBRAKET,"array error",xpos)){
 			// MESG("	RBRAKET found!");
@@ -1010,12 +1010,12 @@ int err_factor()
 		tok0->tname="assign";
 		RT_MESG1(527);
 	case TOK_ASSIGN_TYPE:{
-		MESG("TOK_ASSIGN_TYPE: tok0 [%s] tnum=%d ttype=%d",tok0->tname,tok0->tnum,tok0->ttype);
-		MESG("	tok [%s] tnum %d ttype %d",tok->tname,tok->tnum,tok->ttype);
+		// MESG("TOK_ASSIGN_TYPE: tok0 [%s] tnum=%d ttype=%d",tok0->tname,tok0->tnum,tok0->ttype);
+		// MESG("	tok [%s] tnum %d ttype %d",tok->tname,tok->tnum,tok->ttype);
 		if(err_skip_type_args(tok0)) {
-			set_error(tok0,2000,"`TOK_ASSIGN_TYPE: error in argument list");
+			set_error(tok0,2000,"TOK_ASSIGN_TYPE: error in argument list");
 		};
-		MESG("	TOK_ASSIGN_TYPE: end tnum=%d",tok->tnum);
+		// MESG("	TOK_ASSIGN_TYPE: end tnum=%d",tok->tnum);
 		RT_MESG1(528);
 		};
 #if	1
