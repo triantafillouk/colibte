@@ -1073,11 +1073,13 @@ double factor_assign_type()
 	double value=0;
 	tok_struct *tok0 = tok;
 	BTREE *var_tree = tok->tok_node->node_dat;
-
+	MVAR *var_slot=lsslot;
 	int columns = var_tree->items;
 	MVAR *svar = btree_to_mvar(var_tree);
 	int size2=1;
-	// MESG("factor_assign_type: -- var_slot in=%d vtype=%d",var_slot->var_index,var_slot->var_type);
+	MESG("factor_assign_type: [%s]",tok_info(tok));
+	if(lsslot) MESG("lsslot ind=%d type=%d",lsslot->var_index,lsslot->var_type);
+	// MESG("factor_assign_type: -- var_slot ind=%d vtype=%d",var_slot->var_index,var_slot->var_type);
 	// MESG(" factor_assign_type: $$$$$ name=[%s] type %d vtype=%d line=%d size=%d",tok->tname,tok->ttype,var_slot->var_type,tok->tline,size);
 
 	NTOKEN2;
@@ -1339,7 +1341,7 @@ double factor_array_l1()
 	array_dat *adat = array_slot->adat;
 	lstoken=tok;
 	NTOKEN2;
-	// MESG("factor_array_l1:--------> %s . %s",lstoken->tname,tok->tname);
+	MESG("factor_array_l1: ind=%d num=%d --------> %s . %s",tok->tind,tok->tnum,lstoken->tname,tok->tname);
 
 	if(adat->var_tree) {
 		BTNODE *el_node = find_btnode(adat->var_tree,tok->tname);
@@ -1383,11 +1385,12 @@ double factor_array_l2()
 	int ind1;
 	double value=0;
 	MVAR *array_slot;
+	MESG("factor_array_l2: [%s]",tok_info(tok));
 	array_slot=&current_stable[tok->tind];
 	array_dat *adat = array_slot->adat;
 	lstoken=tok;
 	NTOKEN2;
-	MESG("factor_array_l2:--------> %s . %s",lstoken->tname,tok->tname);
+	MESG("factor_array_l2:ind=%d tnum %d --------> %s . %s",tok->tind,tok->tnum,lstoken->tname,tok->tname);
 
 	if(adat->var_tree) {
 		BTNODE *el_node = find_btnode(adat->var_tree,tok->tname);

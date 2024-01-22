@@ -687,6 +687,14 @@ int err_factor()
 		RT_MESG1(493);}
 	case TOK_ARRAY_L2:{
 		MESG("TOK_ARRAY_L2:");
+		err_num=err_num_expression(); 
+		if(!check_skip_token_err1(TOK_RBRAKET,"array error",xpos)){
+			// MESG("	RBRAKET found!");
+		} else {
+			MESG("	No rbracket found!");
+		};
+		NTOKEN_ERR(444);
+		RT_MESG1(4441);		
 	};
 	case TOK_ARRAY_L1:{	// 0 variable
 		// MESG("TOK_ARRAY_L1: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
@@ -707,6 +715,7 @@ int err_factor()
 			NTOKEN_ERR(498);
 		};
 		RT_MESG1(494);
+
 	// case TOK_INCREASE:
 	case TOK_ARRAY1:{
 		// MESG("	err use of tok_array1 [%s]",tok_info(tok0));
