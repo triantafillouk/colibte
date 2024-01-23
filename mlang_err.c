@@ -596,7 +596,8 @@ int err_factor()
 	/*  the following ends factor  */
 #if	1
  	case TOK_SEP:
-		xpos=476;syntax_error("separator in factor!",xpos);
+		xpos=476;
+		// syntax_error("separator in factor!",xpos);
 		RT_MESG1(xpos);
 #endif
 	case TOK_SHOW:
@@ -699,10 +700,23 @@ int err_factor()
 			MESG("	No rbracket found!");
 		};
 		NTOKEN_ERR(444);
+		if(tok->ttype==TOK_INCREASE) {
+			// MESG("	found TOK_INCREASE");
+			tok->dval=1;
+			set_tok_function(tok,0);
+			tok->tgroup=0;
+			NTOKEN_ERR(498);
+		} else
+		if(tok->ttype==TOK_DECREASE) {
+			tok->dval=-1;
+			set_tok_function(tok,0);
+			tok->tgroup=0;
+			NTOKEN_ERR(498);
+		};
 		RT_MESG1(4441);		
 	};
 	case TOK_ARRAY_L1:{	// 0 variable
-		// MESG("TOK_ARRAY_L1: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
+		MESG("TOK_ARRAY_L1: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
 		pre_symbol=0;
 		ex_nvars++;
 		NTOKEN_ERR(499);
