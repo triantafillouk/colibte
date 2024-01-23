@@ -716,7 +716,7 @@ int err_factor()
 		RT_MESG1(4441);		
 	};
 	case TOK_ARRAY_L1:{	// 0 variable
-		MESG("TOK_ARRAY_L1: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
+		// MESG("TOK_ARRAY_L1: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
 		pre_symbol=0;
 		ex_nvars++;
 		NTOKEN_ERR(499);

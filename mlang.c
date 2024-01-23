@@ -1290,7 +1290,7 @@ double factor_array1()
 	array_slot=&current_stable[tok->tind];
 	array_dat *adat = array_slot->adat;
 	lstoken=tok;
-	MESG("factor_array1:----------- vtype=%d",array_slot->var_type);
+	// MESG("factor_array1:----------- vtype=%d",array_slot->var_type);
 	NTOKEN2;
 	ind1 = (int)num_expression();
 
@@ -2494,7 +2494,7 @@ double assign_val(double none)
 		} else {
 			if(sslot->var_type!=VTYPE_ARRAY && sslot->var_type!=VTYPE_SARRAY)	{/* added to handle arrays (v698l) but CHECK!!!!  */
 				if(sslot->var_type==VTYPE_AMIXED) {
-					MESG("	AMIXED !");
+					// MESG("	AMIXED !");
 					// MESG("	AMIXED we are here! %f",*ls_pdval);
 					if(stype!=lmvar->var_type) MESG("	different subtype!!!");
 					if(lmvar->var_type==VTYPE_STRING) free(lmvar->sval);
@@ -3255,7 +3255,7 @@ char * tok_info(tok_struct *tok)
 {
  static char stok[MAXLLEN];
 	// MESG("tok_info: start");
-	MESG("tok_info: ttype=%d",tok->ttype);
+	// MESG("tok_info: ttype=%d",tok->ttype);
 	if(tok->tname!=NULL){
 		if(tok->ttype==TOK_ARRAY1 || tok->ttype==TOK_ARRAY2) {
 			int rows=0;
