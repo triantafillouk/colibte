@@ -351,7 +351,6 @@ int type_init_definition(FILEBUF *bf,BTREE *types_tree,alist *lex_parser, tok_st
  BTREE *type_dat = new_btree(nword,100);
 
  BTNODE *global_type_node = add_btnode(global_types_tree,nword);
-
  if(global_type_node && global_types_tree->new_flag) 
  {
 	// MESG("Add new global type named [%s] in global_types_tree",nword);
@@ -368,24 +367,20 @@ int type_init_definition(FILEBUF *bf,BTREE *types_tree,alist *lex_parser, tok_st
 	};
  };
 
- // MESG("	ttd 2: %d [%s]",slen,nword);
- skip_space1(bf);
- getnc1(bf,&cc,&tok_type);	/* left_par or left braket  */
+ skip_space1(bf);				/* skip space after type  */
+ getnc1(bf,&cc,&tok_type);		/* assign or ..  */
 
- // MESG("	ttd 3: %d [%c]",tok_type,cc);
- if(tok_type == TOK_ASSIGN) {
- 	getnc1(bf,&cc,&tok_type);	/* '=' set to optional ??  */
+ if(tok_type == TOK_ASSIGN) {	/* if assign skip it  */
 	skip_space1(bf);
-	 // MESG("		found assing, skipped!");
 	getnc1(bf,&cc,&tok_type);
  };
- if(tok_type!=TOK_LPAR && tok_type!=TOK_LBRAKET && tok_type!=TOK_LCURL) { 
+
+ if(tok_type!=TOK_LPAR && tok_type!=TOK_LBRAKET) { 
  	set_error(tok_var,110,"type_init_definition left par,left braket");
  	return 0; 
  };
  int end_type=0;
- if(tok_type==TOK_LPAR) end_type=TOK_RPAR;else if(tok_type==TOK_LBRAKET) end_type=TOK_RBRAKET;
- else end_type=TOK_RCURL;
+ if(tok_type==TOK_LPAR) end_type=TOK_RPAR;else end_type=TOK_RBRAKET;
 
  int ind=0;
  while(next_token_type(bf)!=end_type) {
