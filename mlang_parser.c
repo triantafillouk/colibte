@@ -469,8 +469,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int is_now_sep=0;
  int is_now_curl=0;
  int par_level=0;
- // int list_elements=0;
- // int in_type_definition=0;
  int after_rpar=0;
  TLIST curl_stack; // curl stack
  int store_level=0;
@@ -483,7 +481,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  alist *lex_parser=NULL;
  BTREE *stree=use_stree;
  tok_struct *tok=NULL;
- // tok_struct *previous_token=NULL;
  int previous_ttype=0;
 
  int tok_type=0;
@@ -495,7 +492,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  // return if already parsed and not forced to parse
  if(bf->tok_table !=NULL && init==0) return (0);
 
- MESG("parse_block1: file_type=%d [%s]",bf->b_type,bf->b_fname);
+ MESG("- Parse block [%s] type=%d <---------------------",bf->b_fname,bf->b_type);
  if(is_mlang(bf)) script_active=1;	/* initial script state  */
 
  if(init && bf->tok_table!=NULL) {
@@ -530,7 +527,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 #if	DEBUG_SYNTAX
  save_stage_level=stage_level;
 #endif
- MESG("--- Start parsing block loop <--------------------");
+ // MESG("--- Start parsing block loop <--------------------");
  while(getnc1(bf,&cc,&tok_type))
  {
 	if(change_script_state(tok_type,&script_active)) continue;
@@ -1065,8 +1062,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 #if	DEBUG_SYNTAX
  stage_level=save_stage_level;
 #endif
-// 	MESG("	end: %s",bf->b_fname);
-	if(bf->symbol_tree==NULL)MESG(": parse_block1:[%s] > end.",bf->b_fname);
+	if(bf->symbol_tree==NULL)MESG("--- parse_block1:[%s] > end.",bf->b_fname);
 	else MESG(": parse_block1:[%s] > end. Number of tokens %d",bf->b_fname,bf->symbol_tree->items);
  return(TRUE); 
 }
