@@ -13,13 +13,14 @@
 #define	__ALIST_KT__
 /* list structure definitions */
 
-
+// #define	_MESG_DEFINED	1
 #define _BTREE	1
 #define	RB_BALANCE	0
 #define	AVL_BALANCE	1
 #define A_DEBUG	0
 #define	_ASTACK	0
 #define	FULL		0
+#define LIST_HAS_NAME	0
 
 typedef struct _el
 {
@@ -42,13 +43,16 @@ typedef struct sstack {
 
 typedef struct alist
 {
- int id;	// list id
+ short id;	// list id
+ short array_valid;
+ int size;
+#if	LIST_HAS_NAME
+ char *name;
+#endif
  struct _el *head;
  struct _el *last;
  struct _el *current;
- unsigned int size;
  void **data;
- int array_valid;
 #if	_ASTACK
  astack *cstack;	// current stack
 #endif
@@ -128,23 +132,28 @@ typedef struct BTNODE {
 	struct BTNODE *up;	/* for rb trees  */
 	int color;	/* for rb trees  */
 #endif
-	char *node_name;
-	int node_index;
-	int node_type;
-	double val;
+	short node_type;
+	short node_index;
+	short node_vtype;
 #if	AVL_BALANCE
-	int balance;	/* for avl trees  */
+	short balance;	/* for avl trees  */
 #endif
-	char *sval;
+	char *node_name;
+	union {
+		double node_dval;
+		char *node_sval;
+		void *node_dat;
+		struct array_dat *adat;
+	};
 } BTNODE;
 
 typedef struct BTREE {
 	struct BTNODE *root;
 	char *tree_name;
 	int	new_flag;
-	int level;
+	// int level;
 	long items;
-	long max_items;
+	// long max_items;
 } BTREE;
 
 // Initialize a btree table
@@ -164,8 +173,9 @@ void set_btval(char *name,int type,char *sval,double val);
 #endif
 
 BTNODE *set_btdval(BTREE *bt, char *name,double value);
+BTNODE *set_btsval(BTREE *bt, char *name,char *sval);
 
-int set_btsval(BTREE *bt, int type,char *name,char * sval,double val);
+void set_bt_num_val(char *name,double val);
 void init_btvars();
 int set_btnsval(BTNODE *btn, char * sval);
 int set_btndval(BTNODE *btn, double val);
@@ -175,12 +185,15 @@ double btndval(BTREE *bt, char *name);
 char * btnsval(BTREE *bt, char *name);
 
 BTREE *new_btree(char *name,int level);
+BTREE *dup_btree(BTREE *bt_orig);
 void free_btree(BTREE *);
 int delete_btnn(BTREE *bt, char *name);
 void free_btnode(BTNODE *btn);
 BTNODE *new_btnode();
 BTNODE *find_btnode(BTREE *t,char *name);
 void btn_free(BTNODE *btn);
+void eval_btree(BTNODE *node,void do_func(BTNODE *n));
+void print_node(BTNODE *node);
 #if	NUSE
 void delete_avl_node(BTNODE *node);
 #endif

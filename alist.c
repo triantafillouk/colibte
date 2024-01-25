@@ -15,7 +15,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#if	defined _MESG_DEFINED
+#define	VTYPE_NUM		1
+#define	VTYPE_STRING	8
+#define VTYPE_TREE		32
+
+#if	1
 void MESG(const char *fmt, ...);
 #else
 #define MESG(format,...) { \
@@ -54,6 +58,9 @@ alist *new_list(int id1,char *title)
  li->head = NULL;
  li->last = NULL;
  li->current = NULL;
+#if	LIST_HAS_NAME
+ li->name=strdup(title);
+#endif
  if(id1!=0) li->id = id1;
  else { 
  	id++;
@@ -636,6 +643,9 @@ void empty_list(alist *list)
  list->head=NULL;
  list->last=NULL;
  list->current=NULL;
+#if	LIST_HAS_NAME
+ if(list->name) free(list->name);
+#endif
  list->size=0;
  list->array_valid=0;
 }
@@ -656,6 +666,9 @@ void empty_list1(alist *list,int (*ff)(void *))
  list->last=NULL;
  list->current=NULL;
  list->size=0;
+#if	LIST_HAS_NAME
+ if(list->name) free(list->name);
+#endif
  list->array_valid=0;
 // printf("empty_list1:id=%d\n",list->id);
 }
@@ -749,7 +762,7 @@ void **array_data(alist *list)
 {
  int i;
  _el *pel;
-
+ MESG("array_data:");
  if(!list->array_valid) {
  	if(list->data!=NULL) free(list->data);
 	list->data = (void **) malloc(sizeof(void*)*(list->size+1));
@@ -805,7 +818,6 @@ BTNODE *add_btnode(BTREE *bt,char *name);
 int delete_btnode_named(BTREE *bt,char *name);
 BTNODE *find_btnode(BTREE *bt,char *name);
 void show_subtree(BTNODE *node);
-void show_ordered_subtree(BTNODE *node);
 
 // must be moved to eval.c
 
@@ -822,7 +834,6 @@ BTREE *new_btree(char *name,int level)
  bt=(BTREE *)malloc(sizeof(struct BTREE));
  bt->root=NULL;
  bt->tree_name=strdup(name);
- bt->level=level;
  bt->items=0;
  return(bt);
 }
@@ -831,13 +842,19 @@ BTNODE *new_btnode()
 {
  BTNODE *btn;
  btn=(BTNODE *)malloc(sizeof(struct BTNODE));
+ // MESG("new_btnode: size is %ld %ld %ld %ld %ld",sizeof(struct BTNODE),sizeof(short),sizeof(int),sizeof(double),sizeof(void *));
  btn->left=NULL;
  btn->right=NULL;
  btn->node_name=NULL;
  btn->node_type=0;
  btn->node_index=0;
- btn->val=0;
+#if	1
+ btn->node_vtype=VTYPE_NUM;
+ btn->node_dval=0;
+#else
+ btn->node_val=0;
  btn->sval=NULL;
+#endif
 #if	RB_BALANCE
  btn->up=NULL;
 #endif
@@ -851,6 +868,8 @@ void btn_free(BTNODE *btn)
 {
 	if(btn){
 		if(btn->node_name) free(btn->node_name);
+		if(btn->node_vtype==VTYPE_TREE) btn_free(btn->node_dat);
+		else if(btn->node_vtype>VTYPE_STRING) free(btn->node_sval); 
 		free(btn);
 	};
 }
@@ -859,13 +878,18 @@ void btn_free(BTNODE *btn)
 BTNODE * insert_bt_element(BTREE *bt,char *name,int type,int index)
 {
  BTNODE *node;
-//	MESG("insert_bt_element: name=[%s] type=%d index=%d",name,type,index); 
 	node = add_btnode(bt,name);
+	// MESG("insert_bt_element: name=[%s] type=%d index=%d new=%d",name,type,index,bt->new_flag); 
 	if(bt->new_flag) {
 		node->node_type=type;
 		node->node_index=index;
-		node->val=0;
+#if	1
+		node->node_vtype=VTYPE_NUM;
+		node->node_dval=0;
+#else
+		node->node_val=0;
 		node->sval=NULL;
+#endif
 		bt->new_flag=0;
 //		MESG("insert:b index=%d: type=%d [%s]",index,type,value);
 	};
@@ -951,7 +975,7 @@ double btndval(BTREE *bt, char *name)
 // MESG("check directive: %s",name);
  btn = find_btnode(bt,name);
  if(btn) {
- 	return(btn->val);
+ 	return(btn->node_dval);
  } else {
  	return(0);
  };
@@ -963,66 +987,71 @@ char * btnsval(BTREE *bt, char *name)
  BTNODE *btn;
  btn = find_btnode(bt,name);
  if(btn) {
- 	return(btn->sval);
- } else {
- 	return(NULL);
+	if(btn->node_vtype==VTYPE_STRING) return(btn->node_sval);
  };
+ return(NULL);
 }
 
 /* set double value for a node named name of main table  */
 BTNODE *set_btdval(BTREE *bt, char *name,double value)
 {
  BTNODE *btn;
+ // MESG("set_btdval: %s",name);
  btn = find_btnode(bt,name);
  if(btn) {
-	btn->val=value;
-	btn->sval=NULL;
+	if(btn->node_vtype==VTYPE_STRING) {
+		MESG("set_btdval: free string");
+		free(btn->node_sval);btn->node_vtype=VTYPE_NUM;
+		btn->node_vtype=VTYPE_NUM;
+	};
+	btn->node_dval=value;
  } else {
 	btn=add_btnode(bt,name);
-	btn->val=value;
-	btn->sval=NULL;
+	btn->node_dval=value;
+	btn->node_vtype=VTYPE_NUM;
  };
  return(btn);
 }
 
-/* set type,double and string values for a node named name */
-int set_btsval(BTREE *bt, int type,char *name,char * sval,double val)
+BTNODE *set_btsval(BTREE *bt, char *name,char *sval)
 {
  BTNODE *btn;
- int is_new=0;
+ // MESG("set_btdval: %s",name);
  btn = find_btnode(bt,name);
- if(btn==NULL) {
- 	btn=add_btnode(bt,name);
-	is_new=1;
-	btn->node_type=type;
-	btn->sval=NULL;
+ if(btn) {
+	if(btn->node_vtype==VTYPE_STRING) {free(btn->node_sval);} else { btn->node_vtype=VTYPE_STRING;};
+ } else {
+	btn=add_btnode(bt,name);
+	btn->node_vtype=VTYPE_STRING;
  };
-
- if(btn->sval!=NULL) { free(btn->sval);btn->sval=NULL;};
- if(sval!=NULL){
-	btn->sval=strdup(sval);
- };
- btn->val=val;
- return(is_new);
+ btn->node_sval=strdup(sval);
+ return(btn);
 }
 
 /* set the string value for a node */
 int set_btnsval(BTNODE *btn, char * sval)
 {
+ // MESG("set_btnsval: %s",sval);
  if(btn==NULL) return(0);
-
- if(btn->sval!=NULL) { free(btn->sval);btn->sval=NULL;};
+ if(btn->node_vtype==VTYPE_STRING) {
+	if(btn->node_sval!=NULL) { free(btn->node_sval);};
+ } else btn->node_vtype=VTYPE_STRING;
  if(sval!=NULL){
-	btn->sval=strdup(sval);
- };
-// MESG("set_btsval: name[%s] [%s] index=%d type=%d sval=[%s] val=%f is_new=%d",name,btn->node_name,btn->node_index,btn->node_type,btn->sval,btn->val,is_new); 
+	btn->node_sval=strdup(sval);
+ } else btn->node_sval=NULL;
+// MESG("set_btnsval: name[%s] [%s] index=%d type=%d sval=[%s] val=%f is_new=%d",name,btn->node_name,btn->node_index,btn->node_type,btn->sval,btn->node_val,is_new); 
  return(1);
 }
 
 int set_btndval(BTNODE *btn,double val)
 {
+ // MESG("set_btndval: %f",val);
  if(btn==NULL) return(0);
- btn->val=val;
+ if(btn->node_vtype==VTYPE_STRING) {
+	if(btn->node_sval!=NULL) { free(btn->node_sval);};
+	btn->node_vtype=VTYPE_NUM;
+ };
+ btn->node_dval=val;
  return(1);
 }
 
@@ -1225,72 +1254,63 @@ void free_btree(BTREE *bt)
 
 int max_depth=0;
 
-int show_bt_table(BTREE *bt)
+
+void print_node(BTNODE *node)
 {
-//	MESG("show_bt_table:");
-	max_depth=0;
-	if(bt) {
-	show_subtree(bt->root);
-//	show_ordered_subtree(bt->root);
-#if	AVL_BALANCE
-//	MESG("AVL maximum depth is %d",max_depth);
-#else
-#if	RB_BALANCE
-//	MESG("RB maximum depth is %d",max_depth);
-#else
-//	MESG("NO balance maximum depth is %d",max_depth);
-#endif
-#endif
-	};
- return max_depth;
+	char *left_key="";
+	char *right_key="";
+
+	if(node->left) left_key=node->left->node_name;
+	if(node->right) right_key=node->right->node_name;
+
+	if(node->node_vtype==VTYPE_NUM) 
+		fprintf(stdout,"%03d:[%-22s] l=[%-22s] r=[%-22s] val %f\n",node->node_index,node->node_name,left_key,right_key,node->node_dval);
+	else if(node->node_vtype==VTYPE_STRING)
+		fprintf(stdout,"%03d:[%-22s] l=[%-22s] r=[%-22s] val  \"%s\"\n",node->node_index,node->node_name,left_key,right_key,node->node_sval);
+	else
+		fprintf(stdout,"%03d:[%-22s] l=[%-22s] r=[%-22s] other type\n",node->node_index,node->node_name,left_key,right_key);
 }
 
-
-void show_bt_table_ordered(BTREE *bt)
+/* Iterate btree node applying a function to it   */
+void eval_btree(BTNODE *node,void do_func(BTNODE *n))
 {
-//	MESG("show_bt_table:");
-	max_depth=0;
-	show_ordered_subtree(bt->root);
-	MESG("maximum depth is %d",max_depth);
-}
-
-
-void show_subtree(BTNODE *node)
-{
- static int depth=0;
- char *left="",*right="";
- depth++;
-// MESG("node:[%s] id=%d type=%d val=%f balance=%d sval=%s",node->node_name,node->node_index,node->node_type,node->val,node->balance,node->sval);
- if(node->left) left = node->left->node_name;
- if(node->right) right = node->right->node_name;
- if(node->left || node->right) {
-//	fprintf(stdout,"%d:node[%s] -> [%s] - [%s]\n",depth,node->node_name,left,right);
-	if(depth>max_depth) max_depth=depth;
-	if(node->sval!=NULL) fprintf(stdout,"%d:node[%s] -> [%s] - [%s] index=%d type=%d val=%f sval=[%s]\n",depth,node->node_name,left,right,node->node_index,node->node_type,node->val,node->sval);
-	else fprintf(stdout,"%d:node[%s] -> [%s] - [%s] index=%d type=%d val=%f\n",depth,node->node_name,left,right,node->node_index,node->node_type,node->val);
- };
- if(node->left) show_subtree(node->left);
- if(node->right) show_subtree(node->right);
- depth--;
-}
-
-void show_ordered_subtree(BTNODE *node)
-{
- static int depth=0;
-// char *left="",*right="";
- depth++;
-// MESG("node:[%s] id=%d type=%d val=%f balance=%d sval=%s",node->node_name,node->node_index,node->node_type,node->val,node->balance,node->sval);
-// if(node->left) left = node->left->node_name;
-// if(node->right) right = node->right->node_name;
-// if(node->left || node->right) fprintf(stdout,"%d:node[%s] -> [%s] - [%s]",depth,node->node_name,left,right);
  if(node->left) {
-	if(node->left) show_ordered_subtree(node->left);
- };
-	if(depth>max_depth) max_depth=depth;
-// 	fprintf(stdout,"%d:node[%s] -> [%s] - [%s]",depth,node->node_name,left,right);
- if(node->right) show_ordered_subtree(node->right);
- depth--;
+ 	eval_btree(node->left,do_func);
+ }
+ do_func(node);
+ if(node->right) eval_btree(node->right,do_func);
 }
 
+/* Iterate btree node applying a function to it   */
+void eval_btree1(BTNODE *node,void do_func(BTNODE *n,void *p),void *p)
+{
+ if(node->left) {
+ 	eval_btree1(node->left,do_func,p);
+ }
+ do_func(node,p);
+ if(node->right) eval_btree1(node->right,do_func,p);
+}
+
+void dup_bt_node(BTNODE *node_orig,void *btree)
+{
+ BTNODE *node = insert_bt_element((BTREE *)btree,node_orig->node_name,node_orig->node_type,node_orig->node_index);
+ // printf("	! add [%10s] type %d index %d\n",node_orig->node_name,node_orig->node_vtype,node_orig->node_index);
+ node->node_vtype=node_orig->node_vtype;
+ if(node->node_vtype==VTYPE_NUM) {
+ 	node->node_dval = node_orig->node_dval;
+	// MESG("	! add [%10s] type %d index %d %f",node->node_name,node->node_vtype,node->node_index,node->node_dval);
+ };
+ if(node->node_vtype==VTYPE_STRING) {
+ 	node->node_sval=strdup(node_orig->node_sval);
+	// MESG("	! add [%10s] type %d index %d %s",node->node_name,node->node_vtype,node->node_index,node->node_sval);
+ };
+}
+
+BTREE *dup_btree(BTREE *bt_orig)
+{
+ BTREE *new_bt = new_btree(bt_orig->tree_name,0);
+ eval_btree1(bt_orig->root,dup_bt_node,(void *)new_bt);
+ return new_bt;
+}
 #endif
 

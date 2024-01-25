@@ -214,25 +214,28 @@ BTNODE * add_btnode(BTREE *tree, char *name)
 	BTNODE *res = NULL;
 
 	res=find_btnode(tree,name);
-	if(res) return(res);
+	if(res) { tree->new_flag=0;return(res);};
 
 	/* perform insert */
 	if (tree->root)
 	{
 		res = avl_insert(tree, &tree->root, NULL, name);
+		res->node_index = tree->items-1;
+		// MESG("	+ add_btnode %s to tree [%s] items %ld %d",
+			// name,tree->tree_name,tree->items,res->node_index);
 	}
 	else
 	{
 		tree->root = new_btnode();
 		if (tree->root)
 		{
-			tree->items++;
 			res = tree->root;
 			res->node_name=strdup(name);
 			tree->new_flag=1;
-#if	A_DEBUG
-			MESG(" avl add_btnode: new [%s] depth=%d",name,depth); 
-#endif
+			res->node_index=tree->items;
+			tree->items++;
+			// MESG("	- add_btnode %s to tree [%s] id=%ld %d",
+				// name,tree->tree_name,tree->items,res->node_index);
 		}
 	}
 

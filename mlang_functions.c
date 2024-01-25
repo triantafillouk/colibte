@@ -59,5 +59,8 @@ m_function m_functions[] = {
 	{"array_cols",1,uf_array_cols},	/* columns of an an array  */
 	{"array_rows",1,uf_array_rows},	/* rows of an an array  */
 	{"dbg_message",1,uf_dbg_message},	/* show debug message  */
+	{"index",0,uf_index},	/* new index  */
+	{"show_vars",0,uf_show_vars},	/* show local vars  */
+	{"list_tokens",0,uf_list_tokens},	/* list_tokens  */
 	{NULL,0,NULL}
 };

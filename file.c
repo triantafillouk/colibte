@@ -454,16 +454,18 @@ int close_file(int n)
 int delete_filebuf(FILEBUF *bp,int force)
 {
 	int stat;
+	// MESG("delete_filebuf:");
     if (bp->b_nwnd > 0) {                  /* Error if on screen.  */
             msg_line("File is on screen");
             return (FALSE);
     };
 	stat = remove_from_list((void *)bp,file_list);
-	if(stat || force) 
+	if((stat || force) && execmd==0) 
 	{
 		EmptyText(bp);
 		if(bp->main_undo) efree(bp->main_undo,"delete_filebuf, main_undo");
 		bp->main_undo=NULL;
+
 		textpoint_free(bp->tp_base);
 		textpoint_free(bp->tp_text_end);
 		textpoint_free(bp->tp_text_o);
@@ -881,7 +883,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->npoints=0;
 	bp->symbol_tree=NULL;
 	bp->symbol_table=NULL;
-
+	bp->type_list=NULL;
 	bp->tp_base = textpoint_new(bp,TP_BASE,0);
 	bp->tp_text_end = textpoint_new(bp,TP_TEXT_END,0);
 	bp->tp_text_o = textpoint_new(bp,TP_TEXT_END,0);
@@ -1136,8 +1138,15 @@ int open_file(int n)
  int err=0;
  int stat=0;
  int line=0;
- // MESG("open_file: %d",n);
+ // MESG("open_file: %d [%s]",n,get_sval());
 	fname[0]=0;
+	if(macro_exec){
+		// MESG("	open_file_named");
+		err=open_file_named(get_sval());
+		err=goto_file(get_sval());
+		// igotolinecol(line,1,-1);
+		return(err);
+	}
 	set_list_type(LDIR);
 	if(n>0) {
 		if(n==3) {
@@ -1168,7 +1177,7 @@ int open_file(int n)
 
 	stat=snprintf(prompt,MAXFLEN,"Open file [%s] : ",tname);
 	if(stat>=MAXFLEN) MESG("truncated prompt when opening file!");
-
+	// MESG("	get the file name from nextarg!");
     if (nextarg(prompt, tname, MAXFLEN,true) != TRUE){
 		set_Offset(o1);
 		set_update(cwp,UPD_WINDOW);

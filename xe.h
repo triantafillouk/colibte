@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.58T86 (26/07/2023)"
+#define VERSION 	"#01.58T99 (24/01/2024)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -33,6 +33,9 @@
 #define	SLIM_ON		1	/* remove no needed elements in structure constructs  */
 
 #define	USE_FAST	1 & PCURSES	/* erase line for double width characters in panel_curses  */
+#define TEST_TYPE	1
+
+#define NEW	1	/* new tested code!  */
 
 #if	DARWIN
 #define	_FILE_OFFSET_BITS	64
@@ -313,23 +316,17 @@ typedef struct  VIDEO {
 #define	HSTART			59
 #define HEX_LINE_LEN	16
 
-typedef struct tok_data {
-	int	ind;
-	int vtype;
-#if	USE_SARRAYS
-	union {
-	double *pdval;
-	char  **psval;
-	};
-#else
-	double *pdval;
-#endif
+typedef struct MVAR {
+	short	var_index;
+	short	var_type;
+	char *var_name;
 	union {
 		double dval;
 		char *sval;
 		struct array_dat *adat;
+		struct BTREE *btree1;
 	};
-} tok_data;
+} MVAR;
 
 #if	GTK
 /* keep gtk part of windows */
@@ -461,7 +458,8 @@ typedef struct MLQUOTES {
 
 #define H_SELECT	128
 
-#define	VTYPE_NUM		1
+#define	VTYPE_NONE		0	/* type not defined yet  */
+#define	VTYPE_NUM		1	/* numeric value  */
 #define	VTYPE_ARRAY		2	/* numeric array  */
 #define	VTYPE_SARRAY	3	/* string array  */
 #define	VTYPE_LIST		4	/* numeric list  */
@@ -470,9 +468,12 @@ typedef struct MLQUOTES {
 #define	VTYPE_ASLIST	7	/* array string list  */
 #define	VTYPE_STRING	8	/* string  */
 #define	VTYPE_BUFFER	9	/* file buffer  */
-#define	VTYPE_AMIXED	12	/* mixed array  */
-#define VTYPE_DYNAMIC	16	/* dynamic array  */
-#define	VTYPE_TREE		32	/* btree pairs  */
+#define VTYPE_ARRAYEL1	10	/* element of array */
+#define VTYPE_ARRAYEL2	11	/* element of double array */
+#define	VTYPE_TREE		12	/* btree pairs  */
+#define VTYPE_TREE_EL	13	/* tree element  */
+#define	VTYPE_AMIXED	14	/* mixed array  */
+#define VTYPE_MIXEDEL	15	/* element of mixed array  */
 
 /* textpoint */
 #define  FULLDEFINED	0
@@ -678,7 +679,12 @@ typedef struct  FILEBUF {
 	struct tok_struct *end_token;	/* the last (EOF) token in tok_table  */
 	int err;	/* negative if not syntax checked  */
 	BTREE *symbol_tree;	/* local symbol table  */
-	tok_data *symbol_table;	/* instance of variables data  */
+#if	TEST_TYPE0
+	BTREE *type_tree;	/* local type table  */
+#else
+	struct alist *type_list;	/* type table list  */
+#endif
+	MVAR *symbol_table;	/* instance of variables data  */
 #if	USE_SLOW_DISPLAY
 	int slow_display;
 #endif

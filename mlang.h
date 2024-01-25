@@ -19,11 +19,16 @@ typedef double (*TFunction)(double v1);
 typedef double (*EFunction)(double v1,double v2);
 
 typedef struct tok_struct {
+	union {
 	short tind;	/* token subtype and variable number */
+	short t_nargs; 	/* number of arguments  */
+	};
 	short tline;	/* line for debugging  */
 	short tnum;	/* token number for debugging  */
 	short ttype;	/* token type */
 	short tgroup;	/* token group  */
+	short tind1;	/* index1 for type elements  */
+	short tind2;	/* index2 for type elements  */
 	char *tname;	// token name or string value
 	double dval;	// double value
 	union {
@@ -34,31 +39,27 @@ typedef struct tok_struct {
 	FFunction directive;
 	union {	
 		int	number_of_args;
-		struct BTNODE *tnode;
+		struct BTNODE *tok_node;
 		struct curl_struct *tcurl;
 		struct tok_struct *match_tok;	/* for curl, parenthesis, bracket  */
 		struct tok_struct *next_tok;	/* for directives  */
 		TextPoint *ddot;				/* ddot text point  */
-		struct array_dat *adat;
+		struct array_dat *tok_adat;		/* used in array definition only in LB  */
 		struct FILEBUF *tbuf;
 	};
 } tok_struct;
 
-typedef struct MVAR {
-	short	vtype;
-	union {
-		double dval;
-		char *sval;
-		struct array_dat *adat;
-	};
-} MVAR;
 
 typedef struct array_dat {
 	short atype;
 	short anum;
-	short rows;
-	short cols;
+	int rows;
+	int cols;
 	short astat;	/* array allocation status  */
+	char *array_name;
+	union {
+		BTREE *var_tree;
+	};
 	union {
 		void *dat;
 		double *dval;
@@ -73,6 +74,11 @@ typedef struct curl_struct {
 	short num;	
 	struct _el *ocurl;
 } curl_struct;
+
+typedef struct key_type {
+	char *name;
+	short atype;
+} key_type;
 
 // #define SEP_FUNCTIONS	1
 
@@ -92,7 +98,7 @@ typedef struct term_type {
 void init_token_mask();
 double assign(int is_edenv);
 int parse_block1(FILEBUF *bf,BTREE *stree,int start,int extra);
-int assign_args1( MVAR *va,tok_data *td,int nargs);
+int assign_args1( MVAR *va,MVAR *td,int nargs);
 double factor_1();
 double term1_1();
 double term2_1();
@@ -192,14 +198,19 @@ enum {
 	TOK_NL				,
 	TOK_DIR_CONTINUE	,
 	TOK_DIR_FOREACH		,
-	TOK_ARRAY1		,	// 70
+	TOK_DIR_TYPE		,
+	TOK_ARRAY1		,	// 71
 	TOK_ARRAY2		,
-	TOK_ARRAY3		,
+	TOK_ARRAY_L1	,
+	TOK_ARRAY_L2	,
 	TOK_ASSIGNENV	,
 	TOK_ASSIGNOPT	,
-	TOK_START,			/* 75 <@ */
 	TOK_END,			/* @> */
-	TOK_OTHER,
+	TOK_DEFINE_TYPE,	// 77
+	TOK_ASSIGN_TYPE,	// 78
+	TOK_TYPE_ELEMENT,	// 79
+	TOK_DOT,
+	TOK_OTHER			// 81
 };
 
 

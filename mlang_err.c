@@ -73,6 +73,9 @@ char * tok_info2(tok_struct *tok)
 #define	SYNTAX_DEBUG1	0
 
 #if	SYNTAX_DEBUG1	/* if debugging  */
+
+#define TDSERR(description) char *Tds=description;MESG("#%*s",stage_level,Tds);
+
 // Return with message
 #define RT_MESG { \
 		if(err_num>0) mesg_out(" >[%s][%d] end with error %d position %d line %d",Tds,tok->tnum,err_num,xpos,tok->tline);\
@@ -87,24 +90,25 @@ char * tok_info2(tok_struct *tok)
 
 #else	/* No debugging macros  */
 
+#define TDSERR(description) {}
+
 // Return with message
 #define RT_MESG { \
-	stage_level--;return(err_num);\
+	;return(err_num);\
 }
 
 #define RT_MESG1(pos) { \
-	stage_level--;return(err_num);\
+	;return(err_num);\
 }
 
 #endif
 
 
-#define SHOW_STAGE(pos)	{ stage_level++;show_type='#';CHECK_TOK(pos);}
+#define SHOW_STAGE(pos)	{ show_type='#';CHECK_TOK(pos);}
 
 #if	1
 #define	CHECK_TOK(pos) { xpos=pos ;}
 #define	NTOKEN_ERR(xxx)	{ tok++;show_type=';';CHECK_TOK(xxx);}
-#define TDSERR(description) {} 
 #else
 
 #define	CHECK_TOK(pos) { xpos=pos;\
@@ -121,7 +125,6 @@ char * tok_info2(tok_struct *tok)
 
 #define	NTOKEN_ERR(xxx)	{ tok++;show_type=';';CHECK_TOK(xxx);}
 
-#define TDSERR(description) char *Tds=description;
 #endif
 
 
@@ -141,15 +144,14 @@ int check_skip_token1( int type)
 
 int check_skip_token_err1(int type,char *mesg,int err)
 {
+	// MESG("	check_skip_token_err: (%s)",tok_info(tok));
  	if(tok->ttype==type) 
- 	{ 
+ 	{
+		// MESG("	check_skip_token_err: %s type=%d",tok->tname,tok->ttype);
 		NTOKEN2;
  		return(0);
  	} else {
 		syntax_error(mesg,err);
-		// ERROR("err %d [%s] token wrong type %d != %d",err,mesg,type,tok->ttype);
-		// err_str=mesg;
-		// err_num=err;
 	};
 
   return(err_num);
@@ -164,27 +166,31 @@ void error_skip_token(int index,char *description)
 
 void set_error(tok_struct *tok,int err,char *description)
 {
- is_break1=1;
+ set_break();
+
  if(tok==NULL) {
+ 	fprintf(stderr,"error: tok is NULL, %d %s\n",err,description);
 	err_num=err;
 	err_str=description;
 	return;
  };
+ // MESG("set_error:----------------");
  err_line=tok->tline;
  err_num=err;
  // MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
  err_str=strdup(description);
+#if	1
  if(execmd) {
 	if(tok->tname==NULL) fprintf(stderr,"Error:%d tnum=%d ttype=%d %s line %d\n",err,tok->tnum,tok->ttype,err_str,err_line);
  	else fprintf(stderr,"Error:%d [%s] tnum=%d ttype=%d %s line %d\n",err,(char *)tok->tname,tok->tnum,tok->ttype,err_str,err_line);
  };
- current_active_flag=0;
+#endif
+ tok=cbfp->end_token;
+ if(tok==NULL) return;
  tok->ttype=TOK_EOF;
- // tok->directive=factor_eof;
  set_tok_directive(tok,factor_eof);
  tok->tgroup=TOK_EOF;
- // NTOKEN2;
- // tok->ttype=TOK_END;
+ tok->ttype=TOK_END;
 }
 
 void syntax_error(char *description,int err)
@@ -196,14 +202,13 @@ void syntax_error(char *description,int err)
 int	err_eval_fun1(tok_struct *tok0)
 {
 	TDSERR("eval_fun1");
-	
 	int ia;
 	int ia0;
 	int f_entry;
-	BTNODE 	*var_node = tok0->tnode;
+	BTNODE 	*var_node = tok0->tok_node;
 	int fnum = var_node->node_index;
-
 	ia0=m_functions[fnum].f_args;
+	// MESG("err_eval_fun1: <<  args=%d",ia0);
 	// MESG("err_eval_fun1: [%s] args=%d tnum=%d ttype=%d",m_functions[fnum].f_name,ia,tok->tnum,tok->ttype);
 
 	f_entry=entry_mode;
@@ -213,23 +218,72 @@ int	err_eval_fun1(tok_struct *tok0)
 
 	ia=0;
 	while(1){
-		// MESG("function arg tnum=%d ttype=%d %d",tok->tnum,tok->ttype,ia);
+		// MESG("function arg tnum=%d ttype=%d ia=%d",tok->tnum,tok->ttype,ia);
 		if(tok->ttype==TOK_RPAR||tok->ttype==TOK_SEP) break;
 		if(tok->ttype==TOK_COMMA) NTOKEN_ERR(403);
 		ia++;
 		err_num=err_num_expression();
-	}
-	if(ia0>=0) {
-		if(ia0!=ia) syntax_error("function arguments error",4031);
+	};
+
+	// Check for correct number of args, this sould not happen!
+	if(ia0>=0 && ia0!=ia) {
+		MESG("Error in number of args: %d != %d",ia0,ia);
+		syntax_error("function arguments error",4031);
 		return(err_num);
 	};
+
+	if(tok->ttype==TOK_RPAR) {
+		// MESG("err_eval_fun1: skip RPAR!!");
+		NTOKEN_ERR(404);
+	};
 	tok0->number_of_args=ia;
-	// MESG("function args are %d",ia);
 
 	entry_mode=f_entry;
-	// MESG("now evaluate it!");
-	/* and now evaluate it! */
+	// MESG("err_eval_fun1: END >> args=%d %d",ia0,ia);
 	RT_MESG1(408);
+}
+
+int err_skip_type_args(tok_struct *tok0)
+{
+ int stat=0;
+ BTNODE *nod0=tok0->tok_node;
+ BTREE *nb = (BTREE *)nod0->node_dat;
+ int args0=nb->items;
+ // MESG("err_skip_type_args: items=%d",args0);
+ // MESG("	items=%d",args0);
+ if(tok->ttype==TOK_LBRAKET) {
+ 	// MESG("	skip index");
+	NTOKEN_ERR(661);
+	stat=err_cexpression();
+	NTOKEN_ERR(662);
+ };
+ if(tok->ttype==TOK_LPAR) {
+ 	// MESG("	there is an LPAR type=%d name=%s",tok->ttype,tok->tname);
+	int nargs=0;
+	int rows=0;
+
+	while(tok->ttype!=TOK_RPAR){
+		// MESG("-- start of loop [%s]",tok->tname);
+		nargs++;
+		if(nargs>args0) {
+			// MESG("	?? nargs?args0 %d>%d",nargs,args0);
+			return 661;
+		};
+		// MESG("	nargs=%d type=%d name=[%s]",nargs,tok->ttype,tok->tname);
+		if(tok->ttype!=TOK_COMMA && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_SEP) { 
+			return 662;
+		};
+		NTOKEN_ERR(668);
+		stat=err_cexpression();
+		// MESG("	next token in loop is [%s] tnum=%d",tok->tname,tok->tnum);
+		if(tok->ttype==TOK_SEP) {
+			rows++;nargs=0;
+		};	
+	};
+	NTOKEN_ERR(670);
+	// MESG("err_skip_type_args: Data definition of [%s] at line %d rows=%d args=%d",tok0->tname,tok0->tline,rows+1,args0);
+ };
+ return stat;
 }
 
 int  err_push_args_1(int *nargs)
@@ -248,8 +302,7 @@ int  err_push_args_1(int *nargs)
 	};
  
  while(1){
-	ex_vtype=VTYPE_NUM;
-	// slval[0]=0;
+	set_vtype(VTYPE_NUM);
 	xpos=412;
 	
 	if(tok->ttype==TOK_RPAR) {
@@ -279,7 +332,6 @@ int  err_push_args_1(int *nargs)
 		*nargs=num_args;
 		xpos=417;
 		set_error(tok,xpos,"after push_args:2");
-//		clear_args(va); 
 		return(err_num);
 	}
  };
@@ -311,11 +363,8 @@ int err_assign_args1(int nargs)
 			break;	/* end of arguments!  */
 		}
 		xpos=423;	/* this should be a var token  */
-#if	1
+
 		err_num_expression();
-#else
-		NTOKEN_ERR(424);	/* skip semicolon or end parenthesis */
-#endif
 		// MESG("err_assign: after lexpression: [%s] %d",tok->tname,tok->ttype);
 		if(tok->ttype==TOK_RPAR)  {
 			break;
@@ -415,7 +464,7 @@ int err_increase_val()
 {
  TDSERR("increase_val");
  SHOW_STAGE(444);
- if(ex_vtype!=VTYPE_NUM) {
+ if(!vtype_is(VTYPE_NUM)) {
 	set_error(tok,444,"increase_val not numeric!");
 	NTOKEN_ERR(444);
 	return(444);
@@ -428,7 +477,7 @@ int err_decrease_val()
 {
  TDSERR("decrease_val");
  SHOW_STAGE(446);
- if(ex_vtype!=VTYPE_NUM) {
+ if(!vtype_is(VTYPE_NUM)) {
 	set_error(tok,446,"decrease_val not numeric!");
 	NTOKEN_ERR(446);
 	return(446);
@@ -454,7 +503,9 @@ int err_assign_env()
 int err_exec_function(char *name,int nargs,FILEBUF **bf)
 {
  TDSERR("exec_function");
+#if	DEBUG1
  int save_stage_level=stage_level;
+#endif
  	// MESG("err_exec_funtion: %s",name);
     FILEBUF *bp;		/* ptr to buffer to execute */
     char bufn[MAXFLEN+2];		/* name of buffer to execute */
@@ -492,9 +543,9 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 		ERROR("found syntax errors in function!");
 		RT_MESG1(464);
 	};
-
+#if	DEBUG1
 	stage_level=save_stage_level;
-	
+#endif
 	CHECK_TOK(465);
 	tok=bp->tok_table;
 	err_num=err_assign_args1(nargs);
@@ -511,10 +562,11 @@ int err_factor()
  static int pre_symbol=0;
  TDSERR("factor");
  // MESG("# err_factor: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
+ // MESG("# err_factor: %s",tok_info(tok));
  int save_macro_exec;
  tok_struct *tok0; 
 
- ex_vtype=VTYPE_NUM;
+ set_vtype(VTYPE_NUM);
  ex_edenv=0;
 
  SHOW_STAGE(470);
@@ -525,8 +577,7 @@ int err_factor()
 		pre_symbol++;
  };
  NTOKEN_ERR(473);
- // MESG("set factor function:");
- // MESG("	err_factor: [%s]",tok_info(tok0));
+ // MESG("	>> : next tok (%s)",tok_info(tok));
  if(tok0->ttype > TOK_OTHER) {
  	// MESG("unknown token type %d line %d %d",tok0->ttype,tok0->tline,last_correct_line);
 	err_num=4730;
@@ -536,14 +587,17 @@ int err_factor()
  // MESG("switch: tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
  switch(tok0->ttype) {
 	/*  the following ends factor  */
+#if	1
  	case TOK_SEP:
-		xpos=476;syntax_error("separator in factor!",xpos);
+		xpos=476;
+		// syntax_error("separator in factor!",xpos);
 		RT_MESG1(xpos);
+#endif
 	case TOK_SHOW:
 		// xpos=477;syntax_error(": in factor",xpos);
 		RT_MESG1(xpos);
 	case TOK_LBRAKET:{	/* array definition  */
-		// MESG("err: TOK_LBRAKET, array definition");
+		// MESG("err: TOK_LBRAKET, array definition for [%s]",tok0->tname);
 		pre_symbol=0;
 		int i=0,j=0;
 		int cdim=0;
@@ -553,15 +607,21 @@ int err_factor()
 		ex_array=NULL;
 		while(cdim>0){
 		while(1) {
+			// MESG("	err: lbra: type=%d [%s] %f",tok->ttype,tok->tname,tok->dval);
 			if(tok->ttype==TOK_EOF||tok->ttype==TOK_SHOW) {
 				xpos=4777;
 				syntax_error(" FAC1_err: No closing braket",xpos);
 				RT_MESG1(xpos);
 			};
-			if(tok->ttype==TOK_SEP) {
-				// MESG("	new row");
+			if(tok->ttype==TOK_SEP || tok->ttype==TOK_COMMA) {
+				// MESG("	tok_sep [%s]",tok->tname);
 				NTOKEN2;
 				continue;
+			};
+			if(tok->ttype!=TOK_NUM && tok->ttype!=TOK_VAR && tok->ttype!=TOK_MINUS && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_PLUS && tok->ttype!=TOK_QUOTE) {
+				xpos=4778;
+				syntax_error(" wrong separator in table definition!",xpos);
+				RT_MESG1(xpos);
 			};
 			err_num=err_num_expression();
 			// MESG("	ex_value=%f err_num=%d",ex_value,err_num);
@@ -571,10 +631,10 @@ int err_factor()
 				// MESG("	tok_rbraket: end definition");
 				cdim=0;break;
 			};
-			if(tok->ttype==TOK_SEP ||tok->ttype==TOK_COMMA) {	/* Add tok->ttype==TOK_COMMA for using comma to separate array items  */
+			if(tok->ttype==TOK_SEP) {	/* Add tok->ttype==TOK_COMMA for using comma to separate array items  */
 				i=0;j++;
 				cdim++;if(cdim>rows) rows=cdim;
-				// MESG("	new row2");
+				// MESG("		new row2");
 				NTOKEN2;
 				continue;
 			};
@@ -583,12 +643,12 @@ int err_factor()
 		};
 		// MESG("set array dat! [%s] rows=%d cols=%d",tok0->tname,rows,cols);
 		// set array dat
-		if(tok0->adat) {
-			free(tok0->adat);
+		if(tok0->tok_adat) {	/* this should never hapen!  */
+			// MESG("err_lb: free array!");
+			free(tok0->tok_adat);
 		};
-		tok0->adat = new_array(rows,cols);
-		// MESG("	array type is %d ?= %d",tok0->ttype,TOK_ARRAY2);
-		// set end
+		tok0->tok_adat = new_array(rows,cols);
+		// MESG("	err: CREATED new array %d [%d %d]",tok0->tok_adat->anum,rows,cols);
 		NTOKEN_ERR(4789)
 		RT_MESG1(4789);
 		};
@@ -599,38 +659,100 @@ int err_factor()
 		RT_MESG1(480);
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
+		// MESG("TOK_VAR: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
 		pre_symbol=0;
 		ex_nvars++;
 		if(tok->ttype==TOK_INCREASE) {
 			tok->dval=1;
-			tok->tgroup=TOK_INCREASE;
+			// tok->tgroup=TOK_TERM2;
+			set_tok_function(tok,0);
 			NTOKEN_ERR(498);
 		} else
 		if(tok->ttype==TOK_DECREASE) {
-			tok->tgroup=TOK_INCREASE;
+			// tok->tgroup=TOK_TERM2;
+			tok->dval=-1;
+			set_tok_function(tok,0);
+			NTOKEN_ERR(498);
+		};
+#if	1
+		if(tok->ttype==TOK_TYPE_ELEMENT) {
+			// MESG("err tok_type_element: %s",tok->tname);
+			set_tok_function(tok,0);
 			tok->dval=-1;
 			NTOKEN_ERR(498);
 		};
+#endif
+		// MESG("	TOK_VAR: return [%s]",tok_info(tok));
 		RT_MESG1(493);}
+	case TOK_ARRAY_L2:{
+		// MESG("TOK_ARRAY_L2:");
+		err_num=err_num_expression(); 
+		if(!check_skip_token_err1(TOK_RBRAKET,"array error",xpos)){
+			// MESG("	RBRAKET found!");
+		} else {
+			MESG("	No rbracket found!");
+		};
+		NTOKEN_ERR(444);
+		if(tok->ttype==TOK_INCREASE) {
+			// MESG("	found TOK_INCREASE");
+			tok->dval=1;
+			set_tok_function(tok,0);
+			tok->tgroup=0;
+			NTOKEN_ERR(498);
+		} else
+		if(tok->ttype==TOK_DECREASE) {
+			tok->dval=-1;
+			set_tok_function(tok,0);
+			tok->tgroup=0;
+			NTOKEN_ERR(498);
+		};
+		RT_MESG1(4441);		
+	};
+	case TOK_ARRAY_L1:{	// 0 variable
+		// MESG("TOK_ARRAY_L1: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
+		pre_symbol=0;
+		ex_nvars++;
+		NTOKEN_ERR(499);
+		};
+		if(tok->ttype==TOK_INCREASE) {
+			tok->dval=1;
+			// tok->tgroup=TOK_TERM2;
+			set_tok_function(tok,0);
+			NTOKEN_ERR(498);
+		} else
+		if(tok->ttype==TOK_DECREASE) {
+			// tok->tgroup=TOK_TERM2;
+			tok->dval=-1;
+			set_tok_function(tok,0);
+			NTOKEN_ERR(498);
+		};
+		RT_MESG1(494);
+
+	// case TOK_INCREASE:
 	case TOK_ARRAY1:{
 		// MESG("	err use of tok_array1 [%s]",tok_info(tok0));
-		// err_num=err_factor();
 		err_num=err_num_expression(); 
-		// MESG("	err tok_array1: after tok=%d",tok->ttype);
+		// MESG("	err tok_array1: after [%s]",tok_info(tok));
 		xpos=499;
-		check_skip_token_err1(TOK_RBRAKET,"array error",xpos);
-		// NTOKEN_ERR(499);
-		tok_struct *save_tok = tok;
-		// check for second index
-		err_num=err_num_expression();
-		if(tok->ttype==TOK_RBRAKET) {
-			tok0->ttype=TOK_ARRAY2;
-			tok0->factor_function=factor_array2;
-			// MESG("	set 2 dimensional array!!!!!!!!");
-			NTOKEN_ERR(500);
+		if(!check_skip_token_err1(TOK_RBRAKET,"array error",xpos)){
+			// MESG("	RBRAKET found!");
 		} else {
-			tok = save_tok;
+			MESG("	No rbracket found!");
 		};
+		if(tok->ttype==TOK_INCREASE) {
+			// MESG("	err TOK_INCREASE: %s",tok_info(tok));
+			tok->dval=1;
+			// tok->tgroup=TOK_TERM2;
+			set_tok_function(tok,0);
+			NTOKEN_ERR(498);
+		} else
+		if(tok->ttype==TOK_DECREASE) {
+			// tok->tgroup=TOK_TERM2;
+			tok->dval=-1;
+			set_tok_function(tok,0);
+			NTOKEN_ERR(498);
+		};
+
 		RT_MESG1(4931);
 		};
 #if	0
@@ -666,13 +788,21 @@ int err_factor()
 			err_num = err_lexpression();
 			CHECK_TOK(484);
 			if(tok->ttype==TOK_LBRAKET) {
-				// MESG("	err_tok_lpar: we have a left braket, continue!");
+				MESG("	(((((( err_tok_lpar: we have a left braket, continue!");
 				RT_MESG;
 			};
+#if	0
+			if(tok->ttype ==TOK_LPAR) {
+				NTOKEN_ERR(1841);
+				RT_MESG;
+			};
+#endif
 			if(tok->ttype !=TOK_RPAR) {
-				xpos=485;
-				// MESG("ttype=%d",tok->ttype);
-				syntax_error(" FAC1_err: No closing parenthesis",xpos);
+				xpos=4850;
+				MESG(" +++++++++++  %s: %d -> %d type=%d",tok->tname,tok->tnum,tok->tnum,tok->ttype);
+
+				set_error(tok0,xpos,"FAC1_err: No closing parenthesis");
+				// syntax_error(" FAC1_err: No closing parenthesis",xpos);
 				RT_MESG1(485);
 			} else { 
 				pnum--;
@@ -689,13 +819,13 @@ int err_factor()
 	case TOK_QUOTE:	 { // string 
 		xpos=488;
 		if(pre_symbol) { syntax_error("symbol before string",xpos);RT_MESG1(4881);};
-		ex_vtype=VTYPE_STRING;
+		set_vtype(VTYPE_STRING);
 		ex_nquote++;
 		RT_MESG1(4882);
 	 	};
 	case TOK_AT: {
 		xpos=489;
-		ex_vtype=VTYPE_NUM;
+		set_vtype(VTYPE_NUM);
 		RT_MESG1(4891);
 		};
 	case TOK_MINUS:
@@ -718,32 +848,28 @@ int err_factor()
 		/* variable's name in tok0->tname */
 		xpos=494;
 		ex_nvars++;
-		var_node=tok0->tnode;
+		var_node=tok0->tok_node;
 
 		ex_edenv=0;
+#if	1
+		set_vtype(var_node->node_vtype);
+#else
 		if(var_node->sval!=NULL) { /* there is a valid string value CHECK !!*/
-			ex_vtype=VTYPE_STRING;
-		} else ex_vtype=VTYPE_NUM;
+			set_vtype(VTYPE_STRING);
+		} else set_vtype(VTYPE_NUM);
+#endif
 		pre_symbol=0;
 		RT_MESG1(xpos);
 	case TOK_ENV:	// 1 editor env var
 		/* variable's name in tok0->tname */
-		var_node=tok0->tnode;
+		var_node=tok0->tok_node;
 		pre_symbol=0;
 		ex_nvars++;
 		RT_MESG1(495);
 	case TOK_FUNC:	// 2 editor function 
 		/* variable's name in tok0->tname */
 		pre_symbol=0;
-#if	1
 		err_num=err_eval_fun1(tok0);
-#else
-		var_node=tok0->tnode;
-		CHECK_TOK(496);
-		MESG("err_TOK_FUNC ind=%d tnum=%d ttype=%d",var_node->node_index,tok->tnum,tok->ttype);
-// 		tok0->factor_function = m_functions[var_node->node_index].ffunction;
-		err_num= err_eval_fun1(var_node->node_index);
-#endif
 		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)
 		int nargs=0;
@@ -759,7 +885,7 @@ int err_factor()
 		err_num = err_push_args_1(&nargs);
 		if(err_num) return(err_num);
 		// MESG("err TOK_PROC: args=%d",nargs);
-		tok0->tind=nargs;
+		tok0->t_nargs=nargs;
 		CHECK_TOK(503);
 		after_proc=tok;
 		// MESG("err TOK_PROC: set after_proc [%s] ttype=%d",tok->tname,tok->ttype);
@@ -785,7 +911,7 @@ int err_factor()
 
 		/* variable's name in tok0->tname */
 		xpos=506;
-		var_node=tok0->tnode;
+		var_node=tok0->tok_node;
 		var_index = var_node->node_index;
 		// MESG("err: TOK_CMD");
 		pre_symbol=0;
@@ -880,20 +1006,40 @@ int err_factor()
 		RT_MESG1(524);
 	};
 	case TOK_DIR_ELSE:
+#if	0
 		xpos=526;
 		set_error(tok,xpos,"else without if error");
+#endif
 		RT_MESG1(5261);
 	case TOK_RBRAKET:
+		// MESG("tok_rbtacket");
 		RT_MESG1(5262);
 	case TOK_ASSIGN:
+		// MESG("TOK_ASSIGN");
 	case TOK_INCREASEBY:
 	case TOK_MULBY:
 	case TOK_DECREASEBY:
 		tok0->tname="assign";
 		RT_MESG1(527);
+	case TOK_ASSIGN_TYPE:{
+		// MESG("TOK_ASSIGN_TYPE: tok0 [%s] tnum=%d ttype=%d",tok0->tname,tok0->tnum,tok0->ttype);
+		// MESG("	tok [%s] tnum %d ttype %d",tok->tname,tok->tnum,tok->ttype);
+		if(err_skip_type_args(tok0)) {
+			set_error(tok0,2000,"TOK_ASSIGN_TYPE: error in argument list");
+		};
+		// MESG("	TOK_ASSIGN_TYPE: end tnum=%d",tok->tnum);
+		RT_MESG1(528);
+		};
+#if	1
+	case TOK_TYPE_ELEMENT:
+		// MESG("TOK_TYPE_ELEMENT: [%s]",tok0->tname);
+		tok0->tgroup=TOK_TERM2;
+		RT_MESG1(529);
+#endif
 	default:
 		xpos=527;
-		// MESG(" default: error_factor: %s",tok_info(tok));
+		MESG(" default: error_factor0: %s tind=%d ttype=%d TOK_VAR=%d",tok_info(tok0),tok0->tind,tok0->ttype,TOK_VAR);
+		MESG(" default: error_factor : %s",tok_info(tok));
 		set_error(tok,3000+tok->ttype,"factor :wrong character found:");
 		RT_MESG1(5271);
  }
@@ -948,7 +1094,7 @@ int err_num_expression()
  TDSERR("num_expression");
  int expression_type=VTYPE_NUM;
 
- ex_vtype=VTYPE_NUM;
+ set_vtype(VTYPE_NUM);
  // slval[0]=0;
  xpos=561;
 
@@ -956,7 +1102,7 @@ int err_num_expression()
  err_num = err_num_term1();
  if(err_num) return(err_num);
 
- expression_type=ex_vtype;	// set local value
+ expression_type=get_vtype();	// set local value
 
  while (tok->tgroup==TOK_TERM) {
    CHECK_TOK(563);
@@ -970,9 +1116,10 @@ int err_num_expression()
 		simple=0;
 		/* check validity of operation combinations   */
 		if(expression_type==VTYPE_STRING) { /* catanate string */
-			if(ex_vtype) {
+			if(get_vtype()) {
 			} else {
-				expression_type=ex_vtype=VTYPE_STRING;
+				set_vtype(VTYPE_STRING);
+				expression_type=get_vtype();
 			}
 		} else {
 		}
@@ -1163,23 +1310,33 @@ int err_check_sentence1()
 	case TOK_DIR_IF:
 		{
 		tok_struct *tok0=tok;
+		// MESG("err: TOK_DIR_IF!");
 		set_tok_directive(tok,tok_dir_if);
 		NTOKEN_ERR(631);	/* go to next token after if */
 		xpos=632;
 
 		err_num=err_lexpression();
+		// MESG("err: TOK_DIR_IF! after lexpr");
 		CHECK_TOK(633);
-		if(err_num) return err_num;
+		if(err_num) { 
+			// MESG("err: TOK_DIR_IF! error!!");
+			return err_num;
+		};
+		// MESG("err: TOK_DIR_IF! check rpar! of %d",tok->tnum);
 		check_skip_token_err1(TOK_RPAR,"tok_dir_if",xpos);
 		CHECK_TOK(634);
 //		if(tok->ttype==TOK_LCURL) is_block=1; 
 		err_num=err_check_sentence1();	/* body of if  */
+		// MESG("	after body of if [%s]",tok_info(tok));
+		// check_skip_token1(TOK_RPAR);	/* ???????????  */
+		// NTOKEN_ERR(635);	/* go after sentence  */
 		CHECK_TOK(635);
 		tok0->next_tok=tok;
 		// MUST: No separator before else, handle this in parser !!!!! CHECK
 		// check for else statement!
-
+		
 		if(tok->ttype==TOK_DIR_ELSE) {
+			// MESG("we have an else statement!");
 			tok0=tok;
 			NTOKEN2;
 			err_num=err_check_sentence1();	/* body of else  */
@@ -1308,10 +1465,18 @@ int err_check_sentence1()
 		if(tok->ttype!=TOK_SEP&&tok->ttype!=TOK_RPAR) 	
 			err_num=err_lexpression();
 		check_skip_token1(TOK_RPAR);
-		// MESG(" err TOK_FIR_RETURN: after lexpression: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype); 
+		// MESG(" err TOK_DIR_RETURN: after lexpression: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype); 
 		RT_MESG1(666);
 	case TOK_SEP:
 		RT_MESG;
+	case TOK_DIR_TYPE:
+		{
+		// tok_struct *tok0=tok;
+		set_tok_directive(tok,tok_dir_type);
+		// MESG("--> err: TOK_DIR_TYPE: %s",tok->tname);
+		NTOKEN_ERR(671);	// this is the type name
+		xpos=632;
+	};break;
 	default:
 		CHECK_TOK(623);
 		err_num=err_lexpression();
@@ -1325,10 +1490,13 @@ int err_check_block1()
  TDSERR("block");
    SHOW_STAGE(671);
    // MESG("err_check_block1: --------------------------------");
+   // MESG("   num: name          ttype tind");
    while(1) {
 	CHECK_TOK(672);
+	// MESG(" - %3d: %-15s %3d %3d",tok->tnum,tok->tname,tok->ttype,tok->tind);
 	switch(tok->ttype) {
 		case TOK_EOF: 
+			// MESG(">>>>>>>>>>>>>>> end error_check!");
 			RT_MESG1(673);
 		case TOK_SEP:
 		case TOK_COMMA:
@@ -1345,7 +1513,6 @@ int err_check_block1()
  	err_num=err_check_sentence1();
 	if(err_num) return(err_num);
    };
-
  xpos=692;syntax_error("Null in block",xpos);
  RT_MESG1(6921);
 }

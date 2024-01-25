@@ -48,7 +48,7 @@ int new_in_key_list=0;
 
 void init_lists()
 {
- // MESG("init_lists:");
+ // fprintf(stderr,"init_lists: size of struct list=%ld\n",sizeof(struct alist));
  file_list=new_list(0,"file_list");
  window_list=new_list(0,"window_list");
  var_list=new_list(0,"var_list");
@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 	if(lc_lang==NULL) lc_lang=getenv("LANG");
 	else if(lc_lang[0]==0) lc_lang=getenv("LANG");
 	errno=0;
-
+	// printf("size of tok_struct is %ld %ld\n",sizeof(struct tok_struct),sizeof(short));exit(1);
 	init_hash();
 	discmd = FALSE;
 	init_lists();
@@ -285,6 +285,8 @@ void parse_command_line(int argc, char **argv)
 					drv_max_colors=8;
 					break;
 #endif
+				case 'd':
+					show_no_time=1;
 				case 'D':
 					set_debug(1);
 					break;
@@ -293,15 +295,15 @@ void parse_command_line(int argc, char **argv)
 					break;
 				case 't':
 					show_tokens=1;
-					MESG("show_tokens!");
+					// MESG("show_tokens!");
 				case 'x':	/* execute file and quit */
 					execmd=1;
 				case 'X':	/* execute file as statrup */
 					carg++;
 					startfile=argv[carg];
 					if(execmd) 
-					{	/* initialize array  */
-						// MESG("initialize array starting at %d",carg);
+					{	/* initialize arument list array  */
+						// MESG("initialize argument array starting at %d",carg);
 						main_args = new_list_array(argc-carg-1);
 						allocate_array(main_args);
 						a_arg=0;
@@ -328,7 +330,7 @@ void parse_command_line(int argc, char **argv)
 					break;
 #endif
 				case 'p':
-					set_btval("reset_position",-1,NULL,1);
+					set_bt_num_val("reset_position",1);
 					break;
 #if	RSESSION
 				case 'r':

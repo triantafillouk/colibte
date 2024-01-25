@@ -128,7 +128,7 @@ test=1
 found=0
 while(test)
 {
- test = search_forward(":")
+ test = search_forward(": ")
  if(test)
  {
 #	print(_text)	
@@ -142,6 +142,7 @@ while(test)
 	break
  }
 }
+ test = search_forward("AbraCatabra")
  goto_line(line1)
 
 }

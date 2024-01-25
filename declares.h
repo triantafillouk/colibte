@@ -59,6 +59,8 @@ double get_val();
 char *get_sval();
 void set_sval(char *);
 void set_dval(double val);
+void set_vdval(double val);
+void set_vsval(char *s);
 
 double next_value();
 int set_arg(int n);

@@ -148,7 +148,6 @@ void set_error(tok_struct *tok,int index,char *description);
 void init_error();
 
 extern char slval[];
-extern int ex_vtype;
 extern int err_num;
 extern char *err_str;
 
@@ -207,7 +206,7 @@ double get_env(int vnum)
 	char *getkill();
 	static double value=0;
 	char svalue[MAXLLEN];
-	int v1=0;
+	long v1=0;
 	svalue[0]=0;
 
 	/* fetch the appropriate value */
@@ -262,11 +261,8 @@ double get_env(int vnum)
 	};
 	value=v1;
 	if(svalue[0]!=0) { 
-		set_vtype(VTYPE_STRING);
 		set_sval(svalue);	
-		ex_vtype=VTYPE_STRING;
-		// value=next_value();
-	} else ex_vtype=VTYPE_NUM;
+	} else set_vdval(value);
 	return(value);
 }
 
@@ -292,9 +288,13 @@ int set_option(int n)
  for(nv=0;nv<num_options;nv++)
  {
 	btn=find_btnode(bt_table,option_names[nv].name);
+#if	1
+	if(btn->node_vtype==VTYPE_STRING) snprintf(prompt,80,"%-10s:[%-5s]",option_names[nv].name,btn->node_sval);
+	else snprintf(prompt,80,"%-10s:[%d]",option_names[nv].name,(int)btn->node_dval);
+#else
  	if(btn->sval != NULL) snprintf(prompt,80,"%-10s:[%-5s]",option_names[nv].name,btn->sval);
-	else snprintf(prompt,80,"%-10s:[%d]",option_names[nv].name,(int)btn->val);
-	
+	else snprintf(prompt,80,"%-10s:[%d]",option_names[nv].name,(int)btn->node_val);
+#endif
 	utf_string_break(prompt,20);
 	option_list[nv]=strdup(prompt);
  };
@@ -306,10 +306,20 @@ int set_option(int n)
  if(nv>=0) {
 	BTNODE *btn;
 	btn=find_btnode(bt_table,option_names[nv].name);
+#if	1
+	if(btn->node_vtype==VTYPE_STRING) {
+		snprintf(prompt,80,"%s [%s] : ",btn->node_name,btn->node_sval);
+		strlcpy(value,btn->node_sval,MAXSLEN);
+	} else {
+		snprintf(prompt,80,"%s [%d]: ",btn->node_name,(int)btn->node_dval);
+		snprintf(value,MAXSLEN,"%d",(int)btn->node_dval);
+	};
+#else
 	if(btn->sval!=NULL) snprintf(prompt,80,"%s [%s] : ",btn->node_name,btn->sval);
-	else snprintf(prompt,80,"%s [%d]: ",btn->node_name,(int)btn->val);
+	else snprintf(prompt,80,"%s [%d]: ",btn->node_name,(int)btn->node_val);
 	if(btn->sval!=NULL) strlcpy(value,btn->sval,MAXSLEN);
-	else snprintf(value,MAXSLEN,"%d",(int)btn->val);
+	else snprintf(value,MAXSLEN,"%d",(int)btn->node_val);
+#endif
 
 	getstring(prompt,value,MAXSLEN,true);
 	
@@ -343,29 +353,29 @@ int set_option_val(int vnum,char *svalue)
 // MESG("set_option_val: vnum=%d [%s]",vnum,svalue);
 		switch (vnum) {
 		case EMFILLCOL:	{
-			set_btval("fillcol",-1,NULL,v1);
+			set_bt_num_val("fillcol",v1);
 			break;
 			};
-		case EMLMARGIN:	set_btval("lmargin",-1,NULL,v1);break;
+		case EMLMARGIN:	set_bt_num_val("lmargin",v1);break;
 		case EMTABSIZE: 
-			set_btval("tabsize",-1,NULL,v1);
+			set_bt_num_val("tabsize",v1);
 			set_env(EVTABSIZE1,"",v1);
 			break;
-		case EMPRECISION: set_btval("print_precision",-1,NULL,v1);break;
-		case EMSHOWHEX: set_btval("show_hex",-1,NULL,v1);break;
+		case EMPRECISION: set_bt_num_val("print_precision",v1);break;
+		case EMSHOWHEX: set_bt_num_val("show_hex",v1);break;
 		case EMKEYEMUL: {
 			set_key_emulation(v1);
 			break;
 			}
-		case EMBACKUP: set_btval("make_backup",-1,NULL,v1);break;
-		case EMBEDICONS: set_btval("embed_icons",-1,NULL,v1);break;
+		case EMBACKUP: set_bt_num_val("make_backup",v1);break;
+		case EMBEDICONS: set_bt_num_val("embed_icons",v1);break;
 		case EMSHOWPOS: {
-			set_btval("show_position",-1,NULL,v1);
+			set_bt_num_val("show_position",v1);
 			break;
 			};
 		case EMVINFOCOL: {
 			WINDP *wp;
-			set_btval("show_vinfo",-1,NULL,v1);
+			set_bt_num_val("show_vinfo",v1);
 
 			if(v1>0) {
 				lbegin(window_list);
@@ -381,15 +391,15 @@ int set_option_val(int vnum,char *svalue)
 			break;
 			};
 		case EMVLINES: {
-			set_btval("show_vmlines",-1,NULL,v1);
+			set_bt_num_val("show_vmlines",v1);
 			break;
 			};
 		case EMCOFFSET: {
-			set_btval("show_coffset",-1,NULL,v1);
+			set_bt_num_val("show_coffset",v1);
 			break;
 			};
 		case EMCDATA: {
-			set_btval("show_cdata",-1,NULL,v1);
+			set_bt_num_val("show_cdata",v1);
 			break;
 			};
 		case EMCCASE: {
@@ -402,23 +412,23 @@ int set_option_val(int vnum,char *svalue)
 			gmode_reg_exp=v1;
 			};break;
 		 case EMSAVHIST: {
-		 	set_btval("save_history",-1,NULL,v1);
+		 	set_bt_num_val("save_history",v1);
 			break;
 		 };
 		  case EMLARGEICONS: {
-		  	set_btval("large_toolbar_icons",-1,NULL,v1);
+		  	set_bt_num_val("large_toolbar_icons",v1);
 		  	break;
 		  };
 		  case EMSAFEOPS: {
-		  	set_btval("safe_ops",-1,NULL,v1);
+		  	set_bt_num_val("safe_ops",v1);
 		  	break;
 		  };
 		  case EMCOLORSCHEME: {
-		  	set_btval("color_scheme",-1,NULL,v1);
+		  	set_bt_num_val("color_scheme",v1);
 		  	break;
 		  };
 		  case EMXCOLORSCHEME: {
-		  	set_btval("xcolor_scheme",-1,NULL,v1);
+		  	set_bt_num_val("xcolor_scheme",v1);
 		  	break;
 		  };
 		}
@@ -503,7 +513,7 @@ void set_env(int vnum,char *svalue,double value)
 		case EVTABSIZE1:
 			if(value>1) {
 				tabsize=value;
-				set_btval("tabsize",-1,NULL,tabsize);
+				set_bt_num_val("tabsize",tabsize);
 			};
 			break;
 		};
@@ -595,15 +605,17 @@ double compute_string(char *s,char *new_string)
  	init_error();
 	initialize_vars();
 	insert_string(fp,s,strlen(s));
+	MESG("compute_string [%s]",s);
 	fp->b_type=1;
 	value=compute_block(fp,cbfp,0);
+	MESG("compute_string new_string=[%s]",new_string);
 
 	if(new_string) {
 		get_text_offs(fp,new_string,0,FLineEnd(fp,0));
 	};
 
 	delete_filebuf(fp,0);
-//	MESG("compute_string: [%s] result=%f",s,value);
+	MESG("compute_string: [%s] result=%f",s,value);
 	return(value);
 }
 
@@ -726,16 +738,17 @@ int dofile(char *fname)
 	int status;	/* results of various calls */
 	char bname[MAXFLEN];
 	snprintf(bname,MAXFLEN,"[%s]",fname);
-	// MESG("dofile:[%s]",fname);
+	// MESG("# dofile:fname=[%s]",fname);
 	show_stage=0;
 	set_screen_update(false);
 	if((bp=get_filebuf(bname,NULL,0))==NULL) { // file not in memory, load it!
+		// MESG("	bname=[%s]",bname);
 		if ((bp = new_filebuf(bname, 0)) == NULL) /* get the needed buffer */
 			return(FALSE);
 
 	/* and try to read in the file to execute */
 		if(cbfp == NULL) cbfp=bp;
-		// MESG("dofile: 10 %s",fname);
+		// MESG("dofile: 10 %s,%s",fname,bp->b_fname);
 		if ((status = file_read1(bp,fname)) != TRUE) {
 			return(status);
 		};
@@ -753,7 +766,7 @@ int dofile(char *fname)
 	/* go execute it! */
 	int backup_caf=current_active_flag;
 	double d = compute_block(bp,bp,1);
-	set_dval(d);
+	set_vdval(d);
 	current_active_flag=backup_caf;
 	/* if not displayed, remove the now unneeded macro buffer and exit */
 	if (bp->b_nwnd == 0) 
@@ -1218,6 +1231,7 @@ int refresh_current_line(int nused)
  offs tpo;	// current offset
  offs sl,el; // start, end of line
  int dsize=0;
+ int ddot_pos;
  offs i;
  show_stage=0;
 
@@ -1227,16 +1241,23 @@ int refresh_current_line(int nused)
 
 	el=FLineEnd(cbfp,tpo);
 	dsize=el-sl;
+	ddot_pos=dsize;
 	for(i=sl;i<el;i++) {
-		if(CharAt(i)==':') { is_ddot=!(cbfp->b_state & FS_VIEW);break;};
+		if(CharAt(i)==':') {
+			if(CharAt(i+1)==':') { i++;continue;}; 
+			is_ddot=!(cbfp->b_state & FS_VIEW);
+			ddot_pos=i-sl+1;break;};
 	};
-
+	
 	// goto the begining of the line
+	set_Offset(sl+ddot_pos);
+	if(is_ddot) DeleteBlock(0,dsize-ddot_pos);
 	set_Offset(sl);
 	get_text_offs(cbfp,text_line,sl,MAXLLEN);
-
-	if(is_ddot) DeleteBlock(0,dsize);	/* clear the line!  */
-
+	set_Offset(sl);
+	if(is_ddot) DeleteBlock(0,ddot_pos);	/* clear the line!  */
+	set_Offset(sl);
+	// MESG("refresh_current_line:[%s] %d",text_line,ddot_pos);
 	value = compute_string(text_line,text_line);
 
 	if(is_ddot) {
