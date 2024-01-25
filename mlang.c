@@ -3014,7 +3014,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  MVAR *local_symbols;
  MVAR *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
-	MESG("#< [%s . %-15s %s ------------------------------------------------------->",bp->b_dname,bp->b_fname,VERSION);
+	MESG("# [%-15s %s ---------------------------------------------",bp->b_fname,VERSION);
  if(show_tokens) {
 	parse_buffer_show_tokens(1);
 	return(0);	

@@ -271,7 +271,6 @@ int err_skip_type_args(tok_struct *tok0)
 		};
 		// MESG("	nargs=%d type=%d name=[%s]",nargs,tok->ttype,tok->tname);
 		if(tok->ttype!=TOK_COMMA && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_SEP) { 
-			// MESG("	??????? [%s] ttype=%d",tok->tname,tok->ttype);
 			return 662;
 		};
 		NTOKEN_ERR(668);
@@ -279,7 +278,6 @@ int err_skip_type_args(tok_struct *tok0)
 		// MESG("	next token in loop is [%s] tnum=%d",tok->tname,tok->tnum);
 		if(tok->ttype==TOK_SEP) {
 			rows++;nargs=0;
-			// NTOKEN_ERR(669);
 		};	
 	};
 	NTOKEN_ERR(670);
@@ -305,7 +303,6 @@ int  err_push_args_1(int *nargs)
  
  while(1){
 	set_vtype(VTYPE_NUM);
-	// slval[0]=0;
 	xpos=412;
 	
 	if(tok->ttype==TOK_RPAR) {
@@ -335,7 +332,6 @@ int  err_push_args_1(int *nargs)
 		*nargs=num_args;
 		xpos=417;
 		set_error(tok,xpos,"after push_args:2");
-//		clear_args(va); 
 		return(err_num);
 	}
  };
@@ -367,11 +363,8 @@ int err_assign_args1(int nargs)
 			break;	/* end of arguments!  */
 		}
 		xpos=423;	/* this should be a var token  */
-#if	1
+
 		err_num_expression();
-#else
-		NTOKEN_ERR(424);	/* skip semicolon or end parenthesis */
-#endif
 		// MESG("err_assign: after lexpression: [%s] %d",tok->tname,tok->ttype);
 		if(tok->ttype==TOK_RPAR)  {
 			break;
