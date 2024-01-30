@@ -854,7 +854,7 @@ int text_mouse_function(int move)
 		};
 		
 //		if cursor pressed on info column and if in dir/view mode the go left
-		if((cbfp->b_flag & (FSNLIST|FSDIRED))) {
+		if((cbfp->b_flag & (FSNLIST))) {
 			if (mouse_window_col<0) {
 				dir_left(0);
 				update_screen(FALSE);

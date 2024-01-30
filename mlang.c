@@ -2313,6 +2313,11 @@ double num_expression()
  return value;
 }
 
+double expression(char *title)
+{
+	return num_expression();
+}
+
 double logical_or(double value)
 {
  int v2;
