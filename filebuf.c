@@ -441,7 +441,7 @@ int FUtfCharLen(FILEBUF *fp,offs o)
 			ch1=FCharAt(fp,o+2);
 			if(ch1<128 || ch1>0xBF) { clen_error=5;return 1;};	/* not a middle utf char  */
 			clen=3;
-		} else {
+		} else if(ch<0xF8) {
 			char ch2,ch3;
 			ch1=FCharAt(fp,o+1);
 			if(ch1<128 || ch1>0xBF) { clen_error=6;return 1;};	/* not a middle utf char  */
@@ -451,7 +451,10 @@ int FUtfCharLen(FILEBUF *fp,offs o)
 			if(ch3<128 || ch3>0xBF) { clen_error=8;return 1;};	/* not a middle utf char  */
 			clen=4;
 //			MESG("- 4:o=%ld %2X %2X %2X %2X",o,ch,ch1,ch2,ch3);
-		}
+		} else {
+			clen_error=9;
+			return 1;
+		};
 //#if	DARWIN || PCURSES
 		if(clen<3 && !fp->utf_accent /* && drv_type<2 */) {	/* check next char for accent!  */
 		if(!FEofAt(fp,o+clen+1)){
@@ -1288,7 +1291,6 @@ offs  FUtfCharAt(FILEBUF *bf, offs offset, utfchar *uc)
  offs o=offset;
 	ulen=FUtfCharLen(bf,o);
 	memset(uc->uval,0,8);
-//	MESG("o=%ld ulen=%d",o,ulen);
 	for(i=0;i<ulen;i++){
 			uc->uval[i]=FCharAt(bf,o+i);
 	};
@@ -2586,7 +2588,6 @@ num utf_FLineLen(FILEBUF *fp, offs ptr)
 {
  num len=0;
  utfchar uc;
-
  while(!FEolAt(fp,ptr)) {
  	ptr=FUtfCharAt(fp,ptr,&uc);
 	if(clen_error) set_utf8_error(1);
