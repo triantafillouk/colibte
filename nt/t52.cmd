@@ -16,7 +16,7 @@ print("set the new surname!")
 c[1].surname=s2
 print("this must be the new surname! ",c[1].surname)
 c[1].surname:
-s3=c1[1].surname
+s3=c[1].surname
 print("this is copied from new surname ",s3)
 print("end")
 # print(a[22].name)

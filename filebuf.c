@@ -3143,7 +3143,14 @@ int set_view_mode(int n)
 			fp->view_mode = VMINFO;
 			WINDP *wp;
 			int infocols=0;
-			if((int)bt_dval("show_vinfo")) infocols=VMICOLS;
+
+			if((int)bt_dval("show_vinfo")) {
+				infocols=0;
+				set_bt_num_val("show_vinfo",0);
+			} else {
+				infocols=VMICOLS;
+				set_bt_num_val("show_vinfo",1);
+			};
 			lbegin(window_list);
 			while((wp=lget(window_list))!=NULL) {
 					wp->w_infocol = infocols;
@@ -3152,11 +3159,12 @@ int set_view_mode(int n)
 			};
 		}
 		};break;
-	case 8: // Hide lines
+	case 8: // Hide info
 		{
 		if(fp->view_mode & VMHEX) {
 		} else {
 			fp->view_mode = 0;
+			set_bt_num_val("show_vinfo",0);
 			WINDP *wp;
 			lbegin(window_list);
 			while((wp=lget(window_list))!=NULL) {

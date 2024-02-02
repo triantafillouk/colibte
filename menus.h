@@ -439,9 +439,7 @@ M_element e_viewas[] =
 	{0,'M',"as MAC     ","",set_view_mode,(struct MENUS *)4,"MVM"},
 	{0,'L',"show Lines ","",set_view_mode,(struct MENUS *)5,"MVL"},
 	{0,'O',"show Offset","",set_view_mode,(struct MENUS *)6,"MVO"},
-#if	TEST0
 	{0,'I',"show vInfo ","",set_view_mode,(struct MENUS *)7,"MVI"},
-#endif
 	{0,'0',"0 hide info","",set_view_mode,(struct MENUS *)8,"MV0"},
 	{0, 0, NULL,"",NULL,0,NULL}
 };
