@@ -30,7 +30,7 @@ VAR option_names[] = {
 	{"save_history",0,NULL},
 	{"large_toolbar_icons",0,NULL},
 	{"safe_ops",0,NULL},
-
+	{"wrap_mode",0,NULL},
 	{"exact_match",0,NULL},
 	{"mode_over",0,NULL},
 	{"mode_regexp",0,NULL},

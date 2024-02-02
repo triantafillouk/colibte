@@ -71,7 +71,7 @@ void toggle_val(char *name){
 
 int toggle_parameter(int type)
 {
-//  MESG("toggle_parameter: type[%d]=[%s] gmode=%d ",type,option_names[type].name,gmode);
+ MESG("toggle_parameter: type[%d]=[%s] gmode=%d ",type,option_names[type].name,gmode);
   toggle_val(option_names[type].name);
   switch(type) {
   	case EMKEYEMUL:	{

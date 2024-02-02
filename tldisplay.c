@@ -1438,6 +1438,7 @@ void status_line(WINDP *wp)
 			if (wp->w_fp->b_mode & (1 << i)) {
 				*stp++ = modecode[i];n++;
 			};
+		if(wp->w_fp->view_mode & VMWRAP) {*stp++='W';n++;};
 		if(wp->w_fp->bom_type == FTYPE_UTF8BOM) { *stp++ = '8';n++;};
 		if(wp->w_fp->bom_type == FTYPE_UTF16BOM) { 
 			*stp++ = '1';n++;*stp++ = '6';n++;

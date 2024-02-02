@@ -441,6 +441,7 @@ M_element e_viewas[] =
 	{0,'O',"show Offset","",set_view_mode,(struct MENUS *)6,"MVO"},
 	{0,'I',"show vInfo ","",set_view_mode,(struct MENUS *)7,"MVI"},
 	{0,'0',"0 hide info","",set_view_mode,(struct MENUS *)8,"MV0"},
+	{0,'W',"Wrap mode  ","",set_view_mode,(struct MENUS *)9,"VMW"},
 	{0, 0, NULL,"",NULL,0,NULL}
 };
 

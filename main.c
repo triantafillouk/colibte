@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 	if(lc_lang==NULL) lc_lang=getenv("LANG");
 	else if(lc_lang[0]==0) lc_lang=getenv("LANG");
 	errno=0;
-	// printf("size of tok_struct is %ld %ld\n",sizeof(struct tok_struct),sizeof(short));exit(1);
+	// printf("size of filebuf %ld textpoint %ld\n",sizeof(struct FILEBUF),sizeof(struct TextPoint));exit(1);
 	init_hash();
 	discmd = FALSE;
 	init_lists();
@@ -360,9 +360,10 @@ void parse_command_line(int argc, char **argv)
 			/* Process an input file */
 			// MESG("- process %d: %s",carg,argv[carg]);
 			set_bfname(bname,argv[carg]);
-//			MESG("main: new input file: [%s]",bname);
+			// MESG("main: new input file: [%s]",bname);
 			if(mmapflag) bflag |= FSMMAP;
 			bp=new_filebuf(bname,bflag);
+			// MESG("after new_filenbuf: view_mode=%d",bp->view_mode);
 			if(bp) {
 			if (firstbp==NULL) {
 				firstbp = bp;

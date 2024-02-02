@@ -408,9 +408,15 @@ WINDP *dublicate_window(WINDP *wp0)
 		if((int)bt_dval("show_vinfo")){
 			wp->w_infocol = VMICOLS;
 			wp->w_fp->view_mode |= VMINFO;
+			if((int)bt_dval("wrap_mode")) wp->w_fp->view_mode |= VMWRAP;
 			set_update(wp,UPD_ALL);
 		} else {
-			wp->w_infocol = 0;
+			if((int)bt_dval("wrap_mode")) {
+				wp->w_infocol = VMICOLS;
+				wp->w_fp->view_mode = VMWRAP|VMINFO;
+			} else {
+				wp->w_infocol = 0;
+			};
 		};
 		wp->w_flag	= UPD_FULL;
 		wp->w_ppline = 0;

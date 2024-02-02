@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.59T1 (2/02/2024)"
+#define VERSION 	"#01.59T2 (2/02/2024)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -34,6 +34,7 @@
 
 #define	USE_FAST	1 & PCURSES	/* erase line for double width characters in panel_curses  */
 #define TEST_TYPE	1
+#define TWRAP		1	/* wrap mode  */
 
 #define NEW	1	/* new tested code!  */
 
@@ -632,7 +633,6 @@ typedef struct  FILEBUF {
 	char	*buffer;		/* real data! */
 	offs	BufferSize;
 	offs	GapSize;
-	int		EolSize;
 	char	EolStr[3];
 	mode_t	FileMode;
 	time_t	FileTime;
@@ -641,16 +641,46 @@ typedef struct  FILEBUF {
 	struct	dir_l	*rdir;
 	struct	dir_l	*cdir;
 	struct	alist	*dir_list_str;
-	int		sort_mode;
 	int		flen0;					/* Initial line len  */
 	int		file_id;				/* file id while reading  */
-	int		b_nwnd;                 /* Count of windows on buffer   */
 // Flags
+#if	1
+	short int	b_nwnd;                 /* Count of windows on buffer   */
+	short int	EolSize;
+	short int	sort_mode;
+	short int 	bom_type;				/* file bom type or 0 */
+	short int	b_state;
+ 	short int	b_flag;                 /* buffer state Flags           */
+	short int	b_mode;					/* editor mode of this buffer	*/
+	short int	view_mode;				/* view mode */
+	short int		b_type;			/* buffer,file type */
+	short int		scratch_num;	/* scratch number or 0  */
+	short int		dir_num;		/* dir number  */
+	short int b_lang;		/* document language, 0 is UTF  */
+	short int m_mode;		/* parse status flag  */
+	short int utf_accent;	/* current utf char is with an accent!  */
+#if	USE_SLOW_DISPLAY
+	short int slow_display;
+#endif
+#else
+	int		b_nwnd;                 /* Count of windows on buffer   */
+	int		EolSize;
+	int		sort_mode;
 	int 	bom_type;				/* file bom type or 0 */
 	int		b_state;
  	int		b_flag;                 /* buffer state Flags           */
 	char	b_mode;					/* editor mode of this buffer	*/
 	char	view_mode;				/* view mode */
+	int		b_type;			/* buffer,file type */
+	int		scratch_num;	/* scratch number or 0  */
+	int		dir_num;		/* dir number  */
+	int b_lang;		/* document language, 0 is UTF  */
+	int m_mode;		/* parse status flag  */
+	int utf_accent;	/* current utf char is with an accent!  */
+#if	USE_SLOW_DISPLAY
+	int slow_display;
+#endif
+#endif
 	struct  FILEBUF *connect_buffer;
 	num		connect_line;
 	num		connect_column;
@@ -661,19 +691,12 @@ typedef struct  FILEBUF {
 	char	b_key[MAXSLEN];		/* current encrypted key	*/
 #endif
 	char	b_dname[MAXFLEN];	/* directory name */
-	int		b_type;			/* buffer,file type */
-
-	int		scratch_num;	/* scratch number or 0  */
-	int		dir_num;		/* dir number  */
 	struct SHLIGHT *hl;		/* highlight type structure */
 	/* Number of lines must be kept to be able to use correctly the scrollbar */
 	num lines;			/* number of lines in buffer */
 	num bytes_read;
 	num line_from;	/* last change from line  */
 	num line_to;	/* last change to line  */
-	int b_lang;		/* document language, 0 is UTF  */
-	int m_mode;		/* parse status flag  */
-	int utf_accent;	/* current utf char is with an accent!  */
 // Macro language sructures
 	struct tok_struct *tok_table;
 	struct tok_struct *end_token;	/* the last (EOF) token in tok_table  */
@@ -685,9 +708,6 @@ typedef struct  FILEBUF {
 	struct alist *type_list;	/* type table list  */
 #endif
 	MVAR *symbol_table;	/* instance of variables data  */
-#if	USE_SLOW_DISPLAY
-	int slow_display;
-#endif
 //	Notes structures
 #if	TNOTES
 	notes_struct *b_note;
@@ -735,14 +755,13 @@ typedef struct  FILEBUF {
 #define EMMAC		0x008	/* Mac line types  */
 #define	EMCRYPT		0x010	/* crypt mode active */
 
-//#define EMFILTER	0x100	/* filtered buffer  */
-
 /* view mode flags */
 #define	VMHEX		0x001	/* view in hex mode */
 #define VMINP		0x002	/* hex input mode  */
 #define VMLINES		0x004	/* show number lines  */
 #define VMOFFSET	0x008	/* show offset  */
 #define	VMINFO		0x010	/* show info column, experimental */
+#define VMWRAP		0x020	/* wrap line mode  */
 
 #define VMCOLS		8
 #define VMICOLS		1

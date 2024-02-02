@@ -276,6 +276,7 @@ int show_info(int n)
 		if(cbfp->view_mode & VMLINES) strlcat(s,"lines ",width);
 		else if(cbfp->view_mode & VMOFFSET) strlcat(s,"offset ",width);
 		else if(cbfp->view_mode & VMINFO) 	strlcat(s,"info",width);
+		else if(cbfp->view_mode & VMWRAP) 	strlcat(s,"wrap",width);
 		else strlcat(s,"no info",width);
 		sm[i++]=strdup(s);sm[i]=0;
 	};
@@ -1982,7 +1983,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 int ifile(FILEBUF *bf,char *name,int ir_flag)
 {
  int stat;
- // MESG("ifile: [%s] ir_flag=%d",name,ir_flag);
+ // MESG("ifile: [%s] ir_flag=%d view_mode=%d",name,ir_flag,bf->view_mode);
  stat=ifile0(bf,name,ir_flag);
  return(stat);
 }
@@ -3064,7 +3065,7 @@ int set_view_mode(int n)
 {
 	FILEBUF *fp=cbfp;
 	offs offset=FOffset(fp);
-
+	// MESG("set_view_mode: mode %d",n);
    switch (n) {
 	case 1: // Dos mode
 		if ((fp->b_flag & FSDIRED) && !(fp->b_state & FS_VIEW)) break;
@@ -3161,11 +3162,13 @@ int set_view_mode(int n)
 		};break;
 	case 8: // Hide info
 		{
-		if(fp->view_mode & VMHEX) {
+		if(fp->view_mode & VMHEX || fp->view_mode & VMWRAP) {
 		} else {
+			if((int)bt_dval("wrap_mode")) break;
 			fp->view_mode = 0;
 			set_bt_num_val("show_vinfo",0);
 			WINDP *wp;
+			
 			lbegin(window_list);
 			while((wp=lget(window_list))!=NULL) {
 				if(wp->w_fp == fp) {
@@ -3173,6 +3176,33 @@ int set_view_mode(int n)
 				}
 			};
 		}
+		};break;
+	case 9: // Wrap mode
+		{
+		int infocols=0;
+		int mode=0;
+		// MESG("change wrap_mode %d",(int)bt_dval("wrap_mode"));
+		if(fp->view_mode & VMHEX) {
+		} else {
+			if((int)bt_dval("show_vinfo")) {
+				infocols=1;
+				mode=VMINFO;
+			};
+			if((int)bt_dval("wrap_mode")) {
+				set_bt_num_val("wrap_mode",0);
+				mode=mode;
+			} else {
+				infocols=1;
+				set_bt_num_val("wrap_mode",1);
+				mode=mode|VMWRAP;
+			};
+			lbegin(window_list);
+			while((wp=lget(window_list))!=NULL) {
+					wp->w_infocol = infocols;
+					wp->w_fp->view_mode = mode;
+					set_update(wp,UPD_ALL);
+			};
+		};		
 		};break;
    };
 	ResetTextPoints(cbfp,0);
