@@ -93,9 +93,11 @@ int toggle_parameter(int type)
 		if((int)bt_dval("show_vinfo")) {
 			cbfp->view_mode |= VMINFO;
 			cwp->w_infocol = VMICOLS;
+			cbfp->b_infocol = VMICOLS;
 		} else {
 			cbfp->view_mode = 0;
 			cwp->w_infocol = 0;
+			cbfp->b_infocol = 0;
 		};
 		update_buffer_windows(cbfp,UPD_ALL|UPD_MOVE);
 		update_screen(1);

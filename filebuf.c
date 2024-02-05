@@ -1434,7 +1434,7 @@ num physical_column(num vcol)
 	}
 	else {
 #if	1
-			physical_column = vcol - cwp->w_lcol + cwp->w_infocol;
+		physical_column = vcol - cwp->w_lcol + cwp->w_infocol;
 #else
 		if(cwp->w_infocol>2) {
 			physical_column = vcol - cwp->w_lcol+VMCOLS;
@@ -3065,7 +3065,7 @@ int set_view_mode(int n)
 {
 	FILEBUF *fp=cbfp;
 	offs offset=FOffset(fp);
-	// MESG("set_view_mode: mode %d",n);
+	MESG("set_view_mode: mode %d",n);
    switch (n) {
 	case 1: // Dos mode
 		if ((fp->b_flag & FSDIRED) && !(fp->b_state & FS_VIEW)) break;
@@ -3179,38 +3179,36 @@ int set_view_mode(int n)
 		}
 		};break;
 	case 9: // Wrap mode
-		{
+	  {
 		int infocols=0;
 		int view_mode=0;
-		if (fp->b_flag >= FSNLIST) break;
+		MESG("toggle wrap_mode! b_flag=%d",fp->b_flag);
+		if (fp->b_flag >= FSNLIST || fp->view_mode & (VMHEX|VMINP)) break;
 		// if (fp->b_flag & FSDIRED && !(fp->b_state & FS_VIEW)) break;
-		// MESG("change wrap_mode %d",(int)bt_dval("wrap_mode"));
-		toggle_val("wrap_mode");
-		int v1=(int)bt_dval("wrap_mode");
-		toggle_val("wrap_mode");
-		if(fp->view_mode & VMHEX) {
-		} else {
-			if(v1) {
-				infocols=1;
-				view_mode=VMINFO;
-			};
-			if(v1) {
-				view_mode |= VMWRAP;
-				infocols=1;
-			};
-			lbegin(window_list);
-			while((wp=lget(window_list))!=NULL) {
-				if(wp->w_fp->view_mode!=VMHEX
-				 && wp->w_fp->view_mode!=VMINP 
-				 && wp->w_fp == fp) {
-					wp->w_infocol = infocols;
-					wp->w_fp->b_infocol = infocols;
-					wp->w_fp->view_mode = view_mode;
-					set_update(wp,UPD_ALL);
-				}
-			};
-		};		
-		};break;
+		MESG("change wrap_mode, current is 0x%X",fp->view_mode);
+		int v1=fp->view_mode & VMWRAP;
+
+		if(v1) fp->view_mode &= ~VMWRAP;
+		else fp->view_mode |= VMWRAP;
+		MESG("change view_mode new is  0x%X",fp->view_mode);
+		
+		if(v1) { MESG("reset wrap_mode");
+			fp->b_infocol=0;
+			view_mode=VMINFO;
+		} else 
+		{ MESG("set wrap_mode");
+			view_mode |= VMWRAP;
+			fp->b_infocol=1;
+		};
+		lbegin(window_list);
+		while((wp=lget(window_list))!=NULL) {
+			if(wp->w_fp == fp) {
+				wp->w_infocol = fp->b_infocol;
+				wp->w_fp->view_mode = view_mode;
+				set_update(wp,UPD_ALL);
+			}
+		};
+	  };break;
    };
 	ResetTextPoints(cbfp,0);
 	set_Offset(offset);

@@ -405,18 +405,18 @@ WINDP *dublicate_window(WINDP *wp0)
 		wp->w_lcol=0;
 		wp->w_plcol=0;
 
-		if((int)bt_dval("show_vinfo")){
+		if(wp->w_fp->view_mode & VMWRAP)
+		{
+			wp->w_infocol = wp->w_fp->b_infocol;
+			wp->w_fp->view_mode = VMWRAP|VMINFO;
+		} else 
+		if(wp->w_fp->view_mode & VMINFO)
+		{
 			wp->w_infocol = VMICOLS;
 			wp->w_fp->view_mode |= VMINFO;
-			if((int)bt_dval("wrap_mode")) wp->w_fp->view_mode |= VMWRAP;
 			set_update(wp,UPD_ALL);
 		} else {
-			if((int)bt_dval("wrap_mode")) {
-				wp->w_infocol = VMICOLS;
-				wp->w_fp->view_mode = VMWRAP|VMINFO;
-			} else {
 				wp->w_infocol = 0;
-			};
 		};
 		wp->w_flag	= UPD_FULL;
 		wp->w_ppline = 0;

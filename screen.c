@@ -2177,13 +2177,13 @@ int update_screen(int force)
 	lbegin(window_list);
 	while((wp=(WINDP *)lget(window_list))!=NULL)
 	{
-		if((int)bt_dval("wrap_mode") 
+		// if((int)bt_dval("wrap_mode")
+		if(wp->w_fp->view_mode & VMWRAP 
 			&& !(wp->w_fp->b_flag & FSNLIST)
 			&& !(wp->w_fp->b_flag & FSNOTES)
 			&& !(wp->w_fp->b_flag & FSNOTESN)
 			&& !(wp->w_fp->view_mode & VMHEX)
 		) 
-
 			update_window_wrap(wp,force);
 		else update_window_nowrap(wp,force);
 	};

@@ -449,9 +449,10 @@ int set_option_val(int vnum,char *svalue)
 			WINDP *wp;
 			while((wp=lget(window_list))!=NULL) {
 			 if(wp->w_fp->view_mode!=VMHEX
-			 && wp->w_fp->b_mode>=VMNLIST) {
+			 && wp->w_fp->b_mode>=FSNLIST) {
 					wp->w_infocol = infocols;
 					wp->w_fp->view_mode |= view_mode;
+					wp->w_fp->b_infocol |= view_mode;
 					MESG("set window view_mode to %d",view_mode);
 					set_update(wp,UPD_ALL);
 				};

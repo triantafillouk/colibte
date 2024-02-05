@@ -100,6 +100,7 @@ int main(int argc, char **argv)
 	discmd = FALSE;
 	init_lists();
 	scratch_files[0]=0;
+	load_config();
 	parse_command_line(argc,argv);
 	// MESG("main:start1");
 	set_start_dir(NULL);

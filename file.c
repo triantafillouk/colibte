@@ -200,9 +200,12 @@ void link_window_buffer(WINDP *wp,FILEBUF *fp)
 	};
 
 	wp->selection=0;	// no selection active
+#if	1
+	wp->w_infocol=fp->b_infocol;
+#else
 	if((int)bt_dval("show_vinfo") || (int)bt_dval("wrap_mode")) wp->w_infocol=VMICOLS;
 	else wp->w_infocol=0;
-
+#endif
 	wp->w_fp = fp;
 	fp->b_nwnd++;
 }
@@ -224,9 +227,12 @@ int set_window_filebuf(WINDP *wp,FILEBUF *bp)
 	set_update(wp,UPD_FULL);
 
 	wp->selection=0;
+#if	1
+	wp->w_infocol=bp->b_infocol;
+#else
 	if((int)bt_dval("show_vinfo") || (int)bt_dval("wrap_mode")) wp->w_infocol=VMICOLS;
 	else wp->w_infocol=0;
-
+#endif
     return (TRUE);
 }
 
@@ -255,9 +261,12 @@ int select_filebuf(FILEBUF *bp)
 	set_update(cwp,UPD_FULL);
 
 	cwp->selection=0;
+#if	1
+	cwp->w_infocol=bp->b_infocol;
+#else
 	if((int)bt_dval("show_vinfo") || (int)bt_dval("wrap_mode")) cwp->w_infocol=VMICOLS;
 	else cwp->w_infocol=0;
-
+#endif
 	return (TRUE);
 }
 
@@ -763,7 +772,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	int dir_num=0;
 	int is_scratch=0;
 	create_base_name(base_name,bname);
-	// MESG("new_filebuf:base_name=[%s] bname=[%s]",base_name,bname);
+	MESG("new_filebuf:base_name=[%s] bname=[%s]",base_name,bname);
 	dir_name[0]=0;
 	is_scratch = scratch_ind(base_name);
 
@@ -858,11 +867,16 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->b_mode  = gmode;
 	bp->b_state = 0;
 	bp->scratch_num=is_scratch;
-
-	if((int)bt_dval("wrap_mode")) bp->view_mode =VMWRAP|VMINFO;
-	else if((int)bt_dval("show_vinfo") || (int)bt_dval("wrap_mode")) bp->view_mode |= VMINFO;
-	else {
-		bp->view_mode  = 0;
+	
+	if((int)bt_dval("wrap_mode")) {
+		bp->view_mode |= VMWRAP|VMINFO;
+		bp->b_infocol=1;
+	} else if((int)bt_dval("show_vinfo")) {
+		bp->view_mode |= VMINFO;
+		bp->b_infocol=1;
+	} else {
+		bp->view_mode = 0;
+		bp->b_infocol = 0;
 	};
 	// MESG("set view_mode %d wrap_mode=%d",bp->view_mode,(int)bt_dval("wrap_mode"));
 	bp->b_lang = default_lang;
