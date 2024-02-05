@@ -440,7 +440,7 @@ int set_option_val(int vnum,char *svalue)
 				view_mode=VMINFO;
 			};
 		   
-		   set_bt_num_val("wrap_mode",(int)v1);
+	   		set_bt_num_val("wrap_mode",(int)v1);
 			if(v1>0) {
 				view_mode |=VMWRAP|VMINFO;
 			} else {
@@ -448,8 +448,8 @@ int set_option_val(int vnum,char *svalue)
 			lbegin(window_list);
 			WINDP *wp;
 			while((wp=lget(window_list))!=NULL) {
-			 if(wp->w_fp->view_mode!=VMHEX
-			 && wp->w_fp->b_mode>=FSNLIST) {
+				if (wp->w_fp->view_mode!=VMHEX
+			 		&& wp->w_fp->b_mode>=FSNLIST) {
 					wp->w_infocol = infocols;
 					wp->w_fp->view_mode |= view_mode;
 					wp->w_fp->b_infocol |= view_mode;
@@ -457,7 +457,7 @@ int set_option_val(int vnum,char *svalue)
 					set_update(wp,UPD_ALL);
 				};
 			};
-		   break;
+			break;
 		  };
 		}
 

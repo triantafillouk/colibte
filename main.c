@@ -100,6 +100,7 @@ int main(int argc, char **argv)
 	discmd = FALSE;
 	init_lists();
 	scratch_files[0]=0;
+	set_start_time();
 	load_config();
 	parse_command_line(argc,argv);
 	// MESG("main:start1");
@@ -110,11 +111,12 @@ int main(int argc, char **argv)
 		// MESG("open_log");
 		open_log(argv[0]);	/* connect to syslog  */
 		// MESG("set_start_time");
-		set_start_time();
+		// set_start_time();
 		// MESG("init_drv_env");
 		driver_type=init_drv_env();	// driver depending variable initialization
 		// MESG("load_config");
-		load_config();
+		// load_config();
+		set_key_emulation((int)bt_dval("keyboard_emulation"));
 		// MESG("load_keys");
 		load_keys();
 		// MESG("read_file_history");

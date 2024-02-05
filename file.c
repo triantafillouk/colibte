@@ -1638,7 +1638,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
  int htype=0;	/* highlight type  */
  char	oext[MAXLLEN], cmd[MAXLLEN];
  *temp_used=0;
- // MESG("init_ftype:[%s] b_type=%d view_mode=%d" ,fname,bp->b_type,bp->view_mode);
+ MESG("init_ftype:[%s] b_type=%d view_mode=%d" ,fname,bp->b_type,bp->view_mode);
 #if	CRYPT
 	s=resetkey(bp);
 	if (s != TRUE)	return(s);

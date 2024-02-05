@@ -3180,8 +3180,7 @@ int set_view_mode(int n)
 		};break;
 	case 9: // Wrap mode
 	  {
-		int infocols=0;
-		int view_mode=0;
+		// int view_mode=0;
 		MESG("toggle wrap_mode! b_flag=%d",fp->b_flag);
 		if (fp->b_flag >= FSNLIST || fp->view_mode & (VMHEX|VMINP)) break;
 		// if (fp->b_flag & FSDIRED && !(fp->b_state & FS_VIEW)) break;
@@ -3190,21 +3189,18 @@ int set_view_mode(int n)
 
 		if(v1) fp->view_mode &= ~VMWRAP;
 		else fp->view_mode |= VMWRAP;
-		MESG("change view_mode new is  0x%X",fp->view_mode);
+		// MESG("change view_mode new is  0x%X",fp->view_mode);
 		
-		if(v1) { MESG("reset wrap_mode");
+		if(v1) { // MESG("reset wrap_mode");
 			fp->b_infocol=0;
-			view_mode=VMINFO;
 		} else 
-		{ MESG("set wrap_mode");
-			view_mode |= VMWRAP;
+		{ // MESG("set wrap_mode");
 			fp->b_infocol=1;
 		};
 		lbegin(window_list);
 		while((wp=lget(window_list))!=NULL) {
 			if(wp->w_fp == fp) {
 				wp->w_infocol = fp->b_infocol;
-				wp->w_fp->view_mode = view_mode;
 				set_update(wp,UPD_ALL);
 			}
 		};
