@@ -24,6 +24,7 @@ int delins(int dlength, char *instr);
 
 ClipBoard *MainClipBoard=NULL;
 extern FILEBUF *cbfp;
+extern alist *window_list;
 
 int lock_move=0;	/* scroll lock movements */
 int lock_sync=0;	/* lock page movement  */
@@ -66,7 +67,7 @@ void toggle_val(char *name){
 	if((int)bt_dval(name)) {
 		set_bt_num_val(name,0);
 	} else set_bt_num_val(name,1);
-//	MESG("new value of [%s] is %d",name,(int)bt_dval(name));
+	MESG("new value of [%s] is %d",name,(int)bt_dval(name));
 }
 
 int toggle_parameter(int type)
@@ -120,6 +121,29 @@ int toggle_parameter(int type)
 //		toggle gtk3 ttilebar (now needs restart)
 		msg_line("restart to change");
 		break;
+	case EMWRAP: {
+	   int infocols=0;
+	   int view_mode=0;
+	   int v1=(int)bt_dval("wrap_mode");
+	   MESG("EMWRAP %f",(int)v1);
+		if((int)bt_dval("show_vinfo")) {
+			infocols=1;
+			view_mode=VMINFO;
+		};
+	   
+		if(v1>0) {
+			view_mode |=VMWRAP;
+			infocols=1;
+		};
+		lbegin(window_list);
+		WINDP *wp;
+		while((wp=lget(window_list))!=NULL) {
+			wp->w_infocol = infocols;
+			wp->w_fp->view_mode |= view_mode;
+			set_update(wp,UPD_ALL);
+		};
+	   break;
+	  };
   };  
   return true;
 }

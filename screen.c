@@ -626,9 +626,10 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 
  if(max_size>0) last_column=start_col+max_size;
  if(last_column>wp->w_ntcols) last_column=wp->w_ntcols;
+#if	0
  if(start_col==0) num_columns=wp->w_infocol;
  else num_columns=0;
-
+#endif
  vtmove(wp,row,start_col);
  if(row<5 && start_col==0){
 	 // MESG("vt_str: at row=%2d index=%2d col=%2d selected=%d [%s]",row,index,start_col,selected,str);
@@ -858,16 +859,17 @@ offs vtline(WINDP *wp, offs tp_offs)
  int bcol=COLOR_BG;
  offs s1,s2,ptr1,ptr2;
  offs cur_lend=0;
- int hexmode = wp->w_fp->view_mode & VMHEX;
+ int hexmode = wp->w_fp->view_mode & (VMHEX||VMINP);
  char info_mask[20];
  static char *vtlm=NULL; // virtual line character mask
  static num  vtla=0; 	 // mask allocated bytes
  int rlen=0;	// real line len
  int num_columns=0;	/* columns of line number shown  */
  num line_num = wp->tp_hline->line + wp->vtrow;
-
- num_columns=wp->w_infocol;
-
+ // if(!hexmode && !(wp->w_fp->b_flag & (FSNLIST||FSNOTES||FSNOTESN))){
+ 	num_columns=wp->w_infocol;
+	MESG("[%s] %3X set num_columns to %d",wp->w_fp->b_flag,wp->w_fp->b_fname,num_columns);
+ // };
  v_text = wp->vs[wp->vtrow]->v_text;
  // MESG("vtline: < %d vtla=%d",wp->vtrow,vtla);
  for(i=0;i<wp->w_ntcols;i++) {
@@ -1616,7 +1618,6 @@ void vtputwc(WINDP *wp, utfchar *uc)
 	register VIDEO *vp;	/* ptr to line being updated */
 	int start_column=0;
 	vp = wp->vs[wp->vtrow];
-	start_column=wp->w_infocol;
 
 	if(fp->view_mode & VMHEX) {
 	 unsigned char c1=0;
@@ -1657,6 +1658,9 @@ void vtputwc(WINDP *wp, utfchar *uc)
 	 	if(i>3||uc->uval[i]==0) break;
 	 }
 	 return;
+	} else {
+		if(wp->w_fp->b_flag < FSNOTES)
+			start_column=wp->w_infocol;
 	};
 	if(wp->vtcol < start_column-1){
 		svchar(vp->v_text+wp->vtcol++,c,COLOR_INFO_BG,COLOR_FG);
@@ -2173,7 +2177,6 @@ int update_screen(int force)
 	lbegin(window_list);
 	while((wp=(WINDP *)lget(window_list))!=NULL)
 	{
-#if	1
 		if((int)bt_dval("wrap_mode") 
 			&& !(wp->w_fp->b_flag & FSNLIST)
 			&& !(wp->w_fp->b_flag & FSNOTES)
@@ -2183,56 +2186,6 @@ int update_screen(int force)
 
 			update_window_wrap(wp,force);
 		else update_window_nowrap(wp,force);
-#else
-		if (wp==cwp) {
-			check_cursor_position(wp); /* check if on screen */
-			wp->currow = window_cursor_line(wp);
-
-			if(wp->selection || (wp->w_flag & UPD_WINDOW) || force||update_all) 
-			{
-				upd_all_virtual_lines(wp,"update_screen:3");
-// 				continue;
-			} else
-			if (wp->w_flag & UPD_EDIT) 
-			{
-				upd_all_virtual_lines(wp,"update_screen:4");	/* update all lines */
-			} else 
-			if (wp->w_flag & UPD_LINE) 
-			{
-				// upd_all_virtual_lines(wp,"update_screen:32");
-				upd_part(wp,"update_screen: 0");
-			} else
-			if(wp->w_flag & UPD_MOVE) { 	/* for notes only!  */
-				upd_move(wp,"update_screen: 2");
-			};
-		} else {
-			if((wp->w_fp == cwp->w_fp 
-				&& ((cw_flag & UPD_EDIT)
-				|| (cw_flag & UPD_LINE))
-			))
-			{
-				if((wp->w_flag & UPD_EDIT) || force || update_all) {
-					upd_all_virtual_lines(wp,"update_screen:6");
-				} else {
-					upd_part(wp,"update_screen: 3");
-				};
-			} else
-			if(wp->w_flag){
-				if((wp->w_flag & UPD_EDIT) || force || update_all) {
-					upd_all_virtual_lines(wp,"update_screen:7");
-				} else {
-					upd_part(wp,"update_screen: 4");
-				};
-			} else
-			if(update_all) {
-				upd_all_virtual_lines(wp,"update_screen:8");
-			};
-		};
-		if ((wp->w_flag & UPD_STATUS) || force) {
-			status_line(wp);	/* update statusline */
-		};
-		wp->w_flag = 0;
-#endif
 	};
 
 	lbegin(window_list);

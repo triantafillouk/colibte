@@ -350,7 +350,7 @@ int set_option_val(int vnum,char *svalue)
 
  v1=atoi(svalue);
  
-// MESG("set_option_val: vnum=%d [%s]",vnum,svalue);
+	MESG("set_option_val: vnum=%d [%s]",vnum,svalue);
 		switch (vnum) {
 		case EMFILLCOL:	{
 			set_bt_num_val("fillcol",v1);
@@ -430,6 +430,33 @@ int set_option_val(int vnum,char *svalue)
 		  case EMXCOLORSCHEME: {
 		  	set_bt_num_val("xcolor_scheme",v1);
 		  	break;
+		  };
+		  case EMWRAP: {
+		   int infocols=0;
+		   int view_mode=0;
+		   MESG("EMWRAP %f",(int)v1);
+			if((int)bt_dval("show_vinfo")) {
+				infocols=1;
+				view_mode=VMINFO;
+			};
+		   
+		   set_bt_num_val("wrap_mode",(int)v1);
+			if(v1>0) {
+				view_mode |=VMWRAP|VMINFO;
+			} else {
+			};
+			lbegin(window_list);
+			WINDP *wp;
+			while((wp=lget(window_list))!=NULL) {
+			 if(wp->w_fp->view_mode!=VMHEX
+			 && wp->w_fp->b_mode>=VMNLIST) {
+					wp->w_infocol = infocols;
+					wp->w_fp->view_mode |= view_mode;
+					MESG("set window view_mode to %d",view_mode);
+					set_update(wp,UPD_ALL);
+				};
+			};
+		   break;
 		  };
 		}
 

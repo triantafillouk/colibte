@@ -3139,6 +3139,7 @@ int set_view_mode(int n)
 		};break;
 	case 7: // Show vertical info lines
 		{
+		if (fp->b_flag & FSDIRED && !(fp->b_state & FS_VIEW)) break;
 		if(fp->view_mode & VMHEX) {
 		} else {
 			fp->view_mode = VMINFO;
@@ -3180,27 +3181,33 @@ int set_view_mode(int n)
 	case 9: // Wrap mode
 		{
 		int infocols=0;
-		int mode=0;
+		int view_mode=0;
+		if (fp->b_flag >= FSNLIST) break;
+		// if (fp->b_flag & FSDIRED && !(fp->b_state & FS_VIEW)) break;
 		// MESG("change wrap_mode %d",(int)bt_dval("wrap_mode"));
+		toggle_val("wrap_mode");
+		int v1=(int)bt_dval("wrap_mode");
+		toggle_val("wrap_mode");
 		if(fp->view_mode & VMHEX) {
 		} else {
-			if((int)bt_dval("show_vinfo")) {
+			if(v1) {
 				infocols=1;
-				mode=VMINFO;
+				view_mode=VMINFO;
 			};
-			if((int)bt_dval("wrap_mode")) {
-				set_bt_num_val("wrap_mode",0);
-				mode=mode;
-			} else {
+			if(v1) {
+				view_mode |= VMWRAP;
 				infocols=1;
-				set_bt_num_val("wrap_mode",1);
-				mode=mode|VMWRAP;
 			};
 			lbegin(window_list);
 			while((wp=lget(window_list))!=NULL) {
+				if(wp->w_fp->view_mode!=VMHEX
+				 && wp->w_fp->view_mode!=VMINP 
+				 && wp->w_fp == fp) {
 					wp->w_infocol = infocols;
-					wp->w_fp->view_mode = mode;
+					wp->w_fp->b_infocol = infocols;
+					wp->w_fp->view_mode = view_mode;
 					set_update(wp,UPD_ALL);
+				}
 			};
 		};		
 		};break;

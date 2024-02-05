@@ -543,11 +543,11 @@ typedef struct  WINDP {
 
 	char	selection;
 	
+	short int	w_infocol;				/* info column size  */
     short   w_ntrows;               /* # of rows of text in window  */
 	short	w_ntcols;				/* columns of this window */
 	num		w_lcol;					/* offset of text in the window */
 	num		w_plcol;				/* previous w_lcol */
-	int		w_infocol;				/* info column size  */
 	struct GWINDP *gwp;				/* internal window structure (gtk or other) */
 	int 	id;
 
@@ -560,8 +560,8 @@ typedef struct  WINDP {
 	/* the value on/off of the quotes are at the end of the window */
 	/* it should better be a pointer to a quote structure specific */
 	/* for each file type */
-	int	vtcol;
-	int	vtrow;
+	short int	vtcol;
+	short int	vtrow;
 	int currow;
 	num curcol;
 	int top_note_line;
@@ -653,12 +653,13 @@ typedef struct  FILEBUF {
  	short int	b_flag;                 /* buffer state Flags           */
 	short int	b_mode;					/* editor mode of this buffer	*/
 	short int	view_mode;				/* view mode */
-	short int		b_type;			/* buffer,file type */
-	short int		scratch_num;	/* scratch number or 0  */
-	short int		dir_num;		/* dir number  */
-	short int b_lang;		/* document language, 0 is UTF  */
-	short int m_mode;		/* parse status flag  */
-	short int utf_accent;	/* current utf char is with an accent!  */
+	short int	b_type;			/* buffer,file type */
+	short int	scratch_num;	/* scratch number or 0  */
+	short int	dir_num;		/* dir number  */
+	short int	b_lang;		/* document language, 0 is UTF  */
+	short int	m_mode;		/* parse status flag  */
+	short int	utf_accent;	/* current utf char is with an accent!  */
+	short int	b_infocol;	/* infocol for the buffer  */
 #if	USE_SLOW_DISPLAY
 	short int slow_display;
 #endif
@@ -872,7 +873,8 @@ enum env_defs {
 	EMUSETITLEBAR,	/* Use titlebar  */
 	EMCCASE,		/* exact match  */
 	EMCOVER,		/* overwite  */
-	EMCREGEXP		/* Use regular expression in search  */
+	EMCREGEXP,		/* Use regular expression in search  */
+	EMWRAP			/* wrap lines global mode  */
 };
 
  /* file extensions */
