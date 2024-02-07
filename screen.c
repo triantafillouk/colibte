@@ -256,6 +256,25 @@ int error_line(char *error_message,...)
     wp->vtcol = col;
 }
 
+void upd_column_pos_hex()
+{
+	if(cbfp->view_mode & VMINP) {
+		cwp->curcol += 10 + 2*cwp->curcol+get_hex_byte();
+	} else {
+		cwp->curcol+=HSTART+1;
+	};
+	if(cwp->curcol+10<cwp->w_ntcols) cwp->w_lcol=0;
+	else if(cwp->curcol - cwp->w_lcol > cwp->w_ntcols-2)
+	if(cwp->w_ntcols - cwp->curcol+cwp->w_lcol < 2) cwp->w_lcol=cwp->curcol - cwp->w_ntcols+5;
+}
+
+void upd_column_pos_wrap()
+{
+	cwp->w_lcol=0;
+	cwp->curcol = cwp->curcol % (cwp->w_ntcols - cwp->w_infocol) + cwp->w_infocol;
+	// MESG("upd_column_pos_wrap: %d < %d",cwp->curcol,cwp->w_ntcols);
+}
+
 /*	upd_column_pos:	update the column position of the hardware cursor and handle extended lines.  */
 void upd_column_pos()
 {
@@ -266,16 +285,12 @@ void upd_column_pos()
 	num_columns=cwp->w_infocol;
 	total_columns=cwp->w_ntcols-num_columns;
 	if(cwp->w_ntcols==0) return;
-	if(cbfp->view_mode & VMHEX) {
-		if(cbfp->view_mode & VMINP) {
-			cwp->curcol += 10 + 2*cwp->curcol+get_hex_byte();
-		} else {
-			cwp->curcol+=HSTART+1;
-		};
-		if(cwp->curcol+10<cwp->w_ntcols) cwp->w_lcol=0;
-		else if(cwp->curcol - cwp->w_lcol > cwp->w_ntcols-2)
-		if(cwp->w_ntcols - cwp->curcol+cwp->w_lcol < 2) cwp->w_lcol=cwp->curcol - cwp->w_ntcols+5;
-	} else {
+	if(cbfp->view_mode & VMHEX){ 
+		upd_column_pos_hex();
+	} else 
+	if(cbfp->view_mode & VMWRAP) {
+		upd_column_pos_wrap();
+	} else
 	if(cwp->curcol < (cwp->w_lcol)+2 && cwp->w_lcol>0) 
 	{
 		if(cwp->curcol+1 < total_columns ) { 
@@ -290,7 +305,7 @@ void upd_column_pos()
 		cwp->w_lcol = cwp->curcol-(total_columns)/1.5;
 //		MESG("upd_column_pos: w_lcol=%d curcol=%d total=%d w_ntcols=%d",cwp->w_lcol,cwp->curcol,total_columns,cwp->w_ntcols);
 	};
-	}
+
 	if(cwp->curcol < cwp->w_lcol) {
 //		ERROR("left column is %lld < curcol=%lld plcol=%lld",cwp->w_lcol,cwp->curcol,cwp->w_plcol);
 		cwp->w_lcol=cwp->curcol;
@@ -2267,7 +2282,9 @@ void update_window_wrap(WINDP *wp,int force)
 		if (wp==cwp) {
 			check_cursor_position(wp); /* check if on screen */
 			wp->currow = window_cursor_line(wp);
-
+#if	1
+				upd_all_wrap_lines(wp,"wrap0");
+#else
 			if(wp->selection || (wp->w_flag & UPD_WINDOW) || force||update_all) 
 			{
 				upd_all_wrap_lines(wp,"wrap1");
@@ -2280,6 +2297,7 @@ void update_window_wrap(WINDP *wp,int force)
 			{
 				upd_part_wrap(wp,"wrap3 partial");
 			}
+#endif
 		} else {
 			if((wp->w_fp == cwp->w_fp 
 				&& ((cw_flag & UPD_EDIT)

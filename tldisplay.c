@@ -909,6 +909,8 @@ void update_cursor_position()
 			else 
 #endif
 			if(cwp->w_fp->b_flag & FSNLIST) movecursor(cwp->current_note_line-cwp->top_note_line+(cwp->w_fp->b_header!=NULL), 0);
+			else if(cwp->w_fp->view_mode & VMWRAP) 
+				movecursor(cwp->currow,cwp->curcol);
 			else movecursor(cwp->currow+(cwp->w_fp->b_header!=NULL), WGetCol());
 			show_cursor("update_cursor_position");
 		};

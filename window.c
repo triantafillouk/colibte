@@ -267,13 +267,26 @@ int chardline(WINDP *wp)
 
 int window_cursor_line(WINDP *wp)
 {
- int cline;
+ int cline=0;
 #if	TNOTES
 	if(cwp->w_fp->b_flag == FSNOTES) cline=cwp->current_tag_line-cwp->top_tag_line;
 	else if(cwp->w_fp->b_flag & FSNOTESN) cline=cwp->current_note_line-cwp->top_note_line;
 	else 
 #endif
 	if(cwp->w_fp->b_flag & FSNLIST) cline=cwp->current_note_line-cwp->top_note_line;
+	else if(cwp->w_fp->view_mode & VMWRAP) {
+		num line=tp_line(wp->tp_hline)-1;
+		num o0=tp_offset(wp->tp_hline);
+		int w_linew=cwp->w_ntcols-cwp->w_infocol;
+		do {
+		 int col=DiffColumn(wp->w_fp,&o0,LineEnd(o0));
+			// find the col at the end of the line or at the right side
+			// int i0=col % w_linew;
+			int line_rows=col/w_linew;
+			cline+=line_rows;
+			line++;
+		} while(line<tp_line(wp->tp_current));
+	} 
 	else cline = tp_line(wp->tp_current)-tp_line(wp->tp_hline);
  // MESG("window_cursor_line: %d",cline);
  return (cline);
