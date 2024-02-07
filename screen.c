@@ -883,7 +883,7 @@ offs vtline(WINDP *wp, offs tp_offs)
  num line_num = wp->tp_hline->line + wp->vtrow;
  // if(!hexmode && !(wp->w_fp->b_flag & (FSNLIST||FSNOTES||FSNOTESN))){
  	num_columns=wp->w_infocol;
-	MESG("[%s] %3X set num_columns to %d",wp->w_fp->b_flag,wp->w_fp->b_fname,num_columns);
+	// MESG("[%s] %3X set num_columns to %d",wp->w_fp->b_flag,wp->w_fp->b_fname,num_columns);
  // };
  v_text = wp->vs[wp->vtrow]->v_text;
  // MESG("vtline: < %d vtla=%d",wp->vtrow,vtla);
@@ -1268,7 +1268,6 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
  int first_column;	// first column to show
  int c=0;
  utfchar uc;
- offs start_show=0;
  int i=0;
  num col;
  num llen=0;	/* Number of characters in the line (utf or sible byte)  */
@@ -1308,7 +1307,6 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 	};
 
 	ptr1 = FLineBegin(fp,tp_offs);
-	if(ptr1==tp_offs) start_show=0;
 	ptr1=tp_offs;
 	cur_lend = FLineEnd(fp,tp_offs);
 	ptr2=cur_lend;
@@ -2030,13 +2028,15 @@ int check_cursor_position(WINDP *wp)
 	if( cur_offs < tp_offset(wp->tp_hline) 
 		|| tp_line(wp->tp_current) > tp_line(wp->tp_hline)+wp->w_ntrows-2-half_last_line-head) 
 	{
-
 		// we are out of bounds. reposition!
-		wp->w_flag = UPD_FULL;
 		force_reposition=1;
 //		MESG("check_cursor_position: reposition!!");
 	};
+	if(wp->w_fp->view_mode & VMWRAP) {
+		if(window_cursor_line(wp) > wp->w_ntrows) force_reposition=1;
+	};
 	if(!force_reposition) return TRUE;
+	wp->w_flag = UPD_FULL;
 	/* reaching here, we need a window refresh */
 	i= wp->w_ppline;
 //	MESG("check_cursor_position: ppline=%d",i);

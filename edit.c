@@ -500,8 +500,8 @@ int next_line(int n)
 	if(n<1) return (false);
 
 	if(!execmd){
-	w_row = current_line-tp_line(cwp->tp_hline);
-
+	// w_row = current_line-tp_line(cwp->tp_hline);
+	w_row = cwp->currow;
 	// if at the end move up
 	if(w_row == cwp->w_ntrows-2-half_last_line) {
 		move_window(-1);
@@ -511,7 +511,19 @@ int next_line(int n)
 	/* and move the point down */
 	if(cbfp->view_mode & VMHEX){
 		textpoint_set_lc(cbfp->tp_current,current_line+n,Offset()%16);
-	} else {
+	} else 
+	if(cbfp->view_mode & VMWRAP) {
+		offs o_now=tp_offset(cwp->tp_current);
+		offs o_end=LineEnd(o_now);
+		int remains=DiffColumn(cwp->w_fp,&o_now,o_end);
+		if(remains>(cwp->w_ntcols-cwp->w_infocol)) {
+			next_character(cwp->w_ntcols-cwp->w_infocol);
+		} else {
+			set_goal_column(-1,"next_line:2");
+			MoveLineCol(current_line+n,cwp->goal_column);
+		};
+	} else
+	{
 		set_goal_column(-1,"next_line:2");
 		MoveLineCol(current_line+n,cwp->goal_column);
 	};
@@ -573,6 +585,17 @@ int prev_line(int n)
 	};
 	if(cbfp->view_mode & VMHEX){
 		textpoint_set_lc(cbfp->tp_current,current_line-n,Offset()%16);
+	} else
+	if(cbfp->view_mode & VMWRAP) {
+		offs o_now=tp_offset(cwp->tp_current);
+		offs o_begin=LineBegin(o_now);
+		int remains=DiffColumn(cwp->w_fp,&o_begin,o_now);
+		if(remains>(cwp->w_ntcols-cwp->w_infocol)) {
+			prev_character(cwp->w_ntcols-cwp->w_infocol);
+		} else {
+			set_goal_column(-1,"prev_line:2");
+			MoveLineCol(current_line-n,cwp->goal_column);
+		};
 	} else {
 		set_goal_column(-1,"prev_line:2");
 		MoveLineCol(current_line-n,cwp->goal_column);

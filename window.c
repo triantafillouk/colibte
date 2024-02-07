@@ -85,7 +85,11 @@ void set_goal_column(int new_column,char *from)
 {
  FILEBUF *fp = cwp->w_fp;
  if(new_column<0) {
-	if(GetCol()>cwp->goal_column) cwp->goal_column=GetCol();
+	if(GetCol()>cwp->goal_column) {
+		if(fp->view_mode & VMWRAP) 
+			cwp->goal_column=GetCol() % (cwp->w_ntcols - cwp->w_infocol);
+		else cwp->goal_column=GetCol();
+	};
  } else {
 	cwp->goal_column=new_column;
  };
@@ -275,17 +279,34 @@ int window_cursor_line(WINDP *wp)
 #endif
 	if(cwp->w_fp->b_flag & FSNLIST) cline=cwp->current_note_line-cwp->top_note_line;
 	else if(cwp->w_fp->view_mode & VMWRAP) {
-		num line=tp_line(wp->tp_hline)-1;
-		num o0=tp_offset(wp->tp_hline);
-		int w_linew=cwp->w_ntcols-cwp->w_infocol;
-		do {
-		 int col=DiffColumn(wp->w_fp,&o0,LineEnd(o0));
-			// find the col at the end of the line or at the right side
-			// int i0=col % w_linew;
-			int line_rows=col/w_linew;
+		num top_line=tp_line(wp->tp_hline);
+		num line=top_line;
+		num top_offset=tp_offset(wp->tp_hline);
+		int w_width=cwp->w_ntcols-cwp->w_infocol;
+		cline=0;
+		num o0=top_offset;
+		num o1=tp_offset(wp->tp_current);
+		// MESG("window_cursor_line: width=%d top o=%ld l=%ld, current o=%ld l=%ld",w_width,top_offset,top_line,o1,tp_line(wp->tp_current)); 
+		while(1) {
+		// find the col at the end of the line or at the right side
+		// int i0=col % w_linew;
+		if(line==tp_line(wp->tp_current)) {
+			o0=LineBegin(o1);
+			// MESG("	o0=%ld o1=%ld",o0,o1);
+			int col=DiffColumn(wp->w_fp,&o0,o1);
+			int line_rows=col/w_width;
 			cline+=line_rows;
+			// MESG("	current: col=%d line_rows=%d cline=%ld o0=%ld o1=%ld",col,line_rows,cline,o0,o1);
+			break;
+		} else {
+			int col=DiffColumn(wp->w_fp,&o0,LineEnd(o0));
+			int line_rows=col/w_width;
+			cline+=line_rows+1;
+			// MESG("	add line: col=%d line_rows=%d cline=%ld o0=%ld",col,line_rows,cline,o0);
 			line++;
-		} while(line<tp_line(wp->tp_current));
+			o0+=wp->w_fp->EolSize;
+		}
+		};
 	} 
 	else cline = tp_line(wp->tp_current)-tp_line(wp->tp_hline);
  // MESG("window_cursor_line: %d",cline);
