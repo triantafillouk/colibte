@@ -519,8 +519,12 @@ int next_line(int n)
 		if(remains>(cwp->w_ntcols-cwp->w_infocol)) {
 			next_character(cwp->w_ntcols-cwp->w_infocol);
 		} else {
-			set_goal_column(-1,"next_line:2");
-			MoveLineCol(current_line+n,cwp->goal_column);
+			if(remains>0) {
+				goto_eol(1);
+			} else {
+				set_goal_column(-1,"next_line:2");
+				MoveLineCol(current_line+n,cwp->goal_column);
+			};
 		};
 	} else
 	{
