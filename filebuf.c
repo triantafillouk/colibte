@@ -467,6 +467,50 @@ int FUtfCharLen(FILEBUF *fp,offs o)
 	return clen;
 }
 
+offs goto_next_wrap_line(FILEBUF *fp,offs start)
+{
+ offs o=start;
+ // from the start of the wrap line
+ int col=0;
+ while(col<cwp->w_ntcols-cwp->w_infocol) {
+ 	if(FEofAt(fp,o)) break;
+	if(FEolAt(fp,o)) break;
+	int c;
+	utfchar uc;
+	o = FUtfCharAt(fp,o,&uc);
+ 	c=uc.uval[0];
+	if (c == CHR_TAB) {
+		col=next_tab(col);
+	} else {
+		col += get_utf_length(&uc);
+#if	0
+		if(clen_error) {
+			set_utf8_error(1);
+			c=DiffColumn(fp,dbo,col_offs);
+			set_utf8_error(0);
+			return c;
+		};
+#endif
+	};
+  };
+ 
+ return o;
+}
+
+// check next char, update offset,physical column!
+offs check_next_char(FILEBUF *fp,offs o,int *col) 
+{
+	int c;
+	utfchar uc;
+	o = FUtfCharAt(fp,o,&uc);
+ 	c=uc.uval[0];
+	if (c == CHR_TAB) {
+		*col=next_tab(*col);
+	} else {
+		*col += get_utf_length(&uc);
+	};
+	return o;
+}
 
 int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs)
 {
@@ -475,6 +519,15 @@ int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs)
  if(fp->b_lang==0 && !utf8_error()){
 //  MESG("diffcol: from %ld to %ld",o,col_offs);
   while (o < col_offs && !FEofAt(fp,o)) {
+#if	1
+	o = check_next_char(fp,o,&col);
+	if(clen_error) {
+		set_utf8_error(1);
+		int c=DiffColumn(fp,dbo,col_offs);
+		set_utf8_error(0);
+		return c;
+	};
+#else
 	int c;
 	utfchar uc;
 	o = FUtfCharAt(fp,o,&uc);
@@ -490,6 +543,7 @@ int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs)
 			return c;
 		};
 	};
+#endif
   };
  } else {
   while (o < col_offs && !FEofAt(fp,o)) {
@@ -3585,6 +3639,7 @@ offs   FPrevLine(FILEBUF *fp,offs ptr)
    while(ptr>0 && !FBolAt(fp,--ptr));
    return(ptr);
 }
+
 
 void show_points(FILEBUF *bf,FILE *fp)
 {

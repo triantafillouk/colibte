@@ -17,6 +17,7 @@ extern int color_scheme_ind;
 extern int drv_initialized;
 
 GWINDP * drv_new_twinp();
+int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs);
 
 int window_num()
 {
@@ -29,6 +30,7 @@ int window_num()
  */
 int reposition(int n)
 {
+ MESG("reposition:");
 	int sline=window_cursor_line(cwp);
 	int midline=cwp->w_ntrows/2;
 	int movelines=midline-sline;
@@ -152,21 +154,92 @@ int prev_window(int n)
 	return (TRUE);
 }
 
+offs check_next_char(FILEBUF *fp,offs o,int *col) ;
+
+offs FNext_wrap_Line(WINDP *wp,offs current_offset)
+{
+ FILEBUF *fp=wp->w_fp;
+ int window_width=wp->w_ntcols-wp->w_infocol;
+ offs o_current = current_offset;
+ // offs top = tp_offset(wp->tp_hline);
+ offs b0=FLineBegin(fp,current_offset);
+ MESG("FNext_wrap_line: begin=%ld o=%ld",b0,current_offset);
+ int col=0;
+ while(b0!=o_current){
+	b0=check_next_char(fp,b0,&col);
+ };
+ // b0=check_next_char(fp,b0,&col);
+
+ while(!FEolAt(fp,b0)){
+	b0=check_next_char(fp,b0,&col);
+	if((col%window_width)==0) break;
+ };
+ if(FEolAt(fp,b0)) b0++;
+ return b0;
+}
+
+offs   FPrev_wrap_Line(FILEBUF *fp,offs ptr)
+{
+ int window_width=cwp->w_ntcols-cwp->w_infocol;
+ offs b0=FLineBegin(fp,ptr);
+ offs b1=b0;
+ int ccol=DiffColumn(fp,&b1,ptr);
+ MESG("FPrev_wrap_line: ccol=%d -----------",ccol);
+ if(ccol< window_width){ // we are at the first wrap line!
+	// goto the begining of the previous line!
+	while(b0>0 && !FBolAt(fp,--b0));
+	MESG("FPrev_wrap_line:1 goto beg of prev line: %ld",b0);
+#if	0
+	offs lbeg=ptr;
+	offs lend=FLineEnd(fp,ptr);
+	int line_cols=DiffColumn(fp,&lbeg,lend);
+	if(line_cols<window_width) return ptr; // the begining of the line
+	// int wrap_lines=line_cols/window_width;
+	// move ptr by wrap_lines
+	// goto last wrap_line
+
+ 	MESG("FPrev_wrap_line:2 %ld -> %ld",ptr,swl);
+#endif
+ };
+
+	// int target_col = (ccol / window_width) * window_width;
+	offs swl=b0;	/* at the start of the line!  */
+	b1 = b0;
+	int col=0;
+	while(b1<ptr) {
+		if(b1 % window_width) swl=b1;
+		b1 = check_next_char(fp,b1,&col);
+	};
+ 	MESG("FPrev_wrap_line:2 %ld -> %ld",ptr,swl);
+	ptr=swl;
+ return(ptr);
+}
+
 /* move text in window by n lines forward/backward */
 int move_window(int n)
 {
 	offs curoffs;
 	if(!drv_initialized) return false;
 	if(n==0) return FALSE;
-
-	curoffs = LineBegin(tp_offset(cwp->tp_hline));
+	if(cwp->w_fp->view_mode & VMWRAP) 
+		curoffs = tp_offset(cwp->tp_hline);
+	else
+		curoffs = LineBegin(tp_offset(cwp->tp_hline));
     if (n < 0) {
         while (n++) curoffs=FNextLine(cbfp,curoffs);
     } else  {
-        while (n-- && (curoffs>0)) curoffs=FPrevLine(cbfp,curoffs);
+		if(cwp->w_fp->view_mode & VMWRAP) {
+			while(n-- &&  (curoffs>0)) {
+				// go to prev window line
+				curoffs = FPrev_wrap_Line(cbfp,curoffs);
+			};
+		} else {
+	        while (n-- && (curoffs>0)) curoffs=FPrevLine(cbfp,curoffs);
+		};
     }
 	set_update(cwp,UPD_MOVE|UPD_WINDOW);
 	tp_copy(cwp->prev_hline,cwp->tp_hline);
+	MESG("move_window: n=%d new top at offs %ld",n,curoffs);
 	textpoint_set(cwp->tp_hline,curoffs);
     return (TRUE);
 }
@@ -282,15 +355,17 @@ int window_cursor_line(WINDP *wp)
 		num top_line=tp_line(wp->tp_hline);
 		num line=top_line;
 		num top_offset=tp_offset(wp->tp_hline);
+		
 		int w_width=cwp->w_ntcols-cwp->w_infocol;
 		cline=0;
 		num o0=top_offset;
 		num o1=tp_offset(wp->tp_current);
-		// MESG("window_cursor_line: width=%d top o=%ld l=%ld, current o=%ld l=%ld",w_width,top_offset,top_line,o1,tp_line(wp->tp_current)); 
+		MESG("window_cursor_line: width=%d top o=%ld l=%ld, current o=%ld l=%ld",w_width,top_offset,top_line,o1,tp_line(wp->tp_current)); 
 		while(1) {
 		// find the col at the end of the line or at the right side
 		// int i0=col % w_linew;
-		if(line==tp_line(wp->tp_current)) {
+		MESG("	wcl: line %ld, current line %ld",line,tp_line(wp->tp_current));
+		if(line>=tp_line(wp->tp_current)) {
 			o0=LineBegin(o1);
 			// MESG("	o0=%ld o1=%ld",o0,o1);
 			int col=DiffColumn(wp->w_fp,&o0,o1);
@@ -309,9 +384,21 @@ int window_cursor_line(WINDP *wp)
 		};
 	} 
 	else cline = tp_line(wp->tp_current)-tp_line(wp->tp_hline);
- // MESG("window_cursor_line: %d",cline);
+ MESG("window_cursor_line: %d",cline);
  return (cline);
 }
+
+#if	NUSE
+// return the column
+int wrap_line_begins(WINDP *wp,offs o1)
+{
+ offs obegin=FLineBegin(wp->w_fp,o1);
+ offs o=obegin;
+ int col=0;
+
+ return col;
+}
+#endif
 
 /*
 	Set selection

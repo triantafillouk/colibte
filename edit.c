@@ -254,13 +254,13 @@ int imove_top_line(num new_top_line)
  int current_row=tp_line(cwp->tp_current)-tp_line(cwp->tp_hline);
  num new_current_line;
  num last_line= tp_line(cwp->w_fp->tp_text_end);
-// MESG("imove_top_line:");
  set_goal_column(0,"imove_top_line");
  if(new_top_line<0) new_top_line=0;
  if(new_top_line>last_line) new_top_line=last_line;
  new_current_line=new_top_line+current_row;
 
  if(new_current_line>last_line) new_current_line=last_line;
+ MESG("imove_top_line:to %ld",new_top_line);
  textpoint_set_lc(cwp->tp_hline, new_top_line,0);
  textpoint_set_lc(cwp->tp_current, new_current_line,0);
  set_update(cwp,UPD_MOVE|UPD_WINDOW);
@@ -519,7 +519,8 @@ int next_line(int n)
 		if(remains>(cwp->w_ntcols-cwp->w_infocol)) {
 			next_character(cwp->w_ntcols-cwp->w_infocol);
 		} else {
-			if(remains>0) {
+			if(remains >0) {
+				// next_character(remains);		
 				goto_eol(1);
 			} else {
 				set_goal_column(-1,"next_line:2");
@@ -824,6 +825,36 @@ int next_page(int  n)
 	if (FEof(cbfp)) return FALSE;
 
 	toline=tp_line(cwp->tp_current);
+	if(cwp->w_fp->view_mode & VMWRAP) {
+		// set new topline
+		offs o=tp_offset(cwp->tp_hline);
+		offs co=tp_offset(cwp->tp_current);
+		int lines=n;
+		MESG("next_page: topo=%ld current=%ld lines=%d---------",o,co,lines);
+		while(--lines>0) {
+			o=FNext_wrap_Line(cwp,o);
+		};
+		textpoint_set(cwp->tp_hline,o);
+		MESG("        : new topo=%ld line=%ld",o,tp_line(cwp->tp_hline));
+		offs top_offset=tp_offset(cwp->tp_hline);
+		// n=lines;
+		o=tp_offset(cwp->tp_current);
+		MESG("		start current from %ld n=%d",o,n);
+		while(--n>0) {
+			o=FNext_wrap_Line(cwp,o);
+			MESG("		next line o=%ld",o);
+		};
+		textpoint_set(cwp->tp_current,o);
+		offs new_current=tp_offset(cwp->tp_current);
+		textpoint_set(cwp->w_fp->tp_current,o);
+		// cwp->w_ppline = tp_line(cwp->tp_current)-tp_line(cwp->tp_hline)+1;
+		MESG("		new current o=%ld line=%ld",tp_line(cwp->tp_current),tp_line(cwp->tp_current));
+		
+		set_update(cwp,UPD_MOVE|UPD_WINDOW);
+		undo_set_noglue();
+
+    	return (OK_CLRSL);
+	} else {
 	cwp->w_ppline = tp_line(cwp->tp_current)-tp_line(cwp->tp_hline)+1;
 	topline=tp_line(cwp->tp_hline);
 	if(toline+n > cbfp->lines) {
@@ -834,7 +865,7 @@ int next_page(int  n)
 		toline += n;
 		topline +=n;
 	};
-
+	};
 	
 	// MESG("next_page: toline=%d col=%d",toline,cwp->goal_column);
 	MoveLineCol(toline,cwp->goal_column);

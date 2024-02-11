@@ -2009,9 +2009,47 @@ int check_cursor_position_notes(WINDP *wp)
 	return(TRUE);
 }
 
+int check_cursor_position_wrap(WINDP *wp)
+{
+	offs cur_offs,cof;
+	FILEBUF *fp = wp->w_fp;
+	int i;
+	MESG("check_cursor_position_wrap: %ld %ld, line %ld %ld ",tp_offset(wp->tp_hline),tp_offset(wp->tp_current),tp_line(wp->tp_hline),tp_line(wp->tp_current));
+	cur_offs=tp_offset(wp->tp_current);
+	i= wp->w_ppline;
+	if( cur_offs < tp_offset(wp->tp_hline)) {
+		MESG("	< ppline=%ld",wp->w_ppline);
+	
+	
+		return FALSE;
+	}  else if  (window_cursor_line(wp) > wp->w_ntrows) {
+		MESG("	> ppline=%ld",wp->w_ppline);
+
+
+		return FALSE;
+	} else return TRUE;
+}
+
+// int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs);
+
+void set_top_hline(WINDP *wp,offs cof)
+{
+	offs b0=FLineBegin(wp->w_fp,cof);
+	if(wp->w_fp->view_mode & VMWRAP) {
+		int w=wp->w_ntcols-wp->w_infocol;
+		offs b1=b0;
+		int line_chars=DiffColumn(wp->w_fp,&b1,cof);
+		int new_loffs = (line_chars / w) * w;
+		// textpoint_set_lc(wp->tp_hline,new_loffs);
+	} else;
+	textpoint_set(wp->tp_hline,b0);
+}
+
 /*	check_cursor_position:	check to see if the cursor is on screen */
 int check_cursor_position(WINDP *wp)
 {
+	if(wp->w_fp->view_mode & VMWRAP)return(check_cursor_position_wrap(wp));
+
 	offs cur_offs,cof;
 	int i;
 	FILEBUF *fp = wp->w_fp;
@@ -2032,14 +2070,11 @@ int check_cursor_position(WINDP *wp)
 		force_reposition=1;
 //		MESG("check_cursor_position: reposition!!");
 	};
-	if(wp->w_fp->view_mode & VMWRAP) {
-		if(window_cursor_line(wp) > wp->w_ntrows) force_reposition=1;
-	};
 	if(!force_reposition) return TRUE;
 	wp->w_flag = UPD_FULL;
 	/* reaching here, we need a window refresh */
 	i= wp->w_ppline;
-//	MESG("check_cursor_position: ppline=%d",i);
+	MESG("check_cursor_position: refresh! ppline=%d",i);
 	/* how far back to go? */
 	if (i > 0) {
 		if (--i >= wp->w_ntrows) i = wp->w_ntrows-2;
@@ -2052,10 +2087,14 @@ int check_cursor_position(WINDP *wp)
 	cof=cur_offs;
 	while (i-- && cof>0) {
 		cof=FPrevLine(fp,cof);
-	}
+	};
 	/* and reset the current line at top of window */
 	tp_copy(wp->prev_hline,wp->tp_hline);
+#if	1
+	set_top_hline(wp,cof);
+#else
 	textpoint_set(wp->tp_hline,FLineBegin(fp,cof))	;
+#endif
 	wp->w_flag |= UPD_WINDOW;
 	if(update_all) wp->w_flag |= UPD_FULL;
 	return(TRUE);
@@ -2214,6 +2253,7 @@ int update_screen(int force)
 	/* update the cursor and flush the buffers */
 	update_cursor_position();
 	/* set previous line */
+	MESG(";update_screen: set new ppline");
 	cwp->w_ppline = window_cursor_line(cwp);
 	cwp->w_flag=0;
 	update_all=0;
@@ -2279,6 +2319,7 @@ void update_window_nowrap(WINDP *wp,int force)
 void update_window_wrap(WINDP *wp,int force)
 {
 	int cw_flag=cwp->w_flag;
+	MESG("update_window_wrap: ------------------");
 		if (wp==cwp) {
 			check_cursor_position(wp); /* check if on screen */
 			wp->currow = window_cursor_line(wp);

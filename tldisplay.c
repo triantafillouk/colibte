@@ -899,7 +899,7 @@ extern BOX *cbox;
 
 void update_cursor_position()
 {
-	// MESG("update_cursor_position: entry_mode=%d row=%d col=%d",entry_mode,cwp->currow,WGetCol());
+	MESG("update_cursor_position: entry_mode=%d row=%d col=%d",entry_mode,cwp->currow,WGetCol());
 	if(!entry_mode)
 	{
 		if(!in_menu) {
