@@ -595,11 +595,27 @@ int prev_line(int n)
 		offs o_now=tp_offset(cwp->tp_current);
 		offs o_begin=LineBegin(o_now);
 		int remains=DiffColumn(cwp->w_fp,&o_begin,o_now);
+		MESG("prev_line: now=%ld beg=%ld top=%ld",o_now,o_begin,tp_offset(cwp->tp_hline));
 		if(remains>(cwp->w_ntcols-cwp->w_infocol)) {
 			prev_character(cwp->w_ntcols-cwp->w_infocol);
 		} else {
 			set_goal_column(-1,"prev_line:2");
 			MoveLineCol(current_line-n,cwp->goal_column);
+		};
+		o_now=tp_offset(cwp->tp_current);
+		MESG("       : new now=%ld",o_now);
+		if(o_now < tp_offset(cwp->tp_hline)) {
+			offs o=LineBegin(o_now);
+			int col=0;
+			// offs new_hline=tp_offset(cwp->tp_hline);
+			offs new_hline=o;
+			while(1){
+				o=check_next_char(cwp->w_fp,o,&col);
+				if(o==o_now) break;
+				if((col % (cwp->w_ntcols-cwp->w_infocol))==0) new_hline=o;
+			};
+			textpoint_set(cwp->tp_hline,new_hline);
+			MESG("       : new hline=%ld",new_hline);
 		};
 	} else {
 		set_goal_column(-1,"prev_line:2");

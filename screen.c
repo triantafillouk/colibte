@@ -2203,7 +2203,7 @@ int update_screen(int force)
 	static int count=0;
 	count++;
 	int cw_flag=cwp->w_flag;
-	// MESG("update_screen: view_mode=%d",cwp->w_fp->view_mode);
+	MESG("update_screen: view_mode=%d o=%ld %ld",cwp->w_fp->view_mode,tp_offset(cwp->tp_current),tp_offset(cwp->w_fp->tp_current));
 	// MESG("\nupdate_screen:noupdate=%d cw_flag=%d force=%d ------ w_ntcols=%d count=%d",noupdate,cw_flag,force,cwp->w_ntcols,count);
 	if (noupdate) return TRUE;
 
