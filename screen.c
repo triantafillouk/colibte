@@ -2009,23 +2009,51 @@ int check_cursor_position_notes(WINDP *wp)
 	return(TRUE);
 }
 
+update_top_position_wrap()
+{
+ int o_now=tp_offset(cwp->tp_current);
+	offs o=LineBegin(o_now);
+ 	MESG("update_top_position_wrap: o_now=%ld begin=%ld",o_now,o);
+	int col=0;
+	// offs new_hline=tp_offset(cwp->tp_hline);
+	offs new_hline=o;
+	MESG("		: start evaluate new hline from %ld new current is %ld",new_hline,o_now);
+	while(1){
+		o=check_next_char(cwp->w_fp,o,&col);
+		if(o>=o_now) { MESG(" 	up to %ld, hline=%ld",o_now,new_hline);break;}
+		if((col % (cwp->w_ntcols-cwp->w_infocol))==0) {
+			new_hline=o;
+			MESG("		set new hline to %ld",new_hline);
+		};
+	};
+	textpoint_set(cwp->tp_hline,new_hline);
+	MESG("       : new hline=%ld",new_hline);
+}
+
 int check_cursor_position_wrap(WINDP *wp)
 {
 	offs cur_offs,cof;
 	FILEBUF *fp = wp->w_fp;
 	int i;
-	MESG("check_cursor_position_wrap: %ld %ld, line %ld %ld ",tp_offset(wp->tp_hline),tp_offset(wp->tp_current),tp_line(wp->tp_hline),tp_line(wp->tp_current));
+	MESG("check_cursor_position_wrap: hline %ld current %ld, line %ld %ld ",tp_offset(wp->tp_hline),tp_offset(wp->tp_current),tp_line(wp->tp_hline),tp_line(wp->tp_current));
 	cur_offs=tp_offset(wp->tp_current);
 	i= wp->w_ppline;
-	if( cur_offs < tp_offset(wp->tp_hline)) {
+	if( cur_offs <= tp_offset(wp->tp_hline)) {
 		MESG("	< ppline=%ld",wp->w_ppline);
-	
-	
+		update_top_position_wrap();
 		return FALSE;
 	}  else if  (window_cursor_line(wp) > wp->w_ntrows) {
 		MESG("	> ppline=%ld",wp->w_ppline);
-
-
+		offs o = FPrev_wrap_Line(wp->w_fp,cur_offs);
+		o = FPrev_wrap_Line(wp->w_fp,o);
+		o = FPrev_wrap_Line(wp->w_fp,o);
+		o = FPrev_wrap_Line(wp->w_fp,o);
+		o = FPrev_wrap_Line(wp->w_fp,o);
+		o = FPrev_wrap_Line(wp->w_fp,o);
+		o = FPrev_wrap_Line(wp->w_fp,o);
+		o = FPrev_wrap_Line(wp->w_fp,o);
+		// update_top_position_wrap();
+		textpoint_set(cwp->tp_hline,o);
 		return FALSE;
 	} else return TRUE;
 }
@@ -2203,7 +2231,8 @@ int update_screen(int force)
 	static int count=0;
 	count++;
 	int cw_flag=cwp->w_flag;
-	MESG("update_screen: view_mode=%d o=%ld %ld",cwp->w_fp->view_mode,tp_offset(cwp->tp_current),tp_offset(cwp->w_fp->tp_current));
+	MESG("update_screen: view_mode=%d o=%ld top=%ld row=%d",
+		cwp->w_fp->view_mode,tp_offset(cwp->tp_current),tp_offset(cwp->tp_hline),cwp->currow);
 	// MESG("\nupdate_screen:noupdate=%d cw_flag=%d force=%d ------ w_ntcols=%d count=%d",noupdate,cw_flag,force,cwp->w_ntcols,count);
 	if (noupdate) return TRUE;
 

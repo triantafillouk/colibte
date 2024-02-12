@@ -189,18 +189,22 @@ offs   FPrev_wrap_Line(FILEBUF *fp,offs ptr)
 	// goto the begining of the previous line!
 	while(b0>0 && !FBolAt(fp,--b0));
 	MESG("FPrev_wrap_line:1 goto beg of prev line: %ld",b0);
-#if	0
-	offs lbeg=ptr;
-	offs lend=FLineEnd(fp,ptr);
-	int line_cols=DiffColumn(fp,&lbeg,lend);
-	if(line_cols<window_width) return ptr; // the begining of the line
-	// int wrap_lines=line_cols/window_width;
-	// move ptr by wrap_lines
-	// goto last wrap_line
-
- 	MESG("FPrev_wrap_line:2 %ld -> %ld",ptr,swl);
-#endif
- };
+	int col=0;
+	offs o=b0;
+	offs o_now=FLineEnd(fp,b0);
+	offs new_hline=o;
+	while(1){
+		o=check_next_char(fp,o,&col);
+		if(o>=o_now) { 
+			// MESG(" 	up to %ld, hline=%ld",o_now,new_hline);
+			break;
+		}
+		if((col % (cwp->w_ntcols-cwp->w_infocol))==0) {
+			new_hline=o;
+			MESG("		set new hline to %ld",new_hline);
+		};
+	};
+	}
 
 	// int target_col = (ccol / window_width) * window_width;
 	offs swl=b0;	/* at the start of the line!  */
@@ -225,8 +229,15 @@ int move_window(int n)
 		curoffs = tp_offset(cwp->tp_hline);
 	else
 		curoffs = LineBegin(tp_offset(cwp->tp_hline));
+	MESG("move_window: start current top=%ld n=%d",curoffs,n);
     if (n < 0) {
-        while (n++) curoffs=FNextLine(cbfp,curoffs);
+        while (n++) {
+			if(cwp->w_fp->view_mode & VMWRAP) {
+				curoffs=goto_next_wrap_line(cbfp,curoffs);
+			} else {	
+				curoffs=FNextLine(cbfp,curoffs);
+			};
+		};
     } else  {
 		if(cwp->w_fp->view_mode & VMWRAP) {
 			while(n-- &&  (curoffs>0)) {
@@ -239,8 +250,9 @@ int move_window(int n)
     }
 	set_update(cwp,UPD_MOVE|UPD_WINDOW);
 	tp_copy(cwp->prev_hline,cwp->tp_hline);
-	MESG("move_window: n=%d new top at offs %ld",n,curoffs);
 	textpoint_set(cwp->tp_hline,curoffs);
+	MESG("move_window: n=%d new top at offs %ld line=%ld col=%ld",n,curoffs,tp_line(cwp->tp_hline),tp_col(cwp->tp_hline));
+
     return (TRUE);
 }
 
@@ -355,33 +367,48 @@ int window_cursor_line(WINDP *wp)
 		num top_line=tp_line(wp->tp_hline);
 		num line=top_line;
 		num top_offset=tp_offset(wp->tp_hline);
-		
+		num top_begin=LineBegin(top_offset);
+		num top_start=top_offset-top_begin;
 		int w_width=cwp->w_ntcols-cwp->w_infocol;
 		cline=0;
 		num o0=top_offset;
 		num o1=tp_offset(wp->tp_current);
-		MESG("window_cursor_line: width=%d top o=%ld l=%ld, current o=%ld l=%ld",w_width,top_offset,top_line,o1,tp_line(wp->tp_current)); 
+		int top_lines=tp_col(wp->tp_hline)/w_width;
+		MESG("window_cursor_line: ---- width=%d top o=%ld l=%ld col=%d, current o=%ld l=%ld, top_lines=%d",
+			w_width,top_offset,top_line,tp_col(wp->tp_hline),o1,tp_line(wp->tp_current),top_lines); 
 		while(1) {
 		// find the col at the end of the line or at the right side
 		// int i0=col % w_linew;
-		MESG("	wcl: line %ld, current line %ld",line,tp_line(wp->tp_current));
-		if(line>=tp_line(wp->tp_current)) {
-			o0=LineBegin(o1);
-			// MESG("	o0=%ld o1=%ld",o0,o1);
-			int col=DiffColumn(wp->w_fp,&o0,o1);
-			int line_rows=col/w_width;
-			cline+=line_rows;
-			// MESG("	current: col=%d line_rows=%d cline=%ld o0=%ld o1=%ld",col,line_rows,cline,o0,o1);
-			break;
-		} else {
+		if(line<tp_line(wp->tp_current)) {
+			MESG("	wcl:< line %ld, current line %ld",line,tp_line(wp->tp_current));
 			int col=DiffColumn(wp->w_fp,&o0,LineEnd(o0));
 			int line_rows=col/w_width;
 			cline+=line_rows+1;
 			// MESG("	add line: col=%d line_rows=%d cline=%ld o0=%ld",col,line_rows,cline,o0);
 			line++;
 			o0+=wp->w_fp->EolSize;
+		} else if(line==tp_line(wp->tp_current)) {
+			MESG("	wcl:= line %ld, current line %ld",line,tp_line(wp->tp_current));
+			o0=LineBegin(o1);
+			MESG("	top line begin=o0=%ld now=o1=%ld top offset=%ld",o0,o1,top_offset);
+			int col=DiffColumn(wp->w_fp,&o0,o1);
+			int line_rows=col/w_width;
+			cline+=line_rows;
+			cline-=top_lines;
+			MESG("	current: col=%d line_rows=%d cline=%ld o0=%ld o1=%ld",col,line_rows,cline,o0,o1);
+			break;
+		} else {
+			MESG("	wcl:> line %ld, current line %ld",line,tp_line(wp->tp_current));
+			o0=LineBegin(o1);
+			MESG("	top line begin=o0=%ld now=o1=%ld top offset=%ld",o0,o1,top_offset);
+			int col=DiffColumn(wp->w_fp,&o0,o1);
+			int line_rows=col/w_width;
+			cline+=line_rows;
+			// cline-=top_lines;
+			MESG("	current: col=%d line_rows=%d cline=%ld o0=%ld o1=%ld",col,line_rows,cline,o0,o1);
+			break;
 		}
-		};
+		}
 	} 
 	else cline = tp_line(wp->tp_current)-tp_line(wp->tp_hline);
  MESG("window_cursor_line: %d",cline);

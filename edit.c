@@ -320,7 +320,7 @@ int goto_line(num n)
 /* Assigned to ALT-< */
 int goto_bof(int n)
 {
-//	MESG("goto_bof:");
+ // MESG("goto_bof:");
 #if	TNOTES
 	if(cbfp->b_flag==FSNOTES) {
 		if(cwp->current_tag_line==0) return FALSE;
@@ -343,7 +343,7 @@ int goto_bof(int n)
 	if(execmd) return (OK_CLRSL);
 	set_update(cwp,UPD_WINDOW);
 	msg_line(time2a());
-
+	MESG("goto_bof");
 	return (OK_RSTGOAL);
 }
 
@@ -513,19 +513,15 @@ int next_line(int n)
 		textpoint_set_lc(cbfp->tp_current,current_line+n,Offset()%16);
 	} else 
 	if(cbfp->view_mode & VMWRAP) {
+		MESG("next_line: < wrap mode!");
 		offs o_now=tp_offset(cwp->tp_current);
 		offs o_end=LineEnd(o_now);
 		int remains=DiffColumn(cwp->w_fp,&o_now,o_end);
 		if(remains>(cwp->w_ntcols-cwp->w_infocol)) {
 			next_character(cwp->w_ntcols-cwp->w_infocol);
 		} else {
-			if(remains >0) {
-				// next_character(remains);		
-				goto_eol(1);
-			} else {
-				set_goal_column(-1,"next_line:2");
-				MoveLineCol(current_line+n,cwp->goal_column);
-			};
+			set_goal_column(-1,"next_line:2");
+			MoveLineCol(current_line+n,cwp->goal_column);
 		};
 	} else
 	{
@@ -533,10 +529,14 @@ int next_line(int n)
 		MoveLineCol(current_line+n,cwp->goal_column);
 	};
 	set_hmark(0,"next_line");
+	MESG("next_line:	end >!");
 	/* reseting the current position */
 	if(!execmd) set_update(cwp,UPD_MOVE);
 	return(TRUE);
 }
+
+void update_top_position_wrap();
+offs   FPrev_wrap_Line(FILEBUF *fp,offs ptr);
 
 /* Move backward by n lines. */
 int prev_line(int n)
@@ -592,30 +592,41 @@ int prev_line(int n)
 		textpoint_set_lc(cbfp->tp_current,current_line-n,Offset()%16);
 	} else
 	if(cbfp->view_mode & VMWRAP) {
+		int window_width=cwp->w_ntcols-cwp->w_infocol;
 		offs o_now=tp_offset(cwp->tp_current);
 		offs o_begin=LineBegin(o_now);
-		int remains=DiffColumn(cwp->w_fp,&o_begin,o_now);
-		MESG("prev_line: now=%ld beg=%ld top=%ld",o_now,o_begin,tp_offset(cwp->tp_hline));
-		if(remains>(cwp->w_ntcols-cwp->w_infocol)) {
-			prev_character(cwp->w_ntcols-cwp->w_infocol);
+		offs o=o_begin;
+		int remains=DiffColumn(cwp->w_fp,&o,o_now);
+		MESG("prev_line: now=%ld col=%d beg=%ld remains=%d top=%ld",o_now,tp_col(cwp->tp_current),o_begin,remains,tp_offset(cwp->tp_hline));
+		if(remains>window_width) {
+			prev_character(window_width);
 		} else {
 			set_goal_column(-1,"prev_line:2");
 			MoveLineCol(current_line-n,cwp->goal_column);
 		};
 		o_now=tp_offset(cwp->tp_current);
-		MESG("       : new now=%ld",o_now);
-		if(o_now < tp_offset(cwp->tp_hline)) {
+		offs o_hline=tp_offset(cwp->tp_hline);
+		MESG("       : new now=%ld hline=%ld",o_now,o_hline);
+		if(o_now <= o_hline) {
+#if	1
+			update_top_position_wrap();
+#else
 			offs o=LineBegin(o_now);
 			int col=0;
 			// offs new_hline=tp_offset(cwp->tp_hline);
 			offs new_hline=o;
+			MESG("		: start evaluate new hline from %ld new current is %ld",new_hline,o_now);
 			while(1){
 				o=check_next_char(cwp->w_fp,o,&col);
-				if(o==o_now) break;
-				if((col % (cwp->w_ntcols-cwp->w_infocol))==0) new_hline=o;
+				if(o>=o_now) { MESG(" 	up to %ld, hline=%ld",o_now,new_hline);break;}
+				if((col % (cwp->w_ntcols-cwp->w_infocol))==0) {
+					new_hline=o;
+					MESG("		set new hline to %ld",new_hline);
+				};
 			};
 			textpoint_set(cwp->tp_hline,new_hline);
 			MESG("       : new hline=%ld",new_hline);
+#endif
 		};
 	} else {
 		set_goal_column(-1,"prev_line:2");

@@ -474,7 +474,9 @@ offs goto_next_wrap_line(FILEBUF *fp,offs start)
  int col=0;
  while(col<cwp->w_ntcols-cwp->w_infocol) {
  	if(FEofAt(fp,o)) break;
-	if(FEolAt(fp,o)) break;
+	if(FBolAt(fp,o) && col>0) {
+		break;
+	};
 	int c;
 	utfchar uc;
 	o = FUtfCharAt(fp,o,&uc);
@@ -483,14 +485,6 @@ offs goto_next_wrap_line(FILEBUF *fp,offs start)
 		col=next_tab(col);
 	} else {
 		col += get_utf_length(&uc);
-#if	0
-		if(clen_error) {
-			set_utf8_error(1);
-			c=DiffColumn(fp,dbo,col_offs);
-			set_utf8_error(0);
-			return c;
-		};
-#endif
 	};
   };
  
