@@ -2060,15 +2060,12 @@ int check_cursor_position_wrap(WINDP *wp)
 	} else return TRUE;
 }
 
-// int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs);
-
 void set_top_hline(WINDP *wp,offs cof)
 {
 	offs b0=FLineBegin(wp->w_fp,cof);
 	if(wp->w_fp->view_mode & VMWRAP) { // ????????? TODO
 		// int w=wp->w_ntcols-wp->w_infocol;
-		offs b1=b0;
-		int line_chars=DiffColumn(wp->w_fp,&b1,cof);
+		int line_chars=DiffColumns(wp->w_fp,&b0,cof);
 		// int new_loffs = (line_chars / w) * w;
 	} else;
 	textpoint_set(wp->tp_hline,b0);

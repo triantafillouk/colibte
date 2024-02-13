@@ -227,6 +227,7 @@ int changes_occured();
 FILEBUF * new_filebuf(char *bname,int bflag);
 FILEBUF * get_filebuf(char *bname,char *dname,int flag);
 int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs);
+int DiffColumns(FILEBUF *fp, offs start,offs col_offs);
 
 
 int window_row_increase(int n);

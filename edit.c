@@ -517,7 +517,7 @@ int next_line(int n)
 		MESG("next_line: < wrap mode!");
 		offs o_now=tp_offset(cwp->tp_current);
 		offs o_end=LineEnd(o_now);
-		int remains=DiffColumn(cwp->w_fp,&o_now,o_end);
+		int remains=DiffColumns(cwp->w_fp,o_now,o_end);
 		if(remains>(cwp->w_ntcols-cwp->w_infocol)) {
 			next_character(cwp->w_ntcols-cwp->w_infocol);
 		} else {
@@ -596,8 +596,7 @@ int prev_line(int n)
 		int window_width=cwp->w_ntcols-cwp->w_infocol;
 		offs o_now=tp_offset(cwp->tp_current);
 		offs o_begin=LineBegin(o_now);
-		offs o=o_begin;
-		int remains=DiffColumn(cwp->w_fp,&o,o_now);
+		int remains=DiffColumns(cwp->w_fp,o_begin,o_now);
 		MESG("prev_line: now=%ld col=%d beg=%ld remains=%d top=%ld",o_now,tp_col(cwp->tp_current),o_begin,remains,tp_offset(cwp->tp_hline));
 		if(remains>window_width) {
 			prev_character(window_width);
@@ -609,25 +608,7 @@ int prev_line(int n)
 		offs o_hline=tp_offset(cwp->tp_hline);
 		MESG("       : new now=%ld hline=%ld",o_now,o_hline);
 		if(o_now <= o_hline) {
-#if	1
 			update_top_position_wrap();
-#else
-			offs o=LineBegin(o_now);
-			int col=0;
-			// offs new_hline=tp_offset(cwp->tp_hline);
-			offs new_hline=o;
-			MESG("		: start evaluate new hline from %ld new current is %ld",new_hline,o_now);
-			while(1){
-				o=check_next_char(cwp->w_fp,o,&col);
-				if(o>=o_now) { MESG(" 	up to %ld, hline=%ld",o_now,new_hline);break;}
-				if((col % (cwp->w_ntcols-cwp->w_infocol))==0) {
-					new_hline=o;
-					MESG("		set new hline to %ld",new_hline);
-				};
-			};
-			textpoint_set(cwp->tp_hline,new_hline);
-			MESG("       : new hline=%ld",new_hline);
-#endif
 		};
 	} else {
 		set_goal_column(-1,"prev_line:2");
@@ -648,7 +629,6 @@ int emptyline(TextPoint *tp)
  if(FBolAt(fp,o) && FEolAt(fp,o)) return true;
  return false;
 }
-
 
 
 // comment/uncomment at start of line

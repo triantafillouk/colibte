@@ -506,6 +506,36 @@ offs check_next_char(FILEBUF *fp,offs o,int *col)
 	return o;
 }
 
+int DiffColumns(FILEBUF *fp, offs start_col,offs col_offs)
+{
+ int col = 0;
+ offs o=start_col;
+ if(fp->b_lang==0 && !utf8_error()){
+//  MESG("diffcol: from %ld to %ld",o,col_offs);
+  while (o < col_offs && !FEofAt(fp,o)) {
+	o = check_next_char(fp,o,&col);
+	if(clen_error) {
+		set_utf8_error(1);
+		int c=DiffColumns(fp,start_col,col_offs);
+		set_utf8_error(0);
+		return c;
+	};
+  };
+ } else {
+  while (o < col_offs && !FEofAt(fp,o)) {
+	int c;
+	c=FCharAt(fp,o);
+	if (c == CHR_TAB) {
+		col=next_tab(col);
+	} else {
+		col ++;
+	};
+	o++;
+  }
+ };
+ return(col);
+}
+
 int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs)
 {
  int col = 0;
@@ -513,31 +543,13 @@ int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs)
  if(fp->b_lang==0 && !utf8_error()){
 //  MESG("diffcol: from %ld to %ld",o,col_offs);
   while (o < col_offs && !FEofAt(fp,o)) {
-#if	1
 	o = check_next_char(fp,o,&col);
 	if(clen_error) {
 		set_utf8_error(1);
-		int c=DiffColumn(fp,dbo,col_offs);
+		int c=DiffColumns(fp,*dbo,col_offs);
 		set_utf8_error(0);
 		return c;
 	};
-#else
-	int c;
-	utfchar uc;
-	o = FUtfCharAt(fp,o,&uc);
- 	c=uc.uval[0];
-	if (c == CHR_TAB) {
-		col=next_tab(col);
-	} else {
-		col += get_utf_length(&uc);
-		if(clen_error) {
-			set_utf8_error(1);
-			c=DiffColumn(fp,dbo,col_offs);
-			set_utf8_error(0);
-			return c;
-		};
-	};
-#endif
   };
  } else {
   while (o < col_offs && !FEofAt(fp,o)) {
@@ -1542,7 +1554,7 @@ num FColumn(FILEBUF *fp,offs o)
  offs	dbo;
  dbo=FLineBegin(fp,o);
  if(fp->view_mode & VMHEX) col = (o-dbo)%0x10;
- else col=DiffColumn(fp,&dbo,o);
+ else col=DiffColumns(fp,dbo,o);
 // MESG("FColumn:%d %ld",col,tp_col(cwp->tp_current));
  return (col);
 }
@@ -1553,7 +1565,7 @@ num Column(offs o)
  offs	dbo;
  dbo=LineBegin(o);
  if(cbfp->view_mode & VMHEX) col = (o-dbo)%0x10;
- else col=DiffColumn(cbfp,&dbo,o);
+ else col=DiffColumns(cbfp,dbo,o);
 // MESG("FColumn:%d %ld",col,tp_col(cwp->tp_current));
  return (col);
 }

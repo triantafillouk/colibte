@@ -18,7 +18,9 @@ extern int drv_initialized;
 
 GWINDP * drv_new_twinp();
 int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs);
+int DiffColumns(FILEBUF *fp, offs start,offs col_offs);
 offs FNext_wrap_Line(WINDP *wp,offs current_offset);
+offs goto_next_wrap_line(FILEBUF *fp,offs start);
 
 int window_num()
 {
@@ -184,7 +186,7 @@ offs   FPrev_wrap_Line(FILEBUF *fp,offs ptr)
  int window_width=cwp->w_ntcols-cwp->w_infocol;
  offs b0=FLineBegin(fp,ptr);
  offs b1=b0;
- int ccol=DiffColumn(fp,&b1,ptr);
+ int ccol=DiffColumns(fp,b1,ptr);
  MESG("FPrev_wrap_line: ccol=%d -----------",ccol);
  if(ccol< window_width){ // we are at the first wrap line!
 	// goto the begining of the previous line!
