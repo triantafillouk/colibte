@@ -127,7 +127,7 @@ void vtinit(int argc, char **argp)
 void movecursor(int row, int col)
 {
  static int t=0;
-    if(row<drv_numrow-2) {
+    if(row<drv_numrow-1) {
 		if(cwp->w_ntcols>40) show_position_info(0);
 		else if(cwp->w_ntcols>25) show_position_info(1);
 		else show_position_info(-1);

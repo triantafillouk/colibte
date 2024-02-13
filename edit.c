@@ -18,6 +18,7 @@ void toggle_global_flag(int option_flag);
 void set_global_flag(int option_flag,int value);
 void get_lowercase_string(char *lower, char *string);
 void get_uppercase_string(char *lower, char *string);
+offs FNext_wrap_Line(WINDP *wp,offs current_offset);
 
 int GetBlock(FILEBUF *fp,char *copy,offs from,offs size);
 int delins(int dlength, char *instr);
@@ -863,16 +864,16 @@ int next_page(int  n)
 		};
 		textpoint_set(cwp->tp_hline,o);
 		MESG("        : new topo=%ld line=%ld",o,tp_line(cwp->tp_hline));
-		offs top_offset=tp_offset(cwp->tp_hline);
+		// offs top_offset=tp_offset(cwp->tp_hline);
 		// n=lines;
-		o=tp_offset(cwp->tp_current);
+		// o=tp_offset(cwp->tp_current);
 		MESG("		start current from %ld n=%d",o,n);
 		while(--n>0) {
 			o=FNext_wrap_Line(cwp,o);
 			MESG("		next line o=%ld",o);
 		};
 		textpoint_set(cwp->tp_current,o);
-		offs new_current=tp_offset(cwp->tp_current);
+		// offs new_current=tp_offset(cwp->tp_current);
 		textpoint_set(cwp->w_fp->tp_current,o);
 		// cwp->w_ppline = tp_line(cwp->tp_current)-tp_line(cwp->tp_hline)+1;
 		MESG("		new current o=%ld line=%ld",tp_line(cwp->tp_current),tp_line(cwp->tp_current));

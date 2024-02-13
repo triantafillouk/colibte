@@ -29,6 +29,8 @@ void upd_all_wrap_lines(WINDP *wp,char *from);
 void update_window_nowrap(WINDP *wp,int force);
 void update_window_wrap(WINDP *wp,int force);
 void upd_part_wrap(WINDP *wp,char *from);
+offs   FPrev_wrap_Line(FILEBUF *fp,offs ptr);
+offs check_next_char(FILEBUF *fp,offs o,int *col);
 
 extern COLOR_SCHEME *current_scheme;
 
@@ -2009,7 +2011,7 @@ int check_cursor_position_notes(WINDP *wp)
 	return(TRUE);
 }
 
-update_top_position_wrap()
+void update_top_position_wrap()
 {
  int o_now=tp_offset(cwp->tp_current);
 	offs o=LineBegin(o_now);
@@ -2032,12 +2034,12 @@ update_top_position_wrap()
 
 int check_cursor_position_wrap(WINDP *wp)
 {
-	offs cur_offs,cof;
-	FILEBUF *fp = wp->w_fp;
-	int i;
+	offs cur_offs;
+	// FILEBUF *fp = wp->w_fp;
+	// int i;
 	MESG("check_cursor_position_wrap: hline %ld current %ld, line %ld %ld ",tp_offset(wp->tp_hline),tp_offset(wp->tp_current),tp_line(wp->tp_hline),tp_line(wp->tp_current));
 	cur_offs=tp_offset(wp->tp_current);
-	i= wp->w_ppline;
+	// i= wp->w_ppline;
 	if( cur_offs <= tp_offset(wp->tp_hline)) {
 		MESG("	< ppline=%ld",wp->w_ppline);
 		update_top_position_wrap();
@@ -2063,12 +2065,11 @@ int check_cursor_position_wrap(WINDP *wp)
 void set_top_hline(WINDP *wp,offs cof)
 {
 	offs b0=FLineBegin(wp->w_fp,cof);
-	if(wp->w_fp->view_mode & VMWRAP) {
-		int w=wp->w_ntcols-wp->w_infocol;
+	if(wp->w_fp->view_mode & VMWRAP) { // ????????? TODO
+		// int w=wp->w_ntcols-wp->w_infocol;
 		offs b1=b0;
 		int line_chars=DiffColumn(wp->w_fp,&b1,cof);
-		int new_loffs = (line_chars / w) * w;
-		// textpoint_set_lc(wp->tp_hline,new_loffs);
+		// int new_loffs = (line_chars / w) * w;
 	} else;
 	textpoint_set(wp->tp_hline,b0);
 }

@@ -18,6 +18,7 @@ extern int drv_initialized;
 
 GWINDP * drv_new_twinp();
 int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs);
+offs FNext_wrap_Line(WINDP *wp,offs current_offset);
 
 int window_num()
 {
@@ -367,8 +368,8 @@ int window_cursor_line(WINDP *wp)
 		num top_line=tp_line(wp->tp_hline);
 		num line=top_line;
 		num top_offset=tp_offset(wp->tp_hline);
-		num top_begin=LineBegin(top_offset);
-		num top_start=top_offset-top_begin;
+		// num top_begin=LineBegin(top_offset);
+		// num top_start=top_offset-top_begin;
 		int w_width=cwp->w_ntcols-cwp->w_infocol;
 		cline=0;
 		num o0=top_offset;
@@ -380,21 +381,21 @@ int window_cursor_line(WINDP *wp)
 		// find the col at the end of the line or at the right side
 		// int i0=col % w_linew;
 		if(line<tp_line(wp->tp_current)) {
-			MESG("	wcl:< line %ld, current line %ld",line,tp_line(wp->tp_current));
 			int col=DiffColumn(wp->w_fp,&o0,LineEnd(o0));
 			int line_rows=col/w_width;
 			cline+=line_rows+1;
+			MESG("	wcl:< line %ld, current line %ld cline=%ld",line,tp_line(wp->tp_current),cline);
 			// MESG("	add line: col=%d line_rows=%d cline=%ld o0=%ld",col,line_rows,cline,o0);
 			line++;
 			o0+=wp->w_fp->EolSize;
 		} else if(line==tp_line(wp->tp_current)) {
-			MESG("	wcl:= line %ld, current line %ld",line,tp_line(wp->tp_current));
+			MESG("	wcl:= line %ld, current line %ld w=%d",line,tp_line(wp->tp_current),w_width);
 			o0=LineBegin(o1);
-			MESG("	top line begin=o0=%ld now=o1=%ld top offset=%ld",o0,o1,top_offset);
+			MESG("	top line begin=o0=%ld now=o1=%ld top offset=%ld top_lines=%d",o0,o1,top_offset,top_lines);
 			int col=DiffColumn(wp->w_fp,&o0,o1);
 			int line_rows=col/w_width;
 			cline+=line_rows;
-			cline-=top_lines;
+			// cline-=top_lines;
 			MESG("	current: col=%d line_rows=%d cline=%ld o0=%ld o1=%ld",col,line_rows,cline,o0,o1);
 			break;
 		} else {
