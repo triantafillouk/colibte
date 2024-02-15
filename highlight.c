@@ -1754,6 +1754,90 @@ void highlight_json(int c)
   };
 }
 
+void highlight_bicep(int c)
+{
+  static int next_quote=0;
+  if(highlight_note(c)) return;
+
+  if(next_quote) hquotem=next_quote;
+  next_quote=0;
+
+  switch(c) {
+	case (CHR_RESET) : // initialize
+		hstate=0;
+		first=1;
+		in_array=0;
+		next_quote=0;
+		slang=LANG_SCRIPT;
+		break;
+	case ':' :
+		if(hstate==0) first=0;
+		break;
+	case CHR_CURLL:
+		if(hquotem==0) { if(hstate==0) { first=1;in_array=0;};};
+		break;
+	case CHR_CURLR:
+		if(hquotem==0) { if(hstate==0) first=1;};
+		break;
+	case CHR_DQUOTE:
+		if(hstate==HS_PREVESC) { hstate=0;break;};
+		if(first) {
+			if(hquotem == 0 && next_quote==0) next_quote=H_QUOTE2;
+			else {
+				hquotem = 0;
+			}
+		} else {
+			if(hquotem == 0 && next_quote==0) {
+				next_quote=H_QUOTE5;
+			} else {
+				hquotem =0;
+			}
+		}
+		hstate=0;
+		break;
+
+	case '/':
+		if(hquotem&H_QUOTE1 || hquotem&H_QUOTE2) { hstate=0;break;};
+		if(hquotem!=H_QUOTE2 && hquotem!=H_QUOTE1) {
+			if(hstate==HS_PREVSLASH) hquotem |=H_QUOTE5;
+			else hstate=HS_PREVSLASH;
+		};
+		break;
+	case '\n':
+	case CHR_CR:
+		hquotem = 0;
+		hstate=HS_LINESTART;
+		break;
+
+	case '#':
+		if(hstate==HS_LINESTART) hquotem = (hquotem)? hquotem : H_QUOTE6;
+		hstate=0;
+		break;
+	case '\\':{
+		hstate=(hstate==HS_PREVESC)?0:HS_PREVESC;
+		};
+		break;
+	case ',':
+		if(in_array==0) first=1; 
+		break;
+	case CHR_LBRA:
+		if(hquotem==0) {
+			in_array=1;
+			first=0;
+		};
+		break;
+	case CHR_RBRA:
+		if(hquotem==0) {
+			in_array=0;
+			first=1;
+		};
+		break;
+	default: { 
+		hstate=0;
+	};
+  };
+}
+
 void highlight_terraform(int c)
 {
   if(highlight_note(c)) return;
