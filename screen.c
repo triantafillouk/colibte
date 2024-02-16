@@ -274,7 +274,7 @@ void upd_column_pos_wrap()
 {
 	cwp->w_lcol=0;
 	cwp->curcol = cwp->curcol % (cwp->w_ntcols - cwp->w_infocol) + cwp->w_infocol;
-	// MESG("upd_column_pos_wrap: %d < %d",cwp->curcol,cwp->w_ntcols);
+	MESG("	upd_column_pos_wrap: %d < %d",cwp->curcol,cwp->w_ntcols);
 }
 
 /*	upd_column_pos:	update the column position of the hardware cursor and handle extended lines.  */
@@ -283,6 +283,7 @@ void upd_column_pos()
  int mo;
  int num_columns=0;
  int total_columns;
+ 
 	cwp->curcol = GetCol();
 	num_columns=cwp->w_infocol;
 	total_columns=cwp->w_ntcols-num_columns;
@@ -292,6 +293,7 @@ void upd_column_pos()
 	} else 
 	if(cbfp->view_mode & VMWRAP) {
 		upd_column_pos_wrap();
+		return;
 	} else
 	if(cwp->curcol < (cwp->w_lcol)+2 && cwp->w_lcol>0) 
 	{
@@ -2065,7 +2067,7 @@ void set_top_hline(WINDP *wp,offs cof)
 	offs b0=FLineBegin(wp->w_fp,cof);
 	if(wp->w_fp->view_mode & VMWRAP) { // ????????? TODO
 		// int w=wp->w_ntcols-wp->w_infocol;
-		int line_chars=DiffColumns(wp->w_fp,&b0,cof);
+		int line_chars=DiffColumns(wp->w_fp,b0,cof);
 		// int new_loffs = (line_chars / w) * w;
 	} else;
 	textpoint_set(wp->tp_hline,b0);
@@ -2094,13 +2096,13 @@ int check_cursor_position(WINDP *wp)
 	{
 		// we are out of bounds. reposition!
 		force_reposition=1;
-//		MESG("check_cursor_position: reposition!!");
+		MESG("check_cursor_position: reposition!!");
 	};
 	if(!force_reposition) return TRUE;
 	wp->w_flag = UPD_FULL;
 	/* reaching here, we need a window refresh */
 	i= wp->w_ppline;
-	MESG("check_cursor_position: refresh! ppline=%d",i);
+	// MESG("check_cursor_position: refresh! ppline=%d",i);
 	/* how far back to go? */
 	if (i > 0) {
 		if (--i >= wp->w_ntrows) i = wp->w_ntrows-2;
@@ -2229,7 +2231,7 @@ int update_screen(int force)
 	static int count=0;
 	count++;
 	int cw_flag=cwp->w_flag;
-	MESG("update_screen: view_mode=%d o=%ld top=%ld row=%d",
+	MESG("!update_screen: view_mode=%d o=%ld top=%ld row=%d",
 		cwp->w_fp->view_mode,tp_offset(cwp->tp_current),tp_offset(cwp->tp_hline),cwp->currow);
 	// MESG("\nupdate_screen:noupdate=%d cw_flag=%d force=%d ------ w_ntcols=%d count=%d",noupdate,cw_flag,force,cwp->w_ntcols,count);
 	if (noupdate) return TRUE;
@@ -2349,6 +2351,7 @@ void update_window_wrap(WINDP *wp,int force)
 	MESG("update_window_wrap: ------------------");
 		if (wp==cwp) {
 			check_cursor_position(wp); /* check if on screen */
+			MESG("	see currow !!!!!!!!!!");
 			wp->currow = window_cursor_line(wp);
 #if	1
 				upd_all_wrap_lines(wp,"wrap0");

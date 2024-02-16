@@ -357,6 +357,58 @@ int chardline(WINDP *wp)
  return(screen_row);
 }
 
+int window_cursor_line_wrap(WINDP *wp)
+{
+  int cline=0;
+  num top_line=tp_line(wp->tp_hline);
+  num top_offset=tp_offset(wp->tp_hline);
+  num current_line=tp_line(wp->tp_current);
+  num current_offset=tp_offset(wp->tp_current);
+  int w_width=cwp->w_ntcols-cwp->w_infocol;
+  MESG(";window_cursor_line_wrap");
+  if(top_line==current_line) {
+	int col=DiffColumns(wp->w_fp,top_offset,current_offset);
+	int line_rows=col/w_width;
+	cline=line_rows;
+	return cline;
+  };  
+
+  if(top_line<current_line) {
+  	// till the end of hline
+	num o=LineEnd(top_offset);
+	int col=DiffColumns(wp->w_fp,top_offset,o);
+	int line_rows=col/w_width;
+	cline=line_rows+1;
+	o += wp->w_fp->EolSize;
+	if(!FBolAt(wp->w_fp,o)) MESG("Not at bol1 !!!!!!!!!!!");
+	while(1) {
+	  num line_start=o;
+	  
+  	  o=LineEnd(line_start);
+	  if(o>current_offset) {
+	  	o=current_offset;
+        int col=DiffColumns(wp->w_fp,line_start,o);
+	    int line_rows=col/w_width;
+	    cline+=line_rows;
+	    return cline;
+	  } else {
+        int col=DiffColumns(wp->w_fp,line_start,o);
+	    int line_rows=col/w_width;
+	    cline+=line_rows;
+		if(o!=current_offset) {
+			o += wp->w_fp->EolSize;
+			cline++;
+		} else {
+			MESG("	p==current_offset %ld at eol",o);
+			return cline;
+		}
+	  };
+  	};
+  };
+  MESG("---- current offset is before hline !!!!");
+  return 0;
+}
+
 int window_cursor_line(WINDP *wp)
 {
  int cline=0;
@@ -367,6 +419,9 @@ int window_cursor_line(WINDP *wp)
 #endif
 	if(cwp->w_fp->b_flag & FSNLIST) cline=cwp->current_note_line-cwp->top_note_line;
 	else if(cwp->w_fp->view_mode & VMWRAP) {
+#if	1
+		return window_cursor_line_wrap(wp);
+#else
 		num top_line=tp_line(wp->tp_hline);
 		num line=top_line;
 		num top_offset=tp_offset(wp->tp_hline);
@@ -412,6 +467,7 @@ int window_cursor_line(WINDP *wp)
 			break;
 		}
 		}
+#endif
 	} 
 	else cline = tp_line(wp->tp_current)-tp_line(wp->tp_hline);
  MESG("window_cursor_line: %d",cline);
