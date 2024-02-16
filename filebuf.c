@@ -472,7 +472,7 @@ offs goto_next_wrap_line(FILEBUF *fp,offs start)
  offs o=start;
  // from the start of the wrap line
  int col=0;
- while(col<cwp->w_ntcols-cwp->w_infocol) {
+ while(col<cwp->w_width) {
  	if(FEofAt(fp,o)) break;
 	if(FBolAt(fp,o) && col>0) {
 		break;
@@ -487,7 +487,7 @@ offs goto_next_wrap_line(FILEBUF *fp,offs start)
 		col += get_utf_length(&uc);
 	};
   };
- 
+ // MESG("		nwl from %ld to %ld col=%d",start,o,col);
  return o;
 }
 

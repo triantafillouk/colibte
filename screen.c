@@ -273,7 +273,7 @@ void upd_column_pos_hex()
 void upd_column_pos_wrap()
 {
 	cwp->w_lcol=0;
-	cwp->curcol = cwp->curcol % (cwp->w_ntcols - cwp->w_infocol) + cwp->w_infocol;
+	cwp->curcol = cwp->curcol % (cwp->w_width) + cwp->w_infocol;
 	MESG("	upd_column_pos_wrap: %d < %d",cwp->curcol,cwp->w_ntcols);
 }
 
@@ -286,6 +286,7 @@ void upd_column_pos()
  
 	cwp->curcol = GetCol();
 	num_columns=cwp->w_infocol;
+
 	total_columns=cwp->w_ntcols-num_columns;
 	if(cwp->w_ntcols==0) return;
 	if(cbfp->view_mode & VMHEX){ 
@@ -645,10 +646,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 
  if(max_size>0) last_column=start_col+max_size;
  if(last_column>wp->w_ntcols) last_column=wp->w_ntcols;
-#if	0
- if(start_col==0) num_columns=wp->w_infocol;
- else num_columns=0;
-#endif
+
  vtmove(wp,row,start_col);
  if(row<5 && start_col==0){
 	 // MESG("vt_str: at row=%2d index=%2d col=%2d selected=%d [%s]",row,index,start_col,selected,str);
@@ -1476,7 +1474,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 		uc.uval[0]='~';
 		vtputwc(wp,&uc);
 	};
-	for (; i <  llen && wp->vtcol < wp->w_ntcols; i++) 
+	for (; i <  llen && wp->vtcol < wp->w_width; i++) 
 	{	// this is the on screen shown area of the line
 		int display_size=0;
 		memset(uc.uval,0,8);
@@ -1524,7 +1522,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 //				MESG("-- %s   ] display_size=%d",uc.uval,display_size);
 			};
 #endif
-			if(wp->vtcol==wp->w_ntcols-1 && display_size>1) { // do not show last double width character!
+			if(wp->vtcol==wp->w_width-1 && display_size>1) { // do not show last double width character!
 				memset(uc.uval,0,8);
 				uc.uval[0]=' ';
 				uc.uval[1]=0;
@@ -1551,7 +1549,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 	// show a line separator (when highlight_md)
 	if(line_sep) {
 		VIDEO *vp=wp->vs[wp->vtrow];
-		for(wp->vtcol=first_column;wp->vtcol< wp->w_ntcols-first_column;wp->vtcol++){ 
+		for(wp->vtcol=first_column;wp->vtcol< wp->w_width;wp->vtcol++){ 
 			vchar *vc = vp->v_text+wp->vtcol;
 
 			svwchar(vc,&double_hline,vc->bcolor,COLOR_COMMENT_FG);	/* double line separator */
@@ -1561,7 +1559,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 	/* highlight according to evaluated mask */
 	if(syntaxh && slang)
 	{
-		for(i0=num_columns;i0< wp->w_ntcols;i0++){
+		for(i0=num_columns;i0< wp->w_width;i0++){
 			if(i0+first_column > real_line_len+num_columns) break;
 			c1=vtlm[i0+first_column-num_columns];
 
@@ -1586,7 +1584,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 	// in case of utf error show local chars with different color!
 	// if(slang)
 	if(fp->b_lang==0){
-		for(i0=0;i0<wp->w_ntcols;i0++) {
+		for(i0=0;i0<wp->w_width;i0++) {
 			if(v_text[i0].uval[0]>128) 
 			{
 				if(v_text[i0].uval[1]==0) {
@@ -2025,7 +2023,7 @@ void update_top_position_wrap()
 	while(1){
 		o=check_next_char(cwp->w_fp,o,&col);
 		if(o>=o_now) { MESG(" 	up to %ld, hline=%ld",o_now,new_hline);break;}
-		if((col % (cwp->w_ntcols-cwp->w_infocol))==0) {
+		if((col % (cwp->w_width))==0) {
 			new_hline=o;
 			MESG("		set new hline to %ld",new_hline);
 		};
@@ -2231,8 +2229,9 @@ int update_screen(int force)
 	static int count=0;
 	count++;
 	int cw_flag=cwp->w_flag;
-	MESG("!update_screen: view_mode=%d o=%ld top=%ld row=%d",
-		cwp->w_fp->view_mode,tp_offset(cwp->tp_current),tp_offset(cwp->tp_hline),cwp->currow);
+	set_window_width(cwp);
+	MESG("!update_screen: < view_mode=%d o=%ld col=%ld top=%ld row=%d cwp_width=%d",
+		cwp->w_fp->view_mode,tp_offset(cwp->tp_current),tp_col(cwp->tp_current),tp_offset(cwp->tp_hline),cwp->currow,cwp->w_width);
 	// MESG("\nupdate_screen:noupdate=%d cw_flag=%d force=%d ------ w_ntcols=%d count=%d",noupdate,cw_flag,force,cwp->w_ntcols,count);
 	if (noupdate) return TRUE;
 
@@ -2282,8 +2281,8 @@ int update_screen(int force)
 	/* update the cursor and flush the buffers */
 	update_cursor_position();
 	/* set previous line */
-	MESG(";update_screen: set new ppline");
 	cwp->w_ppline = window_cursor_line(cwp);
+	MESG(";update_screen: > new ppline=%d current is (l=%ld c=%ld o=%ld)",cwp->w_ppline,tp_line(cwp->tp_current),tp_col(cwp->tp_current),tp_offset(cwp->tp_current));
 	cwp->w_flag=0;
 	update_all=0;
 	drv_flush();

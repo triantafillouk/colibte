@@ -903,7 +903,6 @@ extern BOX *cbox;
 
 void update_cursor_position()
 {
-	MESG("update_cursor_position: entry_mode=%d row=%d col=%d",entry_mode,cwp->currow,WGetCol());
 	if(!entry_mode)
 	{
 		if(!in_menu) {
@@ -913,9 +912,10 @@ void update_cursor_position()
 			else 
 #endif
 			if(cwp->w_fp->b_flag & FSNLIST) movecursor(cwp->current_note_line-cwp->top_note_line+(cwp->w_fp->b_header!=NULL), 0);
-			else if(cwp->w_fp->view_mode & VMWRAP) 
+			else if(cwp->w_fp->view_mode & VMWRAP) {
+				MESG("update_cursor_position: row=%d col=%d %d",cwp->currow,cwp->curcol,WGetCol());
 				movecursor(cwp->currow,cwp->curcol);
-			else movecursor(cwp->currow+(cwp->w_fp->b_header!=NULL), WGetCol());
+			} else movecursor(cwp->currow+(cwp->w_fp->b_header!=NULL), WGetCol());
 			show_cursor("update_cursor_position");
 		};
 	};

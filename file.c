@@ -200,12 +200,11 @@ void link_window_buffer(WINDP *wp,FILEBUF *fp)
 	};
 
 	wp->selection=0;	// no selection active
-#if	1
+
 	wp->w_infocol=fp->b_infocol;
-#else
-	if((int)bt_dval("show_vinfo") || (int)bt_dval("wrap_mode")) wp->w_infocol=VMICOLS;
-	else wp->w_infocol=0;
-#endif
+	/* window width in wrap mode depends from tab size!  */
+	set_window_width(wp);
+
 	wp->w_fp = fp;
 	fp->b_nwnd++;
 }
@@ -227,12 +226,9 @@ int set_window_filebuf(WINDP *wp,FILEBUF *bp)
 	set_update(wp,UPD_FULL);
 
 	wp->selection=0;
-#if	1
 	wp->w_infocol=bp->b_infocol;
-#else
-	if((int)bt_dval("show_vinfo") || (int)bt_dval("wrap_mode")) wp->w_infocol=VMICOLS;
-	else wp->w_infocol=0;
-#endif
+	set_window_width(wp);
+
     return (TRUE);
 }
 
@@ -261,12 +257,9 @@ int select_filebuf(FILEBUF *bp)
 	set_update(cwp,UPD_FULL);
 
 	cwp->selection=0;
-#if	1
 	cwp->w_infocol=bp->b_infocol;
-#else
-	if((int)bt_dval("show_vinfo") || (int)bt_dval("wrap_mode")) cwp->w_infocol=VMICOLS;
-	else cwp->w_infocol=0;
-#endif
+	set_window_width(cwp);
+
 	return (TRUE);
 }
 

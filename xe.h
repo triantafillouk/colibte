@@ -546,6 +546,7 @@ typedef struct  WINDP {
 	short int	w_infocol;				/* info column size  */
     short   w_ntrows;               /* # of rows of text in window  */
 	short	w_ntcols;				/* columns of this window */
+	short	w_width;				/* for wrap width  */
 	num		w_lcol;					/* offset of text in the window */
 	num		w_plcol;				/* previous w_lcol */
 	struct GWINDP *gwp;				/* internal window structure (gtk or other) */

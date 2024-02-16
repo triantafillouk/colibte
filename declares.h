@@ -61,6 +61,7 @@ void set_sval(char *);
 void set_dval(double val);
 void set_vdval(double val);
 void set_vsval(char *s);
+void set_window_width(WINDP *wp);
 
 double next_value();
 int set_arg(int n);

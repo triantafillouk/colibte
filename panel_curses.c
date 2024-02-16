@@ -439,8 +439,10 @@ void set_1window()
 
  cwp->gwp->t_xpos = 0;
  cwp->w_ntcols = drv_numcol-1;
+ set_window_width(cwp);
  drv_set_wvs(cwp);
 }
+
 
 /*
  * Split the current window horizontally
@@ -467,6 +469,7 @@ int split_window(int n)
 		wp->gwp->t_xpos = cwp->gwp->t_xpos;
         wp->w_ntrows = ntrl+1;
 		wp->w_ntcols = cwp->w_ntcols;
+		set_window_width(wp);
 		set_update(wp,UPD_ALL|UPD_STATUS);
 		drv_set_wvs(wp);
 		return (next_window(1));
@@ -493,11 +496,13 @@ int vsplit_window(int n)
         ntr = (cwp->w_ntcols+1-vswidth) - ntl;      /* right  size           */
 		drv_free_win(cwp);
 		cwp->w_ntcols = ntl-1;
+		set_window_width(cwp);
 		drv_set_wvs(cwp);
 		wp->gwp->t_ypos = cwp->gwp->t_ypos;
 		wp->gwp->t_xpos = cwp->gwp->t_xpos+cwp->w_ntcols+vswidth;
 
 		wp->w_ntcols = ntr;
+		set_window_width(wp);
         wp->w_ntrows = cwp->w_ntrows;
 		set_update(wp,UPD_ALL|UPD_STATUS);
 		drv_set_wvs(wp);
@@ -529,6 +534,7 @@ void drv_restore_wdimensions(WINDP *wp)
 {
 	wp->w_ntrows=wp->gwp->back_rows;
 	wp->w_ntcols=wp->gwp->back_cols;
+	set_window_width(wp);
 	wp->gwp->h_flags=0;
 }
 
@@ -2448,12 +2454,14 @@ void update_cols(WINDP *wp,int old_start_col,int new_start_col,float ratio_w,int
 	{
 		wp->gwp->t_xpos = new_start_col;
 		wp->w_ntcols = drv_numcol - wp->gwp->t_xpos;
+		set_window_width(wp);
 		wp->gwp->h_flags &= ~2;
 	} else {
 		WINDP *wp1;
 		_el *cwin=window_list->current;
 		wp->gwp->t_xpos = new_start_col;
 		wp->w_ntcols = round(wp->w_ntcols * ratio_w);
+		set_window_width(wp);
 		wp->gwp->h_flags &= ~2;
 
 		lbegin(window_list);

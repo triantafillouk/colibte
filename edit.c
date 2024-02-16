@@ -450,9 +450,9 @@ int next_line(int n)
 	if(n==0) return(FALSE);
 
 	set_goal_column(-1,"next_line:");
-
 	// get the current line
 	current_line=get_current_line();
+	MESG("next_line: < current=%ld col=%ld",current_line,GetCol());
 	cwp->w_prev_line=current_line;
 	// MESG("next_line: current_line=%d b_flag=0x%X",current_line,b_flag);
 #if	TNOTES
@@ -514,15 +514,19 @@ int next_line(int n)
 		textpoint_set_lc(cbfp->tp_current,current_line+n,Offset()%16);
 	} else 
 	if(cbfp->view_mode & VMWRAP) {
-		MESG("next_line: < wrap mode!");
 		offs o_now=tp_offset(cwp->tp_current);
 		offs o_end=LineEnd(o_now);
 		int remains=DiffColumns(cwp->w_fp,o_now,o_end);
-		if(remains>(cwp->w_ntcols-cwp->w_infocol)) {
-			next_character(cwp->w_ntcols-cwp->w_infocol);
+		MESG("next_line: wrap mode! o=%ld end=%ld remain columns=%d",o_now,o_end,remains);
+		if(remains> cwp->w_width) {
+			next_character(cwp->w_width);
 		} else {
-			set_goal_column(-1,"next_line:2");
-			MoveLineCol(current_line+n,cwp->goal_column);
+			int now_col=tp_col(cwp->tp_current) % cwp->w_width;
+			if(now_col+remains > cwp->w_width) next_character(remains);
+			else {
+				set_goal_column(-1,"next_line:2");
+				MoveLineCol(current_line+n,cwp->goal_column);
+			}
 		};
 	} else
 	{
@@ -593,13 +597,12 @@ int prev_line(int n)
 		textpoint_set_lc(cbfp->tp_current,current_line-n,Offset()%16);
 	} else
 	if(cbfp->view_mode & VMWRAP) {
-		int window_width=cwp->w_ntcols-cwp->w_infocol;
 		offs o_now=tp_offset(cwp->tp_current);
 		offs o_begin=LineBegin(o_now);
 		int remains=DiffColumns(cwp->w_fp,o_begin,o_now);
 		MESG("prev_line: now=%ld col=%d beg=%ld remains=%d top=%ld",o_now,tp_col(cwp->tp_current),o_begin,remains,tp_offset(cwp->tp_hline));
-		if(remains>window_width) {
-			prev_character(window_width);
+		if(remains>cwp->w_width) {
+			prev_character(cwp->w_width);
 		} else {
 			set_goal_column(-1,"prev_line:2");
 			MoveLineCol(current_line-n,cwp->goal_column);
