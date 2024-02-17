@@ -51,7 +51,6 @@ int reposition(int n)
 
 void set_window_width(WINDP *wp)
 {
- 
  // wp->w_width = wp->w_ntcols - wp->w_infocol - (tabsize - (wp->w_ntcols-wp->w_infocol)%tabsize);
  wp->w_width = wp->w_ntcols - wp->w_infocol - (wp->w_ntcols-wp->w_infocol)%tabsize;
  MESG("set_window_width: max=%d set to %d",wp->w_ntcols-wp->w_infocol,wp->w_width);
@@ -100,7 +99,7 @@ void set_goal_column(int new_column,char *from)
  if(new_column<0) {
 	if(GetCol()>cwp->goal_column) {
 		if(fp->view_mode & VMWRAP) 
-			cwp->goal_column=GetCol() % (cwp->w_ntcols - cwp->w_infocol);
+			cwp->goal_column=GetCol() % (cwp->w_width);
 		else cwp->goal_column=GetCol();
 	};
  } else {
@@ -208,7 +207,7 @@ offs   FPrev_wrap_Line(FILEBUF *fp,offs ptr)
 			// MESG(" 	up to %ld, hline=%ld",o_now,new_hline);
 			break;
 		}
-		if((col % (cwp->w_ntcols-cwp->w_infocol))==0) {
+		if((col % (cwp->w_width))==0) {
 			new_hline=o;
 			MESG("		set new hline to %ld",new_hline);
 		};

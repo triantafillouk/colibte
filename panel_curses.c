@@ -827,7 +827,7 @@ int text_mouse_function(int move)
 		// MESG("mouse pressed mb=%d move=%d row=%d col=%d",mouse_button,move,mouse_window_row,mouse_window_col);
 	};
 	if(mouse_button==KMOUSE_BUTTON1 && move<KMOUSE_RELEASE){
-		if(mouse_window_col==wp->w_ntcols-cwp->w_infocol) { // on rline (position status line)
+		if(mouse_window_col==wp->w_width) { // on rline (position status line)
 			int start,len;
 			int lines_to_move;
 			int top_line=tp_line(cwp->tp_hline);
@@ -908,7 +908,7 @@ int text_mouse_function(int move)
 	};
 
 	if(mouse_button==KMOUSE_BUTTON1 && move<KMOUSE_RELEASE) {
-		if(mouse_window_col==wp->w_ntcols-cwp->w_infocol) {
+		if(mouse_window_col==wp->w_width) {
 			// MESG("move<KMOUSE_RELEASE");
 			return 0;
 		};
