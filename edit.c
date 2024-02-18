@@ -518,7 +518,7 @@ int next_line(int n)
 		offs o_end=LineEnd(o_now);
 		int remains=DiffColumns(cwp->w_fp,o_now,o_end);
 		MESG("next_line: wrap mode! o=%ld end=%ld remain columns=%d",o_now,o_end,remains);
-		if(remains> cwp->w_width) {
+		if(remains>= cwp->w_width) {
 			next_character(cwp->w_width);
 		} else {
 			int now_col=tp_col(cwp->tp_current) % cwp->w_width;

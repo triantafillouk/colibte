@@ -274,7 +274,7 @@ void upd_column_pos_wrap()
 {
 	cwp->w_lcol=0;
 	cwp->curcol = cwp->curcol % (cwp->w_width) + cwp->w_infocol;
-	// MESG("upd_column_pos_wrap: %d < %d",cwp->curcol,cwp->w_ntcols);
+	MESG("	upd_column_pos_wrap: %d < %d",cwp->curcol,cwp->w_ntcols);
 }
 
 /*	upd_column_pos:	update the column position of the hardware cursor and handle extended lines.  */
@@ -283,15 +283,18 @@ void upd_column_pos()
  int mo;
  int num_columns=0;
  int total_columns;
+ 
 	cwp->curcol = GetCol();
 	num_columns=cwp->w_infocol;
-	total_columns=cwp->w_width;
+
+	total_columns=cwp->w_ntcols-num_columns;
 	if(cwp->w_ntcols==0) return;
 	if(cbfp->view_mode & VMHEX){ 
 		upd_column_pos_hex();
 	} else 
 	if(cbfp->view_mode & VMWRAP) {
 		upd_column_pos_wrap();
+		return;
 	} else
 	if(cwp->curcol < (cwp->w_lcol)+2 && cwp->w_lcol>0) 
 	{
@@ -407,7 +410,7 @@ int draw_window_line(WINDP *wp, int row)
  /* highlight search pattern  */
  if(l) {
   i3=0;
-  for(i=0,i1=0;i< (wp->w_ntcols);i++) {
+  for(i=0,i1=0;i<wp->w_ntcols;i++) {
     bcol = vp1->v_text[i].bcolor;
     if(bcol==COLOR_SELECT_BG) continue;	/* not if selection is on! */
 	if(vp1->v_text[i].uval[0]==0xFF) {
@@ -1289,7 +1292,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 
  v_text = wp->vs[wp->vtrow]->v_text;
 
- for(i=0;i<wp->w_width;i++) {
+ for(i=0;i<wp->w_ntcols;i++) {
  	v_text[i].uval[0]='A';
 	v_text[i].uval[0]=0;
  };
@@ -1305,7 +1308,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 		s1=s2;s2=ptr2;
 	};
 
-	// ptr1 = FLineBegin(fp,tp_offs);
+	ptr1 = FLineBegin(fp,tp_offs);
 	ptr1=tp_offs;
 	cur_lend = FLineEnd(fp,tp_offs);
 	ptr2=cur_lend;
@@ -1318,7 +1321,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 		llen = ptr2 - tp_offs;
 	};
 
-	if(BolAt(ptr1))
+ // if(slang) MESG("vtline: row=%2d num_columns=%d hquotem=%X",wp->vtrow,num_columns,hquotem);
 	init_line_highlight(wp);
 	
  	if(!slang || hquotem==0) 
@@ -1416,12 +1419,36 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
  	};	// syntaxh
 	
 //	find the offset of the first column
-	col=0;
-	i=0;	
-	// MESG("	vwl: fc=%d llen=%d o=%ld ww=%d",first_column,llen,ptr1,cwp->w_width);
-
+	col=0;	
+#if	0
+	// ptr1=tp_offset;
+#else
+	for (i=0;  col<first_column  &&  i < llen; ++i) { // invisible characters before first column shown
+		if(fp->b_lang == 0 && !utf8_error()) {
+			ptr1 = FUtfCharAt(fp,ptr1,&uc);
+			c=uc.uval[0];
+			
+			if(c>127) {
+				int size;
+				size=get_utf_length(&uc);
+				if(c==0xE0 /* &&  uc.uval[1]>=0xB0 */ )  {
+					wp->vs[wp->vtrow]->slow_line=1;
+#if	USE_SLOW_DISPLAY
+					fp->slow_display=1; /* slow down for thai chars  */
+#endif
+				};
+				col += size-1;
+				c='m';
+			};
+		} else {
+			c = FCharAt(fp,ptr1++);
+		}
+        if (c == '\t' ) col = next_tab(col);
+        else ++col;
+		if(syntaxh) wp->w_fp->hl->h_function(c); 
+	};
+#endif
 	int leave_space=col-first_column;
-	// MESG("	   : col=%d leave_space=%d ptr1=%ld",col,leave_space,ptr1);
 	
 	if(i>llen)	{ // all chars before left limit
 		return cur_lend+wp->w_fp->EolSize;
@@ -1447,7 +1474,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 		uc.uval[0]='~';
 		vtputwc(wp,&uc);
 	};
-	for (; i <  llen && wp->vtcol < wp->w_width+wp->w_infocol; i++) 
+	for (; i <  llen && wp->vtcol < wp->w_width; i++) 
 	{	// this is the on screen shown area of the line
 		int display_size=0;
 		memset(uc.uval,0,8);
@@ -1495,7 +1522,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 //				MESG("-- %s   ] display_size=%d",uc.uval,display_size);
 			};
 #endif
-			if(wp->vtcol==wp->w_width+wp->w_infocol-1 && display_size>1) { // do not show last double width character!
+			if(wp->vtcol==wp->w_width-1 && display_size>1) { // do not show last double width character!
 				memset(uc.uval,0,8);
 				uc.uval[0]=' ';
 				uc.uval[1]=0;
@@ -1519,11 +1546,10 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 			vtputc(wp, FCharAt(fp,ptr1++));
 		}
 	};
-	col=wp->vtcol;
 	// show a line separator (when highlight_md)
 	if(line_sep) {
 		VIDEO *vp=wp->vs[wp->vtrow];
-		for(wp->vtcol=first_column;wp->vtcol< wp->w_ntcols-first_column;wp->vtcol++){ 
+		for(wp->vtcol=first_column;wp->vtcol< wp->w_width;wp->vtcol++){ 
 			vchar *vc = vp->v_text+wp->vtcol;
 
 			svwchar(vc,&double_hline,vc->bcolor,COLOR_COMMENT_FG);	/* double line separator */
@@ -1533,7 +1559,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 	/* highlight according to evaluated mask */
 	if(syntaxh && slang)
 	{
-		for(i0=num_columns;i0< wp->w_width+wp->w_infocol;i0++){
+		for(i0=num_columns;i0< wp->w_width;i0++){
 			if(i0+first_column > real_line_len+num_columns) break;
 			c1=vtlm[i0+first_column-num_columns];
 
@@ -1558,7 +1584,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 	// in case of utf error show local chars with different color!
 	// if(slang)
 	if(fp->b_lang==0){
-		for(i0=0;i0<wp->w_width+wp->w_infocol;i0++) {
+		for(i0=0;i0<wp->w_width;i0++) {
 			if(v_text[i0].uval[0]>128) 
 			{
 				if(v_text[i0].uval[1]==0) {
@@ -1580,12 +1606,12 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 #endif
 	};
 	// MESG("end line: >");
-
-	// MESG("	col=%d w=%d cur_lend=%ld ptr1=%ld",col,cwp->w_width,ptr1);
-	if(ptr1==cur_lend){
-	  if(col==cwp->w_width+1) return ptr1;
-	  else return ptr1+wp->w_fp->EolSize;
-	} else return ptr1;
+#if	0
+	return cur_lend+wp->w_fp->EolSize;
+#else
+	if(ptr1==cur_lend)  return ptr1+wp->w_fp->EolSize;
+	else return ptr1;
+#endif
 }
 
 /* this is called from vtline, vt_str, vtputwc ! */
@@ -1806,13 +1832,9 @@ void vtputwc(WINDP *wp, utfchar *uc)
 
 		/* orizon different color creates problems if utf and local char set (utf string error)  */
 		/* if on the orizon make it a different color */
-		if(wp->w_fp->view_mode & VMWRAP) {
-			if (((wp->vtcol == wp->w_width+wp->w_infocol-1)) || (wp->vtcol==0 && wp->w_lcol > 0)) {
-				ctl_f = COLOR_HORIZON_FG;
-			};
-		} else 
 		if (((wp->vtcol == wp->w_ntcols-1)) || (wp->vtcol==0 && wp->w_lcol > 0)) {
 			ctl_f = COLOR_HORIZON_FG;
+			// ctl_b=line_bcolor;
 		};
 
 //		MESG("--> at col=%d [%s]",wp->vtcol,uc->uval);
@@ -2072,13 +2094,13 @@ int check_cursor_position(WINDP *wp)
 	{
 		// we are out of bounds. reposition!
 		force_reposition=1;
-//		MESG("check_cursor_position: reposition!!");
+		MESG("check_cursor_position: reposition!!");
 	};
 	if(!force_reposition) return TRUE;
 	wp->w_flag = UPD_FULL;
 	/* reaching here, we need a window refresh */
 	i= wp->w_ppline;
-	MESG("check_cursor_position: refresh! ppline=%d",i);
+	// MESG("check_cursor_position: refresh! ppline=%d",i);
 	/* how far back to go? */
 	if (i > 0) {
 		if (--i >= wp->w_ntrows) i = wp->w_ntrows-2;
@@ -2207,8 +2229,9 @@ int update_screen(int force)
 	static int count=0;
 	count++;
 	int cw_flag=cwp->w_flag;
-	MESG("update_screen: view_mode=%d o=%ld top=%ld row=%d",
-		cwp->w_fp->view_mode,tp_offset(cwp->tp_current),tp_offset(cwp->tp_hline),cwp->currow);
+	set_window_width(cwp);
+	MESG("!update_screen: < view_mode=%d o=%ld col=%ld top=%ld row=%d cwp_width=%d",
+		cwp->w_fp->view_mode,tp_offset(cwp->tp_current),tp_col(cwp->tp_current),tp_offset(cwp->tp_hline),cwp->currow,cwp->w_width);
 	// MESG("\nupdate_screen:noupdate=%d cw_flag=%d force=%d ------ w_ntcols=%d count=%d",noupdate,cw_flag,force,cwp->w_ntcols,count);
 	if (noupdate) return TRUE;
 
@@ -2258,8 +2281,8 @@ int update_screen(int force)
 	/* update the cursor and flush the buffers */
 	update_cursor_position();
 	/* set previous line */
-	MESG(";update_screen: set new ppline");
 	cwp->w_ppline = window_cursor_line(cwp);
+	MESG(";update_screen: > new ppline=%d current is (l=%ld c=%ld o=%ld)",cwp->w_ppline,tp_line(cwp->tp_current),tp_col(cwp->tp_current),tp_offset(cwp->tp_current));
 	cwp->w_flag=0;
 	update_all=0;
 	drv_flush();
@@ -2327,6 +2350,7 @@ void update_window_wrap(WINDP *wp,int force)
 	MESG("update_window_wrap: ------------------");
 		if (wp==cwp) {
 			check_cursor_position(wp); /* check if on screen */
+			MESG("	see currow !!!!!!!!!!");
 			wp->currow = window_cursor_line(wp);
 #if	1
 				upd_all_wrap_lines(wp,"wrap0");
