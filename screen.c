@@ -2074,7 +2074,14 @@ int check_cursor_position(WINDP *wp)
 		force_reposition=1;
 //		MESG("check_cursor_position: reposition!!");
 	};
-	if(!force_reposition) return TRUE;
+	if(!force_reposition) {
+		if(wp->w_fp->view_mode & VMWRAP) {
+			int new_row=window_cursor_line(wp);
+			if(new_row>wp->w_ntrows) force_reposition=1;
+			else return TRUE;
+		};
+		return TRUE;
+	};
 	wp->w_flag = UPD_FULL;
 	/* reaching here, we need a window refresh */
 	i= wp->w_ppline;

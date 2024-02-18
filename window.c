@@ -388,7 +388,8 @@ int window_cursor_line_wrap(WINDP *wp)
 	int col=DiffColumns(wp->w_fp,top_offset,o);
 	int line_rows=col/cwp->w_width;
 	cline=line_rows+1;
-	o += wp->w_fp->EolSize;
+	if(col%cwp->w_width !=0) 
+		o += wp->w_fp->EolSize;
 	if(!FBolAt(wp->w_fp,o)) MESG("Not at bol1 !!!!!!!!!!!");
 	while(1) {
 	  num line_start=o;
@@ -400,17 +401,18 @@ int window_cursor_line_wrap(WINDP *wp)
 	    int line_rows=col/wp->w_width;
 	    cline+=line_rows;
 	    return cline;
+	  } else if(o==current_offset) {
+        int col=DiffColumns(wp->w_fp,line_start,o);
+	    int line_rows=col/wp->w_width;
+		cline+=line_rows;
+		// if(col%wp->w_width==0) cline++;	
+		return cline;	  
 	  } else {
         int col=DiffColumns(wp->w_fp,line_start,o);
 	    int line_rows=col/wp->w_width;
 	    cline+=line_rows;
-		if(o!=current_offset) {
-			o += wp->w_fp->EolSize;
-			cline++;
-		} else {
-			MESG("	p==current_offset %ld at eol",o);
-			return cline;
-		}
+		o += wp->w_fp->EolSize;
+		cline++;
 	  };
   	};
   };
