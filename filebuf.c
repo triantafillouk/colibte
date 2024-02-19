@@ -474,7 +474,8 @@ offs goto_next_wrap_line(FILEBUF *fp,offs start)
  int col=0;
  while(col<cwp->w_width) {
  	if(FEofAt(fp,o)) break;
-	if(FBolAt(fp,o) && col>0) {
+	if(FEolAt(fp,o) && col>0) {
+		o++;
 		break;
 	};
 	int c;

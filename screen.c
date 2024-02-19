@@ -2022,8 +2022,10 @@ int check_cursor_position_wrap(WINDP *wp)
 		MESG("	< ppline=%ld",wp->w_ppline);
 		update_top_position_wrap();
 		return FALSE;
-	}  else if  (window_cursor_line(wp) > wp->w_ntrows) {
-		MESG("	> ppline=%ld",wp->w_ppline);
+	}  else if  (window_cursor_line(wp) > wp->w_ntrows-2) {
+		MESG("	> ppline=%ld currow=%d",wp->w_ppline,wp->currow);
+		move_window(-1);
+#if	0
 		offs o = FPrev_wrap_Line(wp->w_fp,cur_offs);
 		o = FPrev_wrap_Line(wp->w_fp,o);
 		o = FPrev_wrap_Line(wp->w_fp,o);
@@ -2034,6 +2036,7 @@ int check_cursor_position_wrap(WINDP *wp)
 		o = FPrev_wrap_Line(wp->w_fp,o);
 		// update_top_position_wrap();
 		textpoint_set(cwp->tp_hline,o);
+#endif
 		return FALSE;
 	} else return TRUE;
 }
@@ -2076,8 +2079,9 @@ int check_cursor_position(WINDP *wp)
 	};
 	if(!force_reposition) {
 		if(wp->w_fp->view_mode & VMWRAP) {
+			MESG("	Not force_reposition!");
 			int new_row=window_cursor_line(wp);
-			if(new_row>wp->w_ntrows) force_reposition=1;
+			if(new_row>wp->w_ntrows-2) force_reposition=1;
 			else return TRUE;
 		};
 		return TRUE;
@@ -2334,6 +2338,7 @@ void update_window_wrap(WINDP *wp,int force)
 	MESG("update_window_wrap: ------------------");
 		if (wp==cwp) {
 			check_cursor_position(wp); /* check if on screen */
+			MESG("update_window_wrap:1");
 			wp->currow = window_cursor_line(wp);
 #if	1
 				upd_all_wrap_lines(wp,"wrap0");
@@ -2559,8 +2564,8 @@ void upd_part_wrap(WINDP *wp,char *from)
 	else {
 		if(line1<0) line1=0;
 		if(line2<0) out_of_view=1;
-		if(line1>wp->w_ntrows) out_of_view=1;
-		if(line2>wp->w_ntrows) line2=wp->w_ntrows;
+		if(line1>wp->w_ntrows-1) out_of_view=1;
+		if(line2>wp->w_ntrows-1) line2=wp->w_ntrows;
 	};
 
 	if(wp->selection==0) set_selection(0);

@@ -216,8 +216,8 @@ int next_character(int n)
 	while (n--) {
 		if(FEof(cbfp)) return FALSE;
 		MoveRightChar(cbfp);
-		set_update(cwp,UPD_MOVE);
 	};
+	set_update(cwp,UPD_MOVE);
     return (OK_RSTGOAL);
 }
 
@@ -505,7 +505,8 @@ int next_line(int n)
 	w_row = cwp->currow;
 	// if at the end move up
 	if(w_row == cwp->w_ntrows-2-half_last_line) {
-		move_window(-1);
+		if(!(cwp->w_fp->view_mode & VMWRAP))
+			move_window(-1);
 	};
 	};
 	if(current_line==tp_line(cbfp->tp_text_end)) return FALSE;
@@ -522,12 +523,16 @@ int next_line(int n)
 			next_character(cwp->w_width);
 		} else {
 			int now_col=tp_col(cwp->tp_current) % cwp->w_width;
-			if(now_col+remains > cwp->w_width) next_character(remains);
+			if(now_col+remains >= cwp->w_width) next_character(remains);
 			else {
 				set_goal_column(-1,"next_line:2");
 				MoveLineCol(current_line+n,cwp->goal_column);
 			}
 		};
+		if(w_row == cwp->w_ntrows-2-half_last_line) {
+			move_window(-1);
+		};
+
 	} else
 	{
 		set_goal_column(-1,"next_line:2");
