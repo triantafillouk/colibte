@@ -547,11 +547,13 @@ int next_line(int n)
 
 void update_top_position_wrap();
 offs   FPrev_wrap_Line(FILEBUF *fp,offs ptr);
+offs   FPrevUtfCharAt(FILEBUF *fp,offs o, utfchar *uc);
 
 /* Move backward by n lines. */
 int prev_line(int n)
 {
  num current_line;
+ 
  int status=0;
 	if (n==0) return FALSE;
    	if (n < 0) return (next_line(-n));
@@ -559,7 +561,7 @@ int prev_line(int n)
 
 	current_line=get_current_line();
 	cwp->w_prev_line=current_line;
-	// MESG("prev_line: current=%d",current_line);
+	MESG("!prev_line: current=%d row=%d",current_line,cwp->currow);
 
 	if(current_line<1) return(0);
 	if(current_line-n < 0) n=current_line;
@@ -594,15 +596,34 @@ int prev_line(int n)
         return(n);
     };
 
-	if(current_line-n < tp_line(cwp->tp_hline))
-	{ // move up window
-		move_window(n+tp_line(cwp->tp_hline)-current_line);
-	};
-	if(cbfp->view_mode & VMHEX){
-		textpoint_set_lc(cbfp->tp_current,current_line-n,Offset()%16);
-	} else
 	if(cbfp->view_mode & VMWRAP) {
 		offs o_now=tp_offset(cwp->tp_current);
+#if	1
+		offs o=o_now;
+		offs col=tp_col(cwp->tp_current) % cwp->w_width;
+		offs col_ori=col;
+		while(o>0){
+			utfchar uc;
+			if(BolAt(o)) { // goto previous line!
+				o -= cwp->w_fp->EolSize;
+				num c1 = DiffColumns(cwp->w_fp,LineBegin(o),o);
+				c1=c1%cwp->w_width;
+				while(c1-- >col_ori) o=FPrevUtfCharAt(cwp->w_fp,o,&uc);
+				textpoint_set(cwp->tp_current,o);
+				break;
+			}
+			o = FPrevUtfCharAt(cwp->w_fp,o,&uc);
+			col--;
+			if(col<=0) {
+				col=cwp->w_width-col_ori;
+				while(col-- >0) {
+						o = FPrevUtfCharAt(cwp->w_fp,o,&uc);
+				};
+				textpoint_set(cwp->tp_current,o);
+				break;
+			};
+		}
+#else
 		offs o_begin=LineBegin(o_now);
 		int remains=DiffColumns(cwp->w_fp,o_begin,o_now);
 		MESG("prev_line: now=%ld col=%d beg=%ld remains=%d top=%ld",o_now,tp_col(cwp->tp_current),o_begin,remains,tp_offset(cwp->tp_hline));
@@ -618,6 +639,14 @@ int prev_line(int n)
 		if(o_now <= o_hline) {
 			update_top_position_wrap();
 		};
+#endif
+	} else
+	if(current_line-n < tp_line(cwp->tp_hline))
+	{ // move up window
+		move_window(n+tp_line(cwp->tp_hline)-current_line);
+	} else
+	if(cbfp->view_mode & VMHEX){
+		textpoint_set_lc(cbfp->tp_current,current_line-n,Offset()%16);
 	} else {
 		set_goal_column(-1,"prev_line:2");
 		MoveLineCol(current_line-n,cwp->goal_column);

@@ -240,7 +240,7 @@ int move_window(int n)
 	offs from_offset=curoffs;
 	offs from_line = tp_line(cwp->tp_hline);
 	int lines_to_move=n;
-	MESG("move_window: start current top=%ld n=%d",curoffs,n);
+	MESG("!move_window: start current top=%ld n=%d",curoffs,n);
     if (n < 0) {
         while (n++ < 0) {
 			if(cwp->w_fp->view_mode & VMWRAP) {

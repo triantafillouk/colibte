@@ -2018,11 +2018,14 @@ int check_cursor_position_wrap(WINDP *wp)
 	MESG("check_cursor_position_wrap: hline %ld current %ld, line %ld %ld ",tp_offset(wp->tp_hline),tp_offset(wp->tp_current),tp_line(wp->tp_hline),tp_line(wp->tp_current));
 	cur_offs=tp_offset(wp->tp_current);
 	// i= wp->w_ppline;
+	int wcl=window_cursor_line(wp);
 	if( cur_offs <= tp_offset(wp->tp_hline)) {
 		MESG("	< ppline=%ld",wp->w_ppline);
 		update_top_position_wrap();
 		return FALSE;
-	}  else if  (window_cursor_line(wp) > wp->w_ntrows-2) {
+	}  else if  (wcl > wp->w_ntrows-2
+				&& wcl <= wp->w_ntrows
+	) {
 		MESG("	> ppline=%ld currow=%d",wp->w_ppline,wp->currow);
 		move_window(-1);
 #if	0
@@ -2038,7 +2041,11 @@ int check_cursor_position_wrap(WINDP *wp)
 		textpoint_set(cwp->tp_hline,o);
 #endif
 		return FALSE;
-	} else return TRUE;
+	} else if(wcl>wp->w_ntrows) {
+		update_top_position_wrap();
+		return FALSE;
+	};
+	return TRUE;
 }
 
 void set_top_hline(WINDP *wp,offs cof)
@@ -2337,7 +2344,7 @@ void update_window_wrap(WINDP *wp,int force)
 	int cw_flag=cwp->w_flag;
 	MESG("update_window_wrap: ------------------");
 		if (wp==cwp) {
-			check_cursor_position(wp); /* check if on screen */
+			check_cursor_position_wrap(wp); /* check if on screen */
 			MESG("update_window_wrap:1");
 			wp->currow = window_cursor_line(wp);
 #if	1

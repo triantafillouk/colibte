@@ -54,7 +54,6 @@ void rvstrcpy(char *rvstr, char *str,int maxlen);
 char *str2ctrl(char *);
 int set_window_filebuf(WINDP *wp,FILEBUF *bp);
 int drv_search_dialog(int f);
-offs   FPrevUtfCharAt(FILEBUF *fp,offs o, utfchar *uc);
 
 offs curoffs;		/* current offset in file  */
 offs last_offs;		/* position of last replace  */
