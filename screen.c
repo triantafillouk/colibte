@@ -2028,21 +2028,20 @@ int check_cursor_position_wrap(WINDP *wp)
 	) {
 		MESG("	> ppline=%ld currow=%d",wp->w_ppline,wp->currow);
 		move_window(-1);
-#if	0
-		offs o = FPrev_wrap_Line(wp->w_fp,cur_offs);
-		o = FPrev_wrap_Line(wp->w_fp,o);
-		o = FPrev_wrap_Line(wp->w_fp,o);
-		o = FPrev_wrap_Line(wp->w_fp,o);
-		o = FPrev_wrap_Line(wp->w_fp,o);
-		o = FPrev_wrap_Line(wp->w_fp,o);
-		o = FPrev_wrap_Line(wp->w_fp,o);
-		o = FPrev_wrap_Line(wp->w_fp,o);
-		// update_top_position_wrap();
-		textpoint_set(cwp->tp_hline,o);
-#endif
 		return FALSE;
 	} else if(wcl>wp->w_ntrows) {
 		update_top_position_wrap();
+#if	0
+		if(FEofAt(wp->w_fp,tp_offset(wp->tp_current))){
+#if	0
+			move_window(-10);
+#else
+			offs o = tp_offset(wp->tp_hline);
+			for(int i=0;i<10;i++) o = FPrev_wrap_Line(wp->w_fp,o);
+			textpoint_set(wp->tp_hline,o);
+#endif
+		};
+#endif
 		return FALSE;
 	};
 	return TRUE;
