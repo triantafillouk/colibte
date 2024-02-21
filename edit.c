@@ -440,7 +440,7 @@ int get_current_line()
 /*  emacs key is "^N". */
 int next_line(int n)
 {
-	int w_row;
+	int w_row=0;
 	num current_line;
 	int status=0;
 	int b_flag = cbfp->b_flag;

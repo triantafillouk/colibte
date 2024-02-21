@@ -281,10 +281,10 @@ void upd_column_pos_wrap()
 void upd_column_pos()
 {
  int mo;
- int num_columns=0;
+ // int num_columns=0;
  int total_columns;
 	cwp->curcol = GetCol();
-	num_columns=cwp->w_infocol;
+	// num_columns=cwp->w_infocol;
 	total_columns=cwp->w_width;
 	if(cwp->w_ntcols==0) return;
 	if(cbfp->view_mode & VMHEX){ 
@@ -2049,12 +2049,9 @@ int check_cursor_position_wrap(WINDP *wp)
 
 void set_top_hline(WINDP *wp,offs cof)
 {
-	offs b0=FLineBegin(wp->w_fp,cof);
-	if(wp->w_fp->view_mode & VMWRAP) { // ????????? TODO
-		// int w=wp->w_ntcols-wp->w_infocol;
-		int line_chars=DiffColumns(wp->w_fp,b0,cof);
-		// int new_loffs = (line_chars / w) * w;
-	} else;
+	offs b0=0;
+	if(wp->w_fp->view_mode & VMWRAP) b0=cof;
+	else b0=FLineBegin(wp->w_fp,cof);
 	textpoint_set(wp->tp_hline,b0);
 }
 
