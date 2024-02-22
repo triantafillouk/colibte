@@ -583,8 +583,23 @@ int prev_line(int n)
 		msg_line(time2a());
 	};
 
+
     if(lock_move) {
         // If at the last line of the window
+		if(cbfp->view_mode & VMWRAP) {
+			MESG("prev_line: row=%d line=%ld col=%ld",cwp->currow,tp_line(cwp->tp_current),tp_col(cwp->tp_current));
+			if(cwp->currow >= cwp->w_ntrows-3-half_last_line) {
+				lock_move=0;
+#if	1	
+				status=prev_line(1);
+#else
+				offs o = FPrev_wrap_Line(cbfp,tp_offset(cwp->tp_current));
+				textpoint_set(cwp->tp_current,o);		
+#endif
+				lock_move=1;
+				return TRUE;
+			};
+		} else {
 		if( current_line - tp_line(cwp->tp_hline) == cwp->w_ntrows-2-half_last_line)
 		{
             lock_move=0;
@@ -592,6 +607,7 @@ int prev_line(int n)
             lock_move=1;
 			if(status==FALSE) return status;
         };
+		};
 		move_window(n);
         return(n);
     };
@@ -599,6 +615,9 @@ int prev_line(int n)
 	if(cbfp->view_mode & VMWRAP) {
 		offs o_now=tp_offset(cwp->tp_current);
 #if	1
+		textpoint_set(cwp->tp_current,FPrev_wrap_Line(cwp->w_fp,o_now));
+#else
+#if	0
 		offs o=o_now;
 		offs col=tp_col(cwp->tp_current) % cwp->w_width;
 		offs col_ori=col;
@@ -639,6 +658,7 @@ int prev_line(int n)
 		if(o_now <= o_hline) {
 			update_top_position_wrap();
 		};
+#endif
 #endif
 	} else
 	if(current_line-n < tp_line(cwp->tp_hline))

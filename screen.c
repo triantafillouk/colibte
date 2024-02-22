@@ -1432,7 +1432,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 			else vtputc(wp,'-');
 		};
 	};
-	MESG("vt_wrap_line: num_columns=%d vtcol=%d w_infocol=%d",num_columns,wp->vtcol,wp->w_infocol);
+	// MESG("vt_wrap_line: num_columns=%d vtcol=%d w_infocol=%d",num_columns,wp->vtcol,wp->w_infocol);
 
 	for (; i <  llen && wp->vtcol < wp->w_width+wp->w_infocol; i++) 
 	{	// this is the on screen shown area of the line

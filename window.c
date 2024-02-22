@@ -187,15 +187,48 @@ offs FNext_wrap_Line(WINDP *wp,offs current_offset)
  return b0;
 }
 
-offs   FPrev_wrap_Line(FILEBUF *fp,offs ptr)
+
+/*
+ col_position = current_column % w_width
+ - if current column >= w_width
+	set current_column to 
+		current_column - w_width
+ - else
+	goto previous line
+	if line_len > w_width
+		full = (line_len/w_width) * w_width
+		rest = line_len - full
+		if rest<col_position
+			goto end of line
+		else goto column full+col_position
+	else
+		if line_len < col_position  
+			goto end of line
+		else
+			goto column col_position
+---
+for col_position=0
+
+ - if current column >= w_width
+	set current_column to 
+		current_column - w_width
+ - else
+	goto previous line
+	if line_len > w_width
+		full = (line_len/w_width) * w_width
+		goto column full
+	else
+		goto column 0
+*/
+offs   FPrev_wrap_Line1(FILEBUF *fp,offs ptr)
 {
  offs b0=FLineBegin(fp,ptr);
  offs b1=b0;
  int ccol=DiffColumns(fp,b1,ptr);
- MESG("FPrev_wrap_line: ccol=%d -----------",ccol);
+ MESG("FPrev_wrap_line: ccol=%d ----------- w=%d",ccol,cwp->w_width);
  if(ccol< cwp->w_width){ // we are at the first wrap line!
 	// goto the begining of the previous line!
-	while(b0>0 && !FBolAt(fp,--b0));
+	while(b0>0 && !FBolAt(fp,--b0)) {b0--;FLineBegin(fp,b0);};
 	MESG("FPrev_wrap_line:1 goto beg of prev line: %ld",b0);
 	int col=0;
 	offs o=b0;
@@ -212,19 +245,79 @@ offs   FPrev_wrap_Line(FILEBUF *fp,offs ptr)
 			MESG("		set new hline to %ld",new_hline);
 		};
 	};
-	}
-
+	};
+	
 	// int target_col = (ccol / window_width) * window_width;
 	offs swl=b0;	/* at the start of the line!  */
+#if	0
+	while(1) {
+		
+	};
+#else
 	b1 = b0;
 	int col=0;
+	MESG("FPrev_wrap_line:2 b0=%ld ptr=%ld",b0,ptr);
 	while(b1<ptr) {
 		if(b1 % cwp->w_width) swl=b1;
 		b1 = check_next_char(fp,b1,&col);
 	};
- 	MESG("FPrev_wrap_line:2 %ld -> %ld",ptr,swl);
+#endif
+ 	MESG("FPrev_wrap_line:3 %ld -> %ld",ptr,swl);
 	ptr=swl;
  return(ptr);
+}
+
+offs   FPrev_wrap_Line(FILEBUF *fp,offs ptr)
+{
+ TextPoint *pwl = textpoint_new(fp,1,0);
+ textpoint_set(pwl,ptr);
+ int col_position = tp_col(pwl) % cwp->w_width;
+ num line=tp_line(pwl);
+ MESG(";FPrev_wrap_line: pos=%d line=%ld o=%ld",col_position,line,ptr);
+ num o1=ptr;
+ if(tp_col(pwl) > cwp->w_width) {
+ 	MESG("	col %ld >= width %d",tp_col(pwl),cwp->w_width);
+ 	num col=tp_col(pwl);
+	textpoint_set_lc(pwl,line,col);
+	o1=tp_offset(pwl);
+ } else {
+ 	if(line>0) {
+		line--;
+		textpoint_set_lc(pwl,line,0);
+		num o0 = tp_offset(pwl);
+		    o1 = FLineEnd(fp,o0);
+		MESG("	goto prev line: %ld o0=%ld end=%ld",line,o0,o1);
+		num linecols = DiffColumns(fp,o0,o1);
+		MESG("		col %ld < width %d",tp_col(pwl),cwp->w_width);
+		if(linecols > cwp->w_width) {
+			num full=(linecols/cwp->w_width) * cwp->w_width;
+			num rest = linecols-full;
+			if(rest<col_position) {
+				MESG("		rest %d < pos %d line %ld linecols=%ld,end at %ld",linecols,col_position,line,linecols,o1);
+				// return o1;
+			} else {
+				textpoint_set_lc(pwl,line,full+col_position);
+				o1=tp_offset(pwl);
+				MESG("		rest %d >= pos %d line %ld linecols=%ld,end at %ld",linecols,col_position,line,linecols,o1);
+			};
+		} else {
+			if(linecols<=col_position) {
+				MESG("		prev linecols %ld < %d o1=%ld",linecols,col_position,o1);
+				// return o1;
+			} else {
+				textpoint_set_lc(pwl,line,col_position);
+				o1=tp_offset(pwl);
+				MESG("		linecols %ld >= %d o1=%ld",linecols,col_position,o1);
+			};
+		};
+	} else {
+		MESG("	line 0");
+		o1=ptr;
+	}
+ };
+ textpoint_delete(pwl);
+ MESG("		o1=%ld",o1);
+ return o1;
 }
 
 /* move text in window by n lines forward/backward */
@@ -253,7 +346,17 @@ int move_window(int n)
 		if(cwp->w_fp->view_mode & VMWRAP) {
 			while((n-- > 0) &&  (curoffs>0)) {
 				// go to prev window line
+#if	0	
+				num col=tp_col(cwp->tp_hline);
+				num line=tp_line(cwp->tp_hline);
+				if(col>cwp->w_width) textpoint_set_lc(cwp->tp_hline,line,col-cwp->w_width);
+				else {
+					if(line>0) textpoint_set_lc(cwp->tp_hline,line-1,col);
+				};
+				curoffs=tp_offset(cwp->tp_hline);
+#else		
 				curoffs = FPrev_wrap_Line(cbfp,curoffs);
+#endif
 			};
 		} else {
 	        while ((n-- >0) && (curoffs>0)) curoffs=FPrevLine(cbfp,curoffs);
