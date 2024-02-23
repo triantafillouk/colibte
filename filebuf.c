@@ -467,31 +467,6 @@ int FUtfCharLen(FILEBUF *fp,offs o)
 	return clen;
 }
 
-offs goto_next_wrap_line(FILEBUF *fp,offs start)
-{
- offs o=start;
- // from the start of the wrap line
- int col=0;
- while(col<cwp->w_width) {
- 	if(FEofAt(fp,o)) break;
-	if(FEolAt(fp,o) && col>0) {
-		o++;
-		break;
-	};
-	int c;
-	utfchar uc;
-	o = FUtfCharAt(fp,o,&uc);
- 	c=uc.uval[0];
-	if (c == CHR_TAB) {
-		col=next_tab(col);
-	} else {
-		col += get_utf_length(&uc);
-	};
-  };
- // MESG("		nwl from %ld to %ld col=%d",start,o,col);
- return o;
-}
-
 // check next char, update offset,physical column!
 offs check_next_char(FILEBUF *fp,offs o,int *col) 
 {

@@ -18,7 +18,7 @@ void toggle_global_flag(int option_flag);
 void set_global_flag(int option_flag,int value);
 void get_lowercase_string(char *lower, char *string);
 void get_uppercase_string(char *lower, char *string);
-offs FNext_wrap_Line(WINDP *wp,offs current_offset);
+offs FNext_wrap_line(WINDP *wp,offs current_offset);
 
 int GetBlock(FILEBUF *fp,char *copy,offs from,offs size);
 int delins(int dlength, char *instr);
@@ -546,7 +546,7 @@ int next_line(int n)
 }
 
 void update_top_position_wrap();
-offs   FPrev_wrap_Line(FILEBUF *fp,offs ptr);
+offs   FPrev_wrap_Line(WINDP *wp,offs ptr);
 offs   FPrevUtfCharAt(FILEBUF *fp,offs o, utfchar *uc);
 
 /* Move backward by n lines. */
@@ -561,7 +561,7 @@ int prev_line(int n)
 
 	current_line=get_current_line();
 	cwp->w_prev_line=current_line;
-	MESG("!prev_line: current=%d row=%d",current_line,cwp->currow);
+	MESG("!prev_line: current=%d row=%d lock=%d",current_line,cwp->currow,lock_move);
 
 	if(current_line<1) return(0);
 	if(current_line-n < 0) n=current_line;
@@ -593,7 +593,7 @@ int prev_line(int n)
 #if	1	
 				status=prev_line(1);
 #else
-				offs o = FPrev_wrap_Line(cbfp,tp_offset(cwp->tp_current));
+				offs o = FPrev_wrap_Line(cwp,tp_offset(cwp->tp_current));
 				textpoint_set(cwp->tp_current,o);		
 #endif
 				lock_move=1;
@@ -614,52 +614,7 @@ int prev_line(int n)
 
 	if(cbfp->view_mode & VMWRAP) {
 		offs o_now=tp_offset(cwp->tp_current);
-#if	1
-		textpoint_set(cwp->tp_current,FPrev_wrap_Line(cwp->w_fp,o_now));
-#else
-#if	0
-		offs o=o_now;
-		offs col=tp_col(cwp->tp_current) % cwp->w_width;
-		offs col_ori=col;
-		while(o>0){
-			utfchar uc;
-			if(BolAt(o)) { // goto previous line!
-				o -= cwp->w_fp->EolSize;
-				num c1 = DiffColumns(cwp->w_fp,LineBegin(o),o);
-				c1=c1%cwp->w_width;
-				while(c1-- >col_ori) o=FPrevUtfCharAt(cwp->w_fp,o,&uc);
-				textpoint_set(cwp->tp_current,o);
-				break;
-			}
-			o = FPrevUtfCharAt(cwp->w_fp,o,&uc);
-			col--;
-			if(col<=0) {
-				col=cwp->w_width-col_ori;
-				while(col-- >0) {
-						o = FPrevUtfCharAt(cwp->w_fp,o,&uc);
-				};
-				textpoint_set(cwp->tp_current,o);
-				break;
-			};
-		}
-#else
-		offs o_begin=LineBegin(o_now);
-		int remains=DiffColumns(cwp->w_fp,o_begin,o_now);
-		MESG("prev_line: now=%ld col=%d beg=%ld remains=%d top=%ld",o_now,tp_col(cwp->tp_current),o_begin,remains,tp_offset(cwp->tp_hline));
-		if(remains>cwp->w_width) {
-			prev_character(cwp->w_width);
-		} else {
-			set_goal_column(-1,"prev_line:2");
-			MoveLineCol(current_line-n,cwp->goal_column);
-		};
-		o_now=tp_offset(cwp->tp_current);
-		offs o_hline=tp_offset(cwp->tp_hline);
-		MESG("       : new now=%ld hline=%ld",o_now,o_hline);
-		if(o_now <= o_hline) {
-			update_top_position_wrap();
-		};
-#endif
-#endif
+		textpoint_set(cwp->tp_current,FPrev_wrap_Line(cwp,o_now));
 	} else
 	if(current_line-n < tp_line(cwp->tp_hline))
 	{ // move up window
@@ -897,7 +852,7 @@ int next_page(int  n)
 		int lines=n;
 		MESG("next_page: topo=%ld current=%ld lines=%d---------",o,co,lines);
 		while(--lines>0) {
-			o=FNext_wrap_Line(cwp,o);
+			o=FNext_wrap_line(cwp,o);
 		};
 		textpoint_set(cwp->tp_hline,o);
 		MESG("        : new topo=%ld line=%ld",o,tp_line(cwp->tp_hline));
@@ -906,7 +861,7 @@ int next_page(int  n)
 		// o=tp_offset(cwp->tp_current);
 		MESG("		start current from %ld n=%d",o,n);
 		while(--n>0) {
-			o=FNext_wrap_Line(cwp,o);
+			o=FNext_wrap_line(cwp,o);
 			MESG("		next line o=%ld",o);
 		};
 		textpoint_set(cwp->tp_current,o);
