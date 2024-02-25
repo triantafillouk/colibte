@@ -211,6 +211,9 @@ ge_edit_draw_event(GtkWidget *widget,cairo_t *cr)
 		wd->wp->w_fp->line_from=line_from;
 		wd->wp->w_fp->line_to=line_to;
 		// MESG("update some from %d to %d",line_from,line_to);
+	if(wd->wp->w_fp->view_mode & VMWRAP) 
+	upd_all_wrap_lines(wd->wp,"cb_set_position 3");
+	else
 		upd_some_virtual_lines(wd->wp,"ge_edit_draw_event:");
 		// MESG("	ge_edit_draw_event: newxy, before_drawing window!");
 		wd->wp->w_flag=UPD_FORCE;

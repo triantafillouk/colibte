@@ -275,6 +275,7 @@ void upd_column_pos_hex()
 
 void upd_column_pos_wrap()
 {
+	MESG("upd_column_pos_wrap: w=%d",cwp->w_width);
 	cwp->w_lcol=0;
 	cwp->curcol = cwp->curcol % (cwp->w_width) + cwp->w_infocol;
 	// MESG("upd_column_pos_wrap: %d < %d",cwp->curcol,cwp->w_ntcols);
@@ -287,6 +288,7 @@ void upd_column_pos()
  // int num_columns=0;
  int total_columns;
 	cwp->curcol = GetCol();
+	MESG("upd_column_pos: curcol=%d",cwp->curcol);
 	// num_columns=cwp->w_infocol;
 	total_columns=cwp->w_width;
 	if(cwp->w_ntcols==0) return;
@@ -294,7 +296,9 @@ void upd_column_pos()
 		upd_column_pos_hex();
 	} else 
 	if(cbfp->view_mode & VMWRAP) {
+		MESG("upd_column_pos_wrap:");
 		upd_column_pos_wrap();
+		MESG("upd_column_pos_wrap:ok");
 	} else
 	if(cwp->curcol < (cwp->w_lcol)+2 && cwp->w_lcol>0) 
 	{
@@ -310,7 +314,7 @@ void upd_column_pos()
 		cwp->w_lcol = cwp->curcol-(total_columns)/1.5;
 //		MESG("upd_column_pos: w_lcol=%d curcol=%d total=%d w_ntcols=%d",cwp->w_lcol,cwp->curcol,total_columns,cwp->w_ntcols);
 	};
-
+	MESG("1");
 	if(cwp->curcol < cwp->w_lcol) {
 //		ERROR("left column is %lld < curcol=%lld plcol=%lld",cwp->w_lcol,cwp->curcol,cwp->w_plcol);
 		cwp->w_lcol=cwp->curcol;
@@ -320,16 +324,18 @@ void upd_column_pos()
 		mo=cwp->w_lcol%tabsize;
 		cwp->w_lcol-=mo;
 	};
+	MESG("2");
 	if(cwp->w_lcol<0) {
 //		ERROR("left column is %lld<0, curcol=%lld",cwp->w_lcol,cwp->curcol);
 		cwp->w_lcol=0;
 	};
+	MESG("3");
 	/* if a new left column then force update! */
 	if(cwp->w_lcol != cwp->w_plcol) {
 		cwp->w_flag |= UPD_FULL|UPD_EDIT;
 		cwp->w_plcol = cwp->w_lcol;
 	};
-	// MESG("upd_column_pos:	w_lcol=%d",cwp->w_lcol);
+	MESG("upd_column_pos:	w_lcol=%d",cwp->w_lcol);
 }
 
 /* get the current line number  */
@@ -2370,6 +2376,123 @@ void update_window_wrap(WINDP *wp,int force)
 		wp->w_flag = 0;
 }
 
+void upd_some_virtual_lines(WINDP *wp,char *from)
+{
+	register offs lp_offs;	/* offset of line to update */
+	register int sline;	/* physical screen line to update */
+	int head=0;
+
+	if(noupdate) return;
+	if(wp->vs == NULL) return;
+	if(wp->w_fp == NULL) return;
+
+	if(!(wp->w_fp->view_mode & VMHEX)) wp->w_fp->hl->h_update(wp);
+	 set_selection(0);
+	MESG("upd_some_virtual_lines:w=%d from[%s] left=%d b_flag=0x%X w_flag=0x%X lines %d-%d",wp->id,from,wp->w_lcol,wp->w_fp->b_flag,wp->w_flag,wp->w_fp->line_from,wp->w_fp->line_to);
+	/* search down the lines, updating them */
+	lp_offs = tp_offset(wp->tp_hline);
+
+	if(wp->w_fp->b_header) {
+		head=1;
+		vt_str(wp,wp->w_fp->b_header,0,0,0,-1,0);
+	};
+	if(wp->w_fp->b_flag!=FSNOTES && wp->w_fp->b_flag!=FSNOTESN && !(wp->w_fp->b_flag & FSNLIST)) 
+	{	/* Buffer view  */
+		// MESG("update virtual from buffer! wp=%d top offs=%ld",wp->id,lp_offs);
+		for(sline=head;sline < wp->w_ntrows;sline++) 
+		{
+			/* and update the virtual line */
+			if(sline >= wp->w_fp->line_from && sline <= wp->w_fp->line_to) {
+				wp->vs[sline]->v_flag =1;	/* update flag  */
+				// MESG("	update line %d",sline);
+			} else wp->vs[sline]->v_flag=0;
+			vtmove(wp,sline, 0);
+	
+			if (lp_offs <= FSize(wp->w_fp)) { // if not at the end of file
+			/* if we are not at the end */
+				if(cwp->selection==0) set_selection(false);
+				lp_offs=vtline(wp,lp_offs);
+				/* we must update the column selection here */
+				if(cwp->selection) set_selection(false);
+			};
+			vteeol(wp,0,0);
+		}
+	}
+	else if(wp->w_fp->b_flag & FSNLIST) {	/* list view  */
+
+		int note_row;
+		// MESG("update FSNLIST");
+		lbegin(wp->w_fp->dir_list_str);
+		for(note_row=0;note_row< wp->top_note_line; note_row++) lmove_to_next(wp->w_fp->dir_list_str,0);
+		
+		for(sline=head;sline<wp->w_ntrows-1;sline++)
+		{
+			istr *row_data;
+			if(sline >= wp->w_fp->line_from &&
+				sline <= wp->w_fp->line_to)
+			wp->vs[sline]->v_flag =1;	/* update flag  */
+			else wp->vs[sline]->v_flag=0;
+
+			row_data=(istr *)lget_current(wp->w_fp->dir_list_str);
+			if(row_data) {
+				vt_str(wp,&row_data->start,sline,wp->current_note_line- wp->top_note_line+1,0,-1,row_data->selected);
+				// MESG("- %2d : [%s]",sline,&row_data->start);
+			} else {
+				// MESG("- %2d : clear note line!",sline);
+				vt_str(wp,"",sline,-1,0,-1,-1);
+			};
+			lmove_to_next(wp->w_fp->dir_list_str,0);
+		};
+	}
+#if	TNOTES
+	else 
+	{	/* Notes view  */
+		int tag_row;
+		int note_row;
+
+		// MESG("update virtual from notes list! wp=%d top tag_line=%d note_line=%d",wp->id,wp->top_tag_line,wp->top_note_line);
+		// MESG("tag list size=%d note list size=%d",wp->w_fp->b_tag_list->size,wp->w_fp->dir_list_str->size);
+		lbegin(wp->w_fp->b_tag_list);
+		for(tag_row=0;tag_row < wp->top_tag_line ;tag_row++) lmove_to_next(wp->w_fp->b_tag_list,0);
+		lbegin(wp->w_fp->dir_list_str);
+		for(note_row=0;note_row< wp->top_note_line; note_row++) lmove_to_next(wp->w_fp->dir_list_str,0);
+		
+		for(sline=head;sline<wp->w_ntrows-1;sline++)
+		{
+			istr *row_data;
+			wp->vs[sline]->v_flag =1;	/* update flag  */
+
+			row_data=(istr *)lget_current(wp->w_fp->b_tag_list);
+			if(row_data) {
+				// MESG("- %2d : [%s]",sline,&row_data->start);
+				// int selected = iarray_index(sel_tags,row_data->index,num_of_selected_tags);
+				vt_str(wp,&row_data->start,sline,wp->current_tag_line- wp->top_tag_line+1,0,20,row_data->selected);
+				// vteeoc(wp,TAGS_WIDTH+3);
+			} else {
+				// MESG("- %2d : clear tag line!",sline);
+				vt_str(wp,"                 ",sline,-1,0,20,-1);
+				// vteeoc(wp,TAGS_WIDTH+3);
+			};
+			row_data=(istr *)lget_current(wp->w_fp->dir_list_str);
+			if(row_data) {
+				vt_str(wp,&row_data->start,sline,wp->current_note_line- wp->top_note_line+1,TAGS_WIDTH+3,-1,row_data->selected);
+				// MESG("- %2d : [%s]",sline,&row_data->start);
+			} else {
+				// MESG("- %2d : clear note line!",sline);
+				vt_str(wp," ",sline,-1,TAGS_WIDTH+3,-1,-1);
+			};
+			lmove_to_next(wp->w_fp->b_tag_list,0);
+			lmove_to_next(wp->w_fp->dir_list_str,0);
+		};
+	};
+#endif
+	if(wp->w_flag & UPD_STATUS) {
+		wp->w_flag=UPD_STATUS;
+	}
+	else wp->w_flag=0;
+	set_draw_flag(wp,"update_some_lines");
+	getwquotes(wp,0);	// set highlight to the top line!
+}
 
 void upd_move(WINDP *wp,char *from)
 {

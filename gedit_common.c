@@ -15,6 +15,7 @@ int set_tag_view_position(int line,int column);
 extern FILEBUF *cbfp;
 int get_current_line();
 int change_sort_mode(int mouse_col);
+offs FNext_wrap_line(WINDP *wp,offs start);
 
 // This is used in scrolling!
 void move_window_lines(WINDP *wp,int lines)
@@ -30,6 +31,9 @@ void move_window_lines(WINDP *wp,int lines)
 	if(next_line(lines)){
 	upd_column_pos();
 	check_cursor_position(wp);
+	if(wp->w_fp->view_mode & VMWRAP) 
+	upd_all_wrap_lines(wp,"cb_set_position 3");
+	else
 	upd_all_virtual_lines(wp,"move_window_lines");
 	draw_window(1,wp,"move_upate_window");
 
@@ -336,9 +340,13 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 		};
 	} else {
 		new_line=tp_line(wp->tp_hline)+mouse_row;
-		new_offset=LineBegin(tp_offset(wp->tp_hline));
+		if(wp->w_fp->view_mode & VMWRAP) new_offset=tp_offset(wp->tp_hline);
+		else new_offset=LineBegin(tp_offset(wp->tp_hline));
+		MESG("top line is: %ld",new_offset);
 		for(i=0;i<mouse_row;i++) {
-	  		new_offset = FNextLine(cbfp,new_offset);
+			if(wp->w_fp->view_mode & VMWRAP) 
+				new_offset = FNext_wrap_line(wp,new_offset);
+	  		else new_offset = FNextLine(cbfp,new_offset);
 		};
 		if(button==KMOUSE_DBLCLICK+1) {
 			select_current_word();
@@ -359,6 +367,13 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 						mouse_col=set_tag_view_position(new_line,mouse_col);
 						update_screen(TRUE);
 					} else {
+					if(wp->w_fp->view_mode & VMWRAP) {
+						MESG("	new_offset: %ld line=%ld col=%d",new_offset,new_line, mouse_col);
+						textpoint_set(wp->tp_current,new_offset);
+						num line = tp_line(wp->tp_current);
+						num col0 = tp_col (wp->tp_current);
+						move_to_new_position(wp,new_offset,line, col0+mouse_col);
+					} else
 					move_to_new_position(wp,new_offset,new_line, mouse_col);
 					if(update_full) update_screen(TRUE);
 					else update_screen(FALSE);
