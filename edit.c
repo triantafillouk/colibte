@@ -68,12 +68,12 @@ void toggle_val(char *name){
 	if((int)bt_dval(name)) {
 		set_bt_num_val(name,0);
 	} else set_bt_num_val(name,1);
-	MESG("new value of [%s] is %d",name,(int)bt_dval(name));
+	// MESG("new value of [%s] is %d",name,(int)bt_dval(name));
 }
 
 int toggle_parameter(int type)
 {
- MESG("toggle_parameter: type[%d]=[%s] gmode=%d ",type,option_names[type].name,gmode);
+ // MESG("toggle_parameter: type[%d]=[%s] gmode=%d ",type,option_names[type].name,gmode);
   toggle_val(option_names[type].name);
   switch(type) {
   	case EMKEYEMUL:	{
@@ -128,7 +128,7 @@ int toggle_parameter(int type)
 	   int infocols=0;
 	   int view_mode=0;
 	   int v1=(int)bt_dval("wrap_mode");
-	   MESG("EMWRAP %f",(int)v1);
+	   // MESG("EMWRAP %f",(int)v1);
 		if((int)bt_dval("show_vinfo")) {
 			infocols=1;
 			view_mode=VMINFO;
@@ -261,7 +261,7 @@ int imove_top_line(num new_top_line)
  new_current_line=new_top_line+current_row;
 
  if(new_current_line>last_line) new_current_line=last_line;
- MESG("imove_top_line:to %ld",new_top_line);
+ // MESG("imove_top_line:to %ld",new_top_line);
  textpoint_set_lc(cwp->tp_hline, new_top_line,0);
  textpoint_set_lc(cwp->tp_current, new_current_line,0);
  set_update(cwp,UPD_MOVE|UPD_WINDOW);
@@ -344,7 +344,7 @@ int goto_bof(int n)
 	if(execmd) return (OK_CLRSL);
 	set_update(cwp,UPD_WINDOW);
 	msg_line(time2a());
-	MESG("goto_bof");
+	// MESG("goto_bof");
 	return (OK_RSTGOAL);
 }
 
@@ -452,7 +452,7 @@ int next_line(int n)
 	set_goal_column(-1,"next_line:");
 	// get the current line
 	current_line=get_current_line();
-	MESG("next_line: < current=%ld col=%ld",current_line,GetCol());
+	// MESG("next_line: < current=%ld col=%ld",current_line,GetCol());
 	cwp->w_prev_line=current_line;
 	// MESG("next_line: current_line=%d b_flag=0x%X",current_line,b_flag);
 #if	TNOTES
@@ -516,9 +516,13 @@ int next_line(int n)
 	} else 
 	if(cbfp->view_mode & VMWRAP) {
 		offs o_now=tp_offset(cwp->tp_current);
+#if	0
+		offs o_next=FNext_wrap_line(cwp,o_now);
+		textpoint_set(cwp->tp_current,o_next);
+#else
 		offs o_end=LineEnd(o_now);
 		int remains=DiffColumns(cwp->w_fp,o_now,o_end);
-		MESG("next_line: wrap mode! o=%ld end=%ld remain columns=%d",o_now,o_end,remains);
+		// MESG("next_line: wrap mode! o=%ld end=%ld remain columns=%d",o_now,o_end,remains);
 		if(remains>= cwp->w_width) {
 			next_character(cwp->w_width);
 		} else {
@@ -529,6 +533,7 @@ int next_line(int n)
 				MoveLineCol(current_line+n,cwp->goal_column);
 			}
 		};
+#endif
 		if(w_row == cwp->w_ntrows-2-half_last_line) {
 			move_window(-1);
 		};
@@ -539,7 +544,7 @@ int next_line(int n)
 		MoveLineCol(current_line+n,cwp->goal_column);
 	};
 	set_hmark(0,"next_line");
-	MESG("next_line:	end >!");
+	// MESG("next_line:	end >!");
 	/* reseting the current position */
 	if(!execmd) set_update(cwp,UPD_MOVE);
 	return(TRUE);
@@ -561,7 +566,7 @@ int prev_line(int n)
 
 	current_line=get_current_line();
 	cwp->w_prev_line=current_line;
-	MESG("!prev_line: current=%d row=%d lock=%d",current_line,cwp->currow,lock_move);
+	// MESG("!prev_line: current=%d row=%d lock=%d",current_line,cwp->currow,lock_move);
 
 	if(current_line<1) return(0);
 	if(current_line-n < 0) n=current_line;
@@ -587,7 +592,7 @@ int prev_line(int n)
     if(lock_move) {
         // If at the last line of the window
 		if(cbfp->view_mode & VMWRAP) {
-			MESG("prev_line: row=%d line=%ld col=%ld",cwp->currow,tp_line(cwp->tp_current),tp_col(cwp->tp_current));
+			// MESG("prev_line: row=%d line=%ld col=%ld",cwp->currow,tp_line(cwp->tp_current),tp_col(cwp->tp_current));
 			if(cwp->currow >= cwp->w_ntrows-3-half_last_line) {
 				lock_move=0;
 #if	1	
@@ -850,25 +855,23 @@ int next_page(int  n)
 		offs o=tp_offset(cwp->tp_hline);
 		offs co=tp_offset(cwp->tp_current);
 		int lines=n;
-		MESG("next_page: topo=%ld current=%ld lines=%d---------",o,co,lines);
+		// MESG("next_page: topo=%ld current=%ld lines=%d---------",o,co,lines);
 		while(--lines>0) {
 			o=FNext_wrap_line(cwp,o);
 		};
 		textpoint_set(cwp->tp_hline,o);
-		MESG("        : new topo=%ld line=%ld",o,tp_line(cwp->tp_hline));
+		// MESG("        : new topo=%ld line=%ld",o,tp_line(cwp->tp_hline));
 		// offs top_offset=tp_offset(cwp->tp_hline);
 		// n=lines;
 		// o=tp_offset(cwp->tp_current);
-		MESG("		start current from %ld n=%d",o,n);
+		// MESG("		start current from %ld n=%d",o,n);
 		while(--n>0) {
 			o=FNext_wrap_line(cwp,o);
-			MESG("		next line o=%ld",o);
+			// MESG("		next line o=%ld",o);
 		};
 		textpoint_set(cwp->tp_current,o);
-		// offs new_current=tp_offset(cwp->tp_current);
 		textpoint_set(cwp->w_fp->tp_current,o);
-		// cwp->w_ppline = tp_line(cwp->tp_current)-tp_line(cwp->tp_hline)+1;
-		MESG("		new current o=%ld line=%ld",tp_line(cwp->tp_current),tp_line(cwp->tp_current));
+		// MESG("		new current o=%ld line=%ld",tp_line(cwp->tp_current),tp_line(cwp->tp_current));
 		
 		set_update(cwp,UPD_MOVE|UPD_WINDOW);
 		undo_set_noglue();
@@ -1198,7 +1201,7 @@ int quick_close(int n)
 	};
 	oldcb = cbfp;                          /* save in case we fail */
 	// MESG("quick_close:");
-	if(oldcb->connect_buffer!=NULL) MESG("	is connected!");
+	// if(oldcb->connect_buffer!=NULL) MESG("	is connected!");
 	if(cbfp->b_fname[0]!=CHR_LBRA)
 	if(!dont_edit()) {
 		// save the buffer
@@ -1206,7 +1209,7 @@ int quick_close(int n)
 		if ((status = save_file( n)) != TRUE) {
 
 			if(cbfp->connect_buffer!=NULL) {
-				MESG("buffer is connected!");
+				// MESG("buffer is connected!");
 				FILEBUF *connect_fp=cbfp->connect_buffer;
 				select_filebuf(connect_fp);
 				delete_filebuf(oldcb,1);
@@ -1224,7 +1227,7 @@ int quick_close(int n)
 	}else {
 	// MESG("quick_close: close_file");
 		if(cbfp->connect_buffer!=NULL) {
-		MESG("buffer is connected!");
+		// MESG("buffer is connected!");
 			FILEBUF *connect_fp=cbfp->connect_buffer;
 			select_filebuf(connect_fp);
 			delete_filebuf(oldcb,1);

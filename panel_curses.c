@@ -898,16 +898,21 @@ int text_mouse_function(int move)
 		} 
 	};
 	if(mouse_window_col<0) mouse_window_col=0;	/* inside info left column  */
-	new_offset=LineBegin(tp_offset(cwp->tp_hline));
+	if(cbfp->view_mode & VMWRAP) new_offset=tp_offset(cwp->tp_hline);
+	else new_offset=LineBegin(tp_offset(cwp->tp_hline));
 
 	// MESG("tp_hline:1 new_offset=%ld row=%d",new_offset,mouse_window_row);
 	int head_line=(cbfp->b_header!=NULL);
 	for(i=head_line;i<mouse_window_row;i++) 
 	{
+		if(cbfp->view_mode & VMWRAP) 
+		new_offset = FNext_wrap_line(cwp,new_offset);
+		else 
   		new_offset = FNextLine(cbfp,new_offset);
 	};
-
+	// MESG("text_mouse_function: new_offset=%ld mouse_row=%d ",new_offset,mouse_window_row);
 	if(mouse_button==KMOUSE_BUTTON1 && move<KMOUSE_RELEASE) {
+	// MESG("	mouse release!");
 		if(mouse_window_col==wp->w_width) {
 			// MESG("move<KMOUSE_RELEASE");
 			return 0;
@@ -941,6 +946,9 @@ int text_mouse_function(int move)
 		} else {
 			textpoint_set(cwp->tp_current,new_offset);
 			new_line=tp_line(cwp->tp_current);
+			int wrap_column=tp_col(cwp->tp_current);
+			// MESG("	new_offset:1 %ld %ld set line %ld col %ld mouse_col=%d",
+				// new_offset,tp_offset(cwp->tp_current),tp_line(cwp->tp_current),tp_col(cwp->tp_current),mouse_window_col);
 			 if(move==KMOUSE_DBLCLICK)
 			 {
 				move_to_new_position(mouse_window_col,new_line);
@@ -961,7 +969,10 @@ int text_mouse_function(int move)
 				} else {
 				start_line=new_line;
 				start_col = mouse_window_col;
-				move_to_new_position(mouse_window_col,new_line);
+				// MESG("	wrap_column=%d",wrap_column);
+				// MESG("	move_to_new_pos: mouse_col=%d new_line=%d",mouse_window_col,new_line);
+				// move_to_new_position(mouse_window_col,new_line);
+				move_to_new_position(wrap_column+mouse_window_col,new_line);
 				};
 			} else {
 				move_to_new_position(mouse_window_col,start_line);
@@ -980,7 +991,7 @@ int text_mouse_function(int move)
 			}
 		};
 	};
-
+	// MESG("	text_mouse_function:1");
 	if(mouse_button==KMOUSE_BUTTON3 && move<KMOUSE_RELEASE) {
 		if(cwp->selection){
 			int status;
@@ -2283,7 +2294,7 @@ void show_debug_color_attr(COLOR_SCHEME *current_cscheme)
 void set_current_scheme(int scheme)
 {
  int i,j;
- MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
+ // MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
  if(scheme<1 || scheme> color_scheme_list->size) scheme=1;
 
  color_scheme_ind=scheme-1;

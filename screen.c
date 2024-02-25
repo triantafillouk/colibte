@@ -1997,7 +1997,8 @@ int check_cursor_position_wrap(WINDP *wp)
 	offs cur_offs;
 	// FILEBUF *fp = wp->w_fp;
 	// int i;
-	MESG("check_cursor_position_wrap: hline %ld current %ld, line %ld %ld ",tp_offset(wp->tp_hline),tp_offset(wp->tp_current),tp_line(wp->tp_hline),tp_line(wp->tp_current));
+	MESG("check_cursor_position_wrap: hline o=%ld l=%ld, current o=%ld, l= %ld",tp_offset(wp->tp_hline),tp_line(wp->tp_hline),
+		tp_offset(wp->tp_current),tp_line(wp->tp_current));
 	cur_offs=tp_offset(wp->tp_current);
 	// i= wp->w_ppline;
 	int wcl=window_cursor_line(wp);
@@ -2203,9 +2204,8 @@ int update_screen(int force)
 	static int count=0;
 	count++;
 	int cw_flag=cwp->w_flag;
-	MESG("update_screen: view_mode=%d o=%ld top=%ld row=%d",
-		cwp->w_fp->view_mode,tp_offset(cwp->tp_current),tp_offset(cwp->tp_hline),cwp->currow);
-	// MESG("\nupdate_screen:noupdate=%d cw_flag=%d force=%d ------ w_ntcols=%d count=%d",noupdate,cw_flag,force,cwp->w_ntcols,count);
+	// MESG("update_screen: view_mode=%d o=%ld top=%ld row=%d",
+		// cwp->w_fp->view_mode,tp_offset(cwp->tp_current),tp_offset(cwp->tp_hline),cwp->currow);
 	if (noupdate) return TRUE;
 
 	/* experiment with screen updating  */
