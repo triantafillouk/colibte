@@ -342,7 +342,7 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 		new_line=tp_line(wp->tp_hline)+mouse_row;
 		if(wp->w_fp->view_mode & VMWRAP) new_offset=tp_offset(wp->tp_hline);
 		else new_offset=LineBegin(tp_offset(wp->tp_hline));
-		MESG("top line is: %ld",new_offset);
+		// MESG("top line is: %ld",new_offset);
 		for(i=0;i<mouse_row;i++) {
 			if(wp->w_fp->view_mode & VMWRAP) 
 				new_offset = FNext_wrap_line(wp,new_offset);
@@ -368,7 +368,7 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 						update_screen(TRUE);
 					} else {
 					if(wp->w_fp->view_mode & VMWRAP) {
-						MESG("	new_offset: %ld line=%ld col=%d",new_offset,new_line, mouse_col);
+						// MESG("	new_offset: %ld line=%ld col=%d",new_offset,new_line, mouse_col);
 						textpoint_set(wp->tp_current,new_offset);
 						num line = tp_line(wp->tp_current);
 						num col0 = tp_col (wp->tp_current);
