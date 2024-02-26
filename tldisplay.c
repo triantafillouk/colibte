@@ -23,6 +23,7 @@ void drv_window_delete(WINDP *wp);
 int get_menu_index_from_mouse();
 void utf_string_break(char *utf_string, int column);
 int noop(int);
+void upd_all_wrap_lines(WINDP *wp,char *from);
 
 extern int drv_initialized;
 extern FILEBUF *cbfp;
@@ -73,7 +74,8 @@ void update_selection()
 	while((wp=(WINDP *)lget(window_list))!=NULL)
 	{
 			if(wp==cwp) wp->currow = window_cursor_line(wp);
-
+			if(wp->w_fp->view_mode & VMWRAP) upd_all_wrap_lines(wp,"update_selection");
+			else
 			upd_all_virtual_lines(wp,"update_selection");	/* update all lines */
 			wp->w_flag = 0;
 	}
@@ -634,7 +636,7 @@ int menu_command(int n)
  /* new_wp, new_line, new_column have been set */
 void move_to_new_position(num new_column,num new_line)
 {
-//	MESG("move_to_new_position: col=%ld line=%ld",new_column,new_line);
+	MESG("move_to_new_position: col=%ld line=%ld",new_column,new_line);
 	set_goal_column(new_column,"move_to_new_position");
 	MoveLineCol(new_line,cwp->goal_column);
 	update_status();
@@ -914,7 +916,7 @@ void update_cursor_position()
 #endif
 			if(cwp->w_fp->b_flag & FSNLIST) movecursor(cwp->current_note_line-cwp->top_note_line+(cwp->w_fp->b_header!=NULL), 0);
 			else if(cwp->w_fp->view_mode & VMWRAP) {
-				MESG("update_cursor_position: row=%d col=%d %d",cwp->currow,cwp->curcol,WGetCol());
+				// MESG("update_cursor_position: row=%d col=%d %d",cwp->currow,cwp->curcol,WGetCol());
 				movecursor(cwp->currow,cwp->curcol);
 			} else movecursor(cwp->currow+(cwp->w_fp->b_header!=NULL), WGetCol());
 			show_cursor("update_cursor_position");

@@ -19,6 +19,7 @@ void set_global_flag(int option_flag,int value);
 void get_lowercase_string(char *lower, char *string);
 void get_uppercase_string(char *lower, char *string);
 offs FNext_wrap_line(WINDP *wp,offs current_offset);
+void next_column(int cols);
 
 int GetBlock(FILEBUF *fp,char *copy,offs from,offs size);
 int delins(int dlength, char *instr);
@@ -452,6 +453,7 @@ int next_line(int n)
 	set_goal_column(-1,"next_line:");
 	// get the current line
 	current_line=get_current_line();
+	// MESG("# next_line: n=%d current is %ld",n,current_line);
 	// MESG("next_line: < current=%ld col=%ld",current_line,GetCol());
 	cwp->w_prev_line=current_line;
 	// MESG("next_line: current_line=%d b_flag=0x%X",current_line,b_flag);
@@ -516,15 +518,13 @@ int next_line(int n)
 	} else 
 	if(cbfp->view_mode & VMWRAP) {
 		offs o_now=tp_offset(cwp->tp_current);
-#if	0
-		offs o_next=FNext_wrap_line(cwp,o_now);
-		textpoint_set(cwp->tp_current,o_next);
-#else
 		offs o_end=LineEnd(o_now);
+
 		int remains=DiffColumns(cwp->w_fp,o_now,o_end);
 		// MESG("next_line: wrap mode! o=%ld end=%ld remain columns=%d",o_now,o_end,remains);
 		if(remains>= cwp->w_width) {
-			next_character(cwp->w_width);
+			next_column(cwp->w_width);
+			// next_character(cwp->w_width);
 		} else {
 			int now_col=tp_col(cwp->tp_current) % cwp->w_width;
 			if(now_col+remains >= cwp->w_width) next_character(remains);
@@ -533,7 +533,7 @@ int next_line(int n)
 				MoveLineCol(current_line+n,cwp->goal_column);
 			}
 		};
-#endif
+
 		if(w_row == cwp->w_ntrows-2-half_last_line) {
 			move_window(-1);
 		};
@@ -853,7 +853,7 @@ int next_page(int  n)
 	if(cwp->w_fp->view_mode & VMWRAP) {
 		// set new topline
 		offs o=tp_offset(cwp->tp_hline);
-		offs co=tp_offset(cwp->tp_current);
+		// offs co=tp_offset(cwp->tp_current);
 		int lines=n;
 		// MESG("next_page: topo=%ld current=%ld lines=%d---------",o,co,lines);
 		while(--lines>0) {

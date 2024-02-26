@@ -57,6 +57,7 @@ int imove_top_line(num new_top_line);
 int set_sposition(WINDP *wp,int *st, int *l);
 void utf_string_break(char *utf_string, int column);
 int change_sort_mode(int mouse_col);
+offs FNext_wrap_line(WINDP *wp,offs start);
 
 int	colorupdate;
 int color_scheme_ind=0;
@@ -947,11 +948,12 @@ int text_mouse_function(int move)
 			textpoint_set(cwp->tp_current,new_offset);
 			new_line=tp_line(cwp->tp_current);
 			int wrap_column=tp_col(cwp->tp_current);
+
 			// MESG("	new_offset:1 %ld %ld set line %ld col %ld mouse_col=%d",
 				// new_offset,tp_offset(cwp->tp_current),tp_line(cwp->tp_current),tp_col(cwp->tp_current),mouse_window_col);
 			 if(move==KMOUSE_DBLCLICK)
 			 {
-				move_to_new_position(mouse_window_col,new_line);
+				move_to_new_position(mouse_window_col+wrap_column,new_line);
 				select_current_word();
 				return 0;
 			 };
@@ -968,14 +970,12 @@ int text_mouse_function(int move)
 					// MESG("mouse_window_col=%d line=%d",mouse_window_col,new_line);
 				} else {
 				start_line=new_line;
-				start_col = mouse_window_col;
-				// MESG("	wrap_column=%d",wrap_column);
-				// MESG("	move_to_new_pos: mouse_col=%d new_line=%d",mouse_window_col,new_line);
-				// move_to_new_position(mouse_window_col,new_line);
+				start_col = wrap_column+mouse_window_col;
+				// MESG("	move_to_new_pos: mouse_col=%d wrap_column=%d new_line=%d",mouse_window_col,wrap_column,new_line);
 				move_to_new_position(wrap_column+mouse_window_col,new_line);
 				};
 			} else {
-				move_to_new_position(mouse_window_col,start_line);
+				move_to_new_position(wrap_column+mouse_window_col,start_line);
 				if(cwp->selection==0) {
 					/* start selection  */
 //					MESG("mouse move: start selection: mouse_col=%d o=%lld charlen=%d start_col=%lld",
@@ -985,7 +985,7 @@ int text_mouse_function(int move)
 				} else {
 //					MESG("mouse move: move  selection: mouse_col=%d o=%lld charlen=%d start_col=%lld",
 //						mouse_window_col,Offset(),charlen(cwp->w_fp,Offset()),start_col);
-					set_xmark(cwp,mouse_window_col,new_line - tp_line(cwp->tp_hline),1);
+					set_xmark(cwp,wrap_column+mouse_window_col,new_line - tp_line(cwp->tp_hline),1);
 				};
 				set_update(cwp,UPD_EDIT);
 			}

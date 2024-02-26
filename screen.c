@@ -2655,7 +2655,7 @@ void upd_part_wrap(WINDP *wp,char *from)
 		line2 = wp->w_fp->line_to-tp_line(wp->tp_hline);;
 	}
 	// MESG("upd_part: window %d lcol=%d from [%s] lines %d - %d",wp->id,wp->w_lcol,from,line1,line2);
-	if(wp->w_lcol!=wp->w_plcol) return upd_all_virtual_lines(wp,"upd_part w_lcol");
+	if(wp->w_lcol!=wp->w_plcol) return upd_all_wrap_lines(wp,"upd_part w_lcol");
 	if(line1<0 && line2<0) out_of_view=1;
 	else {
 		if(line1<0) line1=0;
