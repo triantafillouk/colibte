@@ -31,7 +31,7 @@ void move_window_lines(WINDP *wp,int lines)
 	if(next_line(lines)){
 	upd_column_pos();
 	check_cursor_position(wp);
-	if(wp->w_fp->view_mode & VMWRAP) 
+	if(is_wrap_text(wp->w_fp)) 
 	upd_all_wrap_lines(wp,"cb_set_position 3");
 	else
 	upd_all_virtual_lines(wp,"move_window_lines");
@@ -340,11 +340,11 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 		};
 	} else {
 		new_line=tp_line(wp->tp_hline)+mouse_row;
-		if(wp->w_fp->view_mode & VMWRAP) new_offset=tp_offset(wp->tp_hline);
+		if(is_wrap_text(wp->w_fp)) new_offset=tp_offset(wp->tp_hline);
 		else new_offset=LineBegin(tp_offset(wp->tp_hline));
 		// MESG("top line is: %ld",new_offset);
 		for(i=0;i<mouse_row;i++) {
-			if(wp->w_fp->view_mode & VMWRAP) 
+			if(is_wrap_text(wp->w_fp)) 
 				new_offset = FNext_wrap_line(wp,new_offset);
 	  		else new_offset = FNextLine(cbfp,new_offset);
 		};
@@ -367,7 +367,7 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 						mouse_col=set_tag_view_position(new_line,mouse_col);
 						update_screen(TRUE);
 					} else {
-					if(wp->w_fp->view_mode & VMWRAP) {
+					if(is_wrap_text(wp->w_fp)) {
 						// MESG("	new_offset: %ld line=%ld col=%d",new_offset,new_line, mouse_col);
 						textpoint_set(wp->tp_current,new_offset);
 						num line = tp_line(wp->tp_current);

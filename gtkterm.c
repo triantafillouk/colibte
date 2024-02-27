@@ -1227,7 +1227,7 @@ void cb_set_position(GtkAdjustment *adj, GtkWidget *widget)
 
 	upd_column_pos();
 	check_cursor_position(wd->wp);
-	if(wd->wp->w_fp->view_mode & VMWRAP) 
+	if(is_wrap_text(wd->wp->w_fp)) 
 	upd_all_wrap_lines(wd->wp,"cb_set_position 3");
 	else
 	upd_all_virtual_lines(wd->wp,"cb_set_posision");

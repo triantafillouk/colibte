@@ -80,6 +80,7 @@ void list_select(char *s,int dire);
 void parse_command_line(int , char **);
 int highlight_index(char *,int *);
 int highlight_type(char *);
+int is_wrap_text(FILEBUF *fp);
 
 int select_highlight(int);
 int check_update_highlight(int flag);

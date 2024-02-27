@@ -899,14 +899,14 @@ int text_mouse_function(int move)
 		} 
 	};
 	if(mouse_window_col<0) mouse_window_col=0;	/* inside info left column  */
-	if(cbfp->view_mode & VMWRAP) new_offset=tp_offset(cwp->tp_hline);
+	if(is_wrap_text(cbfp)) new_offset=tp_offset(cwp->tp_hline);
 	else new_offset=LineBegin(tp_offset(cwp->tp_hline));
 
 	// MESG("tp_hline:1 new_offset=%ld row=%d",new_offset,mouse_window_row);
 	int head_line=(cbfp->b_header!=NULL);
 	for(i=head_line;i<mouse_window_row;i++) 
 	{
-		if(cbfp->view_mode & VMWRAP) 
+		if(is_wrap_text(cbfp)) 
 		new_offset = FNext_wrap_line(cwp,new_offset);
 		else 
   		new_offset = FNextLine(cbfp,new_offset);

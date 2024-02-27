@@ -97,7 +97,7 @@ void set_goal_column(int new_column,char *from)
  FILEBUF *fp = cwp->w_fp;
  if(new_column<0) {
 	if(GetCol()>cwp->goal_column) {
-		if(fp->view_mode & VMWRAP) 
+		if(is_wrap_text(fp)) 
 			cwp->goal_column=GetCol() % (cwp->w_width);
 		else cwp->goal_column=GetCol();
 	};
@@ -289,7 +289,7 @@ int move_window(int n)
 	offs curoffs;
 	if(!drv_initialized) return false;
 	if(n==0) return FALSE;
-	if(cwp->w_fp->view_mode & VMWRAP) 
+	if(is_wrap_text(cwp->w_fp)) 
 		curoffs = tp_offset(cwp->tp_hline);
 	else
 		curoffs = LineBegin(tp_offset(cwp->tp_hline));
@@ -299,14 +299,14 @@ int move_window(int n)
 	// MESG("!move_window: start current top=%ld n=%d",curoffs,n);
     if (n < 0) {
         while (n++ < 0) {
-			if(cwp->w_fp->view_mode & VMWRAP) {
+			if(is_wrap_text(cwp->w_fp)) {
 				curoffs=FNext_wrap_line(cwp,curoffs);
 			} else {	
 				curoffs=FNextLine(cbfp,curoffs);
 			};
 		};
     } else  {
-		if(cwp->w_fp->view_mode & VMWRAP) {
+		if(is_wrap_text(cwp->w_fp)) {
 			while((n-- > 0) &&  (curoffs>0)) {
 				// go to prev window line
 				curoffs = FPrev_wrap_Line(cwp,curoffs);
@@ -494,7 +494,7 @@ int window_cursor_line(WINDP *wp)
 	else 
 #endif
 	if(cwp->w_fp->b_flag & FSNLIST) cline=cwp->current_note_line-cwp->top_note_line;
-	else if(cwp->w_fp->view_mode & VMWRAP) {	// WRAP mode!
+	else if(is_wrap_text(cwp->w_fp)) {	// WRAP mode!
 		return window_cursor_line_wrap(wp);
 	} 
 	else cline = tp_line(wp->tp_current)-tp_line(wp->tp_hline);
@@ -641,7 +641,7 @@ WINDP *dublicate_window(WINDP *wp0)
 		wp->w_lcol=0;
 		wp->w_plcol=0;
 
-		if(wp->w_fp->view_mode & VMWRAP)
+		if(is_wrap_text(wp->w_fp))
 		{
 			wp->w_infocol = wp->w_fp->b_infocol;
 			wp->w_fp->view_mode = VMWRAP|VMINFO;

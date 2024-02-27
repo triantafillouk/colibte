@@ -762,7 +762,7 @@ void **array_data(alist *list)
 {
  int i;
  _el *pel;
- MESG("array_data:");
+ // MESG("array_data:");
  if(!list->array_valid) {
  	if(list->data!=NULL) free(list->data);
 	list->data = (void **) malloc(sizeof(void*)*(list->size+1));

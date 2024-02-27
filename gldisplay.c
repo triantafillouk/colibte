@@ -290,7 +290,7 @@ void status_line(WINDP *wp)
 		if((sort_mode %2)==1) { *stp++ = 'r'; };
 	};	
 #endif
-	if(wp->w_fp->view_mode & VMWRAP) {*stp++='W';};
+	if(is_wrap_text(wp->w_fp)) {*stp++='W';};
 	*stp++=' ';
 	if(gmode_over) *stp++ = 'O';
 

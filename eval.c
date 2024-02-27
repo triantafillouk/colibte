@@ -350,7 +350,7 @@ int set_option_val(int vnum,char *svalue)
 
  v1=atoi(svalue);
  
-	MESG("set_option_val: vnum=%d [%s]",vnum,svalue);
+	// MESG("set_option_val: vnum=%d [%s]",vnum,svalue);
 		switch (vnum) {
 		case EMFILLCOL:	{
 			set_bt_num_val("fillcol",v1);
@@ -434,7 +434,7 @@ int set_option_val(int vnum,char *svalue)
 		  case EMWRAP: {
 		   int infocols=0;
 		   int view_mode=0;
-		   MESG("EMWRAP %f",(int)v1);
+		   // MESG("EMWRAP %f",(int)v1);
 			if((int)bt_dval("show_vinfo")) {
 				infocols=1;
 				view_mode=VMINFO;
@@ -448,12 +448,12 @@ int set_option_val(int vnum,char *svalue)
 			lbegin(window_list);
 			WINDP *wp;
 			while((wp=lget(window_list))!=NULL) {
-				if (wp->w_fp->view_mode!=VMHEX
+				if (!(wp->w_fp->view_mode & VMHEX)
 			 		&& wp->w_fp->b_mode>=FSNLIST) {
 					wp->w_infocol = infocols;
 					wp->w_fp->view_mode |= view_mode;
 					wp->w_fp->b_infocol |= view_mode;
-					MESG("set window view_mode to %d",view_mode);
+					// MESG("set window view_mode to %d",view_mode);
 					set_update(wp,UPD_ALL);
 				};
 			};

@@ -74,7 +74,7 @@ void update_selection()
 	while((wp=(WINDP *)lget(window_list))!=NULL)
 	{
 			if(wp==cwp) wp->currow = window_cursor_line(wp);
-			if(wp->w_fp->view_mode & VMWRAP) upd_all_wrap_lines(wp,"update_selection");
+			if(is_wrap_text(wp->w_fp)) upd_all_wrap_lines(wp,"update_selection");
 			else
 			upd_all_virtual_lines(wp,"update_selection");	/* update all lines */
 			wp->w_flag = 0;
@@ -915,7 +915,7 @@ void update_cursor_position()
 			else 
 #endif
 			if(cwp->w_fp->b_flag & FSNLIST) movecursor(cwp->current_note_line-cwp->top_note_line+(cwp->w_fp->b_header!=NULL), 0);
-			else if(cwp->w_fp->view_mode & VMWRAP) {
+			else if(is_wrap_text(cwp->w_fp)) {
 				// MESG("update_cursor_position: row=%d col=%d %d",cwp->currow,cwp->curcol,WGetCol());
 				movecursor(cwp->currow,cwp->curcol);
 			} else movecursor(cwp->currow+(cwp->w_fp->b_header!=NULL), WGetCol());

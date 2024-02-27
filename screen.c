@@ -295,7 +295,7 @@ void upd_column_pos()
 	if(cbfp->view_mode & VMHEX){ 
 		upd_column_pos_hex();
 	} else 
-	if(cbfp->view_mode & VMWRAP) {
+	if(is_wrap_text(cbfp)) {
 		// MESG("upd_column_pos_wrap:");
 		upd_column_pos_wrap();
 		// MESG("upd_column_pos_wrap:ok");
@@ -1794,7 +1794,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 
 		/* orizon different color creates problems if utf and local char set (utf string error)  */
 		/* if on the orizon make it a different color */
-		if(wp->w_fp->view_mode & VMWRAP) {
+		if(is_wrap_text(wp->w_fp)) {
 			if (((wp->vtcol == wp->w_width+wp->w_infocol-1)) || (wp->vtcol==0 && wp->w_lcol > 0)) {
 				ctl_f = COLOR_HORIZON_FG;
 			};
@@ -2031,7 +2031,7 @@ int check_cursor_position_wrap(WINDP *wp)
 void set_top_hline(WINDP *wp,offs cof)
 {
 	offs b0=0;
-	if(wp->w_fp->view_mode & VMWRAP) b0=cof;
+	if(is_wrap_text(wp->w_fp)) b0=cof;
 	else b0=FLineBegin(wp->w_fp,cof);
 	textpoint_set(wp->tp_hline,b0);
 }
@@ -2039,7 +2039,7 @@ void set_top_hline(WINDP *wp,offs cof)
 /*	check_cursor_position:	check to see if the cursor is on screen */
 int check_cursor_position(WINDP *wp)
 {
-	if(wp->w_fp->view_mode & VMWRAP)return(check_cursor_position_wrap(wp));
+	if(is_wrap_text(wp->w_fp))return(check_cursor_position_wrap(wp));
 
 	offs cur_offs,cof;
 	int i;
@@ -2062,7 +2062,7 @@ int check_cursor_position(WINDP *wp)
 //		MESG("check_cursor_position: reposition!!");
 	};
 	if(!force_reposition) {
-		if(wp->w_fp->view_mode & VMWRAP) {
+		if(is_wrap_text(wp->w_fp)) {
 			// MESG("	Not force_reposition!");
 			int new_row=window_cursor_line(wp);
 			if(new_row>wp->w_ntrows-2) force_reposition=1;
@@ -2227,12 +2227,16 @@ int update_screen(int force)
 	while((wp=(WINDP *)lget(window_list))!=NULL)
 	{
 		// if((int)bt_dval("wrap_mode")
+#if	1
+		if(is_wrap_text(wp->w_fp))
+#else
 		if(wp->w_fp->view_mode & VMWRAP 
 			&& !(wp->w_fp->b_flag & FSNLIST)
 			&& !(wp->w_fp->b_flag & FSNOTES)
 			&& !(wp->w_fp->b_flag & FSNOTESN)
 			&& !(wp->w_fp->view_mode & VMHEX)
 		) 
+#endif
 			update_window_wrap(wp,force);
 		else update_window_nowrap(wp,force);
 	};

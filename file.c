@@ -765,7 +765,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	int dir_num=0;
 	int is_scratch=0;
 	create_base_name(base_name,bname);
-	MESG("new_filebuf:base_name=[%s] bname=[%s]",base_name,bname);
+	// MESG("new_filebuf:base_name=[%s] bname=[%s]",base_name,bname);
 	dir_name[0]=0;
 	is_scratch = scratch_ind(base_name);
 
@@ -859,8 +859,9 @@ FILEBUF * new_filebuf(char *bname,int bflag)
     bp->b_flag  = bflag;
 	bp->b_mode  = gmode;
 	bp->b_state = 0;
+	bp->view_mode = 0;
 	bp->scratch_num=is_scratch;
-	
+	// MESG("original view_mode 0x%X",bp->view_mode);
 	if((int)bt_dval("wrap_mode")) {
 		bp->view_mode |= VMWRAP|VMINFO;
 		bp->b_infocol=1;
@@ -871,7 +872,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 		bp->view_mode = 0;
 		bp->b_infocol = 0;
 	};
-	// MESG("set view_mode %d wrap_mode=%d",bp->view_mode,(int)bt_dval("wrap_mode"));
+	// MESG("set view_mode %d wrap_mode=%d infocol=%d",bp->view_mode,(int)bt_dval("wrap_mode"),bp->b_infocol);
 	bp->b_lang = default_lang;
 
 	if(bflag & FSINVS) bp->b_state |= FS_ACTIVE;
@@ -1631,7 +1632,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
  int htype=0;	/* highlight type  */
  char	oext[MAXLLEN], cmd[MAXLLEN];
  *temp_used=0;
- MESG("init_ftype:[%s] b_type=%d view_mode=%d" ,fname,bp->b_type,bp->view_mode);
+ // MESG("init_ftype:[%s] b_type=%d view_mode=0x%X" ,fname,bp->b_type,bp->view_mode);
 #if	CRYPT
 	s=resetkey(bp);
 	if (s != TRUE)	return(s);

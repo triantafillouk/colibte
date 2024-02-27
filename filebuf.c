@@ -237,7 +237,7 @@ int show_info(int n)
 	};
 	if(bp->connect_buffer) SMESG(" connected to %s",bp->connect_buffer->b_fname);
 	if(debug_flag()) {
-		SMESG("Flags: b_mode=%X b_flag=%X view_mode=%X b_type=%X",cbfp->b_mode,cbfp->b_flag,cbfp->view_mode,cbfp->b_type);
+		SMESG("Flags: b_mode=0x%X b_flag=0x%X view_mode=0x%X b_type=0x%X is_wrap=%d",cbfp->b_mode,cbfp->b_flag,cbfp->view_mode,cbfp->b_type,is_wrap_text(cbfp));
 	};
 	if(cbfp->b_mode) {
 		strcpy(s,"Buffer mode: ");	
@@ -935,13 +935,16 @@ void  ResetTextPoints(FILEBUF *bp,int flag)
  num size=0;
  TextPoint *scan;
  if(!flag) { size = tp_offset(bp->tp_text_end); };
+ // MESG("ResetTextPoints: size=%ld lines=%ld",size,tp_line(bp->tp_text_end),tp_line(bp->tp_last));
  for(scan=bp->tp_last; scan; scan=scan->t_next) {
   	scan->line=scan->col=scan->offset=0;
  	scan->flags = FULLDEFINED;
  }; 
  if(!flag) {
 	textpoint_set(bp->tp_text_end,size);
+	// MESG("	new o=%ld lines=%ld lines=%ld",tp_offset(bp->tp_text_end),tp_line(bp->tp_text_end),bp->lines);
 	textpoint_set(bp->tp_text_o,size);
+	bp->lines=tp_line(bp->tp_text_end);
  };
 }
 
@@ -3101,7 +3104,7 @@ int set_view_mode(int n)
 {
 	FILEBUF *fp=cbfp;
 	offs offset=FOffset(fp);
-	MESG("set_view_mode: mode %d",n);
+	// MESG("set_view_mode: to mode %d",n);
    switch (n) {
 	case 1: // Dos mode
 		if ((fp->b_flag & FSDIRED) && !(fp->b_state & FS_VIEW)) break;
@@ -3199,7 +3202,7 @@ int set_view_mode(int n)
 		};break;
 	case 8: // Hide info
 		{
-		if(fp->view_mode & VMHEX || fp->view_mode & VMWRAP) {
+		if(fp->view_mode & VMHEX || is_wrap_text(fp)) {
 		} else {
 			if((int)bt_dval("wrap_mode")) break;
 			fp->view_mode = 0;
@@ -3216,11 +3219,9 @@ int set_view_mode(int n)
 		};break;
 	case 9: // Wrap mode
 	  {
-		// int view_mode=0;
-		MESG("toggle wrap_mode! b_flag=%d",fp->b_flag);
+		// MESG("toggle wrap_mode! b_flag=%d",fp->b_flag);
 		if (fp->b_flag >= FSNLIST || fp->view_mode & (VMHEX|VMINP)) break;
-		// if (fp->b_flag & FSDIRED && !(fp->b_state & FS_VIEW)) break;
-		MESG("change wrap_mode, current is 0x%X",fp->view_mode);
+		// MESG("change wrap_mode, current is 0x%X",fp->view_mode);
 		int v1=fp->view_mode & VMWRAP;
 
 		if(v1) fp->view_mode &= ~VMWRAP;
