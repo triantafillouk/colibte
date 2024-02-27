@@ -50,9 +50,9 @@ int reposition(int n)
 
 void set_window_width(WINDP *wp)
 {
- // wp->w_width = wp->w_ntcols - wp->w_infocol - (tabsize - (wp->w_ntcols-wp->w_infocol)%tabsize);
- wp->w_width = wp->w_ntcols - wp->w_infocol - (wp->w_ntcols-wp->w_infocol)%tabsize;
- MESG("set_window_width: max=%d set to %d",wp->w_ntcols-wp->w_infocol,wp->w_width);
+ // wp->w_width = wp->w_ntcols - wp->w_infocol -1 - (tabsize - (wp->w_ntcols-wp->w_infocol-1)%tabsize);
+ wp->w_width = wp->w_ntcols - wp->w_infocol -1 - (wp->w_ntcols-wp->w_infocol-1)%tabsize;
+ // MESG("set_window_width: max=%d set to %d",wp->w_ntcols-wp->w_infocol,wp->w_width);
 }
 
 /* hard reposition 
