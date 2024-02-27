@@ -1260,6 +1260,9 @@ void highlight_md(int c)
   hstruct=check_words(c);
   if(prev_set>=0) { hquotem=prev_set;prev_set=-1;hprev_line=-1;};
 
+  if((c!='-' && c>31) && hquotem & H_LINESEP)
+ 	 { line_set=0; hquotem ^= H_LINESEP ;};
+
   switch(hstruct) {
 	case START_COMMENT:
 		if(!slang) { // only in html
@@ -2793,6 +2796,9 @@ void highlight_cmd(int c)
 
   if(prev_set>=0) { hquotem=prev_set;prev_set=-1;};
 
+  if((c!='-' && c>31) && hquotem & H_LINESEP)
+ 	 { line_set=0; hquotem ^= H_LINESEP ;};
+
   switch(c) {
 	case CHR_RESET:
 		hstate=0;
@@ -2885,6 +2891,9 @@ void highlight_gtext(int c)
   if(highlight_note(c)) return;
 
   if(prev_set>=0) { hquotem=prev_set;prev_set=-1;};
+
+  if((c!='-' && c>31) && hquotem & H_LINESEP)
+ 	 { line_set=0; hquotem ^= H_LINESEP ;};
 
   switch(c) {
 	case CHR_RESET:

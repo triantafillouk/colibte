@@ -481,7 +481,6 @@ void draw_window(int flag, WINDP *wp,char *from)
 		/* for each line that needs to be updated*/
 		if ((wp->vs[i]->v_flag) ) 
 		{
-#if	1
 			if(wp->vs[i]->slow_line==1) wp->vs[i]->slow_line++;
 			else 
 			if(wp->vs[i]->slow_line==2) 
@@ -490,7 +489,6 @@ void draw_window(int flag, WINDP *wp,char *from)
 				wp->vtcol=0;
 				wp->vs[i]->slow_line=0;
 			};
-#endif
 			draw_window_line(wp,i);
 			ulines++;
 		}
@@ -1213,7 +1211,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 	// show a line separator (when highlight_md)
 	if(line_sep) {
 		VIDEO *vp=wp->vs[wp->vtrow];
-		for(wp->vtcol=first_column;wp->vtcol< wp->w_ntcols-first_column;wp->vtcol++){ 
+		for(wp->vtcol=num_columns;wp->vtcol< wp->w_width;wp->vtcol++){ 
 			vchar *vc = vp->v_text+wp->vtcol;
 
 			svwchar(vc,&double_hline,vc->bcolor,COLOR_COMMENT_FG);	/* double line separator */
@@ -1503,12 +1501,14 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 						memset(uc.uval,0,8);
 						uc.uval[0]=0xFF;
 						uc.uval[1]=0xFF;
+						
 						vtputwc(wp,&uc);
 						display_size--;
 					};		
 				};
 			}
 		} else {
+			
 			vtputc(wp, FCharAt(fp,ptr1++));
 		}
 	};
@@ -1516,7 +1516,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 	// show a line separator (when highlight_md)
 	if(line_sep) {
 		VIDEO *vp=wp->vs[wp->vtrow];
-		for(wp->vtcol=num_columns;wp->vtcol< wp->w_ntcols;wp->vtcol++){ 
+		for(wp->vtcol=num_columns;wp->vtcol< wp->w_width;wp->vtcol++){ 
 			vchar *vc = vp->v_text+wp->vtcol;
 
 			svwchar(vc,&double_hline,vc->bcolor,COLOR_COMMENT_FG);	/* double line separator */
@@ -1896,8 +1896,8 @@ void vt1eol(WINDP *wp,int c,int color)
 {
 	vchar *vpt;
     vpt = wp->vs[wp->vtrow]->v_text;
-	svmchar(vpt+wp->vtcol,c,line_bcolor,color,wp->w_ntcols-wp->vtcol);
-	wp->vtcol=wp->w_ntcols;
+	svmchar(vpt+wp->vtcol,c,line_bcolor,color,wp->w_width-wp->vtcol);
+	wp->vtcol=wp->w_width;
 }
 
 void updgar()
