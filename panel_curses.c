@@ -314,7 +314,6 @@ int delete_window(int n)
 		if(wp==cwp) continue;
 		wx1=wp->gwp->t_xpos;wx2=wx1+wp->w_ntcols;
 		wy1=wp->gwp->t_ypos;wy2=wy1+wp->w_ntrows;
-
 		if(wx1 == cx2+vswidth) {	/* right  */
 			if(cy1 == wy1 && cwp->w_ntrows == wp->w_ntrows) {
 				p_right=1.0;
@@ -322,6 +321,7 @@ int delete_window(int n)
 				wp->w_ntcols += cwp->w_ntcols + vswidth;	/* add width of deleted to the right window  */
 				if(is_first) { w1=wp; is_first=0;};
 				drv_set_wvs(wp);
+				set_window_width(wp);
 			} else
 			if(wy1>=cy1 && wy2<= cy2) {
 				p = (float)(wy2-wy1)/(cy2-cy1);
@@ -330,6 +330,7 @@ int delete_window(int n)
 				wp->w_ntcols += cwp->w_ntcols + vswidth;	/* add width of deleted to the right window  */
 				if(is_first) { w1=wp; is_first=0;};
 				drv_set_wvs(wp);
+				set_window_width(wp);
 			};
 			if(p_right >= 1.0) break;
 		}; 
@@ -339,6 +340,7 @@ int delete_window(int n)
 				wp->w_ntcols += cwp->w_ntcols + vswidth; 	/* add widht of deleted to the left window  */
 				if(is_first) { w1=wp; is_first=0;};
 				drv_set_wvs(wp);
+				set_window_width(wp);
 			}else
 			if(wy1>=cy1 && wy2<= cy2) {
 				p = (float)(wy2-wy1)/(cy2-cy1);
@@ -346,6 +348,7 @@ int delete_window(int n)
 				wp->w_ntcols += cwp->w_ntcols + vswidth; 	/* add widht of deleted to the left window  */
 				if(is_first) { w1=wp; is_first=0;};
 				drv_set_wvs(wp);
+				set_window_width(wp);
 			};
 			if(p_left >= 1.0) break;
 		}; 
@@ -383,7 +386,7 @@ int delete_window(int n)
 			};
 			if(p_up >= 1.0) break;
 		};
-
+		set_window_width(wp);
 	};
 
 	if(w1==NULL) {
