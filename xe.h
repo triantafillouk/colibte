@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.59T8 (27/02/2024)"
+#define VERSION 	"#01.59T9 (28/02/2024)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -57,6 +57,7 @@
 #define	TAGS_WIDTH	15
 #define	NOTES_COLUMN TAGS_WIDTH+2
 
+// b_type flag values
 #define	DIR_DEFAULT		0
 #define	DIR_PRIMARY		1
 #define	DIR_SECONDARY	2

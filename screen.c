@@ -1383,7 +1383,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 			} else {
 				++col;
 			};
-			if(c<32) c='C';
+			if(c<32 || c==0x22) c='1';
 			if(col>=vtla) {
 				vtlm=resize_buffer(vtlm,vtla,vtla+256);
 				vtla+=256;
@@ -1773,7 +1773,8 @@ void vtputwc(WINDP *wp, utfchar *uc)
 
 		if( hquotem==H_QUOTE7 && c=='=') {
 			ctl_f=COLOR_STANDOUT_FG;
-		}
+		};
+		// highlight special chars in all highlight types
 		if((ctl_f==0 && (ctl_b==0||ctl_b==line_bcolor)))
 		switch(c) { 
 			case 39: 	/* single quote  */
@@ -1784,6 +1785,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			case '*': case '=':
 			case '+': case '-':
 			case '&': case '%':
+			// case '"':
 			case '<': case '>': case ',':
 				ctl_f = COLOR_SPEC_FG;ctl_b=line_bcolor;
 			break;

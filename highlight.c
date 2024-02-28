@@ -570,7 +570,7 @@ int check_update_highlight(int flag)
 	getwquotes(cwp,0);
 	// int htemp=hquotem;
 	check_offset1 = FNextLine(fp,tp_offset(cwp->tp_current));
-	fquote_state(check_offset1,tp_offset(cwp->tp_hline),cwp);
+	fquote_state(check_offset1,tp_offset(cwp->tp_hline),cwp,0);
 	h1=hquotem;
 	prev_init=true;
 	// MESG("check_update_highlight: old lines=%ld o0=%ld quote = %X -> %X",oldlines,check_offset1,htemp,h1);
@@ -579,7 +579,7 @@ int check_update_highlight(int flag)
  	num newlines=fp->lines;
 	getwquotes(cwp,0);
 	check_offset2 = FNextLine(fp,tp_offset(cwp->tp_current));
-	fquote_state(check_offset2,tp_offset(cwp->tp_hline),cwp);
+	fquote_state(check_offset2,tp_offset(cwp->tp_hline),cwp,0);
 	// MESG("c: o0=%ld (l=%ld h1=%d)  o1=%ld (l=%d h1=%d)",check_offset1,oldlines,h1,check_offset2,newlines,hquotem);
 	if(newlines!=oldlines || h1!=hquotem) {
 		set_update(cwp,UPD_EDIT);
@@ -618,20 +618,21 @@ int get_selection()
 
 void update_highlight(WINDP *wp)
 {
-// MESG("update_highlight:");
  num known_offset=tp_offset(wp->tp_hsknown);
+ // MESG("#update_highlight: known_offset=%lld top=%lld",known_offset,tp_offset(wp->tp_hline));
  if(!syntaxh) return;
 
 //	prev_slash=prev_ast=hquote5=0;
 //	previous top line is tp_hsknown
 //	previous line with known state is tp_pknown
 //	we must go to tp_hline
-	note_type = (wp->w_fp->b_type >= 1024);
+	note_type = (wp->w_fp->b_type >= NOTE_TYPE);
 	if(note_type) { hnote=1;} else hnote=0;
 //	MESG("update_highlight: note_type=%d ----------------------",note_type);
 #define	TRACE_BACK 100000
 	getwquotes(wp,0);	/* in any case read again current window top line highlight	*/
 	if(tp_offset(wp->tp_hline) == tp_offset(wp->tp_hsknown)) {
+		// MESG("	==");
 		known_offset = tp_offset(wp->tp_hsknown);
 		if(tp_offset(wp->tp_hline)==0) {
 			if(note_type) { hnote=1;} else hnote=0;
@@ -644,35 +645,42 @@ void update_highlight(WINDP *wp)
 	};
 	if(tp_offset(wp->tp_hline) > tp_offset(wp->tp_hsknown)) {
 //		get info from tp_hsknown
+		// MESG("	>");
 		known_offset = tp_offset(wp->tp_hsknown);
 		getwquotes(wp,0); 
-		fquote_state(tp_offset(wp->tp_hline), tp_offset(wp->tp_hsknown),wp);
+		fquote_state(tp_offset(wp->tp_hline), tp_offset(wp->tp_hsknown),wp,1);
 	} else if ( tp_offset(wp->tp_hline) > tp_offset(wp->tp_hmknown) && tp_offset(wp->tp_hline) - tp_offset(wp->tp_hmknown) < TRACE_BACK) 
 	{
 //		get info from wp_hmknown
+		// MESG("	> 2");
 		known_offset = tp_offset(wp->tp_hmknown);
 		getwquotes(wp,1);
-		fquote_state( tp_offset(wp->tp_hline), tp_offset(wp->tp_hmknown),wp);
+		fquote_state( tp_offset(wp->tp_hline), tp_offset(wp->tp_hmknown),wp,1);
 	} else {
 		if( tp_offset(wp->tp_hline) > TRACE_BACK ) {
+			// MESG("	trace back");
 //			set wp->tp_hmknown to tp_line - TRACE_BACK;
+			if(is_wrap_text(wp->w_fp)) textpoint_set(wp->tp_hmknown,tp_offset(wp->tp_hline) - TRACE_BACK);
+			else
 			textpoint_set(wp->tp_hmknown,FLineBegin(wp->w_fp,tp_offset(wp->tp_hline) - TRACE_BACK));
 			init_highlight();
-			fquote_state(tp_offset(wp->tp_hmknown),0,wp);
+			fquote_state(tp_offset(wp->tp_hmknown),0,wp,0);
 			known_offset = tp_offset(wp->tp_hmknown);
 //			save highlight info for tp_pknown
 //			if(note_type) { hnote=1;} else hnote=0;
 			setwquotes(wp,1,known_offset);
-			fquote_state(tp_offset(wp->tp_hline), tp_offset(wp->tp_hmknown),wp);
+			fquote_state(tp_offset(wp->tp_hline), tp_offset(wp->tp_hmknown),wp,1);
 			known_offset=tp_offset(wp->tp_hline);
 		} else {
+			// MESG("	init from 0");
 			init_highlight();
-			fquote_state(tp_offset(wp->tp_hline),0,wp);
+			fquote_state(tp_offset(wp->tp_hline),0,wp,1);
 			known_offset=0;
 		} 
 	};
 //	if(note_type) { hnote=1;} else hnote=0;
 	setwquotes(wp,0,known_offset);
+	// MESG("update_highlight:e");
 }
 
 void update_highlight_line(WINDP *wp)
@@ -3094,34 +3102,45 @@ void init_highlight()
 }
 
 /* find the quote state at the start of a line from previous lines */
-void fquote_state(offs till_offs, offs from_offs, WINDP *wp)
+void fquote_state(offs till_offs, offs from_offs, WINDP *wp,int show)
 {
  offs cof;
  int c;
+#if	0
+ // int hori=hquotem;
+#endif
  if(!syntaxh) return;
  if(till_offs>FSize(cbfp)) {
 	till_offs=FSize(cbfp);
  };
-#if	0
- if(till_offs-from_offs>200000) {
- 	from_offs=FLineBegin(wp->w_fp,till_offs-200000);
- };
-#endif
+
  if(from_offs<1) {
  	wp->w_fp->hl->h_function(CHR_RESET); 
 	from_offs=0;
  };
- wp->w_fp->hl->h_function(CHR_CR); 
+ // wp->w_fp->hl->h_function(CHR_CR); 
+#if	0
+ int hprev=hori;
+#endif
  for(cof=from_offs;cof<till_offs;cof++) {
  	c=FCharAt(wp->w_fp,cof);
 	wp->w_fp->hl->h_function(c); 
+#if	0
+	if((cof>(from_offs+1)) & (hprev!=hquotem) & show & (from_offs>0)) 
+	{
+		MESG("	'%c' at %lld changed from %X -> %X",c,cof,hprev,hquotem);
+	};
+	hprev=hquotem;
+#endif
  };
+ // MESG("fquote: (%lld %d) -> (%lld %d)",from_offs,hori,till_offs,hquotem);
 }
 
 void setwquotes(WINDP *wp,int ind,num known_offset)
 {
 	if(hprev_line>=0) hquotem=hprev_line;
-// MESG("setwquotes:[%s] ind=%d wp_id=%d btype=%d slang=%d hnote=%d hquotem=%X o=%lld",wp->w_fp->b_fname,ind,wp->id,wp->w_fp->b_type,slang,hnote,hquotem,known_offset);
+	// MESG("setwquotes:[%s] ind=%d btype=%d slang=%d hnote=%d hquotem=%X ko=%lld ho=%lld",wp->w_fp->b_fname,ind,wp->w_fp->b_type,slang,hnote,hquotem,known_offset,tp_offset(wp->tp_hline));
+	wp->w_fp->hl->h_function(512);
 	wp->hs[ind].w_hquotem = hquotem;
 	wp->hs[ind].w_slang = slang;
 	wp->hs[ind].w_jflag = in_array+2*first;
@@ -3134,14 +3153,14 @@ void setwquotes(WINDP *wp,int ind,num known_offset)
 
 void getwquotes(WINDP *wp,int ind)
 {
-	wp->w_fp->hl->h_function(CHR_RESET);
+	// wp->w_fp->hl->h_function(CHR_RESET);
 	hquotem=wp->hs[ind].w_hquotem;
 	slang=wp->hs[ind].w_slang;
 	in_array = wp->hs[ind].w_jflag %2;
 	first = wp->hs[ind].w_jflag/2;
 	hselection=wp->hs[ind].w_hselection;
 	hnote = wp->hs[ind].w_notes;
-// MESG("getwquotes:[%s] ind=%d wp_id=%d b_type=%d slang=%d hnote=%d hquotem=%X o=%lld",wp->w_fp->b_fname,ind,wp->id,wp->w_fp->b_type,slang,hnote,hquotem,wp->hs[ind].known_offset);
+	// MESG("getwquotes:[%s] ind=%d b_type=%d slang=%d hnote=%d hquotem=%X ko=%lld ho=%lld",wp->w_fp->b_fname,ind,wp->w_fp->b_type,slang,hnote,hquotem,wp->hs[ind].known_offset,tp_offset(wp->tp_hline));
 }
 
 /*

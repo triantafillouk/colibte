@@ -185,7 +185,7 @@ void test_time1()
  show_time("test_time1:",0);
 
  for(i=0;i<loops;i++) {
-  fquote_state(FSize(cbfp),0,cwp);
+  fquote_state(FSize(cbfp),0,cwp,0);
  }
 
  show_time("test_time1: end",1);
