@@ -68,7 +68,7 @@ void update_selection()
 	/* update any windows that need refreshing */
 	hide_cursor("update_selection");
 	upd_column_pos();
-	MESG("update_selection:");
+	// MESG("update_selection:");
 	// cwp->currow = window_cursor_line(cwp);
 	lbegin(window_list);
 	while((wp=(WINDP *)lget(window_list))!=NULL)
