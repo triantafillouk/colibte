@@ -1383,7 +1383,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 			} else {
 				++col;
 			};
-			if(c<32 || c==0x22) c='1';
+			if(c<32) c='1';
 			if(col>=vtla) {
 				vtlm=resize_buffer(vtlm,vtla,vtla+256);
 				vtla+=256;

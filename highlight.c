@@ -570,7 +570,7 @@ int check_update_highlight(int flag)
 	getwquotes(cwp,0);
 	// int htemp=hquotem;
 	check_offset1 = FNextLine(fp,tp_offset(cwp->tp_current));
-	fquote_state(check_offset1,tp_offset(cwp->tp_hline),cwp,0);
+	fquote_state(check_offset1,tp_offset(cwp->tp_hline),cwp);
 	h1=hquotem;
 	prev_init=true;
 	// MESG("check_update_highlight: old lines=%ld o0=%ld quote = %X -> %X",oldlines,check_offset1,htemp,h1);
@@ -579,7 +579,7 @@ int check_update_highlight(int flag)
  	num newlines=fp->lines;
 	getwquotes(cwp,0);
 	check_offset2 = FNextLine(fp,tp_offset(cwp->tp_current));
-	fquote_state(check_offset2,tp_offset(cwp->tp_hline),cwp,0);
+	fquote_state(check_offset2,tp_offset(cwp->tp_hline),cwp);
 	// MESG("c: o0=%ld (l=%ld h1=%d)  o1=%ld (l=%d h1=%d)",check_offset1,oldlines,h1,check_offset2,newlines,hquotem);
 	if(newlines!=oldlines || h1!=hquotem) {
 		set_update(cwp,UPD_EDIT);
@@ -648,14 +648,14 @@ void update_highlight(WINDP *wp)
 		// MESG("	>");
 		known_offset = tp_offset(wp->tp_hsknown);
 		getwquotes(wp,0); 
-		fquote_state(tp_offset(wp->tp_hline), tp_offset(wp->tp_hsknown),wp,1);
+		fquote_state(tp_offset(wp->tp_hline), tp_offset(wp->tp_hsknown),wp);
 	} else if ( tp_offset(wp->tp_hline) > tp_offset(wp->tp_hmknown) && tp_offset(wp->tp_hline) - tp_offset(wp->tp_hmknown) < TRACE_BACK) 
 	{
 //		get info from wp_hmknown
 		// MESG("	> 2");
 		known_offset = tp_offset(wp->tp_hmknown);
 		getwquotes(wp,1);
-		fquote_state( tp_offset(wp->tp_hline), tp_offset(wp->tp_hmknown),wp,1);
+		fquote_state( tp_offset(wp->tp_hline), tp_offset(wp->tp_hmknown),wp);
 	} else {
 		if( tp_offset(wp->tp_hline) > TRACE_BACK ) {
 			// MESG("	trace back");
@@ -664,17 +664,17 @@ void update_highlight(WINDP *wp)
 			else
 			textpoint_set(wp->tp_hmknown,FLineBegin(wp->w_fp,tp_offset(wp->tp_hline) - TRACE_BACK));
 			init_highlight();
-			fquote_state(tp_offset(wp->tp_hmknown),0,wp,0);
+			fquote_state(tp_offset(wp->tp_hmknown),0,wp);
 			known_offset = tp_offset(wp->tp_hmknown);
 //			save highlight info for tp_pknown
 //			if(note_type) { hnote=1;} else hnote=0;
 			setwquotes(wp,1,known_offset);
-			fquote_state(tp_offset(wp->tp_hline), tp_offset(wp->tp_hmknown),wp,1);
+			fquote_state(tp_offset(wp->tp_hline), tp_offset(wp->tp_hmknown),wp);
 			known_offset=tp_offset(wp->tp_hline);
 		} else {
 			// MESG("	init from 0");
 			init_highlight();
-			fquote_state(tp_offset(wp->tp_hline),0,wp,1);
+			fquote_state(tp_offset(wp->tp_hline),0,wp);
 			known_offset=0;
 		} 
 	};
@@ -3102,13 +3102,10 @@ void init_highlight()
 }
 
 /* find the quote state at the start of a line from previous lines */
-void fquote_state(offs till_offs, offs from_offs, WINDP *wp,int show)
+void fquote_state(offs till_offs, offs from_offs, WINDP *wp)
 {
  offs cof;
  int c;
-#if	0
- // int hori=hquotem;
-#endif
  if(!syntaxh) return;
  if(till_offs>FSize(cbfp)) {
 	till_offs=FSize(cbfp);
@@ -3119,19 +3116,9 @@ void fquote_state(offs till_offs, offs from_offs, WINDP *wp,int show)
 	from_offs=0;
  };
  // wp->w_fp->hl->h_function(CHR_CR); 
-#if	0
- int hprev=hori;
-#endif
  for(cof=from_offs;cof<till_offs;cof++) {
  	c=FCharAt(wp->w_fp,cof);
 	wp->w_fp->hl->h_function(c); 
-#if	0
-	if((cof>(from_offs+1)) & (hprev!=hquotem) & show & (from_offs>0)) 
-	{
-		MESG("	'%c' at %lld changed from %X -> %X",c,cof,hprev,hquotem);
-	};
-	hprev=hquotem;
-#endif
  };
  // MESG("fquote: (%lld %d) -> (%lld %d)",from_offs,hori,till_offs,hquotem);
 }

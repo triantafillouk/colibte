@@ -128,7 +128,7 @@ void vtmove(WINDP *wp,int row,int col);
 void update_status();
 void getwquotes(WINDP *wp,int);
 void setwquotes(WINDP *wp,int,num);
-void fquote_state(offs till_o, offs from_o, WINDP *wp,int show);
+void fquote_state(offs till_o, offs from_o, WINDP *wp);
 void top_menu(int init);
 int draw_window_line(WINDP *wp, int row);
 void put_wtext(WINDP *wp,int row,int maxcol);
