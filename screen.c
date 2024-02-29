@@ -29,7 +29,6 @@ void upd_all_wrap_lines(WINDP *wp,char *from);
 void update_window_nowrap(WINDP *wp,int force);
 void update_window_wrap(WINDP *wp,int force);
 void upd_part_wrap(WINDP *wp,char *from);
-offs   FPrev_wrap_Line(FILEBUF *fp,offs ptr);
 offs check_next_char(FILEBUF *fp,offs o,int *col);
 
 extern COLOR_SCHEME *current_scheme;
@@ -2228,17 +2227,7 @@ int update_screen(int force)
 	lbegin(window_list);
 	while((wp=(WINDP *)lget(window_list))!=NULL)
 	{
-		// if((int)bt_dval("wrap_mode")
-#if	1
 		if(is_wrap_text(wp->w_fp))
-#else
-		if(wp->w_fp->view_mode & VMWRAP 
-			&& !(wp->w_fp->b_flag & FSNLIST)
-			&& !(wp->w_fp->b_flag & FSNOTES)
-			&& !(wp->w_fp->b_flag & FSNOTESN)
-			&& !(wp->w_fp->view_mode & VMHEX)
-		) 
-#endif
 			update_window_wrap(wp,force);
 		else update_window_nowrap(wp,force);
 	};

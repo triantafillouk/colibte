@@ -636,7 +636,7 @@ int menu_command(int n)
  /* new_wp, new_line, new_column have been set */
 void move_to_new_position(num new_column,num new_line)
 {
-	MESG("move_to_new_position: col=%ld line=%ld",new_column,new_line);
+	// MESG("move_to_new_position: col=%ld line=%ld",new_column,new_line);
 	set_goal_column(new_column,"move_to_new_position");
 	MoveLineCol(new_line,cwp->goal_column);
 	update_status();

@@ -1699,6 +1699,7 @@ void highlight_json(int c)
 		break;
 	case ':' :
 		if(hstate==0) first=0;
+		hstate=0;
 		break;
 	case CHR_CURLL:
 		if(hquotem==0) { if(hstate==0) { first=1;in_array=0;};};
@@ -1712,12 +1713,14 @@ void highlight_json(int c)
 			if(hquotem == 0 && next_quote==0) next_quote=H_QUOTE2;
 			else {
 				hquotem = 0;
+				next_quote=0;
 			}
 		} else {
 			if(hquotem == 0 && next_quote==0) {
 				next_quote=H_QUOTE5;
 			} else {
 				hquotem =0;
+				next_quote=0;
 			}
 		}
 		hstate=0;
@@ -1758,6 +1761,8 @@ void highlight_json(int c)
 			in_array=0;
 			first=1;
 		};
+		break;
+	case CHR_FLUSH:
 		break;
 	default: { 
 		hstate=0;
@@ -3127,7 +3132,7 @@ void setwquotes(WINDP *wp,int ind,num known_offset)
 {
 	if(hprev_line>=0) hquotem=hprev_line;
 	// MESG("setwquotes:[%s] ind=%d btype=%d slang=%d hnote=%d hquotem=%X ko=%lld ho=%lld",wp->w_fp->b_fname,ind,wp->w_fp->b_type,slang,hnote,hquotem,known_offset,tp_offset(wp->tp_hline));
-	wp->w_fp->hl->h_function(512);
+	wp->w_fp->hl->h_function(CHR_FLUSH);
 	wp->hs[ind].w_hquotem = hquotem;
 	wp->hs[ind].w_slang = slang;
 	wp->hs[ind].w_jflag = in_array+2*first;

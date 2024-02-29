@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.59T10 (28/02/2024)"
+#define VERSION 	"#01.59T11 (29/02/2024)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -269,6 +269,7 @@ typedef long long num;
 #define CHR_SLASH		'/'
 //#define CHR_NBSPACE		0xC2A0
 #define CHR_NBSPACE		' '
+#define CHR_FLUSH		512
 
 #define	PATHCHR	':'
 #define DIRSEPSTR "/"
