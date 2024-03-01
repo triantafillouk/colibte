@@ -849,6 +849,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	} else vteeoc(wp,max_size);
 }
 
+#if	NUSE
 // use this instead of realloc to debug
 char * resize_buffer(char *buffer,num old_size,num new_size)
 {
@@ -858,8 +859,88 @@ char * resize_buffer(char *buffer,num old_size,num new_size)
  if(buffer!=NULL) efree(buffer,"resize, free old buffer");
  return new_allocation;
 }
+#endif
 
 int line_sep=0;
+vchar *init_vt_line(WINDP *wp)
+{
+ vchar *v_text = wp->vs[wp->vtrow]->v_text;
+ int i;
+ for(i=0;i<wp->w_width;i++) {
+ 	v_text[i].uval[0]='A';
+	v_text[i].uval[0]=0;
+ };
+ memset(v_text,0,sizeof(struct vchar)*wp->w_ntcols);
+ return v_text;
+}
+
+//	Mask prepare (vtlm)
+char *vt_mask_init(num llen)
+{
+ static num vtla=0;
+ static char *vtlm=NULL;
+	if(vtla==0) { // initial mask allocation
+		vtla=256;
+		// MESG("vt_mask_init:initial alloc of 128");
+		vtlm=emalloc(vtla,"initial allocation vtlm");
+	};
+	if(llen>=vtla) {
+		vtla=llen+256;
+		MESG("	vt_mask_init: realloc new with %ld",vtla);
+		vtlm=realloc(vtlm,vtla);
+	}
+ return vtlm; 
+}
+
+int vt_hex_line(WINDP *wp,char *vtlm, int llen, num ptr1)
+{
+		char hs[4];
+		int j,j1;
+		int i=0;
+		int c;
+		num sptr=ptr1;
+		FILEBUF *fp=wp->w_fp;
+
+		if(llen>=0) {
+		sprintf(vtlm,"%08llX: ",ptr1);
+		i=10;
+		for(j=0;j<=15;j++) {
+			if(j<=llen) {
+			c=FCharAt(fp,sptr++);
+			sprintf(hs,"%02X ",c);
+			} else strlcpy(hs,"-- ",4);
+			for(j1=0;j1<strlen(hs);) {
+				vtlm[i++]=hs[j1++];
+			};
+		};
+		vtlm[i++]='|';
+		vtlm[i++]=' ';
+		sptr=ptr1;
+		j1=i;
+
+		for(j=0;j<=llen;j++) {
+			c=FCharAt(fp,sptr++);
+			vtlm[i++]=c;
+		};
+		} else i=0;
+		vtlm[i]=0;
+		return i;
+} 
+
+char *set_info_mask(WINDP *wp,num ptr1,num line_num)
+{
+ static char info_mask[20];
+	if(wp->w_fp->view_mode == VMLINES) {
+		snprintf(info_mask,11,"%07llu ",line_num+1);
+	} else {
+		if(wp->w_fp->view_mode == VMOFFSET) {
+			snprintf(info_mask,11,"%07llX ",ptr1);
+		} else {
+			snprintf(info_mask,11,"==");
+		}
+	};
+ return info_mask;
+}
 
 /* update line starting at offset start of specific window */
 offs vtline(WINDP *wp, offs tp_offs)
@@ -880,8 +961,8 @@ offs vtline(WINDP *wp, offs tp_offs)
  offs s1,s2,ptr1,ptr2;
  offs cur_lend=0;
  int hexmode = wp->w_fp->view_mode & (VMHEX||VMINP);
- char info_mask[20];
- static char *vtlm=NULL; // virtual line character mask
+ char *info_mask;
+ char *vtlm=NULL;
  static num  vtla=0; 	 // mask allocated bytes
  int rlen=0;	// real line len
  int num_columns=0;	/* columns of line number shown  */
@@ -890,13 +971,8 @@ offs vtline(WINDP *wp, offs tp_offs)
  	num_columns=wp->w_infocol;
 	// MESG("[%s] %3X set num_columns to %d",wp->w_fp->b_flag,wp->w_fp->b_fname,num_columns);
  // };
- v_text = wp->vs[wp->vtrow]->v_text;
- // MESG("vtline: < %d vtla=%d",wp->vtrow,vtla);
- for(i=0;i<wp->w_ntcols;i++) {
- 	v_text[i].uval[0]='A';
-	v_text[i].uval[0]=0;
- };
- memset(v_text,0,sizeof(struct vchar)*wp->w_ntcols);
+
+ v_text = init_vt_line(wp);
 
  first_column = wp->w_lcol;	/* first column to show at the beginning of the line */
  
@@ -943,58 +1019,15 @@ offs vtline(WINDP *wp, offs tp_offs)
 		};
 	};
 
-//	Mask creation (vtlm)
-	if(vtla==0) { // initial mask allocation
-		vtla=128;
-		if(llen>=vtla) vtla=llen+128;
-		if(vtlm!=NULL) { 
-			// MESG("	vtlm is not null, free!!!!");
-			efree(vtlm,"initial allocation free vtlm");
-		};
-		vtlm=emalloc(vtla,"initial allocation vtlm");
-	};
+	vtlm=vt_mask_init(llen);
 
 	if(hexmode) {
-		char hs[4];
-		int j,j1;
-		num sptr=ptr1;
-
-		if(llen>=0) {
-		sprintf(vtlm,"%08llX: ",ptr1);
-		i=10;
-		for(j=0;j<=15;j++) {
-			if(j<=llen) {
-			c=FCharAt(fp,sptr++);
-			sprintf(hs,"%02X ",c);
-			} else strlcpy(hs,"-- ",4);
-			for(j1=0;j1<strlen(hs);) {
-				vtlm[i++]=hs[j1++];
-			};
-		};
-		vtlm[i++]='|';
-		vtlm[i++]=' ';
-		sptr=ptr1;
-		j1=i;
-		for(j=0;j<=llen;j++) {
-			c=FCharAt(fp,sptr++);
-			vtlm[i++]=c;
-		};
-		} else i=0;
-		vtlm[i]=0;
-		vtla=i;
+		vtla=vt_hex_line(wp,vtlm,llen,ptr1);
 	} else
 	{
 		if(llen>=0 && num_columns) 
 		{
-			if(wp->w_fp->view_mode == VMLINES) {
-				snprintf(info_mask,11,"%07llu ",line_num+1);
-			} else {
-				if(wp->w_fp->view_mode == VMOFFSET) {
-					snprintf(info_mask,11,"%07llX ",ptr1);
-				} else {
-					snprintf(info_mask,11,"==");
-				}
-			};
+			info_mask=set_info_mask(wp,ptr1,line_num);
 		};
 		line_sep=0;
 		if(syntaxh) 
@@ -1024,13 +1057,12 @@ offs vtline(WINDP *wp, offs tp_offs)
 				++col;
 			};
 			if(c<32) c='C';
-			if(col>=vtla) {
-				vtlm=resize_buffer(vtlm,vtla,vtla+256);
-				vtla+=256;
-			};
+
+			if(col>vtla) vtlm=vt_mask_init(vtla+col);
 			while(rlen<col){
 				vtlm[rlen++]=c;
 			};
+
 		};
 		vtlm[rlen]=0;
 		// if(col>=vtla) MESG("vtlm[%d]=[%s] col=%d vtla=%d",wp->vtrow,vtlm,col,vtla);
@@ -1283,8 +1315,8 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
  int bcol=COLOR_BG;
  offs s1,s2,ptr1,ptr2;
  offs cur_lend=0;
- char info_mask[20];
- static char *vtlm=NULL; // virtual line character mask
+ char *info_mask;
+ char *vtlm=NULL;
  static num  vtla=0; 	 // mask allocated bytes
  int real_line_len=0;	// real line len
  int num_columns=0;	/* columns of line number shown  */
@@ -1292,13 +1324,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
  int line_start=0;
  num_columns=wp->w_infocol;
 
- v_text = wp->vs[wp->vtrow]->v_text;
-
- for(i=0;i<wp->w_width;i++) {
- 	v_text[i].uval[0]='A';
-	v_text[i].uval[0]=0;
- };
- memset(v_text,0,sizeof(struct vchar)*wp->w_ntcols);
+ v_text = init_vt_line(wp);
 
 	col = 0;
 	s1=tp_offset(wp->w_smark);
@@ -1333,29 +1359,11 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 		hquotem &= ~H_UTFERR; 
 	};
 
-
-//	Mask creation (vtlm)
-	if(vtla==0) { // initial mask allocation
-		vtla=128;
-		if(llen>=vtla) vtla=llen+128;
-		if(vtlm!=NULL) { 
-			// MESG("	vtlm is not null, free!!!!");
-			efree(vtlm,"initial allocation free vtlm");
-		};
-		vtlm=emalloc(vtla,"initial allocation vtlm");
-	};
+	vtlm=vt_mask_init(llen);
 
 	if(llen>=0 && num_columns) 
 	{
-		if(wp->w_fp->view_mode & VMLINES) {
-			snprintf(info_mask,11,"%07llu ",line_num+1);
-		} else {
-			if(wp->w_fp->view_mode & VMOFFSET) {
-				snprintf(info_mask,11,"%07llX ",ptr1);
-			} else {
-				snprintf(info_mask,11,"==");
-			}
-		};
+		info_mask=set_info_mask(wp,ptr1,line_num);
 	};
 	line_sep=0;
 	if(syntaxh) {
@@ -1383,13 +1391,13 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 				++col;
 			};
 			if(c<32) c='1';
-			if(col>=vtla) {
-				vtlm=resize_buffer(vtlm,vtla,vtla+256);
-				vtla+=256;
-			};
-			while(real_line_len<col){
+
+			if(wp->w_ntcols > vtla) vtlm=vt_mask_init(vtla+wp->w_ntcols);
+			while(real_line_len<wp->w_ntcols)
+			{
 				vtlm[real_line_len++]=c;
 			};
+
 		};
 		vtlm[real_line_len]=0;
 		// if(col>=vtla) MESG("vtlm[%d]=[%s] col=%d vtla=%d",wp->vtrow,vtlm,col,vtla);

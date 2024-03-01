@@ -942,8 +942,9 @@ void  ResetTextPoints(FILEBUF *bp,int flag)
  }; 
  if(!flag) {
 	textpoint_set(bp->tp_text_end,size);
-	// MESG("	new o=%ld lines=%ld lines=%ld",tp_offset(bp->tp_text_end),tp_line(bp->tp_text_end),bp->lines);
+	MESG("	new o=%ld lines=%ld new lines=%ld b_mode=%X",tp_offset(bp->tp_text_end),tp_line(bp->tp_text_end),bp->lines,bp->b_mode);
 	textpoint_set(bp->tp_text_o,size);
+	if( bp->b_mode > VMINP) 
 	bp->lines=tp_line(bp->tp_text_end);
  };
 }
