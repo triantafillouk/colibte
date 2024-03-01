@@ -1371,7 +1371,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 		offs p=ptr1;
 		
 		// col=0;
-		for(i=0;i<llen && i< wp->w_ntcols;i++) {
+		for(i=0;i<llen && i< wp->w_width;i++) {
 			if(fp->b_lang == 0 && !utf8_error()) {
 				p = FUtfCharAt(fp,p,&uc);
 				c=uc.uval[0];
