@@ -59,6 +59,9 @@ utfchar single_hline = { "↪" };
 utfchar next_l = { "↘" };
 utfchar first_l = { "►" };
 
+//num cline_end=0;
+//num cstart_offset;
+
 #if	NUSE
 int addutfvchar(char *str, vchar *vc, int pos, FILEBUF *w_fp)
 {
@@ -942,6 +945,44 @@ char *set_info_mask(WINDP *wp,num ptr1,num line_num)
  return info_mask;
 }
 
+offs cashed_FLend(FILEBUF *fp,offs tp_offs,int reset)
+{
+ static offs end_offs=0;
+ static offs start=-1;
+ if(reset) {
+	end_offs=FLineEnd(fp,tp_offs);	
+	start=tp_offs;
+	return start;
+ };
+	if(tp_offs==start || !FBolAt(fp,tp_offs) )
+	{
+		// MESG("	tp %ld - end %ld",start,end_offs);
+		// end_offs=cline_end;
+	} else {
+		end_offs=FLineEnd(fp,tp_offs);	
+		start=tp_offs;
+	}
+	return end_offs;
+}
+
+offs cached_llen(FILEBUF *fp,offs tp_offs,int reset)
+{
+ static offs llen=0;
+ static num start=-1;
+ if(reset){
+ 	llen = utf_FLineLen(fp,tp_offs);
+	start=tp_offs;
+ };
+ if(tp_offs==start || !FBolAt(fp,tp_offs))
+ {
+	// MESG("	tp %ld - llen %ld",start,llen);
+ } else {
+ 	llen = utf_FLineLen(fp,tp_offs);
+	start=tp_offs;
+ };
+ return llen;
+}
+
 /* update line starting at offset start of specific window */
 offs vtline(WINDP *wp, offs tp_offs)
 {
@@ -1336,12 +1377,15 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 
 	// ptr1 = FLineBegin(fp,tp_offs);
 	ptr1=tp_offs;
-	cur_lend = FLineEnd(fp,tp_offs);
+
+	cur_lend = cashed_FLend(fp,tp_offs,0);
+
 	ptr2=cur_lend;
 	if(BolAt(ptr1)) line_start=1;
 	// set_utf8_error(0);	/* reset utf_error on each line!!  */
 	if((wp->w_fp->b_lang == 0 )) {
-		llen = utf_FLineLen(wp->w_fp,tp_offs);
+	    llen=cached_llen(wp->w_fp,tp_offs,0);
+		// llen = utf_FLineLen(wp->w_fp,tp_offs);
 		if(utf8_error()) llen=ptr2-ptr1;
 	} else {
 		llen = ptr2 - tp_offs;
@@ -2679,6 +2723,8 @@ void upd_part_wrap(WINDP *wp,char *from)
 		vt_str(wp,wp->w_fp->b_header,0,0,0,-1,0);
 	};
 	// MESG("	upd_part: line1=%d line2=%d",line1,line2);
+	cached_llen(wp->w_fp,lp_offs,1);
+
 	for(sline=head;sline <= line2 ;sline++) 
 	{
 		/* and update the virtual line */
@@ -2723,11 +2769,7 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 		vt_str(wp,wp->w_fp->b_header,0,0,0,-1,0);
 	};
 	
-#if	TNOTES
 	if(wp->w_fp->b_flag!=FSNOTES && wp->w_fp->b_flag!=FSNOTESN && !(wp->w_fp->b_flag & FSNLIST)) 
-#else
-	if(!(wp->w_fp->b_flag & FSNLIST)) 
-#endif
 	{	/* Buffer view  */
 		// MESG("update virtual from buffer! wp=%d top offs=%ld",wp->id,lp_offs);
 		for(sline=head;sline < wp->w_ntrows;sline++) 
@@ -2825,18 +2867,21 @@ void upd_all_wrap_lines(WINDP *wp,char *from)
 	register offs lp_offs;	/* offset of line to update */
 	register int sline;	/* physical screen line to update */
 	int head=0;
-
+	MESG("Upd_all_wrap_lines:");
 	if(noupdate) return;
 	if(wp->vs == NULL) return;
 	if(wp->w_fp == NULL) return;
 
-	if(!(wp->w_fp->view_mode & VMHEX)) wp->w_fp->hl->h_update(wp);
-	 set_selection(0);
+	wp->w_fp->hl->h_update(wp);
+	set_selection(0);
 
 	/* search down the lines, updating them */
 	lp_offs = tp_offset(wp->tp_hline);
 
-	
+	// cline_end=FLineEnd(wp->w_fp,lp_offs);
+	// cstart_offset=lp_offs;
+	cashed_FLend(wp->w_fp,lp_offs,1);
+
 	for(sline=head;sline < wp->w_ntrows;sline++) 
 	{
 		/* and update the virtual line */
@@ -2845,6 +2890,8 @@ void upd_all_wrap_lines(WINDP *wp,char *from)
 		if (lp_offs <= FSize(wp->w_fp)) { // if not at the end of file
 		/* if we are not at the end */
 			if(cwp->selection==0) set_selection(false);
+
+			// cline_end=cashed_FLend(wp->w_fp,lp_offs);
 			lp_offs=vt_wrap_line(wp,lp_offs);
 			/* we must update the column selection here */
 			if(cwp->selection) set_selection(false);

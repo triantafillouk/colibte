@@ -619,7 +619,7 @@ int get_selection()
 void update_highlight(WINDP *wp)
 {
  num known_offset=tp_offset(wp->tp_hsknown);
- // MESG("#update_highlight: known_offset=%lld top=%lld",known_offset,tp_offset(wp->tp_hline));
+ MESG("#update_highlight: known_offset=%lld top=%lld",known_offset,tp_offset(wp->tp_hline));
  if(!syntaxh) return;
 
 //	prev_slash=prev_ast=hquote5=0;
@@ -690,7 +690,7 @@ void update_highlight_line(WINDP *wp)
 //	previous top line is tp_hsknown
 //	previous line with known state is tp_pknown
 //	we must go to tp_hline
-//	MESG("update_highlight_line:");
+	MESG("update_highlight_line:");
 	getwquotes(wp,0);	/* in any case read again current window top line highlight	*/
 	hquotem=0;
 	slang=1;
@@ -705,7 +705,7 @@ void update_highlight_none(WINDP *wp)
 //	previous top line is tp_hsknown
 //	previous line with known state is tp_pknown
 //	we must go to tp_hline
-//	MESG("update_highlight_none:");
+	MESG("update_highlight_none:");
 	getwquotes(wp,0);	/* in any case read again current window top line highlight	*/
 	hquotem=0;
 	slang=0;
