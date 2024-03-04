@@ -3115,7 +3115,7 @@ void fquote_state(offs till_offs, offs from_offs, WINDP *wp)
  if(till_offs>FSize(cbfp)) {
 	till_offs=FSize(cbfp);
  };
-
+ MESG("fquote_state: from %ld to %ld",from_offs,till_offs);
  if(from_offs<1) {
  	wp->w_fp->hl->h_function(CHR_RESET); 
 	from_offs=0;
