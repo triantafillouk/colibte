@@ -57,10 +57,8 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
  char *vtlm=NULL;
  static num  vtla=0; 	 // mask allocated bytes
  int real_line_len=0;	// real line len
- int num_columns=0;	/* columns of line number shown  */
  num line_num = wp->tp_hline->line + wp->vtrow;
  int line_start=0;
- num_columns=wp->w_infocol;
 
  v_text = init_vt_line(wp);
 
@@ -87,7 +85,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 	} else {
 		llen = ptr2 - tp_offs;
 	};
-
+	// MESG("	wline: %d ptr=%ld",wp->vtrow,ptr1);
 	if(BolAt(ptr1))	init_line_highlight(wp);
 	
  	if(!slang || hquotem==0) 
@@ -99,15 +97,20 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 		hquotem &= ~H_UTFERR; 
 	};
 
+
 	vtlm=vt_mask_init(llen);
 
-	if(llen>=0 && num_columns) 
+	if(llen>=0 && wp->w_infocol) 
 	{
 		info_mask=set_info_mask(wp,ptr1,line_num);
 	};
 	line_sep=0;
 	if(syntaxh) {
 	//	create mask for the whole line without tabs or special characters
+#if	1
+		if(llen>wp->w_width) llen=wp->w_width;
+		real_line_len=color_mask_create(wp,ptr1,llen,vtlm,vtla);
+#else
 		offs p=ptr1;
 		
 		// col=0;
@@ -133,7 +136,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 			if(c<32) c='1';
 
 			if(wp->w_ntcols > vtla) vtlm=vt_mask_init(vtla+wp->w_ntcols);
-			while(real_line_len<wp->w_ntcols)
+			while(real_line_len<col)
 			{
 				vtlm[real_line_len++]=c;
 			};
@@ -141,7 +144,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 		};
 		vtlm[real_line_len]=0;
 		// if(col>=vtla) MESG("vtlm[%d]=[%s] col=%d vtla=%d",wp->vtrow,vtlm,col,vtla);
-
+		// MESG("	- %2d ptr1=%ld -> %ld =%ld rllen=%d w=%d i=%d col=%d cols=%d",wp->vtrow,tp_offs,p,p-ptr1,real_line_len,wp->w_width,i,col,wp->w_ntcols);
 		int canstart=1;
 		for(i0=0 ;i0< real_line_len;i0++) {
 			// Check for boundary characters
@@ -163,27 +166,16 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 				// MESG("	422 i0=%d",i0);
 			}
  		};
+#endif
  	};	// syntaxh
-	
 //	find the offset of the first column
 	col=0;
 	i=0;	
 
 // ----------------------------------------------
 //	character creation
-	wp->vtcol=0;
 
-	if(num_columns>2){
-		for(i0=0;i0<num_columns;i0++){	/* put the info columns  */
-			vtputc(wp,info_mask[i0]);
-		};
-	} else {
-		for(i0=0;i0<num_columns;i0++){	/* put the info columns  */
-			if(BolAt(ptr1)) vtputc(wp,'*');	// vtputc(wp,CHR_SPACE);
-			else vtputc(wp,'-');
-		};
-	};
-	// MESG("vt_wrap_line: num_columns=%d vtcol=%d w_infocol=%d",num_columns,wp->vtcol,wp->w_infocol);
+	draw_info_mask(wp,ptr1,info_mask);
 
 	for (; i <  llen && wp->vtcol < wp->w_width+wp->w_infocol; i++) 
 	{	// this is the on screen shown area of the line
@@ -199,10 +191,10 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 			};
 			if(wp->selection==REGION_COLM){
 				if(s1<cur_lend && s2>tp_offs) set_selection(true);
-				if(((wp->vtcol-num_columns) < col0) || ((wp->vtcol - num_columns) >= col1)) set_selection(false);
+				if(((wp->vtcol-wp->w_infocol) < col0) || ((wp->vtcol - wp->w_infocol) >= col1)) set_selection(false);
 			};
 		};
-
+		if(FEolAt(fp,ptr1)) break;
 		if(fp->b_lang == 0 && !utf8_error()) {
 			num char_bytes=ptr1;
 			ptr1 = FUtfCharAt(fp,ptr1,&uc);
@@ -255,7 +247,6 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 				};
 			}
 		} else {
-			
 			vtputc(wp, FCharAt(fp,ptr1++));
 		}
 	};
@@ -263,7 +254,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 	// show a line separator (when highlight_md)
 	if(line_sep) {
 		VIDEO *vp=wp->vs[wp->vtrow];
-		for(wp->vtcol=num_columns;wp->vtcol< wp->w_width;wp->vtcol++){ 
+		for(wp->vtcol=wp->w_infocol;wp->vtcol< wp->w_width;wp->vtcol++){ 
 			vchar *vc = vp->v_text+wp->vtcol;
 
 			svwchar(vc,&double_hline,vc->bcolor,COLOR_COMMENT_FG);	/* double line separator */
@@ -280,9 +271,9 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 	/* highlight according to evaluated mask */
 	if(syntaxh && slang)
 	{
-		for(i0=num_columns;i0< wp->w_width+wp->w_infocol;i0++){
-			if(i0 > real_line_len+num_columns) break;
-			c1=vtlm[i0-num_columns];
+		for(i0=wp->w_infocol;i0< wp->w_width+wp->w_infocol;i0++){
+			if(i0 > real_line_len+wp->w_infocol) break;
+			c1=vtlm[i0-wp->w_infocol];
 
 			fcol = v_text[i0].fcolor;
 			bcol = v_text[i0].bcolor;
@@ -344,6 +335,7 @@ void upd_all_wrap_lines(WINDP *wp,char *from)
 	// cstart_offset=lp_offs;
 	cashed_FLend(wp->w_fp,lp_offs,1);
 
+	getwquotes(wp,0);
 	for(sline=head;sline < wp->w_ntrows;sline++) 
 	{
 		/* and update the virtual line */

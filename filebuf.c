@@ -2613,7 +2613,7 @@ offs   LineEnd(offs ptr)
 
 offs   FLineEnd(FILEBUF *fp,offs ptr)
 {
- MESG("FLineEnd: %lld",ptr);
+ // MESG("FLineEnd: %lld",ptr);
    if(fp->view_mode & VMHEX) {
 		offs o;
 		o = ptr % HEX_LINE_LEN+1;
@@ -2630,7 +2630,7 @@ num utf_FLineLen(FILEBUF *fp, offs ptr)
 {
  num len=0;
  utfchar uc;
- MESG("utf_FLineLen: %ld",ptr);
+ // MESG("utf_FLineLen: %ld",ptr);
  while(!FEolAt(fp,ptr)) {
  	ptr=FUtfCharAt(fp,ptr,&uc);
 	if(clen_error) set_utf8_error(1);

@@ -476,8 +476,13 @@ int next_wrap_line(int n)
 
 	{
 		offs o_now=tp_offset(cwp->tp_current);
+#if	1
+		offs o=o_now;
+		while(!EolAt(o) && o< o_now+2*cwp->w_width) o++;
+		offs o_end=o;
+#else
 		offs o_end=LineEnd(o_now);
-
+#endif
 		int remains=DiffColumns(cwp->w_fp,o_now,o_end);
 		// MESG("next_wrap_line: wrap mode! o=%ld end=%ld remain columns=%d",o_now,o_end,remains);
 		if(remains>= cwp->w_width) {
