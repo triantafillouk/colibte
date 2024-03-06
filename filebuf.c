@@ -1331,7 +1331,7 @@ offs  FUtfCharAt(FILEBUF *bf, offs offset, utfchar *uc)
  int i,ulen;
  offs o=offset;
 	ulen=FUtfCharLen(bf,o);
-	memset(uc->uval,0,8);
+	memset(uc->uval,0,ulen);
 	for(i=0;i<ulen;i++){
 			uc->uval[i]=FCharAt(bf,o+i);
 	};
@@ -2588,6 +2588,11 @@ offs   FLineBegin(FILEBUF *fp,offs ptr)
 	o = (ptr) % HEX_LINE_LEN;
 	ptr -= o;
    } else {
+
+	if(tp_line(fp->tp_text_end)==0) {
+	    MESG("FlineBegin: %ld end line=%ld",ptr,tp_line(fp->tp_text_end));
+		return 0;
+	};
 	while(!FBolAt(fp,ptr))  ptr--;
    };
 	return(ptr);
@@ -2630,7 +2635,7 @@ num utf_FLineLen(FILEBUF *fp, offs ptr)
 {
  num len=0;
  utfchar uc;
- // MESG("utf_FLineLen: %ld",ptr);
+ MESG("utf_FLineLen: %ld",ptr);
  while(!FEolAt(fp,ptr)) {
  	ptr=FUtfCharAt(fp,ptr,&uc);
 	if(clen_error) set_utf8_error(1);

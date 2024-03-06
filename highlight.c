@@ -618,9 +618,9 @@ int get_selection()
 
 void update_highlight(WINDP *wp)
 {
+ if(!syntaxh) return;
  num known_offset=tp_offset(wp->tp_hsknown);
  MESG("#update_highlight: known_offset=%lld top=%lld",known_offset,tp_offset(wp->tp_hline));
- if(!syntaxh) return;
 
 //	prev_slash=prev_ast=hquote5=0;
 //	previous top line is tp_hsknown
