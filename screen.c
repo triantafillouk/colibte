@@ -180,16 +180,18 @@ void set_update(WINDP *wp_toset, int flag)
  lbegin(window_list);
  while((wp=(WINDP *)lget(window_list))!=NULL)
  {
-	if ((wp->w_fp == fp && (flag & UPD_EDIT)) && wp!=wp_toset ) 
+	// if ((wp->w_fp == fp && (flag & UPD_EDIT)) && wp!=wp_toset ) 
+	if ((wp->w_fp == fp && (flag & UPD_EDIT)) ) 
 	{
-		if( ((tp_line(wp->tp_hline) <= tp_line(wp_toset->tp_current)) &&
-			(tp_line(wp_toset->tp_current) <= (tp_line(wp->tp_hline)+wp->w_ntrows)))
+		if( (((tp_line(wp->tp_hline) <= tp_line(wp_toset->tp_current)) &&
+			(tp_line(wp_toset->tp_current) <= (tp_line(wp->tp_hline)+wp->w_ntrows)))) || is_wrap_text(wp->w_fp)
 		)
 		{
 			wp->w_flag |= flag;
 			tp_copy(wp->tp_hsknown, wp_toset->tp_hsknown);
 			wp->hs[0].w_hquotem = wp_toset->hs[0].w_hquotem;
 			wp->hs[0].w_slang = wp_toset->hs[0].w_slang;
+			MESG("set_update: window %d flag %d",wp->id,wp->w_flag);
 		};
 	};
  };
@@ -399,7 +401,7 @@ int draw_window_line(WINDP *wp, int row)
  char *lower_match;
  VIDEO *vp1 = wp->vs[row];
 
- // MESG(">draw_window_line: row=%d",row);
+ MESG(">draw_window_line: row=%d",row);
  if(gmode_reg_exp) {
 #if	USE_GLIB
 	if(gmode_exact_case) match=strdup(patmatch);
@@ -2018,18 +2020,16 @@ int update_screen(int force)
 	static int count=0;
 	count++;
 	int cw_flag=cwp->w_flag;
-	// MESG("update_screen: view_mode=%d o=%ld top=%ld row=%d",
-		// cwp->w_fp->view_mode,tp_offset(cwp->tp_current),tp_offset(cwp->tp_hline),cwp->currow);
 	if (noupdate) return TRUE;
 
+	MESG("# update_screen: ------------------------------");
 	/* experiment with screen updating  */
 	if(cw_flag==0) return(FALSE);
 
 	if (force == FALSE && kbdmode == PLAY)	return(TRUE);
 
 	/* update any windows that need refreshing */
-	if(is_wrap_text(cwp->w_fp))
-	show_time("update_screen: 0",0);
+	if(is_wrap_text(cwp->w_fp))	show_time("update_screen: 0",0);
 	hide_cursor("update_screen: start");
 	// MESG("hide_cursor: ok!");
 	if(cwp->selection) {
@@ -2039,19 +2039,21 @@ int update_screen(int force)
 			tp_copy(cwp->w_emark,cwp->tp_current);
 	}
 
-	if(is_wrap_text(cwp->w_fp))
-	show_time("update_screen: 1",1);
+	if(is_wrap_text(cwp->w_fp))	show_time("update_screen: 1",1);
 	upd_column_pos();	/* update column position  */
 	/* if screen is garbage, re-plot it */
 	if (update_all)	{ 
 		updgar();
 	};
+	lbegin(window_list);
+	while((wp=(WINDP *)lget(window_list))!=NULL) MESG("--- this is window %d wrap=%d",wp->id,is_wrap_text(wp->w_fp));
+
 	// MESG("loop windows");
 	lbegin(window_list);
 	while((wp=(WINDP *)lget(window_list))!=NULL)
 	{
-		if(is_wrap_text(wp->w_fp))
-			update_window_wrap(wp,force);
+		MESG("	loop window now is %d wrap=%d",wp->id,is_wrap_text(wp->w_fp));
+		if(is_wrap_text(wp->w_fp))	update_window_wrap(wp,force);
 		else update_window_nowrap(wp,force);
 	};
 
@@ -2139,7 +2141,7 @@ void update_window_wrap(WINDP *wp,int force)
 		if (wp==cwp) {
 			show_time("update_window_wrap:0",1);
 			check_cursor_position_wrap(wp); /* check if on screen */
-			// MESG("update_window_wrap:1");
+			MESG("update_window_wrap:1 window %d",wp->id);
 			show_time("update_window_wrap:1",1);
 			wp->currow = window_cursor_line(wp);
 #if	1
@@ -2478,7 +2480,7 @@ void upd_part_wrap(WINDP *wp,char *from)
 		line1 = wp->w_fp->line_from-tp_line(wp->tp_hline);;
 		line2 = wp->w_fp->line_to-tp_line(wp->tp_hline);;
 	}
-	// MESG("upd_part: window %d lcol=%d from [%s] lines %d - %d",wp->id,wp->w_lcol,from,line1,line2);
+	MESG("upd_part: window %d lcol=%d from [%s] lines %d - %d",wp->id,wp->w_lcol,from,line1,line2);
 	if(wp->w_lcol!=wp->w_plcol) return upd_all_wrap_lines(wp,"upd_part w_lcol");
 	if(line1<0 && line2<0) out_of_view=1;
 	else {

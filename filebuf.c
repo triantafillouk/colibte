@@ -3253,7 +3253,7 @@ int set_view_mode(int n)
    };
 	ResetTextPoints(cbfp,0);
 	set_Offset(offset);
-	set_update(cwp,UPD_MOVE|UPD_FULL);
+	set_update(cwp,UPD_EDIT|UPD_FULL);
 	return true;
 }
 
