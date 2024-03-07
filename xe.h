@@ -24,7 +24,7 @@
 #else
 #define DOUBLE_ESC	0	/* use double escape for abort command else single  */
 #endif
-
+#define	TNEXT	1
 #define	TARROWS		1	/* Use arrow menus in panel curses  */
 #define	USE_UTF8	1	/* Use utf8 characters  */
 

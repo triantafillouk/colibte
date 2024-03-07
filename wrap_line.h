@@ -19,6 +19,7 @@ offs cashed_FLend(FILEBUF *fp,offs tp_offs,int reset)
 	return end_offs;
 }
 
+#if	NUSE
 offs cached_llen(FILEBUF *fp,offs tp_offs,int reset)
 {
  static offs llen=0;
@@ -36,6 +37,19 @@ offs cached_llen(FILEBUF *fp,offs tp_offs,int reset)
 	// llen = 500;
 	start=tp_offs;
  };
+ return llen;
+}
+#endif
+
+offs wrap_llen(WINDP *wp,offs tp_offs)
+{
+ int llen=0;
+ utfchar uc;
+	offs o=tp_offs;
+	while(!FEolAt(wp->w_fp,o) && llen<wp->w_width){
+		o=FUtfCharAt(wp->w_fp,o,&uc);
+		llen++;
+	};
  return llen;
 }
 
@@ -81,8 +95,8 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 	if(BolAt(ptr1)) line_start=1;
 	// set_utf8_error(0);	/* reset utf_error on each line!!  */
 	if((wp->w_fp->b_lang == 0 )) {
-		
-	    llen=cached_llen(wp->w_fp,tp_offs,0);
+		llen=wrap_llen(wp,tp_offs);
+	    // llen=cached_llen(wp->w_fp,tp_offs,0);
 		// llen = utf_FLineLen(wp->w_fp,tp_offs);
 		if(utf8_error()) llen=ptr2-ptr1;
 	} else {

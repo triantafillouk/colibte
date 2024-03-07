@@ -19,7 +19,11 @@ extern int drv_initialized;
 GWINDP * drv_new_twinp();
 int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs);
 int DiffColumns(FILEBUF *fp, offs start,offs col_offs);
+#if	TNEXT
+offs FNext_wrap_line(WINDP *wp,offs current_offset,int lines);
+#else
 offs FNext_wrap_line(WINDP *wp,offs current_offset);
+#endif
 
 int window_num()
 {
@@ -166,7 +170,11 @@ int prev_window(int n)
 
 offs check_next_char(FILEBUF *fp,offs o,int *col) ;
 
+#if	TNEXT
+offs FNext_wrap_line(WINDP *wp,offs start,int lines)
+#else
 offs FNext_wrap_line(WINDP *wp,offs start)
+#endif
 {
  offs o=start;
  FILEBUF *fp=wp->w_fp;
@@ -177,11 +185,16 @@ offs FNext_wrap_line(WINDP *wp,offs start)
  TextPoint *tp_now = new_textpoint_at(wp->w_fp,1,start);
  int col_now = tp_col(tp_now)%wp->w_width;
 #endif
+#if	TNEXT
+ while(lines-- >0)
+#endif
+ {
  while(col<cwp->w_width) {
  	if(FEofAt(fp,o)) break;
 	if(FEolAt(fp,o)) {
 		// if(col+col_now<wp->w_width) { o++;continue;};
 		o++;
+		col=0;
 		// MESG("		: eol break! %ld new at %ld col=%d",start,o,col);
 		break;
 	};
@@ -195,6 +208,8 @@ offs FNext_wrap_line(WINDP *wp,offs start)
 		col += get_utf_length(&uc);
 	};
   };
+  col=0;
+ };
  // MESG("		: > from %ld to %ld col=%d",start,o,col);
  return o;
 }
@@ -232,7 +247,7 @@ for col_position=0
 		goto column 0
 */
 
-offs   FPrev_wrap_line(WINDP *wp,offs ptr)
+offs   FPrev_wrap_line(WINDP *wp,offs ptr,int n)
 {
  // MESG("FPrev_wrap_line:");
  FILEBUF *fp=wp->w_fp;
@@ -241,9 +256,9 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr)
  num line=tp_line(pwl);
  // MESG(";FPrev_wrap_line: pos=%d line=%ld o=%ld tp_col=%ld",col_position,line,ptr,tp_col(pwl));
  num o1=ptr;
- if(tp_col(pwl) >= wp->w_width) {
+ if(tp_col(pwl) >= n*wp->w_width) {
  	// MESG("	col %ld >= width %d",tp_col(pwl),wp->w_width);
- 	num col=tp_col(pwl) - wp->w_width;
+ 	num col=tp_col(pwl) - n*wp->w_width;
 	textpoint_set_lc(pwl,line,col);
 	o1=tp_offset(pwl);
  } else {
@@ -296,19 +311,29 @@ int move_window(int n)
 		curoffs = LineBegin(tp_offset(cwp->tp_hline));
 	// MESG("move_window: current=%ld n=%d",curoffs,n);
     if (n < 0) {
-        while (n++ < 0) {
 			if(is_wrap_text(cwp->w_fp)) {
+#if	1
+			curoffs=FNext_wrap_line(cwp,curoffs,-n);
+#else
+        	while (n++ < 0) {
 				curoffs=FNext_wrap_line(cwp,curoffs);
-			} else {	
-				curoffs=FNextLine(cbfp,curoffs);
 			};
-		};
+#endif
+			} else {	
+        while (n++ < 0) {
+				curoffs=FNextLine(cbfp,curoffs);
+		}
+			};
     } else  {
 		if(is_wrap_text(cwp->w_fp)) {
+#if	1
+			curoffs = FPrev_wrap_line(cwp,curoffs,n);
+#else
 			while((n-- > 0) &&  (curoffs>0)) {
 				// go to prev window line
-				curoffs = FPrev_wrap_line(cwp,curoffs);
+				curoffs = FPrev_wrap_line(cwp,curoffs,1);
 			};
+#endif
 		} else {
 	        while ((n-- >0) && (curoffs>0)) curoffs=FPrevLine(cbfp,curoffs);
 		};

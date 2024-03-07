@@ -1788,12 +1788,17 @@ int check_cursor_position_notes(WINDP *wp)
 
 void update_top_position_wrap()
 {
- static offs known=0;
 
  int o_now=tp_offset(cwp->tp_current);
 	offs o;
+#if	1
+	o = FLineBegin(cwp->w_fp,o_now);
+	if(is_wrap_text(cbfp)) show_time("update_top_position_wrap 1",1);
+#else
+	static offs known=0;
 	if(known<o_now-cwp->w_width) o=known;
-	else o=LineBegin(o_now);
+	else o=FLineBegin(o_now);
+#endif
  	// MESG("update_top_position_wrap: o_now=%ld begin=%ld",o_now,o);
 	int col=0;
 	// offs new_hline=tp_offset(cwp->tp_hline);
@@ -1808,11 +1813,12 @@ void update_top_position_wrap()
 		if((col % (cwp->w_width))==0) {
 			new_hline=o;
 			// MESG("		set new hline to %ld",new_hline);
-			if(o<o_now-1000) known=o;
+			// if(o<o_now-1000) known=o;
 		};
 	};
 	textpoint_set(cwp->tp_hline,new_hline);
 	// MESG("       : new hline=%ld",new_hline);
+	if(is_wrap_text(cbfp)) show_time("update_top_position_wrap end",1);
 }
 
 int check_cursor_position_wrap(WINDP *wp)
@@ -1824,6 +1830,7 @@ int check_cursor_position_wrap(WINDP *wp)
 		// tp_offset(wp->tp_current),tp_line(wp->tp_current));
 	cur_offs=tp_offset(wp->tp_current);
 	int wcl=window_cursor_line(wp);
+	if(is_wrap_text(wp->w_fp)) show_time("check_cursor_position 1",1);
 	if( cur_offs <= tp_offset(wp->tp_hline)) {
 		// MESG("	< ppline=%ld",wp->w_ppline);
 		update_top_position_wrap();
@@ -2055,21 +2062,18 @@ int update_screen(int force)
 	};
 	// MESG("go update physical");
 	/* update the virtual screen to the physical screen */
-	if(is_wrap_text(cwp->w_fp))
-	show_time("update_physical",1);
+	if(is_wrap_text(cwp->w_fp))show_time("update_physical",1);
 	update_physical_windows();
-	/* update the cursor and flush the buffers */
-	if(is_wrap_text(cwp->w_fp))
-	show_time("update_cursor_position",1);
+	if(is_wrap_text(cwp->w_fp))show_time("update_physical end",1);	/* update the cursor and flush the buffers */
 	update_cursor_position();
+	if(is_wrap_text(cwp->w_fp))	show_time("update_cursor_position",1);
 	/* set previous line */
 	// MESG(";update_screen: set new ppline");
 	cwp->w_ppline = window_cursor_line(cwp);
 	cwp->w_flag=0;
 	update_all=0;
 	drv_flush();
-	if(is_wrap_text(cwp->w_fp))
-	show_time("update_screen: end",2);
+	if(is_wrap_text(cwp->w_fp))	show_time("update_screen: end",2);
 	// MESG("update_screen: end");
 	return(TRUE);
 }
@@ -2496,7 +2500,8 @@ void upd_part_wrap(WINDP *wp,char *from)
 		vt_str(wp,wp->w_fp->b_header,0,0,0,-1,0);
 	};
 	// MESG("	upd_part: line1=%d line2=%d",line1,line2);
-	cached_llen(wp->w_fp,lp_offs,1);
+	
+	// cached_llen(wp->w_fp,lp_offs,1);
 
 	for(sline=head;sline <= line2 ;sline++) 
 	{
