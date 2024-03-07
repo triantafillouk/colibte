@@ -1788,9 +1788,12 @@ int check_cursor_position_notes(WINDP *wp)
 
 void update_top_position_wrap()
 {
- int o_now=tp_offset(cwp->tp_current);
-	offs o=LineBegin(o_now);
+ static offs known=0;
 
+ int o_now=tp_offset(cwp->tp_current);
+	offs o;
+	if(known<o_now-cwp->w_width) o=known;
+	else o=LineBegin(o_now);
  	// MESG("update_top_position_wrap: o_now=%ld begin=%ld",o_now,o);
 	int col=0;
 	// offs new_hline=tp_offset(cwp->tp_hline);
@@ -1805,6 +1808,7 @@ void update_top_position_wrap()
 		if((col % (cwp->w_width))==0) {
 			new_hline=o;
 			// MESG("		set new hline to %ld",new_hline);
+			if(o<o_now-1000) known=o;
 		};
 	};
 	textpoint_set(cwp->tp_hline,new_hline);

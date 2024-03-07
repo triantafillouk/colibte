@@ -4,17 +4,17 @@ offs cashed_FLend(FILEBUF *fp,offs tp_offs,int reset)
  static offs end_offs=0;
  static offs start=-1;
  if(reset) {
-	// end_offs=FLineEnd(fp,tp_offs);	
-	start=tp_offs+500;
+	end_offs=FLineEnd(fp,tp_offs);	
+	start=tp_offs;
 	return start;
  };
 	if(tp_offs==start || !FBolAt(fp,tp_offs) )
 	{
 		// MESG("	tp %ld - end %ld",start,end_offs);
-		// end_offs=cline_end;
+		//end_offs=cline_end;
 	} else {
-		// end_offs=FLineEnd(fp,tp_offs);	
-		start=tp_offs+500;
+		end_offs=FLineEnd(fp,tp_offs);	
+		start=tp_offs;
 	}
 	return end_offs;
 }
@@ -24,16 +24,16 @@ offs cached_llen(FILEBUF *fp,offs tp_offs,int reset)
  static offs llen=0;
  static num start=-1;
  if(reset){
- 	// llen = utf_FLineLen(fp,tp_offs);
-	llen = 500;
+ 	llen = utf_FLineLen(fp,tp_offs);
+	// llen = 500;
 	start=tp_offs;
  };
  if(tp_offs==start || !FBolAt(fp,tp_offs))
  {
 	// MESG("	tp %ld - llen %ld",start,llen);
  } else {
- 	// llen = utf_FLineLen(fp,tp_offs);
-	llen = 500;
+ 	llen = utf_FLineLen(fp,tp_offs);
+	// llen = 500;
 	start=tp_offs;
  };
  return llen;
