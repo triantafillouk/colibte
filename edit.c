@@ -583,6 +583,7 @@ int next_line(int n)
 	w_row = cwp->currow;
 	// if at the end move up
 	if(w_row == cwp->w_ntrows-2-half_last_line) {
+		// if(!is_wrap_text(cwp->w_fp))
 			move_window(-1);
 	};
 	};

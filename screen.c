@@ -871,7 +871,7 @@ vchar *init_vt_line(WINDP *wp)
  	v_text[i].uval[0]='A';
 	v_text[i].uval[0]=0;
  };
- memset(v_text,0,sizeof(struct vchar)*wp->w_ntcols);
+ // memset(v_text,0,sizeof(struct vchar)*wp->w_ntcols);
  return v_text;
 }
 
@@ -2475,7 +2475,7 @@ void upd_part_wrap(WINDP *wp,char *from)
 		vt_str(wp,wp->w_fp->b_header,0,0,0,-1,0);
 	};
 	// MESG("	upd_part: line1=%d line2=%d",line1,line2);
-	cached_llen(wp->w_fp,lp_offs,1);
+	// cached_llen(wp->w_fp,lp_offs,1);
 
 	for(sline=head;sline <= line2 ;sline++) 
 	{

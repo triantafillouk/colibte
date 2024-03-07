@@ -6,7 +6,7 @@ offs cashed_FLend(FILEBUF *fp,offs tp_offs,int reset)
  if(reset) {
 	end_offs=FLineEnd(fp,tp_offs);	
 	start=tp_offs;
-	return start;
+	return end_offs;
  };
 	if(tp_offs==start || !FBolAt(fp,tp_offs) )
 	{
@@ -19,6 +19,7 @@ offs cashed_FLend(FILEBUF *fp,offs tp_offs,int reset)
 	return end_offs;
 }
 
+#if	NUSE
 offs cached_llen(FILEBUF *fp,offs tp_offs,int reset)
 {
  static offs llen=0;
@@ -34,6 +35,19 @@ offs cached_llen(FILEBUF *fp,offs tp_offs,int reset)
  	llen = utf_FLineLen(fp,tp_offs);
 	start=tp_offs;
  };
+ return llen;
+}
+#endif
+
+offs wrap_llen(WINDP *wp,offs tp_offs)
+{
+ int llen=0;
+ utfchar uc;
+	offs o=tp_offs;
+	while(!FEolAt(wp->w_fp,o) && llen<wp->w_width){
+		o=FUtfCharAt(wp->w_fp,o,&uc);
+		llen++;
+	};
  return llen;
 }
 
@@ -79,13 +93,17 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 	if(BolAt(ptr1)) line_start=1;
 	// set_utf8_error(0);	/* reset utf_error on each line!!  */
 	if((wp->w_fp->b_lang == 0 )) {
+#if	1
+		llen = wrap_llen(wp,tp_offs);
+#else
 	    llen=cached_llen(wp->w_fp,tp_offs,0);
+#endif
 		// llen = utf_FLineLen(wp->w_fp,tp_offs);
 		if(utf8_error()) llen=ptr2-ptr1;
 	} else {
 		llen = ptr2 - tp_offs;
 	};
-	// MESG("	wline: %d ptr=%ld",wp->vtrow,ptr1);
+	MESG("	wcl: %d start=%ld end=%ld llen=%ld",wp->vtrow,ptr1,cur_lend,llen);
 	if(BolAt(ptr1))	init_line_highlight(wp);
 	
  	if(!slang || hquotem==0) 
