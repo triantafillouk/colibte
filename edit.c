@@ -1023,6 +1023,7 @@ int prev_page(int n)
 	show_time("prev_page: 0",1);
 #if	1
 		o=FPrev_wrap_line(cwp,o,lines);
+		
 #else
 		while(--lines>0) {
 			o=FPrev_wrap_line(cwp,o);
@@ -1030,8 +1031,9 @@ int prev_page(int n)
 #endif
 		textpoint_set(cwp->tp_hline,o);
 		// MESG("		start current from %ld n=%d",o,n);
+		o=tp_offset(cwp->tp_current);
 #if	1
-		
+		o=FPrev_wrap_line(cwp,o,lines);
 #else
 		o=tp_offset(cwp->tp_current);
 	show_time("prev_page: 1",1);

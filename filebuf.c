@@ -2590,7 +2590,7 @@ offs   FLineBegin(FILEBUF *fp,offs ptr)
    } else {
 
 	if(tp_line(fp->tp_text_end)==0) {
-	    MESG("FlineBegin: %ld end line=%ld",ptr,tp_line(fp->tp_text_end));
+	    // MESG("FlineBegin: %ld end line=%ld",ptr,tp_line(fp->tp_text_end));
 		return 0;
 	};
 	while(!FBolAt(fp,ptr))  ptr--;

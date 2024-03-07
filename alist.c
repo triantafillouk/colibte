@@ -361,10 +361,13 @@ void lset_current(alist *l,void *data)
 // move to next
 void lmove_to_next(alist *l,int circ)
 {
+ if(l->current == NULL) return;
  if(l->current == l->last && circ) { 
+		MESG("lmove_to_next: circ");
  		l->current = l->head;
  } else {
-	if(l->current!=NULL) l->current = l->current->next;
+		MESG("lmove_to_next!");
+		l->current = l->current->next;
  }
 }
 

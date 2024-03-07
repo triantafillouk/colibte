@@ -354,7 +354,7 @@ void upd_all_wrap_lines(WINDP *wp,char *from)
 	cashed_FLend(wp->w_fp,lp_offs,1);
 	getwquotes(wp,0);
 	show_time("bl",1);
-	MESG("# update_all_wrap_lines: wrap=%d window %d",is_wrap_text(wp->w_fp),wp->id);
+	// MESG("# update_all_wrap_lines: wrap=%d window %d",is_wrap_text(wp->w_fp),wp->id);
 	for(sline=head;sline < wp->w_ntrows;sline++) 
 	{
 		/* and update the virtual line */
@@ -363,7 +363,7 @@ void upd_all_wrap_lines(WINDP *wp,char *from)
 		if (lp_offs <= FSize(wp->w_fp)) { // if not at the end of file
 		/* if we are not at the end */
 			if(cwp->selection==0) set_selection(false);
-			MESG("	vt_wrap_line: %d at %ld",sline,lp_offs);
+			// MESG("	vt_wrap_line: %d at %ld",sline,lp_offs);
 			// cline_end=cashed_FLend(wp->w_fp,lp_offs);
 			lp_offs=vt_wrap_line(wp,lp_offs);
 			/* we must update the column selection here */

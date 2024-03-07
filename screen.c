@@ -191,7 +191,7 @@ void set_update(WINDP *wp_toset, int flag)
 			tp_copy(wp->tp_hsknown, wp_toset->tp_hsknown);
 			wp->hs[0].w_hquotem = wp_toset->hs[0].w_hquotem;
 			wp->hs[0].w_slang = wp_toset->hs[0].w_slang;
-			MESG("set_update: window %d flag %d",wp->id,wp->w_flag);
+			// MESG("set_update: window %d flag %d",wp->id,wp->w_flag);
 		};
 	};
  };
@@ -401,7 +401,7 @@ int draw_window_line(WINDP *wp, int row)
  char *lower_match;
  VIDEO *vp1 = wp->vs[row];
 
- MESG(">draw_window_line: row=%d",row);
+ // MESG(">draw_window_line: row=%d",row);
  if(gmode_reg_exp) {
 #if	USE_GLIB
 	if(gmode_exact_case) match=strdup(patmatch);
@@ -2045,18 +2045,38 @@ int update_screen(int force)
 	if (update_all)	{ 
 		updgar();
 	};
+#if	0
 	lbegin(window_list);
 	while((wp=(WINDP *)lget(window_list))!=NULL) MESG("--- this is window %d wrap=%d",wp->id,is_wrap_text(wp->w_fp));
-
+#endif
 	// MESG("loop windows");
 	lbegin(window_list);
+#if	1
+	while(1) {
+		// MESG(";start of while:");
+		wp=(WINDP *)lget_current(window_list);
+		if(wp==NULL) break;
+		// MESG("	+++ loop1: %d",wp->id);
+		_el *l_current = window_list->current;
+		// MESG("	++++ loop window now is %d wrap=%d",wp->id,is_wrap_text(wp->w_fp));
+		if(is_wrap_text(wp->w_fp))	update_window_wrap(wp,force);
+		else update_window_nowrap(wp,force);
+		set_current(window_list,l_current);
+		// MESG(" +++  move to next!");
+		lmove_to_next(window_list,0);
+		// MESG(" ___ moved!");
+	};
+#else
+	lbegin(window_list);
+	// MESG("	=== second loop");
 	while((wp=(WINDP *)lget(window_list))!=NULL)
 	{
-		MESG("	loop window now is %d wrap=%d",wp->id,is_wrap_text(wp->w_fp));
+		// MESG("	loop window now is %d wrap=%d",wp->id,is_wrap_text(wp->w_fp));
 		if(is_wrap_text(wp->w_fp))	update_window_wrap(wp,force);
 		else update_window_nowrap(wp,force);
 	};
-
+#endif
+	// MESG("	----- after update");
 	lbegin(window_list);
 	while((wp=(WINDP *)lget(window_list))!=NULL){
 		wp->w_fp->line_from=-1;	
