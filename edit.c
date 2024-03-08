@@ -903,11 +903,10 @@ int next_page(int  n)
 	// we must define a default page lenght
  	return false; 	
  };
-	// MESG("next_page:");
 	if (n<0) return (prev_page(-n));
 	if (n==0) return FALSE;
 	n *= cwp->w_ntrows-1;
-
+	// MESG("next_page: n=%d w=%d",n,cwp->w_width);
 #if	TNOTES
 	if(cbfp->b_flag==FSNOTES) {
 		cwp->goal_column=0;
@@ -935,12 +934,12 @@ int next_page(int  n)
 		// set new topline
 		offs o=tp_offset(cwp->tp_hline);
 		// offs co=tp_offset(cwp->tp_current);
-		int lines=n;
+		int num_lines=n;
 		// MESG("next_page: topo=%ld current=%ld lines=%d---------",o,co,lines);
 #if	TNEXT
-		o=FNext_wrap_line(cwp,o,lines);
+		o=FNext_wrap_line(cwp,o,num_lines);
 #else
-		while(--lines>0) {
+		while(--num_lines>0) {
 			o=FNext_wrap_line(cwp,o);
 		};
 #endif
@@ -948,7 +947,7 @@ int next_page(int  n)
 		// MESG("		start current from %ld n=%d",o,n);
 		o=tp_offset(cwp->tp_current);
 #if	TNEXT
-		o=FNext_wrap_line(cwp,o,n);
+		o=FNext_wrap_line(cwp,o,num_lines);
 #else
 		while(--n>0) {
 			o=FNext_wrap_line(cwp,o);
@@ -988,38 +987,38 @@ int next_page(int  n)
 
 
 /* Scroll backward by a specified number of pages. */
-int prev_page(int n)
+int prev_page(int num_pages)
 {
  num toline;
  int headline=(cbfp->b_header!=NULL);
-
+ int num_lines = num_pages*(cwp->w_ntrows-1)+1;
+ if(is_wrap_text(cbfp)) num_lines = num_pages*(cwp->w_ntrows-1);
  if(!discmd) {
 	// no page defined yet without window!
 	// we must define a default page lenght
  	return false; 	
  };
-// MESG("prev_page:");
- if (n<0) return (next_page(-n));
+ // MESG("# prev_page:");
+ if (num_pages<0) return (next_page(-num_pages));
 
-	if(is_wrap_text(cwp->w_fp))	show_time("prev_page: start",0);
-	n *= cwp->w_ntrows-2;
+	// if(is_wrap_text(cwp->w_fp))	show_time("prev_page: start",0);
 #if	TNOTES
 	if(cbfp->b_flag==FSNOTES) {
 		cwp->goal_column=0;
-		if(n > cwp->current_tag_line+headline) n=cwp->current_tag_line;
-		if(n==0) return FALSE;
+		if(num_lines > cwp->current_tag_line+headline) num_lines=cwp->current_tag_line;
+		if(num_lines==0) return FALSE;
 
 		// MESG("prev_page: FSNOTES from %d - %d = %d",cwp->current_tag_line,n,cwp->current_tag_line-n);
-		cwp->current_tag_line-=n;
+		cwp->current_tag_line-=num_lines;
 		set_update(cwp,UPD_MOVE|UPD_WINDOW);
 		return (OK_CLRSL);
 	} else
 #endif
 	if(cbfp->b_flag & FSNOTESN || cbfp->b_flag & FSNLIST) {
 		cwp->goal_column=NOTES_COLUMN+2;
-		if(n > cwp->current_note_line+headline) n=cwp->current_note_line;
-		if(n==0) return FALSE;
-		cwp->current_note_line-=n;
+		if(num_lines > cwp->current_note_line+headline) num_lines=cwp->current_note_line;
+		if(num_lines==0) return FALSE;
+		cwp->current_note_line-=num_lines;
 		set_update(cwp,UPD_MOVE|UPD_WINDOW);
 		return (OK_CLRSL);
 	};
@@ -1028,23 +1027,41 @@ int prev_page(int n)
  toline=tp_line(cwp->tp_current);
  if(is_wrap_text(cbfp)) {
  	offs o=tp_offset(cwp->tp_hline);
-	int num_lines=n;
-	show_time("prev_page: 0",1);
+	// int num_lines=n;
+	int nline=num_lines;
+	// show_time("prev_page: 0",1);
+	// MESG("prev_page: toline=%d num_lines=%d w=%d rows=%d",toline,num_lines,cwp->w_width,cwp->w_ntrows);
 #if	TNEXT
+		if(toline==0) 
 		o=FPrev_wrap_line(cwp,o,num_lines);
+		else
+		while(--nline >0) {
+			o=FPrev_wrap_line(cwp,o,1);
+		};
 #else
-		while(--num_lines>0) {
+		while(nline-- >0) {
 			o=FPrev_wrap_line(cwp,o);
 		};
 #endif
 		textpoint_set(cwp->tp_hline,o);
 		// MESG("		start current from %ld n=%d",o,n);
 		o=tp_offset(cwp->tp_current);
+		nline=num_lines;
 #if	TNEXT
-		o=FPrev_wrap_line(cwp,o,n);
+#if	0
+		o=FPrev_wrap_line(cwp,o,num_lines);
+#else
+		if(toline==0) 
+		o=FPrev_wrap_line(cwp,o,num_lines);
+		else
+		while(nline-- >0) {
+			o=FPrev_wrap_line(cwp,o,1);
+			// MESG("		next line o=%ld",o);
+		};
+#endif
 #else
 		// show_time("prev_page: 1",1);
-		while(--n>0) {
+		while(--nline>0) {
 			o=FPrev_wrap_line(cwp,o);
 			// MESG("		next line o=%ld",o);
 		};
@@ -1056,14 +1073,14 @@ int prev_page(int n)
 		set_update(cwp,UPD_MOVE|UPD_WINDOW);
 		undo_set_noglue();
 
-	show_time("prev_page: end",1);
+		// show_time("prev_page: end",1);
     	return (OK_CLRSL);
  };
  cwp->w_ppline = tp_line(cwp->tp_current)-tp_line(cwp->tp_hline)+1;
- if(toline-n<0 ) {
+ if(toline-num_lines<0 ) {
 	toline=0;
-	n=toline;
- } else {toline-=n;};
+	num_lines=toline;
+ } else {toline-=num_lines;};
 
  // set_goal_column(0,"prev_page");
  MoveLineCol(toline,cwp->goal_column);

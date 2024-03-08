@@ -345,7 +345,7 @@ void upd_all_wrap_lines(WINDP *wp,char *from)
 	/* search down the lines, updating them */
 	lp_offs = tp_offset(wp->tp_hline);
 	// MESG("#update_all_wrap_lines: top=%ld", lp_offs);
-	show_time("update_all_wrap!",1);
+	// show_time("update_all_wrap!",1);
 	wp->w_fp->hl->h_update(wp);
 	set_selection(0);
 
@@ -353,7 +353,7 @@ void upd_all_wrap_lines(WINDP *wp,char *from)
 	// cstart_offset=lp_offs;
 	cashed_FLend(wp->w_fp,lp_offs,1);
 	getwquotes(wp,0);
-	show_time("bl",1);
+	// show_time("bl",1);
 	// MESG("# update_all_wrap_lines: wrap=%d window %d",is_wrap_text(wp->w_fp),wp->id);
 	for(sline=head;sline < wp->w_ntrows;sline++) 
 	{
@@ -379,5 +379,5 @@ void upd_all_wrap_lines(WINDP *wp,char *from)
 	else wp->w_flag=0;
 	set_draw_flag(wp,"upd_all_wrap_lines");
 	getwquotes(wp,0);	// set highlight to the top line!
-	show_time("	end:",1);
+	// show_time("	end:",1);
 }
