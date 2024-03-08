@@ -1922,7 +1922,7 @@ int check_cursor_position(WINDP *wp)
  */
 int  show_position_info(int short_version)
 {
-	int col;
+	num col;
 	num loffs;
 	char str[MAXSLEN];
 	int sstat=0;
@@ -1968,16 +1968,24 @@ int  show_position_info(int short_version)
 		} else sstat=snprintf(str,MAXSLEN,"%5llX",Offset());
 	} else {
 	  	// MESG("show row/col info");
+#if	1
+		col=tp_col(cwp->tp_current);
+#else
 		col=GetCol()+1;
+#endif
 		if(short_version) {
 			sstat=snprintf(str,MAXSLEN,"%6lld",getcline()+1);
 		} else {
 			if(Eol()) {
-				if(bt_dval("show_coffset")) {
-					sstat=snprintf(str,MAXSLEN,"%5lld %5lld %3d ",getcline()+1,Offset(),col);
+				if(is_wrap_text(cbfp)){
+					sstat=snprintf(str,MAXSLEN,"%6lld %7lld ",getcline()+1,loffs);
 				} else {
-					sstat=snprintf(str,MAXSLEN,"%5lld %3lld %3d ",getcline()+1,loffs,col);
+				if(bt_dval("show_coffset")) {
+					sstat=snprintf(str,MAXSLEN,"%6lld %7lld %7lld ",getcline()+1,Offset(),col);
+				} else {
+					sstat=snprintf(str,MAXSLEN,"%6lld %7lld %7lld ",getcline()+1,loffs,col);
 				};
+				}
 				if((int)bt_dval("show_cdata")) { 
 					if(cwp->w_fp->b_mode & EMDOS) strlcat(str,"0D0A",MAXSLEN);
 					else if(cwp->w_fp->b_mode & EMUNIX) strlcat(str,"000A",MAXSLEN);
@@ -1985,18 +1993,25 @@ int  show_position_info(int short_version)
 					else strlcat(str,"    ",MAXSLEN);
 				};
 			} else {
-				sstat=snprintf(str,MAXSLEN,"%5lld ",getcline()+1);
-				if(bt_dval("show_coffset")) {
-					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%5lld ",Offset());
+				sstat=snprintf(str,MAXSLEN,"%6lld ",getcline()+1);
+				
+				if(is_wrap_text(cbfp)){
+					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",loffs);
 				} else {
-					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%3lld ",loffs);
+					if(bt_dval("show_coffset")) {
+						sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",Offset());
+					} else {
+						sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",loffs);
+					};
+					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",col);
 				};
-				sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%3d ",col);
+
 				if((int)bt_dval("show_cdata")) {
 					int size=1;
 					long value=utf_value_len(&size);
-					if(debug_flag()) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX %d",value,size);
-					else sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX",value);
+					// if(debug_flag()) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX %d",value,size);
+					// else 
+					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX",value);
 				};
 				if(strlen(str) < 10) short_version=1;
 			};
