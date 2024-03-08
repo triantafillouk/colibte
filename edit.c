@@ -18,7 +18,13 @@ void toggle_global_flag(int option_flag);
 void set_global_flag(int option_flag,int value);
 void get_lowercase_string(char *lower, char *string);
 void get_uppercase_string(char *lower, char *string);
-offs FNext_wrap_line(WINDP *wp,offs current_offset,int lines);
+#if	TNEXT
+offs FNext_wrap_line(WINDP *wp,offs current_offset,int num_lines);
+offs FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines);
+#else
+offs FNext_wrap_line(WINDP *wp,offs current_offset);
+offs FPrev_wrap_line(WINDP *wp,offs ptr);
+#endif
 void next_column(int cols);
 
 int GetBlock(FILEBUF *fp,char *copy,offs from,offs size);
@@ -603,7 +609,6 @@ int next_line(int n)
 }
 
 void update_top_position_wrap();
-offs   FPrev_wrap_line(WINDP *wp,offs ptr,int lines);
 offs   FPrevUtfCharAt(FILEBUF *fp,offs o, utfchar *uc);
 
 int prev_wrap_line(int n)
@@ -633,7 +638,11 @@ int prev_wrap_line(int n)
     };
 
 	offs o_now=tp_offset(cwp->tp_current);
+#if	TNEXT
 	textpoint_set(cwp->tp_current,FPrev_wrap_line(cwp,o_now,1));
+#else
+	textpoint_set(cwp->tp_current,FPrev_wrap_line(cwp,o_now));
+#endif
 
 	set_hmark(0,"prev_line");
 	set_update(cwp,UPD_MOVE);
@@ -928,7 +937,7 @@ int next_page(int  n)
 		// offs co=tp_offset(cwp->tp_current);
 		int lines=n;
 		// MESG("next_page: topo=%ld current=%ld lines=%d---------",o,co,lines);
-#if	1
+#if	TNEXT
 		o=FNext_wrap_line(cwp,o,lines);
 #else
 		while(--lines>0) {
@@ -938,7 +947,7 @@ int next_page(int  n)
 		textpoint_set(cwp->tp_hline,o);
 		// MESG("		start current from %ld n=%d",o,n);
 		o=tp_offset(cwp->tp_current);
-#if	1
+#if	TNEXT
 		o=FNext_wrap_line(cwp,o,n);
 #else
 		while(--n>0) {
@@ -1019,24 +1028,22 @@ int prev_page(int n)
  toline=tp_line(cwp->tp_current);
  if(is_wrap_text(cbfp)) {
  	offs o=tp_offset(cwp->tp_hline);
-	int lines=n;
+	int num_lines=n;
 	show_time("prev_page: 0",1);
-#if	1
-		o=FPrev_wrap_line(cwp,o,lines);
-		
+#if	TNEXT
+		o=FPrev_wrap_line(cwp,o,num_lines);
 #else
-		while(--lines>0) {
+		while(--num_lines>0) {
 			o=FPrev_wrap_line(cwp,o);
 		};
 #endif
 		textpoint_set(cwp->tp_hline,o);
 		// MESG("		start current from %ld n=%d",o,n);
 		o=tp_offset(cwp->tp_current);
-#if	1
-		o=FPrev_wrap_line(cwp,o,lines);
+#if	TNEXT
+		o=FPrev_wrap_line(cwp,o,n);
 #else
-		o=tp_offset(cwp->tp_current);
-	show_time("prev_page: 1",1);
+		// show_time("prev_page: 1",1);
 		while(--n>0) {
 			o=FPrev_wrap_line(cwp,o);
 			// MESG("		next line o=%ld",o);

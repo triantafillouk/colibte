@@ -57,7 +57,11 @@ int imove_top_line(num new_top_line);
 int set_sposition(WINDP *wp,int *st, int *l);
 void utf_string_break(char *utf_string, int column);
 int change_sort_mode(int mouse_col);
+#if	TNEXT
+offs FNext_wrap_line(WINDP *wp,offs start,int num_lines);
+#else
 offs FNext_wrap_line(WINDP *wp,offs start);
+#endif
 
 int	colorupdate;
 int color_scheme_ind=0;
@@ -910,7 +914,11 @@ int text_mouse_function(int move)
 	for(i=head_line;i<mouse_window_row;i++) 
 	{
 		if(is_wrap_text(cbfp)) 
+#if	TNEXT
+		new_offset = FNext_wrap_line(cwp,new_offset,1);
+#else
 		new_offset = FNext_wrap_line(cwp,new_offset);
+#endif
 		else 
   		new_offset = FNextLine(cbfp,new_offset);
 	};

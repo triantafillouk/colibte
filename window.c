@@ -181,10 +181,6 @@ offs FNext_wrap_line(WINDP *wp,offs start)
  // from the start of the wrap line
  int col=0;
  // MESG(";FNext_wrap_line: < start from %ld",start);
-#if	0
- TextPoint *tp_now = new_textpoint_at(wp->w_fp,1,start);
- int col_now = tp_col(tp_now)%wp->w_width;
-#endif
 #if	TNEXT
  while(lines-- >0)
 #endif
@@ -312,7 +308,7 @@ int move_window(int n)
 	// MESG("move_window: current=%ld n=%d",curoffs,n);
     if (n < 0) {
 			if(is_wrap_text(cwp->w_fp)) {
-#if	1
+#if	TNEXT
 			curoffs=FNext_wrap_line(cwp,curoffs,-n);
 #else
         	while (n++ < 0) {
@@ -326,12 +322,12 @@ int move_window(int n)
 			};
     } else  {
 		if(is_wrap_text(cwp->w_fp)) {
-#if	1
+#if	TNEXT
 			curoffs = FPrev_wrap_line(cwp,curoffs,n);
 #else
 			while((n-- > 0) &&  (curoffs>0)) {
 				// go to prev window line
-				curoffs = FPrev_wrap_line(cwp,curoffs,1);
+				curoffs = FPrev_wrap_line(cwp,curoffs);
 			};
 #endif
 		} else {
@@ -437,9 +433,17 @@ int chardline(WINDP *wp)
 
  do
  {
- 	ptr=FNextLine(wp->w_fp,ptr);
+	if(is_wrap_text(wp->w_fp))
+#if	TNEXT
+	 	ptr=FNext_wrap_line(wp,ptr,1);
+#else
+	 	ptr=FNext_wrap_line(wp,ptr);
+#endif
+	else
+	 	ptr=FNextLine(wp->w_fp,ptr);
 	if(ptr>current_offset) break;
-	if(FBolAt(wp->w_fp,ptr)) screen_row++;
+	
+	if(is_wrap_text(wp->w_fp) || FBolAt(wp->w_fp,ptr)) screen_row++;
  } while(ptr<size);
 
  return(screen_row);
