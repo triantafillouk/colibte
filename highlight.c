@@ -620,7 +620,8 @@ void update_highlight(WINDP *wp)
 {
  if(!syntaxh) return;
  num known_offset=tp_offset(wp->tp_hsknown);
- MESG("#update_highlight: known_offset=%lld top=%lld",known_offset,tp_offset(wp->tp_hline));
+ // FindLineCol(wp->tp_hline);
+ // MESG_time("update_highlight: known=%lld top=%lld",known_offset,tp_offset(wp->tp_hline));
 
 //	prev_slash=prev_ast=hquote5=0;
 //	previous top line is tp_hsknown
@@ -680,7 +681,7 @@ void update_highlight(WINDP *wp)
 	};
 //	if(note_type) { hnote=1;} else hnote=0;
 	setwquotes(wp,0,known_offset);
-	// MESG("update_highlight:e");
+	// MESG_time("update_highlight:end");
 }
 
 void update_highlight_line(WINDP *wp)
@@ -3111,11 +3112,11 @@ void fquote_state(offs till_offs, offs from_offs, WINDP *wp)
 {
  offs cof;
  int c;
+ int orig_hquotem=hquotem;
  if(!syntaxh) return;
  if(till_offs>FSize(cbfp)) {
 	till_offs=FSize(cbfp);
  };
- MESG("fquote_state: from %ld to %ld",from_offs,till_offs);
  if(from_offs<1) {
  	wp->w_fp->hl->h_function(CHR_RESET); 
 	from_offs=0;
@@ -3125,7 +3126,7 @@ void fquote_state(offs till_offs, offs from_offs, WINDP *wp)
  	c=FCharAt(wp->w_fp,cof);
 	wp->w_fp->hl->h_function(c); 
  };
- // MESG("fquote: (%lld %d) -> (%lld %d)",from_offs,hori,till_offs,hquotem);
+ // MESG_time("!fquote: (%lld %X) -> (%lld %X)",from_offs,orig_hquotem,till_offs,hquotem);
 }
 
 void setwquotes(WINDP *wp,int ind,num known_offset)

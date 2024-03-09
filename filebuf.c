@@ -569,22 +569,24 @@ void FindLineCol(TextPoint *tp)
 	TextPoint	*scan;
 	offs	 dist=INT_MAX;
 	offs	 new_dist=INT_MAX-1;
-
+	// MESG("FindLineCol: [%s] o=%ld",tp_name[tp->tp_type],tp->offset);
 	for(scan=fp->tp_last; scan; scan=scan->t_next) {
 		if(scan==tp) continue;
+		// MESG("flc: check [%s] o=%ld",tp_name[scan->tp_type],scan->offset);
 		if(!(scan->flags)) 
 		{
 			new_dist=llabs(tp->offset-scan->offset);
-	 		if(new_dist < dist)
+	 		if(new_dist < dist && scan->offset<tp->offset)
+	 		// if(new_dist < dist )
 			{
 	    		dist=new_dist;
 	    		if(dist==0) {
 				   tp->col=scan->col;
 				   tp->line=scan->line;
 				   tp->flags = FULLDEFINED;
-//				   MESG("	findlinecol:[%s] based on [%s] o=%lld col=%lld line=%lld",tp_name[tp->tp_type],tp_name[scan->tp_type],tp->offset,tp->col,tp->line);
 				   return;				
 				};
+				// MESG("	findlinecol:[%s] based on [%s] o=%lld col=%lld line=%lld dist=%d",tp_name[tp->tp_type],tp_name[scan->tp_type],tp->offset,tp->col,tp->line,dist);
 	    		found=scan;
 	 		}
       	}
@@ -601,7 +603,7 @@ void FindLineCol(TextPoint *tp)
       o=c=l=0;
    };
 
-//	MESG("	findlinecol:[%s] o=%lld found on [%s] o=%lld col=%lld line=%lld ",tp_name[tp->tp_type],tp->offset,tp_name[found->tp_type],o,c,l);
+	// MESG("	findlinecol:[%s] o=%lld found on [%s] o=%lld col=%lld line=%lld ",tp_name[tp->tp_type],tp->offset,tp_name[found->tp_type],o,c,l);
    if(o>tp->offset)  {	/* go back lines  */
       o=FLineBegin(fp,o);
       c=0;
@@ -2635,12 +2637,13 @@ num utf_FLineLen(FILEBUF *fp, offs ptr)
 {
  num len=0;
  utfchar uc;
- MESG("utf_FLineLen: %ld",ptr);
+ // MESG_time("utf_FLineLen: from %ld",ptr);
  while(!FEolAt(fp,ptr)) {
  	ptr=FUtfCharAt(fp,ptr,&uc);
 	if(clen_error) set_utf8_error(1);
 	len++;
  };
+ // MESG_time("utf_FLineLen: till %ld len=%ld",ptr,len);
  return len;
 }
 
@@ -2726,8 +2729,9 @@ void   MoveLeftChar(FILEBUF *fp)
 					break;
 				};
 			};
-//			MESG("	prev_char: final clen=%d",clen);
+			// MESG_time("move left:0");
 			textpoint_move(fp->tp_current,-clen);
+			// MESG_time("move left:1");
 		} else textpoint_move(fp->tp_current,-1);
    }
 }
@@ -3227,6 +3231,7 @@ int set_view_mode(int n)
 		};break;
 	case 9: // Wrap mode
 	  {
+		// show_time("convert to wrap mode",0);
 		// MESG("toggle wrap_mode! b_flag=%d",fp->b_flag);
 		if (fp->b_flag >= FSNLIST || fp->view_mode & (VMHEX|VMINP)) break;
 		// MESG("change wrap_mode, current is 0x%X",fp->view_mode);
@@ -3251,7 +3256,9 @@ int set_view_mode(int n)
 		};
 	  };break;
    };
+	// MESG_time("before reset points",1);
 	ResetTextPoints(cbfp,0);
+	// MESG_time("after reset points",1);
 	set_Offset(offset);
 	set_update(cwp,UPD_EDIT|UPD_FULL);
 	return true;

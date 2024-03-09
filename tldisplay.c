@@ -1289,8 +1289,10 @@ void main_loop()
     update_screen(FALSE);
 	/* get the next command from the keyboard */
 	app_error=0;
-	c = getcmd();
+	// show_time(";main_loop end",2);
 
+	c = getcmd();
+	// show_time("# go main execute ----------",0);
 	/* execute the keyboard sequence */
 	main_execute(c);
  };

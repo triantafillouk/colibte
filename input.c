@@ -698,7 +698,7 @@ char *cmd_to_tstr(int cmd)
 
 int set_key_emulation(int emulation)
 {
-	MESG("set_key_emulation: %d",emulation);
+	// MESG("set_key_emulation: %d",emulation);
 	set_bt_num_val("keyboard_emulation",emulation);
 	if(emulation == 1) key_table = keytab_emacs;
 	else key_table = keytab_win;
@@ -944,6 +944,10 @@ void out_print(char *s,int nl)
 	if(!discmd) {
 		if(nl) printf("%s\n",s);
 		else printf("%s",s);
+		return;
+	};
+	if(debug_flag()) {
+		MESG("%s",s);
 		return;
 	};
 #endif

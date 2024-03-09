@@ -462,13 +462,11 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
 		};
 	}
  } ;
- // show_time("scan_dir: end",1);
  namelist[i]=NULL;
  if(num_of_files<MAXSTAT)qsort_dir(namelist,num_of_files,current_sort_mode);
  else msg_line("dir too big to sort contains %d files",num_of_files);
 
  *namelist_a = namelist;
- // show_time("after sort:",1);
  return(num_of_files);
 }
 

@@ -816,7 +816,6 @@ int execute(int c, int  n)
 {
     int status=0;
 	int (*execfunc)();		/* ptr to function to execute */
-
 	if(cbfp==NULL) return(0);
 	execfunc = key_function(c,1);
 	if (execfunc != NULL) {
@@ -834,7 +833,6 @@ int execute(int c, int  n)
         if(status) return (OK_CLRSL);
 		else return FALSE;
 	}
-
 	msg_line("[Key (%s) not assigned!]",xe_key_name(c));		/* complain		*/
     return (FALSE);
 }
@@ -843,18 +841,19 @@ int execute(int c, int  n)
 void main_execute(int c)
 {
  static int cflag=0;
-//	MESG("main_execute: %X nnarg=%d",c,nnarg);
 	/* and execute the command */
+	// MESG_time("main_execute: key %s",xe_key_name(c));
 	cflag=execute(c, nnarg);
-//	MESG("		: cflag = %X",cflag);
 	if(cflag!=OK_ARG) nnarg=1;
 	else {
 		if(nnarg>1) {
 			msg_line("arg: %d",nnarg);
 		};
 	};
+	// MESG_time("after execute");
 
 	if(cflag & OK_RSTGOAL)	cwp->goal_column=GetCol();
+	// MESG_time("after GetCol");
 //	if(cflag==OK_CLRSL  || cflag==OK_RSTGOAL) clear_message_line();
 }
 

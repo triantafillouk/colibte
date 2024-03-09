@@ -64,6 +64,7 @@ double  show_time(char *description,int init);
 char **split_2_sarray(char *as,int splitchr);
 
 void MESG(const char *fmt, ...);
+void MESG_time(const char *fmt, ...);
 void ERROR(const char *fmt, ...);
 void SYS_ERROR(const char *fmt, ...);
 void msg_log(int priority,const char *fmt, ...);

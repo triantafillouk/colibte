@@ -893,7 +893,7 @@ char *vt_mask_init(num llen)
 	};
 	if(llen>=vtla) {
 		vtla=llen+256;
-		MESG("	vt_mask_init: realloc new with %ld",vtla);
+		// MESG("	vt_mask_init: realloc new with %ld",vtla);
 		vtlm=realloc(vtlm,vtla);
 	}
  return vtlm; 
@@ -1788,14 +1788,15 @@ int check_cursor_position_notes(WINDP *wp)
 	return(TRUE);
 }
 
-void update_top_position_wrap()
+offs update_top_position_wrap()
 {
 
  int o_now=tp_offset(cwp->tp_current);
 	offs o;
 #if	1
+	// MESG_time("update_top_position_wrap: %ld",o_now);
 	o = FLineBegin(cwp->w_fp,o_now);
-	// if(is_wrap_text(cbfp)) show_time("update_top_position_wrap 1",1);
+	// MESG_time("update_top_position_wrap: begin=%ld",o);
 #else
 	static offs known=0;
 	if(known<o_now-cwp->w_width) o=known;
@@ -1819,8 +1820,9 @@ void update_top_position_wrap()
 		};
 	};
 	textpoint_set(cwp->tp_hline,new_hline);
-	// MESG("       : new hline=%ld",new_hline);
-	// if(is_wrap_text(cbfp)) show_time("update_top_position_wrap end",1);
+	// FindLineCol(cwp->tp_hline);
+	// MESG_time("update_top_position_wrap end hline=%ld",tp_offset(cwp->tp_hline));
+	return(tp_offset(cwp->tp_hline));
 }
 
 int check_cursor_position_wrap(WINDP *wp)
@@ -2037,14 +2039,14 @@ int update_screen(int force)
 	int cw_flag=cwp->w_flag;
 	if (noupdate) return TRUE;
 
-	MESG("# update_screen: ------------------------------");
+	// MESG("# update_screen: ------------------------------");
 	/* experiment with screen updating  */
 	if(cw_flag==0) return(FALSE);
 
 	if (force == FALSE && kbdmode == PLAY)	return(TRUE);
 
 	/* update any windows that need refreshing */
-	// if(is_wrap_text(cwp->w_fp))	show_time("update_screen: 0",0);
+	// show_time("! update_screen: 0",1);
 	hide_cursor("update_screen: start");
 	// MESG("hide_cursor: ok!");
 	if(cwp->selection) {
@@ -2054,8 +2056,8 @@ int update_screen(int force)
 			tp_copy(cwp->w_emark,cwp->tp_current);
 	}
 
-	// if(is_wrap_text(cwp->w_fp))	show_time("update_screen: 1",1);
 	upd_column_pos();	/* update column position  */
+	// show_time("update_screen: 1",1);
 	/* if screen is garbage, re-plot it */
 	if (update_all)	{ 
 		updgar();
@@ -2099,18 +2101,18 @@ int update_screen(int force)
 	};
 	// MESG("go update physical");
 	/* update the virtual screen to the physical screen */
-	// if(is_wrap_text(cwp->w_fp))show_time("update_physical",1);
+	// show_time("update_physical",1);
 	update_physical_windows();
-	// if(is_wrap_text(cwp->w_fp))show_time("update_physical end",1);	/* update the cursor and flush the buffers */
+	// show_time("update_physical end",1);	/* update the cursor and flush the buffers */
 	update_cursor_position();
-	// if(is_wrap_text(cwp->w_fp))	show_time("update_cursor_position",1);
+	// show_time("after update_cursor_position",1);
 	/* set previous line */
 	// MESG(";update_screen: set new ppline");
 	cwp->w_ppline = window_cursor_line(cwp);
 	cwp->w_flag=0;
 	update_all=0;
 	drv_flush();
-	// if(is_wrap_text(cwp->w_fp))	show_time("update_screen: end",2);
+	// show_time("update_screen: end",2);
 	// MESG("update_screen: end");
 	return(TRUE);
 }
@@ -2174,10 +2176,9 @@ void update_window_wrap(WINDP *wp,int force)
 	int cw_flag=cwp->w_flag;
 	// MESG("update_window_wrap: ------------------");
 		if (wp==cwp) {
-			// show_time("update_window_wrap:0",1);
+			// MESG_time("update_window_wrap:1 window %d",wp->id);
 			check_cursor_position_wrap(wp); /* check if on screen */
-			MESG("update_window_wrap:1 window %d",wp->id);
-			// show_time("update_window_wrap:1",1);
+			// MESG_time("update_window_wrap: check curpos",wp->id);
 			wp->currow = window_cursor_line(wp);
 #if	1
 				upd_all_wrap_lines(wp,"wrap0");
@@ -2223,6 +2224,7 @@ void update_window_wrap(WINDP *wp,int force)
 			status_line(wp);	/* update statusline */
 		};
 		wp->w_flag = 0;
+		// MESG_time(";update_window_wrap:end window %d",wp->id);
 }
 
 void upd_some_virtual_lines(WINDP *wp,char *from)
