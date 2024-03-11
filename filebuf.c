@@ -87,6 +87,38 @@ offs    FSize();
 
 void FindLineCol(TextPoint *tp);
 
+void MESG_time(const char *fmt, ...)
+{
+ if(!debug_flag()) return;
+ va_list args;
+ static char mline[512];
+ if(!(strcmp(cbfp->b_fname,"[out]"))) return;
+    if (fmt != NULL) {
+		va_start(args,fmt);
+		vsnprintf(mline,511,fmt,args);
+		va_end(args);
+
+		show_time(mline,1);
+		fflush(stderr);
+    }
+}
+
+void MESG_time_start(const char *fmt, ...)
+{
+ if(!debug_flag()) return;
+ va_list args;
+ static char mline[512];
+ if(!(strcmp(cbfp->b_fname,"[out]"))) return;
+    if (fmt != NULL) {
+		va_start(args,fmt);
+		vsnprintf(mline,511,fmt,args);
+		va_end(args);
+
+		show_time(mline,0);
+		fflush(stderr);
+    }
+}
+
 void *emalloc(long size,char *des)
 {
  void *a;

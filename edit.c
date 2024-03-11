@@ -195,13 +195,12 @@ int prev_character(int n)
 {
  if (n < 0) return (next_character(-n));
 
- // if(is_wrap_text(cwp->w_fp))	show_time("prev_char:",0);
  while (n--) {
  	if(Offset()<=0) return FALSE;
 	MoveLeftChar(cbfp);
 	set_update(cwp,UPD_MOVE);
  };
- // if(is_wrap_text(cwp->w_fp))	show_time("prev_char:end",1);
+ MESG_time("prev_char:end");
  return (OK_RSTGOAL);
 }
 

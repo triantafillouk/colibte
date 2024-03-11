@@ -947,7 +947,8 @@ void out_print(char *s,int nl)
 		return;
 	};
 	if(debug_flag()) {
-		MESG("%s",s);
+		if(nl) fprintf(stderr,"%s\n",s);
+		else fprintf(stderr,"%s",s);
 		return;
 	};
 #endif

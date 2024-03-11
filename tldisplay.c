@@ -1283,6 +1283,7 @@ void main_loop()
  int c;
  init_message_loop(); 
  change_color_scheme(color_scheme_ind+1);
+ MESG_time_start("main_loop:");
  while(1) { /* main keyboard loop */
 	/* Fix up the screen    */
 //	MESG("main_loop:0 buffer=%d [%s][%s] -----",cbfp->b_index,cbfp->b_dname,cbfp->b_fname);
@@ -1292,7 +1293,7 @@ void main_loop()
 	// show_time(";main_loop end",2);
 
 	c = getcmd();
-	// show_time("# go main execute ----------",0);
+	MESG_time_start("# main_loop go execute ----------");
 	/* execute the keyboard sequence */
 	main_execute(c);
  };

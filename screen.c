@@ -2046,7 +2046,7 @@ int update_screen(int force)
 	if (force == FALSE && kbdmode == PLAY)	return(TRUE);
 
 	/* update any windows that need refreshing */
-	// show_time("! update_screen: 0",1);
+	MESG_time("! update_screen: 0");
 	hide_cursor("update_screen: start");
 	// MESG("hide_cursor: ok!");
 	if(cwp->selection) {
@@ -2057,7 +2057,7 @@ int update_screen(int force)
 	}
 
 	upd_column_pos();	/* update column position  */
-	// show_time("update_screen: 1",1);
+	MESG_time("update_screen: 1");
 	/* if screen is garbage, re-plot it */
 	if (update_all)	{ 
 		updgar();
@@ -2101,9 +2101,9 @@ int update_screen(int force)
 	};
 	// MESG("go update physical");
 	/* update the virtual screen to the physical screen */
-	// show_time("update_physical",1);
+	MESG_time("update_physical");
 	update_physical_windows();
-	// show_time("update_physical end",1);	/* update the cursor and flush the buffers */
+	MESG_time("update_physical end",1);	/* update the cursor and flush the buffers */
 	update_cursor_position();
 	// show_time("after update_cursor_position",1);
 	/* set previous line */

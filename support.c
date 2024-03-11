@@ -355,22 +355,6 @@ void MESG(const char *fmt, ...)
     }
 }
 
-void MESG_time(const char *fmt, ...)
-{
- // if(!debug_flag()) return;
- va_list args;
- static char mline[512];
-
-    if (fmt != NULL) {
-		va_start(args,fmt);
-		vsnprintf(mline,511,fmt,args);
-		va_end(args);
-		// if(!debug_flag()) return;
-
-		show_time(mline,1);
-		fflush(stderr);
-    }
-}
 
 # define _MESG_DEFINED
 # endif

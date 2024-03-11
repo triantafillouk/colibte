@@ -29,6 +29,7 @@ int found=0;
 char	search_pattern[MAXLLEN];            /* Search pattern	*/
 char	replace_pattern[MAXLLEN];			/* replacement pattern		*/
 char	search_lowercase_pattern[MAXLLEN];		/* lower case search pattern  */
+void MESG_time_start(const char *fmt, ...);
 num prof_count=0;
 extern FILEBUF *cbfp;
 
@@ -638,7 +639,7 @@ int	replaces(int query, int next_only, int n)
 	prof_count=0;
 	stat=snprintf(lline,1024,"sreplace: %s with %s",search_pattern,replace_pattern);
 	if(stat<256) MESG("truncated 5");
-	show_time(lline,0);
+	MESG_time_start(lline);
 
 	while ( (!next_only || n > nummatch) &&
 		(nlflag == FALSE || nlrepl == FALSE) )
@@ -671,7 +672,7 @@ int	replaces(int query, int next_only, int n)
 		if((nummatch % 100000)==0) 
 		{
 			stat=snprintf(lline,256,"count=%lld at %lld",(long long int)nummatch,current_offset);
-			show_time(lline,1);
+			MESG_time(lline);
 		};
 		/* Check if we are on the last line.*/
 		nlrepl = FEof(fp);
@@ -774,7 +775,7 @@ qprompt:
 
 	stat=snprintf(lline,256,"replaced %lld items count=%lld",(long long int)numsub,prof_count);
 //	if(stat<256) 
-	show_time(lline,1);
+	MESG_time(lline);
 	/* And report the results.*/
 	setmark(0);
 	set_modified(fp);

@@ -102,7 +102,6 @@ double  show_time(char *description,int init)
 	struct timeval      timev;
 	char sout[512];
 	diff_sec=diff_usec=0;
-
 	gettimeofday(&timev, NULL);
 	sec1 = (int)timev.tv_sec;
 	usec1 = (int)timev.tv_usec;
@@ -138,7 +137,8 @@ double  show_time(char *description,int init)
 	// if(xwin && discmd) MESG("%s",sout);
 	// MESG("%s",sout);
 	};
-	out_print(sout,1);
+	if(debug_flag()) fprintf(stderr,"%s'n",sout);
+	else out_print(sout,1);
 
 	prev_usec=usec1;
 	prev_sec=sec1;
