@@ -2039,14 +2039,13 @@ int update_screen(int force)
 	int cw_flag=cwp->w_flag;
 	if (noupdate) return TRUE;
 
-	// MESG("# update_screen: ------------------------------");
 	/* experiment with screen updating  */
 	if(cw_flag==0) return(FALSE);
 
 	if (force == FALSE && kbdmode == PLAY)	return(TRUE);
 
 	/* update any windows that need refreshing */
-	MESG_time("! update_screen: 0");
+	// MESG_time("! update_screen: ---------------");
 	hide_cursor("update_screen: start");
 	// MESG("hide_cursor: ok!");
 	if(cwp->selection) {
@@ -2057,18 +2056,14 @@ int update_screen(int force)
 	}
 
 	upd_column_pos();	/* update column position  */
-	MESG_time("update_screen: 1");
+	// MESG_time("update_screen: 1");
 	/* if screen is garbage, re-plot it */
 	if (update_all)	{ 
 		updgar();
 	};
-#if	0
-	lbegin(window_list);
-	while((wp=(WINDP *)lget(window_list))!=NULL) MESG("--- this is window %d wrap=%d",wp->id,is_wrap_text(wp->w_fp));
-#endif
+
 	// MESG("loop windows");
 	lbegin(window_list);
-#if	1
 	while(1) {
 		// MESG(";start of while:");
 		wp=(WINDP *)lget_current(window_list);
@@ -2083,16 +2078,7 @@ int update_screen(int force)
 		lmove_to_next(window_list,0);
 		// MESG(" ___ moved!");
 	};
-#else
-	lbegin(window_list);
-	// MESG("	=== second loop");
-	while((wp=(WINDP *)lget(window_list))!=NULL)
-	{
-		// MESG("	loop window now is %d wrap=%d",wp->id,is_wrap_text(wp->w_fp));
-		if(is_wrap_text(wp->w_fp))	update_window_wrap(wp,force);
-		else update_window_nowrap(wp,force);
-	};
-#endif
+
 	// MESG("	----- after update");
 	lbegin(window_list);
 	while((wp=(WINDP *)lget(window_list))!=NULL){
@@ -2101,19 +2087,18 @@ int update_screen(int force)
 	};
 	// MESG("go update physical");
 	/* update the virtual screen to the physical screen */
-	MESG_time("update_physical");
+	// MESG_time("update_physical");
 	update_physical_windows();
-	MESG_time("update_physical end",1);	/* update the cursor and flush the buffers */
+	// MESG_time("update_physical end",1);	
+	/* update the cursor and flush the buffers */
 	update_cursor_position();
-	// show_time("after update_cursor_position",1);
 	/* set previous line */
 	// MESG(";update_screen: set new ppline");
 	cwp->w_ppline = window_cursor_line(cwp);
 	cwp->w_flag=0;
 	update_all=0;
 	drv_flush();
-	// show_time("update_screen: end",2);
-	// MESG("update_screen: end");
+	// MESG_time("update_screen: end");
 	return(TRUE);
 }
 

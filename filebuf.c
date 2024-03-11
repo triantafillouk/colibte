@@ -1877,7 +1877,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 		msg_line("[%s] not a regular file!");
 	   	return(false);
    };
-//  show_time("ifile: start status=%d",status); 
+
   if(!ir_flag) {
   	status=init_ftype(bf,name,&temp_used); // if not insert then get file type
 	if(status!=TRUE) return FALSE;
@@ -2047,7 +2047,6 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 		unlink(name);
 		bf->b_state |= FS_VIEW;
 	};
-//	show_time("ifile: end ok",0);
 	bf->line_to = tp_line(bf->tp_text_end);
 //	MESG("ifile0:end b_type=%d",bf->b_type);
    	return(true);
@@ -3263,7 +3262,7 @@ int set_view_mode(int n)
 		};break;
 	case 9: // Wrap mode
 	  {
-		// show_time("convert to wrap mode",0);
+		// MESG_time("convert to wrap mode",0);
 		// MESG("toggle wrap_mode! b_flag=%d",fp->b_flag);
 		if (fp->b_flag >= FSNLIST || fp->view_mode & (VMHEX|VMINP)) break;
 		// MESG("change wrap_mode, current is 0x%X",fp->view_mode);

@@ -378,5 +378,4 @@ void upd_all_wrap_lines(WINDP *wp,char *from)
 	set_draw_flag(wp,"upd_all_wrap_lines");
 	// MESG_time("#update_all_wrap_lines: end");
 	getwquotes(wp,0);	// set highlight to the top line!
-	// show_time("	end:",1);
 }

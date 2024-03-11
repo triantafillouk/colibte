@@ -200,7 +200,7 @@ int prev_character(int n)
 	MoveLeftChar(cbfp);
 	set_update(cwp,UPD_MOVE);
  };
- MESG_time("prev_char:end");
+ // MESG_time("prev_char:end");
  return (OK_RSTGOAL);
 }
 
@@ -1002,7 +1002,6 @@ int prev_page(int num_pages)
  // MESG("# prev_page:");
  if (num_pages<0) return (next_page(-num_pages));
 
-	// if(is_wrap_text(cwp->w_fp))	show_time("prev_page: start",0);
 #if	TNOTES
 	if(cbfp->b_flag==FSNOTES) {
 		cwp->goal_column=0;
@@ -1030,7 +1029,6 @@ int prev_page(int num_pages)
  	offs o=tp_offset(cwp->tp_hline);
 	// int num_lines=n;
 	int nline=num_lines;
-	// show_time("prev_page: 0",1);
 	// MESG("prev_page: toline=%d num_lines=%d w=%d rows=%d",toline,num_lines,cwp->w_width,cwp->w_ntrows);
 #if	TNEXT
 		if(toline==0) 
@@ -1061,7 +1059,6 @@ int prev_page(int num_pages)
 		};
 #endif
 #else
-		// show_time("prev_page: 1",1);
 		while(--nline>0) {
 			o=FPrev_wrap_line(cwp,o);
 			// MESG("		next line o=%ld",o);
@@ -1074,7 +1071,6 @@ int prev_page(int num_pages)
 		set_update(cwp,UPD_MOVE|UPD_WINDOW);
 		undo_set_noglue();
 
-		// show_time("prev_page: end",1);
     	return (OK_CLRSL);
  };
  cwp->w_ppline = tp_line(cwp->tp_current)-tp_line(cwp->tp_hline)+1;
