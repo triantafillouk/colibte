@@ -458,8 +458,12 @@ int next_wrap_line(int n)
 {
 	num current_line;
 	int headline=(cbfp->b_header!=NULL);
-
+	MESG_time("next_wrap_line:");
+#if	1
+	cwp->goal_column=cwp->curcol;
+#else
 	set_goal_column(-1,"next_wrap_line:");
+#endif
 	// get the current line
 	current_line=get_current_line();
 	cwp->w_prev_line=current_line;
@@ -478,7 +482,7 @@ int next_wrap_line(int n)
 
 	{	
 		if(cbfp->lines  < GetLine()+n+headline) n=cbfp->lines-GetLine()-headline;
-		// MESG("next_line: l=%d lines=%ld n=%ld",GetLine(),cbfp->lines,n);
+		MESG_time("next_line: l=%d lines=%ld n=%ld",GetLine(),cbfp->lines,n);
 	};
 
 	{
@@ -491,7 +495,7 @@ int next_wrap_line(int n)
 		offs o_end=LineEnd(o_now);
 #endif
 		int remains=DiffColumns(cwp->w_fp,o_now,o_end);
-		// MESG("next_wrap_line: wrap mode! o=%ld end=%ld remain columns=%d",o_now,o_end,remains);
+		MESG_time("next_wrap_line: wrap mode! o=%ld end=%ld remain columns=%d",o_now,o_end,remains);
 		if(remains>= cwp->w_width) {
 			// MESG("next_wrap_line: remains %d > w=%d",remains,cwp->w_width);
 			next_column(cwp->w_width);
@@ -511,6 +515,7 @@ int next_wrap_line(int n)
 		};
 	};
 
+	MESG_time("next_wrap_line:end");
 	set_hmark(0,"next_line");
 	// MESG("next_wrap_line:	end >!");
 	/* reseting the current position */
@@ -615,8 +620,11 @@ offs   FPrevUtfCharAt(FILEBUF *fp,offs o, utfchar *uc);
 int prev_wrap_line(int n)
 {
  num current_line=get_current_line();
-	
+#if	1
+	cwp->goal_column=cwp->curcol;
+#else
 	set_goal_column(-1,"prev_wrap_line:");
+#endif
 	cwp->w_prev_line=current_line;
 	// MESG("!prev_wrap_line: current=%d row=%d lock=%d",current_line,cwp->currow,lock_move);
 

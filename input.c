@@ -941,7 +941,7 @@ void out_print(char *s,int nl)
 	// MESG("out_print: current buffer is [%s] discmd=%d",cbfp->b_fname,discmd);
 	if(s==NULL) return;
 #if	1
-	if(!discmd) {
+	if(!discmd && !debug_flag()) {
 		if(nl) printf("%s\n",s);
 		else printf("%s",s);
 		return;

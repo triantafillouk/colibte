@@ -1594,7 +1594,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			case '*': case '=':
 			case '+': case '-':
 			case '&': case '%':
-			// case '"':
+			// case CHR_DQUOTE:
 			case '<': case '>': case ',':
 				ctl_f = COLOR_SPEC_FG;ctl_b=line_bcolor;
 			break;
@@ -1820,8 +1820,9 @@ offs update_top_position_wrap()
 		};
 	};
 	textpoint_set(cwp->tp_hline,new_hline);
+	tp_copy(cwp->w_fp->save_hline,cwp->tp_hline);
 	// FindLineCol(cwp->tp_hline);
-	// MESG_time("update_top_position_wrap end hline=%ld",tp_offset(cwp->tp_hline));
+	MESG_time("update_top_position_wrap end hline=%ld",tp_offset(cwp->tp_hline));
 	return(tp_offset(cwp->tp_hline));
 }
 

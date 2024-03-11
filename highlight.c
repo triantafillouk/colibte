@@ -630,7 +630,7 @@ void update_highlight(WINDP *wp)
 	note_type = (wp->w_fp->b_type >= NOTE_TYPE);
 	if(note_type) { hnote=1;} else hnote=0;
 //	MESG("update_highlight: note_type=%d ----------------------",note_type);
-#define	TRACE_BACK 100000
+#define	TRACE_BACK 10000000
 	getwquotes(wp,0);	/* in any case read again current window top line highlight	*/
 	if(tp_offset(wp->tp_hline) == tp_offset(wp->tp_hsknown)) {
 		// MESG("	==");
@@ -1684,6 +1684,83 @@ void highlight_perl(int c)
 
 
 void highlight_json(int c)
+{
+  if(highlight_note(c)) return;
+
+  switch(c) {
+	case (CHR_RESET) : // initialize
+		hstate=0;
+		first=1;
+		in_array=0;
+		break;
+	case ':' :
+		if(hstate==0) first=0;
+		hstate=0;
+		break;
+	case CHR_CURLL:
+		if(hquotem==0) { if(hstate==0) { first=1;in_array=0;};};
+		break;
+	case CHR_CURLR:
+		if(hquotem==0) { if(hstate==0) first=1;};
+		break;
+	case CHR_DQUOTE:
+		if(hstate==HS_PREVESC) { hstate=0;break;};
+		if(first) {
+			if(hquotem == 0 ) hquotem=H_QUOTE2;
+			else hquotem =0;
+		} else {
+			if(hquotem == 0 ) hquotem=H_QUOTE5;
+			else hquotem =0;
+			
+		}
+		hstate=0;
+		break;
+
+	case '/':
+		if(hquotem&H_QUOTE1 || hquotem&H_QUOTE2) { hstate=0;break;};
+		if(hquotem!=H_QUOTE2 && hquotem!=H_QUOTE1) {
+			if(hstate==HS_PREVSLASH) hquotem |=H_QUOTE5;
+			else hstate=HS_PREVSLASH;
+		};
+		break;
+	case '\n':
+	case CHR_CR:
+		hquotem = 0;
+		hstate=HS_LINESTART;
+		break;
+
+	case '#':
+		if(hstate==HS_LINESTART) hquotem = (hquotem)? hquotem : H_QUOTE6;
+		hstate=0;
+		break;
+	case '\\':{
+		hstate=(hstate==HS_PREVESC)?0:HS_PREVESC;
+		};
+		break;
+	case ',':
+		if(in_array==0) first=1; 
+		break;
+	case CHR_LBRA:
+		if(hquotem==0) {
+			in_array=1;
+			first=0;
+		};
+		break;
+	case CHR_RBRA:
+		if(hquotem==0) {
+			in_array=0;
+			first=1;
+		};
+		break;
+	case CHR_FLUSH:
+		break;
+	default: { 
+		hstate=0;
+	};
+  };
+}
+
+void highlight_json_ori(int c)
 {
   static int next_quote=0;
   if(highlight_note(c)) return;
@@ -3112,7 +3189,7 @@ void fquote_state(offs till_offs, offs from_offs, WINDP *wp)
 {
  offs cof;
  int c;
- // int orig_hquotem=hquotem;
+ int orig_hquotem=hquotem;
  if(!syntaxh) return;
  if(till_offs>FSize(cbfp)) {
 	till_offs=FSize(cbfp);
@@ -3126,7 +3203,7 @@ void fquote_state(offs till_offs, offs from_offs, WINDP *wp)
  	c=FCharAt(wp->w_fp,cof);
 	wp->w_fp->hl->h_function(c); 
  };
- // MESG_time("!fquote: (%lld %X) -> (%lld %X)",from_offs,orig_hquotem,till_offs,hquotem);
+ MESG_time("!fquote: (%lld %X) -> (%lld %X)",from_offs,orig_hquotem,till_offs,hquotem);
 }
 
 void setwquotes(WINDP *wp,int ind,num known_offset)

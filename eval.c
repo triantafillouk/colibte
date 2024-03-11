@@ -842,7 +842,7 @@ void main_execute(int c)
 {
  static int cflag=0;
 	/* and execute the command */
-	// MESG_time("main_execute: key %s",xe_key_name(c));
+	MESG_time("main_execute: ------- key %s",xe_key_name(c));
 	cflag=execute(c, nnarg);
 	if(cflag!=OK_ARG) nnarg=1;
 	else {
@@ -850,10 +850,10 @@ void main_execute(int c)
 			msg_line("arg: %d",nnarg);
 		};
 	};
-	// MESG_time("after execute");
+	MESG_time("after execute");
 
-	if(cflag & OK_RSTGOAL)	cwp->goal_column=GetCol();
-	// MESG_time("after GetCol");
+	// if(cflag & OK_RSTGOAL)	cwp->goal_column=GetCol();
+	MESG_time("after GetCol");
 //	if(cflag==OK_CLRSL  || cflag==OK_RSTGOAL) clear_message_line();
 }
 

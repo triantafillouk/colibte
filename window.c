@@ -180,7 +180,7 @@ offs FNext_wrap_line(WINDP *wp,offs start)
  FILEBUF *fp=wp->w_fp;
  // from the start of the wrap line
  int col=0;
- // MESG(";FNext_wrap_line: < start from %ld",start);
+ MESG_time(";FNext_wrap_line: < start from %ld",start);
 #if	TNEXT
  while(lines-- >0)
 #endif
@@ -206,7 +206,7 @@ offs FNext_wrap_line(WINDP *wp,offs start)
   };
   col=0;
  };
- // MESG("		: > from %ld to %ld col=%d",start,o,col);
+ MESG_time("!: > from %ld to %ld col=%d",start,o,col);
  return o;
 }
 
@@ -552,11 +552,24 @@ void next_column(int cols)
  offs from = tp_offset(cbfp->tp_current);
  offs o=from;
  int col=0;
+#if	1
+ MESG_time("next_column: start");
+ int num_chars=0;
+	while (col<cols) {
+		if(FEof(cbfp)) return;
+		o = check_next_char(cbfp,o,&col);
+		num_chars++;
+	};
+	MESG_time("next_column: from=%ld to %ld",from,o);
+	textpoint_set(cbfp->tp_current,o);
+
+#else
 	while (col<cols) {
 		if(FEof(cbfp)) return;
 		o = check_next_char(cbfp,o,&col);
 		MoveRightChar(cbfp);
 	};
+#endif
  // MESG("next_column: cols=%d from=%ld to %ld line %ld col %ld",cols,from,tp_offset(cbfp->tp_current),tp_line(cbfp->tp_current),tp_col(cbfp->tp_current));
 }
 

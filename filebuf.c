@@ -608,7 +608,7 @@ void FindLineCol(TextPoint *tp)
 		if(!(scan->flags)) 
 		{
 			new_dist=llabs(tp->offset-scan->offset);
-	 		if(new_dist < dist && scan->offset<tp->offset)
+	 		if(new_dist <= dist && scan->offset<tp->offset)
 	 		// if(new_dist < dist )
 			{
 	    		dist=new_dist;
@@ -635,7 +635,7 @@ void FindLineCol(TextPoint *tp)
       o=c=l=0;
    };
 
-	// MESG("	findlinecol:[%s] o=%lld found on [%s] o=%lld col=%lld line=%lld ",tp_name[tp->tp_type],tp->offset,tp_name[found->tp_type],o,c,l);
+	// MESG_time(";flc:[%s] o=%lld from [%s] o=%lld col=%lld line=%lld ",tp_name[tp->tp_type],tp->offset,tp_name[found->tp_type],o,c,l);
    if(o>tp->offset)  {	/* go back lines  */
       o=FLineBegin(fp,o);
       c=0;
@@ -671,6 +671,7 @@ void FindLineCol(TextPoint *tp)
    tp->line=l;
    tp->offset=o;
    tp->flags = FULLDEFINED;
+	// MESG_time(";flc:[%s] -> o=%lld col=%lld line=%lld ",tp_name[tp->tp_type],o,c,l);
 }
 
 void textpoint_move(TextPoint *tp,offs shift)
@@ -1535,7 +1536,14 @@ num WGetCol()
 // returns the current column in current file buffer
 num GetCol()
 {
+// TEST !!!!
+#if	1
+ // num now_col=FColumn(cbfp,FOffset(cbfp));
+ // if(now_col!=tp_col(cbfp->tp_current)) ERROR("wrong getcol!");
+ return tp_col(cbfp->tp_current);
+#else
 	return(FColumn(cbfp,FOffset(cbfp)));
+#endif
 }
 
 // returns the current line in current file buffer
@@ -2845,6 +2853,7 @@ void   MoveRightChar(FILEBUF *fp)
    };
 	clen=FUtfCharLen(fp,FOffset(fp));
 	textpoint_move(fp->tp_current,clen);
+	tp_copy(fp->save_current,fp->tp_current);
 }
 
 #define	MemStep	(0x2000)
