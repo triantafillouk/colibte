@@ -3112,7 +3112,7 @@ void fquote_state(offs till_offs, offs from_offs, WINDP *wp)
 {
  offs cof;
  int c;
- int orig_hquotem=hquotem;
+ // int orig_hquotem=hquotem;
  if(!syntaxh) return;
  if(till_offs>FSize(cbfp)) {
 	till_offs=FSize(cbfp);

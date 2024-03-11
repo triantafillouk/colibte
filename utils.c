@@ -19,6 +19,7 @@
 
 int scmp(const char* s, const char* t);
 void set_vdval(double value);
+int debug_flag();
 
 extern int discmd;
 extern int show_no_time;
@@ -137,7 +138,7 @@ double  show_time(char *description,int init)
 	// if(xwin && discmd) MESG("%s",sout);
 	// MESG("%s",sout);
 	};
-	if(debug_flag()) fprintf(stderr,"%s'n",sout);
+	if(debug_flag()) fprintf(stderr,"%s\n",sout);
 	else out_print(sout,1);
 
 	prev_usec=usec1;
