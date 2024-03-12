@@ -10,6 +10,8 @@ int select_font_mono(int n);
 int buffer_is_connected(FILEBUF *bf);
 int noop(int n);
 void msg_line(char *fmt, ...);
+void MESG_time(const char *fmt, ...);
+void MESG_time_start(const char *fmt, ...);
 int init_drv_env();
 void init_common();
 int load_keys();

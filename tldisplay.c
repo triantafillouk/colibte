@@ -1283,14 +1283,16 @@ void main_loop()
  int c;
  init_message_loop(); 
  change_color_scheme(color_scheme_ind+1);
+ MESG_time_start("main_loop:");
  while(1) { /* main keyboard loop */
 	/* Fix up the screen    */
-//	MESG("main_loop:0 buffer=%d [%s][%s] -----",cbfp->b_index,cbfp->b_dname,cbfp->b_fname);
     update_screen(FALSE);
+	MESG_time("after update_screen");
 	/* get the next command from the keyboard */
 	app_error=0;
-	c = getcmd();
 
+	c = getcmd();
+	MESG_time_start("# main_loop go execute ----------");
 	/* execute the keyboard sequence */
 	main_execute(c);
  };
@@ -1647,6 +1649,11 @@ int get_utf_length(utfchar *utf_char_str)
 	if(b1 == 0x92) return 1;
 #if	DARWIN
 	if(b1==0x9C||b1==0x9D||b1==0x9E) return 1;
+#else
+	if(b1==0x9c) {
+		int b2=utf_char_str->uval[2];
+		if(b2==0x93||b2==0x94) return 1;
+	};
 #endif
 	if(b1==0x99) {
 		int b2=utf_char_str->uval[2];

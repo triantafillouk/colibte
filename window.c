@@ -19,7 +19,11 @@ extern int drv_initialized;
 GWINDP * drv_new_twinp();
 int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs);
 int DiffColumns(FILEBUF *fp, offs start,offs col_offs);
+#if	TNEXT
+offs FNext_wrap_line(WINDP *wp,offs current_offset,int lines);
+#else
 offs FNext_wrap_line(WINDP *wp,offs current_offset);
+#endif
 
 int window_num()
 {
@@ -166,22 +170,27 @@ int prev_window(int n)
 
 offs check_next_char(FILEBUF *fp,offs o,int *col) ;
 
+#if	TNEXT
+offs FNext_wrap_line(WINDP *wp,offs start,int lines)
+#else
 offs FNext_wrap_line(WINDP *wp,offs start)
+#endif
 {
  offs o=start;
  FILEBUF *fp=wp->w_fp;
  // from the start of the wrap line
  int col=0;
- // MESG(";FNext_wrap_line: < start from %ld",start);
-#if	0
- TextPoint *tp_now = new_textpoint_at(wp->w_fp,1,start);
- int col_now = tp_col(tp_now)%wp->w_width;
+ MESG_time(";FNext_wrap_line: < start from %ld",start);
+#if	TNEXT
+ while(lines-- >0)
 #endif
- while(col<cwp->w_width) {
+ {
+ while(col < cwp->w_width) {
  	if(FEofAt(fp,o)) break;
 	if(FEolAt(fp,o)) {
 		// if(col+col_now<wp->w_width) { o++;continue;};
 		o++;
+		col=0;
 		// MESG("		: eol break! %ld new at %ld col=%d",start,o,col);
 		break;
 	};
@@ -195,7 +204,9 @@ offs FNext_wrap_line(WINDP *wp,offs start)
 		col += get_utf_length(&uc);
 	};
   };
- // MESG("		: > from %ld to %ld col=%d",start,o,col);
+  col=0;
+ };
+ MESG_time("!: > from %ld to %ld col=%d",start,o,col);
  return o;
 }
 
@@ -232,24 +243,35 @@ for col_position=0
 		goto column 0
 */
 
+#if	TNEXT
+offs   FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines)
+#else
 offs   FPrev_wrap_line(WINDP *wp,offs ptr)
+#endif
 {
  // MESG("FPrev_wrap_line:");
+#if	!TNEXT
+ num_lines=1;
+#endif
  FILEBUF *fp=wp->w_fp;
  TextPoint *pwl = new_textpoint_at(fp,1,ptr);
  int col_position = tp_col(pwl) % wp->w_width;
  num line=tp_line(pwl);
- // MESG(";FPrev_wrap_line: pos=%d line=%ld o=%ld tp_col=%ld",col_position,line,ptr,tp_col(pwl));
+ // num pline=line;
+ num pcol=tp_col(pwl);
+ // MESG(";FPrev_wrap_line:num_lines=%d wcol_pos=%d line=%ld o=%ld tp_col=%ld >= %d",num_lines,col_position,line,ptr,tp_col(pwl),num_lines*wp->w_width);
  num o1=ptr;
- if(tp_col(pwl) >= wp->w_width) {
- 	// MESG("	col %ld >= width %d",tp_col(pwl),wp->w_width);
- 	num col=tp_col(pwl) - wp->w_width;
+ if(tp_col(pwl) >= num_lines*wp->w_width) 
+ {
+ 	num col=tp_col(pwl) - num_lines*wp->w_width;
 	textpoint_set_lc(pwl,line,col);
 	o1=tp_offset(pwl);
+ 	// MESG(";FPre_line:num_lines=%d pline=%ld -> line=%ld  col %ld -> %ld o1=%ld >= width %d rows=%d",num_lines,pline,line,pcol,tp_col(pwl),o1,wp->w_width,wp->w_ntrows);
  } else {
  	if(line>0) {
-		line--;
-		textpoint_set_lc(pwl,line,0);
+		line -= num_lines;
+		if(line<0) line=0;
+		textpoint_set_lc(pwl,line,pcol);
 		num o0 = tp_offset(pwl);
 		    o1 = FLineEnd(fp,o0);
 		// MESG("	goto prev line: %ld o0=%ld end=%ld",line,o0,o1);
@@ -296,19 +318,36 @@ int move_window(int n)
 		curoffs = LineBegin(tp_offset(cwp->tp_hline));
 	// MESG("move_window: current=%ld n=%d",curoffs,n);
     if (n < 0) {
-        while (n++ < 0) {
 			if(is_wrap_text(cwp->w_fp)) {
+#if	TNEXT
+			curoffs=FNext_wrap_line(cwp,curoffs,-n);
+#else
+        	while (n++ < 0) {
 				curoffs=FNext_wrap_line(cwp,curoffs);
-			} else {	
-				curoffs=FNextLine(cbfp,curoffs);
 			};
-		};
+#endif
+			} else {	
+        while (n++ < 0) {
+				curoffs=FNextLine(cbfp,curoffs);
+		}
+			};
     } else  {
 		if(is_wrap_text(cwp->w_fp)) {
+#if	TNEXT
+#if	0
+			curoffs = FPrev_wrap_line(cwp,curoffs,n);
+#else
+			while((n-- > 0) &&  (curoffs>0)) {
+				// go to prev window line
+				curoffs = FPrev_wrap_line(cwp,curoffs,1);
+			};
+#endif
+#else
 			while((n-- > 0) &&  (curoffs>0)) {
 				// go to prev window line
 				curoffs = FPrev_wrap_line(cwp,curoffs);
 			};
+#endif
 		} else {
 	        while ((n-- >0) && (curoffs>0)) curoffs=FPrevLine(cbfp,curoffs);
 		};
@@ -412,9 +451,17 @@ int chardline(WINDP *wp)
 
  do
  {
- 	ptr=FNextLine(wp->w_fp,ptr);
+	if(is_wrap_text(wp->w_fp))
+#if	TNEXT
+	 	ptr=FNext_wrap_line(wp,ptr,1);
+#else
+	 	ptr=FNext_wrap_line(wp,ptr);
+#endif
+	else
+	 	ptr=FNextLine(wp->w_fp,ptr);
 	if(ptr>current_offset) break;
-	if(FBolAt(wp->w_fp,ptr)) screen_row++;
+	
+	if(is_wrap_text(wp->w_fp) || FBolAt(wp->w_fp,ptr)) screen_row++;
  } while(ptr<size);
 
  return(screen_row);
@@ -505,11 +552,24 @@ void next_column(int cols)
  offs from = tp_offset(cbfp->tp_current);
  offs o=from;
  int col=0;
+#if	1
+ MESG_time("next_column: start");
+ int num_chars=0;
+	while (col<cols) {
+		if(FEof(cbfp)) return;
+		o = check_next_char(cbfp,o,&col);
+		num_chars++;
+	};
+	MESG_time("next_column: from=%ld to %ld",from,o);
+	textpoint_set(cbfp->tp_current,o);
+
+#else
 	while (col<cols) {
 		if(FEof(cbfp)) return;
 		o = check_next_char(cbfp,o,&col);
 		MoveRightChar(cbfp);
 	};
+#endif
  // MESG("next_column: cols=%d from=%ld to %ld line %ld col %ld",cols,from,tp_offset(cbfp->tp_current),tp_line(cbfp->tp_current),tp_col(cbfp->tp_current));
 }
 

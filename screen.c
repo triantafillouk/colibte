@@ -56,7 +56,8 @@ int	noupdate=1;		/* no need to update the screen , no display started */
 
 utfchar double_hline = { "═" };
 utfchar single_hline = { "↪" };
-utfchar next_l = { "↘" };
+utfchar next_l = { " " };
+// utfchar next_l = { "↘" };
 utfchar first_l = { "►" };
 
 //num cline_end=0;
@@ -179,16 +180,18 @@ void set_update(WINDP *wp_toset, int flag)
  lbegin(window_list);
  while((wp=(WINDP *)lget(window_list))!=NULL)
  {
-	if ((wp->w_fp == fp && (flag & UPD_EDIT)) && wp!=wp_toset ) 
+	// if ((wp->w_fp == fp && (flag & UPD_EDIT)) && wp!=wp_toset ) 
+	if ((wp->w_fp == fp && (flag & UPD_EDIT)) ) 
 	{
-		if( ((tp_line(wp->tp_hline) <= tp_line(wp_toset->tp_current)) &&
-			(tp_line(wp_toset->tp_current) <= (tp_line(wp->tp_hline)+wp->w_ntrows)))
+		if( (((tp_line(wp->tp_hline) <= tp_line(wp_toset->tp_current)) &&
+			(tp_line(wp_toset->tp_current) <= (tp_line(wp->tp_hline)+wp->w_ntrows)))) || is_wrap_text(wp->w_fp)
 		)
 		{
 			wp->w_flag |= flag;
 			tp_copy(wp->tp_hsknown, wp_toset->tp_hsknown);
 			wp->hs[0].w_hquotem = wp_toset->hs[0].w_hquotem;
 			wp->hs[0].w_slang = wp_toset->hs[0].w_slang;
+			// MESG("set_update: window %d flag %d",wp->id,wp->w_flag);
 		};
 	};
  };
@@ -288,8 +291,11 @@ void upd_column_pos()
 {
  int mo;
  int total_columns;
-	cwp->curcol = GetCol();
+ // if(is_wrap_text(cbfp)) show_time("upd_column_pos1",1);
+	// cwp->curcol = GetCol();
+	cwp->curcol = tp_col(cbfp->tp_current);
 	// MESG("upd_column_pos: curcol=%d",cwp->curcol);
+ // if(is_wrap_text(cbfp)) show_time("upd_column_pos2",1);
 	total_columns=cwp->w_width;
 	if(cwp->w_ntcols==0) return;
 	if(cbfp->view_mode & VMHEX){ 
@@ -887,7 +893,7 @@ char *vt_mask_init(num llen)
 	};
 	if(llen>=vtla) {
 		vtla=llen+256;
-		MESG("	vt_mask_init: realloc new with %ld",vtla);
+		// MESG("	vt_mask_init: realloc new with %ld",vtla);
 		vtlm=realloc(vtlm,vtla);
 	}
  return vtlm; 
@@ -1588,7 +1594,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			case '*': case '=':
 			case '+': case '-':
 			case '&': case '%':
-			// case '"':
+			// case CHR_DQUOTE:
 			case '<': case '>': case ',':
 				ctl_f = COLOR_SPEC_FG;ctl_b=line_bcolor;
 			break;
@@ -1782,11 +1788,20 @@ int check_cursor_position_notes(WINDP *wp)
 	return(TRUE);
 }
 
-void update_top_position_wrap()
+offs update_top_position_wrap()
 {
- int o_now=tp_offset(cwp->tp_current);
-	offs o=LineBegin(o_now);
 
+ int o_now=tp_offset(cwp->tp_current);
+	offs o;
+#if	1
+	// MESG_time("update_top_position_wrap: %ld",o_now);
+	o = FLineBegin(cwp->w_fp,o_now);
+	// MESG_time("update_top_position_wrap: begin=%ld",o);
+#else
+	static offs known=0;
+	if(known<o_now-cwp->w_width) o=known;
+	else o=FLineBegin(o_now);
+#endif
  	// MESG("update_top_position_wrap: o_now=%ld begin=%ld",o_now,o);
 	int col=0;
 	// offs new_hline=tp_offset(cwp->tp_hline);
@@ -1801,10 +1816,14 @@ void update_top_position_wrap()
 		if((col % (cwp->w_width))==0) {
 			new_hline=o;
 			// MESG("		set new hline to %ld",new_hline);
+			// if(o<o_now-1000) known=o;
 		};
 	};
 	textpoint_set(cwp->tp_hline,new_hline);
-	// MESG("       : new hline=%ld",new_hline);
+	tp_copy(cwp->w_fp->save_hline,cwp->tp_hline);
+	// FindLineCol(cwp->tp_hline);
+	MESG_time("update_top_position_wrap end hline=%ld",tp_offset(cwp->tp_hline));
+	return(tp_offset(cwp->tp_hline));
 }
 
 int check_cursor_position_wrap(WINDP *wp)
@@ -1816,6 +1835,7 @@ int check_cursor_position_wrap(WINDP *wp)
 		// tp_offset(wp->tp_current),tp_line(wp->tp_current));
 	cur_offs=tp_offset(wp->tp_current);
 	int wcl=window_cursor_line(wp);
+	// if(is_wrap_text(wp->w_fp)) show_time("check_cursor_position 1",1);
 	if( cur_offs <= tp_offset(wp->tp_hline)) {
 		// MESG("	< ppline=%ld",wp->w_ppline);
 		update_top_position_wrap();
@@ -1905,7 +1925,7 @@ int check_cursor_position(WINDP *wp)
  */
 int  show_position_info(int short_version)
 {
-	int col;
+	num col;
 	num loffs;
 	char str[MAXSLEN];
 	int sstat=0;
@@ -1951,16 +1971,24 @@ int  show_position_info(int short_version)
 		} else sstat=snprintf(str,MAXSLEN,"%5llX",Offset());
 	} else {
 	  	// MESG("show row/col info");
+#if	1
+		col=tp_col(cwp->tp_current);
+#else
 		col=GetCol()+1;
+#endif
 		if(short_version) {
 			sstat=snprintf(str,MAXSLEN,"%6lld",getcline()+1);
 		} else {
 			if(Eol()) {
-				if(bt_dval("show_coffset")) {
-					sstat=snprintf(str,MAXSLEN,"%5lld %5lld %3d ",getcline()+1,Offset(),col);
+				if(is_wrap_text(cbfp)){
+					sstat=snprintf(str,MAXSLEN,"%6lld %7lld ",getcline()+1,loffs);
 				} else {
-					sstat=snprintf(str,MAXSLEN,"%5lld %3lld %3d ",getcline()+1,loffs,col);
+				if(bt_dval("show_coffset")) {
+					sstat=snprintf(str,MAXSLEN,"%6lld %7lld %7lld ",getcline()+1,Offset(),col);
+				} else {
+					sstat=snprintf(str,MAXSLEN,"%6lld %7lld %7lld ",getcline()+1,loffs,col);
 				};
+				}
 				if((int)bt_dval("show_cdata")) { 
 					if(cwp->w_fp->b_mode & EMDOS) strlcat(str,"0D0A",MAXSLEN);
 					else if(cwp->w_fp->b_mode & EMUNIX) strlcat(str,"000A",MAXSLEN);
@@ -1968,18 +1996,25 @@ int  show_position_info(int short_version)
 					else strlcat(str,"    ",MAXSLEN);
 				};
 			} else {
-				sstat=snprintf(str,MAXSLEN,"%5lld ",getcline()+1);
-				if(bt_dval("show_coffset")) {
-					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%5lld ",Offset());
+				sstat=snprintf(str,MAXSLEN,"%6lld ",getcline()+1);
+				
+				if(is_wrap_text(cbfp)){
+					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",loffs);
 				} else {
-					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%3lld ",loffs);
+					if(bt_dval("show_coffset")) {
+						sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",Offset());
+					} else {
+						sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",loffs);
+					};
+					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",col);
 				};
-				sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%3d ",col);
+
 				if((int)bt_dval("show_cdata")) {
 					int size=1;
 					long value=utf_value_len(&size);
-					if(debug_flag()) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX %d",value,size);
-					else sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX",value);
+					// if(debug_flag()) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX %d",value,size);
+					// else 
+					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX",value);
 				};
 				if(strlen(str) < 10) short_version=1;
 			};
@@ -2003,8 +2038,6 @@ int update_screen(int force)
 	static int count=0;
 	count++;
 	int cw_flag=cwp->w_flag;
-	// MESG("update_screen: view_mode=%d o=%ld top=%ld row=%d",
-		// cwp->w_fp->view_mode,tp_offset(cwp->tp_current),tp_offset(cwp->tp_hline),cwp->currow);
 	if (noupdate) return TRUE;
 
 	/* experiment with screen updating  */
@@ -2013,6 +2046,7 @@ int update_screen(int force)
 	if (force == FALSE && kbdmode == PLAY)	return(TRUE);
 
 	/* update any windows that need refreshing */
+	// MESG_time("! update_screen: ---------------");
 	hide_cursor("update_screen: start");
 	// MESG("hide_cursor: ok!");
 	if(cwp->selection) {
@@ -2023,19 +2057,30 @@ int update_screen(int force)
 	}
 
 	upd_column_pos();	/* update column position  */
+	// MESG_time("update_screen: 1");
 	/* if screen is garbage, re-plot it */
 	if (update_all)	{ 
 		updgar();
 	};
+
 	// MESG("loop windows");
 	lbegin(window_list);
-	while((wp=(WINDP *)lget(window_list))!=NULL)
-	{
-		if(is_wrap_text(wp->w_fp))
-			update_window_wrap(wp,force);
+	while(1) {
+		// MESG(";start of while:");
+		wp=(WINDP *)lget_current(window_list);
+		if(wp==NULL) break;
+		// MESG("	+++ loop1: %d",wp->id);
+		_el *l_current = window_list->current;
+		// MESG("	++++ loop window now is %d wrap=%d",wp->id,is_wrap_text(wp->w_fp));
+		if(is_wrap_text(wp->w_fp))	update_window_wrap(wp,force);
 		else update_window_nowrap(wp,force);
+		set_current(window_list,l_current);
+		// MESG(" +++  move to next!");
+		lmove_to_next(window_list,0);
+		// MESG(" ___ moved!");
 	};
 
+	// MESG("	----- after update");
 	lbegin(window_list);
 	while((wp=(WINDP *)lget(window_list))!=NULL){
 		wp->w_fp->line_from=-1;	
@@ -2043,7 +2088,9 @@ int update_screen(int force)
 	};
 	// MESG("go update physical");
 	/* update the virtual screen to the physical screen */
+	// MESG_time("update_physical");
 	update_physical_windows();
+	// MESG_time("update_physical end",1);	
 	/* update the cursor and flush the buffers */
 	update_cursor_position();
 	/* set previous line */
@@ -2052,7 +2099,7 @@ int update_screen(int force)
 	cwp->w_flag=0;
 	update_all=0;
 	drv_flush();
-	// MESG("update_screen: end");
+	// MESG_time("update_screen: end");
 	return(TRUE);
 }
 
@@ -2115,11 +2162,13 @@ void update_window_wrap(WINDP *wp,int force)
 	int cw_flag=cwp->w_flag;
 	// MESG("update_window_wrap: ------------------");
 		if (wp==cwp) {
+			// MESG_time("update_window_wrap:1 window %d",wp->id);
 			check_cursor_position_wrap(wp); /* check if on screen */
-			// MESG("update_window_wrap:1");
+			// MESG_time("update_window_wrap: check curpos",wp->id);
 			wp->currow = window_cursor_line(wp);
 #if	1
 				upd_all_wrap_lines(wp,"wrap0");
+				// show_time("after wrap_lines",1);
 #else
 			if(wp->selection || (wp->w_flag & UPD_WINDOW) || force||update_all) 
 			{
@@ -2161,6 +2210,7 @@ void update_window_wrap(WINDP *wp,int force)
 			status_line(wp);	/* update statusline */
 		};
 		wp->w_flag = 0;
+		// MESG_time(";update_window_wrap:end window %d",wp->id);
 }
 
 void upd_some_virtual_lines(WINDP *wp,char *from)
@@ -2453,7 +2503,7 @@ void upd_part_wrap(WINDP *wp,char *from)
 		line1 = wp->w_fp->line_from-tp_line(wp->tp_hline);;
 		line2 = wp->w_fp->line_to-tp_line(wp->tp_hline);;
 	}
-	// MESG("upd_part: window %d lcol=%d from [%s] lines %d - %d",wp->id,wp->w_lcol,from,line1,line2);
+	MESG("upd_part: window %d lcol=%d from [%s] lines %d - %d",wp->id,wp->w_lcol,from,line1,line2);
 	if(wp->w_lcol!=wp->w_plcol) return upd_all_wrap_lines(wp,"upd_part w_lcol");
 	if(line1<0 && line2<0) out_of_view=1;
 	else {
@@ -2511,7 +2561,7 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 
 	if(!(wp->w_fp->view_mode & VMHEX)) wp->w_fp->hl->h_update(wp);
 	 set_selection(0);
-
+	
 	// MESG("upd_all_virtual_lines:w=%d vinfo=%f from[%s] left=%d b_flag=0x%X w_flag=0x%X",wp->id,bt_dval("show_vinfo"),from,wp->w_lcol,wp->w_fp->b_flag,wp->w_flag);
 	/* search down the lines, updating them */
 	lp_offs = tp_offset(wp->tp_hline);

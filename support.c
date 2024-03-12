@@ -354,6 +354,8 @@ void MESG(const char *fmt, ...)
 		};
     }
 }
+
+
 # define _MESG_DEFINED
 # endif
 
