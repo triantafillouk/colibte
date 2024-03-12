@@ -15,6 +15,7 @@
 int hselection=0;
 
 int hquotem=0;	/* highlight quote mask */
+int prev_hquotem=0;
 int hprev_line=-1;
 int slang=0;		/* script language in html */
 int css_style=0;	/* cs html style   */
@@ -659,7 +660,7 @@ void update_highlight(WINDP *wp)
 		fquote_state( tp_offset(wp->tp_hline), tp_offset(wp->tp_hmknown),wp);
 	} else {
 		if( tp_offset(wp->tp_hline) > TRACE_BACK ) {
-			// MESG("	trace back");
+			MESG_time("	trace back tp_hline=%ld",tp_offset(wp->tp_hline));
 //			set wp->tp_hmknown to tp_line - TRACE_BACK;
 			if(is_wrap_text(wp->w_fp)) textpoint_set(wp->tp_hmknown,tp_offset(wp->tp_hline) - TRACE_BACK);
 			else
@@ -1692,10 +1693,13 @@ void highlight_json(int c)
 		hstate=0;
 		first=1;
 		in_array=0;
+		prev_hquotem=0;
 		break;
 	case ':' :
-		if(hstate==0) first=0;
-		hstate=0;
+		if(hquotem==0) {
+			if(hstate==0) first=0;
+			hstate=0;
+		};
 		break;
 	case CHR_CURLL:
 		if(hquotem==0) { if(hstate==0) { first=1;in_array=0;};};
@@ -1711,7 +1715,6 @@ void highlight_json(int c)
 		} else {
 			if(hquotem == 0 ) hquotem=H_QUOTE5;
 			else hquotem =0;
-			
 		}
 		hstate=0;
 		break;
@@ -1726,7 +1729,9 @@ void highlight_json(int c)
 	case '\n':
 	case CHR_CR:
 		hquotem = 0;
+		prev_hquotem = 0;
 		hstate=HS_LINESTART;
+		first=1;
 		break;
 
 	case '#':
@@ -1738,7 +1743,7 @@ void highlight_json(int c)
 		};
 		break;
 	case ',':
-		if(in_array==0) first=1; 
+		if(in_array==0 && hquotem==0) first=1; 
 		break;
 	case CHR_LBRA:
 		if(hquotem==0) {
@@ -3201,6 +3206,7 @@ void fquote_state(offs till_offs, offs from_offs, WINDP *wp)
  // wp->w_fp->hl->h_function(CHR_CR); 
  for(cof=from_offs;cof<till_offs;cof++) {
  	c=FCharAt(wp->w_fp,cof);
+	prev_hquotem=hquotem;
 	wp->w_fp->hl->h_function(c); 
  };
  MESG_time("!fquote: (%lld %X) -> (%lld %X)",from_offs,orig_hquotem,till_offs,hquotem);

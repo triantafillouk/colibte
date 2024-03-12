@@ -36,6 +36,7 @@ extern COLOR_SCHEME *current_scheme;
 int specialh=0;
 /* highlight state  */
 extern int hquotem;
+extern int prev_hquotem;
 extern int slang;
 extern int stop_word_highlight;
 extern int start_word_highlight;
@@ -1208,7 +1209,10 @@ offs vtline(WINDP *wp, offs tp_offs)
 		}
         if (c == '\t' ) col = next_tab(col);
         else ++col;
-		if(syntaxh) wp->w_fp->hl->h_function(c); 
+		if(syntaxh) {
+			prev_hquotem=hquotem;
+			wp->w_fp->hl->h_function(c); 
+		};
 	};
 	int leave_space=col-first_column;
 	
@@ -1376,6 +1380,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 		if(c>127) {
 				c='m';
 		};
+		prev_hquotem=hquotem;
 		wp->w_fp->hl->h_function(c);
 	};
 	};
@@ -1465,6 +1470,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 	if(hquotem & H_LINESEP) line_sep=1;else line_sep=0;
 
 	if(syntaxh) {
+		prev_hquotem=hquotem;
 		wp->w_fp->hl->h_function(c); 
 	};
 	if (c == '\t') {              
@@ -1601,6 +1607,9 @@ void vtputwc(WINDP *wp, utfchar *uc)
 
 			default:
 				ctl_f=wp->w_fcolor;ctl_b=line_bcolor;
+		};
+		if(prev_hquotem!=hquotem && c==CHR_DQUOTE) {
+			ctl_f = COLOR_HORIZON_FG;ctl_b=line_bcolor;
 		};
 
 		/* orizon different color creates problems if utf and local char set (utf string error)  */

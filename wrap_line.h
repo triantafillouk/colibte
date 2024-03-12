@@ -345,7 +345,7 @@ void upd_all_wrap_lines(WINDP *wp,char *from)
 	/* search down the lines, updating them */
 	lp_offs = tp_offset(wp->tp_hline);
 	// MESG_time("#update_all_wrap_lines: top=%ld", lp_offs);
-	wp->w_fp->hl->h_update(wp);
+	//wp->w_fp->hl->h_update(wp);
 	set_selection(0);
 
 	// cline_end=FLineEnd(wp->w_fp,lp_offs);
