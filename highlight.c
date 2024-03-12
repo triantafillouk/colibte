@@ -15,6 +15,7 @@
 int hselection=0;
 
 int hquotem=0;	/* highlight quote mask */
+int prev_hquotem=-1;
 int hprev_line=-1;
 int slang=0;		/* script language in html */
 int css_style=0;	/* cs html style   */
@@ -1692,6 +1693,7 @@ void highlight_json(int c)
 		hstate=0;
 		first=1;
 		in_array=0;
+		prev_hquotem=-1;
 		break;
 	case ':' :
 		if(hstate==0) first=0;
@@ -1727,6 +1729,7 @@ void highlight_json(int c)
 	case CHR_CR:
 		hquotem = 0;
 		hstate=HS_LINESTART;
+		prev_hquotem=-1;
 		break;
 
 	case '#':
@@ -3201,6 +3204,7 @@ void fquote_state(offs till_offs, offs from_offs, WINDP *wp)
  // wp->w_fp->hl->h_function(CHR_CR); 
  for(cof=from_offs;cof<till_offs;cof++) {
  	c=FCharAt(wp->w_fp,cof);
+	prev_hquotem=hquotem;
 	wp->w_fp->hl->h_function(c); 
  };
  MESG_time("!fquote: (%lld %X) -> (%lld %X)",from_offs,orig_hquotem,till_offs,hquotem);
