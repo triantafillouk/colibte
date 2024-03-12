@@ -1610,7 +1610,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 		};
 
 		if(prev_hquotem!=hquotem && c==CHR_DQUOTE) {
-			ctl_f = COLOR_HORIZON_FG;ctl_b=line_bcolor;
+			ctl_f = COLOR_FG;ctl_b=line_bcolor;
 		};
 		/* orizon different color creates problems if utf and local char set (utf string error)  */
 		/* if on the orizon make it a different color */

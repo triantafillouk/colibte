@@ -339,8 +339,10 @@ int show_info(int n)
 		SMESG("Highlight type: [%s] syntaxh=%d slang=%d",bp->hl->description,syntaxh,cwp->hs[0].w_slang);
 		if(debug_flag()) {
 //			SMESG("  b_type=%d",b_type);
-			SMESG("  hknown[%d] h=%X n=%d slang=%d j=%d o=%lld",0,cwp->hs[0].w_hquotem,cwp->hs[0].w_notes,cwp->hs[0].w_slang,cwp->hs[0].w_jflag,cwp->hs[0].known_offset);
-			SMESG("  hknown[%d] h=%X n=%d slang=%d j=%d o=%lld",1,cwp->hs[1].w_hquotem,cwp->hs[0].w_notes,cwp->hs[1].w_slang,cwp->hs[1].w_jflag,cwp->hs[1].known_offset);
+			SMESG("  hknown[%d] h=%X n=%d slang=%d first=%d o=%lld",0,cwp->hs[0].w_hquotem,cwp->hs[0].w_notes,cwp->hs[0].w_slang,cwp->hs[0].w_first,cwp->hs[0].known_offset);
+			SMESG("  hknown[%d] h=%X n=%d slang=%d first=%d o=%lld",1,cwp->hs[1].w_hquotem,cwp->hs[0].w_notes,cwp->hs[1].w_slang,cwp->hs[1].w_first,cwp->hs[1].known_offset);
+			SMESG("  hknown[%d] h=%X n=%d slang=%d in_array=%d o=%lld",0,cwp->hs[0].w_hquotem,cwp->hs[0].w_notes,cwp->hs[0].w_slang,cwp->hs[0].w_in_array,cwp->hs[0].known_offset);
+			SMESG("  hknown[%d] h=%X n=%d slang=%d in_array=%d o=%lld",1,cwp->hs[1].w_hquotem,cwp->hs[0].w_notes,cwp->hs[1].w_slang,cwp->hs[1].w_in_array,cwp->hs[1].known_offset);
 		};
 		SMESG("Buffer size : %lld readed=%lld",bp->BufferSize-bp->GapSize,bp->bytes_read);
 		SMESG("Buffer lines: %lld",bp->lines);

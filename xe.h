@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.59T13 (8/03/2024)"
+#define VERSION 	"#01.59T14 (12/03/2024)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -428,8 +428,10 @@ typedef struct MLQUOTES {
 	unsigned int w_hquotem;
 	unsigned char w_hselection;
 	unsigned char w_slang;
-	unsigned char w_jflag;	/* for json parse  */
 	unsigned char w_notes;
+	unsigned char w_first;
+	unsigned char w_in_array;
+	short int w_hstate;
 	num known_offset;
 } MLQUOTES;
 

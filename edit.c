@@ -336,6 +336,19 @@ int goto_line(num n)
 	return(igotolinecol(n,1,0));
 }
 
+int goto_offset(num n)		
+{
+	char arg[MAXSLEN];
+	arg[0]=0;
+	if ((nextarg("Go to offset : ", arg, MAXSLEN,true)) != TRUE) 	return(FALSE);
+	if(macro_exec!=MACRO_MODE2) n = get_val();
+	if(cbfp->b_flag & FSNLIST) {
+		return(OK_CLRSL);
+	};
+	textpoint_set(cbfp->tp_current,n);
+	return OK_CLRSL;
+}
+
 /* Go to the beginning of the file */
 /* Assigned to ALT-< */
 int goto_bof(int n)

@@ -166,6 +166,7 @@ M_element e_search[] =
 	{0, 'I', "find In dir              ","_5find In dir", grep_cmd,0,"SI"},
 	{0, 'C', "reCursive find           ","", rgrep_cmd,0,"SC"},
 	{0, 'L', "goto Line           ALT-G","_Ggoto Line", goto_line,0,"SL"}, 
+	{0, 'O', "goto Offset              ","_Ggoto Offset", goto_offset,0,"SO"}, 
 	{0, '@', "View functions      ALT-@","_@view functions  @", view_functions,(struct MENUS *)2,"S1"},
 	{0, '#', "View structures     ALT-#","_#view Structures #", view_functions,(struct MENUS *)3,"S2"},
 	{0, 0, NULL,"",NULL,0,NULL}

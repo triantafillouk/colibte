@@ -617,6 +617,7 @@ int get_selection()
  return hselection;
 }
 
+#if	0
 void update_highlight(WINDP *wp)
 {
  if(!syntaxh) return;
@@ -631,7 +632,6 @@ void update_highlight(WINDP *wp)
 	note_type = (wp->w_fp->b_type >= NOTE_TYPE);
 	if(note_type) { hnote=1;} else hnote=0;
 //	MESG("update_highlight: note_type=%d ----------------------",note_type);
-#define	TRACE_BACK 10000000
 	getwquotes(wp,0);	/* in any case read again current window top line highlight	*/
 	if(tp_offset(wp->tp_hline) == tp_offset(wp->tp_hsknown)) {
 		// MESG("	==");
@@ -651,13 +651,59 @@ void update_highlight(WINDP *wp)
 		known_offset = tp_offset(wp->tp_hsknown);
 		getwquotes(wp,0); 
 		fquote_state(tp_offset(wp->tp_hline), tp_offset(wp->tp_hsknown),wp);
+		known_offset = tp_offset(wp->tp_hline);
+	} else {
+			// MESG("	init from 0");
+			init_highlight();
+			fquote_state(tp_offset(wp->tp_hline),0,wp);
+			// known_offset=0;
+			known_offset = tp_offset(wp->tp_hline);
+	};
+//	if(note_type) { hnote=1;} else hnote=0;
+	setwquotes(wp,0,known_offset);
+	// MESG_time("update_highlight:end");
+}
+#else
+void update_highlight(WINDP *wp)
+{
+ if(!syntaxh) return;
+ // FindLineCol(wp->tp_hline);
+ // MESG_time("update_highlight: known=%lld top=%lld",known_offset,tp_offset(wp->tp_hline));
+
+//	prev_slash=prev_ast=hquote5=0;
+//	previous top line is tp_hsknown
+//	previous line with known state is tp_pknown
+//	we must go to tp_hline
+	
+	note_type = (wp->w_fp->b_type >= NOTE_TYPE);
+	if(note_type) { hnote=1;} else hnote=0;
+//	MESG("update_highlight: note_type=%d ----------------------",note_type);
+#define	TRACE_BACK 10000000
+	num known_offset = getwquotes(wp,0);	/* in any case read again current window top line highlight	*/
+	if(tp_offset(wp->tp_hline) == tp_offset(wp->tp_hsknown)) {
+		// MESG("	==");
+		if(tp_offset(wp->tp_hline)==0) {
+			if(note_type) { hnote=1;} else hnote=0;
+			wp->w_fp->hl->h_function(CHR_RESET);
+			setwquotes(wp,0,known_offset);
+		} else {
+			getwquotes(wp,0);
+		}
+		return;
+	};
+	if(tp_offset(wp->tp_hline) > tp_offset(wp->tp_hsknown)) {
+//		get info from tp_hsknown
+		// MESG("	>");
+		known_offset = getwquotes(wp,0); 
+		fquote_state(tp_offset(wp->tp_hline), known_offset,wp);
+		known_offset = tp_offset(wp->tp_hline);
 	} else if ( tp_offset(wp->tp_hline) > tp_offset(wp->tp_hmknown) && tp_offset(wp->tp_hline) - tp_offset(wp->tp_hmknown) < TRACE_BACK) 
 	{
 //		get info from wp_hmknown
 		// MESG("	> 2");
-		known_offset = tp_offset(wp->tp_hmknown);
-		getwquotes(wp,1);
-		fquote_state( tp_offset(wp->tp_hline), tp_offset(wp->tp_hmknown),wp);
+		known_offset = getwquotes(wp,1);
+		fquote_state( tp_offset(wp->tp_hline), known_offset,wp);
+		known_offset = tp_offset(wp->tp_hline);
 	} else {
 		if( tp_offset(wp->tp_hline) > TRACE_BACK ) {
 			// MESG("	trace back");
@@ -684,6 +730,7 @@ void update_highlight(WINDP *wp)
 	setwquotes(wp,0,known_offset);
 	// MESG_time("update_highlight:end");
 }
+#endif
 
 void update_highlight_line(WINDP *wp)
 {
@@ -1693,7 +1740,6 @@ void highlight_json(int c)
 		hstate=0;
 		first=1;
 		in_array=0;
-		prev_hquotem=-1;
 		break;
 	case ':' :
 		if(hstate==0) first=0;
@@ -1701,119 +1747,22 @@ void highlight_json(int c)
 		break;
 	case CHR_CURLL:
 		if(hquotem==0) { if(hstate==0) { first=1;in_array=0;};};
+		hstate=0;
 		break;
 	case CHR_CURLR:
 		if(hquotem==0) { if(hstate==0) first=1;};
+		hstate=0;
 		break;
 	case CHR_DQUOTE:
 		if(hstate==HS_PREVESC) { hstate=0;break;};
-		if(first) {
-			if(hquotem == 0 ) hquotem=H_QUOTE2;
-			else hquotem =0;
-		} else {
-			if(hquotem == 0 ) hquotem=H_QUOTE5;
-			else hquotem =0;
-			
-		}
+		if(hquotem == 0) {
+			if(first) hquotem = H_QUOTE2;
+			else hquotem = H_QUOTE5;
+		
+		} else hquotem=0;
 		hstate=0;
 		break;
 
-	case '/':
-		if(hquotem&H_QUOTE1 || hquotem&H_QUOTE2) { hstate=0;break;};
-		if(hquotem!=H_QUOTE2 && hquotem!=H_QUOTE1) {
-			if(hstate==HS_PREVSLASH) hquotem |=H_QUOTE5;
-			else hstate=HS_PREVSLASH;
-		};
-		break;
-	case '\n':
-	case CHR_CR:
-		hquotem = 0;
-		hstate=HS_LINESTART;
-		prev_hquotem=-1;
-		break;
-
-	case '#':
-		if(hstate==HS_LINESTART) hquotem = (hquotem)? hquotem : H_QUOTE6;
-		hstate=0;
-		break;
-	case '\\':{
-		hstate=(hstate==HS_PREVESC)?0:HS_PREVESC;
-		};
-		break;
-	case ',':
-		if(in_array==0) first=1; 
-		break;
-	case CHR_LBRA:
-		if(hquotem==0) {
-			in_array=1;
-			first=0;
-		};
-		break;
-	case CHR_RBRA:
-		if(hquotem==0) {
-			in_array=0;
-			first=1;
-		};
-		break;
-	case CHR_FLUSH:
-		break;
-	default: { 
-		hstate=0;
-	};
-  };
-}
-
-void highlight_json_ori(int c)
-{
-  static int next_quote=0;
-  if(highlight_note(c)) return;
-
-  if(next_quote) hquotem=next_quote;
-  next_quote=0;
-
-  switch(c) {
-	case (CHR_RESET) : // initialize
-		hstate=0;
-		first=1;
-		in_array=0;
-		next_quote=0;
-		break;
-	case ':' :
-		if(hstate==0) first=0;
-		hstate=0;
-		break;
-	case CHR_CURLL:
-		if(hquotem==0) { if(hstate==0) { first=1;in_array=0;};};
-		break;
-	case CHR_CURLR:
-		if(hquotem==0) { if(hstate==0) first=1;};
-		break;
-	case CHR_DQUOTE:
-		if(hstate==HS_PREVESC) { hstate=0;break;};
-		if(first) {
-			if(hquotem == 0 && next_quote==0) next_quote=H_QUOTE2;
-			else {
-				hquotem = 0;
-				next_quote=0;
-			}
-		} else {
-			if(hquotem == 0 && next_quote==0) {
-				next_quote=H_QUOTE5;
-			} else {
-				hquotem =0;
-				next_quote=0;
-			}
-		}
-		hstate=0;
-		break;
-
-	case '/':
-		if(hquotem&H_QUOTE1 || hquotem&H_QUOTE2) { hstate=0;break;};
-		if(hquotem!=H_QUOTE2 && hquotem!=H_QUOTE1) {
-			if(hstate==HS_PREVSLASH) hquotem |=H_QUOTE5;
-			else hstate=HS_PREVSLASH;
-		};
-		break;
 	case '\n':
 	case CHR_CR:
 		hquotem = 0;
@@ -1830,18 +1779,22 @@ void highlight_json_ori(int c)
 		break;
 	case ',':
 		if(in_array==0) first=1; 
+		hstate=0;
 		break;
 	case CHR_LBRA:
 		if(hquotem==0) {
 			in_array=1;
 			first=0;
 		};
+		hstate=0;
 		break;
+		
 	case CHR_RBRA:
 		if(hquotem==0) {
 			in_array=0;
 			first=1;
 		};
+		hstate=0;
 		break;
 	case CHR_FLUSH:
 		break;
@@ -1850,6 +1803,7 @@ void highlight_json_ori(int c)
 	};
   };
 }
+
 
 void highlight_bicep(int c)
 {
@@ -3217,23 +3171,26 @@ void setwquotes(WINDP *wp,int ind,num known_offset)
 	wp->w_fp->hl->h_function(CHR_FLUSH);
 	wp->hs[ind].w_hquotem = hquotem;
 	wp->hs[ind].w_slang = slang;
-	wp->hs[ind].w_jflag = in_array+2*first;
 	wp->hs[ind].w_hselection = hselection;
 	wp->hs[ind].w_notes = hnote;
 	wp->hs[ind].known_offset = known_offset;
+	wp->hs[ind].w_hstate = hstate;
+	wp->hs[ind].w_in_array = in_array;
+	wp->hs[ind].w_first = first;
 	// MESG("	w_hquotem[%d]=%X",ind,wp->hs[ind].w_hquotem);
 	if(ind==0) tp_copy(wp->tp_hsknown,wp->tp_hline);
 }
 
-void getwquotes(WINDP *wp,int ind)
+offs getwquotes(WINDP *wp,int ind)
 {
-	// wp->w_fp->hl->h_function(CHR_RESET);
 	hquotem=wp->hs[ind].w_hquotem;
 	slang=wp->hs[ind].w_slang;
-	in_array = wp->hs[ind].w_jflag %2;
-	first = wp->hs[ind].w_jflag/2;
 	hselection=wp->hs[ind].w_hselection;
 	hnote = wp->hs[ind].w_notes;
+	hstate = wp->hs[ind].w_hstate;
+	first = wp->hs[ind].w_first;
+	in_array = wp->hs[ind].w_in_array;
+	return wp->hs[ind].known_offset;
 	// MESG("getwquotes:[%s] ind=%d b_type=%d slang=%d hnote=%d hquotem=%X ko=%lld ho=%lld",wp->w_fp->b_fname,ind,wp->w_fp->b_type,slang,hnote,hquotem,wp->hs[ind].known_offset,tp_offset(wp->tp_hline));
 }
 

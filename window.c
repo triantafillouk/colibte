@@ -669,8 +669,10 @@ WINDP *dublicate_window(WINDP *wp0)
 			wp->hs[ind].w_hquotem = wp0->hs[ind].w_hquotem;
 			wp->hs[ind].w_hselection = 0;
 			wp->hs[ind].w_slang = wp0->hs[ind].w_slang;
-			wp->hs[ind].w_jflag = wp0->hs[ind].w_jflag;
 			wp->hs[ind].w_notes = wp0->hs[ind].w_notes;
+			wp->hs[ind].w_hstate = wp0->hs[ind].w_hstate;
+			wp->hs[ind].w_first = wp0->hs[ind].w_first;
+			wp->hs[ind].w_in_array = wp0->hs[ind].w_in_array;
 			wp->hs[ind].known_offset = wp0->hs[ind].known_offset;
 		};
 

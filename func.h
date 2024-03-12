@@ -79,6 +79,7 @@ FUNCS	ftable[] = {
 	{"select_next_line",	1,	select_next_line,"select and move down"},
 	{"select_prev_line",	1,	select_prev_line,"select and move up"},
 	{"goto_line",		1,	goto_line,"Go to a specific line"},
+	{"goto_offset",		1,	goto_offset,"Goto offset"},
 	{"match_fence",		0,	match_fence,"Find a correspondig fence and go there (C fences)"},
 	{"tab",				1,	tab, "insert a tab"},
 	{"find_previous",	1,	find_previous,"Find previous occurense of a search"},
