@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.59T14 (12/03/2024)"
+#define VERSION 	"#01.59T15 (13/03/2024)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -426,11 +426,19 @@ typedef struct DRV_FLAGS {
 
 typedef struct MLQUOTES {
 	unsigned int w_hquotem;
+	unsigned int w_prev_set;
 	unsigned char w_hselection;
 	unsigned char w_slang;
 	unsigned char w_notes;
 	unsigned char w_first;
 	unsigned char w_in_array;
+	unsigned char flag_word;
+	unsigned char w_prev_space;
+	char single_quoted;
+	char double_quoted;
+	unsigned char w_bold;
+	unsigned char w_hquote_start;
+	unsigned char w_line_set;
 	short int w_hstate;
 	num known_offset;
 } MLQUOTES;
