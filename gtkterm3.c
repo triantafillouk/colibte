@@ -2049,8 +2049,7 @@ int get_pango_length(char *st)
 	pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
 	pango_layout_set_text (wd->layout, st, -1);
 	pango_layout_get_size (wd->layout, &width, &height);
-	// if(st[0]>0x80)
-// 	MESG("pango_len:[%2X %2X %2X %2x] w=%d CLEN=%f",st[0],st[1],st[2],st[3],width/PANGO_SCALE,CLEN);
+	// MESG("pango_len:[%s][%2X %2X %2X %2x %2X %2X %2X %2x] w=%d CLEN=%f\n",st,st[0],st[1],st[2],st[3],st[4],st[5],st[6],st[7],width/PANGO_SCALE,CLEN);
 	return width/PANGO_SCALE;
 }
 

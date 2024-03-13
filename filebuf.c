@@ -1368,7 +1368,7 @@ offs  FUtfCharAt(FILEBUF *bf, offs offset, utfchar *uc)
  int i,ulen;
  offs o=offset;
 	ulen=FUtfCharLen(bf,o);
-	memset(uc->uval,0,ulen);
+	memset(uc->uval,0,8);
 	for(i=0;i<ulen;i++){
 			uc->uval[i]=FCharAt(bf,o+i);
 	};
