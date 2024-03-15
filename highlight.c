@@ -676,6 +676,7 @@ void update_highlight(WINDP *wp)
 void update_highlight(WINDP *wp)
 {
  if(!syntaxh) return;
+ num known_offset=tp_offset(wp->tp_hsknown);
  // FindLineCol(wp->tp_hline);
  // MESG_time("update_highlight: known=%lld top=%lld",known_offset,tp_offset(wp->tp_hline));
 
@@ -688,7 +689,7 @@ void update_highlight(WINDP *wp)
 	if(note_type) { hnote=1;} else hnote=0;
 //	MESG("update_highlight: note_type=%d ----------------------",note_type);
 #define	TRACE_BACK 10000000
-	num known_offset = getwquotes(wp,0);	/* in any case read again current window top line highlight	*/
+	getwquotes(wp,0);	/* in any case read again current window top line highlight	*/
 	if(tp_offset(wp->tp_hline) == tp_offset(wp->tp_hsknown)) {
 		// MESG("	==");
 		if(tp_offset(wp->tp_hline)==0) {
@@ -703,7 +704,12 @@ void update_highlight(WINDP *wp)
 	if(tp_offset(wp->tp_hline) > tp_offset(wp->tp_hsknown)) {
 //		get info from tp_hsknown
 		// MESG("	>");
-		known_offset = getwquotes(wp,0); 
+#if	1
+		known_offset = 	getwquotes(wp,0); 
+#else
+		known_offset = tp_offset(wp->tp_hsknown); 
+		getwquotes(wp,0); 
+#endif
 		fquote_state(tp_offset(wp->tp_hline), known_offset,wp);
 		known_offset = tp_offset(wp->tp_hline);
 	} else if ( tp_offset(wp->tp_hline) > tp_offset(wp->tp_hmknown) && tp_offset(wp->tp_hline) - tp_offset(wp->tp_hmknown) < TRACE_BACK) 

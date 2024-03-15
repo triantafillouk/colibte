@@ -927,11 +927,11 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 
 	bp->save_hs[0].w_hquotem=0;
 	bp->save_hs[0].w_hselection=0;
-	bp->save_hs[0].w_slang=0;
+	bp->save_hs[0].w_slang=1;
 	bp->save_hs[0].w_notes=0;
 	bp->save_hs[1].w_hquotem=0;
 	bp->save_hs[1].w_hselection=0;
-	bp->save_hs[1].w_slang=0;
+	bp->save_hs[1].w_slang=1;
 	bp->save_hs[1].w_notes=0;
 	bp->b_type=0;
 	bp->lines=0L;

@@ -1502,7 +1502,7 @@ int tab(int n)
 }
 
 /* change tabs to spaces for a number of lines */
-int detab_line(int n)		
+int detab_line(int n)
 {
 	num oldline;
 //	MESG("detab_line:");
