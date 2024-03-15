@@ -298,7 +298,8 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr)
 		};
 	} else {
 		// MESG("	line 0");
-		o1=ptr;
+		textpoint_set_lc(pwl,0,pcol%wp->w_width);
+		o1=tp_offset(pwl);
 	}
  };
  textpoint_delete(pwl);

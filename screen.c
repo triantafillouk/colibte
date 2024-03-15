@@ -1550,9 +1550,11 @@ void vtputwc(WINDP *wp, utfchar *uc)
 				ctl_f=wp->w_fcolor;ctl_b=line_bcolor;
 		};
 
+		if(!get_selection())
 		if(prev_hquotem!=hquotem && c==CHR_DQUOTE) {
 			ctl_f = COLOR_FG;ctl_b=line_bcolor;
 		};
+
 		/* orizon different color creates problems if utf and local char set (utf string error)  */
 		/* if on the orizon make it a different color */
 		if(is_wrap_text(wp->w_fp)) {
@@ -1752,7 +1754,7 @@ offs update_top_position_wrap()
 	// MESG("		: start evaluate new hline from %ld new current is %ld",new_hline,o_now);
 	while(1){
 		o=check_next_char(cwp->w_fp,o,&col);
-		if(o>=o_now) { 
+		if(o>o_now) { 
 			// MESG(" 	up to %ld, hline=%ld",o_now,new_hline);
 			break;
 		}
@@ -1779,7 +1781,7 @@ int check_cursor_position_wrap(WINDP *wp)
 	cur_offs=tp_offset(wp->tp_current);
 	int wcl=window_cursor_line(wp);
 	// if(is_wrap_text(wp->w_fp)) show_time("check_cursor_position 1",1);
-	if( cur_offs <= tp_offset(wp->tp_hline)) {
+	if( cur_offs < tp_offset(wp->tp_hline)) {
 		// MESG("	< ppline=%ld",wp->w_ppline);
 		update_top_position_wrap();
 		return FALSE;
