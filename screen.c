@@ -1350,7 +1350,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 			if(bcol!=COLOR_BG || fcol!=COLOR_FG) {continue;};
 
 			if(i0>stop_word_highlight) { continue;};	// in yaml only!
-			if(bcol==COLOR_BG && fcol!=COLOR_COMMENT_FG && fcol!=COLOR_PREP_FG)
+			// if(bcol==COLOR_BG && fcol!=COLOR_COMMENT_FG && fcol!=COLOR_PREP_FG)
 			{
 				if(c1==COLOR_WORD1_FG) svcolor(v_text+i0,bcol,COLOR_WORD1_FG);
 				else if(c1==COLOR_WORD2_FG) svcolor(v_text+i0,bcol,COLOR_WORD2_FG);

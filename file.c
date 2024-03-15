@@ -979,7 +979,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	else strlcpy(bp->b_dname,dir_name,MAXFLEN);
 
 	if(!is_special_buffer(bp)) set_working_dir(bp->b_dname);
-
+	bp->hl->h_function(CHR_RESET);
 	// MESG("set view_mode %d wrap_mode=%d",bp->view_mode,(int)bt_dval("wrap_mode"));
 	return(bp);
 }
