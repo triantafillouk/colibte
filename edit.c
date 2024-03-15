@@ -186,6 +186,7 @@ int goto_bol(int n)
 		};
 	} else
 	ToLineBegin();
+	set_goal_column(0,"goto_bol");
 	set_update(cwp,UPD_MOVE);
 	return (OK_RSTGOAL);
 }

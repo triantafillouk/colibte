@@ -1119,68 +1119,9 @@ offs vtline(WINDP *wp, offs tp_offs)
 		};
 		line_sep=0;
 		if(syntaxh) 
-		{
-
-//	create mask for the whole line without tabs or special characters
-#if	1
-	rlen=color_mask_create(wp,ptr1,llen,vtlm,vtla);
-#else
-		offs p=ptr1;
-		
-		// col=0;
-		for(i=0;i<llen;i++) {
-			if(fp->b_lang == 0 && !utf8_error()) {
-				p = FUtfCharAt(fp,p,&uc);
-				c=uc.uval[0];
-				if(c>127) {
-					int size;
-					size=get_utf_length(&uc);
-					col += size-1;
-					c='C';
-				};
-			} else {
-				c = FCharAt(fp,p++);
-			};
-        	if (c == '\t' ) {
-				col = next_tab(col);
-				c=CHR_SPACE;
-			} else {
-				++col;
-			};
-			if(c<32) c='C';
-
-			if(col>vtla) vtlm=vt_mask_init(vtla+col);
-			while(rlen<col){
-				vtlm[rlen++]=c;
-			};
-
-		};
-		vtlm[rlen]=0;
-		// if(col>=vtla) MESG("vtlm[%d]=[%s] col=%d vtla=%d",wp->vtrow,vtlm,col,vtla);
-
-		int canstart=1;
-		for(i0=0 ;i0< rlen;i0++) {
-			// Check for boundary characters
-				c1 = vtlm[i0];
-				if(!fp->hl->c_inword(c1))
-				{ 
-					canstart=1;
-					continue;
-				}
-			if(canstart) {
-			// MESG("		421 i0=%d",i0);
-			// Highlight numerics, set type to H_NUMERIC
-				if(!checknumerics(fp,vtlm,&i0,COLOR_STANDOUT_FG))
-			// check for words of type 1, set type to H_WORD1
-				if(!checkwords(fp,vtlm,&i0,fp->hl->w0,COLOR_WORD1_FG))
-			// check for words of type 2, set type to H_WORD2
-				checkwords(fp,vtlm,&i0,fp->hl->w1,COLOR_WORD2_FG);
-				canstart=0;
-				// MESG("	422 i0=%d",i0);
-			}
- 		};
-#endif
- 		};	// syntaxh
+		{	//	create mask for the whole line without tabs or special characters
+			rlen=color_mask_create(wp,ptr1,llen,vtlm,vtla);
+ 		};	
 	};
 	
 //	find the offset of the first column
@@ -1802,16 +1743,9 @@ offs update_top_position_wrap()
 
  int o_now=tp_offset(cwp->tp_current);
 	offs o;
-#if	1
 	// MESG_time("update_top_position_wrap: %ld",o_now);
 	o = FLineBegin(cwp->w_fp,o_now);
 	// MESG_time("update_top_position_wrap: begin=%ld",o);
-#else
-	static offs known=0;
-	if(known<o_now-cwp->w_width) o=known;
-	else o=FLineBegin(o_now);
-#endif
- 	// MESG("update_top_position_wrap: o_now=%ld begin=%ld",o_now,o);
 	int col=0;
 	// offs new_hline=tp_offset(cwp->tp_hline);
 	offs new_hline=o;

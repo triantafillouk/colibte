@@ -553,14 +553,14 @@ void next_column(int cols)
  offs o=from;
  int col=0;
 #if	1
- MESG_time("next_column: start");
+ // MESG_time("next_column: start");
  int num_chars=0;
 	while (col<cols) {
 		if(FEof(cbfp)) return;
 		o = check_next_char(cbfp,o,&col);
 		num_chars++;
 	};
-	MESG_time("next_column: from=%ld to %ld",from,o);
+	// MESG_time("next_column: from=%ld to %ld",from,o);
 	textpoint_set(cbfp->tp_current,o);
 
 #else
