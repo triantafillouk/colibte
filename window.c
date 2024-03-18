@@ -101,7 +101,8 @@ void set_goal_column(int new_column,char *from)
 {
  FILEBUF *fp = cwp->w_fp;
  if(new_column<0) {
-	if(GetCol()>cwp->goal_column) {
+	// if(GetCol()>cwp->goal_column) 
+	{
 		if(is_wrap_text(fp)) 
 			cwp->goal_column=GetCol() % (cwp->w_width);
 		else cwp->goal_column=GetCol();

@@ -202,6 +202,7 @@ int prev_character(int n)
 	set_update(cwp,UPD_MOVE);
  };
  // MESG_time("prev_char:end");
+ set_goal_column(-1,"prev_character");
  return (OK_RSTGOAL);
 }
 
@@ -223,6 +224,7 @@ int goto_eol(int n)
 	} else {
 		ToLineEnd();
 	};
+	set_goal_column(-1,"goto_eol");
 	set_update(cwp,UPD_MOVE);
 	return (OK_RSTGOAL);
 }
@@ -237,6 +239,7 @@ int next_character(int n)
 		if(FEof(cbfp)) return FALSE;
 		MoveRightChar(cbfp);
 	};
+	set_goal_column(-1,"next_character");
 	set_update(cwp,UPD_MOVE);
     return (OK_RSTGOAL);
 }
@@ -275,7 +278,6 @@ int imove_top_line(num new_top_line)
  int current_row=tp_line(cwp->tp_current)-tp_line(cwp->tp_hline);
  num new_current_line;
  num last_line= tp_line(cwp->w_fp->tp_text_end);
- set_goal_column(0,"imove_top_line");
  if(new_top_line<0) new_top_line=0;
  if(new_top_line>last_line) new_top_line=last_line;
  new_current_line=new_top_line+current_row;
@@ -285,7 +287,8 @@ int imove_top_line(num new_top_line)
  textpoint_set_lc(cwp->tp_hline, new_top_line,0);
  textpoint_set_lc(cwp->tp_current, new_current_line,0);
  set_update(cwp,UPD_MOVE|UPD_WINDOW);
-
+ set_goal_column(0,"imove_top_line");
+ 
  return 1;
 }
 
@@ -294,10 +297,10 @@ int igotolinecol(num line,num column,int line_flag)
 {
 	if(line<1) return FALSE;
 
-	set_goal_column(column,"iogotolinecol:");
 	init_highlight();
 	cwp->w_ppline=line_flag;	// set physical position at mid window
 	MoveLineCol(line-1,column-1);
+	set_goal_column(column,"iogotolinecol:");
 	set_update(cwp,UPD_WINDOW);
 	undo_set_noglue();
 
@@ -309,9 +312,9 @@ int igotooffset(num n,int ppline)
 	if(n<1) return FALSE;
 //	MESG("igotooffset:");
 
-	set_goal_column(0,"iogotooffset");
 	init_highlight();
 	set_Offset(n);
+	set_goal_column(0,"iogotooffset");
 	
 	cwp->w_ppline=ppline;	/* set physical position at mid window */
 	set_update(cwp,UPD_WINDOW|UPD_MOVE);
@@ -473,7 +476,7 @@ int next_wrap_line(int n)
 	num current_line;
 	int headline=(cbfp->b_header!=NULL);
 	MESG_time("next_wrap_line:");
-#if	1
+#if	0
 	cwp->goal_column=cwp->curcol;
 #else
 	set_goal_column(-1,"next_wrap_line:");
@@ -517,9 +520,9 @@ int next_wrap_line(int n)
 			int now_col=tp_col(cwp->tp_current) % cwp->w_width;
 			if(now_col+remains >= cwp->w_width) next_column(remains);
 			else {
-				set_goal_column(-1,"next_wrap_line:2");
 				// MESG("next_wrap_line: .. movelinecol, current_line=%ld n=%d goal=%d",current_line,n,cwp->goal_column);
 				MoveLineCol(current_line+n,cwp->goal_column);
+				set_goal_column(-1,"next_wrap_line:2");
 			}
 		};
 
@@ -552,7 +555,7 @@ int next_line(int n)
 
 	if(is_wrap_text(cbfp) & !execmd) return next_wrap_line(n);
 
-	set_goal_column(-1,"next_line:");
+	// set_goal_column(-1,"next_line:");
 	// get the current line
 	current_line=get_current_line();
 	// MESG("# next_line: n=%d current is %ld b_flag=%d",n,current_line,cbfp->b_flag);
@@ -619,7 +622,7 @@ int next_line(int n)
 		textpoint_set_lc(cbfp->tp_current,current_line+n,Offset()%16);
 	} else 
 	{
-		set_goal_column(-1,"next_line:2");
+		// set_goal_column(-1,"next_line:2");
 		MoveLineCol(current_line+n,cwp->goal_column);
 	};
 	set_hmark(0,"next_line");
@@ -635,10 +638,12 @@ offs   FPrevUtfCharAt(FILEBUF *fp,offs o, utfchar *uc);
 int prev_wrap_line(int n)
 {
  num current_line=get_current_line();
+#if	0
 #if	1
 	cwp->goal_column=cwp->curcol;
 #else
 	set_goal_column(-1,"prev_wrap_line:");
+#endif
 #endif
 	cwp->w_prev_line=current_line;
 	// MESG("!prev_wrap_line: current=%d row=%d lock=%d",current_line,cwp->currow,lock_move);
@@ -684,7 +689,7 @@ int prev_line(int n)
    	if (n < 0) return (next_line(-n));
 	if(is_wrap_text(cbfp) & !execmd) return prev_wrap_line(n);
 
-	set_goal_column(-1,"prev_line:");
+	// set_goal_column(-1,"prev_line:");
 
 	current_line=get_current_line();
 	cwp->w_prev_line=current_line;
@@ -733,7 +738,7 @@ int prev_line(int n)
 	if(cbfp->view_mode & VMHEX){
 		textpoint_set_lc(cbfp->tp_current,current_line-n,Offset()%16);
 	} else {
-		set_goal_column(-1,"prev_line:2");
+		// set_goal_column(-1,"prev_line:2");
 		MoveLineCol(current_line-n,cwp->goal_column);
 	};
 	set_hmark(0,"prev_line");
