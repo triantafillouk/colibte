@@ -180,13 +180,14 @@ offs FNext_wrap_line(WINDP *wp,offs start)
  FILEBUF *fp=wp->w_fp;
  // from the start of the wrap line
  int col=0;
- MESG_time(";FNext_wrap_line: < start from %ld",start);
+ MESG_time(";FNext_wrap_line: from %ld lines=%d",start,lines);
 #if	TNEXT
  while(lines-- >0)
 #endif
  {
+ offs now_start=o;
  while(col < cwp->w_width) {
- 	if(FEofAt(fp,o)) break;
+ 	if(FEofAt(fp,o)) return now_start;
 	if(FEolAt(fp,o)) {
 		// if(col+col_now<wp->w_width) { o++;continue;};
 		o++;
@@ -259,7 +260,7 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr)
  num line=tp_line(pwl);
  // num pline=line;
  num pcol=tp_col(pwl);
- // MESG(";FPrev_wrap_line:num_lines=%d wcol_pos=%d line=%ld o=%ld tp_col=%ld >= %d",num_lines,col_position,line,ptr,tp_col(pwl),num_lines*wp->w_width);
+ MESG(";FPrev_wrap_line:num_lines=%d wcol_pos=%d line=%ld o=%ld tp_col=%ld >= %d",num_lines,col_position,line,ptr,tp_col(pwl),num_lines*wp->w_width);
  num o1=ptr;
  if(tp_col(pwl) >= num_lines*wp->w_width) 
  {
@@ -271,29 +272,31 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr)
  	if(line>0) {
 		line -= num_lines;
 		if(line<0) line=0;
-		textpoint_set_lc(pwl,line,pcol);
+		textpoint_set_lc(pwl,line,col_position);
+		MESG("	previous line %ld o=%ld c=%ld",tp_line(pwl),tp_offset(pwl),tp_col(pwl));
 		num o0 = tp_offset(pwl);
 		    o1 = FLineEnd(fp,o0);
 		// MESG("	goto prev line: %ld o0=%ld end=%ld",line,o0,o1);
 		num linecols = DiffColumns(fp,o0,o1);
+		MESG("	goto prev line: %ld o0=%ld end=%ld linecols=%ld col=%ld",line,o0,o1,linecols,tp_col(pwl));
 		// MESG("		col %ld < width %d",tp_col(pwl),wp->w_width);
-		if(linecols > wp->w_width) {
+		if(linecols> wp->w_width) {
 			num full=(linecols/wp->w_width) * wp->w_width;
 			num rest = linecols-full;
 			if(rest<col_position) {
-				// MESG("		rest %d < pos %d line %ld linecols=%ld,end at %ld",linecols,col_position,line,linecols,o1);
+				MESG("		rest %d < pos %d line %ld linecols=%ld,end at %ld",linecols,col_position,line,linecols,o1);
 			} else {
 				textpoint_set_lc(pwl,line,full+col_position);
 				o1=tp_offset(pwl);
-				// MESG("		rest %d >= pos %d line %ld linecols=%ld,end at %ld",linecols,col_position,line,linecols,o1);
+				MESG("		rest %d >= pos %d line %ld linecols=%ld,end at %ld",linecols,col_position,line,linecols,o1);
 			};
 		} else {
 			if(linecols<=col_position) {
-				// MESG("		prev linecols %ld < %d o1=%ld",linecols,col_position,o1);
+				MESG("		prev linecols %ld < %d o1=%ld",linecols,col_position,o1);
 			} else {
 				textpoint_set_lc(pwl,line,col_position);
 				o1=tp_offset(pwl);
-				// MESG("		linecols %ld >= %d o1=%ld",linecols,col_position,o1);
+				MESG("		linecols %ld >= %d o1=%ld",linecols,col_position,o1);
 			};
 		};
 	} else {

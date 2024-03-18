@@ -2109,8 +2109,8 @@ void update_window_wrap(WINDP *wp,int force)
 		if (wp==cwp) {
 			// MESG_time("update_window_wrap:1 window %d",wp->id);
 			check_cursor_position_wrap(wp); /* check if on screen */
-			// MESG_time("update_window_wrap: check curpos",wp->id);
 			wp->currow = window_cursor_line(wp);
+			MESG_time("update_window_wrap: currow=%d hline o=%ld c=%ld current o=%ld",wp->currow,tp_offset(wp->tp_hline),tp_col(wp->tp_hline),tp_offset(wp->tp_current));
 #if	1
 				upd_all_wrap_lines(wp,"wrap0");
 				// show_time("after wrap_lines",1);

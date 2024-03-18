@@ -850,10 +850,10 @@ void main_execute(int c)
 			msg_line("arg: %d",nnarg);
 		};
 	};
-	MESG_time("after execute");
+	// MESG_time("after execute");
 
 	// if(cflag & OK_RSTGOAL)	cwp->goal_column=GetCol();
-	MESG_time("after GetCol");
+	// MESG_time("after GetCol");
 //	if(cflag==OK_CLRSL  || cflag==OK_RSTGOAL) clear_message_line();
 }
 

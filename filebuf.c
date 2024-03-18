@@ -946,6 +946,7 @@ void  FindOffset(TextPoint *tp)
    while(c<tp->col) {
 	utfchar uc;
 	o=FUtfCharAt(fp,o,&uc);
+	if(uc.uval[0]=='\n') { o--;break;};
 	if(uc.uval[0]=='\t') c=next_tab(c);
 	else c+=get_utf_length(&uc);
    };   

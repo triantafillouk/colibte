@@ -3142,7 +3142,7 @@ void fquote_state(offs till_offs, offs from_offs, WINDP *wp)
 	prev_hquotem=hquotem;
 	wp->w_fp->hl->h_function(c); 
  };
- MESG_time("!fquote: (%lld %X) -> (%lld %X)",from_offs,orig_hquotem,till_offs,hquotem);
+ // MESG_time("!fquote: (%lld %X) -> (%lld %X)",from_offs,orig_hquotem,till_offs,hquotem);
 }
 
 void setwquotes(WINDP *wp,int ind,num known_offset)

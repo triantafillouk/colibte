@@ -951,7 +951,16 @@ int next_page(int  n)
 		return (OK_CLRSL);
 	};
 
+#if	1
+	if(is_wrap_text(cbfp)) {
+		if(FSize(cbfp) - FOffset(cbfp)<cwp->w_width) return FALSE; 
+	} else {
+		if(tp_line(cbfp->tp_current)+2>cbfp->lines) return FALSE;
+		if (FEof(cbfp)) return FALSE;
+	};
+#else
 	if (FEof(cbfp)) return FALSE;
+#endif
 
 	toline=tp_line(cwp->tp_current);
 	if(is_wrap_text(cbfp)) {
