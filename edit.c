@@ -475,12 +475,8 @@ int next_wrap_line(int n)
 {
 	num current_line;
 	int headline=(cbfp->b_header!=NULL);
-	MESG_time("next_wrap_line:");
-#if	0
-	cwp->goal_column=cwp->curcol;
-#else
-	set_goal_column(-1,"next_wrap_line:");
-#endif
+	// MESG_time("next_wrap_line:");
+
 	// get the current line
 	current_line=get_current_line();
 	cwp->w_prev_line=current_line;
@@ -522,7 +518,6 @@ int next_wrap_line(int n)
 			else {
 				// MESG("next_wrap_line: .. movelinecol, current_line=%ld n=%d goal=%d",current_line,n,cwp->goal_column);
 				MoveLineCol(current_line+n,cwp->goal_column);
-				set_goal_column(-1,"next_wrap_line:2");
 			}
 		};
 
@@ -555,7 +550,6 @@ int next_line(int n)
 
 	if(is_wrap_text(cbfp) & !execmd) return next_wrap_line(n);
 
-	// set_goal_column(-1,"next_line:");
 	// get the current line
 	current_line=get_current_line();
 	// MESG("# next_line: n=%d current is %ld b_flag=%d",n,current_line,cbfp->b_flag);
@@ -622,7 +616,6 @@ int next_line(int n)
 		textpoint_set_lc(cbfp->tp_current,current_line+n,Offset()%16);
 	} else 
 	{
-		// set_goal_column(-1,"next_line:2");
 		MoveLineCol(current_line+n,cwp->goal_column);
 	};
 	set_hmark(0,"next_line");
@@ -638,13 +631,7 @@ offs   FPrevUtfCharAt(FILEBUF *fp,offs o, utfchar *uc);
 int prev_wrap_line(int n)
 {
  num current_line=get_current_line();
-#if	0
-#if	1
-	cwp->goal_column=cwp->curcol;
-#else
-	set_goal_column(-1,"prev_wrap_line:");
-#endif
-#endif
+
 	cwp->w_prev_line=current_line;
 	// MESG("!prev_wrap_line: current=%d row=%d lock=%d",current_line,cwp->currow,lock_move);
 
@@ -688,8 +675,6 @@ int prev_line(int n)
 	if (n==0) return FALSE;
    	if (n < 0) return (next_line(-n));
 	if(is_wrap_text(cbfp) & !execmd) return prev_wrap_line(n);
-
-	// set_goal_column(-1,"prev_line:");
 
 	current_line=get_current_line();
 	cwp->w_prev_line=current_line;
@@ -738,7 +723,6 @@ int prev_line(int n)
 	if(cbfp->view_mode & VMHEX){
 		textpoint_set_lc(cbfp->tp_current,current_line-n,Offset()%16);
 	} else {
-		// set_goal_column(-1,"prev_line:2");
 		MoveLineCol(current_line-n,cwp->goal_column);
 	};
 	set_hmark(0,"prev_line");
@@ -1116,7 +1100,6 @@ int prev_page(int num_pages)
 	num_lines=toline;
  } else {toline-=num_lines;};
 
- // set_goal_column(0,"prev_page");
  MoveLineCol(toline,cwp->goal_column);
 
  set_hmark(0,"prev_page");
