@@ -281,6 +281,7 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr)
 
 		textpoint_set_lc(pwl,line,0);
 		num goal_column = wp->goal_column % wp->w_width;
+		if(col_position==0) goal_column=0;
 		num o0 = tp_offset(pwl);
 		    o1 = FLineEnd(fp,o0);
 		// MESG("	goto prev line: %ld o0=%ld end=%ld",line,o0,o1);

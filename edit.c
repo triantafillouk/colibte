@@ -283,7 +283,7 @@ int imove_top_line(num new_top_line)
  new_current_line=new_top_line+current_row;
 
  if(new_current_line>last_line) new_current_line=last_line;
- // MESG("imove_top_line:to %ld",new_top_line);
+ MESG("imove_top_line:to %ld",new_top_line);
  textpoint_set_lc(cwp->tp_hline, new_top_line,0);
  textpoint_set_lc(cwp->tp_current, new_current_line,0);
  set_update(cwp,UPD_MOVE|UPD_WINDOW);
@@ -965,6 +965,7 @@ int next_page(int  n)
 			o=FNext_wrap_line(cwp,o);
 		};
 #endif
+		set_top_hline(cwp,o,"next_page");
 		textpoint_set(cwp->tp_hline,o);
 		// MESG("		start current from %ld n=%d",o,n);
 		o=tp_offset(cwp->tp_current);
@@ -1063,14 +1064,11 @@ int prev_page(int num_pages)
 			o=FPrev_wrap_line(cwp,o);
 		};
 #endif
-		textpoint_set(cwp->tp_hline,o);
+		set_top_hline(cwp,o,"prev_page");
 		// MESG("		start current from %ld n=%d",o,n);
 		o=tp_offset(cwp->tp_current);
 		nline=num_lines;
 #if	TNEXT
-#if	0
-		o=FPrev_wrap_line(cwp,o,num_lines);
-#else
 		if(toline==0) 
 		o=FPrev_wrap_line(cwp,o,num_lines);
 		else
@@ -1078,7 +1076,6 @@ int prev_page(int num_pages)
 			o=FPrev_wrap_line(cwp,o,1);
 			// MESG("		next line o=%ld",o);
 		};
-#endif
 #else
 		while(--nline>0) {
 			o=FPrev_wrap_line(cwp,o);

@@ -1764,10 +1764,14 @@ offs update_top_position_wrap()
 			// if(o<o_now-1000) known=o;
 		};
 	};
-	textpoint_set(cwp->tp_hline,new_hline);
+	set_top_hline(cwp,new_hline,"update_top_position_wrap");
+	if((tp_col(cwp->tp_hline) % cwp->w_width)!=0) {
+		MESG("	ERROR !!!!!!!!!!!!! setting hline col=%ld",tp_col(cwp->tp_hline));
+	};
 	tp_copy(cwp->w_fp->save_hline,cwp->tp_hline);
 	// FindLineCol(cwp->tp_hline);
-	MESG_time("update_top_position_wrap end hline=%ld",tp_offset(cwp->tp_hline));
+	MESG_time("update_top_position_wrap end hline=%ld line=%ld c=%ld",tp_offset(cwp->tp_hline),
+		tp_line(cwp->tp_hline),tp_col(cwp->tp_hline));
 	return(tp_offset(cwp->tp_hline));
 }
 
@@ -1776,8 +1780,8 @@ int check_cursor_position_wrap(WINDP *wp)
 	offs cur_offs;
 	// FILEBUF *fp = wp->w_fp;
 	// int i;
-	// MESG("check_cursor_position_wrap: hline o=%ld l=%ld, current o=%ld, l= %ld",tp_offset(wp->tp_hline),tp_line(wp->tp_hline),
-		// tp_offset(wp->tp_current),tp_line(wp->tp_current));
+	MESG("check_cursor_position_wrap: hline o=%ld l=%ld, current o=%ld, l= %ld",tp_offset(wp->tp_hline),tp_line(wp->tp_hline),
+		tp_offset(wp->tp_current),tp_line(wp->tp_current));
 	cur_offs=tp_offset(wp->tp_current);
 	int wcl=window_cursor_line(wp);
 	// if(is_wrap_text(wp->w_fp)) show_time("check_cursor_position 1",1);
@@ -1798,12 +1802,17 @@ int check_cursor_position_wrap(WINDP *wp)
 	return TRUE;
 }
 
-void set_top_hline(WINDP *wp,offs cof)
+void set_top_hline(WINDP *wp,offs cof,char *from)
 {
 	offs b0=0;
 	if(is_wrap_text(wp->w_fp)) b0=cof;
 	else b0=FLineBegin(wp->w_fp,cof);
 	textpoint_set(wp->tp_hline,b0);
+	if((tp_col(wp->tp_hline) % wp->w_width)!=0) {
+		textpoint_set_lc(wp->tp_hline,tp_line(wp->tp_hline),0);
+		MESG("set_top_hline: error correct!!!!!!");
+	};
+	MESG("set_top_hline:[%s] l=%ld o=%ld c=%ld",from,tp_line(wp->tp_hline),tp_offset(wp->tp_hline),tp_col(wp->tp_hline));
 }
 
 /*	check_cursor_position:	check to see if the cursor is on screen */
@@ -1859,7 +1868,7 @@ int check_cursor_position(WINDP *wp)
 	};
 	/* and reset the current line at top of window */
 	tp_copy(wp->prev_hline,wp->tp_hline);
-	set_top_hline(wp,cof);
+	set_top_hline(wp,cof,"check_cursor_position");
 	wp->w_flag |= UPD_WINDOW;
 	if(update_all) wp->w_flag |= UPD_FULL;
 	return(TRUE);
