@@ -15,11 +15,7 @@ int set_tag_view_position(int line,int column);
 extern FILEBUF *cbfp;
 int get_current_line();
 int change_sort_mode(int mouse_col);
-#if	TNEXT
 offs FNext_wrap_line(WINDP *wp,offs start,int num_lines);
-#else
-offs FNext_wrap_line(WINDP *wp,offs start);
-#endif
 
 // This is used in scrolling!
 void move_window_lines(WINDP *wp,int lines)
@@ -349,11 +345,7 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 		// MESG("top line is: %ld",new_offset);
 		for(i=0;i<mouse_row;i++) {
 			if(is_wrap_text(wp->w_fp)) 
-#if	TNEXT
 				new_offset = FNext_wrap_line(wp,new_offset,1);
-#else
-				new_offset = FNext_wrap_line(wp,new_offset);
-#endif
 	  		else new_offset = FNextLine(cbfp,new_offset);
 		};
 		if(button==KMOUSE_DBLCLICK+1) {

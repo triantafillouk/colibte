@@ -30,6 +30,7 @@ void update_window_nowrap(WINDP *wp,int force);
 void update_window_wrap(WINDP *wp,int force);
 void upd_part_wrap(WINDP *wp,char *from);
 offs check_next_char(FILEBUF *fp,offs o,int *col);
+void set_top_hline(WINDP *wp,offs cof,char *from);
 
 extern COLOR_SCHEME *current_scheme;
 
@@ -1810,9 +1811,9 @@ void set_top_hline(WINDP *wp,offs cof,char *from)
 	textpoint_set(wp->tp_hline,b0);
 	if((tp_col(wp->tp_hline) % wp->w_width)!=0) {
 		textpoint_set_lc(wp->tp_hline,tp_line(wp->tp_hline),0);
-		MESG("set_top_hline: error correct!!!!!!");
+		// MESG("set_top_hline: error correct!!!!!!");
 	};
-	MESG("set_top_hline:[%s] l=%ld o=%ld c=%ld",from,tp_line(wp->tp_hline),tp_offset(wp->tp_hline),tp_col(wp->tp_hline));
+	// MESG("set_top_hline:[%s] l=%ld o=%ld c=%ld",from,tp_line(wp->tp_hline),tp_offset(wp->tp_hline),tp_col(wp->tp_hline));
 }
 
 /*	check_cursor_position:	check to see if the cursor is on screen */
