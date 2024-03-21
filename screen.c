@@ -1809,12 +1809,10 @@ void set_top_hline(WINDP *wp,offs cof,char *from)
 	if(is_wrap_text(wp->w_fp)) b0=cof;
 	else b0=FLineBegin(wp->w_fp,cof);
 	textpoint_set(wp->tp_hline,b0);
-#if	1
 	if((tp_col(wp->tp_hline) % wp->w_width)!=0) {
 		textpoint_set_lc(wp->tp_hline,tp_line(wp->tp_hline),0);
 		// MESG("set_top_hline: error correct!!!!!!");
 	};
-#endif
 	// MESG("set_top_hline:[%s] l=%ld o=%ld c=%ld",from,tp_line(wp->tp_hline),tp_offset(wp->tp_hline),tp_col(wp->tp_hline));
 }
 
