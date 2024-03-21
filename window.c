@@ -242,7 +242,7 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines)
  FILEBUF *fp=wp->w_fp;
  TextPoint *pwl = new_textpoint_at(fp,1,ptr);
  int col_position = tp_col(pwl) % wp->w_width;
-
+ // if(FEolAt(fp,ptr) && col_position>0)
  if(col_position < cwp->goal_column) col_position=cwp->goal_column;
  num line=tp_line(pwl);
  num pcol=tp_col(pwl);
@@ -251,6 +251,7 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines)
  if(tp_col(pwl) >= num_lines*wp->w_width) 
  {
  	num col=tp_col(pwl) - num_lines*wp->w_width;
+	if(tp_col(pwl)%wp->w_width < cwp->goal_column) col += cwp->goal_column - tp_col(pwl)%wp->w_width;
 	// if(col%wp->w_width < wp->goal_column) col += (wp->goal_column - col%wp->w_width);
 	textpoint_set_lc(pwl,line,col);
 	o1=tp_offset(pwl);
