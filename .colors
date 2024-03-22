@@ -1,5 +1,5 @@
 [Snow]
-normal_bg=#F0F8FF
+normal_bg=#F0F0F0
 menu_bg=#0000AE 
 selection_bg=#80B0D0 
 search_bg=#AE0000 
@@ -257,4 +257,30 @@ comment_fg=#699854
 changed_fg=#CD9000 
 horizon_fg=#A000A0 
 inactive_fg=#A0A0A0 
+rowcol_fg=#FFFF00 
+[WSnow]
+normal_bg=#F8F8F8
+menu_bg=#0000AE 
+selection_bg=#CFCFCF 
+search_bg=#FF8080 
+quote_bg=#A0F0A0 
+light_bg=#B0B0C0 
+info_bg=#C0C0C0 
+inactive_bg=#A0A0A0 
+box_bg=#808080 
+code_bg=#D8D8D8 
+normal_fg=#000000 
+menu_fg=#FFFFFF 
+standout_fg=#0000AE 
+control_fg=#FF0000 
+prep_fg=#800080
+word1_fg=#FE0000 italic
+word2_fg=#005000 
+word3_fg=#98E098 
+special_fg=#0000AE 
+single_quote_fg=#006000 
+comment_fg=#A02000 italic
+changed_fg=#FF0000 
+horizon_fg=#800080 
+inactive_fg=#F0F0F0 
 rowcol_fg=#FFFF00 

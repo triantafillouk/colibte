@@ -296,7 +296,16 @@ void upd_column_pos()
  int total_columns;
  // if(is_wrap_text(cbfp)) show_time("upd_column_pos1",1);
 	// cwp->curcol = GetCol();
+#if	1
 	cwp->curcol = tp_col(cbfp->tp_current);
+#if	1
+	if(tp_col(cbfp->tp_current)!=FColumn(cbfp,FOffset(cbfp))) {
+		MESG("	upd_column_pos: ERROR! o=%ld %ld != %ld",tp_col(cbfp->tp_current),FColumn(cbfp,FOffset(cbfp)));
+	};
+#endif
+#else
+	cwp->curcol = FColumn(cbfp,FOffset(cbfp));
+#endif
 	// MESG("upd_column_pos: curcol=%d",cwp->curcol);
  // if(is_wrap_text(cbfp)) show_time("upd_column_pos2",1);
 	total_columns=cwp->w_width;
@@ -1559,11 +1568,15 @@ void vtputwc(WINDP *wp, utfchar *uc)
 
 		/* orizon different color creates problems if utf and local char set (utf string error)  */
 		/* if on the orizon make it a different color */
+#if	1
+		if(!is_wrap_text(wp->w_fp))
+#else
 		if(is_wrap_text(wp->w_fp)) {
 			if (((wp->vtcol == wp->w_width+wp->w_infocol-1)) || (wp->vtcol==0 && wp->w_lcol > 0)) {
 				ctl_f = COLOR_HORIZON_FG;
 			};
-		} else 
+		} else
+#endif
 		if (((wp->vtcol == wp->w_ntcols-1)) || (wp->vtcol==0 && wp->w_lcol > 0)) {
 			ctl_f = COLOR_HORIZON_FG;
 		};

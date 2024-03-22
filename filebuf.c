@@ -610,7 +610,7 @@ void FindLineCol(TextPoint *tp)
 		if(!(scan->flags)) 
 		{
 			new_dist=llabs(tp->offset-scan->offset);
-	 		if(new_dist <= dist && scan->offset<tp->offset)
+	 		if(new_dist <= dist )
 	 		// if(new_dist < dist )
 			{
 	    		dist=new_dist;
@@ -671,7 +671,10 @@ void FindLineCol(TextPoint *tp)
 	c += DiffColumn(fp,&o,tp->offset);
    tp->col=c;
    tp->line=l;
-   tp->offset=o;
+   if(o!=tp->offset) {
+	   MESG("FindLineCol: o=%ld != tp->offset=%ld",o,tp->offset);
+	   tp->offset=o;
+   };
    tp->flags = FULLDEFINED;
 	// MESG_time(";flc:[%s] -> o=%lld col=%lld line=%lld ",tp_name[tp->tp_type],o,c,l);
 }
@@ -946,7 +949,7 @@ void  FindOffset(TextPoint *tp)
    while(c<tp->col) {
 	utfchar uc;
 	o=FUtfCharAt(fp,o,&uc);
-	if(uc.uval[0]=='\n') { o--;break;};
+	if(uc.uval[0]=='\n'||uc.uval[0]=='\r') { o--;break;};
 	if(uc.uval[0]=='\t') c=next_tab(c);
 	else c+=get_utf_length(&uc);
    };   
@@ -1595,7 +1598,7 @@ num Column(offs o)
  return (col);
 }
 
-num     FGetLine(FILEBUF *fp)
+num  FGetLine(FILEBUF *fp)
 {
    return(tp_line(fp->tp_current));
 }
