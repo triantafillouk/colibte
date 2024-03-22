@@ -60,7 +60,8 @@ utfchar double_hline = { "═" };
 utfchar single_hline = { "↪" };
 utfchar next_l = { " " };
 // utfchar next_l = { "↘" };
-utfchar first_l = { "►" };
+// utfchar first_l = { "►" };
+utfchar first_l = { "." };
 
 //num cline_end=0;
 //num cstart_offset;
@@ -1969,7 +1970,11 @@ int  show_position_info(int short_version)
 					long value=utf_value_len(&size);
 					// if(debug_flag()) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX %d",value,size);
 					// else 
-					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX",value);
+					if(value==0x9) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str)," TAB");
+					else if(value==0x20) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str)," SPC");
+					else if(value==0x0A) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str)," NL ");
+					else if(value==0x0D) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str)," CR ");
+					else sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX",value);
 				};
 				if(strlen(str) < 10) short_version=1;
 			};

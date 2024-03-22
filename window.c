@@ -251,12 +251,12 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines)
  if(tp_col(pwl) >= num_lines*wp->w_width) 
  {
  	num col=tp_col(pwl) - num_lines*wp->w_width;
-	if(tp_col(pwl)%wp->w_width < cwp->goal_column) col += cwp->goal_column - tp_col(pwl)%wp->w_width;
+	/// if(tp_col(pwl)%wp->w_width < cwp->goal_column) col += cwp->goal_column - tp_col(pwl)%wp->w_width;
 	// if(col%wp->w_width < wp->goal_column) col += (wp->goal_column - col%wp->w_width);
 	textpoint_set_lc(pwl,line,col);
 	o1=tp_offset(pwl);
-	// num diffcol = DiffColumns(fp,o1,ptr);
-	// MESG("	diffcol %ld %ld",num_lines*wp->w_width,diffcol);
+	num diffcol = DiffColumns(fp,o1,ptr);
+	MESG("!FPrev_wrap_line: backtrack %ld diffcol %ld prev col=%ld",num_lines*wp->w_width,diffcol,col);
  	// MESG(";FPre_line:num_lines=%d pline=%ld -> line=%ld  col %ld -> %ld o1=%ld >= width %d rows=%d",num_lines,pline,line,pcol,tp_col(pwl),o1,wp->w_width,wp->w_ntrows);
  } else {
  	if(line>0) {
