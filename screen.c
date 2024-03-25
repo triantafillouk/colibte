@@ -296,7 +296,7 @@ void upd_column_pos()
  int total_columns;
  // if(is_wrap_text(cbfp)) show_time("upd_column_pos1",1);
 	// cwp->curcol = GetCol();
-#if	1
+#if	0
 	cwp->curcol = tp_col(cbfp->tp_current);
 #if	1
 	if(tp_col(cbfp->tp_current)!=FColumn(cbfp,FOffset(cbfp))) {
@@ -1780,23 +1780,28 @@ offs update_top_position_wrap()
 		};
 	};
 	set_top_hline(cwp,new_hline,"update_top_position_wrap");
+#if	WRAPD
 	if((tp_col(cwp->tp_hline) % cwp->w_width)!=0) {
 		MESG("	ERROR !!!!!!!!!!!!! setting hline col=%ld",tp_col(cwp->tp_hline));
 	};
+#endif
 	tp_copy(cwp->w_fp->save_hline,cwp->tp_hline);
 	// FindLineCol(cwp->tp_hline);
+#if	WRAPD
 	MESG_time("update_top_position_wrap end hline=%ld line=%ld c=%ld",tp_offset(cwp->tp_hline),
 		tp_line(cwp->tp_hline),tp_col(cwp->tp_hline));
+#endif
 	return(tp_offset(cwp->tp_hline));
 }
 
 int check_cursor_position_wrap(WINDP *wp)
 {
 	offs cur_offs;
-	// FILEBUF *fp = wp->w_fp;
-	// int i;
-	MESG("check_cursor_position_wrap: hline o=%ld l=%ld, current o=%ld, l= %ld",tp_offset(wp->tp_hline),tp_line(wp->tp_hline),
-		tp_offset(wp->tp_current),tp_line(wp->tp_current));
+#if	WRAPD
+	MESG("check_cursor_position_wrap: hline o=%ld l=%ld, current o=%ld, l= %ld c=%ld",
+		tp_offset(wp->tp_hline),tp_line(wp->tp_hline),
+		tp_offset(wp->tp_current),tp_line(wp->tp_current),tp_col(wp->tp_current));
+#endif
 	cur_offs=tp_offset(wp->tp_current);
 	int wcl=window_cursor_line(wp);
 	// if(is_wrap_text(wp->w_fp)) show_time("check_cursor_position 1",1);
@@ -2138,7 +2143,9 @@ void update_window_wrap(WINDP *wp,int force)
 			// MESG_time("update_window_wrap:1 window %d",wp->id);
 			check_cursor_position_wrap(wp); /* check if on screen */
 			wp->currow = window_cursor_line(wp);
+#if	WRAPD
 			MESG_time("update_window_wrap: currow=%d hline o=%ld c=%ld current o=%ld",wp->currow,tp_offset(wp->tp_hline),tp_col(wp->tp_hline),tp_offset(wp->tp_current));
+#endif
 #if	1
 				upd_all_wrap_lines(wp,"wrap0");
 				// show_time("after wrap_lines",1);

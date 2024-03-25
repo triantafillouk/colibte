@@ -633,17 +633,17 @@ double compute_string(char *s,char *new_string)
  	init_error();
 	initialize_vars();
 	insert_string(fp,s,strlen(s));
-	MESG("compute_string [%s]",s);
+	// MESG("compute_string [%s]",s);
 	fp->b_type=1;
 	value=compute_block(fp,cbfp,0);
-	MESG("compute_string new_string=[%s]",new_string);
+	// MESG("compute_string new_string=[%s]",new_string);
 
 	if(new_string) {
 		get_text_offs(fp,new_string,0,FLineEnd(fp,0));
 	};
 
 	delete_filebuf(fp,0);
-	MESG("compute_string: [%s] result=%f",s,value);
+	// MESG("compute_string: [%s] result=%f",s,value);
 	return(value);
 }
 
@@ -842,7 +842,7 @@ void main_execute(int c)
 {
  static int cflag=0;
 	/* and execute the command */
-	MESG_time("main_execute: ------- key %s",xe_key_name(c));
+	// MESG_time("main_execute: ------- key %s",xe_key_name(c));
 	cflag=execute(c, nnarg);
 	if(cflag!=OK_ARG) nnarg=1;
 	else {

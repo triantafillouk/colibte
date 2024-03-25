@@ -138,6 +138,9 @@ void movecursor(int row, int col)
 		msg_line("cursor out of bound %d!",t++);
 		row=drv_numrow-3;
 	};
+#if	WRAPD
+	MESG("	move(x=%d y=%d) cur_col (%ld %d)",col,row,tp_col(cwp->tp_current),tp_col(cwp->tp_current)%cwp->w_width);
+#endif
 	drv_win_move(cwp,row, col);
 }
 
@@ -1292,7 +1295,7 @@ void main_loop()
 	app_error=0;
 
 	c = getcmd();
-	MESG_time_start("# main_loop go execute ----------");
+	MESG_time_start("# main_loop go execute -------key %s",xe_key_name(c));
 	/* execute the keyboard sequence */
 	main_execute(c);
  };

@@ -1247,7 +1247,8 @@ int dir_right(int n)
   } else {  // move in directory
 	status = movein_dir(fname_ns);
   };
-  cwp->goal_column=0;
+
+  set_goal_column(0,"dir_right");
   cwp->w_lcol=0;
   set_update(cwp,UPD_STATUS);
   return(status);

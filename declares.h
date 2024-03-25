@@ -231,8 +231,8 @@ int list_filebuf(char *title, char *st,int f1,int *return_flag);
 int changes_occured();
 FILEBUF * new_filebuf(char *bname,int bflag);
 FILEBUF * get_filebuf(char *bname,char *dname,int flag);
-int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs);
-int DiffColumns(FILEBUF *fp, offs start,offs col_offs);
+int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from);
+int DiffColumns(FILEBUF *fp, offs start,offs col_offs,char *from);
 
 
 int window_row_increase(int n);
@@ -786,7 +786,9 @@ offs FPrevLine(FILEBUF *,offs);
 int   ReadBlock(char *file_name,int fd,offs size,offs *act_read);
 int   DeleteBlock(offs left,offs right);
 int   InsertBlock(FILEBUF *fp,char *block_left,offs size_left, char *block_right,offs size_right);
+#if	NUSE
 int   ReplaceBlock(char *block,offs size);
+#endif
 void  textpoint_delete(TextPoint *tp);
 offs   get_text_offs(FILEBUF *,char *,offs,offs);
 void set_Char(offs,byte);

@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.59T18 (22/03/2024)"
+#define VERSION 	"#01.59T19 (23/03/2024)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -36,6 +36,7 @@
 #define TWRAP		1	/* wrap mode  */
 
 #define NEW	1	/* new tested code!  */
+#define WRAPD	0	/* wrap debug  */
 
 #if	DARWIN
 #define	_FILE_OFFSET_BITS	64
