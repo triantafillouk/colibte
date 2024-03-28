@@ -1199,8 +1199,8 @@ void  FindOffset(TextPoint *tp)
    while(c<tp->col) {
 	utfchar uc;
 	o=FUtfCharAt(fp,o,&uc);
-	if(uc.uval[0]=='\n'||uc.uval[0]=='\r') { 
-		o--;
+	if(FEolAt(fp,o)) {
+		o-=fp->EolSize;
 		MESG("FindOffset: EOL, column bigger than expected! % %d",c,tp->col);
 		break;
 	};
