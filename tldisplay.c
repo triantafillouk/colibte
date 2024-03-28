@@ -1614,7 +1614,6 @@ int get_utf_length(utfchar *utf_char_str)
  if(clen_error) { return 1;};
 
  b0=utf_char_str->uval[0];
- if(b0==0) return 0;
  if(b0<128) return 1;
 #if	DARWIN | 1
  // accents do not take space in mac 

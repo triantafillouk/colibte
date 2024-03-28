@@ -40,7 +40,7 @@ X11lib0= -lX11 -L/opt/X11/lib $(GLIB_LIB)
 EXTFILE=.$(APP_NAME)_ext_mac
 WSL:=0
 #CC=clang -DGVERS='"$(GVERS)"'
-CC=gcc-12 -DGVERS='"$(GVERS)"'
+CC=gcc-13 -DGVERS='"$(GVERS)"'
 endif
 
 # for Linux
