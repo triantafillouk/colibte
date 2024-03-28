@@ -630,7 +630,7 @@ void drv_set_wvs(WINDP *wp)
  wp->w_ntrows=(wp->gwp->d_height-dl_height)/CHEIGHT+1;
  wp->gwp->back_width = wp->gwp->d_width;
  wp->gwp->back_height = wp->gwp->d_height;
-
+ set_window_width(wp);
  allocate_virtual_window(wp);
  
  resize_draw_win(wp); 

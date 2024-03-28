@@ -19,27 +19,6 @@ offs cashed_FLend(FILEBUF *fp,offs tp_offs,int reset)
 	return end_offs;
 }
 
-#if	NUSE
-offs cached_llen(FILEBUF *fp,offs tp_offs,int reset)
-{
- static offs llen=0;
- static num start=-1;
- if(reset){
- 	llen = utf_FLineLen(fp,tp_offs);
-	// llen = 500;
-	start=tp_offs;
- };
- if(tp_offs==start || !FBolAt(fp,tp_offs))
- {
-	// MESG("	tp %ld - llen %ld",start,llen);
- } else {
- 	llen = utf_FLineLen(fp,tp_offs);
-	// llen = 500;
-	start=tp_offs;
- };
- return llen;
-}
-#endif
 
 offs wrap_llen(WINDP *wp,offs tp_offs)
 {
@@ -122,66 +101,8 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 	line_sep=0;
 	if(syntaxh) {
 	//	create mask for the whole line without tabs or special characters
-#if	1
 		if(llen>wp->w_width) llen=wp->w_width;
 		real_line_len=color_mask_create(wp,ptr1,llen,vtlm,vtla);
-#else
-		offs p=ptr1;
-		
-		// col=0;
-		for(i=0;i<llen && i< wp->w_width;i++) {
-			if(fp->b_lang == 0 && !utf8_error()) {
-				p = FUtfCharAt(fp,p,&uc);
-				c=uc.uval[0];
-				if(c>127) {
-					int size;
-					size=get_utf_length(&uc);
-					col += size-1;
-					c='C';
-				};
-			} else {
-				c = FCharAt(fp,p++);
-			};
-        	if (c == '\t' ) {
-				col = next_tab(col);
-				c=CHR_SPACE;
-			} else {
-				++col;
-			};
-			if(c<32) c='1';
-
-			if(wp->w_ntcols > vtla) vtlm=vt_mask_init(vtla+wp->w_ntcols);
-			while(real_line_len<col)
-			{
-				vtlm[real_line_len++]=c;
-			};
-
-		};
-		vtlm[real_line_len]=0;
-		// if(col>=vtla) MESG("vtlm[%d]=[%s] col=%d vtla=%d",wp->vtrow,vtlm,col,vtla);
-		// MESG("	- %2d ptr1=%ld -> %ld =%ld rllen=%d w=%d i=%d col=%d cols=%d",wp->vtrow,tp_offs,p,p-ptr1,real_line_len,wp->w_width,i,col,wp->w_ntcols);
-		int canstart=1;
-		for(i0=0 ;i0< real_line_len;i0++) {
-			// Check for boundary characters
-				c1 = vtlm[i0];
-				if(!fp->hl->c_inword(c1))
-				{ 
-					canstart=1;
-					continue;
-				}
-			if(canstart) {
-			// MESG("		421 i0=%d",i0);
-			// Highlight numerics, set type to H_NUMERIC
-				if(!checknumerics(fp,vtlm,&i0,COLOR_STANDOUT_FG))
-			// check for words of type 1, set type to H_WORD1
-				if(!checkwords(fp,vtlm,&i0,fp->hl->w0,COLOR_WORD1_FG))
-			// check for words of type 2, set type to H_WORD2
-				checkwords(fp,vtlm,&i0,fp->hl->w1,COLOR_WORD2_FG);
-				canstart=0;
-				// MESG("	422 i0=%d",i0);
-			}
- 		};
-#endif
  	};	// syntaxh
 //	find the offset of the first column
 	col=0;

@@ -713,8 +713,8 @@ int set_font(char *font_name)
 		wp->w_ntrows = wd->nrows;
 		if(wd->nrows * CHEIGHTI < wd->height) wp->w_ntrows++;
 		wp->w_ntcols = wd->ncols;
-		set_window_width(wp);
 		if(wd->ncols * CLEN < wd->width) wp->w_ntcols++;
+		set_window_width(wp);
 		wp->w_ntrows+=half_last_line;
 		allocate_virtual_window(wp);
 	};

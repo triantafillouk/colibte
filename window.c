@@ -19,7 +19,8 @@ extern int drv_initialized;
 GWINDP * drv_new_twinp();
 int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from);
 int DiffColumns(FILEBUF *fp, offs start,offs col_offs,char *from);
-offs FNext_wrap_line(WINDP *wp,offs current_offset,int lines);
+offs FNext_wrap_line(WINDP *wp,offs current_offset,int lines,int top);
+void set_top_hline(WINDP *wp,offs cof,char *from);
 
 int window_num()
 {
@@ -172,7 +173,7 @@ int prev_window(int n)
 
 offs check_next_char(FILEBUF *fp,offs o,int *col) ;
 
-offs FNext_wrap_line(WINDP *wp,offs start,int lines)
+offs FNext_wrap_line(WINDP *wp,offs start,int lines,int top)
 {
  offs o=start;
  FILEBUF *fp=wp->w_fp;
@@ -190,7 +191,7 @@ offs FNext_wrap_line(WINDP *wp,offs start,int lines)
 	};
 	if(FEolAt(fp,o)) {
 		// if(col+col_now<wp->w_width) { o++;continue;};
-		o++;
+		o+=fp->EolSize;
 		col=0;
 		// MESG("		: eol break! %ld new at %ld col=%d",start,o,col);
 		break;
@@ -246,9 +247,9 @@ for col_position=0
 
 offs   FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines)
 {
- MESG("FPrev_wrap_line:");
  FILEBUF *fp=wp->w_fp;
  TextPoint *pwl = new_textpoint_at(fp,1,ptr);
+ MESG("FPrev_wrap_line: now at o=%ld %ld l=%ld c=%ld",tp_offset(pwl),ptr,tp_line(pwl),tp_col(pwl));
  int col_position = tp_col(pwl) % wp->w_width;
  // if(FEolAt(fp,ptr) && col_position>0)
  if(col_position < cwp->goal_column) col_position=cwp->goal_column;
@@ -260,7 +261,14 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines)
  num o1=ptr;
  if(tp_col(pwl) >= num_lines*wp->w_width) 
  {
-	MESG("13 tp_col=%ld n=%d w=%d",tp_col(pwl),num_lines,wp->w_width);
+	MESG("13 tp_col=%ld n=%d w=%d",tp_col(pwl),num_lines,wp->w_width,num_lines*wp->w_width);
+#if	1
+	textpoint_set_lc(pwl,tp_line(pwl),tp_col(pwl)-num_lines*wp->w_width);
+	o1=tp_offset(pwl);
+	MESG("	1: l=%ld c=%ld o=%ld",tp_line(pwl),tp_col(pwl),o1);
+	textpoint_set(pwl,o1);
+		MESG("	2: l=%ld c=%ld o=%ld",tp_line(pwl),tp_col(pwl),o1);
+#else
  	num col=tp_col(pwl) - num_lines*wp->w_width;
 	/// if(tp_col(pwl)%wp->w_width < cwp->goal_column) col += cwp->goal_column - tp_col(pwl)%wp->w_width;
 	// if(col%wp->w_width < wp->goal_column) col += (wp->goal_column - col%wp->w_width);
@@ -278,12 +286,13 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines)
 	};
 #endif
  	// MESG(";FPre_line:num_lines=%d pline=%ld -> line=%ld  col %ld -> %ld o1=%ld >= width %d rows=%d",num_lines,pline,line,prev_col,tp_col(pwl),o1,wp->w_width,wp->w_ntrows);
+#endif
  } else {
 	MESG("11");
  	if(line>0) {
 		line -= num_lines;
 		if(line<0) line=0;
-		MESG("set pwl to start of previous line!");
+		MESG("set pwl to start of previous line (%ld)!",line);
 		textpoint_set_lc(pwl,line,0);
 		MESG("1");
 		num goal_column = wp->goal_column % wp->w_width;
@@ -326,7 +335,7 @@ int move_window(int n)
 	// MESG("move_window: current=%ld n=%d",curoffs,n);
     if (n < 0) {
 			if(is_wrap_text(cwp->w_fp)) {
-			curoffs=FNext_wrap_line(cwp,curoffs,-n);
+			curoffs=FNext_wrap_line(cwp,curoffs,-n,1);
 			} else {	
         while (n++ < 0) {
 				curoffs=FNextLine(cbfp,curoffs);
@@ -344,7 +353,8 @@ int move_window(int n)
     }
 	set_update(cwp,UPD_MOVE|UPD_WINDOW);
 	tp_copy(cwp->prev_hline,cwp->tp_hline);
-	textpoint_set(cwp->tp_hline,curoffs);
+	set_top_hline(cwp,curoffs,"move_window");
+	// textpoint_set(cwp->tp_hline,curoffs);
 	// MESG("move_window: by %d top from (o=%ld l=%ld) to (o=%ld l=%ld) col=%ld",lines_to_move,from_offset,from_line
 		// ,curoffs,tp_line(cwp->tp_hline),tp_col(cwp->tp_hline));
 
@@ -442,7 +452,7 @@ int chardline(WINDP *wp)
  do
  {
 	if(is_wrap_text(wp->w_fp))
-	 	ptr=FNext_wrap_line(wp,ptr,1);
+	 	ptr=FNext_wrap_line(wp,ptr,1,1);
 	else
 	 	ptr=FNextLine(wp->w_fp,ptr);
 	if(ptr>current_offset) break;
@@ -535,10 +545,14 @@ int window_cursor_line(WINDP *wp)
 
 void next_column(int cols)
 {
- offs from = tp_offset(cbfp->tp_current);
- offs o=from;
- int col=0;
-#if	1
+ TextPoint *tp=cbfp->tp_current;
+ // offs from = tp_offse(tp);
+ // offs o=from;
+ // int col=0;
+ textpoint_set_lc(tp,tp_line(tp),tp_col(tp)+cols);
+ return;
+#if	0
+#if	0
  // MESG_time("next_column: start");
  int num_chars=0;
 	while (col<cols) {
@@ -557,6 +571,7 @@ void next_column(int cols)
 	};
 #endif
  // MESG("next_column: cols=%d from=%ld to %ld line %ld col %ld",cols,from,tp_offset(cbfp->tp_current),tp_line(cbfp->tp_current),tp_col(cbfp->tp_current));
+#endif
 }
 
 /*

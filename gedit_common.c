@@ -15,7 +15,7 @@ int set_tag_view_position(int line,int column);
 extern FILEBUF *cbfp;
 int get_current_line();
 int change_sort_mode(int mouse_col);
-offs FNext_wrap_line(WINDP *wp,offs start,int num_lines);
+offs FNext_wrap_line(WINDP *wp,offs start,int num_lines,int top);
 
 // This is used in scrolling!
 void move_window_lines(WINDP *wp,int lines)

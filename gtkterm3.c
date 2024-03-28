@@ -33,6 +33,7 @@ void set_cursor(int val,char *from);
 void set_window_font(WINDP *wp);
 void ge_edit_display_expose_area(GtkWidget *widget, GdkRectangle *area);
 char **get_scheme_names();
+void upd_all_wrap_lines(WINDP *wp,char *from);
 
 GdkRGBA *current_colors[COLOR_TYPES];
 

@@ -57,7 +57,7 @@ int imove_top_line(num new_top_line);
 int set_sposition(WINDP *wp,int *st, int *l);
 void utf_string_break(char *utf_string, int column);
 int change_sort_mode(int mouse_col);
-offs FNext_wrap_line(WINDP *wp,offs start,int num_lines);
+offs FNext_wrap_line(WINDP *wp,offs start,int num_lines,int top);
 
 int	colorupdate;
 int color_scheme_ind=0;
@@ -910,7 +910,7 @@ int text_mouse_function(int move)
 	for(i=head_line;i<mouse_window_row;i++) 
 	{
 		if(is_wrap_text(cbfp)) 
-		new_offset = FNext_wrap_line(cwp,new_offset,1);
+		new_offset = FNext_wrap_line(cwp,new_offset,1,1);
 		else 
   		new_offset = FNextLine(cbfp,new_offset);
 	};
@@ -1724,6 +1724,7 @@ int check_v_sibling(WINDP *wp,int left,int top,int new_cols)
 			};
 			if(!left) wp1->gwp->t_xpos -= new_cols;
 			wp1->w_ntcols += new_cols;
+			set_window_width(wp1);
 			return true;
 		};
 	};
@@ -1869,6 +1870,7 @@ int vresize_wind(int n)
 			window_list->current=cwin;
 
 			wp1->w_ntcols -=n;
+			set_window_width(wp1);
 		}; 
  	};
 	if(wp==NULL) return false;	/* no window found to give/take space  */
@@ -1880,6 +1882,7 @@ int vresize_wind(int n)
 		cwp->gwp->h_flags=2;
 		cwp->w_ntcols +=n;	
 		cwp->gwp->t_xpos-=n;
+		set_window_width(cwp);
 	};
 	};
  } else {	/* current window on left of the screen  */
@@ -1901,6 +1904,7 @@ int vresize_wind(int n)
 
 			wp1->gwp->t_xpos+=n;
 			wp1->w_ntcols -=n;
+			set_window_width(wp1);
 		}; 
 	}; 
 	if(wp==NULL) return false;	/* no window found to give/take space  */
@@ -1911,6 +1915,7 @@ int vresize_wind(int n)
 	if(!error) {
 		cwp->gwp->h_flags=2;
 		cwp->w_ntcols +=n;	/* set  */
+		set_window_width(cwp);
 	};
 	};
  };
