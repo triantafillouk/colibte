@@ -345,7 +345,7 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 		// MESG("top line is: %ld",new_offset);
 		for(i=0;i<mouse_row;i++) {
 			if(is_wrap_text(wp->w_fp)) 
-				new_offset = FNext_wrap_line(wp,new_offset,1);
+				new_offset = FNext_wrap_line(wp,new_offset,1,1);
 	  		else new_offset = FNextLine(cbfp,new_offset);
 		};
 		if(button==KMOUSE_DBLCLICK+1) {

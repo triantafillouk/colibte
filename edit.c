@@ -101,7 +101,7 @@ int toggle_parameter(int type)
 		msg_line("restart to change icons");
 		break;
 	case EMVINFOCOL: 
-		if(!(cbfp->view_mode & VMHEX)) {
+		if(!(cwp->w_fp->view_mode & VMHEX)) {
 		set_update(cwp,UPD_MOVE|UPD_FULL);
 //		MESG("toggle_parameter [%d] val=%d",EMVINFOCOL,(int)bt_dval("show_vinfo"));
 		if((int)bt_dval("show_vinfo")) {
@@ -185,7 +185,7 @@ int goto_bol(int n)
 	} else
 	ToLineBegin();
 	set_goal_column(0,"goto_bol");
-	set_update(cwp,UPD_MOVE);
+	if(cwp) set_update(cwp,UPD_MOVE);
 	return (OK_RSTGOAL);
 }
 
@@ -431,7 +431,7 @@ int goto_eof(int n)
 	undo_set_noglue();
 	set_hmark(0,"goto_eof");
 	set_update(cwp,UPD_WINDOW);
-	cwp->w_ppline=0;
+	if(cwp) cwp->w_ppline=0;
 	msg_line(time2a());
 	return (OK_RSTGOAL);
 }

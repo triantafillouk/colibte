@@ -41,7 +41,6 @@ extern int prev_hquotem;
 extern int slang;
 extern int stop_word_highlight;
 extern int start_word_highlight;
-extern FILEBUF *cbfp;
 extern int drv_colors;
 extern int sel_tags[11];
 extern int num_of_selected_tags;
@@ -194,6 +193,21 @@ void set_update(WINDP *wp_toset, int flag)
 			tp_copy(wp->tp_hsknown, wp_toset->tp_hsknown);
 			wp->hs[0].w_hquotem = wp_toset->hs[0].w_hquotem;
 			wp->hs[0].w_slang = wp_toset->hs[0].w_slang;
+#if	1
+			wp->hs[0].w_prev_set = wp_toset->hs[0].w_prev_set;
+			wp->hs[0].w_hselection = wp_toset->hs[0].w_hselection;
+			wp->hs[0].w_notes = wp_toset->hs[0].w_notes;
+			wp->hs[0].w_first = wp_toset->hs[0].w_first;
+			wp->hs[0].w_in_array = wp_toset->hs[0].w_in_array;
+			wp->hs[0].flag_word = wp_toset->hs[0].flag_word;
+			wp->hs[0].w_prev_space = wp_toset->hs[0].w_prev_space;
+			wp->hs[0].single_quoted = wp_toset->hs[0].single_quoted;
+			wp->hs[0].double_quoted = wp_toset->hs[0].double_quoted;
+			wp->hs[0].w_bold = wp_toset->hs[0].w_bold;
+			wp->hs[0].w_hquote_start = wp_toset->hs[0].w_hquote_start;
+			wp->hs[0].w_line_set = wp_toset->hs[0].w_line_set;
+			wp->hs[0].w_hstate = wp_toset->hs[0].w_hstate;
+#endif
 			// MESG("set_update: window %d flag %d",wp->id,wp->w_flag);
 		};
 	};
@@ -271,7 +285,7 @@ int error_line(char *error_message,...)
 
 void upd_column_pos_hex()
 {
-	if(cbfp->view_mode & VMINP) {
+	if(cwp->w_fp->view_mode & VMINP) {
 		cwp->curcol += 10 + 2*cwp->curcol+get_hex_byte();
 	} else {
 		cwp->curcol+=HSTART+1;
@@ -294,26 +308,27 @@ void upd_column_pos()
 {
  int mo;
  int total_columns;
- // if(is_wrap_text(cbfp)) show_time("upd_column_pos1",1);
+ FILEBUF *fp = cwp->w_fp;
+ // if(is_wrap_text(fp)) show_time("upd_column_pos1",1);
 	// cwp->curcol = GetCol();
 #if	0
-	cwp->curcol = tp_col(cbfp->tp_current);
+	cwp->curcol = tp_col(fp->tp_current);
 #if	1
-	if(tp_col(cbfp->tp_current)!=FColumn(cbfp,FOffset(cbfp))) {
-		MESG("	upd_column_pos: ERROR! o=%ld %ld != %ld",tp_col(cbfp->tp_current),FColumn(cbfp,FOffset(cbfp)));
+	if(tp_col(fp->tp_current)!=FColumn(,FOffset(fp))) {
+		MESG("	upd_column_pos: ERROR! o=%ld %ld != %ld",tp_col(fp->tp_current),FColumn(fp,FOffset(fp)));
 	};
 #endif
 #else
-	cwp->curcol = FColumn(cbfp,FOffset(cbfp));
+	cwp->curcol = FColumn(fp,FOffset(fp));
 #endif
 	// MESG("upd_column_pos: curcol=%d",cwp->curcol);
- // if(is_wrap_text(cbfp)) show_time("upd_column_pos2",1);
+ // if(is_wrap_text(fp)) show_time("upd_column_pos2",1);
 	total_columns=cwp->w_width;
 	if(cwp->w_ntcols==0) return;
-	if(cbfp->view_mode & VMHEX){ 
+	if(fp->view_mode & VMHEX){ 
 		upd_column_pos_hex();
 	} else 
-	if(is_wrap_text(cbfp)) {
+	if(is_wrap_text(fp)) {
 		// MESG("upd_column_pos_wrap:");
 		upd_column_pos_wrap();
 		// MESG("upd_column_pos_wrap:ok");
@@ -1810,7 +1825,7 @@ int check_cursor_position_wrap(WINDP *wp)
 		update_top_position_wrap();
 		return FALSE;
 	}  else if  (wcl > wp->w_ntrows-2
-				&& wcl <= wp->w_ntrows
+				&& wcl < wp->w_ntrows
 	) {
 		// MESG("	> ppline=%ld currow=%d",wp->w_ppline,wp->currow);
 		move_window(-1);
@@ -1903,11 +1918,11 @@ int  show_position_info(int short_version)
 	num loffs;
 	char str[MAXSLEN];
 	int sstat=0;
-	// MESG("show_position_info: b_flag=%X",cbfp->b_flag);
 	if(cwp==NULL) return false;
+	FILEBUF *fp = cwp->w_fp;
 #if	TNOTES
-	if(cbfp->b_flag>=FSNOTES) {
-	  if(cbfp->b_flag & FSDIRED) 
+	if(fp->b_flag>=FSNOTES) {
+	  if(fp->b_flag & FSDIRED) 
 	  {
 	  	// MESG("show dir info");
 	  	if(!short_version) {
@@ -1923,7 +1938,7 @@ int  show_position_info(int short_version)
 	  };
 	} else
 #else
-	if(cbfp->b_flag & FSDIRED) 
+	if(fp->b_flag & FSDIRED) 
 	{
 		// MESG("show dir info");
 		if(!short_version) {
@@ -1938,8 +1953,8 @@ int  show_position_info(int short_version)
 #endif 
 	{
 	loffs=Offset()-LineBegin(Offset())+1;
-	// MESG("show_position_info: o=%ld loff=%ld b_flag=%X b_mode=%X b_state=%X",Offset(),loffs,cbfp->b_flag,cbfp->b_mode,cbfp->b_state);
-	if(cbfp->view_mode & VMHEX) {
+	// MESG("show_position_info: o=%ld loff=%ld b_flag=%X b_mode=%X b_state=%X",Offset(),loffs,fp->b_flag,fp->b_mode,fp->b_state);
+	if(fp->view_mode & VMHEX) {
 		if(short_version==0) {
 			sstat=snprintf(str,MAXSLEN,"%5lld %5llX (%02lX)",Offset(),Offset(),utf_value());
 		} else sstat=snprintf(str,MAXSLEN,"%5llX",Offset());
@@ -1954,7 +1969,7 @@ int  show_position_info(int short_version)
 			sstat=snprintf(str,MAXSLEN,"%6lld",getcline()+1);
 		} else {
 			if(Eol()) {
-				if(is_wrap_text(cbfp)){
+				if(is_wrap_text(fp)){
 					sstat=snprintf(str,MAXSLEN,"%6lld %7lld ",getcline()+1,loffs);
 				} else {
 				if(bt_dval("show_coffset")) {
@@ -1972,7 +1987,7 @@ int  show_position_info(int short_version)
 			} else {
 				sstat=snprintf(str,MAXSLEN,"%6lld ",getcline()+1);
 				
-				if(is_wrap_text(cbfp)){
+				if(is_wrap_text(fp)){
 					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",loffs);
 				} else {
 					if(bt_dval("show_coffset")) {
@@ -2227,10 +2242,10 @@ void upd_some_virtual_lines(WINDP *wp,char *from)
 	
 			if (lp_offs <= FSize(wp->w_fp)) { // if not at the end of file
 			/* if we are not at the end */
-				if(cwp->selection==0) set_selection(false);
+				if(wp->selection==0) set_selection(false);
 				lp_offs=vtline(wp,lp_offs);
 				/* we must update the column selection here */
-				if(cwp->selection) set_selection(false);
+				if(wp->selection) set_selection(false);
 			};
 			vteeol(wp,0,0);
 		}
@@ -2561,10 +2576,10 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 			vtmove(wp,sline, 0);
 			if (lp_offs <= FSize(wp->w_fp)) { // if not at the end of file
 			/* if we are not at the end */
-				if(cwp->selection==0) set_selection(false);
+				if(wp->selection==0) set_selection(false);
 				lp_offs=vtline(wp,lp_offs);
 				/* we must update the column selection here */
-				if(cwp->selection) set_selection(false);
+				if(wp->selection) set_selection(false);
 			};
 			
 			vteeol(wp,0,0);

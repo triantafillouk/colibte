@@ -351,7 +351,7 @@ int move_window(int n)
 			curoffs=FNext_wrap_line(cwp,curoffs,-n,1);
 			} else {	
         while (n++ < 0) {
-				curoffs=FNextLine(cbfp,curoffs);
+				curoffs=FNextLine(cwp->w_fp,curoffs);
 		}
 			};
     } else  {
@@ -361,7 +361,7 @@ int move_window(int n)
 				curoffs = FPrev_wrap_line(cwp,curoffs,1);
 			};
 		} else {
-	        while ((n-- >0) && (curoffs>0)) curoffs=FPrevLine(cbfp,curoffs);
+	        while ((n-- >0) && (curoffs>0)) curoffs=FPrevLine(cwp->w_fp,curoffs);
 		};
     }
 	set_update(cwp,UPD_MOVE|UPD_WINDOW);
@@ -558,7 +558,7 @@ int window_cursor_line(WINDP *wp)
 
 void next_column(int cols)
 {
- TextPoint *tp=cbfp->tp_current;
+ TextPoint *tp=cwp->tp_current;
  // offs from = tp_offse(tp);
  // offs o=from;
  // int col=0;
@@ -569,21 +569,21 @@ void next_column(int cols)
  // MESG_time("next_column: start");
  int num_chars=0;
 	while (col<cols) {
-		if(FEof(cbfp)) return;
-		o = check_next_char(cbfp,o,&col);
+		if(FEof(fp)) return;
+		o = check_next_char(fp,o,&col);
 		num_chars++;
 	};
 	// MESG_time("next_column: from=%ld to %ld",from,o);
-	textpoint_set(cbfp->tp_current,o);
+	textpoint_set(fp->tp_current,o);
 
 #else
 	while (col<cols) {
-		if(FEof(cbfp)) return;
-		o = check_next_char(cbfp,o,&col);
-		MoveRightChar(cbfp);
+		if(FEof(fp)) return;
+		o = check_next_char(fp,o,&col);
+		MoveRightChar(fp);
 	};
 #endif
- // MESG("next_column: cols=%d from=%ld to %ld line %ld col %ld",cols,from,tp_offset(cbfp->tp_current),tp_line(cbfp->tp_current),tp_col(cbfp->tp_current));
+ // MESG("next_column: cols=%d from=%ld to %ld line %ld col %ld",cols,from,tp_offset(fp->tp_current),tp_line(fp->tp_current),tp_col(fp->tp_current));
 #endif
 }
 
@@ -600,12 +600,13 @@ void set_xmark(WINDP *smark_wp, int mouse_col,int mouse_row,int f)
 	int goal=0;
 
 	if(smark_wp==NULL) return;
+	FILEBUF *fp = smark_wp->w_fp;
 
 	if(smark_wp->w_fp->view_mode & VMHEX) mouse_col-=HSTART+1;
 		/* find line (mouse_row) lines down from top window line */
 		new_offset=LineBegin(tp_offset(smark_wp->tp_hline));
 		for(i=0;i<mouse_row;i++) {
-	  		new_offset = FNextLine(cbfp,new_offset);
+	  		new_offset = FNextLine(fp,new_offset);
 		};
 		if(f==0) { /* set start mark */
 			goal=valid_offset(new_offset,mouse_col+smark_wp->w_lcol);
@@ -806,10 +807,10 @@ int getwline()	/* get screen offset of current line in current window */
 	/* search down the line we want */
 	ptr=LineBegin(tp_offset(cwp->tp_hline));
 	while (ptr <= Offset() && ptr<CSize()) {
-		ptr=FNextLine(cbfp,ptr);
+		ptr=FNextLine(cwp->w_fp,ptr);
 		screen_row++;
 	}
-	if(Offset()==FSize(cbfp)) {
+	if(Offset()==FSize(cwp->w_fp)) {
 		if(Bol()) screen_row++;
 	};
 	/* and return the value */
@@ -825,7 +826,7 @@ int sh_outwindow(int n)
 		if(bp->b_nwnd >0) {
 			WINDP *out_window = find_buffer_window(bp);
 			// find output window and close it!
-			if(out_window && cbfp != bp) {
+			if(out_window && current_window->w_fp != bp) {
 				cwp=out_window;
 				delete_window(1);
 				set_current_window(current_window,"sh_outwindow");

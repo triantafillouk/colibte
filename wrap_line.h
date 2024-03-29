@@ -243,9 +243,8 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 	};
 	// MESG("end line: >");
 
-	// MESG("	col=%d w=%d cur_lend=%ld ptr1=%ld",col,cwp->w_width,ptr1);
 	if(ptr1==cur_lend){
-	  if(col==cwp->w_width+1) return ptr1;
+	  if(col==wp->w_width+1) return ptr1;
 	  else return ptr1+wp->w_fp->EolSize;
 	} else return ptr1;
 
@@ -263,7 +262,7 @@ void upd_all_wrap_lines(WINDP *wp,char *from)
 	if(wp->w_fp == NULL) return;
 	/* search down the lines, updating them */
 	lp_offs = tp_offset(wp->tp_hline);
-	// MESG_time("#update_all_wrap_lines: top=%ld", lp_offs);
+	MESG_time("#update_all_wrap_lines:window %d width=%d top offset=%ld", wp->id,wp->w_width, lp_offs);
 	wp->w_fp->hl->h_update(wp);
 	set_selection(0);
 
@@ -279,12 +278,12 @@ void upd_all_wrap_lines(WINDP *wp,char *from)
 		vtmove(wp,sline, 0);
 		if (lp_offs <= FSize(wp->w_fp)) { // if not at the end of file
 		/* if we are not at the end */
-			if(cwp->selection==0) set_selection(false);
+			if(wp->selection==0) set_selection(false);
 			// MESG("	vt_wrap_line: %d at %ld",sline,lp_offs);
 			// cline_end=cashed_FLend(wp->w_fp,lp_offs);
 			lp_offs=vt_wrap_line(wp,lp_offs);
 			/* we must update the column selection here */
-			if(cwp->selection) set_selection(false);
+			if(wp->selection) set_selection(false);
 		};
 		
 		vteeol(wp,0,0);
