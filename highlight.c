@@ -3159,6 +3159,9 @@ void setwquotes(WINDP *wp,int ind,num known_offset)
 	wp->hs[ind].w_in_array = in_array;
 	wp->hs[ind].w_first = first;
 	wp->hs[ind].w_prev_set = prev_set;
+	wp->hs[ind].flag_word = flag_word;
+	wp->hs[ind].single_quoted=single_quoted;
+	wp->hs[ind].double_quoted = double_quoted;
 	wp->hs[ind].w_bold = h_bold;
 	wp->hs[ind].w_hquote_start = h_hquote_start;
 	wp->hs[ind].w_line_set = h_line_set;
@@ -3173,9 +3176,10 @@ offs getwquotes(WINDP *wp,int ind)
 	slang=wp->hs[ind].w_slang;
 	hselection=wp->hs[ind].w_hselection;
 	hnote = wp->hs[ind].w_notes;
+
 	hstate = wp->hs[ind].w_hstate;
-	first = wp->hs[ind].w_first;
 	in_array = wp->hs[ind].w_in_array;
+	first = wp->hs[ind].w_first;
 	prev_set = wp->hs[ind].w_prev_set;
 	flag_word = wp->hs[ind].flag_word;
 	single_quoted = wp->hs[ind].single_quoted;
