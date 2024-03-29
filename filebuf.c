@@ -579,7 +579,7 @@ int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
  return(col);
 }
 
-#if	1
+#if	0
 void FindLineCol(TextPoint *tp)
 {
  FILEBUF *fp=tp->fp;
@@ -738,7 +738,9 @@ void FindLineCol(TextPoint *tp)
      o=found->offset;
      c=found->col;
      l=found->line;
-	 MESG("findlinecol: o=%ld found o=%ld c=%ld l=%ld",tp->offset,o,c,l);
+#if	WRAPD
+	 // MESG("findlinecol: o=%ld found o=%ld c=%ld l=%ld",tp->offset,o,c,l);
+#endif
    } else {
       o=c=l=0;
    };
@@ -751,7 +753,9 @@ void FindLineCol(TextPoint *tp)
          o=FPrevLine(fp,o);
          l--;
       };
+#if	WRAPD
 	  MESG("	go back and start from o=%ld l=%ld c=0",o,l);
+#endif
    };
 
 
@@ -775,11 +779,15 @@ void FindLineCol(TextPoint *tp)
       c=0;
    };
 	c += DiffColumn(fp,&o,tp->offset,"FindLineCol:OK");
-	MESG("	we are on the same line %ld, find col = %ld",l,c);
+#if	WRAPD
+	// MESG("	we are on the same line %ld, find col = %ld",l,c);
+#endif
    tp->col=c;
    tp->line=l;
    if(o!=tp->offset) {
+#if	WRAPD
 	   MESG("FindLineCol: offset modified!, o=%ld != tp->offset=%ld l=%ld c=%ld",o,tp->offset,l,c);
+#endif
 	   tp->offset=o;
    };
    tp->flags = FULLDEFINED;
@@ -1199,9 +1207,9 @@ void  FindOffset(TextPoint *tp)
    while(c<tp->col) {
 	utfchar uc;
 	o=FUtfCharAt(fp,o,&uc);
-	if(FEolAt(fp,o)) {
-		o-=fp->EolSize;
-		MESG("FindOffset: EOL, column bigger than expected! % %d",c,tp->col);
+	if(uc.uval[0]=='\n'||uc.uval[0]=='\r') {
+		o--;
+		MESG("FindOffset: EOL, column bigger than expected! %d %d",c,tp->col);
 		break;
 	};
 	if(uc.uval[0]=='\t') c=next_tab(c);

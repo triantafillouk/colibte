@@ -179,7 +179,7 @@ offs FNext_wrap_line(WINDP *wp,offs start,int lines,int top)
  FILEBUF *fp=wp->w_fp;
  // from the start of the wrap line
  int col=0;
- MESG_time(";FNext_wrap_line: from %ld lines=%d",start,lines);
+ // MESG_time(";FNext_wrap_line: from %ld lines=%d",start,lines);
 
  while(lines-- >0)
  {
@@ -249,25 +249,32 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines)
 {
  FILEBUF *fp=wp->w_fp;
  TextPoint *pwl = new_textpoint_at(fp,1,ptr);
+#if	WRAPD
  MESG("FPrev_wrap_line: now at o=%ld %ld l=%ld c=%ld",tp_offset(pwl),ptr,tp_line(pwl),tp_col(pwl));
+#endif
  int col_position = tp_col(pwl) % wp->w_width;
  // if(FEolAt(fp,ptr) && col_position>0)
  if(col_position < cwp->goal_column) col_position=cwp->goal_column;
  num line=tp_line(pwl);
  num prev_col=tp_col(pwl);
+#if	WRAPD
  MESG(";FPrev_wrap_line:num_lines=%d wcol_pos=%d line=%ld o=%ld tp_col=%ld >= %d",num_lines,col_position,line,ptr,tp_col(pwl),num_lines*wp->w_width);
  MESG("12");
-
+#endif
  num o1=ptr;
  if(tp_col(pwl) >= num_lines*wp->w_width) 
  {
+#if	WRAPD
 	MESG("13 tp_col=%ld n=%d w=%d",tp_col(pwl),num_lines,wp->w_width,num_lines*wp->w_width);
+#endif
 #if	1
 	textpoint_set_lc(pwl,tp_line(pwl),tp_col(pwl)-num_lines*wp->w_width);
 	o1=tp_offset(pwl);
+#if	WRAPD
 	MESG("	1: l=%ld c=%ld o=%ld",tp_line(pwl),tp_col(pwl),o1);
 	textpoint_set(pwl,o1);
-		MESG("	2: l=%ld c=%ld o=%ld",tp_line(pwl),tp_col(pwl),o1);
+	MESG("	2: l=%ld c=%ld o=%ld",tp_line(pwl),tp_col(pwl),o1);
+#endif
 #else
  	num col=tp_col(pwl) - num_lines*wp->w_width;
 	/// if(tp_col(pwl)%wp->w_width < cwp->goal_column) col += cwp->goal_column - tp_col(pwl)%wp->w_width;
@@ -288,20 +295,26 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines)
  	// MESG(";FPre_line:num_lines=%d pline=%ld -> line=%ld  col %ld -> %ld o1=%ld >= width %d rows=%d",num_lines,pline,line,prev_col,tp_col(pwl),o1,wp->w_width,wp->w_ntrows);
 #endif
  } else {
-	MESG("11");
+	// MESG("11");
  	if(line>0) {
 		line -= num_lines;
 		if(line<0) line=0;
+#if	WRAPD
 		MESG("set pwl to start of previous line (%ld)!",line);
+#endif
 		textpoint_set_lc(pwl,line,0);
-		MESG("1");
+		// MESG("1");
 		num goal_column = wp->goal_column % wp->w_width;
 		if(col_position==0) set_goal_column(0,"FPrev_wrap_line");
 		num o0 = tp_offset(pwl);
 		    o1 = FLineEnd(fp,o0);
+#if	WRAPD
 		MESG("	goto prev line: %ld o0=%ld end=%ld",line,o0,o1);
+#endif
 		num linecols = DiffColumns(fp,o0,o1,"Fprev_wrap_line:2:BEG");
+#if	WRAPD
 		MESG("	goto prev line: %ld o0=%ld end=%ld linecols=%ld col=%ld",line,o0,o1,linecols,tp_col(pwl));
+#endif
 		num rest = linecols % wp->w_width;
 		num full_lines = linecols / wp->w_width;
 		if(rest <= goal_column) {

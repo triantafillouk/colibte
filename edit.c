@@ -478,9 +478,10 @@ int next_wrap_line(int n)
 	current_line=get_current_line();
 	cwp->w_prev_line=current_line;
 
+#if	WRAPD
 	MESG_time("next_wrap_line: current line=%ld %ld c=%ld o=%ld",
 		tp_line(cwp->tp_current),current_line,tp_col(cwp->tp_current),tp_offset(cwp->tp_current));
-
+#endif
     if(lock_move) {
 		if(current_line==tp_line(cwp->tp_hline))
 		{
@@ -505,7 +506,9 @@ int next_wrap_line(int n)
 		offs o=o_now;
 		while(!EolAt(o) && o< o_now+(n+2)*cwp->w_width) {
 			if(EofAt(o)) {
+#if	WRAPD
 				MESG("next_wrap_line: at end return false!");
+#endif
 				return(FALSE);
 			}
 			o++;
@@ -520,15 +523,21 @@ int next_wrap_line(int n)
 		MESG_time("next_wrap_line:1 wrap mode! o=%ld end=%ld remain columns=%d",o_now,o_end,remains);
 #endif
 		if(remains>= n*cwp->w_width) {
+#if	WRAPD
 			MESG("next_wrap_line:2 remains %d > w=%d",remains,cwp->w_width);
+#endif
 			next_column(n*cwp->w_width);
 		} else {
 			int now_col=tp_col(cwp->tp_current) % cwp->w_width;
 			if(now_col+remains >= cwp->w_width) {
+#if	WRAPD
 				MESG("next_wrap_line:3 now_col %d + remains %d >= w=%d",now_col,remains,cwp->w_width);
+#endif
 				next_column(remains);
 			} else {
+#if	WRAPD
 				MESG("next_wrap_line:4 now_col %d + remains %d < w=%d",now_col,remains,cwp->w_width);
+#endif
 				MoveLineCol(current_line+n,cwp->goal_column);
 			}
 		};
@@ -646,8 +655,9 @@ int prev_wrap_line(int n)
  num current_line=get_current_line();
 
 	cwp->w_prev_line=current_line;
+#if	WRAPD
 	MESG("!prev_wrap_line: current=%d row=%d lock=%d",current_line,cwp->currow,lock_move);
-
+#endif
 	// if(current_line-n < 0) n=current_line;
 
     if(lock_move) {
@@ -667,7 +677,7 @@ int prev_wrap_line(int n)
     };
 
 	offs o_now=tp_offset(cwp->tp_current);
-	MESG("prev_line:1");
+	// MESG("prev_line:1");
 	offs new_offset = FPrev_wrap_line(cwp,o_now,n);
 	textpoint_set(cwp->tp_current,new_offset);
 #if	WRAPD

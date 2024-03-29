@@ -1832,7 +1832,7 @@ void set_top_hline(WINDP *wp,offs cof,char *from)
 		textpoint_set_lc(wp->tp_hline,tp_line(wp->tp_hline),0);
 		// MESG("set_top_hline: error correct!!!!!!");
 	};
-	MESG("set_top_hline:[%s] l=%ld o=%ld c=%ld",from,tp_line(wp->tp_hline),tp_offset(wp->tp_hline),tp_col(wp->tp_hline));
+	// MESG("set_top_hline:[%s] l=%ld o=%ld c=%ld",from,tp_line(wp->tp_hline),tp_offset(wp->tp_hline),tp_col(wp->tp_hline));
 }
 
 /*	check_cursor_position:	check to see if the cursor is on screen */
