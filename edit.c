@@ -742,8 +742,9 @@ int prev_line(int n)
 
 	if(current_line-n < tp_line(cwp->tp_hline))
 	{ // move up window
-		move_window(n+tp_line(cwp->tp_hline)-current_line);
-	} else
+		// move_window(n+tp_line(cwp->tp_hline)-current_line);
+		move_window(n+current_line-tp_line(cwp->tp_hline));
+	};
 	if(cbfp->view_mode & VMHEX){
 		textpoint_set_lc(cbfp->tp_current,current_line-n,Offset()%16);
 	} else {

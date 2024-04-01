@@ -529,6 +529,7 @@ M_element e_mode[] =
 	{0, 'H', "Highlight toggle ","",  toggle_highlight, 0,"MH"},
 	{0, 'R', "cRypt            ","",  toggle_crypt, 0,"MR"},
 	{0, 'J', "Justify          ","",  toggle_just, 0,"MJ"},	
+	{0, 'O', "Overwrite toggle ","",  toggle_over, 0,"MO"},
 	{MMENU,'G',"Global options   ","", NULL, &global_params,"MG" },
 	{MMENU,'V',"View mode        ","", NULL, &m_viewas,"MV"},
 #if	PCURSES

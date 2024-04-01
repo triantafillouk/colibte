@@ -446,14 +446,7 @@ int	setpattern(char apat[], char *st,int srch)
 	{
 		matchlen = strlen(apat);
 		if (gmode_exact_case == 0) {
-#if	1
 			get_uppercase_string(apat,apat);
-#else
-			gchar *upper;
-			upper = g_utf8_strup(apat,-1);
-			strlcpy(apat,upper,MAXLLEN);
-			g_free(upper);
-#endif
 		};
 	};
 	// reset pattern match
@@ -581,14 +574,7 @@ int	replaces(int query, int next_only, int n)
 		nextarg("replace",search_pattern,MAXLLEN,true);
 		num_expression();
 		if (gmode_exact_case == 0) {
-#if	1
 			get_uppercase_string(search_pattern,search_pattern);
-#else
-			gchar *upper;
-			upper = g_utf8_strup(search_pattern,-1);
-			strlcpy(search_pattern,upper,MAXLLEN);
-			g_free(upper);
-#endif
 		};
 
 		matchlen=strlen(search_pattern);
@@ -1199,7 +1185,6 @@ int	rexp_scanner(REXP_PAT *patptr, int direct, int beg_or_end)
 
 	return FALSE;	/* We could not find a match */
 }
-#define	UTFCOMP	1
 
 int amatch(char c1,REXP_PAT *pat,int direct)
 {

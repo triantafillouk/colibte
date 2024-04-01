@@ -967,131 +967,6 @@ TextPoint *tp_dup(TextPoint *tp,int window_id)
  return t;
 }
 
-#if	0
-void  FindOffset(TextPoint *tp)
-{
-    TextPoint   *found=NULL;
-	offs dist=INT_MAX;
-	offs new_dist=INT_MAX;
-	FILEBUF *fp=tp->fp;
-#if	WRAPD
-	num o0,l0,c0,t0,o1,l1,c1,o2;
-	MESG("FindOffset: l=%ld c=%ld t=%d",tp->line,tp->col,tp->flags);
-#endif
-	if(fp->view_mode & VMHEX) {
-		tp->offset = tp->line * HEX_LINE_LEN + tp->col;
-		tp->flags=0;
-		if(tp->offset > FSize(tp->fp)) {
-			tp->offset=FSize(tp->fp);
-			tp->flags = LINECOLUNDEFINED;
-			FindLineCol(tp);
-		};
-		return;
-	};
-	TextPoint *scan;
-	for(scan=fp->tp_last ; scan; scan=scan->t_next) {
-		if(scan==tp) continue;
-		if(!(scan->flags))
-		{
-			new_dist=llabs(tp->line - scan->line);
-			if(  new_dist < dist )
-			{
-				found=scan;
-				dist=new_dist;
-				if(dist<2) break;
-			}
-		};
-	};
-
-   offs  o;
-   num   l,c;
-
-   if(found)  {
-#if	1
-     o=found->offset;
-     c=found->col;
-#else
-      if(found->flags&COLUNDEFINED) {
-         o=FLineBegin(fp,found->offset);
-         c=0;
-      } else  {
-         o=found->offset;
-         c=found->col;
-      };
-#endif
-      l=found->line;
-#if	WRAPD
-	  o0=o;l0=l;c0=c;t0=found->tp_type;
-#endif
-   } else {
-	  o=c=l=0;
-   };
-#if	WRAPD
-	  t0=0;
-#endif
-
-   if(l>tp->line) {
-      while(l>tp->line) {
-         o=FPrevLine(fp,o);
-         l--;
-      };
-      c=0;
-   }
-   else if(l<tp->line) {
-      if(FEofAt(fp,o)) {
-         tp->offset=o;
-         tp->line=l;
-         tp->col=c;
-         tp->flags = FULLDEFINED;
-         return;
-      };
-      while(l<tp->line) {
-         o=FLineEnd(fp,o);
-         if(FEofAt(fp,o)) {
-            tp->offset=o;
-            tp->line=l;
-            tp->col=0;
-            tp->flags = FULLDEFINED;
-            return;
-         }
-         o=FNextLine(fp,o);
-         l++;
-         if(FEofAt(fp,o)) {
-            tp->offset=o;
-            tp->line=l;
-            tp->col=0;
-            tp->flags = FULLDEFINED;
-            return;
-         }
-      }
-      c=0;
-   }
-	/* we have found the correct line  */
-#if	WRAPD
-   o1=o;l1=l;c1=c;
-#endif
-#if	1
-	o=FLineBegin(fp,o);c=0;
-#else
-   if(c>tp->col) { // it is difficult to correctly backspace with tabs,multiple width utf chars, go to the start of the line!!
-		o=FLineBegin(fp,o);c=0;
-   };
-#endif
-#if	WRAPD
-	o2=o;
-#endif
-   while(c<tp->col) {
-	utfchar uc;
-	o=FUtfCharAt(fp,o,&uc);
-	if(uc.uval[0]=='\t') c=next_tab(c);
-	else c+=get_utf_length(&uc);
-   };   
-
-   tp->col=c;
-   tp->offset=o;
-   tp->flags = FULLDEFINED;
-}
-#else
 void  FindOffset(TextPoint *tp)
 {
     TextPoint   *found=NULL;
@@ -1224,7 +1099,6 @@ void  FindOffset(TextPoint *tp)
    	o0,l0,c0,tp_name[t0],o1,l1,c1,o2,o);
 #endif
 }
-#endif
 
 /* set tp to offset , independant */
 void textpoint_set(TextPoint *tp,offs o)
