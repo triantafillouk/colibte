@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.58T99 (25/01/2024)"
+#define VERSION 	"#01.59T23 (1/04/2024)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -24,7 +24,6 @@
 #else
 #define DOUBLE_ESC	0	/* use double escape for abort command else single  */
 #endif
-
 #define	TARROWS		1	/* Use arrow menus in panel curses  */
 #define	USE_UTF8	1	/* Use utf8 characters  */
 
@@ -34,8 +33,10 @@
 
 #define	USE_FAST	1 & PCURSES	/* erase line for double width characters in panel_curses  */
 #define TEST_TYPE	1
+#define TWRAP		1	/* wrap mode  */
 
 #define NEW	1	/* new tested code!  */
+#define WRAPD	0	/* wrap debug  */
 
 #if	DARWIN
 #define	_FILE_OFFSET_BITS	64
@@ -56,6 +57,7 @@
 #define	TAGS_WIDTH	15
 #define	NOTES_COLUMN TAGS_WIDTH+2
 
+// b_type flag values
 #define	DIR_DEFAULT		0
 #define	DIR_PRIMARY		1
 #define	DIR_SECONDARY	2
@@ -267,6 +269,7 @@ typedef long long num;
 #define CHR_SLASH		'/'
 //#define CHR_NBSPACE		0xC2A0
 #define CHR_NBSPACE		' '
+#define CHR_FLUSH		512
 
 #define	PATHCHR	':'
 #define DIRSEPSTR "/"
@@ -423,10 +426,20 @@ typedef struct DRV_FLAGS {
 
 typedef struct MLQUOTES {
 	unsigned int w_hquotem;
+	unsigned int w_prev_set;
 	unsigned char w_hselection;
 	unsigned char w_slang;
-	unsigned char w_jflag;	/* for json parse  */
 	unsigned char w_notes;
+	unsigned char w_first;
+	unsigned char w_in_array;
+	unsigned char flag_word;
+	unsigned char w_prev_space;
+	char single_quoted;
+	char double_quoted;
+	unsigned char w_bold;
+	unsigned char w_hquote_start;
+	unsigned char w_line_set;
+	short int w_hstate;
 	num known_offset;
 } MLQUOTES;
 
@@ -542,11 +555,12 @@ typedef struct  WINDP {
 
 	char	selection;
 	
+	short int	w_infocol;				/* info column size  */
     short   w_ntrows;               /* # of rows of text in window  */
 	short	w_ntcols;				/* columns of this window */
+	short	w_width;				/* for wrap width  */
 	num		w_lcol;					/* offset of text in the window */
 	num		w_plcol;				/* previous w_lcol */
-	int		w_infocol;				/* info column size  */
 	struct GWINDP *gwp;				/* internal window structure (gtk or other) */
 	int 	id;
 
@@ -559,8 +573,8 @@ typedef struct  WINDP {
 	/* the value on/off of the quotes are at the end of the window */
 	/* it should better be a pointer to a quote structure specific */
 	/* for each file type */
-	int	vtcol;
-	int	vtrow;
+	short int	vtcol;
+	short int	vtrow;
 	int currow;
 	num curcol;
 	int top_note_line;
@@ -632,7 +646,6 @@ typedef struct  FILEBUF {
 	char	*buffer;		/* real data! */
 	offs	BufferSize;
 	offs	GapSize;
-	int		EolSize;
 	char	EolStr[3];
 	mode_t	FileMode;
 	time_t	FileTime;
@@ -641,16 +654,47 @@ typedef struct  FILEBUF {
 	struct	dir_l	*rdir;
 	struct	dir_l	*cdir;
 	struct	alist	*dir_list_str;
-	int		sort_mode;
 	int		flen0;					/* Initial line len  */
 	int		file_id;				/* file id while reading  */
-	int		b_nwnd;                 /* Count of windows on buffer   */
 // Flags
+#if	1
+	short int	b_nwnd;                 /* Count of windows on buffer   */
+	short int	EolSize;
+	short int	sort_mode;
+	short int 	bom_type;				/* file bom type or 0 */
+	short int	b_state;
+ 	short int	b_flag;                 /* buffer state Flags           */
+	short int	b_mode;					/* editor mode of this buffer	*/
+	short int	view_mode;				/* view mode */
+	short int	b_type;			/* buffer,file type */
+	short int	scratch_num;	/* scratch number or 0  */
+	short int	dir_num;		/* dir number  */
+	short int	b_lang;		/* document language, 0 is UTF  */
+	short int	m_mode;		/* parse status flag  */
+	short int	utf_accent;	/* current utf char is with an accent!  */
+	short int	b_infocol;	/* infocol for the buffer  */
+#if	USE_SLOW_DISPLAY
+	short int slow_display;
+#endif
+#else
+	int		b_nwnd;                 /* Count of windows on buffer   */
+	int		EolSize;
+	int		sort_mode;
 	int 	bom_type;				/* file bom type or 0 */
 	int		b_state;
  	int		b_flag;                 /* buffer state Flags           */
 	char	b_mode;					/* editor mode of this buffer	*/
 	char	view_mode;				/* view mode */
+	int		b_type;			/* buffer,file type */
+	int		scratch_num;	/* scratch number or 0  */
+	int		dir_num;		/* dir number  */
+	int b_lang;		/* document language, 0 is UTF  */
+	int m_mode;		/* parse status flag  */
+	int utf_accent;	/* current utf char is with an accent!  */
+#if	USE_SLOW_DISPLAY
+	int slow_display;
+#endif
+#endif
 	struct  FILEBUF *connect_buffer;
 	num		connect_line;
 	num		connect_column;
@@ -661,19 +705,12 @@ typedef struct  FILEBUF {
 	char	b_key[MAXSLEN];		/* current encrypted key	*/
 #endif
 	char	b_dname[MAXFLEN];	/* directory name */
-	int		b_type;			/* buffer,file type */
-
-	int		scratch_num;	/* scratch number or 0  */
-	int		dir_num;		/* dir number  */
 	struct SHLIGHT *hl;		/* highlight type structure */
 	/* Number of lines must be kept to be able to use correctly the scrollbar */
 	num lines;			/* number of lines in buffer */
 	num bytes_read;
 	num line_from;	/* last change from line  */
 	num line_to;	/* last change to line  */
-	int b_lang;		/* document language, 0 is UTF  */
-	int m_mode;		/* parse status flag  */
-	int utf_accent;	/* current utf char is with an accent!  */
 // Macro language sructures
 	struct tok_struct *tok_table;
 	struct tok_struct *end_token;	/* the last (EOF) token in tok_table  */
@@ -685,9 +722,6 @@ typedef struct  FILEBUF {
 	struct alist *type_list;	/* type table list  */
 #endif
 	MVAR *symbol_table;	/* instance of variables data  */
-#if	USE_SLOW_DISPLAY
-	int slow_display;
-#endif
 //	Notes structures
 #if	TNOTES
 	notes_struct *b_note;
@@ -735,14 +769,13 @@ typedef struct  FILEBUF {
 #define EMMAC		0x008	/* Mac line types  */
 #define	EMCRYPT		0x010	/* crypt mode active */
 
-//#define EMFILTER	0x100	/* filtered buffer  */
-
 /* view mode flags */
 #define	VMHEX		0x001	/* view in hex mode */
 #define VMINP		0x002	/* hex input mode  */
 #define VMLINES		0x004	/* show number lines  */
 #define VMOFFSET	0x008	/* show offset  */
 #define	VMINFO		0x010	/* show info column, experimental */
+#define VMWRAP		0x020	/* wrap line mode  */
 
 #define VMCOLS		8
 #define VMICOLS		1
@@ -853,7 +886,8 @@ enum env_defs {
 	EMUSETITLEBAR,	/* Use titlebar  */
 	EMCCASE,		/* exact match  */
 	EMCOVER,		/* overwite  */
-	EMCREGEXP		/* Use regular expression in search  */
+	EMCREGEXP,		/* Use regular expression in search  */
+	EMWRAP			/* wrap lines global mode  */
 };
 
  /* file extensions */

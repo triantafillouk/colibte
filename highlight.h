@@ -100,6 +100,7 @@ void highlight_tags(int c);
 void highlight_sln(int c);
 void highlight_md(int c);
 void highlight_lua(int c);
+void highlight_bicep(int c);
 
 char *c_w[] = { "if","else","do","while","switch","case","for","return","break","goto","continue","typedef",
 	"namespace","this","throw","try","catch","@property","" };
@@ -173,6 +174,10 @@ char *xml_w1[] = { "INPUT", "FONT", "OPTION","SMALL","" };
 
 char *jscript_w[] = { "function","if","else","return", "try","catch","throws","throw","finally","final","goto","while","break","switch","implements","case","foreach","continue","for","debugger","do","with","yield","return","in","of","await","pipeline","stages","stage","steps", "agent","when","class","" };
 char *jscript_w1[] = { "def","this","constructor","var","package","private","namespace","using","protected","public","import","export","extends","typeof","void","char","int","short","long","static","transient","volatile","super","native","boolean","float","enum","syncronized", "eval","echo","print","let","const", "abstract","arguments", "title", "meta", "true","false","null","new","null","instanceof","" };
+
+char *bicep_w[] = { "using", "metadata", "var", "param","resource","output","targetScope", "module","output", "description","" };
+char *bicep_w1[] = { "name","kind","sku","properties","reserved","string","int","secureString","null","scope","params","dependsOn",
+	"managementGroup", "resourceGroup", "subscription", "tenant", ""};
 
 char *terraform_w[] = { "variable","resource","type","proviser","module","output",""};
 char *terraform_w1[] = { "string","number","list", "tags","tag","source","description","name","var","key","value",""};
@@ -302,6 +307,7 @@ char *log_extensions[] = {"LOG","log","syslog",""};
 char *compress_extensions[] = { "COMPRESS","gz","zip","bz2","tgz","bgz","bjz","Z",""};
 char *tags_extensions[] = { "TAGS","tags","ctags",""};
 char *json_extensions[] = { "JSON","json","gyp","gypi","tfstate",""};		// files .jshintrc, bowerrc
+char *bicep_extensions[] = { "BICEP","bicep","bicepparam", ""};
 char *yaml_extensions[] = { "YAML","YML","yaml","yml",""};
 char *dir_extensions[] = { "" };
 char *tag_extensions[] = { "tag",""};
@@ -365,6 +371,7 @@ SHLIGHT hts[] = {
  { "CAL",1,0,none_w,none_w, highlight_cmd,update_highlight_line,c_in_txt_word,gtxt_extensions,comment_perl },
  { "MD",0,0,none_w,none_w, highlight_md, update_highlight, c_in_txt_word,md_extensions,comment_html },
  { "LUA",0,0,lua_w,lua_w1,highlight_lua,update_highlight,c_incword,lua_extensions,comment_lua },
+ { "BICEP",0,0,bicep_w,bicep_w1,highlight_c,update_highlight,c_incword,bicep_extensions,comment_cc },
  { NULL,0,0,NULL,NULL,NULL,NULL,NULL }
 };
 

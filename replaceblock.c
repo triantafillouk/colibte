@@ -1,4 +1,4 @@
-
+#if	NUSE
 int ReplaceBlock(char *string_to_insert,offs size_to_delete)
 {
  int insert_size = strlen(string_to_insert);
@@ -158,3 +158,4 @@ int ReplaceBlock(char *string_to_insert,offs size_to_delete)
  }
  return true;
 }
+#endif

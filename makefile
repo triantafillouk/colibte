@@ -40,7 +40,7 @@ X11lib0= -lX11 -L/opt/X11/lib $(GLIB_LIB)
 EXTFILE=.$(APP_NAME)_ext_mac
 WSL:=0
 #CC=clang -DGVERS='"$(GVERS)"'
-CC=gcc-12 -DGVERS='"$(GVERS)"'
+CC=gcc-13 -DGVERS='"$(GVERS)"'
 endif
 
 # for Linux
@@ -172,10 +172,10 @@ edit.o: edit.c xe.h
 
 gldisplay.o: xe.h screen.c menus.h
 
-screen.o: xe.h screen.c
+screen.o: xe.h screen.c wrap_line.h
 	${CC} $(FLAGS1) -DGTK3=0 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char screen.c -o screen.o
 
-screen3.o: xe.h screen.c
+screen3.o: xe.h screen.c wrap_line.h
 	${CC} $(FLAGS1) -DGTK3=1 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE)  -funsigned-char screen.c -o screen3.o
 
 eval.o: xe.h eval.c eval.h alist.h 

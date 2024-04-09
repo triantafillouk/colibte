@@ -102,7 +102,6 @@ double  show_time(char *description,int init)
 	struct timeval      timev;
 	char sout[512];
 	diff_sec=diff_usec=0;
-
 	gettimeofday(&timev, NULL);
 	sec1 = (int)timev.tv_sec;
 	usec1 = (int)timev.tv_usec;
@@ -123,17 +122,22 @@ double  show_time(char *description,int init)
 			diff_sec--;
 		}
 	};
+	char c=' ';
+	if(description[0]=='#') c='#';
+	else if(description[0]==';') c=';';
+	else if(description[0]=='!') c='!';
 
 	if(show_no_time)
 	{
-		if(init==0) snprintf(sout,512,"[%35s] %d,%06d  %d,%06d --------",description,0,0,0,0);
-		else        snprintf(sout,512,"[%35s] %d,%06d  %d,%06d",description,1,0,0,0);
+		if(init==0) snprintf(sout,512,"%c[%45s] %d,%06d  %d,%06d --------",c,description,0,0,0,0);
+		else        snprintf(sout,512,"%c[%45s] %d,%06d  %d,%06d",c,description,1,0,0,0);
 	} else 	{
-		if(init==0) snprintf(sout,512,"[%35s] %d,%06d  %d,%06d --------",description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
-		else        snprintf(sout,512,"[%35s] %d,%06d  %d,%06d",description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
+		if(init==0) snprintf(sout,512,"%c[%45s] %d,%06d  %d,%06d --------",c,description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
+		else        snprintf(sout,512,"%c[%45s] %d,%06d  %d,%06d",c,description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
 	// if(xwin && discmd) MESG("%s",sout);
 	// MESG("%s",sout);
 	};
+
 	out_print(sout,1);
 
 	prev_usec=usec1;

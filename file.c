@@ -186,7 +186,6 @@ void link_window_buffer(WINDP *wp,FILEBUF *fp)
 
 	textpoint_link(wp->tp_hmknown,fp);
 	textpoint_set(wp->tp_hmknown,tp_offset(fp->save_hmknown));
-	wp->selection=0;	// no selection active
 #if	TNOTES
 	wp->top_note_line=fp->save_top_note;
 	wp->top_tag_line=fp->save_top_tag;
@@ -199,8 +198,12 @@ void link_window_buffer(WINDP *wp,FILEBUF *fp)
 		wp->hs[i].w_slang=fp->save_hs[i].w_slang;
 		wp->hs[i].w_notes=fp->save_hs[i].w_notes;
 	};
-	if((int)bt_dval("show_vinfo")) wp->w_infocol=VMICOLS;
-	else wp->w_infocol=0;
+
+	wp->selection=0;	// no selection active
+
+	wp->w_infocol=fp->b_infocol;
+	/* window width in wrap mode depends from tab size!  */
+	set_window_width(wp);
 
 	wp->w_fp = fp;
 	fp->b_nwnd++;
@@ -221,9 +224,10 @@ int set_window_filebuf(WINDP *wp,FILEBUF *bp)
 	textpoint_set(wp->tp_hsknown,0);
 	textpoint_set(wp->tp_hmknown,0);
 	set_update(wp,UPD_FULL);
+
 	wp->selection=0;
-	if((int)bt_dval("show_vinfo")) wp->w_infocol=VMICOLS;
-	else wp->w_infocol=0;
+	wp->w_infocol=bp->b_infocol;
+	set_window_width(wp);
 
     return (TRUE);
 }
@@ -251,9 +255,10 @@ int select_filebuf(FILEBUF *bp)
 	textpoint_set(cwp->tp_hsknown,0);
 	textpoint_set(cwp->tp_hmknown,0);
 	set_update(cwp,UPD_FULL);
+
 	cwp->selection=0;
-	if((int)bt_dval("show_vinfo")) cwp->w_infocol=VMICOLS;
-	else cwp->w_infocol=0;
+	cwp->w_infocol=bp->b_infocol;
+	set_window_width(cwp);
 
 	return (TRUE);
 }
@@ -854,9 +859,20 @@ FILEBUF * new_filebuf(char *bname,int bflag)
     bp->b_flag  = bflag;
 	bp->b_mode  = gmode;
 	bp->b_state = 0;
+	bp->view_mode = 0;
 	bp->scratch_num=is_scratch;
-	if((int)bt_dval("show_vinfo")) bp->view_mode = VMINFO;
-	else bp->view_mode  = 0;
+	// MESG("original view_mode 0x%X",bp->view_mode);
+	if((int)bt_dval("wrap_mode")) {
+		bp->view_mode |= VMWRAP|VMINFO;
+		bp->b_infocol=1;
+	} else if((int)bt_dval("show_vinfo")) {
+		bp->view_mode |= VMINFO;
+		bp->b_infocol=1;
+	} else {
+		bp->view_mode = 0;
+		bp->b_infocol = 0;
+	};
+	// MESG("set view_mode %d wrap_mode=%d infocol=%d",bp->view_mode,(int)bt_dval("wrap_mode"),bp->b_infocol);
 	bp->b_lang = default_lang;
 
 	if(bflag & FSINVS) bp->b_state |= FS_ACTIVE;
@@ -911,11 +927,11 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 
 	bp->save_hs[0].w_hquotem=0;
 	bp->save_hs[0].w_hselection=0;
-	bp->save_hs[0].w_slang=0;
+	bp->save_hs[0].w_slang=1;
 	bp->save_hs[0].w_notes=0;
 	bp->save_hs[1].w_hquotem=0;
 	bp->save_hs[1].w_hselection=0;
-	bp->save_hs[1].w_slang=0;
+	bp->save_hs[1].w_slang=1;
 	bp->save_hs[1].w_notes=0;
 	bp->b_type=0;
 	bp->lines=0L;
@@ -963,7 +979,8 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	else strlcpy(bp->b_dname,dir_name,MAXFLEN);
 
 	if(!is_special_buffer(bp)) set_working_dir(bp->b_dname);
-
+	bp->hl->h_function(CHR_RESET);
+	// MESG("set view_mode %d wrap_mode=%d",bp->view_mode,(int)bt_dval("wrap_mode"));
 	return(bp);
 }
 
@@ -1251,7 +1268,7 @@ int set_buf_key(FILEBUF *bp)	/* reset encryption key of current file */
 
 	/* get the string to use as an encrytion string */
 	bp->b_key[0]=0;
-	MESG("set_buf_key: b_type=%d %d size=%d",bp->b_type,NOTE_TYPE,sizeof(bp->b_key));
+	// MESG("set_buf_key: b_type=%d %d size=%d",bp->b_type,NOTE_TYPE,sizeof(bp->b_key));
 #if	TNOTES
 	if(bp->b_type & NOTE_TYPE
 		|| bp->b_type & NOTE_CAL_TYPE
@@ -1410,7 +1427,7 @@ int edit_file(char *fname)
 int file_read(FILEBUF *bp, char *fname)
 {
  int stat=0;
- // MESG("file_read: fname=[%s]",fname);
+ // MESG("file_read: fname=[%s] view_mode=%d",fname,bp->view_mode);
  if(fname[0]!=CHR_LBRA) if(!execmd) msg_line(" reading file:[%s]",fname);
 
  /* clear the buffer */
@@ -1615,7 +1632,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
  int htype=0;	/* highlight type  */
  char	oext[MAXLLEN], cmd[MAXLLEN];
  *temp_used=0;
- // MESG("init_ftype:[%s] b_type=%d",fname,bp->b_type);
+ // MESG("init_ftype:[%s] b_type=%d view_mode=0x%X" ,fname,bp->b_type,bp->view_mode);
 #if	CRYPT
 	s=resetkey(bp);
 	if (s != TRUE)	return(s);
@@ -1633,7 +1650,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
 	int ftype = file_type(fname, &tc, oext);
 	bp->b_type |= ftype;
 	// MESG("init_ftype: check tc %d b_type=%d [%s] [%s] oext=[%s]",tc,bp->b_type,hts[FX_COMPRESS].file_extentions[tc],uncompress_command[tc],oext);
-
+	// MESG("init_file: view_mode=%d",bp->view_mode);
 	if(tc) {
 			snprintf(cmd,MAXLLEN,"%s %s > /tmp/uncompressed 2>/tmp/err",uncompress_command[tc],fname);
 			if(system(cmd)) strlcpy(fname,"/tmp/err",MAXFLEN);
@@ -1669,13 +1686,13 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
 			if(bt_dval("notes_recreate")) {
 				MESG("Notes recreate!");
 				if(get_notes_key(1)==NULL) {
- 					MESG("get new notes key");
+ 					// MESG("get new notes key");
 					set_notes_key(1);
 					if(get_notes_key()) {
 						strlcpy(bp->b_key,get_notes_key(),sizeof(bp->b_key));
 					} else return false;
 				} else {
-					MESG("set key from notes key!");
+					// MESG("set key from notes key!");
 					strlcpy(bp->b_key,get_notes_key(),sizeof(bp->b_key));
 				};
 				s=true;

@@ -350,7 +350,7 @@ int set_option_val(int vnum,char *svalue)
 
  v1=atoi(svalue);
  
-// MESG("set_option_val: vnum=%d [%s]",vnum,svalue);
+	// MESG("set_option_val: vnum=%d [%s]",vnum,svalue);
 		switch (vnum) {
 		case EMFILLCOL:	{
 			set_bt_num_val("fillcol",v1);
@@ -430,6 +430,34 @@ int set_option_val(int vnum,char *svalue)
 		  case EMXCOLORSCHEME: {
 		  	set_bt_num_val("xcolor_scheme",v1);
 		  	break;
+		  };
+		  case EMWRAP: {
+		   int infocols=0;
+		   int view_mode=0;
+		   // MESG("EMWRAP %f",(int)v1);
+			if((int)bt_dval("show_vinfo")) {
+				infocols=1;
+				view_mode=VMINFO;
+			};
+		   
+	   		set_bt_num_val("wrap_mode",(int)v1);
+			if(v1>0) {
+				view_mode |=VMWRAP|VMINFO;
+			} else {
+			};
+			lbegin(window_list);
+			WINDP *wp;
+			while((wp=lget(window_list))!=NULL) {
+				if (!(wp->w_fp->view_mode & VMHEX)
+			 		&& wp->w_fp->b_mode>=FSNLIST) {
+					wp->w_infocol = infocols;
+					wp->w_fp->view_mode |= view_mode;
+					wp->w_fp->b_infocol |= view_mode;
+					// MESG("set window view_mode to %d",view_mode);
+					set_update(wp,UPD_ALL);
+				};
+			};
+			break;
 		  };
 		}
 
@@ -605,17 +633,17 @@ double compute_string(char *s,char *new_string)
  	init_error();
 	initialize_vars();
 	insert_string(fp,s,strlen(s));
-	MESG("compute_string [%s]",s);
+	// MESG("compute_string [%s]",s);
 	fp->b_type=1;
 	value=compute_block(fp,cbfp,0);
-	MESG("compute_string new_string=[%s]",new_string);
+	// MESG("compute_string new_string=[%s]",new_string);
 
 	if(new_string) {
 		get_text_offs(fp,new_string,0,FLineEnd(fp,0));
 	};
 
 	delete_filebuf(fp,0);
-	MESG("compute_string: [%s] result=%f",s,value);
+	// MESG("compute_string: [%s] result=%f",s,value);
 	return(value);
 }
 
@@ -788,7 +816,6 @@ int execute(int c, int  n)
 {
     int status=0;
 	int (*execfunc)();		/* ptr to function to execute */
-
 	if(cbfp==NULL) return(0);
 	execfunc = key_function(c,1);
 	if (execfunc != NULL) {
@@ -806,7 +833,6 @@ int execute(int c, int  n)
         if(status) return (OK_CLRSL);
 		else return FALSE;
 	}
-
 	msg_line("[Key (%s) not assigned!]",xe_key_name(c));		/* complain		*/
     return (FALSE);
 }
@@ -815,18 +841,19 @@ int execute(int c, int  n)
 void main_execute(int c)
 {
  static int cflag=0;
-//	MESG("main_execute: %X nnarg=%d",c,nnarg);
 	/* and execute the command */
+	// MESG_time("main_execute: ------- key %s",xe_key_name(c));
 	cflag=execute(c, nnarg);
-//	MESG("		: cflag = %X",cflag);
 	if(cflag!=OK_ARG) nnarg=1;
 	else {
 		if(nnarg>1) {
 			msg_line("arg: %d",nnarg);
 		};
 	};
+	// MESG_time("after execute");
 
-	if(cflag & OK_RSTGOAL)	cwp->goal_column=GetCol();
+	// if(cflag & OK_RSTGOAL)	cwp->goal_column=GetCol();
+	// MESG_time("after GetCol");
 //	if(cflag==OK_CLRSL  || cflag==OK_RSTGOAL) clear_message_line();
 }
 

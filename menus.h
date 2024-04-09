@@ -166,6 +166,7 @@ M_element e_search[] =
 	{0, 'I', "find In dir              ","_5find In dir", grep_cmd,0,"SI"},
 	{0, 'C', "reCursive find           ","", rgrep_cmd,0,"SC"},
 	{0, 'L', "goto Line           ALT-G","_Ggoto Line", goto_line,0,"SL"}, 
+	{0, 'O', "goto Offset              ","_Ggoto Offset", goto_offset,0,"SO"}, 
 	{0, '@', "View functions      ALT-@","_@view functions  @", view_functions,(struct MENUS *)2,"S1"},
 	{0, '#', "View structures     ALT-#","_#view Structures #", view_functions,(struct MENUS *)3,"S2"},
 	{0, 0, NULL,"",NULL,0,NULL}
@@ -224,6 +225,7 @@ M_element e_global_params[] =
 	{MTOGGLE,'O',"show cursor Offset   ","show_coffset",toggle_parameter,(struct MENUS *)EMCOFFSET ,"MGO"},
 	{MTOGGLE,'D',"show cursor Data     ","show_cdata",toggle_parameter,(struct MENUS *)EMCDATA ,"MGD"},
 	{MTOGGLE,'H',"save file History    ","save_history",toggle_parameter,(struct MENUS *)EMSAVHIST ,"MGH"},
+	{MTOGGLE,'W',"Wrap lines mode      ","wrap_mode",toggle_parameter,(struct MENUS *)EMWRAP,"MGW"},
 #if	GTK
 	{MTOGGLE,'T',"large Toolbar icons  ","large_toolbar_icons",toggle_parameter,(struct MENUS *)EMLARGEICONS ,"MGT"},
 	{MTOGGLE,'R',"use titlebaR         ","use_titlebar",toggle_parameter,(struct MENUS *)EMUSETITLEBAR ,"MGR"},
@@ -439,10 +441,9 @@ M_element e_viewas[] =
 	{0,'M',"as MAC     ","",set_view_mode,(struct MENUS *)4,"MVM"},
 	{0,'L',"show Lines ","",set_view_mode,(struct MENUS *)5,"MVL"},
 	{0,'O',"show Offset","",set_view_mode,(struct MENUS *)6,"MVO"},
-#if	TEST0
 	{0,'I',"show vInfo ","",set_view_mode,(struct MENUS *)7,"MVI"},
-#endif
 	{0,'0',"0 hide info","",set_view_mode,(struct MENUS *)8,"MV0"},
+	{0,'W',"Wrap mode  ","",set_view_mode,(struct MENUS *)9,"VMW"},
 	{0, 0, NULL,"",NULL,0,NULL}
 };
 
@@ -528,6 +529,7 @@ M_element e_mode[] =
 	{0, 'H', "Highlight toggle ","",  toggle_highlight, 0,"MH"},
 	{0, 'R', "cRypt            ","",  toggle_crypt, 0,"MR"},
 	{0, 'J', "Justify          ","",  toggle_just, 0,"MJ"},	
+	{0, 'O', "Overwrite toggle ","",  toggle_over, 0,"MO"},
 	{MMENU,'G',"Global options   ","", NULL, &global_params,"MG" },
 	{MMENU,'V',"View mode        ","", NULL, &m_viewas,"MV"},
 #if	PCURSES

@@ -350,7 +350,9 @@ ge_edit_display_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
 
 			upd_column_pos();
 			check_cursor_position(wd->wp);
-
+			if(is_wrap_text(wd->wp->w_fp)) 
+			upd_all_wrap_lines(wd->wp,"cb_set_position 3");
+			else
 			upd_all_virtual_lines(wd->wp,"gedit_display_size_allocate");
 			draw_window(1,wd->wp,"gedit_display_size_allocate");
 			update_all=0;

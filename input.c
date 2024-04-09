@@ -698,7 +698,7 @@ char *cmd_to_tstr(int cmd)
 
 int set_key_emulation(int emulation)
 {
-	MESG("set_key_emulation: %d",emulation);
+	// MESG("set_key_emulation: %d",emulation);
 	set_bt_num_val("keyboard_emulation",emulation);
 	if(emulation == 1) key_table = keytab_emacs;
 	else key_table = keytab_win;
@@ -941,9 +941,14 @@ void out_print(char *s,int nl)
 	// MESG("out_print: current buffer is [%s] discmd=%d",cbfp->b_fname,discmd);
 	if(s==NULL) return;
 #if	1
-	if(!discmd) {
+	if(!discmd && !debug_flag()) {
 		if(nl) printf("%s\n",s);
 		else printf("%s",s);
+		return;
+	};
+	if(debug_flag()) {
+		if(nl) fprintf(stderr,"%s\n",s);
+		else fprintf(stderr,"%s",s);
 		return;
 	};
 #endif

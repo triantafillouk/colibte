@@ -14,6 +14,11 @@
 void  textpoint_OrFlags(FILEBUF *fp,int mask);
 void reset_points(FILEBUF *bf);
 
+void update_file_lines(FILEBUF *fp)
+{
+
+}
+
 num  ConvertFromUnixToDos(FILEBUF *fp)
 {
  num ptr=0L;
@@ -32,7 +37,7 @@ num  ConvertFromUnixToDos(FILEBUF *fp)
       size--;
       ptr++;
    };
-//   MESG("convertFromUnixToDos: lines=%lld size=%lld %lld",lines,ptr,FSize(fp));
+   MESG("convertFromUnixToDos: lines=%lld size=%lld %lld",line,ptr,FSize(fp));
    return(ptr);
 }
 
@@ -54,6 +59,8 @@ num  ConvertFromDosToUnix(FILEBUF *fp)
       size--;
       ptr++;
    };
+   fp->lines=line;
+   MESG("ConvertFromDisToUnix: lines=%ld ptr=%d",fp->lines,ptr);
    return(ptr);
 }
 
@@ -81,12 +88,14 @@ int dos2unix(int n)
 // MESG("dos2unix: text_o=(%ld %ld %ld f=%X)",cfp->tp_text_o->line,cfp->tp_text_o->col,cfp->tp_text_o->offset,cfp->tp_text_o->flags);
 // MESG("dos2unix: oldsize=%lld newsize=%lld end column: %lld %lld",oldsize,newsize,tp_col(cfp->tp_text_end),tp_col(cfp->tp_text_o));
  
+ // MESG("	dos2unix: newsize=%ld",newsize);
  textpoint_set(cfp->tp_text_end,newsize);
  textpoint_set(cfp->tp_text_o,newsize);
 // MESG("dos2unix: text_end=(%ld %ld %ld f=%X)",cfp->tp_text_end->line,cfp->tp_text_end->col,cfp->tp_text_end->offset,cfp->tp_text_end->flags);
 // MESG("dos2unix: text_o=(%ld %ld %ld f=%X)",cfp->tp_text_o->line,cfp->tp_text_o->col,cfp->tp_text_o->offset,cfp->tp_text_o->flags);
 
  cfp->lines = tp_line(cfp->tp_text_end);
+ // MESG(" dos2unix: lines = %ld",cfp->lines);
  if(cfp->b_nwnd>0){
 	set_update(cwp,UPD_EDIT);
  };
