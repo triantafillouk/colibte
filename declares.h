@@ -10,6 +10,8 @@ int select_font_mono(int n);
 int buffer_is_connected(FILEBUF *bf);
 int noop(int n);
 void msg_line(char *fmt, ...);
+void MESG_time(const char *fmt, ...);
+void MESG_time_start(const char *fmt, ...);
 int init_drv_env();
 void init_common();
 int load_keys();
@@ -50,6 +52,7 @@ int open_dir(char *dir_name,int type);
 int goto_dir(char *dir_name,int dir_num);
 int dir_size(int n);
 int goto_line(num n);
+int goto_offset(num n);
 int igotolinecol(num line,num column,int flag);
 int igotooffset(num n,int ppline);
 int docmd(char *cmd);
@@ -61,6 +64,7 @@ void set_sval(char *);
 void set_dval(double val);
 void set_vdval(double val);
 void set_vsval(char *s);
+void set_window_width(WINDP *wp);
 
 double next_value();
 int set_arg(int n);
@@ -79,6 +83,7 @@ void list_select(char *s,int dire);
 void parse_command_line(int , char **);
 int highlight_index(char *,int *);
 int highlight_type(char *);
+int is_wrap_text(FILEBUF *fp);
 
 int select_highlight(int);
 int check_update_highlight(int flag);
@@ -124,7 +129,7 @@ void mlforce(char *s)	;
 num vtline(WINDP *wp, offs tp_offs);
 void vtmove(WINDP *wp,int row,int col);
 void update_status();
-void getwquotes(WINDP *wp,int);
+num getwquotes(WINDP *wp,int);
 void setwquotes(WINDP *wp,int,num);
 void fquote_state(offs till_o, offs from_o, WINDP *wp);
 void top_menu(int init);
@@ -226,7 +231,8 @@ int list_filebuf(char *title, char *st,int f1,int *return_flag);
 int changes_occured();
 FILEBUF * new_filebuf(char *bname,int bflag);
 FILEBUF * get_filebuf(char *bname,char *dname,int flag);
-int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs);
+int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from);
+int DiffColumns(FILEBUF *fp, offs start,offs col_offs,char *from);
 
 
 int window_row_increase(int n);
@@ -780,7 +786,9 @@ offs FPrevLine(FILEBUF *,offs);
 int   ReadBlock(char *file_name,int fd,offs size,offs *act_read);
 int   DeleteBlock(offs left,offs right);
 int   InsertBlock(FILEBUF *fp,char *block_left,offs size_left, char *block_right,offs size_right);
+#if	NUSE
 int   ReplaceBlock(char *block,offs size);
+#endif
 void  textpoint_delete(TextPoint *tp);
 offs   get_text_offs(FILEBUF *,char *,offs,offs);
 void set_Char(offs,byte);

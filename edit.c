@@ -19,11 +19,18 @@ void set_global_flag(int option_flag,int value);
 void get_lowercase_string(char *lower, char *string);
 void get_uppercase_string(char *lower, char *string);
 
+offs FNext_wrap_line(WINDP *wp,offs current_offset,int num_lines,int top);
+offs FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines);
+void set_top_hline(WINDP *wp,offs cof,char *from);
+
+void next_column(int cols);
+
 int GetBlock(FILEBUF *fp,char *copy,offs from,offs size);
 int delins(int dlength, char *instr);
 
 ClipBoard *MainClipBoard=NULL;
 extern FILEBUF *cbfp;
+extern alist *window_list;
 
 int lock_move=0;	/* scroll lock movements */
 int lock_sync=0;	/* lock page movement  */
@@ -61,17 +68,26 @@ int do_nothing(int n)
 	return TRUE;
 }
 
+int is_wrap_text(FILEBUF *fp)
+{
+ if(fp->view_mode & VMWRAP &&
+    fp->b_flag < FSNOTES &&
+	!(fp->view_mode & VMHEX)
+ ) return 1;
+ return 0;
+}
+
 void toggle_val(char *name){
 //	if(name==NULL) return;
 	if((int)bt_dval(name)) {
 		set_bt_num_val(name,0);
 	} else set_bt_num_val(name,1);
-//	MESG("new value of [%s] is %d",name,(int)bt_dval(name));
+	// MESG("new value of [%s] is %d",name,(int)bt_dval(name));
 }
 
 int toggle_parameter(int type)
 {
-//  MESG("toggle_parameter: type[%d]=[%s] gmode=%d ",type,option_names[type].name,gmode);
+ // MESG("toggle_parameter: type[%d]=[%s] gmode=%d ",type,option_names[type].name,gmode);
   toggle_val(option_names[type].name);
   switch(type) {
   	case EMKEYEMUL:	{
@@ -85,16 +101,17 @@ int toggle_parameter(int type)
 		msg_line("restart to change icons");
 		break;
 	case EMVINFOCOL: 
-		if(cbfp->view_mode & VMHEX) {}
-		else {
+		if(!(cwp->w_fp->view_mode & VMHEX)) {
 		set_update(cwp,UPD_MOVE|UPD_FULL);
 //		MESG("toggle_parameter [%d] val=%d",EMVINFOCOL,(int)bt_dval("show_vinfo"));
 		if((int)bt_dval("show_vinfo")) {
 			cbfp->view_mode |= VMINFO;
 			cwp->w_infocol = VMICOLS;
+			cbfp->b_infocol = VMICOLS;
 		} else {
 			cbfp->view_mode = 0;
 			cwp->w_infocol = 0;
+			cbfp->b_infocol = 0;
 		};
 		update_buffer_windows(cbfp,UPD_ALL|UPD_MOVE);
 		update_screen(1);
@@ -120,6 +137,32 @@ int toggle_parameter(int type)
 //		toggle gtk3 ttilebar (now needs restart)
 		msg_line("restart to change");
 		break;
+	case EMWRAP: {
+	   int infocols=0;
+	   int view_mode=0;
+	   int v1=(int)bt_dval("wrap_mode");
+	   // MESG("EMWRAP %f",(int)v1);
+		if((int)bt_dval("show_vinfo")) {
+			infocols=1;
+			view_mode=VMINFO;
+		};
+	   
+		if(v1>0) {
+			view_mode |=VMWRAP;
+			infocols=1;
+		};
+		lbegin(window_list);
+		WINDP *wp;
+		while((wp=lget(window_list))!=NULL) {
+			if(wp->w_fp->b_flag < FSNOTES) {
+			wp->w_infocol = infocols;
+			wp->w_fp->view_mode |= view_mode;
+			// MESG("set w_fp view_mode to 0x%X",wp->w_fp->view_mode);
+			set_update(wp,UPD_ALL);
+			};
+		};
+	   break;
+	  };
   };  
   return true;
 }
@@ -141,20 +184,23 @@ int goto_bol(int n)
 		};
 	} else
 	ToLineBegin();
-	set_update(cwp,UPD_MOVE);
+	set_goal_column(0,"goto_bol");
+	if(cwp) set_update(cwp,UPD_MOVE);
 	return (OK_RSTGOAL);
 }
 
 /* Move the cursor back by "n" characters.  */
 int prev_character(int n)
 {
- // MESG("prev_character:");
  if (n < 0) return (next_character(-n));
+
  while (n--) {
  	if(Offset()<=0) return FALSE;
 	MoveLeftChar(cbfp);
 	set_update(cwp,UPD_MOVE);
  };
+ // MESG_time("prev_char:end");
+ set_goal_column(-1,"prev_character");
  return (OK_RSTGOAL);
 }
 
@@ -176,6 +222,7 @@ int goto_eol(int n)
 	} else {
 		ToLineEnd();
 	};
+	set_goal_column(-1,"goto_eol");
 	set_update(cwp,UPD_MOVE);
 	return (OK_RSTGOAL);
 }
@@ -189,8 +236,9 @@ int next_character(int n)
 	while (n--) {
 		if(FEof(cbfp)) return FALSE;
 		MoveRightChar(cbfp);
-		set_update(cwp,UPD_MOVE);
 	};
+	set_goal_column(-1,"next_character");
+	set_update(cwp,UPD_MOVE);
     return (OK_RSTGOAL);
 }
 
@@ -228,17 +276,17 @@ int imove_top_line(num new_top_line)
  int current_row=tp_line(cwp->tp_current)-tp_line(cwp->tp_hline);
  num new_current_line;
  num last_line= tp_line(cwp->w_fp->tp_text_end);
-// MESG("imove_top_line:");
- set_goal_column(0,"imove_top_line");
  if(new_top_line<0) new_top_line=0;
  if(new_top_line>last_line) new_top_line=last_line;
  new_current_line=new_top_line+current_row;
 
  if(new_current_line>last_line) new_current_line=last_line;
+ MESG("imove_top_line:to %ld",new_top_line);
  textpoint_set_lc(cwp->tp_hline, new_top_line,0);
  textpoint_set_lc(cwp->tp_current, new_current_line,0);
  set_update(cwp,UPD_MOVE|UPD_WINDOW);
-
+ set_goal_column(0,"imove_top_line");
+ 
  return 1;
 }
 
@@ -247,10 +295,10 @@ int igotolinecol(num line,num column,int line_flag)
 {
 	if(line<1) return FALSE;
 
-	set_goal_column(column,"iogotolinecol:");
 	init_highlight();
 	cwp->w_ppline=line_flag;	// set physical position at mid window
 	MoveLineCol(line-1,column-1);
+	set_goal_column(column,"iogotolinecol:");
 	set_update(cwp,UPD_WINDOW);
 	undo_set_noglue();
 
@@ -262,9 +310,9 @@ int igotooffset(num n,int ppline)
 	if(n<1) return FALSE;
 //	MESG("igotooffset:");
 
-	set_goal_column(0,"iogotooffset");
 	init_highlight();
 	set_Offset(n);
+	set_goal_column(0,"iogotooffset");
 	
 	cwp->w_ppline=ppline;	/* set physical position at mid window */
 	set_update(cwp,UPD_WINDOW|UPD_MOVE);
@@ -290,11 +338,24 @@ int goto_line(num n)
 	return(igotolinecol(n,1,0));
 }
 
+int goto_offset(num n)		
+{
+	char arg[MAXSLEN];
+	arg[0]=0;
+	if ((nextarg("Go to offset : ", arg, MAXSLEN,true)) != TRUE) 	return(FALSE);
+	if(macro_exec!=MACRO_MODE2) n = get_val();
+	if(cbfp->b_flag & FSNLIST) {
+		return(OK_CLRSL);
+	};
+	textpoint_set(cbfp->tp_current,n);
+	return OK_CLRSL;
+}
+
 /* Go to the beginning of the file */
 /* Assigned to ALT-< */
 int goto_bof(int n)
 {
-//	MESG("goto_bof:");
+ // MESG("goto_bof:");
 #if	TNOTES
 	if(cbfp->b_flag==FSNOTES) {
 		if(cwp->current_tag_line==0) return FALSE;
@@ -317,7 +378,7 @@ int goto_bof(int n)
 	if(execmd) return (OK_CLRSL);
 	set_update(cwp,UPD_WINDOW);
 	msg_line(time2a());
-
+	// MESG("goto_bof");
 	return (OK_RSTGOAL);
 }
 
@@ -339,7 +400,7 @@ int goto_eof(int n)
 #if	TNOTES
 
 	if(cbfp->b_flag==FSNOTES) {
-		cwp->goal_column=0;
+		set_goal_column(0,"goto_eof");
 		toline=cbfp->b_tags-headline;
 		cwp->current_tag_line = toline;
 		MoveLineCol(toline,cwp->goal_column);
@@ -347,7 +408,7 @@ int goto_eof(int n)
 		return (OK_CLRSL);
 	} else
 	if(cbfp->b_flag & FSNOTESN) {
-		cwp->goal_column=NOTES_COLUMN+2;
+		set_goal_column(NOTES_COLUMN+2,"goto_eof:2");
 		toline=cbfp->b_notes-headline;
 		cwp->current_note_line = toline;
 		MoveLineCol(toline,cwp->goal_column);
@@ -357,20 +418,20 @@ int goto_eof(int n)
 	// MESG("next_page: toline=%d col=%d",toline,cwp->goal_column);
 #endif
 	if(cbfp->b_flag& FSNLIST) {
-		cwp->goal_column=0;
+		set_goal_column(0,"goto_eof:3");
 		toline=cbfp->b_notes-headline;
 		cwp->current_note_line = toline;
 		MoveLineCol(toline,cwp->goal_column);
 		set_update(cwp,UPD_WINDOW);
 		msg_line(time2a());
 		return (OK_CLRSL);
-	}
+	};
 	set_Offset(FSize(cbfp));
 	if(execmd) return (OK_CLRSL);
 	undo_set_noglue();
 	set_hmark(0,"goto_eof");
 	set_update(cwp,UPD_WINDOW);
-	cwp->w_ppline=0;
+	if(cwp) cwp->w_ppline=0;
 	msg_line(time2a());
 	return (OK_RSTGOAL);
 }
@@ -378,7 +439,6 @@ int goto_eof(int n)
 int scroll_up(int n)
 {
  int lines=n;
-
  lock_move=1;
  lines=next_line(lines);
  lock_move=0;
@@ -388,7 +448,7 @@ int scroll_up(int n)
 int scroll_down(int n)
 {
  int status;
-
+ // if(tp_offset(cwp->tp_hline)<1) return FALSE;
  lock_move=1;
  status=prev_line(n);
  lock_move=0;
@@ -409,11 +469,99 @@ int get_current_line()
 	return current_line;
 }
 
+int next_wrap_line(int n)
+{
+	num current_line;
+	int headline=(cbfp->b_header!=NULL);
+
+	// get the current line
+	current_line=get_current_line();
+	cwp->w_prev_line=current_line;
+
+#if	WRAPD
+	MESG_time("next_wrap_line: current line=%ld %ld c=%ld o=%ld",
+		tp_line(cwp->tp_current),current_line,tp_col(cwp->tp_current),tp_offset(cwp->tp_current));
+#endif
+    if(lock_move) {
+		if(current_line==tp_line(cwp->tp_hline))
+		{
+            lock_move=0;
+            int status=next_wrap_line(n);
+            lock_move=1;
+			if(status==FALSE) return status;
+        };
+        return(move_window(-n));
+    };
+
+	{	
+		if(cbfp->lines  < GetLine()+n+headline) n=cbfp->lines-GetLine()-headline;
+#if	WRAPD
+		MESG_time("next_wrap_line: l=%d lines=%ld n=%ld",GetLine(),cbfp->lines,n);
+#endif
+	};
+
+	{
+		offs o_now=tp_offset(cwp->tp_current);
+#if	1
+		offs o=o_now;
+		while(!EolAt(o) && o< o_now+(n+2)*cwp->w_width) {
+			if(EofAt(o)) {
+#if	WRAPD
+				MESG("next_wrap_line: at end return false!");
+#endif
+				return(FALSE);
+			}
+			o++;
+		};
+		offs o_end=o;
+#else
+		offs o_end=LineEnd(o_now);
+#endif
+		int remains=DiffColumns(cwp->w_fp,o_now,o_end,"next_wrap_line:OK:known");
+		if(remains<cwp->w_width && current_line >= tp_line(cwp->w_fp->tp_text_end)) return FALSE;
+#if	WRAPD
+		MESG_time("next_wrap_line:1 wrap mode! o=%ld end=%ld remain columns=%d",o_now,o_end,remains);
+#endif
+		if(remains>= n*cwp->w_width) {
+#if	WRAPD
+			MESG("next_wrap_line:2 remains %d > w=%d",remains,cwp->w_width);
+#endif
+			next_column(n*cwp->w_width);
+		} else {
+			int now_col=tp_col(cwp->tp_current) % cwp->w_width;
+			if(now_col+remains >= cwp->w_width) {
+#if	WRAPD
+				MESG("next_wrap_line:3 now_col %d + remains %d >= w=%d",now_col,remains,cwp->w_width);
+#endif
+				next_column(remains);
+			} else {
+#if	WRAPD
+				MESG("next_wrap_line:4 now_col %d + remains %d < w=%d",now_col,remains,cwp->w_width);
+#endif
+				MoveLineCol(current_line+n,cwp->goal_column);
+			}
+		};
+
+		if(cwp->currow == cwp->w_ntrows-2-half_last_line) 
+		{
+			move_window(-1);
+		};
+	};
+#if	WRAPD
+	MESG_time("next_wrap_line:end new pos l=%ld c=%ld",tp_line(cwp->tp_current),tp_col(cwp->tp_current));
+#endif
+	set_hmark(0,"next_line");
+	// MESG("next_wrap_line:	end >!");
+	/* reseting the current position */
+	set_update(cwp,UPD_MOVE);
+	return(TRUE);
+}
+
 /* Move forward by n lines. */
 /*  emacs key is "^N". */
 int next_line(int n)
 {
-	int w_row;
+	int w_row=0;
 	num current_line;
 	int status=0;
 	int b_flag = cbfp->b_flag;
@@ -422,10 +570,12 @@ int next_line(int n)
     if (n < 0)  return (prev_line(-n));
 	if(n==0) return(FALSE);
 
-	set_goal_column(-1,"next_line:");
+	if(is_wrap_text(cbfp) & !execmd) return next_wrap_line(n);
 
 	// get the current line
 	current_line=get_current_line();
+	// MESG("# next_line: n=%d current is %ld b_flag=%d",n,current_line,cbfp->b_flag);
+	// MESG("next_line: < current=%ld col=%ld",current_line,GetCol());
 	cwp->w_prev_line=current_line;
 	// MESG("next_line: current_line=%d b_flag=0x%X",current_line,b_flag);
 #if	TNOTES
@@ -474,39 +624,85 @@ int next_line(int n)
 	if(n<1) return (false);
 
 	if(!execmd){
-	w_row = current_line-tp_line(cwp->tp_hline);
-
+	// w_row = current_line-tp_line(cwp->tp_hline);
+	w_row = cwp->currow;
 	// if at the end move up
 	if(w_row == cwp->w_ntrows-2-half_last_line) {
-		move_window(-1);
+		// if(!is_wrap_text(cwp->w_fp))
+			move_window(-1);
 	};
 	};
 	if(current_line==tp_line(cbfp->tp_text_end)) return FALSE;
 	/* and move the point down */
 	if(cbfp->view_mode & VMHEX){
 		textpoint_set_lc(cbfp->tp_current,current_line+n,Offset()%16);
-	} else {
-		set_goal_column(-1,"next_line:2");
+	} else 
+	{
 		MoveLineCol(current_line+n,cwp->goal_column);
 	};
 	set_hmark(0,"next_line");
+	// MESG("next_line:	end >!");
 	/* reseting the current position */
 	if(!execmd) set_update(cwp,UPD_MOVE);
 	return(TRUE);
+}
+
+void update_top_position_wrap();
+offs   FPrevUtfCharAt(FILEBUF *fp,offs o, utfchar *uc);
+
+int prev_wrap_line(int n)
+{
+ num current_line=get_current_line();
+
+	cwp->w_prev_line=current_line;
+#if	WRAPD
+	MESG("!prev_wrap_line: current=%d row=%d lock=%d",current_line,cwp->currow,lock_move);
+#endif
+	// if(current_line-n < 0) n=current_line;
+
+    if(lock_move) {
+        // If at the last line of the window
+		// MESG("prev_line: row=%d line=%ld col=%ld",cwp->currow,tp_line(cwp->tp_current),tp_col(cwp->tp_current));
+		if(cwp->currow >= cwp->w_ntrows-3-half_last_line
+			|| tp_offset(cwp->tp_current)>cwp->w_width
+		) {
+			lock_move=0;
+			int status=prev_wrap_line(n);
+			lock_move=1;
+			if(status==FALSE) return status;
+			// return TRUE;
+		};
+		move_window(n);
+        return(n);
+    };
+
+	offs o_now=tp_offset(cwp->tp_current);
+	// MESG("prev_line:1");
+	offs new_offset = FPrev_wrap_line(cwp,o_now,n);
+	textpoint_set(cwp->tp_current,new_offset);
+#if	WRAPD
+	MESG("prev_wrap_line: o_now=%ld to (o=%ld col=%ld %d)",
+		o_now,new_offset,tp_col(cwp->tp_current),tp_col(cwp->tp_current)%cwp->w_width);
+#endif
+	set_hmark(0,"prev_line");
+	set_update(cwp,UPD_MOVE);
+	undo_set_noglue();
+	return (TRUE);
 }
 
 /* Move backward by n lines. */
 int prev_line(int n)
 {
  num current_line;
+ 
  int status=0;
 	if (n==0) return FALSE;
    	if (n < 0) return (next_line(-n));
-	set_goal_column(-1,"prev_line:");
+	if(is_wrap_text(cbfp) & !execmd) return prev_wrap_line(n);
 
 	current_line=get_current_line();
 	cwp->w_prev_line=current_line;
-	// MESG("prev_line: current=%d",current_line);
+	// MESG("!prev_line: current=%d row=%d lock=%d",current_line,cwp->currow,lock_move);
 
 	if(current_line<1) return(0);
 	if(current_line-n < 0) n=current_line;
@@ -528,9 +724,12 @@ int prev_line(int n)
 		msg_line(time2a());
 	};
 
+
     if(lock_move) {
         // If at the last line of the window
-		if( current_line - tp_line(cwp->tp_hline) == cwp->w_ntrows-2-half_last_line)
+		if( current_line - tp_line(cwp->tp_hline) == cwp->w_ntrows-2-half_last_line
+		 || tp_line(cwp->tp_current)>0
+		)
 		{
             lock_move=0;
             status=prev_line(n);
@@ -543,12 +742,12 @@ int prev_line(int n)
 
 	if(current_line-n < tp_line(cwp->tp_hline))
 	{ // move up window
-		move_window(n+tp_line(cwp->tp_hline)-current_line);
+		// move_window(n+tp_line(cwp->tp_hline)-current_line);
+		move_window(n+current_line-tp_line(cwp->tp_hline));
 	};
 	if(cbfp->view_mode & VMHEX){
 		textpoint_set_lc(cbfp->tp_current,current_line-n,Offset()%16);
 	} else {
-		set_goal_column(-1,"prev_line:2");
 		MoveLineCol(current_line-n,cwp->goal_column);
 	};
 	set_hmark(0,"prev_line");
@@ -566,7 +765,6 @@ int emptyline(TextPoint *tp)
  if(FBolAt(fp,o) && FEolAt(fp,o)) return true;
  return false;
 }
-
 
 
 // comment/uncomment at start of line
@@ -642,7 +840,7 @@ int goto_bop(int n)
 	if(emptyline(tp) || tp_char(tp)==12) break;
  };
 
- cwp->goal_column=0;
+ set_goal_column(0,"goto_bop");
  MoveLineCol(toline,0);
 
  set_update(cwp,UPD_MOVE);
@@ -743,14 +941,13 @@ int next_page(int  n)
 	// we must define a default page lenght
  	return false; 	
  };
-	// MESG("next_page:");
 	if (n<0) return (prev_page(-n));
 	if (n==0) return FALSE;
 	n *= cwp->w_ntrows-1;
-
+	// MESG("next_page: n=%d w=%d",n,cwp->w_width);
 #if	TNOTES
 	if(cbfp->b_flag==FSNOTES) {
-		cwp->goal_column=0;
+		set_goal_column(0,"next_page:1");
 		if(cbfp->b_tags < cwp->current_tag_line+n+headline) n=cbfp->b_tags-cwp->current_tag_line-headline;
 		if(n==0) return FALSE;
 		// MESG("next_page: FSNOTES from %d + %d = %d max=%d",cwp->current_tag_line,n,cwp->current_tag_line+n,cbfp->b_tags);
@@ -760,7 +957,7 @@ int next_page(int  n)
 	} else
 #endif
 	if(cbfp->b_flag & FSNOTESN || cbfp->b_flag & FSNLIST) {
-		cwp->goal_column=NOTES_COLUMN+2;
+		set_goal_column(NOTES_COLUMN+2,"next_page:2");
 		if(cbfp->b_notes < cwp->current_note_line+n+headline) n=cbfp->b_notes-cwp->current_note_line-headline;
 		if(n==0) return FALSE;
 		cwp->current_note_line+=n;
@@ -768,9 +965,39 @@ int next_page(int  n)
 		return (OK_CLRSL);
 	};
 
+#if	1
+	if(is_wrap_text(cbfp)) {
+		if(FSize(cbfp) - FOffset(cbfp)<cwp->w_width) return FALSE; 
+	} else {
+		if(tp_line(cbfp->tp_current)+2>cbfp->lines) return FALSE;
+		if (FEof(cbfp)) return FALSE;
+	};
+#else
 	if (FEof(cbfp)) return FALSE;
+#endif
 
 	toline=tp_line(cwp->tp_current);
+	if(is_wrap_text(cbfp)) {
+		// set new topline
+		offs o=tp_offset(cwp->tp_hline);
+		// offs co=tp_offset(cwp->tp_current);
+		int num_lines=n;
+		// MESG("next_page: topo=%ld current=%ld lines=%d---------",o,co,lines);
+		o=FNext_wrap_line(cwp,o,num_lines,1);
+		set_top_hline(cwp,o,"next_page");
+		// MESG("		start current from %ld n=%d",o,n);
+		o=tp_offset(cwp->tp_current);
+
+		o=FNext_wrap_line(cwp,o,num_lines,0);
+		textpoint_set(cwp->tp_current,o);
+		textpoint_set(cwp->w_fp->tp_current,o);
+		// MESG("		new current o=%ld line=%ld",tp_line(cwp->tp_current),tp_line(cwp->tp_current));
+		
+		set_update(cwp,UPD_MOVE|UPD_WINDOW);
+		undo_set_noglue();
+
+    	return (OK_CLRSL);
+	} else {
 	cwp->w_ppline = tp_line(cwp->tp_current)-tp_line(cwp->tp_hline)+1;
 	topline=tp_line(cwp->tp_hline);
 	if(toline+n > cbfp->lines) {
@@ -781,7 +1008,7 @@ int next_page(int  n)
 		toline += n;
 		topline +=n;
 	};
-
+	};
 	
 	// MESG("next_page: toline=%d col=%d",toline,cwp->goal_column);
 	MoveLineCol(toline,cwp->goal_column);
@@ -795,51 +1022,82 @@ int next_page(int  n)
 
 
 /* Scroll backward by a specified number of pages. */
-int prev_page(int n)
+int prev_page(int num_pages)
 {
  num toline;
  int headline=(cbfp->b_header!=NULL);
-
+ int num_lines = num_pages*(cwp->w_ntrows-1)+1;
+ if(is_wrap_text(cbfp)) num_lines = num_pages*(cwp->w_ntrows-1);
  if(!discmd) {
 	// no page defined yet without window!
 	// we must define a default page lenght
  	return false; 	
  };
-// MESG("prev_page:");
- if (n<0) return (next_page(-n));
+ // MESG("# prev_page:");
+ if (num_pages<0) return (next_page(-num_pages));
 
-
-	n *= cwp->w_ntrows-1;
 #if	TNOTES
 	if(cbfp->b_flag==FSNOTES) {
-		cwp->goal_column=0;
-		if(n > cwp->current_tag_line+headline) n=cwp->current_tag_line;
-		if(n==0) return FALSE;
+		set_goal_column(0,"prev_page:1");
+		if(num_lines > cwp->current_tag_line+headline) num_lines=cwp->current_tag_line;
+		if(num_lines==0) return FALSE;
 
 		// MESG("prev_page: FSNOTES from %d - %d = %d",cwp->current_tag_line,n,cwp->current_tag_line-n);
-		cwp->current_tag_line-=n;
+		cwp->current_tag_line-=num_lines;
 		set_update(cwp,UPD_MOVE|UPD_WINDOW);
 		return (OK_CLRSL);
 	} else
 #endif
 	if(cbfp->b_flag & FSNOTESN || cbfp->b_flag & FSNLIST) {
-		cwp->goal_column=NOTES_COLUMN+2;
-		if(n > cwp->current_note_line+headline) n=cwp->current_note_line;
-		if(n==0) return FALSE;
-		cwp->current_note_line-=n;
+		set_goal_column(NOTES_COLUMN+2,"prev_page:1");
+		if(num_lines > cwp->current_note_line+headline) num_lines=cwp->current_note_line;
+		if(num_lines==0) return FALSE;
+		cwp->current_note_line-=num_lines;
 		set_update(cwp,UPD_MOVE|UPD_WINDOW);
 		return (OK_CLRSL);
 	};
 
  if(FBof(cbfp)) return (false);
  toline=tp_line(cwp->tp_current);
- cwp->w_ppline = tp_line(cwp->tp_current)-tp_line(cwp->tp_hline)+1;
- if(toline-n<0) {
-	toline=0;
-	n=toline;
- } else {toline-=n;};
+ if(is_wrap_text(cbfp)) {
+ 	offs o=tp_offset(cwp->tp_hline);
+	// int num_lines=n;
+	int nline=num_lines;
+	// MESG("prev_page: toline=%d num_lines=%d w=%d rows=%d",toline,num_lines,cwp->w_width,cwp->w_ntrows);
+		if(toline==0) 
+		o=FPrev_wrap_line(cwp,o,num_lines);
+		else
+		while(--nline >0) {
+			o=FPrev_wrap_line(cwp,o,1);
+		};
+		set_top_hline(cwp,o,"prev_page");
+		// MESG("		start current from %ld n=%d",o,n);
+		o=tp_offset(cwp->tp_current);
+		nline=num_lines;
 
- // set_goal_column(0,"prev_page");
+		if(toline==0) 
+		o=FPrev_wrap_line(cwp,o,num_lines);
+		else
+		while(nline-- >0) {
+			o=FPrev_wrap_line(cwp,o,1);
+			// MESG("		next line o=%ld",o);
+		};
+
+		textpoint_set(cwp->tp_current,o);
+		textpoint_set(cwp->w_fp->tp_current,o);
+		// MESG("		new current o=%ld line=%ld",tp_line(cwp->tp_current),tp_line(cwp->tp_current));
+		
+		set_update(cwp,UPD_MOVE|UPD_WINDOW);
+		undo_set_noglue();
+
+    	return (OK_CLRSL);
+ };
+ cwp->w_ppline = tp_line(cwp->tp_current)-tp_line(cwp->tp_hline)+1;
+ if(toline-num_lines<0 ) {
+	toline=0;
+	num_lines=toline;
+ } else {toline-=num_lines;};
+
  MoveLineCol(toline,cwp->goal_column);
 
  set_hmark(0,"prev_page");
@@ -1094,7 +1352,7 @@ int quick_close(int n)
 	};
 	oldcb = cbfp;                          /* save in case we fail */
 	// MESG("quick_close:");
-	if(oldcb->connect_buffer!=NULL) MESG("	is connected!");
+	// if(oldcb->connect_buffer!=NULL) MESG("	is connected!");
 	if(cbfp->b_fname[0]!=CHR_LBRA)
 	if(!dont_edit()) {
 		// save the buffer
@@ -1102,7 +1360,7 @@ int quick_close(int n)
 		if ((status = save_file( n)) != TRUE) {
 
 			if(cbfp->connect_buffer!=NULL) {
-				MESG("buffer is connected!");
+				// MESG("buffer is connected!");
 				FILEBUF *connect_fp=cbfp->connect_buffer;
 				select_filebuf(connect_fp);
 				delete_filebuf(oldcb,1);
@@ -1120,7 +1378,7 @@ int quick_close(int n)
 	}else {
 	// MESG("quick_close: close_file");
 		if(cbfp->connect_buffer!=NULL) {
-		MESG("buffer is connected!");
+		// MESG("buffer is connected!");
 			FILEBUF *connect_fp=cbfp->connect_buffer;
 			select_filebuf(connect_fp);
 			delete_filebuf(oldcb,1);
@@ -1240,7 +1498,7 @@ int tab(int n)
 }
 
 /* change tabs to spaces for a number of lines */
-int detab_line(int n)		
+int detab_line(int n)
 {
 	num oldline;
 //	MESG("detab_line:");

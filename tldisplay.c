@@ -23,6 +23,7 @@ void drv_window_delete(WINDP *wp);
 int get_menu_index_from_mouse();
 void utf_string_break(char *utf_string, int column);
 int noop(int);
+void upd_all_wrap_lines(WINDP *wp,char *from);
 
 extern int drv_initialized;
 extern FILEBUF *cbfp;
@@ -67,12 +68,14 @@ void update_selection()
 	/* update any windows that need refreshing */
 	hide_cursor("update_selection");
 	upd_column_pos();
-	cwp->currow = window_cursor_line(cwp);
+	// MESG("update_selection:");
+	// cwp->currow = window_cursor_line(cwp);
 	lbegin(window_list);
 	while((wp=(WINDP *)lget(window_list))!=NULL)
 	{
 			if(wp==cwp) wp->currow = window_cursor_line(wp);
-
+			if(is_wrap_text(wp->w_fp)) upd_all_wrap_lines(wp,"update_selection");
+			else
 			upd_all_virtual_lines(wp,"update_selection");	/* update all lines */
 			wp->w_flag = 0;
 	}
@@ -126,11 +129,18 @@ void vtinit(int argc, char **argp)
 
 void movecursor(int row, int col)
 {
+ static int t=0;
     if(row<drv_numrow-1) {
 		if(cwp->w_ntcols>40) show_position_info(0);
 		else if(cwp->w_ntcols>25) show_position_info(1);
 		else show_position_info(-1);
+	} else {
+		msg_line("cursor out of bound %d!",t++);
+		row=drv_numrow-3;
 	};
+#if	WRAPD
+	MESG("	move(x=%d y=%d) cur_col (%ld %d)",col,row,tp_col(cwp->tp_current),tp_col(cwp->tp_current)%cwp->w_width);
+#endif
 	drv_win_move(cwp,row, col);
 }
 
@@ -629,7 +639,7 @@ int menu_command(int n)
  /* new_wp, new_line, new_column have been set */
 void move_to_new_position(num new_column,num new_line)
 {
-//	MESG("move_to_new_position: col=%ld line=%ld",new_column,new_line);
+	// MESG("move_to_new_position: col=%ld line=%ld",new_column,new_line);
 	set_goal_column(new_column,"move_to_new_position");
 	MoveLineCol(new_line,cwp->goal_column);
 	update_status();
@@ -899,7 +909,6 @@ extern BOX *cbox;
 
 void update_cursor_position()
 {
-	// MESG("update_cursor_position: entry_mode=%d row=%d col=%d",entry_mode,cwp->currow,WGetCol());
 	if(!entry_mode)
 	{
 		if(!in_menu) {
@@ -909,7 +918,10 @@ void update_cursor_position()
 			else 
 #endif
 			if(cwp->w_fp->b_flag & FSNLIST) movecursor(cwp->current_note_line-cwp->top_note_line+(cwp->w_fp->b_header!=NULL), 0);
-			else movecursor(cwp->currow+(cwp->w_fp->b_header!=NULL), WGetCol());
+			else if(is_wrap_text(cwp->w_fp)) {
+				// MESG("update_cursor_position: row=%d col=%d %d",cwp->currow,cwp->curcol,WGetCol());
+				movecursor(cwp->currow,cwp->curcol);
+			} else movecursor(cwp->currow+(cwp->w_fp->b_header!=NULL), WGetCol());
 			show_cursor("update_cursor_position");
 		};
 	};
@@ -1274,14 +1286,16 @@ void main_loop()
  int c;
  init_message_loop(); 
  change_color_scheme(color_scheme_ind+1);
+ MESG_time_start("main_loop:");
  while(1) { /* main keyboard loop */
 	/* Fix up the screen    */
-//	MESG("main_loop:0 buffer=%d [%s][%s] -----",cbfp->b_index,cbfp->b_dname,cbfp->b_fname);
     update_screen(FALSE);
+	MESG_time("after update_screen");
 	/* get the next command from the keyboard */
 	app_error=0;
-	c = getcmd();
 
+	c = getcmd();
+	MESG_time_start("# main_loop go execute -------key %s",xe_key_name(c));
 	/* execute the keyboard sequence */
 	main_execute(c);
  };
@@ -1438,6 +1452,7 @@ void status_line(WINDP *wp)
 			if (wp->w_fp->b_mode & (1 << i)) {
 				*stp++ = modecode[i];n++;
 			};
+		if(wp->w_fp->view_mode & VMWRAP) {*stp++='W';n++;};
 		if(wp->w_fp->bom_type == FTYPE_UTF8BOM) { *stp++ = '8';n++;};
 		if(wp->w_fp->bom_type == FTYPE_UTF16BOM) { 
 			*stp++ = '1';n++;*stp++ = '6';n++;
@@ -1599,7 +1614,6 @@ int get_utf_length(utfchar *utf_char_str)
  if(clen_error) { return 1;};
 
  b0=utf_char_str->uval[0];
- if(b0==0) return 0;
  if(b0<128) return 1;
 #if	DARWIN | 1
  // accents do not take space in mac 
@@ -1637,6 +1651,11 @@ int get_utf_length(utfchar *utf_char_str)
 	if(b1 == 0x92) return 1;
 #if	DARWIN
 	if(b1==0x9C||b1==0x9D||b1==0x9E) return 1;
+#else
+	if(b1==0x9c) {
+		int b2=utf_char_str->uval[2];
+		if(b2==0x93||b2==0x94) return 1;
+	};
 #endif
 	if(b1==0x99) {
 		int b2=utf_char_str->uval[2];

@@ -33,6 +33,7 @@ void set_cursor(int val,char *from);
 void set_window_font(WINDP *wp);
 void ge_edit_display_expose_area(GtkWidget *widget, GdkRectangle *area);
 char **get_scheme_names();
+void upd_all_wrap_lines(WINDP *wp,char *from);
 
 GdkRGBA *current_colors[COLOR_TYPES];
 
@@ -498,7 +499,7 @@ void show_cursor (char *from)
 	// MESG("show_cursor: start from %s",from);
 #if	SHOW_CLINE
 	area.x = 0;
-	area.height = 1;	/* current line height  */
+	area.height = 5;	/* current line height  */
 	area.y = py+CHEIGHTI-area.height;
 	area.width = cwp->gwp->width;
 	// MESG("show_cursor: from %s <%d y=%d y=%d",from,ind,area.x,area.y);	
@@ -518,7 +519,7 @@ void show_cursor (char *from)
 	end_draw(wd,"show_cursor:line end");
 #endif
 	/* get current cursor area */
-	area.x = px+1;
+	area.x = (px+1)%(wd->wp->w_width * CLENI);
 	area.y = py;
 
 	area.width = CLEN;
@@ -628,7 +629,7 @@ void set_edit_font(GeEditDisplay *wd)
 	/* use pango metrics  */
 	if(wd->layout==NULL) {
 		wd->layout=pango_cairo_create_layout (wd->cr);
-		MESG("set_edit_font: new layout!");
+		// MESG("set_edit_font: new layout!");
 	};
 	PangoContext *context = pango_layout_get_context(wd->layout);
 	PangoLanguage *language = pango_language_get_default();
@@ -1281,6 +1282,7 @@ int newxy(WINDP *wp)
 		free_virtual_window(wp);
 		wp->w_ntcols = new_cols;
 		wp->w_ntrows = new_rows;
+		set_window_width(wp);
 		gwp->width = new_width;
 		gwp->height = new_height;
 		allocate_virtual_window(wp);
@@ -1349,6 +1351,9 @@ void cb_set_position(GtkAdjustment *adj, GtkWidget *widget)
 #if	1	// this is not needed for wayland!, it sends a draw event in any case !!!!
 //	update_all=true;
 	// MESG("cb_set_position: update virtual lines!");
+	if(is_wrap_text(wd->wp->w_fp))
+	upd_all_wrap_lines(wd->wp,"cb_set_position 3");
+	else
 	upd_all_virtual_lines(wd->wp,"cb_set_position 3");
 	// MESG("cb_set_position: draw_window!");
 	draw_window(0,wd->wp,"cb_set_position");
@@ -2045,8 +2050,7 @@ int get_pango_length(char *st)
 	pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
 	pango_layout_set_text (wd->layout, st, -1);
 	pango_layout_get_size (wd->layout, &width, &height);
-	// if(st[0]>0x80)
-// 	MESG("pango_len:[%2X %2X %2X %2x] w=%d CLEN=%f",st[0],st[1],st[2],st[3],width/PANGO_SCALE,CLEN);
+	// MESG("pango_len:[%s][%2X %2X %2X %2x %2X %2X %2X %2x] w=%d CLEN=%f\n",st,st[0],st[1],st[2],st[3],st[4],st[5],st[6],st[7],width/PANGO_SCALE,CLEN);
 	return width/PANGO_SCALE;
 }
 

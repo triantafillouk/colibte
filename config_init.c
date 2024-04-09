@@ -21,7 +21,7 @@ char *find_file(char *subdir,char *fname,int cflag,int create_if_not_found);
 void load_config()
 {
  int i=0;
- // MESG("lxoad_config:");
+ // fprintf(stderr,"load config\n");
 
  char *fname = find_file("",CONFIGFILE,0,0);
 
@@ -37,8 +37,10 @@ void load_config()
 		// MESG("	- set [%s] to %d",flag_name,atoi(value_array[i]));
 		// set_btval(flag_name,-1,NULL,atoi(value_array[i]));
 		set_bt_num_val(flag_name,atoi(value_array[i]));
+		// fprintf(stderr,"	- %20s %d\n",flag_name,atoi(value_array[i]));
 	};
-	MESG("configuration loaded! (%d) pairs",pair_nums);
+	// MESG("configuration loaded! (%d) pairs",pair_nums);
+	// fprintf(stderr,"configuration loaded! (%d) pairs\n",pair_nums);
  };
 
  sarray_clear(name_array);

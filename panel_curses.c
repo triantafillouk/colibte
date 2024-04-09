@@ -57,6 +57,7 @@ int imove_top_line(num new_top_line);
 int set_sposition(WINDP *wp,int *st, int *l);
 void utf_string_break(char *utf_string, int column);
 int change_sort_mode(int mouse_col);
+offs FNext_wrap_line(WINDP *wp,offs start,int num_lines,int top);
 
 int	colorupdate;
 int color_scheme_ind=0;
@@ -313,7 +314,6 @@ int delete_window(int n)
 		if(wp==cwp) continue;
 		wx1=wp->gwp->t_xpos;wx2=wx1+wp->w_ntcols;
 		wy1=wp->gwp->t_ypos;wy2=wy1+wp->w_ntrows;
-
 		if(wx1 == cx2+vswidth) {	/* right  */
 			if(cy1 == wy1 && cwp->w_ntrows == wp->w_ntrows) {
 				p_right=1.0;
@@ -321,6 +321,7 @@ int delete_window(int n)
 				wp->w_ntcols += cwp->w_ntcols + vswidth;	/* add width of deleted to the right window  */
 				if(is_first) { w1=wp; is_first=0;};
 				drv_set_wvs(wp);
+				set_window_width(wp);
 			} else
 			if(wy1>=cy1 && wy2<= cy2) {
 				p = (float)(wy2-wy1)/(cy2-cy1);
@@ -329,6 +330,7 @@ int delete_window(int n)
 				wp->w_ntcols += cwp->w_ntcols + vswidth;	/* add width of deleted to the right window  */
 				if(is_first) { w1=wp; is_first=0;};
 				drv_set_wvs(wp);
+				set_window_width(wp);
 			};
 			if(p_right >= 1.0) break;
 		}; 
@@ -338,6 +340,7 @@ int delete_window(int n)
 				wp->w_ntcols += cwp->w_ntcols + vswidth; 	/* add widht of deleted to the left window  */
 				if(is_first) { w1=wp; is_first=0;};
 				drv_set_wvs(wp);
+				set_window_width(wp);
 			}else
 			if(wy1>=cy1 && wy2<= cy2) {
 				p = (float)(wy2-wy1)/(cy2-cy1);
@@ -345,6 +348,7 @@ int delete_window(int n)
 				wp->w_ntcols += cwp->w_ntcols + vswidth; 	/* add widht of deleted to the left window  */
 				if(is_first) { w1=wp; is_first=0;};
 				drv_set_wvs(wp);
+				set_window_width(wp);
 			};
 			if(p_left >= 1.0) break;
 		}; 
@@ -382,7 +386,7 @@ int delete_window(int n)
 			};
 			if(p_up >= 1.0) break;
 		};
-
+		set_window_width(wp);
 	};
 
 	if(w1==NULL) {
@@ -439,8 +443,10 @@ void set_1window()
 
  cwp->gwp->t_xpos = 0;
  cwp->w_ntcols = drv_numcol-1;
+ set_window_width(cwp);
  drv_set_wvs(cwp);
 }
+
 
 /*
  * Split the current window horizontally
@@ -467,6 +473,7 @@ int split_window(int n)
 		wp->gwp->t_xpos = cwp->gwp->t_xpos;
         wp->w_ntrows = ntrl+1;
 		wp->w_ntcols = cwp->w_ntcols;
+		set_window_width(wp);
 		set_update(wp,UPD_ALL|UPD_STATUS);
 		drv_set_wvs(wp);
 		return (next_window(1));
@@ -493,11 +500,13 @@ int vsplit_window(int n)
         ntr = (cwp->w_ntcols+1-vswidth) - ntl;      /* right  size           */
 		drv_free_win(cwp);
 		cwp->w_ntcols = ntl-1;
+		set_window_width(cwp);
 		drv_set_wvs(cwp);
 		wp->gwp->t_ypos = cwp->gwp->t_ypos;
 		wp->gwp->t_xpos = cwp->gwp->t_xpos+cwp->w_ntcols+vswidth;
 
 		wp->w_ntcols = ntr;
+		set_window_width(wp);
         wp->w_ntrows = cwp->w_ntrows;
 		set_update(wp,UPD_ALL|UPD_STATUS);
 		drv_set_wvs(wp);
@@ -529,6 +538,7 @@ void drv_restore_wdimensions(WINDP *wp)
 {
 	wp->w_ntrows=wp->gwp->back_rows;
 	wp->w_ntcols=wp->gwp->back_cols;
+	set_window_width(wp);
 	wp->gwp->h_flags=0;
 }
 
@@ -821,7 +831,7 @@ int text_mouse_function(int move)
 		// MESG("mouse pressed mb=%d move=%d row=%d col=%d",mouse_button,move,mouse_window_row,mouse_window_col);
 	};
 	if(mouse_button==KMOUSE_BUTTON1 && move<KMOUSE_RELEASE){
-		if(mouse_window_col==wp->w_ntcols-cwp->w_infocol) { // on rline (position status line)
+		if((mouse_window_col+wp->w_infocol)==wp->w_ntcols) { // on rline (position status line)
 			int start,len;
 			int lines_to_move;
 			int top_line=tp_line(cwp->tp_hline);
@@ -892,17 +902,22 @@ int text_mouse_function(int move)
 		} 
 	};
 	if(mouse_window_col<0) mouse_window_col=0;	/* inside info left column  */
-	new_offset=LineBegin(tp_offset(cwp->tp_hline));
+	if(is_wrap_text(cbfp)) new_offset=tp_offset(cwp->tp_hline);
+	else new_offset=LineBegin(tp_offset(cwp->tp_hline));
 
 	// MESG("tp_hline:1 new_offset=%ld row=%d",new_offset,mouse_window_row);
 	int head_line=(cbfp->b_header!=NULL);
 	for(i=head_line;i<mouse_window_row;i++) 
 	{
+		if(is_wrap_text(cbfp)) 
+		new_offset = FNext_wrap_line(cwp,new_offset,1,1);
+		else 
   		new_offset = FNextLine(cbfp,new_offset);
 	};
-
+	// MESG("text_mouse_function: new_offset=%ld mouse_row=%d ",new_offset,mouse_window_row);
 	if(mouse_button==KMOUSE_BUTTON1 && move<KMOUSE_RELEASE) {
-		if(mouse_window_col==wp->w_ntcols-cwp->w_infocol) {
+	// MESG("	mouse release!");
+		if(mouse_window_col==wp->w_width) {
 			// MESG("move<KMOUSE_RELEASE");
 			return 0;
 		};
@@ -935,9 +950,13 @@ int text_mouse_function(int move)
 		} else {
 			textpoint_set(cwp->tp_current,new_offset);
 			new_line=tp_line(cwp->tp_current);
+			int wrap_column=tp_col(cwp->tp_current);
+
+			// MESG("	new_offset:1 %ld %ld set line %ld col %ld mouse_col=%d",
+				// new_offset,tp_offset(cwp->tp_current),tp_line(cwp->tp_current),tp_col(cwp->tp_current),mouse_window_col);
 			 if(move==KMOUSE_DBLCLICK)
 			 {
-				move_to_new_position(mouse_window_col,new_line);
+				move_to_new_position(mouse_window_col+wrap_column,new_line);
 				select_current_word();
 				return 0;
 			 };
@@ -954,11 +973,12 @@ int text_mouse_function(int move)
 					// MESG("mouse_window_col=%d line=%d",mouse_window_col,new_line);
 				} else {
 				start_line=new_line;
-				start_col = mouse_window_col;
-				move_to_new_position(mouse_window_col,new_line);
+				start_col = wrap_column+mouse_window_col;
+				// MESG("	move_to_new_pos: mouse_col=%d wrap_column=%d new_line=%d",mouse_window_col,wrap_column,new_line);
+				move_to_new_position(wrap_column+mouse_window_col,new_line);
 				};
 			} else {
-				move_to_new_position(mouse_window_col,start_line);
+				move_to_new_position(wrap_column+mouse_window_col,start_line);
 				if(cwp->selection==0) {
 					/* start selection  */
 //					MESG("mouse move: start selection: mouse_col=%d o=%lld charlen=%d start_col=%lld",
@@ -968,13 +988,13 @@ int text_mouse_function(int move)
 				} else {
 //					MESG("mouse move: move  selection: mouse_col=%d o=%lld charlen=%d start_col=%lld",
 //						mouse_window_col,Offset(),charlen(cwp->w_fp,Offset()),start_col);
-					set_xmark(cwp,mouse_window_col,new_line - tp_line(cwp->tp_hline),1);
+					set_xmark(cwp,wrap_column+mouse_window_col,new_line - tp_line(cwp->tp_hline),1);
 				};
 				set_update(cwp,UPD_EDIT);
 			}
 		};
 	};
-
+	// MESG("	text_mouse_function:1");
 	if(mouse_button==KMOUSE_BUTTON3 && move<KMOUSE_RELEASE) {
 		if(cwp->selection){
 			int status;
@@ -1704,6 +1724,7 @@ int check_v_sibling(WINDP *wp,int left,int top,int new_cols)
 			};
 			if(!left) wp1->gwp->t_xpos -= new_cols;
 			wp1->w_ntcols += new_cols;
+			set_window_width(wp1);
 			return true;
 		};
 	};
@@ -1849,6 +1870,7 @@ int vresize_wind(int n)
 			window_list->current=cwin;
 
 			wp1->w_ntcols -=n;
+			set_window_width(wp1);
 		}; 
  	};
 	if(wp==NULL) return false;	/* no window found to give/take space  */
@@ -1860,6 +1882,7 @@ int vresize_wind(int n)
 		cwp->gwp->h_flags=2;
 		cwp->w_ntcols +=n;	
 		cwp->gwp->t_xpos-=n;
+		set_window_width(cwp);
 	};
 	};
  } else {	/* current window on left of the screen  */
@@ -1881,6 +1904,7 @@ int vresize_wind(int n)
 
 			wp1->gwp->t_xpos+=n;
 			wp1->w_ntcols -=n;
+			set_window_width(wp1);
 		}; 
 	}; 
 	if(wp==NULL) return false;	/* no window found to give/take space  */
@@ -1891,6 +1915,7 @@ int vresize_wind(int n)
 	if(!error) {
 		cwp->gwp->h_flags=2;
 		cwp->w_ntcols +=n;	/* set  */
+		set_window_width(cwp);
 	};
 	};
  };
@@ -2277,7 +2302,7 @@ void show_debug_color_attr(COLOR_SCHEME *current_cscheme)
 void set_current_scheme(int scheme)
 {
  int i,j;
- MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
+ // MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
  if(scheme<1 || scheme> color_scheme_list->size) scheme=1;
 
  color_scheme_ind=scheme-1;
@@ -2448,12 +2473,14 @@ void update_cols(WINDP *wp,int old_start_col,int new_start_col,float ratio_w,int
 	{
 		wp->gwp->t_xpos = new_start_col;
 		wp->w_ntcols = drv_numcol - wp->gwp->t_xpos;
+		set_window_width(wp);
 		wp->gwp->h_flags &= ~2;
 	} else {
 		WINDP *wp1;
 		_el *cwin=window_list->current;
 		wp->gwp->t_xpos = new_start_col;
 		wp->w_ntcols = round(wp->w_ntcols * ratio_w);
+		set_window_width(wp);
 		wp->gwp->h_flags &= ~2;
 
 		lbegin(window_list);

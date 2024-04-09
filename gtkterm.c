@@ -1172,7 +1172,7 @@ int newxy(WINDP *wp)
 
 	wp->w_ntcols = dra_width(wp->gwp)/CLEN+1;
 	wp->w_ntrows = dra_height(wp->gwp)/CHEIGHTI+2;
-
+	set_window_width(wp);
 	allocate_virtual_window(wp);
 	return(TRUE);
 }
@@ -1227,6 +1227,9 @@ void cb_set_position(GtkAdjustment *adj, GtkWidget *widget)
 
 	upd_column_pos();
 	check_cursor_position(wd->wp);
+	if(is_wrap_text(wd->wp->w_fp)) 
+	upd_all_wrap_lines(wd->wp,"cb_set_position 3");
+	else
 	upd_all_virtual_lines(wd->wp,"cb_set_posision");
 
 	update_physical_windows();

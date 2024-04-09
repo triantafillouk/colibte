@@ -29,6 +29,7 @@ int found=0;
 char	search_pattern[MAXLLEN];            /* Search pattern	*/
 char	replace_pattern[MAXLLEN];			/* replacement pattern		*/
 char	search_lowercase_pattern[MAXLLEN];		/* lower case search pattern  */
+void MESG_time_start(const char *fmt, ...);
 num prof_count=0;
 extern FILEBUF *cbfp;
 
@@ -54,7 +55,6 @@ void rvstrcpy(char *rvstr, char *str,int maxlen);
 char *str2ctrl(char *);
 int set_window_filebuf(WINDP *wp,FILEBUF *bp);
 int drv_search_dialog(int f);
-offs   FPrevUtfCharAt(FILEBUF *fp,offs o, utfchar *uc);
 
 offs curoffs;		/* current offset in file  */
 offs last_offs;		/* position of last replace  */
@@ -446,14 +446,7 @@ int	setpattern(char apat[], char *st,int srch)
 	{
 		matchlen = strlen(apat);
 		if (gmode_exact_case == 0) {
-#if	1
 			get_uppercase_string(apat,apat);
-#else
-			gchar *upper;
-			upper = g_utf8_strup(apat,-1);
-			strlcpy(apat,upper,MAXLLEN);
-			g_free(upper);
-#endif
 		};
 	};
 	// reset pattern match
@@ -581,14 +574,7 @@ int	replaces(int query, int next_only, int n)
 		nextarg("replace",search_pattern,MAXLLEN,true);
 		num_expression();
 		if (gmode_exact_case == 0) {
-#if	1
 			get_uppercase_string(search_pattern,search_pattern);
-#else
-			gchar *upper;
-			upper = g_utf8_strup(search_pattern,-1);
-			strlcpy(search_pattern,upper,MAXLLEN);
-			g_free(upper);
-#endif
 		};
 
 		matchlen=strlen(search_pattern);
@@ -639,7 +625,7 @@ int	replaces(int query, int next_only, int n)
 	prof_count=0;
 	stat=snprintf(lline,1024,"sreplace: %s with %s",search_pattern,replace_pattern);
 	if(stat<256) MESG("truncated 5");
-	show_time(lline,0);
+	MESG_time_start(lline);
 
 	while ( (!next_only || n > nummatch) &&
 		(nlflag == FALSE || nlrepl == FALSE) )
@@ -672,7 +658,7 @@ int	replaces(int query, int next_only, int n)
 		if((nummatch % 100000)==0) 
 		{
 			stat=snprintf(lline,256,"count=%lld at %lld",(long long int)nummatch,current_offset);
-			show_time(lline,1);
+			MESG_time(lline);
 		};
 		/* Check if we are on the last line.*/
 		nlrepl = FEof(fp);
@@ -775,7 +761,7 @@ qprompt:
 
 	stat=snprintf(lline,256,"replaced %lld items count=%lld",(long long int)numsub,prof_count);
 //	if(stat<256) 
-	show_time(lline,1);
+	MESG_time(lline);
 	/* And report the results.*/
 	setmark(0);
 	set_modified(fp);
@@ -1199,7 +1185,6 @@ int	rexp_scanner(REXP_PAT *patptr, int direct, int beg_or_end)
 
 	return FALSE;	/* We could not find a match */
 }
-#define	UTFCOMP	1
 
 int amatch(char c1,REXP_PAT *pat,int direct)
 {

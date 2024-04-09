@@ -126,7 +126,7 @@ int delete_window(int n)
 /* dummy for GTK */
 void list_dir1(char *st)
 {
-//s MESG("list_dir1:[%s] this is dummy in GTK!",st);
+// MESG("list_dir1:[%s] this is dummy in GTK!",st);
 }
 
 /* resize rows. Dummy for gtk */
@@ -290,6 +290,7 @@ void status_line(WINDP *wp)
 		if((sort_mode %2)==1) { *stp++ = 'r'; };
 	};	
 #endif
+	if(is_wrap_text(wp->w_fp)) {*stp++='W';};
 	*stp++=' ';
 	if(gmode_over) *stp++ = 'O';
 
