@@ -1545,6 +1545,10 @@ void highlight_jscript(int c)
 		hstate=0;
 		slang=LANG_SCRIPT;
 		break;
+	case CHR_PARL:
+	case '=':
+		if(hstate==0) hstate=HS_ASSIGN;
+		break;
 	/* single quotes */
 	case CHR_SQUOTE: 
 		if(hstate==HS_PREVESC) { hstate=0;break;};
@@ -1560,6 +1564,7 @@ void highlight_jscript(int c)
 		hstate=0;
 		break;
 	/* double quotes */
+	case '`':
 	case CHR_DQUOTE:
 		if(hstate==HS_PREVESC) { hstate=0;break;};
 		if(!(hquotem & H_QUOTE7)) {
@@ -1587,14 +1592,20 @@ void highlight_jscript(int c)
 		break;
 	/* comments */
 	case '/':
+		if(hstate==HS_ASSIGN) { 
+			hstate=0;
+			hquotem=H_QUOTE12;break;
+		};
 		if(hstate==HS_PREVESC) { hstate=0;break;};
+		if(hquotem==H_QUOTE12) { hstate=0;hquotem=0;break;};
 		if(hquotem!=H_QUOTE2 && hquotem!=H_QUOTE1) {
 			if(hstate==HS_PREVSLASH) hquotem=H_QUOTE5;
-			else if(hstate==HS_PREVAST) hquotem &= ~H_QUOTEC;
+			else if(hstate==HS_PREVAST && hquotem!=H_QUOTE12) {hquotem &= ~H_QUOTEC;hstate=0;break;};
 			if(hquotem & H_QUOTE7) hquotem &= ~H_QUOTE7;
-			else if(hstate==HS_SPEC) hquotem |= H_QUOTE7;
+			// else if(hstate==HS_SPEC) hquotem |= H_QUOTE7;
 		};
-		if(hquotem!=H_QUOTEC && hquotem!=H_QUOTE2) hstate=HS_PREVSLASH;
+		// if(hquotem!=H_QUOTEC && hquotem!=H_QUOTE2) hstate=HS_PREVSLASH;
+		if(hquotem==0) hstate=HS_PREVSLASH;
 		break;
 	case '\\':{
 		hstate=(hstate==HS_PREVESC)?0:HS_PREVESC;
@@ -1602,7 +1613,7 @@ void highlight_jscript(int c)
 		break;
 	case '\n':
 	case CHR_CR:
-		hquotem &= ~(H_QUOTE6|H_QUOTE5|H_QUOTE4);
+		hquotem &= ~(H_QUOTE6|H_QUOTE5|H_QUOTE4|H_QUOTE12);
 		hstate=HS_LINESTART;
 		break;
 	case '!':
@@ -1631,12 +1642,9 @@ void highlight_jscript(int c)
 		if(hstate==HS_PSMALLER) hquotem=0;
 		hstate=0;
 		break;
-	case CHR_PARL:
-		hstate=HS_SPEC;
-		break;
 	case ' ':
 	case '\t':
-		if(hstate!=HS_LINESTART && hstate!=HS_PSMALLER && hstate!=HS_SPEC) hstate=0;
+		if(hstate!=HS_LINESTART && hstate!=HS_PSMALLER && hstate!=HS_SPEC && hstate!=HS_ASSIGN) hstate=0;
 		break;		
 	default: { 
 		if(hstate==HS_PSMALLER && hquotem==0) hquotem = H_QUOTE4;
