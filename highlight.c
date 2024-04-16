@@ -3156,8 +3156,8 @@ void fquote_state(offs till_offs, offs from_offs, WINDP *wp)
 void setwquotes(WINDP *wp,int ind,num known_offset)
 {
 	if(hprev_line>=0) hquotem=hprev_line;
-	// MESG("setwquotes:[%s] ind=%d btype=%d slang=%d hnote=%d hquotem=%X ko=%lld ho=%lld",wp->w_fp->b_fname,ind,wp->w_fp->b_type,slang,hnote,hquotem,known_offset,tp_offset(wp->tp_hline));
-	wp->w_fp->hl->h_function(CHR_FLUSH);
+	// MESG("setwquotes:[%s] ind=%d btype=%d slang=%d hstate=%d hquotem=%X ko=%lld ho=%lld",wp->w_fp->b_fname,ind,wp->w_fp->b_type,slang,hstate,hquotem,known_offset,tp_offset(wp->tp_hline));
+	// wp->w_fp->hl->h_function(CHR_FLUSH);	/* is it needed ?, now only for json  */
 	wp->hs[ind].w_hquotem = hquotem;
 	wp->hs[ind].w_slang = slang;
 	wp->hs[ind].w_hselection = hselection;
@@ -3196,8 +3196,8 @@ offs getwquotes(WINDP *wp,int ind)
 	h_hquote_start = wp->hs[ind].w_hquote_start;
 	h_line_set = wp->hs[ind].w_line_set;
 	h_prev_space = wp->hs[ind].w_prev_space;
+	// MESG("getwquotes:[%s] ind=%d b_type=%d slang=%d hstate=%d hquotem=%X ko=%lld ho=%lld",wp->w_fp->b_fname,ind,wp->w_fp->b_type,slang,hstate,hquotem,wp->hs[ind].known_offset,tp_offset(wp->tp_hline));
 	return wp->hs[ind].known_offset;
-	// MESG("getwquotes:[%s] ind=%d b_type=%d slang=%d hnote=%d hquotem=%X ko=%lld ho=%lld",wp->w_fp->b_fname,ind,wp->w_fp->b_type,slang,hnote,hquotem,wp->hs[ind].known_offset,tp_offset(wp->tp_hline));
 }
 
 /*
