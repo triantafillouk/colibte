@@ -533,7 +533,7 @@ int DiffColumns(FILEBUF *fp, offs start_col,offs col_offs,char *from)
 	};
   };
  } else {
-  while (o < col_offs && !FEofAt(fp,o)) {
+  while ((o < col_offs) && !FEofAt(fp,o)) {
 	int c;
 	c=FCharAt(fp,o);
 	if (c == CHR_TAB) {
@@ -547,6 +547,46 @@ int DiffColumns(FILEBUF *fp, offs start_col,offs col_offs,char *from)
  return(col);
 }
 
+#if	1
+int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
+{
+ int col = 0;
+ offs o=*dbo;
+ if(fp->b_lang==0 && !utf8_error()){
+//  MESG("diffcol: from %ld to %ld",o,col_offs);
+  while (o < col_offs && !FEofAt(fp,o)) {
+	int c;
+	utfchar uc;
+	o = FUtfCharAt(fp,o,&uc);
+ 	c=uc.uval[0];
+	if (c == CHR_TAB) {
+		col=next_tab(col);
+	} else {
+		col += get_utf_length(&uc);
+		if(clen_error) {
+			set_utf8_error(1);
+			c=DiffColumn(fp,dbo,col_offs,"inside");
+			set_utf8_error(0);
+			return c;
+		};
+	};
+  };
+ } else {
+  while (o < col_offs && !FEofAt(fp,o)) {
+	int c;
+	c=FCharAt(fp,o);
+	if (c == CHR_TAB) {
+		col=next_tab(col);
+	} else {
+		col ++;
+	};
+	o++;
+  }
+ };
+ *dbo=o;
+ return(col);
+}
+#else
 int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
 {
  int col = 0;
@@ -578,6 +618,7 @@ int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
  *dbo=o;
  return(col);
 }
+#endif
 
 #if	0
 void FindLineCol(TextPoint *tp)
@@ -1677,9 +1718,13 @@ num WGetCol()
 // num col1;
  num col2;
 //	col1 = tp_col(cwp->tp_current) - cwp->w_lcol;
+#if	0
+ col2=tp_col(cwp->tp_current);
+#else
  if(cwp->w_fp->b_flag & FSNOTESN) col2=NOTES_COLUMN+2;
 	else col2 = physical_column(FColumn(cbfp,cwp->tp_current->offset));
  // MESG("wg: (%ld - %d+%d) col2=%ld",tp_col(cwp->tp_current),cwp->w_lcol,cwp->w_infocol,col2);
+#endif
  return col2;
 }
 
@@ -1726,7 +1771,12 @@ num FColumn(FILEBUF *fp,offs o)
  offs	dbo;
  dbo=FLineBegin(fp,o);
  if(fp->view_mode & VMHEX) col = (o-dbo)%0x10;
- else col=DiffColumns(fp,dbo,o,"FColumn:OK:BEG!");
+ else 
+#if	0
+ 	col=DiffColumns(fp,dbo,o,"FColumn:OK:BEG!");
+#else
+	col=DiffColumn(fp,&dbo,o,"FColumn");
+#endif
 // MESG("FColumn:%d %ld",col,tp_col(cwp->tp_current));
  return (col);
 }
