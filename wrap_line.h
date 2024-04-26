@@ -48,7 +48,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
  int bcol=COLOR_BG;
  offs s1,s2,ptr1,ptr2;
  offs cur_lend=0;
- char *info_mask;
+ char *info_mask="";
  char *vtlm=NULL;
  static num  vtla=0; 	 // mask allocated bytes
  int real_line_len=0;	// real line len
@@ -73,7 +73,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 	ptr2=cur_lend;
 	if(FBolAt(fp,ptr1)) line_start=1;
 	// set_utf8_error(0);	/* reset utf_error on each line!!  */
-	if((wp->w_fp->b_lang == 0 )) {
+	if(wp->w_fp->b_lang == 0 ) {
 		llen=wrap_llen(wp,tp_offs);
 		if(utf8_error()) llen=ptr2-ptr1;
 	} else {

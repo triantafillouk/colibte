@@ -1080,7 +1080,7 @@ offs vtline(WINDP *wp, offs tp_offs)
  int bcol=COLOR_BG;
  offs s1,s2,ptr1,ptr2;
  offs cur_lend=0;
- int hexmode = wp->w_fp->view_mode & (VMHEX||VMINP);
+ int hexmode = wp->w_fp->view_mode & (VMHEX|VMINP);
  char *info_mask;
  char *vtlm=NULL;
  static num  vtla=0; 	 // mask allocated bytes

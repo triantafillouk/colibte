@@ -254,7 +254,6 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 	BTNODE *btn=add_to_symbol_tree(stree,name,TOK_VAR);
 	tok->tind=btn->node_index;
 	tok->ttype=btn->node_type;
-	// tok->tvtype=VTYPE_NONE;
 	ex_edenv=tok->ttype;
 	btn->node_vtype=VTYPE_NONE;
 	// MESG("	set_var: new variable name=%s tind=%d ttype=%d",name,tok->tind,tok->ttype);
@@ -753,8 +752,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				tok_type=TOK_EQUAL;
 				break;
 			};
+			if(ex_edenv==TOK_VAR) tok_type=TOK_ASSIGN;
 			if(ex_edenv==TOK_ENV) tok_type=TOK_ASSIGNENV;
 			if(ex_edenv==TOK_OPTION) tok_type=TOK_ASSIGNOPT;
+			ex_edenv=0;
 			break;
 		case TOK_COMMA:{
 			if(next_token_type(bf)==TOK_NL
