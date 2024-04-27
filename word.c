@@ -174,7 +174,7 @@ int delbword(int n)
 {
 	long size=0;
 	offs o;
-
+   
 	if(dont_edit()) return FALSE;
 	if (n < 1)	return (FALSE);
 	textpoint_set(cwp->w_emark,Offset());
@@ -211,7 +211,7 @@ int delbword(int n)
 	else {
 	o=Offset()-2;size=1;
 	while(n--) {
-	if(isspace(CharAt(o))) {o--;size++;};
+	// if(isspace(CharAt(o))) {o--;size++;};
 	while(cbfp->hl->c_inword(CharAt(o))) {
 		if(o>=0) size++;
 		if(o<1) break;
