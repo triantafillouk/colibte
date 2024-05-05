@@ -971,8 +971,10 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 		if(bp->cdir == bp->rdir) { 
 			set_highlight(bp,highlight_index("DIR",&ind2));
 		} else {
-			bp->b_type = 0;
-			set_highlight(bp,highlight_index("NONE",&ind2));
+			int used=0;
+			init_ftype(bp,bp->b_fname,&used);
+			// MESG("used %d type=%d",used,bp->b_type);
+			set_highlight(bp,bp->b_type);
 		}
 	};
 	if(bp->b_flag & FSINVS) strlcpy(bp->b_dname,get_start_dir(),MAXFLEN);

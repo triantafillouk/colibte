@@ -1625,6 +1625,11 @@ int get_utf_length(utfchar *utf_char_str)
  // accents do take space in WSL exept when converted to composed.
  if((b0==0xCC || b0==0xCD) && utf_char_str->uval[1]< 0xB0) return 1;
 #endif
+ if(b0==0xE0) {
+	int b1=utf_char_str->uval[1];
+	if(b1==0xA5) return 0;
+	return 1; 
+ };
  if(b0<0xE1) return 1;
  if(b0==0xE2) {
 	int b1=utf_char_str->uval[1];
