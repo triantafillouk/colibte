@@ -118,7 +118,6 @@ void vtinit(int argc, char **argp)
 	drv_post_init();
 	resize_screen(2);
 	cwp = dublicate_window(0);	/* creates first window  */
-	// MESG("vtinit:end");
 	set_1window();
 }
 
@@ -949,8 +948,12 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
  char st[MAXLLEN];	// this is the string to display (asterix for encrypted)
  char st2[MAXLLEN];	// this is the real string
  int saved_kbdmode=kbdmode;
+ 
+ // MESG("win_getstring:");
+ // MESG("win_getstring: prompt %s maxlen=%d execmd=%d",prompt,maxlen,execmd);
  if(maxlen>MAXLLEN-1) maxlen=MAXLLEN-1;
  if(execmd) {
+	// MESG("	print the prompt!");
 	printf("%s",prompt);
 	if(fgets(st1,maxlen,stdin)==NULL) return false;
 	return(true);

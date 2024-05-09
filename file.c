@@ -972,9 +972,14 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 			set_highlight(bp,highlight_index("DIR",&ind2));
 		} else {
 			int used=0;
-			init_ftype(bp,bp->b_fname,&used);
-			// MESG("used %d type=%d",used,bp->b_type);
-			set_highlight(bp,bp->b_type);
+			// MESG("set ftype! len=%d id=%d bom_type=%d discmd=%d",bp->flen0,bp->file_id,bp->bom_type,discmd);
+			if(discmd) {
+				init_ftype(bp,bp->b_fname,&used);
+				// MESG("used %d type=%d",used,bp->b_type);
+				set_highlight(bp,bp->b_type);
+			} else {
+				set_highlight(bp,highlight_index("TEXT",&ind2));
+			};
 		}
 	};
 	if(bp->b_flag & FSINVS) strlcpy(bp->b_dname,get_start_dir(),MAXFLEN);
@@ -1270,7 +1275,7 @@ int set_buf_key(FILEBUF *bp)	/* reset encryption key of current file */
 
 	/* get the string to use as an encrytion string */
 	bp->b_key[0]=0;
-	// MESG("set_buf_key: b_type=%d %d size=%d",bp->b_type,NOTE_TYPE,sizeof(bp->b_key));
+	MESG("set_buf_key: b_type=%d %d size=%d",bp->b_type,NOTE_TYPE,sizeof(bp->b_key));
 #if	TNOTES
 	if(bp->b_type & NOTE_TYPE
 		|| bp->b_type & NOTE_CAL_TYPE
@@ -1286,7 +1291,7 @@ int set_buf_key(FILEBUF *bp)	/* reset encryption key of current file */
 	} else 
 #endif
 	{
-		// MESG("get encryption_key!");
+		MESG("get encryption_key! b_key=%X",bp->b_key);
 		status = nextarg("Encryption String: ", bp->b_key, MAXSLEN - 1,false);
 	    if (status != TRUE)  return(status);
 	
@@ -1701,6 +1706,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
 			} else 
 #endif
 			{
+				// MESG("resetkey!");
 				s = resetkey(bp);
 			};
 			if (s != TRUE)	return(s);

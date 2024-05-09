@@ -3461,6 +3461,7 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 	/* if we are interactive, go get it! */
 	// MESG("nextarg:");
 	if (macro_exec == FALSE) {
+		// MESG("getstring: %s",prompt);
 		if(getstring(prompt, buffer, size,show)!=FALSE) {
 			// MESG("nextarg: buffer=[%s]",buffer);
 			set_dval(atof(buffer));
