@@ -1275,7 +1275,7 @@ int set_buf_key(FILEBUF *bp)	/* reset encryption key of current file */
 
 	/* get the string to use as an encrytion string */
 	bp->b_key[0]=0;
-	MESG("set_buf_key: b_type=%d %d size=%d",bp->b_type,NOTE_TYPE,sizeof(bp->b_key));
+	// MESG("set_buf_key: b_type=%d %d size=%d",bp->b_type,NOTE_TYPE,sizeof(bp->b_key));
 #if	TNOTES
 	if(bp->b_type & NOTE_TYPE
 		|| bp->b_type & NOTE_CAL_TYPE
@@ -1291,7 +1291,7 @@ int set_buf_key(FILEBUF *bp)	/* reset encryption key of current file */
 	} else 
 #endif
 	{
-		MESG("get encryption_key! b_key=%X",bp->b_key);
+		// MESG("get encryption_key! b_key=%X",bp->b_key);
 		status = nextarg("Encryption String: ", bp->b_key, MAXSLEN - 1,false);
 	    if (status != TRUE)  return(status);
 	
