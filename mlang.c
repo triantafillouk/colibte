@@ -2970,7 +2970,6 @@ double exec_block1(FILEBUF *fp)
    while(tok->ttype!=TOK_EOF && current_active_flag) 
    {
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
-	// if(tok->ttype==TOK_RPAR) { exit(1);};
 	if(tok->ttype==TOK_SEP){ NTOKEN2;
 		// MESG("factor_sep: [%s %d]",tok->tname,tok->ttype);
 		if(tok->ttype==TOK_VAR) lstoken=tok;
@@ -2997,7 +2996,6 @@ double exec_block1_break(FILEBUF *fp)
    while(tok->ttype!=TOK_EOF && current_active_flag) 
    {
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
-	if(tok->ttype==TOK_RPAR) { exit(1);};
 	if(tok->ttype==TOK_SEP){ NTOKEN2;continue;	};
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;return(val);};
 	if(tok->ttype==TOK_COMMA) { NTOKEN2;};

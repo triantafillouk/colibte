@@ -1855,7 +1855,7 @@ void edinit(char *bname)
     register FILEBUF *bp;
 
     bp = new_filebuf(bname,0);             /* First buffer         */
-    if (bp==NULL)  exit(1);
+    if (bp==NULL) { ERROR("cannot create buffer [%s]",bname); exit(1);};
 	select_filebuf(bp);
 }
 
