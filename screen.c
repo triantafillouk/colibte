@@ -901,10 +901,10 @@ vchar *init_vt_line(WINDP *wp)
  vchar *v_text = wp->vs[wp->vtrow]->v_text;
  int i;
  for(i=0;i<wp->w_width;i++) {
- 	v_text[i].uval[0]='A';
+ 	// v_text[i].uval[0]='A';
 	v_text[i].uval[0]=0;
+	v_text[i].bcolor=wp->w_bcolor;
  };
- // memset(v_text,0,sizeof(struct vchar)*wp->w_ntcols);
  return v_text;
 }
 

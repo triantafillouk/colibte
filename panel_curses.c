@@ -550,8 +550,6 @@ int getkcmd(char *k);
 
 int init_sighandler();
 
-void  svchar(vchar *vc,int val,int b_color,int f_color);
-void  svmchar(vchar *vc,int val,int b_color,int f_color,int count);
 void drv_bindkeys();
 void putpad(char *str);
 

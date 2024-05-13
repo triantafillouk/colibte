@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.59T32 (12/05/2024)"
+#define VERSION 	"#01.59T33 (13/05/2024)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -301,7 +301,7 @@ typedef struct vchar {
 	unsigned char uval[8];	/* stores a utf char  */
 	short int  attr;
 	short int bcolor;	/* background  */
-	int fcolor;	/* foreground  */
+	short int fcolor;	/* foreground  */
 #if	NUSE
 	unsigned int display_width;
 	unsigned int display_height;
