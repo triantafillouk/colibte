@@ -333,7 +333,13 @@ int show_info(int n)
 #endif
 	} else {
 		SMESG("Position info: line=%lld col=%lld offset=%lld char=[0x%lX]",getcline()+1,GetCol()+1,Offset(),utf_value());
+#if	0
 		SMESG(" row %d , %d, %lld",chardline(cwp)+1,getwline(),tp_line(cwp->tp_current)-tp_line(cwp->tp_hline));
+#endif
+		SMESG(" row %d , %d, %lld",chardline(cwp)+1,getwline(),tp_line(cwp->tp_current)-tp_line(cwp->tp_hline));
+
+
+
 		SMESG("File type: [%s] (%d)",hts[b_typ].description,b_typ);
 		if(bp->b_type & NOTE_TYPE) SMESG("Note type");
 		SMESG("Highlight type: [%s] syntaxh=%d slang=%d",bp->hl->description,syntaxh,cwp->hs[0].w_slang);
@@ -439,6 +445,7 @@ int FUtfCharLen(FILEBUF *fp,offs o)
  int clen=1;
 	clen_error=0;
 	fp->utf_accent=0;
+	
 	if(FEolAt(fp,o)) return fp->EolSize;
 
 	if(fp->view_mode & VMHEX) return 1;
@@ -620,7 +627,7 @@ int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
 }
 #endif
 
-#if	0
+#if	1
 void FindLineCol(TextPoint *tp)
 {
  FILEBUF *fp=tp->fp;
@@ -676,7 +683,7 @@ void FindLineCol(TextPoint *tp)
      o=found->offset;
      c=found->col;
      l=found->line;
-	 MESG("findlinecol: o=%ld found o=%ld c=%ld l=%ld",tp->offset,o,c,l);
+	 // MESG("findlinecol: o=%ld found o=%ld c=%ld l=%ld",tp->offset,o,c,l);
    } else {
       o=c=l=0;
    };
@@ -689,7 +696,7 @@ void FindLineCol(TextPoint *tp)
          o=FPrevLine(fp,o);
          l--;
       }
-	  MESG("	go back and start from o=%ld l=%ld c=0",o,l);
+	  // MESG("	go back and start from o=%ld l=%ld c=0",o,l);
    };
 
 
@@ -714,7 +721,7 @@ void FindLineCol(TextPoint *tp)
    };
 
    c += DiffColumn(fp,&o,tp->offset,"FindLineCol:OK");
-	MESG("	we are on the same line %ld, find col = %ld",l,c);
+	// MESG("	we are on the same line %ld, find col = %ld",l,c);
    tp->col=c;
    tp->line=l;
    tp->offset=o;
@@ -3052,7 +3059,9 @@ void   MoveRightChar(FILEBUF *fp)
     return;
    };
 	clen=FUtfCharLen(fp,FOffset(fp));
+	// MESG("MoveRightChar:1 clen=%d o=%ld col=%ld",clen,fp->tp_current->offset,fp->tp_current->col);
 	textpoint_move(fp->tp_current,clen);
+	// MESG("MoveRightChar:2 clen=%d o=%ld col=%ld",clen,fp->tp_current->offset,fp->tp_current->col);
 	tp_copy(fp->save_current,fp->tp_current);
 }
 
