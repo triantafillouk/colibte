@@ -319,7 +319,8 @@ void upd_column_pos()
 	};
 #endif
 #else
-	cwp->curcol = FColumn(fp,FOffset(fp));
+	if(is_wrap_text(fp)) cwp->curcol = fp->tp_current->col;
+	else cwp->curcol = FColumn(fp,FOffset(fp));
 #endif
 	// MESG("upd_column_pos: curcol=%d",cwp->curcol);
  // if(is_wrap_text(fp)) show_time("upd_column_pos2",1);
@@ -1775,7 +1776,7 @@ offs update_top_position_wrap()
 
  int o_now=tp_offset(cwp->tp_current);
 	offs o;
-	// MESG_time("update_top_position_wrap: %ld",o_now);
+	MESG_time("update_top_position_wrap: %ld",o_now);
 	o = FLineBegin(cwp->w_fp,o_now);
 	// MESG_time("update_top_position_wrap: begin=%ld",o);
 	int col=0;
@@ -2153,7 +2154,7 @@ void update_window_nowrap(WINDP *wp,int force)
 void update_window_wrap(WINDP *wp,int force)
 {
 	int cw_flag=cwp->w_flag;
-	// MESG("update_window_wrap: ------------------");
+	MESG("update_window_wrap: ------------------");
 		if (wp==cwp) {
 			// MESG_time("update_window_wrap:1 window %d",wp->id);
 			check_cursor_position_wrap(wp); /* check if on screen */

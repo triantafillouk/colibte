@@ -67,17 +67,17 @@ void FindLineCol(TextPoint *tp)	/* -- 0 --*/
       while(o>tp->offset) {
          o=FPrevLine(fp,o);
          l--;
-      }
+      };
 #if	WRAPD
 	  MESG("	go back and start from o=%ld l=%ld c=0",o,l);
 #endif
    };
 
-   MESG("findlinecol: o=%ld offset=%ld",o,tp->offset);
+   // MESG("findlinecol: o=%ld offset=%ld",o,tp->offset);
    while(o<tp->offset) {	/* go forward lines  */
       offs next_line=FNextLine(fp,o);
 
-      if(next_line>tp->offset) break;
+      if(next_line>tp->offset||(o+1)==FSize(fp)) break;
 
 	  if( !FBolAt(fp,next_line)) { 
 		if(next_line==FSize(fp)) {
@@ -93,8 +93,7 @@ void FindLineCol(TextPoint *tp)	/* -- 0 --*/
       l++;
       c=0;
    };
-
-   c += DiffColumn(fp,&o,tp->offset,"FindLineCol:OK");
+	c += DiffColumn(fp,&o,tp->offset,"FindLineCol:OK");
 #if	WRAPD
 	// MESG("	we are on the same line %ld, find col = %ld",l,c);
 #endif

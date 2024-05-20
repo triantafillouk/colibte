@@ -982,13 +982,15 @@ int next_page(int  n)
 		offs o=tp_offset(cwp->tp_hline);
 		// offs co=tp_offset(cwp->tp_current);
 		int num_lines=n;
-		// MESG("next_page: topo=%ld current=%ld lines=%d---------",o,co,lines);
+		// MESG("next_page: topo=%ld lines=%d --------",o,num_lines);
 		o=FNext_wrap_line(cwp,o,num_lines,1);
+		// MESG("         : new topo=%ld",o);
 		set_top_hline(cwp,o,"next_page");
 		// MESG("		start current from %ld n=%d",o,n);
 		o=tp_offset(cwp->tp_current);
 
 		o=FNext_wrap_line(cwp,o,num_lines,0);
+		// MESG("         : new current=%ld",o);
 		textpoint_set(cwp->tp_current,o);
 		textpoint_set(cwp->w_fp->tp_current,o);
 		// MESG("		new current o=%ld line=%ld",tp_line(cwp->tp_current),tp_line(cwp->tp_current));
@@ -1438,8 +1440,8 @@ int twiddle(int n)
 	check_update_highlight(0);
 	if(cbfp->b_flag & FSDIRED) return(0);
 	if(dont_edit()) return FALSE;
-	if(FColumn(cbfp,Offset())<2) return FALSE;
-
+	// if(FColumn(cbfp,Offset())<2) return FALSE;
+	if(tp_col(cbfp->tp_current)<2) return FALSE;
 	offs p1,p2;
 	
 	MoveLeftChar(cbfp);

@@ -527,10 +527,11 @@ int DiffColumns(FILEBUF *fp, offs start_col,offs col_offs,char *from)
 {
  int col = 0;
  offs o=start_col;
+ if(col_offs>FSize(fp)) col_offs=FSize(fp);
  // if((start_col % 4)!=0) MESG("DiffColumns[%s] %ld %d ERROR!!!!",from,start_col,start_col%4);
  if(fp->b_lang==0 && !utf8_error()){
 //  MESG("diffcol: from %ld to %ld",o,col_offs);
-  while (o < col_offs && !FEofAt(fp,o)) {
+  while (o < col_offs ) {
 	o = check_next_char(fp,o,&col);
 	if(clen_error) {
 		set_utf8_error(1);
@@ -540,7 +541,7 @@ int DiffColumns(FILEBUF *fp, offs start_col,offs col_offs,char *from)
 	};
   };
  } else {
-  while ((o < col_offs) && !FEofAt(fp,o)) {
+  while (o < col_offs) {
 	int c;
 	c=FCharAt(fp,o);
 	if (c == CHR_TAB) {
@@ -559,9 +560,10 @@ int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
 {
  int col = 0;
  offs o=*dbo;
+ if(col_offs>FSize(fp)) col_offs=FSize(fp);
  if(fp->b_lang==0 && !utf8_error()){
 //  MESG("diffcol: from %ld to %ld",o,col_offs);
-  while (o < col_offs && !FEofAt(fp,o)) {
+  while (o < col_offs) {
 	int c;
 	utfchar uc;
 	o = FUtfCharAt(fp,o,&uc);
@@ -579,7 +581,7 @@ int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
 	};
   };
  } else {
-  while (o < col_offs && !FEofAt(fp,o)) {
+  while (o < col_offs) {
 	int c;
 	c=FCharAt(fp,o);
 	if (c == CHR_TAB) {
@@ -626,7 +628,6 @@ int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
  return(col);
 }
 #endif
-
 
 #if	0
 #include "findlinecol0.c"
@@ -1567,6 +1568,7 @@ num FColumn(FILEBUF *fp,offs o)
 {
  int    col;
  offs	dbo;
+ // MESG("FColumn: o=%ld",o);
  dbo=FLineBegin(fp,o);
  if(fp->view_mode & VMHEX) col = (o-dbo)%0x10;
  else 
@@ -2622,6 +2624,7 @@ offs   LineBegin(offs ptr)
 
 offs   FLineBegin(FILEBUF *fp,offs ptr)
 {
+	// MESG("FLineBegin: ptr=%ld",ptr);
    if(fp->view_mode & VMHEX) {
    	offs o;
 	o = (ptr) % HEX_LINE_LEN;
@@ -2907,7 +2910,7 @@ if(fp->BufferSize < fp->ptr2) {
 void  CalculateLineCol(FILEBUF *fp,num *line,num *col,offs source,offs target)
 {
    offs	 bol_point;
-	
+	// MESG("CalculateLineCol:");	
    if(source>target) {
       for( ; source>target; source--)  {
 	 	if(FBolAt(fp,source)) {
@@ -3673,6 +3676,7 @@ offs   FNextLine(FILEBUF *fp,offs ptr)
 
 offs   FPrevLine(FILEBUF *fp,offs ptr)
 {
+   MESG("FPrevLine:");
    ptr=FLineBegin(fp,ptr);
    while(ptr>0 && !FBolAt(fp,--ptr));
    return(ptr);
@@ -3769,6 +3773,7 @@ char *get_line_at(FILEBUF *fb,offs offset)
 	offs bol;
 	offs eol;
 	int ind=0;
+	// MESG("get_line_at:");
 	bol=FLineBegin(fb,offset);
 	eol=FLineEnd(fb,offset);
 	

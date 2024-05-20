@@ -1,3 +1,6 @@
+#define	TEST1	1
+#define	TEST0	0
+
 void FindLineCol(TextPoint *tp)	/* -- 1 --*/
 {
  FILEBUF *fp=tp->fp;
@@ -29,7 +32,12 @@ void FindLineCol(TextPoint *tp)	/* -- 1 --*/
 		// MESG("flc: check [%s] o=%ld",tp_name[scan->tp_type],scan->offset);
 		if(!(scan->flags)) 
 		{
+#if	TEST0
+			new_dist=tp->offset-scan->offset;
+			if(new_dist<0) continue;
+#else
 			new_dist=llabs(tp->offset-scan->offset);
+#endif
 	 		// if(new_dist <= dist )
 	 		if(new_dist < dist )
 			// if(scan->offset<=tp->offset)
@@ -61,8 +69,10 @@ void FindLineCol(TextPoint *tp)	/* -- 1 --*/
       o=c=l=0;
    };
 
+#if	1
 	// MESG_time(";flc:[%s] o=%lld from [%s] o=%lld col=%lld line=%lld ",tp_name[tp->tp_type],tp->offset,tp_name[found->tp_type],o,c,l);
    if(o>tp->offset)  {	/* go back lines  */
+	  // MESG("	go back lines: o=%ld offset=%ld",o,tp->offset);
       o=FLineBegin(fp,o);
       c=0;
       while(o>tp->offset) {
@@ -73,15 +83,40 @@ void FindLineCol(TextPoint *tp)	/* -- 1 --*/
 	  MESG("	go back and start from o=%ld l=%ld c=0",o,l);
 #endif
    };
+#endif
 
-
+   // MESG("findlinecol: o=%ld c=%ld l=%ld offset=%ld",o,c,l,tp->offset);
+#if	TEST1
+	char eol=fp->EolStr[fp->EolSize-1];
+	
+	// offs begoll=o;
+	while(o<tp->offset) {	/* go forward lines  */
+		if(FCharAt_NoCheck(fp,o)==eol) {
+			o++;
+			if(fp->EolSize>1) {
+				if(FCharAt_NoCheck(fp,o)==fp->EolStr[1]) {l++;c=0;o++;};
+			} else {
+				l++;c=0;			
+			};
+		} else {
+			int c1;
+			utfchar uc;
+			o=FUtfCharAt(fp,o,&uc);
+			c1=uc.uval[0];
+			if(c1==CHR_TAB) c=next_tab(c);
+			else c+=get_utf_length(&uc);
+		};
+	}
+	// MESG("findlinecol: new o=%ld c=%ld l=%ld",o,c,l);
+#else
+   offs fsize=FSize(fp);
    while(o<tp->offset) {	/* go forward lines  */
       offs next_line=FNextLine(fp,o);
 
-      if(next_line>tp->offset||(o+1)==FSize(fp)) break;
+      if(next_line>tp->offset||(o+1)==fsize) break;
 
 	  if( !FBolAt(fp,next_line)) { 
-		if(next_line==FSize(fp)) {
+		if(next_line==fsize) {
 			o=FLineBegin(fp,next_line);
 			c=0;break;
 		} else {
@@ -95,6 +130,7 @@ void FindLineCol(TextPoint *tp)	/* -- 1 --*/
       c=0;
    };
 	c += DiffColumn(fp,&o,tp->offset,"FindLineCol:OK");
+#endif
 #if	WRAPD
 	// MESG("	we are on the same line %ld, find col = %ld",l,c);
 #endif
@@ -106,6 +142,8 @@ void FindLineCol(TextPoint *tp)	/* -- 1 --*/
 #endif
 	   tp->offset=o;
    };
+   // MESG("           : o=%ld c=%ld l=%ld offset=%ld",o,c,l,tp->offset);
+
    tp->flags = FULLDEFINED;
 	// MESG_time(";flc:[%s] -> o=%lld col=%lld line=%lld ",tp_name[tp->tp_type],o,c,l);
 }

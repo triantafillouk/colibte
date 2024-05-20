@@ -1261,7 +1261,7 @@ int refresh_current_line(int nused)
  int ddot_pos;
  offs i;
  show_stage=0;
-
+ // MESG("refresh_current_line:");
 	tpo=tp_offset(cwp->tp_current);
 	
 	sl=FLineBegin(cbfp,tpo);
