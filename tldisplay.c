@@ -134,7 +134,7 @@ void movecursor(int row, int col)
 		else if(cwp->w_ntcols>25) show_position_info(1);
 		else show_position_info(-1);
 	} else {
-		msg_line("cursor out of bound %d!",t++);
+		msg_line("cursor out of bound %d! row=%d num_rows=%d",t++,row,drv_numrow);
 		row=drv_numrow-3;
 	};
 #if	WRAPD
