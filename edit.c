@@ -1665,6 +1665,8 @@ int insert_date(int n)
 {
  char *date=date_string(n);
 	insert_string(cbfp,date,strlen(date));
+	set_goal_column(cwp->tp_current->col,"date");
+	// cwp->goal_column=cwp->tp_current->col;
 	update_buffer_windows(cbfp,UPD_WINDOW);
 	return TRUE;
 }
@@ -1827,7 +1829,8 @@ int insert_chr(int n,int c)
 		textpoint_move(cbfp->tp_current,n*l);
 	};
  };
-
+ set_goal_column(cwp->tp_current->col,"inschr");
+ // cwp->goal_column=cwp->tp_current->col;
  check_update_highlight(2);
  set_end_line(cbfp,GetLine());
  set_modified(cbfp);
@@ -1889,6 +1892,7 @@ int insert_newline(FILEBUF *fp)
 {
 	if(!InsertBlock(fp,fp->EolStr,fp->EolSize,0,0)) return FALSE;
 	textpoint_move(fp->tp_current,fp->EolSize);
+	set_goal_column(fp->tp_current->col,"newline");
 	update_buffer_windows(fp,UPD_EDIT);
 	set_modified(fp);
 	update_lines(fp);
@@ -2178,6 +2182,7 @@ int cut_region(int flag)
 			EndUndoGroup(cbfp->main_undo);
 		};
 		reset_region_textpoints();
+		set_goal_column(cwp->tp_current->col,"cut");
 		set_update(cwp,UPD_EDIT);
 		set_modified(cbfp);
 		return TRUE;
@@ -2381,6 +2386,7 @@ int delete_box(int n)
  };
  set_Offset(cofs);
  setmark(0);
+ set_goal_column(cwp->tp_current->col,"del box");
  set_update(cwp,UPD_EDIT+UPD_WINDOW);
  set_modified(cwp->w_fp);
  return TRUE; 

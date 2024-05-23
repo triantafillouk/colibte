@@ -69,7 +69,6 @@ void FindLineCol(TextPoint *tp)	/* -- 1 --*/
       o=c=l=0;
    };
 
-#if	1
 	// MESG_time(";flc:[%s] o=%lld from [%s] o=%lld col=%lld line=%lld ",tp_name[tp->tp_type],tp->offset,tp_name[found->tp_type],o,c,l);
    if(o>tp->offset)  {	/* go back lines  */
 	  // MESG("	go back lines: o=%ld offset=%ld",o,tp->offset);
@@ -83,13 +82,11 @@ void FindLineCol(TextPoint *tp)	/* -- 1 --*/
 	  MESG("	go back and start from o=%ld l=%ld c=0",o,l);
 #endif
    };
-#endif
 
    // MESG("findlinecol: o=%ld c=%ld l=%ld offset=%ld",o,c,l,tp->offset);
 #if	TEST1
 	char eol=fp->EolStr[fp->EolSize-1];
 	
-	// offs begoll=o;
 	while(o<tp->offset) {	/* go forward lines  */
 		if(FCharAt_NoCheck(fp,o)==eol) {
 			o++;
