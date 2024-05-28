@@ -1320,7 +1320,7 @@ unsigned char *str2out(char *s)
 /*   emacs key  ^X^C, assigned also to ALT-X  */
 int quit(int n)
 {
-//	MESG("quit:n=%d discmd=%d,macro_exec=%d,changed=%d",n,discmd,macro_exec,changes_occured());
+	MESG("quit:n=%d discmd=%d,macro_exec=%d,changed=%d",n,discmd,macro_exec,changes_occured());
         if (
 		!discmd					/* no display forces it */
 		|| macro_exec				/* in a macro just quit no questions */
@@ -1328,7 +1328,7 @@ int quit(int n)
         || changes_occured() == FALSE         /* All buffers clean.   */
 						/* User says it's OK.   */
         || (confirm("Modified files exist","Leave anyway?",1)) == TRUE) {
-	
+		MESG("quit!!!");
 		msg_line("");
 		save_scratch_files();
 		save_config();

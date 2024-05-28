@@ -260,8 +260,7 @@ int show_info(int n)
 #endif
 	SMESG("Current directory: %s",getcwd(s1,256));
 	SMESG("Start dir: %s",get_start_dir());
-	SMESG("Default codepage used : [%s]",codepage_str[default_lang]);
-	SMESG("Default local Codepage: [%s]",codepage_str[default_local_codepage]);
+	SMESG("Default codepage: [%s], local [%s]",codepage_str[default_lang],codepage_str[default_local_codepage]);
 	SMESG("--- File buffer information ---------------------------------");
 	SMESG("Buffer name     : [%s] index=%d",bp->b_fname,bp->b_index);
 	if(strlen(bp->b_dname)>0) {
@@ -294,9 +293,9 @@ int show_info(int n)
 	if(cbfp->b_flag & FSNLIST) 		strlcat(s,"Note list",width);
 // 	if(cbfp->b_flag & FSNCALIST) 	strlcat(s,"Calendar list view",width);
 	sm[i++]=strdup(s);sm[i]=0;
-#if	NUSE
-	if(cbfp->slow_display) { SMESG("buffer slow!");} else { SMESG("buffer fast display");};
-#endif
+	if(debug_flag()) {
+		if(cbfp->slow_display) { SMESG("buffer slow!");} else { SMESG("buffer fast display");};
+	};
 	if(debug_flag()) {
 		SMESG(" ptr1=%lld ptr2=%lld size=%lld file size=%lld,gap=%lld",bp->ptr1,bp->ptr2,bp->BufferSize,FSize(bp),bp->GapSize);
 	};
@@ -332,17 +331,17 @@ int show_info(int n)
 		}
 #endif
 	} else {
-		SMESG("Position info: line=%lld col=%lld offset=%lld char=[0x%lX]",getcline()+1,GetCol()+1,Offset(),utf_value());
-#if	0
-		SMESG(" row %d , %d, %lld",chardline(cwp)+1,getwline(),tp_line(cwp->tp_current)-tp_line(cwp->tp_hline));
-#endif
-		SMESG(" row %d , %d, %lld",chardline(cwp)+1,getwline(),tp_line(cwp->tp_current)-tp_line(cwp->tp_hline));
+		if(debug_flag()) {
+			SMESG("Position info: line=%lld col=%lld offset=%lld char=[0x%lX]",getcline()+1,GetCol()+1,Offset(),utf_value());
+			SMESG(" row %d , %d, %lld",chardline(cwp)+1,getwline(),tp_line(cwp->tp_current)-tp_line(cwp->tp_hline));
+		} else {
+			SMESG("Position info: line=%lld col=%lld offset=%lld char=[0x%lX] row %d",getcline()+1,GetCol()+1,Offset(),utf_value(),getwline());
+		};
 
 
-
-		SMESG("File type: [%s] (%d)",hts[b_typ].description,b_typ);
+		SMESG("File type: [%s] (%d) highlight type [%s] syntaxh=%d slang=%d",hts[b_typ].description,b_typ,bp->hl->description,syntaxh,cwp->hs[0].w_slang);
 		if(bp->b_type & NOTE_TYPE) SMESG("Note type");
-		SMESG("Highlight type: [%s] syntaxh=%d slang=%d",bp->hl->description,syntaxh,cwp->hs[0].w_slang);
+		// SMESG("Highlight type: [%s] syntaxh=%d slang=%d",bp->hl->description,syntaxh,cwp->hs[0].w_slang);
 		if(debug_flag()) {
 //			SMESG("  b_type=%d",b_type);
 			SMESG("  hknown[%d] h=%X n=%d slang=%d first=%d o=%lld",0,cwp->hs[0].w_hquotem,cwp->hs[0].w_notes,cwp->hs[0].w_slang,cwp->hs[0].w_first,cwp->hs[0].known_offset);
@@ -350,9 +349,12 @@ int show_info(int n)
 			SMESG("  hknown[%d] h=%X n=%d slang=%d in_array=%d o=%lld",0,cwp->hs[0].w_hquotem,cwp->hs[0].w_notes,cwp->hs[0].w_slang,cwp->hs[0].w_in_array,cwp->hs[0].known_offset);
 			SMESG("  hknown[%d] h=%X n=%d slang=%d in_array=%d o=%lld",1,cwp->hs[1].w_hquotem,cwp->hs[0].w_notes,cwp->hs[1].w_slang,cwp->hs[1].w_in_array,cwp->hs[1].known_offset);
 		};
-		SMESG("Buffer size : %lld readed=%lld",bp->BufferSize-bp->GapSize,bp->bytes_read);
-		SMESG("Buffer lines: %lld",bp->lines);
-		SMESG("End of line: size=%d",bp->EolSize);
+		if(debug_flag()) {
+			SMESG("Buffer size : %lld readed=%lld lines %lld",bp->BufferSize-bp->GapSize,bp->bytes_read,bp->lines);
+			SMESG("End of line: size=%d",bp->EolSize);
+		} else {
+			SMESG("Buffer size:%lld, lines:%lld, Eol size:%d",bp->BufferSize-bp->GapSize,bp->lines,bp->EolSize);
+		};
 	};
 	SMESG("Document codepage: %s (%d)",codepage_str[bp->b_lang],bp->b_lang);
 	SMESG("Current window: %2d H=%d W=%d lcol=%lld",cwp->id,cwp->w_ntrows,cwp->w_ntcols,cwp->w_lcol);

@@ -1781,16 +1781,8 @@ int file_type(char *name, int *compression_type,char *oext)
  e=0;
  create_base_name(bname,name);
  *compression_type=0;
-
- if(bname[0]=='.') {
-	strcpy(oext,"");
-	int type=0;
-	int ind=highlight_index(bname+1,&type);
-	// MESG("file_type: . [%s] = %d ind=%d",bname+1,type,ind);
-	if(ind) return ind;
-	return(highlight_index("DOT",&ind2));
- };
- if(!strcasecmp(bname,"makefile")) return(highlight_index("MAKE",&ind2));
+ if(strlen(bname)>2)
+	if(!strcasecmp(bname+1,"akefile")) return(highlight_index("MAKE",&ind2));
  i=strlen(bname)-1;
  if(bname[i]=='~') i--;
  for(ext_len=0;i>0;i--,ext_len++) {
@@ -1814,6 +1806,21 @@ int file_type(char *name, int *compression_type,char *oext)
 		return e1_type;
 	};	
  } else { 	/* No extention at all found!  */
+	 if(bname[0]=='.') {
+		if (   !strcmp(bname,".profile") 
+			|| !strcmp(bname,".bashrc") 
+			|| !strcmp(bname,".bash_logout") 
+			|| !strcmp(bname,".bash_profile")
+			) {
+			return(highlight_index("SHELL",&ind2));
+		};
+		strcpy(oext,"");
+		int type=0;
+		int ind=highlight_index(bname+1,&type);
+		// MESG("file_type: . [%s] = %d ind=%d",bname+1,type,ind);
+		if(ind) return ind;
+		return(highlight_index("DOT",&ind2));
+	 };
 	 strcpy(oext,"");
 	 return(0);
  };
@@ -1891,9 +1898,9 @@ int save_file_history(int n)
  char *fname;
 
  if(bt_dval("save_history")==0) return 0;
-// MESG("save_file_history:");
+ // MESG("save_file_history:");
  fname = find_file("",APPLICATION_HISTORY,1,1);
-// MESG("save_file_history: %s",fname);
+ // MESG("save_file_history: to %s",fname);
  return save_list_array(fname,recent_file_list);
 }
 
@@ -1901,8 +1908,8 @@ int read_file_history(int n)
 {
  char *fname;
 
- if((fname = find_file("",APPLICATION_HISTORY,1,0))==NULL) return FALSE;
  recent_file_list=new_list(0,"read_file_history");
+ if((fname = find_file("",APPLICATION_HISTORY,1,0))==NULL) return FALSE;
 
 // MESG("read_file_history: from [%s]",fname);
  read_list_array(fname,recent_file_list);
