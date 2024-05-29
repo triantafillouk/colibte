@@ -1221,18 +1221,18 @@ void check_line_mode(FILEBUF *bf)
 		bf->EolSize=2;
 		strlcpy(bf->EolStr,"\r\n",3);
 		bf->b_mode |= EMDOS;
-//		MESG("	dos mode");
+		// MESG("	dos mode");
 		textpoint_OrFlags(bf,COLUNDEFINED|LINEUNDEFINED);
       } else  
 	  if(MacLastLine>0){
 		bf->EolSize=1;
 		strlcpy(bf->EolStr,"\r",3);
 		bf->b_mode |= EMMAC;
-//		MESG("	mac mode");
+		// MESG("	mac mode");
 		textpoint_OrFlags(bf,COLUNDEFINED|LINEUNDEFINED);
 	  } else
 	  {
-//		MESG("	unix mode");
+		// MESG("	unix mode");
 		bf->b_mode |= EMUNIX;
       };
 }
@@ -3678,7 +3678,7 @@ offs   FNextLine(FILEBUF *fp,offs ptr)
 
 offs   FPrevLine(FILEBUF *fp,offs ptr)
 {
-   MESG("FPrevLine:");
+   // MESG("FPrevLine:");
    ptr=FLineBegin(fp,ptr);
    while(ptr>0 && !FBolAt(fp,--ptr));
    return(ptr);

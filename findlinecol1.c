@@ -85,10 +85,14 @@ void FindLineCol(TextPoint *tp)	/* -- 1 --*/
 
    // MESG("findlinecol: o=%ld c=%ld l=%ld offset=%ld",o,c,l,tp->offset);
 #if	TEST1
-	char eol=fp->EolStr[fp->EolSize-1];
-	
+	char first_eol_char='\n';
+#if	1
+	if((fp->b_mode & EMDOS) || (fp->b_mode & EMMAC) ) first_eol_char='\r';
+#else
+	char first_eol_char=fp->EolStr[fp->EolSize-1];
+#endif
 	while(o<tp->offset) {	/* go forward lines  */
-		if(FCharAt_NoCheck(fp,o)==eol) {
+		if(FCharAt_NoCheck(fp,o)==first_eol_char) {
 			o++;
 			if(fp->EolSize>1) {
 				if(FCharAt_NoCheck(fp,o)==fp->EolStr[1]) {l++;c=0;o++;};

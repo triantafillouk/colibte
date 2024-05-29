@@ -754,7 +754,7 @@ void update_highlight_line(WINDP *wp)
 //	previous top line is tp_hsknown
 //	previous line with known state is tp_pknown
 //	we must go to tp_hline
-	MESG("update_highlight_line:");
+	// MESG("update_highlight_line:");
 	getwquotes(wp,0);	/* in any case read again current window top line highlight	*/
 	hquotem=0;
 	slang=1;
