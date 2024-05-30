@@ -1966,9 +1966,14 @@ int back_delete(long n)
 
 		chars_to_delete=ccol-ncol;
 		s1+=ncol;
-
 		set_Offset(s1);
-		DeleteBlock(0,chars_to_delete);
+		// MESG("	delete: chars=%d ccol=%d ncol=%d ncol0=%d start=%d end=%d",chars_to_delete,ccol,ncol,ncol0,s1-ncol,s1);
+		if(chars_to_delete==0) {
+			chars_to_delete=n;
+			DeleteBlock(chars_to_delete,0);
+		} else {
+			DeleteBlock(0,chars_to_delete);
+		};
 		s1 = LineEnd(s1)+1;
 		s2 += n;
 		start_line++;

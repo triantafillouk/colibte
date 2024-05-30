@@ -559,10 +559,15 @@ int insert_tab( int n)
  } else {
  	if(cwp->selection) {
 		if( cwp->selection == REGION_COLM) {
+#if	0
+				int ispaces = tabsize-tp_col(cbfp->tp_current)%(tabsize);
+				insert_chr(ispaces, CHR_SPACE);
+#else
 			if(cbfp->hl->notab) {
 				int ispaces = tabsize-tp_col(cbfp->tp_current)%(tabsize);
 				insert_chr(ispaces, CHR_SPACE);
 			} else insert_chr(1,CHR_TAB);
+#endif
 			return TRUE;
 		} else {
 			if(tp_offset(cwp->w_smark) > tp_offset(cwp->w_emark)) {
