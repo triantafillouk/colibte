@@ -188,10 +188,13 @@ int shell_cmd(int nused)
 	return s;
 }
 
+char *get_line_at(FILEBUF *fb,offs offset);
+
 int exec_shell(char *tline)
 {
 //     int    s;	/* return status from CLI */
 	FILEBUF *bp,*bperr;
+	FILEBUF	*old_buffer=cbfp;
 	static char bname[] = "[command]";
 	static char ename[] = "[error]";
 
@@ -217,11 +220,7 @@ int exec_shell(char *tline)
 	strlcat(tline,filnam,MAXLLEN);
 	strlcat(tline," 2> ",MAXLLEN); 	// error file
 	strlcat(tline,filerr,MAXLLEN);
-#if	0
-	if(!macro_exec){
-		
-	};
-#endif
+
 	status=sysexec(tline);
 
 	if(status) {
@@ -267,19 +266,26 @@ int exec_shell(char *tline)
 		/* and get rid of the temporary file */
 		unlink(filnam);
 		unlink(filerr);
-#if	0
-		if(!macro_exec) 
-		{
-			select_filebuf(old_cbfp);
+		// MESG("exec: err_lines=%ld out_lines=%ld",bperr->lines,bp->lines);
+
+		if(bp->lines<2) {
+			select_filebuf(old_buffer);
+			if(cbfp->b_flag & (FSNLIST)) dir_reload(1);
 		};
-#endif
-		msg_line("ok!");
+		
+		if(bperr->lines<2)	msg_line("ok!");
+		else if(bperr->lines==2) {
+			char *err_line1 = get_line_at(bperr,0);
+			// MESG("err: %s",err_line1);
+			msg_line(err_line1);
+		} else msg_line("ok");
 		return(TRUE);
 	} else {
 		set_update(cwp,UPD_MOVE);
 		return (FALSE);
 	};
 }
+
 
 int shell_cmd1(int  nused)
 {

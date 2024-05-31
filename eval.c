@@ -1261,6 +1261,10 @@ int refresh_current_line(int nused)
  int ddot_pos;
  offs i;
  show_stage=0;
+
+ // if special file type return
+ if(cbfp->b_flag & (FSNLIST|FSDIRED|FSNOTES|FSNOTESN)) return 0;
+
  // MESG("refresh_current_line:");
 	tpo=tp_offset(cwp->tp_current);
 	

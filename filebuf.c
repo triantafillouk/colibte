@@ -3783,6 +3783,7 @@ char *get_line_at(FILEBUF *fb,offs offset)
 		line[ind]=FCharAt(fb,bol+ind);
 	};
 	line[ind]=0;
+	// MESG("get_line_at:[%s]",line);
 	return(line);
 }
 
