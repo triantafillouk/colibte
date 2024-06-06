@@ -274,7 +274,7 @@ M_element e_select_on[] =
 {
 	{0, 'C', "Copy         ^C","^Ccopy",	copy_region, 0,"EC"} ,	
 	{0, 'X', "cut          ^X","^Xcut",	cut_region, (struct MENUS *)1,"EX"} ,	
-	{0, 'U', "Unselect       ","",  set_mark,0,"EU"},
+	// {0, 'U', "Unselect       ","",  set_mark,0,"EU"},
 	{0, 0, NULL,"",NULL,0,NULL}
 };
 
