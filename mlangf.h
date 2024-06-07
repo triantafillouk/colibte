@@ -32,6 +32,7 @@ double uf_dinput();
 double uf_init();
 double uf_val();
 double uf_sqrt();
+double uf_cbrt();
 double uf_sin();
 double uf_cos();
 double uf_tan();

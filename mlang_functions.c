@@ -32,6 +32,7 @@ m_function m_functions[] = {
 	{"initialize",0,uf_init},	/* variables init */
 	{"s_val",1,uf_val},			/* numerical string value  */
 	{"sqrt",1,uf_sqrt},
+	{"cbrt",1,uf_cbrt},
 	{"sin",1,uf_sin},
 	{"cos",1,uf_cos},
 	{"tan",1,uf_tan},
