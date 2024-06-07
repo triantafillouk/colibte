@@ -318,7 +318,7 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 	/* We are always in an editors window */
 	if(cbfp->b_flag & FSNLIST) {
 		new_line = wp->top_note_line+mouse_row;
-		MESG("mouse at new_line=%d",new_line);
+		// MESG("mouse at new_line=%d",new_line);
 		if(new_line==wp->current_note_line) {
 			// MESG("dir: in same line=%d",new_line);
 			if(button==1) {
@@ -359,7 +359,7 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 	};
 	// MESG("button=%d",button);
 		if(button==1) {	/* move to position */
-			MESG("mouse button 1 prev=%d",prev_button);
+			// MESG("mouse button 1 prev=%d",prev_button);
 			if(prev_button==3) { prev_button=1;set_mark(0);set_update(cwp,UPD_EDIT);update_screen(1);update_full(1);return ;};
 			prev_button=1;
 			set_update(cwp,UPD_MOVE);
@@ -418,7 +418,7 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 				if(cwp->selection)
 					/* check for no region in buffer or box in buffer */
 				{
-					MESG("selection menu!");
+					// MESG("selection menu!");
 					if(cwp->selection == REGION_COLM) {
 						drv_show_menu_popup(popup_boxed_region);
 					} else {

@@ -487,6 +487,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int script_active=0;
  tok_struct *array_tok=NULL;
  int skip_token=0;
+ int start_of_line=1;
 
  // return if already parsed and not forced to parse
  if(bf->tok_table !=NULL && init==0) return (0);
@@ -706,6 +707,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		case TOK_MINUS:
 			if(next_token_type(bf)==TOK_MINUS) {
 				getnc1(bf,&cc,&tok_type);
+				if(start_of_line) { 
+					tok_type=TOK_COMMENT;
+					skip_2nl(bf);continue;
+				};
 				tok_type=TOK_DECREASE;
 				break;
 			};
@@ -785,7 +790,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			return(0);
 			};
 	};
-
+	if(tok_type==TOK_NL) {
+		start_of_line = 1;
+		continue;
+	};
 	// MESG("	- token type=[%d %s] previous token is [%d %s]",tok_type,tname(tok_type),previous_ttype,tname(previous_ttype));
 	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {

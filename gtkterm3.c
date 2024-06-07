@@ -2028,7 +2028,7 @@ int set_color(int n)
 
 void drv_show_menu_popup(GtkWidget *popup_menu)
 {
-	MESG("drv_show_menu_popup: b_flag=%X",cbfp->b_flag);
+	// MESG("drv_show_menu_popup: b_flag=%X",cbfp->b_flag);
 	// start_menu=&m_notes_tag;
 	gtk_menu_popup_at_pointer(GTK_MENU(popup_menu),NULL);
 }
