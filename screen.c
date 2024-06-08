@@ -2162,7 +2162,7 @@ void update_window_wrap(WINDP *wp,int force)
 #if	WRAPD
 			MESG_time("update_window_wrap: currow=%d hline o=%ld c=%ld current o=%ld",wp->currow,tp_offset(wp->tp_hline),tp_col(wp->tp_hline),tp_offset(wp->tp_current));
 #endif
-#if	1
+#if	0
 				upd_all_wrap_lines(wp,"wrap0");
 				// show_time("after wrap_lines",1);
 #else
@@ -2177,7 +2177,7 @@ void update_window_wrap(WINDP *wp,int force)
 			if (wp->w_flag & UPD_LINE) 
 			{
 				upd_part_wrap(wp,"wrap3 partial");
-			}
+			} else upd_all_wrap_lines(wp,"wrap1");
 #endif
 		} else {
 			if((wp->w_fp == cwp->w_fp 
