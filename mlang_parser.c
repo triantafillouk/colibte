@@ -492,7 +492,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  // return if already parsed and not forced to parse
  if(bf->tok_table !=NULL && init==0) return (0);
 
- MESG("- Parse block [%s] type=%d <---------------------",bf->b_fname,bf->b_type);
+ // MESG("- Parse block [%s] type=%d <---------------------",bf->b_fname,bf->b_type);
  if(is_mlang(bf)) script_active=1;	/* initial script state  */
 
  if(init && bf->tok_table!=NULL) {
@@ -1033,6 +1033,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok_type!=TOK_SEP) 
 	{	
 		if(tok_type==0) {
+			ADD_TOKEN("0");
 			tok->ttype=TOK_SEP;
 			tok->tname="end 0";
 		} else {
@@ -1043,8 +1044,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			tok->tname="end sep";
 		};
 	};
+	// MESG("parse_block1: set end token");
 	bf->end_token=tok;	/* save end token  */
-	ADD_TOKEN("end token");
+	// ADD_TOKEN("end token");
 	tok->ttype=TOK_EOF;
 	tok->tind=0;
 	tok->tline=tok_line;
@@ -1073,6 +1075,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 #endif
 	if(bf->symbol_tree==NULL)MESG("--- parse_block1:[%s] > end.",bf->b_fname);
 	else MESG(": parse_block1:[%s] > end. Number of tokens %d",bf->b_fname,bf->symbol_tree->items);
+ // MESG("partse_block1: end"); 
  return(TRUE); 
 }
 

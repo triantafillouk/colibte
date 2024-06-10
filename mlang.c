@@ -3239,6 +3239,7 @@ int parse_buffer_show_tokens(int n)
 	return(0);
  };
  out_print("|-------- Token list -----------------------------------",1);
+ // if(tok_ind==NULL) return 0;
  while(1)
  {
 	if((ind%25)==0)  out_print("Num Line Ind Type               Val        Group",1);
