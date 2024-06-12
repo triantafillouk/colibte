@@ -171,6 +171,7 @@ void set_update(WINDP *wp_toset, int flag)
 	return;
  };
  fp = wp_toset->w_fp;
+ MESG("set_update: %d",flag);
  if(flag & UPD_EDIT) {
 	{	/* First change, so	*/
 		flag |= UPD_STATUS; 		/* update mode lines.	*/
@@ -2154,15 +2155,16 @@ void update_window_nowrap(WINDP *wp,int force)
 void update_window_wrap(WINDP *wp,int force)
 {
 	int cw_flag=cwp->w_flag;
-	MESG("update_window_wrap: ------------------");
+	MESG("update_window_wrap: ------------------ force=%d",force);
 		if (wp==cwp) {
 			// MESG_time("update_window_wrap:1 window %d",wp->id);
-			check_cursor_position_wrap(wp); /* check if on screen */
+			if(!check_cursor_position_wrap(wp)) set_update(wp,UPD_WINDOW); /* check if on screen */
 			wp->currow = window_cursor_line(wp);
 #if	WRAPD
 			MESG_time("update_window_wrap: currow=%d hline o=%ld c=%ld current o=%ld",wp->currow,tp_offset(wp->tp_hline),tp_col(wp->tp_hline),tp_offset(wp->tp_current));
 #endif
 #if	1
+			if(wp->w_flag>1)
 				upd_all_wrap_lines(wp,"wrap0");
 				// show_time("after wrap_lines",1);
 #else
