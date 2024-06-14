@@ -1,5 +1,5 @@
 /*
-	Curses,gtk editor,notes,directory browser
+ 	Curses,gtk editor,notes,directory browser
 	Copyright Kostas Triantafillou
 	GNU LESSER GENERAL PUBLIC LICENSE version 2 
 	(or at your option) any later version.
@@ -2164,7 +2164,7 @@ void update_window_wrap(WINDP *wp,int force)
 			MESG_time("update_window_wrap: currow=%d hline o=%ld c=%ld current o=%ld",wp->currow,tp_offset(wp->tp_hline),tp_col(wp->tp_hline),tp_offset(wp->tp_current));
 #endif
 #if	1
-			if(wp->w_flag>1)
+			if(wp->w_flag>1 || wp->selection)
 				upd_all_wrap_lines(wp,"wrap0");
 				// show_time("after wrap_lines",1);
 #else
