@@ -46,7 +46,7 @@ char msg[] = "Usage is\n\
 \n\
  options\n\
  -h         : show help\n\
- -v         : show version\n\
+ -V         : show version\n\
  -k         : set encryption flag\n\
  -D         : activate debug flag\n\
  -b         : open as binary\n\
@@ -57,6 +57,7 @@ char msg[] = "Usage is\n\
  -N         : open Notes tag view\n\
  -r         : record session keys\n\
  -s <file>  : open and replay session file\n\
+ -v         : open in view mode\n\
 ";
  printf("%s\n",msg);
  };

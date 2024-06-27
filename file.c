@@ -38,6 +38,19 @@ char *uncompress_command[] = {
 int add_to_recent_list(char *full_file_name);
 int is_encrypt(int file_id);
 
+int default_view_mode=0;
+
+void set_default_view_mode(int flag)
+{
+	default_view_mode=1;
+}
+
+int get_default_view_mode()
+{
+	// MESG("view flag is %d",view_flag);
+	return default_view_mode;
+}
+
 int scratch_ind(char *bname)
 {
 	if(bname==NULL) return 0;
@@ -126,7 +139,7 @@ int activate_file(FILEBUF *bp)
 	// MESG("activate_file:[%s] b_type=%d b_flag=%X",bp->b_fname,bp->b_type,bp->b_flag);
 	if ((bp->b_state & FS_ACTIVE) ==0)
 	{	
-//		MESG("active_file: is not active, activate it!");
+		// MESG("activatee_file: is not active, activate it!");
 		/* read it in and activate it */
 		if(bp->b_fname[0]!=CHR_LBRA || !strncmp(bp->b_fname,"[D",2))
 		{
@@ -149,7 +162,7 @@ int activate_file(FILEBUF *bp)
 			add_to_recent_list(get_buf_full_name(bp));
 		};
 	};
-//	MESG("activate_file: end [%s] b_type=%d b_flag=%d",bp->b_fname,bp->b_type,bp->b_flag);
+	// MESG("activate_file: end [%s] b_type=%d b_flag=%d b_state=%X",bp->b_fname,bp->b_type,bp->b_flag,bp->b_state);
 	return true;
 }
 
@@ -1135,7 +1148,7 @@ int open_file_named(char *fname)
  char full_name[MAXFLEN];
  int err;
  struct stat bp_stat;
-	// MESG("open_file_named:[%s]",fname);
+	MESG("open_file_named:[%s]",fname);
 	set_bfname(full_name,fname);
 	err=stat(full_name,&bp_stat);
 	if(S_ISDIR(bp_stat.st_mode)) { 
@@ -1405,7 +1418,7 @@ int goto_file(char *file_name)
 int edit_file(char *fname)
 {
  FILEBUF *bp;
- // MESG("edit_file: [%s]",fname);
+ MESG("edit_file: [%s]",fname);
  if(fname[0]=='/') {
 	bp=get_filebuf(fname,NULL,0);
  } else {
@@ -1446,13 +1459,19 @@ int file_read(FILEBUF *bp, char *fname)
  };
  bp->b_flag &= ~FSINVS;
  bp->b_state &= ~FS_CHG;
+
+
  if(is_scratch_buffer(bp)) {
  	char scratch_file[MAXFLEN];
 	stat=snprintf(scratch_file,MAXFLEN,"%s/%s",bp->b_dname,bp->b_fname);
 	if(stat<MAXFLEN) unlink(scratch_file);
  };
  set_update(cwp,UPD_FULL);
- // MESG("file_read: end: b_type=%d",bp->b_type);
+ if(get_default_view_mode()) {
+ 	bp->b_state |= FS_VIEW;
+ 	// MESG("set as view only");
+ };
+ // MESG("file_read: end: b_type=%d b_state=%X",bp->b_type,bp->b_state);
  return TRUE; 
 }
 

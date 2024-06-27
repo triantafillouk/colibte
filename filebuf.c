@@ -2058,6 +2058,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 		bf->b_state |= FS_VIEW;
 	};
 	bf->line_to = tp_line(bf->tp_text_end);
+
 //	MESG("ifile0:end b_type=%d",bf->b_type);
    	return(true);
 }
@@ -2068,6 +2069,8 @@ int ifile(FILEBUF *bf,char *name,int ir_flag)
  int stat;
  // MESG("ifile: [%s] ir_flag=%d view_mode=%d",name,ir_flag,bf->view_mode);
  stat=ifile0(bf,name,ir_flag);
+
+
  return(stat);
 }
 

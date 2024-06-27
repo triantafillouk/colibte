@@ -171,7 +171,7 @@ void set_update(WINDP *wp_toset, int flag)
 	return;
  };
  fp = wp_toset->w_fp;
- MESG("set_update: %d",flag);
+ // MESG("set_update: %d",flag);
  if(flag & UPD_EDIT) {
 	{	/* First change, so	*/
 		flag |= UPD_STATUS; 		/* update mode lines.	*/
