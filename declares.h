@@ -540,6 +540,8 @@ int delete_window(int n);
 int split_window(int n);
 int window_row_resize(int n);
 int window_column_resize(int n);
+int vresize_wind(int n);
+int hresize_wind(int n);
 int both_down(int n);
 int both_up(int n);
 int page_move_up(int n);

@@ -166,7 +166,7 @@ int window_row_resize(int n)
 	slines[0]=0;
 	if(nextarg("Resize window by # lines: ", slines, 80,true)!=TRUE) return(FALSE);
 	if(!macro_exec) n = get_val();
-	return(hresize_wind(n));
+	return(hresize_wind(n-cwp->w_ntrows));
 }
 
 int window_row_increase(int n)
@@ -197,13 +197,13 @@ int window_column_resize(int n)
 {
 	if(!drv_initialized) return 0;
 	char slines[80];
-
+	int new_size=0;
 	/* must have a non-default argument, else ignore call */
 	slines[0]=0;
+	
 	if(nextarg("Resize window by # columns: ", slines, 80,true)!=TRUE) return(FALSE);
-	if(!macro_exec) n = get_val();
-
-	return(vresize_wind(n));
+	if(!macro_exec) new_size = get_val();
+	return(vresize_wind(new_size-cwp->w_ntcols));
 }
 
 int describe_key(int n)	/* describe the command for a certain key */
