@@ -166,6 +166,7 @@ int window_row_resize(int n)
 	slines[0]=0;
 	if(nextarg("Resize window by # lines: ", slines, 80,true)!=TRUE) return(FALSE);
 	if(!macro_exec) n = get_val();
+	if(slines[0]=='-'||slines[0]=='+') return(hresize_wind(n));
 	return(hresize_wind(n-cwp->w_ntrows));
 }
 
@@ -203,6 +204,7 @@ int window_column_resize(int n)
 	
 	if(nextarg("Resize window by # columns: ", slines, 80,true)!=TRUE) return(FALSE);
 	if(!macro_exec) new_size = get_val();
+	if(slines[0]=='-'||slines[0]=='+') return(vresize_wind(new_size));
 	return(vresize_wind(new_size-cwp->w_ntcols));
 }
 
