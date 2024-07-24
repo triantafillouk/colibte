@@ -1088,7 +1088,7 @@ int check_words(int c)
  int matchw=0;
  int i;
 
- if(c==0) {
+ if(c==0||c==CHR_LINE||c==CHR_RESET||c==' ') {
 	for(i=0;i<CHECK_WORDS;i++) ssind[i]=0;
 	return(0);
  } else {
@@ -1313,13 +1313,13 @@ void highlight_md(int c)
 {
   int hstruct=0;
   // if(highlight_note(c)) return;
-
   hstruct=check_words(c);
   if(prev_set>=0) { hquotem=prev_set;prev_set=-1;hprev_line=-1;};
 
+#if	1
   if((c!='-' && c>31) && hquotem & H_LINESEP)
  	 { h_line_set=0; hquotem ^= H_LINESEP ;};
-
+#endif
   switch(hstruct) {
 	case START_COMMENT:
 		if(!slang) { // only in html
@@ -1330,6 +1330,7 @@ void highlight_md(int c)
 		if(!slang) { // only in html
 			hquotem =0;
 		};break;
+#if	1
 	case START_MDCODE:
 		if(slang) {
 			slang=0;
@@ -1343,15 +1344,28 @@ void highlight_md(int c)
 			// MESG("<start mdcode");
 		};
 		break;
+#endif
   };
 
   switch(c) {
 	case CHR_LINE:
 	case CHR_CR:
 		// if(slang) MESG("LINE_START! hprev_line=%d hquotem=%d",hprev_line,hquotem);
-		if(hprev_line>=0) { hquotem=hprev_line;hprev_line=-1;}
-		else {
-			hquotem &= ~(H_QUOTE1|H_QUOTE4|H_QUOTE5|H_QUOTE6|H_QUOTE10|H_QUOTE11|H_LINESEP);
+		if(hprev_line>0 && slang) { 
+#if	1
+			if(hprev_line==H_QUOTE12)
+			{
+				hquotem=hprev_line;
+				//hprev_line=-1;
+			} else {
+#endif
+				hquotem=0;
+				hprev_line=-1;
+			};
+		} else {
+			// hquotem &= ~(H_QUOTE1|H_QUOTE4|H_QUOTE5|H_QUOTE6|H_QUOTE10|H_QUOTE11|H_LINESEP);
+			hquotem=0;
+			hprev_line=-1;
 		};
 		hstate=HS_LINESTART;
 		h_line_set=0;
@@ -1450,12 +1464,12 @@ void highlight_md(int c)
 		h_hquote_start=hquotem;
 		hquotem=H_QUOTE8;
 		break;
-
+#if	1
 	case CHR_BIGER:
 		if(slang==1) break;
 		if(hstate==HS_PREVESC) { hstate=0;break;};
 		if(hquotem & H_QUOTE10||hquotem & H_QUOTE11|| hquotem & H_QUOTE12) break;
-		if(hstate==HS_LINESTART) {
+		if(	hstate==HS_LINESTART) {
 			prev_set = H_QUOTE10;
 			hquotem=0;
 			hstate=0;
@@ -1466,10 +1480,11 @@ void highlight_md(int c)
 		} else {
 			prev_set = h_hquote_start;
 			h_hquote_start=0;
-			hquotem = H_QUOTE8;
+			//hquotem = H_QUOTE8;
 			hstate=0;
 		};
 		break;
+#endif
 	case '_':
 		if(slang==1) break;
 		if(hstate==HS_PREVESC) { hstate=0;break;};
@@ -1499,8 +1514,9 @@ void highlight_md(int c)
 		break;
 	case '*':
 		if(slang==1) break;
+		if(hquotem & H_QUOTE6) break;
 		if(hstate==HS_PREVESC) { hstate=0;break;};
-		if(hquotem & H_QUOTE10||hquotem & H_QUOTE11|| hquotem & H_QUOTE12) break;
+		if(hquotem & H_QUOTE10||hquotem & H_QUOTE11|| hquotem & H_QUOTE12 ) break;
 		if(hstate==HS_PREVAST||hstate==HS_PREVSPACE||hstate==HS_LINESTART) {
 			hstate=HS_PREVAST;
 			h_bold++;
@@ -1525,11 +1541,17 @@ void highlight_md(int c)
 		};
 		break;
 	case ' ':
-	case '\t':
+	// case '\t':
 		if(slang==1) break;
 		if(h_bold==1) { hquotem=0; prev_set=0;h_bold=0;};
 		if(hstate!=HS_LINESTART) hstate=HS_PREVSPACE;
 		if(hquotem==H_LINESEP) hquotem=0;
+		break;
+		
+	case '\t':
+		if(slang==1) break;
+		if(hstate!=HS_LINESTART) hstate=HS_PREVSPACE;
+		else hquotem=0;
 		break;		
 	default: { 
 		if(slang==1) break;
