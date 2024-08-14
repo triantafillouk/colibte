@@ -1172,7 +1172,7 @@ int set_locale(int local_codepage)
 		case 1:
 		case 11:
 		case 12:
-			default_local_codepage=1;
+			default_local_codepage=7;
 			break;
 		default:	
 			default_local_codepage=local_codepage;
