@@ -551,9 +551,7 @@ M_element e_mode[] =
 	{0,	'P', "Page lock        ","", toggle_sync_lock,0,"MP"},
 #if	USE_GLIB
 	{MMENU, 'C', "file Codepage    ", "",  NULL, &m_lang,"MC"},
-#if	!GTK
-	{MMENU, 'F', "Font local       ", "",  NULL, &m_local,"MF"},
-#endif
+	{MMENU, 'F', "File local       ", "",  NULL, &m_local,"MF"},
 #endif
     {MMENU, 'S', "Sort mode        ", "",  NULL, &m_sort,"MS"},
 	{0, 0, NULL,"",NULL,0,NULL}
