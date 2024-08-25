@@ -270,6 +270,7 @@ int set_crypt(int n);
 #endif
 int toggle_highlight(int n);
 int toggle_crypt(int n);
+int next_utf8_error(int n);
 int set_just(int n);
 int toggle_just(int n);
 int match_fence(int n);

@@ -294,6 +294,7 @@ FUNCS	ftable[] = {
 	{"save_as_note",0, save_as_note,""},
 	{"recreate_notes_db",1,recreate_notes_db,""},
 #endif
+	{"next_utf8_error",0,next_utf8_error,""},
 	{"do_nothing",0,	do_nothing,"do nothing"},
 	{NULL,	0,		NULL}
 };

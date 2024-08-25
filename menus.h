@@ -169,6 +169,7 @@ M_element e_search[] =
 	{0, 'O', "goto Offset              ","_Ggoto Offset", goto_offset,0,"SO"}, 
 	{0, '@', "View functions      ALT-@","_@view functions  @", view_functions,(struct MENUS *)2,"S1"},
 	{0, '#', "View structures     ALT-#","_#view Structures #", view_functions,(struct MENUS *)3,"S2"},
+	{0,'U',  "next Utf8 error          ","_find next utf error",next_utf8_error,0,"SU"},
 	{0, 0, NULL,"",NULL,0,NULL}
 };
 

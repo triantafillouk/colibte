@@ -2864,6 +2864,27 @@ void   MoveRightChar(FILEBUF *fp)
 	tp_copy(fp->save_current,fp->tp_current);
 }
 
+int next_utf8_error(int n)
+{
+ int clen=0;
+ FILEBUF *fp=cbfp;
+ offs o=tp_offset(fp->tp_current);
+ clen_error=0;
+ while(!FEofAt(fp,o)) {
+ 	clen=FUtfCharLen(fp,o);
+	if(clen_error) break;
+	o+=clen;
+ };
+ if(!FEofAt(fp,o)) {
+ 	textpoint_set(fp->tp_current,o);
+	set_update(cwp,UPD_WINDOW);
+	msg_line("Found utf8 error!");
+ } else {
+ 	msg_line("No utf8 error!");
+	return 0;
+ }
+}
+
 #define	MemStep	(0x2000)
 
 int    GetSpace(FILEBUF *fp,offs s)
