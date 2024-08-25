@@ -2868,6 +2868,10 @@ int next_utf8_error(int n)
 {
  int clen=0;
  FILEBUF *fp=cbfp;
+ if(fp->b_lang!=0) {
+	msg_line("this is not a utf8 file!");
+	return(0);
+ };
  offs o=tp_offset(fp->tp_current);
  clen_error=0;
  while(!FEofAt(fp,o)) {
