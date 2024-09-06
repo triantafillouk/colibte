@@ -319,7 +319,7 @@ int set_sort_mode(int mode)
  // MESG("set_sort_mode: current=%d mode=%d",current_sort_mode,mode);
  if(!(cwp->w_fp->b_flag & FSDIRED)) return true;
 
-	if(mode==-1) {
+	if(mode==-1 || current_sort_mode==mode) {
 		if((current_sort_mode%2)==0) current_sort_mode++;
 		else current_sort_mode--;
 	} else current_sort_mode=mode;

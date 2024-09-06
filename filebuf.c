@@ -2883,10 +2883,12 @@ int next_utf8_error(int n)
  	textpoint_set(fp->tp_current,o);
 	set_update(cwp,UPD_WINDOW);
 	msg_line("Found utf8 error!");
+	return 1;
  } else {
  	msg_line("No utf8 error!");
 	return 0;
  }
+
 }
 
 #define	MemStep	(0x2000)
