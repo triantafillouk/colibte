@@ -2967,7 +2967,8 @@ double exec_block1(FILEBUF *fp)
  // MESG("exec_block1: starting at tok %d type=%d err=%d",tok->tnum,tok->ttype,err_num);
 	exe_buffer=fp;
 	// MESG("exec_block1:[%s] size of tok_struct is %d",fp->b_fname,sizeof(tok_struct));
-   while(tok->ttype!=TOK_EOF && current_active_flag) 
+   if(!current_active_flag) return(val);
+   while(tok->ttype!=TOK_EOF) 
    {
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
 	if(tok->ttype==TOK_SEP){ NTOKEN2;
@@ -2982,6 +2983,7 @@ double exec_block1(FILEBUF *fp)
 		refresh_ddot_1(val);NTOKEN2;continue;
 	};
  	val=tok->directive();
+	if(!current_active_flag) break;
    };
    // MESG("exec_block1: end!");
 	return(val);

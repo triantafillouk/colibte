@@ -447,13 +447,13 @@ int scroll_up(int n)
 
 int scroll_down(int n)
 {
- int status;
+ int lines=n;
  // if(tp_offset(cwp->tp_hline)<1) return FALSE;
  lock_move=1;
- status=prev_line(n);
+ lines=prev_line(lines);
  lock_move=0;
 
- return status;
+ return lines;
 }
 
 int get_current_line()
@@ -748,7 +748,7 @@ int prev_line(int n)
 	if(cbfp->view_mode & VMHEX){
 		textpoint_set_lc(cbfp->tp_current,current_line-n,Offset()%16);
 	} else {
-		MoveLineCol(current_line-n,cwp->goal_column);
+		MoveLineCol(current_line-n+1,cwp->goal_column);
 	};
 	set_hmark(0,"prev_line");
 	set_update(cwp,UPD_MOVE);
