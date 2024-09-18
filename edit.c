@@ -447,13 +447,13 @@ int scroll_up(int n)
 
 int scroll_down(int n)
 {
- int lines=n;
+ int status;
  // if(tp_offset(cwp->tp_hline)<1) return FALSE;
  lock_move=1;
- lines=prev_line(lines);
+ status=prev_line(n);
  lock_move=0;
 
- return lines;
+ return status;
 }
 
 int get_current_line()
@@ -567,6 +567,7 @@ int next_line(int n)
 	int b_flag = cbfp->b_flag;
 	int headline=(cbfp->b_header!=NULL);
 
+	MESG("next_line: ------------- n=%d lock=%d",n,lock_move);
     if (n < 0)  return (prev_line(-n));
 	if(n==0) return(FALSE);
 
@@ -671,6 +672,11 @@ int prev_wrap_line(int n)
 			lock_move=1;
 			if(status==FALSE) return status;
 			// return TRUE;
+		} else {
+			lock_move=0;
+			int status=prev_wrap_line(n-1);
+			lock_move=1;
+			if(status==FALSE) return status;
 		};
 		move_window(n);
         return(n);
@@ -694,7 +700,7 @@ int prev_wrap_line(int n)
 int prev_line(int n)
 {
  num current_line;
- 
+ MESG("prev_line: ------------- n=%d lock=%d",n,lock_move);
  int status=0;
 	if (n==0) return FALSE;
    	if (n < 0) return (next_line(-n));
@@ -726,6 +732,8 @@ int prev_line(int n)
 
 
     if(lock_move) {
+		MESG("lock_move:");
+#if	0
         // If at the last line of the window
 		if( current_line - tp_line(cwp->tp_hline) == cwp->w_ntrows-2-half_last_line
 		 || tp_line(cwp->tp_current)>0
@@ -736,6 +744,29 @@ int prev_line(int n)
             lock_move=1;
 			if(status==FALSE) return status;
         };
+#else
+		if( current_line - tp_line(cwp->tp_hline) == cwp->w_ntrows-2-half_last_line
+		 // || tp_line(cwp->tp_current)>0
+		)
+		{
+            lock_move=0;
+			MESG("prev_line lock end 1");
+            status=prev_line(n);
+            lock_move=1;
+			if(status==FALSE) return status;
+        } else if(tp_line(cwp->tp_current)>0 && tp_line(cwp->tp_hline)==0) {
+            lock_move=0;
+			MESG("prev_line lock start 2");
+            status=prev_line(n);
+            lock_move=1;
+			return status;		
+		} else {
+            lock_move=0;
+			MESG("prev_line lock mid 3");
+            status=prev_line(n-1);
+            lock_move=1;
+		};
+#endif
 		move_window(n);
         return(n);
     };
@@ -748,7 +779,7 @@ int prev_line(int n)
 	if(cbfp->view_mode & VMHEX){
 		textpoint_set_lc(cbfp->tp_current,current_line-n,Offset()%16);
 	} else {
-		MoveLineCol(current_line-n+1,cwp->goal_column);
+		MoveLineCol(current_line-n,cwp->goal_column);
 	};
 	set_hmark(0,"prev_line");
 	set_update(cwp,UPD_MOVE);
