@@ -45,6 +45,7 @@ void update_selection();
 void restore_original_colors();
 int set_tag_view_position(int line,int column);
 int change_sort_mode(int mouse_col);
+int listdir(int dtype);
 
 BOX *cbox=NULL; // current box
 BOX *msg_box=NULL;	// current message box
@@ -457,6 +458,7 @@ int split_window(int n)
         register WINDP *wp;
         register int    ntru;
         register int    ntrl;
+		int status=0;
  		if(!drv_initialized) return 0;
        if (cwp->w_ntrows < 16) {
                 msg_line("Cannot split a %d line window", cwp->w_ntrows);
@@ -476,8 +478,14 @@ int split_window(int n)
 		set_window_width(wp);
 		set_update(wp,UPD_ALL|UPD_STATUS);
 		drv_set_wvs(wp);
-		return (next_window(1));
+		status=next_window(1);
+		if(cwp->w_fp->dir_num == 1) {
+			listdir(wp->w_fp->dir_num + 1);
+		};
+
+		return (status);
 }
+
 
 /*
  * Split the current window vertically
@@ -488,7 +496,7 @@ int vsplit_window(int n)
     WINDP *wp;
     int    ntl;
     int    ntr;
-	
+	int	status=0;	
  	if(!drv_initialized) return 0;
     if (cwp->w_ntcols < 40) {
             msg_line("Cannot split a %d column window", cwp->w_ntcols);
@@ -510,7 +518,11 @@ int vsplit_window(int n)
         wp->w_ntrows = cwp->w_ntrows;
 		set_update(wp,UPD_ALL|UPD_STATUS);
 		drv_set_wvs(wp);
-		return (next_window(1));
+		status=next_window(1);
+		if(cwp->w_fp->dir_num == 1) {
+			listdir(wp->w_fp->dir_num + 1);
+		};
+		return (status);
 }
 
 // allocate window virtual screen
