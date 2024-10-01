@@ -479,7 +479,7 @@ int split_window(int n)
 		set_update(wp,UPD_ALL|UPD_STATUS);
 		drv_set_wvs(wp);
 		status=next_window(1);
-		if(cwp->w_fp->dir_num == 1) {
+		if(cwp->w_fp->dir_num == 1 && cbfp->b_flag & FSNLIST) {
 			listdir(wp->w_fp->dir_num + 1);
 		};
 
@@ -519,7 +519,7 @@ int vsplit_window(int n)
 		set_update(wp,UPD_ALL|UPD_STATUS);
 		drv_set_wvs(wp);
 		status=next_window(1);
-		if(cwp->w_fp->dir_num == 1) {
+		if((cwp->w_fp->dir_num == 1) && (cbfp->b_flag & FSNLIST)) {
 			listdir(wp->w_fp->dir_num + 1);
 		};
 		return (status);

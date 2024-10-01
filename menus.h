@@ -345,7 +345,9 @@ M_element e_window[] =
 	{0, ']', "Next              ]"," ]Next", next_window, 0,"W]"} ,	
 	{0, 'I', "view Internal file ","", select_file_internal, 0,"WI" },
 	{0, 'D', "Directory list     ","", listdir1, 0,"WD"},
+#if	0
 	{0, 'S', "deStination dir    ","", listdir2, 0,"WS"},
+#endif
 #if TNOTES
 	{0, 'T', "noTes dir          ","", open_notes_dir,0,"WT"},
 	{0, 'W', "note tag vieW      ","", show_tag_view,0,"WW"},
