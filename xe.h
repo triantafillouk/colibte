@@ -27,6 +27,8 @@
 #define	TARROWS		1	/* Use arrow menus in panel curses  */
 #define	USE_UTF8	1	/* Use utf8 characters  */
 
+#define	TNOTES2		0
+
 #define	USE_SARRAYS	1
 #define	NO_LPAR		1
 #define	SLIM_ON		1	/* remove no needed elements in structure constructs  */
@@ -292,6 +294,7 @@ typedef struct notes_struct {
 	char n_cat[512];
 	char n_tags[512];
 	int encrypt_flag;
+	long long timestamp;
 } notes_struct;
 #endif
 

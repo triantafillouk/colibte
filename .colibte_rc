@@ -16,6 +16,8 @@ font="andale mono 14"
 function page_loop()
 {
  cls()
+ eof(1)
+ print("Scroll speed test, file:"+_file_name+" lines:"+_line)
  bof(1)
  show_time("started",0)
  i=0
@@ -28,6 +30,8 @@ function page_loop()
  }
  show_time("Ended",2)
  print("----")
+ select_file("[out]")
+ bof(1)
 }
 
 function show_out()
