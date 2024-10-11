@@ -435,7 +435,6 @@ int *query_int_column(sqlite3 *db, char *sql,int *count)
 
 char *query_string(sqlite3 *db,char *sql,int *index)
 {
- char *err_msg=NULL;
  int stat;
  sqlite3_stmt *res;
  int step;
@@ -459,9 +458,8 @@ char *query_string(sqlite3 *db,char *sql,int *index)
 		return NULL;
 	};
  } else {
- 	MESG("query_string: error [%s]",sql);
- 	error_line("sql error: %s", err_msg);
-	sqlite3_free(err_msg);
+ 	MESG("query_string: error %d [%s]",stat,sql);
+ 	error_line("sql error: %d %s", sql);
 	return NULL;
  };
  return NULL;	
@@ -469,7 +467,6 @@ char *query_string(sqlite3 *db,char *sql,int *index)
 
 int query_rowid(sqlite3 *db,char *sql)
 {
- char *err_msg=NULL;
  int stat;
  sqlite3_stmt *res;
  int step;
@@ -493,42 +490,40 @@ int query_rowid(sqlite3 *db,char *sql)
 		return row_id;
 	};
  } else {
- 	MESG("query_rowid: error [%s]",sql);
- 	return error_line("sql error: %s", err_msg);
+ 	MESG("query_rowid: error %d [%s]",stat,sql);
+ 	return error_line("query_rowid: %d %s",stat,sql);
  };
  return 0;	
 }
 
 long int query_int(sqlite3 *db,char *sql)
 {
- char *err_msg=NULL;
  int stat;
  sqlite3_stmt *res;
  int step;
- long int row_id=0;
+ long int ivalue=0;
  MESG("query_int: [%s]",sql);
 
- if(db==NULL) { MESG("db is NULL!!!!!");return 0;};
+ if(db==NULL) { error_line("db is NULL!!!!!");return 0;};
  stat = sqlite3_prepare_v2(db, sql, -1, &res, 0);
  if(stat==SQLITE_OK) {
 	step = sqlite3_step(res);
 
 	if(step==SQLITE_ROW) {
 //		MESG("	found: %s len=%d",sqlite3_column_text(res,0),strlen((char *)sqlite3_column_text(res,0)));
-		MESG("	found");
-		row_id = sqlite3_column_int(res,1);
+		// MESG("	found");
+		ivalue = sqlite3_column_int(res,1);
 		sqlite3_finalize(res);
 		
-		return row_id;
+		return ivalue;
 	} else {
 		MESG("	not found!");
 		sqlite3_finalize(res);
-		return row_id;
+		return ivalue;
 	};
  } else {
- 	MESG("query_int: error [%s]",sql);
-	error_line("sql error: %s", err_msg);
-	sqlite3_free(err_msg);
+ 	MESG("query_int: error %d [%s]",stat,sql);
+	error_line("sql error:%d %s", stat,sql);
 	return 0;
  };
  return 0;	
@@ -549,11 +544,10 @@ int query_int1(sqlite3 *db,char *sql)
 int sql_exec(sqlite3 *db, char *sql,int ignore)
 {
  char *err_msg=NULL;
-
  // MESG("sql_exec: [%s]",sql);
  if(sqlite3_exec(db, sql, 0, 0, &err_msg)!=SQLITE_OK)
  {
- 	if(ignore==0) error_line("sql error: %s", err_msg);
+ 	if(ignore==0) error_line("sql_exec error: %s", err_msg);
 	sqlite3_free(err_msg);
 	return false;
  };
@@ -593,17 +587,18 @@ int save_to_db(notes_struct *note)
 {
  sqlite3 *db;
  if((db=notes_db_open("save_to_db"))==NULL) return false;
+
  char sql[MAXLLEN];
  int stat=false;
  int note_id=0;
- MESG("save_to_db:0 title [%s] cat=[%s] name=[%s]",note->n_title,note->n_cat,note->n_name);
+ // MESG("save_to_db:0 title [%s] cat=[%s] name=[%s]",note->n_title,note->n_cat,note->n_name);
  // check if found
  if(snprintf(sql,MAXLLEN,"SELECT Category,rowid from notes where Name = '%s';",note->n_name)>=MAXLLEN) {
  	ERROR("%s","Notes name too long!");
 	// notes_db_close(db);
 	return false ;
  };
- MESG("	check if old, [%s]",sql);
+ // MESG("	check if old, [%s]",sql);
  char *new_cat = query_string(db,sql,&note_id);
  // MESG(" new_cat=[%s] note_id is %d!",new_cat,note_id);
  
@@ -619,12 +614,12 @@ int save_to_db(notes_struct *note)
 		// MESG("	- new tag  [%s]",tag);
 	}; 
  
- MESG("save_to_db:1 note_id=%d name=[%s] cat=[%s] new_cat=[%s]",note_id,note->n_name,note->n_cat,new_cat);
+ // MESG("save_to_db:1 note_id=%d name=[%s] cat=[%s] new_cat=[%s]",note_id,note->n_name,note->n_cat,new_cat);
  if(note_id && !strcmp(note->n_cat,(char *)new_cat )) {
 	// MESG("same note file! update [%s]/[%s]",new_cat,note->n_name);
 
 	// delete all old tags (no check!!)
-	MESG("	- Delete old tags!");
+	// MESG("	- Delete old tags!");
 	sprintf(sql,"delete from tags where note_id = %d;",note_id);
 	if(!sql_exec(db,sql,0)){
 		error_line("Cannot delete old tags!");
@@ -642,7 +637,7 @@ int save_to_db(notes_struct *note)
 	if(snprintf(sql,MAXLLEN,"UPDATE notes set Title = \"%s\" where rowid = %d",note->n_title,note_id)>=MAXLLEN) {
 		MESG("Title truncated!");
 	} ;
-	MESG("update title sql=[%s]",sql);
+	// MESG("update title sql=[%s]",sql);
 	if(!sql_exec(db,sql,0)){
 		error_line("Cannot update title");
 	};
@@ -650,7 +645,7 @@ int save_to_db(notes_struct *note)
 	if(snprintf(sql,MAXLLEN,"UPDATE notes set Date = \"%s\" where rowid = %d",note->n_date,note_id)>=MAXLLEN) {
 		MESG("Title truncated!");
 	} ;
-	MESG("update: %s",sql);
+	// MESG("update: %s",sql);
 	if(!sql_exec(db,sql,0)){
 		error_line("Cannot update date");
 	};
@@ -684,7 +679,7 @@ int save_to_db(notes_struct *note)
  	if(new_note_id) {
 		char **ta=current_tag_array;
 		char *tag;
-		MESG("create tags!");
+		// MESG("create tags!");
 		while((tag = *ta++)!=NULL) {
 			if(tag[0]=='#') tag++;
 			save_tag(db,new_note_id,tag);
@@ -693,7 +688,7 @@ int save_to_db(notes_struct *note)
  };
  free_sarray(current_tag_array);
  notes_db_close(db);
- MESG("-------------------------- end saving");
+ // MESG("-------------------------- end saving");
  return stat;
 }
 
@@ -1016,27 +1011,14 @@ int save_note()
 	};
 	// MESG("save_note:5 dir=[%s]",fp->b_dname);
 	status=chdir(fp->b_dname);
-#if	TNOTES2
-	sqlite3 *db;
-	if((db=notes_db_open("save_note"))==NULL) {
-		return false;
-	};
-#endif
 	if(writeu1(fp->b_fname,fp)) {
 		// MESG("test1 ------------- write1 ok!");
 		// Get file timestamp and add it to notes
 		note->timestamp = fp->FileTime;
-#if	TNOTES2
-		status=save_to_db(db,note);
-#else
 		status=save_to_db(note);
-#endif
 	} else {
 		MESG("cannot write file!");
 	};
-#if	TNOTES2
-	notes_db_close(db);
-#endif
 	return true;
 }
 
@@ -1262,12 +1244,8 @@ int recreate_notes_db(int init_db)
 				};
 				// s_note=bp->b_note;
 				MESG("  %3d: add - n=[%s] title=[%s] cat=[%s] tags=[%s]",i,s_note->n_name,s_note->n_title,s_note->n_cat,s_note->n_tags);
-#if	TNOTES2
-				status=save_to_db(db,s_note);
-#else
 				s_note->timestamp = st.st_mtime;
 				status=save_to_db(s_note);
-#endif
 				notes_new++;
 				// select_filebuf(current_buffer);
 				delete_filebuf(bp,1);
@@ -1283,9 +1261,6 @@ int recreate_notes_db(int init_db)
 		};
 		
 	};
-#if	NOTES2
-	notes_db_close(db);
-#endif
 	set_bt_num_val("notes_recreate",0);
 	free_sarray(notes_files);
 	// select_filebuf(current_buffer);

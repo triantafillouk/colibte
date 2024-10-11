@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.59T63 (10/10/2024)"
+#define VERSION 	"#01.59T64 (11/10/2024)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -26,8 +26,6 @@
 #endif
 #define	TARROWS		1	/* Use arrow menus in panel curses  */
 #define	USE_UTF8	1	/* Use utf8 characters  */
-
-#define	TNOTES2		0
 
 #define	USE_SARRAYS	1
 #define	NO_LPAR		1

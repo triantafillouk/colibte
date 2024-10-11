@@ -47,11 +47,7 @@ int show_sqlite_tables(char *fname);
 /* ----- notes utility functions ----- */
 int insert_preamble();
 int new_note(int n);
-#if	TNOTES2
-int save_to_db(sqlite3 *db,notes_struct *note);
-#else
 int save_to_db(notes_struct *note);
-#endif
 int save_tag(sqlite3 *db,int notes_id,char *tag);
 // Parse note and create db fields
 int parse_note(FILEBUF *fp);
