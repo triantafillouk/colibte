@@ -1889,7 +1889,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
    };
 
   if(!ir_flag) {
-  	status=init_ftype(bf,name,&temp_used); // if not insert then get file type
+  	status=init_ftype(bf,name,&temp_used,0); // if not insert then get file type
 	if(status!=TRUE) return FALSE;
   };
    errno=0;

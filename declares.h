@@ -807,7 +807,7 @@ void checkwb(char *);
 void syncwb();
 void textpoint_move(TextPoint *tp,offs o);
 void update_lines();
-int init_ftype(FILEBUF *bf,char *file_name,int *temp_used);
+int init_ftype(FILEBUF *bf,char *file_name,int *temp_used,int from_note);
 void beginundogroup(UNDOS *u);
 void EndUndoGroup(UNDOS *u);
 num GetCol();

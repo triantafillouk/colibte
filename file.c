@@ -777,11 +777,14 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	char dir_name[MAXFLEN];	// directory name
 	int dir_num=0;
 	int is_scratch=0;
+	int from_note = 0;
+	if(bflag==NOTE_TYPE) { bflag=0;from_note=1;}; 
+
 	create_base_name(base_name,bname);
-	// MESG("new_filebuf:base_name=[%s] bname=[%s]",base_name,bname);
+	// MESG("new_filebuf:base_name=[%s] bname=[%s] bflag=%X",base_name,bname,bflag);
 	dir_name[0]=0;
 	is_scratch = scratch_ind(base_name);
-
+	
 	if(is_scratch) {
 		snprintf(dir_name,MAXFLEN,"%s/.%s",getenv("HOME"),APPLICATION_NAME);
 	} else {
@@ -987,7 +990,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 			int used=0;
 			// MESG("set ftype! len=%d id=%d bom_type=%d discmd=%d",bp->flen0,bp->file_id,bp->bom_type,discmd);
 			if(discmd) {
-				init_ftype(bp,bp->b_fname,&used);
+				init_ftype(bp,bp->b_fname,&used,from_note);
 				// MESG("used %d type=%d",used,bp->b_type);
 				set_highlight(bp,bp->b_type);
 			} else {
@@ -1148,7 +1151,7 @@ int open_file_named(char *fname)
  char full_name[MAXFLEN];
  int err;
  struct stat bp_stat;
-	MESG("open_file_named:[%s]",fname);
+	// MESG("open_file_named:[%s]",fname);
 	set_bfname(full_name,fname);
 	err=stat(full_name,&bp_stat);
 	if(S_ISDIR(bp_stat.st_mode)) { 
@@ -1194,12 +1197,12 @@ int open_file(int n)
 	if(! (cbfp->b_flag & FSDIRED)){
 	if(cbfp->b_fname[0]==CHR_LBRA) {
 		if(chdir(get_start_dir())) {
-			msg_line("cannot open file in dir [%s]",cbfp->b_dname);
+			error_line("cannot open file in dir [%s]",cbfp->b_dname);
 			return false;
 		};
 	} else {
 		if(chdir(cbfp->b_dname)) {
-			msg_line("cannot open file in dir [%s]",cbfp->b_dname);
+			error_line("cannot open file in dir [%s]",cbfp->b_dname);
 			return false;
 		};
 	}
@@ -1418,7 +1421,7 @@ int goto_file(char *file_name)
 int edit_file(char *fname)
 {
  FILEBUF *bp;
- MESG("edit_file: [%s]",fname);
+ // MESG("edit_file: [%s]",fname);
  if(fname[0]=='/') {
 	bp=get_filebuf(fname,NULL,0);
  } else {
@@ -1651,7 +1654,7 @@ int rename_file(int n)
     return (TRUE);
 }
 
-int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
+int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 {
  int s;
  int		tc=0;			/* file second extension type */
@@ -1704,13 +1707,14 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
 		|| file_type_is("CMD",bp->b_type) 
 		|| file_type_is("TEXT",bp->b_type) 
 		|| file_type_is("MD",bp->b_type) 
-		|| (bp->b_type & NOTE_TYPE))
+		|| (bp->b_type >= NOTE_TYPE))
 		 ) {	
-			// MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
+			MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
 			bp->b_mode |= EMCRYPT;
 #if	TNOTES
-			if(bt_dval("notes_recreate")) {
-				MESG("Notes recreate!");
+			if(bt_dval("notes_recreate") || from_note) 
+			{
+				// MESG("Notes recreate!");
 				if(get_notes_key(1)==NULL) {
  					// MESG("get new notes key");
 					set_notes_key(1);
