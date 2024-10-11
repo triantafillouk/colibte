@@ -349,7 +349,7 @@ alist *query_string_columns(sqlite3 *db, char *sql,int *widths)
 		add_element_to_list((void *)data,a);
 	};
  } else {
- 	MESG("	quesr_string_columns: error [%s]!",sql);
+ 	error_line("query_string_columns: error [%s]!",sql);
  };
  sqlite3_finalize(res); 
  return a;
@@ -390,7 +390,7 @@ double *query_num_column(sqlite3 *db, char *sql)
 	empty_list(a);
 	free_list(a,"query_column");
 	return darray;
- } else MESG(" query_num_column: error [%s]",sql);
+ } else error_line(" query_num_column: error [%s]",sql);
  return NULL;
 }
 
@@ -429,7 +429,7 @@ int *query_int_column(sqlite3 *db, char *sql,int *count)
 	empty_list(a);
 	free_list(a,"query_column");
 	return iarray;
- } else MESG("query_int_column: error [%s]",sql); 
+ } else error_line("query_int_column: error [%s]",sql); 
  return NULL;
 }
 
@@ -449,7 +449,7 @@ char *query_string(sqlite3 *db,char *sql,int *index)
 	if(step==SQLITE_ROW) {
 		strlcpy(return_string,(char *)sqlite3_column_text(res,0),512);
 		*index = sqlite3_column_int(res,1);;
-		MESG("query_string: result: %s row=%d",return_string,*index);
+		// MESG("query_string: result: %s row=%d",return_string,*index);
 		sqlite3_finalize(res);
 		return return_string;
 	} else {
@@ -458,7 +458,7 @@ char *query_string(sqlite3 *db,char *sql,int *index)
 		return NULL;
 	};
  } else {
- 	MESG("query_string: error %d [%s]",stat,sql);
+ 	// MESG("query_string: error %d [%s]",stat,sql);
  	error_line("sql error: %d %s", sql);
 	return NULL;
  };
@@ -569,7 +569,7 @@ sqlite3 * notes_db_open(char *message)
  set_bfname(db_file_name,NOTES_DBFILE);
  // MESG("notes_db_open:< [%s] opened=%d",db_file_name,opened_files);
  if(sqlite3_open(db_file_name,&db)!=SQLITE_OK) {
-	msg_line("Notes db [%s]: %s",db_file_name,sqlite3_errmsg(db));
+	error_line("Notes db [%s]: %s",db_file_name,sqlite3_errmsg(db));
 	// notes_db_close(db);
 	return NULL;
 	if(init_notes_db(1)) {
@@ -579,7 +579,7 @@ sqlite3 * notes_db_open(char *message)
 		};
 	} else return NULL;
  } else opened_files++ ;
- MESG("notes_db_open: [%s] opened files %d",message,opened_files);
+ // MESG("notes_db_open: [%s] opened files %d",message,opened_files);
  return db;
 }
 
@@ -1738,7 +1738,6 @@ int get_current_note_id()
  return note_id;
 }
 
-#if	1
 time_t get_note_timestamp(char *note_name)
 {
  char sql[MAXLLEN];
@@ -1752,7 +1751,6 @@ time_t get_note_timestamp(char *note_name)
 
  return tstamp;
 }
-#endif
 
 char *get_current_note_name()
 {
@@ -1770,7 +1768,7 @@ char *get_current_note_name()
  // MESG("	category,rowid = [%s]",full_name);
  // MESG("	NOTES_DIR=[%s]",NOTES_DIR);
  if(snprintf(notes_name,1024,"%s/%s/",NOTES_DIR,query_string(db,full_name,&note_id))>=1024) {
- 	ERROR("notes file name too long, truncated!"); ; 
+ 	error_line("notes file name too long, truncated!"); ; 
  };
  // MESG("	notes_name = [%s]",notes_name);
  sprintf(full_name,"SELECT name,rowid from notes where rowid = %d",note_id);
@@ -1792,23 +1790,40 @@ int edit_note(int n)
   char *full_name = get_current_note_name();
  
  if(full_name==NULL) {
- 	MESG("edit_note: note name is null!");
+ 	error_line("edit_note: note name is null!");
 	return false;
  };
  FILEBUF *bp;
+ int btype=0;
+ 
+#if	1
+	if(!strncmp(".cal",full_name+(strlen(full_name)-4),4) 
+		|| !strncmp("_cal.md",full_name+(strlen(full_name)-7),7) 
+		){
+		btype = NOTE_CAL_TYPE;
+	} else if(!strncmp(".todo",full_name+(strlen(full_name)-5),5)
+			||!strncmp("_todo.md",full_name+(strlen(full_name)-8),8))
+		{
+		btype=NOTE_TODO_TYPE;
+	} else btype=NOTE_TYPE;
+#endif
+
 	// MESG("edit_note:[%s] n=%d b_type=%d",full_name,n,cbfp->b_type);
-	if(edit_file(full_name)) return true;
-	
-	if((bp=new_filebuf(full_name,0))==NULL) {
-    	msg_line("Cannot open note [%s]",full_name);
+	// if(edit_file(full_name)) return true;
+	// MESG("edit_note: new_filebuf: [%s]",full_name);
+	if((bp=new_filebuf(full_name,NOTE_TYPE))==NULL) {
+    	error_line("Cannot open note [%s]",full_name);
         return (FALSE);
 	};
+	// MESG("edit_note: set b_type");
 	bp->connect_buffer = cbfp;
 	bp->connect_top_line = cwp->top_tag_line;
 	bp->connect_top_note = cwp->top_note_line;
 	bp->connect_line = cwp->current_tag_line;
 	bp->connect_column = cwp->current_note_line;
-	
+#if	1
+	bp->b_type |= btype;
+#else
 	if(!strncmp(".cal",bp->b_fname+(strlen(bp->b_fname)-4),4) 
 		|| !strncmp("_cal.md",bp->b_fname+(strlen(bp->b_fname)-7),7) 
 		){
@@ -1818,7 +1833,8 @@ int edit_note(int n)
 		{
 		bp->b_type|=NOTE_TODO_TYPE;
 	} else bp->b_type|=NOTE_TYPE;
-
+#endif
+	// MESG("edit_note: select_filebuf");
 	select_filebuf(bp);
 
 	set_hmark(1,"edit_note");
@@ -2026,6 +2042,7 @@ int set_notes_key(int n)
 	crypt_string(NULL, 0L);
 	crypt_string(b_key, strlen(b_key));
 	set_local_notes_key(b_key);
+	msg_line("notes key set ok!");
 	return true;
 }
 
