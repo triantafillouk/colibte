@@ -502,7 +502,7 @@ long int query_int(sqlite3 *db,char *sql)
  sqlite3_stmt *res;
  int step;
  long int ivalue=0;
- MESG("query_int: [%s]",sql);
+ // MESG("query_int: [%s]",sql);
 
  if(db==NULL) { error_line("db is NULL!!!!!");return 0;};
  stat = sqlite3_prepare_v2(db, sql, -1, &res, 0);
@@ -1176,7 +1176,7 @@ int recreate_notes_db(int init_db)
 		status = init_notes_db(1);
 	};
 	set_bfname(notes_dir,NOTES_DIR);
-	set_notes_key(1);
+	// set_notes_key(1);
 	sprintf(tmp_file,"/tmp/notes_contents.out");
 	sprintf(cmd,"find -L %s  >%s 2>/dev/null",notes_dir,tmp_file);
 	status = system(cmd);
@@ -1209,23 +1209,23 @@ int recreate_notes_db(int init_db)
 			};
 			if(!S_ISDIR(st.st_mode)) {
 				FILEBUF *bp;
-				MESG("  %3d insert: [%s]",i,notes_files[i]);
+				// MESG("  %3d insert: [%s]",i,notes_files[i]);
 
 				// time_t prev_time ;
 				notes_struct *s_note=init_note();
 				create_base_name(notes_name,notes_files[i]+start_notes);
-#if	1
+
 				if(!init_db) 
 				{
 				time_t tstamp = get_note_timestamp(notes_name);
 					
-				MESG("---- %3d  %10s [%s] timestamp %ld file timestamp %ld",i,notes_files[i]+start_notes,notes_name,tstamp,st.st_mtime);
+				// MESG("---- %3d  %10s [%s] timestamp %ld file timestamp %ld",i,notes_files[i]+start_notes,notes_name,tstamp,st.st_mtime);
 					if(tstamp==st.st_mtime) {
 						notes_same++;
 						continue;
 					};
 				};
-#endif
+
 				// FILEBUF *current_buffer=cbfp;
 				bp=new_filebuf(notes_files[i],0);
 				
@@ -1233,7 +1233,7 @@ int recreate_notes_db(int init_db)
 				bp->b_note = s_note;
 				// select_filebuf(bp);
 				activate_file(bp);
-				MESG("  #%3d: go parse %s",i,notes_files[i]);
+				// MESG("  #%3d: go parse %s",i,notes_files[i]);
 				if(!parse_note(bp)) {
 					msg_line(" file [%s] Not a note file !!!!!!!!!!!!",notes_files[i]);
 					delete_filebuf(bp,1);
@@ -1242,14 +1242,13 @@ int recreate_notes_db(int init_db)
 					notes_failparse++;
 					continue;					
 				};
-				// s_note=bp->b_note;
-				MESG("  %3d: add - n=[%s] title=[%s] cat=[%s] tags=[%s]",i,s_note->n_name,s_note->n_title,s_note->n_cat,s_note->n_tags);
+				// MESG("  %3d: add - n=[%s] title=[%s] cat=[%s] tags=[%s]",i,s_note->n_name,s_note->n_title,s_note->n_cat,s_note->n_tags);
 				s_note->timestamp = st.st_mtime;
 				status=save_to_db(s_note);
 				notes_new++;
 				// select_filebuf(current_buffer);
 				delete_filebuf(bp,1);
-				MESG("	+ %3d note added [%s]!",i,notes_files[i]);
+				// MESG("	+ %3d note added [%s]!",i,notes_files[i]);
 			} else {
 				dirs++;
 				// select_filebuf(current_buffer);
@@ -2033,7 +2032,7 @@ int set_notes_key(int n)
 	char b_key[MAXSLEN];
 	int status=1;
 	b_key[0]=0;
-	// MESG("set_notes_key:");
+	MESG("set_notes_key:");
 	status = nextarg("Notes Encryption String: ", b_key, MAXSLEN,false);
 //	disinp = odisinp;
 	if (status != TRUE)  return(status);
