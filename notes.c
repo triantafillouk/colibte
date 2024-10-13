@@ -23,7 +23,7 @@ notes_struct *init_note();
 int get_current_tag_id();
 char *get_current_tag_name();
 time_t get_note_timestamp(char *note_name);
-long int query_int(sqlite3 *db,char *sql);
+long int query_int(sqlite3 *db,char *sql_string);
 
 int insert_preamble(FILEBUF *fp,int type)
 {
@@ -81,6 +81,23 @@ int insert_preamble(FILEBUF *fp,int type)
 	return(true);
 }
 
+char *sql_sanitize(char *sql_string)
+{
+ static char s_string[1024];
+
+ if(sindex(sql_string,"'")) {
+ 	int i,i1=0;
+	for(i=0;i<strlen(sql_string);i++,i1++) {
+		if(sql_string[i]=='\'') {
+			s_string[i1++]='\'';
+		};
+		s_string[i1]=sql_string[i];
+	};
+	s_string[i1]=0;
+ 	return s_string;
+ } else
+ return sql_string;
+}
 
 int new_note(int type)
 {
@@ -544,10 +561,10 @@ int query_int1(sqlite3 *db,char *sql)
 int sql_exec(sqlite3 *db, char *sql,int ignore)
 {
  char *err_msg=NULL;
- // MESG("sql_exec: [%s]",sql);
+ MESG("sql_exec: [%s]",sql);
  if(sqlite3_exec(db, sql, 0, 0, &err_msg)!=SQLITE_OK)
  {
- 	if(ignore==0) error_line("sql_exec error: %s", err_msg);
+ 	if(ignore==0) error_line("sql_exec:[%s] error %s",sql, err_msg);
 	sqlite3_free(err_msg);
 	return false;
  };
@@ -634,7 +651,8 @@ int save_to_db(notes_struct *note)
 		save_tag(db,note_id,tag);
 	};
 	// update the title and date if[MCP7 changed!
-	if(snprintf(sql,MAXLLEN,"UPDATE notes set Title = \"%s\" where rowid = %d",note->n_title,note_id)>=MAXLLEN) {
+	char *note_title = sql_sanitize(note->n_title);
+	if(snprintf(sql,MAXLLEN,"UPDATE notes set Title = \"%s\" where rowid = %d",note_title,note_id)>=MAXLLEN) {
 		MESG("Title truncated!");
 	} ;
 	// MESG("update title sql=[%s]",sql);
@@ -658,13 +676,13 @@ int save_to_db(notes_struct *note)
 	strlcat(sql,"INSERT INTO notes(Name, Title, Date, Category, Encrypt, timestamp) ",MAXLLEN);
 	strlcat(sql,"VALUES ('",MAXLLEN);
 	strlcat(sql,note->n_name,MAXLLEN);  strlcat(sql,"','",MAXLLEN);
-	strlcat(sql,note->n_title,MAXLLEN); strlcat(sql,"','",MAXLLEN);
+	strlcat(sql,sql_sanitize(note->n_title),MAXLLEN); strlcat(sql,"','",MAXLLEN);
 	strlcat(sql,note->n_date,MAXLLEN);  strlcat(sql,"','",MAXLLEN);
 	strlcat(sql,note->n_cat,MAXLLEN);   strlcat(sql,"',0",MAXLLEN);
 	sprintf(time_stamp,",%lld);",note->timestamp);
 	strlcat(sql,time_stamp,MAXLLEN);
 	strlcat(sql,"END TRANSACTION;",MAXLLEN);
-	MESG("save_to_db:2 [%s]",sql);
+	// MESG("save_to_db:2 [%s]",sql);
 	if (sql_exec(db,sql,0)){
 		msg_line(" Note saved to db!");
 		stat=true;
@@ -1117,7 +1135,7 @@ int show_sqlite_tables(char *fname)
     rc = sqlite3_exec(db, sql, callback_print, 0, &err_msg);
     
     if (rc != SQLITE_OK ) {
-        error_line("SQL error: %s", err_msg);
+        error_line("SQL error:[%s] %s",sql, err_msg);
         sqlite3_free(err_msg);
         notes_db_close(db);
         return false;
@@ -1146,7 +1164,7 @@ int init_notes_db(int n)
 	// MESG("init sql is [%s]",sql);
 	stat = sqlite3_exec(db, sql, 0,0, &err_msg);
 	if(stat != SQLITE_OK) {
-		error_line("sql error: %s",err_msg);
+		error_line("sql error:[%s] %s",sql,err_msg);
 		sqlite3_free(err_msg);
 		notes_db_close(db);
 		return false;
