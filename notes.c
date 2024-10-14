@@ -490,7 +490,7 @@ int query_rowid(sqlite3 *db,char *sql)
  int row_id=0;
 // MESG("query row_id: [%s]",sql);
 
- if(db==NULL) { MESG("db is NULL!!!!!");return 0;};
+ if(db==NULL) { msg_line("db is NULL!!!!!");return 0;};
  stat = sqlite3_prepare_v2(db, sql, -1, &res, 0);
  if(stat==SQLITE_OK) {
 	step = sqlite3_step(res);
@@ -507,7 +507,7 @@ int query_rowid(sqlite3 *db,char *sql)
 		return row_id;
 	};
  } else {
- 	MESG("query_rowid: error %d [%s]",stat,sql);
+ 	// MESG("query_rowid: error %d [%s]",stat,sql);
  	return error_line("query_rowid: %d %s",stat,sql);
  };
  return 0;	
@@ -539,7 +539,7 @@ long int query_int(sqlite3 *db,char *sql)
 		return ivalue;
 	};
  } else {
- 	MESG("query_int: error %d [%s]",stat,sql);
+ 	// MESG("query_int: error %d [%s]",stat,sql);
 	error_line("sql error:%d %s", stat,sql);
 	return 0;
  };
@@ -1759,11 +1759,12 @@ time_t get_note_timestamp(char *note_name)
 {
  char sql[MAXLLEN];
  sqlite3 *db;
+ long int tstamp=0;
  if((db=notes_db_open("get_note_timestamp"))==NULL) return 0;
 
- snprintf(sql,MAXLLEN,"SELECT rowid,timestamp from notes where Name = '%s';",note_name);
- long int tstamp = query_int(db,sql);
- // MESG("get_notes_timestamp:tstamp=%ld",tstamp);
+ if(snprintf(sql,MAXLLEN,"SELECT rowid,timestamp from notes where Name = '%s';",note_name)<MAXLLEN) {
+	tstamp = query_int(db,sql);
+ };
  notes_db_close(db);
 
  return tstamp;
