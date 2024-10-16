@@ -827,6 +827,7 @@ int text_mouse_function(int move)
 		// reset_region_textpoints();
 		set_mark(0);
 		change_window(wp);
+		set_mark(0);
 	};
 	/* We are in an editors window */
 	mouse_window_row = mousey - wp->gwp->t_ypos;

@@ -1295,12 +1295,12 @@ void main_loop()
  while(1) { /* main keyboard loop */
 	/* Fix up the screen    */
     update_screen(FALSE);
-	MESG_time("after update_screen");
+	// MESG_time("after update_screen");
 	/* get the next command from the keyboard */
 	app_error=0;
 
 	c = getcmd();
-	MESG_time_start("# main_loop go execute -------key %s",xe_key_name(c));
+	// MESG_time_start("# main_loop go execute -------key %s",xe_key_name(c));
 	/* execute the keyboard sequence */
 	main_execute(c);
  };
