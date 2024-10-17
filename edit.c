@@ -1189,6 +1189,7 @@ int setmark(int n)
  	} else {
 		tp_copy(cwp->w_smark,cwp->tp_current);
  		tp_copy(cwp->w_emark,cwp->tp_current);
+		cwp->hs[0].w_hselection=0;
  	};
  } else { // clear region selection and set region mode to normal
 			set_update(cwp,UPD_FULL);

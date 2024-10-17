@@ -405,6 +405,7 @@ int delete_window(int n)
 	set_current_window(w1,"delete_window");
 	free_window_data(to_delete);
 
+	setmark(0);
 	set_update(cwp,UPD_WINDOW|UPD_ALL);
 	update_status();
 	return(TRUE);
