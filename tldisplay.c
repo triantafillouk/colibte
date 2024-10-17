@@ -1291,7 +1291,7 @@ void main_loop()
  int c;
  init_message_loop(); 
  change_color_scheme(color_scheme_ind+1);
- MESG_time_start("main_loop:");
+ // MESG_time_start("main_loop:");
  while(1) { /* main keyboard loop */
 	/* Fix up the screen    */
     update_screen(FALSE);
@@ -1300,7 +1300,7 @@ void main_loop()
 	app_error=0;
 
 	c = getcmd();
-	// MESG_time_start("# main_loop go execute -------key %s",xe_key_name(c));
+	MESG_time_start("# main_loop go execute -------key %s",xe_key_name(c));
 	/* execute the keyboard sequence */
 	main_execute(c);
  };
@@ -1605,7 +1605,7 @@ void list_dir1(char *st)
 		strcpy(st,"");
 		list_dir1(st);
 	} else {
-		MESG("cannot change to dir [%s]",dirname);
+		msg_line("cannot change to dir [%s]",dirname);
 	};
  };
  list_off();

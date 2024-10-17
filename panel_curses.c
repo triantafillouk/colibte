@@ -405,7 +405,6 @@ int delete_window(int n)
 	set_current_window(w1,"delete_window");
 	free_window_data(to_delete);
 
-	setmark(0);
 	set_update(cwp,UPD_WINDOW|UPD_ALL);
 	update_status();
 	return(TRUE);
@@ -828,7 +827,6 @@ int text_mouse_function(int move)
 		// reset_region_textpoints();
 		set_mark(0);
 		change_window(wp);
-		set_mark(0);
 	};
 	/* We are in an editors window */
 	mouse_window_row = mousey - wp->gwp->t_ypos;
