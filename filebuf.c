@@ -260,8 +260,7 @@ int show_info(int n)
 #endif
 	SMESG("Current directory: %s",getcwd(s1,256));
 	SMESG("Start dir: %s",get_start_dir());
-	SMESG("Default codepage used : [%s]",codepage_str[default_lang]);
-	SMESG("Default local Codepage: [%s]",codepage_str[default_local_codepage]);
+	SMESG("Default codepage: [%s], local [%s]",codepage_str[default_lang],codepage_str[default_local_codepage]);
 	SMESG("--- File buffer information ---------------------------------");
 	SMESG("Buffer name     : [%s] index=%d",bp->b_fname,bp->b_index);
 	if(strlen(bp->b_dname)>0) {
@@ -294,9 +293,9 @@ int show_info(int n)
 	if(cbfp->b_flag & FSNLIST) 		strlcat(s,"Note list",width);
 // 	if(cbfp->b_flag & FSNCALIST) 	strlcat(s,"Calendar list view",width);
 	sm[i++]=strdup(s);sm[i]=0;
-#if	NUSE
-	if(cbfp->slow_display) { SMESG("buffer slow!");} else { SMESG("buffer fast display");};
-#endif
+	if(debug_flag()) {
+		if(cbfp->slow_display) { SMESG("buffer slow!");} else { SMESG("buffer fast display");};
+	};
 	if(debug_flag()) {
 		SMESG(" ptr1=%lld ptr2=%lld size=%lld file size=%lld,gap=%lld",bp->ptr1,bp->ptr2,bp->BufferSize,FSize(bp),bp->GapSize);
 	};
@@ -332,11 +331,17 @@ int show_info(int n)
 		}
 #endif
 	} else {
-		SMESG("Position info: line=%lld col=%lld offset=%lld char=[0x%lX]",getcline()+1,GetCol()+1,Offset(),utf_value());
-		SMESG(" row %d , %d, %lld",chardline(cwp)+1,getwline(),tp_line(cwp->tp_current)-tp_line(cwp->tp_hline));
-		SMESG("File type: [%s] (%d)",hts[b_typ].description,b_typ);
+		if(debug_flag()) {
+			SMESG("Position info: line=%lld col=%lld offset=%lld char=[0x%lX]",getcline()+1,GetCol()+1,Offset(),utf_value());
+			SMESG(" row %d , %d, %lld",chardline(cwp)+1,getwline(),tp_line(cwp->tp_current)-tp_line(cwp->tp_hline));
+		} else {
+			SMESG("Position info: line=%lld col=%lld offset=%lld char=[0x%lX] row %d",getcline()+1,GetCol()+1,Offset(),utf_value(),getwline());
+		};
+
+
+		SMESG("File type: [%s] (%d) highlight type [%s] syntaxh=%d slang=%d",hts[b_typ].description,b_typ,bp->hl->description,syntaxh,cwp->hs[0].w_slang);
 		if(bp->b_type & NOTE_TYPE) SMESG("Note type");
-		SMESG("Highlight type: [%s] syntaxh=%d slang=%d",bp->hl->description,syntaxh,cwp->hs[0].w_slang);
+		// SMESG("Highlight type: [%s] syntaxh=%d slang=%d",bp->hl->description,syntaxh,cwp->hs[0].w_slang);
 		if(debug_flag()) {
 //			SMESG("  b_type=%d",b_type);
 			SMESG("  hknown[%d] h=%X n=%d slang=%d first=%d o=%lld",0,cwp->hs[0].w_hquotem,cwp->hs[0].w_notes,cwp->hs[0].w_slang,cwp->hs[0].w_first,cwp->hs[0].known_offset);
@@ -344,9 +349,12 @@ int show_info(int n)
 			SMESG("  hknown[%d] h=%X n=%d slang=%d in_array=%d o=%lld",0,cwp->hs[0].w_hquotem,cwp->hs[0].w_notes,cwp->hs[0].w_slang,cwp->hs[0].w_in_array,cwp->hs[0].known_offset);
 			SMESG("  hknown[%d] h=%X n=%d slang=%d in_array=%d o=%lld",1,cwp->hs[1].w_hquotem,cwp->hs[0].w_notes,cwp->hs[1].w_slang,cwp->hs[1].w_in_array,cwp->hs[1].known_offset);
 		};
-		SMESG("Buffer size : %lld readed=%lld",bp->BufferSize-bp->GapSize,bp->bytes_read);
-		SMESG("Buffer lines: %lld",bp->lines);
-		SMESG("End of line: size=%d",bp->EolSize);
+		if(debug_flag()) {
+			SMESG("Buffer size : %lld readed=%lld lines %lld",bp->BufferSize-bp->GapSize,bp->bytes_read,bp->lines);
+			SMESG("End of line: size=%d",bp->EolSize);
+		} else {
+			SMESG("Buffer size:%lld, lines:%lld, Eol size:%d",bp->BufferSize-bp->GapSize,bp->lines,bp->EolSize);
+		};
 	};
 	SMESG("Document codepage: %s (%d)",codepage_str[bp->b_lang],bp->b_lang);
 	SMESG("Current window: %2d H=%d W=%d lcol=%lld",cwp->id,cwp->w_ntrows,cwp->w_ntcols,cwp->w_lcol);
@@ -439,6 +447,7 @@ int FUtfCharLen(FILEBUF *fp,offs o)
  int clen=1;
 	clen_error=0;
 	fp->utf_accent=0;
+	
 	if(FEolAt(fp,o)) return fp->EolSize;
 
 	if(fp->view_mode & VMHEX) return 1;
@@ -520,10 +529,11 @@ int DiffColumns(FILEBUF *fp, offs start_col,offs col_offs,char *from)
 {
  int col = 0;
  offs o=start_col;
+ if(col_offs>FSize(fp)) col_offs=FSize(fp);
  // if((start_col % 4)!=0) MESG("DiffColumns[%s] %ld %d ERROR!!!!",from,start_col,start_col%4);
  if(fp->b_lang==0 && !utf8_error()){
 //  MESG("diffcol: from %ld to %ld",o,col_offs);
-  while (o < col_offs && !FEofAt(fp,o)) {
+  while (o < col_offs ) {
 	o = check_next_char(fp,o,&col);
 	if(clen_error) {
 		set_utf8_error(1);
@@ -533,7 +543,7 @@ int DiffColumns(FILEBUF *fp, offs start_col,offs col_offs,char *from)
 	};
   };
  } else {
-  while (o < col_offs && !FEofAt(fp,o)) {
+  while (o < col_offs) {
 	int c;
 	c=FCharAt(fp,o);
 	if (c == CHR_TAB) {
@@ -547,6 +557,47 @@ int DiffColumns(FILEBUF *fp, offs start_col,offs col_offs,char *from)
  return(col);
 }
 
+#if	1
+int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
+{
+ int col = 0;
+ offs o=*dbo;
+ if(col_offs>FSize(fp)) col_offs=FSize(fp);
+ if(fp->b_lang==0 && !utf8_error()){
+//  MESG("diffcol: from %ld to %ld",o,col_offs);
+  while (o < col_offs) {
+	int c;
+	utfchar uc;
+	o = FUtfCharAt(fp,o,&uc);
+ 	c=uc.uval[0];
+	if (c == CHR_TAB) {
+		col=next_tab(col);
+	} else {
+		col += get_utf_length(&uc);
+		if(clen_error) {
+			set_utf8_error(1);
+			c=DiffColumn(fp,dbo,col_offs,"inside");
+			set_utf8_error(0);
+			return c;
+		};
+	};
+  };
+ } else {
+  while (o < col_offs) {
+	int c;
+	c=FCharAt(fp,o);
+	if (c == CHR_TAB) {
+		col=next_tab(col);
+	} else {
+		col ++;
+	};
+	o++;
+  }
+ };
+ *dbo=o;
+ return(col);
+}
+#else
 int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
 {
  int col = 0;
@@ -578,221 +629,12 @@ int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
  *dbo=o;
  return(col);
 }
+#endif
 
 #if	0
-void FindLineCol(TextPoint *tp)
-{
- FILEBUF *fp=tp->fp;
-
-  if(tp->offset<1)
-   {
-      tp->col=tp->line=tp->offset=0;
-      tp->flags = FULLDEFINED;
-      return;
-   }
-   if(!(tp->flags & LINECOLUNDEFINED))  {	/* already defined!  */
-		ERROR("findlinecol: already defined!");	/* to be removed !!!!  */
-		return;
-	};
-	if(fp->view_mode & VMHEX) {
-		tp->line = tp->offset / HEX_LINE_LEN;
-		tp->col = tp->offset % HEX_LINE_LEN;
-		tp->flags = FULLDEFINED;
-		return;
-	};
-
-	TextPoint   *found=NULL;
-	TextPoint	*scan;
-	offs	 dist=INT_MAX;
-	offs	 new_dist=INT_MAX-1;
-	// MESG("FindLineCol: [%s] o=%ld",tp_name[tp->tp_type],tp->offset);
-	for(scan=fp->tp_last; scan; scan=scan->t_next) {
-		if(scan==tp) continue;
-		// MESG("flc: check [%s] o=%ld",tp_name[scan->tp_type],scan->offset);
-		if(!(scan->flags)) 
-		{
-			new_dist=llabs(tp->offset-scan->offset);
-	 		if(new_dist <= dist && scan->offset<tp->offset)
-	 		// if(new_dist < dist )
-			{
-	    		dist=new_dist;
-	    		if(dist==0) {
-				   tp->col=scan->col;
-				   tp->line=scan->line;
-				   tp->flags = FULLDEFINED;
-				   return;				
-				};
-				// MESG("	findlinecol:[%s] based on [%s] o=%lld col=%lld line=%lld dist=%d",tp_name[tp->tp_type],tp_name[scan->tp_type],tp->offset,tp->col,tp->line,dist);
-	    		found=scan;
-	 		}
-      	}
-	}
-
-   offs  o;
-   num   l,c;
-
-   if(found) {
-     o=found->offset;
-     c=found->col;
-     l=found->line;
-	 MESG("findlinecol: o=%ld found o=%ld c=%ld l=%ld",tp->offset,o,c,l);
-   } else {
-      o=c=l=0;
-   };
-
-	// MESG_time(";flc:[%s] o=%lld from [%s] o=%lld col=%lld line=%lld ",tp_name[tp->tp_type],tp->offset,tp_name[found->tp_type],o,c,l);
-   if(o>tp->offset)  {	/* go back lines  */
-      o=FLineBegin(fp,o);
-      c=0;
-      while(o>tp->offset) {
-         o=FPrevLine(fp,o);
-         l--;
-      }
-	  MESG("	go back and start from o=%ld l=%ld c=0",o,l);
-   };
-
-
-   while(o<tp->offset) {	/* go forward lines  */
-      offs next_line=FNextLine(fp,o);
-
-      if(next_line>tp->offset) break;
-
-	  if( !FBolAt(fp,next_line)) { 
-		if(next_line==FSize(fp)) {
-			o=FLineBegin(fp,next_line);
-			c=0;break;
-		} else {
-			msg_log(1,"FindLineCol:3 !fbol o=%lld",next_line);	/* should never pass from here!!  */
-	  		o=next_line; continue;
-		}
-	  };
-
-      o=next_line;
-      l++;
-      c=0;
-   };
-
-   c += DiffColumn(fp,&o,tp->offset,"FindLineCol:OK");
-	MESG("	we are on the same line %ld, find col = %ld",l,c);
-   tp->col=c;
-   tp->line=l;
-   tp->offset=o;
-   tp->flags = FULLDEFINED;
-	// MESG_time(";flc:[%s] -> o=%lld col=%lld line=%lld ",tp_name[tp->tp_type],o,c,l);
-}
+#include "findlinecol0.c"
 #else
-// find line,column at specific offset
-void FindLineCol(TextPoint *tp)
-{
- FILEBUF *fp=tp->fp;
-
-  if(tp->offset<1)
-   {
-      tp->col=tp->line=tp->offset=0;
-      tp->flags = FULLDEFINED;
-      return;
-   }
-   if(!(tp->flags & LINECOLUNDEFINED))  {	/* already defined!  */
-		ERROR("findlinecol: already defined!");	/* to be removed !!!!  */
-		return;
-	};
-	if(fp->view_mode & VMHEX) {
-		tp->line = tp->offset / HEX_LINE_LEN;
-		tp->col = tp->offset % HEX_LINE_LEN;
-		tp->flags = FULLDEFINED;
-		return;
-	};
-
-	TextPoint   *found=NULL;
-	TextPoint	*scan;
-	offs	 dist=INT_MAX;
-	offs	 new_dist=INT_MAX-1;
-	// MESG("FindLineCol: [%s] o=%ld",tp_name[tp->tp_type],tp->offset);
-	for(scan=fp->tp_last; scan; scan=scan->t_next) {
-		if(scan==tp) continue;
-		// MESG("flc: check [%s] o=%ld",tp_name[scan->tp_type],scan->offset);
-		if(!(scan->flags)) 
-		{
-			new_dist=llabs(tp->offset-scan->offset);
-	 		// if(new_dist <= dist )
-	 		if(new_dist < dist )
-			// if(scan->offset<=tp->offset)
-			{
-	    		dist=new_dist;
-	    		if(dist==0) {
-				   tp->col=scan->col;
-				   tp->line=scan->line;
-				   tp->flags = FULLDEFINED;
-				   return;				
-				};
-				// MESG("	findlinecol:[%s] based on [%s] o=%lld col=%lld line=%lld dist=%d",tp_name[tp->tp_type],tp_name[scan->tp_type],tp->offset,tp->col,tp->line,dist);
-	    		found=scan;
-	 		}
-      	}
-	}
-
-   offs  o;
-   num   l,c;
-
-   if(found) {
-     o=found->offset;
-     c=found->col;
-     l=found->line;
-#if	WRAPD
-	 // MESG("findlinecol: o=%ld found o=%ld c=%ld l=%ld",tp->offset,o,c,l);
-#endif
-   } else {
-      o=c=l=0;
-   };
-
-	// MESG_time(";flc:[%s] o=%lld from [%s] o=%lld col=%lld line=%lld ",tp_name[tp->tp_type],tp->offset,tp_name[found->tp_type],o,c,l);
-   if(o>tp->offset)  {	/* go back lines  */
-      o=FLineBegin(fp,o);
-      c=0;
-      while(o>tp->offset) {
-         o=FPrevLine(fp,o);
-         l--;
-      };
-#if	WRAPD
-	  MESG("	go back and start from o=%ld l=%ld c=0",o,l);
-#endif
-   };
-
-
-   while(o<tp->offset) {	/* go forward lines  */
-      offs next_line=FNextLine(fp,o);
-
-      if(next_line>tp->offset) break;
-
-	  if( !FBolAt(fp,next_line)) { 
-		if(next_line==FSize(fp)) {
-			o=FLineBegin(fp,next_line);
-			c=0;break;
-		} else {
-			msg_log(1,"FindLineCol:3 !fbol o=%lld",next_line);	/* should never pass from here!!  */
-	  		o=next_line; continue;
-		}
-	  };
-
-      o=next_line;
-      l++;
-      c=0;
-   };
-	c += DiffColumn(fp,&o,tp->offset,"FindLineCol:OK");
-#if	WRAPD
-	// MESG("	we are on the same line %ld, find col = %ld",l,c);
-#endif
-   tp->col=c;
-   tp->line=l;
-   if(o!=tp->offset) {
-#if	WRAPD
-	   MESG("FindLineCol: offset modified!, o=%ld != tp->offset=%ld l=%ld c=%ld",o,tp->offset,l,c);
-#endif
-	   tp->offset=o;
-   };
-   tp->flags = FULLDEFINED;
-	// MESG_time(";flc:[%s] -> o=%lld col=%lld line=%lld ",tp_name[tp->tp_type],o,c,l);
-}
+#include "findlinecol1.c"
 #endif
 
 void textpoint_move(TextPoint *tp,offs shift)
@@ -1379,18 +1221,18 @@ void check_line_mode(FILEBUF *bf)
 		bf->EolSize=2;
 		strlcpy(bf->EolStr,"\r\n",3);
 		bf->b_mode |= EMDOS;
-//		MESG("	dos mode");
+		// MESG("	dos mode");
 		textpoint_OrFlags(bf,COLUNDEFINED|LINEUNDEFINED);
       } else  
 	  if(MacLastLine>0){
 		bf->EolSize=1;
 		strlcpy(bf->EolStr,"\r",3);
 		bf->b_mode |= EMMAC;
-//		MESG("	mac mode");
+		// MESG("	mac mode");
 		textpoint_OrFlags(bf,COLUNDEFINED|LINEUNDEFINED);
 	  } else
 	  {
-//		MESG("	unix mode");
+		// MESG("	unix mode");
 		bf->b_mode |= EMUNIX;
       };
 }
@@ -1677,9 +1519,13 @@ num WGetCol()
 // num col1;
  num col2;
 //	col1 = tp_col(cwp->tp_current) - cwp->w_lcol;
+#if	0
+ col2=tp_col(cwp->tp_current);
+#else
  if(cwp->w_fp->b_flag & FSNOTESN) col2=NOTES_COLUMN+2;
 	else col2 = physical_column(FColumn(cbfp,cwp->tp_current->offset));
  // MESG("wg: (%ld - %d+%d) col2=%ld",tp_col(cwp->tp_current),cwp->w_lcol,cwp->w_infocol,col2);
+#endif
  return col2;
 }
 
@@ -1724,9 +1570,15 @@ num FColumn(FILEBUF *fp,offs o)
 {
  int    col;
  offs	dbo;
+ // MESG("FColumn: o=%ld",o);
  dbo=FLineBegin(fp,o);
  if(fp->view_mode & VMHEX) col = (o-dbo)%0x10;
- else col=DiffColumns(fp,dbo,o,"FColumn:OK:BEG!");
+ else 
+#if	0
+ 	col=DiffColumns(fp,dbo,o,"FColumn:OK:BEG!");
+#else
+	col=DiffColumn(fp,&dbo,o,"FColumn");
+#endif
 // MESG("FColumn:%d %ld",col,tp_col(cwp->tp_current));
  return (col);
 }
@@ -2037,7 +1889,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
    };
 
   if(!ir_flag) {
-  	status=init_ftype(bf,name,&temp_used); // if not insert then get file type
+  	status=init_ftype(bf,name,&temp_used,0); // if not insert then get file type
 	if(status!=TRUE) return FALSE;
   };
    errno=0;
@@ -2206,6 +2058,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 		bf->b_state |= FS_VIEW;
 	};
 	bf->line_to = tp_line(bf->tp_text_end);
+
 //	MESG("ifile0:end b_type=%d",bf->b_type);
    	return(true);
 }
@@ -2216,6 +2069,8 @@ int ifile(FILEBUF *bf,char *name,int ir_flag)
  int stat;
  // MESG("ifile: [%s] ir_flag=%d view_mode=%d",name,ir_flag,bf->view_mode);
  stat=ifile0(bf,name,ir_flag);
+
+
  return(stat);
 }
 
@@ -2774,6 +2629,7 @@ offs   LineBegin(offs ptr)
 
 offs   FLineBegin(FILEBUF *fp,offs ptr)
 {
+	// MESG("FLineBegin: ptr=%ld",ptr);
    if(fp->view_mode & VMHEX) {
    	offs o;
 	o = (ptr) % HEX_LINE_LEN;
@@ -3002,8 +2858,37 @@ void   MoveRightChar(FILEBUF *fp)
     return;
    };
 	clen=FUtfCharLen(fp,FOffset(fp));
+	// MESG("MoveRightChar:1 clen=%d o=%ld col=%ld",clen,fp->tp_current->offset,fp->tp_current->col);
 	textpoint_move(fp->tp_current,clen);
+	// MESG("MoveRightChar:2 clen=%d o=%ld col=%ld",clen,fp->tp_current->offset,fp->tp_current->col);
 	tp_copy(fp->save_current,fp->tp_current);
+}
+
+int next_utf8_error(int n)
+{
+ int clen=0;
+ FILEBUF *fp=cbfp;
+ if(fp->b_lang!=0) {
+	msg_line("this is not a utf8 file!");
+	return(0);
+ };
+ offs o=tp_offset(fp->tp_current);
+ clen_error=0;
+ while(!FEofAt(fp,o)) {
+ 	clen=FUtfCharLen(fp,o);
+	if(clen_error) break;
+	o+=clen;
+ };
+ if(!FEofAt(fp,o)) {
+ 	textpoint_set(fp->tp_current,o);
+	set_update(cwp,UPD_WINDOW);
+	msg_line("Found utf8 error!");
+	return 1;
+ } else {
+ 	msg_line("No utf8 error!");
+	return 0;
+ }
+
 }
 
 #define	MemStep	(0x2000)
@@ -3057,7 +2942,7 @@ if(fp->BufferSize < fp->ptr2) {
 void  CalculateLineCol(FILEBUF *fp,num *line,num *col,offs source,offs target)
 {
    offs	 bol_point;
-	
+	// MESG("CalculateLineCol:");	
    if(source>target) {
       for( ; source>target; source--)  {
 	 	if(FBolAt(fp,source)) {
@@ -3823,6 +3708,7 @@ offs   FNextLine(FILEBUF *fp,offs ptr)
 
 offs   FPrevLine(FILEBUF *fp,offs ptr)
 {
+   // MESG("FPrevLine:");
    ptr=FLineBegin(fp,ptr);
    while(ptr>0 && !FBolAt(fp,--ptr));
    return(ptr);
@@ -3919,6 +3805,7 @@ char *get_line_at(FILEBUF *fb,offs offset)
 	offs bol;
 	offs eol;
 	int ind=0;
+	// MESG("get_line_at:");
 	bol=FLineBegin(fb,offset);
 	eol=FLineEnd(fb,offset);
 	
@@ -3926,6 +3813,7 @@ char *get_line_at(FILEBUF *fb,offs offset)
 		line[ind]=FCharAt(fb,bol+ind);
 	};
 	line[ind]=0;
+	// MESG("get_line_at:[%s]",line);
 	return(line);
 }
 

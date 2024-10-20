@@ -1268,6 +1268,7 @@ double factor_option()
  BTNODE *bte; 
 /* variable's name in tok0->tname */
 	bte=tok->tok_node;
+	// MESG("factor_option: set var_node [%s]",tok_info(tok));
 	var_node=bte;
 	NTOKEN2;
 
@@ -1561,6 +1562,7 @@ double factor_env()
 	double value=0;
 	bte=tok->tok_node;
 	var_node=bte;
+	// MESG("factor_env: set var_node [%s]",tok_info(tok));
 	value = get_env(bte->node_index);
 	NTOKEN2;
 	RTRN(value);
@@ -1958,7 +1960,7 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_TERM	,	// term operators (+,-)
 	factor_none,	// TOK_TERM1	,	// term1 operators (%,^)
 	factor_none,	// TOK_TERM2	,	// term2 operators (*,/)
-	factor_none,	// TOK_ASSIGN	,	// assignment
+	factor_none,		// TOK_ASSIGN	,	// assignment
 	factor_eof,		// TOK_EOF		,	// end of file token
 	factor_num,		// TOK_NUM, numeric value
 
@@ -2073,6 +2075,7 @@ static double inline dir_lcurl()
 static double inline dir_lcurl_break()
 {
 	NTOKEN2;
+	// MESG("dir_lcurl_break:");
 	return exec_block1_break(exe_buffer);
 }
 
@@ -2443,8 +2446,9 @@ double assign_env(double none)
 {
 	double v1;
 	int left_index;
-	TDS("assign_env");
+	// MESG("assign_env:");
 	left_index=var_node->node_index;
+	// MESG("assign_env: left_index=%d",left_index);
 	v1=lexpression();
 	set_env(left_index,get_sval(),v1);
 	var_node=NULL;
@@ -2963,10 +2967,10 @@ double exec_block1(FILEBUF *fp)
  // MESG("exec_block1: starting at tok %d type=%d err=%d",tok->tnum,tok->ttype,err_num);
 	exe_buffer=fp;
 	// MESG("exec_block1:[%s] size of tok_struct is %d",fp->b_fname,sizeof(tok_struct));
-   while(tok->ttype!=TOK_EOF && current_active_flag) 
+   if(!current_active_flag) return(val);
+   while(tok->ttype!=TOK_EOF) 
    {
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
-	// if(tok->ttype==TOK_RPAR) { exit(1);};
 	if(tok->ttype==TOK_SEP){ NTOKEN2;
 		// MESG("factor_sep: [%s %d]",tok->tname,tok->ttype);
 		if(tok->ttype==TOK_VAR) lstoken=tok;
@@ -2979,6 +2983,7 @@ double exec_block1(FILEBUF *fp)
 		refresh_ddot_1(val);NTOKEN2;continue;
 	};
  	val=tok->directive();
+	if(!current_active_flag) break;
    };
    // MESG("exec_block1: end!");
 	return(val);
@@ -2988,24 +2993,26 @@ double exec_block1_break(FILEBUF *fp)
 {
  double val=0;
  INIT_STAGE;
- TDS("exec_block1");
- // MESG("exec_block1_break:");
  exe_buffer=fp;
+	// MESG("#exec_block:%d ttype=%d [%s]",tok->tnum,tok->ttype,tok_info(tok));
    while(tok->ttype!=TOK_EOF && current_active_flag) 
    {
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
-	// if(tok->ttype==TOK_RPAR) { exit(1);};
 	if(tok->ttype==TOK_SEP){ NTOKEN2;continue;	};
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;return(val);};
 	if(tok->ttype==TOK_COMMA) { NTOKEN2;};
 	if(tok->ttype==TOK_SHOW) {
+		// MESG("	tok_show:");
 		refresh_ddot_1(val);NTOKEN2;continue;
 	};
 	if(drv_check_break_key()){
 		syntax_error("user interruption",100);
 		if(is_break1) return 0;
 	};
+	// MESG("	before directive!");
  	val=tok->directive();
+	// MESG("	after!");
+	// MESG(" [%s]",tok_info(tok));
    };
    // MESG("exec_block1: end!");
 	return(val);
@@ -3234,6 +3241,7 @@ int parse_buffer_show_tokens(int n)
 	return(0);
  };
  out_print("|-------- Token list -----------------------------------",1);
+ // if(tok_ind==NULL) return 0;
  while(1)
  {
 	if((ind%25)==0)  out_print("Num Line Ind Type               Val        Group",1);
@@ -3454,6 +3462,7 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 	/* if we are interactive, go get it! */
 	// MESG("nextarg:");
 	if (macro_exec == FALSE) {
+		// MESG("getstring: %s",prompt);
 		if(getstring(prompt, buffer, size,show)!=FALSE) {
 			// MESG("nextarg: buffer=[%s]",buffer);
 			set_dval(atof(buffer));

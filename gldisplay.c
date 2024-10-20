@@ -19,6 +19,7 @@ extern FILEBUF *cbfp;
 
 void free_virtual_window(WINDP *wp);
 char *time2a();
+int listdir(int dtype);
 
 //int newxy(WINDP *wp);
 WINDP * make_split(WINDP *oldwindow);
@@ -56,10 +57,14 @@ int split_window(int n)
  if(wpnew==NULL) return(FALSE);
  gwnew = ge_cedit_new((GtkWidget *)cwp->gwp->bte->pbox,wpnew,1); // vpan
  if(gwnew==NULL) return(FALSE);
+ if((wpnew->w_fp->dir_num == 1) && (cbfp->b_flag & FSNLIST)) {
+	listdir(wpnew->w_fp->dir_num + 1);
+ };
  events_flush();
  set_cursor(0,"split_window");
  return(TRUE);
 }
+
 
 /*
  * Split the current window vertically
@@ -79,6 +84,10 @@ if(!drv_initialized) return 0;
  if(wpnew==NULL) return(FALSE);
  gwnew = ge_cedit_new((GtkWidget *)cwp->gwp->bte->pbox,wpnew,2);
  if(gwnew==NULL) return(FALSE);
+ if((wpnew->w_fp->dir_num == 1) && (cbfp->b_flag & FSNLIST)) {
+	listdir(wpnew->w_fp->dir_num + 1);
+ };
+
  events_flush();
  return(TRUE);
 }

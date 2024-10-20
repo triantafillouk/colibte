@@ -429,8 +429,8 @@ double uf_seed()
 
 double uf_abs()
 {
-	get_function_args(1);
-	double value= fabs(va[0].dval);
+	double value=get_numeric_arg();
+	value= fabs(value);
 	return value;
 }
 
@@ -563,8 +563,28 @@ double uf_val()
 double uf_sqrt()
 {
 	double value=get_numeric_arg();
-	if(vtype_is(VTYPE_NUM)) value=sqrt(va[0].dval);
-	else syntax_error("aqrt: wrong argument",305);
+	// MESG("sqrt(%f)",value);
+	if(vtype_is(VTYPE_NUM)) {
+		value=sqrt(value);
+	} else {
+		// MESG("error! vtype=%X",get_vtype());
+		syntax_error("sqrt: wrong argument",305);
+	};
+	// MESG("	is %f",value);
+	return value;
+}
+
+double uf_cbrt()
+{
+	double value=get_numeric_arg();
+	// MESG("cbrt(%f)",value);
+	if(vtype_is(VTYPE_NUM)) {
+		value=cbrt(value);
+	} else {
+		// MESG("error! vtype=%X",get_vtype());
+		syntax_error("cbrt: wrong argument",305);
+	};
+	// MESG("	is %f",value);
 
 	return value;
 }
@@ -591,7 +611,7 @@ double uf_sin()
 double uf_cos()
 {
 	double value=get_numeric_arg();
-	if(vtype_is(VTYPE_NUM))	value=cos(va[0].dval);
+	if(vtype_is(VTYPE_NUM))	value=cos(value);
 	else syntax_error("cos: wrong argument",305);
 	return value;
 }
@@ -607,7 +627,7 @@ double uf_tan()
 double uf_log10()
 {
 	double value=get_numeric_arg();
-	if(vtype_is(VTYPE_NUM))	value=log10(va[0].dval);
+	if(vtype_is(VTYPE_NUM))	value=log10(value);
 	else syntax_error("log10: wrong argument",305);
 	return value;
 }
@@ -615,7 +635,7 @@ double uf_log10()
 double uf_atan()
 {
 	double value=get_numeric_arg();
-	if(vtype_is(VTYPE_NUM))	value=atan(va[0].dval);
+	if(vtype_is(VTYPE_NUM))	value=atan(value);
 	else syntax_error("atan: wrong argument",305);
 	return value;
 }
@@ -623,7 +643,7 @@ double uf_atan()
 double uf_log()
 {
 	double value=get_numeric_arg();
-	if(vtype_is(VTYPE_NUM))	value=log(va[0].dval);
+	if(vtype_is(VTYPE_NUM))	value=log(value);
 	else syntax_error("log: wrong argument",305);
 	return value;
 }
@@ -631,7 +651,7 @@ double uf_log()
 double uf_trunc()
 {
 	double value=get_numeric_arg();
-	if(vtype_is(VTYPE_NUM))	value=trunc(va[0].dval);
+	if(vtype_is(VTYPE_NUM))	value=trunc(value);
 	else syntax_error("trunc: wrong argument",305);
 	return value;
 }
@@ -639,7 +659,7 @@ double uf_trunc()
 double uf_round()
 {
 	double value=get_numeric_arg();
-	if(vtype_is(VTYPE_NUM))	value=round(va[0].dval);
+	if(vtype_is(VTYPE_NUM))	value=round(value);
 	else syntax_error("round: wrong argument",305);
 	return value;
 }

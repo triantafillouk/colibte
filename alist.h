@@ -3,10 +3,7 @@
 	Copyright K.Triantafillou
 	GPL2 lib license
 */
-#if	0
- ;aslkd ;alskd;alsk d;laskd;laskd;lask ;lsakd ;alskd ;aslkd askld'asadsadad'
- if int else struct
-#endif
+
 /* version  10/8/2022 */
 
 #ifndef __ALIST_KT__
@@ -97,7 +94,9 @@ void *lget_num(alist *pl,int n); // get the n-th element
 int  remove_from_list(void *p, alist *pl); // find and remove
 int remove_current_from_list(alist *pl);
 _el *find_el(void *p, alist *pl); // find an element that matches data
+#if	NUSE
 _el * insert_beetween(alist *l,void *d,void *d1,void *d2); // find and insert beetween 2 others
+#endif
 _el * linsert_after(alist *l,void *d);// insert after current element
 _el * linsert(alist *list,void *d);// insert
 _el *get_current(alist *l); /* get current element */

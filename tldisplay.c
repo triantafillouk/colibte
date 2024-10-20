@@ -118,7 +118,6 @@ void vtinit(int argc, char **argp)
 	drv_post_init();
 	resize_screen(2);
 	cwp = dublicate_window(0);	/* creates first window  */
-	// MESG("vtinit:end");
 	set_1window();
 }
 
@@ -135,7 +134,7 @@ void movecursor(int row, int col)
 		else if(cwp->w_ntcols>25) show_position_info(1);
 		else show_position_info(-1);
 	} else {
-		msg_line("cursor out of bound %d!",t++);
+		msg_line("cursor out of bound %d! row=%d num_rows=%d",t++,row,drv_numrow);
 		row=drv_numrow-3;
 	};
 #if	WRAPD
@@ -167,7 +166,8 @@ int window_row_resize(int n)
 	slines[0]=0;
 	if(nextarg("Resize window by # lines: ", slines, 80,true)!=TRUE) return(FALSE);
 	if(!macro_exec) n = get_val();
-	return(hresize_wind(n));
+	if(slines[0]=='-'||slines[0]=='+') return(hresize_wind(n));
+	return(hresize_wind(n-cwp->w_ntrows));
 }
 
 int window_row_increase(int n)
@@ -198,13 +198,14 @@ int window_column_resize(int n)
 {
 	if(!drv_initialized) return 0;
 	char slines[80];
-
+	int new_size=0;
 	/* must have a non-default argument, else ignore call */
 	slines[0]=0;
+	
 	if(nextarg("Resize window by # columns: ", slines, 80,true)!=TRUE) return(FALSE);
-	if(!macro_exec) n = get_val();
-
-	return(vresize_wind(n));
+	if(!macro_exec) new_size = get_val();
+	if(slines[0]=='-'||slines[0]=='+') return(vresize_wind(new_size));
+	return(vresize_wind(new_size-cwp->w_ntcols));
 }
 
 int describe_key(int n)	/* describe the command for a certain key */
@@ -949,8 +950,12 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
  char st[MAXLLEN];	// this is the string to display (asterix for encrypted)
  char st2[MAXLLEN];	// this is the real string
  int saved_kbdmode=kbdmode;
+ 
+ // MESG("win_getstring:");
+ // MESG("win_getstring: prompt %s maxlen=%d execmd=%d",prompt,maxlen,execmd);
  if(maxlen>MAXLLEN-1) maxlen=MAXLLEN-1;
  if(execmd) {
+	// MESG("	print the prompt!");
 	printf("%s",prompt);
 	if(fgets(st1,maxlen,stdin)==NULL) return false;
 	return(true);
@@ -1286,11 +1291,11 @@ void main_loop()
  int c;
  init_message_loop(); 
  change_color_scheme(color_scheme_ind+1);
- MESG_time_start("main_loop:");
+ // MESG_time_start("main_loop:");
  while(1) { /* main keyboard loop */
 	/* Fix up the screen    */
     update_screen(FALSE);
-	MESG_time("after update_screen");
+	// MESG_time("after update_screen");
 	/* get the next command from the keyboard */
 	app_error=0;
 
@@ -1600,7 +1605,7 @@ void list_dir1(char *st)
 		strcpy(st,"");
 		list_dir1(st);
 	} else {
-		MESG("cannot change to dir [%s]",dirname);
+		msg_line("cannot change to dir [%s]",dirname);
 	};
  };
  list_off();
@@ -1625,6 +1630,11 @@ int get_utf_length(utfchar *utf_char_str)
  // accents do take space in WSL exept when converted to composed.
  if((b0==0xCC || b0==0xCD) && utf_char_str->uval[1]< 0xB0) return 1;
 #endif
+ if(b0==0xE0) {
+	int b1=utf_char_str->uval[1];
+	if(b1==0xA5) return 0;
+	return 1; 
+ };
  if(b0<0xE1) return 1;
  if(b0==0xE2) {
 	int b1=utf_char_str->uval[1];

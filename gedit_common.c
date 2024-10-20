@@ -17,6 +17,8 @@ int get_current_line();
 int change_sort_mode(int mouse_col);
 offs FNext_wrap_line(WINDP *wp,offs start,int num_lines,int top);
 
+void update_full(int f);
+
 // This is used in scrolling!
 void move_window_lines(WINDP *wp,int lines)
 {
@@ -272,14 +274,15 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
  int i,mouse_row,mouse_col;
  static int update_ok=0;
  static int count=0;
- int update_full=0;
+ static int prev_button=0;
+ int update_all=0;
 
  count ++;
  num new_line;
  offs new_offset;
  // MESG("update_from_mouse: x=%d y=%d button=%d reset=%d",x,y,button,reset);
  if(reset) { prow=-1;pcol=-1; 
-// 	MESG("update_from_mouse: reset");
+	// MESG("update_from_mouse: reset");
 	hide_cursor("update_from_mouse"); 
 	if(cwp !=wp /* && selection_on==0 */) { // we must change current window
 //		MESG("update_from_mouse: change_window");
@@ -300,7 +303,7 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 	return;
  };
  // MESG("update_from_mouse: prow=%d col=%d row=%d",prow,mouse_col,mouse_row);
- if(prow<0) update_full=1;
+ if(prow<0) update_all=1;
  if(mouse_row==prow && mouse_col==pcol) { 
 	update_ok=false;
  } else {
@@ -315,7 +318,7 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 	/* We are always in an editors window */
 	if(cbfp->b_flag & FSNLIST) {
 		new_line = wp->top_note_line+mouse_row;
-		MESG("mouse at new_line=%d",new_line);
+		// MESG("mouse at new_line=%d",new_line);
 		if(new_line==wp->current_note_line) {
 			// MESG("dir: in same line=%d",new_line);
 			if(button==1) {
@@ -356,6 +359,9 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 	};
 	// MESG("button=%d",button);
 		if(button==1) {	/* move to position */
+			// MESG("mouse button 1 prev=%d",prev_button);
+			if(prev_button==3) { prev_button=1;set_mark(0);set_update(cwp,UPD_EDIT);update_screen(1);update_full(1);return ;};
+			prev_button=1;
 			set_update(cwp,UPD_MOVE);
 			{
 				if(update_ok) {
@@ -375,7 +381,7 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 						move_to_new_position(wp,new_offset,line, col0+mouse_col);
 					} else
 					move_to_new_position(wp,new_offset,new_line, mouse_col);
-					if(update_full) update_screen(TRUE);
+					if(update_all) update_screen(TRUE);
 					else update_screen(FALSE);
 					};
 				};
@@ -385,9 +391,11 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 			if(update_ok) {
 				update_screen(FALSE);
 			};
+			prev_button=2;
 		};
 		if(button==3) {
 			// MESG("button:3");
+			prev_button=3;
 			if(cbfp->b_flag & FSNOTES) {
 				drv_show_menu_popup(popup_tag_menu);
 				update_screen(TRUE);
@@ -416,6 +424,7 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 					} else {
 						drv_show_menu_popup(popup_select_on);
 					};
+					// MESG("show selection popup menu!");
 				};
 				if(cbfp->b_flag & FSNLIST) {
 					// MESG("FSNLIST!");

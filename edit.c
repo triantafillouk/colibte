@@ -567,6 +567,7 @@ int next_line(int n)
 	int b_flag = cbfp->b_flag;
 	int headline=(cbfp->b_header!=NULL);
 
+	MESG("next_line: ------------- n=%d lock=%d",n,lock_move);
     if (n < 0)  return (prev_line(-n));
 	if(n==0) return(FALSE);
 
@@ -671,6 +672,11 @@ int prev_wrap_line(int n)
 			lock_move=1;
 			if(status==FALSE) return status;
 			// return TRUE;
+		} else {
+			lock_move=0;
+			int status=prev_wrap_line(n-1);
+			lock_move=1;
+			if(status==FALSE) return status;
 		};
 		move_window(n);
         return(n);
@@ -694,7 +700,7 @@ int prev_wrap_line(int n)
 int prev_line(int n)
 {
  num current_line;
- 
+ MESG("prev_line: ------------- n=%d lock=%d",n,lock_move);
  int status=0;
 	if (n==0) return FALSE;
    	if (n < 0) return (next_line(-n));
@@ -726,6 +732,8 @@ int prev_line(int n)
 
 
     if(lock_move) {
+		MESG("lock_move:");
+#if	0
         // If at the last line of the window
 		if( current_line - tp_line(cwp->tp_hline) == cwp->w_ntrows-2-half_last_line
 		 || tp_line(cwp->tp_current)>0
@@ -736,6 +744,29 @@ int prev_line(int n)
             lock_move=1;
 			if(status==FALSE) return status;
         };
+#else
+		if( current_line - tp_line(cwp->tp_hline) == cwp->w_ntrows-2-half_last_line
+		 // || tp_line(cwp->tp_current)>0
+		)
+		{
+            lock_move=0;
+			MESG("prev_line lock end 1");
+            status=prev_line(n);
+            lock_move=1;
+			if(status==FALSE) return status;
+        } else if(tp_line(cwp->tp_current)>0 && tp_line(cwp->tp_hline)==0) {
+            lock_move=0;
+			MESG("prev_line lock start 2");
+            status=prev_line(n);
+            lock_move=1;
+			return status;		
+		} else {
+            lock_move=0;
+			MESG("prev_line lock mid 3");
+            status=prev_line(n-1);
+            lock_move=1;
+		};
+#endif
 		move_window(n);
         return(n);
     };
@@ -982,13 +1013,15 @@ int next_page(int  n)
 		offs o=tp_offset(cwp->tp_hline);
 		// offs co=tp_offset(cwp->tp_current);
 		int num_lines=n;
-		// MESG("next_page: topo=%ld current=%ld lines=%d---------",o,co,lines);
+		// MESG("next_page: topo=%ld lines=%d --------",o,num_lines);
 		o=FNext_wrap_line(cwp,o,num_lines,1);
+		// MESG("         : new topo=%ld",o);
 		set_top_hline(cwp,o,"next_page");
 		// MESG("		start current from %ld n=%d",o,n);
 		o=tp_offset(cwp->tp_current);
 
 		o=FNext_wrap_line(cwp,o,num_lines,0);
+		// MESG("         : new current=%ld",o);
 		textpoint_set(cwp->tp_current,o);
 		textpoint_set(cwp->w_fp->tp_current,o);
 		// MESG("		new current o=%ld line=%ld",tp_line(cwp->tp_current),tp_line(cwp->tp_current));
@@ -1156,6 +1189,7 @@ int setmark(int n)
  	} else {
 		tp_copy(cwp->w_smark,cwp->tp_current);
  		tp_copy(cwp->w_emark,cwp->tp_current);
+		cwp->hs[0].w_hselection=0;
  	};
  } else { // clear region selection and set region mode to normal
 			set_update(cwp,UPD_FULL);
@@ -1318,7 +1352,7 @@ unsigned char *str2out(char *s)
 /*   emacs key  ^X^C, assigned also to ALT-X  */
 int quit(int n)
 {
-//	MESG("quit:n=%d discmd=%d,macro_exec=%d,changed=%d",n,discmd,macro_exec,changes_occured());
+	// MESG("quit:n=%d discmd=%d,macro_exec=%d,changed=%d",n,discmd,macro_exec,changes_occured());
         if (
 		!discmd					/* no display forces it */
 		|| macro_exec				/* in a macro just quit no questions */
@@ -1326,7 +1360,7 @@ int quit(int n)
         || changes_occured() == FALSE         /* All buffers clean.   */
 						/* User says it's OK.   */
         || (confirm("Modified files exist","Leave anyway?",1)) == TRUE) {
-	
+		// MESG("quit!!!");
 		msg_line("");
 		save_scratch_files();
 		save_config();
@@ -1438,8 +1472,8 @@ int twiddle(int n)
 	check_update_highlight(0);
 	if(cbfp->b_flag & FSDIRED) return(0);
 	if(dont_edit()) return FALSE;
-	if(FColumn(cbfp,Offset())<2) return FALSE;
-
+	// if(FColumn(cbfp,Offset())<2) return FALSE;
+	if(tp_col(cbfp->tp_current)<2) return FALSE;
 	offs p1,p2;
 	
 	MoveLeftChar(cbfp);
@@ -1663,6 +1697,8 @@ int insert_date(int n)
 {
  char *date=date_string(n);
 	insert_string(cbfp,date,strlen(date));
+	set_goal_column(cwp->tp_current->col,"date");
+	// cwp->goal_column=cwp->tp_current->col;
 	update_buffer_windows(cbfp,UPD_WINDOW);
 	return TRUE;
 }
@@ -1825,7 +1861,8 @@ int insert_chr(int n,int c)
 		textpoint_move(cbfp->tp_current,n*l);
 	};
  };
-
+ set_goal_column(cwp->tp_current->col,"inschr");
+ // cwp->goal_column=cwp->tp_current->col;
  check_update_highlight(2);
  set_end_line(cbfp,GetLine());
  set_modified(cbfp);
@@ -1887,6 +1924,7 @@ int insert_newline(FILEBUF *fp)
 {
 	if(!InsertBlock(fp,fp->EolStr,fp->EolSize,0,0)) return FALSE;
 	textpoint_move(fp->tp_current,fp->EolSize);
+	set_goal_column(fp->tp_current->col,"newline");
 	update_buffer_windows(fp,UPD_EDIT);
 	set_modified(fp);
 	update_lines(fp);
@@ -1960,9 +1998,14 @@ int back_delete(long n)
 
 		chars_to_delete=ccol-ncol;
 		s1+=ncol;
-
 		set_Offset(s1);
-		DeleteBlock(0,chars_to_delete);
+		// MESG("	delete: chars=%d ccol=%d ncol=%d ncol0=%d start=%d end=%d",chars_to_delete,ccol,ncol,ncol0,s1-ncol,s1);
+		if(chars_to_delete==0) {
+			chars_to_delete=n;
+			DeleteBlock(chars_to_delete,0);
+		} else {
+			DeleteBlock(0,chars_to_delete);
+		};
 		s1 = LineEnd(s1)+1;
 		s2 += n;
 		start_line++;
@@ -2176,6 +2219,7 @@ int cut_region(int flag)
 			EndUndoGroup(cbfp->main_undo);
 		};
 		reset_region_textpoints();
+		set_goal_column(cwp->tp_current->col,"cut");
 		set_update(cwp,UPD_EDIT);
 		set_modified(cbfp);
 		return TRUE;
@@ -2379,6 +2423,7 @@ int delete_box(int n)
  };
  set_Offset(cofs);
  setmark(0);
+ set_goal_column(cwp->tp_current->col,"del box");
  set_update(cwp,UPD_EDIT+UPD_WINDOW);
  set_modified(cwp->w_fp);
  return TRUE; 

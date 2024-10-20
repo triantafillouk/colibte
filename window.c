@@ -186,7 +186,7 @@ offs FNext_wrap_line(WINDP *wp,offs start,int lines,int top)
  offs now_start=o;
  while(col < cwp->w_width) {
  	if(FEofAt(fp,o)) {
-		MESG("on last line! %ld",now_start);
+		// MESG("on last line! %ld",now_start);
 		return now_start;
 	};
 	if(FEolAt(fp,o)) {
@@ -250,6 +250,8 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines)
  FILEBUF *fp=wp->w_fp;
  TextPoint *pwl = new_textpoint_at(fp,1,ptr);
 #if	WRAPD
+ // MESG("FPrev_wrap_line: current ptr=%ld line=%ld col=%ld",wp->tp_current->offset,wp->tp_current->line,wp->tp_current->col);
+ // MESG("FPrev_wrap_line: ptr=%ld line=%ld col=%ld",ptr,pwl->line,pwl->col);
  MESG("FPrev_wrap_line: now at o=%ld %ld l=%ld c=%ld",tp_offset(pwl),ptr,tp_line(pwl),tp_col(pwl));
 #endif
  int col_position = tp_col(pwl) % wp->w_width;
@@ -317,8 +319,11 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines)
 #endif
 		num rest = linecols % wp->w_width;
 		num full_lines = linecols / wp->w_width;
+		// MESG("	prev_line: rest=%ld goal_column=%ld col_position=%ld",rest,goal_column,col_position);
 		if(rest <= goal_column) {
 			// goto eol o1
+			// if(col_position<rest) 
+			textpoint_set_lc(pwl,line,col_position);
 		} else {
 			textpoint_set_lc(pwl,line,full_lines*wp->w_width+goal_column);
 			o1 = tp_offset(pwl);
@@ -461,13 +466,15 @@ int chardline(WINDP *wp)
  num current_offset = FOffset(wp->w_fp);
 
  if(size==0) return screen_row;
-
+ num prev=ptr;
  do
  {
 	if(is_wrap_text(wp->w_fp))
 	 	ptr=FNext_wrap_line(wp,ptr,1,1);
 	else
 	 	ptr=FNextLine(wp->w_fp,ptr);
+	if(ptr==prev) break;
+	prev=ptr;
 	if(ptr>current_offset) break;
 	
 	if(is_wrap_text(wp->w_fp) || FBolAt(wp->w_fp,ptr)) screen_row++;

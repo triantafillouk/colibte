@@ -169,6 +169,7 @@ M_element e_search[] =
 	{0, 'O', "goto Offset              ","_Ggoto Offset", goto_offset,0,"SO"}, 
 	{0, '@', "View functions      ALT-@","_@view functions  @", view_functions,(struct MENUS *)2,"S1"},
 	{0, '#', "View structures     ALT-#","_#view Structures #", view_functions,(struct MENUS *)3,"S2"},
+	{0,'U',  "next Utf8 error          ","_find next utf error",next_utf8_error,0,"SU"},
 	{0, 0, NULL,"",NULL,0,NULL}
 };
 
@@ -274,7 +275,7 @@ M_element e_select_on[] =
 {
 	{0, 'C', "Copy         ^C","^Ccopy",	copy_region, 0,"EC"} ,	
 	{0, 'X', "cut          ^X","^Xcut",	cut_region, (struct MENUS *)1,"EX"} ,	
-	{0, 'U', "Unselect       ","",  set_mark,0,"EU"},
+	// {0, 'U', "Unselect       ","",  set_mark,0,"EU"},
 	{0, 0, NULL,"",NULL,0,NULL}
 };
 
@@ -344,7 +345,9 @@ M_element e_window[] =
 	{0, ']', "Next              ]"," ]Next", next_window, 0,"W]"} ,	
 	{0, 'I', "view Internal file ","", select_file_internal, 0,"WI" },
 	{0, 'D', "Directory list     ","", listdir1, 0,"WD"},
+#if	0
 	{0, 'S', "deStination dir    ","", listdir2, 0,"WS"},
+#endif
 #if TNOTES
 	{0, 'T', "noTes dir          ","", open_notes_dir,0,"WT"},
 	{0, 'W', "note tag vieW      ","", show_tag_view,0,"WW"},
@@ -551,9 +554,7 @@ M_element e_mode[] =
 	{0,	'P', "Page lock        ","", toggle_sync_lock,0,"MP"},
 #if	USE_GLIB
 	{MMENU, 'C', "file Codepage    ", "",  NULL, &m_lang,"MC"},
-#if	!GTK
-	{MMENU, 'F', "Font local       ", "",  NULL, &m_local,"MF"},
-#endif
+	{MMENU, 'F', "File local       ", "",  NULL, &m_local,"MF"},
 #endif
     {MMENU, 'S', "Sort mode        ", "",  NULL, &m_sort,"MS"},
 	{0, 0, NULL,"",NULL,0,NULL}

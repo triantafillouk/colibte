@@ -163,8 +163,12 @@ int convert_char(int n)
 	int len,i;
 	num lbegin;
 	num cline=GetLine();
+	// MESG("convert arg=%d",n+1);
 	if(n==2) {	// convert from local to utf
 	op=0;
+	
+	// if(cfp->b_lang) MESG("convert from local to utf : b_lang=%d %s --> utf",cfp->b_lang,codepage_str[cfp->b_lang]);
+	// else MESG("convert from default local page %d to utf: %s --> utf",default_local_codepage,codepage_str[default_local_codepage]);
 	lbegin=op;
 	while(!FEofAt(cfp,op)) {
 		len=LineEnd(op)-lbegin;
@@ -202,40 +206,28 @@ int convert_char(int n)
 	};
 	  cfp->b_lang=0;
 	} else { // convert utf8 to local
-	
+	// MESG("convert from utf8 to local: -> %s",codepage_str[default_local_codepage]);
 	op=0;
 	lbegin=op;
 	while(!FEofAt(cfp,op)) {
 		len=LineEnd(op)-lbegin;
 		cc1=malloc(len+1);
 		c2=cc1;
+		gchar *cc2;
+		gsize r,w;
 		for(i=0;i<len;i++,op++) {
 			c=CharAt(op);
+			*c2++=c;
+		};
+		cc2=g_convert(cc1,len,codepage_str[default_local_codepage],"UTF-8",&r,&w,NULL);
 
-		if(c < 128) {
-			*c2++=c; 
-		} else 
-		if (c==194)  {
-			op++;;
-			i++;
-			*c2++=CharAt(op);
-		}
-		 else 
-		if (c==206) {
-			op++; i++; c=CharAt(op);
-			*c2++ = c+48;	
-		} else 
-		if (c==207) {
-			op++; i++; c=CharAt(op);
-			*c2++ = c+112;	
-		}
-	  };
 	  textpoint_set(cwp->tp_current,lbegin);
 	  DeleteBlock(0,len);
 	  textpoint_set(cwp->tp_current,lbegin);
-	  InsertBlock(cfp,cc1,c2-cc1,0,0);
+	  InsertBlock(cfp,cc2,w,0,0);
 	  op=lbegin=FNextLine(cfp,lbegin);
 	  free(cc1);
+	  g_free(cc2);
 	};
 
 	};

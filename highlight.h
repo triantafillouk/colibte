@@ -41,6 +41,7 @@ int comment_lua();
 #define HS_LETTER		1024	// alpha
 #define HS_PREVSPACE	2048
 #define HS_TAG			4096
+#define HS_ASSIGN		8192		
 #else
 #define HS_LINESTART	1
 #define HS_PREVAST		2

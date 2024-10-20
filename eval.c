@@ -509,9 +509,11 @@ void set_env(int vnum,char *svalue,double value)
 		case EVCWROW:	
 			igotolinecol(v1+tp_line(cwp->tp_hline),1,0);
 				break;
-		case EVWCOLS: window_column_resize(v1);
+		case EVWCOLS: 
+				vresize_wind(-cwp->w_ntcols+(int)v1);
 				break;
-		case EVWROWS: window_row_resize(v1);
+		case EVWROWS: 
+				hresize_wind(-cwp->w_ntrows+(int)v1);
 				break;
 		// _found is read only
 		// _next_word is read only
@@ -1170,7 +1172,7 @@ int set_locale(int local_codepage)
 		case 1:
 		case 11:
 		case 12:
-			default_local_codepage=1;
+			default_local_codepage=7;
 			break;
 		default:	
 			default_local_codepage=local_codepage;
@@ -1262,6 +1264,10 @@ int refresh_current_line(int nused)
  offs i;
  show_stage=0;
 
+ // if special file type return
+ if(cbfp->b_flag & (FSNLIST|FSDIRED|FSNOTES|FSNOTESN)) return 0;
+	macro_exec=1;
+ // MESG("refresh_current_line:");
 	tpo=tp_offset(cwp->tp_current);
 	
 	sl=FLineBegin(cbfp,tpo);
@@ -1305,7 +1311,7 @@ int refresh_current_line(int nused)
 	} else {
 		textpoint_set(cwp->tp_current,tpo);	/* where it was !  */
 	};
-
+	macro_exec=0;
 	set_update(cwp,UPD_EDIT);
  	return(TRUE);
 }

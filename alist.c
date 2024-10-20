@@ -214,7 +214,7 @@ _el * linsert_after(alist *list,void *d)
  return(ei);
 }
 
-
+#if	NUSE
 _el * insert_beetween(alist *list,void *d,void *d1,void *d2)
 {
  _el *e1,*e2,*ei;
@@ -242,6 +242,7 @@ _el * insert_beetween(alist *list,void *d,void *d1,void *d2)
  list->array_valid=0;
  return(ei);
 }
+#endif
 
 /* move current to head of the list */
 void lbegin(alist *l)

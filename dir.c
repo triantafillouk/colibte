@@ -319,7 +319,7 @@ int set_sort_mode(int mode)
  // MESG("set_sort_mode: current=%d mode=%d",current_sort_mode,mode);
  if(!(cwp->w_fp->b_flag & FSDIRED)) return true;
 
-	if(mode==-1) {
+	if(mode==-1 || current_sort_mode==mode) {
 		if((current_sort_mode%2)==0) current_sort_mode++;
 		else current_sort_mode--;
 	} else current_sort_mode=mode;
@@ -1490,7 +1490,8 @@ int dir_left(int n)
  int dir_num = cbfp->dir_num;
  int stat=0;
 
- if(cbfp->connect_buffer==NULL && cbfp->b_flag != FSNLIST+FSDIRED) return false;
+
+ if(cbfp->connect_buffer==NULL && cbfp->b_flag != FSNLIST+FSDIRED) return(prev_character(1));
 #if	TNOTES
  if(IS_FLAG(cbfp->b_flag,FSNOTES)) return false;
  // MESG("dir_left: b_state=0x%X b_type=0x%X b_flag=0x%X",cbfp->b_state,cbfp->b_type,cbfp->b_flag);

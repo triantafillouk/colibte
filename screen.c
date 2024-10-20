@@ -1,5 +1,5 @@
 /*
-	Curses,gtk editor,notes,directory browser
+ 	Curses,gtk editor,notes,directory browser
 	Copyright Kostas Triantafillou
 	GNU LESSER GENERAL PUBLIC LICENSE version 2 
 	(or at your option) any later version.
@@ -171,6 +171,7 @@ void set_update(WINDP *wp_toset, int flag)
 	return;
  };
  fp = wp_toset->w_fp;
+ // MESG("set_update: %d",flag);
  if(flag & UPD_EDIT) {
 	{	/* First change, so	*/
 		flag |= UPD_STATUS; 		/* update mode lines.	*/
@@ -319,7 +320,8 @@ void upd_column_pos()
 	};
 #endif
 #else
-	cwp->curcol = FColumn(fp,FOffset(fp));
+	if(is_wrap_text(fp)) cwp->curcol = fp->tp_current->col;
+	else cwp->curcol = FColumn(fp,FOffset(fp));
 #endif
 	// MESG("upd_column_pos: curcol=%d",cwp->curcol);
  // if(is_wrap_text(fp)) show_time("upd_column_pos2",1);
@@ -901,10 +903,10 @@ vchar *init_vt_line(WINDP *wp)
  vchar *v_text = wp->vs[wp->vtrow]->v_text;
  int i;
  for(i=0;i<wp->w_width;i++) {
- 	v_text[i].uval[0]='A';
+ 	// v_text[i].uval[0]='A';
 	v_text[i].uval[0]=0;
+	v_text[i].bcolor=wp->w_bcolor;
  };
- // memset(v_text,0,sizeof(struct vchar)*wp->w_ntcols);
  return v_text;
 }
 
@@ -1080,7 +1082,7 @@ offs vtline(WINDP *wp, offs tp_offs)
  int bcol=COLOR_BG;
  offs s1,s2,ptr1,ptr2;
  offs cur_lend=0;
- int hexmode = wp->w_fp->view_mode & (VMHEX||VMINP);
+ int hexmode = wp->w_fp->view_mode & (VMHEX|VMINP);
  char *info_mask;
  char *vtlm=NULL;
  static num  vtla=0; 	 // mask allocated bytes
@@ -1775,7 +1777,7 @@ offs update_top_position_wrap()
 
  int o_now=tp_offset(cwp->tp_current);
 	offs o;
-	// MESG_time("update_top_position_wrap: %ld",o_now);
+	MESG_time("update_top_position_wrap: %ld",o_now);
 	o = FLineBegin(cwp->w_fp,o_now);
 	// MESG_time("update_top_position_wrap: begin=%ld",o);
 	int col=0;
@@ -2153,15 +2155,16 @@ void update_window_nowrap(WINDP *wp,int force)
 void update_window_wrap(WINDP *wp,int force)
 {
 	int cw_flag=cwp->w_flag;
-	// MESG("update_window_wrap: ------------------");
+	MESG("update_window_wrap: ------------------ force=%d",force);
 		if (wp==cwp) {
 			// MESG_time("update_window_wrap:1 window %d",wp->id);
-			check_cursor_position_wrap(wp); /* check if on screen */
+			if(!check_cursor_position_wrap(wp)) set_update(wp,UPD_WINDOW); /* check if on screen */
 			wp->currow = window_cursor_line(wp);
 #if	WRAPD
 			MESG_time("update_window_wrap: currow=%d hline o=%ld c=%ld current o=%ld",wp->currow,tp_offset(wp->tp_hline),tp_col(wp->tp_hline),tp_offset(wp->tp_current));
 #endif
 #if	1
+			if(wp->w_flag>1 || wp->selection)
 				upd_all_wrap_lines(wp,"wrap0");
 				// show_time("after wrap_lines",1);
 #else
@@ -2176,7 +2179,7 @@ void update_window_wrap(WINDP *wp,int force)
 			if (wp->w_flag & UPD_LINE) 
 			{
 				upd_part_wrap(wp,"wrap3 partial");
-			}
+			} else upd_all_wrap_lines(wp,"wrap1");
 #endif
 		} else {
 			if((wp->w_fp == cwp->w_fp 

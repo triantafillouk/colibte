@@ -53,6 +53,18 @@ int confirm(char *title,char *prompt,int always) {
   return false;
 }
 
+// dummy for gtk
+int hresize_wind(int n)
+{
+ return 0;
+}
+
+// dummy for gtk
+int vresize_wind(int n)
+{
+ return 0;
+}
+
 void drv_clear_line(WINDP *wp,int row)
 {
 }

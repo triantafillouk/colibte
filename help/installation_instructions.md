@@ -45,6 +45,8 @@ To compile:
 
 ### for tag support
 >	sudo apt install exuberant-ctags
+or
+>	sudo apt install universal-ctags
 
 ## Prerequisites for compiling in RedHat/Centos Linux 
 > yum install gcc

@@ -254,7 +254,6 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 	BTNODE *btn=add_to_symbol_tree(stree,name,TOK_VAR);
 	tok->tind=btn->node_index;
 	tok->ttype=btn->node_type;
-	// tok->tvtype=VTYPE_NONE;
 	ex_edenv=tok->ttype;
 	btn->node_vtype=VTYPE_NONE;
 	// MESG("	set_var: new variable name=%s tind=%d ttype=%d",name,tok->tind,tok->ttype);
@@ -488,11 +487,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  int script_active=0;
  tok_struct *array_tok=NULL;
  int skip_token=0;
+ int start_of_line=1;
 
  // return if already parsed and not forced to parse
  if(bf->tok_table !=NULL && init==0) return (0);
 
- MESG("- Parse block [%s] type=%d <---------------------",bf->b_fname,bf->b_type);
+ // MESG("- Parse block [%s] type=%d <---------------------",bf->b_fname,bf->b_type);
  if(is_mlang(bf)) script_active=1;	/* initial script state  */
 
  if(init && bf->tok_table!=NULL) {
@@ -707,6 +707,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 		case TOK_MINUS:
 			if(next_token_type(bf)==TOK_MINUS) {
 				getnc1(bf,&cc,&tok_type);
+				if(start_of_line) { 
+					tok_type=TOK_COMMENT;
+					skip_2nl(bf);continue;
+				};
 				tok_type=TOK_DECREASE;
 				break;
 			};
@@ -753,8 +757,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 				tok_type=TOK_EQUAL;
 				break;
 			};
+			if(ex_edenv==TOK_VAR) tok_type=TOK_ASSIGN;
 			if(ex_edenv==TOK_ENV) tok_type=TOK_ASSIGNENV;
 			if(ex_edenv==TOK_OPTION) tok_type=TOK_ASSIGNOPT;
+			ex_edenv=0;
 			break;
 		case TOK_COMMA:{
 			if(next_token_type(bf)==TOK_NL
@@ -784,7 +790,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			return(0);
 			};
 	};
-
+	if(tok_type==TOK_NL) {
+		start_of_line = 1;
+		continue;
+	};
 	// MESG("	- token type=[%d %s] previous token is [%d %s]",tok_type,tname(tok_type),previous_ttype,tname(previous_ttype));
 	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {
@@ -1024,6 +1033,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	if(tok_type!=TOK_SEP) 
 	{	
 		if(tok_type==0) {
+			ADD_TOKEN("0");
 			tok->ttype=TOK_SEP;
 			tok->tname="end 0";
 		} else {
@@ -1034,8 +1044,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 			tok->tname="end sep";
 		};
 	};
+	// MESG("parse_block1: set end token");
 	bf->end_token=tok;	/* save end token  */
-	ADD_TOKEN("end token");
+	// ADD_TOKEN("end token");
 	tok->ttype=TOK_EOF;
 	tok->tind=0;
 	tok->tline=tok_line;
@@ -1064,6 +1075,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 #endif
 	if(bf->symbol_tree==NULL)MESG("--- parse_block1:[%s] > end.",bf->b_fname);
 	else MESG(": parse_block1:[%s] > end. Number of tokens %d",bf->b_fname,bf->symbol_tree->items);
+ // MESG("partse_block1: end"); 
  return(TRUE); 
 }
 

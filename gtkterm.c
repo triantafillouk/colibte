@@ -34,6 +34,7 @@ void button_color_save(GtkWidget *wd, gpointer *data);
 int put_wtext1(WINDP *wp, int row,int pos_x,int col);
 void set_cursor(int val,char *from);
 char **get_scheme_names();
+void upd_all_wrap_lines(WINDP *wp,char *from);
 
 /* local variables */
 int color_scheme_ind;

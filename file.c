@@ -38,6 +38,19 @@ char *uncompress_command[] = {
 int add_to_recent_list(char *full_file_name);
 int is_encrypt(int file_id);
 
+int default_view_mode=0;
+
+void set_default_view_mode(int flag)
+{
+	default_view_mode=1;
+}
+
+int get_default_view_mode()
+{
+	// MESG("view flag is %d",view_flag);
+	return default_view_mode;
+}
+
 int scratch_ind(char *bname)
 {
 	if(bname==NULL) return 0;
@@ -126,7 +139,7 @@ int activate_file(FILEBUF *bp)
 	// MESG("activate_file:[%s] b_type=%d b_flag=%X",bp->b_fname,bp->b_type,bp->b_flag);
 	if ((bp->b_state & FS_ACTIVE) ==0)
 	{	
-//		MESG("active_file: is not active, activate it!");
+		// MESG("activatee_file: is not active, activate it!");
 		/* read it in and activate it */
 		if(bp->b_fname[0]!=CHR_LBRA || !strncmp(bp->b_fname,"[D",2))
 		{
@@ -149,7 +162,7 @@ int activate_file(FILEBUF *bp)
 			add_to_recent_list(get_buf_full_name(bp));
 		};
 	};
-//	MESG("activate_file: end [%s] b_type=%d b_flag=%d",bp->b_fname,bp->b_type,bp->b_flag);
+	// MESG("activate_file: end [%s] b_type=%d b_flag=%d b_state=%X",bp->b_fname,bp->b_type,bp->b_flag,bp->b_state);
 	return true;
 }
 
@@ -764,11 +777,14 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	char dir_name[MAXFLEN];	// directory name
 	int dir_num=0;
 	int is_scratch=0;
+	int from_note = 0;
+	if(bflag==NOTE_TYPE) { bflag=0;from_note=1;}; 
+
 	create_base_name(base_name,bname);
-	// MESG("new_filebuf:base_name=[%s] bname=[%s]",base_name,bname);
+	// MESG("new_filebuf:base_name=[%s] bname=[%s] bflag=%X",base_name,bname,bflag);
 	dir_name[0]=0;
 	is_scratch = scratch_ind(base_name);
-
+	
 	if(is_scratch) {
 		snprintf(dir_name,MAXFLEN,"%s/.%s",getenv("HOME"),APPLICATION_NAME);
 	} else {
@@ -971,8 +987,15 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 		if(bp->cdir == bp->rdir) { 
 			set_highlight(bp,highlight_index("DIR",&ind2));
 		} else {
-			bp->b_type = 0;
-			set_highlight(bp,highlight_index("NONE",&ind2));
+			int used=0;
+			// MESG("set ftype! len=%d id=%d bom_type=%d discmd=%d",bp->flen0,bp->file_id,bp->bom_type,discmd);
+			if(discmd) {
+				init_ftype(bp,bp->b_fname,&used,from_note);
+				// MESG("used %d type=%d",used,bp->b_type);
+				set_highlight(bp,bp->b_type);
+			} else {
+				set_highlight(bp,highlight_index("TEXT",&ind2));
+			};
 		}
 	};
 	if(bp->b_flag & FSINVS) strlcpy(bp->b_dname,get_start_dir(),MAXFLEN);
@@ -1174,12 +1197,12 @@ int open_file(int n)
 	if(! (cbfp->b_flag & FSDIRED)){
 	if(cbfp->b_fname[0]==CHR_LBRA) {
 		if(chdir(get_start_dir())) {
-			msg_line("cannot open file in dir [%s]",cbfp->b_dname);
+			error_line("cannot open file in dir [%s]",cbfp->b_dname);
 			return false;
 		};
 	} else {
 		if(chdir(cbfp->b_dname)) {
-			msg_line("cannot open file in dir [%s]",cbfp->b_dname);
+			error_line("cannot open file in dir [%s]",cbfp->b_dname);
 			return false;
 		};
 	}
@@ -1284,7 +1307,7 @@ int set_buf_key(FILEBUF *bp)	/* reset encryption key of current file */
 	} else 
 #endif
 	{
-		// MESG("get encryption_key!");
+		// MESG("get encryption_key! b_key=%X",bp->b_key);
 		status = nextarg("Encryption String: ", bp->b_key, MAXSLEN - 1,false);
 	    if (status != TRUE)  return(status);
 	
@@ -1439,13 +1462,19 @@ int file_read(FILEBUF *bp, char *fname)
  };
  bp->b_flag &= ~FSINVS;
  bp->b_state &= ~FS_CHG;
+
+
  if(is_scratch_buffer(bp)) {
  	char scratch_file[MAXFLEN];
 	stat=snprintf(scratch_file,MAXFLEN,"%s/%s",bp->b_dname,bp->b_fname);
 	if(stat<MAXFLEN) unlink(scratch_file);
  };
  set_update(cwp,UPD_FULL);
- // MESG("file_read: end: b_type=%d",bp->b_type);
+ if(get_default_view_mode()) {
+ 	bp->b_state |= FS_VIEW;
+ 	// MESG("set as view only");
+ };
+ // MESG("file_read: end: b_type=%d b_state=%X",bp->b_type,bp->b_state);
  return TRUE; 
 }
 
@@ -1625,7 +1654,7 @@ int rename_file(int n)
     return (TRUE);
 }
 
-int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
+int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 {
  int s;
  int		tc=0;			/* file second extension type */
@@ -1678,13 +1707,14 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
 		|| file_type_is("CMD",bp->b_type) 
 		|| file_type_is("TEXT",bp->b_type) 
 		|| file_type_is("MD",bp->b_type) 
-		|| (bp->b_type & NOTE_TYPE))
+		|| (bp->b_type >= NOTE_TYPE))
 		 ) {	
-			// MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
+			MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
 			bp->b_mode |= EMCRYPT;
 #if	TNOTES
-			if(bt_dval("notes_recreate")) {
-				MESG("Notes recreate!");
+			if(bt_dval("notes_recreate") || from_note) 
+			{
+				// MESG("Notes recreate!");
 				if(get_notes_key(1)==NULL) {
  					// MESG("get new notes key");
 					set_notes_key(1);
@@ -1699,6 +1729,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used)
 			} else 
 #endif
 			{
+				// MESG("resetkey!");
 				s = resetkey(bp);
 			};
 			if (s != TRUE)	return(s);
@@ -1773,16 +1804,8 @@ int file_type(char *name, int *compression_type,char *oext)
  e=0;
  create_base_name(bname,name);
  *compression_type=0;
-
- if(bname[0]=='.') {
-	strcpy(oext,"");
-	int type=0;
-	int ind=highlight_index(bname+1,&type);
-	// MESG("file_type: . [%s] = %d ind=%d",bname+1,type,ind);
-	if(ind) return ind;
-	return(highlight_index("DOT",&ind2));
- };
- if(!strcasecmp(bname,"makefile")) return(highlight_index("MAKE",&ind2));
+ if(strlen(bname)>2)
+	if(!strcasecmp(bname+1,"akefile")) return(highlight_index("MAKE",&ind2));
  i=strlen(bname)-1;
  if(bname[i]=='~') i--;
  for(ext_len=0;i>0;i--,ext_len++) {
@@ -1806,6 +1829,21 @@ int file_type(char *name, int *compression_type,char *oext)
 		return e1_type;
 	};	
  } else { 	/* No extention at all found!  */
+	 if(bname[0]=='.') {
+		if (   !strcmp(bname,".profile") 
+			|| !strcmp(bname,".bashrc") 
+			|| !strcmp(bname,".bash_logout") 
+			|| !strcmp(bname,".bash_profile")
+			) {
+			return(highlight_index("SHELL",&ind2));
+		};
+		strcpy(oext,"");
+		int type=0;
+		int ind=highlight_index(bname+1,&type);
+		// MESG("file_type: . [%s] = %d ind=%d",bname+1,type,ind);
+		if(ind) return ind;
+		return(highlight_index("DOT",&ind2));
+	 };
 	 strcpy(oext,"");
 	 return(0);
  };
@@ -1847,7 +1885,7 @@ void edinit(char *bname)
     register FILEBUF *bp;
 
     bp = new_filebuf(bname,0);             /* First buffer         */
-    if (bp==NULL)  exit(1);
+    if (bp==NULL) { ERROR("cannot create buffer [%s]",bname); exit(1);};
 	select_filebuf(bp);
 }
 
@@ -1883,9 +1921,9 @@ int save_file_history(int n)
  char *fname;
 
  if(bt_dval("save_history")==0) return 0;
-// MESG("save_file_history:");
+ // MESG("save_file_history:");
  fname = find_file("",APPLICATION_HISTORY,1,1);
-// MESG("save_file_history: %s",fname);
+ // MESG("save_file_history: to %s",fname);
  return save_list_array(fname,recent_file_list);
 }
 
@@ -1893,8 +1931,8 @@ int read_file_history(int n)
 {
  char *fname;
 
- if((fname = find_file("",APPLICATION_HISTORY,1,0))==NULL) return FALSE;
  recent_file_list=new_list(0,"read_file_history");
+ if((fname = find_file("",APPLICATION_HISTORY,1,0))==NULL) return FALSE;
 
 // MESG("read_file_history: from [%s]",fname);
  read_list_array(fname,recent_file_list);

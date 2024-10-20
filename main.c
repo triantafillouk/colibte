@@ -40,6 +40,7 @@ alist *color_scheme_list;
 
 void help_arguments(int f);
 void set_screen_update(int flag);
+void set_default_view_mode(int flag);
 
 struct array_dat *main_args=NULL;
 int dofile(char *fname);
@@ -277,7 +278,7 @@ void parse_command_line(int argc, char **argv)
 				case 'h':
 					help_arguments(1);
 					exit(0);
-				case 'v':
+				case 'V':
 					help_arguments(0);
 					exit(0);
 #if	1
@@ -345,6 +346,9 @@ void parse_command_line(int argc, char **argv)
 					record_session = FALSE;
 					sessionfile=argv[carg];
 //					MESG("set sessionfile");
+					break;
+				case 'v':
+					set_default_view_mode(1);
 					break;
 #endif
 				default:	/* unknown switch */
