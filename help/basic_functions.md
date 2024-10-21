@@ -98,6 +98,7 @@
     find_tag(0)                                   : find current word in tags
     query_replace(search_string,replace_with)     : query replace (interactive replace)
 
+```
 ## Edit commands
     twiddle()                                     : twiddle previous 2 characters
     trim_line()                                   : trim line current line
@@ -129,6 +130,7 @@
     insert_indent(lines)                          : insert new lines based on current indent
     tab(tabs)                                     : indent line
     next_line(lines)                              : goto next line(s)
+```
 
 ## Dir mode commands
     listdir1()                                    : directory list 1
