@@ -48,12 +48,12 @@
 ## Conversion commands
 
 ```
-    dos2unix()                            : convert buffer to unix
-    unix2dos()                            : convert buffer to dos
-    convert_char(type)                    : buffer conversion
-            type=0    - IBM437    to ISO8859-7
-            type=1    - ISO8859-7 to IBM437
-            type=2  - ISO8859-7 to utf8
+ #   dos2unix()                            : convert buffer to unix
+ #   unix2dos()                            : convert buffer to dos
+ #   convert_char(type)                    : buffer conversion
+ #           type=0    - IBM437    to ISO8859-7
+ #           type=1    - ISO8859-7 to IBM437
+ #           type=2  - ISO8859-7 to utf8
 ```
 
 ## Movement commands
@@ -100,36 +100,36 @@
 
 ```
 ## Edit commands
-    twiddle()                                     : twiddle previous 2 characters
-    trim_line()                                   : trim line current line
-    undo()                                        : undo editing
-    redo()                                        : redo editing
-    region_lower()                                : Lower case a defined region
-    region_upper()                                : Upper case a defined region
-    copy_region()                                 : Copy region
-    count_words()                                 : count words in marked region
-    del_char(characters)                          : delete characters
-    del_next_word(words)                          : delete next words
-    del_prev_word(words)                          : delete previous words
-    del_prev_char(characters)                     : delete previous character
-    del_blank_lines(lines)                        : delete blank lines
-    entab_line(lines)                             : change tabs to spaces for a number of lines
-    detab_line(lines)                             : change spaces to tabs for a number of lines
-    line_fill(indent)                             : Line fill (up to fillcol), left indent if indent is true.
-    fill_paragraph(fill type)                     : fill current paragraph 
-        n=0,2    use left_margin
-    erase_eol()                                   : erase to end of line
-    quote_character()                             : insert control characters instead of command (interactive only)
-    insert_tab(tabs)                              : insert a tab (or corresponding spaces)
-    remove_tab(tabs)                              : unindent region by number of tabs
-    clear_buffer(file name)                       : empty file buffer
-    unmark_buffer()                               : flag buffer as unchanged
-    insert(string to insert)                      : insert string
-    delete_line(lines)                            : delete line(s)
-    newline(newlines)                             : insert new line
-    insert_indent(lines)                          : insert new lines based on current indent
-    tab(tabs)                                     : indent line
-    next_line(lines)                              : goto next line(s)
+ #   twiddle()                                     : twiddle previous 2 characters
+ #   trim_line()                                   : trim line current line
+ #   undo()                                        : undo editing
+ #   redo()                                        : redo editing
+ #   region_lower()                                : Lower case a defined region
+ #   region_upper()                                : Upper case a defined region
+ #   copy_region()                                 : Copy region
+ #   count_words()                                 : count words in marked region
+ #   del_char(characters)                          : delete characters
+ #   del_next_word(words)                          : delete next words
+ #   del_prev_word(words)                          : delete previous words
+ #   del_prev_char(characters)                     : delete previous character
+ #   del_blank_lines(lines)                        : delete blank lines
+ #   entab_line(lines)                             : change tabs to spaces for a number of lines
+ #   detab_line(lines)                             : change spaces to tabs for a number of lines
+ #   line_fill(indent)                             : Line fill (up to fillcol), left indent if indent is true.
+ #   fill_paragraph(fill type)                     : fill current paragraph 
+ #       n=0,2    use left_margin
+ #   erase_eol()                                   : erase to end of line
+ #   quote_character()                             : insert control characters instead of command (interactive only)
+ #   insert_tab(tabs)                              : insert a tab (or corresponding spaces)
+ #   remove_tab(tabs)                              : unindent region by number of tabs
+ #   clear_buffer(file name)                       : empty file buffer
+ #   unmark_buffer()                               : flag buffer as unchanged
+ #   insert(string to insert)                      : insert string
+ #   delete_line(lines)                            : delete line(s)
+ #   newline(newlines)                             : insert new line
+ #   insert_indent(lines)                          : insert new lines based on current indent
+ #   tab(tabs)                                     : indent line
+ #   next_line(lines)                              : goto next line(s)
 ```
 
 ## Dir mode commands

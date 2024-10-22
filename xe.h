@@ -441,6 +441,8 @@ typedef struct MLQUOTES {
 	unsigned char w_hquote_start;
 	unsigned char w_line_set;
 	short int w_hstate;
+	short int w_prev_line;
+	short int w_jflag;
 	num known_offset;
 } MLQUOTES;
 

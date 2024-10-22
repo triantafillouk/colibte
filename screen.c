@@ -37,7 +37,7 @@ extern COLOR_SCHEME *current_scheme;
 int specialh=0;
 /* highlight state  */
 extern int hquotem;
-extern int prev_hquotem;
+int prev_hquotem=0;
 extern int slang;
 extern int stop_word_highlight;
 extern int start_word_highlight;
