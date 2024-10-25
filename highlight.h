@@ -24,12 +24,27 @@ int comment_matlab(int n);
 int comment_none(int n);
 int comment_basic(int n);
 int comment_sql(int n);
-
+int comment_lua();
 
 /* character states */
+#if	1
 #define HS_LINESTART	1
 #define HS_PREVAST		2
-#define HS_PREVACCENT	3
+#define HS_PREVSLASH	4
+#define HS_PREVESC		8
+#define HS_PSMALLER		16
+#define HS_END1			32
+#define HS_END2			64
+#define	HS_SPEC			128	// special
+#define HS_QMARK		256
+#define HS_ES2			512
+#define HS_LETTER		1024	// alpha
+#define HS_PREVSPACE	2048
+#define HS_TAG			4096
+#define HS_ASSIGN		8192		
+#else
+#define HS_LINESTART	1
+#define HS_PREVAST		2
 #define HS_PREVSLASH	4
 #define HS_PREVESC		5
 #define HS_PSMALLER		6
@@ -37,15 +52,11 @@ int comment_sql(int n);
 #define HS_END2			8
 #define	HS_SPEC			9	// special
 #define HS_QMARK		10
-#define HS_Q1			11
-#define HS_S0			20
-#define	HS_S1			21
-#define HS_S2			22
-#define HS_S3			23
-#define HS_ES1			24
 #define HS_ES2			25
 #define HS_LETTER		30	// alpha
 #define HS_PREVSPACE	64
+#define HS_TAG			128
+#endif
 	/* inserted script language  */
 
 /* flags */
@@ -84,10 +95,13 @@ void highlight_ecl(int c);
 void highlight_sql(int c);
 void highlight_matlab(int c);
 void highlight_cmd(int c);
+void highlight_gtext(int c);
 void highlight_rust(int c);
 void highlight_tags(int c);
 void highlight_sln(int c);
 void highlight_md(int c);
+void highlight_lua(int c);
+void highlight_bicep(int c);
 
 char *c_w[] = { "if","else","do","while","switch","case","for","return","break","goto","continue","typedef",
 	"namespace","this","throw","try","catch","@property","" };
@@ -161,6 +175,10 @@ char *xml_w1[] = { "INPUT", "FONT", "OPTION","SMALL","" };
 
 char *jscript_w[] = { "function","if","else","return", "try","catch","throws","throw","finally","final","goto","while","break","switch","implements","case","foreach","continue","for","debugger","do","with","yield","return","in","of","await","pipeline","stages","stage","steps", "agent","when","class","" };
 char *jscript_w1[] = { "def","this","constructor","var","package","private","namespace","using","protected","public","import","export","extends","typeof","void","char","int","short","long","static","transient","volatile","super","native","boolean","float","enum","syncronized", "eval","echo","print","let","const", "abstract","arguments", "title", "meta", "true","false","null","new","null","instanceof","" };
+
+char *bicep_w[] = { "using", "metadata", "var", "param","resource","output","targetScope", "module","output", "description","" };
+char *bicep_w1[] = { "name","kind","sku","properties","reserved","string","int","secureString","null","scope","params","dependsOn",
+	"managementGroup", "resourceGroup", "subscription", "tenant", ""};
 
 char *terraform_w[] = { "variable","resource","type","proviser","module","output",""};
 char *terraform_w1[] = { "string","number","list", "tags","tag","source","description","name","var","key","value",""};
@@ -236,6 +254,9 @@ char *dir_w1[] = { "/home","Downloads","Desktop","" };
 
 char *tag_w[] = { NULL,NULL,NULL,NULL,NULL};
 char *tag_w1[] = { NULL,NULL,NULL,NULL,NULL};
+
+char *lua_w[] = { "function","while","do","elseif","in","if","then","else","for","end","return",NULL };
+char *lua_w1[] = { "print","local","ipairs","true","false","cooroutine","pairs","type","nil","setmetatable",NULL};
 
 /* extensions defined  */
 char *no_extensions[] = {"" };
@@ -271,7 +292,7 @@ char *pascal_extensions[] = {"PASCAL","pas",""};
 char *postscript_extensions[] = {"POSTSCRIPT","ps",""};
 char *python_extensions[] = {"PYTHON","py","pyw","wsgi",""};
 char *basic_extensions[] = {"BASIC","bas",""};
-char *jscript_extensions[] = {"JAVASCRIPT","js","jenkinsfile","cs","jsm","_js",""};
+char *jscript_extensions[] = {"JAVASCRIPT","js","jenkinsfile","cs","jsm","_js","ts",""};
 char *asp_extensions[] = {"ASP","asp",""};
 char *java_extensions[] = {"JAVA","java","jnlp",""};
 char *php_extensions[] = {"PHP","php","php3","php4","phtm","ctp",""};
@@ -287,11 +308,13 @@ char *log_extensions[] = {"LOG","log","syslog",""};
 char *compress_extensions[] = { "COMPRESS","gz","zip","bz2","tgz","bgz","bjz","Z",""};
 char *tags_extensions[] = { "TAGS","tags","ctags",""};
 char *json_extensions[] = { "JSON","json","gyp","gypi","tfstate",""};		// files .jshintrc, bowerrc
+char *bicep_extensions[] = { "BICEP","bicep","bicepparam", ""};
 char *yaml_extensions[] = { "YAML","YML","yaml","yml",""};
 char *dir_extensions[] = { "" };
 char *tag_extensions[] = { "tag",""};
 char *sln_extensions[] = { "SLN","sln",""};
 char *terraform_extensions[] = {"tfvars","tf",""};
+char *lua_extensions[] = {"lua",""};
 
 SHLIGHT hts[] = {
  { "NONE",0,0,none_w,none_w, highlight_text,update_highlight_none,c_in_txt_word,no_extensions,comment_perl },
@@ -314,7 +337,7 @@ SHLIGHT hts[] = {
  { "MAN",1,0,none_w,none_w, highlight_text,update_highlight,c_incword,man_extensions,comment_none },
  { "M4",0,0,none_w,none_w, highlight_text,update_highlight,c_incword,m4_extensions,comment_none },
  { "INFO",1,0,none_w,none_w, highlight_text,update_highlight,c_incword,info_extensions,comment_none },
- { "GTEXT",1,0,none_w,none_w, highlight_cmd,update_highlight_line,c_in_txt_word,gtxt_extensions,comment_perl },
+ { "GTEXT",1,0,none_w,none_w, highlight_gtext,update_highlight_line,c_in_txt_word,gtxt_extensions,comment_perl },
  { "PYTHON",0,1,python_w,python_w1, highlight_python,update_highlight,c_incword,python_extensions,comment_perl },
  { "BASIC",1,0,basic_w,basic_w1, highlight_other,update_highlight,c_incword,basic_extensions,comment_basic },
  { "WML",1,0,wml_w,wml_w1, highlight_html,update_highlight,c_incword,wml_extensions,comment_html },
@@ -348,6 +371,8 @@ SHLIGHT hts[] = {
  { "JULIA",0,0,julia_w,julia_w1,highlight_julia,update_highlight,c_incword,julia_extensions,comment_perl },
  { "CAL",1,0,none_w,none_w, highlight_cmd,update_highlight_line,c_in_txt_word,gtxt_extensions,comment_perl },
  { "MD",0,0,none_w,none_w, highlight_md, update_highlight, c_in_txt_word,md_extensions,comment_html },
+ { "LUA",0,0,lua_w,lua_w1,highlight_lua,update_highlight,c_incword,lua_extensions,comment_lua },
+ { "BICEP",0,0,bicep_w,bicep_w1,highlight_c,update_highlight,c_incword,bicep_extensions,comment_cc },
  { NULL,0,0,NULL,NULL,NULL,NULL,NULL }
 };
 

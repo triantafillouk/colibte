@@ -129,7 +129,7 @@ void mlforce(char *s)	;
 num vtline(WINDP *wp, offs tp_offs);
 void vtmove(WINDP *wp,int row,int col);
 void update_status();
-void getwquotes(WINDP *wp,int);
+offs getwquotes(WINDP *wp,int);
 void setwquotes(WINDP *wp,int,num);
 void fquote_state(offs till_o, offs from_o, WINDP *wp);
 void top_menu(int init);
