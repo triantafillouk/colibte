@@ -785,6 +785,7 @@ void highlight_c(int c)
 	case CHR_SQUOTE: 
 		if(flag_word==2) { hstate=0;break;};
 		if(hquotem&H_QUOTE2) { hstate=0; break;};
+		if(hquotem&H_QUOTE5) { hstate=0; break;};
 //		if(double_quoted) { hstate=0;break;};
 		if(hstate!=HS_PREVESC) { 
 			if(hquotem) hquotem=hquotem & ~H_QUOTE1;else prev_set=H_QUOTE1;
@@ -798,8 +799,9 @@ void highlight_c(int c)
 //		if(flag_word==3) word_is_quoted=2;
 		if(flag_word==2) { hstate=0;break;};
 		if(hquotem&H_QUOTE1) { hstate=0;break;};
+		if(hquotem&H_QUOTE5) { hstate=0; break;};
 //		if(single_quoted) { hstate=0;break;};
-		if(hstate!=HS_PREVESC) { hquotem = (hquotem)? hquotem & ~H_QUOTE2: hquotem | H_QUOTE2;
+		if(hstate!=HS_PREVESC) { hquotem = (hquotem&H_QUOTE2)? hquotem & ~H_QUOTE2: hquotem | H_QUOTE2;
 			double_quoted = (double_quoted)? 0:1;
 		};
 		hstate=0;
@@ -841,6 +843,7 @@ void highlight_c(int c)
 	case CHR_CR:
 		hquotem &= ~(H_QUOTE6|H_QUOTE4|H_QUOTE5|H_QUOTE9);
 		hstate=HS_LINESTART;
+		h_prev_space=1;
 //		single_quoted=0;
 //		double_quoted=0;
 		flag_word=0;
@@ -3087,11 +3090,17 @@ void highlight_lua(int c)
 		break;
 
 	case CHR_DQUOTE:
-		if(hstate!=HS_LETTER) {
-			if(hstate!=HS_PREVESC) hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
+		if(hstate==HS_PREVESC) break;
+#if	1
+		hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
+#else
+		if(hstate!=HS_LETTER) 
+		{
+			hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
 		} else {
 			hquotem &= ~H_QUOTE2;
 		};
+#endif
 		hstate=0;
 		break;
 

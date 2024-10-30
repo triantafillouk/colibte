@@ -1081,11 +1081,16 @@ int prev_page(int num_pages)
 		return (OK_CLRSL);
 	} else
 #endif
+	// MESG("prev_page: b_flag=%X num_lines=%d",cbfp->b_flag,num_lines);
 	if(cbfp->b_flag & FSNOTESN || cbfp->b_flag & FSNLIST) {
 		set_goal_column(NOTES_COLUMN+2,"prev_page:1");
 		if(num_lines > cwp->current_note_line+headline) num_lines=cwp->current_note_line;
-		if(num_lines==0) return FALSE;
+
+		if(num_lines<1) return FALSE;
+
 		cwp->current_note_line-=num_lines;
+		if(cwp->current_note_line<0) cwp->current_note_line=0;
+		// MESG("	: current_note_line=%d",cwp->current_note_line);
 		set_update(cwp,UPD_MOVE|UPD_WINDOW);
 		return (OK_CLRSL);
 	};
