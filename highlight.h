@@ -103,12 +103,12 @@ void highlight_md(int c);
 void highlight_lua(int c);
 void highlight_bicep(int c);
 
-char *c_w[] = { "if","else","do","while","switch","case","for","return","break","goto","continue","typedef",
-	"namespace","this","throw","try","catch","@property","" };
+char *c_w[] = { "if","elseif","else","do","while","switch","case","for","return","break","goto","continue","typedef",
+	"namespace","this","throw","try","catch","@property","default","" };
 char *c_w1[] = { "long", "int", "short","float", "double", "char", "union","struct","register", "unsigned","bool",
-	"void","short","extern","static","const","enum","inline","class","public","private",
-	"@interface","@end","@class","@public","@private","@implementation","self",
-	"protected","template","" };
+	"void","short","extern","static","const","enum","inline","class","public","private","volatile",
+	"@interface","@end","@class","@public","@private","@implementation","self","NULL",
+	"protected","template","true","false","" };
 
 char *julia_w[] = { "if","elseif","else","function","for","in","while","begin","end",
 	"return","do","try","catch","map","finally","break","continue","global","" };
