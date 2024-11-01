@@ -1188,6 +1188,7 @@ int open_file(int n)
 		return(err);
 	}
 	set_list_type(LDIR);
+
 	if(n>0) {
 		if(n==3) {
 			if(!BolAt(Offset())) goto_bol(1);
