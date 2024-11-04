@@ -1,0 +1,403 @@
+[abyss]
+style.background = { common.color "#02103d" }
+style.background2 = { common.color "#02103d" }
+style.background3 = { common.color "#02103d" }
+style.text = { common.color "#0f6773" }
+style.caret = { common.color "#6a8ca8" }
+style.accent = { common.color "#6a8ca8" }
+style.dim = { common.color "#303030" }
+style.divider = { common.color "#151515" }
+style.selection = { common.color "#242424" }
+style.line_number = { common.color "#252525" }
+style.line_number2 = { common.color "#444444" } -- akjshkajshd kajsdhkasjhdk ahd
+style.line_highlight = { common.color "#101010" }
+style.scrollbar = { common.color "#252525" }
+style.scrollbar2 = { common.color "#444444" }
+
+style.syntax = {}
+style.syntax["normal"] = { common.color "#a0a0a0" }
+style.syntax["symbol"] = { common.color "#a0a0a0" }
+style.syntax["comment"] = { common.color "#404040" }
+style.syntax["keyword"] = { common.color "#dfdfdf" }
+style.syntax["keyword2"] = { common.color "#dfdfdf" }
+style.syntax["number"] = { common.color "#dfdfdf" }
+style.syntax["literal"] = { common.color "#dfdfdf" }
+style.syntax["string"] = { common.color "#132a52" }
+style.syntax["operator"] = { common.color "#01A870" }
+style.syntax["function"] = { common.color "#01A870" }
+
+[betelgeuse]
+style.background         = { common.color "#222831" }
+style.background2        = { common.color "#1e232b" }
+style.background3        = { common.color "#1e232b" }
+style.text               = { common.color "#dfe2e7" }
+style.caret              = { common.color "#dfe2e7" }
+style.accent             = { common.color "#e2e4e9" }
+style.dim                = { common.color "#8893a5" }
+style.divider            = { common.color "#1e232b" }
+style.selection          = { common.color "#2c3440" }
+style.line_number        = { common.color "#8893a5" }
+style.line_number2       = { common.color "#8893a5" }
+style.line_highlight     = { common.color "#242a34" }
+style.scrollbar          = { common.color "#2c3440" }
+style.scrollbar2         = { common.color "#f5ad44" }
+style.scrollbar_track    = { common.color "#00000000" }
+style.nagbar             = { common.color "#db504a" }
+style.nagbar_text        = { common.color "#dfe2e7" }
+style.nagbar_dim         = { common.color "rgba(0, 0, 0, 0.45)" }
+style.drag_overlay       = { common.color "#dfe2e733" }
+style.drag_overlay_tab   = { common.color "#f5ad44" }
+style.good               = { common.color "#47e2b1" }
+style.warn               = { common.color "#f5ad44" }
+style.error              = { common.color "#db504a" }
+style.modified           = { common.color "#448bf5" }
+
+-- Syntax --
+style.syntax             = {}
+style.syntax["normal"]   = { common.color "#dfe2e7" }
+style.syntax["symbol"]   = { common.color "#dfe2e7" }
+style.syntax["comment"]  = { common.color "#8893a5" }
+style.syntax["keyword"]  = { common.color "#448bf5" }
+style.syntax["keyword2"] = { common.color "#f5ad44" }
+style.syntax["number"]   = { common.color "#f5ad44" }
+style.syntax["literal"]  = { common.color "#45e1df" }
+style.syntax["string"]   = { common.color "#f5ad44" }
+style.syntax["operator"] = { common.color "#dfe2e7" }
+style.syntax["function"] = { common.color "#f786aa" }
+
+-- Lint+ --
+style.lint               = {}
+style.lint["info"]       = { common.color "#448bf5" }
+style.lint["hint"]       = { common.color "#47e2b1" }
+style.lint["warning"]    = { common.color "#f5ad44" }
+style.lint["error"]      = { common.color "#db504a" }
+
+[c0nfy]
+style.background = { common.color "#03071e" }
+style.background2 = { common.color "#03071e" }
+style.background3 = { common.color "#03071e" }
+style.text = { common.color "#ffa848" }
+style.caret = { common.color "#ffa848" }
+style.accent = { common.color "#ffb86c" }
+style.dim = { common.color "#4f526b" }
+style.divider = { common.color "#22242e" }
+style.selection = { common.color "#4c5163" }
+style.line_number = { common.color "#44475a" }
+style.line_number2 = { common.color "#717796" }
+style.line_highlight = { common.color "#2d303d" }
+style.scrollbar = { common.color "#44475a" }
+style.scrollbar2 = { common.color "#4c5163" }
+
+style.syntax = {}
+style.syntax["normal"] = { common.color "#f5faff" }
+style.syntax["symbol"] = { common.color "#f5faff" }
+style.syntax["comment"] = { common.color "#081355" }
+style.syntax["keyword"] = { common.color "#fc0fc0" }
+style.syntax["keyword2"] = { common.color "#05e6fa" }
+style.syntax["number"] = { common.color "#7612c5" }
+style.syntax["literal"] = { common.color "#7612c5" }
+style.syntax["string"] = { common.color "#fdd017" }
+style.syntax["operator"] = { common.color "#fc0fc0" }
+style.syntax["function"] = { common.color "#05e6fa" }
+
+[lite_xl]
+local style = require "core.style"
+local common = require "core.common"
+
+style.background = { common.color "#2e2e32" }  -- Docview
+style.background2 = { common.color "#252529" } -- Treeview
+style.background3 = { common.color "#252529" } -- Command view
+style.text = { common.color "#97979c" }
+style.caret = { common.color "#93DDFA" }
+style.accent = { common.color "#e1e1e6" }
+-- style.dim - text color for nonactive tabs, tabs divider, prefix in log and
+-- search result, hotkeys for context menu and command view
+style.dim = { common.color "#525257" }
+style.divider = { common.color "#202024" } -- Line between nodes
+style.selection = { common.color "#48484f" }
+style.line_number = { common.color "#525259" }
+style.line_number2 = { common.color "#83838f" } -- With cursor
+style.line_highlight = { common.color "#343438" }
+style.scrollbar = { common.color "#414146" }
+style.scrollbar2 = { common.color "#4b4b52" } -- Hovered
+style.scrollbar_track = { common.color "#252529" }
+style.nagbar = { common.color "#FF0000" }
+style.nagbar_text = { common.color "#FFFFFF" }
+style.nagbar_dim = { common.color "rgba(0, 0, 0, 0.45)" }
+style.drag_overlay = { common.color "rgba(255,255,255,0.1)" }
+style.drag_overlay_tab = { common.color "#93DDFA" }
+style.good = { common.color "#72b886" }
+style.warn = { common.color "#FFA94D" }
+style.error = { common.color "#FF3333" }
+style.modified = { common.color "#1c7c9c" }
+
+style.syntax["normal"] = { common.color "#e1e1e6" }
+style.syntax["symbol"] = { common.color "#e1e1e6" }
+style.syntax["comment"] = { common.color "#676b6f" }
+style.syntax["keyword"] = { common.color "#E58AC9" }  -- local function end if case
+style.syntax["keyword2"] = { common.color "#F77483" } -- self int float
+style.syntax["number"] = { common.color "#FFA94D" }
+style.syntax["literal"] = { common.color "#FFA94D" }  -- true false nil
+style.syntax["string"] = { common.color "#f7c95c" }
+style.syntax["operator"] = { common.color "#93DDFA" } -- = + - / < >
+style.syntax["function"] = { common.color "#93DDFA" }
+
+style.log["INFO"]  = { icon = "i", color = style.text }
+style.log["WARN"]  = { icon = "!", color = style.warn }
+style.log["ERROR"] = { icon = "!", color = style.error }
+
+[github_dark_dim]
+local style = require "core.style"
+local common = require "core.common"
+
+-- GitHub color palette
+-- Ported by Andrey Proskurin (proskur1n)
+local bg = { common.color "#22272e" }
+local bg2 = { common.color "#2d333b" }
+local fg = { common.color "#adbac7" }
+local fgdim = { common.color "#768390" }
+local red = { common.color "#f47067" }
+local blue = { common.color "#6cb6ff" }
+local purple = { common.color "#dcbdfb" }
+
+style.background = bg
+style.background2 = bg
+style.background3 = bg
+style.text = fg
+style.caret = red
+style.accent = blue
+style.dim = fgdim
+style.divider = { common.color "#444c56" }
+style.selection = { common.color "#2e4c77" }
+style.line_number = fgdim
+style.line_number2 = fg
+style.line_highlight = bg2
+style.scrol = fgdim
+style.scrollbar2 = fg
+
+style.syntax["normal"] = fg
+style.syntax["symbol"] = fg
+style.syntax["comment"] = fgdim
+style.syntax["keyword"] = red
+style.syntax["keyword2"] = red
+style.syntax["number"] = blue
+style.syntax["literal"] = blue
+style.syntax["string"] = { common.color "#96d0ff" }
+style.syntax["operator"] = fg
+style.syntax["function"] = blue
+
+[github]
+style.background = { common.color "#fbfbfb" }
+style.background2 = { common.color "#f2f2f2" }
+style.background3 = { common.color "#f2f2f2" }
+style.text = { common.color "#404040" }
+style.caret = { common.color "#181818" }
+style.accent = { common.color "#0366d6" }
+style.dim = { common.color "#b0b0b0" }
+style.divider = { common.color "#e8e8e8" }
+style.selection = { common.color "#b7dce8" }
+style.line_number = { common.color "#d0d0d0" }
+style.line_number2 = { common.color "#808080" }
+style.line_highlight = { common.color "#f2f2f2" }
+style.scrollbar = { common.color "#e0e0e0" }
+style.scrollbar2 = { common.color "#c0c0c0" }
+
+style.syntax["normal"] = { common.color "#24292e" }
+style.syntax["symbol"] = { common.color "#24292e" }
+style.syntax["comment"] = { common.color "#6a737d" }
+style.syntax["keyword"] = { common.color "#d73a49" }
+style.syntax["keyword2"] = { common.color "#d73a49" }
+style.syntax["number"] = { common.color "#005cc5" }
+style.syntax["literal"] = { common.color "#005cc5" }
+style.syntax["string"] = { common.color "#032f62" }
+style.syntax["operator"] = { common.color "#d73a49" }
+style.syntax["function"] = { common.color "#005cc5" }
+
+[github_dark]
+local bg = { common.color "#0d1117" }
+local bg2 = { common.color "#161925" }
+local fg = { common.color "#adbac7" }
+local fgdim = { common.color "#768390" }
+local red = { common.color "#f47067" }
+local blue = { common.color "#6cb6ff" }
+local purple = { common.color "#dcbdfb" }
+
+style.background = bg
+style.background2 = bg
+style.background3 = bg2
+style.text = fg
+style.caret = red
+style.accent = blue
+style.dim = fgdim
+style.divider = { common.color "#444c56" }
+style.selection = { common.color "#2e4c77" }
+style.line_number = fgdim
+style.line_number2 = fg
+style.line_highlight = {common.color "#1e202e"}
+style.scrollbar = fgdim
+style.scrollbar2 = fg
+
+style.syntax["normal"] = fg
+style.syntax["symbol"] = fg
+style.syntax["comment"] = fgdim
+style.syntax["keyword"] = red
+style.syntax["keyword2"] = red
+style.syntax["number"] = blue
+style.syntax["literal"] = blue
+style.syntax["string"] = { common.color "#96d0ff" }
+style.syntax["operator"] = fg
+style.syntax["function"] = blue
+
+style.guide = { common.color "#404040" }              -- indentguide
+
+[monokai]
+style.background = { common.color "#272822" }
+style.background2 = { common.color "#181915" }
+style.background3 = { common.color "#181915" }
+style.text = { common.color "#9EA191" }
+style.caret = { common.color "#F8F8F0" }
+style.accent = { common.color "#F8F8F2" }
+style.dim = { common.color "#5E6052" }
+style.divider = { common.color "#181915" }
+style.selection = { common.color "#49483E" }
+style.line_number = { common.color "#90918B" }
+style.line_number2 = { common.color "#D2D0C6" }
+style.line_highlight = { common.color "#49483E" }
+style.scrollbar = { common.color "#53534F" }
+style.scrollbar2 = { common.color "#53534F" }
+
+style.syntax["normal"] = { common.color "#F8F8F2" }
+style.syntax["symbol"] = { common.color "#F8F8F2" }
+style.syntax["comment"] = { common.color "#75715E" }
+style.syntax["keyword"] = { common.color "#F92672" }
+style.syntax["keyword2"] = { common.color "#F92672" }
+style.syntax["number"] = { common.color "#AE81FF" }
+style.syntax["literal"] = { common.color "#E6DB74" }
+style.syntax["string"] = { common.color "#E6DB74" }
+style.syntax["operator"] = { common.color "#F92472" }
+style.syntax["function"] = { common.color "#A6E22E" }
+
+[rose-pine-moon]
+rose_pine_moon.base = "#232136"
+rose_pine_moon.surface = "#2a273f"
+rose_pine_moon.overlay = "#393552"
+rose_pine_moon.muted = "#6e6a86"
+rose_pine_moon.subtle = "#908caa"
+rose_pine_moon.text = "#e0def4"
+rose_pine_moon.love = "#eb6f92"
+rose_pine_moon.gold = "#f6c177"
+rose_pine_moon.rose = "#ea9a97"
+rose_pine_moon.pine = "#3e8fb0"
+rose_pine_moon.foam = "#9ccfd8"
+rose_pine_moon.iris = "#c4a7e7"
+rose_pine_moon.highlight_low = "#2a283e"
+rose_pine_moon.highlight_med = "#44415a"
+rose_pine_moon.highlight_high = "#56526e"
+
+style.background = { common.color(rose_pine_moon.base) } -- Docview
+style.background2 = { common.color(rose_pine_moon.base) } -- Treeview
+style.background3 = { common.color(rose_pine_moon.base) } -- Command view
+style.text = { common.color(rose_pine_moon.text) }
+style.caret = { common.color(rose_pine_moon.rose) }
+style.accent = { common.color(rose_pine_moon.text) }
+-- style.dim - text color for nonactive tabs, tabs divider, prefix in log and
+-- search result, hotkeys for context menu and command view
+style.dim = { common.color(rose_pine_moon.highlight_high) }
+style.divider = { common.color(rose_pine_moon.overlay) } -- Line between nodes
+style.selection = { common.color(rose_pine_moon.surface) }
+style.line_number = { common.color(rose_pine_moon.highlight_low) }
+style.line_number2 = { common.color(rose_pine_moon.text) } -- With cursor
+style.line_highlight = { common.color(rose_pine_moon.surface) }
+style.scrollbar = { common.color(rose_pine_moon.highlight_low) }
+style.scrollbar2 = { common.color(rose_pine_moon.highlight_med) } -- Hovered
+style.scrollbar_track = { common.color(rose_pine_moon.highlight_high) }
+style.nagbar = { common.color(rose_pine_moon.love) }
+style.nagbar_text = { common.color(rose_pine_moon.text) }
+style.nagbar_dim = { common.color("rgba(0, 0, 0, 0.45)") }
+style.drag_overlay = { common.color("rgb(38, 35, 58, 0.7)") }
+style.drag_overlay_tab = { common.color(rose_pine_moon.foam) }
+style.good = { common.color(rose_pine_moon.iris) }
+style.warn = { common.color(rose_pine_moon.gold) }
+style.error = { common.color(rose_pine_moon.love) }
+style.modified = { common.color(rose_pine_moon.foam) }
+
+style.syntax["normal"] = { common.color(rose_pine_moon.text) }
+style.syntax["symbol"] = { common.color(rose_pine_moon.text) }
+style.syntax["comment"] = { common.color(rose_pine_moon.muted) }
+style.syntax["keyword"] = { common.color(rose_pine_moon.pine) } -- local function end if case
+style.syntax["keyword2"] = { common.color(rose_pine_moon.love) } -- self int float
+style.syntax["number"] = { common.color(rose_pine_moon.gold) }
+style.syntax["literal"] = { common.color(rose_pine_moon.gold) } -- true false nil
+style.syntax["string"] = { common.color(rose_pine_moon.gold) }
+style.syntax["operator"] = { common.color(rose_pine_moon.subtle) } -- = + - / < >
+style.syntax["function"] = { common.color(rose_pine_moon.love) }
+
+[tokyo-night]
+local style = require "core.style"
+local common = require "core.common"
+
+style.background = { common.color "#1a1b26" }
+style.background2 = { common.color "#16161e" }
+style.background3 = { common.color "#24283b" }
+style.text = { common.color "#a9b1d6" }
+style.caret = { common.color "#a9b1d6" }
+style.accent = { common.color "#7aa2f7" } -- Text in autocomplete and command, col(>80) in satusbar
+style.dim = { common.color "#565f89" } -- Text of nonactive tabs, prefix in log
+style.divider = { common.color "#101014" }
+style.selection = { common.color "#282B3C" }
+style.line_number = { common.color "#363B54" }
+style.line_number2 = { common.color "#737AA2" } -- Number on line with caret
+style.line_highlight = { common.color "#1E202E"}
+style.scrollbar = { common.color "#24283b" }
+style.scrollbar2 = { common.color "#414868" } -- Hovered
+
+style.syntax["normal"] = { common.color "#9ABDF5" }
+style.syntax["symbol"] = { common.color "#c0caf5" }
+style.syntax["comment"] = { common.color "#414868" }
+style.syntax["keyword"] = { common.color "#bb9af7" }  -- local function end, if case
+style.syntax["keyword2"] = { common.color "#bb9af7" } -- self, int float
+style.syntax["number"] = { common.color "#ff9e64" }
+style.syntax["literal"] = { common.color "#c0caf5" }
+style.syntax["string"] = { common.color "#9ece6a" }
+style.syntax["operator"] = { common.color "#2ac3de"}  -- = + - / < >
+style.syntax["function"] = { common.color "#7aa2f7" }
+
+-- PLUGINS
+style.linter_warning = { common.color "#e0af68" }     -- linter
+style.bracketmatch_color = { common.color "#565f89" } -- bracketmatch
+style.guide = { common.color "#1E202E" }
+style.guide_highlight = { common.color "#363B54" }              -- indentguide
+style.guide_width = 1                                 -- indentguide
+
+[vscode-dark]
+style.background = { common.color "#1E1E1E" }
+style.background2 = { common.color "#252526" }
+style.background3 = { common.color "#252526" }
+style.text = { common.color "#D4D4D4" }
+style.caret = { common.color "#FFFFFF" }
+style.accent = { common.color "#76BCFF" } -- Text in autocomplete and command, col(>80) in satusbar
+style.dim = { common.color "#7A7A7A" } -- Text of nonactive tabs, prefix in log
+style.divider = { common.color "#1E1E1E" }
+style.selection = { common.color "#264F78" }
+style.line_number = { common.color "#707070" }
+style.line_number2 = { common.color "#A0A0A0" } -- Number on line with caret
+style.line_highlight = { common.color "#333A40"}
+style.scrollbar = { common.color "#404040" }
+style.scrollbar2 = { common.color "#707070" } -- Hovered
+
+style.syntax["normal"] = { common.color "#D4D4D4" }
+style.syntax["symbol"] = { common.color "#D4D4D4" }
+style.syntax["comment"] = { common.color "#6A9955" }
+style.syntax["keyword"] = { common.color "#569CD6" }  -- local function end, if case
+style.syntax["keyword2"] = { common.color "#C586C0" } -- self, int float
+style.syntax["number"] = { common.color "#B5CEA8" }
+style.syntax["literal"] = { common.color "#569CD6" }
+style.syntax["string"] = { common.color "#CE9178" }
+style.syntax["operator"] = { common.color "#8590A5"}  -- = + - / < >
+style.syntax["function"] = { common.color "#DCDCAA" }
+
+-- PLUGINS
+style.linter_warning = { common.color "#B89500" }     -- linter
+style.bracketmatch_color = { common.color "#76BCFF" } -- bracketmatch
+style.guide = { common.color "#404040" }              -- indentguide
+style.guide_width = 1                                 -- indentguide
