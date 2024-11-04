@@ -90,13 +90,14 @@ int color_scheme_read()
 
 		sscanf(b,"%c%s]\n",&left,name1);
 		name1[strlen(name1)-1]=0;
-
+		MESG("read color_scheme [%s]",name1);
 		scheme = get_scheme_by_name(name1);
 
 		if(!scheme) { 	/* a new scheme!!  */
 			scheme = malloc(sizeof(COLOR_SCHEME));
 			add_element_to_list((void *)scheme,color_scheme_list);
 			scheme->scheme_name = strdup(name1);
+			MESG("	new color scheme [%s]",name1);
 			int i;
 			for(i=0;i<COLOR_TYPES;i++) scheme->color_style[i].color_value="#203040";
 			// MESG("	create new scheme %s schemes now %d",name1,color_scheme_list->size);
@@ -108,6 +109,7 @@ int color_scheme_read()
 	char **sa = arg_list;
 	char *item = *sa++; 
 	j = sarray_index(color_type,item);	/* get color type  */
+	if(j<0) { free_sarray(arg_list); continue;};
 	scheme->color_style[j].color_index=0;
 	if(j>=0) {
 	// loop for attributes

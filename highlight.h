@@ -104,15 +104,15 @@ void highlight_lua(int c);
 void highlight_bicep(int c);
 
 char *c_w[] = { "if","elseif","else","do","while","switch","case","for","return","break","goto","continue","typedef",
-	"namespace","this","throw","try","catch","@property","default","" };
+	"namespace","this","throw","try","catch","@property","default","extern","static","const","" };
 char *c_w1[] = { "long", "int", "short","float", "double", "char", "union","struct","register", "unsigned","bool",
-	"void","short","extern","static","const","enum","inline","class","public","private","volatile",
+	"void","short","enum","inline","class","public","private","volatile",
 	"@interface","@end","@class","@public","@private","@implementation","self","NULL",
 	"protected","template","true","false","" };
 
 char *julia_w[] = { "if","elseif","else","function","for","in","while","begin","end",
-	"return","do","try","catch","map","finally","break","continue","global","" };
-char *julia_w1[] = { "print","println","abs","complex","const","typeof",
+	"return","do","try","catch","map","finally","break","continue","global","const","" };
+char *julia_w1[] = { "print","println","abs","complex","typeof",
 	"Int8","Int32","Int64","UInt8","UInt32","UInt64","Int128","UInt128",
 	"Float32","Float64","Float128","BigInt","BigFloat","string","true","false",
 	"NaN","Inf","Char","max","min","mean","exp",
@@ -123,34 +123,34 @@ char *julia_w1[] = { "print","println","abs","complex","const","typeof",
 
 
 char *v_w[] = { "if","else","do","while","match","case","for","in","return","break","goto","continue","typedef","import",
-	"module","this","throw","try","catch","fn","assert","lock","" };
+	"module","this","throw","try","catch","fn","assert","lock","const","" };
 char *v_w1[] = { "mut","long", "int","i32","i64", "short","u32","f32", "f64", "string", "voidptr", "struct", "unsigned","bool","sql","pub",
-	"void","short","extern","static","const","enum","inline","class","public","private","false","true","println","eprintln","table",
+	"void","short","extern","static","enum","inline","class","public","private","false","true","println","eprintln","table",
 	"self","result","or","" };
 
 char *go_w[] = { "import","package","func","if","else","do","while","go", "switch","case","for","return","break","goto","continue","typedef",
-	"select","this","try","default","defer","interface","map","range", "fallthrough", "" };
+	"select","this","try","default","defer","interface","map","range", "fallthrough","const", "" };
 char *go_w1[] = { "var","type","long", "int", "short","float", "double", "char", "chan", "struct","register", "unsigned","bool","string","uint64",
-	"void","short","extern","static","const","enum","inline","class","public","private","new",
+	"void","short","extern","static","enum","inline","class","public","private","new",
 	"self","true","false",
 	"protected","template","" };
 
 char *rust_w[] = { "fn","let","loop","if","else","do","while","in","match","for","return","break","goto","continue",
-	"loop","where","FnOnce","use","match","typedef",
+	"loop","where","FnOnce","use","match","typedef","extern","static","const",
 	"assert_eq!","Iterator","panic!","Ok","Err","parse::",
 	"" };
 char *rust_w1[] = { "i8","i32", "i64","i128","isize","u8","u32","u64","u128","usize", "str","f32","f64","bool","char","mut",
 	"Vec::","type","vec!","&mut","ref","None",
-	"extern","static","struct","enum","const","true","false","class","self","Some","format!","macrot_rules!",
+	"struct","enum","true","false","class","self","Some","format!","macrot_rules!",
 	"pub","any","impl","crate::","super","mod","my_mod::","deeply::","nested::","iter::","result::","error::","fmt::","DoubleError::","mem::",
 	"trait","String::","MathError::","Box::","HashMap::","collect::","thread::","Path::",
 	"unsafe","try",
 	""};
 
 char *java_w[] = { "import","if","else","goto", "while","switch","case","for","do","return","break","continue",
-		"default","try","catch","assert","finally","throws","throw","" };
+		"default","try","catch","assert","finally","throws","throw","const","" };
 char *java_w1[] = { "short","long", "int", "float", "double", "byte", "boolean", "static","strictfp","public", "String",
-		"class","void","char","const","native","volatile","enum","extends","implements","instanceof","interface","transient",
+		"class","void","char","native","volatile","enum","extends","implements","instanceof","interface","transient",
 		"abstract", "package", "private", "protected", "final", "new", "Integer", "synchronized","this", "true","false","null","" };
 
 char *none_w[] = { "" };
@@ -173,8 +173,8 @@ char *html_w1[] = { "function","class","include","defined","define","echo","prin
 char *xml_w[]= { "<?XML","HEAD", "BODY", "CARD", "BR","A","CARD","DO","" };
 char *xml_w1[] = { "INPUT", "FONT", "OPTION","SMALL","" };
 
-char *jscript_w[] = { "function","if","else","return", "try","catch","throws","throw","finally","final","goto","while","break","switch","implements","case","foreach","continue","for","debugger","do","with","yield","return","in","of","await","pipeline","stages","stage","steps", "agent","when","class","" };
-char *jscript_w1[] = { "def","this","constructor","var","package","private","namespace","using","protected","public","import","export","extends","typeof","void","char","int","short","long","static","transient","volatile","super","native","boolean","float","enum","syncronized", "eval","echo","print","let","const", "abstract","arguments", "title", "meta", "true","false","null","new","null","instanceof","" };
+char *jscript_w[] = { "function","if","else","return", "try","catch","throws","throw","finally","final","goto","while","break","switch","implements","case","foreach","continue","for","debugger","do","with","yield","return","in","of","await","pipeline","stages","stage","steps", "agent","when","class","const","" };
+char *jscript_w1[] = { "def","this","constructor","var","package","private","namespace","using","protected","public","import","export","extends","typeof","void","char","int","short","long","static","transient","volatile","super","native","boolean","float","enum","syncronized", "eval","echo","print","let", "abstract","arguments", "title", "meta", "true","false","null","new","null","instanceof","" };
 
 char *bicep_w[] = { "using", "metadata", "var", "param","resource","output","targetScope", "module","output", "description","" };
 char *bicep_w1[] = { "name","kind","sku","properties","reserved","string","int","secureString","null","scope","params","dependsOn",
@@ -239,9 +239,9 @@ char *matlab_w[] = {"if","for","elseif","else","while","begin","endif","end","cl
 char *matlab_w1[] = {"endfunction","function","return","plot","hold","pause","clear","set",""};
 
 char *objc_w[] = { "if","else","do","while","switch","case","for","return","break","goto","continue","typedef",
-	"namespace","this","throw","try","catch","@property","" };
+	"namespace","this","throw","try","catch","@property","const","" };
 char *objc_w1[] = { "long", "int", "short","float", "double", "char", "struct","register", "unsigned","bool",
-	"void","short","extern","static","const","enum","inline","class","public","private",
+	"void","short","extern","static","enum","inline","class","public","private",
 	"@interface","@end","@class","@public","@private","@implementation","self",
 	"protected","template","" };
 

@@ -1,10 +1,10 @@
 assign_sub ("page_loop", "M-!")
 assign_sub ("show_out","M-,")
 assign_sub ("w_abbrev", "M-/")
-assign_sub ("test1", "^XX")
 assign_sub ("clear_results", "^XC")
 assign_sub ("clear_results", "M-?")
 assign_sub ("test1","M-~")
+assign_sub ("litexl","M-$")
 
 #color_scheme(2)
 font="andale mono 14"
@@ -149,4 +149,47 @@ while(test)
  test = search_forward("AbraCatabra")
  goto_line(line1)
 
+}
+
+function litexl ()
+{
+ print("start convertion")
+ bof; replace_string("style."," ")
+ bof; replace_string("syntax[","")
+ bof; replace_string("\"]","")
+ bof; replace_string("}","")
+ bof; replace_string("{ common.color \"","")
+ bof; replace_string("\"","")
+
+ bof; replace_string("background3","info_bg")		#
+ bof; replace_string("background2","menu_bg") 		#
+ bof; replace_string("dim","light_bg")				#
+ bof; replace_string("selection","selection_bg")	#
+ bof; replace_string("scrollbar2","search_bg")		#
+ bof; replace_string("divider","box_bg")			#
+ bofl replace_string("scrollbar_track","code_bg")	#
+ bof; replace_string("scrollbar","inactive_bg")		#
+ bof; replace_string("line_highlight","quote_bg")	# 
+
+ bof; replace_string("normal",		"normal_fg")
+ bof; replace_string("background",	"normal_bg")	#
+ bof; replace_string("accent", 		"menu_fg")	
+ bof; replace_string("operator",	"special_fg")
+ bof; replace_string("comment",		"comment_fg")
+ bof; replace_string("keyword2",	"word2_fg")	
+ bof; replace_string("literal",		"word1_fg")
+ bof; replace_string("keyword",		"prep_fg")
+ bof; replace_string("string",		"single_quote_fg")
+ bof; replace_string("function",	"word3_fg")
+ bof; replace_string("symbol",		"horizon_fg")
+ bof; replace_string("modified",	"changed_fg")
+ bof; replace_string("dim",			"inactive_fg")
+ bof; replace_string("caret", 		"rowcol_fg")
+ bof; replace_string("line_number2","control_fg")
+ bof; replace_string("line_number", "not_used")
+ bof; replace_string("number", 		"standout_fg")
+ bof; replace_string("{ common.color(","")
+ bof; replace_string(")","")
+ bof; replace_string(" ","")
+ bof
 }
