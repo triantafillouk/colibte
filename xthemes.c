@@ -16,9 +16,9 @@ char *basic_color_names[] = {
 
 // default color schemes
 char *default_scheme_names[] = {
-	"Snow","Midnight","Cyan","Blue","Gray","Dark gray",
+	"Snow","Midnight","Cyan","Blue","Gray","Dark_gray",
 	"Sunny","Twilight","Lunar","Velvet",
-	NULL,NULL
+	NULL
 };
 
 
@@ -90,14 +90,14 @@ int color_scheme_read()
 
 		sscanf(b,"%c%s]\n",&left,name1);
 		name1[strlen(name1)-1]=0;
-		MESG("read color_scheme [%s]",name1);
+		// MESG("read color_scheme [%s]",name1);
 		scheme = get_scheme_by_name(name1);
 
 		if(!scheme) { 	/* a new scheme!!  */
 			scheme = malloc(sizeof(COLOR_SCHEME));
 			add_element_to_list((void *)scheme,color_scheme_list);
 			scheme->scheme_name = strdup(name1);
-			MESG("	new color scheme [%s]",name1);
+			// MESG("	new color scheme [%s]",name1);
 			int i;
 			for(i=0;i<COLOR_TYPES;i++) scheme->color_style[i].color_value="#203040";
 			// MESG("	create new scheme %s schemes now %d",name1,color_scheme_list->size);
@@ -195,7 +195,7 @@ void init_default_schemes()
 	COLOR_SCHEME *scheme = malloc(sizeof(COLOR_SCHEME));
 	scheme->scheme_name = default_scheme_names[scheme_ind];
 
-	// fprintf(stderr,"scheme %d [%s] ----------------------\n",scheme_ind,scheme->scheme_name);
+	// fprintf(stderr,"init scheme %d [%s] ----------------------\n",scheme_ind,scheme->scheme_name);
 	int total_colors=FG_COLORS+BG_COLORS;
 		for(i=0;i<total_colors;i++) 
 		{
