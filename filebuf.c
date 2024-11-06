@@ -51,6 +51,8 @@ int   ReplaceTextFromFile(char *name,FILEBUF *bf,int fd,offs size,offs *act_read
 int CheckMode(mode_t mode);
 void textpoint_reset(TextPoint *tp);
 int chardline(WINDP *wp);
+// offs  Fcheck_UtfCharAt(FILEBUF *bf, offs offset, char *c);
+offs  FUtfCharAt_nocheck(FILEBUF *bf, offs offset, utfchar *uc);
 
 FILEBUF *cbfp=NULL;
 int clen_error=0;
@@ -1365,6 +1367,20 @@ offs  FUtfCharAt(FILEBUF *bf, offs offset, utfchar *uc)
 	return o+ulen;
 }
 
+offs  FUtfCharAt_nocheck(FILEBUF *bf, offs offset, utfchar *uc)
+{
+ int i,ulen;
+ offs o=offset;
+	// ulen=FUtfCharLen(bf,o);
+	char ch=FCharAt_NoCheck(bf,o);
+	ulen = utf8charlen_nocheck(ch);
+	memset(uc->uval,0,8);
+	for(i=0;i<ulen;i++){
+			uc->uval[i]=FCharAt_NoCheck(bf,o+i);
+	};
+	return o+ulen;
+}
+
 byte  FCharAt_NoCheck(FILEBUF *fp,offs offset)
 {
    if(offset>=fp->ptr1) offset+=fp->GapSize;
@@ -1793,6 +1809,7 @@ void update_lines(FILEBUF *bp)
 {
 //  num old_lines=bp->lines;
 	textpoint_set(bp->tp_text_o,FSize(bp));
+	if(debug_flag()) MESG_time("update_lines:1");
 	textpoint_set(bp->tp_text_end,FSize(bp));
 	bp->lines=tp_line(bp->tp_text_end)+1;
 	// MESG("update_lines: old=%ld new=%ld s=%ld",old_lines,bp->lines,FSize(bp));
@@ -1876,12 +1893,12 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	};
    status=stat(name,&st);
    // MESG("ifile0: [%s] dir=[%s] name=[%s] status=%d ir_flag=%d",bf->b_fname,bf->b_dname,name,status,ir_flag);
+	MESG_time_start("ifile0: %s",bf->b_fname);
    if(status==-1 && errno==ENOENT)
    {
 	if(name[0]!=CHR_LBRA)	msg_line("New file \"%s\"",name);
 	return(false);
    } ;
-	// MESG("ifile0: 0 name=%s",name);
    if(!CheckMode(st.st_mode)) {
 		SYS_ERROR("[%s] not a regular file!");
 		msg_line("[%s] not a regular file!");
@@ -1921,7 +1938,6 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 			 bf->b_state |= FS_VIEW;
 		};
    };
-	// MESG("ifile0: 3");
 	// if(bf->b_flag & FSMMAP) MESG("ifile0: memory mapped file %s!",bf->b_fname);
 #if	0
 	if(bf->b_mode & EMCRYPT) {	/* no mmap fro encrypted files!  */
@@ -1989,6 +2005,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	 			return(false);
 			}
 		};
+
 	    CheckPoint(bf);
 
 		if(bf->b_mode & EMCRYPT){ // decrypt the rest of the file
@@ -2049,7 +2066,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	};
 
 	textpoint_set(bf->tp_current,0);	// goto the beginning
-
+	MESG_time("ifile0: end");
 	close(file);
 	if(!execmd) msg_line("%s: chars=%lld,lines=%lld type %s",bf->b_fname,FSize(bf),bf->lines,bf->hl->description);
 	if(temp_used) {
@@ -2981,7 +2998,7 @@ int   InsertBlock(FILEBUF *fp, char *block_left,offs size_left,char *block_right
    if(fp->b_flag & FSMMAP) return false;
    size=size_left+size_right;
    if(size==0) return(true);
-//	MESG("InsertBlock: pos=%ld l=%ld r=%ld",FOffset(fp),size_left,size_right);
+	// MESG("InsertBlock:%s pos=%ld l=%ld r=%ld",fp->b_fname,FOffset(fp),size_left,size_right);
    PreModify(fp);
 
    if(size_left>0) {
@@ -3135,7 +3152,7 @@ int   ReplaceTextFromFile(char *file_name,FILEBUF *fp,int fd,offs size,offs *act
 {
    // buffer should be clear
    if(fp->b_flag & FSMMAP)      return false;
-//	MESG("ReplaceTextFromFile:[%s] size=%ld ptr1=%ld ptr2=%ld",fp->b_fname,size,fp->ptr1,fp->ptr2);
+	// MESG("ReplaceTextFromFile:[%s] size=%ld ptr1=%ld ptr2=%ld",fp->b_fname,size,fp->ptr1,fp->ptr2);
    if(size==0) {
       *act_read=0;
       return(true);

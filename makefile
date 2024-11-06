@@ -203,7 +203,7 @@ xlib.o: xe.h xlib.c menus.h keytable.h
 
 alist.o: alist.c alist.h avl_tree.c rb_tree.c
 
-filebuf.o: xe.h filebuf.c undo.h replaceblock.c
+filebuf.o: xe.h filebuf.c undo.h replaceblock.c findlinecol1.c
 
 search.o: xe.h search.c
 
