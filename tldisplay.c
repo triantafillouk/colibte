@@ -556,7 +556,7 @@ extern int mousey,mousex;
 int execute_menu(int fixed)	/* execute menu */
 {
  register int status=FALSE;
- register int (*execfunc)();		/* ptr to function to execute */
+ register int (*execfunc)(int);		/* ptr to function to execute */
  int line=1;
  short key;
  long int repeat = repeat_arg;

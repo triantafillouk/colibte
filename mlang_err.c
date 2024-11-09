@@ -260,7 +260,7 @@ int err_skip_type_args(tok_struct *tok0)
  if(tok->ttype==TOK_LPAR) {
  	// MESG("	there is an LPAR type=%d name=%s",tok->ttype,tok->tname);
 	int nargs=0;
-	int rows=0;
+	// int rows=0;
 
 	while(tok->ttype!=TOK_RPAR){
 		// MESG("-- start of loop [%s]",tok->tname);
@@ -277,7 +277,8 @@ int err_skip_type_args(tok_struct *tok0)
 		stat=err_cexpression();
 		// MESG("	next token in loop is [%s] tnum=%d",tok->tname,tok->tnum);
 		if(tok->ttype==TOK_SEP) {
-			rows++;nargs=0;
+			// rows++;
+			nargs=0;
 		};	
 	};
 	NTOKEN_ERR(670);
@@ -288,7 +289,7 @@ int err_skip_type_args(tok_struct *tok0)
 
 int  err_push_args_1(int *nargs)
 {
- int i=0;
+ // int i=0;
  int num_args=0;
  TDSERR("push_args");
 
@@ -319,7 +320,7 @@ int  err_push_args_1(int *nargs)
 		*nargs=num_args;
 		return(err_num);
 	};
-	i++;
+	// i++;
 	xpos=415;
 	
 	if(tok->ttype==TOK_RPAR) {
@@ -599,7 +600,8 @@ int err_factor()
 	case TOK_LBRAKET:{	/* array definition  */
 		// MESG("err: TOK_LBRAKET, array definition for [%s]",tok0->tname);
 		pre_symbol=0;
-		int i=0,j=0;
+		int i=0;
+		// int j=0;
 		int cdim=0;
 		int rows=1,cols=0;
 		cdim=1;
@@ -632,7 +634,8 @@ int err_factor()
 				cdim=0;break;
 			};
 			if(tok->ttype==TOK_SEP) {	/* Add tok->ttype==TOK_COMMA for using comma to separate array items  */
-				i=0;j++;
+				i=0;
+				// j++;
 				cdim++;if(cdim>rows) rows=cdim;
 				// MESG("		new row2");
 				NTOKEN2;

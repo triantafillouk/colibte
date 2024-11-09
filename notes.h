@@ -23,7 +23,7 @@
 #define	TAG_UNSELECT_CURRENT	3
 
 // open an sqlite3 database
-sqlite3 * notes_db_open();
+sqlite3 * notes_db_open(char *message);
 // returns multiple rowss
 char ***query_rows(sqlite3 *db, char *sql);
 // returns one row
@@ -45,7 +45,7 @@ int callback_print(void *NotUsed, int argc, char **argv, char **azColName);
 int show_sqlite_tables(char *fname);
 
 /* ----- notes utility functions ----- */
-int insert_preamble();
+int insert_preamble(FILEBUF *fp,int type);
 int new_note(int n);
 int save_to_db(notes_struct *note);
 int save_tag(sqlite3 *db,int notes_id,char *tag);

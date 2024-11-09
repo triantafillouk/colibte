@@ -51,7 +51,7 @@ num  ConvertFromDosToUnix(FILEBUF *fp)
    {
       if(FCharAt(fp,ptr)=='\r' && FCharAt(fp,ptr+1)=='\n') {
 	 	textpoint_set(fp->tp_current,ptr);
-	 	DeleteChar(fp);
+	 	DeleteChar();
 	 	size--;
 		line++;
 //		MESG("d2u line=%d e=%lld lines=%lld col=%lld f=%d",line,te->offset,te->line,te->col,te->flags);

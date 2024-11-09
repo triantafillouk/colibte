@@ -85,7 +85,6 @@ offs   FLineBegin(FILEBUF *fp,offs ptr);
 offs   PrevLine(offs ptr);
 offs   FPrevLine(FILEBUF *fp,offs ptr);
 offs   LineEnd(offs ptr);
-offs    FSize();
 
 void FindLineCol(TextPoint *tp);
 
@@ -2764,13 +2763,13 @@ void   MoveLeftChar(FILEBUF *fp)
    {
 		if(fp->b_lang == 0) { /* in case of utf encoding  */
 
-			int previous_accents=0;
+			// int previous_accents=0;
 			for(i=2;i<5;i++){
 				cl=FUtfCharLen(fp,o-i);
 //				MESG("prev_char: o=%ld i=%d cl=%d accent=%d",o,i,cl,fp->utf_accent);
 				if(cl==i) {
 					if(fp->utf_accent) {
-						previous_accents++;
+						// previous_accents++;
 						clen=i;
 //						MESG("	pc: accent! clen=%d previous_accents=%d",clen,previous_accents);
 						if(clen==2) {
@@ -2811,13 +2810,13 @@ offs   FPrevUtfCharAt(FILEBUF *fp,offs o, utfchar *uc)
    {
 		if(fp->b_lang == 0) { /* in case of utf encoding  */
 
-			int previous_accents=0;
+			// int previous_accents=0;
 			for(i=2;i<5;i++){
 				cl=FUtfCharLen(fp,o-i);
 //				MESG("prev_char: o=%ld i=%d cl=%d accent=%d",o,i,cl,fp->utf_accent);
 				if(cl==i) {
 					if(fp->utf_accent) {
-						previous_accents++;
+						// previous_accents++;
 						clen=i;
 //						MESG("	pc: accent! clen=%d previous_accents=%d",clen,previous_accents);
 						if(clen==2) {

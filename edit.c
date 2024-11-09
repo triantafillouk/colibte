@@ -18,6 +18,7 @@ void toggle_global_flag(int option_flag);
 void set_global_flag(int option_flag,int value);
 void get_lowercase_string(char *lower, char *string);
 void get_uppercase_string(char *lower, char *string);
+void update_lines(FILEBUF *bp);
 
 offs FNext_wrap_line(WINDP *wp,offs current_offset,int num_lines,int top);
 offs FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines);

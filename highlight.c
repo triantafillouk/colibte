@@ -44,6 +44,8 @@ int read1line(FILEBUF *);
 char *fline=NULL;
 int flen=0;
 
+void	ToLineBegin();
+
 /* select highlight type from list  */
 int select_highlight(int n)
 {
@@ -241,7 +243,7 @@ int comment_with_string(char *comment_string,int start)
 		offs pos;
 		offs bol_offs;
 		int size;
-		ToLineBegin(1);
+		ToLineBegin();
 		bol_offs = Offset();
 		pos = find_string_inline(comment_string);
 		if(pos<bol_offs) {	/* not found !  */
@@ -255,7 +257,7 @@ int comment_with_string(char *comment_string,int start)
 		};
 		if(pos>=bol_offs) {
 			// delete it!
-			ToLineBegin(1);
+			ToLineBegin();
 			textpoint_move(fp->tp_current,pos-bol_offs);
 			int c = FCharAt(fp,pos+strlen(comment_string));
 			int space=0;

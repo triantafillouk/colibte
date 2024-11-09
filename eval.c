@@ -184,7 +184,7 @@ int set_debug(int n)
 	return true;
 }
 
-int debug_flag(int n)
+int debug_flag()
 {
 	return macbug;
 }
@@ -817,7 +817,7 @@ int dofile(char *fname)
 int execute(int c, int  n)
 {
     int status=0;
-	int (*execfunc)();		/* ptr to function to execute */
+	int (*execfunc)(int);		/* ptr to function to execute */
 	if(cbfp==NULL) return(0);
 	execfunc = key_function(c,1);
 	if (execfunc != NULL) {

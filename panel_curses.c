@@ -1166,7 +1166,7 @@ void drv_back_color()
 #endif
 }
 
-extern int 	(*get_function())();
+extern int 	(*get_function(char *))();
 
 struct  BFK {
 	char *func_name;
@@ -2025,7 +2025,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
  	/* we have a difference */
 	v1=vtext;
 	imax=0;
-	int ccor=0;
+	// int ccor=0;
 
 	v1=vtext;
 
@@ -2076,7 +2076,10 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 		// if(vstr[0]>0x20) {MESG("  %2d %2d [%s] [%X %X %X]",row,i,vstr,vstr[0],vstr[1],vstr[2]);};
 		if(vstr[0]==0x20) {vstr[0]=0xC2;vstr[1]=0x80;};
 #endif
-		if		(vstr[0]==0xF0 && vstr[1]==0x9F && vstr[2]!=0x8F && vstr[2]!=0x91 && vstr[2]!=0x92 && vstr[2]!=0x94 && vstr[2]!=0x96 && vstr[2]!=0x98 && vstr[2]!=0xA4 && vstr[2]!=0xA7 ) { wprintw(wp->gwp->draw,"%c",'?');ccor++;}
+		if	(vstr[0]==0xF0 && vstr[1]==0x9F && vstr[2]!=0x8F && vstr[2]!=0x91 && vstr[2]!=0x92 && vstr[2]!=0x94 && vstr[2]!=0x96 && vstr[2]!=0x98 && vstr[2]!=0xA4 && vstr[2]!=0xA7 ) { 
+			wprintw(wp->gwp->draw,"%c",'?');
+			// ccor++;
+		}
 		// else if	(vstr[0]==0xF0 && vstr[1]==0x9F && vstr[2]!=0x94) wprintw(wp->gwp->draw,"%c",'?');
 		else if	(vstr[0]==0xF0 && vstr[1]==0x9D) { wprintw(wp->gwp->draw,"%s",unknown1);}
 		else if	(vstr[0]==0xF0 && vstr[1]==0x90 && vstr[2]==0x90) wprintw(wp->gwp->draw,"%c",'#');
@@ -2257,9 +2260,9 @@ void drv_msg_line(char *arg)
 int dspv(WINDOW *disp_window,int x,int y,char *st)
 {
  int c;
- int len;
+ // int len;
  int x_pos,y_pos;
- len=0;
+ // len=0;
  // MESG("dspv: x=%d y=%d [%s]",x,y,st);
  hide_cursor("dpsv");
  wmove(disp_window,y,x);
@@ -2269,7 +2272,7 @@ int dspv(WINDOW *disp_window,int x,int y,char *st)
 		drv_wcolor(disp_window,COLOR_CTRL_FG,COLOR_BG);
 		waddch(disp_window,'^');
 		(c)+=64;
-		len++;
+		// len++;
 	};
 	waddch(disp_window,c);
 	drv_wcolor(disp_window,COLOR_FG,COLOR_BG);

@@ -500,7 +500,7 @@ void draw_window(int flag, WINDP *wp,char *from)
 {
  // static int ind=0;
  register int i;
- int ulines=0;
+ // int ulines=0;
 	// MESG(" draw_window: id=%d from=%s ind=%d",wp->id,from,ind);
 	drv_start_window_update(wp);
  	prepare_converter(wp->w_fp->b_lang);
@@ -525,7 +525,7 @@ void draw_window(int flag, WINDP *wp,char *from)
 				wp->vs[i]->slow_line=0;
 			};
 			draw_window_line(wp,i);
-			ulines++;
+			// ulines++;
 		}
 	};
 	// MESG("# -- draw_window:[%s] %d drawned lines %d flag=%X wflag=%X ind=%d",from,wp->id,ulines,flag,wp->w_flag,ind++);
@@ -2030,8 +2030,8 @@ int  show_position_info(int short_version)
 int update_screen(int force)
 {
 	WINDP *wp;
-	static int count=0;
-	count++;
+	// static int count=0;
+	// count++;
 	int cw_flag=cwp->w_flag;
 	if (noupdate) return TRUE;
 
@@ -2557,7 +2557,7 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 	if(wp->vs == NULL) return;
 	if(wp->w_fp == NULL) return;
 
-	if(!(wp->w_fp->view_mode & VMHEX)) wp->w_fp->hl->h_update(wp);
+	// if(!(wp->w_fp->view_mode & VMHEX)) wp->w_fp->hl->h_update(wp);
 	 set_selection(0);
 	
 	// MESG("upd_all_virtual_lines:w=%d vinfo=%f from[%s] left=%d b_flag=0x%X w_flag=0x%X",wp->id,bt_dval("show_vinfo"),from,wp->w_lcol,wp->w_fp->b_flag,wp->w_flag);

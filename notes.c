@@ -8,6 +8,7 @@
 */
 #include "xe.h"
 
+
 extern FILEBUF *cbfp;
 #define	MD_NOTES	1
 #define	TITLE_FIRST	1
@@ -24,6 +25,7 @@ int get_current_tag_id();
 char *get_current_tag_name();
 time_t get_note_timestamp(char *note_name);
 long int query_int(sqlite3 *db,char *sql_string);
+void set_highlight(FILEBUF *bf,int type);
 
 int insert_preamble(FILEBUF *fp,int type)
 {
@@ -197,7 +199,7 @@ offs fast_scanner4 (FILEBUF *fp, offs buff_size, char *pat, int patlen,offs star
 offs find_str_reol(FILEBUF *fp, offs start, char *needle_string, char *return_string,int max_len)
 {
 	offs ptr = start;
-	int len=0;
+	//int len=0;
 	int flen=strlen(needle_string);	/* to find string len  */
 	// MESG("	find_str_reol: [%s] max_len=%d",needle_string,max_len);
 	ptr = fast_scanner4(fp, FSize(fp), needle_string,flen,start);
@@ -208,8 +210,8 @@ offs find_str_reol(FILEBUF *fp, offs start, char *needle_string, char *return_st
 			if(rs-return_string<max_len-1) {
 				char ch = FCharAt(fp,ptr);
 				// MESG("		%ld  %c %X",rs-return_string,ch,ch);
-				*rs++ = ch; ptr++; len++;
-				// MESG("      ,");
+				*rs++ = ch; ptr++; 
+				// len++;
 			} else ptr++;
 		};
 		*rs=0;
@@ -338,11 +340,11 @@ alist *query_string_columns(sqlite3 *db, char *sql,int *widths)
  stat = sqlite3_prepare_v2(db, sql, -1, &res, 0);
  alist *a=new_list(0,"query_column");
  if(stat==SQLITE_OK) {
-	int rows=0;
+	// int rows=0;
 	while((step=sqlite3_step(res))==SQLITE_ROW) {
 		int column;
 		txt[0]=0;
-		rows++;
+		// rows++;
 		int row_id = atoi((char *)sqlite3_column_text(res,0));
 		// MESG(" row %2d : id=%d\n",rows,row_id);
 		for(column=1;column<widths[0]+1;column++) {

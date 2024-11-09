@@ -356,17 +356,16 @@ int load_scratch_files()
  if(d1==NULL) {
  	MESG("cannot read home .%s dir",APPLICATION_NAME);
  } else {
- 	int i=0;
 	struct dirent *df1;
 	char **namelist=NULL;
 
-	for(i=0;;i++) {
+	while(1) {
 		FILEBUF *bp;
 		df1=readdir(d1);
 		if(df1==NULL) { closedir(d1);break;};
-		// if(df1->d_name[0]!=CHR_LBRA) { i--;continue;};
-		if(strncmp(df1->d_name,"[new",4)!=0) { i--;continue;};
-		// if(strcmp(".",df1->d_name)==0) { i--;continue;};
+		// if(df1->d_name[0]!=CHR_LBRA) { continue;};
+		if(strncmp(df1->d_name,"[new",4)!=0) { continue;};
+		// if(strcmp(".",df1->d_name)==0) { continue;};
 		if(ind%256 == 0) namelist = (char **)realloc((char *)namelist, (ind+256)*sizeof(char *));
 		namelist[ind]=(char *)malloc(strlen(df1->d_name)+1);
 		if(namelist[ind]) {
@@ -1716,7 +1715,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 			if(bt_dval("notes_recreate") || from_note) 
 			{
 				// MESG("Notes recreate!");
-				if(get_notes_key(1)==NULL) {
+				if(get_notes_key()==NULL) {
  					// MESG("get new notes key");
 					set_notes_key(1);
 					if(get_notes_key()) {

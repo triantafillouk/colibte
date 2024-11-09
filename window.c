@@ -64,11 +64,12 @@ void set_window_width(WINDP *wp)
 int hard_reposition(int n)
 {
 	n = 0;	/* default to 0 to center screen */
-	num line,col;
+	num line;
+	// num col;
 	int ppline = cwp->w_ppline;
 	show_info(1);
 	line=tp_line(cwp->tp_current)+1;
-	col=tp_col(cwp->tp_current);
+	// col=tp_col(cwp->tp_current);
 	igotolinecol(line,1,ppline+1);	
 	cwp->w_ppline=ppline+1;
 	set_update(cwp,UPD_WINDOW);

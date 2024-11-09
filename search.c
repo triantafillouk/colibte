@@ -1310,7 +1310,7 @@ int find_tag(int n)
 
 // get the current word or another word
 	set_hmark(1,"find_tag");
-	strlcpy(tword+1,getcurcword(0),127);
+	strlcpy(tword+1,getcurcword(),127);
 	// MESG("find_tag:[%s]",tword);
 	if(tword[1]==0) { 
 		return(0);

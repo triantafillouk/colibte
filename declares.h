@@ -115,7 +115,7 @@ void init_default_schemes();
 
 // display.c
 int error_line(char *,...);
-void vtinit();
+void vtinit(int argc, char **argp);
 int update_screen(int);
 int check_cursor_position(WINDP *wp);
 int get_utf_length(utfchar *utf_char_str);
@@ -593,7 +593,7 @@ int find_previous(int n);
 int	scanner(char *patrn, int direct, int beg_or_end);
 int	readpattern(char *prompt, char *str, int srch);
 int	setpattern(char apat[], char *st,int srch);
-void savematch();
+void savematch(int direction);
 void rvstrcpy(char *rvstr, char *str,int maxlen);
 int sreplace(int n);
 int qreplace(int n);
@@ -687,7 +687,7 @@ void xdab(int y,int b,char *s,int bcolor,int fcolor);
 void box_line_print(int y,int start, char *st,int width, int selected,int active);
 void remove_box();
 
-int set_fontindex();
+int set_fontindex(int n);
 int increase_font_size(int n);
 int decrease_font_size(int n);
 
@@ -806,7 +806,7 @@ void init_clipboard();
 void checkwb(char *);
 void syncwb();
 void textpoint_move(TextPoint *tp,offs o);
-void update_lines();
+void update_lines(FILEBUF *bp);
 int init_ftype(FILEBUF *bf,char *file_name,int *temp_used,int from_note);
 void beginundogroup(UNDOS *u);
 void EndUndoGroup(UNDOS *u);
@@ -830,7 +830,7 @@ void  ResetTextPoints(FILEBUF *bp,int);
 
 /* highlight.c */
 void init_highlight();
-void set_highlight();
+void set_highlight(FILEBUF *bf,int type);
 void init_line_txt(WINDP *wp,offs tp_offs);
 void init_line_cobol(WINDP *wp,offs tp_offs);
 
@@ -842,7 +842,7 @@ int get_selection();
 void *emalloc(long,char *);
 void efree(void *,char *);
 char *getcurfword();
-void start_interactive();
+void start_interactive(char *);
 void end_interactive();
 void init_message_loop();
 void  main_execute(int c);
