@@ -690,13 +690,22 @@ WINDP *dublicate_window(WINDP *wp0)
 
 		for(ind=0;ind<2;ind++) {
 			wp->hs[ind].w_hquotem = wp0->hs[ind].w_hquotem;
+			wp->hs[ind].w_prev_set= wp0->hs[ind].w_prev_set;
 			wp->hs[ind].w_hselection = 0;
 			wp->hs[ind].w_slang = wp0->hs[ind].w_slang;
 			wp->hs[ind].w_notes = wp0->hs[ind].w_notes;
-			wp->hs[ind].w_hstate = wp0->hs[ind].w_hstate;
 			wp->hs[ind].w_first = wp0->hs[ind].w_first;
-			wp->hs[ind].w_in_array = wp0->hs[ind].w_in_array;
+			wp->hs[ind].w_in_array =  wp0->hs[ind].w_in_array;
+			wp->hs[ind].flag_word = wp0->hs[ind].flag_word;
+			wp->hs[ind].w_prev_space = wp0->hs[ind].w_prev_space;
+			wp->hs[ind].single_quoted = wp0->hs[ind].single_quoted;
+			wp->hs[ind].double_quoted = wp0->hs[ind].double_quoted;
+			wp->hs[ind].w_bold = wp0->hs[ind].w_bold;
+			wp->hs[ind].w_hquote_start = wp0->hs[ind].w_hquote_start;
+			wp->hs[ind].w_line_set = wp0->hs[ind].w_line_set;
+			wp->hs[ind].w_hstate = wp0->hs[ind].w_hstate;
 			wp->hs[ind].known_offset = wp0->hs[ind].known_offset;
+			wp->hs[ind].w_prev_line = wp0->hs[ind].w_prev_line;
 		};
 
 		lfind_data(wp0,window_list);
@@ -743,9 +752,21 @@ WINDP *dublicate_window(WINDP *wp0)
 		wp->draw_flag = 0;		
 		for(ind=0;ind<2;ind++){
 			wp->hs[ind].w_hquotem = 0;
+			wp->hs[ind].w_prev_set = 0;
 			wp->hs[ind].w_hselection =0;
 			wp->hs[ind].w_slang=0;
 			wp->hs[ind].w_notes=0;
+			wp->hs[ind].w_first = 0;
+			wp->hs[ind].w_in_array = 0;
+			wp->hs[ind].flag_word = 0;
+			wp->hs[ind].w_prev_space = 0;
+			wp->hs[ind].single_quoted = 0;
+			wp->hs[ind].double_quoted = 0;
+			wp->hs[ind].w_bold = 0;
+			wp->hs[ind].w_hquote_start = 0;
+			wp->hs[ind].w_line_set=0;
+			wp->hs[ind].w_hstate=0;
+			wp->hs[ind].w_prev_line=0;
 			wp->hs[ind].known_offset=0;
 		};
 
