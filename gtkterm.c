@@ -135,7 +135,7 @@ void sinsert_nl(char *dat,int nbytes);
 
 WINDP * make_split(WINDP *oldwindow);
 void expose_line(int i, WINDP *wp);
-int set_fontindex(int);
+int set_fontindex(num);
 void cb_tools(GtkWidget *w, T_ELEMENT *telem );
 
 void allocate_virtual_window(WINDP *wp);
@@ -685,7 +685,7 @@ void set_window_font(WINDP *wp)
  set_edit_font(wd);
 }
 
-int select_font(int n)
+int select_font(num n)
 {
  char font_name[MAXFLEN];
  int status;
@@ -1556,7 +1556,7 @@ void show_color_sample(GtkWidget *table,int ypos,char *text)
 
 extern alist *color_schemes;
 
-int set_color(int n)
+int set_color(num n)
 {
  GtkWidget *vbox;
  GtkWidget *hbox;

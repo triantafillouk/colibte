@@ -89,7 +89,7 @@ double dtransy(double y)
 
 #include "plot_cairo.c"
 
-int plot_clear(int);
+int plot_clear(num);
 int plot_update=0;
 
 void draw_line(cairo_t *cr,int x0,int y0,int x1, int y1)
@@ -750,7 +750,7 @@ int plot_zoom(num n)
 	return 1;
 }
 
-int plot_move(int direction) 
+int plot_move(num direction) 
 {
  double nx0;
 	nx0 = tdif(xmax,xmin);
