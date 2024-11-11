@@ -136,7 +136,7 @@ ge_plot_area_draw(GtkWidget *widget,cairo_t *cr)
 	plot_reset(allocation.width,allocation.height);
 
 	pl_clear();
-	plot_redraw(wd);
+	plot_redraw();
 
 	return TRUE;
 }

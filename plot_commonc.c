@@ -32,7 +32,7 @@ extern Display *dis0;
 
 double find_scale(double,int,int);
 void set_coords();
-void show_coords();
+void show_coords(cairo_t *crp);
 void plot_redraw();
 void pl_clear();
 

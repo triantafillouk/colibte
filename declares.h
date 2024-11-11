@@ -644,7 +644,7 @@ int plot_scale(num n);
 int plot_text(num n);
 void set_ratio();
 void set_coords();
-void show_coords();
+// void show_coords();
 int plot_fill(num n);
 int plot_circle(num n) ;
 int plot_rcircle(num n) ;

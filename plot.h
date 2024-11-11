@@ -118,10 +118,9 @@ int plot_coordinates = PORIGIN_BL;
 int relative_flag=0;
 int show_frames=0;
 
-plot_element *new_plot_element();
 double *add_plot_element(int type, int size);
 void free_plot_list();
-plot_element *new_plot_element();
+plot_element *new_plot_element(int);
 void new_plot_list();
 void plot_redraw();
 void do_timer_plot();

@@ -31,13 +31,15 @@
 #define ESEMBED	1	/* embed icon */
 #define ESTOCK 	2	/* stock icon */
 
+typedef long long num;
+
  /* Menu definitions by KT */
 typedef struct M_element {
 	int type;	/* function, menu, line */
 	char high;	/* highlight character */
 	char *txt;
 	char *help;
-	int (*func)();
+	int (*func)(num);
 	struct MENUS *menu;
 	char *macro;
 } M_element;

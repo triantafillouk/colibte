@@ -1423,7 +1423,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			start_column=wp->w_infocol;
 	};
 	if(wp->vtcol < start_column-1){
-		svchar(vp->v_text+wp->vtcol++,c,COLOR_INFO_BG,COLOR_INACTIVE_FG);
+		svchar(vp->v_text+wp->vtcol++,c,COLOR_INFO_BG,COLOR_FG);
 		return;
 	};
 
