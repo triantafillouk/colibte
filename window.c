@@ -31,7 +31,7 @@ int window_num()
  * Position current line in mid window, redraw.
  * Bound to ^L.
  */
-int reposition(int n)
+int reposition(num n)
 {
  // MESG("reposition:");
 	int sline=window_cursor_line(cwp);
@@ -61,7 +61,7 @@ void set_window_width(WINDP *wp)
  * this is for error conditions only, remove for production 
  * bound to ^XL . use to show current status
  */
-int hard_reposition(int n)
+int hard_reposition(num n)
 {
 	n = 0;	/* default to 0 to center screen */
 	num line;
@@ -146,7 +146,7 @@ void set_current_window(WINDP *new_wp,char *title)
  * Go to next window.
 	Bound to "C-X C-N".
  */
-int next_window(int n)
+int next_window(num n)
 {
 	register WINDP *wp;
 	if(!drv_initialized) return false;
@@ -161,7 +161,7 @@ int next_window(int n)
 /*
  * Go to previous window.
  */
-int prev_window(int n)
+int prev_window(num n)
 {
 	register WINDP *wp;
 	if(!drv_initialized) return false;
@@ -342,7 +342,7 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines)
 }
 
 /* move text position in window by n lines forward/backward */
-int move_window(int n)
+int move_window(num n)
 {
 	offs curoffs;
 	if(!drv_initialized) return false;
@@ -405,7 +405,7 @@ void free_window_data(WINDP *wp)
  * Remove all other windows from screen
  * Bound to "^X 1". 
  */
-int one_window(int n)
+int one_window(num n)
 {
  WINDP *wp;
 
@@ -432,7 +432,7 @@ int one_window(int n)
  return (TRUE);
 }
 
-int buffer_in_view(int n)
+int buffer_in_view(num n)
 {
  FILEBUF *view_buffer;
  WINDP *view_window;
@@ -775,7 +775,7 @@ void set_windows_color()
 }
 
 /* move both windows down  */
-int both_down(int n)
+int both_down(num n)
 {
 	next_page(n);
 	prev_window(1);
@@ -792,7 +792,7 @@ int both_down(int n)
 }
 
 /* move both windows up  */
-int both_up(int n)
+int both_up(num n)
 {
 	prev_page(n);
 	next_window(1);
@@ -825,7 +825,7 @@ int getwline()	/* get screen offset of current line in current window */
 	return(screen_row);
 }
 
-int sh_outwindow(int n)
+int sh_outwindow(num n)
 {
  FILEBUF *bp;
  WINDP *current_window = cwp;

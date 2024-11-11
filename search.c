@@ -45,7 +45,7 @@ int	scanner(char *pattern, int direction, int beg_or_end);
 void update_tag_linecol();
 #endif
 void set_global(int beg_or_end,int direction);
-int	replaces(int query,int f,int n);
+int	replaces(int query,int f,num n);
 int	nextch(int direction);
 int regexp_str(char *pat, char *lower,REXP_PAT *regexp_pat,int dir );
 int	amatch(char c1,REXP_PAT *pat,int direct);
@@ -123,7 +123,7 @@ void get_uppercase_string(char *upper, char *string)
  * forwsearch -- Search forward.  Get a search string from the user, and
  *	search for the string. 
  */
-int forwsearch(int n)
+int forwsearch(num n)
 {
 	register int status = TRUE;
 
@@ -164,7 +164,7 @@ char *get_line_at(FILEBUF *fb,offs offset);
  * find_next -- Search forward for a previously acquired search string.
  */
 
-int find_next(int  n)
+int find_next(num n)
 {
 	if (n < 0)	return(find_previous(-n));
 	if (search_pattern[0] == 0)
@@ -195,7 +195,7 @@ int find_next(int  n)
 /* 
 	Search backwords 
  */
-int backsearch(int n)
+int backsearch(num n)
 {
 	register int status = TRUE;
 	if(n==0) return FALSE;
@@ -226,7 +226,7 @@ int backsearch(int n)
 /*
  * find_previous -- Reverse search for a previously acquired search string,
  */
-int find_previous(int n)
+int find_previous(num n)
 {
 	if(n==0) return FALSE;
 	if (n < 0)	return(find_next(-n));
@@ -502,7 +502,7 @@ void rvstrcpy(char *rvstr, char *str,int maxlen)
 /*
  * sreplace -- Search and replace.
  */
-int sreplace(int n)
+int sreplace(num n)
 {
 	return(replaces(FALSE,0, n));
 }
@@ -510,12 +510,12 @@ int sreplace(int n)
 /*
  * qreplace -- search and replace with query.
  */
-int qreplace(int n)
+int qreplace(num n)
 {
 	return(replaces(TRUE,0, n));
 }
 
-int replace_next(int n)
+int replace_next(num n)
 {
 	return(replaces(FALSE,1,n));
 }
@@ -523,7 +523,7 @@ int replace_next(int n)
 /*
  * replaces -- Search for a string and replace it with another
  */
-int	replaces(int query, int next_only, int n)
+int	replaces(int query, int next_only, num n)
 /* query: Query enabled flag */
 {
 	register int status;	/* success flag on pattern inputs */
@@ -857,7 +857,7 @@ int nextch(int dir)
 
 char *strcasestr(const char *haystack, const char *needle);;
 
-int forw_stat(int n)
+int forw_stat(num n)
 {
  int status=0;
 
@@ -936,7 +936,7 @@ int forw_stat(int n)
 }
 
 
-int back_stat(int n)
+int back_stat(num n)
 {
  int status;
  char reverse_pattern[MAXLLEN];
@@ -1292,7 +1292,7 @@ void restore_gmode()
 	gmode_reg_exp=regexp_back;
 }
 
-int find_tag(int n)
+int find_tag(num n)
 {
  char tword[128];
  
@@ -1423,7 +1423,7 @@ int find_tag(int n)
 offs fast_scanner4 (FILEBUF *bp, offs stringlen, char *pat, int patlen,offs start);
 offs pattern_line;
 
-int grep_buffer(int nuse)
+int grep_buffer(num nuse)
 {
 	int status;		/* return status from CLI */
 	FILEBUF *bp=cbfp;	/* pointer to buffer */

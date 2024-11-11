@@ -103,7 +103,7 @@ void draw_line_to(cairo_t *cr,int x1, int y1)
  cairo_line_to(cr,x1,y1);
 }
 
-int plot_close(int n) 
+int plot_close(num n) 
 {
  if(plot_is_maped) 
  {
@@ -119,7 +119,7 @@ int plot_close(int n)
 }
 
 
-int plot_rotate(int n)
+int plot_rotate(num n)
 {
  double a;
  double *v;
@@ -131,7 +131,7 @@ int plot_rotate(int n)
  return 1;
 }
 
-int plot_translate(int n)
+int plot_translate(num n)
 {
  double x,y;
  double *v;
@@ -144,7 +144,7 @@ int plot_translate(int n)
  return 1;
 }
 
-int plot_scale(int n)
+int plot_scale(num n)
 {
  double x,y;
  double *v;
@@ -158,7 +158,7 @@ int plot_scale(int n)
  return 1;
 }
 
-int plot_move_to(int n)
+int plot_move_to(num n)
 {
  double x,y;
  double *v;
@@ -174,7 +174,7 @@ int plot_move_to(int n)
  return 1;
 }
 
-int plot_elipsep(int n)
+int plot_elipsep(num n)
 {
  double x,y;
  double *v;
@@ -189,7 +189,7 @@ int plot_elipsep(int n)
  return 1;
 }
 
-int plot_point(int n)
+int plot_point(num n)
 {
  double x,y;
  double *v;
@@ -205,7 +205,7 @@ int plot_point(int n)
  return 1;
 }
 
-int plot_line(int n) 
+int plot_line(num n) 
 {
  double x0,y0,x1,y1;
  double *v;
@@ -221,7 +221,7 @@ int plot_line(int n)
  return 1;
 }
 
-int plot_lineto(int n) 
+int plot_lineto(num n) 
 {
  double  x0,y0;
  double x1,y1;
@@ -240,7 +240,7 @@ int plot_lineto(int n)
  return 1;
 }
 
-int plot_curve_to(int n)
+int plot_curve_to(num n)
 {
  double *v;
  if(!plot_is_maped) return(0);
@@ -258,7 +258,7 @@ int plot_curve_to(int n)
 }
 
 // set rgb color (stroke color)
-int plot_color(int n)
+int plot_color(num n)
 {
  int color;
  double *v;
@@ -272,7 +272,7 @@ int plot_color(int n)
 }
 
 	/* fill color  */
-int plot_fcolor(int n)
+int plot_fcolor(num n)
 {
  double r,g,b,a;
  double *v;
@@ -286,7 +286,7 @@ int plot_fcolor(int n)
 }
 
 // set line width
-int plot_lwidth(int n)
+int plot_lwidth(num n)
 {
  double width;
  double *v;
@@ -297,7 +297,7 @@ int plot_lwidth(int n)
  return 1;
 }
 
-int plot_set_color(int n)
+int plot_set_color(num n)
 {
  double *v;
  char *s;
@@ -345,7 +345,7 @@ int plot_set_color(int n)
  return 1;
 }
 
-int plot_resize(int n)
+int plot_resize(num n)
 {
  if(!plot_is_maped) return(0);
 
@@ -361,7 +361,7 @@ void plot_status(int f,char *st)
  gtk_label_set_text((GtkLabel *)((GtkStatusbar *)wplot_pline)->label,st);
 }
 
-int plot_title(int n)
+int plot_title(num n)
 {
  char s[MAXLLEN];
  double *v;
@@ -377,7 +377,7 @@ int plot_title(int n)
  return 1;
 }
 
-int plot_text(int n)
+int plot_text(num n)
 {
  char s[MAXLLEN];
  double *v;
@@ -389,7 +389,7 @@ int plot_text(int n)
 }
 
 
-int path_end(int n)
+int path_end(num n)
 {
  double *v;
 
@@ -515,7 +515,7 @@ void str_tik1(cairo_t *cr,double x,double y,double value,double precision)
  cairo_show_text(cr,st); 
 }
 
-int plot_circle(int n) 
+int plot_circle(num n) 
 {
 	double x,y,r;
 	double *v;
@@ -533,7 +533,7 @@ int plot_circle(int n)
 	return 1;
 }
 
-int plot_rcircle(int n) 
+int plot_rcircle(num n) 
 {
 	double r;
 	double *v;
@@ -546,7 +546,7 @@ int plot_rcircle(int n)
 	return 1;
 }
 
-int plot_arc(int n) 
+int plot_arc(num n) 
 {
  double r,a1,a2;
  double *v;
@@ -562,7 +562,7 @@ int plot_arc(int n)
 	return 1;
 }
 
-int plot_rectangle(int n)
+int plot_rectangle(num n)
 {
  double w,h;
  double *v;
@@ -574,7 +574,7 @@ int plot_rectangle(int n)
 	return 1;
 }
 
-int plot_triangle(int n)
+int plot_triangle(num n)
 {
  double *v;
 	v=add_plot_element(PTRIANGLE,4);
@@ -586,7 +586,7 @@ int plot_triangle(int n)
 	return 1;
 }
 
-int plot_polyline(int n)
+int plot_polyline(num n)
 {
  double *v;
  int i=1;
@@ -616,7 +616,7 @@ int plot_polyline(int n)
 }
 
 
-int plot_image(int n) 
+int plot_image(num n) 
 {
  char s[MAXLLEN];
  double *v;
@@ -639,7 +639,7 @@ int plot_image(int n)
 }
 
 
-int set_absolute(int n)
+int set_absolute(num n)
 {
 	double *v;
 	v = add_plot_element(PABSOLUTE,0);
@@ -647,7 +647,7 @@ int set_absolute(int n)
 	return 0;
 }
 
-int set_relative(int n)
+int set_relative(num n)
 {
 	double *v;
 	v = add_plot_element(PRELATIVE,0);
@@ -655,7 +655,7 @@ int set_relative(int n)
 	return 1;
 }
 
-int plot_alpha(int n)
+int plot_alpha(num n)
 {
  double *v;
  double a;
@@ -667,7 +667,7 @@ int plot_alpha(int n)
 	return true;
 }
 
-int plot_stat(int n) 
+int plot_stat(num n) 
 {
  if(!plot_is_maped) return(0);
 	MESG("plot_stat not implemented yet!");	
@@ -709,7 +709,7 @@ double dmean(double x,double y)
  return( (x+y)/2.0);
 }
 
-int plot_zoom(int n) 
+int plot_zoom(num n) 
 {
  double nx0,ny0;
  double d,dy;
@@ -824,7 +824,7 @@ double *add_plot_element(int type, int size)
 }
 
 
-int plot_close_path(int n)
+int plot_close_path(num n)
 {
 	if(plist!=NULL) {
 		plist->closed=1;
@@ -832,7 +832,7 @@ int plot_close_path(int n)
 	} else return 0;
 }
 
-int plot_poly_nostroke(int n)
+int plot_poly_nostroke(num n)
 {
 	if(plist!=NULL) {
 		plist->stroke=0;

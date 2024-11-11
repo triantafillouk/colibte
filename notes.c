@@ -101,7 +101,7 @@ char *sql_sanitize(char *sql_string)
  return sql_string;
 }
 
-int new_note(int type)
+int new_note(num type)
 {
  int stat=0;
  char scratch_name[24];
@@ -183,12 +183,12 @@ notes_struct *init_note()
 	return note;
 }
 
-int new_cal_note(int n)
+int new_cal_note(num n)
 {
 	return new_note(2);
 }
 
-int new_todo_note(int n)
+int new_todo_note(num n)
 {
 	return new_note(5);
 }
@@ -1042,7 +1042,7 @@ int save_note()
 	return true;
 }
 
-int open_notes_dir(int n)
+int open_notes_dir(num n)
 {
  int status=0;
  char go_name[MAXFLEN];
@@ -1067,22 +1067,22 @@ int open_notes_dir(int n)
 	return(status);
 }
 
-int search_notes_tagged(int n)
+int search_notes_tagged(num n)
 {
 	return 1;
 }
 
-int view_notes_by_date(int n)
+int view_notes_by_date(num n)
 {
 	return 1;
 }
 
-int show_tags(int n)
+int show_tags(num n)
 {
 	return 1;
 }
 
-int move_to_notes(int n) 	/* dir mode  */
+int move_to_notes(num n) 	/* dir mode  */
 {
 	return 1;
 }
@@ -1148,7 +1148,7 @@ int show_sqlite_tables(char *fname)
 }
 
 // Initialize notes database 
-int init_notes_db(int n)
+int init_notes_db(num n)
 {
  sqlite3 *db;
  char *err_msg=NULL;
@@ -1180,7 +1180,7 @@ int init_notes_db(int n)
 
 
 // reconstruct notes database from file contents.
-int recreate_notes_db(int init_db)
+int recreate_notes_db(num init_db)
 {
  int status;
  char cmd[1024];
@@ -1399,17 +1399,17 @@ int show_category_list(char *category)
 	return 1;
 }
 
-int show_calendar_list(int n)
+int show_calendar_list(num n)
 {
 	return show_category_list("calendar");
 }
 
-int show_todo_list(int n)
+int show_todo_list(num n)
 {
 	return show_category_list("todo");
 }
 
-int show_tag_view(int n)
+int show_tag_view(num n)
 {
 	sqlite3 *db;
 	FILEBUF *tag_view;
@@ -1526,7 +1526,7 @@ int set_tag_view_position(int line,int column)
 }
 
 #if	TNOTES
-int toggle_tagnote(int n)
+int toggle_tagnote(num n)
 {
 	// int b_flag = (cbfp->b_flag >>6) << 6;
 	int b_flag = cbfp->b_flag;
@@ -1562,17 +1562,17 @@ void update_tag_linecol()
 	update_hmark();
 }
 
-int toggle_tag(int n)
+int toggle_tag(num n)
 {
 	return select_tag(TAG_SELECT_TOGGLE);
 }
 
-int unselect_tag(int n)
+int unselect_tag(num n)
 {
 	return select_tag(TAG_UNSELECT_CURRENT);
 }
 
-int remove_tags(int n)
+int remove_tags(num n)
 {
 	return select_tag(TAG_UNSELECT_ALL);
 }
@@ -1595,7 +1595,7 @@ int get_id_from_list(alist *list,int ind)
 // n=1	-> select current tag
 // n=2	-> unselect current tag
 
-int select_tag(int n)
+int select_tag(num n)
 {
  char *select_word=NULL;
  int tag_id=0;
@@ -1804,7 +1804,7 @@ char *get_current_note_name()
 }
 
 
-int edit_note(int n)
+int edit_note(num n)
 {
   // MESG("edit_note:");
   char *full_name = get_current_note_name();
@@ -1863,7 +1863,7 @@ int edit_note(int n)
  return true;
 }
 
-int view_note(int n)
+int view_note(num n)
 {
 	// int b_flag = (cbfp->b_flag >>8) << 8;
 	int b_flag = cbfp->b_flag;
@@ -1916,7 +1916,7 @@ int delete_noteid(int note_id)
 	} else return false;
 }
 
-int delete_tagnote(int force)
+int delete_tagnote(num force)
 {
   int b_flag = (cbfp->b_flag >>8) << 8;
   if(b_flag == FSNLIST) {
@@ -2000,7 +2000,7 @@ int delete_tagnote(int force)
 }
 
 // Convert to note
-int save_as_note(int n)
+int save_as_note(num n)
 {
  // notes_struct *note=NULL;
 	// insert preamble
@@ -2048,7 +2048,7 @@ void set_local_notes_key(char *key)
 	strlcpy(notes_key,key,MAXSLEN);	
 }
 
-int set_notes_key(int n)
+int set_notes_key(num n)
 {
 	char b_key[MAXSLEN];
 	int status=1;

@@ -72,7 +72,7 @@ void set_plot_timer()
  signal(SIGALRM, do_timer_plot);
 }
 
-int plot_frames(int n)
+int plot_frames(num n)
 {
 	double *v;
 	v = add_plot_element(PFRAMES,1);
@@ -99,7 +99,7 @@ tok_struct *current_token();
 char *tok_info(tok_struct *tok);
 
 // cartesians coordinates , axes
-int plot_coord(int n) 
+int plot_coord(num n) 
 {
  
  if(!plot_on()) { plot_init(0);};
@@ -144,7 +144,7 @@ void set_coords()
 
 }
 
-int path_start(int n)
+int path_start(num n)
 {
  double *v;
  char *s;

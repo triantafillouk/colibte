@@ -691,7 +691,7 @@ int plot_on()
  else return 1;
 }
 
-int plot_init(int n)
+int plot_init(num n)
 {
   GtkWidget *vbox1, *hbox,*hbox1;
   GtkWidget *toolbar_plot;

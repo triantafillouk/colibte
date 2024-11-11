@@ -47,7 +47,7 @@ int flen=0;
 void	ToLineBegin();
 
 /* select highlight type from list  */
-int select_highlight(int n)
+int select_highlight(num n)
 {
 	int htype=0;
 	int highlight_num=0;

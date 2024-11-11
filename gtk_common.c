@@ -1746,7 +1746,7 @@ void prepare_converter(int buffer_lang)
  };
 }
 
-int set_bg(int n)
+int set_bg(num n)
 {
 	return(new_shell(n));
 }

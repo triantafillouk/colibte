@@ -73,7 +73,7 @@ int sysexec(char *st)
 }
 
 /* update tag file */
-int update_tags(int nused)
+int update_tags(num nused)
 {
  FILEBUF *tagb;
  FILEBUF *old_cbfp;
@@ -112,7 +112,7 @@ int update_tags(int nused)
 }
 
 /* update tag file */
-int view_functions(int nused)
+int view_functions(num nused)
 {
  // FILEBUF *tagb;
  // FILEBUF *old_cbfp;
@@ -178,7 +178,7 @@ int exec_shell(char *tline);
  * show stdout on [command] buffer, stderr on [error] buffer
  * emacs key ^X!, assigned to Alt-1
  */
-int shell_cmd(int nused)
+int shell_cmd(num nused)
 {
     int    s;	/* return status from CLI */
     char	tline[MAXLLEN]; 	/* command line send to shell */
@@ -382,7 +382,7 @@ int shell_cmd1(int  nused)
 }
 
 /* execute a background system command */
-int bg_cmd(int n)
+int bg_cmd(num n)
 {
  char line[MAXLLEN];
  char fname[MAXFLEN+1];
@@ -436,7 +436,7 @@ char *extension_string(FILEBUF *bp)
 }
 
 /* grep command assigned to alt-5  */
-int grep_cmd(int  n)
+int grep_cmd(num n)
 {
 	FILEBUF *bp;
 	char	line[MAXLLEN];
@@ -552,7 +552,7 @@ int grep_cmd(int  n)
 	};
 }
 
-int rgrep_cmd(int n)
+int rgrep_cmd(num n)
 {
 	// MESG("rgrep_cmd: n=%d",n);
 	return grep_cmd(2);	
@@ -562,7 +562,7 @@ int rgrep_cmd(int n)
  * filter a buffer through an external program
  * emacs key ^X#, assigned also to alt-3
  */
-int filter_buffer(int nuse)
+int filter_buffer(num nuse)
 {
 	int    s;		/* return status from CLI */
 	FILEBUF *bp;	/* pointer to buffer to zot */

@@ -1423,7 +1423,7 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			start_column=wp->w_infocol;
 	};
 	if(wp->vtcol < start_column-1){
-		svchar(vp->v_text+wp->vtcol++,c,COLOR_INFO_BG,COLOR_FG);
+		svchar(vp->v_text+wp->vtcol++,c,COLOR_INFO_BG,COLOR_INACTIVE_FG);
 		return;
 	};
 
@@ -1914,7 +1914,7 @@ int check_cursor_position(WINDP *wp)
 /*
  * Display the current cursor position information on the statusline
  */
-int  show_position_info(int short_version)
+int  show_position_info(num short_version)
 {
 	num col;
 	num loffs;
@@ -2027,7 +2027,7 @@ int  show_position_info(int short_version)
 /*
  * Make sure that the display is right. 
  */
-int update_screen(int force)
+int update_screen(num force)
 {
 	WINDP *wp;
 	// static int count=0;
