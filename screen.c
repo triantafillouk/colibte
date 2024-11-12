@@ -2557,7 +2557,7 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 	if(wp->vs == NULL) return;
 	if(wp->w_fp == NULL) return;
 
-	// if(!(wp->w_fp->view_mode & VMHEX)) wp->w_fp->hl->h_update(wp);
+	if(!(wp->w_fp->view_mode & VMHEX)) wp->w_fp->hl->h_update(wp);
 	 set_selection(0);
 	
 	// MESG("upd_all_virtual_lines:w=%d vinfo=%f from[%s] left=%d b_flag=0x%X w_flag=0x%X",wp->id,bt_dval("show_vinfo"),from,wp->w_lcol,wp->w_fp->b_flag,wp->w_flag);

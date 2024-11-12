@@ -572,6 +572,7 @@ int check_update_highlight(int flag)
  static int h1;
  static num check_offset1=0;
  static num check_offset2=0;
+ // MESG("check_update_highlight:f=%d cwp hline=%ld",flag,tp_offset(cwp->tp_hline));
  if(flag==0) {
 	if(prev_init) return 0;
  	oldlines=fp->lines;
@@ -625,6 +626,7 @@ int get_selection()
 }
 
 #define	TRACE_BACK 1000000
+
 
 #if	0
 void update_highlight(WINDP *wp)
@@ -3447,7 +3449,8 @@ void fquote_state(offs till_offs, offs from_offs, WINDP *wp)
 {
  offs cof;
  int c;
- // int orig_hquotem=hquotem;
+ // int orig_hquotem=hquotem
+ // MESG("fquote_state: from %ld -> %ld",from_offs,till_offs);;
  if(!syntaxh) return;
  if(till_offs>FSize(cbfp)) {
 	till_offs=FSize(cbfp);
