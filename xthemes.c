@@ -8,6 +8,7 @@ COLOR_SCHEME *get_scheme_by_index(int scheme_num);
 COLOR_SCHEME *get_scheme_by_name(char *name);
 
 extern alist *color_scheme_list;
+extern int drv_colors;
 
 char *basic_color_names[] = {
 	"black","red","green","orange","blue","magenta","cyan","white",

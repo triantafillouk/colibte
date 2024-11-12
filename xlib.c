@@ -81,6 +81,7 @@ int mousex=0;
 int mousey=0;
 extern int e_pos;			// entry position
 
+int drv_initialized=0;
 extern int drv_numrow;		// current driver screen rows
 extern int drv_numcol;		// current driver screen columns
 extern FILEBUF *cbfp;
@@ -124,9 +125,9 @@ void show_subw1();
 int x_insert ();
 
 extern void update_box(int,int,int,int);
-extern int update_screen(int);
+extern int update_screen(num);
 int get_from_mouse(XEvent report,int);
-extern int copy_region(int);
+extern int copy_region(num);
 extern void update_status();
 extern alist *window_list;
 extern void set_wvs(WINDP *);
@@ -238,7 +239,7 @@ unsigned long background_pixel=0L, foreground_pixel=1L;
 int is_updated;
 int is_cnfupd;
 
-typedef int (*function_int)(int);
+// typedef int (*function_int)(num);
 
 function_int key_convert_from_mouse(function_int execf)
 {
@@ -598,7 +599,7 @@ void drv_open()
     	|ButtonReleaseMask
 	);
 
-
+	drv_initialized=1;
 #if	XPLOT
 	set_plot_timer();
 #endif
@@ -2834,7 +2835,7 @@ int check_v_sibling(WINDP *wp,int left,int top,int new_width)
 }
 
 
-int hresize_wind(int diff)
+int hresize_wind(num diff)
 {
 /*
  horizontal resize window 
@@ -2932,7 +2933,7 @@ int hresize_wind(int diff)
  return true;
 }
 
-int vresize_wind(int diff)
+int vresize_wind(num diff)
 {
 /*
  vertical resize window 
@@ -3029,6 +3030,9 @@ int vresize_wind(int diff)
  return true;
 }
 
+void drv_clear_line(WINDP *wp,int row)
+{
+}
 
 int new_shell(num n)
 {
