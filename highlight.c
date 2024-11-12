@@ -800,6 +800,7 @@ void highlight_c(int c)
 		break;
 	/* double quotes */
 	case CHR_DQUOTE:
+		if(hquotem&H_QUOTEC) break;
 //		if(flag_word==3) word_is_quoted=2;
 		if(flag_word==2) { hstate=0;break;};
 		if(hquotem&H_QUOTE1) { hstate=0;break;};
