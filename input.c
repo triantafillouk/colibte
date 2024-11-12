@@ -366,7 +366,7 @@ KEYTAB *key_item(KEYTAB *key_table,int c)
  return(kp);
 }
 
-int set_key_function2(int (*kfunc)(int), int c,char *name,KEYTAB *keytab)
+int set_key_function2(int (*kfunc)(num), int c,char *name,KEYTAB *keytab)
 {
 	KEYTAB *ktp;
 
@@ -394,7 +394,7 @@ int set_key_function2(int (*kfunc)(int), int c,char *name,KEYTAB *keytab)
 }
 
 /* assign a function to a keyboard control sequence (c) */
-int set_key_function(int (*kfunc)(int), int c,char *name)
+int set_key_function(int (*kfunc)(num), int c,char *name)
 {
  int stat=0;
 	stat += set_key_function2(kfunc,c,name,keytab_emacs);
@@ -404,11 +404,11 @@ int set_key_function(int (*kfunc)(int), int c,char *name)
 }
 
 /* assign subroutine to key */
-int assign_sub(int n)
+int assign_sub(num n)
 {
 	int c; /* key to assign the sub */
 	char funname[32];
-	int(*kfunc)(int);
+	int(*kfunc)(num);
 	int s;
 	funname[0]=0;
 	// MESG("assign_sub:");
@@ -445,10 +445,10 @@ int (*get_function(char *fname))()
 void error_skip_token(int index,char *description);
 
 /* ask for a function and a key and bind them */
-int assign_function(int n)
+int assign_function(num n)
 {
 	int c; /* key to assign the function */
-	int (*kfunc)(int n);	/* ptr to the requested function */
+	int (*kfunc)(num n);	/* ptr to the requested function */
 	char st[256];
 	char func_name[128];
 	AKEYS *key_reg;
@@ -498,7 +498,7 @@ int load_keys()
  while(fgets(str_line,MAXLLEN,f1)){
 	char **a_as;
 	int c;
-	int (*kfunc)(int n);	/* ptr to the requested function */
+	int (*kfunc)(num n);	/* ptr to the requested function */
 	AKEYS *key_reg;
 
 	str_line[strlen(str_line)-1]=0;
@@ -522,7 +522,7 @@ int load_keys()
 }
 
 /* ask for a key and remove assignement */
-int unassign_key(int n)
+int unassign_key(num n)
 {
 	int c;		
 	KEYTAB *ktp;
@@ -548,7 +548,7 @@ int unassign_key(int n)
 }
 
 /* Show all assignements in a buffer */
-int show_keys(int n)
+int show_keys(num n)
 {
 	register KEYTAB *ktp;	/* pointer into the key table */
 	register FUNCS *ftp;	/* pointer into the function table */
@@ -696,7 +696,7 @@ char *cmd_to_tstr(int cmd)
  return(tstr);
 }
 
-int set_key_emulation(int emulation)
+int set_key_emulation(num emulation)
 {
 	// MESG("set_key_emulation: %d",emulation);
 	set_bt_num_val("keyboard_emulation",emulation);
@@ -816,7 +816,7 @@ int tstr_to_command(char *tstr)
 /* ask for and 'insert' a string into the current file
    at the current point. Mainly used by macros.
 */
-int istring(int n)	
+int istring(num n)	
 {
 	register int status;	/* status return code */
 	char tstring[MAXLLEN];	/* string to add */

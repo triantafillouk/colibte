@@ -39,8 +39,9 @@ X11include=-I/opt/X11/include/
 X11lib0= -lX11 -L/opt/X11/lib $(GLIB_LIB)
 EXTFILE=.$(APP_NAME)_ext_mac
 WSL:=0
-CC=clang -DGVERS='"$(GVERS)"'
-#CC=gcc-13 -DGVERS='"$(GVERS)"'
+CC=zig cc -target x86_64-linux-gnu -DGVERS='"$(GVERS)"'
+#CC=clang -DGVERS='"$(GVERS)"'
+#CC=gcc-14 -DGVERS='"$(GVERS)"'
 endif
 
 # for Linux
@@ -53,6 +54,7 @@ X11lib0=-L/usr/X11R6/lib -lX11 -L/opt/X11/lib
 WSL:=`uname -a|grep "icrosoft" |wc -l`
 EXTFILE:=.$(APP_NAME)_ext_$(WSL)
 CC=gcc -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
+#CC=zig cc -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
 endif
 
 # for solaris
@@ -203,7 +205,7 @@ xlib.o: xe.h xlib.c menus.h keytable.h
 
 alist.o: alist.c alist.h avl_tree.c rb_tree.c
 
-filebuf.o: xe.h filebuf.c undo.h replaceblock.c
+filebuf.o: xe.h filebuf.c undo.h replaceblock.c findlinecol1.c
 
 search.o: xe.h search.c
 
@@ -258,8 +260,8 @@ ctg2 : gmain.o system.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o gi
 	${CC} gmain.o system.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o notes.o mlangf.o -o ctg2  -lX11 $(GTK2_FLAGS)  $(GLIB_LIB) -lm
 
 # This is with Xlib library, no plot !
-ctxe : main.o system.o edit.o screen.o  xldisplay.o eval.o mlang.o  file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o  highlight.o dir.o utils.o alist.o filebuf.o support.o config_init.o utf8_support.o notes.o
-	${CC} main.o system.o edit.o screen.o   xldisplay.o eval.o mlang.o file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o highlight.o dir.o utils.o alist.o  filebuf.o support.o config_init.o utf8_support.o notes.o -o ctxe -lm  $(GLIB_LIB) ${X11lib} 
+ctxe : main.o system.o edit.o screen.o  xldisplay.o eval.o mlang.o  file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o  highlight.o dir.o utils.o alist.o filebuf.o support.o config_init.o utf8_support.o mlangf.o notes.o
+	${CC} main.o system.o edit.o screen.o   xldisplay.o eval.o mlang.o file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o highlight.o dir.o utils.o alist.o  filebuf.o support.o config_init.o utf8_support.o mlangf.o notes.o -o ctxe -lm  $(GLIB_LIB) ${X11lib} 
 
 #	This is for SCO and Xlib. -lsocket is needed at the end of every X application
 #	cc -b elf main.o system.o edit.o  display.o eval.om lang.o file.o input.o help.o search.o  word.o window.o marks.o convert.o   xlib.o -o emacs  -lm -L/usr/X11R6/lib -lX11 -lsocket
@@ -268,8 +270,8 @@ ctxe : main.o system.o edit.o screen.o  xldisplay.o eval.o mlang.o  file.o  xinp
 cte : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o mlangf.o xthemes.c
 	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o -o cte  $(GLIB_LIB) ${LPCURSES} -lm
 
-ce : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o
-	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o -o ce  $(GLIB_LIB) ${LPCURSES} -lm
+ce : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o
+	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o -o ce  $(GLIB_LIB) ${LPCURSES} -lm
 
 gplotc.o: gplotc.c plot_cairo.c plot_commonc.c gplot.h
 	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o $*.o  $*.c

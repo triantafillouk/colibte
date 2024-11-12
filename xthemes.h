@@ -360,5 +360,6 @@ char *color_type[] = {
 	"changed_fg",
 	"horizon_fg",
 	"inactive_fg",
-	"rowcol_fg"
+	"rowcol_fg",
+	"info_fg",NULL
 };

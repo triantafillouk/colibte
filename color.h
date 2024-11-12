@@ -44,7 +44,7 @@ enum color_types_bg {
 	COLOR_CODE_BG		// color code background
 };
 
-#define	FG_COLORS	15
+#define	FG_COLORS	16
 enum color_types_fg {
 	COLOR_FG=BG_COLORS,	// normal, info column, double quote foreground
 	COLOR_MENU_FG,		// menu foreground
@@ -60,7 +60,8 @@ enum color_types_fg {
 	COLOR_CHANGE_FG,	// modeline changed foreground
 	COLOR_HORIZON_FG,	// orizon letters foreground
 	COLOR_INACTIVE_FG,	// modeline inactive foreground
-	COLOR_ROWCOL_FG		// DROWCOL status foreground
+	COLOR_ROWCOL_FG,	// DROWCOL status foreground
+	COLOR_INFO_FG
 };
 
 #define COLOR_TYPES	BG_COLORS+FG_COLORS
@@ -77,5 +78,36 @@ typedef struct COLOR_SCHEME {
 	COLOR_ATTR color_style[COLOR_TYPES];
 } COLOR_SCHEME;
 
+
+/*
+ - From lite-xl
+style.background 		= normal_bg
+style.background2 		= menu_bg
+style.background3 		= search_bg
+style.text 				= { common.color "#0f6773" }
+style.caret 			= { common.color "#6a8ca8" }
+style.accent 			= { common.color "#6a8ca8" }
+style.dim 				= { common.color "#303030" }
+style.divider 			= { common.color "#151515" }
+style.selection 		= selection_bg
+style.line_number 		= { common.color "#252525" }
+style.line_number2 		= { common.color "#444444" }
+style.line_highlight 	= { common.color "#101010" }
+style.scrollbar  		= { common.color "#252525" }
+style.scrollbar2 		= inactive_bg
+
+style.syntax["normal"] 	= normal_fg
+style.syntax["symbol"] 	= special_fg
+style.syntax["comment"] = comment_fg
+style.syntax["keyword"] = word1_fg
+style.syntax["keyword2"] = word2_fg
+style.syntax["number"] 	= standout_fg
+style.syntax["literal"] = single_quote_fg
+style.syntax["string"] 	= 
+style.syntax["operator"] = { common.color "#01A870" }
+style.syntax["function"] = word3_fg
+
+ 
+*/
 
 /* --- */

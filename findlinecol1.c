@@ -100,11 +100,10 @@ void FindLineCol(TextPoint *tp)	/* -- 1 --*/
 				l++;c=0;			
 			};
 		} else {
-			int c1;
 			utfchar uc;
-			o=FUtfCharAt(fp,o,&uc);
-			c1=uc.uval[0];
-			if(c1==CHR_TAB) c=next_tab(c);
+			// o=FUtfCharAt(fp,o,&uc);
+			o=FUtfCharAt_nocheck(fp,o,&uc);
+			if(uc.uval[0]==CHR_TAB) c=next_tab(c);
 			else c+=get_utf_length(&uc);
 		};
 	}

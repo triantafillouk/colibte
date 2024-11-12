@@ -31,7 +31,7 @@ int window_num()
  * Position current line in mid window, redraw.
  * Bound to ^L.
  */
-int reposition(int n)
+int reposition(num n)
 {
  // MESG("reposition:");
 	int sline=window_cursor_line(cwp);
@@ -61,14 +61,15 @@ void set_window_width(WINDP *wp)
  * this is for error conditions only, remove for production 
  * bound to ^XL . use to show current status
  */
-int hard_reposition(int n)
+int hard_reposition(num n)
 {
 	n = 0;	/* default to 0 to center screen */
-	num line,col;
+	num line;
+	// num col;
 	int ppline = cwp->w_ppline;
 	show_info(1);
 	line=tp_line(cwp->tp_current)+1;
-	col=tp_col(cwp->tp_current);
+	// col=tp_col(cwp->tp_current);
 	igotolinecol(line,1,ppline+1);	
 	cwp->w_ppline=ppline+1;
 	set_update(cwp,UPD_WINDOW);
@@ -145,7 +146,7 @@ void set_current_window(WINDP *new_wp,char *title)
  * Go to next window.
 	Bound to "C-X C-N".
  */
-int next_window(int n)
+int next_window(num n)
 {
 	register WINDP *wp;
 	if(!drv_initialized) return false;
@@ -160,7 +161,7 @@ int next_window(int n)
 /*
  * Go to previous window.
  */
-int prev_window(int n)
+int prev_window(num n)
 {
 	register WINDP *wp;
 	if(!drv_initialized) return false;
@@ -341,7 +342,7 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines)
 }
 
 /* move text position in window by n lines forward/backward */
-int move_window(int n)
+int move_window(num n)
 {
 	offs curoffs;
 	if(!drv_initialized) return false;
@@ -404,7 +405,7 @@ void free_window_data(WINDP *wp)
  * Remove all other windows from screen
  * Bound to "^X 1". 
  */
-int one_window(int n)
+int one_window(num n)
 {
  WINDP *wp;
 
@@ -431,7 +432,7 @@ int one_window(int n)
  return (TRUE);
 }
 
-int buffer_in_view(int n)
+int buffer_in_view(num n)
 {
  FILEBUF *view_buffer;
  WINDP *view_window;
@@ -689,13 +690,22 @@ WINDP *dublicate_window(WINDP *wp0)
 
 		for(ind=0;ind<2;ind++) {
 			wp->hs[ind].w_hquotem = wp0->hs[ind].w_hquotem;
+			wp->hs[ind].w_prev_set= wp0->hs[ind].w_prev_set;
 			wp->hs[ind].w_hselection = 0;
 			wp->hs[ind].w_slang = wp0->hs[ind].w_slang;
 			wp->hs[ind].w_notes = wp0->hs[ind].w_notes;
-			wp->hs[ind].w_hstate = wp0->hs[ind].w_hstate;
 			wp->hs[ind].w_first = wp0->hs[ind].w_first;
-			wp->hs[ind].w_in_array = wp0->hs[ind].w_in_array;
+			wp->hs[ind].w_in_array =  wp0->hs[ind].w_in_array;
+			wp->hs[ind].flag_word = wp0->hs[ind].flag_word;
+			wp->hs[ind].w_prev_space = wp0->hs[ind].w_prev_space;
+			wp->hs[ind].single_quoted = wp0->hs[ind].single_quoted;
+			wp->hs[ind].double_quoted = wp0->hs[ind].double_quoted;
+			wp->hs[ind].w_bold = wp0->hs[ind].w_bold;
+			wp->hs[ind].w_hquote_start = wp0->hs[ind].w_hquote_start;
+			wp->hs[ind].w_line_set = wp0->hs[ind].w_line_set;
+			wp->hs[ind].w_hstate = wp0->hs[ind].w_hstate;
 			wp->hs[ind].known_offset = wp0->hs[ind].known_offset;
+			wp->hs[ind].w_prev_line = wp0->hs[ind].w_prev_line;
 		};
 
 		lfind_data(wp0,window_list);
@@ -742,9 +752,21 @@ WINDP *dublicate_window(WINDP *wp0)
 		wp->draw_flag = 0;		
 		for(ind=0;ind<2;ind++){
 			wp->hs[ind].w_hquotem = 0;
+			wp->hs[ind].w_prev_set = -1;
 			wp->hs[ind].w_hselection =0;
 			wp->hs[ind].w_slang=0;
 			wp->hs[ind].w_notes=0;
+			wp->hs[ind].w_first = 0;
+			wp->hs[ind].w_in_array = 0;
+			wp->hs[ind].flag_word = 0;
+			wp->hs[ind].w_prev_space = 1;
+			wp->hs[ind].single_quoted = 0;
+			wp->hs[ind].double_quoted = 0;
+			wp->hs[ind].w_bold = 0;
+			wp->hs[ind].w_hquote_start = 0;
+			wp->hs[ind].w_line_set=0;
+			wp->hs[ind].w_hstate=0;
+			wp->hs[ind].w_prev_line=0;
 			wp->hs[ind].known_offset=0;
 		};
 
@@ -774,7 +796,7 @@ void set_windows_color()
 }
 
 /* move both windows down  */
-int both_down(int n)
+int both_down(num n)
 {
 	next_page(n);
 	prev_window(1);
@@ -791,7 +813,7 @@ int both_down(int n)
 }
 
 /* move both windows up  */
-int both_up(int n)
+int both_up(num n)
 {
 	prev_page(n);
 	next_window(1);
@@ -824,7 +846,7 @@ int getwline()	/* get screen offset of current line in current window */
 	return(screen_row);
 }
 
-int sh_outwindow(int n)
+int sh_outwindow(num n)
 {
  FILEBUF *bp;
  WINDP *current_window = cwp;

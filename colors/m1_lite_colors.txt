@@ -1,0 +1,379 @@
+# change common.color -> ' '
+# change style.syntax -> ' '
+[abyss]
+style.background = {   "#02103d" }
+style.background2 = {   "#02103d" }
+style.background3 = {   "#02103d" }
+style.text = {   "#0f6773" }
+style.caret = {   "#6a8ca8" }
+style.accent = {   "#6a8ca8" }
+style.dim = {   "#303030" }
+style.divider = {   "#151515" }
+style.selection = {   "#242424" }
+style.line_number = {   "#252525" }
+style.line_number2 = {   "#444444" }
+style.line_highlight = {   "#101010" }
+style.scrollbar = {   "#252525" }
+style.scrollbar2 = {   "#444444" }
+
+ ["normal"] = {   "#a0a0a0" }
+ ["symbol"] = {   "#a0a0a0" }
+ ["comment"] = {   "#404040" }
+ ["keyword"] = {   "#dfdfdf" }
+ ["keyword2"] = {   "#dfdfdf" }
+ ["number"] = {   "#dfdfdf" }
+ ["literal"] = {   "#dfdfdf" }
+ ["string"] = {   "#132a52" }
+ ["operator"] = {   "#01A870" }
+ ["function"] = {   "#01A870" }
+
+[betelgeuse]
+style.background         = {   "#222831" }
+style.background2        = {   "#1e232b" }
+style.background3        = {   "#1e232b" }
+style.text               = {   "#dfe2e7" }
+style.caret              = {   "#dfe2e7" }
+style.accent             = {   "#e2e4e9" }
+style.dim                = {   "#8893a5" }
+style.divider            = {   "#1e232b" }
+style.selection          = {   "#2c3440" }
+style.line_number        = {   "#8893a5" }
+style.line_number2       = {   "#8893a5" }
+style.line_highlight     = {   "#242a34" }
+style.scrollbar          = {   "#2c3440" }
+style.scrollbar2         = {   "#f5ad44" }
+style.scrollbar_track    = {   "#00000000" }
+style.nagbar             = {   "#db504a" }
+style.nagbar_text        = {   "#dfe2e7" }
+style.nagbar_dim         = {   "rgba(0, 0, 0, 0.45)" }
+style.drag_overlay       = {   "#dfe2e733" }
+style.drag_overlay_tab   = {   "#f5ad44" }
+style.good               = {   "#47e2b1" }
+style.warn               = {   "#f5ad44" }
+style.error              = {   "#db504a" }
+style.modified           = {   "#448bf5" }
+
+ ["normal"]   = {   "#dfe2e7" }
+ ["symbol"]   = {   "#dfe2e7" }
+ ["comment"]  = {   "#8893a5" }
+ ["keyword"]  = {   "#448bf5" }
+ ["keyword2"] = {   "#f5ad44" }
+ ["number"]   = {   "#f5ad44" }
+ ["literal"]  = {   "#45e1df" }
+ ["string"]   = {   "#f5ad44" }
+ ["operator"] = {   "#dfe2e7" }
+ ["function"] = {   "#f786aa" }
+
+[c0nfy]
+style.background = {   "#03071e" }
+style.background2 = {   "#03071e" }
+style.background3 = {   "#03071e" }
+style.text = {   "#ffa848" }
+style.caret = {   "#ffa848" }
+style.accent = {   "#ffb86c" }
+style.dim = {   "#4f526b" }
+style.divider = {   "#22242e" }
+style.selection = {   "#4c5163" }
+style.line_number = {   "#44475a" }
+style.line_number2 = {   "#717796" }
+style.line_highlight = {   "#2d303d" }
+style.scrollbar = {   "#44475a" }
+style.scrollbar2 = {   "#4c5163" }
+
+ ["normal"] = {   "#f5faff" }
+ ["symbol"] = {   "#f5faff" }
+ ["comment"] = {   "#081355" }
+ ["keyword"] = {   "#fc0fc0" }
+ ["keyword2"] = {   "#05e6fa" }
+ ["number"] = {   "#7612c5" }
+ ["literal"] = {   "#7612c5" }
+ ["string"] = {   "#fdd017" }
+ ["operator"] = {   "#fc0fc0" }
+ ["function"] = {   "#05e6fa" }
+
+[lite_xl]
+
+style.background = {   "#2e2e32" }  -- Docview
+style.background2 = {   "#252529" } -- Treeview
+style.background3 = {   "#252529" } -- Command view
+style.text = {   "#97979c" }
+style.caret = {   "#93DDFA" }
+style.accent = {   "#e1e1e6" }
+-- style.dim - text color for nonactive tabs, tabs divider, prefix in log and
+-- search result, hotkeys for context menu and command view
+style.dim = {   "#525257" }
+style.divider = {   "#202024" } -- Line between nodes
+style.selection = {   "#48484f" }
+style.line_number = {   "#525259" }
+style.line_number2 = {   "#83838f" } -- With cursor
+style.line_highlight = {   "#343438" }
+style.scrollbar = {   "#414146" }
+style.scrollbar2 = {   "#4b4b52" } -- Hovered
+style.scrollbar_track = {   "#252529" }
+style.nagbar = {   "#FF0000" }
+style.nagbar_text = {   "#FFFFFF" }
+style.nagbar_dim = {   "rgba(0, 0, 0, 0.45)" }
+style.drag_overlay = {   "rgba(255,255,255,0.1)" }
+style.drag_overlay_tab = {   "#93DDFA" }
+style.good = {   "#72b886" }
+style.warn = {   "#FFA94D" }
+style.error = {   "#FF3333" }
+style.modified = {   "#1c7c9c" }
+
+ ["normal"] = {   "#e1e1e6" }
+ ["symbol"] = {   "#e1e1e6" }
+ ["comment"] = {   "#676b6f" }
+ ["keyword"] = {   "#E58AC9" }  -- local function end if case
+ ["keyword2"] = {   "#F77483" } -- self int float
+ ["number"] = {   "#FFA94D" }
+ ["literal"] = {   "#FFA94D" }  -- true false nil
+ ["string"] = {   "#f7c95c" }
+ ["operator"] = {   "#93DDFA" } -- = + - / < >
+ ["function"] = {   "#93DDFA" }
+
+[github_dark_dim]
+
+-- GitHub color palette
+-- Ported by Andrey Proskurin (proskur1n)
+local bg = {   "#22272e" }
+local bg2 = {   "#2d333b" }
+local fg = {   "#adbac7" }
+local fgdim = {   "#768390" }
+local red = {   "#f47067" }
+local blue = {   "#6cb6ff" }
+local purple = {   "#dcbdfb" }
+
+style.background = bg
+style.background2 = bg
+style.background3 = bg
+style.text = fg
+style.caret = red
+style.accent = blue
+style.dim = fgdim
+style.divider = {   "#444c56" }
+style.selection = {   "#2e4c77" }
+style.line_number = fgdim
+style.line_number2 = fg
+style.line_highlight = bg2
+style.scrol = fgdim
+style.scrollbar2 = fg
+
+ ["normal"] = fg
+ ["symbol"] = fg
+ ["comment"] = fgdim
+ ["keyword"] = red
+ ["keyword2"] = red
+ ["number"] = blue
+ ["literal"] = blue
+ ["string"] = {   "#96d0ff" }
+ ["operator"] = fg
+ ["function"] = blue
+
+[github]
+style.background = {   "#fbfbfb" }
+style.background2 = {   "#f2f2f2" }
+style.background3 = {   "#f2f2f2" }
+style.text = {   "#404040" }
+style.caret = {   "#181818" }
+style.accent = {   "#0366d6" }
+style.dim = {   "#b0b0b0" }
+style.divider = {   "#e8e8e8" }
+style.selection = {   "#b7dce8" }
+style.line_number = {   "#d0d0d0" }
+style.line_number2 = {   "#808080" }
+style.line_highlight = {   "#f2f2f2" }
+style.scrollbar = {   "#e0e0e0" }
+style.scrollbar2 = {   "#c0c0c0" }
+
+ ["normal"] = {   "#24292e" }
+ ["symbol"] = {   "#24292e" }
+ ["comment"] = {   "#6a737d" }
+ ["keyword"] = {   "#d73a49" }
+ ["keyword2"] = {   "#d73a49" }
+ ["number"] = {   "#005cc5" }
+ ["literal"] = {   "#005cc5" }
+ ["string"] = {   "#032f62" }
+ ["operator"] = {   "#d73a49" }
+ ["function"] = {   "#005cc5" }
+
+[github_dark]
+local bg = {   "#0d1117" }
+local bg2 = {   "#161925" }
+local fg = {   "#adbac7" }
+local fgdim = {   "#768390" }
+local red = {   "#f47067" }
+local blue = {   "#6cb6ff" }
+local purple = {   "#dcbdfb" }
+
+style.background = bg
+style.background2 = bg
+style.background3 = bg2
+style.text = fg
+style.caret = red
+style.accent = blue
+style.dim = fgdim
+style.divider = {   "#444c56" }
+style.selection = {   "#2e4c77" }
+style.line_number = fgdim
+style.line_number2 = fg
+style.line_highlight = {  "#1e202e"}
+style.scrollbar = fgdim
+style.scrollbar2 = fg
+
+ ["normal"] = fg
+ ["symbol"] = fg
+ ["comment"] = fgdim
+ ["keyword"] = red
+ ["keyword2"] = red
+ ["number"] = blue
+ ["literal"] = blue
+ ["string"] = {   "#96d0ff" }
+ ["operator"] = fg
+ ["function"] = blue
+
+style.guide = {   "#404040" }              -- indentguide
+
+[monokai]
+style.background = {   "#272822" }
+style.background2 = {   "#181915" }
+style.background3 = {   "#181915" }
+style.text = {   "#9EA191" }
+style.caret = {   "#F8F8F0" }
+style.accent = {   "#F8F8F2" }
+style.dim = {   "#5E6052" }
+style.divider = {   "#181915" }
+style.selection = {   "#49483E" }
+style.line_number = {   "#90918B" }
+style.line_number2 = {   "#D2D0C6" }
+style.line_highlight = {   "#49483E" }
+style.scrollbar = {   "#53534F" }
+style.scrollbar2 = {   "#53534F" }
+
+ ["normal"] = {   "#F8F8F2" }
+ ["symbol"] = {   "#F8F8F2" }
+ ["comment"] = {   "#75715E" }
+ ["keyword"] = {   "#F92672" }
+ ["keyword2"] = {   "#F92672" }
+ ["number"] = {   "#AE81FF" }
+ ["literal"] = {   "#E6DB74" }
+ ["string"] = {   "#E6DB74" }
+ ["operator"] = {   "#F92472" }
+ ["function"] = {   "#A6E22E" }
+
+[rose-pine-moon]
+rose_pine_moon.base = "#232136"
+rose_pine_moon.surface = "#2a273f"
+rose_pine_moon.overlay = "#393552"
+rose_pine_moon.muted = "#6e6a86"
+rose_pine_moon.subtle = "#908caa"
+rose_pine_moon.text = "#e0def4"
+rose_pine_moon.love = "#eb6f92"
+rose_pine_moon.gold = "#f6c177"
+rose_pine_moon.rose = "#ea9a97"
+rose_pine_moon.pine = "#3e8fb0"
+rose_pine_moon.foam = "#9ccfd8"
+rose_pine_moon.iris = "#c4a7e7"
+rose_pine_moon.highlight_low = "#2a283e"
+rose_pine_moon.highlight_med = "#44415a"
+rose_pine_moon.highlight_high = "#56526e"
+
+style.background = {  (rose_pine_moon.base) } -- Docview
+style.background2 = {  (rose_pine_moon.base) } -- Treeview
+style.background3 = {  (rose_pine_moon.base) } -- Command view
+style.text = {  (rose_pine_moon.text) }
+style.caret = {  (rose_pine_moon.rose) }
+style.accent = {  (rose_pine_moon.text) }
+-- style.dim - text color for nonactive tabs, tabs divider, prefix in log and
+-- search result, hotkeys for context menu and command view
+style.dim = {  (rose_pine_moon.highlight_high) }
+style.divider = {  (rose_pine_moon.overlay) } -- Line between nodes
+style.selection = {  (rose_pine_moon.surface) }
+style.line_number = {  (rose_pine_moon.highlight_low) }
+style.line_number2 = {  (rose_pine_moon.text) } -- With cursor
+style.line_highlight = {  (rose_pine_moon.surface) }
+style.scrollbar = {  (rose_pine_moon.highlight_low) }
+style.scrollbar2 = {  (rose_pine_moon.highlight_med) } -- Hovered
+style.scrollbar_track = {  (rose_pine_moon.highlight_high) }
+style.nagbar = {  (rose_pine_moon.love) }
+style.nagbar_text = {  (rose_pine_moon.text) }
+style.nagbar_dim = {  ("rgba(0, 0, 0, 0.45)") }
+style.drag_overlay = {  ("rgb(38, 35, 58, 0.7)") }
+style.drag_overlay_tab = {  (rose_pine_moon.foam) }
+style.good = {  (rose_pine_moon.iris) }
+style.warn = {  (rose_pine_moon.gold) }
+style.error = {  (rose_pine_moon.love) }
+style.modified = {  (rose_pine_moon.foam) }
+
+ ["normal"] = {  (rose_pine_moon.text) }
+ ["symbol"] = {  (rose_pine_moon.text) }
+ ["comment"] = {  (rose_pine_moon.muted) }
+ ["keyword"] = {  (rose_pine_moon.pine) } -- local function end if case
+ ["keyword2"] = {  (rose_pine_moon.love) } -- self int float
+ ["number"] = {  (rose_pine_moon.gold) }
+ ["literal"] = {  (rose_pine_moon.gold) } -- true false nil
+ ["string"] = {  (rose_pine_moon.gold) }
+ ["operator"] = {  (rose_pine_moon.subtle) } -- = + - / < >
+ ["function"] = {  (rose_pine_moon.love) }
+
+[tokyo-night]
+
+style.background = {   "#1a1b26" }
+style.background2 = {   "#16161e" }
+style.background3 = {   "#24283b" }
+style.text = {   "#a9b1d6" }
+style.caret = {   "#a9b1d6" }
+style.accent = {   "#7aa2f7" } -- Text in autocomplete and command, col(>80) in satusbar
+style.dim = {   "#565f89" } -- Text of nonactive tabs, prefix in log
+style.divider = {   "#101014" }
+style.selection = {   "#282B3C" }
+style.line_number = {   "#363B54" }
+style.line_number2 = {   "#737AA2" } -- Number on line with caret
+style.line_highlight = {   "#1E202E"}
+style.scrollbar = {   "#24283b" }
+style.scrollbar2 = {   "#414868" } -- Hovered
+
+ ["normal"] = {   "#9ABDF5" }
+ ["symbol"] = {   "#c0caf5" }
+ ["comment"] = {   "#414868" }
+ ["keyword"] = {   "#bb9af7" }  -- local function end, if case
+ ["keyword2"] = {   "#bb9af7" } -- self, int float
+ ["number"] = {   "#ff9e64" }
+ ["literal"] = {   "#c0caf5" }
+ ["string"] = {   "#9ece6a" }
+ ["operator"] = {   "#2ac3de"}  -- = + - / < >
+ ["function"] = {   "#7aa2f7" }
+
+-- PLUGINS
+style.linter_warning = {   "#e0af68" }     -- linter
+style.bracketmatch_color = {   "#565f89" } -- bracketmatch
+style.guide = {   "#1E202E" }
+style.guide_highlight = {   "#363B54" }              -- indentguide
+style.guide_width = 1                                 -- indentguide
+
+[vscode-dark]
+style.background = {   "#1E1E1E" }
+style.background2 = {   "#252526" }
+style.background3 = {   "#252526" }
+style.text = {   "#D4D4D4" }
+style.caret = {   "#FFFFFF" }
+style.accent = {   "#76BCFF" } -- Text in autocomplete and command, col(>80) in satusbar
+style.dim = {   "#7A7A7A" } -- Text of nonactive tabs, prefix in log
+style.divider = {   "#1E1E1E" }
+style.selection = {   "#264F78" }
+style.line_number = {   "#707070" }
+style.line_number2 = {   "#A0A0A0" } -- Number on line with caret
+style.line_highlight = {   "#333A40"}
+style.scrollbar = {   "#404040" }
+style.scrollbar2 = {   "#707070" } -- Hovered
+
+ ["normal"] = {   "#D4D4D4" }
+ ["symbol"] = {   "#D4D4D4" }
+ ["comment"] = {   "#6A9955" }
+ ["keyword"] = {   "#569CD6" }  -- local function end, if case
+ ["keyword2"] = {   "#C586C0" } -- self, int float
+ ["number"] = {   "#B5CEA8" }
+ ["literal"] = {   "#569CD6" }
+ ["string"] = {   "#CE9178" }
+ ["operator"] = {   "#8590A5"}  -- = + - / < >
+ ["function"] = {   "#DCDCAA" }
+

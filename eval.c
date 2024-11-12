@@ -154,7 +154,7 @@ extern char *err_str;
 int nnarg=1;
 
 // set a numeric argument for next funtion to execute
-int set_arg(int n)
+int set_arg(num n)
 {
 	char arg[MAXSLEN];
 	arg[0]=0;
@@ -178,13 +178,13 @@ BTNODE *find_bt_element(char *name)
  return(btn);
 }
 
-int set_debug(int n)
+int set_debug(num n)
 {
 	macbug=n;
 	return true;
 }
 
-int debug_flag(int n)
+int debug_flag()
 {
 	return macbug;
 }
@@ -268,7 +268,7 @@ double get_env(int vnum)
 
 
  /* Select an editor variable and edit its value */
-int set_option(int n)
+int set_option(num n)
 {
  int nv;
  char value[MAXSLEN];
@@ -332,7 +332,7 @@ int set_option(int n)
  return(FALSE);
 }
 
-short int get_next_key(int mode)
+short int get_next_key(num mode)
 {
  if(mode==PLAY) {
  	if(kbdptr==kbdend-1) return-1;
@@ -570,7 +570,7 @@ int sindex(char *source, char *pattern)	/* find pattern within source */
 	return(0);
 }
 
-char *date_string(int n)
+char *date_string(num n)
 {
  static char date_str[128];
  int res=0;
@@ -666,7 +666,7 @@ int docmd(char *cmd)
 
 /*	macro_line:	Execute a macro command typed 
 			by the user					*/
-int macro_line(int nused)
+int macro_line(num nused)
 {
 	char cmd_name[MAXLLEN];		/* string holding command to execute */
 	int status;
@@ -717,14 +717,14 @@ int exec_named_function(char *name)
 	return(ival);
 }
 
-int execsub(int n)
+int execsub(num n)
 {
 //	MESG("execsub: %d %s",n,subname);
 	return(exec_named_function(subname));
 }
 
 /* find and execute a macro file */
-int exec_file(int n)	
+int exec_file(num n)	
 {
 	int status;	/* return status of name query */
 	char fname[MAXFLEN];	/* name of file to execute */
@@ -817,7 +817,7 @@ int dofile(char *fname)
 int execute(int c, int  n)
 {
     int status=0;
-	int (*execfunc)();		/* ptr to function to execute */
+	int (*execfunc)(num);		/* ptr to function to execute */
 	if(cbfp==NULL) return(0);
 	execfunc = key_function(c,1);
 	if (execfunc != NULL) {
@@ -957,7 +957,7 @@ void set_record_string1(char *st2)
 
 /* record keys and form a macro to be executed later */
 /* Assigned to F7 */
-int record_macro(int n)
+int record_macro(num n)
 {
 	if (kbdmode == STOP) {
 		msg_line("[Start macro]");
@@ -1025,7 +1025,7 @@ int replay(int mode,int ntimes)
  return TRUE;
 }
 
-int exec_macro(int ntimes)
+int exec_macro(num ntimes)
 {
  if (kbdmode != STOP) {
     msg_line("Macro already active");
@@ -1083,7 +1083,7 @@ int execute_session(char *fname)
 }
 
 /* load, replay session */
-int load_session(int n)
+int load_session(num n)
 {
  int status;
  static char fname[MAXFLEN];
@@ -1096,7 +1096,7 @@ int load_session(int n)
  };
 }
 
-int show_session(int n)
+int show_session(num n)
 {
  
  char *ptr;
@@ -1126,7 +1126,7 @@ for(key=&kbdm_session[0];key<kbdsession_end;key++){
  return TRUE;
 }
 
-int save_session(int n)
+int save_session(num n)
 {
  int f;
  int len=kbdsession_end-&kbdm_session[0];
@@ -1165,7 +1165,7 @@ int save_session(int n)
 #endif
 
 /* set default local codepage for ISO files,characters */
-int set_locale(int local_codepage)
+int set_locale(num local_codepage)
 {
 	switch(local_codepage){
 		case 0:
@@ -1182,7 +1182,7 @@ int set_locale(int local_codepage)
 
 #if	RSESSION
 // save trace in case of an error
-int save_trace(int n)
+int save_trace(num n)
 {
 	FILE *fp;
 	FILEBUF *bp;
@@ -1252,7 +1252,7 @@ int create_function_buffer(FILEBUF *pbuf,char *function_name,offs start_function
  (cbfp is cwp->w_fp)
  function bound to ALT-=
 */
-int refresh_current_line(int nused)
+int refresh_current_line(num nused)
 {
  double value=0;
  int is_ddot=0;

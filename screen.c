@@ -36,8 +36,8 @@ extern COLOR_SCHEME *current_scheme;
 
 int specialh=0;
 /* highlight state  */
+int prev_hquotem=-1;
 extern int hquotem;
-extern int prev_hquotem;
 extern int slang;
 extern int stop_word_highlight;
 extern int start_word_highlight;
@@ -500,7 +500,7 @@ void draw_window(int flag, WINDP *wp,char *from)
 {
  // static int ind=0;
  register int i;
- int ulines=0;
+ // int ulines=0;
 	// MESG(" draw_window: id=%d from=%s ind=%d",wp->id,from,ind);
 	drv_start_window_update(wp);
  	prepare_converter(wp->w_fp->b_lang);
@@ -525,7 +525,7 @@ void draw_window(int flag, WINDP *wp,char *from)
 				wp->vs[i]->slow_line=0;
 			};
 			draw_window_line(wp,i);
-			ulines++;
+			// ulines++;
 		}
 	};
 	// MESG("# -- draw_window:[%s] %d drawned lines %d flag=%X wflag=%X ind=%d",from,wp->id,ulines,flag,wp->w_flag,ind++);
@@ -1423,15 +1423,15 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			start_column=wp->w_infocol;
 	};
 	if(wp->vtcol < start_column-1){
-		svchar(vp->v_text+wp->vtcol++,c,COLOR_INFO_BG,COLOR_FG);
+		svchar(vp->v_text+wp->vtcol++,c,COLOR_INFO_BG,COLOR_INFO_FG);
 		return;
 	};
 
 	if(wp->vtcol == start_column-1){
 #if	DARWIN || PCURSES
-		svchar(vp->v_text+wp->vtcol++,CHR_NBSPACE,COLOR_INFO_BG,COLOR_FG);
+		svchar(vp->v_text+wp->vtcol++,CHR_NBSPACE,COLOR_INFO_BG,COLOR_INFO_FG);
 #else
-		svchar(vp->v_text+wp->vtcol++,CHR_SPACE,COLOR_INFO_BG,COLOR_FG);
+		svchar(vp->v_text+wp->vtcol++,CHR_SPACE,COLOR_INFO_BG,COLOR_INFO_FG);
 #endif
 		return;
 	};
@@ -1914,7 +1914,7 @@ int check_cursor_position(WINDP *wp)
 /*
  * Display the current cursor position information on the statusline
  */
-int  show_position_info(int short_version)
+int  show_position_info(num short_version)
 {
 	num col;
 	num loffs;
@@ -2027,11 +2027,11 @@ int  show_position_info(int short_version)
 /*
  * Make sure that the display is right. 
  */
-int update_screen(int force)
+int update_screen(num force)
 {
 	WINDP *wp;
-	static int count=0;
-	count++;
+	// static int count=0;
+	// count++;
 	int cw_flag=cwp->w_flag;
 	if (noupdate) return TRUE;
 

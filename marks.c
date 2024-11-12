@@ -35,7 +35,7 @@
 /* set a book mark 
  Assigned to ^XT
 */
-int set_bmark(int n)
+int set_bmark(num n)
 {
  bmark[bknum].line=getcline()+1;
  bmark[bknum].column=getccolumn()+1;
@@ -82,7 +82,7 @@ int goto_mark(BMARK *mark)
 	return(1);
 }
 
-int goto_bmark(int n)
+int goto_bmark(num n)
 {
  if(n>=0 && n<bknum) {
  	goto_mark(&bmark[n]);
@@ -101,7 +101,7 @@ int goto_bmark(int n)
 
 #define BMARKLEN	80
 /* select a bookmark from keyboard and goto it */
-int select_bmark(int n)
+int select_bmark(num n)
 {
  char **mark_list;
  int ind;
@@ -120,7 +120,7 @@ int select_bmark(int n)
 }
 
 
-int prev_bmark(int n)
+int prev_bmark(num n)
 {
  int t;
  t=ptag;
@@ -131,7 +131,7 @@ int prev_bmark(int n)
 }
 
 /* next_bmark: FIXME!! */
-int next_bmark(int n)
+int next_bmark(num n)
 {
  ptag=ctag;
  ctag++;
@@ -142,7 +142,7 @@ int next_bmark(int n)
 }
 
 /* clear all bookmarks */
-int clear_bmarks(int n) 
+int clear_bmarks(num n) 
 {
  int i;
  for(i=0;i<BKMAX;i++) {
@@ -198,7 +198,7 @@ void update_hmark()
 }
 
 
-int select_hmark(int nind)
+int select_hmark(num nind)
 {
  char **mark_list;
  int ind;
@@ -224,7 +224,7 @@ int select_hmark(int nind)
 }
 
 /* delete all history marks of a buffer. */
-int delete_hmark(int flag)
+int delete_hmark(num flag)
 {
  int i1,i0;
  char now_fname[MAXFLEN];
@@ -267,7 +267,7 @@ int delete_hmark(int flag)
 
 
 /* goto current history mark */
-int current_hmark(int n)
+int current_hmark(num n)
 {
  int rn;
  if(hmstart<BKMAX && hmcurrent<hmstart) return 0;	/* No mark!  */
@@ -280,7 +280,7 @@ int current_hmark(int n)
 }
 
 /* goto previous history mark */
-int prev_hmark(int n)
+int prev_hmark(num n)
 {
  int rn;
  // MESG("prev_hmark:");
@@ -303,7 +303,7 @@ int prev_hmark(int n)
 
 
 /* goto next history mark */
-int next_hmark(int n)
+int next_hmark(num n)
 {
  int rn;
  if(hmcurrent+n >  hmnum) return FALSE;

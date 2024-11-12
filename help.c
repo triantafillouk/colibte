@@ -12,7 +12,7 @@
 extern FILEBUF *cbfp;
 
 /* Show on screen help */
-int help(int n)	
+int help(num n)	
 {
 
 	FILEBUF *bp;	/* buffer pointer to help */

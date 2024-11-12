@@ -186,7 +186,7 @@ int get_box_cline()
 	return cbox->cline;
 }
 
-int select_font_mono(int n)
+int select_font_mono(num n)
 {
 	return true;
 }
@@ -209,13 +209,13 @@ void SigHandler(int sig)
  }
 }
 
-int set_bg(int n)
+int set_bg(num n)
 {
 	kill(getpid(),SIGTSTP);	/* send pause signal!  */
 	return(1);
 }
 
-extern int new_line(int n);
+extern int new_line(num n);
 
 function_int key_convert_from_mouse(function_int execf)
 {
@@ -289,7 +289,7 @@ WINDOW *drv_new_win(char *label,int h,int w,int y,int x)
  * Delete the current window, rearange screen space
  * Bound to ^X0.
  */
-int delete_window(int n)
+int delete_window(num n)
 {
 	WINDP *wp=NULL;	/* loop window */ 
 	WINDP *w1=NULL;	/* first window to go and receive deleted space */
@@ -453,7 +453,7 @@ void set_1window()
  * Split the current window horizontally
  * Bound to "C-X 2". 
  */
-int split_window(int n)
+int split_window(num n)
 {
         register WINDP *wp;
         register int    ntru;
@@ -491,7 +491,7 @@ int split_window(int n)
  * Split the current window vertically
  * Bound to "C-X 3". 
  */
-int vsplit_window(int n)
+int vsplit_window(num n)
 {
     WINDP *wp;
     int    ntl;
@@ -611,7 +611,7 @@ void disable_key_mouse()
 #endif
 }
 
-int toggle_mouse(int n)
+int toggle_mouse(num n)
 {
 	if(mcurflag) mcurflag=FALSE;else mcurflag=TRUE;
 	if(mcurflag) {
@@ -1166,7 +1166,7 @@ void drv_back_color()
 #endif
 }
 
-extern int 	(*get_function())();
+extern int 	(*get_function(char *))();
 
 struct  BFK {
 	char *func_name;
@@ -1744,7 +1744,7 @@ int check_v_sibling(WINDP *wp,int left,int top,int new_cols)
  return true;
 }
 
-int hresize_wind(int n)
+int hresize_wind(num n)
 {
 /*
  horizontal resize window 
@@ -1844,7 +1844,7 @@ int hresize_wind(int n)
  return true;
 }
 
-int vresize_wind(int n)
+int vresize_wind(num n)
 {
 /*
  vertical resize window 
@@ -2025,7 +2025,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
  	/* we have a difference */
 	v1=vtext;
 	imax=0;
-	int ccor=0;
+	// int ccor=0;
 
 	v1=vtext;
 
@@ -2076,7 +2076,10 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 		// if(vstr[0]>0x20) {MESG("  %2d %2d [%s] [%X %X %X]",row,i,vstr,vstr[0],vstr[1],vstr[2]);};
 		if(vstr[0]==0x20) {vstr[0]=0xC2;vstr[1]=0x80;};
 #endif
-		if		(vstr[0]==0xF0 && vstr[1]==0x9F && vstr[2]!=0x8F && vstr[2]!=0x91 && vstr[2]!=0x92 && vstr[2]!=0x94 && vstr[2]!=0x96 && vstr[2]!=0x98 && vstr[2]!=0xA4 && vstr[2]!=0xA7 ) { wprintw(wp->gwp->draw,"%c",'?');ccor++;}
+		if	(vstr[0]==0xF0 && vstr[1]==0x9F && vstr[2]!=0x8F && vstr[2]!=0x91 && vstr[2]!=0x92 && vstr[2]!=0x94 && vstr[2]!=0x96 && vstr[2]!=0x98 && vstr[2]!=0xA4 && vstr[2]!=0xA7 ) { 
+			wprintw(wp->gwp->draw,"%c",'?');
+			// ccor++;
+		}
 		// else if	(vstr[0]==0xF0 && vstr[1]==0x9F && vstr[2]!=0x94) wprintw(wp->gwp->draw,"%c",'?');
 		else if	(vstr[0]==0xF0 && vstr[1]==0x9D) { wprintw(wp->gwp->draw,"%s",unknown1);}
 		else if	(vstr[0]==0xF0 && vstr[1]==0x90 && vstr[2]==0x90) wprintw(wp->gwp->draw,"%c",'#');
@@ -2186,12 +2189,12 @@ void export_region(ClipBoard *clip)
 	ext_system_copy();
 }
 
-int set_fontindex(int n) {
+int set_fontindex(num n) {
 // dummy function
  return TRUE;
 }
 
-int select_font(int n)
+int select_font(num n)
 { // dummy function
  return TRUE;
 }
@@ -2257,9 +2260,9 @@ void drv_msg_line(char *arg)
 int dspv(WINDOW *disp_window,int x,int y,char *st)
 {
  int c;
- int len;
+ // int len;
  int x_pos,y_pos;
- len=0;
+ // len=0;
  // MESG("dspv: x=%d y=%d [%s]",x,y,st);
  hide_cursor("dpsv");
  wmove(disp_window,y,x);
@@ -2269,7 +2272,7 @@ int dspv(WINDOW *disp_window,int x,int y,char *st)
 		drv_wcolor(disp_window,COLOR_CTRL_FG,COLOR_BG);
 		waddch(disp_window,'^');
 		(c)+=64;
-		len++;
+		// len++;
 	};
 	waddch(disp_window,c);
 	drv_wcolor(disp_window,COLOR_FG,COLOR_BG);
@@ -2608,17 +2611,17 @@ int init_sighandler()
 	return 0;
 }
 
-int system_paste(int n)
+int system_paste(num n)
 {
 	return ext_system_paste();
 }
 
-int set_color(int n)
+int set_color(num n)
 {
 	return(TRUE);
 }
 
-int new_shell(int n)
+int new_shell(num n)
 {
 	int status;
 	char *cp;
@@ -2644,13 +2647,13 @@ int new_shell(int n)
 
 int text_mouse_function(int);
 
-int text_mouse_error(int n)
+int text_mouse_error(num n)
 {
 	msg_line("text_mouse error");
 	return 1;
 }
 
-int text_mouse_pos(int n)
+int text_mouse_pos(num n)
 {
 	text_mouse_function(1);
 	return(FALSE);
@@ -2658,7 +2661,7 @@ int text_mouse_pos(int n)
 
 WINDP *get_mouse_window();
 
-int text_mouse_left_press(int n)
+int text_mouse_left_press(num n)
 {
  struct timeval timev;
  int double_click=0;
@@ -2680,7 +2683,7 @@ int text_mouse_left_press(int n)
  return FALSE;
 }
 
-int text_mouse_right_press(int n)
+int text_mouse_right_press(num n)
 {
  // MESG("mouse_right_press:");
  mouse_button=KMOUSE_BUTTON3;
@@ -2688,7 +2691,7 @@ int text_mouse_right_press(int n)
   return FALSE;
 }
 
-int text_mouse_release(int n)
+int text_mouse_release(num n)
 {
 
 	if(mousepx==mouserx && mousepy==mousery) {	/* this is just a click!  */
@@ -2701,7 +2704,7 @@ int text_mouse_release(int n)
 	return FALSE;
 }
 
-int open_file_dialog(char *fname,int n)
+int open_file_dialog(char *fname,num n)
 {
 	return(TRUE);
 }
@@ -2711,12 +2714,12 @@ void prepare_converter(int local_lang)
 
 }
 
-int select1_font(int n)
+int select1_font(num n)
 {
 	return(TRUE);
 }
 
-int select_scheme(int n)
+int select_scheme(num n)
 {
  int nv;
  char **scheme_names;

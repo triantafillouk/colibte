@@ -23,7 +23,7 @@
 #define	TAG_UNSELECT_CURRENT	3
 
 // open an sqlite3 database
-sqlite3 * notes_db_open();
+sqlite3 * notes_db_open(char *message);
 // returns multiple rowss
 char ***query_rows(sqlite3 *db, char *sql);
 // returns one row
@@ -45,37 +45,37 @@ int callback_print(void *NotUsed, int argc, char **argv, char **azColName);
 int show_sqlite_tables(char *fname);
 
 /* ----- notes utility functions ----- */
-int insert_preamble();
-int new_note(int n);
+int insert_preamble(FILEBUF *fp,int type);
+int new_note(num n);
 int save_to_db(notes_struct *note);
 int save_tag(sqlite3 *db,int notes_id,char *tag);
 // Parse note and create db fields
 int parse_note(FILEBUF *fp);
 int save_note();
-int open_notes_dir(int n);
-//int search_notes_dir(int n);	/* TBD  */
-int search_notes_tagged(int n);	/* TBD  */
-int view_notes_by_date(int n);	/* TBD  */
+int open_notes_dir(num n);
+//int search_notes_dir(num n);	/* TBD  */
+int search_notes_tagged(num n);	/* TBD  */
+int view_notes_by_date(num n);	/* TBD  */
 // Initialize notes database 
-int init_notes_db(int n);
-int recreate_notes_db(int n);
+int init_notes_db(num n);
+int recreate_notes_db(num n);
 
-int show_tag_view(int n);
-int create_note_with_current_file(int n);
+int show_tag_view(num n);
+int create_note_with_current_file(num n);
 
-int toggle_tagnote(int n);
-int toggle_tag(int n);
-int unselect_tag(int n);
-int remove_tags(int n);
-int select_tag(int n);
+int toggle_tagnote(num n);
+int toggle_tag(num n);
+int unselect_tag(num n);
+int remove_tags(num n);
+int select_tag(num n);
 
 /* edit, view note */
-int edit_note(int n);
-int view_note(int n);
-int notes_menu_command(int n);
-int delete_tagnote(int n);
-int save_as_note(int n);
+int edit_note(num n);
+int view_note(num n);
+int notes_menu_command(num n);
+int delete_tagnote(num n);
+int save_as_note(num n);
 char *get_notes_key();
 void set_local_notes_key(char *key);
-int set_notes_key(int n);
+int set_notes_key(num n);
 

@@ -22,7 +22,7 @@ char *str_tfile(struct stat *t,char *file_name,int maxsize);
 void drv_window_delete(WINDP *wp);
 int get_menu_index_from_mouse();
 void utf_string_break(char *utf_string, int column);
-int noop(int);
+int noop(num);
 void upd_all_wrap_lines(WINDP *wp,char *from);
 
 extern int drv_initialized;
@@ -90,7 +90,7 @@ void update_selection()
 }
 
 /* Display the top menu  */
-void top_menu(int init)
+void top_menu(num init)
 {
  int i;
  int fch,bch;
@@ -157,7 +157,7 @@ void clear_message_line()
  } else app_error--;
 }
 
-int window_row_resize(int n)
+int window_row_resize(num n)
 {
 	char slines[80];
  	if(!drv_initialized) return 0;
@@ -170,31 +170,31 @@ int window_row_resize(int n)
 	return(hresize_wind(n-cwp->w_ntrows));
 }
 
-int window_row_increase(int n)
+int window_row_increase(num n)
 {
 	if(!drv_initialized) return 0;
 	return(hresize_wind(5));
 }
 
-int window_column_increase(int n)
+int window_column_increase(num n)
 {
 	if(!drv_initialized) return 0;
 	return(vresize_wind(5));
 }
 
-int window_row_decrease(int n)
+int window_row_decrease(num n)
 {
 	if(!drv_initialized) return 0;
 	return(hresize_wind(-5));
 }
 
-int window_column_decrease(int n)
+int window_column_decrease(num n)
 {
 	if(!drv_initialized) return 0;
 	return(vresize_wind(-5));
 }
 
-int window_column_resize(int n)
+int window_column_resize(num n)
 {
 	if(!drv_initialized) return 0;
 	char slines[80];
@@ -208,7 +208,7 @@ int window_column_resize(int n)
 	return(vresize_wind(new_size-cwp->w_ntcols));
 }
 
-int describe_key(int n)	/* describe the command for a certain key */
+int describe_key(num n)	/* describe the command for a certain key */
 {
 	int c;		/* key to describe */
 	if(macro_exec) return 0;
@@ -232,7 +232,7 @@ void plot_redraw()
 {
 }
 
-int mouse_move(int n)
+int mouse_move(num n)
 {
  return true;
 }
@@ -553,10 +553,10 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 MENUS *start_menu = &m_topn;
 extern int mousey,mousex;
 
-int execute_menu(int fixed)	/* execute menu */
+int execute_menu(num fixed)	/* execute menu */
 {
  register int status=FALSE;
- register int (*execfunc)();		/* ptr to function to execute */
+ register int (*execfunc)(int);		/* ptr to function to execute */
  int line=1;
  short key;
  long int repeat = repeat_arg;
@@ -631,7 +631,7 @@ int execute_menu(int fixed)	/* execute menu */
  return(status);
 }
 
-int menu_command(int n)
+int menu_command(num n)
 {
 	start_menu = &m_topn;
 	return execute_menu(1);
@@ -890,7 +890,7 @@ int disp_list(char **m_array,int start,int nu,int max_lines,int sx,int sy,int wi
  * Quote the next character, and insert it into the buffer. All the characters
  * are taken literally. Bound to "^Q"
  */
-int quote(int n)
+int quote(num n)
 {
 	int    c;
 	if(dont_edit()) return FALSE;
@@ -1307,7 +1307,7 @@ void main_loop()
 }
 
 
-int show_version(int n)
+int show_version(num n)
 {
  // MESG("show_version:");
  msg_line("This is %s version %s !",APPLICATION_NAME,VERSION);
@@ -1522,22 +1522,22 @@ void status_line(WINDP *wp)
 }
 
 // dummy commands
-int increase_font_size(int n)
+int increase_font_size(num n)
 {
 	return true;
 }
 
-int decrease_font_size(int n)
+int decrease_font_size(num n)
 {
 	return true;
 }
 
-int toggle_bold(int n)
+int toggle_bold(num n)
 {
 	return true;
 }
 
-void freelist(char **namelist, int n)
+void freelist(char **namelist, num n)
 {
  int i;
  for(i=0;i<n;i++) free(namelist[i]);

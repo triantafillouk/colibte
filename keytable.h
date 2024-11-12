@@ -516,6 +516,7 @@ KEYTAB keytab_view[] = {
 	{'q',		close_file,"q"},
 	{CHR_LBRA,		goto_bop,"["},
 	{CHR_RBRA,		goto_eop,"]"},
+	{'%',		match_fence,"%"},
 	{',',		view_previous,","},
 	{'.',		view_next,"."},
 	{0,		NULL,NULL}

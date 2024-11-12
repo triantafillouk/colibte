@@ -3124,7 +3124,7 @@ int empty_tok_table(FILEBUF *fp)
  return(1);
 }
 
-int refresh_current_buffer(int nused)
+int refresh_current_buffer(num nused)
 {
  double val=0;
  FILEBUF *fp=cbfp;
@@ -3185,7 +3185,7 @@ int refresh_current_buffer(int nused)
 }
 
 // parse, check current buffer
-int parse_check_current_buffer(int n)
+int parse_check_current_buffer(num n)
 {
  FILEBUF *fp=cbfp;
 
@@ -3215,7 +3215,7 @@ int parse_check_current_buffer(int n)
  };
 }
 
-int parse_buffer_show_tokens(int n)
+int parse_buffer_show_tokens(num n)
 {
  FILEBUF *fp=cbfp;
  tok_struct *tok_ind=NULL;
@@ -3316,7 +3316,7 @@ char * tok_info(tok_struct *tok)
 	return stok;
 }
 
-int show_parse_buffer(int n)
+int show_parse_buffer(num n)
 {
  FILEBUF *fp;
  TDS("show parse");
