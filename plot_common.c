@@ -79,7 +79,7 @@ plot_element *padd_plot_element(int type, int size)
  return(plist);
 }
 
-int plot_close_path(int n)
+int plot_close_path(num n)
 {
 	if(plist!=NULL) {
 		plist->closed=1;
@@ -87,7 +87,7 @@ int plot_close_path(int n)
 	} else return 0;
 }
 
-int plot_poly_nostroke(int n)
+int plot_poly_nostroke(num n)
 {
 	if(plist!=NULL) {
 		plist->stroke=0;
@@ -96,7 +96,7 @@ int plot_poly_nostroke(int n)
 	} else return 0;
 }
 
-int plot_polyline(int n)
+int plot_polyline(num n)
 {
  double *v;
  int i=1;
@@ -124,7 +124,7 @@ int plot_polyline(int n)
 	return 1;
 }
 
-int plot_triangle(int n)
+int plot_triangle(num n)
 {
  double *v;
 	v=add_plot_element(PTRIANGLE,4);
@@ -136,7 +136,7 @@ int plot_triangle(int n)
 	return 1;
 }
 
-int plot_set_color(int n)
+int plot_set_color(num n)
 {
  double *v;
  plot_element *pe;
@@ -194,7 +194,7 @@ void set_plot_timer()
  signal(SIGALRM, do_timer_plot);
 }
 
-int plot_frames(int n)
+int plot_frames(num n)
 {
 	double *v;
 	v = add_plot_element(PFRAMES,1);
@@ -232,7 +232,7 @@ double find_scale(double diff,int len,int type)
 }
 
 // cartesians coordinates , axes
-int plot_coord(int n) 
+int plot_coord(num n) 
 {
  if(!plot_is_maped) { plot_init(0);};
  xmin=expression("xmin"); skip_comma();
@@ -315,7 +315,7 @@ void set_coords()
 
 }
 
-int path_start(int n)
+int path_start(num n)
 {
  double *v;
  char *s;
@@ -324,14 +324,14 @@ int path_start(int n)
  return 1;
 }
 
-int path_end(int n)
+int path_end(num n)
 {
  double *v;
  v=add_plot_element(PEND,0);
  return 1;
 }
 
-int set_absolute(int n)
+int set_absolute(num n)
 {
 	double *v;
 	v = add_plot_element(PABSOLUTE,0);
@@ -339,7 +339,7 @@ int set_absolute(int n)
 	return 0;
 }
 
-int set_relative(int n)
+int set_relative(num n)
 {
 	double *v;
 	v = add_plot_element(PRELATIVE,0);
@@ -347,7 +347,7 @@ int set_relative(int n)
 	return 1;
 }
 
-int plot_text(int n)
+int plot_text(num n)
 {
  char s[MAXLLEN];
 

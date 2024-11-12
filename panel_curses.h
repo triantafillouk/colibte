@@ -29,10 +29,10 @@ void hdab(int x,int b,char *s,int bcolor,int fcolor);
 void clear_hmenu();
 
 int resize_screen(int init);
-int vresize_wind(int diff);
-int hresize_wind(int diff);
+int vresize_wind(num diff);
+int hresize_wind(num diff);
 
-typedef int (*function_int)(int);
+typedef int (*function_int)(num);
 function_int key_convert_from_mouse(function_int execf);
 
 int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int disinp);

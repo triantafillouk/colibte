@@ -16,7 +16,7 @@ char *get_notes_key();
 
 /* external defined functions  */
 char *getcurfword();
-int open_file_dialog(char *,int n);
+int open_file_dialog(char *,num n);
 
 extern alist *file_list;
 extern alist *window_list;
@@ -75,7 +75,7 @@ int is_special_buffer(FILEBUF *bp)
 	return false;
 }
 
-int new_file(int n)
+int new_file(num n)
 {
  int stat;
  char scratch_name[24];
@@ -116,7 +116,7 @@ int buffer_is_connected(FILEBUF *bf)
 
 /* switch to the next file buffer in the file list */
 /* Bound to F10 */
-int next_file(int n)	
+int next_file(num n)	
 {
 	register FILEBUF *bp;
 	FILEBUF *fp=cbfp;
@@ -166,7 +166,7 @@ int activate_file(FILEBUF *bp)
 	return true;
 }
 
-int umark_buffer(int n)
+int umark_buffer(num n)
 {
  if(cbfp){
 	cbfp->b_state &= ~FS_CHG;
@@ -383,7 +383,7 @@ int load_scratch_files()
 
 
 /* close current window file */
-int close_file(int n)
+int close_file(num n)
 {
 	FILEBUF *f_toclose,*bp,*f_previous=NULL;
 	WINDP *wp;
@@ -525,7 +525,7 @@ int delete_filebuf(FILEBUF *bp,int force)
 /*	List file buffers, in a window, select from the list
 	and make active. ( ^B )
 */
-int select_file(int n)
+int select_file(num n)
 {
 	char st[2048];
     register FILEBUF *bp;
@@ -580,7 +580,7 @@ int select_file(int n)
 }
 
 /* list/select internal file buffers */
-int select_file_internal(int n)
+int select_file_internal(num n)
 {
 	char st[2048];
     register FILEBUF *bp;
@@ -1112,7 +1112,7 @@ int bom_type(int file_id)
 }
 
 /* Reload file from disk */
-int reload_file(int n)
+int reload_file(num n)
 {
  FILEBUF *fp=cbfp;
  // MESG("reload_file: %X",fp->b_flag);
@@ -1129,7 +1129,7 @@ int reload_file(int n)
 }
 
 /* Insert a file into current position.  */
-int insert_file(int  n)
+int insert_file(num  n)
 {
     char fname[MAXFLEN];
 	FILEBUF *fp=cbfp;
@@ -1168,7 +1168,7 @@ int open_file_named(char *fname)
  * emacs key ^O
  */
 
-int open_file(int n)
+int open_file(num n)
 {
  char fname[MAXFLEN];	/* file user wishes to find */
  char tname[MAXFLEN];
@@ -1234,7 +1234,7 @@ int open_file(int n)
 	return(err);
 }
 
-int clear_buffer(int n)
+int clear_buffer(num n)
 {
  char fname[MAXFLEN];	/* file user wishes to find */
  char tname[MAXFLEN];
@@ -1280,7 +1280,7 @@ int clear_buffer(int n)
 #define CHAR_START	29
 #define CHAR_END	255
 
-int set_key(int nused)
+int set_key(num nused)
 {
 	return set_buf_key(cbfp);
 }
@@ -1530,7 +1530,7 @@ int writeu1(char *fname, FILEBUF *fp)
 /*
  * Current file save with a new name
  */
-int saveas_file(int n)
+int saveas_file(num n)
 {
 	int    stat;
     char	fname[MAXFLEN];
@@ -1590,7 +1590,7 @@ int saveas_file(int n)
 /*
  * Save current file, or sort menu in dir mode
  */
-int save_file(int n)
+int save_file(num n)
 {
  FILEBUF *fp=cbfp;
 
@@ -1642,7 +1642,7 @@ int save_file(int n)
 /*
  * Change file name of current buffer
  */
-int rename_file(int n)
+int rename_file(num n)
 {
 	register int    s;
 	char            fname[MAXFLEN];
@@ -1766,7 +1766,7 @@ void update_file_status(FILEBUF *fp)
 }
 
  /* get a menu file, select an item , execute it */
-int menufile(int n)
+int menufile(num n)
 {
  char *fname;
  int nu,s;
@@ -1916,7 +1916,7 @@ int add_to_recent_list(char *full_file_name)
 	return 1;
 }
 
-int save_file_history(int n)
+int save_file_history(num n)
 {
  char *fname;
 
@@ -1927,7 +1927,7 @@ int save_file_history(int n)
  return save_list_array(fname,recent_file_list);
 }
 
-int read_file_history(int n)
+int read_file_history(num n)
 {
  char *fname;
 
@@ -1941,7 +1941,7 @@ int read_file_history(int n)
  return 1;
 }
 
-int open_recent_file(int n)
+int open_recent_file(num n)
 {
  char *fname;
  int nam1;

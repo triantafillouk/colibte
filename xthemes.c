@@ -8,6 +8,7 @@ COLOR_SCHEME *get_scheme_by_index(int scheme_num);
 COLOR_SCHEME *get_scheme_by_name(char *name);
 
 extern alist *color_scheme_list;
+extern int drv_colors;
 
 char *basic_color_names[] = {
 	"black","red","green","orange","blue","magenta","cyan","white",
@@ -209,7 +210,7 @@ void init_default_schemes()
 
 
 /* change color scheme */
-int change_color_scheme(int  scheme)
+int change_color_scheme(num  scheme)
 {
  // MESG("change_color_scheme: n=%d,color_scheme_ind=%d",scheme,color_scheme_ind);
  if(scheme<1 || scheme> color_scheme_list->size) scheme=1;

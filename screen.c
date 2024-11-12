@@ -1914,7 +1914,7 @@ int check_cursor_position(WINDP *wp)
 /*
  * Display the current cursor position information on the statusline
  */
-int  show_position_info(int short_version)
+int  show_position_info(num short_version)
 {
 	num col;
 	num loffs;
@@ -2027,7 +2027,7 @@ int  show_position_info(int short_version)
 /*
  * Make sure that the display is right. 
  */
-int update_screen(int force)
+int update_screen(num force)
 {
 	WINDP *wp;
 	// static int count=0;

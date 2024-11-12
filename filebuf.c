@@ -243,7 +243,7 @@ extern int hmstart;
 extern int hmnum;
 extern BMARK hmark[];
 
-int show_info(int n)
+int show_info(num n)
 {
  char s[2048];
  char s1[256];
@@ -2880,7 +2880,7 @@ void   MoveRightChar(FILEBUF *fp)
 	tp_copy(fp->save_current,fp->tp_current);
 }
 
-int next_utf8_error(int n)
+int next_utf8_error(num n)
 {
  int clen=0;
  FILEBUF *fp=cbfp;
@@ -3203,7 +3203,7 @@ int   GetBlock(FILEBUF *fp,char *copy,offs from,offs size)
 
 // show as Unix or DOS or HEX
 // operates on cbfp
-int set_view_mode(int n)
+int set_view_mode(num n)
 {
 	FILEBUF *fp=cbfp;
 	offs offset=FOffset(fp);
@@ -3356,7 +3356,7 @@ int set_view_mode(int n)
 }
 
 // operates on cbfp
-int set_doc_lang(int n)
+int set_doc_lang(num n)
 {
  if(n<1 || n>20) n=1;
  cbfp->b_lang = n-1;
@@ -3365,7 +3365,7 @@ int set_doc_lang(int n)
  return OK_CLRSL;
 }
 
-int set_default_local(int n)
+int set_default_local(num n)
 {
  if(n<1 || n>20) n=1;
  default_local_codepage = n-1;
@@ -3804,7 +3804,7 @@ offs get_text_offs(FILEBUF *bf,char *buf, offs o, offs size)
 }
 
 /* operates on cbfp,cwp */
-int undo(int n)
+int undo(num n)
 {
 //	if(cwp->w_fp->b_flag & FSDIRED) return 0;
 
@@ -3834,7 +3834,7 @@ char *get_line_at(FILEBUF *fb,offs offset)
 }
 
 /* operates on cbfp,cwp */
-int redo(int n)
+int redo(num n)
 {
 	while(n--) {
 		RedoGroup(cbfp->main_undo);

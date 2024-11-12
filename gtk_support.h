@@ -24,7 +24,13 @@ typedef struct T_ELEMENT  {
 	char *icon_name;	/* stock icon nane  */
 	char **embedded_icon;		/* embeded icon  */
 	char *help;			/* showing help  */
-	int (*func)();		/* bind function  */
+#if	1
+	int (*func)(long long n);		/* bind function  */
+#else
+	int (*func)(long long n);		/* bind function  */
+	gboolean (*callbak)(GtkWidget *, GdkEventKey *, gpointer);
+#endif
+	// gboolean (*func)(GtkEntry *, GdkEventKey *, gpointer);
 	int type;
 } T_ELEMENT;
 
