@@ -24,6 +24,7 @@ changed_fg=#FF0000
 horizon_fg=#800080 
 inactive_fg=#E3E3E3 
 rowcol_fg=#FFFF00 
+info_fg=#202020
 [Midnight]
 normal_bg=#000000 
 menu_bg=#003060 
@@ -31,7 +32,7 @@ selection_bg=#004070
 search_bg=#A00000 
 quote_bg=#005000 
 light_bg=#202025 
-info_bg=#353535 
+info_bg=#252525 
 inactive_bg=#304050 
 box_bg=#303030 
 code_bg=#202020 
@@ -50,6 +51,7 @@ changed_fg=#F09090
 horizon_fg=#A000A0 
 inactive_fg=#808080
 rowcol_fg=#FFFF00
+info_fg=#808080
 [Cyan]
 normal_bg=#004050 
 menu_bg=#005080 
@@ -57,7 +59,7 @@ selection_bg=#4060A0
 search_bg=#D00000 
 quote_bg=#008000 
 light_bg=#506070 
-info_bg=#303030 
+info_bg=#105060
 inactive_bg=#303030 
 box_bg=#0050A0 
 code_bg=#404040 
@@ -75,7 +77,8 @@ comment_fg=#F09000
 changed_fg=#FF0000 
 horizon_fg=#FF00FF 
 inactive_fg=#808080 
-rowcol_fg=#FFFF00 
+rowcol_fg=#FFFF00
+info_fg=#A0A0A0 
 [Blue]
 normal_bg=#002060 
 menu_bg=#008080 
@@ -102,6 +105,7 @@ changed_fg=#F09000
 horizon_fg=#FF00FF 
 inactive_fg=#808080 
 rowcol_fg=#FFFF00 
+info_fg=#909090
 [Gray]
 normal_bg=#909090 
 menu_bg=#003060 
@@ -123,11 +127,12 @@ word2_fg=red4
 word3_fg=#00FFFF 
 special_fg=#00D0D0 
 single_quote_fg=#508050 
-comment_fg=#F5E5B5 
+comment_fg=#F5F5A5 
 changed_fg=#E5D5A5 
 horizon_fg=#8C008C 
 inactive_fg=#F2F2F2 
 rowcol_fg=#FFFF00 
+info_fg=#202020
 [Dark_gray]
 normal_bg=#303030 
 menu_bg=#336194 
@@ -135,7 +140,7 @@ selection_bg=#005070
 search_bg=#FA0000 
 quote_bg=#007A00 
 light_bg=#404055 
-info_bg=#5F5F5F 
+info_bg=#353535
 inactive_bg=#434343 
 box_bg=#336194 
 code_bg=#404040 
@@ -154,6 +159,7 @@ changed_fg=#F09000
 horizon_fg=#FF00FF 
 inactive_fg=#909090 
 rowcol_fg=#FFFF00 
+info_fg=#808080
 [Sunny]
 normal_bg=#E0E0F0 
 menu_bg=#2020A0 
@@ -161,7 +167,7 @@ selection_bg=#50A0F0
 search_bg=#AD0000 
 quote_bg=#00B000 
 light_bg=#B0B0C0 
-info_bg=#C0C0B0 
+info_bg=#D0D0E0 
 inactive_bg=#777777 
 box_bg=#808080 
 code_bg=#A8A8A8 
@@ -180,6 +186,7 @@ changed_fg=#A04040
 horizon_fg=#FF00FF 
 inactive_fg=#E3E3E3 
 rowcol_fg=#FFFF00 
+info_fg=#202020
 [Twilight]
 normal_bg=#141414 
 menu_bg=#005577 
@@ -187,7 +194,7 @@ selection_bg=#007090
 search_bg=#804040 
 quote_bg=#407040 
 light_bg=#202530 
-info_bg=#404040 
+info_bg=#353535
 inactive_bg=#707080 
 box_bg=#205060 
 code_bg=#282828 
@@ -206,6 +213,7 @@ changed_fg=#F0AD80
 horizon_fg=#FF00FF 
 inactive_fg=#E0E0E0 
 rowcol_fg=#FFFF00 
+info_fg=#909090
 [Lunar]
 normal_bg=#202020 
 menu_bg=#0070A0 
@@ -213,7 +221,7 @@ selection_bg=#005070
 search_bg=#D06060 
 quote_bg=#008000 
 light_bg=#202025 
-info_bg=#444433 
+info_bg=#323232
 inactive_bg=#4D4D4D 
 box_bg=#506070 
 code_bg=#404040 
@@ -232,6 +240,7 @@ changed_fg=#F09090
 horizon_fg=#A000A0 
 inactive_fg=#808080 
 rowcol_fg=#FFFF00 
+info_fg=#A0A0A0 
 [Velvet]
 normal_bg=#1C1C1C 
 menu_bg=#0060A0 
@@ -258,6 +267,7 @@ changed_fg=#CD9000
 horizon_fg=#A000A0 
 inactive_fg=#A0A0A0 
 rowcol_fg=#FFFF00 
+info_fg=#A0A0A0 
 [Dark2]
 normal_bg=#202020 
 menu_bg=#336164 
@@ -284,7 +294,7 @@ changed_fg=#F09000
 horizon_fg=#FF00FF 
 inactive_fg=#909090 
 rowcol_fg=#FFFF00 
-
+info_fg=#A0A0A0 
 [WSnow]
 normal_bg=#F8F8F8
 menu_bg=#0000AE 
@@ -292,7 +302,7 @@ selection_bg=#CFCFCF
 search_bg=#FF8080 
 quote_bg=#A0F0A0 
 light_bg=#B0B0C0 
-info_bg=#C0C0C0 
+info_bg=#D8D8D8 
 inactive_bg=#A0A0A0 
 box_bg=#808080 
 code_bg=#D8D8D8 
@@ -311,6 +321,7 @@ changed_fg=#FF0000
 horizon_fg=#800080 
 inactive_fg=#F0F0F0 
 rowcol_fg=#FFFF00 
+info_fg=#202020
 
 [Abyss]
 normal_bg=#02103d
@@ -319,7 +330,7 @@ selection_bg=#242424
 search_bg=#f44444
 quote_bg=#107010
 light_bg=#303030
-info_bg=#02103d
+info_bg=#12204d
 box_bg=#151515
 inactive_bg=#252525
 
@@ -327,7 +338,7 @@ menu_fg=#bacce8
 control_fg=#f4f444
 normal_fg=#a0a0a0
 horizon_fg=#ff0000
-comment_fg=#505050
+comment_fg=#908080
 prep_fg=#dfdfdf
 word2_fg=#dfdfdf
 standout_fg=#dfdfdf
@@ -337,6 +348,7 @@ special_fg=#01A870
 word3_fg=#01A870
 inactive_fg=#939393 
 rowcol_fg=#fafca8
+info_fg=#808080
 
 [Betelgeuse]
 normal_bg=#222831
@@ -364,6 +376,7 @@ special_fg=#dfe2e7
 word3_fg=#f786aa
 inactive_fg=#838383 
 rowcol_fg=#FFFF00
+info_fg=#909090
 
 [C0nfy]
 normal_bg=#03071e
@@ -379,7 +392,7 @@ control_fg=#f17796
 quote_bg=#2d603d
 search_bg=#Ac5163
 normal_fg=#f5faff
-comment_fg=#081355
+comment_fg=#484385
 prep_fg=#fc0fc0
 word2_fg=#05e6fa
 standout_fg=#7612c5
@@ -391,6 +404,7 @@ changed_fg=#FF0000
 horizon_fg=#f5faff
 inactive_fg=#636363 
 rowcol_fg=#ffa848
+info_fg=#808080
 
 [Lite_xl]
 normal_bg=#2e2e32
@@ -418,11 +432,12 @@ word1_fg=#FFA94D
 single_quote_fg=#f7c95c
 special_fg=#93DDFA
 word3_fg=#93DDFA
+info_fg=#909090
 
 [Github]
 normal_bg=#fbfbfb
 menu_bg=#525252
-info_bg=#b2b2b2
+info_bg=#C2C2C2
 inactive_bg=#a0a0a0
 light_bg=#b0b0b0
 box_bg=#888888
@@ -444,11 +459,12 @@ word3_fg=#005cc5
 inactive_fg=#535353 
 rowcol_fg=#f8f818
 menu_fg=#f3f6f6
+info_fg=#404040
 
 [Github_dark]
 normal_bg=#0d1117
 menu_bg=#5d5157
-info_bg=#161925
+info_bg=#262935
 inactive_bg=#262626
 selection_bg=#2e4c77
 search_bg=#fdbac7
@@ -471,16 +487,17 @@ special_fg=#adbac7
 word3_fg=#6cb6ff
 inactive_fg=#939393 
 rowcol_fg=#FFFF00 
+info_fg=#808080
 
 [Monokai]
 normal_bg=#272822
 menu_bg=#53534F
-info_bg=#181915
+info_bg=#1E1F18
 inactive_bg=#181915
 rowcol_fg=#F8F830
 menu_fg=#F8F8F2
 light_bg=#5E6052
-box_bg=#181915
+box_bg=#383925
 selection_bg=#49483E
 control_fg=#D2D0C6
 quote_bg=#49983E
@@ -497,6 +514,7 @@ special_fg=#F92472
 word3_fg=#A6E22E
 changed_fg=#fc8c8c
 inactive_fg=#939393 
+info_fg=#A0A0A0 
 
 [Rose-pine-moon]
 normal_bg=#232136
@@ -524,6 +542,7 @@ single_quote_fg=#f6c177
 special_fg=#908caa
 word3_fg=#eb6f92
 inactive_fg=#939393 
+info_fg=#808080
 
 [Tokyo-night]
 normal_bg=#1a1b26
@@ -540,7 +559,7 @@ inactive_bg=#24283b
 search_bg=#914868
 normal_fg=#9ABDF5
 horizon_fg=#c0caf5
-comment_fg=#414868
+comment_fg=#515878
 prep_fg=#bb9af7
 word2_fg=#bb9af7
 standout_fg=#ff9e64
@@ -549,6 +568,7 @@ single_quote_fg=#9ece6a
 special_fg=#2ac3de
 word3_fg=#7aa2f7
 inactive_fg=#939393 
+info_fg=#808080
 
 [Vscode-dark]
 normal_bg=#1E1E1E
@@ -575,3 +595,4 @@ single_quote_fg=#CE9178
 special_fg=#8590A5
 word3_fg=#DCDCAA
 inactive_fg=#838383 
+info_fg=#A0A0A0 

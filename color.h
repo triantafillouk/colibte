@@ -44,7 +44,7 @@ enum color_types_bg {
 	COLOR_CODE_BG		// color code background
 };
 
-#define	FG_COLORS	15
+#define	FG_COLORS	16
 enum color_types_fg {
 	COLOR_FG=BG_COLORS,	// normal, info column, double quote foreground
 	COLOR_MENU_FG,		// menu foreground
@@ -60,7 +60,8 @@ enum color_types_fg {
 	COLOR_CHANGE_FG,	// modeline changed foreground
 	COLOR_HORIZON_FG,	// orizon letters foreground
 	COLOR_INACTIVE_FG,	// modeline inactive foreground
-	COLOR_ROWCOL_FG		// DROWCOL status foreground
+	COLOR_ROWCOL_FG,	// DROWCOL status foreground
+	COLOR_INFO_FG
 };
 
 #define COLOR_TYPES	BG_COLORS+FG_COLORS
