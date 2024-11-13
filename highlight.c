@@ -907,6 +907,7 @@ void highlight_julia(int c)
 		break;
 	/* single quotes */ 
 	case CHR_SQUOTE: 
+		if(hquotem&H_QUOTEC) break;
 		if(flag_word==2) { hstate=0;break;};
 		if(hquotem&H_QUOTE2) { hstate=0;break;};
 //		if(double_quoted) { hstate=0;break;};
@@ -920,6 +921,7 @@ void highlight_julia(int c)
 		break;
 	/* double quotes */
 	case CHR_DQUOTE:
+		if(hquotem&H_QUOTEC) break;
 		if(flag_word==2) { hstate=0;break;};
 		if(hquotem&H_QUOTE1) { hstate=0;break;};
 //		if(single_quoted) { hstate=0;break;};
@@ -1000,6 +1002,7 @@ void highlight_rust(int c)
 #endif
 	/* double quotes */
 	case CHR_DQUOTE:
+		if(hquotem&H_QUOTEC) break;
 		if(hstate!=HS_PREVESC) hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
 		hstate=0;
 		break;
@@ -1195,6 +1198,7 @@ void highlight_html(int c)
 
 	/* double quotes */
 	case CHR_DQUOTE:
+		if(hquotem&H_QUOTEC) break;
 //		if(hstate!=HS_PREVESC) hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
 		if(slang || (hquotem & H_QUOTE7))
 		if(hstate!=HS_PREVESC) {
@@ -1860,6 +1864,7 @@ void highlight_jscript(int c)
 		break;
 	/* single quotes */
 	case CHR_SQUOTE: 
+		if(hquotem&H_QUOTEC) break;
 		if(hstate==HS_PREVESC) { hstate=0;break;};
 		if(!(hquotem & H_QUOTE7)) {
 			if(hquotem & H_QUOTE4 && !(hquotem & H_QUOTE2)) {
@@ -1875,6 +1880,7 @@ void highlight_jscript(int c)
 	/* double quotes */
 	case '`':
 	case CHR_DQUOTE:
+		if(hquotem&H_QUOTEC) break;
 		if(hstate==HS_PREVESC) { hstate=0;break;};
 		if(!(hquotem & H_QUOTE7)) {
 			if(hquotem & H_QUOTE4 && !(hquotem & H_QUOTE1)) {
@@ -1987,6 +1993,7 @@ void highlight_perl(int c)
 		break;
 	/* double quotes */
 	case CHR_DQUOTE:
+		if(hquotem&H_QUOTE5) break;
 		if(hstate!=HS_PREVESC) {
 			if(hquotem & H_QUOTE4 && !(hquotem & H_QUOTE1)) {
 				if(hquotem == H_QUOTE4) {
@@ -2226,6 +2233,7 @@ void highlight_terraform(int c)
 		break;
 	/* double quotes */
 	case CHR_DQUOTE:
+		if(hquotem&H_QUOTEC) break;
 //		if(hstate!=HS_PREVESC) hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
 		if(hstate!=HS_PREVESC && !(hquotem & H_QUOTE7)) {
 			if(hquotem & H_QUOTE4 && !(hquotem & H_QUOTE1)) {
@@ -2352,6 +2360,7 @@ void highlight_yaml(int c)
 		break;
 
 	case CHR_SQUOTE:
+		if(hquotem&H_QUOTEC) break;
 		if(hquotem != H_QUOTE6 && !(hquotem&H_QUOTE2)){
 			if(hstate==HS_PREVESC) { hstate=0;break;};
 			if(first) {
@@ -2370,6 +2379,7 @@ void highlight_yaml(int c)
 		};break;
 
 	case CHR_DQUOTE:
+		if(hquotem&H_QUOTEC) break;
 		if(hquotem  != H_QUOTE6){
 			if(hstate==HS_PREVESC) { hstate=0;break;};
 			if(first) {
@@ -2547,6 +2557,7 @@ void highlight_python(int c)
 		break;
 	/* single quotes */
 	case CHR_SQUOTE: 
+		if(hquotem&H_QUOTEC) break;
 		if(hstate!=HS_PREVESC) {
 			if(single_quoted==2) {
 				hquotem = (hquotem & H_COMMENT)? hquotem & ~H_COMMENT: H_COMMENT;
@@ -2571,6 +2582,7 @@ void highlight_python(int c)
 		break;
 	/* double quotes */
 	case CHR_DQUOTE:
+		if(hquotem&H_QUOTEC) break;
 		if(hstate!=HS_PREVESC) {
 			if(double_quoted==2) {
 				hquotem = (hquotem & H_COMMENT)? hquotem & ~H_COMMENT: H_COMMENT;
