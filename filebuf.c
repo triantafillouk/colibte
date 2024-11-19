@@ -1082,7 +1082,7 @@ int clipboard_copy(ClipBoard *clip)
 		  	if(c<col1) k-=(col1-c);
 		  	if(k>(clip->width-i)) k=(clip->width-i);
 		  	i+=k;
-		  	while(k-->0)  *text_ptr++=' ';
+		  	while(k-- >0)  *text_ptr++=' ';
 		  	c=c1;
 		  	continue;
 	       } else {;

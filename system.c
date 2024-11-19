@@ -691,7 +691,7 @@ int init_system_clipboard()
 	return 0;
 }
 
-/* return the first list from system clipboard */
+/* return the first line from system clipboard */
 char *ext_system_paste_line()
 {
  static char filnam[MAXFLEN];
@@ -728,6 +728,41 @@ char *ext_system_paste_line()
 }    
         
 int ext_system_paste()
+{
+ static char filnam[MAXFLEN];
+ static char exec_st[MAXFLEN];
+ int status=0;
+
+	if(!x11_display_ok) return 0;
+	status = set_unique_tmp_file(filnam,"command",MAXFLEN);
+	if(status>=MAXFLEN) return 0;
+	status=snprintf(exec_st,MAXFLEN,"%s > %s 2> /dev/null",clip_copy,filnam);
+	if(status>=MAXFLEN) return 0;
+
+	status = system(exec_st);
+	if(status==0) {
+		int file;
+		struct stat    st;
+		long int size;
+		long long int act_read;
+		offs o1=Offset();
+		file=open(filnam,O_RDONLY);
+		fstat(file,&st);
+		size = st.st_size;
+		status = ReadBlock(filnam,file,size,&act_read);
+		o1 += act_read;
+		close(file);
+		unlink(filnam);
+		set_Offset(o1);
+		set_update(cwp,UPD_EDIT);
+		setmark(0);
+		return status;
+	};
+	msg_line("cannot insert system clipboard!");
+	return 0;
+}
+
+int ext_system_column_paste()
 {
  static char filnam[MAXFLEN];
  static char exec_st[MAXFLEN];

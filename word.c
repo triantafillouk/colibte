@@ -769,7 +769,7 @@ int c_incword(int c)
 	if (c=='.') return(TRUE);
 	if (c>='a' && c<='z')
 		return (TRUE);
-	if (c>='A' && c<='Z')
+	if (c>='@' && c<='Z')
 		return (TRUE);
 	if (c>='0' && c<='9')
 		return (TRUE);

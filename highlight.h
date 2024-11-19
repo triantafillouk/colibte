@@ -77,6 +77,7 @@ int comment_lua();
 
 int highlight_note(int c);
 void highlight_c(int c);
+void highlight_zig(int c);
 void highlight_julia(int c);
 void highlight_perl(int c);
 void highlight_json(int c);
@@ -109,6 +110,34 @@ char *c_w1[] = { "long", "int", "short","float", "double", "char", "union","stru
 	"void","short","enum","inline","class","public","private","volatile",
 	"@interface","@end","@class","@public","@private","@implementation","self","NULL",
 	"protected","template","true","false","" };
+
+char *zig_w[] = { "if","elseif","else","do","while","switch","for","return",
+	"break","continue","try",
+	"await","callconv","catch","comptime","defer","errdefer","error","inline","linksection",
+	"noalias","noinline","nosuspend","orelse","or","resume","suspend","test",
+	"namespace","this","throw","fn","threadlocal","export","assert","opaque",
+	"compilerError","compileLog","unreachable",
+	"" };
+char *zig_w1[] = { 
+	"i8","u8","i16","u16","i32","u32","i64","u64","i128","u128",
+	"isize","usize","c_char","c_short","c_ushort","c_int","c_uint","c_long","c_ulong","c_longlong","c_ulonglong","c_longdouble",
+	"f16","f32","f64","f80","f128","bool","anyopaque","noreturn","type","anyerror","comptime_int","comptime_float",
+	"@Type","@as","@comptime","@Vector","@typeInfo","@tagName","@sizeOf",
+	"@constCast","@ctz","@cUndef","@cVarg","@cVaCopy","@cVaEnd","@cVaStart","@divExact","@divFloor","@divTrunc",
+	"@embedFile","@enumFromInt","@errorName","@errorReturnTraace","@errorCast","@export","@extern","@fence","@field",
+	"@fieldParentPtr","@floatCast","@floadFromInt","@frameAddress","@hasDecl","@hasField","@import",
+	"@inCompTime","@intCast","@intFromBool","@intFromError","@intFromFloat","@max","@min","@memcpy","@memset",
+	"@wasmMemorySize","@wasmMemoryGrow","@mod","@panic","@rem","@mulWithOverflow","@popCount","@prefetch",
+	"@prtCast","@prtFromInt","@rem","@returnAddress","@select","@setAlignStack","@setCold","@setEvalBranchQuota",
+	"@setFloatMode","@setRunTimeSafety","@shlExact","@slWithOverflow","@shrExact","@shuffle","@sizeOf","@splat",
+	"@reduce","@src","@sqrt","@cos","@tan","@exp","@exp2","@log","@log2","@log10","@abs","@floor","@trunc",
+	"@round","@subWithOverflow","@This","@trap","@truncate","@Type","@typeInfo","@typeName","@TypeOf","@unionInit",
+	"@volatileCast","@workGroupId","@workGroupSize","@workItemId",
+	"@cImport","@cInclude","@cDefine","@cUndef","@import","threadlocal",
+	"void","const","pub","var","struct","packed","union","enum","var","volatile","print",
+	// keywords
+	"addrspace","align","allowzero","and","anyframe","anytype","asm","async",
+	"null","true","false","undefined","" };
 
 char *julia_w[] = { "if","elseif","else","function","for","in","while","begin","end",
 	"return","do","try","catch","map","finally","break","continue","global","const","" };
@@ -261,7 +290,8 @@ char *lua_w1[] = { "print","local","ipairs","true","false","cooroutine","pairs",
 /* extensions defined  */
 char *no_extensions[] = {"" };
 char *bin_extensions[] = {"BIN","a","so",""};
-char *c_extensions[] = { "C","c","h","cc","xpm","glade","m4","cpp","hpp","hh","hxx","ii","ino","i","" };
+char *c_extensions[] = { "C","c","h","cc","xpm","glade","m4","cpp","hpp","hh","hxx","ii","ino","i","","zig","" };
+char *zig_extensions[] = { "zig","ZIG",""};
 char *julia_extensions[] = { "JL","jl",""};
 char *go_extensions[] = { "GO","go","" };
 char *v_extensions[] = { "V","v","" };
@@ -373,6 +403,7 @@ SHLIGHT hts[] = {
  { "MD",0,0,none_w,none_w, highlight_md, update_highlight, c_in_txt_word,md_extensions,comment_html },
  { "LUA",0,0,lua_w,lua_w1,highlight_lua,update_highlight,c_incword,lua_extensions,comment_lua },
  { "BICEP",0,0,bicep_w,bicep_w1,highlight_c,update_highlight,c_incword,bicep_extensions,comment_cc },
+ { "ZIG", 0,0,zig_w,zig_w1,highlight_zig,update_highlight,c_incword,zig_extensions,comment_cc },
  { NULL,0,0,NULL,NULL,NULL,NULL,NULL }
 };
 

@@ -1676,7 +1676,7 @@ void vteeoc(WINDP *wp, int endcol)
 	blank=CHR_NBSPACE;	// use this for mac terminal!
 #else
 	blank=CHR_SPACE;
-	blank='@';
+	// blank='@';
 #endif
 	if(wp->vtcol>endcol){
 		svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,endcol-wp->vtcol);

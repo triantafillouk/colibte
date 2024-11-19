@@ -888,6 +888,124 @@ void highlight_c(int c)
   h_prev_space = (c==' '||c=='\t');
 }
 
+void highlight_zig(int c)
+{
+//  MESG("h %c %3d flag=%d dquoted=%d",c,c,flag_word,double_quoted);
+  if(highlight_note(c)) return;
+ 
+  if(prev_set>=0) { hquotem=prev_set;prev_set=-1;};
+ 
+  switch(c) {
+	case (CHR_RESET) : // initialize
+		hstate=0;
+		slang=1;
+		single_quoted=0;
+		double_quoted=0;
+		flag_word=0;
+		h_prev_space=1;
+		hquotem=0;
+		prev_set=-1;
+//		MESG("highlight_c: reset");
+		break;
+	/* single quotes */ 
+	case CHR_SQUOTE: 
+		if(flag_word==2) { hstate=0;break;};
+		if(hquotem&H_QUOTE2) { hstate=0; break;};
+		if(hquotem&H_QUOTE5) { hstate=0; break;};
+//		if(double_quoted) { hstate=0;break;};
+		if(hstate!=HS_PREVESC) { 
+			if(hquotem) hquotem=hquotem & ~H_QUOTE1;else prev_set=H_QUOTE1;
+			// hquotem = (hquotem)? hquotem & ~H_QUOTE1: hquotem | H_QUOTE1;
+			single_quoted = (single_quoted)? 0:1;
+		}; 
+		hstate=0;
+		break;
+	/* double quotes */
+	case CHR_DQUOTE:
+		if(hquotem&H_QUOTEC) break;
+//		if(flag_word==3) word_is_quoted=2;
+		if(flag_word==2) { hstate=0;break;};
+		if(hquotem&H_QUOTE1) { hstate=0;break;};
+		if(hquotem&H_QUOTE5) { hstate=0; break;};
+//		if(single_quoted) { hstate=0;break;};
+		if(hstate!=HS_PREVESC) { hquotem = (hquotem&H_QUOTE2)? hquotem & ~H_QUOTE2: hquotem | H_QUOTE2;
+			double_quoted = (double_quoted)? 0:1;
+		};
+		hstate=0;
+		break;
+#if	0
+	case '#':
+		if(hquotem&H_QUOTE1) {  hstate=0;break;};
+		if(hquotem&H_QUOTE2) {  hstate=0;break;};
+		if(hquotem&H_COMMENT) { hstate=0;break;};
+
+		if(hstate==HS_LINESTART) {
+			hquotem = (hquotem)? hquotem : H_QUOTE6;
+				flag_word=1;
+		};
+		hstate=0;
+		break;
+#endif
+	/* zig comments */
+	case '/':
+		if(hquotem&H_QUOTE1 || hquotem&H_QUOTE2) { hstate=0;break;};
+		if(hquotem!=H_QUOTE2 && hquotem!=H_QUOTE1) {
+			if(hstate==HS_PREVSLASH) prev_set=H_QUOTE5;
+			else if(hstate==HS_PREVAST) hquotem &= ~H_QUOTEC;
+		};
+		if(hquotem!=H_QUOTEC && hquotem!=H_QUOTE2) hstate=HS_PREVSLASH;
+		break;
+	case CHR_BSLASH:
+		if(hquotem&H_QUOTE1 || hquotem&H_QUOTE2) {
+			hstate=(hstate==HS_PREVESC)?0:HS_PREVESC;
+		};
+		break;
+	case '\n':
+	case CHR_CR:
+		hquotem &= ~(H_QUOTE6|H_QUOTE4|H_QUOTE5|H_QUOTE9);
+		hstate=HS_LINESTART;
+		h_prev_space=1;
+//		single_quoted=0;
+//		double_quoted=0;
+		flag_word=0;
+		break;
+	case '\t':
+	case ' ':
+		if(double_quoted) {hstate=0; break;};
+		if(single_quoted) {hstate=0; break;};
+//		flag_word=0;	/* Use this for the old style (all line is colored as preprocessor)  */
+		if(hstate!=HS_LINESTART) hstate=0;
+		if(!h_prev_space){
+			if(flag_word==2) {
+				hquotem &= ~H_QUOTE6;
+				flag_word=3;
+				hquotem |= H_QUOTE9;
+			} 
+			else
+			if(flag_word==3) {
+				hquotem &= ~H_QUOTE9;
+				flag_word=0;
+			};
+			
+		};
+		break;
+#if	0
+	case CHR_PARL:
+		if(flag_word==3) break;
+		if(flag_word>1) {
+			hquotem &= ~H_QUOTE9;
+			flag_word=0;
+		};hstate=0;
+		break;	
+#endif
+	default: { 
+		hstate=0;
+		if(flag_word==1) flag_word=2;
+	};
+  };
+  h_prev_space = (c==' '||c=='\t');
+}
+
 void highlight_julia(int c)
 {
 //  MESG("h %c %3d flag=%d dquoted=%d",c,c,flag_word,double_quoted);
