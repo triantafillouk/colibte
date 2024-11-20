@@ -735,6 +735,7 @@ typedef struct  FILEBUF {
 	struct	alist	*b_tag_list;
 #endif
 	struct	alist *dir_list_stack;
+	num maxlinelen;
 }  FILEBUF;
 
 #if	TNOTES

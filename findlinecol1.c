@@ -1,10 +1,11 @@
 #define	TEST1	1
 #define	TEST0	0
 
-void FindLineCol(TextPoint *tp)	/* -- 1 --*/
+void FindLineCol(TextPoint *tp)	/* -- 1 -- */
 {
  FILEBUF *fp=tp->fp;
-
+//  num maxlinelen=0;
+  fp->maxlinelen=0;
   if(tp->offset<1)
    {
       tp->col=tp->line=tp->offset=0;
@@ -85,8 +86,8 @@ void FindLineCol(TextPoint *tp)	/* -- 1 --*/
 
    // MESG("findlinecol: o=%ld c=%ld l=%ld offset=%ld",o,c,l,tp->offset);
 #if	TEST1
-	char first_eol_char='\n';
 #if	1
+	char first_eol_char='\n';
 	if((fp->b_mode & EMDOS) || (fp->b_mode & EMMAC) ) first_eol_char='\r';
 #else
 	char first_eol_char=fp->EolStr[fp->EolSize-1];
@@ -95,9 +96,15 @@ void FindLineCol(TextPoint *tp)	/* -- 1 --*/
 		if(FCharAt_NoCheck(fp,o)==first_eol_char) {
 			o++;
 			if(fp->EolSize>1) {
-				if(FCharAt_NoCheck(fp,o)==fp->EolStr[1]) {l++;c=0;o++;};
+				if(FCharAt_NoCheck(fp,o)==fp->EolStr[1]) {
+					l++;
+					if(c>fp->maxlinelen) fp->maxlinelen=c;
+					c=0;o++;
+				};
 			} else {
-				l++;c=0;			
+					l++;
+					if(c>fp->maxlinelen) fp->maxlinelen=c;
+					c=0;			
 			};
 		} else {
 			utfchar uc;
@@ -112,10 +119,12 @@ void FindLineCol(TextPoint *tp)	/* -- 1 --*/
    offs fsize=FSize(fp);
    while(o<tp->offset) {	/* go forward lines  */
       offs next_line=FNextLine(fp,o);
+	  if (next_line-o > fp->maxlinelen) fp->maxlinelen=next_line-o;
 
       if(next_line>tp->offset||(o+1)==fsize) break;
-
+#if	1
 	  if( !FBolAt(fp,next_line)) { 
+		MESG("not bol: %ld %ld",next_line,fsize);
 		if(next_line==fsize) {
 			o=FLineBegin(fp,next_line);
 			c=0;break;
@@ -124,7 +133,7 @@ void FindLineCol(TextPoint *tp)	/* -- 1 --*/
 	  		o=next_line; continue;
 		}
 	  };
-
+#endif
       o=next_line;
       l++;
       c=0;
@@ -143,7 +152,6 @@ void FindLineCol(TextPoint *tp)	/* -- 1 --*/
 	   tp->offset=o;
    };
    // MESG("           : o=%ld c=%ld l=%ld offset=%ld",o,c,l,tp->offset);
-
    tp->flags = FULLDEFINED;
-	// MESG_time(";flc:[%s] -> o=%lld col=%lld line=%lld ",tp_name[tp->tp_type],o,c,l);
+	MESG_time(";flc:[%s][%s] -> o=%lld col=%lld line=%lld max=%lld",fp->b_fname,tp_name[tp->tp_type],o,c,l,fp->maxlinelen);
 }
