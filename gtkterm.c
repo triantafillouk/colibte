@@ -1688,6 +1688,7 @@ int get_pango_length(char *st)
 int get_utf_length(utfchar *utf_char_str)
 {
  int b0;
+ if(utf_char_str[0]<128) return 1;
  if(clen_error) { return 1;};
  int plen=get_pango_length((char *)utf_char_str->uval);
  if(plen!=0) {

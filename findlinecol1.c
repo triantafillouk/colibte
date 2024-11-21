@@ -1,10 +1,11 @@
-#define	TEST1	1
+#define	TEST1	0	// for real display columns!
 #define	TEST0	0
+
+offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size);
 
 void FindLineCol(TextPoint *tp)	/* -- 1 -- */
 {
  FILEBUF *fp=tp->fp;
-//  num maxlinelen=0;
   fp->maxlinelen=0;
   if(tp->offset<1)
    {
@@ -92,6 +93,7 @@ void FindLineCol(TextPoint *tp)	/* -- 1 -- */
 #else
 	char first_eol_char=fp->EolStr[fp->EolSize-1];
 #endif
+
 	while(o<tp->offset) {	/* go forward lines  */
 		if(FCharAt_NoCheck(fp,o)==first_eol_char) {
 			o++;
@@ -108,7 +110,6 @@ void FindLineCol(TextPoint *tp)	/* -- 1 -- */
 			};
 		} else {
 			utfchar uc;
-			// o=FUtfCharAt(fp,o,&uc);
 			o=FUtfCharAt_nocheck(fp,o,&uc);
 			if(uc.uval[0]==CHR_TAB) c=next_tab(c);
 			else c+=get_utf_length(&uc);
@@ -117,12 +118,20 @@ void FindLineCol(TextPoint *tp)	/* -- 1 -- */
 	// MESG("findlinecol: new o=%ld c=%ld l=%ld",o,c,l);
 #else
    offs fsize=FSize(fp);
+   num line_size=0;
    while(o<tp->offset) {	/* go forward lines  */
+#if	1
+	offs next_line=FCheckNextLine(fp,o,&line_size);
+	if(line_size > fp->maxlinelen) fp->maxlinelen=line_size;
+#else
       offs next_line=FNextLine(fp,o);
+	  // the following is not correct, it is the number of bytes in the line
+	  // not the columns on the display!
 	  if (next_line-o > fp->maxlinelen) fp->maxlinelen=next_line-o;
+#endif 
 
       if(next_line>tp->offset||(o+1)==fsize) break;
-#if	1
+
 	  if( !FBolAt(fp,next_line)) { 
 		MESG("not bol: %ld %ld",next_line,fsize);
 		if(next_line==fsize) {
@@ -133,7 +142,7 @@ void FindLineCol(TextPoint *tp)	/* -- 1 -- */
 	  		o=next_line; continue;
 		}
 	  };
-#endif
+
       o=next_line;
       l++;
       c=0;

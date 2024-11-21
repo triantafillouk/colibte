@@ -1616,10 +1616,10 @@ void list_dir1(char *st)
 int get_utf_length(utfchar *utf_char_str)
 {
  int b0;
- if(clen_error) { return 1;};
 
  b0=utf_char_str->uval[0];
  if(b0<128) return 1;
+ if(clen_error) { return 1;};
 #if	DARWIN | 1
  // accents do not take space in mac 
  if((b0==0xCC || b0==0xCD)) {

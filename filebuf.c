@@ -558,18 +558,20 @@ int DiffColumns(FILEBUF *fp, offs start_col,offs col_offs,char *from)
  return(col);
 }
 
-#if	1
+// DiffColumn depends on the display driver, 
+// each character can have different display lentgh
 int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
 {
  int col = 0;
  offs o=*dbo;
- if(col_offs>FSize(fp)) col_offs=FSize(fp);
+ offs file_size=FSize(fp);
+ if(col_offs>file_size) col_offs=file_size;
  if(fp->b_lang==0 && !utf8_error()){
 //  MESG("diffcol: from %ld to %ld",o,col_offs);
   while (o < col_offs) {
 	int c;
 	utfchar uc;
-	o = FUtfCharAt(fp,o,&uc);
+	o = FUtfCharAt_nocheck(fp,o,&uc);
  	c=uc.uval[0];
 	if (c == CHR_TAB) {
 		col=next_tab(col);
@@ -598,39 +600,7 @@ int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
  *dbo=o;
  return(col);
 }
-#else
-int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
-{
- int col = 0;
- offs o=*dbo;
- // if((*dbo % 4)!=0) MESG("DiffColumns[%s] %ld %d ERROR!!!!",from,*dbo,*dbo%4);
- if(fp->b_lang==0 && !utf8_error()){
-//  MESG("diffcol: from %ld to %ld",o,col_offs);
-  while (o < col_offs && !FEofAt(fp,o)) {
-	o = check_next_char(fp,o,&col);
-	if(clen_error) {
-		set_utf8_error(1);
-		int c=DiffColumns(fp,*dbo,col_offs,"DiffColumn");
-		set_utf8_error(0);
-		return c;
-	};
-  };
- } else {
-  while (o < col_offs && !FEofAt(fp,o)) {
-	int c;
-	c=FCharAt(fp,o);
-	if (c == CHR_TAB) {
-		col=next_tab(col);
-	} else {
-		col ++;
-	};
-	o++;
-  }
- };
- *dbo=o;
- return(col);
-}
-#endif
+
 
 #if	0
 #include "findlinecol0.c"
@@ -3661,6 +3631,66 @@ int   DeleteBlock(offs left,offs right)
    return(true);
 }
 
+
+#if	1
+offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
+{
+ utfchar uc;
+ num col=0;;
+ num file_size=FSize(fp);
+
+ if(fp->EolSize>1) {
+	char c0=fp->EolStr[0];
+	char c1=fp->EolStr[1];
+	while((ptr=FUtfCharAt_nocheck(fp,ptr,&uc)) < file_size){
+		if(uc.uval[0]==c0) {
+			if(FCharAt_NoCheck(fp,ptr)==c1) {
+				ptr++;
+			} else continue; 
+			*display_size=col;
+			return ptr;
+		};
+		if(uc.uval[0]==CHR_TAB) col=next_tab(col);
+		else col+=get_utf_length(&uc);
+	}
+ } else{
+ 	char c0=fp->EolStr[0];
+	while((ptr=FUtfCharAt_nocheck(fp,ptr,&uc)) < file_size){
+		if(uc.uval[0]==c0) {
+			*display_size=col;
+			return ptr;
+		};
+		if(uc.uval[0]==CHR_TAB) col=next_tab(col);
+		else col+=get_utf_length(&uc);
+	};
+ };
+ *display_size=col;
+ return ptr;
+}
+#else
+offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
+{
+ utfchar uc;
+ num col=0;;
+ num file_size=FSize(fp);
+
+ while((ptr=FUtfCharAt_nocheck(fp,ptr,&uc)) < file_size){
+	if(uc.uval[0]==fp->EolStr[fp->EolSize-1]) {
+		if(fp->EolSize>1) {
+			if(FCharAt_NoCheck(fp,ptr)==fp->EolStr[1]) {
+				ptr++;
+			} else continue; 
+		};
+		*display_size=col;
+		return ptr;
+	};
+	if(uc.uval[0]==CHR_TAB) col=next_tab(col);
+	else col+=get_utf_length(&uc);
+ };
+ *display_size=col;
+ return ptr;
+}
+#endif
 
 offs   FNextLine(FILEBUF *fp,offs ptr)
 {
