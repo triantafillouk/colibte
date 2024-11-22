@@ -164,6 +164,8 @@ FUNCS	ftable[] = {
 	{"unassign_key",1,		unassign_key,"Unassign a function or subroutine from a key"},	/* only in interactive mode  */
 	{"saveas_file",	1,		saveas_file,"Save the file as another name"},
 	{"paste_region",	0,	paste_region,"Past the clipboard contents in current position"},
+	{"move_line_up",	1,	move_line_up,"Move line up"},
+	{"move_line_down",	1,	move_line_down,"Move line down"},
 	{"cut_region",		0,	cut_region,"Cut the region and put it in clipboard"},
 	{"update_screen",	1,  update_screen,"update_screen"},
 

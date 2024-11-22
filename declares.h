@@ -38,6 +38,8 @@ int get_hex_byte();
 void toggle_hex_byte();
 void reset_hex_byte();
 int move_window(num);
+int move_line_up(num);
+int move_line_down(num);
 void select_current_word();
 int window_cursor_line(WINDP *wp);
 void set_goal_column(int new_column,char *from);

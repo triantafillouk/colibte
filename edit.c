@@ -1180,11 +1180,9 @@ int setmark(num n)
 // MESG("setmark:");
  if(n) {
  	if(cwp->selection) {
-		cwp->selection=0;
 		reset_region_textpoints();
 	} else cwp->selection=n;
  } else {
- 	cwp->selection=0;
 	reset_region_textpoints();
  };
 
@@ -1195,13 +1193,13 @@ int setmark(num n)
  	} else {
 		tp_copy(cwp->w_smark,cwp->tp_current);
  		tp_copy(cwp->w_emark,cwp->tp_current);
-		cwp->hs[0].w_hselection=0;
+		cwp->hs[0].w_hselection=1;
  	};
  } else { // clear region selection and set region mode to normal
-			set_update(cwp,UPD_FULL);
-			tp_copy(cwp->w_smark,cwp->tp_current);
-			tp_copy(cwp->w_emark,cwp->tp_current);
-			cwp->hs[0].w_hselection=0;
+		set_update(cwp,UPD_FULL);
+		tp_copy(cwp->w_smark,cwp->tp_current);
+		tp_copy(cwp->w_emark,cwp->tp_current);
+		cwp->hs[0].w_hselection=0;
 	};
 	set_update(cwp,UPD_MOVE);
 
@@ -2282,6 +2280,75 @@ int copy_region(num n)
 	snprintf(s,80,"[%lld bytes copied]",MainClipBoard->width);
  msg_line(s);
  return TRUE;
+}
+
+int move_line_up(num n)
+{
+ if(tp_line(cwp->tp_current)<1) {
+	// MESG("move_line_up: on first line!");
+ 	return false;
+ };
+ // mark current line
+	// MESG("move_line_up:s b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	setmark(0);
+	ToLineBegin();
+	setmark(REGION_CHAR);
+	// MESG("move_line_up:0 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	MoveLineCol(tp_line(cwp->tp_current)+1,0);
+	// MESG("move_line_up:1 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	ToLineBegin();
+	tp_copy(cwp->w_emark,cwp->tp_current);
+	// MESG("move_line_up:2 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	
+ // put in clipboard marked region
+	clipboard_copy(MainClipBoard); 
+	// MESG("move_line_up:3 copy %ld",MainClipBoard->width);
+	// MESG("move_line_up:3 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	
+ // delete current
+	delete_region(1); setmark(0);
+ // go up one line and paste
+	MoveLineCol(tp_line(cwp->tp_current)-1,0);
+	paste_region(1);
+ // go up one line
+	MoveLineCol(tp_line(cwp->tp_current)-1,0);
+	set_update(cwp,UPD_EDIT);
+	return 1;
+}
+
+int move_line_down(num n)
+{
+
+ if(tp_line(cwp->tp_current)> tp_line(cbfp->tp_text_end)-2) {
+	// MESG("move_line_down: on last line!");
+ 	return false;
+ };
+ // mark current line
+	MESG("move_line_down:s b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	setmark(0);
+	ToLineBegin();
+	setmark(REGION_CHAR);
+	// MESG("move_line_down:0 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	MoveLineCol(tp_line(cwp->tp_current)+1,0);
+	// MESG("move_line_down:1 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	ToLineBegin();
+	tp_copy(cwp->w_emark,cwp->tp_current);
+	// MESG("move_line_down:2 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	
+ // put in clipboard marked region
+	clipboard_copy(MainClipBoard); 
+	// MESG("move_line_down:3 copy %ld",MainClipBoard->width);
+	// MESG("move_line_down:3 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	
+// delete current
+	delete_region(1); setmark(0);
+ // go down one line and paste
+	MoveLineCol(tp_line(cwp->tp_current)+1,0);
+	paste_region(1);
+ // go up one line
+	MoveLineCol(tp_line(cwp->tp_current)-1,0);
+	set_update(cwp,UPD_EDIT);
+	return 1;
 }
 
 // paste_region function (^V)

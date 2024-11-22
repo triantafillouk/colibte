@@ -699,6 +699,7 @@ char *ext_system_paste_line()
  int status=0;
 
 	if(!x11_display_ok) return "";
+	if(dont_edit() || cbfp->b_flag & FSDIRED )return false;
 	status = set_unique_tmp_file(filnam,"command",MAXFLEN);
 	if(status>=MAXFLEN) return "";
 	status=snprintf(exec_st,MAXFLEN,"%s > %s 2> /dev/null",clip_copy,filnam);
@@ -734,6 +735,8 @@ int ext_system_paste()
  int status=0;
 
 	if(!x11_display_ok) return 0;
+	if(dont_edit() || cbfp->b_flag & FSDIRED )return false;
+
 	status = set_unique_tmp_file(filnam,"command",MAXFLEN);
 	if(status>=MAXFLEN) return 0;
 	status=snprintf(exec_st,MAXFLEN,"%s > %s 2> /dev/null",clip_copy,filnam);
