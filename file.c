@@ -264,9 +264,12 @@ int select_filebuf(FILEBUF *bp)
 	unlink_filebuf(cwp);
 	link_window_buffer(cwp,bp);
 	set_utf8_error(0);
-
+	// test
 	textpoint_set(cwp->tp_hsknown,0);
 	textpoint_set(cwp->tp_hmknown,0);
+	// end test
+	fquote_state(tp_offset(cwp->tp_hline),0,cwp);
+	setwquotes(cwp,0,0);
 	set_update(cwp,UPD_FULL);
 
 	cwp->selection=0;
