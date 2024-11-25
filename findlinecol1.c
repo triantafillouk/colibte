@@ -1,4 +1,4 @@
-#define	TEST1	0	// for real display columns!
+#define	TEST1	1	// for real display columns!
 #define	TEST0	0
 
 offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size);
