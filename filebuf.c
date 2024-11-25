@@ -3655,7 +3655,9 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
 	}
  } else{
  	char c0=fp->EolStr[0];
-	while((ptr=FUtfCharAt_nocheck(fp,ptr,&uc)) < file_size){
+	while(ptr <= file_size)
+	{
+		ptr=FUtfCharAt_nocheck(fp,ptr,&uc);
 		if(uc.uval[0]==c0) {
 			*display_size=col;
 			return ptr;

@@ -943,14 +943,9 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->EolStr[0]=10;bp->EolStr[1]=0;
 	bp->main_undo=undo_new();
 
-	bp->save_hs[0].w_hquotem=0;
-	bp->save_hs[0].w_hselection=0;
-	bp->save_hs[0].w_slang=1;
-	bp->save_hs[0].w_notes=0;
-	bp->save_hs[1].w_hquotem=0;
-	bp->save_hs[1].w_hselection=0;
-	bp->save_hs[1].w_slang=1;
-	bp->save_hs[1].w_notes=0;
+	init_highlight_structure(&bp->save_hs[0]);
+	init_highlight_structure(&bp->save_hs[1]);
+
 	bp->b_type=0;
 	bp->lines=0L;
 	bp->bytes_read=0L;

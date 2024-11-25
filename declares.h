@@ -85,6 +85,7 @@ void parse_command_line(int , char **);
 int highlight_index(char *,int *);
 int highlight_type(char *);
 int is_wrap_text(FILEBUF *fp);
+void init_highlight_structure(MLQUOTES *hs);
 
 int select_highlight(num);
 int check_update_highlight(int flag);

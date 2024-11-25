@@ -750,25 +750,9 @@ WINDP *dublicate_window(WINDP *wp0)
 		wp->w_ppline = 0;
 		wp->w_prev_line=0;
 		wp->draw_flag = 0;		
-		for(ind=0;ind<2;ind++){
-			wp->hs[ind].w_hquotem = 0;
-			wp->hs[ind].w_prev_set = -1;
-			wp->hs[ind].w_hselection =0;
-			wp->hs[ind].w_slang=0;
-			wp->hs[ind].w_notes=0;
-			wp->hs[ind].w_first = 0;
-			wp->hs[ind].w_in_array = 0;
-			wp->hs[ind].flag_word = 0;
-			wp->hs[ind].w_prev_space = 1;
-			wp->hs[ind].single_quoted = 0;
-			wp->hs[ind].double_quoted = 0;
-			wp->hs[ind].w_bold = 0;
-			wp->hs[ind].w_hquote_start = 0;
-			wp->hs[ind].w_line_set=0;
-			wp->hs[ind].w_hstate=0;
-			wp->hs[ind].w_prev_line=0;
-			wp->hs[ind].known_offset=0;
-		};
+
+		init_highlight_structure(&wp->hs[0]);
+		init_highlight_structure(&wp->hs[1]);
 
 		add_element_to_list((void *)wp,window_list);
 		link_window_buffer(wp,wp->w_fp);

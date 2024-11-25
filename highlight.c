@@ -627,6 +627,26 @@ int get_selection()
 
 #define	TRACE_BACK 1000000
 
+void init_highlight_structure(MLQUOTES *hs)
+{
+	hs->w_hquotem = 0;
+	hs->w_prev_set = -1;
+	hs->w_hselection =0;
+	hs->w_slang=0;
+	hs->w_notes=0;
+	hs->w_first = 0;
+	hs->w_in_array = 0;
+	hs->flag_word = 0;
+	hs->w_prev_space = 1;
+	hs->single_quoted = 0;
+	hs->double_quoted = 0;
+	hs->w_bold = 0;
+	hs->w_hquote_start = 0;
+	hs->w_line_set=0;
+	hs->w_hstate=0;
+	hs->w_prev_line=0;
+	hs->known_offset=0;
+}
 
 #if	0
 void update_highlight(WINDP *wp)
