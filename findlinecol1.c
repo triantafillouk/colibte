@@ -3,7 +3,7 @@
 
 offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size);
 
-void FindLineCol(TextPoint *tp)	/* -- 1 -- */
+void FindLineCol(TextPoint *tp)
 {
  FILEBUF *fp=tp->fp;
   fp->maxlinelen=0;
@@ -99,6 +99,9 @@ void FindLineCol(TextPoint *tp)	/* -- 1 -- */
 					l++;
 					if(c>fp->maxlinelen) fp->maxlinelen=c;
 					c=0;o++;
+				} else {
+					// MESG("findlinecol: test1:l=%ld c=%ld o=%ld",l,c,o);
+					c++;
 				};
 			} else {
 					l++;
@@ -124,7 +127,7 @@ void FindLineCol(TextPoint *tp)	/* -- 1 -- */
       if(next_line>tp->offset) { break;};
 
 	  if( !FBolAt(fp,next_line)) { 
-		MESG("not bol: %ld %ld",next_line,fsize);
+		// MESG("not bol: %ld %ld",next_line,fsize);
 		if(next_line==fsize) {
 			o=FLineBegin(fp,next_line);
 			c=0;break;
@@ -153,5 +156,5 @@ void FindLineCol(TextPoint *tp)	/* -- 1 -- */
    };
    // MESG("           : o=%ld c=%ld l=%ld offset=%ld",o,c,l,tp->offset);
    tp->flags = FULLDEFINED;
-	MESG_time(";flc:[%s][%s] -> o=%lld col=%lld line=%lld max=%lld",fp->b_fname,tp_name[tp->tp_type],o,c,l,fp->maxlinelen);
+	// MESG_time(";flc:[%s][%s] -> o=%lld col=%lld line=%lld max=%lld",fp->b_fname,tp_name[tp->tp_type],o,c,l,fp->maxlinelen);
 }

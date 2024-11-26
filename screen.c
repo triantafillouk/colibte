@@ -1980,6 +1980,8 @@ int  show_position_info(num short_version)
 					sstat=snprintf(str,MAXSLEN,"%6lld %7lld %7lld ",getcline()+1,loffs,col);
 				};
 				}
+				if(FOffset(cwp->w_fp)==FSize(cwp->w_fp)) strlcat(str,"EOF",MAXSLEN);
+				else
 				if((int)bt_dval("show_cdata")) { 
 					if(cwp->w_fp->b_mode & EMDOS) strlcat(str,"0D0A",MAXSLEN);
 					else if(cwp->w_fp->b_mode & EMUNIX) strlcat(str,"000A",MAXSLEN);

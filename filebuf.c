@@ -3631,8 +3631,6 @@ int   DeleteBlock(offs left,offs right)
    return(true);
 }
 
-
-#if	1
 offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
 {
  utfchar uc;
@@ -3671,30 +3669,6 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
  // MESG("Line_size:0 %ld",*display_size);
  return ptr;
 }
-#else
-offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
-{
- utfchar uc;
- num col=0;;
- num file_size=FSize(fp);
-
- while((ptr=FUtfCharAt_nocheck(fp,ptr,&uc)) < file_size){
-	if(uc.uval[0]==fp->EolStr[fp->EolSize-1]) {
-		if(fp->EolSize>1) {
-			if(FCharAt_NoCheck(fp,ptr)==fp->EolStr[1]) {
-				ptr++;
-			} else continue; 
-		};
-		*display_size=col;
-		return ptr;
-	};
-	if(uc.uval[0]==CHR_TAB) col=next_tab(col);
-	else col+=get_utf_length(&uc);
- };
- *display_size=col;
- return ptr;
-}
-#endif
 
 offs   FNextLine(FILEBUF *fp,offs ptr)
 {
