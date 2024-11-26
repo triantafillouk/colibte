@@ -3648,6 +3648,7 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
 				ptr++;
 			} else continue; 
 			*display_size=col;
+			// MESG("Line_size:0 %ld",*display_size);
 			return ptr;
 		};
 		if(uc.uval[0]==CHR_TAB) col=next_tab(col);
@@ -3667,6 +3668,7 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
 	};
  };
  *display_size=col;
+ // MESG("Line_size:0 %ld",*display_size);
  return ptr;
 }
 #else

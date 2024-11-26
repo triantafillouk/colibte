@@ -269,7 +269,7 @@ int select_filebuf(FILEBUF *bp)
 	textpoint_set(cwp->tp_hmknown,0);
 	// end test
 	fquote_state(tp_offset(cwp->tp_hline),0,cwp);
-	setwquotes(cwp,0,0);
+	highlight_save_state(cwp,0,0);
 	set_update(cwp,UPD_FULL);
 
 	cwp->selection=0;

@@ -46,8 +46,10 @@ char msg[] = "Usage is\n\
 \n\
  options\n\
  -h         : show help\n\
+ -C			: max colors 256\n\
  -V         : show version\n\
  -k         : set encryption flag\n\
+ -d			: show no time\n\
  -D         : activate debug flag\n\
  -b         : open as binary\n\
  -x <file>  : execute cmd file and quit\n\
@@ -57,6 +59,9 @@ char msg[] = "Usage is\n\
  -N         : open Notes tag view\n\
  -r         : record session keys\n\
  -s <file>  : open and replay session file\n\
+ -t			: show tokens\n\
+ -T			: todo flag\n\
+ -L			: cal flag\n\
  -v         : open in view mode\n\
 ";
  printf("%s\n",msg);

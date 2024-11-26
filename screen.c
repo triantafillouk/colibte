@@ -2326,7 +2326,7 @@ void upd_some_virtual_lines(WINDP *wp,char *from)
 	}
 	else wp->w_flag=0;
 	set_draw_flag(wp,"update_some_lines");
-	getwquotes(wp,0);	// set highlight to the top line!
+	highlight_restore_state(wp,0);	// set highlight to the top line!
 }
 
 void upd_move(WINDP *wp,char *from)
@@ -2418,7 +2418,7 @@ void upd_move(WINDP *wp,char *from)
 #endif
 	set_draw_flag(wp,"upd_move");
 	wp->w_flag=UPD_STATUS;
-	getwquotes(wp,0);	// set highlight to the top line!
+	highlight_restore_state(wp,0);	// set highlight to the top line!
 }
 
 
@@ -2480,7 +2480,7 @@ void upd_part(WINDP *wp,char *from)
 	};
 	if(wp->w_flag & UPD_STATUS) wp->w_flag=UPD_STATUS;
 	else wp->w_flag=0;
-	getwquotes(wp,0);	// set highlight to the top line!
+	highlight_restore_state(wp,0);	// set highlight to the top line!
 }
 
 void upd_part_wrap(WINDP *wp,char *from)
@@ -2543,7 +2543,7 @@ void upd_part_wrap(WINDP *wp,char *from)
 	};
 	if(wp->w_flag & UPD_STATUS) wp->w_flag=UPD_STATUS;
 	else wp->w_flag=0;
-	getwquotes(wp,0);	// set highlight to the top line!
+	highlight_restore_state(wp,0);	// set highlight to the top line!
 }
 
 /*	upd_all_virtual_lines:	update all the lines in a window */
@@ -2568,7 +2568,7 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 		head=1;
 		vt_str(wp,wp->w_fp->b_header,0,0,0,-1,0);
 	};
-	getwquotes(wp,0);
+	highlight_restore_state(wp,0);
 	if(wp->w_fp->b_flag!=FSNOTES && wp->w_fp->b_flag!=FSNOTESN && !(wp->w_fp->b_flag & FSNLIST)) 
 	{	/* Buffer view  */
 		// MESG("update virtual from buffer! wp=%d top offs=%ld",wp->id,lp_offs);
@@ -2657,7 +2657,7 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 	}
 	else wp->w_flag=0;
 	set_draw_flag(wp,"upd_all_virtual_lines");
-	getwquotes(wp,0);	// set highlight to the top line!
+	highlight_restore_state(wp,0);	// set highlight to the top line!
 	// MESG("upd_all_virtual_lines: end!");
 }
 

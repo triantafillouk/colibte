@@ -269,7 +269,7 @@ void upd_all_wrap_lines(WINDP *wp,char *from)
 	// cline_end=FLineEnd(wp->w_fp,lp_offs);
 	// cstart_offset=lp_offs;
 	cashed_FLend(wp->w_fp,lp_offs,1);
-	getwquotes(wp,0);
+	highlight_restore_state(wp,0);
 	// MESG("# update_all_wrap_lines: wrap=%d window %d",is_wrap_text(wp->w_fp),wp->id);
 	for(sline=head;sline < wp->w_ntrows;sline++) 
 	{
@@ -295,5 +295,5 @@ void upd_all_wrap_lines(WINDP *wp,char *from)
 	else wp->w_flag=0;
 	set_draw_flag(wp,"upd_all_wrap_lines");
 	// MESG_time("#update_all_wrap_lines: end");
-	getwquotes(wp,0);	// set highlight to the top line!
+	highlight_restore_state(wp,0);	// set highlight to the top line!
 }

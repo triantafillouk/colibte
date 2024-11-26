@@ -576,7 +576,7 @@ int check_update_highlight(int flag)
  if(flag==0) {
 	if(prev_init) return 0;
  	oldlines=fp->lines;
-	getwquotes(cwp,0);
+	highlight_restore_state(cwp,0);
 	// int htemp=hquotem;
 	check_offset1 = FNextLine(fp,tp_offset(cwp->tp_current));
 	fquote_state(check_offset1,tp_offset(cwp->tp_hline),cwp);
@@ -586,7 +586,7 @@ int check_update_highlight(int flag)
  } else {
 	if(!prev_init) return 0;
  	num newlines=fp->lines;
-	getwquotes(cwp,0);
+	highlight_restore_state(cwp,0);
 	check_offset2 = FNextLine(fp,tp_offset(cwp->tp_current));
 	fquote_state(check_offset2,tp_offset(cwp->tp_hline),cwp);
 	// MESG("c: o0=%ld (l=%ld h1=%d)  o1=%ld (l=%d h1=%d)",check_offset1,oldlines,h1,check_offset2,newlines,hquotem);
@@ -662,15 +662,15 @@ void update_highlight(WINDP *wp)
 		slang=0;
 		hselection=0;
 		fquote_state(wp->hs[0].known_offset, 0,wp);
-		setwquotes(wp,1,wp->hs[0].known_offset);
+		highlight_save_state(wp,1,wp->hs[0].known_offset);
 		MESG("uh: nkown_offset (%ld  %ld)",wp->hs[0].known_offset,wp->hs[1].known_offset);
 		MESG("  : hquotem      (%X  %X)",wp->hs[0].w_hquotem,wp->hs[1].w_hquotem);
 		MESG("  : slang        (%d  %d)",wp->hs[0].w_slang,wp->hs[1].w_slang);
 #else
-		getwquotes(wp,0);
+		highlight_restore_state(wp,0);
 #endif
 		fquote_state(hline_offset,wp->hs[0].known_offset,wp);
-		setwquotes(wp,0,hline_offset);
+		highlight_save_state(wp,0,hline_offset);
 	} else 
 #endif
 	{
@@ -678,7 +678,7 @@ void update_highlight(WINDP *wp)
 		slang=0;
 		hselection=0;
 		fquote_state(hline_offset, 0,wp);
-		setwquotes(wp,0,hline_offset);
+		highlight_save_state(wp,0,hline_offset);
 	};
 }
 #else
@@ -698,15 +698,15 @@ void update_highlight(WINDP *wp)
 	if(note_type) { hnote=1;} else hnote=0;
 //	MESG("update_highlight: note_type=%d ----------------------",note_type);
 
-	getwquotes(wp,0);	/* in any case read again current window top line highlight	*/
+	highlight_restore_state(wp,0);	/* in any case read again current window top line highlight	*/
 	if(tp_offset(wp->tp_hline) == tp_offset(wp->tp_hsknown)) {
 		// MESG("	==");
 		if(tp_offset(wp->tp_hline)==0) {
 			if(note_type) { hnote=1;} else hnote=0;
 			wp->w_fp->hl->h_function(CHR_RESET);
-			setwquotes(wp,0,known_offset);
+			highlight_save_state(wp,0,known_offset);
 		} else {
-			getwquotes(wp,0);
+			highlight_restore_state(wp,0);
 		}
 		return;
 	};
@@ -714,10 +714,10 @@ void update_highlight(WINDP *wp)
 //		get info from tp_hsknown
 		// MESG("	>");
 #if	1
-		known_offset = 	getwquotes(wp,0); 
+		known_offset = 	highlight_restore_state(wp,0); 
 #else
 		known_offset = tp_offset(wp->tp_hsknown); 
-		getwquotes(wp,0); 
+		highlight_restore_state(wp,0); 
 #endif
 		fquote_state(tp_offset(wp->tp_hline), known_offset,wp);
 		known_offset = tp_offset(wp->tp_hline);
@@ -725,7 +725,7 @@ void update_highlight(WINDP *wp)
 	{
 //		get info from wp_hmknown
 		// MESG("	> 2");
-		known_offset = getwquotes(wp,1);
+		known_offset = highlight_restore_state(wp,1);
 		fquote_state( tp_offset(wp->tp_hline), known_offset,wp);
 		known_offset = tp_offset(wp->tp_hline);
 	} else {
@@ -740,7 +740,7 @@ void update_highlight(WINDP *wp)
 			known_offset = tp_offset(wp->tp_hmknown);
 //			save highlight info for tp_pknown
 //			if(note_type) { hnote=1;} else hnote=0;
-			setwquotes(wp,1,known_offset);
+			highlight_save_state(wp,1,known_offset);
 			fquote_state(tp_offset(wp->tp_hline), tp_offset(wp->tp_hmknown),wp);
 			known_offset=tp_offset(wp->tp_hline);
 		} else {
@@ -751,7 +751,7 @@ void update_highlight(WINDP *wp)
 		} 
 	};
 //	if(note_type) { hnote=1;} else hnote=0;
-	setwquotes(wp,0,known_offset);
+	highlight_save_state(wp,0,known_offset);
 	// MESG_time("update_highlight:end");
 }
 #endif
@@ -764,11 +764,11 @@ void update_highlight_line(WINDP *wp)
 //	previous line with known state is tp_pknown
 //	we must go to tp_hline
 	// MESG("update_highlight_line:");
-	getwquotes(wp,0);	/* in any case read again current window top line highlight	*/
+	highlight_restore_state(wp,0);	/* in any case read again current window top line highlight	*/
 	hquotem=0;
 	slang=1;
 	hselection=0;
-	setwquotes(wp,0,tp_offset(wp->tp_hline));
+	highlight_save_state(wp,0,tp_offset(wp->tp_hline));
 }
 
 void update_highlight_none(WINDP *wp)
@@ -779,11 +779,11 @@ void update_highlight_none(WINDP *wp)
 //	previous line with known state is tp_pknown
 //	we must go to tp_hline
 	// MESG("update_highlight_none:");
-	getwquotes(wp,0);	/* in any case read again current window top line highlight	*/
+	highlight_restore_state(wp,0);	/* in any case read again current window top line highlight	*/
 	hquotem=0;
 	slang=0;
 	hselection=0;
-	setwquotes(wp,0,tp_offset(wp->tp_hline));
+	highlight_save_state(wp,0,tp_offset(wp->tp_hline));
 }
 
 void highlight_c(int c)
@@ -3619,10 +3619,10 @@ void fquote_state(offs till_offs, offs from_offs, WINDP *wp)
  // MESG_time("!fquote: (%lld %X) -> (%lld %X)",from_offs,orig_hquotem,till_offs,hquotem);
 }
 
-void setwquotes(WINDP *wp,int ind,num known_offset)
+void highlight_save_state(WINDP *wp,int ind,num known_offset)
 {
 	// if(hprev_line>=0) hquotem=hprev_line;
-	// MESG("setwquotes:[%s] ind=%d btype=%d slang=%d hstate=%d hquotem=%X ko=%lld ho=%lld",wp->w_fp->b_fname,ind,wp->w_fp->b_type,slang,hstate,hquotem,known_offset,tp_offset(wp->tp_hline));
+	// MESG("highlight_save_state:[%s] ind=%d btype=%d slang=%d hstate=%d hquotem=%X ko=%lld ho=%lld",wp->w_fp->b_fname,ind,wp->w_fp->b_type,slang,hstate,hquotem,known_offset,tp_offset(wp->tp_hline));
 	// wp->w_fp->hl->h_function(CHR_FLUSH);	/* is it needed ?, now only for json  */
 	wp->hs[ind].w_hquotem = hquotem;
 	wp->hs[ind].w_slang = slang;
@@ -3645,7 +3645,7 @@ void setwquotes(WINDP *wp,int ind,num known_offset)
 	if(ind==0) tp_copy(wp->tp_hsknown,wp->tp_hline);
 }
 
-offs getwquotes(WINDP *wp,int ind)
+offs highlight_restore_state(WINDP *wp,int ind)
 {
 	hquotem=wp->hs[ind].w_hquotem;
 	slang=wp->hs[ind].w_slang;
@@ -3664,7 +3664,7 @@ offs getwquotes(WINDP *wp,int ind)
 	h_line_set = wp->hs[ind].w_line_set;
 	h_prev_space = wp->hs[ind].w_prev_space;
 	hprev_line = wp->hs[ind].w_prev_line;
-	// MESG("getwquotes:[%s] ind=%d b_type=%d slang=%d hstate=%d hquotem=%X ko=%lld ho=%lld",wp->w_fp->b_fname,ind,wp->w_fp->b_type,slang,hstate,hquotem,wp->hs[ind].known_offset,tp_offset(wp->tp_hline));
+	// MESG("highlight_restore_state:[%s] ind=%d b_type=%d slang=%d hstate=%d hquotem=%X ko=%lld ho=%lld",wp->w_fp->b_fname,ind,wp->w_fp->b_type,slang,hstate,hquotem,wp->hs[ind].known_offset,tp_offset(wp->tp_hline));
 	return wp->hs[ind].known_offset;
 }
 
