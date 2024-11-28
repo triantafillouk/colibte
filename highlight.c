@@ -450,6 +450,14 @@ int comment_perl(int n)
 	return comment_with_string("#",n);
 }
 
+int comment_ini(int n)
+{
+	// MESG("comment_ini: n=%d",n);
+	if(n==C_COLSTART) return comment_with_string(";",C_COLSTART);
+	if(n==C_LINEEND) return comment_with_string(";",C_LINEEND);
+	return comment_with_string(";",C_LINEBEG);
+}
+
 int comment_none(int n)
 {
 	return 0;
@@ -2254,6 +2262,54 @@ void highlight_json(int c)
 		};
 		hstate=0;
 		break;
+	case CHR_FLUSH:
+		break;
+	default: { 
+		hstate=0;
+	};
+  };
+}
+
+void highlight_ini(int c)
+{
+  if(highlight_note(c)) return;
+  if(prev_set>=0) { hquotem=prev_set;prev_set=-1;};
+
+  switch(c) {
+	case (CHR_RESET) : // initialize
+		hstate=0;
+		first=1;
+		in_array=0;
+		break;
+#if	1
+	case '=':
+		if(hquotem==0) { prev_set = H_QUOTE1;};
+		hstate=0;
+		break;
+#endif
+	case '\n':
+	case CHR_CR:
+		hquotem = 0;
+		hstate=HS_LINESTART;
+		first=1;
+		break;
+
+	case ';':
+		if(hquotem==0 || hquotem==H_QUOTE1) hquotem = H_COMMENT;
+		hstate=0;
+		break;
+	case CHR_LBRA:
+		if(hquotem==0) {
+			prev_set = H_QUOTE6;
+		};
+		hstate=0;
+		break;
+		
+	case CHR_RBRA:
+		if(hquotem) hquotem=0;
+		hstate=0;
+		break;
+
 	case CHR_FLUSH:
 		break;
 	default: { 
