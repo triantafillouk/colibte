@@ -351,7 +351,6 @@ char *lua_extensions[] = {"lua",""};
 
 SHLIGHT hts[] = {
  { "NONE",0,0,none_w,none_w, highlight_text,update_highlight_none,c_in_txt_word,no_extensions,comment_perl },
- { "INI",0,0,none_w,none_w, highlight_ini,update_highlight_none,c_in_txt_word,ini_extensions,comment_ini },
  { "CMD",0,0,cmd_w,cmd_w1, highlight_cmd,update_highlight,c_incword,cmd_extensions,comment_perl },
  { "TEXT",1,0,text_w,none_w, highlight_text,update_highlight_line,c_in_txt_word,txt_extensions,comment_perl },
  { "C", 0,0,c_w,c_w1,highlight_c,update_highlight,c_incword,c_extensions,comment_cc },
@@ -408,6 +407,7 @@ SHLIGHT hts[] = {
  { "LUA",0,0,lua_w,lua_w1,highlight_lua,update_highlight,c_incword,lua_extensions,comment_lua },
  { "BICEP",0,0,bicep_w,bicep_w1,highlight_c,update_highlight,c_incword,bicep_extensions,comment_cc },
  { "ZIG", 0,0,zig_w,zig_w1,highlight_zig,update_highlight,c_incword,zig_extensions,comment_cc },
+ { "INI",0,0,none_w,none_w, highlight_ini,update_highlight_none,c_in_txt_word,ini_extensions,comment_ini },
  
  { NULL,0,0,NULL,NULL,NULL,NULL,NULL }
 };
