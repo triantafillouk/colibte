@@ -1302,7 +1302,7 @@ void main_loop()
 	c = getcmd();
 	MESG_time_start("# main_loop go execute -------key %s",xe_key_name(c));
 	/* execute the keyboard sequence */
-	msg_line(time2a());
+	// msg_line(time2a());
 	main_execute(c);
  };
 }

@@ -346,7 +346,7 @@ char *function_name(int (*func)(), char **description);
 // crypt.c
 int set_key( num n);
 int set_buf_key(FILEBUF *curbp);
-void crypt_string(char *ctr,long len);
+void crypt_string(char *ctr,num len);
 
 // support.c
 int read_list_array(char *file_name, alist *new_list);

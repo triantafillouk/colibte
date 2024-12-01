@@ -1192,18 +1192,18 @@ void check_line_mode(FILEBUF *bf)
 		bf->EolSize=2;
 		strlcpy(bf->EolStr,"\r\n",3);
 		bf->b_mode |= EMDOS;
-		// MESG("	dos mode");
+		// MESG(";[%10s] check_line_mode: dos mode",bf->b_fname);
 		textpoint_OrFlags(bf,COLUNDEFINED|LINEUNDEFINED);
       } else  
 	  if(MacLastLine>0){
 		bf->EolSize=1;
 		strlcpy(bf->EolStr,"\r",3);
 		bf->b_mode |= EMMAC;
-		// MESG("	mac mode");
+		// MESG(";[%10s] check_line_mode: mac mode",bf->b_fname);
 		textpoint_OrFlags(bf,COLUNDEFINED|LINEUNDEFINED);
 	  } else
 	  {
-		// MESG("	unix mode");
+		// MESG(";[%10s] check_line_mode: unix mode",bf->b_fname);
 		bf->b_mode |= EMUNIX;
       };
 }
@@ -1776,12 +1776,11 @@ off_t  GetDevSize(int fd)
 
 void update_lines(FILEBUF *bp)
 {
-//  num old_lines=bp->lines;
 	textpoint_set(bp->tp_text_o,FSize(bp));
-	if(debug_flag()) MESG_time("update_lines:1");
+	MESG_time("update_lines:1 %ld",tp_line(bp->tp_text_o));
 	textpoint_set(bp->tp_text_end,FSize(bp));
 	bp->lines=tp_line(bp->tp_text_end)+1;
-	// MESG("update_lines: old=%ld new=%ld s=%ld",old_lines,bp->lines,FSize(bp));
+	// MESG("update_lines: lines=%ld size=%ld",bp->lines,FSize(bp));
 }
 
 num get_lines(FILEBUF *bp)
@@ -1978,7 +1977,11 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	    CheckPoint(bf);
 
 		if(bf->b_mode & EMCRYPT){ // decrypt the rest of the file
+			// char *b = bf->buffer;
+			// MESG("enc: %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X",b[0],b[1],b[2],b[3],b[4],b[5],b[6],b[7],b[8],b[9],b[10],b[11],b[12],b[13],b[14],b[15],b[16],b[17],b[18],b[19],b[20],b[21],b[22],b[23],b[24],b[25],b[26],b[27],b[28],b[29]);
 			crypt_string(bf->buffer,act_read);
+			// MESG("Encrypted !!!!!!!!!!!!!!!!!!!!");
+			// MESG("enc: %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X",b[0],b[1],b[2],b[3],b[4],b[5],b[6],b[7],b[8],b[9],b[10],b[11],b[12],b[13],b[14],b[15],b[16],b[17],b[18],b[19],b[20],b[21],b[22],b[23],b[24],b[25],b[26],b[27],b[28],b[29]);
 		};
 	}
 	else /* buffer_mmapped */
@@ -2035,7 +2038,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	};
 
 	textpoint_set(bf->tp_current,0);	// goto the beginning
-	MESG_time("ifile0: end");
+	// MESG_time("ifile0: end");
 	close(file);
 	if(!execmd) msg_line("%s: chars=%lld,lines=%lld type %s",bf->b_fname,FSize(bf),bf->lines,bf->hl->description);
 	if(temp_used) {
@@ -2967,7 +2970,7 @@ int   InsertBlock(FILEBUF *fp, char *block_left,offs size_left,char *block_right
    if(fp->b_flag & FSMMAP) return false;
    size=size_left+size_right;
    if(size==0) return(true);
-	// MESG("InsertBlock:%s pos=%ld l=%ld r=%ld",fp->b_fname,FOffset(fp),size_left,size_right);
+	MESG("InsertBlock:%s pos=%ld l=%ld r=%ld",fp->b_fname,FOffset(fp),size_left,size_right);
    PreModify(fp);
 
    if(size_left>0) {
@@ -3008,7 +3011,6 @@ int   InsertBlock(FILEBUF *fp, char *block_left,offs size_left,char *block_right
    CalculateLineCol(fp,&num_of_lines,&num_of_columns,oldoffset,oldoffset+size_left);
    CalculateLineCol(fp,&num_of_lines,&num_of_columns,oldoffset+size_left,oldoffset+size);
 
-//   MESG("	ins: old_offset=%ld left=%ld right=%ld lines=%ld break_at=%d join_at=%d",oldoffset,size_left,size_right,num_of_lines,break_at,join_at);
    TextPoint *scan;
    for(scan=fp->tp_last; scan; scan=scan->t_next) {
 	  if(scan==fp->tp_current) {
@@ -3035,7 +3037,7 @@ int   InsertBlock(FILEBUF *fp, char *block_left,offs size_left,char *block_right
 //	MESG("	update current point= o=%ld->%ld l->%ld c=%ld",oldoffset,fp->tp_current->offset,fp->tp_current->line,fp->tp_current->col);
 	// set_modified(fp);
 	fp->b_state |= FS_CHG;
-	update_lines(fp);
+	// update_lines(fp);
 	return(true);
 }
 
@@ -3140,7 +3142,7 @@ int   ReplaceTextFromFile(char *file_name,FILEBUF *fp,int fd,offs size,offs *act
    fp->ptr1+=*act_read;
    fp->GapSize-=*act_read;
 //	MESG("	ptr1=%ld ptr2=%ld gap=%ld",fp->ptr1,fp->ptr2,fp->GapSize);
-   update_lines(fp);
+	if(!(fp->b_mode & EMCRYPT)) update_lines(fp);
    return(true);
 }
 

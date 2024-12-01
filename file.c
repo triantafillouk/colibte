@@ -1321,7 +1321,7 @@ int set_buf_key(FILEBUF *bp)	/* reset encryption key of current file */
 /* uncrypt/decrypt a string. This is taken/modified from Jaspa microemacs editor 
  * Copyright (C) 1986 Dana L. Hoggatt
 */
-void crypt_string(char *ctr,long len)
+void crypt_string(char *ctr,num len)
 {
 	unsigned int cc;
 	int val;
@@ -1659,7 +1659,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
  int htype=0;	/* highlight type  */
  char	oext[MAXLLEN], cmd[MAXLLEN];
  *temp_used=0;
- MESG("init_ftype:[%s] b_type=%d view_mode=0x%X" ,fname,bp->b_type,bp->view_mode);
+ // MESG("init_ftype:[%s] b_type=%d view_mode=0x%X" ,fname,bp->b_type,bp->view_mode);
 #if	CRYPT
 	s=resetkey(bp);
 	if (s != TRUE)	return(s);
@@ -1707,7 +1707,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 		|| file_type_is("MD",bp->b_type) 
 		|| (bp->b_type >= NOTE_TYPE))
 		 ) {	
-			MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
+			// MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
 			bp->b_mode |= EMCRYPT;
 #if	TNOTES
 			if(bt_dval("notes_recreate") || from_note) 
@@ -1812,13 +1812,13 @@ int file_type(char *name, int *compression_type,char *oext)
  };
  ext1[ext_len]=0;	// extension in reverse 
  i--;
- MESG("file_type: [%s] [%s] len=%d e=%d",name,ext1,ext_len,e);
+ // MESG("file_type: [%s] [%s] len=%d e=%d",name,ext1,ext_len,e);
 
  if(e>0 && ext_len>0) {
 	revstr(ext1);
 	strlcpy(oext,ext1,MAXLLEN);
 	ind=highlight_index(oext,&ind2);
-	MESG("file_type: [%s] ind=%d",oext,ind);
+	// MESG("file_type: [%s] ind=%d",oext,ind);
 	if(ind==FX_COMPRESS)
 	{
 		*compression_type=ind2;
