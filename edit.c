@@ -1470,7 +1470,7 @@ int noop(num n){
 /* emacs key "^T". */
 int twiddle(num n)
 {
-	char ts[10];
+	char ts[16];
 	int i;
 
 	check_update_highlight(0);

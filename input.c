@@ -80,7 +80,7 @@ extern int in_menu;
 char key_string[128];
 char * xe_key_name(int c);
 int	ctlxc = CNTRL | 'X';		/* current control X prefix char */
-char utfokey[10];
+char utfokey[16];
 int utflen=0;
 int	tlist=0 ;
 int liston=0;

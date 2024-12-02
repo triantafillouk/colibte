@@ -1577,7 +1577,7 @@ int set_color(num n)
 	return(1);
  }; 
 
- snprintf(wtitle,256,"set color %d",n);
+ snprintf(wtitle,256,"set color %lld",n);
  changed_color=n;
 
  colors_win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
