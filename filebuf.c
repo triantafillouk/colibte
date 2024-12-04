@@ -430,7 +430,7 @@ int is_utf_accent(FILEBUF *fp, offs o)
 
 int utf8charlen_nocheck(int ch)
 {
- if(ch<129) return 1;
+ if(ch<0xC0) return 1;
  if(ch<0xE0) return 2;
  if(ch<0xF0) return 3;
  return 4;
@@ -3037,7 +3037,7 @@ int   InsertBlock(FILEBUF *fp, char *block_left,offs size_left,char *block_right
 //	MESG("	update current point= o=%ld->%ld l->%ld c=%ld",oldoffset,fp->tp_current->offset,fp->tp_current->line,fp->tp_current->col);
 	// set_modified(fp);
 	fp->b_state |= FS_CHG;
-	// update_lines(fp);
+	update_lines(fp);
 	return(true);
 }
 

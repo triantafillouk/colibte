@@ -2616,6 +2616,10 @@ int set_crypt(num n)
 
 int toggle_crypt(num n)
 {
+ if(cbfp->b_flag & FSMMAP) {
+	msg_line("mmap cannot not be crypted, goto edit mode first!");
+ 	return FALSE;
+ };
  toggleoptionf(EMCRYPT,0);
  return TRUE;
 }
