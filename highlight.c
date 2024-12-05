@@ -816,8 +816,10 @@ void highlight_c(int c)
 	/* single quotes */ 
 	case CHR_SQUOTE: 
 		if(flag_word==2) { hstate=0;break;};
+		if(hquotem&H_QUOTEC) break;
 		if(hquotem&H_QUOTE2) { hstate=0; break;};
 		if(hquotem&H_QUOTE5) { hstate=0; break;};
+		if(hquotem&H_QUOTE6) { hstate=0; break;};
 //		if(double_quoted) { hstate=0;break;};
 		if(hstate!=HS_PREVESC) { 
 			if(hquotem) hquotem=hquotem & ~H_QUOTE1;else prev_set=H_QUOTE1;
@@ -828,15 +830,16 @@ void highlight_c(int c)
 		break;
 	/* double quotes */
 	case CHR_DQUOTE:
+		if(hstate==HS_PREVESC) { hstate=0;break;};
 		if(hquotem&H_QUOTEC) break;
-//		if(flag_word==3) word_is_quoted=2;
-		if(flag_word==2) { hstate=0;break;};
+		// if(flag_word==2) { hstate=0;break;};
 		if(hquotem&H_QUOTE1) { hstate=0;break;};
 		if(hquotem&H_QUOTE5) { hstate=0; break;};
+		// if(hquotem&H_QUOTE6) { hstate=0; break;};
 //		if(single_quoted) { hstate=0;break;};
-		if(hstate!=HS_PREVESC) { hquotem = (hquotem&H_QUOTE2)? hquotem & ~H_QUOTE2: hquotem | H_QUOTE2;
-			double_quoted = (double_quoted)? 0:1;
-		};
+// 		hquotem = (hquotem&H_QUOTE2)? hquotem & ~H_QUOTE2: hquotem | H_QUOTE2;
+		hquotem = (hquotem&H_QUOTE2)? 0: H_QUOTE2;
+		double_quoted = (double_quoted)? 0:1;
 		hstate=0;
 		break;
 	/* c comments */
@@ -898,7 +901,7 @@ void highlight_c(int c)
 				hquotem &= ~H_QUOTE9;
 				flag_word=0;
 			};
-			
+			h_prev_space=1;			
 		};
 		break;
 	case CHR_PARL:
@@ -1637,7 +1640,7 @@ void highlight_md(int c)
 		} else {
 			prev_set = h_hquote_start;
 			h_hquote_start=0;
-			//hquotem = H_QUOTE8;
+			hquotem = H_QUOTE8;
 			hstate=0;
 		};
 		break;
