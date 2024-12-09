@@ -1,4 +1,4 @@
-#define	TEST1	0	// for real display columns!
+#define	TEST1	1	// for real display columns!
 #define	TEST0	0
 
 offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size);
@@ -6,7 +6,8 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size);
 void FindLineCol(TextPoint *tp)
 {
  FILEBUF *fp=tp->fp;
-  fp->maxlinelen=0;
+  // fp->maxlinelen=0;
+  // MESG("findlinecol: o=%ld",tp->offset);
   if(tp->offset<1)
    {
       tp->col=tp->line=tp->offset=0;
@@ -119,11 +120,12 @@ void FindLineCol(TextPoint *tp)
 #else
    offs fsize=FSize(fp);
    num line_size=0;
+   num num_line=0;
    while(o<tp->offset) {	/* go forward lines  */
 	// c=0;
 	if(o>fsize-1) break;
 	offs next_line=FCheckNextLine(fp,o,&line_size);
-		if(line_size > fp->maxlinelen) fp->maxlinelen=line_size;
+		// MESG("	%4ld: o=%ld next_line=%ld line_size=%ld max=%ld",num_line++,o,next_line,line_size,fp->maxlinelen);
       if(next_line>tp->offset) { break;};
 
 	  if( !FBolAt(fp,next_line)) { 

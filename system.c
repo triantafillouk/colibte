@@ -15,7 +15,7 @@
 extern int update_all;
 extern FILEBUF *cbfp;
 void set_sval(char *s);
-
+int main_clipboard_copy();
 
 struct timeval start_time;	/* editor time started stamp */
 
@@ -727,7 +727,10 @@ char *ext_system_paste_line()
 
 	return "";
 }    
-        
+
+int utf8charlen_nocheck(int ch);
+
+#if	0        
 int ext_system_paste()
 {
  static char filnam[MAXFLEN];
@@ -764,8 +767,8 @@ int ext_system_paste()
 	msg_line("cannot insert system clipboard!");
 	return 0;
 }
-
-int ext_system_column_paste()
+#else
+int ext_system_paste()
 {
  static char filnam[MAXFLEN];
  static char exec_st[MAXFLEN];
@@ -779,17 +782,90 @@ int ext_system_column_paste()
 
 	status = system(exec_st);
 	if(status==0) {
+		FILEBUF *ori_buf = cbfp;
+		offs o1=Offset();	/* original offset  */
+		if(cwp->selection) {
+		// MESG("#ext_system_paste_column:---------------");
+		FILEBUF *tmp_bp = new_filebuf(filnam,0);
+		select_filebuf(tmp_bp);
+		set_Offset(FSize(tmp_bp));
+		num max_len = tmp_bp->maxlinelen;
+		char *ml = malloc(max_len+2);
+		set_Offset(0);
+		num line_start=0;
+		// MESG("#ext_system_paste_column: %ld",max_len);
+
+		select_filebuf(ori_buf);
+		num start_column=tp_col(cbfp->tp_current);
+		char *pad_space = (char *)malloc(start_column+1);
+		memset(pad_space,'+',start_column+1);
+		do {
+			char *l=get_line_at(tmp_bp,line_start);
+			memset(ml,0,max_len+1);
+			// sprintf(ml,"%-*s",(int)max_len,l);
+			int col=0, in_offset=0;;
+			char *ml_out = ml;
+			num line_end_column=tp_col(cbfp->tp_current);
+			if(line_end_column<start_column) {
+				insert_string(cbfp,pad_space,start_column-line_end_column);
+			};
+			while(in_offset<strlen(l)) {
+				utfchar uc;
+				in_offset=SUtfCharAt(l,in_offset,&uc);
+				if(uc.uval[0]==CHR_TAB) {col=next_tab(col);}
+				else col+=get_utf_length(&uc);
+				memcpy(ml_out,&uc,utf8charlen_nocheck(uc.uval[0]));
+				ml_out+=utf8charlen_nocheck(uc.uval[0]);
+			};;
+			
+			while(col++<max_len) { *ml_out++=' ';}; *ml_out=0;
+			line_start = FNextLine(tmp_bp,line_start);
+			
+			// MESG("insert:[%s]",ml);
+			// insert_string(cbfp,ml,ml_out-ml);
+			if(FEof(cbfp)) {
+				insert_newline(cbfp);
+				if(start_column>0) {
+					// memset(ml,' ',start_column);
+					// *(ml+start_column) = 0;
+					// insert_string(cbfp,ml,start_column);
+					insert_string(cbfp,pad_space,start_column);
+				};
+					insert_string(cbfp,ml,ml_out-ml);
+			} else {
+				insert_string(cbfp,ml,ml_out-ml);
+				if(!next_line(1)) {
+					set_Offset(FSize(cbfp));
+					insert_newline(cbfp);
+				};;
+				if(FEof(cbfp)) {
+					insert_newline(cbfp);
+					if(start_column>0) {
+						// memset(ml,' ',start_column);
+						// *(ml+start_column) = 0;
+						// insert_string(cbfp,ml,start_column);
+						insert_string(cbfp,pad_space,start_column);
+					};
+				}
+			};
+		} while(line_start<FSize(tmp_bp));
+		free(pad_space);
+		free(ml);
+		unlink(filnam);
+		delete_filebuf(tmp_bp,1);
+		set_update(cwp,UPD_ALL);
+		} else {
 		int file;
 		struct stat    st;
 		long int size;
 		long long int act_read;
-		offs o1=Offset();
 		file=open(filnam,O_RDONLY);
 		fstat(file,&st);
 		size = st.st_size;
 		status = ReadBlock(filnam,file,size,&act_read);
 		o1 += act_read;
 		close(file);
+		};
 		unlink(filnam);
 		set_Offset(o1);
 		set_update(cwp,UPD_EDIT);
@@ -799,6 +875,7 @@ int ext_system_column_paste()
 	msg_line("cannot insert system clipboard!");
 	return 0;
 }
+#endif
 
 extern struct ClipBoard *MainClipBoard;
 

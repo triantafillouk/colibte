@@ -1777,7 +1777,7 @@ off_t  GetDevSize(int fd)
 void update_lines(FILEBUF *bp)
 {
 	textpoint_set(bp->tp_text_o,FSize(bp));
-	MESG_time("update_lines:1 %ld",tp_line(bp->tp_text_o));
+	// MESG_time("update_lines:1 %ld %ld",tp_line(bp->tp_text_o),bp->maxlinelen);
 	textpoint_set(bp->tp_text_end,FSize(bp));
 	bp->lines=tp_line(bp->tp_text_end)+1;
 	// MESG("update_lines: lines=%ld size=%ld",bp->lines,FSize(bp));
@@ -1878,7 +1878,6 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	if(status!=TRUE) return FALSE;
   };
    errno=0;
-	// MESG("ifile0: 1 name=%s",name);
    /* clear the 'temporarily read-only' bit */
    bf->b_state &= ~FS_VIEW;
    if(!name[0])
@@ -1887,7 +1886,6 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 		msg_line("No name for memory mapped file!");
       	return(true);
    }
-	// MESG("ifile0: 2 name=%s errno=%d",name,errno);
 
    if(errno==0) {
 		bf->FileMode=st.st_mode;
@@ -2020,7 +2018,6 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	check_line_mode(bf);
 
 	update_lines(bf);
-//	MESG("	lines updated!");
 	if(!(bf->b_flag & FSMMAP)) 
 		set_modified(bf);
 
@@ -2038,9 +2035,9 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	};
 
 	textpoint_set(bf->tp_current,0);	// goto the beginning
-	// MESG_time("ifile0: end");
+	MESG_time("ifile0: end");
 	close(file);
-	if(!execmd) msg_line("%s: chars=%lld,lines=%lld type %s",bf->b_fname,FSize(bf),bf->lines,bf->hl->description);
+	if(!execmd) msg_line("%s: chars=%lld,lines=%lld type %s max line len=%ld",bf->b_fname,FSize(bf),bf->lines,bf->hl->description,bf->maxlinelen);
 	if(temp_used) {
 		// MESG("remove temporary %s",name);
 		unlink(name);
@@ -2970,7 +2967,7 @@ int   InsertBlock(FILEBUF *fp, char *block_left,offs size_left,char *block_right
    if(fp->b_flag & FSMMAP) return false;
    size=size_left+size_right;
    if(size==0) return(true);
-	MESG("InsertBlock:%s pos=%ld l=%ld r=%ld",fp->b_fname,FOffset(fp),size_left,size_right);
+	// MESG("InsertBlock:%s pos=%ld l=%ld r=%ld",fp->b_fname,FOffset(fp),size_left,size_right);
    PreModify(fp);
 
    if(size_left>0) {
@@ -3647,8 +3644,8 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
 			if(FCharAt_NoCheck(fp,ptr)==c1) {
 				ptr++;
 			} else continue; 
-			*display_size=col;
-			// MESG("Line_size:0 %ld",*display_size);
+			if(col>fp->maxlinelen) { fp->maxlinelen=col;*display_size=col;};
+			// MESG("Line_size:2 %ld",*display_size);
 			return ptr;
 		};
 		if(uc.uval[0]==CHR_TAB) col=next_tab(col);
@@ -3660,14 +3657,16 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
 	{
 		ptr=FUtfCharAt_nocheck(fp,ptr,&uc);
 		if(uc.uval[0]==c0) {
-			*display_size=col;
+			if(col>fp->maxlinelen) { fp->maxlinelen=col;*display_size=col;};
+			// MESG("Line_size:1 %ld",*display_size);
 			return ptr;
 		};
 		if(uc.uval[0]==CHR_TAB) col=next_tab(col);
 		else col+=get_utf_length(&uc);
 	};
  };
- *display_size=col;
+ // last line with no new line at the end
+ if(col>fp->maxlinelen) { fp->maxlinelen=col;*display_size=col;};
  // MESG("Line_size:0 %ld",*display_size);
  return ptr;
 }
@@ -3781,7 +3780,7 @@ void  EmptyText(FILEBUF *bp)
    bp->lines=0;
    bp->EolSize=1;
    bp->b_state &= ~(FS_CHG);
-	
+   bp->maxlinelen=0;
    strlcpy(bp->EolStr,"\n",3);
    if(bp->tok_table!=NULL){
 	empty_tok_table(bp);

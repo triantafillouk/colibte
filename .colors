@@ -521,7 +521,7 @@ info_fg=#808080
 
 
 [Vscode-dark]
-normal_bg=#1E1E1E
+normal_bg=#000000
 menu_bg=#454546
 info_bg=#252526
 rowcol_fg=#F0A0A0

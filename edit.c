@@ -78,6 +78,11 @@ int is_wrap_text(FILEBUF *fp)
  return 0;
 }
 
+int main_clipboard_copy()
+{
+	return  clipboard_copy(MainClipBoard); 
+}
+
 void toggle_val(char *name){
 //	if(name==NULL) return;
 	if((int)bt_dval(name)) {
@@ -568,7 +573,7 @@ int next_line(num n)
 	int b_flag = cbfp->b_flag;
 	int headline=(cbfp->b_header!=NULL);
 
-	MESG("next_line: ------------- n=%d lock=%d",n,lock_move);
+	// MESG("next_line: ------------- n=%d lock=%d",n,lock_move);
     if (n < 0)  return (prev_line(-n));
 	if(n==0) return(FALSE);
 

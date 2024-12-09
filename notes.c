@@ -1347,7 +1347,7 @@ int insert_lines(sqlite3 *db, char *query_string, int *widths)
 		insert_string(cbfp,column_string,strlen(column_string));
 		insert_newline(cbfp);
 	};
-//	MESG("insert_column: col=%d tags=%d notes=%d",start_col,num_of_selected_tags,num_of_selected_notes);
+//	MESG("insert_lines: col=%d tags=%d notes=%d",start_col,num_of_selected_tags,num_of_selected_notes);
 	return line;
 }
 

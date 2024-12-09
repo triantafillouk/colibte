@@ -136,7 +136,7 @@ int next_file(num n)
 int activate_file(FILEBUF *bp)
 {
 	if(bp->b_dname[0]!=0) if(chdir(bp->b_dname)!=0) return false;
-	// MESG("activate_file:[%s] b_type=%d b_flag=%X",bp->b_fname,bp->b_type,bp->b_flag);
+	// MESG("activate_file:[%s] b_type=%d b_flag=%X mll=%ld ",bp->b_fname,bp->b_type,bp->b_flag,bp->maxlinelen);
 	if ((bp->b_state & FS_ACTIVE) ==0)
 	{	
 		// MESG("activatee_file: is not active, activate it!");
@@ -157,12 +157,13 @@ int activate_file(FILEBUF *bp)
 		textpoint_set(bp->tp_current,0);
 		// bp->save_ppline=0;
 		bp->b_state |= FS_ACTIVE;
+		// MESG("activate_file:[%s] b_type=%d b_flag=%X mll=%ld ",bp->b_fname,bp->b_type,bp->b_flag,bp->maxlinelen);
 
 		if(bp->b_fname[0]!=CHR_LBRA){
 			add_to_recent_list(get_buf_full_name(bp));
 		};
 	};
-	// MESG("activate_file: end [%s] b_type=%d b_flag=%d b_state=%X",bp->b_fname,bp->b_type,bp->b_flag,bp->b_state);
+	// MESG("activate_file: end [%s] b_type=%d b_flag=%d b_state=%X maxline=%ld",bp->b_fname,bp->b_type,bp->b_flag,bp->b_state,bp->maxlinelen);
 	return true;
 }
 
@@ -879,6 +880,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->b_state = 0;
 	bp->view_mode = 0;
 	bp->scratch_num=is_scratch;
+	bp->maxlinelen=0;
 	// MESG("original view_mode 0x%X",bp->view_mode);
 	if((int)bt_dval("wrap_mode")) {
 		bp->view_mode |= VMWRAP|VMINFO;

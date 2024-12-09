@@ -1133,9 +1133,11 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
      if( execf== del_prev_char ) { /* delete previous character */
 	 if(ce<1) continue;
 //		Go back one character
+		// MESG("back: ce=%d ce1=%d",ce,ce1);
 		ce=utf8_str_left(st2,ce);
-
+		// MESG("	in: %d",ce);
 		SUtfCharAt(st2,ce,&uc);
+		// MESG("char: %d",uc.uval[0]);
 		if(disinp) {
 			cursor_x -= get_utf_length(&uc);
 		} else {
@@ -1145,10 +1147,10 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
 		if(disinp) ce1=ce;else ce1--;
 		if(ci<32) {
 			cursor_x--;
-			if(disinp) ce1--;
+			// if(disinp) ce1--;
 		};
 		cw=utf8_countbytes(ci);
-
+		// MESG(" cw=%d ci=%d ce1=%d",cw,ci,ce1);
 		if(disinp) {
 			if(ci<32){
 				delchar(st2,ce);
@@ -1159,6 +1161,7 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
 					delchar(st2,ce);
 				};
 			};
+			MESG(" s=[%s] ce1=%d",st2,ce1);
 		} else {
 			while((cw--)>0){
 				delchar(st2,ce);
@@ -1236,7 +1239,7 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
 	 } else {
      	cursor_x++;
 	 }
-     if(ci<32 && disinp) cursor_x++;
+     if(ci<32 && disinp) {cursor_x++;ce1++;};
    };
  };
 #if	USE_GLIB
