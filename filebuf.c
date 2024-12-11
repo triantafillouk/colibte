@@ -2735,7 +2735,12 @@ void   MoveLeftChar(FILEBUF *fp)
 
 			// int previous_accents=0;
 			for(i=2;i<5;i++){
+#if	0
 				cl=FUtfCharLen(fp,o-i);
+#else			
+				int c0=FCharAt(fp,o-i);
+				cl=utf8charlen_nocheck(c0);
+#endif
 //				MESG("prev_char: o=%ld i=%d cl=%d accent=%d",o,i,cl,fp->utf_accent);
 				if(cl==i) {
 					if(fp->utf_accent) {
