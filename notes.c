@@ -133,6 +133,7 @@ int new_note(num type)
  stat=goto_file(scratch_name);
  // MESG("new_note: stat=%d",stat);
  if(stat) {
+	update_lines(cbfp);
 	// cbfp->scratch_num=scratch_ind;
 	insert_preamble(cbfp,type);
 	// goto name field
@@ -147,7 +148,6 @@ int new_note(num type)
 	if(type==3) {
 		cbfp->b_type=NOTE_TODO_TYPE+highlight_type("todo");
 	}
-
 #if	MD_NOTES
 	int type=0;
 	set_highlight(cbfp,highlight_index("MD",&type));
@@ -1347,7 +1347,7 @@ int insert_lines(sqlite3 *db, char *query_string, int *widths)
 		insert_string(cbfp,column_string,strlen(column_string));
 		insert_newline(cbfp);
 	};
-//	MESG("insert_column: col=%d tags=%d notes=%d",start_col,num_of_selected_tags,num_of_selected_notes);
+//	MESG("insert_lines: col=%d tags=%d notes=%d",start_col,num_of_selected_tags,num_of_selected_notes);
 	return line;
 }
 

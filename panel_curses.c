@@ -674,20 +674,20 @@ void drv_open()
  color_scheme_read();
 
  if(drv_colors>drv_max_colors) drv_colors=drv_max_colors;
-// MESG("set drv_colors to %d color pairs are %d",drv_colors,drv_color_pairs);
+	// MESG("set drv_colors to %d color pairs are %d",drv_colors,drv_color_pairs);
 
 	color_menu_fg=COLOR_MENU_FG;
 	color_menu_bg=COLOR_MENU_BG;
 
 // print_colors("Original ones");
-//   MESG("drv_open: color_scheme_ind=%d",color_scheme_ind);
+   // MESG("drv_open: color_scheme_ind=%d",color_scheme_ind);
    set_current_scheme(color_scheme_ind+1);	/* set default midnight theme  */
 
  // driver specific keyboard bindings
  drv_bindkeys();
  vswidth=1;
  drv_initialized=1;
-// MESG("drv_open:end");
+ // MESG("drv_open:end");
 }
 
 int drv_search_dialog(int f)
@@ -2333,7 +2333,7 @@ void set_current_scheme(int scheme)
 	if(drv_colors>8) {
 		for(i=0;i<FG_COLORS+BG_COLORS;i++) {
 			refresh();
-			// MESG("	set color %d: %s",i,current_scheme->color_values[i]);
+			// MESG("	set color %d: %s",i,current_scheme->color_style[i]);
 			RGB_DEF *rv = get_rgb_values(current_scheme->color_style[i].color_value);
 			init_color(i+START_COLOR,rv->r,rv->g,rv->b);
 		};
@@ -2356,7 +2356,7 @@ void set_current_scheme(int scheme)
 				RGB_DEF *rv = get_rgb_values(current_scheme->color_style[i].color_value);
 				init_color(basic,rv->r,rv->g,rv->b);
 				inited[basic]=1;
-				MESG("init color: %d (%d %d %d)",basic,rv->r,rv->g,rv->b);
+				// MESG("init color: %d (%d %d %d)",basic,rv->r,rv->g,rv->b);
 			};
 		};
 		}

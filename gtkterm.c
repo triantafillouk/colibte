@@ -1577,7 +1577,7 @@ int set_color(num n)
 	return(1);
  }; 
 
- snprintf(wtitle,256,"set color %d",n);
+ snprintf(wtitle,256,"set color %lld",n);
  changed_color=n;
 
  colors_win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -1688,6 +1688,7 @@ int get_pango_length(char *st)
 int get_utf_length(utfchar *utf_char_str)
 {
  int b0;
+ if(utf_char_str->uval[0]<128) return 1;
  if(clen_error) { return 1;};
  int plen=get_pango_length((char *)utf_char_str->uval);
  if(plen!=0) {

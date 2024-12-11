@@ -39,9 +39,9 @@ X11include=-I/opt/X11/include/
 X11lib0= -lX11 -L/opt/X11/lib $(GLIB_LIB)
 EXTFILE=.$(APP_NAME)_ext_mac
 WSL:=0
-CC=zig cc -target x86_64-linux-gnu -DGVERS='"$(GVERS)"'
+#CC=zig cc -DGVERS='"$(GVERS)"'
 #CC=clang -DGVERS='"$(GVERS)"'
-#CC=gcc-14 -DGVERS='"$(GVERS)"'
+CC=gcc-14 -DGVERS='"$(GVERS)"'
 endif
 
 # for Linux

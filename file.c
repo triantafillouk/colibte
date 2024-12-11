@@ -136,7 +136,7 @@ int next_file(num n)
 int activate_file(FILEBUF *bp)
 {
 	if(bp->b_dname[0]!=0) if(chdir(bp->b_dname)!=0) return false;
-	// MESG("activate_file:[%s] b_type=%d b_flag=%X",bp->b_fname,bp->b_type,bp->b_flag);
+	// MESG("activate_file:[%s] b_type=%d b_flag=%X mll=%ld ",bp->b_fname,bp->b_type,bp->b_flag,bp->maxlinelen);
 	if ((bp->b_state & FS_ACTIVE) ==0)
 	{	
 		// MESG("activatee_file: is not active, activate it!");
@@ -157,12 +157,13 @@ int activate_file(FILEBUF *bp)
 		textpoint_set(bp->tp_current,0);
 		// bp->save_ppline=0;
 		bp->b_state |= FS_ACTIVE;
+		// MESG("activate_file:[%s] b_type=%d b_flag=%X mll=%ld ",bp->b_fname,bp->b_type,bp->b_flag,bp->maxlinelen);
 
 		if(bp->b_fname[0]!=CHR_LBRA){
 			add_to_recent_list(get_buf_full_name(bp));
 		};
 	};
-	// MESG("activate_file: end [%s] b_type=%d b_flag=%d b_state=%X",bp->b_fname,bp->b_type,bp->b_flag,bp->b_state);
+	// MESG("activate_file: end [%s] b_type=%d b_flag=%d b_state=%X maxline=%ld",bp->b_fname,bp->b_type,bp->b_flag,bp->b_state,bp->maxlinelen);
 	return true;
 }
 
@@ -264,9 +265,12 @@ int select_filebuf(FILEBUF *bp)
 	unlink_filebuf(cwp);
 	link_window_buffer(cwp,bp);
 	set_utf8_error(0);
-
+	// test
 	textpoint_set(cwp->tp_hsknown,0);
 	textpoint_set(cwp->tp_hmknown,0);
+	// end test
+	fquote_state(tp_offset(cwp->tp_hline),0,cwp);
+	highlight_save_state(cwp,0,0);
 	set_update(cwp,UPD_FULL);
 
 	cwp->selection=0;
@@ -876,6 +880,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->b_state = 0;
 	bp->view_mode = 0;
 	bp->scratch_num=is_scratch;
+	bp->maxlinelen=0;
 	// MESG("original view_mode 0x%X",bp->view_mode);
 	if((int)bt_dval("wrap_mode")) {
 		bp->view_mode |= VMWRAP|VMINFO;
@@ -940,14 +945,9 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->EolStr[0]=10;bp->EolStr[1]=0;
 	bp->main_undo=undo_new();
 
-	bp->save_hs[0].w_hquotem=0;
-	bp->save_hs[0].w_hselection=0;
-	bp->save_hs[0].w_slang=1;
-	bp->save_hs[0].w_notes=0;
-	bp->save_hs[1].w_hquotem=0;
-	bp->save_hs[1].w_hselection=0;
-	bp->save_hs[1].w_slang=1;
-	bp->save_hs[1].w_notes=0;
+	init_highlight_structure(&bp->save_hs[0]);
+	init_highlight_structure(&bp->save_hs[1]);
+
 	bp->b_type=0;
 	bp->lines=0L;
 	bp->bytes_read=0L;
@@ -1128,6 +1128,8 @@ int reload_file(num n)
    return(file_read(fp, fp->b_fname));
 }
 
+int insert_text_file_as_column(char *filnam);
+
 /* Insert a file into current position.  */
 int insert_file(num  n)
 {
@@ -1139,7 +1141,11 @@ int insert_file(num  n)
 	fname[0]=0;
     if (nextarg("Insert file: ", fname, MAXFLEN,true) != TRUE)
                 return(FALSE);
-	stat=ifile(fp,fname,1);
+	if(cwp->selection==REGION_COLUMN){
+		stat=insert_text_file_as_column(fname);
+	} else { 
+		stat=ifile(fp,fname,1);
+	};
 	set_update(cwp,UPD_WINDOW);
     return(stat);
 }
@@ -1323,7 +1329,7 @@ int set_buf_key(FILEBUF *bp)	/* reset encryption key of current file */
 /* uncrypt/decrypt a string. This is taken/modified from Jaspa microemacs editor 
  * Copyright (C) 1986 Dana L. Hoggatt
 */
-void crypt_string(char *ctr,long len)
+void crypt_string(char *ctr,num len)
 {
 	unsigned int cc;
 	int val;
@@ -1709,7 +1715,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 		|| file_type_is("MD",bp->b_type) 
 		|| (bp->b_type >= NOTE_TYPE))
 		 ) {	
-			MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
+			// MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
 			bp->b_mode |= EMCRYPT;
 #if	TNOTES
 			if(bt_dval("notes_recreate") || from_note) 
@@ -1814,12 +1820,13 @@ int file_type(char *name, int *compression_type,char *oext)
  };
  ext1[ext_len]=0;	// extension in reverse 
  i--;
+ // MESG("file_type: [%s] [%s] len=%d e=%d",name,ext1,ext_len,e);
 
  if(e>0 && ext_len>0) {
 	revstr(ext1);
 	strlcpy(oext,ext1,MAXLLEN);
 	ind=highlight_index(oext,&ind2);
-
+	// MESG("file_type: [%s] ind=%d",oext,ind);
 	if(ind==FX_COMPRESS)
 	{
 		*compression_type=ind2;

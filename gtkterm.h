@@ -18,6 +18,9 @@ extern void on_list1_selection_changed (GtkList *list, gpointer user_data);
 extern int execute(int c, int  n);
 int getcmd();
 
+int input_line_ok_event(num n);
+int input_line_cancel_event(num n);
+
 gboolean
 on_parent_key_press_event (GtkWidget *widget,
     GdkEventKey *event, gpointer  user_data);
@@ -78,11 +81,13 @@ T_ELEMENT main_toolbar[] = {
 T_ELEMENT input_toolbar[] = {
 // object-select-symbolic, system-shutdown, view-fullscreen, view-refresh
 // application-exit, emblem-default
+#if	1
+	{ 2,"ok2.xpm"    , "emblem-default", ok2_xpm,"Ok!", input_line_ok_event, 1},
+	{ 2,"cancel2.xpm", "window-close", exit_xpm, "Cancel!", input_line_cancel_event, 1},
+#else
 	{ 2,"ok2.xpm"    , "emblem-default", ok2_xpm,"Ok!", on_gs_entry_ok_event, 1},
-// edit-delete,
-// edit-find, 
-//	{ 2,"cancel2.xpm", "dialog-error", exit_xpm, "Cancel!", on_gs_entry_cancel_event, 1},
 	{ 2,"cancel2.xpm", "window-close", exit_xpm, "Cancel!", on_gs_entry_cancel_event, 1},
+#endif
 //	{ 2,"ok2.xpm"    , "go-jump", ok2_xpm,"Ok!", on_gs_entry_ok_event, 1},
 	{ 0,NULL, NULL, NULL, NULL,NULL,0 }
 };
@@ -91,11 +96,11 @@ T_ELEMENT input_toolbar[] = {
 T_ELEMENT search_tbar[] = {
 // object-select-symbolic, system-shutdown, view-fullscreen, view-refresh
 // application-exit, emblem-default
-	{ 2,"ok2.xpm"    , "emblem-default", ok2_xpm,"Ok!", on_gs_entry_ok_event, 1},
+	{ 2,"ok2.xpm"    , "emblem-default", ok2_xpm,"Ok!", input_line_ok_event, 1},
 //	{ 2,"cancel2.xpm", "window-close", exit_xpm, "Cancel!", on_gs_entry_cancel_event, 1},
 // edit-delete,
 // edit-find, 
-	{ 2,"cancel2.xpm", "dialog-error", exit_xpm, "Cancel!", on_gs_entry_cancel_event, 1},
+	{ 2,"cancel2.xpm", "dialog-error", exit_xpm, "Cancel!", input_line_cancel_event, 1},
 //	{ 2,"ok2.xpm"    , "go-jump", ok2_xpm,"Ok!", on_gs_entry_ok_event, 1},
 //	{ 2,"cancel2.xpm", "window-close", exit_xpm, "Cancel!", on_gs_entry_cancel_event, 1},
 	{ 0,NULL, NULL, NULL, NULL,NULL,0 }

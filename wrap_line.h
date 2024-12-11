@@ -125,7 +125,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 			} else {
 				set_selection(false);
 			};
-			if(wp->selection==REGION_COLM){
+			if(wp->selection==REGION_COLUMN){
 				if(s1<cur_lend && s2>tp_offs) set_selection(true);
 				if(((wp->vtcol-wp->w_infocol) < col0) || ((wp->vtcol - wp->w_infocol) >= col1)) set_selection(false);
 			};
@@ -269,7 +269,7 @@ void upd_all_wrap_lines(WINDP *wp,char *from)
 	// cline_end=FLineEnd(wp->w_fp,lp_offs);
 	// cstart_offset=lp_offs;
 	cashed_FLend(wp->w_fp,lp_offs,1);
-	getwquotes(wp,0);
+	highlight_restore_state(wp,0);
 	// MESG("# update_all_wrap_lines: wrap=%d window %d",is_wrap_text(wp->w_fp),wp->id);
 	for(sline=head;sline < wp->w_ntrows;sline++) 
 	{
@@ -295,5 +295,5 @@ void upd_all_wrap_lines(WINDP *wp,char *from)
 	else wp->w_flag=0;
 	set_draw_flag(wp,"upd_all_wrap_lines");
 	// MESG_time("#update_all_wrap_lines: end");
-	getwquotes(wp,0);	// set highlight to the top line!
+	highlight_restore_state(wp,0);	// set highlight to the top line!
 }

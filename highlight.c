@@ -450,6 +450,14 @@ int comment_perl(int n)
 	return comment_with_string("#",n);
 }
 
+int comment_ini(int n)
+{
+	// MESG("comment_ini: n=%d",n);
+	if(n==C_COLSTART) return comment_with_string(";",C_COLSTART);
+	if(n==C_LINEEND) return comment_with_string(";",C_LINEEND);
+	return comment_with_string(";",C_LINEBEG);
+}
+
 int comment_none(int n)
 {
 	return 0;
@@ -576,7 +584,7 @@ int check_update_highlight(int flag)
  if(flag==0) {
 	if(prev_init) return 0;
  	oldlines=fp->lines;
-	getwquotes(cwp,0);
+	highlight_restore_state(cwp,0);
 	// int htemp=hquotem;
 	check_offset1 = FNextLine(fp,tp_offset(cwp->tp_current));
 	fquote_state(check_offset1,tp_offset(cwp->tp_hline),cwp);
@@ -586,7 +594,7 @@ int check_update_highlight(int flag)
  } else {
 	if(!prev_init) return 0;
  	num newlines=fp->lines;
-	getwquotes(cwp,0);
+	highlight_restore_state(cwp,0);
 	check_offset2 = FNextLine(fp,tp_offset(cwp->tp_current));
 	fquote_state(check_offset2,tp_offset(cwp->tp_hline),cwp);
 	// MESG("c: o0=%ld (l=%ld h1=%d)  o1=%ld (l=%d h1=%d)",check_offset1,oldlines,h1,check_offset2,newlines,hquotem);
@@ -627,6 +635,26 @@ int get_selection()
 
 #define	TRACE_BACK 1000000
 
+void init_highlight_structure(MLQUOTES *hs)
+{
+	hs->w_hquotem = 0;
+	hs->w_prev_set = -1;
+	hs->w_hselection =0;
+	hs->w_slang=0;
+	hs->w_notes=0;
+	hs->w_first = 0;
+	hs->w_in_array = 0;
+	hs->flag_word = 0;
+	hs->w_prev_space = 1;
+	hs->single_quoted = 0;
+	hs->double_quoted = 0;
+	hs->w_bold = 0;
+	hs->w_hquote_start = 0;
+	hs->w_line_set=0;
+	hs->w_hstate=0;
+	hs->w_prev_line=0;
+	hs->known_offset=0;
+}
 
 #if	0
 void update_highlight(WINDP *wp)
@@ -642,15 +670,15 @@ void update_highlight(WINDP *wp)
 		slang=0;
 		hselection=0;
 		fquote_state(wp->hs[0].known_offset, 0,wp);
-		setwquotes(wp,1,wp->hs[0].known_offset);
+		highlight_save_state(wp,1,wp->hs[0].known_offset);
 		MESG("uh: nkown_offset (%ld  %ld)",wp->hs[0].known_offset,wp->hs[1].known_offset);
 		MESG("  : hquotem      (%X  %X)",wp->hs[0].w_hquotem,wp->hs[1].w_hquotem);
 		MESG("  : slang        (%d  %d)",wp->hs[0].w_slang,wp->hs[1].w_slang);
 #else
-		getwquotes(wp,0);
+		highlight_restore_state(wp,0);
 #endif
 		fquote_state(hline_offset,wp->hs[0].known_offset,wp);
-		setwquotes(wp,0,hline_offset);
+		highlight_save_state(wp,0,hline_offset);
 	} else 
 #endif
 	{
@@ -658,7 +686,7 @@ void update_highlight(WINDP *wp)
 		slang=0;
 		hselection=0;
 		fquote_state(hline_offset, 0,wp);
-		setwquotes(wp,0,hline_offset);
+		highlight_save_state(wp,0,hline_offset);
 	};
 }
 #else
@@ -678,15 +706,15 @@ void update_highlight(WINDP *wp)
 	if(note_type) { hnote=1;} else hnote=0;
 //	MESG("update_highlight: note_type=%d ----------------------",note_type);
 
-	getwquotes(wp,0);	/* in any case read again current window top line highlight	*/
+	highlight_restore_state(wp,0);	/* in any case read again current window top line highlight	*/
 	if(tp_offset(wp->tp_hline) == tp_offset(wp->tp_hsknown)) {
 		// MESG("	==");
 		if(tp_offset(wp->tp_hline)==0) {
 			if(note_type) { hnote=1;} else hnote=0;
 			wp->w_fp->hl->h_function(CHR_RESET);
-			setwquotes(wp,0,known_offset);
+			highlight_save_state(wp,0,known_offset);
 		} else {
-			getwquotes(wp,0);
+			highlight_restore_state(wp,0);
 		}
 		return;
 	};
@@ -694,10 +722,10 @@ void update_highlight(WINDP *wp)
 //		get info from tp_hsknown
 		// MESG("	>");
 #if	1
-		known_offset = 	getwquotes(wp,0); 
+		known_offset = 	highlight_restore_state(wp,0); 
 #else
 		known_offset = tp_offset(wp->tp_hsknown); 
-		getwquotes(wp,0); 
+		highlight_restore_state(wp,0); 
 #endif
 		fquote_state(tp_offset(wp->tp_hline), known_offset,wp);
 		known_offset = tp_offset(wp->tp_hline);
@@ -705,7 +733,7 @@ void update_highlight(WINDP *wp)
 	{
 //		get info from wp_hmknown
 		// MESG("	> 2");
-		known_offset = getwquotes(wp,1);
+		known_offset = highlight_restore_state(wp,1);
 		fquote_state( tp_offset(wp->tp_hline), known_offset,wp);
 		known_offset = tp_offset(wp->tp_hline);
 	} else {
@@ -720,7 +748,7 @@ void update_highlight(WINDP *wp)
 			known_offset = tp_offset(wp->tp_hmknown);
 //			save highlight info for tp_pknown
 //			if(note_type) { hnote=1;} else hnote=0;
-			setwquotes(wp,1,known_offset);
+			highlight_save_state(wp,1,known_offset);
 			fquote_state(tp_offset(wp->tp_hline), tp_offset(wp->tp_hmknown),wp);
 			known_offset=tp_offset(wp->tp_hline);
 		} else {
@@ -731,7 +759,7 @@ void update_highlight(WINDP *wp)
 		} 
 	};
 //	if(note_type) { hnote=1;} else hnote=0;
-	setwquotes(wp,0,known_offset);
+	highlight_save_state(wp,0,known_offset);
 	// MESG_time("update_highlight:end");
 }
 #endif
@@ -744,11 +772,11 @@ void update_highlight_line(WINDP *wp)
 //	previous line with known state is tp_pknown
 //	we must go to tp_hline
 	// MESG("update_highlight_line:");
-	getwquotes(wp,0);	/* in any case read again current window top line highlight	*/
+	highlight_restore_state(wp,0);	/* in any case read again current window top line highlight	*/
 	hquotem=0;
 	slang=1;
 	hselection=0;
-	setwquotes(wp,0,tp_offset(wp->tp_hline));
+	highlight_save_state(wp,0,tp_offset(wp->tp_hline));
 }
 
 void update_highlight_none(WINDP *wp)
@@ -759,11 +787,11 @@ void update_highlight_none(WINDP *wp)
 //	previous line with known state is tp_pknown
 //	we must go to tp_hline
 	// MESG("update_highlight_none:");
-	getwquotes(wp,0);	/* in any case read again current window top line highlight	*/
+	highlight_restore_state(wp,0);	/* in any case read again current window top line highlight	*/
 	hquotem=0;
 	slang=0;
 	hselection=0;
-	setwquotes(wp,0,tp_offset(wp->tp_hline));
+	highlight_save_state(wp,0,tp_offset(wp->tp_hline));
 }
 
 void highlight_c(int c)
@@ -788,8 +816,10 @@ void highlight_c(int c)
 	/* single quotes */ 
 	case CHR_SQUOTE: 
 		if(flag_word==2) { hstate=0;break;};
+		if(hquotem&H_QUOTEC) break;
 		if(hquotem&H_QUOTE2) { hstate=0; break;};
 		if(hquotem&H_QUOTE5) { hstate=0; break;};
+		if(hquotem&H_QUOTE6) { hstate=0; break;};
 //		if(double_quoted) { hstate=0;break;};
 		if(hstate!=HS_PREVESC) { 
 			if(hquotem) hquotem=hquotem & ~H_QUOTE1;else prev_set=H_QUOTE1;
@@ -800,14 +830,16 @@ void highlight_c(int c)
 		break;
 	/* double quotes */
 	case CHR_DQUOTE:
-//		if(flag_word==3) word_is_quoted=2;
-		if(flag_word==2) { hstate=0;break;};
+		if(hstate==HS_PREVESC) { hstate=0;break;};
+		if(hquotem&H_QUOTEC) break;
+		// if(flag_word==2) { hstate=0;break;};
 		if(hquotem&H_QUOTE1) { hstate=0;break;};
 		if(hquotem&H_QUOTE5) { hstate=0; break;};
+		// if(hquotem&H_QUOTE6) { hstate=0; break;};
 //		if(single_quoted) { hstate=0;break;};
-		if(hstate!=HS_PREVESC) { hquotem = (hquotem&H_QUOTE2)? hquotem & ~H_QUOTE2: hquotem | H_QUOTE2;
-			double_quoted = (double_quoted)? 0:1;
-		};
+// 		hquotem = (hquotem&H_QUOTE2)? hquotem & ~H_QUOTE2: hquotem | H_QUOTE2;
+		hquotem = (hquotem&H_QUOTE2)? 0: H_QUOTE2;
+		double_quoted = (double_quoted)? 0:1;
 		hstate=0;
 		break;
 	/* c comments */
@@ -869,7 +901,7 @@ void highlight_c(int c)
 				hquotem &= ~H_QUOTE9;
 				flag_word=0;
 			};
-			
+			h_prev_space=1;			
 		};
 		break;
 	case CHR_PARL:
@@ -879,6 +911,124 @@ void highlight_c(int c)
 			flag_word=0;
 		};hstate=0;
 		break;	
+	default: { 
+		hstate=0;
+		if(flag_word==1) flag_word=2;
+	};
+  };
+  h_prev_space = (c==' '||c=='\t');
+}
+
+void highlight_zig(int c)
+{
+//  MESG("h %c %3d flag=%d dquoted=%d",c,c,flag_word,double_quoted);
+  if(highlight_note(c)) return;
+ 
+  if(prev_set>=0) { hquotem=prev_set;prev_set=-1;};
+ 
+  switch(c) {
+	case (CHR_RESET) : // initialize
+		hstate=0;
+		slang=1;
+		single_quoted=0;
+		double_quoted=0;
+		flag_word=0;
+		h_prev_space=1;
+		hquotem=0;
+		prev_set=-1;
+//		MESG("highlight_c: reset");
+		break;
+	/* single quotes */ 
+	case CHR_SQUOTE: 
+		if(flag_word==2) { hstate=0;break;};
+		if(hquotem&H_QUOTE2) { hstate=0; break;};
+		if(hquotem&H_QUOTE5) { hstate=0; break;};
+//		if(double_quoted) { hstate=0;break;};
+		if(hstate!=HS_PREVESC) { 
+			if(hquotem) hquotem=hquotem & ~H_QUOTE1;else prev_set=H_QUOTE1;
+			// hquotem = (hquotem)? hquotem & ~H_QUOTE1: hquotem | H_QUOTE1;
+			single_quoted = (single_quoted)? 0:1;
+		}; 
+		hstate=0;
+		break;
+	/* double quotes */
+	case CHR_DQUOTE:
+		if(hquotem&H_QUOTEC) break;
+//		if(flag_word==3) word_is_quoted=2;
+		if(flag_word==2) { hstate=0;break;};
+		if(hquotem&H_QUOTE1) { hstate=0;break;};
+		if(hquotem&H_QUOTE5) { hstate=0; break;};
+//		if(single_quoted) { hstate=0;break;};
+		if(hstate!=HS_PREVESC) { hquotem = (hquotem&H_QUOTE2)? hquotem & ~H_QUOTE2: hquotem | H_QUOTE2;
+			double_quoted = (double_quoted)? 0:1;
+		};
+		hstate=0;
+		break;
+#if	0
+	case '#':
+		if(hquotem&H_QUOTE1) {  hstate=0;break;};
+		if(hquotem&H_QUOTE2) {  hstate=0;break;};
+		if(hquotem&H_COMMENT) { hstate=0;break;};
+
+		if(hstate==HS_LINESTART) {
+			hquotem = (hquotem)? hquotem : H_QUOTE6;
+				flag_word=1;
+		};
+		hstate=0;
+		break;
+#endif
+	/* zig comments */
+	case '/':
+		if(hquotem&H_QUOTE1 || hquotem&H_QUOTE2) { hstate=0;break;};
+		if(hquotem!=H_QUOTE2 && hquotem!=H_QUOTE1) {
+			if(hstate==HS_PREVSLASH) prev_set=H_QUOTE5;
+			else if(hstate==HS_PREVAST) hquotem &= ~H_QUOTEC;
+		};
+		if(hquotem!=H_QUOTEC && hquotem!=H_QUOTE2) hstate=HS_PREVSLASH;
+		break;
+	case CHR_BSLASH:
+		if(hquotem&H_QUOTE1 || hquotem&H_QUOTE2) {
+			hstate=(hstate==HS_PREVESC)?0:HS_PREVESC;
+		};
+		break;
+	case '\n':
+	case CHR_CR:
+		hquotem &= ~(H_QUOTE6|H_QUOTE4|H_QUOTE5|H_QUOTE9);
+		hstate=HS_LINESTART;
+		h_prev_space=1;
+//		single_quoted=0;
+//		double_quoted=0;
+		flag_word=0;
+		break;
+	case '\t':
+	case ' ':
+		if(double_quoted) {hstate=0; break;};
+		if(single_quoted) {hstate=0; break;};
+//		flag_word=0;	/* Use this for the old style (all line is colored as preprocessor)  */
+		if(hstate!=HS_LINESTART) hstate=0;
+		if(!h_prev_space){
+			if(flag_word==2) {
+				hquotem &= ~H_QUOTE6;
+				flag_word=3;
+				hquotem |= H_QUOTE9;
+			} 
+			else
+			if(flag_word==3) {
+				hquotem &= ~H_QUOTE9;
+				flag_word=0;
+			};
+			
+		};
+		break;
+#if	0
+	case CHR_PARL:
+		if(flag_word==3) break;
+		if(flag_word>1) {
+			hquotem &= ~H_QUOTE9;
+			flag_word=0;
+		};hstate=0;
+		break;	
+#endif
 	default: { 
 		hstate=0;
 		if(flag_word==1) flag_word=2;
@@ -906,6 +1056,7 @@ void highlight_julia(int c)
 		break;
 	/* single quotes */ 
 	case CHR_SQUOTE: 
+		if(hquotem&H_QUOTEC) break;
 		if(flag_word==2) { hstate=0;break;};
 		if(hquotem&H_QUOTE2) { hstate=0;break;};
 //		if(double_quoted) { hstate=0;break;};
@@ -919,6 +1070,7 @@ void highlight_julia(int c)
 		break;
 	/* double quotes */
 	case CHR_DQUOTE:
+		if(hquotem&H_QUOTEC) break;
 		if(flag_word==2) { hstate=0;break;};
 		if(hquotem&H_QUOTE1) { hstate=0;break;};
 //		if(single_quoted) { hstate=0;break;};
@@ -999,6 +1151,7 @@ void highlight_rust(int c)
 #endif
 	/* double quotes */
 	case CHR_DQUOTE:
+		if(hquotem&H_QUOTEC) break;
 		if(hstate!=HS_PREVESC) hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
 		hstate=0;
 		break;
@@ -1194,6 +1347,7 @@ void highlight_html(int c)
 
 	/* double quotes */
 	case CHR_DQUOTE:
+		if(hquotem&H_QUOTEC) break;
 //		if(hstate!=HS_PREVESC) hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
 		if(slang || (hquotem & H_QUOTE7))
 		if(hstate!=HS_PREVESC) {
@@ -1486,7 +1640,7 @@ void highlight_md(int c)
 		} else {
 			prev_set = h_hquote_start;
 			h_hquote_start=0;
-			//hquotem = H_QUOTE8;
+			hquotem = H_QUOTE8;
 			hstate=0;
 		};
 		break;
@@ -1859,6 +2013,7 @@ void highlight_jscript(int c)
 		break;
 	/* single quotes */
 	case CHR_SQUOTE: 
+		if(hquotem&H_QUOTEC) break;
 		if(hstate==HS_PREVESC) { hstate=0;break;};
 		if(!(hquotem & H_QUOTE7)) {
 			if(hquotem & H_QUOTE4 && !(hquotem & H_QUOTE2)) {
@@ -1874,6 +2029,7 @@ void highlight_jscript(int c)
 	/* double quotes */
 	case '`':
 	case CHR_DQUOTE:
+		if(hquotem&H_QUOTEC) break;
 		if(hstate==HS_PREVESC) { hstate=0;break;};
 		if(!(hquotem & H_QUOTE7)) {
 			if(hquotem & H_QUOTE4 && !(hquotem & H_QUOTE1)) {
@@ -1986,6 +2142,7 @@ void highlight_perl(int c)
 		break;
 	/* double quotes */
 	case CHR_DQUOTE:
+		if(hquotem&H_QUOTE5) break;
 		if(hstate!=HS_PREVESC) {
 			if(hquotem & H_QUOTE4 && !(hquotem & H_QUOTE1)) {
 				if(hquotem == H_QUOTE4) {
@@ -2116,6 +2273,54 @@ void highlight_json(int c)
   };
 }
 
+void highlight_ini(int c)
+{
+  if(highlight_note(c)) return;
+  if(prev_set>=0) { hquotem=prev_set;prev_set=-1;};
+
+  switch(c) {
+	case (CHR_RESET) : // initialize
+		hstate=0;
+		first=1;
+		in_array=0;
+		break;
+#if	1
+	case '=':
+		if(hquotem==0) { prev_set = H_QUOTE1;};
+		hstate=0;
+		break;
+#endif
+	case '\n':
+	case CHR_CR:
+		hquotem = 0;
+		hstate=HS_LINESTART;
+		first=1;
+		break;
+
+	case ';':
+		if(hquotem==0 || hquotem==H_QUOTE1) hquotem = H_COMMENT;
+		hstate=0;
+		break;
+	case CHR_LBRA:
+		if(hquotem==0) {
+			prev_set = H_QUOTE6;
+		};
+		hstate=0;
+		break;
+		
+	case CHR_RBRA:
+		if(hquotem) hquotem=0;
+		hstate=0;
+		break;
+
+	case CHR_FLUSH:
+		break;
+	default: { 
+		hstate=0;
+	};
+  };
+}
+
 
 void highlight_bicep(int c)
 {
@@ -2225,6 +2430,7 @@ void highlight_terraform(int c)
 		break;
 	/* double quotes */
 	case CHR_DQUOTE:
+		if(hquotem&H_QUOTEC) break;
 //		if(hstate!=HS_PREVESC) hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
 		if(hstate!=HS_PREVESC && !(hquotem & H_QUOTE7)) {
 			if(hquotem & H_QUOTE4 && !(hquotem & H_QUOTE1)) {
@@ -2351,6 +2557,7 @@ void highlight_yaml(int c)
 		break;
 
 	case CHR_SQUOTE:
+		if(hquotem&H_QUOTEC) break;
 		if(hquotem != H_QUOTE6 && !(hquotem&H_QUOTE2)){
 			if(hstate==HS_PREVESC) { hstate=0;break;};
 			if(first) {
@@ -2369,6 +2576,7 @@ void highlight_yaml(int c)
 		};break;
 
 	case CHR_DQUOTE:
+		if(hquotem&H_QUOTEC) break;
 		if(hquotem  != H_QUOTE6){
 			if(hstate==HS_PREVESC) { hstate=0;break;};
 			if(first) {
@@ -2546,6 +2754,7 @@ void highlight_python(int c)
 		break;
 	/* single quotes */
 	case CHR_SQUOTE: 
+		if(hquotem&H_QUOTEC) break;
 		if(hstate!=HS_PREVESC) {
 			if(single_quoted==2) {
 				hquotem = (hquotem & H_COMMENT)? hquotem & ~H_COMMENT: H_COMMENT;
@@ -2570,6 +2779,7 @@ void highlight_python(int c)
 		break;
 	/* double quotes */
 	case CHR_DQUOTE:
+		if(hquotem&H_QUOTEC) break;
 		if(hstate!=HS_PREVESC) {
 			if(double_quoted==2) {
 				hquotem = (hquotem & H_COMMENT)? hquotem & ~H_COMMENT: H_COMMENT;
@@ -3468,10 +3678,10 @@ void fquote_state(offs till_offs, offs from_offs, WINDP *wp)
  // MESG_time("!fquote: (%lld %X) -> (%lld %X)",from_offs,orig_hquotem,till_offs,hquotem);
 }
 
-void setwquotes(WINDP *wp,int ind,num known_offset)
+void highlight_save_state(WINDP *wp,int ind,num known_offset)
 {
 	// if(hprev_line>=0) hquotem=hprev_line;
-	// MESG("setwquotes:[%s] ind=%d btype=%d slang=%d hstate=%d hquotem=%X ko=%lld ho=%lld",wp->w_fp->b_fname,ind,wp->w_fp->b_type,slang,hstate,hquotem,known_offset,tp_offset(wp->tp_hline));
+	// MESG("highlight_save_state:[%s] ind=%d btype=%d slang=%d hstate=%d hquotem=%X ko=%lld ho=%lld",wp->w_fp->b_fname,ind,wp->w_fp->b_type,slang,hstate,hquotem,known_offset,tp_offset(wp->tp_hline));
 	// wp->w_fp->hl->h_function(CHR_FLUSH);	/* is it needed ?, now only for json  */
 	wp->hs[ind].w_hquotem = hquotem;
 	wp->hs[ind].w_slang = slang;
@@ -3494,7 +3704,7 @@ void setwquotes(WINDP *wp,int ind,num known_offset)
 	if(ind==0) tp_copy(wp->tp_hsknown,wp->tp_hline);
 }
 
-offs getwquotes(WINDP *wp,int ind)
+offs highlight_restore_state(WINDP *wp,int ind)
 {
 	hquotem=wp->hs[ind].w_hquotem;
 	slang=wp->hs[ind].w_slang;
@@ -3513,7 +3723,7 @@ offs getwquotes(WINDP *wp,int ind)
 	h_line_set = wp->hs[ind].w_line_set;
 	h_prev_space = wp->hs[ind].w_prev_space;
 	hprev_line = wp->hs[ind].w_prev_line;
-	// MESG("getwquotes:[%s] ind=%d b_type=%d slang=%d hstate=%d hquotem=%X ko=%lld ho=%lld",wp->w_fp->b_fname,ind,wp->w_fp->b_type,slang,hstate,hquotem,wp->hs[ind].known_offset,tp_offset(wp->tp_hline));
+	// MESG("highlight_restore_state:[%s] ind=%d b_type=%d slang=%d hstate=%d hquotem=%X ko=%lld ho=%lld",wp->w_fp->b_fname,ind,wp->w_fp->b_type,slang,hstate,hquotem,wp->hs[ind].known_offset,tp_offset(wp->tp_hline));
 	return wp->hs[ind].known_offset;
 }
 

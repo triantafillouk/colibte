@@ -33,7 +33,7 @@ char *codepage_str[] = {
 };
 
 /* initialized global definitions */
-int	gmode = 0;			/* global editor mode		*/
+int	gmode = EMUNIX;			/* global editor mode		*/
 int gmode_exact_case = 0;
 int gmode_reg_exp = 0;
 int gmode_over = 0;

@@ -558,7 +558,7 @@ int insert_tab(num n)
 	return remove_tab(-n);
  } else {
  	if(cwp->selection) {
-		if( cwp->selection == REGION_COLM) {
+		if( cwp->selection == REGION_COLUMN) {
 #if	0
 				int ispaces = tabsize-tp_col(cbfp->tp_current)%(tabsize);
 				insert_chr(ispaces, CHR_SPACE);
@@ -769,7 +769,7 @@ int c_incword(int c)
 	if (c=='.') return(TRUE);
 	if (c>='a' && c<='z')
 		return (TRUE);
-	if (c>='A' && c<='Z')
+	if (c>='@' && c<='Z')
 		return (TRUE);
 	if (c>='0' && c<='9')
 		return (TRUE);

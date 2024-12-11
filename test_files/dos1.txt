@@ -15,9 +15,11 @@ unknown command pwd
 BOOTMGR[2]> reboot
 unknown command reload
 
-CPU Microcode Revision:  20h
+CPU Microcode Revision:  20hasasd
 CPUID:                   6D8h
+asdad
 BIOS version:            8035
+
 BIOS build date:         11/05/2008
 Press ESC key twice to skip memory test9% of the system memory tested OK12% of the system memory tested OK15% of the system memory tested OK18% of the system memory tested OK21% of the system memory tested OK24% of the system memory tested OK27% of the system memory tested OK31% of the system memory tested OK34% of the system memory tested OK37% of the system memory tested OK40% of the system memory tested OK43% of the system memory tested OK46% of the system memory tested OK49% of the system memory tested OK52% of the system memory tested OK56% of the system memory tested OK59% of the system memory tested OK62% of the system memory tested OK65% of the system memory tested OK68% of the system memory tested OK71% of the system memory tested OK74% of the system memory tested OK77% of the system memory tested OK81% of the system memory tested OK84% of the system memory tested OK87% of the system memory tested OK90% of the system memory tested OK93% of the system memory tested OK96% of the system memory tested OK99% of the system memory tested OK100% of the system memory tested OK1,072,300,032 bytes of system memory tested OK
 -\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-\|/-Uncompressing ... done
@@ -542,12 +544,13 @@ devfs on /dev (devfs, local)
 # 
 # 
 # 
+
 # 
 # 
-# 
+# 
 # 
 # sysinfo
-sysinfo: not found
+sysinfo: not found
 # 
 # 
 # 

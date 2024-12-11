@@ -711,7 +711,7 @@ int set_font(char *font_name)
  lbegin(window_list);
  hide_cursor("set_font");
  while((wp=(WINDP *)lget(window_list))!=NULL) {
-	getwquotes(wp,0);
+	highlight_restore_state(wp,0);
 	wd = GTK_EDIT_DISPLAY(wp->gwp->draw);
 	if(wd!=NULL) {
 		free_virtual_window(wp);
@@ -1235,8 +1235,8 @@ WINDP * make_split(WINDP *wp)
     register WINDP *new_wp;	// the new window
 //	MESG("make_split: ======================");
 	new_wp = dublicate_window(wp);
-	if(wp) setwquotes(new_wp,0,tp_offset(wp->tp_hsknown));
-	else setwquotes(new_wp,0,0);
+	if(wp) highlight_save_state(new_wp,0,tp_offset(wp->tp_hsknown));
+	else highlight_save_state(new_wp,0,0);
     return (new_wp);
 }
 

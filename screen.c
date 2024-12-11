@@ -1125,7 +1125,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 		ptr2=s1;
 		s1=s2;s2=ptr2;
 	};
-	if(wp->selection==REGION_COLM) {
+	if(wp->selection==REGION_COLUMN) {
 		ptr2=ptr1;
 		col0=FColumn(wp->w_fp,tp_offset(wp->w_smark)-wp->w_lcol);
 		col1=FColumn(wp->w_fp,tp_offset(wp->w_emark)-wp->w_lcol);
@@ -1235,7 +1235,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 			} else {
 				set_selection(false);
 			};
-			if(wp->selection==REGION_COLM){
+			if(wp->selection==REGION_COLUMN){
 				if(s1<cur_lend && s2>tp_offs) set_selection(true);
 				if(((wp->vtcol-wp->w_infocol) < col0) || ((wp->vtcol - wp->w_infocol) >= col1)) set_selection(false);
 			};
@@ -1626,7 +1626,7 @@ void vteeol(WINDP *wp, int selected,int inside)
 #else
 	blank=CHR_SPACE;
 #endif
-	if(inside && wp->selection==REGION_COLM) {
+	if(inside && wp->selection==REGION_COLUMN) {
 		if(wp->vtcol<col0) {
 			 svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,col0 - wp->vtcol);
 			 svmchar(vp->v_text+col0,blank,COLOR_SELECT_BG,wp->w_fcolor,col1-col0+1);
@@ -1676,7 +1676,7 @@ void vteeoc(WINDP *wp, int endcol)
 	blank=CHR_NBSPACE;	// use this for mac terminal!
 #else
 	blank=CHR_SPACE;
-	blank='@';
+	// blank='@';
 #endif
 	if(wp->vtcol>endcol){
 		svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,endcol-wp->vtcol);
@@ -1980,6 +1980,8 @@ int  show_position_info(num short_version)
 					sstat=snprintf(str,MAXSLEN,"%6lld %7lld %7lld ",getcline()+1,loffs,col);
 				};
 				}
+				if(FOffset(cwp->w_fp)==FSize(cwp->w_fp)) strlcat(str,"EOF",MAXSLEN);
+				else
 				if((int)bt_dval("show_cdata")) { 
 					if(cwp->w_fp->b_mode & EMDOS) strlcat(str,"0D0A",MAXSLEN);
 					else if(cwp->w_fp->b_mode & EMUNIX) strlcat(str,"000A",MAXSLEN);
@@ -2326,7 +2328,7 @@ void upd_some_virtual_lines(WINDP *wp,char *from)
 	}
 	else wp->w_flag=0;
 	set_draw_flag(wp,"update_some_lines");
-	getwquotes(wp,0);	// set highlight to the top line!
+	highlight_restore_state(wp,0);	// set highlight to the top line!
 }
 
 void upd_move(WINDP *wp,char *from)
@@ -2418,7 +2420,7 @@ void upd_move(WINDP *wp,char *from)
 #endif
 	set_draw_flag(wp,"upd_move");
 	wp->w_flag=UPD_STATUS;
-	getwquotes(wp,0);	// set highlight to the top line!
+	highlight_restore_state(wp,0);	// set highlight to the top line!
 }
 
 
@@ -2480,7 +2482,7 @@ void upd_part(WINDP *wp,char *from)
 	};
 	if(wp->w_flag & UPD_STATUS) wp->w_flag=UPD_STATUS;
 	else wp->w_flag=0;
-	getwquotes(wp,0);	// set highlight to the top line!
+	highlight_restore_state(wp,0);	// set highlight to the top line!
 }
 
 void upd_part_wrap(WINDP *wp,char *from)
@@ -2543,7 +2545,7 @@ void upd_part_wrap(WINDP *wp,char *from)
 	};
 	if(wp->w_flag & UPD_STATUS) wp->w_flag=UPD_STATUS;
 	else wp->w_flag=0;
-	getwquotes(wp,0);	// set highlight to the top line!
+	highlight_restore_state(wp,0);	// set highlight to the top line!
 }
 
 /*	upd_all_virtual_lines:	update all the lines in a window */
@@ -2568,7 +2570,7 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 		head=1;
 		vt_str(wp,wp->w_fp->b_header,0,0,0,-1,0);
 	};
-	getwquotes(wp,0);
+	highlight_restore_state(wp,0);
 	if(wp->w_fp->b_flag!=FSNOTES && wp->w_fp->b_flag!=FSNOTESN && !(wp->w_fp->b_flag & FSNLIST)) 
 	{	/* Buffer view  */
 		// MESG("update virtual from buffer! wp=%d top offs=%ld",wp->id,lp_offs);
@@ -2657,7 +2659,7 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 	}
 	else wp->w_flag=0;
 	set_draw_flag(wp,"upd_all_virtual_lines");
-	getwquotes(wp,0);	// set highlight to the top line!
+	highlight_restore_state(wp,0);	// set highlight to the top line!
 	// MESG("upd_all_virtual_lines: end!");
 }
 

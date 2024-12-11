@@ -38,6 +38,8 @@ int get_hex_byte();
 void toggle_hex_byte();
 void reset_hex_byte();
 int move_window(num);
+int move_line_up(num);
+int move_line_down(num);
 void select_current_word();
 int window_cursor_line(WINDP *wp);
 void set_goal_column(int new_column,char *from);
@@ -83,6 +85,7 @@ void parse_command_line(int , char **);
 int highlight_index(char *,int *);
 int highlight_type(char *);
 int is_wrap_text(FILEBUF *fp);
+void init_highlight_structure(MLQUOTES *hs);
 
 int select_highlight(num);
 int check_update_highlight(int flag);
@@ -128,8 +131,8 @@ void mlforce(char *s)	;
 num vtline(WINDP *wp, offs tp_offs);
 void vtmove(WINDP *wp,int row,int col);
 void update_status();
-offs getwquotes(WINDP *wp,int);
-void setwquotes(WINDP *wp,int,num);
+offs highlight_restore_state(WINDP *wp,int);
+void highlight_save_state(WINDP *wp,int,num);
 void fquote_state(offs till_o, offs from_o, WINDP *wp);
 void top_menu(num init);
 int draw_window_line(WINDP *wp, int row);
@@ -343,7 +346,7 @@ char *function_name(int (*func)(), char **description);
 // crypt.c
 int set_key( num n);
 int set_buf_key(FILEBUF *curbp);
-void crypt_string(char *ctr,long len);
+void crypt_string(char *ctr,num len);
 
 // support.c
 int read_list_array(char *file_name, alist *new_list);

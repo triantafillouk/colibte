@@ -1,10 +1,13 @@
-#define	TEST1	1
+#define	TEST1	1	// for real display columns!
 #define	TEST0	0
 
-void FindLineCol(TextPoint *tp)	/* -- 1 --*/
+offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size);
+
+void FindLineCol(TextPoint *tp)
 {
  FILEBUF *fp=tp->fp;
-
+  // fp->maxlinelen=0;
+  // MESG("findlinecol: o=%ld",tp->offset);
   if(tp->offset<1)
    {
       tp->col=tp->line=tp->offset=0;
@@ -84,24 +87,30 @@ void FindLineCol(TextPoint *tp)	/* -- 1 --*/
    };
 
    // MESG("findlinecol: o=%ld c=%ld l=%ld offset=%ld",o,c,l,tp->offset);
-#if	TEST1
 	char first_eol_char='\n';
-#if	1
 	if((fp->b_mode & EMDOS) || (fp->b_mode & EMMAC) ) first_eol_char='\r';
-#else
-	char first_eol_char=fp->EolStr[fp->EolSize-1];
-#endif
+	if(first_eol_char != fp->EolStr[0]) MESG("------ EOL string not correct !!!! %X %X",first_eol_char,fp->EolStr[0]);
+
+#if	TEST1
 	while(o<tp->offset) {	/* go forward lines  */
 		if(FCharAt_NoCheck(fp,o)==first_eol_char) {
 			o++;
 			if(fp->EolSize>1) {
-				if(FCharAt_NoCheck(fp,o)==fp->EolStr[1]) {l++;c=0;o++;};
+				if(FCharAt_NoCheck(fp,o)==fp->EolStr[1]) {
+					l++;
+					if(c>fp->maxlinelen) fp->maxlinelen=c;
+					c=0;o++;
+				} else {
+					// MESG("findlinecol: test1:l=%ld c=%ld o=%ld",l,c,o);
+					c++;
+				};
 			} else {
-				l++;c=0;			
+					l++;
+					if(c>fp->maxlinelen) fp->maxlinelen=c;
+					c=0;			
 			};
 		} else {
 			utfchar uc;
-			// o=FUtfCharAt(fp,o,&uc);
 			o=FUtfCharAt_nocheck(fp,o,&uc);
 			if(uc.uval[0]==CHR_TAB) c=next_tab(c);
 			else c+=get_utf_length(&uc);
@@ -110,12 +119,17 @@ void FindLineCol(TextPoint *tp)	/* -- 1 --*/
 	// MESG("findlinecol: new o=%ld c=%ld l=%ld",o,c,l);
 #else
    offs fsize=FSize(fp);
+   num line_size=0;
+   num num_line=0;
    while(o<tp->offset) {	/* go forward lines  */
-      offs next_line=FNextLine(fp,o);
-
-      if(next_line>tp->offset||(o+1)==fsize) break;
+	// c=0;
+	if(o>fsize-1) break;
+	offs next_line=FCheckNextLine(fp,o,&line_size);
+		// MESG("	%4ld: o=%ld next_line=%ld line_size=%ld max=%ld",num_line++,o,next_line,line_size,fp->maxlinelen);
+      if(next_line>tp->offset) { break;};
 
 	  if( !FBolAt(fp,next_line)) { 
+		// MESG("not bol: %ld %ld",next_line,fsize);
 		if(next_line==fsize) {
 			o=FLineBegin(fp,next_line);
 			c=0;break;
@@ -143,7 +157,6 @@ void FindLineCol(TextPoint *tp)	/* -- 1 --*/
 	   tp->offset=o;
    };
    // MESG("           : o=%ld c=%ld l=%ld offset=%ld",o,c,l,tp->offset);
-
    tp->flags = FULLDEFINED;
-	// MESG_time(";flc:[%s] -> o=%lld col=%lld line=%lld ",tp_name[tp->tp_type],o,c,l);
+	// MESG_time(";flc:[%s][%s] -> o=%lld col=%lld line=%lld max=%lld",fp->b_fname,tp_name[tp->tp_type],o,c,l,fp->maxlinelen);
 }

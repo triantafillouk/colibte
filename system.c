@@ -15,7 +15,7 @@
 extern int update_all;
 extern FILEBUF *cbfp;
 void set_sval(char *s);
-
+int main_clipboard_copy();
 
 struct timeval start_time;	/* editor time started stamp */
 
@@ -691,7 +691,7 @@ int init_system_clipboard()
 	return 0;
 }
 
-/* return the first list from system clipboard */
+/* return the first line from system clipboard */
 char *ext_system_paste_line()
 {
  static char filnam[MAXFLEN];
@@ -699,6 +699,7 @@ char *ext_system_paste_line()
  int status=0;
 
 	if(!x11_display_ok) return "";
+	if(dont_edit() || cbfp->b_flag & FSDIRED )return false;
 	status = set_unique_tmp_file(filnam,"command",MAXFLEN);
 	if(status>=MAXFLEN) return "";
 	status=snprintf(exec_st,MAXFLEN,"%s > %s 2> /dev/null",clip_copy,filnam);
@@ -726,7 +727,102 @@ char *ext_system_paste_line()
 
 	return "";
 }    
-        
+
+int utf8charlen_nocheck(int ch);
+
+int insert_text_file_as_column(char *filnam)
+{
+	offs o1=Offset();	/* original offset  */
+	FILEBUF *ori_buf = cbfp;
+
+	const num start_column=tp_col(cbfp->tp_current);
+	// MESG("#insert_text_file_as_column: position %ld ---------------",start_column);
+
+	char *pad_space = (char *)malloc(start_column+1);
+	if(pad_space==NULL) return false;
+	memset(pad_space,' ',start_column+1);
+
+	FILEBUF *tmp_bp = new_filebuf(filnam,0);
+	if(tmp_bp==NULL) return false;
+
+	if(!select_filebuf(tmp_bp)) return false;
+	// set_Offset(FSize(tmp_bp));
+
+	const num max_len = tmp_bp->maxlinelen;
+
+	char *ml = malloc(max_len+2);
+	if(ml==NULL) {
+		delete_filebuf(tmp_bp,1);
+		return false;
+	};
+	// set_Offset(0);
+	num line_start=0;
+
+	select_filebuf(ori_buf);
+
+	while(line_start<FSize(tmp_bp)) {
+		char *line_text=get_line_at(tmp_bp,line_start);
+		int col=0, in_offset=0;;
+		char *ml_out = ml;
+		num line_end_column=tp_col(cbfp->tp_current);
+
+		memset(ml,0,max_len+1);
+		if(line_end_column<start_column) {
+			insert_string(cbfp,pad_space,start_column-line_end_column);
+		};
+		// insert_string(cbfp,"|",1);
+		while(in_offset<strlen(line_text)) {
+			utfchar uc;
+			in_offset=SUtfCharAt(line_text,in_offset,&uc);
+			if(uc.uval[0]==CHR_TAB) {col=next_tab(col);}
+			else col+=get_utf_length(&uc);
+			memcpy(ml_out,&uc,utf8charlen_nocheck(uc.uval[0]));
+			ml_out+=utf8charlen_nocheck(uc.uval[0]);
+		};
+		
+		while(col++<max_len) { *ml_out++=' ';}; *ml_out=0;
+		line_start = FNextLine(tmp_bp,line_start);
+		
+		if(FEof(cbfp)) {
+			insert_string(cbfp,ml,ml_out-ml);
+			insert_newline(cbfp);
+		} else {
+			insert_string(cbfp,ml,ml_out-ml);
+			if(!next_line(1)) {
+				set_Offset(FSize(cbfp));
+				insert_newline(cbfp);
+			};
+		};
+	} 
+	free(pad_space);
+	free(ml);
+	delete_filebuf(tmp_bp,1);
+
+	// goto original position
+	set_Offset(o1);
+	return 1;
+}
+
+int insert_text_file(char *filnam)
+{
+	offs o1=Offset();	/* original offset  */
+	int status;
+	struct stat    st;
+	long int size;
+	long long int act_read;
+	int file=open(filnam,O_RDONLY);
+	if(file<1) return false;
+	fstat(file,&st);
+	size = st.st_size;
+	status = ReadBlock(filnam,file,size,&act_read);
+	if(status) {
+	o1 += act_read;
+	close(file);
+	set_Offset(o1);
+	return true;
+	} else return false;
+}
+
 int ext_system_paste()
 {
  static char filnam[MAXFLEN];
@@ -741,19 +837,13 @@ int ext_system_paste()
 
 	status = system(exec_st);
 	if(status==0) {
-		int file;
-		struct stat    st;
-		long int size;
-		long long int act_read;
-		offs o1=Offset();
-		file=open(filnam,O_RDONLY);
-		fstat(file,&st);
-		size = st.st_size;
-		status = ReadBlock(filnam,file,size,&act_read);
-		o1 += act_read;
-		close(file);
+
+		if(cwp->selection==REGION_COLUMN) {	/* Column past  */
+			status=insert_text_file_as_column(filnam);
+		} else {	/* Normal paste  */
+			status=insert_text_file(filnam);
+		};
 		unlink(filnam);
-		set_Offset(o1);
 		set_update(cwp,UPD_EDIT);
 		setmark(0);
 		return status;

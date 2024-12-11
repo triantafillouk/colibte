@@ -550,7 +550,7 @@ int dir_edit(num n)
 	cbfp->b_flag &= ~(FSDIRED|FSMMAP);
 	
 	 if(! ifile(cbfp,fname,0)) return(FALSE);
-
+ 
 	igotooffset(poffset,ppline);
 	cbfp->b_state &= ~FS_CHG;
 	set_update(cwp,UPD_FULL);

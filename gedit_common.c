@@ -419,7 +419,7 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 					/* check for no region in buffer or box in buffer */
 				{
 					// MESG("selection menu!");
-					if(cwp->selection == REGION_COLM) {
+					if(cwp->selection == REGION_COLUMN) {
 						drv_show_menu_popup(popup_boxed_region);
 					} else {
 						drv_show_menu_popup(popup_select_on);
