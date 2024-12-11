@@ -906,12 +906,13 @@ int quote(num n)
 		case 'e':
 			for(int i=0;i<n;i++) insert_string(cbfp,"€",3);
 			set_update(cwp,UPD_EDIT);
-			// update_buffer_windows(cbfp,UPD_LINE);
 			break;
 		case 0xCE:\
 			c=drv_getc(1);
-			if(c==0xB5 || c==0xE5)
+			if(c==0xB5 || c==0xE5){
 				for(int i=0;i<n;i++) insert_string(cbfp,"€",3);
+				set_update(cwp,UPD_EDIT);
+			};
 			break;
 		default:
 			return insert_chr(n,c);
