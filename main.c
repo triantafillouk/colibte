@@ -96,7 +96,7 @@ int main(int argc, char **argv)
 	if(lc_lang==NULL) lc_lang=getenv("LANG");
 	else if(lc_lang[0]==0) lc_lang=getenv("LANG");
 	errno=0;
-	// printf("size of filebuf %ld textpoint %ld\n",sizeof(struct FILEBUF),sizeof(struct TextPoint));exit(1);
+
 	init_hash();
 	discmd = FALSE;
 	init_lists();

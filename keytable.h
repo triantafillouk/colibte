@@ -368,11 +368,14 @@ KEYTAB  keytab_win[MAXASSIGNS] = {
 	{META|'\'',		comment_line,"ALT-'"},
 	{META|';',		comment_line2,"ALT-;"},
 
+	{META|CNTRL|'A',		assign_function,"ALT-^A"},
 	{META|CNTRL|'C',		countwords,"ALT-^C"},
 	{META|CNTRL|'F',		linefill,"ALT-^F"},
 	{META|CNTRL|'H',		delbword,"ALT-^H"},
 	{META|CNTRL|'I',		remove_tab,"ALT-^I"},	// shift tab
-	{META|CNTRL|'K',		assign_function,"ALT-^K"},
+	{META|CNTRL|'J',		move_line_down,"ALT^J"},
+	{META|CNTRL|'K',		move_line_up,"ALT^K"},
+	
 	{META|CNTRL|'U',		unassign_key,"ALT-^U"},
 	{META|CNTRL|'L',		toggle_sync_lock,"ALT-^L"},
 	{META|CNTRL|'M',		toggle_move_lock,"ALT-^M"},
@@ -516,6 +519,7 @@ KEYTAB keytab_view[] = {
 	{'q',		close_file,"q"},
 	{CHR_LBRA,		goto_bop,"["},
 	{CHR_RBRA,		goto_eop,"]"},
+	{'%',		match_fence,"%"},
 	{',',		view_previous,","},
 	{'.',		view_next,"."},
 	{0,		NULL,NULL}

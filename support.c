@@ -475,7 +475,7 @@ int read_list_array(char *file_name, alist *new_list)
    FILE *handler = fopen(file_name, "r");
 	char *start_line;
 	char *temporary=NULL;
-	int lines=0;
+	// int lines=0;
 	int start_point=0;
 	empty_list(new_list);
    if (handler)
@@ -497,7 +497,7 @@ int read_list_array(char *file_name, alist *new_list)
 		start_point=0;
 		for(i=0;i<read_size;i++){
 			if(buffer[i]=='\r'){	/* msdos line type  */
-				lines++;
+				// lines++;
 				buffer[i]=0;
 				if(buffer[i+1]=='\n') { 
 					buffer[i+1]=0;
@@ -510,7 +510,7 @@ int read_list_array(char *file_name, alist *new_list)
 				start_point=i;
 			};
 			if(buffer[i]=='\n'){	/* unix line type  */
-				lines++;
+				// lines++;
 				buffer[i]=0;
 				temporary=malloc(i-start_point+2);
 				memcpy(temporary,start_line,i-start_point+1);
@@ -534,7 +534,7 @@ int read_list_array(char *file_name, alist *new_list)
 int save_list_array(char *file_name, alist *array)
 {
  FILE *handler=NULL;
- int lines=0;
+ // int lines=0;
  char *line;
  int slen;
 	if(array==NULL) { 
@@ -545,7 +545,7 @@ int save_list_array(char *file_name, alist *array)
 	if(handler){
 		lbegin(array);
 		while((line=(char *)lget(array))!=NULL) {
-			lines++;
+			// lines++;
 			slen=strlen(line);
 			fwrite(line,slen,1,handler);
 			fwrite("\n",1,1,handler);	/* fix for DOS ending!  */

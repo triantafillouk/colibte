@@ -29,7 +29,7 @@ num o,o_start,o_end;
 	cwp->selection=1;
 }
 
-int prev_word(int n)
+int prev_word(num n)
 {
  int p;
 	if (n < 0)	return (next_word(-n));
@@ -56,7 +56,7 @@ int prev_word(int n)
  * Move the cursor forward by the specified number of words. All of the motion
  * is done by "next_character". Error if you try and move beyond the buffer's end.
  */
-int next_word(int n)
+int next_word(num n)
 {
 	if (n < 0)	return (prev_word(-n));
 	while (n--) {
@@ -77,7 +77,7 @@ int next_word(int n)
 // goto_eow(n)
 // goto to end of current word
 // if n==0 then no move if at end of a word
-int goto_eow(int n)
+int goto_eow(num n)
 {
 	if (n < 0)	return (prev_word(-n));
 	if(n==0) {
@@ -104,7 +104,7 @@ int goto_eow(int n)
  * delete words. 
  * Bound to "M-D".
  */
-int delete_word(int  n)
+int delete_word(num  n)
 {
 	offs curoffs;
 	register int c;		/* temp char */
@@ -170,7 +170,7 @@ int delete_word(int  n)
  * Kill backwards by "n" words. Move backwards by the desired number of words,
  * Bound to "M-Rubout" and to "M-Backspace".
  */
-int delbword(int n)
+int delbword(num n)
 {
 	long size=0;
 	offs o;
@@ -241,7 +241,7 @@ int inword()
 
 // fillpara: FIXME later. no unified undo
 // fillpara: FIXME later. change the logic to more efficient
-int fillpara (int n)	/* Fill the current paragraph according to the current fill column	*/
+int fillpara (num n)	/* Fill the current paragraph according to the current fill column	*/
 {
 	int c,i;			/* current char durring scan	*/
 	utfchar uc;
@@ -362,7 +362,7 @@ int fillpara (int n)	/* Fill the current paragraph according to the current fill
 /*	wordcount:	count the # of words in the marked region,
 			along with average word sizes, # of chars, etc,
 			and report on them.			*/
-int countwords(int n) // ignored arguments
+int countwords(num n) // ignored arguments
 {
 	offs curoffs;
 	offs start_offset,end_offset;
@@ -447,7 +447,7 @@ int words_in_line(offs o,int *nspace)
  return w;
 }
 
-int linefill( int indent)
+int linefill(num indent)
 /* ident
    = 0 > do not insert spaces at the beginning
    = 1 > insert lmargin spaces at the beginning
@@ -548,7 +548,7 @@ int check_tabs(offs tpo, int ntabs)
 /* If  selection is  on then  for the  selected lines  otherwise for the
    current line 
 */
-int insert_tab( int n)
+int insert_tab(num n)
 {
  offs back_offset,curoffs;
  if(n<0) {
@@ -558,7 +558,7 @@ int insert_tab( int n)
 	return remove_tab(-n);
  } else {
  	if(cwp->selection) {
-		if( cwp->selection == REGION_COLM) {
+		if( cwp->selection == REGION_COLUMN) {
 #if	0
 				int ispaces = tabsize-tp_col(cbfp->tp_current)%(tabsize);
 				insert_chr(ispaces, CHR_SPACE);
@@ -617,7 +617,7 @@ int insert_tab( int n)
 	No move on the left if one of the lines have not enough space at the
 	beggining.
 */
-int remove_tab(int n)
+int remove_tab(num n)
 {
  int i,j;
  offs back_offset,curoffs;
@@ -769,7 +769,7 @@ int c_incword(int c)
 	if (c=='.') return(TRUE);
 	if (c>='a' && c<='z')
 		return (TRUE);
-	if (c>='A' && c<='Z')
+	if (c>='@' && c<='Z')
 		return (TRUE);
 	if (c>='0' && c<='9')
 		return (TRUE);

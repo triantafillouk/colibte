@@ -16,7 +16,7 @@ char *get_notes_key();
 
 /* external defined functions  */
 char *getcurfword();
-int open_file_dialog(char *,int n);
+int open_file_dialog(char *,num n);
 
 extern alist *file_list;
 extern alist *window_list;
@@ -75,7 +75,7 @@ int is_special_buffer(FILEBUF *bp)
 	return false;
 }
 
-int new_file(int n)
+int new_file(num n)
 {
  int stat;
  char scratch_name[24];
@@ -116,7 +116,7 @@ int buffer_is_connected(FILEBUF *bf)
 
 /* switch to the next file buffer in the file list */
 /* Bound to F10 */
-int next_file(int n)	
+int next_file(num n)	
 {
 	register FILEBUF *bp;
 	FILEBUF *fp=cbfp;
@@ -136,7 +136,7 @@ int next_file(int n)
 int activate_file(FILEBUF *bp)
 {
 	if(bp->b_dname[0]!=0) if(chdir(bp->b_dname)!=0) return false;
-	// MESG("activate_file:[%s] b_type=%d b_flag=%X",bp->b_fname,bp->b_type,bp->b_flag);
+	// MESG("activate_file:[%s] b_type=%d b_flag=%X mll=%ld ",bp->b_fname,bp->b_type,bp->b_flag,bp->maxlinelen);
 	if ((bp->b_state & FS_ACTIVE) ==0)
 	{	
 		// MESG("activatee_file: is not active, activate it!");
@@ -157,16 +157,17 @@ int activate_file(FILEBUF *bp)
 		textpoint_set(bp->tp_current,0);
 		// bp->save_ppline=0;
 		bp->b_state |= FS_ACTIVE;
+		// MESG("activate_file:[%s] b_type=%d b_flag=%X mll=%ld ",bp->b_fname,bp->b_type,bp->b_flag,bp->maxlinelen);
 
 		if(bp->b_fname[0]!=CHR_LBRA){
 			add_to_recent_list(get_buf_full_name(bp));
 		};
 	};
-	// MESG("activate_file: end [%s] b_type=%d b_flag=%d b_state=%X",bp->b_fname,bp->b_type,bp->b_flag,bp->b_state);
+	// MESG("activate_file: end [%s] b_type=%d b_flag=%d b_state=%X maxline=%ld",bp->b_fname,bp->b_type,bp->b_flag,bp->b_state,bp->maxlinelen);
 	return true;
 }
 
-int umark_buffer(int n)
+int umark_buffer(num n)
 {
  if(cbfp){
 	cbfp->b_state &= ~FS_CHG;
@@ -264,9 +265,12 @@ int select_filebuf(FILEBUF *bp)
 	unlink_filebuf(cwp);
 	link_window_buffer(cwp,bp);
 	set_utf8_error(0);
-
+	// test
 	textpoint_set(cwp->tp_hsknown,0);
 	textpoint_set(cwp->tp_hmknown,0);
+	// end test
+	fquote_state(tp_offset(cwp->tp_hline),0,cwp);
+	highlight_save_state(cwp,0,0);
 	set_update(cwp,UPD_FULL);
 
 	cwp->selection=0;
@@ -356,17 +360,16 @@ int load_scratch_files()
  if(d1==NULL) {
  	MESG("cannot read home .%s dir",APPLICATION_NAME);
  } else {
- 	int i=0;
 	struct dirent *df1;
 	char **namelist=NULL;
 
-	for(i=0;;i++) {
+	while(1) {
 		FILEBUF *bp;
 		df1=readdir(d1);
 		if(df1==NULL) { closedir(d1);break;};
-		// if(df1->d_name[0]!=CHR_LBRA) { i--;continue;};
-		if(strncmp(df1->d_name,"[new",4)!=0) { i--;continue;};
-		// if(strcmp(".",df1->d_name)==0) { i--;continue;};
+		// if(df1->d_name[0]!=CHR_LBRA) { continue;};
+		if(strncmp(df1->d_name,"[new",4)!=0) { continue;};
+		// if(strcmp(".",df1->d_name)==0) { continue;};
 		if(ind%256 == 0) namelist = (char **)realloc((char *)namelist, (ind+256)*sizeof(char *));
 		namelist[ind]=(char *)malloc(strlen(df1->d_name)+1);
 		if(namelist[ind]) {
@@ -384,7 +387,7 @@ int load_scratch_files()
 
 
 /* close current window file */
-int close_file(int n)
+int close_file(num n)
 {
 	FILEBUF *f_toclose,*bp,*f_previous=NULL;
 	WINDP *wp;
@@ -526,7 +529,7 @@ int delete_filebuf(FILEBUF *bp,int force)
 /*	List file buffers, in a window, select from the list
 	and make active. ( ^B )
 */
-int select_file(int n)
+int select_file(num n)
 {
 	char st[2048];
     register FILEBUF *bp;
@@ -581,7 +584,7 @@ int select_file(int n)
 }
 
 /* list/select internal file buffers */
-int select_file_internal(int n)
+int select_file_internal(num n)
 {
 	char st[2048];
     register FILEBUF *bp;
@@ -877,6 +880,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->b_state = 0;
 	bp->view_mode = 0;
 	bp->scratch_num=is_scratch;
+	bp->maxlinelen=0;
 	// MESG("original view_mode 0x%X",bp->view_mode);
 	if((int)bt_dval("wrap_mode")) {
 		bp->view_mode |= VMWRAP|VMINFO;
@@ -941,14 +945,9 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->EolStr[0]=10;bp->EolStr[1]=0;
 	bp->main_undo=undo_new();
 
-	bp->save_hs[0].w_hquotem=0;
-	bp->save_hs[0].w_hselection=0;
-	bp->save_hs[0].w_slang=1;
-	bp->save_hs[0].w_notes=0;
-	bp->save_hs[1].w_hquotem=0;
-	bp->save_hs[1].w_hselection=0;
-	bp->save_hs[1].w_slang=1;
-	bp->save_hs[1].w_notes=0;
+	init_highlight_structure(&bp->save_hs[0]);
+	init_highlight_structure(&bp->save_hs[1]);
+
 	bp->b_type=0;
 	bp->lines=0L;
 	bp->bytes_read=0L;
@@ -1113,7 +1112,7 @@ int bom_type(int file_id)
 }
 
 /* Reload file from disk */
-int reload_file(int n)
+int reload_file(num n)
 {
  FILEBUF *fp=cbfp;
  // MESG("reload_file: %X",fp->b_flag);
@@ -1129,8 +1128,10 @@ int reload_file(int n)
    return(file_read(fp, fp->b_fname));
 }
 
+int insert_text_file_as_column(char *filnam);
+
 /* Insert a file into current position.  */
-int insert_file(int  n)
+int insert_file(num  n)
 {
     char fname[MAXFLEN];
 	FILEBUF *fp=cbfp;
@@ -1140,7 +1141,11 @@ int insert_file(int  n)
 	fname[0]=0;
     if (nextarg("Insert file: ", fname, MAXFLEN,true) != TRUE)
                 return(FALSE);
-	stat=ifile(fp,fname,1);
+	if(cwp->selection==REGION_COLUMN){
+		stat=insert_text_file_as_column(fname);
+	} else { 
+		stat=ifile(fp,fname,1);
+	};
 	set_update(cwp,UPD_WINDOW);
     return(stat);
 }
@@ -1169,7 +1174,7 @@ int open_file_named(char *fname)
  * emacs key ^O
  */
 
-int open_file(int n)
+int open_file(num n)
 {
  char fname[MAXFLEN];	/* file user wishes to find */
  char tname[MAXFLEN];
@@ -1188,6 +1193,7 @@ int open_file(int n)
 		return(err);
 	}
 	set_list_type(LDIR);
+
 	if(n>0) {
 		if(n==3) {
 			if(!BolAt(Offset())) goto_bol(1);
@@ -1234,7 +1240,7 @@ int open_file(int n)
 	return(err);
 }
 
-int clear_buffer(int n)
+int clear_buffer(num n)
 {
  char fname[MAXFLEN];	/* file user wishes to find */
  char tname[MAXFLEN];
@@ -1280,7 +1286,7 @@ int clear_buffer(int n)
 #define CHAR_START	29
 #define CHAR_END	255
 
-int set_key(int nused)
+int set_key(num nused)
 {
 	return set_buf_key(cbfp);
 }
@@ -1323,7 +1329,7 @@ int set_buf_key(FILEBUF *bp)	/* reset encryption key of current file */
 /* uncrypt/decrypt a string. This is taken/modified from Jaspa microemacs editor 
  * Copyright (C) 1986 Dana L. Hoggatt
 */
-void crypt_string(char *ctr,long len)
+void crypt_string(char *ctr,num len)
 {
 	unsigned int cc;
 	int val;
@@ -1530,7 +1536,7 @@ int writeu1(char *fname, FILEBUF *fp)
 /*
  * Current file save with a new name
  */
-int saveas_file(int n)
+int saveas_file(num n)
 {
 	int    stat;
     char	fname[MAXFLEN];
@@ -1590,7 +1596,7 @@ int saveas_file(int n)
 /*
  * Save current file, or sort menu in dir mode
  */
-int save_file(int n)
+int save_file(num n)
 {
  FILEBUF *fp=cbfp;
 
@@ -1642,7 +1648,7 @@ int save_file(int n)
 /*
  * Change file name of current buffer
  */
-int rename_file(int n)
+int rename_file(num n)
 {
 	register int    s;
 	char            fname[MAXFLEN];
@@ -1709,13 +1715,13 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 		|| file_type_is("MD",bp->b_type) 
 		|| (bp->b_type >= NOTE_TYPE))
 		 ) {	
-			MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
+			// MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
 			bp->b_mode |= EMCRYPT;
 #if	TNOTES
 			if(bt_dval("notes_recreate") || from_note) 
 			{
 				// MESG("Notes recreate!");
-				if(get_notes_key(1)==NULL) {
+				if(get_notes_key()==NULL) {
  					// MESG("get new notes key");
 					set_notes_key(1);
 					if(get_notes_key()) {
@@ -1766,7 +1772,7 @@ void update_file_status(FILEBUF *fp)
 }
 
  /* get a menu file, select an item , execute it */
-int menufile(int n)
+int menufile(num n)
 {
  char *fname;
  int nu,s;
@@ -1814,12 +1820,13 @@ int file_type(char *name, int *compression_type,char *oext)
  };
  ext1[ext_len]=0;	// extension in reverse 
  i--;
+ // MESG("file_type: [%s] [%s] len=%d e=%d",name,ext1,ext_len,e);
 
  if(e>0 && ext_len>0) {
 	revstr(ext1);
 	strlcpy(oext,ext1,MAXLLEN);
 	ind=highlight_index(oext,&ind2);
-
+	// MESG("file_type: [%s] ind=%d",oext,ind);
 	if(ind==FX_COMPRESS)
 	{
 		*compression_type=ind2;
@@ -1916,7 +1923,7 @@ int add_to_recent_list(char *full_file_name)
 	return 1;
 }
 
-int save_file_history(int n)
+int save_file_history(num n)
 {
  char *fname;
 
@@ -1927,7 +1934,7 @@ int save_file_history(int n)
  return save_list_array(fname,recent_file_list);
 }
 
-int read_file_history(int n)
+int read_file_history(num n)
 {
  char *fname;
 
@@ -1941,7 +1948,7 @@ int read_file_history(int n)
  return 1;
 }
 
-int open_recent_file(int n)
+int open_recent_file(num n)
 {
  char *fname;
  int nam1;

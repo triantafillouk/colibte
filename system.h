@@ -8,7 +8,7 @@ int set_unique_tmp_file(char *str,char *name,int size);
 int sysexec(char *st);
 
 /* update tag file */
-int update_tags(int nused);
+int update_tags(num nused);
 
 
 /*
@@ -16,22 +16,22 @@ int update_tags(int nused);
  * show stdout on [command] buffer, stderr on [error] buffer
  * emacs key ^X!, assigned to Alt-1
  */
-int shell_cmd(int  nused);
+int shell_cmd(num nused);
 
 /* execute a background system command */
-int bg_cmd(int n);
+int bg_cmd(num n);
 
 char *extension_string(FILEBUF *bp);
 
 
-int grep_cmd(int  n);
-int rgrep_cmd(int n);
+int grep_cmd(num  n);
+int rgrep_cmd(num n);
 
 /*
  * filter a buffer through an external program
  * emacs key ^X#, assigned also to alt-3
  */
-int filter_buffer(int nuse);
+int filter_buffer(num nuse);
 
 #if	DARWIN
 // check bpcopy/pbpaste on mac

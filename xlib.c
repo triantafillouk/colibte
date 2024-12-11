@@ -81,6 +81,7 @@ int mousex=0;
 int mousey=0;
 extern int e_pos;			// entry position
 
+int drv_initialized=0;
 extern int drv_numrow;		// current driver screen rows
 extern int drv_numcol;		// current driver screen columns
 extern FILEBUF *cbfp;
@@ -97,8 +98,8 @@ int set_tag_view_position(int line,int column);
 
 void allocate_virtual_window(WINDP *wp);
 void update_screen_size(void);
-int update_screen_height(int n);
-int update_screen_width(int n);
+int update_screen_height(num n);
+int update_screen_width(num n);
 void set_back_color();
 void set_xposition(WINDP *wp,int);
 void init_colors();
@@ -124,16 +125,16 @@ void show_subw1();
 int x_insert ();
 
 extern void update_box(int,int,int,int);
-extern int update_screen(int);
+extern int update_screen(num);
 int get_from_mouse(XEvent report,int);
-extern int copy_region(int);
+extern int copy_region(num);
 extern void update_status();
 extern alist *window_list;
 extern void set_wvs(WINDP *);
 
 void drv_move(int y,int x);
 int set_sposition(WINDP *wp,int *,int *);
-int set_fontindex(int n);
+int set_fontindex(num n);
 int set_font(char *);
 void sinsert_nl(char *,int);
 void Draw_up_button(GWINDP *gwp,int,int,int);
@@ -238,7 +239,7 @@ unsigned long background_pixel=0L, foreground_pixel=1L;
 int is_updated;
 int is_cnfupd;
 
-typedef int (*function_int)(int);
+// typedef int (*function_int)(num);
 
 function_int key_convert_from_mouse(function_int execf)
 {
@@ -598,7 +599,7 @@ void drv_open()
     	|ButtonReleaseMask
 	);
 
-
+	drv_initialized=1;
 #if	XPLOT
 	set_plot_timer();
 #endif
@@ -1557,7 +1558,7 @@ void drv_window_delete(WINDP *wp)
  * Delete the current window, rearange screen space
  * Bound to ^X0.
  */
-int delete_window(int n)
+int delete_window(num n)
 {
 	WINDP *wp=NULL;	/* loop window */ 
 	WINDP *w1=NULL;	/* first window to go and receive deleted space */
@@ -1858,7 +1859,7 @@ void set_1window()
  * Split the current window horizontally
  * Bound to "C-X 2". 
  */
-int split_window(int n)
+int split_window(num n)
 {
         register WINDP *wp;
 
@@ -1887,7 +1888,7 @@ int split_window(int n)
  * Split the current window vertically
  * Bound to "C-X 3". 
  */
-int vsplit_window(int n)
+int vsplit_window(num n)
 {
     WINDP *wp;
 	
@@ -2009,7 +2010,7 @@ int get_from_mouse(XEvent report,int button)
 	return(-1);
 }
 
-int set_fontindex(int n)
+int set_fontindex(num n)
 {
  font_index=n-1;
  if(font_index>9 || font_index<0) font_index=0;
@@ -2044,7 +2045,7 @@ int set_font(char *font_name)
  return(FALSE);
 }
 
-int select_font(int n)
+int select_font(num n)
 {
  char font_name[MAXFLEN];
  int status;
@@ -2122,7 +2123,7 @@ void drv_update_styles()
 	};
 }
 
-int system_paste(int n)
+int system_paste(num n)
 {
  if(dont_edit() || cbfp->b_flag & FSDIRED )return false;
 #if	1
@@ -2560,7 +2561,7 @@ int set_sposition(WINDP *wp,int *st, int *l)
  return(cline);
 }
 
-int select_font_mono(int n)
+int select_font_mono(num n)
 {
  int s;
  s=selectl("Select Font",font_list,10,20,30,1,30,-1);
@@ -2834,7 +2835,7 @@ int check_v_sibling(WINDP *wp,int left,int top,int new_width)
 }
 
 
-int hresize_wind(int diff)
+int hresize_wind(num diff)
 {
 /*
  horizontal resize window 
@@ -2932,7 +2933,7 @@ int hresize_wind(int diff)
  return true;
 }
 
-int vresize_wind(int diff)
+int vresize_wind(num diff)
 {
 /*
  vertical resize window 
@@ -3029,8 +3030,11 @@ int vresize_wind(int diff)
  return true;
 }
 
+void drv_clear_line(WINDP *wp,int row)
+{
+}
 
-int new_shell(int n)
+int new_shell(num n)
 {
 	// start terminal in background!, no return code!, so return always true.
 	if(system("xterm&")==0) return(TRUE);
@@ -3039,12 +3043,12 @@ int new_shell(int n)
 
 // dummy commands
 
-int set_color(int n)
+int set_color(num n)
 {
 	return(TRUE);
 }
 
-int open_file_dialog(char *fname,int n)
+int open_file_dialog(char *fname,num n)
 {
 	return(TRUE);
 }
@@ -3054,37 +3058,37 @@ void prepare_converter(int local_lang)
 
 }
 
-int set_bg(int n)
+int set_bg(num n)
 {
 	return(TRUE);
 }
 
-int toggle_mouse(int n)
+int toggle_mouse(num n)
 {
 	return FALSE;
 }
 
-int text_mouse_pos(int n)
+int text_mouse_pos(num n)
 {
 	return FALSE;
 }
 
-int text_mouse_left_press(int n)
+int text_mouse_left_press(num n)
 {
 	return FALSE;
 }
 
-int text_mouse_release(int n)
+int text_mouse_release(num n)
 {
 	return FALSE;
 }
 
-int text_mouse_right_press(int n)
+int text_mouse_right_press(num n)
 {
 	return FALSE;
 }
 
-int text_mouse_error(int n)
+int text_mouse_error(num n)
 {
 	return FALSE;
 }

@@ -8,6 +8,7 @@ COLOR_SCHEME *get_scheme_by_index(int scheme_num);
 COLOR_SCHEME *get_scheme_by_name(char *name);
 
 extern alist *color_scheme_list;
+extern int drv_colors;
 
 char *basic_color_names[] = {
 	"black","red","green","orange","blue","magenta","cyan","white",
@@ -16,9 +17,9 @@ char *basic_color_names[] = {
 
 // default color schemes
 char *default_scheme_names[] = {
-	"Snow","Midnight","Cyan","Blue","Gray","Dark gray",
+	"Snow","Midnight","Cyan","Blue","Gray","Dark_gray",
 	"Sunny","Twilight","Lunar","Velvet",
-	NULL,NULL
+	NULL
 };
 
 
@@ -90,13 +91,14 @@ int color_scheme_read()
 
 		sscanf(b,"%c%s]\n",&left,name1);
 		name1[strlen(name1)-1]=0;
-
+		// MESG("read color_scheme [%s]",name1);
 		scheme = get_scheme_by_name(name1);
 
 		if(!scheme) { 	/* a new scheme!!  */
 			scheme = malloc(sizeof(COLOR_SCHEME));
 			add_element_to_list((void *)scheme,color_scheme_list);
 			scheme->scheme_name = strdup(name1);
+			// MESG("	new color scheme [%s]",name1);
 			int i;
 			for(i=0;i<COLOR_TYPES;i++) scheme->color_style[i].color_value="#203040";
 			// MESG("	create new scheme %s schemes now %d",name1,color_scheme_list->size);
@@ -108,6 +110,7 @@ int color_scheme_read()
 	char **sa = arg_list;
 	char *item = *sa++; 
 	j = sarray_index(color_type,item);	/* get color type  */
+	if(j<0) { free_sarray(arg_list); continue;};
 	scheme->color_style[j].color_index=0;
 	if(j>=0) {
 	// loop for attributes
@@ -193,7 +196,7 @@ void init_default_schemes()
 	COLOR_SCHEME *scheme = malloc(sizeof(COLOR_SCHEME));
 	scheme->scheme_name = default_scheme_names[scheme_ind];
 
-	// fprintf(stderr,"scheme %d [%s] ----------------------\n",scheme_ind,scheme->scheme_name);
+	// fprintf(stderr,"init scheme %d [%s] ----------------------\n",scheme_ind,scheme->scheme_name);
 	int total_colors=FG_COLORS+BG_COLORS;
 		for(i=0;i<total_colors;i++) 
 		{
@@ -207,7 +210,7 @@ void init_default_schemes()
 
 
 /* change color scheme */
-int change_color_scheme(int  scheme)
+int change_color_scheme(num  scheme)
 {
  // MESG("change_color_scheme: n=%d,color_scheme_ind=%d",scheme,color_scheme_ind);
  if(scheme<1 || scheme> color_scheme_list->size) scheme=1;

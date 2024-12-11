@@ -1,0 +1,291 @@
+[abyss]
+style.background = { common.color "#02103d" }
+style.background2 = { common.color "#02103d" }
+style.background3 = { common.color "#02103d" }
+style.text = { common.color "#0f6773" }
+style.caret = { common.color "#6a8ca8" }
+style.accent = { common.color "#6a8ca8" } 
+style.dim = { common.color "#303030" }
+style.divider = { common.color "#151515" }
+style.selection = { common.color "#242424" }
+style.line_number = { common.color "#252525" }
+style.line_number2 = { common.color "#444444" } 
+style.line_highlight = { common.color "#101010" }
+style.scrollbar = { common.color "#252525" }
+style.scrollbar2 = { common.color "#444444" }
+
+style.syntax["normal"] = { common.color "#a0a0a0" }
+style.syntax["symbol"] = { common.color "#a0a0a0" }
+style.syntax["comment"] = { common.color "#404040" }
+style.syntax["keyword"] = { common.color "#dfdfdf" }
+style.syntax["keyword2"] = { common.color "#dfdfdf" }
+style.syntax["number"] = { common.color "#dfdfdf" }
+style.syntax["literal"] = { common.color "#dfdfdf" }
+style.syntax["string"] = { common.color "#132a52" }
+style.syntax["operator"] = { common.color "#01A870" }
+style.syntax["function"] = { common.color "#01A870" }
+
+[betelgeuse]
+style.background         = { common.color "#222831" }
+style.background2        = { common.color "#1e232b" }
+style.background3        = { common.color "#1e232b" }
+style.text               = { common.color "#dfe2e7" }
+style.caret              = { common.color "#dfe2e7" }
+style.accent             = { common.color "#e2e4e9" }
+style.dim                = { common.color "#8893a5" }
+style.divider            = { common.color "#1e232b" }
+style.selection          = { common.color "#2c3440" }
+style.line_number        = { common.color "#8893a5" }
+style.line_number2       = { common.color "#8893a5" }
+style.line_highlight     = { common.color "#242a34" }
+style.scrollbar          = { common.color "#2c3440" }
+style.scrollbar2         = { common.color "#f5ad44" }
+style.scrollbar_track    = { common.color "#00000000" }
+style.good               = { common.color "#47e2b1" }
+style.warn               = { common.color "#f5ad44" }
+style.error              = { common.color "#db504a" }
+style.modified           = { common.color "#448bf5" }
+
+style.syntax["normal"]   = { common.color "#dfe2e7" }
+style.syntax["symbol"]   = { common.color "#dfe2e7" }
+style.syntax["comment"]  = { common.color "#8893a5" }
+style.syntax["keyword"]  = { common.color "#448bf5" }
+style.syntax["keyword2"] = { common.color "#f5ad44" }
+style.syntax["number"]   = { common.color "#f5ad44" }
+style.syntax["literal"]  = { common.color "#45e1df" }
+style.syntax["string"]   = { common.color "#f5ad44" }
+style.syntax["operator"] = { common.color "#dfe2e7" }
+style.syntax["function"] = { common.color "#f786aa" }
+
+[c0nfy]
+style.background = { common.color "#03071e" }
+style.background2 = { common.color "#03071e" }
+style.background3 = { common.color "#03071e" }
+style.text = { common.color "#ffa848" }
+style.caret = { common.color "#ffa848" }
+style.accent = { common.color "#ffb86c" }
+style.dim = { common.color "#4f526b" }
+style.divider = { common.color "#22242e" }
+style.selection = { common.color "#4c5163" }
+style.line_number = { common.color "#44475a" }
+style.line_number2 = { common.color "#717796" }
+style.line_highlight = { common.color "#2d303d" }
+style.scrollbar = { common.color "#44475a" }
+style.scrollbar2 = { common.color "#4c5163" }
+
+style.syntax["normal"] = { common.color "#f5faff" }
+style.syntax["symbol"] = { common.color "#f5faff" }
+style.syntax["comment"] = { common.color "#081355" }
+style.syntax["keyword"] = { common.color "#fc0fc0" }
+style.syntax["keyword2"] = { common.color "#05e6fa" }
+style.syntax["number"] = { common.color "#7612c5" }
+style.syntax["literal"] = { common.color "#7612c5" }
+style.syntax["string"] = { common.color "#fdd017" }
+style.syntax["operator"] = { common.color "#fc0fc0" }
+style.syntax["function"] = { common.color "#05e6fa" }
+
+[lite_xl]
+
+style.background = { common.color "#2e2e32" }  
+style.background2 = { common.color "#252529" } 
+style.background3 = { common.color "#252529" } 
+style.text = { common.color "#97979c" }
+style.caret = { common.color "#93DDFA" }
+style.accent = { common.color "#e1e1e6" }
+
+style.dim = { common.color "#525257" }
+style.divider = { common.color "#202024" } 
+style.selection = { common.color "#48484f" }
+style.line_number = { common.color "#525259" }
+style.line_number2 = { common.color "#83838f" } 
+style.line_highlight = { common.color "#343438" }
+style.scrollbar = { common.color "#414146" }
+style.scrollbar2 = { common.color "#4b4b52" } 
+style.scrollbar_track = { common.color "#252529" }
+style.drag_overlay = { common.color "#252525" }
+style.drag_overlay_tab = { common.color "#93DDFA" }
+style.good = { common.color "#72b886" }
+style.warn = { common.color "#FFA94D" }
+style.error = { common.color "#FF3333" }
+style.modified = { common.color "#1c7c9c" }
+
+style.syntax["normal"] = { common.color "#e1e1e6" }
+style.syntax["symbol"] = { common.color "#e1e1e6" }
+style.syntax["comment"] = { common.color "#676b6f" }
+style.syntax["keyword"] = { common.color "#E58AC9" }  
+style.syntax["keyword2"] = { common.color "#F77483" } 
+style.syntax["number"] = { common.color "#FFA94D" }
+style.syntax["literal"] = { common.color "#FFA94D" }  
+style.syntax["string"] = { common.color "#f7c95c" }
+style.syntax["operator"] = { common.color "#93DDFA" } 
+style.syntax["function"] = { common.color "#93DDFA" }
+
+[github]
+style.background = { common.color "#fbfbfb" }
+style.background2 = { common.color "#f2f2f2" }
+style.background3 = { common.color "#f2f2f2" }
+style.text = { common.color "#404040" }
+style.caret = { common.color "#181818" }
+style.accent = { common.color "#0366d6" }
+style.dim = { common.color "#b0b0b0" }
+style.divider = { common.color "#e8e8e8" }
+style.selection = { common.color "#b7dce8" }
+style.line_number = { common.color "#d0d0d0" }
+style.line_number2 = { common.color "#808080" }
+style.line_highlight = { common.color "#f2f2f2" }
+style.scrollbar = { common.color "#e0e0e0" }
+style.scrollbar2 = { common.color "#c0c0c0" }
+
+style.syntax["normal"] = { common.color "#24292e" }
+style.syntax["symbol"] = { common.color "#24292e" }
+style.syntax["comment"] = { common.color "#6a737d" }
+style.syntax["keyword"] = { common.color "#d73a49" }
+style.syntax["keyword2"] = { common.color "#d73a49" }
+style.syntax["number"] = { common.color "#005cc5" }
+style.syntax["literal"] = { common.color "#005cc5" }
+style.syntax["string"] = { common.color "#032f62" }
+style.syntax["operator"] = { common.color "#d73a49" }
+style.syntax["function"] = { common.color "#005cc5" }
+
+[github_dark]
+style.background = { common.color "#0d1117" }
+style.background2 = { common.color "#0d1117" }
+style.background3 = { common.color "#161925" }
+style.text = { common.color "#adbac7" }
+style.caret = { common.color "#f47067" }
+style.accent = { common.color "#6cb6ff" }
+style.dim = { common.color "#768390" }
+style.divider = { common.color "#444c56" }
+style.selection = { common.color "#2e4c77" }
+style.line_number = { common.color "#768390" }
+style.line_number2 = { common.color "#adbac7" }
+style.line_highlight = {common.color "#1e202e"}
+style.scrollbar = { common.color "#768390" }
+style.scrollbar2 = { common.color "#adbac7" }
+
+style.syntax["normal"] = { common.color "#adbac7" }
+style.syntax["symbol"] = { common.color "#adbac7" }
+style.syntax["comment"] = { common.color "#768390" }
+style.syntax["keyword"] = { common.color "#f47067" }
+style.syntax["keyword2"] = { common.color "#f47067" }
+style.syntax["number"] = { common.color "#6cb6ff" }
+style.syntax["literal"] = { common.color "#6cb6ff" }
+style.syntax["string"] = { common.color "#96d0ff" }
+style.syntax["operator"] = { common.color "#adbac7" }
+style.syntax["function"] = { common.color "#6cb6ff" }
+
+[monokai]
+style.background = { common.color "#272822" }
+style.background2 = { common.color "#181915" }
+style.background3 = { common.color "#181915" }
+style.text = { common.color "#9EA191" }
+style.caret = { common.color "#F8F8F0" }
+style.accent = { common.color "#F8F8F2" }
+style.dim = { common.color "#5E6052" }
+style.divider = { common.color "#181915" }
+style.selection = { common.color "#49483E" }
+style.line_number = { common.color "#90918B" }
+style.line_number2 = { common.color "#D2D0C6" }
+style.line_highlight = { common.color "#49483E" }
+style.scrollbar = { common.color "#53534F" }
+style.scrollbar2 = { common.color "#53534F" }
+
+style.syntax["normal"] = { common.color "#F8F8F2" }
+style.syntax["symbol"] = { common.color "#F8F8F2" }
+style.syntax["comment"] = { common.color "#75715E" }
+style.syntax["keyword"] = { common.color "#F92672" }
+style.syntax["keyword2"] = { common.color "#F92672" }
+style.syntax["number"] = { common.color "#AE81FF" }
+style.syntax["literal"] = { common.color "#E6DB74" }
+style.syntax["string"] = { common.color "#E6DB74" }
+style.syntax["operator"] = { common.color "#F92472" }
+style.syntax["function"] = { common.color "#A6E22E" }
+
+[rose-pine-moon]
+style.background = { common.color("#232136") }
+style.background2 = { common.color("#232136") }
+style.background3 = { common.color("#232136") }
+style.text = { common.color("#e0def4") }
+style.caret = { common.color("#ea9a97") }
+style.accent = { common.color("#e0def4") }
+style.dim = { common.color("#56526e") }
+style.divider = { common.color("#393552") }
+style.selection = { common.color("#2a273f") }
+style.line_number = { common.color("#2a283e") }
+style.line_number2 = { common.color("#e0def4") }
+style.line_highlight = { common.color("#2a273f") }
+style.scrollbar = { common.color("#2a283e") }
+style.scrollbar2 = { common.color("#44415a") }
+style.scrollbar_track = { common.color("#56526e") }
+style.drag_overlay = { common.color("rgb(38, 35, 58, 0.7)") }
+style.drag_overlay_tab = { common.color("#9ccfd8") }
+style.good = { common.color("#c4a7e7") }
+style.warn = { common.color("#f6c177") }
+style.error = { common.color("#eb6f92") }
+style.modified = { common.color("#9ccfd8") }
+
+style.syntax["normal"] = { common.color("#e0def4") }
+style.syntax["symbol"] = { common.color("#e0def4") }
+style.syntax["comment"] = { common.color("#6e6a86") }
+style.syntax["keyword"] = { common.color("#3e8fb0") }
+style.syntax["keyword2"] = { common.color("#eb6f92") }
+style.syntax["number"] = { common.color("#f6c177") }
+style.syntax["literal"] = { common.color("#f6c177") }
+style.syntax["string"] = { common.color("#f6c177") }
+style.syntax["operator"] = { common.color("#908caa") }
+style.syntax["function"] = { common.color("#eb6f92") }
+
+[tokyo-night]
+style.background = { common.color "#1a1b26" }
+style.background2 = { common.color "#16161e" }
+style.background3 = { common.color "#24283b" }
+style.text = { common.color "#a9b1d6" }
+style.caret = { common.color "#a9b1d6" }
+style.accent = { common.color "#7aa2f7" }
+style.dim = { common.color "#565f89" }
+style.divider = { common.color "#101014" }
+style.selection = { common.color "#282B3C" }
+style.line_number = { common.color "#363B54" }
+style.line_number2 = { common.color "#737AA2" }
+style.line_highlight = { common.color "#1E202E"}
+style.scrollbar = { common.color "#24283b" }
+style.scrollbar2 = { common.color "#414868" }
+
+style.syntax["normal"] = { common.color "#9ABDF5" }
+style.syntax["symbol"] = { common.color "#c0caf5" }
+style.syntax["comment"] = { common.color "#414868" }
+style.syntax["keyword"] = { common.color "#bb9af7" }
+style.syntax["keyword2"] = { common.color "#bb9af7" }
+style.syntax["number"] = { common.color "#ff9e64" }
+style.syntax["literal"] = { common.color "#c0caf5" }
+style.syntax["string"] = { common.color "#9ece6a" }
+style.syntax["operator"] = { common.color "#2ac3de"}
+style.syntax["function"] = { common.color "#7aa2f7" }
+
+[vscode-dark]
+style.background = { common.color "#1E1E1E" }
+style.background2 = { common.color "#252526" }
+style.background3 = { common.color "#252526" }
+style.text = { common.color "#D4D4D4" }
+style.caret = { common.color "#FFFFFF" }
+style.accent = { common.color "#76BCFF" } 
+style.dim = { common.color "#7A7A7A" } 
+style.divider = { common.color "#1E1E1E" }
+style.selection = { common.color "#264F78" }
+style.line_number = { common.color "#707070" }
+style.line_number2 = { common.color "#A0A0A0" }
+style.line_highlight = { common.color "#333A40"}
+style.scrollbar = { common.color "#404040" }
+style.scrollbar2 = { common.color "#707070" } 
+
+style.syntax["normal"] = { common.color "#D4D4D4" }
+style.syntax["symbol"] = { common.color "#D4D4D4" }
+style.syntax["comment"] = { common.color "#6A9955" }
+style.syntax["keyword"] = { common.color "#569CD6" } 
+style.syntax["keyword2"] = { common.color "#C586C0" }
+style.syntax["number"] = { common.color "#B5CEA8" }
+style.syntax["literal"] = { common.color "#569CD6" }
+style.syntax["string"] = { common.color "#CE9178" }
+style.syntax["operator"] = { common.color "#8590A5"}
+style.syntax["function"] = { common.color "#DCDCAA" }
+

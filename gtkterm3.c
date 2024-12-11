@@ -143,7 +143,7 @@ void sinsert_nl(char *dat,int nbytes);
 
 WINDP * make_split(WINDP *oldwindow);
 void expose_line(int i, WINDP *wp);
-int set_fontindex(int);
+int set_fontindex(num);
 void cb_tools(GtkWidget *w, T_ELEMENT *telem );
 
 void allocate_virtual_window(WINDP *wp);
@@ -572,7 +572,7 @@ void hide_cursor (char *from)
 {
 	cairo_region_t *region;
 	GdkRectangle area;
-	static int ind=0;
+	// static int ind=0;
 	// MESG("hide_cursor: %d ind=%d",cursor_showing,ind);
 	if (cursor_showing == 0) return;
 #if	1
@@ -605,7 +605,7 @@ void hide_cursor (char *from)
 	end_draw(wd,"hide cursor");
 	// MESG("hide_cursor: end");
 	cursor_showing = 0;
-	ind++;
+	// ind++;
 	return;
 }
 
@@ -660,7 +660,7 @@ void set_window_font(WINDP *wp)
  set_edit_font(wd);
 }
 
-int select_font(int n)
+int select_font(num n)
 {
  char font_name[MAXFLEN];
  int status;
@@ -1878,7 +1878,7 @@ void show_color_sample(GtkWidget *table,int ypos,char *text)
 }
 
 // create/show color dialog
-int set_color(int n)
+int set_color(num n)
 {
  GtkWidget *vbox;
  GtkWidget *hbox;
@@ -1899,7 +1899,7 @@ int set_color(int n)
  	gtk_widget_show(colors_win);
 	return(1);
  }; 
- snprintf(wtitle,32,"set color %d",n);
+ snprintf(wtitle,32,"set color %d",(int)n);
  changed_color=n;
 
  colors_win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -2058,6 +2058,7 @@ int get_pango_length(char *st)
 int get_utf_length(utfchar *utf_char_str)
 {
  int b0;
+ if(utf_char_str->uval[0]<128) return 1;
  if(clen_error) { return 1;};
  int plen=get_pango_length((char *)utf_char_str->uval);
  if(plen!=0) {

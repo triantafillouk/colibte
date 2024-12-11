@@ -51,7 +51,7 @@ num  ConvertFromDosToUnix(FILEBUF *fp)
    {
       if(FCharAt(fp,ptr)=='\r' && FCharAt(fp,ptr+1)=='\n') {
 	 	textpoint_set(fp->tp_current,ptr);
-	 	DeleteChar(fp);
+	 	DeleteChar();
 	 	size--;
 		line++;
 //		MESG("d2u line=%d e=%lld lines=%lld col=%lld f=%d",line,te->offset,te->line,te->col,te->flags);
@@ -64,7 +64,7 @@ num  ConvertFromDosToUnix(FILEBUF *fp)
    return(ptr);
 }
 
-int dos2unix(int n)
+int dos2unix(num n)
 {
  FILEBUF *cfp=current_filebuf();
  num newsize=0;
@@ -102,7 +102,7 @@ int dos2unix(int n)
  return true;
 }
 
-int unix2dos(int n)
+int unix2dos(num n)
 {
  FILEBUF *cfp=current_filebuf();
  num newsize=0;
@@ -137,7 +137,7 @@ int unix2dos(int n)
 
 #if	USE_GLIB
 /* Character convertions */
-int convert_char(int n)
+int convert_char(num n)
 {
  num op;
  byte c;

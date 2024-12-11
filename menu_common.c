@@ -3,7 +3,7 @@
 */
 extern MENUS *start_menu;
 
-int work_menu(int n)
+int work_menu(num n)
 {
  FILEBUF *fp=cbfp;
 	if(fp->b_flag & FSDIRED && fp->b_flag & FSNLIST) {

@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.59T69 (17/10/2024)"
+#define VERSION 	"#01.59T95 (11/12/2024)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -442,6 +442,7 @@ typedef struct MLQUOTES {
 	unsigned char w_line_set;
 	short int w_hstate;
 	num known_offset;
+	int w_prev_line;
 } MLQUOTES;
 
 /* highlight quote masks */
@@ -734,6 +735,7 @@ typedef struct  FILEBUF {
 	struct	alist	*b_tag_list;
 #endif
 	struct	alist *dir_list_stack;
+	num maxlinelen;
 }  FILEBUF;
 
 #if	TNOTES
@@ -796,8 +798,8 @@ typedef struct  FILEBUF {
 /*	structure for the function names */
 typedef struct {
 	char *n_name;		/* macro name */
-	short arg;
-	int (*n_func)();	/* function  */
+	short arg;			/* number of arguments  */
+	int (*n_func)(num);	/* function  */
 	char *n_help;		/* function description */
 } FUNCS;
 
@@ -854,7 +856,7 @@ struct kdirent {
 #define REGION_NONE		0
 #define REGION_CHAR		1
 #define REGION_LINE		2
-#define	REGION_COLM		3
+#define	REGION_COLUMN	3
 
 /* bom types */
 #define	FTYPE_ENCRYPTED	1

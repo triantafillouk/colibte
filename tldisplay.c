@@ -22,7 +22,7 @@ char *str_tfile(struct stat *t,char *file_name,int maxsize);
 void drv_window_delete(WINDP *wp);
 int get_menu_index_from_mouse();
 void utf_string_break(char *utf_string, int column);
-int noop(int);
+int noop(num);
 void upd_all_wrap_lines(WINDP *wp,char *from);
 
 extern int drv_initialized;
@@ -90,7 +90,7 @@ void update_selection()
 }
 
 /* Display the top menu  */
-void top_menu(int init)
+void top_menu(num init)
 {
  int i;
  int fch,bch;
@@ -157,7 +157,7 @@ void clear_message_line()
  } else app_error--;
 }
 
-int window_row_resize(int n)
+int window_row_resize(num n)
 {
 	char slines[80];
  	if(!drv_initialized) return 0;
@@ -170,31 +170,31 @@ int window_row_resize(int n)
 	return(hresize_wind(n-cwp->w_ntrows));
 }
 
-int window_row_increase(int n)
+int window_row_increase(num n)
 {
 	if(!drv_initialized) return 0;
 	return(hresize_wind(5));
 }
 
-int window_column_increase(int n)
+int window_column_increase(num n)
 {
 	if(!drv_initialized) return 0;
 	return(vresize_wind(5));
 }
 
-int window_row_decrease(int n)
+int window_row_decrease(num n)
 {
 	if(!drv_initialized) return 0;
 	return(hresize_wind(-5));
 }
 
-int window_column_decrease(int n)
+int window_column_decrease(num n)
 {
 	if(!drv_initialized) return 0;
 	return(vresize_wind(-5));
 }
 
-int window_column_resize(int n)
+int window_column_resize(num n)
 {
 	if(!drv_initialized) return 0;
 	char slines[80];
@@ -208,7 +208,7 @@ int window_column_resize(int n)
 	return(vresize_wind(new_size-cwp->w_ntcols));
 }
 
-int describe_key(int n)	/* describe the command for a certain key */
+int describe_key(num n)	/* describe the command for a certain key */
 {
 	int c;		/* key to describe */
 	if(macro_exec) return 0;
@@ -232,7 +232,7 @@ void plot_redraw()
 {
 }
 
-int mouse_move(int n)
+int mouse_move(num n)
 {
  return true;
 }
@@ -553,10 +553,10 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
 MENUS *start_menu = &m_topn;
 extern int mousey,mousex;
 
-int execute_menu(int fixed)	/* execute menu */
+int execute_menu(num fixed)	/* execute menu */
 {
  register int status=FALSE;
- register int (*execfunc)();		/* ptr to function to execute */
+ register int (*execfunc)(int);		/* ptr to function to execute */
  int line=1;
  short key;
  long int repeat = repeat_arg;
@@ -631,7 +631,7 @@ int execute_menu(int fixed)	/* execute menu */
  return(status);
 }
 
-int menu_command(int n)
+int menu_command(num n)
 {
 	start_menu = &m_topn;
 	return execute_menu(1);
@@ -890,7 +890,7 @@ int disp_list(char **m_array,int start,int nu,int max_lines,int sx,int sy,int wi
  * Quote the next character, and insert it into the buffer. All the characters
  * are taken literally. Bound to "^Q"
  */
-int quote(int n)
+int quote(num n)
 {
 	int    c;
 	if(dont_edit()) return FALSE;
@@ -1133,9 +1133,11 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
      if( execf== del_prev_char ) { /* delete previous character */
 	 if(ce<1) continue;
 //		Go back one character
+		// MESG("back: ce=%d ce1=%d",ce,ce1);
 		ce=utf8_str_left(st2,ce);
-
+		// MESG("	in: %d",ce);
 		SUtfCharAt(st2,ce,&uc);
+		// MESG("char: %d",uc.uval[0]);
 		if(disinp) {
 			cursor_x -= get_utf_length(&uc);
 		} else {
@@ -1145,10 +1147,10 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
 		if(disinp) ce1=ce;else ce1--;
 		if(ci<32) {
 			cursor_x--;
-			if(disinp) ce1--;
+			// if(disinp) ce1--;
 		};
 		cw=utf8_countbytes(ci);
-
+		// MESG(" cw=%d ci=%d ce1=%d",cw,ci,ce1);
 		if(disinp) {
 			if(ci<32){
 				delchar(st2,ce);
@@ -1159,6 +1161,7 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
 					delchar(st2,ce);
 				};
 			};
+			MESG(" s=[%s] ce1=%d",st2,ce1);
 		} else {
 			while((cw--)>0){
 				delchar(st2,ce);
@@ -1236,7 +1239,7 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
 	 } else {
      	cursor_x++;
 	 }
-     if(ci<32 && disinp) cursor_x++;
+     if(ci<32 && disinp) {cursor_x++;ce1++;};
    };
  };
 #if	USE_GLIB
@@ -1302,12 +1305,13 @@ void main_loop()
 	c = getcmd();
 	MESG_time_start("# main_loop go execute -------key %s",xe_key_name(c));
 	/* execute the keyboard sequence */
+	// msg_line(time2a());
 	main_execute(c);
  };
 }
 
 
-int show_version(int n)
+int show_version(num n)
 {
  // MESG("show_version:");
  msg_line("This is %s version %s !",APPLICATION_NAME,VERSION);
@@ -1522,22 +1526,22 @@ void status_line(WINDP *wp)
 }
 
 // dummy commands
-int increase_font_size(int n)
+int increase_font_size(num n)
 {
 	return true;
 }
 
-int decrease_font_size(int n)
+int decrease_font_size(num n)
 {
 	return true;
 }
 
-int toggle_bold(int n)
+int toggle_bold(num n)
 {
 	return true;
 }
 
-void freelist(char **namelist, int n)
+void freelist(char **namelist, num n)
 {
  int i;
  for(i=0;i<n;i++) free(namelist[i]);
@@ -1616,10 +1620,10 @@ void list_dir1(char *st)
 int get_utf_length(utfchar *utf_char_str)
 {
  int b0;
- if(clen_error) { return 1;};
 
  b0=utf_char_str->uval[0];
  if(b0<128) return 1;
+ if(clen_error) { return 1;};
 #if	DARWIN | 1
  // accents do not take space in mac 
  if((b0==0xCC || b0==0xCD)) {

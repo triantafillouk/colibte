@@ -49,7 +49,7 @@ char **getdir(char *dirname,char *s_find,int *num);
 char *str_efile(struct kdirent *entry);
 char *str_tfile(struct stat *t,char *file_name,int maxsize);
 FILEBUF *get_dir_buffer(int flag,int dir_num);
-int dir_other_reload(int n);
+int dir_other_reload(num n);
 void escape_file_name(char *fname);
 void delete_current_list_line();
 int stricmp1(const char *str1, const char *str2);
@@ -312,7 +312,7 @@ char **getdir(char *dirname,char *s_find,int *num)
  return(namelist);
 }
 
-int set_sort_mode(int mode)
+int set_sort_mode(num mode)
 {
  int old_sort_mode=current_sort_mode;
  int current_sort_mode=cwp->w_fp->sort_mode;
@@ -372,7 +372,7 @@ int update_line(int size)
 }
 
 // count dir size
-int dir_size(int n)
+int dir_size(num n)
 {
  int num_of_files=0; /* no of files in directory */
  DIR *d1;
@@ -528,7 +528,7 @@ void set_todirname(char *base_name,int dir_num)
  base_name[2]='0'+dir_num;
 }
 
-int dir_edit(int n) 
+int dir_edit(num n) 
 {
   char fname[MAXFLEN];
 
@@ -550,7 +550,7 @@ int dir_edit(int n)
 	cbfp->b_flag &= ~(FSDIRED|FSMMAP);
 	
 	 if(! ifile(cbfp,fname,0)) return(FALSE);
-
+ 
 	igotooffset(poffset,ppline);
 	cbfp->b_state &= ~FS_CHG;
 	set_update(cwp,UPD_FULL);
@@ -581,7 +581,7 @@ int start_edit(int n)
 }
 
 /* simple copy */
-int dir_copy(int n)
+int dir_copy(num n)
 {
   struct stat t;
   int s;
@@ -650,7 +650,7 @@ int dir_copy(int n)
 }
 
 /* simple rename/move */
-int dir_move(int n) 
+int dir_move(num n) 
 {
   struct stat t;
   int s1;
@@ -719,7 +719,7 @@ int dir_move(int n)
 }
 
 /* Rename, move in the same dir to a different name!  */
-int dir_file_rename(int n) 
+int dir_file_rename(num n) 
 {
   struct stat t;
   int s1;
@@ -768,7 +768,7 @@ int dir_file_rename(int n)
   return(TRUE);
 }
 
-int dir_new_file(int n)
+int dir_new_file(num n)
 {
   int s1;
   struct stat t;
@@ -791,7 +791,7 @@ int dir_new_file(int n)
 	return 1;
 }
 
-int dir_new_dir(int n)
+int dir_new_dir(num n)
 {
   int s1;
   struct stat t;
@@ -816,7 +816,7 @@ int dir_new_dir(int n)
 	return 1;
 }
 
-int dir_link(int n)
+int dir_link(num n)
 {
   int s1;
   int s2;
@@ -862,7 +862,7 @@ int dir_link(int n)
   return 1;
 }
 
-int dir_reload(int n)
+int dir_reload(num n)
 {
 	pdline = cbfp->cdir->cline-1;
 	reinit_dir(cbfp);
@@ -873,7 +873,7 @@ int dir_reload(int n)
 	return 1;
 }
 
-int dir_other_reload(int n)
+int dir_other_reload(num n)
 {
   FILEBUF *dbuf;	/* destination dir buffer  */
   WINDP *wp;
@@ -911,7 +911,7 @@ void delete_current_list_line()
 }
 
  /* delete one file */
-int dir_del1(int  n) 
+int dir_del1(num  n) 
 {
   int status;
   char fname[MAXFLEN];
@@ -1002,7 +1002,7 @@ int movein_dir(char *fname)
 }
 
 /* view a file in dir mode */
-int dir_view(int n) 
+int dir_view(num n) 
 {
   int is_dir;
   char fname[512];
@@ -1197,7 +1197,7 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 }
 
 /* directory command execution */
-int dir_exec(int n) 
+int dir_exec(num n) 
 {
   int ftype;
   int status;
@@ -1221,7 +1221,7 @@ int dir_exec(int n)
 }
 
 /* external view */
-int dir_right(int n) 
+int dir_right(num n) 
 {
   int ftype;
   char fname[512];
@@ -1254,7 +1254,7 @@ int dir_right(int n)
   return(status);
 }
 
-int script_exec(int nuse)
+int script_exec(num nuse)
 {
 	int    s;		/* return status from CLI */
 	FILEBUF *bp;	/* pointer to buffer to zot */
@@ -1436,7 +1436,7 @@ FILEBUF *get_dir_buffer(int flag,int dnum)
 	return(NULL);
 }
 
-int view_next(int n)
+int view_next(num n)
 {
 #if	TNOTES
  if(cbfp->b_flag==FSNOTES) return(0);
@@ -1458,7 +1458,7 @@ int view_next(int n)
  return(1); 
 }
 
-int view_previous(int n)
+int view_previous(num n)
 {
 #if	TNOTES
  if(cbfp->b_flag==FSNOTES) return(0);
@@ -1483,7 +1483,7 @@ int view_previous(int n)
  return(1); 
 }
 
-int dir_left(int n)
+int dir_left(num n)
 {
  FILEBUF *bf;
  FILEBUF *vbuf;
@@ -1593,7 +1593,7 @@ int dir_left(int n)
   return(stat);
 }
 
-int dir_tag(int n) 
+int dir_tag(num n) 
 {
   if(!(cbfp->b_flag & FSNLIST)) return FALSE;
   istr **row_data = (istr **) array_data(cbfp->dir_list_str);
@@ -1607,7 +1607,7 @@ int dir_tag(int n)
 }
 
 /* show current dir file info on window */
-int dir_showfileinfo(int n) 
+int dir_showfileinfo(num n) 
 {
  return(OK_CLRSL);
 }

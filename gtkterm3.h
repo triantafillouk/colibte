@@ -23,6 +23,8 @@ gboolean
 on_parent_configure (GtkWidget *widget,
   GdkEventConfigure *event, gpointer user_data);
 
+int input_line_ok_event(num n);
+int input_line_cancel_event(num n);
 gboolean
 on_gs_entry_key_press_event (GtkEntry *widget,
 	GdkEventKey *event, gpointer user_data);
@@ -65,7 +67,7 @@ T_ELEMENT main_toolbar[] = {
 	{ ESTOCK,"editcopy.xpm","edit-copy",  editcopy_xpm,  "Edit copy", copy_region,1},
 	{ ESTOCK,"editpaste.xpm","edit-paste",  editpaste_xpm, "Edit paste", paste_region, 2},
 
-	{ ESTOCK,"queue.xpm","edit-paste",  queue_xpm, "Next File", next_file ,1},
+	{ ESTOCK,"queue.xpm","edit-paste",  queue_xpm, "Next File", next_file,1},
 
 	{ ESTOCK, "undo.xpm","edit-undo",  undo_xpm, "Undo",undo,1},
 	{ ESTOCK, "redo.xpm","edit-redo",  redo_xpm, "Redo",redo,1},
@@ -81,9 +83,13 @@ T_ELEMENT main_toolbar[] = {
 
 /* Input Line toolbar  */
 T_ELEMENT input_toolbar[] = {
+#if	1
+	{ ESTOCK,"ok2.xpm","emblem-default", ok2_xpm, "Ok!", input_line_ok_event, 1},
+	{ ESTOCK,"cancel2.xpm","window-close", exit_xpm, "Cancel!", input_line_cancel_event, 1},
+#else
 	{ ESTOCK,"ok2.xpm","emblem-default", ok2_xpm, "Ok!", on_gs_entry_ok_event, 1},
 	{ ESTOCK,"cancel2.xpm","window-close", exit_xpm, "Cancel!", on_gs_entry_cancel_event, 1},
-//	{ ESTOCK,"cancel2.xpm","dialog-error", exit_xpm, "Cancel!", on_gs_entry_cancel_event, 1},
+#endif
 	{ 0,NULL, NULL,NULL,NULL,NULL,0 }
 };
 

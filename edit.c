@@ -18,6 +18,7 @@ void toggle_global_flag(int option_flag);
 void set_global_flag(int option_flag,int value);
 void get_lowercase_string(char *lower, char *string);
 void get_uppercase_string(char *lower, char *string);
+void update_lines(FILEBUF *bp);
 
 offs FNext_wrap_line(WINDP *wp,offs current_offset,int num_lines,int top);
 offs FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines);
@@ -57,13 +58,13 @@ void reset_hex_byte()
 	hex_byte = 0;
 }
 
-int next_tab(int i)
+int next_tab(num i)
 {
  return (i+tabsize-(i)%(tabsize));
 }
 
 // a function to do nothing
-int do_nothing(int n)
+int do_nothing(num n)
 {
 	return TRUE;
 }
@@ -77,6 +78,11 @@ int is_wrap_text(FILEBUF *fp)
  return 0;
 }
 
+int main_clipboard_copy()
+{
+	return  clipboard_copy(MainClipBoard); 
+}
+
 void toggle_val(char *name){
 //	if(name==NULL) return;
 	if((int)bt_dval(name)) {
@@ -85,7 +91,7 @@ void toggle_val(char *name){
 	// MESG("new value of [%s] is %d",name,(int)bt_dval(name));
 }
 
-int toggle_parameter(int type)
+int toggle_parameter(num type)
 {
  // MESG("toggle_parameter: type[%d]=[%s] gmode=%d ",type,option_names[type].name,gmode);
   toggle_val(option_names[type].name);
@@ -168,7 +174,7 @@ int toggle_parameter(int type)
 }
 
 /* Move the cursor to the beginning of the current line. */
-int goto_bol(int n)
+int goto_bol(num n)
 {
 	// MESG("goto_bol: b_flag=%X",cbfp->b_flag);
 	if(cbfp->b_flag==FSNOTES || cbfp->b_flag & FSNOTESN || cbfp->b_flag& FSNLIST) {
@@ -190,7 +196,7 @@ int goto_bol(int n)
 }
 
 /* Move the cursor back by "n" characters.  */
-int prev_character(int n)
+int prev_character(num n)
 {
  if (n < 0) return (next_character(-n));
 
@@ -205,7 +211,7 @@ int prev_character(int n)
 }
 
 /* Move the cursor to the end of the current line. */
-int goto_eol(int n)
+int goto_eol(num n)
 {
 	// MESG("goto_eol: b_flag=%X",cbfp->b_flag);
 	if(cbfp->b_flag==FSNOTES || cbfp->b_flag & FSNOTESN || cbfp->b_flag& FSNLIST) {
@@ -230,7 +236,7 @@ int goto_eol(int n)
 /*
  * Move the cursor forwards by "n" characters. 
  */
-int next_character(int n)
+int next_character(num n)
 {
 	if (n < 0) return (prev_character(-n));
 	while (n--) {
@@ -242,28 +248,28 @@ int next_character(int n)
     return (OK_RSTGOAL);
 }
 
-int select_next_character(int n)
+int select_next_character(num n)
 {
 	if(cwp->selection==0) setmark(REGION_CHAR);
 	set_update(cwp,UPD_MOVE);
 	return next_character(n);
 }
 
-int select_prev_character(int n)
+int select_prev_character(num n)
 {
 	if(cwp->selection==0) setmark(REGION_CHAR);
 	set_update(cwp,UPD_MOVE);
 	return prev_character(n);
 }
 
-int select_next_line(int n)
+int select_next_line(num n)
 {
 	if(cwp->selection==0) setmark(REGION_CHAR);
 	set_update(cwp,UPD_MOVE);
 	return next_line(n);
 }
 
-int select_prev_line(int n)
+int select_prev_line(num n)
 {
 	if(cwp->selection==0) setmark(REGION_CHAR);
 	set_update(cwp,UPD_MOVE);
@@ -353,7 +359,7 @@ int goto_offset(num n)
 
 /* Go to the beginning of the file */
 /* Assigned to ALT-< */
-int goto_bof(int n)
+int goto_bof(num n)
 {
  // MESG("goto_bof:");
 #if	TNOTES
@@ -392,7 +398,7 @@ int dont_edit()
 
 /* Move to the end of the file. */
 /*  Assigned to "ALT->".*/
-int goto_eof(int n)
+int goto_eof(num n)
 {
 	int headline=(cbfp->b_header!=NULL);
 	int toline=0;
@@ -436,7 +442,7 @@ int goto_eof(int n)
 	return (OK_RSTGOAL);
 }
 
-int scroll_up(int n)
+int scroll_up(num n)
 {
  int lines=n;
  lock_move=1;
@@ -445,7 +451,7 @@ int scroll_up(int n)
  return lines;
 }
 
-int scroll_down(int n)
+int scroll_down(num n)
 {
  int status;
  // if(tp_offset(cwp->tp_hline)<1) return FALSE;
@@ -469,7 +475,7 @@ int get_current_line()
 	return current_line;
 }
 
-int next_wrap_line(int n)
+int next_wrap_line(num n)
 {
 	num current_line;
 	int headline=(cbfp->b_header!=NULL);
@@ -559,7 +565,7 @@ int next_wrap_line(int n)
 
 /* Move forward by n lines. */
 /*  emacs key is "^N". */
-int next_line(int n)
+int next_line(num n)
 {
 	int w_row=0;
 	num current_line;
@@ -567,7 +573,7 @@ int next_line(int n)
 	int b_flag = cbfp->b_flag;
 	int headline=(cbfp->b_header!=NULL);
 
-	MESG("next_line: ------------- n=%d lock=%d",n,lock_move);
+	// MESG("next_line: ------------- n=%d lock=%d",n,lock_move);
     if (n < 0)  return (prev_line(-n));
 	if(n==0) return(FALSE);
 
@@ -651,7 +657,7 @@ int next_line(int n)
 void update_top_position_wrap();
 offs   FPrevUtfCharAt(FILEBUF *fp,offs o, utfchar *uc);
 
-int prev_wrap_line(int n)
+int prev_wrap_line(num n)
 {
  num current_line=get_current_line();
 
@@ -697,7 +703,7 @@ int prev_wrap_line(int n)
 }
 
 /* Move backward by n lines. */
-int prev_line(int n)
+int prev_line(num n)
 {
  num current_line;
  MESG("prev_line: ------------- n=%d lock=%d",n,lock_move);
@@ -799,7 +805,7 @@ int emptyline(TextPoint *tp)
 
 
 // comment/uncomment at start of line
-int comment_line(int n)
+int comment_line(num n)
 {
 	FILEBUF *fp = cbfp;
 	int comment_type=C_COLSTART;
@@ -841,7 +847,7 @@ int comment_line(int n)
 }
 
 // comment at end of line or at start/end of selection
-int comment_line2(int n)
+int comment_line2(num n)
 {
 	FILEBUF *fp = cbfp;
 	// MESG("comment_line2:");
@@ -854,7 +860,7 @@ int comment_line2(int n)
    If at the beginning  then goto the
    beginning of previous paragraph 
 */
-int goto_bop(int n)
+int goto_bop(num n)
 {
  register TextPoint *tp;
  num toline;
@@ -881,7 +887,7 @@ int goto_bop(int n)
 }
 
 /* goto end of paragraph */
-int goto_eop(int n)
+int goto_eop(num n)
 {
  TextPoint *tp;
  num toline;
@@ -962,7 +968,7 @@ int valid_offset(offs o_in_line,int column_goal)
 
 
 /* Scroll forward by a specified number of pages */
-int next_page(int  n)
+int next_page(num n)
 {
  int headline=(cbfp->b_header!=NULL);
  num toline;
@@ -1055,7 +1061,7 @@ int next_page(int  n)
 
 
 /* Scroll backward by a specified number of pages. */
-int prev_page(int num_pages)
+int prev_page(num num_pages)
 {
  num toline;
  int headline=(cbfp->b_header!=NULL);
@@ -1081,11 +1087,16 @@ int prev_page(int num_pages)
 		return (OK_CLRSL);
 	} else
 #endif
+	// MESG("prev_page: b_flag=%X num_lines=%d",cbfp->b_flag,num_lines);
 	if(cbfp->b_flag & FSNOTESN || cbfp->b_flag & FSNLIST) {
 		set_goal_column(NOTES_COLUMN+2,"prev_page:1");
 		if(num_lines > cwp->current_note_line+headline) num_lines=cwp->current_note_line;
-		if(num_lines==0) return FALSE;
+
+		if(num_lines<1) return FALSE;
+
 		cwp->current_note_line-=num_lines;
+		if(cwp->current_note_line<0) cwp->current_note_line=0;
+		// MESG("	: current_note_line=%d",cwp->current_note_line);
 		set_update(cwp,UPD_MOVE|UPD_WINDOW);
 		return (OK_CLRSL);
 	};
@@ -1140,32 +1151,32 @@ int prev_page(int num_pages)
 }
 
 /* set normal (character) marked region */
-int set_mark(int n)	
+int set_mark(num n)	
 {
 	return(setmark(REGION_CHAR));
 }
 
-int set_no_mark(int n)
+int set_no_mark(num n)
 {
 	return(setmark(0));
 }
 
 /* set line region */
-int set_line_mark(int n)	
+int set_line_mark(num n)	
 {
 	return(setmark(REGION_LINE));
 }
 
 /* set column region */
 /* assigned to alt-c */
-int set_column_mark(int n)	
+int set_column_mark(num n)	
 {
-	return(setmark(REGION_COLM));
+	return(setmark(REGION_COLUMN));
 }
 
 /* set/clear mark region */
 /* assigned to ^space */
-int setmark(int n)
+int setmark(num n)
 {
  if(!discmd) {
 	// no selection without a window!
@@ -1174,11 +1185,9 @@ int setmark(int n)
 // MESG("setmark:");
  if(n) {
  	if(cwp->selection) {
-		cwp->selection=0;
 		reset_region_textpoints();
 	} else cwp->selection=n;
  } else {
- 	cwp->selection=0;
 	reset_region_textpoints();
  };
 
@@ -1189,13 +1198,13 @@ int setmark(int n)
  	} else {
 		tp_copy(cwp->w_smark,cwp->tp_current);
  		tp_copy(cwp->w_emark,cwp->tp_current);
-		cwp->hs[0].w_hselection=0;
+		cwp->hs[0].w_hselection=1;
  	};
  } else { // clear region selection and set region mode to normal
-			set_update(cwp,UPD_FULL);
-			tp_copy(cwp->w_smark,cwp->tp_current);
-			tp_copy(cwp->w_emark,cwp->tp_current);
-			cwp->hs[0].w_hselection=0;
+		set_update(cwp,UPD_FULL);
+		tp_copy(cwp->w_smark,cwp->tp_current);
+		tp_copy(cwp->w_emark,cwp->tp_current);
+		cwp->hs[0].w_hselection=0;
 	};
 	set_update(cwp,UPD_MOVE);
 
@@ -1205,7 +1214,7 @@ int setmark(int n)
 /* Swap the values of "." and "mark" in the current window. */
 /* emacs key  "^X^X".  */
 /* every window has its own marks!! */
-int swap_mark(int n)
+int swap_mark(num n)
 {
  TextPoint *p;
  if(!discmd) return false;
@@ -1221,7 +1230,7 @@ int swap_mark(int n)
 
 /*	the cursor is moved to a matching fence	*/
 /*	default assigned to ^] */
-int match_fence(int flag)
+int match_fence(num flag)
 {
 	int sdir;	/* direction of search (1/-1) */
 	int count;	/* current fence level count */
@@ -1296,7 +1305,7 @@ int match_fence(int flag)
 
 /* toggle lock movement */
 /* bind to ^X^M or F12 */
-int toggle_move_lock(int n)
+int toggle_move_lock(num n)
 {
  if(lock_move==0) lock_move=1;else lock_move=0;
  return TRUE;
@@ -1304,19 +1313,19 @@ int toggle_move_lock(int n)
 
 /* toggle page movement synchronization  */
 /* bind to F11 */
-int toggle_sync_lock(int n)
+int toggle_sync_lock(num n)
 {
  if(lock_sync==0) lock_sync=1;else lock_sync=0;
  return TRUE;
 }
 
-int page_move_down(int n)
+int page_move_down(num n)
 {
  if(lock_sync) return both_up(n);
  else return prev_page(n);
 }
 
-int page_move_up(int n)
+int page_move_up(num n)
 {
  if(lock_sync) return both_down(n);
  else return next_page(n);
@@ -1350,7 +1359,7 @@ unsigned char *str2out(char *s)
 
 /* Quit command. */
 /*   emacs key  ^X^C, assigned also to ALT-X  */
-int quit(int n)
+int quit(num n)
 {
 	// MESG("quit:n=%d discmd=%d,macro_exec=%d,changed=%d",n,discmd,macro_exec,changes_occured());
         if (
@@ -1376,7 +1385,7 @@ int quit(int n)
 
 /* Save the current file and closes it. If the last one then quits. */
 /* Assigned to F3 keybutton. */
-int quick_close(int n)
+int quick_close(num n)
 {
     register FILEBUF *oldcb; /* original current buffer */
 	register int status;
@@ -1436,7 +1445,7 @@ int quick_close(int n)
 
 /* Abort command.  */
 	/* emacs key ^G  */
-int abort_cmd(int n)
+int abort_cmd(num n)
 {
 	kbdmode = STOP;
 //	MESG("abort_cmd:");
@@ -1448,14 +1457,14 @@ int abort_cmd(int n)
     return(false);
 }
 
-int update_menu(int n)
+int update_menu(num n)
 {
 //	MESG("update menu:");
 	drv_flush();
 	return true;
 }
 
-int noop(int n){
+int noop(num n){
 	MESG("No op!");
 	return true;
 };
@@ -1464,9 +1473,9 @@ int noop(int n){
 
 /* Twiddle the two previous characters */
 /* emacs key "^T". */
-int twiddle(int n)
+int twiddle(num n)
 {
-	char ts[10];
+	char ts[16];
 	int i;
 
 	check_update_highlight(0);
@@ -1513,7 +1522,7 @@ int twiddle(int n)
 
 /* Insert a tab  */
 /* Assigned to ^I */
-int tab(int n)
+int tab(num n)
 {
 	// MESG("tab: b_flag=0x%X",cbfp->b_flag);
 	if(cbfp->b_flag & FSDIRED) return(0);
@@ -1532,7 +1541,7 @@ int tab(int n)
 }
 
 /* change tabs to spaces for a number of lines */
-int detab_line(int n)
+int detab_line(num n)
 {
 	num oldline;
 //	MESG("detab_line:");
@@ -1580,7 +1589,7 @@ int detab_line(int n)
 }
 
 /* change spaces to tabs for a number of lines !!*/
-int entab_line(int n)
+int entab_line(num n)
 {
  register int cc;	/* current column */
  register int c;	/* current character */
@@ -1640,7 +1649,7 @@ int entab_line(int n)
 
 /* Delete blank lines around current position */
 /* emacs key "^X^O". */
-int del_blank_lines(int n)
+int del_blank_lines(num n)
 {
  offs o1,o2;
  if(cbfp->b_flag & FSDIRED) return(0);
@@ -1672,7 +1681,7 @@ int del_blank_lines(int n)
 
 /* Insert a newline. */
 /* Assigned to "^M" or <enter>. */
-int new_line(int n)
+int new_line(num n)
 {
 	register int    s;
 	if(cbfp->b_flag & FSDIRED) return(0);
@@ -1693,7 +1702,7 @@ int new_line(int n)
 }
 
 
-int insert_date(int n)
+int insert_date(num n)
 {
  char *date=date_string(n);
 	insert_string(cbfp,date,strlen(date));
@@ -1705,7 +1714,7 @@ int insert_date(int n)
 
 /* Delete character(s), or selected region */
 /* Assigned to DEL . */
-int del_char(int n)
+int del_char(num n)
 { 
  int s;
  if(cbfp->b_flag & FSDIRED) return(dir_del1(n));
@@ -1736,7 +1745,7 @@ int del_char(int n)
 
 /* Delete backwards. */
 /* Assigned to both "BACKSPACE" and "^H". */
-int del_prev_char(int n)
+int del_prev_char(num n)
 {
     register int    s;
 	if(cbfp->b_flag & FSDIRED) return(0);
@@ -1751,7 +1760,7 @@ int del_prev_char(int n)
 /* Erase text till end of line., 
    move the deleted chars to clipboard */
 /*  emacs key ^K */
-int erase_eol(int n)
+int erase_eol(num n)
 {
 	if(cbfp->b_flag & FSDIRED) return(0);
 	if(dont_edit()) return FALSE;
@@ -1809,7 +1818,7 @@ int insert_chr(int n,int c)
 	memset(s,c,n);
 	s[n]=0;
  };
- if(cwp->selection == REGION_COLM){
+ if(cwp->selection == REGION_COLUMN){
 	// from first line of selection to last line of selection
 	num s1,s2,s_temp;
 	int ccol0=GetCol();
@@ -1964,7 +1973,7 @@ int back_delete(long n)
  check_update_highlight(0);
  // MESG("back_delete: lines=%ld",oldlines);
  cbfp->line_from = GetLine();
- if(cwp->selection == REGION_COLM)
+ if(cwp->selection == REGION_COLUMN)
  {
 	// from first line of selection to last line of selection
 	num s1,s2,s_temp;
@@ -2044,7 +2053,7 @@ int set_linetext(char *txt)
 }
 
 // trim spaces at the end of current line
-int trim_line(int n)
+int trim_line(num n)
 {
    offs   ptr,todelete,oldcur;
    int trimmed_at_start=0;
@@ -2098,7 +2107,7 @@ int trim_line(int n)
 
 /* Indent with tabs and spaces */
 /* emacs key "^J". */
-int insert_indent(int n)
+int insert_indent(num n)
 {
     int    c,itabs,ispaces;
 	offs curoffs;
@@ -2140,7 +2149,7 @@ int insert_indent(int n)
 
 /* Delete one whole line , put it in local clipboard */ 
 /* assigned to ^D  */
-int delete_line(int n)
+int delete_line(num n)
 {
  int status;
 #if	TNOTES
@@ -2179,7 +2188,7 @@ int delete_line(int n)
 /* cut region beetween start and end marks, put in clipboard */
 /* emacs key "^W" (or to ^X in case ^X esc sequences are not supported). */
 /* if no flag then no update */
-int cut_region(int flag)
+int cut_region(num flag)
 {
  offs so,eo;
  num len;
@@ -2207,7 +2216,7 @@ int cut_region(int flag)
 		clipboard_copy(MainClipBoard);
 		export_region(MainClipBoard);
 	};
-	if(cwp->selection == REGION_COLM) return(delete_box(flag));
+	if(cwp->selection == REGION_COLUMN) return(delete_box(flag));
 
 	if(flag) setmark(0);
 
@@ -2246,7 +2255,7 @@ int delete_region()
 		textpoint_set(cwp->tp_current,so);
 	};
 
-	if(cwp->selection == REGION_COLM) return(delete_box(0));
+	if(cwp->selection == REGION_COLUMN) return(delete_box(0));
  	check_update_highlight(0);
 	if(DeleteBlock(0,len)) {
 		if(!check_update_highlight(2)) {
@@ -2260,7 +2269,7 @@ int delete_region()
 
 /* copy region to clipboard */
 /* Bound to "M-W" or ^C. */
-int copy_region(int n)
+int copy_region(num n)
 {
  char s[80];
 
@@ -2278,9 +2287,78 @@ int copy_region(int n)
  return TRUE;
 }
 
+int move_line_up(num n)
+{
+ if(tp_line(cwp->tp_current)<1) {
+	// MESG("move_line_up: on first line!");
+ 	return false;
+ };
+ // mark current line
+	// MESG("move_line_up:s b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	setmark(0);
+	ToLineBegin();
+	setmark(REGION_CHAR);
+	// MESG("move_line_up:0 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	MoveLineCol(tp_line(cwp->tp_current)+1,0);
+	// MESG("move_line_up:1 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	ToLineBegin();
+	tp_copy(cwp->w_emark,cwp->tp_current);
+	// MESG("move_line_up:2 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	
+ // put in clipboard marked region
+	clipboard_copy(MainClipBoard); 
+	// MESG("move_line_up:3 copy %ld",MainClipBoard->width);
+	// MESG("move_line_up:3 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	
+ // delete current
+	delete_region(1); setmark(0);
+ // go up one line and paste
+	MoveLineCol(tp_line(cwp->tp_current)-1,0);
+	paste_region(1);
+ // go up one line
+	MoveLineCol(tp_line(cwp->tp_current)-1,0);
+	set_update(cwp,UPD_EDIT);
+	return 1;
+}
+
+int move_line_down(num n)
+{
+
+ if(tp_line(cwp->tp_current)> tp_line(cbfp->tp_text_end)-2) {
+	// MESG("move_line_down: on last line!");
+ 	return false;
+ };
+ // mark current line
+	MESG("move_line_down:s b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	setmark(0);
+	ToLineBegin();
+	setmark(REGION_CHAR);
+	// MESG("move_line_down:0 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	MoveLineCol(tp_line(cwp->tp_current)+1,0);
+	// MESG("move_line_down:1 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	ToLineBegin();
+	tp_copy(cwp->w_emark,cwp->tp_current);
+	// MESG("move_line_down:2 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	
+ // put in clipboard marked region
+	clipboard_copy(MainClipBoard); 
+	// MESG("move_line_down:3 copy %ld",MainClipBoard->width);
+	// MESG("move_line_down:3 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	
+// delete current
+	delete_region(1); setmark(0);
+ // go down one line and paste
+	MoveLineCol(tp_line(cwp->tp_current)+1,0);
+	paste_region(1);
+ // go up one line
+	MoveLineCol(tp_line(cwp->tp_current)-1,0);
+	set_update(cwp,UPD_EDIT);
+	return 1;
+}
+
 // paste_region function (^V)
 // operates on cbfp
-int paste_region(int n)
+int paste_region(num n)
 {
  int status;
 	if(dont_edit() || cbfp->b_flag & FSDIRED )return false;
@@ -2322,7 +2400,7 @@ void normalize_region(FILEBUF *bp, offs *offs1, offs *offs2)
 
 /* Lower case region. */
 /* emacs key "C-X C-L" */
-int lowerregion(int  n)
+int lowerregion(num  n)
 {
 	char *region_str=NULL;
 	offs offs1,offs2;
@@ -2352,7 +2430,7 @@ int lowerregion(int  n)
 
 /* Capitalize region */
 /* emacs key "c-x c-u".  */
-int upperregion(int  n)
+int upperregion(num  n)
 {
 	char *region_str=NULL;
 	offs offs1,offs2;
@@ -2380,7 +2458,7 @@ int upperregion(int  n)
 }
 
 // delete_box: undo information is passed for each line separatly. FIXME
-int delete_box(int n)
+int delete_box(num n)
 {
  num h,l1,l2,col;
  offs cofs,lbo;
@@ -2484,21 +2562,21 @@ void toggleoptionf(int option_flag, int global)
 }
 
 /* set edit mode overwite */ 
-int set_over(int n)
+int set_over(num n)
 {
  gmode_over=n;
  return TRUE;
 }
 
 /* set edit mode case sensitive search */
-int set_case(int n)
+int set_case(num n)
 {
  gmode_exact_case=n;
  return TRUE;
 }
 
 /* toggle highlight on/off */
-int toggle_highlight(int n)
+int toggle_highlight(num n)
 {
  if(syntaxh) syntaxh=0;else syntaxh=1;
  set_update(cwp,UPD_ALL);
@@ -2506,7 +2584,7 @@ int toggle_highlight(int n)
 }
 
 /* set regular expression in search */
-int set_regexp(int n)
+int set_regexp(num n)
 {
 // MESG("set_regexp n=%d",n);
  gmode_reg_exp=n;
@@ -2514,40 +2592,44 @@ int set_regexp(int n)
 }
 
 /* toggle edit mode case sensitive search */
-int toggle_case(int n)
+int toggle_case(num n)
 {
  if(gmode_exact_case) gmode_exact_case=0;else gmode_exact_case=1;
  return TRUE;
 }
 
 /* toggle regular expression in search */
-int toggle_regexp(int n)
+int toggle_regexp(num n)
 {
  if(gmode_reg_exp) gmode_reg_exp=0;else gmode_reg_exp=1;
  return TRUE;
 }
 
 /* Toggle insert - ovewrite mode.  */
-int toggle_over(int n)
+int toggle_over(num n)
 {
  if(gmode_over) gmode_over=0;else gmode_over=1;
  update_status();
  return TRUE;
 }
 
-int set_crypt(int n)
+int set_crypt(num n)
 {
 	set_optionf(EMCRYPT,0);
  return TRUE;
 }
 
-int toggle_crypt(int n)
+int toggle_crypt(num n)
 {
+ if(cbfp->b_flag & FSMMAP) {
+	msg_line("mmap cannot not be crypted, goto edit mode first!");
+ 	return FALSE;
+ };
  toggleoptionf(EMCRYPT,0);
  return TRUE;
 }
 
-int set_just(int n)
+int set_just(num n)
 {
  set_optionf(EMJUST,0);
  return TRUE;
@@ -2555,14 +2637,14 @@ int set_just(int n)
 
 /* toggle justify mode */ 
 /* emacs key ^XJ */
-int toggle_just(int n)
+int toggle_just(num n)
 {
  toggleoptionf(EMJUST,0);
  return TRUE;
 }
 
 
-int read_colors(int n)
+int read_colors(num n)
 {
 // MESG("read_colors:n=%d",n);
  if(color_scheme_read())
@@ -2574,7 +2656,7 @@ int read_colors(int n)
 }
 
 
-int save_colors(int n)
+int save_colors(num n)
 {
 	return color_scheme_save();
 }

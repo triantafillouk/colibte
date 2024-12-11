@@ -54,13 +54,13 @@ int confirm(char *title,char *prompt,int always) {
 }
 
 // dummy for gtk
-int hresize_wind(int n)
+int hresize_wind(num n)
 {
  return 0;
 }
 
 // dummy for gtk
-int vresize_wind(int n)
+int vresize_wind(num n)
 {
  return 0;
 }
@@ -250,7 +250,7 @@ void drv_move(int y,int x)
 	// MESG("drv_move: x=%d y=%d",x,y);
 }
 
-void top_menu(int init) {
+void top_menu(num init) {
  /* a dummy one. Menu is handled by gtk */
 }
 
@@ -432,14 +432,14 @@ int drv_check_break_key()
  return 0;
 }
 
-int increase_font_size(int n)
+int increase_font_size(num n)
 {
  font_size  +=1;
  set_font(current_font_name);
  return true;
 }
 
-int decrease_font_size(int n)
+int decrease_font_size(num n)
 {
  if(font_size > 8) {
  	font_size-=2;
@@ -448,7 +448,7 @@ int decrease_font_size(int n)
  return true;
 }
 
-int toggle_bold(int n)
+int toggle_bold(num n)
 {
 	if(font_weight==CAIRO_FONT_WEIGHT_NORMAL) font_weight=CAIRO_FONT_WEIGHT_BOLD;
 	else font_weight=CAIRO_FONT_WEIGHT_NORMAL;
@@ -456,7 +456,7 @@ int toggle_bold(int n)
 	return true;
 }
 
-int set_fontindex(int n) {
+int set_fontindex(num n) {
 // dummy function
  return TRUE;
 }
@@ -672,7 +672,7 @@ void put_wtext(WINDP *wp, int row,int maxcol)
 	expose_line(row,wp);	/* is needed for GTK2!  */
 }
 
-int select_font_mono(int n)
+int select_font_mono(num n)
 {
  selectl("Select font",mono_fonts_list,mono_fonts_number,20,5,1,30,-1);
  if(index_value>=0) set_font(mono_fonts_list[index_value]);
@@ -711,7 +711,7 @@ int set_font(char *font_name)
  lbegin(window_list);
  hide_cursor("set_font");
  while((wp=(WINDP *)lget(window_list))!=NULL) {
-	getwquotes(wp,0);
+	highlight_restore_state(wp,0);
 	wd = GTK_EDIT_DISPLAY(wp->gwp->draw);
 	if(wd!=NULL) {
 		free_virtual_window(wp);
@@ -1019,6 +1019,20 @@ on_wlist_key_press (GtkWidget *widget,GdkEventKey *event,gpointer data)
 	return(FALSE);
 }
 
+int input_line_ok_event(num n)
+{
+ MESG("input_line_ok_event:");
+ on_gs_entry_ok_event(gs_entry,NULL,NULL);
+ return 1;
+}
+
+int input_line_cancel_event(num n)
+{
+ on_gs_entry_cancel_event(gs_entry,NULL,NULL);
+ MESG("input_line_cancel_event:");
+ return 1;
+}
+
 gboolean on_gs_entry_key_press_event(GtkEntry *g_entry,
 	GdkEventKey     *event, gpointer  user_data)
 {
@@ -1097,7 +1111,7 @@ on_gs_entry_ok_event        (GtkWidget       *widget,
 	key_wait=1;
 	};
 	ss=gtk_entry_get_text(GTK_ENTRY(gs_entry));
-	// MESG("gs_entry_ok_event: %s",ss);
+	MESG("gs_entry_ok_event: %s",ss);
 	entry_mode=KNORMAL;
 	if(ss==NULL) return FALSE;
 	if(ss[0]==0) return FALSE;
@@ -1221,8 +1235,8 @@ WINDP * make_split(WINDP *wp)
     register WINDP *new_wp;	// the new window
 //	MESG("make_split: ======================");
 	new_wp = dublicate_window(wp);
-	if(wp) setwquotes(new_wp,0,tp_offset(wp->tp_hsknown));
-	else setwquotes(new_wp,0,0);
+	if(wp) highlight_save_state(new_wp,0,tp_offset(wp->tp_hsknown));
+	else highlight_save_state(new_wp,0,0);
     return (new_wp);
 }
 
@@ -1249,7 +1263,7 @@ int set_sposition(WINDP *wp, int *st, int *l)
 }
 
 // past function
-int system_paste(int n)
+int system_paste(num n)
 {
  if(dont_edit() || cbfp->b_flag & FSDIRED )return false;
 // hide_cursor("system_paste");
@@ -1286,11 +1300,11 @@ void  set_dtlist(GtkWidget *dlist, char *glist[])
 
 void cb_menu(GtkWidget *widget, M_element *element)
 {
-  int n;
+  num n;
   int status;
   char *s;
 
-  n = (long int) element->menu;
+  n = (num) element->menu;
   if(n==0) n=1;
 
 //  MESG("menu element [%s] key [%c] [%s]",element->txt,element->high,element->macro);  
@@ -1509,7 +1523,7 @@ void cb_tools(GtkWidget *w, T_ELEMENT *telem )
  	status = toggle_button(w, telem->type-100);
 	return;
  } else {
-	status = (*telem->func)(1,telem->type);
+	status = (*telem->func)(telem->type);
  };
  if(status>0) {
  	update_screen(1);
@@ -1541,7 +1555,7 @@ void set_cursor(int val,char *from)
 
 
 extern short *kbdptr;
-int repeat_arg=1;
+num repeat_arg=1;
 
 int (*get_menucmd(MENUS *m1,int first))()
 {
@@ -1586,10 +1600,10 @@ int (*get_menucmd(MENUS *m1,int first))()
 	return(execf);
 }
 
-int menu_command(int n)
+int menu_command(num n)
 {
  register int status=FALSE;
- register int (*execfunc)();		/* ptr to function to execute */
+ register int (*execfunc)(num);		/* ptr to function to execute */
  int line;
  short key;
  MENUS *main_menu;
@@ -1633,6 +1647,7 @@ int menu_command(int n)
  };
  return(true);
 }
+
 
 void start_interactive(char *prompt)
 {
@@ -1707,7 +1722,7 @@ char *g2utf(char *str)
  return utf;
 }
 
-int new_shell(int n)
+int new_shell(num n)
 {
 	// start terminal in background!, no return code!, so return always true.
 	if(system("xterm&")<0) return(FALSE);
@@ -1746,42 +1761,42 @@ void prepare_converter(int buffer_lang)
  };
 }
 
-int set_bg(int n)
+int set_bg(num n)
 {
 	return(new_shell(n));
 }
 
-int toggle_mouse(int n)
+int toggle_mouse(num n)
 {
 	return FALSE;
 }
 
-int text_mouse_pos(int n)
+int text_mouse_pos(num n)
 {
 	return FALSE;
 }
 
-int text_mouse_left_press(int n)
+int text_mouse_left_press(num n)
 {
 	return FALSE;
 }
 
-int text_mouse_release(int n)
+int text_mouse_release(num n)
 {
 	return FALSE;
 }
 
-int text_mouse_right_press(int n)
+int text_mouse_right_press(num n)
 {
 	return FALSE;
 }
 
-int text_mouse_error(int n)
+int text_mouse_error(num n)
 {
 	return FALSE;
 }
 
-int execute_menu(int n)
+int execute_menu(num n)
 {
  FILEBUF *fp=cbfp;
  // MESG("execute_menu: n=%d b_flag=%X",n,fp->b_flag);

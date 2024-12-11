@@ -51,6 +51,8 @@ int   ReplaceTextFromFile(char *name,FILEBUF *bf,int fd,offs size,offs *act_read
 int CheckMode(mode_t mode);
 void textpoint_reset(TextPoint *tp);
 int chardline(WINDP *wp);
+// offs  Fcheck_UtfCharAt(FILEBUF *bf, offs offset, char *c);
+offs  FUtfCharAt_nocheck(FILEBUF *bf, offs offset, utfchar *uc);
 
 FILEBUF *cbfp=NULL;
 int clen_error=0;
@@ -83,7 +85,6 @@ offs   FLineBegin(FILEBUF *fp,offs ptr);
 offs   PrevLine(offs ptr);
 offs   FPrevLine(FILEBUF *fp,offs ptr);
 offs   LineEnd(offs ptr);
-offs    FSize();
 
 void FindLineCol(TextPoint *tp);
 
@@ -242,7 +243,7 @@ extern int hmstart;
 extern int hmnum;
 extern BMARK hmark[];
 
-int show_info(int n)
+int show_info(num n)
 {
  char s[2048];
  char s1[256];
@@ -429,7 +430,7 @@ int is_utf_accent(FILEBUF *fp, offs o)
 
 int utf8charlen_nocheck(int ch)
 {
- if(ch<129) return 1;
+ if(ch<0xC0) return 1;
  if(ch<0xE0) return 2;
  if(ch<0xF0) return 3;
  return 4;
@@ -557,18 +558,20 @@ int DiffColumns(FILEBUF *fp, offs start_col,offs col_offs,char *from)
  return(col);
 }
 
-#if	1
+// DiffColumn depends on the display driver, 
+// each character can have different display lentgh
 int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
 {
  int col = 0;
  offs o=*dbo;
- if(col_offs>FSize(fp)) col_offs=FSize(fp);
+ offs file_size=FSize(fp);
+ if(col_offs>file_size) col_offs=file_size;
  if(fp->b_lang==0 && !utf8_error()){
 //  MESG("diffcol: from %ld to %ld",o,col_offs);
   while (o < col_offs) {
 	int c;
 	utfchar uc;
-	o = FUtfCharAt(fp,o,&uc);
+	o = FUtfCharAt_nocheck(fp,o,&uc);
  	c=uc.uval[0];
 	if (c == CHR_TAB) {
 		col=next_tab(col);
@@ -597,39 +600,7 @@ int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
  *dbo=o;
  return(col);
 }
-#else
-int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
-{
- int col = 0;
- offs o=*dbo;
- // if((*dbo % 4)!=0) MESG("DiffColumns[%s] %ld %d ERROR!!!!",from,*dbo,*dbo%4);
- if(fp->b_lang==0 && !utf8_error()){
-//  MESG("diffcol: from %ld to %ld",o,col_offs);
-  while (o < col_offs && !FEofAt(fp,o)) {
-	o = check_next_char(fp,o,&col);
-	if(clen_error) {
-		set_utf8_error(1);
-		int c=DiffColumns(fp,*dbo,col_offs,"DiffColumn");
-		set_utf8_error(0);
-		return c;
-	};
-  };
- } else {
-  while (o < col_offs && !FEofAt(fp,o)) {
-	int c;
-	c=FCharAt(fp,o);
-	if (c == CHR_TAB) {
-		col=next_tab(col);
-	} else {
-		col ++;
-	};
-	o++;
-  }
- };
- *dbo=o;
- return(col);
-}
-#endif
+
 
 #if	0
 #include "findlinecol0.c"
@@ -1029,7 +1000,7 @@ int clipboard_copy(ClipBoard *clip)
 		return(TRUE);
 	} else
 #endif
-	if(cwp->selection == REGION_COLM)
+	if(cwp->selection == REGION_COLUMN)
    {
       clip->rect=TRUE;
 
@@ -1081,7 +1052,7 @@ int clipboard_copy(ClipBoard *clip)
 		  	if(c<col1) k-=(col1-c);
 		  	if(k>(clip->width-i)) k=(clip->width-i);
 		  	i+=k;
-		  	while(k-->0)  *text_ptr++=' ';
+		  	while(k-- >0)  *text_ptr++=' ';
 		  	c=c1;
 		  	continue;
 	       } else {;
@@ -1221,18 +1192,18 @@ void check_line_mode(FILEBUF *bf)
 		bf->EolSize=2;
 		strlcpy(bf->EolStr,"\r\n",3);
 		bf->b_mode |= EMDOS;
-		// MESG("	dos mode");
+		// MESG(";[%10s] check_line_mode: dos mode",bf->b_fname);
 		textpoint_OrFlags(bf,COLUNDEFINED|LINEUNDEFINED);
       } else  
 	  if(MacLastLine>0){
 		bf->EolSize=1;
 		strlcpy(bf->EolStr,"\r",3);
 		bf->b_mode |= EMMAC;
-		// MESG("	mac mode");
+		// MESG(";[%10s] check_line_mode: mac mode",bf->b_fname);
 		textpoint_OrFlags(bf,COLUNDEFINED|LINEUNDEFINED);
 	  } else
 	  {
-		// MESG("	unix mode");
+		// MESG(";[%10s] check_line_mode: unix mode",bf->b_fname);
 		bf->b_mode |= EMUNIX;
       };
 }
@@ -1361,6 +1332,20 @@ offs  FUtfCharAt(FILEBUF *bf, offs offset, utfchar *uc)
 	memset(uc->uval,0,8);
 	for(i=0;i<ulen;i++){
 			uc->uval[i]=FCharAt(bf,o+i);
+	};
+	return o+ulen;
+}
+
+offs  FUtfCharAt_nocheck(FILEBUF *bf, offs offset, utfchar *uc)
+{
+ int i,ulen;
+ offs o=offset;
+	// ulen=FUtfCharLen(bf,o);
+	char ch=FCharAt_NoCheck(bf,o);
+	ulen = utf8charlen_nocheck(ch);
+	memset(uc->uval,0,8);
+	for(i=0;i<ulen;i++){
+			uc->uval[i]=FCharAt_NoCheck(bf,o+i);
 	};
 	return o+ulen;
 }
@@ -1791,11 +1776,11 @@ off_t  GetDevSize(int fd)
 
 void update_lines(FILEBUF *bp)
 {
-//  num old_lines=bp->lines;
 	textpoint_set(bp->tp_text_o,FSize(bp));
+	// MESG_time("update_lines:1 %ld %ld",tp_line(bp->tp_text_o),bp->maxlinelen);
 	textpoint_set(bp->tp_text_end,FSize(bp));
 	bp->lines=tp_line(bp->tp_text_end)+1;
-	// MESG("update_lines: old=%ld new=%ld s=%ld",old_lines,bp->lines,FSize(bp));
+	// MESG("update_lines: lines=%ld size=%ld",bp->lines,FSize(bp));
 }
 
 num get_lines(FILEBUF *bp)
@@ -1876,12 +1861,12 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	};
    status=stat(name,&st);
    // MESG("ifile0: [%s] dir=[%s] name=[%s] status=%d ir_flag=%d",bf->b_fname,bf->b_dname,name,status,ir_flag);
+	MESG_time_start("ifile0: %s",bf->b_fname);
    if(status==-1 && errno==ENOENT)
    {
 	if(name[0]!=CHR_LBRA)	msg_line("New file \"%s\"",name);
 	return(false);
    } ;
-	// MESG("ifile0: 0 name=%s",name);
    if(!CheckMode(st.st_mode)) {
 		SYS_ERROR("[%s] not a regular file!");
 		msg_line("[%s] not a regular file!");
@@ -1893,7 +1878,6 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	if(status!=TRUE) return FALSE;
   };
    errno=0;
-	// MESG("ifile0: 1 name=%s",name);
    /* clear the 'temporarily read-only' bit */
    bf->b_state &= ~FS_VIEW;
    if(!name[0])
@@ -1902,7 +1886,6 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 		msg_line("No name for memory mapped file!");
       	return(true);
    }
-	// MESG("ifile0: 2 name=%s errno=%d",name,errno);
 
    if(errno==0) {
 		bf->FileMode=st.st_mode;
@@ -1921,7 +1904,6 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 			 bf->b_state |= FS_VIEW;
 		};
    };
-	// MESG("ifile0: 3");
 	// if(bf->b_flag & FSMMAP) MESG("ifile0: memory mapped file %s!",bf->b_fname);
 #if	0
 	if(bf->b_mode & EMCRYPT) {	/* no mmap fro encrypted files!  */
@@ -1989,10 +1971,15 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	 			return(false);
 			}
 		};
+
 	    CheckPoint(bf);
 
 		if(bf->b_mode & EMCRYPT){ // decrypt the rest of the file
+			// char *b = bf->buffer;
+			// MESG("enc: %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X",b[0],b[1],b[2],b[3],b[4],b[5],b[6],b[7],b[8],b[9],b[10],b[11],b[12],b[13],b[14],b[15],b[16],b[17],b[18],b[19],b[20],b[21],b[22],b[23],b[24],b[25],b[26],b[27],b[28],b[29]);
 			crypt_string(bf->buffer,act_read);
+			// MESG("Encrypted !!!!!!!!!!!!!!!!!!!!");
+			// MESG("enc: %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X %2X",b[0],b[1],b[2],b[3],b[4],b[5],b[6],b[7],b[8],b[9],b[10],b[11],b[12],b[13],b[14],b[15],b[16],b[17],b[18],b[19],b[20],b[21],b[22],b[23],b[24],b[25],b[26],b[27],b[28],b[29]);
 		};
 	}
 	else /* buffer_mmapped */
@@ -2031,7 +2018,6 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	check_line_mode(bf);
 
 	update_lines(bf);
-//	MESG("	lines updated!");
 	if(!(bf->b_flag & FSMMAP)) 
 		set_modified(bf);
 
@@ -2049,9 +2035,9 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	};
 
 	textpoint_set(bf->tp_current,0);	// goto the beginning
-
+	MESG_time("ifile0: end");
 	close(file);
-	if(!execmd) msg_line("%s: chars=%lld,lines=%lld type %s",bf->b_fname,FSize(bf),bf->lines,bf->hl->description);
+	if(!execmd) msg_line("%s: chars=%lld,lines=%lld type %s max line len=%ld",bf->b_fname,FSize(bf),bf->lines,bf->hl->description,bf->maxlinelen);
 	if(temp_used) {
 		// MESG("remove temporary %s",name);
 		unlink(name);
@@ -2747,13 +2733,13 @@ void   MoveLeftChar(FILEBUF *fp)
    {
 		if(fp->b_lang == 0) { /* in case of utf encoding  */
 
-			int previous_accents=0;
+			// int previous_accents=0;
 			for(i=2;i<5;i++){
 				cl=FUtfCharLen(fp,o-i);
 //				MESG("prev_char: o=%ld i=%d cl=%d accent=%d",o,i,cl,fp->utf_accent);
 				if(cl==i) {
 					if(fp->utf_accent) {
-						previous_accents++;
+						// previous_accents++;
 						clen=i;
 //						MESG("	pc: accent! clen=%d previous_accents=%d",clen,previous_accents);
 						if(clen==2) {
@@ -2794,13 +2780,13 @@ offs   FPrevUtfCharAt(FILEBUF *fp,offs o, utfchar *uc)
    {
 		if(fp->b_lang == 0) { /* in case of utf encoding  */
 
-			int previous_accents=0;
+			// int previous_accents=0;
 			for(i=2;i<5;i++){
 				cl=FUtfCharLen(fp,o-i);
 //				MESG("prev_char: o=%ld i=%d cl=%d accent=%d",o,i,cl,fp->utf_accent);
 				if(cl==i) {
 					if(fp->utf_accent) {
-						previous_accents++;
+						// previous_accents++;
 						clen=i;
 //						MESG("	pc: accent! clen=%d previous_accents=%d",clen,previous_accents);
 						if(clen==2) {
@@ -2864,7 +2850,7 @@ void   MoveRightChar(FILEBUF *fp)
 	tp_copy(fp->save_current,fp->tp_current);
 }
 
-int next_utf8_error(int n)
+int next_utf8_error(num n)
 {
  int clen=0;
  FILEBUF *fp=cbfp;
@@ -2981,7 +2967,7 @@ int   InsertBlock(FILEBUF *fp, char *block_left,offs size_left,char *block_right
    if(fp->b_flag & FSMMAP) return false;
    size=size_left+size_right;
    if(size==0) return(true);
-//	MESG("InsertBlock: pos=%ld l=%ld r=%ld",FOffset(fp),size_left,size_right);
+	// MESG("InsertBlock:%s pos=%ld l=%ld r=%ld",fp->b_fname,FOffset(fp),size_left,size_right);
    PreModify(fp);
 
    if(size_left>0) {
@@ -3022,7 +3008,6 @@ int   InsertBlock(FILEBUF *fp, char *block_left,offs size_left,char *block_right
    CalculateLineCol(fp,&num_of_lines,&num_of_columns,oldoffset,oldoffset+size_left);
    CalculateLineCol(fp,&num_of_lines,&num_of_columns,oldoffset+size_left,oldoffset+size);
 
-//   MESG("	ins: old_offset=%ld left=%ld right=%ld lines=%ld break_at=%d join_at=%d",oldoffset,size_left,size_right,num_of_lines,break_at,join_at);
    TextPoint *scan;
    for(scan=fp->tp_last; scan; scan=scan->t_next) {
 	  if(scan==fp->tp_current) {
@@ -3135,7 +3120,7 @@ int   ReplaceTextFromFile(char *file_name,FILEBUF *fp,int fd,offs size,offs *act
 {
    // buffer should be clear
    if(fp->b_flag & FSMMAP)      return false;
-//	MESG("ReplaceTextFromFile:[%s] size=%ld ptr1=%ld ptr2=%ld",fp->b_fname,size,fp->ptr1,fp->ptr2);
+	// MESG("ReplaceTextFromFile:[%s] size=%ld ptr1=%ld ptr2=%ld",fp->b_fname,size,fp->ptr1,fp->ptr2);
    if(size==0) {
       *act_read=0;
       return(true);
@@ -3154,7 +3139,7 @@ int   ReplaceTextFromFile(char *file_name,FILEBUF *fp,int fd,offs size,offs *act
    fp->ptr1+=*act_read;
    fp->GapSize-=*act_read;
 //	MESG("	ptr1=%ld ptr2=%ld gap=%ld",fp->ptr1,fp->ptr2,fp->GapSize);
-   update_lines(fp);
+	if(!(fp->b_mode & EMCRYPT)) update_lines(fp);
    return(true);
 }
 
@@ -3187,7 +3172,7 @@ int   GetBlock(FILEBUF *fp,char *copy,offs from,offs size)
 
 // show as Unix or DOS or HEX
 // operates on cbfp
-int set_view_mode(int n)
+int set_view_mode(num n)
 {
 	FILEBUF *fp=cbfp;
 	offs offset=FOffset(fp);
@@ -3340,7 +3325,7 @@ int set_view_mode(int n)
 }
 
 // operates on cbfp
-int set_doc_lang(int n)
+int set_doc_lang(num n)
 {
  if(n<1 || n>20) n=1;
  cbfp->b_lang = n-1;
@@ -3349,7 +3334,7 @@ int set_doc_lang(int n)
  return OK_CLRSL;
 }
 
-int set_default_local(int n)
+int set_default_local(num n)
 {
  if(n<1 || n>20) n=1;
  default_local_codepage = n-1;
@@ -3645,6 +3630,46 @@ int   DeleteBlock(offs left,offs right)
    return(true);
 }
 
+offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
+{
+ utfchar uc;
+ num col=0;;
+ num file_size=FSize(fp);
+
+ if(fp->EolSize>1) {
+	char c0=fp->EolStr[0];
+	char c1=fp->EolStr[1];
+	while((ptr=FUtfCharAt_nocheck(fp,ptr,&uc)) < file_size){
+		if(uc.uval[0]==c0) {
+			if(FCharAt_NoCheck(fp,ptr)==c1) {
+				ptr++;
+			} else continue; 
+			if(col>fp->maxlinelen) { fp->maxlinelen=col;*display_size=col;};
+			// MESG("Line_size:2 %ld",*display_size);
+			return ptr;
+		};
+		if(uc.uval[0]==CHR_TAB) col=next_tab(col);
+		else col+=get_utf_length(&uc);
+	}
+ } else{
+ 	char c0=fp->EolStr[0];
+	while(ptr <= file_size)
+	{
+		ptr=FUtfCharAt_nocheck(fp,ptr,&uc);
+		if(uc.uval[0]==c0) {
+			if(col>fp->maxlinelen) { fp->maxlinelen=col;*display_size=col;};
+			// MESG("Line_size:1 %ld",*display_size);
+			return ptr;
+		};
+		if(uc.uval[0]==CHR_TAB) col=next_tab(col);
+		else col+=get_utf_length(&uc);
+	};
+ };
+ // last line with no new line at the end
+ if(col>fp->maxlinelen) { fp->maxlinelen=col;*display_size=col;};
+ // MESG("Line_size:0 %ld",*display_size);
+ return ptr;
+}
 
 offs   FNextLine(FILEBUF *fp,offs ptr)
 {
@@ -3755,7 +3780,7 @@ void  EmptyText(FILEBUF *bp)
    bp->lines=0;
    bp->EolSize=1;
    bp->b_state &= ~(FS_CHG);
-	
+   bp->maxlinelen=0;
    strlcpy(bp->EolStr,"\n",3);
    if(bp->tok_table!=NULL){
 	empty_tok_table(bp);
@@ -3788,7 +3813,7 @@ offs get_text_offs(FILEBUF *bf,char *buf, offs o, offs size)
 }
 
 /* operates on cbfp,cwp */
-int undo(int n)
+int undo(num n)
 {
 //	if(cwp->w_fp->b_flag & FSDIRED) return 0;
 
@@ -3818,7 +3843,7 @@ char *get_line_at(FILEBUF *fb,offs offset)
 }
 
 /* operates on cbfp,cwp */
-int redo(int n)
+int redo(num n)
 {
 	while(n--) {
 		RedoGroup(cbfp->main_undo);

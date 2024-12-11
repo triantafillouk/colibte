@@ -42,7 +42,7 @@ void vtinit(int argc, char **argv)
  * Split the current window horizontally
  * Bound to "C-X 2". 
  */
-int split_window(int n)
+int split_window(num n)
 {
  GWINDP *gwnew;	// new window
  WINDP *wpnew;
@@ -70,7 +70,7 @@ int split_window(int n)
  * Split the current window vertically
  * Bound to "C-X 3". 
  */
-int vsplit_window(int n)
+int vsplit_window(num n)
 {
  GWINDP *gwnew;	// new window
  WINDP *wpnew;
@@ -97,7 +97,7 @@ if(!drv_initialized) return 0;
  * Delete the current window, rearange screen space
  * Bound to ^X0.
  */
-int delete_window(int n)
+int delete_window(num n)
 {	/* new gtk version! */
 	WINDP *new_wp;	/* window to go and receive deleted space */
 	WINDP *to_delete=cwp;
@@ -139,34 +139,34 @@ void list_dir1(char *st)
 }
 
 /* resize rows. Dummy for gtk */
-int window_row_resize(int n)
+int window_row_resize(num n)
 {
 	return FALSE;
 }
 
 /* resize columns. Dummy for gtk */
-int window_column_resize(int n)
+int window_column_resize(num n)
 {
 	return FALSE;
 }
 
 
-int window_row_increase(int n)
+int window_row_increase(num n)
 {
 	return FALSE;
 }
 
-int window_column_increase(int n)
+int window_column_increase(num n)
 {
 	return FALSE;
 }
 
-int window_row_decrease(int n)
+int window_row_decrease(num n)
 {
 	return FALSE;
 }
 
-int window_column_decrease(int n)
+int window_column_decrease(num n)
 {
 	return FALSE;
 }
@@ -183,7 +183,7 @@ void movecursor(int row, int col)
 	drv_move(row+(cwp->w_fp->b_header!=NULL),col);
 }
 
-int mouse_move(int n)
+int mouse_move(num n)
 {
 	return true;
 }
@@ -196,7 +196,7 @@ void clear_message_line()
 	} else app_error--;
 }
 
-int describe_key(int n)	/* describe the command for a certain key */
+int describe_key(num n)	/* describe the command for a certain key */
 {
 	/* prompt the user to type us a key to describe */
 	msg_line(": describe-key ");
@@ -208,7 +208,7 @@ int describe_key(int n)	/* describe the command for a certain key */
  * Quote the next character, and insert it into the buffer. All the characters
  * are taken literally. Bound to "^Q"
  */
-int quote(int n)
+int quote(num n)
 {
 	if(dont_edit()) return FALSE;
 //	MESG("quote: n=%d nnarg=%d",n,nnarg);
@@ -225,7 +225,7 @@ int quote(int n)
 
 extern GtkWidget *parent;
 
-int show_version(int n)
+int show_version(num n)
 {
  char version_str[64];
  int res;
