@@ -1128,6 +1128,8 @@ int reload_file(num n)
    return(file_read(fp, fp->b_fname));
 }
 
+int insert_text_file_as_column(char *filnam);
+
 /* Insert a file into current position.  */
 int insert_file(num  n)
 {
@@ -1139,7 +1141,11 @@ int insert_file(num  n)
 	fname[0]=0;
     if (nextarg("Insert file: ", fname, MAXFLEN,true) != TRUE)
                 return(FALSE);
-	stat=ifile(fp,fname,1);
+	if(cwp->selection==REGION_COLUMN){
+		stat=insert_text_file_as_column(fname);
+	} else { 
+		stat=ifile(fp,fname,1);
+	};
 	set_update(cwp,UPD_WINDOW);
     return(stat);
 }

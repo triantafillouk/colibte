@@ -125,7 +125,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 			} else {
 				set_selection(false);
 			};
-			if(wp->selection==REGION_COLM){
+			if(wp->selection==REGION_COLUMN){
 				if(s1<cur_lend && s2>tp_offs) set_selection(true);
 				if(((wp->vtcol-wp->w_infocol) < col0) || ((wp->vtcol - wp->w_infocol) >= col1)) set_selection(false);
 			};

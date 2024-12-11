@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.59T94 (9/12/2024)"
+#define VERSION 	"#01.59T95 (11/12/2024)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -856,7 +856,7 @@ struct kdirent {
 #define REGION_NONE		0
 #define REGION_CHAR		1
 #define REGION_LINE		2
-#define	REGION_COLM		3
+#define	REGION_COLUMN	3
 
 /* bom types */
 #define	FTYPE_ENCRYPTED	1

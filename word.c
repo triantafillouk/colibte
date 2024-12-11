@@ -558,7 +558,7 @@ int insert_tab(num n)
 	return remove_tab(-n);
  } else {
  	if(cwp->selection) {
-		if( cwp->selection == REGION_COLM) {
+		if( cwp->selection == REGION_COLUMN) {
 #if	0
 				int ispaces = tabsize-tp_col(cbfp->tp_current)%(tabsize);
 				insert_chr(ispaces, CHR_SPACE);

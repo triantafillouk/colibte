@@ -735,8 +735,8 @@ int insert_text_file_as_column(char *filnam)
 	offs o1=Offset();	/* original offset  */
 	FILEBUF *ori_buf = cbfp;
 
-	// MESG("#ext_system_paste_column:---------------");
 	const num start_column=tp_col(cbfp->tp_current);
+	// MESG("#insert_text_file_as_column: position %ld ---------------",start_column);
 
 	char *pad_space = (char *)malloc(start_column+1);
 	if(pad_space==NULL) return false;
@@ -838,7 +838,7 @@ int ext_system_paste()
 	status = system(exec_st);
 	if(status==0) {
 
-		if(cwp->selection) {	/* Column past  */
+		if(cwp->selection==REGION_COLUMN) {	/* Column past  */
 			status=insert_text_file_as_column(filnam);
 		} else {	/* Normal paste  */
 			status=insert_text_file(filnam);

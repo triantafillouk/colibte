@@ -1000,7 +1000,7 @@ int clipboard_copy(ClipBoard *clip)
 		return(TRUE);
 	} else
 #endif
-	if(cwp->selection == REGION_COLM)
+	if(cwp->selection == REGION_COLUMN)
    {
       clip->rect=TRUE;
 

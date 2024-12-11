@@ -831,7 +831,7 @@ int execute(int c, int  n)
     if ((c>=0x20 && c<=0xFF )) {	/* Self inserting.      */
 		if ( cbfp->b_flag & FSMMAP) return FALSE;
         status = insert_chr(n, c);
-		if(gmode_over && cwp->selection!=REGION_COLM && !Eol()) status = del_char(n);
+		if(gmode_over && cwp->selection!=REGION_COLUMN && !Eol()) status = del_char(n);
         if(status) return (OK_CLRSL);
 		else return FALSE;
 	}

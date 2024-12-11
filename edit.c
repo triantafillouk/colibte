@@ -1171,7 +1171,7 @@ int set_line_mark(num n)
 /* assigned to alt-c */
 int set_column_mark(num n)	
 {
-	return(setmark(REGION_COLM));
+	return(setmark(REGION_COLUMN));
 }
 
 /* set/clear mark region */
@@ -1818,7 +1818,7 @@ int insert_chr(int n,int c)
 	memset(s,c,n);
 	s[n]=0;
  };
- if(cwp->selection == REGION_COLM){
+ if(cwp->selection == REGION_COLUMN){
 	// from first line of selection to last line of selection
 	num s1,s2,s_temp;
 	int ccol0=GetCol();
@@ -1973,7 +1973,7 @@ int back_delete(long n)
  check_update_highlight(0);
  // MESG("back_delete: lines=%ld",oldlines);
  cbfp->line_from = GetLine();
- if(cwp->selection == REGION_COLM)
+ if(cwp->selection == REGION_COLUMN)
  {
 	// from first line of selection to last line of selection
 	num s1,s2,s_temp;
@@ -2216,7 +2216,7 @@ int cut_region(num flag)
 		clipboard_copy(MainClipBoard);
 		export_region(MainClipBoard);
 	};
-	if(cwp->selection == REGION_COLM) return(delete_box(flag));
+	if(cwp->selection == REGION_COLUMN) return(delete_box(flag));
 
 	if(flag) setmark(0);
 
@@ -2255,7 +2255,7 @@ int delete_region()
 		textpoint_set(cwp->tp_current,so);
 	};
 
-	if(cwp->selection == REGION_COLM) return(delete_box(0));
+	if(cwp->selection == REGION_COLUMN) return(delete_box(0));
  	check_update_highlight(0);
 	if(DeleteBlock(0,len)) {
 		if(!check_update_highlight(2)) {

@@ -1125,7 +1125,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 		ptr2=s1;
 		s1=s2;s2=ptr2;
 	};
-	if(wp->selection==REGION_COLM) {
+	if(wp->selection==REGION_COLUMN) {
 		ptr2=ptr1;
 		col0=FColumn(wp->w_fp,tp_offset(wp->w_smark)-wp->w_lcol);
 		col1=FColumn(wp->w_fp,tp_offset(wp->w_emark)-wp->w_lcol);
@@ -1235,7 +1235,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 			} else {
 				set_selection(false);
 			};
-			if(wp->selection==REGION_COLM){
+			if(wp->selection==REGION_COLUMN){
 				if(s1<cur_lend && s2>tp_offs) set_selection(true);
 				if(((wp->vtcol-wp->w_infocol) < col0) || ((wp->vtcol - wp->w_infocol) >= col1)) set_selection(false);
 			};
@@ -1626,7 +1626,7 @@ void vteeol(WINDP *wp, int selected,int inside)
 #else
 	blank=CHR_SPACE;
 #endif
-	if(inside && wp->selection==REGION_COLM) {
+	if(inside && wp->selection==REGION_COLUMN) {
 		if(wp->vtcol<col0) {
 			 svmchar(vp->v_text+wp->vtcol,blank,ctl_b,ctl_f,col0 - wp->vtcol);
 			 svmchar(vp->v_text+col0,blank,COLOR_SELECT_BG,wp->w_fcolor,col1-col0+1);
