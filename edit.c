@@ -1882,10 +1882,10 @@ int insert_chr(int n,int c)
 /* insert string */
 int insert_string(FILEBUF *fp,char *c,int size)
 {
- check_update_highlight(0);
+ // check_update_highlight(0);
  if(!InsertBlock(fp,c,size,0,0)) return false;
  textpoint_move(fp->tp_current,size);
- check_update_highlight(2);
+ // check_update_highlight(2);
  // set_update(cwp,UPD_EDIT);
  set_modified(fp);
  return TRUE;
@@ -1899,34 +1899,6 @@ int insert_string_nl(FILEBUF *fp,char *str)
 	if(!insert_newline(fp)) return (FALSE);
 	return TRUE;
 }
-
-#if	NUSE
-/* Insert a string at column position */
-int insert_string_col(FILEBUF *fp,char *str,int col)
-{
-	int len=strlen(str);
-	if(col<0) {
-		ToLineEnd();
-	} else {
-		int i;
-		ToLineBegin();
-		for(i=0;i<col;i++) {
-			if(Eol()) { 
-			// insert space
-				insert_string(fp," ",1);
-			} else {
-				MoveRightChar(fp);
-			};
-		};
-	};
-	insert_string(fp,str,len);
-	if(FEof(fp)) insert_newline(fp);
-	else
-	if(col<0) insert_newline(fp);
-	set_update(cwp,UPD_EDIT);
-	return true;
-}
-#endif
 
 /* Insert a newline  at the current location  */
 int insert_newline(FILEBUF *fp)

@@ -386,6 +386,7 @@ int bg_cmd(num n)
 {
  char line[MAXLLEN];
  char fname[MAXFLEN+1];
+ char tmp_name[MAXFLEN];
  register int    s;
  unsigned int i;
  int stat;
@@ -394,6 +395,7 @@ int bg_cmd(num n)
 	if ((s=nextarg("&", line, MAXLLEN,true)) != TRUE) 	return(s);
 	/* replace %f with the current file name */
 	/* for now this has to be at the end of the line */
+	
 	if(cbfp->b_flag & FSDIRED) {
 		s = dir_getfile(fname,1);
 	} else {
@@ -409,8 +411,11 @@ int bg_cmd(num n)
 				strlcat(line,fname,MAXLLEN);
 			}
 		};
-	}
-	strlcat(line,"&",MAXLLEN);
+	};
+	stat = set_unique_tmp_file(tmp_name,"bf_cmd",MAXFLEN);
+	strlcat(line," > ",MAXLLEN);strlcat(line,tmp_name,MAXLLEN);
+	strlcat(line," 2> ",MAXLLEN);strlcat(line,tmp_name,MAXLLEN);
+	strlcat(line,".out &",MAXLLEN);
 	sysexec(line);
 	set_update(cwp,UPD_MOVE);
     return (TRUE);
@@ -700,7 +705,7 @@ char *ext_system_paste_line()
 
 	if(!x11_display_ok) return "";
 	if(dont_edit() || cbfp->b_flag & FSDIRED )return false;
-	status = set_unique_tmp_file(filnam,"command",MAXFLEN);
+	status = set_unique_tmp_file(filnam,"paste",MAXFLEN);
 	if(status>=MAXFLEN) return "";
 	status=snprintf(exec_st,MAXFLEN,"%s > %s 2> /dev/null",clip_copy,filnam);
 	if(status>=MAXFLEN) return "";
@@ -749,6 +754,7 @@ int insert_text_file_as_column(char *filnam)
 	// set_Offset(FSize(tmp_bp));
 
 	const num max_len = tmp_bp->maxlinelen;
+	const num max_insert = max_len*tmp_bp->lines;
 
 	char *ml = malloc(max_len+2);
 	if(ml==NULL) {
@@ -848,7 +854,7 @@ int ext_system_paste()
 		setmark(0);
 		return status;
 	};
-	msg_line("cannot insert system clipboard!");
+	error_line("cannot insert system clipboard!");
 	return 0;
 }
 

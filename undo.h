@@ -26,17 +26,16 @@ typedef struct UNDOS {
 	undo_Change *chain_head;
 	undo_Change *chain_ptr;
 	undo_Change *chain_tail;
+	offs head_position;
+	offs max_size;
+	time_t last_change_time;
 	int group_open;
 	unsigned current_group;
-	offs head_position;
 	int locked;
 	int enabled;
-   time_t last_change_time;
-
-   int glue_changes;
-   int glue_max_time;
-   offs max_size;
-   int min_groups;
+	int glue_changes;
+	int glue_max_time;
+	int min_groups;
 } UNDOS;
 
 

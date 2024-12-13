@@ -187,7 +187,7 @@ void init_names()
  } else { /* Not a . dir in user's home dir, create it. */
  	// create dir
 	if(mkdir(home_dir,S_IRWXU)) {
-		SYS_ERROR("cannot create .%s dir in home dir",APPLICATION_NAME);
+		error_line("cannot create .%s dir in home dir",APPLICATION_NAME);
 	} else {
 		MESG("created .%s dir in home dir",APPLICATION_NAME);
 	};
@@ -1039,7 +1039,7 @@ int exec_shell(char *tline);
 // external execution of a file
 int exec_ext(char *fname,char *fname_ns,int f_vx)
 {
-	char wd[MAXFLEN];
+	char tmp_name[MAXFLEN];
 	char cmd[MAXLLEN];
 	char *cmd_ext=NULL;
 	int status=0;
@@ -1074,9 +1074,9 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 
 	if(s1<1) { // no extension found (0 is none!)
 		if(f_vx==FILE_EXEC) { // execute in background
-			if(fname[0]!='/') strlcpy(wd,"./",MAXLLEN);else wd[0]=0;
-			strlcat(wd,fname,MAXLLEN);
-			exec_shell(wd);
+			if(fname[0]!='/') strlcpy(tmp_name,"./",MAXLLEN);else tmp_name[0]=0;
+			strlcat(tmp_name,fname,MAXLLEN);
+			exec_shell(tmp_name);
 			return true;
 		} else {
 			// MESG("exec_ext: 2");
@@ -1109,8 +1109,9 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 	};
 
 	if(inview) {
+		// sstat=set_unique_tmp_file(tmp_name,"exec",MAXFLEN);
 		cmd_ext=strdup(cmd);
-		sstat=snprintf(cmd,MAXLLEN,"%s %s > /tmp/exec 2>/tmp/err",cmd_ext,fname);
+		sstat=snprintf(cmd,MAXLLEN,"%s %s > /tmp/exec 2>/dev/null",cmd_ext,fname);
 		free(cmd_ext);
 		if(sstat>=MAXLLEN) { return error_line("command 9 truncated!");};
 		sstat=snprintf(fname,MAXFLEN,"/tmp/exec");
@@ -1118,30 +1119,30 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 		if(system(cmd)== -1) {
 			return error_line("Error return from '%s %s'",cmd,fname);
 		}
-		strlcpy(wd,"/tmp",MAXFLEN);
+		strlcpy(tmp_name,"/tmp",MAXFLEN);
 		// MESG("exec_ext: 4 inview: %s",fname);
 		view_file(fname);
 		return true;
 	};
 	if(is_compressed) {
 		char cmd2[MAXLLEN];
-		sstat=set_unique_tmp_file(wd,fname,MAXFLEN);
+		sstat=set_unique_tmp_file(tmp_name,fname,MAXFLEN);
 		if(!sstat) return false;
 		/* This is a compressed file. Uncompress to a temporary first */
-		sstat=snprintf(cmd2,MAXLLEN,"gzcat %s > %s 2>/tmp/err",fname,wd);
+		sstat=snprintf(cmd2,MAXLLEN,"gzcat %s > %s 2>/dev/null",fname,tmp_name);
 		// MESG("exec_ext: uncompress command $s",cmd2);
 		if(sstat<MAXLLEN) {
 			if(system(cmd2)) { return error_line("cannot decompress file");};
 		} else { return error_line("truncated, cannot sysexec");};
 		sync();
-		// sstat=snprintf(wd,MAXFLEN,"%s",tmp_name);
+		// sstat=snprintf(tmp_name,MAXFLEN,"%s",tmp_name);
 		// if(sstat>=MAXFLEN) { return error_line("command 11 truncated!");};
-		sstat=snprintf(cmd2,MAXLLEN,"%s \"%s\" >/dev/null 2>/dev/null &",cmd,wd);
+		sstat=snprintf(cmd2,MAXLLEN,"%s \"%s\" >/dev/null 2>/dev/null &",cmd,tmp_name);
 		// MESG("exec_ext: exec command $s",cmd2);
 		if(sstat<MAXLLEN) status = sysexec(cmd2);
 		else { return error_line("truncated, cannot sysexec");};
 	} else {
-		s=getcwd(wd,MAXFLEN);
+		s=getcwd(tmp_name,MAXFLEN);
 	};
 
 // execute the command with the file name as argument
@@ -1150,7 +1151,7 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 
 	if(!strncmp("/mnt/",cmd_ext+web_view,5)) {
 		char ms_fname[MAXLLEN];
-		sstat=snprintf(ms_fname,MAXLLEN,"%s/%s",wd,fname_ns);
+		sstat=snprintf(ms_fname,MAXLLEN,"%s/%s",tmp_name,fname_ns);
 		if(sstat>=MAXLLEN-1) {
 			return error_line("error return from %s",ms_fname);
 		};
@@ -1168,18 +1169,18 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 			err=1;
 		};
 	} else {
-		if(web_view) sstat=snprintf(cmd,MAXLLEN,"%s \"file://%s/%s\" >/dev/null  2>/dev/null &",cmd_ext+web_view,wd,fname_ns);
+		if(web_view) sstat=snprintf(cmd,MAXLLEN,"%s \"file://%s/%s\" >/dev/null  2>/dev/null &",cmd_ext+web_view,tmp_name,fname_ns);
 		else {
 			if(f_vx==FILE_EXEC) { 
-			wd[0]=0;
-			strlcat(wd,cmd_ext,MAXLLEN);
-			strlcat(wd," ",MAXLLEN);
-			strlcat(wd,fname,MAXLLEN);
-			// MESG("use exec_shell [%s]",wd);
-			exec_shell(wd);
+			tmp_name[0]=0;
+			strlcat(tmp_name,cmd_ext,MAXLLEN);
+			strlcat(tmp_name," ",MAXLLEN);
+			strlcat(tmp_name,fname,MAXLLEN);
+			// MESG("use exec_shell [%s]",tmp_name);
+			exec_shell(tmp_name);
 			return true;
 			};
-			sstat=snprintf(cmd,MAXLLEN,"%s \"%s/%s\" >/dev/null  2>/dev/null &",cmd_ext,wd,fname_ns);
+			sstat=snprintf(cmd,MAXLLEN,"%s \"%s/%s\" >/dev/null  2>/dev/null &",cmd_ext,tmp_name,fname_ns);
 		};
 //		MESG("exec:2 [%s]",cmd);
 	};
@@ -1191,7 +1192,7 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 	// MESG("Execute: [%s]",cmd);
 	if(sstat<MAXLLEN) status=sysexec(cmd);
 	else { MESG("command truncated,cannot execute!");return FALSE;};
-	if(is_compressed) unlink(wd);	/* remove temporary file  */
+	if(is_compressed) unlink(tmp_name);	/* remove temporary file  */
 	if(status>0) return FALSE;
 	else return TRUE;
 }
@@ -1674,7 +1675,8 @@ int dir_getfile(char *fname,int flag)
 
  // MESG("dir_getfile: b_flag=%X [%s]",cbfp->b_flag,line_str);  
  c=line_str[0];
- if(c=='c') { SYS_ERROR("cannot view c type files");return -1;};
+ if(c=='c') { error_line("cannot view c type files");return -1;};
+ if(c=='s') { error_line("cannot view socket files");return -1;};
  if(c=='#' ||c=='!'||c=='/') ftype=FTYPE_DIR;else ftype=FTYPE_NORMAL;
  c=line_str[1];
  if(c=='l') is_link=1;
