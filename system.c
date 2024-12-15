@@ -734,6 +734,10 @@ char *ext_system_paste_line()
 }    
 
 int utf8charlen_nocheck(int ch);
+void undo_set_lock(FILEBUF *fp);
+void undo_clear_lock(FILEBUF *fp);
+
+#define	TEST1	1
 
 int insert_text_file_as_column(char *filnam)
 {
@@ -742,10 +746,7 @@ int insert_text_file_as_column(char *filnam)
 
 	const num start_column=tp_col(cbfp->tp_current);
 	// MESG("#insert_text_file_as_column: position %ld ---------------",start_column);
-
-	char *pad_space = (char *)malloc(start_column+1);
-	if(pad_space==NULL) return false;
-	memset(pad_space,' ',start_column+1);
+	
 
 	FILEBUF *tmp_bp = new_filebuf(filnam,0);
 	if(tmp_bp==NULL) return false;
@@ -754,27 +755,47 @@ int insert_text_file_as_column(char *filnam)
 	// set_Offset(FSize(tmp_bp));
 
 	const num max_len = tmp_bp->maxlinelen;
-	const num max_insert = max_len*tmp_bp->lines;
 
+#if	TEST1
+	char *pad_space = (char *)malloc(start_column+max_len+2);
+	if(pad_space==NULL) { delete_filebuf(tmp_bp,1); return false;};
+	// memset(pad_space,' ',start_column+max_len+2);
+#else
+	char *pad_space = (char *)malloc(start_column+1);
+	if(pad_space==NULL) { delete_filebuf(tmp_bp,1); return false;};
+	memset(pad_space,' ',start_column+1);
 	char *ml = malloc(max_len+2);
 	if(ml==NULL) {
 		delete_filebuf(tmp_bp,1);
 		return false;
 	};
+#endif
 	// set_Offset(0);
 	num line_start=0;
 
 	select_filebuf(ori_buf);
-
+	char *ml_out;
 	while(line_start<FSize(tmp_bp)) {
 		char *line_text=get_line_at(tmp_bp,line_start);
 		int col=0, in_offset=0;;
-		char *ml_out = ml;
+#if	TEST1
+		ml_out = pad_space;
+#else
+		ml_out = ml;
+#endif
 		num line_end_column=tp_col(cbfp->tp_current);
-
+#if	TEST1
+		// memset(pad_space,'^',start_column+max_len+2);
+#else
 		memset(ml,0,max_len+1);
+#endif
 		if(line_end_column<start_column) {
+#if	TEST1
+			memset(pad_space,'#',start_column-line_end_column);
+			ml_out=pad_space+(start_column-line_end_column);
+#else
 			insert_string(cbfp,pad_space,start_column-line_end_column);
+#endif
 		};
 		// insert_string(cbfp,"|",1);
 		while(in_offset<strlen(line_text)) {
@@ -790,10 +811,20 @@ int insert_text_file_as_column(char *filnam)
 		line_start = FNextLine(tmp_bp,line_start);
 		
 		if(FEof(cbfp)) {
+#if	TEST1
+			memcpy(ml_out,cbfp->EolStr,cbfp->EolSize);
+			ml_out+=cbfp->EolSize;
+			insert_string(cbfp,pad_space,ml_out-pad_space);
+#else
 			insert_string(cbfp,ml,ml_out-ml);
 			insert_newline(cbfp);
+#endif
 		} else {
+#if	TEST1
+			insert_string(cbfp,pad_space,ml_out-pad_space);
+#else
 			insert_string(cbfp,ml,ml_out-ml);
+#endif
 			if(!next_line(1)) {
 				set_Offset(FSize(cbfp));
 				insert_newline(cbfp);
@@ -801,11 +832,14 @@ int insert_text_file_as_column(char *filnam)
 		};
 	} 
 	free(pad_space);
+#if	!TEST1
 	free(ml);
+#endif
 	delete_filebuf(tmp_bp,1);
 
 	// goto original position
 	set_Offset(o1);
+	MESG_time("paste_as_column:end");
 	return 1;
 }
 
