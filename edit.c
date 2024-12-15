@@ -2283,7 +2283,7 @@ int move_line_up(num n)
 	// MESG("move_line_up:3 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
 	
  // delete current
-	delete_region(1); setmark(0);
+	delete_region(); setmark(0);
  // go up one line and paste
 	MoveLineCol(tp_line(cwp->tp_current)-1,0);
 	paste_region(1);
@@ -2318,7 +2318,7 @@ int move_line_down(num n)
 	// MESG("move_line_down:3 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
 	
 // delete current
-	delete_region(1); setmark(0);
+	delete_region(); setmark(0);
  // go down one line and paste
 	MoveLineCol(tp_line(cwp->tp_current)+1,0);
 	paste_region(1);

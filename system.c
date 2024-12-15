@@ -791,7 +791,7 @@ int insert_text_file_as_column(char *filnam)
 #endif
 		if(line_end_column<start_column) {
 #if	TEST1
-			memset(pad_space,'#',start_column-line_end_column);
+			memset(pad_space,' ',start_column-line_end_column);
 			ml_out=pad_space+(start_column-line_end_column);
 #else
 			insert_string(cbfp,pad_space,start_column-line_end_column);
@@ -835,6 +835,7 @@ int insert_text_file_as_column(char *filnam)
 #if	!TEST1
 	free(ml);
 #endif
+	undo_set_noglue();
 	delete_filebuf(tmp_bp,1);
 
 	// goto original position
