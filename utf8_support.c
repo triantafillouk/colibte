@@ -142,7 +142,7 @@ int SUtfCharLen(char *utfstr,int offset,utfchar *uc)
 			// MESG("- s=[%s] o=%d",utfstr+o,o);
 			clen += s_is_utf_accent(utfstr,o+clen);
 		} else {
-			MESG("clen=%d",clen);
+			// MESG("clen=%d",clen);
 		};
 	return clen;
 }

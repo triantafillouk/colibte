@@ -28,7 +28,7 @@ int set_unique_tmp_file(char *str,char *name,int size)
 {
  int len;
  len=snprintf(str,size,"/tmp/%s_%ld_%ld.txt",name,start_time.tv_sec,(long)start_time.tv_usec);
- if(len>size) {MESG("tmp file %s truncated!",name);return false;};
+ if(len>size) { error_line("tmp file %s truncated!",name);return false;};
  return true;
 }
 
@@ -41,7 +41,7 @@ int sysexec(char *st)
 	if(!execmd && !macro_exec) msg_line("wait for [%s]",st);
 	events_flush();
 	if(strncmp(cbfp->b_fname,"[new",4)==0){
-		if(chdir(get_start_dir())!=0) { MESG("cannot change dir to start_dir %s",get_start_dir());};
+		if(chdir(get_start_dir())!=0) { error_line("cannot change dir to start_dir %s",get_start_dir());};
 	};
     status=system(st);
 		// 127 or -1 -> error

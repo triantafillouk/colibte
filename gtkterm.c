@@ -361,7 +361,7 @@ void titletext ()
 void drv_update_styles()
 {
  // we have to destroy old styles if they exist!
- MESG("drv_update_styles: color_scheme_ind=%d",color_scheme_ind);
+ // MESG("drv_update_styles: color_scheme_ind=%d",color_scheme_ind);
  st1a = gtk_style_new();
  st1i = gtk_style_new();
  st3a = gtk_style_new();
@@ -390,7 +390,7 @@ void drv_update_styles()
  gdk_color_parse(current_scheme->color_style[COLOR_INACTIVE_BG].color_value,&st3i->base[GTK_STATE_NORMAL]);
  gdk_color_parse(current_scheme->color_style[COLOR_INACTIVE_BG].color_value,&st3i->bg[GTK_STATE_NORMAL]);
  gdk_color_parse("green",&st3i->base[GTK_STATE_SELECTED]);
- MESG("drv_update_styles: end");
+ // MESG("drv_update_styles: end");
 }
 
 int drv_search_dialog(int f)
@@ -422,7 +422,7 @@ void window_clear(WINDP *wp)
 {
  return;
 	drv_set_default_bgcolor();
-	MESG("window_clear:%d",wp->id);
+	// MESG("window_clear:%d",wp->id);
 	if(wp!=NULL) {
 		if(wp->gwp!=NULL) {
 		if(GTK_EDIT_DISPLAY(wp->gwp->draw)->cr!=NULL) {
@@ -942,12 +942,12 @@ void scheme_names_button_change(GtkWidget *wdg, void* data)
  color_scheme_ind = active;
  change_color_scheme(color_scheme_ind+1);
  update_screen(1);
- MESG("scheme_names_button_change: 1"); 
+ // MESG("scheme_names_button_change: 1"); 
  
   for(i=0;i<CTYPE_ROWS;i++) {
 	show_color_sample(table1,i+1,"text");
   };
- MESG("scheme_names_button_change: ok!"); 
+ // MESG("scheme_names_button_change: ok!"); 
 }
 
 void connect_exit_button(GtkBox *parent_box, GCallback callback_function, void *data)
@@ -1406,7 +1406,7 @@ void color_ok_select(GtkWidget *wd, gpointer *data)
 
  change_color_scheme(color_scheme_ind+1);
  update_screen(TRUE);
- MESG("color_ok_select ->sc");
+ // MESG("color_ok_select ->sc");
  show_cursor("color_ok_select");
 
  ctext=current_color_element->sample_ctext;

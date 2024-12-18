@@ -119,7 +119,7 @@ ge_edit_display_event(GtkWidget	*widget, GdkEvent *event)
 				event_sec=now;event_usec=unow;
 				last_event=GDK_SCROLL+1;
 				if(wd->cr!=NULL) {
-					MESG("	drawing!");
+					// MESG("	drawing!");
 				}; 
 				if(lines<1) {
 					return (TRUE);

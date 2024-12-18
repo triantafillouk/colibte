@@ -287,7 +287,7 @@ int imove_top_line(num new_top_line)
  new_current_line=new_top_line+current_row;
 
  if(new_current_line>last_line) new_current_line=last_line;
- MESG("imove_top_line:to %ld",new_top_line);
+ // MESG("imove_top_line:to %ld",new_top_line);
  textpoint_set_lc(cwp->tp_hline, new_top_line,0);
  textpoint_set_lc(cwp->tp_current, new_current_line,0);
  set_update(cwp,UPD_MOVE|UPD_WINDOW);
@@ -706,7 +706,7 @@ int prev_wrap_line(num n)
 int prev_line(num n)
 {
  num current_line;
- MESG("prev_line: ------------- n=%d lock=%d",n,lock_move);
+ // MESG("prev_line: ------------- n=%d lock=%d",n,lock_move);
  int status=0;
 	if (n==0) return FALSE;
    	if (n < 0) return (next_line(-n));
@@ -738,7 +738,7 @@ int prev_line(num n)
 
 
     if(lock_move) {
-		MESG("lock_move:");
+		// MESG("lock_move:");
 #if	0
         // If at the last line of the window
 		if( current_line - tp_line(cwp->tp_hline) == cwp->w_ntrows-2-half_last_line
@@ -756,19 +756,19 @@ int prev_line(num n)
 		)
 		{
             lock_move=0;
-			MESG("prev_line lock end 1");
+			// MESG("prev_line lock end 1");
             status=prev_line(n);
             lock_move=1;
 			if(status==FALSE) return status;
         } else if(tp_line(cwp->tp_current)>0 && tp_line(cwp->tp_hline)==0) {
             lock_move=0;
-			MESG("prev_line lock start 2");
+			// MESG("prev_line lock start 2");
             status=prev_line(n);
             lock_move=1;
 			return status;		
 		} else {
             lock_move=0;
-			MESG("prev_line lock mid 3");
+			// MESG("prev_line lock mid 3");
             status=prev_line(n-1);
             lock_move=1;
 		};
@@ -1465,7 +1465,7 @@ int update_menu(num n)
 }
 
 int noop(num n){
-	MESG("No op!");
+	// MESG("No op!");
 	return true;
 };
 
@@ -2301,7 +2301,7 @@ int move_line_down(num n)
  	return false;
  };
  // mark current line
-	MESG("move_line_down:s b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	// MESG("move_line_down:s b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
 	setmark(0);
 	ToLineBegin();
 	setmark(REGION_CHAR);

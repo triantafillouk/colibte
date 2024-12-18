@@ -189,7 +189,7 @@ void init_names()
 	if(mkdir(home_dir,S_IRWXU)) {
 		error_line("cannot create .%s dir in home dir",APPLICATION_NAME);
 	} else {
-		MESG("created .%s dir in home dir",APPLICATION_NAME);
+		// MESG("created .%s dir in home dir",APPLICATION_NAME);
 	};
 	// move files from default dir here
  };
@@ -673,7 +673,7 @@ int dir_move(num n)
   };
 
   sstat=snprintf(sconfirm,MAXLLEN,"Move [%s] to: ",fname);
-  if(sstat>=MAXLLEN) MESG("truncated 8");
+  if(sstat>=MAXLLEN) { error_line("to long file name, truncated");return(false);}
   if((s1 = nextarg(sconfirm,destination,MAXFLEN,true)) !=TRUE) return(s1);
 
   escape_file_name(fname);
@@ -1191,7 +1191,7 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 	};
 	// MESG("Execute: [%s]",cmd);
 	if(sstat<MAXLLEN) status=sysexec(cmd);
-	else { MESG("command truncated,cannot execute!");return FALSE;};
+	else { error_line("command truncated,cannot execute!");return FALSE;};
 	if(is_compressed) unlink(tmp_name);	/* remove temporary file  */
 	if(status>0) return FALSE;
 	else return TRUE;
@@ -2008,7 +2008,7 @@ int insert_dir(FILEBUF *buf_dir,int retain)
  d1 = buf_dir->b_dname;
  // MESG("insert_dir:");
  alist *dir_list_str=new_list(0,"dir_as_list");
- if(buf_dir->cdir == NULL) { MESG("cdif is null");return 0;};
+ if(buf_dir->cdir == NULL) { error_line("cdif is null");return 0;};
  buf_dir->cdir->dir_name = strdup(buf_dir->b_dname);
 
 
