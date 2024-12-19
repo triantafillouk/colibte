@@ -718,10 +718,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 #else
 			if(next_token_type(bf)==TOK_MINUS) {
 				getnc1(bf,&cc,&tok_type);
-				if(start_of_line) { 
-					tok_type=TOK_COMMENT;
-					skip_2nl(bf);continue;
-				};
 				tok_type=TOK_DECREASE;
 				break;
 			};
