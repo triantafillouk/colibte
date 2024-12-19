@@ -858,7 +858,7 @@ void list_select(char *s,int dire)
  alist *hl=NULL;
  char *s1;
  int file_flag=0;
- MESG("list_select: tlist=%d",tlist);
+ // MESG("list_select: tlist=%d",tlist);
  switch(tlist) {
  case LDIR:{
  	if(is_scratch_buffer(cbfp)) {

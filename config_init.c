@@ -79,7 +79,7 @@ int save_keys()
  char key_line[MAXLLEN];
  AKEYS *key;
 
- MESG("save_keys:");
+ // MESG("save_keys:");
  fname=find_file("",APPLICATION_KEYS,0,1);
  f1=fopen(fname,"w");
  if(f1!=NULL) MESG("save_keys: to [%s]",fname);

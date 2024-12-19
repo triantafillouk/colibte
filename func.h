@@ -102,7 +102,7 @@ FUNCS	ftable[] = {
 	{"toggle_mouse",	0,	toggle_mouse,"toggle mouse integration"},
 	{"help",	0,		help,"Show help text"},
 	{"exec",	1,		shell_cmd,"Execute a shell command, show output in [command] buffer"},
-	{"bg_cmd",	1,		bg_cmd,"Execute a background command, output in /tmp/cmd### file, error in /tmp/err### file"},
+	{"bg_cmd",	1,		bg_cmd,"Execute a background command, output in /tmp/bg_cmd### file, error in /tmp/bg_cmd###.err file"},
 	{"new_shell",	0,	new_shell,"start interactive shell (xterm like)"},
 	{"rgrep_command",	1,	rgrep_cmd,"Recursive find insize current directory"},
 	{"grep_command",	1,	grep_cmd,"Gr a word and show results in a new window"},

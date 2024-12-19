@@ -354,11 +354,11 @@ int load_scratch_files()
  int ind=0;
  // MESG("load_scratch_files:");
  stat=snprintf(home_dir,MAXFLEN,"%s/.%s",getenv("HOME"),APPLICATION_NAME);
- if(stat>=MAXFLEN) MESG("truncated scratch file");
+ if(stat>=MAXFLEN) {error_line("truncated scratch file");return 0;};
 
  d1 = opendir((const char *)home_dir);
  if(d1==NULL) {
- 	MESG("cannot read home .%s dir",APPLICATION_NAME);
+ 	error_line("cannot read home .%s dir",APPLICATION_NAME);
  } else {
 	struct dirent *df1;
 	char **namelist=NULL;
@@ -377,7 +377,7 @@ int load_scratch_files()
 			set_full_name(scratch_name,home_dir,namelist[ind],MAXFLEN);
 
 			bp=new_filebuf(scratch_name,0);
-			if(bp==NULL) MESG("cannot create new scratch file!");
+			if(bp==NULL) { error_line("cannot create new scratch file!");return ind;};
 			ind++;
 		};
 	} ;
@@ -1222,7 +1222,7 @@ int open_file(num n)
 	if(!macro_exec && (xwin==2)) return(open_file_dialog(tname,n));
 
 	stat=snprintf(prompt,MAXFLEN,"Open file [%s] : ",tname);
-	if(stat>=MAXFLEN) MESG("truncated prompt when opening file!");
+	if(stat>=MAXFLEN) { error_line("truncated prompt when opening file!");return false;};
 	// MESG("	get the file name from nextarg!");
     if (nextarg(prompt, tname, MAXFLEN,true) != TRUE){
 		set_Offset(o1);
@@ -1271,7 +1271,7 @@ int clear_buffer(num n)
 		bp=cls_fout(fname);
 		return(true);
 	} else {
-		MESG("buffer %s not opened!",fname);
+		error_line("buffer %s not opened!",fname);
 	};	
 	return false;
 }
@@ -1687,9 +1687,24 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 	// MESG("init_ftype: check tc %d b_type=%d [%s] [%s] oext=[%s]",tc,bp->b_type,hts[FX_COMPRESS].file_extentions[tc],uncompress_command[tc],oext);
 	// MESG("init_file: view_mode=%d",bp->view_mode);
 	if(tc) {
-			snprintf(cmd,MAXLLEN,"%s %s > /tmp/uncompressed 2>/tmp/err",uncompress_command[tc],fname);
-			if(system(cmd)) strlcpy(fname,"/tmp/err",MAXFLEN);
-			else  strlcpy(fname,"/tmp/uncompressed",MAXFLEN);
+		char tmp_name[MAXFLEN];
+		int status = set_unique_tmp_file(tmp_name,"compressed",MAXFLEN);
+			status=snprintf(cmd,MAXLLEN,"%s %s > %s.out 2> %s.err",uncompress_command[tc],fname,tmp_name,tmp_name);
+			if(status>MAXLLEN) { error_line("uncompress command truncated!");return false;};
+			// MESG("uncompress:[%s]",cmd);
+			status=system(cmd);
+			strlcpy(fname,tmp_name,MAXFLEN);
+			strlcat(tmp_name,".err",MAXFLEN);
+			if(status) {
+				strlcat(fname,".out",MAXFLEN);
+				msg_line("cannot open compressed file!");
+				unlink(fname);
+				unlink(tmp_name);
+				return(false);
+			} else  {
+				strlcat(fname,".out",MAXFLEN);
+				unlink(tmp_name);
+			};
 			*temp_used=tc;
 	};
 

@@ -25,7 +25,7 @@ int comment_none(int n);
 int comment_basic(int n);
 int comment_sql(int n);
 int comment_lua();
-int comment_ini();
+int comment_ini(int n);
 
 /* character states */
 #if	1

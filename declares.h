@@ -523,9 +523,6 @@ void reset_region_textpoints();
 int delete_region();
 int abort_cmd(num n);
 int update_menu(num n);
-#if	NUSE
-int insert_string_col(FILEBUF *fp, char *str,int col);
-#endif
 
 
 int undo(num n);

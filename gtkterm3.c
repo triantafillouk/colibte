@@ -1290,7 +1290,7 @@ int newxy(WINDP *wp)
 		return(TRUE);
 
 	} else { 
-		MESG("newxy: CLEN too small!");
+		error_line("newxy: CLEN too small!");
 	};
 	return(FALSE);
 }
@@ -1480,25 +1480,25 @@ on_search_entry_ok_event (GtkWidget *widget,
 // get button values
 
 // get entry values
-	MESG("search type is %d",search_type);
+	// MESG("search type is %d",search_type);
 //	gtk_widget_grab_focus(cwp->gwp->draw);
-	MESG("search input is [%s]",gtk_entry_get_text((GtkEntry *)search_input));
+	// MESG("search input is [%s]",gtk_entry_get_text((GtkEntry *)search_input));
 	strlcpy(search_pattern,gtk_entry_get_text((GtkEntry *)search_input),MAXLLEN);
-	MESG("search pattern [%s]",search_pattern);
+	// MESG("search pattern [%s]",search_pattern);
 	if(search_type==2) {
 		strlcpy(replace_pattern,gtk_entry_get_text((GtkEntry *)replace_input),MAXLLEN);
 	};
-	MESG("close window");
+	// MESG("close window");
 	search_close(search_dialog);
 	gs_entry_return_flag=1;
-	MESG("search ok!");
+	// MESG("search ok!");
 // go search or replace!
 	if(search_type==1) {
-		MESG("search for [%s]",search_pattern);
+		// MESG("search for [%s]",search_pattern);
 	};
 	if(search_type==2) {
-		MESG("search for   [%s]",search_pattern);
-		MESG("replace with [%s]",replace_pattern);
+		// MESG("search for   [%s]",search_pattern);
+		// MESG("replace with [%s]",replace_pattern);
 	};
  return true;
 }
@@ -1507,7 +1507,7 @@ gboolean
 on_search_entry_cancel_event (GtkWidget *widget,
 	GdkEventKey *event,gpointer user_data)
 {
-	MESG("on_search_entry_cancel_event:");
+	// MESG("on_search_entry_cancel_event:");
 	search_close(search_dialog);
 	gs_entry_return_flag=0;
 	return false;
@@ -1516,7 +1516,7 @@ on_search_entry_cancel_event (GtkWidget *widget,
 gboolean on_search_dialog_close_event (GtkWidget *widget,
 	GdkEventKey *event,gpointer user_data)
 {
-	MESG("on_search_dialog_close_event:");
+	// MESG("on_search_dialog_close_event:");
 	
 	search_close(widget);
 	gs_entry_return_flag=0;
