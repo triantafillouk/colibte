@@ -123,11 +123,11 @@ int new_note(num type)
 #else
 	res=snprintf(scratch_name,24,"%s.cal",date_string(3));
 #endif
-	if(res==25) MESG("cal name truncated");
+	if(res==25) { error_line("cal name truncated");return false;};
  };
  if(type==3) { 
 	res=snprintf(scratch_name,24,"%s",date_string(3));
-	if(res==25) MESG("todo name truncated");
+	if(res==25) { error_line("todo name truncated");return false;};
  };
 
  stat=goto_file(scratch_name);
@@ -322,7 +322,7 @@ alist *query_string_column(sqlite3 *db, char *sql)
 	};
 	sqlite3_finalize(res);
 	return a;
- } else MESG("query_string_column: error [%s]",sql);
+ } else { error_line("query_string_column: error [%s]",sql);};
  sqlite3_finalize(res); 
  return NULL;
 }
@@ -563,7 +563,7 @@ int query_int1(sqlite3 *db,char *sql)
 int sql_exec(sqlite3 *db, char *sql,int ignore)
 {
  char *err_msg=NULL;
- MESG("sql_exec: [%s]",sql);
+ // MESG("sql_exec: [%s]",sql);
  if(sqlite3_exec(db, sql, 0, 0, &err_msg)!=SQLITE_OK)
  {
  	if(ignore==0) error_line("sql_exec:[%s] error %s",sql, err_msg);
@@ -765,11 +765,11 @@ int parse_note(FILEBUF *fp)
 	if(note==NULL) note=fp->b_note=init_note();
 	// MESG("!parse_note: --- b_type=%X dir=[%s] name=[%s] tags=[%s] lines=%d",fp->b_type,fp->b_dname,fp->b_fname,note->n_tags,fp->lines);
 	if(fp->lines<2) {
-		MESG("### parse error, too few lines (%d)!!",fp->lines);
+		error_line("### parse error, too few lines (%d)!!",fp->lines);
 		return false;
 	};
 	if(FSize(fp)<10) {
-		MESG("### parse error size < 10",FSize(fp));
+		error_line("### parse error size < 10",FSize(fp));
 		return false;
 	};
 	if(fp->b_type & NOTE_CAL_TYPE) {
@@ -2053,7 +2053,7 @@ int set_notes_key(num n)
 	char b_key[MAXSLEN];
 	int status=1;
 	b_key[0]=0;
-	MESG("set_notes_key:");
+	// MESG("set_notes_key:");
 	status = nextarg("Notes Encryption String: ", b_key, MAXSLEN,false);
 //	disinp = odisinp;
 	if (status != TRUE)  return(status);

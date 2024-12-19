@@ -144,7 +144,7 @@ ge_edit_draw_event(GtkWidget *widget,cairo_t *cr)
 	};
 	gdk_cairo_get_clip_rectangle(cr,&clip_rect);
 
-	if(wd->cr!=NULL) MESG("!!!!!!!! cr not null!");
+	// if(wd->cr!=NULL) MESG("!!!!!!!! cr not null!");
 
 	if(clip_rect.width<3 || clip_rect.height<3) 
 	{
@@ -377,7 +377,7 @@ cairo_t *begin_draw(GeEditDisplay *wd,cairo_region_t *region,char *from)
 	wd->region=region;
 
 	if(wd->layout==NULL) {
-		MESG("begin_draw: new layout!");
+		// MESG("begin_draw: new layout!");
 		wd->layout = pango_cairo_create_layout (wd->cr);
 	};
 	return wd->cr;

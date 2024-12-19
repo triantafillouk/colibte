@@ -270,7 +270,7 @@ int error_line(char *error_message,...)
 	va_end(args);
 	app_error=1;
 	msg_line("%s",mline);
-	if(debug_flag()) MESG("%s",mline);
+	// if(debug_flag()) MESG("%s",mline);
 	app_error=0;
 	return FALSE;
 }
@@ -1777,7 +1777,7 @@ offs update_top_position_wrap()
 
  int o_now=tp_offset(cwp->tp_current);
 	offs o;
-	MESG_time("update_top_position_wrap: %ld",o_now);
+	// MESG_time("update_top_position_wrap: %ld",o_now);
 	o = FLineBegin(cwp->w_fp,o_now);
 	// MESG_time("update_top_position_wrap: begin=%ld",o);
 	int col=0;
@@ -2157,7 +2157,7 @@ void update_window_nowrap(WINDP *wp,int force)
 void update_window_wrap(WINDP *wp,int force)
 {
 	int cw_flag=cwp->w_flag;
-	MESG("update_window_wrap: ------------------ force=%d",force);
+	// MESG("update_window_wrap: ------------------ force=%d",force);
 		if (wp==cwp) {
 			// MESG_time("update_window_wrap:1 window %d",wp->id);
 			if(!check_cursor_position_wrap(wp)) set_update(wp,UPD_WINDOW); /* check if on screen */
@@ -2503,7 +2503,7 @@ void upd_part_wrap(WINDP *wp,char *from)
 		line1 = wp->w_fp->line_from-tp_line(wp->tp_hline);;
 		line2 = wp->w_fp->line_to-tp_line(wp->tp_hline);;
 	}
-	MESG("upd_part: window %d lcol=%d from [%s] lines %d - %d",wp->id,wp->w_lcol,from,line1,line2);
+	// MESG("upd_part: window %d lcol=%d from [%s] lines %d - %d",wp->id,wp->w_lcol,from,line1,line2);
 	if(wp->w_lcol!=wp->w_plcol) return upd_all_wrap_lines(wp,"upd_part w_lcol");
 	if(line1<0 && line2<0) out_of_view=1;
 	else {

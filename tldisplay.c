@@ -895,13 +895,29 @@ int quote(num n)
 	int    c;
 	if(dont_edit()) return FALSE;
 	if(kbdmode==BPLAY||kbdmode==PLAY) {
-		char c=get_next_key(kbdmode);
-		insert_chr(n,c);
-		return TRUE;
+		c=get_next_key(kbdmode);
+	} else {
+	    c = drv_getc(1);
 	};
 
-    c = drv_getc(1);
-    return (insert_chr(n, c));
+	
+	switch(c) {
+		case 'E':
+		case 'e':
+			for(int i=0;i<n;i++) insert_string(cbfp,"€",3);
+			set_update(cwp,UPD_EDIT);
+			break;
+		case 0xCE:\
+			c=drv_getc(1);
+			if(c==0xB5 || c==0xE5){
+				for(int i=0;i<n;i++) insert_string(cbfp,"€",3);
+				set_update(cwp,UPD_EDIT);
+			};
+			break;
+		default:
+			return insert_chr(n,c);
+	};
+    return (true);
 }
 
 void events_flush() {}	

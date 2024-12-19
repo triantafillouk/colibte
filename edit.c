@@ -287,7 +287,7 @@ int imove_top_line(num new_top_line)
  new_current_line=new_top_line+current_row;
 
  if(new_current_line>last_line) new_current_line=last_line;
- MESG("imove_top_line:to %ld",new_top_line);
+ // MESG("imove_top_line:to %ld",new_top_line);
  textpoint_set_lc(cwp->tp_hline, new_top_line,0);
  textpoint_set_lc(cwp->tp_current, new_current_line,0);
  set_update(cwp,UPD_MOVE|UPD_WINDOW);
@@ -706,7 +706,7 @@ int prev_wrap_line(num n)
 int prev_line(num n)
 {
  num current_line;
- MESG("prev_line: ------------- n=%d lock=%d",n,lock_move);
+ // MESG("prev_line: ------------- n=%d lock=%d",n,lock_move);
  int status=0;
 	if (n==0) return FALSE;
    	if (n < 0) return (next_line(-n));
@@ -738,7 +738,7 @@ int prev_line(num n)
 
 
     if(lock_move) {
-		MESG("lock_move:");
+		// MESG("lock_move:");
 #if	0
         // If at the last line of the window
 		if( current_line - tp_line(cwp->tp_hline) == cwp->w_ntrows-2-half_last_line
@@ -756,19 +756,19 @@ int prev_line(num n)
 		)
 		{
             lock_move=0;
-			MESG("prev_line lock end 1");
+			// MESG("prev_line lock end 1");
             status=prev_line(n);
             lock_move=1;
 			if(status==FALSE) return status;
         } else if(tp_line(cwp->tp_current)>0 && tp_line(cwp->tp_hline)==0) {
             lock_move=0;
-			MESG("prev_line lock start 2");
+			// MESG("prev_line lock start 2");
             status=prev_line(n);
             lock_move=1;
 			return status;		
 		} else {
             lock_move=0;
-			MESG("prev_line lock mid 3");
+			// MESG("prev_line lock mid 3");
             status=prev_line(n-1);
             lock_move=1;
 		};
@@ -1465,7 +1465,7 @@ int update_menu(num n)
 }
 
 int noop(num n){
-	MESG("No op!");
+	// MESG("No op!");
 	return true;
 };
 
@@ -1882,10 +1882,10 @@ int insert_chr(int n,int c)
 /* insert string */
 int insert_string(FILEBUF *fp,char *c,int size)
 {
- check_update_highlight(0);
+ // check_update_highlight(0);
  if(!InsertBlock(fp,c,size,0,0)) return false;
  textpoint_move(fp->tp_current,size);
- check_update_highlight(2);
+ // check_update_highlight(2);
  // set_update(cwp,UPD_EDIT);
  set_modified(fp);
  return TRUE;
@@ -1899,34 +1899,6 @@ int insert_string_nl(FILEBUF *fp,char *str)
 	if(!insert_newline(fp)) return (FALSE);
 	return TRUE;
 }
-
-#if	NUSE
-/* Insert a string at column position */
-int insert_string_col(FILEBUF *fp,char *str,int col)
-{
-	int len=strlen(str);
-	if(col<0) {
-		ToLineEnd();
-	} else {
-		int i;
-		ToLineBegin();
-		for(i=0;i<col;i++) {
-			if(Eol()) { 
-			// insert space
-				insert_string(fp," ",1);
-			} else {
-				MoveRightChar(fp);
-			};
-		};
-	};
-	insert_string(fp,str,len);
-	if(FEof(fp)) insert_newline(fp);
-	else
-	if(col<0) insert_newline(fp);
-	set_update(cwp,UPD_EDIT);
-	return true;
-}
-#endif
 
 /* Insert a newline  at the current location  */
 int insert_newline(FILEBUF *fp)
@@ -2311,7 +2283,7 @@ int move_line_up(num n)
 	// MESG("move_line_up:3 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
 	
  // delete current
-	delete_region(1); setmark(0);
+	delete_region(); setmark(0);
  // go up one line and paste
 	MoveLineCol(tp_line(cwp->tp_current)-1,0);
 	paste_region(1);
@@ -2329,7 +2301,7 @@ int move_line_down(num n)
  	return false;
  };
  // mark current line
-	MESG("move_line_down:s b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
+	// MESG("move_line_down:s b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
 	setmark(0);
 	ToLineBegin();
 	setmark(REGION_CHAR);
@@ -2346,7 +2318,7 @@ int move_line_down(num n)
 	// MESG("move_line_down:3 b=%ld s=%ld e=%ld",cbfp->tp_current->offset,cwp->w_smark->offset,cwp->w_emark->offset);
 	
 // delete current
-	delete_region(1); setmark(0);
+	delete_region(); setmark(0);
  // go down one line and paste
 	MoveLineCol(tp_line(cwp->tp_current)+1,0);
 	paste_region(1);

@@ -897,7 +897,7 @@ void  FindOffset(TextPoint *tp)
 	o=FUtfCharAt(fp,o,&uc);
 	if(uc.uval[0]=='\n'||uc.uval[0]=='\r') {
 		o--;
-		MESG("FindOffset: EOL, column bigger than expected! %d %d",c,tp->col);
+		error_line("FindOffset: EOL, column bigger than expected! %d %d",c,tp->col);
 		break;
 	};
 	if(uc.uval[0]=='\t') c=next_tab(c);
@@ -2233,6 +2233,16 @@ bool undo_locked(FILEBUF *fp)
 	return fp->main_undo->locked;
 }
 
+void undo_set_lock(FILEBUF *fp)
+{
+	fp->main_undo->locked=true;
+}
+
+void undo_clear_lock(FILEBUF *fp)
+{
+	fp->main_undo->locked=false;
+}
+
 void undo_clear(UNDOS *u)
 {
 	if(u==NULL) return;
@@ -2574,16 +2584,18 @@ void   PreModify(FILEBUF *fp)
    if(shift>0)
    {
       memmove(fp->buffer+fp->ptr1,fp->buffer+fp->ptr2,shift);
+	  // MESG("premodify: memmove distance=%ld size=%ld",fp->buffer+fp->ptr1 - fp->buffer+fp->ptr2,shift);
       fp->oldptr1=fp->ptr1+=shift;
       fp->oldptr2=fp->ptr2+=shift;
    }
    else if(shift<0)
    {
       memmove(fp->buffer+fp->ptr2+shift,fp->buffer+fp->ptr1+shift,-shift);
+	  // MESG("premodify: memmove distance=%ld size=%ld",fp->buffer+fp->ptr2 - fp->buffer+fp->ptr1,-shift);
       fp->oldptr1=fp->ptr1+=shift;
       fp->oldptr2=fp->ptr2+=shift;
    };
-//	MESG("Premodify: o=%ld shift=%ld ptr1=%ld ptr2=%ld gap=%ld",FOffset(fp),shift,fp->ptr1,fp->ptr2,fp->GapSize);
+	// MESG("Premodify: o=%ld shift=%ld ptr1=%ld ptr2=%ld gap=%ld",FOffset(fp),shift,fp->ptr1,fp->ptr2,fp->GapSize);
 	refresh_textpoints(fp);
 }
 
@@ -2735,7 +2747,12 @@ void   MoveLeftChar(FILEBUF *fp)
 
 			// int previous_accents=0;
 			for(i=2;i<5;i++){
+#if	0
 				cl=FUtfCharLen(fp,o-i);
+#else			
+				int c0=FCharAt(fp,o-i);
+				cl=utf8charlen_nocheck(c0);
+#endif
 //				MESG("prev_char: o=%ld i=%d cl=%d accent=%d",o,i,cl,fp->utf_accent);
 				if(cl==i) {
 					if(fp->utf_accent) {
@@ -2986,8 +3003,9 @@ int   InsertBlock(FILEBUF *fp, char *block_left,offs size_left,char *block_right
 	}
 
    memmove(fp->buffer+fp->ptr1,block_left,size_left);
+	// MESG("insertblock: memmove distance %ld - %ld size = %ld",fp->buffer+fp->ptr1,block_left,size_left);
    memmove(fp->buffer+fp->ptr2-size_right,block_right,size_right);
-
+	// MESG("			 : memmove distance %ld - %ld size = %ld",fp->buffer+fp->ptr2-size_right,block_right,size_right);
    oldoffset=FOffset(fp);
    break_at=-1;
    for(i=1; i<fp->EolSize; i++) {

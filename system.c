@@ -28,7 +28,7 @@ int set_unique_tmp_file(char *str,char *name,int size)
 {
  int len;
  len=snprintf(str,size,"/tmp/%s_%ld_%ld.txt",name,start_time.tv_sec,(long)start_time.tv_usec);
- if(len>size) {MESG("tmp file %s truncated!",name);return false;};
+ if(len>size) { error_line("tmp file %s truncated!",name);return false;};
  return true;
 }
 
@@ -41,7 +41,7 @@ int sysexec(char *st)
 	if(!execmd && !macro_exec) msg_line("wait for [%s]",st);
 	events_flush();
 	if(strncmp(cbfp->b_fname,"[new",4)==0){
-		if(chdir(get_start_dir())!=0) { MESG("cannot change dir to start_dir %s",get_start_dir());};
+		if(chdir(get_start_dir())!=0) { error_line("cannot change dir to start_dir %s",get_start_dir());};
 	};
     status=system(st);
 		// 127 or -1 -> error
@@ -386,6 +386,7 @@ int bg_cmd(num n)
 {
  char line[MAXLLEN];
  char fname[MAXFLEN+1];
+ char tmp_name[MAXFLEN];
  register int    s;
  unsigned int i;
  int stat;
@@ -394,6 +395,7 @@ int bg_cmd(num n)
 	if ((s=nextarg("&", line, MAXLLEN,true)) != TRUE) 	return(s);
 	/* replace %f with the current file name */
 	/* for now this has to be at the end of the line */
+	
 	if(cbfp->b_flag & FSDIRED) {
 		s = dir_getfile(fname,1);
 	} else {
@@ -409,8 +411,11 @@ int bg_cmd(num n)
 				strlcat(line,fname,MAXLLEN);
 			}
 		};
-	}
-	strlcat(line,"&",MAXLLEN);
+	};
+	stat = set_unique_tmp_file(tmp_name,"bf_cmd",MAXFLEN);
+	strlcat(line," > ",MAXLLEN);strlcat(line,tmp_name,MAXLLEN);
+	strlcat(line," 2> ",MAXLLEN);strlcat(line,tmp_name,MAXLLEN);
+	strlcat(line,".out &",MAXLLEN);
 	sysexec(line);
 	set_update(cwp,UPD_MOVE);
     return (TRUE);
@@ -700,7 +705,7 @@ char *ext_system_paste_line()
 
 	if(!x11_display_ok) return "";
 	if(dont_edit() || cbfp->b_flag & FSDIRED )return false;
-	status = set_unique_tmp_file(filnam,"command",MAXFLEN);
+	status = set_unique_tmp_file(filnam,"paste",MAXFLEN);
 	if(status>=MAXFLEN) return "";
 	status=snprintf(exec_st,MAXFLEN,"%s > %s 2> /dev/null",clip_copy,filnam);
 	if(status>=MAXFLEN) return "";
@@ -729,6 +734,10 @@ char *ext_system_paste_line()
 }    
 
 int utf8charlen_nocheck(int ch);
+void undo_set_lock(FILEBUF *fp);
+void undo_clear_lock(FILEBUF *fp);
+
+#define	TEST1	1
 
 int insert_text_file_as_column(char *filnam)
 {
@@ -737,10 +746,7 @@ int insert_text_file_as_column(char *filnam)
 
 	const num start_column=tp_col(cbfp->tp_current);
 	// MESG("#insert_text_file_as_column: position %ld ---------------",start_column);
-
-	char *pad_space = (char *)malloc(start_column+1);
-	if(pad_space==NULL) return false;
-	memset(pad_space,' ',start_column+1);
+	
 
 	FILEBUF *tmp_bp = new_filebuf(filnam,0);
 	if(tmp_bp==NULL) return false;
@@ -750,25 +756,46 @@ int insert_text_file_as_column(char *filnam)
 
 	const num max_len = tmp_bp->maxlinelen;
 
+#if	TEST1
+	char *pad_space = (char *)malloc(start_column+max_len+2);
+	if(pad_space==NULL) { delete_filebuf(tmp_bp,1); return false;};
+	// memset(pad_space,' ',start_column+max_len+2);
+#else
+	char *pad_space = (char *)malloc(start_column+1);
+	if(pad_space==NULL) { delete_filebuf(tmp_bp,1); return false;};
+	memset(pad_space,' ',start_column+1);
 	char *ml = malloc(max_len+2);
 	if(ml==NULL) {
 		delete_filebuf(tmp_bp,1);
 		return false;
 	};
+#endif
 	// set_Offset(0);
 	num line_start=0;
 
 	select_filebuf(ori_buf);
-
+	char *ml_out;
 	while(line_start<FSize(tmp_bp)) {
 		char *line_text=get_line_at(tmp_bp,line_start);
 		int col=0, in_offset=0;;
-		char *ml_out = ml;
+#if	TEST1
+		ml_out = pad_space;
+#else
+		ml_out = ml;
+#endif
 		num line_end_column=tp_col(cbfp->tp_current);
-
+#if	TEST1
+		// memset(pad_space,'^',start_column+max_len+2);
+#else
 		memset(ml,0,max_len+1);
+#endif
 		if(line_end_column<start_column) {
+#if	TEST1
+			memset(pad_space,' ',start_column-line_end_column);
+			ml_out=pad_space+(start_column-line_end_column);
+#else
 			insert_string(cbfp,pad_space,start_column-line_end_column);
+#endif
 		};
 		// insert_string(cbfp,"|",1);
 		while(in_offset<strlen(line_text)) {
@@ -784,10 +811,20 @@ int insert_text_file_as_column(char *filnam)
 		line_start = FNextLine(tmp_bp,line_start);
 		
 		if(FEof(cbfp)) {
+#if	TEST1
+			memcpy(ml_out,cbfp->EolStr,cbfp->EolSize);
+			ml_out+=cbfp->EolSize;
+			insert_string(cbfp,pad_space,ml_out-pad_space);
+#else
 			insert_string(cbfp,ml,ml_out-ml);
 			insert_newline(cbfp);
+#endif
 		} else {
+#if	TEST1
+			insert_string(cbfp,pad_space,ml_out-pad_space);
+#else
 			insert_string(cbfp,ml,ml_out-ml);
+#endif
 			if(!next_line(1)) {
 				set_Offset(FSize(cbfp));
 				insert_newline(cbfp);
@@ -795,11 +832,15 @@ int insert_text_file_as_column(char *filnam)
 		};
 	} 
 	free(pad_space);
+#if	!TEST1
 	free(ml);
+#endif
+	undo_set_noglue();
 	delete_filebuf(tmp_bp,1);
 
 	// goto original position
 	set_Offset(o1);
+	MESG_time("paste_as_column:end");
 	return 1;
 }
 
@@ -848,7 +889,7 @@ int ext_system_paste()
 		setmark(0);
 		return status;
 	};
-	msg_line("cannot insert system clipboard!");
+	error_line("cannot insert system clipboard!");
 	return 0;
 }
 

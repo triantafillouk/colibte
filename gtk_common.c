@@ -17,7 +17,7 @@ int drv_initialized=0;
 
 void set_current_scheme(int scheme)
 {
- MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
+ // MESG("set_current_scheme: scheme=%d drv_colors=%d",scheme,drv_colors);
 
  color_scheme_ind=scheme-1;
  set_bt_num_val("color_scheme",color_scheme_ind+1); 
@@ -25,7 +25,7 @@ void set_current_scheme(int scheme)
  current_scheme = get_scheme_by_index(color_scheme_ind);
 
  set_current_colors();
- MESG("set_current_scheme: %s end",current_scheme->scheme_name);
+ // MESG("set_current_scheme: %s end",current_scheme->scheme_name);
 }
 
 #include "xthemes.c"
@@ -87,11 +87,11 @@ void drv_open()
 	if(cwp==NULL) { ERROR("no cwp!");exit(0);};
 	wlist=create_select_window();	// this is the list window (only one!)
 	gtk_widget_realize(parent);
-	MESG("parent realized!");
+	// MESG("parent realized!");
 	gtk_widget_show(parent);
-	MESG("parent showed!");
+	// MESG("parent showed!");
 	gtk_widget_grab_focus(cwp->gwp->draw);
-	MESG("drv_open: end");
+	// MESG("drv_open: end");
 	drv_initialized=1;
 }
 
@@ -1021,7 +1021,7 @@ on_wlist_key_press (GtkWidget *widget,GdkEventKey *event,gpointer data)
 
 int input_line_ok_event(num n)
 {
- MESG("input_line_ok_event:");
+ // MESG("input_line_ok_event:");
  on_gs_entry_ok_event(gs_entry,NULL,NULL);
  return 1;
 }
@@ -1029,7 +1029,7 @@ int input_line_ok_event(num n)
 int input_line_cancel_event(num n)
 {
  on_gs_entry_cancel_event(gs_entry,NULL,NULL);
- MESG("input_line_cancel_event:");
+ // MESG("input_line_cancel_event:");
  return 1;
 }
 
@@ -1111,7 +1111,7 @@ on_gs_entry_ok_event        (GtkWidget       *widget,
 	key_wait=1;
 	};
 	ss=gtk_entry_get_text(GTK_ENTRY(gs_entry));
-	MESG("gs_entry_ok_event: %s",ss);
+	// MESG("gs_entry_ok_event: %s",ss);
 	entry_mode=KNORMAL;
 	if(ss==NULL) return FALSE;
 	if(ss[0]==0) return FALSE;
@@ -1383,7 +1383,7 @@ int open_file_dialog(char *tname,int n)
  int stat;
  	if(is_scratch_buffer(cbfp)) {
 		if(chdir(get_start_dir())) {
-			MESG("cannot go to start dir!");
+			error_line("cannot go to start dir!");
 			return false;
 		};
 	};

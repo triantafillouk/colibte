@@ -400,7 +400,7 @@ char **read_sarray(char *file_name,int *size)
 				buffer[i]=0;
 			};
 		};
-		MESG("read_sarray: lines=%d",lines);
+		// MESG("read_sarray: lines=%d",lines);
 		array=malloc((lines+1)*sizeof(char *));
 		for(l=0,i=0;l<lines;l++){
 			array[l]=buffer+i;

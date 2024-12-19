@@ -719,7 +719,7 @@ int check_init(FILEBUF *bf)
 		err=err_check_block1();
 		bf->err=err;
 		bf->m_mode |= M_CHECKED;
-		MESG("Block checked! err=%d",err);
+		// MESG("Block checked! err=%d",err);
 	};
  };
 
@@ -953,8 +953,8 @@ double factor_type_element()
 {
  double value=0;
  array_dat *adat = lsslot->adat;
- MESG("	factor_type_element: lsslot %d [%s] array name=[%s] vtype=%d (%s)",lsslot->var_index,lstoken->tname,adat->array_name,lsslot->var_type,vtype_names[lsslot->var_type]);
- MESG("	type_element [%s]",tok->tname);
+ // MESG("	factor_type_element: lsslot %d [%s] array name=[%s] vtype=%d (%s)",lsslot->var_index,lstoken->tname,adat->array_name,lsslot->var_type,vtype_names[lsslot->var_type]);
+ // MESG("	type_element [%s]",tok->tname);
  if(adat->var_tree) {
  	int ind;
  	// MESG("	var tree name [%s]",adat->var_tree->tree_name);
