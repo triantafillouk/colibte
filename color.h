@@ -78,5 +78,4 @@ typedef struct COLOR_SCHEME {
 	COLOR_ATTR color_style[COLOR_TYPES];
 } COLOR_SCHEME;
 
-
 /* --- */

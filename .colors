@@ -600,6 +600,7 @@ horizon_fg=#f5faff
 inactive_fg=#636363 
 rowcol_fg=#ffa848
 info_fg=#808080
+
 [andromeda]
 normal_bg=#17181C
 menu_bg=#0060A0 
