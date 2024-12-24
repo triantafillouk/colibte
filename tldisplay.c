@@ -821,11 +821,14 @@ int selectl(char *title,char *m_array[],int nu,int max_height,int sx,int sy,int 
 		};
 		if(j>=nu) continue;
 
-		// MESG(": found c=%c start=%d i=%d iol=%d",c,start,i,iol);
 		if(i>start+max_height-1) {
+		// MESG(": found 1 c=%c start=%d i=%d iol=%d found=%d nu=%d max=%d",c,start,i,iol,found,nu,max_height);
+			
 			start=disp_list(m_array,i,nu,max_height,sx,sy,width,active);
-			box_line_print(0,0,m_array[i],width,1,active);
+			// MESG("	new start=%d i=%d",start,i);
+			box_line_print(i,start,m_array[i],width,1,active);
 		} else {
+		// MESG(": found 2 c=%c start=%d i=%d iol=%d found=%d",c,start,i,iol,found);
 			if(i<start) start=i;
 			start=disp_list(m_array,start,nu,max_height,sx,sy,width,active);
 			box_line_print(i,start,m_array[i],width,1,active);
@@ -876,8 +879,8 @@ int selectl(char *title,char *m_array[],int nu,int max_height,int sx,int sy,int 
 int disp_list(char **m_array,int start,int nu,int max_lines,int sx,int sy,int width,int active)
 {
  register int i;
- // MESG("disp_list: < start=%d lines=%d",start,max_lines);
- if(start+max_lines>nu) start=nu-max_lines;
+ if(start+max_lines>=nu) start=nu-max_lines;
+ // MESG("disp_list: < start=%d lines=%d nu=%d",start,max_lines,nu);
  for(i=start;i<start+max_lines;i++) {
 	box_line_print(i,start,m_array[i],width,0,active);
  };
