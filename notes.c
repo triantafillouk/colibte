@@ -1370,7 +1370,7 @@ int show_category_list(char *category)
 	// MESG("category id %d",tag_id);
 	
 	if(tag_id<1) {notes_db_close(db);return 0;};
-	sprintf(sql,"SELECT rowid,DATE,TITLE FROM NOTES where rowid in (select note_id from tags where tag_id = %d);",tag_id);
+	sprintf(sql,"SELECT rowid,DATE,TITLE FROM NOTES where rowid in (select note_id from tags where tag_id = %d) order by DATE ASC;",tag_id);
 	if(strlen(category)>55) category[55]=0;
 	snprintf(buffer_name,64,"[%s view]",category);
 	cat_view = cls_fout(buffer_name);

@@ -592,7 +592,7 @@ int dir_copy(num n)
   char destination_escaped[MAXFLEN];
   char fname[MAXFLEN];
   char sline[MAXLLEN];
-  char *cp_flags="";
+  char *cp_flags="-pf";
   char sconfirm[MAXLLEN];
   int s1,destination_is_dir=0;
   FILEBUF *dbuf;	/* destination dir buffer  */
@@ -613,7 +613,7 @@ int dir_copy(num n)
 
   strlcpy(destination_escaped,destination,MAXFLEN);
 
-  if (ftype == FTYPE_DIR) cp_flags="-rp";
+  if (ftype == FTYPE_DIR) cp_flags="-rpf";
 
   s1=chdir(cbfp->b_dname);
 //  MESG("current dir is [%s]",getcwd(NULL,MAXFLEN));
