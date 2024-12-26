@@ -592,7 +592,11 @@ int dir_copy(num n)
   char destination_escaped[MAXFLEN];
   char fname[MAXFLEN];
   char sline[MAXLLEN];
+#if	DARWIN
+  char *cp_flags="-pcf";
+#else
   char *cp_flags="-pf";
+#endif
   char sconfirm[MAXLLEN];
   int s1,destination_is_dir=0;
   FILEBUF *dbuf;	/* destination dir buffer  */
@@ -612,8 +616,11 @@ int dir_copy(num n)
   if((s = nextarg(sconfirm,destination,MAXFLEN,true)) !=TRUE) return(s);
 
   strlcpy(destination_escaped,destination,MAXFLEN);
-
+#if	DARWIN
+  if (ftype == FTYPE_DIR) cp_flags="-rcpf";
+#else
   if (ftype == FTYPE_DIR) cp_flags="-rpf";
+#endif
 
   s1=chdir(cbfp->b_dname);
 //  MESG("current dir is [%s]",getcwd(NULL,MAXFLEN));
@@ -621,18 +628,20 @@ int dir_copy(num n)
   escape_file_name(fname);
   escape_file_name(destination_escaped);
 
-  if(snprintf(sline,MAXLLEN,"cp %s %s %s 2> /dev/null",
-  	cp_flags,fname,destination_escaped)>=MAXLLEN) {
-		msg_line("File name too long!");
-		return(FALSE);
-	};
   // MESG("dir_copy:[%s]",sline);
   s1=stat(destination_escaped,&t);
   // MESG("dir_copy:[%s] status=%d",sline,s1);
   if(s1==0) {	/* it exists!  */
   	s1=1;
 	destination_is_dir = (t.st_mode & S_IFMT) == S_IFDIR;
+	if(!destination_is_dir) cp_flags="-pf";
   } else s1=0;
+
+  if(snprintf(sline,MAXLLEN,"cp %s %s %s 2> /dev/null",
+  	cp_flags,fname,destination_escaped)>=MAXLLEN) {
+		msg_line("File name too long!");
+		return(FALSE);
+	};
 
   if((s1=(system(sline))) !=0 ) { 
 	return error_line("Error copying %s to %s status=%d",fname,destination,s1);
@@ -825,6 +834,8 @@ int dir_link(num n)
   char current_dir[MAXLLEN];
   char source_name[MAXLLEN];
   int sstat=0;
+  char *flags="-s";
+
   FILEBUF *dbuf;	/* destination dir buffer  */
 //  MESG("dir_link:");
   if(!(cbfp->b_flag & FSNLIST)) return FALSE;
@@ -851,7 +862,7 @@ int dir_link(num n)
 
 
   escape_file_name(destination);
-  sstat=snprintf(sline,MAXLLEN,"ln -s %s %s 2>/dev/null",source_name,destination);
+  sstat=snprintf(sline,MAXLLEN,"ln %s %s %s 2>/dev/null",flags,source_name,destination);
   if(sstat>=MAXLLEN) { return error_line("dir link fname overflow!");return FALSE;};
 
   s1=chdir(cbfp->b_dname);
