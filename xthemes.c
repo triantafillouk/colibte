@@ -51,6 +51,50 @@ COLOR_SCHEME *get_scheme_by_name(char *name)
  return cs;
 }
 
+int color_change(int color,int c)
+{
+ int c1=80 ;
+ if(c=='+'||c=='=') { c1=color+8;};
+ if(c=='-') { c1=color-8;};
+ if(c==1||c==-1) c1=color+c;
+ if(c1<0) c1=0;
+ if(c1>255) c1=255;
+ return c1;
+}
+
+int color_edit(num n)
+{
+ int c;
+ int r,g,b;
+ msg_line("in color edit! (-,+,r,g,b,R,G,B, esc to exit");
+ current_scheme = get_scheme_by_index(color_scheme_ind);
+ while((c=drv_getc(0))!=27){
+	sscanf(current_scheme->color_style[0].color_value,"#%2X%2X%2X",&r,&g,&b);
+	switch(c) {
+		case '+':case '=':
+		case '-':
+			r = color_change(r,c);
+			g = color_change(g,c);
+			b = color_change(b,c);
+			break;
+		case 'b': b = color_change(b,1);break;
+		case 'g': g = color_change(g,1);break;
+		case 'r': r = color_change(r,1);break;
+		case 'B': b = color_change(b,-1);break;
+		case 'G': g = color_change(g,-1);break;
+		case 'R': r = color_change(r,-1);break;
+		default:
+			continue;
+	};
+	sprintf(current_scheme->color_style[0].color_value,"#%02X%02X%02X",r,g,b);
+ 	change_color_scheme(color_scheme_ind+1);
+ 	msg_line("new color %s  r=%d g=%d b=%d",current_scheme->color_style[0].color_value,r,g,b);
+	
+	update_screen(FALSE);
+ }; 
+ return true;
+}
+
 int color_scheme_read()
 {
  FILE *f1;

@@ -854,6 +854,7 @@ WINDP *dublicate_window(WINDP *wp0);
 char *get_last_in_list(int tlist);
 int toggle_bold(num n);
 int file_exists(char *fname);
+int color_edit(num n);
 
 /* system.c  */
 int init_system_clipboard();

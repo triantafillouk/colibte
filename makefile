@@ -191,7 +191,7 @@ mlangf.o: xe.h mlangf.c mlangf.h mlang.h
 mlangg.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang_functions.c mlang.h alist.h xe.h
 	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char mlang.c -o mlangg.o
 
-tldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h
+tldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h menu.h
 	${CC} tldisplay.c $(FLAGS1)  -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o tldisplay.o
 
 xldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h

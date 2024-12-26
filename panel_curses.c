@@ -932,12 +932,10 @@ int text_mouse_function(int move)
 			// MESG("move<KMOUSE_RELEASE");
 			return 0;
 		};
-#if	0
 		if(mouse_started_in_rline) {
 //			MESG("in rline !");
 			return 0;
 		};
-#endif
 		// MESG("tp_current:beginning: new_offset=%ld b_flag=%X",new_offset,cbfp->b_flag);
 		if(cbfp->b_flag & FSNLIST) {
 				// MESG("mouse dir mode");

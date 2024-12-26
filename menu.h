@@ -21,7 +21,7 @@
 
 #define HORIZONTAL	0
 #define VERTICAL	1
-#define HLABEL_WIDTH 8	/* horizontal menu lebel width  */
+#define HLABEL_WIDTH 7	/* horizontal menu lebel width  */
 
 #define MFUNCTION	0
 #define MMENU		1
