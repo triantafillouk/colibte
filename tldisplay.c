@@ -917,6 +917,15 @@ int quote(num n)
 				set_update(cwp,UPD_EDIT);
 			};
 			break;
+		case 'c': case 'C':
+			for(int i=0;i<n;i++) insert_string(cbfp,"©",3);
+			set_update(cwp,UPD_EDIT);
+			break;
+		case 'r': case 'R':
+			for(int i=0;i<n;i++) insert_string(cbfp,"®",3);
+			set_update(cwp,UPD_EDIT);
+			break;
+
 		default:
 			return insert_chr(n,c);
 	};
