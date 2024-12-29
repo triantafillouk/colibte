@@ -929,8 +929,16 @@ on_dra0_key_press_event(GtkWidget       *widget,
 		if(!quote_flag)	key_buf[key_index++]=7;
 		else key_buf[key_index++]=ks;
 	} else { 
+			if(ks=='e') {
+			int i=0;
+			for(;i<nnarg;i++) insert_string(cbfp,"€",3);
+			nnarg=1;
+			set_update(cwp,UPD_EDIT);
+			key_index--;
+			} else {
 		key_buf[key_index++]=ks;
 		if(flag & CTLX && emacs_emul) key_buf[key_index++]=24; // control_x
+		}
 	};
   	n_chars--;
   } else {

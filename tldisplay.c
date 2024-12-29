@@ -918,11 +918,11 @@ int quote(num n)
 			};
 			break;
 		case 'c': case 'C':
-			for(int i=0;i<n;i++) insert_string(cbfp,"©",3);
+			for(int i=0;i<n;i++) insert_string(cbfp,"©",2);
 			set_update(cwp,UPD_EDIT);
 			break;
 		case 'r': case 'R':
-			for(int i=0;i<n;i++) insert_string(cbfp,"®",3);
+			for(int i=0;i<n;i++) insert_string(cbfp,"®",2);
 			set_update(cwp,UPD_EDIT);
 			break;
 
