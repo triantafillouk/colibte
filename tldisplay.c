@@ -889,6 +889,19 @@ int disp_list(char **m_array,int start,int nu,int max_lines,int sx,int sy,int wi
  return(start);
 }
 
+
+void insert_key_string(char *ch,int n)
+{
+ int clen=strlen(ch);
+ int j;
+ int i;
+ for(i=0;i<n;i++) {
+	for(j=0;j<clen;j++) utfokey[j]=ch[j];
+	utfokey[j]=0;
+	insert_chr(1,ch[0]); 
+ }
+}
+
 /*
  * Quote the next character, and insert it into the buffer. All the characters
  * are taken literally. Bound to "^Q"
@@ -903,27 +916,22 @@ int quote(num n)
 	    c = drv_getc(1);
 	};
 
-	
 	switch(c) {
 		case 'E':
 		case 'e':
-			for(int i=0;i<n;i++) insert_string(cbfp,"€",3);
-			set_update(cwp,UPD_EDIT);
+			insert_key_string("€",n);
 			break;
 		case 0xCE:\
 			c=drv_getc(1);
 			if(c==0xB5 || c==0xE5){
-				for(int i=0;i<n;i++) insert_string(cbfp,"€",3);
-				set_update(cwp,UPD_EDIT);
+				insert_key_string("€",n);
 			};
 			break;
 		case 'c': case 'C':
-			for(int i=0;i<n;i++) insert_string(cbfp,"©",2);
-			set_update(cwp,UPD_EDIT);
+			insert_key_string("©",n);
 			break;
 		case 'r': case 'R':
-			for(int i=0;i<n;i++) insert_string(cbfp,"®",2);
-			set_update(cwp,UPD_EDIT);
+			insert_key_string("®",n);
 			break;
 
 		default:

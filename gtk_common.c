@@ -743,6 +743,16 @@ int set_font(char *font_name)
   return(TRUE);
 }
 
+
+int insert_key_string(char *ch)
+{
+	int clen=strlen(ch);
+	int j=0;
+	for(j=0;j<clen;j++) utfokey[j]=ch[j];
+	utfokey[j]=0;
+	return clen;
+}
+
 gboolean
 on_dra0_key_press_event(GtkWidget       *widget,
                         GdkEventKey     *event,
@@ -925,20 +935,18 @@ on_dra0_key_press_event(GtkWidget       *widget,
 	}
 	}
 	else if (ks == 27) { 
-//				ks= CNTRL | 'G'; 
+		//	ks= CNTRL | 'G'; 
 		if(!quote_flag)	key_buf[key_index++]=7;
 		else key_buf[key_index++]=ks;
 	} else { 
-			if(ks=='e') {
-			int i=0;
-			for(;i<nnarg;i++) insert_string(cbfp,"€",3);
-			nnarg=1;
-			set_update(cwp,UPD_EDIT);
-			key_index--;
-			} else {
-		key_buf[key_index++]=ks;
-		if(flag & CTLX && emacs_emul) key_buf[key_index++]=24; // control_x
-		}
+		switch(ks) {
+			case 'e': case 'E': n_chars=insert_key_string("€");break;
+			case 'c': case 'C': n_chars=insert_key_string("©");break;
+			case 'r': case 'R': n_chars=insert_key_string("®");break;
+			default:
+				key_buf[key_index++]=ks;
+				if(flag & CTLX && emacs_emul) key_buf[key_index++]=24; // control_x
+		};
 	};
   	n_chars--;
   } else {
@@ -973,6 +981,7 @@ on_dra0_key_press_event(GtkWidget       *widget,
 		};
 	};
 	nnarg=1;
+	set_update(cwp,UPD_EDIT);
  	update_screen(0);
 	flag = 0;key_index=0;
 //	gtk_widget_grab_focus(widget);
