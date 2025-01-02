@@ -51,12 +51,14 @@ COLOR_SCHEME *get_scheme_by_name(char *name)
  return cs;
 }
 
+int color_step=4;
+
 int color_change(int color,int c)
 {
  int c1=80 ;
- if(c=='+'||c=='=') { c1=color+8;};
- if(c=='-') { c1=color-8;};
- if(c==1||c==-1) c1=color+c;
+ if(c=='+'||c=='=') { c1=color+color_step;};
+ if(c=='-') { c1=color-color_step;};
+ if(c==1||c==-1) c1=color+4*c;
  if(c1<0) c1=0;
  if(c1>255) c1=255;
  return c1;
@@ -66,17 +68,30 @@ int color_edit(num n)
 {
  int c;
  int r,g,b;
+ char original_color[16];
+ strcpy(original_color,current_scheme->color_style[n].color_value);
  msg_line("in color edit! [%s] (-,+,r,g,b,R,G,B, esc to exit",current_scheme->color_style[n].color_value);
  current_scheme = get_scheme_by_index(color_scheme_ind);
+ color_step=4;
  while((c=get1key())!='q'){
 	sscanf(current_scheme->color_style[n].color_value,"#%2X%2X%2X",&r,&g,&b);
 	switch(c) {
+		case '1': case '2': case '4': case '8': 
+			color_step=c-'0';
+			msg_line("set color step to %d",color_step);
+			update_screen(true);
+			continue;
 		case '+':case '=':
 		case '-':
 			r = color_change(r,c);
 			g = color_change(g,c);
 			b = color_change(b,c);
 			break;
+		case 'z': case 'Z': {
+			strcpy(current_scheme->color_style[n].color_value,original_color);
+			sscanf(current_scheme->color_style[n].color_value,"#%2X%2X%2X",&r,&g,&b);;
+			break;
+		};
 		case 'b': b = color_change(b,1);break;
 		case 'g': g = color_change(g,1);break;
 		case 'r': r = color_change(r,1);break;
