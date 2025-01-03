@@ -3077,11 +3077,6 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		if(bp->symbol_tree){
 			delete_symbol_table(local_symbols,bp->symbol_tree->items,0,0);
 			bp->symbol_tree=NULL;
-#if	TEST_TYPE0
-			/* delete the type tree  */
-			delete_type_tree(bp->type_tree);
-			bp->type_tree=NULL;
-#endif
 		};
 		current_stable=old_symbol_table;
 	};
@@ -3227,9 +3222,7 @@ int parse_buffer_show_tokens(num n)
 
  /* clear parse list  */
  empty_tok_table(fp);
-#if	TEST_TYPE0
- fp->type_tree=new_btree("type_tree",0);
-#endif
+
  INIT_STAGE;
  // clear out buffer
  cls_fout("[out]");

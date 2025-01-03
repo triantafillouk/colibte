@@ -267,9 +267,7 @@ int toggle_case(num n);
 int toggle_regexp(num n);
 int set_case(num n);
 int set_regexp(num n);
-#if	CRYPT
 int set_crypt(num n);
-#endif
 int toggle_highlight(num n);
 int toggle_crypt(num n);
 int next_utf8_error(num n);
@@ -376,9 +374,7 @@ void set_env(int vnum,char *svalue,double value);
 
 int sindex(char *source, char *pattern);
 int nextarg(char *prompt,char *buffer, int size,int disinp);
-#if	DATE
 char *time2a();
-#endif
 void getnc() ;
 void getntok(char *var_name);
 
@@ -418,9 +414,7 @@ int execsub(num n);
 
 int exec_file(num n);
 // int dofile(char *fname,array_dat *args_array);
-#if	CTAGS
 int update_tags(num n);
-#endif
 
 // file.c
 int reload_file(num n);
@@ -441,9 +435,8 @@ void set_working_dir(char *dir);
 char * get_working_dir();
 
 void init_extensions();
-#if	CRYPT
 int resetkey(FILEBUF *bp);
-#endif
+
 int edit_file(char *fname);
 int file_read(FILEBUF *bp, char *fname);
 int file_read1(FILEBUF *bp, char *fname);

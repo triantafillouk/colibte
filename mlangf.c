@@ -255,13 +255,7 @@ double uf_mid()
 		if((int)va[1].dval>strlen(va[0].sval) || va[2].dval==0) {
 			set_sval("");
 		} else {
-#if	NEW
 			set_nsval(va[0].sval+(int)va[1].dval,(int)va[2].dval);
-#else
-			clean_saved_string((int)va[2].dval);
-			memcpy(saved_string,va[0].sval+(int)va[1].dval,va[2].dval);
-			saved_string[(int)va[2].dval]=0;
-#endif
 		};
 		} else {
 			syntax_error("mid: wrong_type of args",100);

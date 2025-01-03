@@ -289,16 +289,6 @@ void status_line(WINDP *wp)
 	if(wp->w_fp->b_flag & FSMMAP) {*stp++ = 'M'; n++;};
 	if(wp->w_fp->b_flag & FSNLIST) {*stp++ = 'L'; n++;};
 
-#if	0
-	if(wp->w_fp->b_flag & FSDIRED) {	/* add sort mode  */
-		if(sort_mode>7) *stp++ = 'A'; 
-		else if(sort_mode>5) *stp++ = 'C';
-		else if(sort_mode>3) *stp++ = 'T';
-		else if(sort_mode>1) *stp++ = 'S';
-		else *stp++ = 'N';
-		if((sort_mode %2)==1) { *stp++ = 'r'; };
-	};	
-#endif
 	if(is_wrap_text(wp->w_fp)) {*stp++='W';};
 	*stp++=' ';
 	if(gmode_over) *stp++ = 'O';

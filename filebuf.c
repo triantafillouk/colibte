@@ -1904,16 +1904,11 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 			 bf->b_state |= FS_VIEW;
 		};
    };
+
 	// if(bf->b_flag & FSMMAP) MESG("ifile0: memory mapped file %s!",bf->b_fname);
-#if	0
-	if(bf->b_mode & EMCRYPT) {	/* no mmap fro encrypted files!  */
-		bf->b_flag &= ~FSMMAP;
-	};
-#else
 	if(bf->bom_type != 0) {	/* no mmap */
 		bf->b_flag &= ~FSMMAP;
 	};
-#endif
 	// MESG("ifile0: 4 name=%s",name);
 	file=open(name,O_RDONLY);
 
