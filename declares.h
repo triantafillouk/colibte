@@ -86,7 +86,7 @@ int highlight_index(char *,int *);
 int highlight_type(char *);
 int is_wrap_text(FILEBUF *fp);
 void init_highlight_structure(MLQUOTES *hs);
-
+int insert_money_symbol(num); 
 int select_highlight(num);
 int check_update_highlight(int flag);
 int file_type_is(char *extention,int check_type);

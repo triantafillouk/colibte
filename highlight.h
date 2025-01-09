@@ -14,7 +14,7 @@ int c_incword(int c);
 int c_injword(int c);
 int c_incobol_word(int c);
 int c_in_txt_word(int c);
-int comment_c();
+int comment_c(int dummy);
 int comment_cc(int n);
 int comment_perl(int n);
 int comment_html(int n);
@@ -24,8 +24,9 @@ int comment_matlab(int n);
 int comment_none(int n);
 int comment_basic(int n);
 int comment_sql(int n);
-int comment_lua();
+int comment_lua(int dummy);
 int comment_ini(int n);
+int comment_md(int n);
 
 /* character states */
 #if	1
@@ -403,7 +404,7 @@ SHLIGHT hts[] = {
  { "V", 0,0,v_w,v_w1,highlight_c,update_highlight,c_incword,v_extensions,comment_cc },
  { "JULIA",0,0,julia_w,julia_w1,highlight_julia,update_highlight,c_incword,julia_extensions,comment_perl },
  { "CAL",1,0,none_w,none_w, highlight_cmd,update_highlight_line,c_in_txt_word,gtxt_extensions,comment_perl },
- { "MD",0,0,none_w,none_w, highlight_md, update_highlight, c_in_txt_word,md_extensions,comment_html },
+ { "MD",0,0,none_w,none_w, highlight_md, update_highlight, c_in_txt_word,md_extensions,comment_md },
  { "LUA",0,0,lua_w,lua_w1,highlight_lua,update_highlight,c_incword,lua_extensions,comment_lua },
  { "BICEP",0,0,bicep_w,bicep_w1,highlight_c,update_highlight,c_incword,bicep_extensions,comment_cc },
  { "ZIG", 0,0,zig_w,zig_w1,highlight_zig,update_highlight,c_incword,zig_extensions,comment_cc },

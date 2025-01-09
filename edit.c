@@ -812,6 +812,7 @@ int comment_line(num n)
 	// MESG("comment_line: n=%d type=%d buffer_type=%d = %s",n,comment_type,fp->b_type,fp->hl->description);
 	if(cwp->selection) {
 		offs start,end,o,end0;
+		// MESG("comment_line: selection");
 		int size=0;
 		start = tp_offset(cwp->w_smark);
 		end = tp_offset(cwp->w_emark);

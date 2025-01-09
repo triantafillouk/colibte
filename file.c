@@ -36,7 +36,7 @@ char *uncompress_command[] = {
 
 /* local define functions */
 int add_to_recent_list(char *full_file_name);
-int is_encrypt(int file_id);
+// int is_encrypt(int file_id);
 
 int default_view_mode=0;
 
