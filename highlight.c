@@ -237,7 +237,7 @@ int file_type_is(char *extention,int check_type)
 int comment_with_string(char *comment_string,int start)
 {
  FILEBUF *fp=cbfp;
-//	MESG("comment_with_string: type=%d",start);
+ 	// MESG("comment_with_string: type=%d",start);
 	if(fp->b_flag<4) {
 		offs curoffs=Offset();
 		offs pos;
@@ -258,14 +258,15 @@ int comment_with_string(char *comment_string,int start)
 		if(pos>=bol_offs) {
 			// delete it!
 			ToLineBegin();
-			textpoint_move(fp->tp_current,pos-bol_offs);
+			// textpoint_move(fp->tp_current,pos-bol_offs);
+			textpoint_set(fp->tp_current,pos);
 			int c = FCharAt(fp,pos+strlen(comment_string));
 			int space=0;
 			if(c==' '||c=='\t') space=1;
 			DeleteBlock(0,strlen(comment_string)+space);
-			if(curoffs>pos)
-				set_Offset(curoffs-strlen(comment_string)-space);
-			else set_Offset(curoffs);
+			if(curoffs==pos+strlen(comment_string)) { set_Offset(curoffs-strlen(comment_string));}
+			else if(curoffs>pos+strlen(comment_string)){ set_Offset(curoffs-strlen(comment_string)-space);} 
+			else {set_Offset(curoffs); }
 			size=-strlen(comment_string)-space;
 		};
 		if(cwp) set_update(cwp,UPD_EDIT);
@@ -437,7 +438,7 @@ int comment_css2()
 
 int comment_cc(int n)
 {
-//	MESG("comment_cc: n=%d",n);
+// MESG("comment_cc: n=%d",n);
  	if(n==C_STARTEND) return comment_c(1);
 	if(n==C_COLSTART) return comment_with_string("//",C_COLSTART);
 	if(n==C_LINEEND) return comment_with_string("//",C_LINEEND);
