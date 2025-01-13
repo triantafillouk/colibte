@@ -938,12 +938,17 @@ on_dra0_key_press_event(GtkWidget       *widget,
 		//	ks= CNTRL | 'G'; 
 		if(!quote_flag)	key_buf[key_index++]=7;
 		else key_buf[key_index++]=ks;
-	} else { 
+	} else {
+		if(quote_flag){
 		switch(ks) {
 			case 'e': case 'E': n_chars=insert_key_string("€");break;
 			case 'c': case 'C': n_chars=insert_key_string("©");break;
 			case 'r': case 'R': n_chars=insert_key_string("®");break;
 			default:
+				key_buf[key_index++]=ks;
+				if(flag & CTLX && emacs_emul) key_buf[key_index++]=24; // control_x
+		};
+		} else {
 				key_buf[key_index++]=ks;
 				if(flag & CTLX && emacs_emul) key_buf[key_index++]=24; // control_x
 		};
@@ -1181,7 +1186,7 @@ int getstring(char *prompt, char *st1, int maxlen,int disinp)
 	};
 	init_input();
 	strlcpy(st2,st1,MAXLLEN-1);
-//	MESG("getstring: kbdmode=0x%X",kbdmode);
+	MESG("getstring: kbdmode=0x%X",kbdmode);
 	if(kbdmode==PLAY) {
 		return(set_play_string(st1));
 	};
@@ -1197,20 +1202,24 @@ int getstring(char *prompt, char *st1, int maxlen,int disinp)
 		gtk_entry_set_visibility(GTK_ENTRY(gs_entry),1);
 	};
 	entry_mode=KENTRY;
+	MESG("	1:");
 	start_interactive(prompt);
+	MESG("	2:");
 	entry_mode=KENTRY;
 	gtk_widget_show(gs_entry);
+	MESG("	3:");
 
 
 	gtk_widget_set_can_focus (gs_entry,TRUE);
 	gtk_widget_grab_focus(gs_entry);
+	MESG("	4:");
 
 	while(entry_mode==KENTRY) {
 		// MESG("KENTRY:");
 		events_flush();
 		usleep(100000);
 	};
-//	MESG("getstring: end1");
+	MESG("getstring: end1");
 	if(cbfp->b_lang == 0) {
 		strlcpy(st2,gtk_entry_get_text(GTK_ENTRY(gs_entry)),MAXLLEN);
 		strlcpy(st1,st2,MAXLLEN);
@@ -1668,6 +1677,7 @@ int menu_command(num n)
 
 void start_interactive(char *prompt)
 {
+	MESG("start_interactive:");
 	if(compact1) {
 		gtk_widget_hide(toolbar1);
 	};
@@ -1676,6 +1686,7 @@ void start_interactive(char *prompt)
 	gtk_label_set_text((GtkLabel *)gs_label,prompt);
 	gtk_widget_show(gs_label);
 	gtk_widget_show(toolbar2);
+	MESG("start_interactive:end");
 }
 
 void end_interactive()

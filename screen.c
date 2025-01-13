@@ -1922,6 +1922,7 @@ int  show_position_info(num short_version)
 	int sstat=0;
 	if(cwp==NULL) return false;
 	FILEBUF *fp = cwp->w_fp;
+	// MESG("show_position_info:");
 #if	TNOTES
 	if(fp->b_flag>=FSNOTES) {
 	  if(fp->b_flag & FSDIRED) 

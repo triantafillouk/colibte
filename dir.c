@@ -25,7 +25,7 @@
 
 #define DIR_CURRENT	0
 #define	DIR_OTHER	1
-
+#define	TMULTIPLE	0
 char **f_extcmd;
 char **f_extension;
 
@@ -581,6 +581,7 @@ int start_edit(int n)
 }
 
 /* simple copy */
+#if	0
 int dir_copy(num n)
 {
   struct stat t;
@@ -657,6 +658,85 @@ int dir_copy(num n)
 
   return(TRUE);
 }
+#else
+int dir_copy(num n)
+{
+  struct stat t;
+  int s;
+  int is_other_dir=0;
+  int ftype;
+  int sstat=0;
+  char destination[MAXFLEN];
+  char destination_escaped[MAXFLEN];
+  char fname[MAXFLEN];
+  char sline[MAXLLEN];
+  MESG("dir_multi_copy:");
+#if	DARWIN
+  char *cp_flags="-pcf";
+#else
+  char *cp_flags="-pf";
+#endif
+  char sconfirm[MAXLLEN];
+  int s1,destination_is_dir=0;
+  FILEBUF *dbuf;	/* destination dir buffer  */
+
+  if(!(cbfp->b_flag & FSNLIST)) return FALSE;
+  dbuf=get_dir_buffer(DIR_OTHER,0);	/* get destination dir buffer  */
+  if(dbuf!=NULL) {
+  	strlcpy(destination,dbuf->b_dname,MAXFLEN);
+  } else {
+  	destination[0]=0;
+  };
+  set_list_type(LDIR2);
+
+  ftype=dir_getfile(fname,1);
+  sstat=snprintf(sconfirm,MAXLLEN,"Copy [%s] to: ",fname);
+
+  if(sstat>=MAXLLEN) MESG("truncated 7");
+  if((s = nextarg(sconfirm,destination,MAXFLEN,true)) !=TRUE) return(s);
+  strlcpy(destination_escaped,destination,MAXFLEN);
+#if	DARWIN
+  if (ftype == FTYPE_DIR) cp_flags="-rcpf";
+#else
+  if (ftype == FTYPE_DIR) cp_flags="-rpf";
+#endif
+
+  s1=chdir(cbfp->b_dname);
+  MESG("current dir is [%s]",getcwd(NULL,MAXFLEN));
+  MESG(" buffer dir is [%s]",cbfp->b_dname);
+  escape_file_name(fname);
+  escape_file_name(destination_escaped);
+
+  MESG("dir_multi_copy:sline=[%s]",sline);
+  s1=stat(destination_escaped,&t);
+  // MESG("dir_copy:[%s] status=%d",sline,s1);
+  if(s1==0) {	/* it exists!  */
+  	s1=1;
+	destination_is_dir = (t.st_mode & S_IFMT) == S_IFDIR;
+	if(!destination_is_dir) cp_flags="-pf";
+  } else s1=0;
+
+  if(snprintf(sline,MAXLLEN,"cp %s %s %s 2> /dev/null",
+  	cp_flags,fname,destination_escaped)>=MAXLLEN) {
+		msg_line("File name too long!");
+		return(FALSE);
+	};
+
+  if((s1=(system(sline))) !=0 ) { 
+	return error_line("Error copying %s to %s status=%d",fname,destination,s1);
+  };
+//	MESG("result status =%d",s1);
+	if(strstr(destination,"/")!=NULL) is_other_dir=1;
+	s1=chdir(cbfp->b_dname);
+	if(destination_is_dir || is_other_dir) {
+//		cbfp->b_state &= ~FS_CHG;
+		dir_other_reload(1);
+		return(TRUE);
+	} else dir_reload(1);
+
+  return(TRUE);
+}
+#endif
 
 /* simple rename/move */
 int dir_move(num n) 
@@ -1656,7 +1736,7 @@ char *get_line_at(FILEBUF *fb,offs offset);
 /* if flag then add \ in front of space characters  */
 int dir_getfile(char *fname,int flag) 
 {
- offs s;
+ // offs s;
  char c;
  int ftype;
  int len;
@@ -1667,7 +1747,7 @@ int dir_getfile(char *fname,int flag)
  struct stat t;
  int perms=0;
  fname[0]=0;
- // MESG("dir_getfile:start f=%d note_line=%d",flag,cwp->current_note_line);
+ MESG("dir_getfile:start f=%d note_line=%d",flag,cwp->current_note_line);
 
  char *line_str;
  if(cbfp->b_flag & FSNLIST) {
@@ -1691,14 +1771,24 @@ int dir_getfile(char *fname,int flag)
  if(c=='#' ||c=='!'||c=='/') ftype=FTYPE_DIR;else ftype=FTYPE_NORMAL;
  c=line_str[1];
  if(c=='l') is_link=1;
- s=DIR_NAME_POSITION;
+ // s=DIR_NAME_POSITION;
  len=strlen(line_str)-DIR_NAME_POSITION;
  f=f1;
+ char *start_string=line_str+DIR_NAME_POSITION;
+ char *end_string=strstr(line_str," -->");
+ if(end_string != NULL) {
+	len=end_string-start_string;
+ };
 
+#if	1
+  memcpy(f1,start_string,len);
+  f1[len]=0;
+  escape_file_name(f1);  
+#else
  for(; len>0;len--) {
   c=line_str[s];
   if(c==0) break;
-  if(c==' ' && line_str[s+3]=='>') break;
+  // if(c==' ' && line_str[s+3]=='>') break;
   if(c==' ' && (flag==1)) { *f++ = '\\';};	/* escape space  */
   if(c=='&' && (flag==1)) { *f++ = '\\';};	/* escape background flag */
   if(c=='(' && (flag==1)) { *f++ = '\\';};	/* escape background flag */
@@ -1707,7 +1797,8 @@ int dir_getfile(char *fname,int flag)
   *f++ = c;s++;
  };
  *f=0;
-
+#endif
+ MESG("file name: [%s][%s]",start_string,f1);
  if(stat_result<0) {
 	strlcpy(fname,f1,MAXFLEN);
 	// MESG("stat_result: <0 , return [%s]!",fname);
