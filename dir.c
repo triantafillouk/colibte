@@ -1690,9 +1690,14 @@ int dir_tag(num n)
   if(!(cbfp->b_flag & FSNLIST)) return FALSE;
   istr **row_data = (istr **) array_data(cbfp->dir_list_str);
   istr *dir_str = row_data[cwp->current_note_line];
-  if(dir_str->selected) dir_str->selected=0;
-  else dir_str->selected=1;
-  // MESG("dir_tag: %d",dir_str->selected);
+  if(dir_str->selection_tag) {
+  	dir_str->selection_tag=0;
+	selected_files--;
+  } else {
+  	dir_str->selection_tag=1;
+	selected_files++;
+  };
+  // MESG("dir_tag: %d",dir_str->selection_tag);
   next_line(1);
   set_update(cwp,UPD_EDIT);
   return 1;
@@ -1839,7 +1844,6 @@ int dir_getfile(char *fname,int flag)
 			snprintf(fname,MAXFLEN,"%s %4d:",s_perms,perms);
 		};
 	} else {
-
 	 	strlcpy(fname,f1,MAXFLEN);
 	};
  } else {
@@ -2133,7 +2137,7 @@ int insert_dir(FILEBUF *buf_dir,int retain)
 	dir_istr = (istr *)malloc(sizeof(istr)+strlen(fline));
 	memcpy(&dir_istr->start,fline,strlen(fline)+1);
 	dir_istr->index = dir_ind++;
-	dir_istr->selected=0;
+	dir_istr->selection_tag=0;
 
 	add_element_to_list((void *)dir_istr,dir_list_str);
 
@@ -2176,6 +2180,28 @@ int insert_dir(FILEBUF *buf_dir,int retain)
  if(stat) return (FALSE);
  return(TRUE);
 }
+
+void clear_dir_selections(FILEBUF *fp)
+{
+ istr **row_data = (istr **) array_data(fp->dir_list_str);
+ int i;
+ for(i=0;i<fp->dir_list_str->size;i++) {
+	istr *dir_str = row_data[cwp->current_note_line];
+	dir_str->selection_tag=0;
+ };
+}
+
+void reverse_dir_selections(FILEBUF *fp)
+{
+ istr **row_data = (istr **) array_data(fp->dir_list_str);
+ int i;
+ for(i=0;i<fp->dir_list_str->size;i++) {
+	istr *dir_str = row_data[cwp->current_note_line];
+	if(dir_str->selection_tag==0) dir_str->selection_tag=1;
+	else dir_str->selection_tag=0;
+ };
+}
+
 
 int listdir(int dtype)
 { 

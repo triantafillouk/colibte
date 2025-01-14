@@ -1922,12 +1922,12 @@ int  show_position_info(num short_version)
 	int sstat=0;
 	if(cwp==NULL) return false;
 	FILEBUF *fp = cwp->w_fp;
-	// MESG("show_position_info:");
+	MESG("show_position_info:");
 #if	TNOTES
 	if(fp->b_flag>=FSNOTES) {
 	  if(fp->b_flag & FSDIRED) 
 	  {
-	  	// MESG("show dir info");
+	  	MESG("show dir info");
 	  	if(!short_version) {
 			char finfo[MAXFLEN];
 	
@@ -2273,7 +2273,7 @@ void upd_some_virtual_lines(WINDP *wp,char *from)
 
 			row_data=(istr *)lget_current(wp->w_fp->dir_list_str);
 			if(row_data) {
-				vt_str(wp,&row_data->start,sline,wp->current_note_line- wp->top_note_line+1,0,-1,row_data->selected);
+				vt_str(wp,&row_data->start,sline,wp->current_note_line- wp->top_note_line+1,0,-1,row_data->selection_tag);
 				// MESG("- %2d : [%s]",sline,&row_data->start);
 			} else {
 				// MESG("- %2d : clear note line!",sline);
@@ -2304,7 +2304,7 @@ void upd_some_virtual_lines(WINDP *wp,char *from)
 			if(row_data) {
 				// MESG("- %2d : [%s]",sline,&row_data->start);
 				// int selected = iarray_index(sel_tags,row_data->index,num_of_selected_tags);
-				vt_str(wp,&row_data->start,sline,wp->current_tag_line- wp->top_tag_line+1,0,20,row_data->selected);
+				vt_str(wp,&row_data->start,sline,wp->current_tag_line- wp->top_tag_line+1,0,20,row_data->selection_tag);
 				// vteeoc(wp,TAGS_WIDTH+3);
 			} else {
 				// MESG("- %2d : clear tag line!",sline);
@@ -2313,7 +2313,7 @@ void upd_some_virtual_lines(WINDP *wp,char *from)
 			};
 			row_data=(istr *)lget_current(wp->w_fp->dir_list_str);
 			if(row_data) {
-				vt_str(wp,&row_data->start,sline,wp->current_note_line- wp->top_note_line+1,TAGS_WIDTH+3,-1,row_data->selected);
+				vt_str(wp,&row_data->start,sline,wp->current_note_line- wp->top_note_line+1,TAGS_WIDTH+3,-1,row_data->selection_tag);
 				// MESG("- %2d : [%s]",sline,&row_data->start);
 			} else {
 				// MESG("- %2d : clear note line!",sline);
@@ -2370,7 +2370,7 @@ void upd_move(WINDP *wp,char *from)
 
 			row_data=(istr *)lget_current(wp->w_fp->dir_list_str);
 			if(row_data) {
-				vt_str(wp,&row_data->start,sline,wp->current_note_line- wp->top_note_line+1,0,-1,row_data->selected);
+				vt_str(wp,&row_data->start,sline,wp->current_note_line- wp->top_note_line+1,0,-1,row_data->selection_tag);
 			} else {
 				// MESG("- %2d : clear note line!",sline);
 				vt_str(wp,"",sline,-1,0,-1,-1);
@@ -2398,7 +2398,7 @@ void upd_move(WINDP *wp,char *from)
 			row_data=(istr *)lget_current(wp->w_fp->b_tag_list);
 			if(row_data) {
 				// MESG("- %2d : [%s]",sline,&row_data->start);
-				vt_str(wp,&row_data->start,sline,wp->current_tag_line- wp->top_tag_line+1,0,20,row_data->selected);
+				vt_str(wp,&row_data->start,sline,wp->current_tag_line- wp->top_tag_line+1,0,20,row_data->selection_tag);
 				// vteeoc(wp,TAGS_WIDTH+3);
 			} else {
 				// MESG("- %2d : clear tag line!",sline);
@@ -2407,7 +2407,7 @@ void upd_move(WINDP *wp,char *from)
 			};
 			row_data=(istr *)lget_current(wp->w_fp->dir_list_str);
 			if(row_data) {
-				vt_str(wp,&row_data->start,sline,wp->current_note_line- wp->top_note_line+1,TAGS_WIDTH+3,-1,row_data->selected);
+				vt_str(wp,&row_data->start,sline,wp->current_note_line- wp->top_note_line+1,TAGS_WIDTH+3,-1,row_data->selection_tag);
 				// MESG("- %2d : [%s]",sline,&row_data->start);
 			} else {
 				// MESG("- %2d : clear note line!",sline);
@@ -2605,7 +2605,7 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 
 			row_data=(istr *)lget_current(wp->w_fp->dir_list_str);
 			if(row_data) {
-				vt_str(wp,&row_data->start,sline,wp->current_note_line- wp->top_note_line+1,0,-1,row_data->selected);
+				vt_str(wp,&row_data->start,sline,wp->current_note_line- wp->top_note_line+1,0,-1,row_data->selection_tag);
 				// MESG("- %2d : [%s]",sline,&row_data->start);
 			} else {
 				// MESG("- %2d : clear note line!",sline);
@@ -2635,7 +2635,7 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 			row_data=(istr *)lget_current(wp->w_fp->b_tag_list);
 			if(row_data) {
 				// MESG("- %2d : [%s]",sline,&row_data->start);
-				vt_str(wp,&row_data->start,sline,wp->current_tag_line- wp->top_tag_line+1,0,20,row_data->selected);
+				vt_str(wp,&row_data->start,sline,wp->current_tag_line- wp->top_tag_line+1,0,20,row_data->selection_tag);
 				// vteeoc(wp,TAGS_WIDTH+3);
 			} else {
 				// MESG("- %2d : clear tag line!",sline);
@@ -2644,7 +2644,7 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 			};
 			row_data=(istr *)lget_current(wp->w_fp->dir_list_str);
 			if(row_data) {
-				vt_str(wp,&row_data->start,sline,wp->current_note_line- wp->top_note_line+1,TAGS_WIDTH+3,-1,row_data->selected);
+				vt_str(wp,&row_data->start,sline,wp->current_note_line- wp->top_note_line+1,TAGS_WIDTH+3,-1,row_data->selection_tag);
 				// MESG("- %2d : [%s]",sline,&row_data->start);
 			} else {
 				// MESG("- %2d : clear note line!",sline);

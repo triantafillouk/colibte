@@ -401,8 +401,8 @@ typedef struct BTWE {
 #endif
 
 typedef struct ISTR {
-	int index;
-	int selected;
+	short index;
+	short selection_tag;
 	char start;
 } istr;
 
@@ -645,7 +645,7 @@ typedef struct  FILEBUF {
 	struct	dir_l	*rdir;
 	struct	dir_l	*cdir;
 	struct	alist	*dir_list_str;
-	int		flen0;					/* Initial line len  */
+	int		selected_files;
 	int		file_id;				/* file id while reading  */
 // Flags
 	short int	b_nwnd;                 /* Count of windows on buffer   */
