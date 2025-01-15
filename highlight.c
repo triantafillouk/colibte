@@ -2283,6 +2283,89 @@ void highlight_perl(int c)
   };
 }
 
+// powershell
+void highlight_ps1(int c)
+{
+  if(highlight_note(c)) return;
+
+  switch(c) {
+	case (CHR_RESET) : // initialize
+		hstate=0;
+		slang=LANG_SCRIPT;
+		break;
+	/* single quotes */
+	case CHR_SQUOTE: 
+//		if(hstate!=HS_PREVESC) hquotem = (hquotem)? hquotem & ~H_QUOTE1: H_QUOTE1;
+		if(hstate!=HS_PREVESC) {
+			if(hquotem & H_QUOTE4 && !(hquotem & H_QUOTE2)) {
+				if(hquotem == H_QUOTE4) {
+					hquotem = H_QUOTE1 | H_QUOTE4;
+				} else {
+					hquotem = H_QUOTE4;  
+				}
+			} else hquotem = (hquotem)? hquotem & ~H_QUOTE1: H_QUOTE1;
+		};
+		hstate=0;
+		break;
+	/* double quotes */
+	case CHR_DQUOTE:
+		if(hquotem&H_QUOTE5) break;
+		if(hstate!=HS_PREVESC) {
+			if(hquotem & H_QUOTE4 && !(hquotem & H_QUOTE1)) {
+				if(hquotem == H_QUOTE4) {
+					hquotem = H_QUOTE2 | H_QUOTE4;
+				} else {
+					hquotem = H_QUOTE4;
+				}
+			} else hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
+		};
+		hstate=0;
+		break;
+	/* comments */
+	case '#':
+		if((hstate!=HS_PREVESC) && (hquotem!=H_QUOTE2 && hquotem!=H_QUOTE1)) {
+			hquotem |= H_QUOTE5;
+		};
+		hstate=0;
+		break;
+	case '\\':
+	case '$':{
+		hstate=(hstate==HS_PREVESC)?0:HS_PREVESC;
+		};
+		break;
+	case '\n':
+	case CHR_CR:
+		hquotem &= ~(H_QUOTE6|H_QUOTE4|H_QUOTE5|H_QUOTE9);
+		hstate=HS_LINESTART;
+		break;
+	case '!':
+		if(hstate==HS_PSMALLER) hquotem |= H_QUOTEC;
+		hstate=0;
+		break;
+	case '-':
+		if(hquotem==H_QUOTEC) {
+			if(hstate==HS_END1) hstate=HS_END2;
+			else hstate=HS_END1;
+		} else hstate=0;
+		break;
+	case '?':
+		if(hstate==HS_PSMALLER) hquotem=0;
+		hstate=0;
+		break;
+	case CHR_PARL:
+		hstate=HS_SPEC;
+		break;
+	case ' ':
+	case '\t':
+		if(hstate!=HS_LINESTART && hstate!=HS_PSMALLER && hstate!=HS_SPEC) hstate=0;
+		break;		
+	default: { 
+		if(hstate==HS_PSMALLER && hquotem==0) hquotem = H_QUOTE4;
+		hstate=0;
+	};
+  };
+}
+
 
 void highlight_json(int c)
 {

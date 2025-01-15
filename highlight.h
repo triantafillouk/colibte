@@ -106,6 +106,7 @@ void highlight_sln(int c);
 void highlight_md(int c);
 void highlight_lua(int c);
 void highlight_bicep(int c);
+void highlight_ps1(int c);
 
 char *c_w[] = { "if","elseif","else","do","while","switch","case","for","return","break","goto","continue","typedef",
 	"namespace","this","throw","try","catch","@property","default","extern","static","const","" };
@@ -234,7 +235,7 @@ char *perl_w[] = { "while","foreach","elsif","do","if","else","end","next","unle
 char *perl_w1[] = { "my","our","printf","print","open","close","mkdir","exit","sprintf","push","chomp","shift","split","local",
 	"or","not","xor","le","lt","ne","eq","and","gt","ge","$self", "" };
 char *ps1_w[] = { "WHILE","FOREACH","ELSIF","DO","IF","ELSE","END","NEXT","UNLESS","CONTINUE",
-	"FUNCTION","UNTIL","FOR","SWITCH","DIE","RETURN","" };
+	"FUNCTION","UNTIL","FOR","SWITCH","DIE","RETURN","TRY","CATCH","" };
 char *ps1_w1[] = { "GLOBAL","WRITE-HOST","OPEN","CLOSE","MKDIR","RM","PARAM","STRING","INT",
 	"OR","NOT","XOR","LE","LT","NE","EQ","AND","GT","GE","CONTAINS", "LIKE","NOTCONTAINS",
 	"GET-CONTENT","GET-CHILDREN","GET-HOST","READ-HOST","" };
@@ -390,7 +391,7 @@ SHLIGHT hts[] = {
  { "MATLAB",0,0,matlab_w,matlab_w1,highlight_matlab,update_highlight,c_incword,matlab_extensions,comment_matlab},
  { "COMPRESS",0,0,none_w,none_w,highlight_text,update_highlight,c_incword,compress_extensions,comment_none},
  { "TAGS",0,0,none_w,none_w, highlight_text,update_highlight_none,c_incobol_word,tags_extensions,comment_none },
- { "PS1",1,0,ps1_w,ps1_w1, highlight_other,update_highlight,c_incword,ps1_extensions,comment_perl },
+ { "PS1",1,0,ps1_w,ps1_w1, highlight_ps1,update_highlight,c_incword,ps1_extensions,comment_perl },
  { "SSG",1,1,ssg_w,ssg_w1, highlight_ecl,update_highlight_line,c_incword,ssg_extensions,comment_ecl },
  { "YAML",0,1,yaml_w,yaml_w1, highlight_yaml,update_highlight_line,c_incword,yaml_extensions,comment_perl },
  { "JSON",0,0,jscript_w,jscript_w1,highlight_json,update_highlight,c_incword,json_extensions,comment_cc },

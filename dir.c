@@ -53,6 +53,7 @@ int dir_other_reload(num n);
 void escape_file_name(char *fname);
 void delete_current_list_line();
 int stricmp1(const char *str1, const char *str2);
+int dir_getfile1(char *fname,int flag,int file_index) ;
 
 int pdline=-1;
 int current_sort_mode=0;
@@ -580,6 +581,40 @@ int start_edit(int n)
  return true;
 }
 
+int copy_1file(char *fname,char *destination,int ftype)
+{
+  struct stat t;
+  int s1=stat(destination,&t);
+  int destination_is_dir=0;
+  char sline[MAXLLEN];
+#if	DARWIN
+  char *cp_flags="-pcf";
+  if (ftype == FTYPE_DIR) cp_flags="-rcpf";
+#else
+  char *cp_flags="-pf";
+  if (ftype == FTYPE_DIR) cp_flags="-rpf";
+#endif
+  // MESG("dir_copy:[%s] status=%d",sline,s1);
+  if(s1==0) {	/* it exists!  */
+  	s1=1;
+	destination_is_dir = (t.st_mode & S_IFMT) == S_IFDIR;
+	if(!destination_is_dir) cp_flags="-pf";
+  } else s1=0;
+
+  escape_file_name(fname);
+  if(snprintf(sline,MAXLLEN,"cp %s %s %s 2> /dev/null",
+  	cp_flags,fname,destination)>=MAXLLEN) {
+		msg_line("File name too long!");
+		return(FALSE);
+	};
+
+  // MESG("dir_copy1:sline=[%s]",sline);
+  if((s1=(system(sline))) !=0 ) { 
+	return error_line("Error copying %s to %s status=%d",fname,destination,s1);
+  };
+  return(true);
+}
+
 /* simple copy */
 #if	0
 int dir_copy(num n)
@@ -661,7 +696,7 @@ int dir_copy(num n)
 #else
 int dir_copy(num n)
 {
-  struct stat t;
+  // struct stat t;
   int s;
   int is_other_dir=0;
   int ftype;
@@ -669,13 +704,8 @@ int dir_copy(num n)
   char destination[MAXFLEN];
   char destination_escaped[MAXFLEN];
   char fname[MAXFLEN];
-  char sline[MAXLLEN];
-  MESG("dir_multi_copy:");
-#if	DARWIN
-  char *cp_flags="-pcf";
-#else
-  char *cp_flags="-pf";
-#endif
+  // char sline[MAXLLEN];
+  MESG("dir_multi_copy:-----------------------------");
   char sconfirm[MAXLLEN];
   int s1,destination_is_dir=0;
   FILEBUF *dbuf;	/* destination dir buffer  */
@@ -689,42 +719,47 @@ int dir_copy(num n)
   };
   set_list_type(LDIR2);
 
-  ftype=dir_getfile(fname,1);
-  sstat=snprintf(sconfirm,MAXLLEN,"Copy [%s] to: ",fname);
-
+  if(cbfp->selected_files==0) {
+	ftype=dir_getfile(fname,1);
+	sstat=snprintf(sconfirm,MAXLLEN,"Copy [%s] to: ",fname);
+  } else {
+	sstat=snprintf(sconfirm,MAXLLEN,"Copy selected to: ");
+  };
   if(sstat>=MAXLLEN) MESG("truncated 7");
+
   if((s = nextarg(sconfirm,destination,MAXFLEN,true)) !=TRUE) return(s);
+
   strlcpy(destination_escaped,destination,MAXFLEN);
-#if	DARWIN
-  if (ftype == FTYPE_DIR) cp_flags="-rcpf";
-#else
-  if (ftype == FTYPE_DIR) cp_flags="-rpf";
-#endif
 
   s1=chdir(cbfp->b_dname);
   MESG("current dir is [%s]",getcwd(NULL,MAXFLEN));
   MESG(" buffer dir is [%s]",cbfp->b_dname);
-  escape_file_name(fname);
   escape_file_name(destination_escaped);
 
-  MESG("dir_multi_copy:sline=[%s]",sline);
-  s1=stat(destination_escaped,&t);
-  // MESG("dir_copy:[%s] status=%d",sline,s1);
-  if(s1==0) {	/* it exists!  */
-  	s1=1;
-	destination_is_dir = (t.st_mode & S_IFMT) == S_IFDIR;
-	if(!destination_is_dir) cp_flags="-pf";
-  } else s1=0;
 
-  if(snprintf(sline,MAXLLEN,"cp %s %s %s 2> /dev/null",
-  	cp_flags,fname,destination_escaped)>=MAXLLEN) {
-		msg_line("File name too long!");
-		return(FALSE);
+// ----- start
+
+  if(cbfp->selected_files==0) {
+	s1=copy_1file(fname,destination_escaped,ftype);
+  } else {
+	int i;
+	istr **row_data = (istr **) array_data(cbfp->dir_list_str);
+	s1=0;
+ 	for(i=0;i<cbfp->dir_list_str->size;i++) {
+		istr *dir_str = row_data[i];
+		if(dir_str->selection_tag) {
+			ftype = dir_getfile1(fname,1,i);
+			MESG("copy line %d name=%s type=%d",i,fname,ftype);
+			if(ftype>=0) {
+				s1+=copy_1file(fname,destination_escaped,ftype);
+				dir_str->selection_tag=0;
+				cbfp->selected_files--;
+			}
+		};
 	};
-
-  if((s1=(system(sline))) !=0 ) { 
-	return error_line("Error copying %s to %s status=%d",fname,destination,s1);
   };
+// ---- end
+
 //	MESG("result status =%d",s1);
 	if(strstr(destination,"/")!=NULL) is_other_dir=1;
 	s1=chdir(cbfp->b_dname);
@@ -733,7 +768,8 @@ int dir_copy(num n)
 		dir_other_reload(1);
 		return(TRUE);
 	} else dir_reload(1);
-
+  if(s1==1) msg_line("1 file copied");
+  if(s1>1) msg_line("%d files copied",s1);
   return(TRUE);
 }
 #endif
@@ -1692,10 +1728,10 @@ int dir_tag(num n)
   istr *dir_str = row_data[cwp->current_note_line];
   if(dir_str->selection_tag) {
   	dir_str->selection_tag=0;
-	selected_files--;
+	cbfp->selected_files--;
   } else {
   	dir_str->selection_tag=1;
-	selected_files++;
+	cbfp->selected_files++;
   };
   // MESG("dir_tag: %d",dir_str->selection_tag);
   next_line(1);
@@ -1752,12 +1788,12 @@ int dir_getfile(char *fname,int flag)
  struct stat t;
  int perms=0;
  fname[0]=0;
- MESG("dir_getfile:start f=%d note_line=%d",flag,cwp->current_note_line);
+ // MESG("dir_getfile:start f=%d line=%d",flag,cwp->current_note_line);
 
  char *line_str;
  if(cbfp->b_flag & FSNLIST) {
 	// MESG("dir_getfile: size of dir=%d line %d",cbfp->dir_list_str->size,cwp->current_note_line);
-	if(cbfp->dir_list_str->size==0) return -1;
+	if(cbfp->dir_list_str->size==0) return -1;	// no lines
 
 	istr **row_data = (istr **)array_data(cbfp->dir_list_str);
 	// MESG("dir_getfile: 2");
@@ -1766,9 +1802,10 @@ int dir_getfile(char *fname,int flag)
 	// MESG("current index=%d",current_str->index);
 	line_str = &current_str->start;
 	// MESG("line_str:[%s]",line_str); 
- } else
+ } else {
+	MESG("dir_getfile not in FSNLIST!");
  	line_str=get_line_at(cbfp,Offset());
-
+ };
  // MESG("dir_getfile: b_flag=%X [%s]",cbfp->b_flag,line_str);  
  c=line_str[0];
  if(c=='c') { error_line("cannot view c type files");return -1;};
@@ -1785,25 +1822,12 @@ int dir_getfile(char *fname,int flag)
 	len=end_string-start_string;
  };
 
-#if	1
+
   memcpy(f1,start_string,len);
   f1[len]=0;
   escape_file_name(f1);  
-#else
- for(; len>0;len--) {
-  c=line_str[s];
-  if(c==0) break;
-  // if(c==' ' && line_str[s+3]=='>') break;
-  if(c==' ' && (flag==1)) { *f++ = '\\';};	/* escape space  */
-  if(c=='&' && (flag==1)) { *f++ = '\\';};	/* escape background flag */
-  if(c=='(' && (flag==1)) { *f++ = '\\';};	/* escape background flag */
-  if(c=='|' && (flag==1)) { *f++ = '\\';};	/* escape background flag */
-  if(c==')' && (flag==1)) { *f++ = '\\';};	/* escape background flag */
-  *f++ = c;s++;
- };
- *f=0;
-#endif
- MESG("file name: [%s][%s]",start_string,f1);
+
+ // MESG("file name: [%s][%s]",start_string,f1);
  if(stat_result<0) {
 	strlcpy(fname,f1,MAXFLEN);
 	// MESG("stat_result: <0 , return [%s]!",fname);
@@ -1856,6 +1880,72 @@ int dir_getfile(char *fname,int flag)
 	else return FTYPE_NORMAL;
  };
  
+ return(ftype); 
+}
+
+int dir_getfile1(char *fname,int flag,int file_index) 
+{
+ char c;
+ int ftype=FTYPE_NORMAL;
+ int len;
+ int stat_result=0;
+ int is_link=0;
+ static char f1[MAXFLEN];
+ struct stat t;
+
+ fname[0]=0;
+ // MESG("dir_getfile1 :start f=%d file_index=%d",flag,file_index);
+
+ char *line_str;
+ if(cbfp->b_flag & FSNLIST) {
+	// MESG("dir_getfile: size of dir=%d line %d",cbfp->dir_list_str->size,cwp->current_note_line);
+	if(cbfp->dir_list_str->size==0) return -1;	// no lines
+
+	istr **row_data = (istr **)array_data(cbfp->dir_list_str);
+	// MESG("dir_getfile: 2");
+	if(file_index > cbfp->dir_list_str->size-1) return -1;
+	istr *current_str = row_data[file_index];
+	// MESG("current index=%d",current_str->index);
+	line_str = &current_str->start;
+	// MESG("line_str:[%s]",line_str); 
+ } else {
+	MESG("dir_getfile not in FSNLIST!");
+ 	line_str=get_line_at(cbfp,Offset());
+	return 0;
+ };
+ // MESG("dir_getfile: b_flag=%X [%s]",cbfp->b_flag,line_str);  
+ c=line_str[0];
+ if(c=='c') { error_line("cannot view c type files");return -1;};
+ if(c=='s') { error_line("cannot view socket files");return -1;};
+ if(c=='#') ftype=FTYPE_DIR;
+ c=line_str[1];
+ if(c=='l') is_link=1;
+ // s=DIR_NAME_POSITION;
+ len=strlen(line_str)-DIR_NAME_POSITION;
+
+ char *start_string=line_str+DIR_NAME_POSITION;
+ char *end_string=strstr(line_str," -->");
+ if(end_string != NULL) {
+	len=end_string-start_string;
+ };
+
+  memcpy(f1,start_string,len);
+  f1[len]=0;
+  escape_file_name(f1);  
+
+ // MESG("file name: [%s]",f1);
+
+ // MESG("get_file: [%s] is_link=%d",f1,is_link);
+ if(is_link) 
+ {
+	stat_result=stat(f1,&t);
+	if(stat_result) {
+		if(S_ISDIR(t.st_mode)) ftype=FTYPE_DIRLINK;
+		else ftype=FTYPE_NORMAL;
+	} else return -1;
+ };
+ strlcpy(fname,f1,MAXFLEN);
+
  return(ftype); 
 }
 
@@ -2186,22 +2276,38 @@ void clear_dir_selections(FILEBUF *fp)
  istr **row_data = (istr **) array_data(fp->dir_list_str);
  int i;
  for(i=0;i<fp->dir_list_str->size;i++) {
-	istr *dir_str = row_data[cwp->current_note_line];
+	istr *dir_str = row_data[i];
 	dir_str->selection_tag=0;
  };
+ fp->selected_files=0;
+}
+
+void set_all_dir_selections(FILEBUF *fp)
+{
+ istr **row_data = (istr **) array_data(fp->dir_list_str);
+ int i;
+ for(i=0;i<fp->dir_list_str->size;i++) {
+	istr *dir_str = row_data[i];
+	dir_str->selection_tag=1;
+ };
+ fp->selected_files=0;
 }
 
 void reverse_dir_selections(FILEBUF *fp)
 {
  istr **row_data = (istr **) array_data(fp->dir_list_str);
  int i;
+ fp->selected_files=0;
  for(i=0;i<fp->dir_list_str->size;i++) {
-	istr *dir_str = row_data[cwp->current_note_line];
-	if(dir_str->selection_tag==0) dir_str->selection_tag=1;
-	else dir_str->selection_tag=0;
+	istr *dir_str = row_data[i];
+	if(dir_str->selection_tag==0) {
+		dir_str->selection_tag=1;
+		fp->selected_files++;
+	} else {
+		dir_str->selection_tag=0;
+	};
  };
 }
-
 
 int listdir(int dtype)
 { 
