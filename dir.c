@@ -581,6 +581,7 @@ int start_edit(int n)
  return true;
 }
 
+// copy file, for the moment no questions asked!
 int copy_1file(char *fname,char *destination,int ftype)
 {
   struct stat t;
@@ -615,85 +616,27 @@ int copy_1file(char *fname,char *destination,int ftype)
   return(true);
 }
 
-/* simple copy */
-#if	0
-int dir_copy(num n)
+int move_1file(char *fname,char *destination)
 {
   struct stat t;
-  int s;
-  int is_other_dir=0;
-  int ftype;
-  int sstat=0;
-  char destination[MAXFLEN];
-  char destination_escaped[MAXFLEN];
-  char fname[MAXFLEN];
+  // int s1=stat(destination,&t);
+  int s1=0;
   char sline[MAXLLEN];
-#if	DARWIN
-  char *cp_flags="-pcf";
-#else
-  char *cp_flags="-pf";
-#endif
-  char sconfirm[MAXLLEN];
-  int s1,destination_is_dir=0;
-  FILEBUF *dbuf;	/* destination dir buffer  */
 
-  if(!(cbfp->b_flag & FSNLIST)) return FALSE;
-  dbuf=get_dir_buffer(DIR_OTHER,0);	/* get destination dir buffer  */
-  if(dbuf!=NULL) {
-  	strlcpy(destination,dbuf->b_dname,MAXFLEN);
-  } else {
-  	destination[0]=0;
-  };
-  set_list_type(LDIR2);
-  ftype=dir_getfile(fname,1);
+  // MESG("nove_1file: [%s] -> [%s] status=%d",fname,destination,s1);
 
-  sstat=snprintf(sconfirm,MAXLLEN,"Copy [%s] to: ",fname);
-  if(sstat>=MAXLLEN) MESG("truncated 7");
-  if((s = nextarg(sconfirm,destination,MAXFLEN,true)) !=TRUE) return(s);
-
-  strlcpy(destination_escaped,destination,MAXFLEN);
-#if	DARWIN
-  if (ftype == FTYPE_DIR) cp_flags="-rcpf";
-#else
-  if (ftype == FTYPE_DIR) cp_flags="-rpf";
-#endif
-
-  s1=chdir(cbfp->b_dname);
-//  MESG("current dir is [%s]",getcwd(NULL,MAXFLEN));
-//  MESG(" buffer dir is [%s]",cbfp->b_dname);
-  escape_file_name(fname);
-  escape_file_name(destination_escaped);
-
-  // MESG("dir_copy:[%s]",sline);
-  s1=stat(destination_escaped,&t);
-  // MESG("dir_copy:[%s] status=%d",sline,s1);
-  if(s1==0) {	/* it exists!  */
-  	s1=1;
-	destination_is_dir = (t.st_mode & S_IFMT) == S_IFDIR;
-	if(!destination_is_dir) cp_flags="-pf";
-  } else s1=0;
-
-  if(snprintf(sline,MAXLLEN,"cp %s %s %s 2> /dev/null",
-  	cp_flags,fname,destination_escaped)>=MAXLLEN) {
-		msg_line("File name too long!");
+  if(snprintf(sline,MAXLLEN,"mv %s %s 2> /dev/null",
+  	fname,destination)>=MAXLLEN) {
+		msg_line("nove command too long!");
 		return(FALSE);
 	};
 
-  if((s1=(system(sline))) !=0 ) { 
-	return error_line("Error copying %s to %s status=%d",fname,destination,s1);
-  };
-//	MESG("result status =%d",s1);
-	if(strstr(destination,"/")!=NULL) is_other_dir=1;
-	s1=chdir(cbfp->b_dname);
-	if(destination_is_dir || is_other_dir) {
-//		cbfp->b_state &= ~FS_CHG;
-		dir_other_reload(1);
-		return(TRUE);
-	} else dir_reload(1);
-
-  return(TRUE);
+  // MESG("dir_copy1:sline=[%s]",sline);
+  s1=(system(sline));
+  return(s1);
 }
-#else
+
+/* simple copy */
 int dir_copy(num n)
 {
   // struct stat t;
@@ -732,14 +675,15 @@ int dir_copy(num n)
   strlcpy(destination_escaped,destination,MAXFLEN);
 
   s1=chdir(cbfp->b_dname);
-  MESG("current dir is [%s]",getcwd(NULL,MAXFLEN));
-  MESG(" buffer dir is [%s]",cbfp->b_dname);
+  // MESG("current dir is [%s]",getcwd(NULL,MAXFLEN));
+  // MESG(" buffer dir is [%s]",cbfp->b_dname);
   escape_file_name(destination_escaped);
 
 
 // ----- start
 
   if(cbfp->selected_files==0) {
+    escape_file_name(fname);
 	s1=copy_1file(fname,destination_escaped,ftype);
   } else {
 	int i;
@@ -772,7 +716,6 @@ int dir_copy(num n)
   if(s1>1) msg_line("%d files copied",s1);
   return(TRUE);
 }
-#endif
 
 /* simple rename/move */
 int dir_move(num n) 
@@ -801,20 +744,8 @@ int dir_move(num n)
   if(sstat>=MAXLLEN) { error_line("to long file name, truncated");return(false);}
   if((s1 = nextarg(sconfirm,destination,MAXFLEN,true)) !=TRUE) return(s1);
 
-  escape_file_name(fname);
-  strlcpy(sline,"mv ",MAXLLEN);
-  strlcat(sline,fname,MAXLLEN);
-  strlcat(sline," ",MAXLLEN);
-  strlcat(sline,destination,MAXLLEN);
-  strlcat(sline," 2> /dev/null",MAXLLEN);
-  s1=chdir(cbfp->b_dname);
-  s1=stat(destination,&t);
-  if(s1==0) {	/* it exists!  */
-  	s1=1;
-	destination_is_dir = (t.st_mode & S_IFMT) == S_IFDIR;
-	// MESG("destination is dir!");
-  } else s1=0;
-  s2=system(sline);
+  escape_file_name(destination);
+  s2 = move_1file(fname,destination);
 
   if(s2 != 0) { return error_line("Error moving %s to %s",fname,destination);}
   else {
@@ -1825,7 +1756,7 @@ int dir_getfile(char *fname,int flag)
 
   memcpy(f1,start_string,len);
   f1[len]=0;
-  escape_file_name(f1);  
+  // escape_file_name(f1);  
 
  // MESG("file name: [%s][%s]",start_string,f1);
  if(stat_result<0) {
