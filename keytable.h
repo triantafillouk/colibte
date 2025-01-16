@@ -483,6 +483,10 @@ KEYTAB keytab_dir[] = {
 	{'v',		dir_view,"v"},
 	{'s',		script_exec,"s"},
 	{'z',		dir_size,"z"},
+	{'-',		dir_select_none,"-"},
+	{'=',		dir_select_all,"="},
+	{'*',		dir_select_reverse,"*"},
+
 	{SPEC1|'C',	dir_right,"Arrow right"},
 	{SPEC1|'D',	dir_left,"Arrow left"},
 	{SPEC|'C',	dir_right,"spec c"},

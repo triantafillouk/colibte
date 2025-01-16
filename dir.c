@@ -2284,8 +2284,9 @@ int insert_dir(FILEBUF *buf_dir,int retain)
  return(TRUE);
 }
 
-void clear_dir_selections(FILEBUF *fp)
+int dir_select_none(num dummy)
 {
+ FILEBUF *fp=cbfp;
  istr **row_data = (istr **) array_data(fp->dir_list_str);
  int i;
  for(i=0;i<fp->dir_list_str->size;i++) {
@@ -2293,21 +2294,31 @@ void clear_dir_selections(FILEBUF *fp)
 	dir_str->selection_tag=0;
  };
  fp->selected_files=0;
+ MESG("dir_select_none:");
+ set_update(cwp,UPD_EDIT);
+ return true;
 }
 
-void set_all_dir_selections(FILEBUF *fp)
+int dir_select_all(num dummy)
 {
+ FILEBUF *fp=cbfp;
+ 
  istr **row_data = (istr **) array_data(fp->dir_list_str);
  int i;
+ fp->selected_files=0;
  for(i=0;i<fp->dir_list_str->size;i++) {
 	istr *dir_str = row_data[i];
 	dir_str->selection_tag=1;
+	fp->selected_files++;
  };
- fp->selected_files=0;
+ MESG("dir_select_all: selected=%d",fp->selected_files);
+ set_update(cwp,UPD_EDIT);
+ return true;
 }
 
-void reverse_dir_selections(FILEBUF *fp)
+int dir_select_reverse(num dummy)
 {
+ FILEBUF *fp=cbfp;
  istr **row_data = (istr **) array_data(fp->dir_list_str);
  int i;
  fp->selected_files=0;
@@ -2320,6 +2331,10 @@ void reverse_dir_selections(FILEBUF *fp)
 		dir_str->selection_tag=0;
 	};
  };
+ MESG("dir_select_reverse: selected=%d",fp->selected_files);
+ set_update(cwp,UPD_EDIT);
+ // dir_reload(1);
+ return true;
 }
 
 int listdir(int dtype)

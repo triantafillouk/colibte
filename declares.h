@@ -66,6 +66,9 @@ void set_dval(double val);
 void set_vdval(double val);
 void set_vsval(char *s);
 void set_window_width(WINDP *wp);
+int dir_select_reverse(num dummy);
+int dir_select_all(num dummy);
+int dir_select_none(num dummy);
 
 double next_value();
 int set_arg(num n);

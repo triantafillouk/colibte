@@ -277,6 +277,10 @@ FUNCS	ftable[] = {
 	{"dir_reload",	0,		dir_reload,"refresh dir (dir mode)"},
 	{"in_view",		1,		buffer_in_view,"buffer in view"},
 	{"dir_showfileinfo",0,	dir_showfileinfo,"Show file info (dir mode)"},
+	{"dir_select_all",0,	dir_select_all,"Select all files"},
+	{"dir_select_none",0,	dir_select_none,"Unselect all files"},
+	{"dir_select_reverse",0,dir_select_reverse,"Reverse selections"},
+
 	{"show_info",	0,		show_info,"Show info"},
 #if	RSESSION
 	{"load_session",1,		load_session,"load, replay session keys"},
