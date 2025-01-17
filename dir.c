@@ -25,7 +25,7 @@
 
 #define DIR_CURRENT	0
 #define	DIR_OTHER	1
-#define	TMULTIPLE	0
+
 char **f_extcmd;
 char **f_extension;
 
@@ -621,6 +621,7 @@ int move_1file(char *fname,char *destination)
   // struct stat t;
   // int s1=stat(destination,&t);
   int s1=0;
+
   char sline[MAXLLEN];
 
   // MESG("nove_1file: [%s] -> [%s] status=%d",fname,destination,s1);
@@ -628,13 +629,13 @@ int move_1file(char *fname,char *destination)
 
   if(snprintf(sline,MAXLLEN,"mv %s %s 2> /dev/null",
   	fname,destination)>=MAXLLEN) {
-		msg_line("nove command too long!");
+		msg_line("move command too long!");
 		return(FALSE);
 	};
 
-  MESG("move_1file:sline=[%s]",sline);
+  // MESG("move_1file:sline=[%s]",sline);
   s1=(system(sline));
-  MESG("	status %d",s1);
+  // MESG("	status %d",s1);
   return(s1);
 }
 
@@ -649,8 +650,8 @@ int dir_copy(num n)
   char destination[MAXFLEN];
   char destination_escaped[MAXFLEN];
   char fname[MAXFLEN];
-  // char sline[MAXLLEN];
-  MESG("dir_multi_copy:-----------------------------");
+
+  // MESG("dir_multi_copy:-----------------------------");
   char sconfirm[MAXLLEN];
   int s1,destination_is_dir=0;
   FILEBUF *dbuf;	/* destination dir buffer  */
@@ -695,7 +696,7 @@ int dir_copy(num n)
 		istr *dir_str = row_data[i];
 		if(dir_str->selection_tag) {
 			ftype = dir_getfile1(fname,1,i);
-			MESG("copy line %d name=%s type=%d",i,fname,ftype);
+			// MESG("copy line %d name=%s type=%d",i,fname,ftype);
 			if(ftype>=0) {
 				s1+=copy_1file(fname,destination_escaped,ftype);
 				dir_str->selection_tag=0;
@@ -741,8 +742,7 @@ int dir_move(num n)
   } else {
   	destination[0]=0;
   };
-  MESG("selected files=%d",cbfp->selected_files);
-  // return(false);
+  // MESG("selected files=%d",cbfp->selected_files);
   int files_to_move=cbfp->selected_files;
   if(cbfp->selected_files==0) {
 	if(dir_getfile(fname,1)<0) return FALSE;
@@ -764,7 +764,7 @@ int dir_move(num n)
 		istr *dir_str = row_data[i];
 		if(dir_str->selection_tag) {
 			int ftype = dir_getfile1(fname,1,i);
-			MESG("move file in line %d name=%s type=%d",i,fname,ftype);
+			// MESG("move file in line %d name=%s type=%d",i,fname,ftype);
 			if(ftype>=0) {
 				s2=move_1file(fname,destination);
 				if(s2==0) {
@@ -1009,6 +1009,10 @@ int delete_dir(char *fname)
     char sconfirm[MAXLLEN];
 	int sstat=0;
 	int status=0;
+#if	1
+	status = rmdir(fname);
+	if(status!=0)
+#else
 	sstat=snprintf(rmcmd,MAXFLEN,"rmdir %s 2>/dev/null",fname);
 	if(sstat<MAXFLEN) {
 		status=system(rmcmd);
@@ -1016,8 +1020,9 @@ int delete_dir(char *fname)
 	} else {
 		return error_line("command truncated!");
 	};
-//	MESG("status = %d",status);
-	if(status) {
+	if(status) 
+#endif
+	{
 		sstat=snprintf(sconfirm,MAXLLEN,"Dir [%s] not empty",fname);
 		if(sstat>=MAXLLEN) { return error_line("command truncated!");};
 		if( confirm(sconfirm,"remove ?",1)) {
@@ -1026,7 +1031,7 @@ int delete_dir(char *fname)
 				status=system(rmcmd);
 				// MESG("delete_dir:[%s] 2 status=%d",fname,status);
 			} else { return error_line("rm command truncated!");};
-		}
+		} else return 1;
 	};
 	return status;
 }
@@ -1064,8 +1069,8 @@ int dir_del1(num  n)
   } else if(status==FTYPE_DIR) {	/* FTYPE_DIR  */
 
 	status = delete_dir(fname);
-
-	if(status) { 
+	if(status>0) return true;
+	if(status<0) { 
 		set_update(cwp,UPD_STATUS);
 		return error_line("Dir %s not removed",fname);
 	} else { 
@@ -1091,7 +1096,7 @@ int dir_del1(num  n)
 					} else {
 						s1=unlink(fname);
 					};
-					MESG("	s1=%d",s1);
+					// MESG("	s1=%d",s1);
 					if(s1==0) {
 						dir_str->selection_tag=0;
 						cbfp->selected_files--;
@@ -2294,7 +2299,7 @@ int dir_select_none(num dummy)
 	dir_str->selection_tag=0;
  };
  fp->selected_files=0;
- MESG("dir_select_none:");
+ // MESG("dir_select_none:");
  set_update(cwp,UPD_EDIT);
  return true;
 }
@@ -2311,7 +2316,7 @@ int dir_select_all(num dummy)
 	dir_str->selection_tag=1;
 	fp->selected_files++;
  };
- MESG("dir_select_all: selected=%d",fp->selected_files);
+ // MESG("dir_select_all: selected=%d",fp->selected_files);
  set_update(cwp,UPD_EDIT);
  return true;
 }
@@ -2331,7 +2336,7 @@ int dir_select_reverse(num dummy)
 		dir_str->selection_tag=0;
 	};
  };
- MESG("dir_select_reverse: selected=%d",fp->selected_files);
+ // MESG("dir_select_reverse: selected=%d",fp->selected_files);
  set_update(cwp,UPD_EDIT);
  // dir_reload(1);
  return true;

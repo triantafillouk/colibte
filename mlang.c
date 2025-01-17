@@ -324,7 +324,7 @@ double increase_by()
 			// MESG("	increase string val");
 			char *stmp=malloc(strlen(get_sval())+strlen(ls_psval[0]));
 			strcpy(stmp,ls_psval[0]);
-			strcat(stmp,get_sval());	/* check!! TODO  */
+			strcat(stmp,get_sval());
 			free(ls_psval[0]);
 			ls_psval[0]=stmp;
 		} else {

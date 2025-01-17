@@ -779,7 +779,7 @@ array_dat *cofactor2inverse(array_dat *faca, double det)
  return(inversea);
 }
 
-/* print array, fix for better TODO */
+/* print array  */
 void print_array1(char *title,array_dat *adat)
 {
 	char so[MAXLLEN];
