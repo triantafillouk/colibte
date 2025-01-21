@@ -52,6 +52,7 @@ int goto_file(char *file_name);
 int open_dir(char *dir_name,int type);
 int goto_dir(char *dir_name,int dir_num);
 int dir_size(num n);
+int dir_count_files(num n);
 int goto_line(num n);
 int goto_offset(num n);
 int igotolinecol(num line,num column,int flag);

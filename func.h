@@ -22,7 +22,8 @@ FUNCS	ftable[] = {
 	{"assign_function",2,	assign_function,"Assign a function to a key"},
 	{"assign_sub",	2,		assign_sub,"Assign a macro subroutine to a key"},
 	{"execsub",	1,		execsub,"execute a subroutine"},
-	{"dir_size",0,			dir_size,"current dir size"},
+	{"dir_count_files",0,	dir_count_files,"count filed"},
+	{"dir_size",0,			dir_size,"dir size"},
 	{"region_lower",0,		lowerregion,"Lower case the characters of a selected region"},
 	{"region_upper",0,		upperregion,"Upper case the characters of a selected region"},
 #if	USE_GLIB

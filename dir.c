@@ -372,15 +372,28 @@ int update_line(int size)
 	return 0;
 }
 
+int update_uline(char *s)
+{
+	istr **row_data = (istr **)array_data(cbfp->dir_list_str);
+	istr *current_str = row_data[cwp->current_note_line];
+	char *line_str = &current_str->start;
+	// MESG("update_line: [%s]",line_str);
+	memset(line_str+3,' ',10);
+	memcpy(line_str+(13-strlen(s)),s,strlen(s));
+	// MESG("update_line: [%s]",line_str);
+	set_update(cwp,UPD_EDIT);
+	return 0;
+}
+
 // count dir size
-int dir_size(num n)
+int dir_count_files(num n)
 {
  int num_of_files=0; /* no of files in directory */
  DIR *d1;
  struct dirent *df1;
  char dir_name[MAXFLEN];
  int ftype = dir_getfile(dir_name,0);
- msg_line("check dir_size");
+ msg_line("check file count");
  // MESG("ftype=%d [%s]",ftype,dir_name);
  if(ftype==2) {
  d1 = opendir(dir_name);
@@ -394,7 +407,47 @@ int dir_size(num n)
  num_of_files-=2;
  // MESG("dir size is %d",num_of_files);
  update_line(num_of_files);
- msg_line("dir size is %d",num_of_files);
+ msg_line("files in dir are %d",num_of_files);
+ };
+ return num_of_files; 
+}
+
+int dir_size(num n)
+{
+ int num_of_files=0; /* no of files in directory */
+ char dir_name[MAXFLEN];
+ char tmp_name[MAXFLEN];
+ int ftype = dir_getfile(dir_name,0);
+ FILE *fid;
+ // MESG("ftype=%d [%s]",ftype,dir_name);
+ if(ftype==FTYPE_DIR) {
+  char sline[MAXLLEN];
+  msg_line("checking dir size ...");
+  escape_file_name(dir_name);
+  // MESG("du %s",dir_name);
+  set_unique_tmp_file(tmp_name,"du",MAXFLEN);
+  // MESG("results to %s",tmp_name);
+  if(snprintf(sline,sizeof(sline),"du -sh %s > %s 2>/dev/null",dir_name,tmp_name)>=sizeof(sline)){
+  	msg_line("command %s too long!",sline);
+	return(FALSE);
+  };
+  int status=system(sline);
+  if(status==0) {
+	fid=fopen(tmp_name,"r");
+	int num=fscanf(fid,"%s %s",sline,dir_name);
+	fclose(fid);
+	unlink(tmp_name);
+	// MESG("%s %s",sline,dir_name);
+	if(num<1) { 
+		msg_line("cannot check!");
+		return(false);
+	} else { 
+		msg_line("dir size %s",sline);
+		update_uline(sline);
+	};
+  } else {
+  	msg_line("du error!");
+  }
  };
  return num_of_files; 
 }

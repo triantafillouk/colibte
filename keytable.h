@@ -464,6 +464,7 @@ KEYTAB  keytab_win[MAXASSIGNS] = {
 	{0,			NULL,NULL}
 };
 
+
 KEYTAB keytab_dir[] = {
 	{CNTRL|'M',	dir_exec,"^M"},
 	{'e',		dir_edit,"e"},
@@ -481,8 +482,9 @@ KEYTAB keytab_dir[] = {
 	{'r',		dir_reload,"r"},
 	{'x',		dir_exec,"x"},
 	{'v',		dir_view,"v"},
+	{'u',		dir_size,"u"},
 	{'s',		script_exec,"s"},
-	{'z',		dir_size,"z"},
+	{'z',		dir_count_files,"z"},
 	{'-',		dir_select_none,"-"},
 	{'=',		dir_select_all,"="},
 	{'*',		dir_select_reverse,"*"},
