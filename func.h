@@ -24,6 +24,7 @@ FUNCS	ftable[] = {
 	{"execsub",	1,		execsub,"execute a subroutine"},
 	{"dir_count_files",0,	dir_count_files,"count filed"},
 	{"dir_size",0,			dir_size,"dir size"},
+	{"dir_compare",0,		dir_compare,"dir compare"},
 	{"region_lower",0,		lowerregion,"Lower case the characters of a selected region"},
 	{"region_upper",0,		upperregion,"Upper case the characters of a selected region"},
 #if	USE_GLIB

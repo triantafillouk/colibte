@@ -53,7 +53,7 @@ int dir_other_reload(num n);
 void escape_file_name(char *fname);
 void delete_current_list_line();
 int stricmp1(const char *str1, const char *str2);
-int dir_getfile1(char *fname,int flag,int file_index) ;
+int dir_getfile1(FILEBUF *fp,char *fname,int flag,int file_index) ;
 
 int pdline=-1;
 int current_sort_mode=0;
@@ -395,7 +395,7 @@ int dir_count_files(num n)
  int ftype = dir_getfile(dir_name,0);
  msg_line("check file count");
  // MESG("ftype=%d [%s]",ftype,dir_name);
- if(ftype==2) {
+ if(ftype==FTYPE_DIR) {
  d1 = opendir(dir_name);
  if(d1==NULL) { return error_line("cant open dir %s",dir_name);return 0;};
  // Find how many files in the dir
@@ -692,6 +692,43 @@ int move_1file(char *fname,char *destination)
   return(s1);
 }
 
+int dir_compare(num n)
+{
+ if(!(cbfp->b_flag & FSNLIST)) return FALSE;
+ FILEBUF *f1=cbfp;
+ FILEBUF *f2=get_dir_buffer(DIR_OTHER,0);
+ if(!(f2->b_flag & FSNLIST)) return FALSE;
+ char *name1[MAXFLEN];
+ char *name2[MAXFLEN];
+ if(f1!=f2) {
+ 	if(f2->sort_mode !=f1->sort_mode) return false;
+	msg_line("dir compare..");
+	int i,j;
+	int ftype1=0;
+	int ftype2=0;
+	f1->selected_files=0;
+	f2->selected_files=0;
+	istr **r1=(istr **) array_data(f1->dir_list_str);
+	istr **r2=(istr **) array_data(f1->dir_list_str);
+	for(i=0;i<f1->dir_list_str->size;i++) {
+		istr *d1=r1[i];
+		d1->selection_tag=0;
+		ftype1 = dir_getfile1(f1,name1,1,i);
+		for(j=0;j<f2->dir_list_str->size;j++) {
+			istr *d2=r2[j];
+			ftype2 = dir_getfile1(f2,name2,1,j);
+			if(strcmp(name1,name2)==0) {
+				d1->selection_tag=1;
+				d2->selection_tag=1;
+			};
+		};
+	};
+	set_update(cwp,UPD_ALL);
+	msg_line("dirs compared!");
+ } else return false;
+ return true;
+}
+
 /* simple copy */
 int dir_copy(num n)
 {
@@ -748,7 +785,7 @@ int dir_copy(num n)
  	for(i=0;i<cbfp->dir_list_str->size;i++) {
 		istr *dir_str = row_data[i];
 		if(dir_str->selection_tag) {
-			ftype = dir_getfile1(fname,1,i);
+			ftype = dir_getfile1(cbfp,fname,1,i);
 			// MESG("copy line %d name=%s type=%d",i,fname,ftype);
 			if(ftype>=0) {
 				s1+=copy_1file(fname,destination_escaped,ftype);
@@ -816,7 +853,7 @@ int dir_move(num n)
  	for(i=0;i<cbfp->dir_list_str->size;i++) {
 		istr *dir_str = row_data[i];
 		if(dir_str->selection_tag) {
-			int ftype = dir_getfile1(fname,1,i);
+			int ftype = dir_getfile1(cbfp,fname,1,i);
 			// MESG("move file in line %d name=%s type=%d",i,fname,ftype);
 			if(ftype>=0) {
 				s2=move_1file(fname,destination);
@@ -1140,7 +1177,7 @@ int dir_del1(num  n)
 	 	for(i=0;i<cbfp->dir_list_str->size;i++) {
 			istr *dir_str = row_data[i];
 			if(dir_str->selection_tag) {
-				int ftype = dir_getfile1(fname,0,i);
+				int ftype = dir_getfile1(cbfp,fname,0,i);
 				// MESG("delete line %d name='%s' type=%d",i,fname,ftype);
 				if(ftype>=0) {
 					if(ftype==FTYPE_DIR) {
@@ -1954,7 +1991,7 @@ int dir_getfile(char *fname,int flag)
  return(ftype); 
 }
 
-int dir_getfile1(char *fname,int flag,int file_index) 
+int dir_getfile1(FILEBUF *fp,char *fname,int flag,int file_index) 
 {
  char c;
  int ftype=FTYPE_NORMAL;
@@ -1968,23 +2005,23 @@ int dir_getfile1(char *fname,int flag,int file_index)
  // MESG("dir_getfile1 :start f=%d file_index=%d",flag,file_index);
 
  char *line_str;
- if(cbfp->b_flag & FSNLIST) {
-	// MESG("dir_getfile: size of dir=%d line %d",cbfp->dir_list_str->size,cwp->current_note_line);
-	if(cbfp->dir_list_str->size==0) return -1;	// no lines
+ if(fp->b_flag & FSNLIST) {
+	// MESG("dir_getfile: size of dir=%d line %d",fp->dir_list_str->size,cwp->current_note_line);
+	if(fp->dir_list_str->size==0) return -1;	// no lines
 
-	istr **row_data = (istr **)array_data(cbfp->dir_list_str);
+	istr **row_data = (istr **)array_data(fp->dir_list_str);
 	// MESG("dir_getfile: 2");
-	if(file_index > cbfp->dir_list_str->size-1) return -1;
+	if(file_index > fp->dir_list_str->size-1) return -1;
 	istr *current_str = row_data[file_index];
 	// MESG("current index=%d",current_str->index);
 	line_str = &current_str->start;
 	// MESG("line_str:[%s]",line_str); 
  } else {
 	// MESG("dir_getfile not in FSNLIST!");
- 	line_str=get_line_at(cbfp,Offset());
+ 	line_str=get_line_at(fp,Offset());
 	return 0;
  };
- // MESG("dir_getfile: b_flag=%X [%s]",cbfp->b_flag,line_str);  
+ // MESG("dir_getfile: b_flag=%X [%s]",fp->b_flag,line_str);  
  c=line_str[0];
  if(c=='c') { error_line("cannot view c type files");return -1;};
  if(c=='s') { error_line("cannot view socket files");return -1;};
