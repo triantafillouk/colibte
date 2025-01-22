@@ -271,6 +271,7 @@ FUNCS	ftable[] = {
 	{"mkdir",		1,		dir_new_dir,"Create new dir (dir mode)"},
 	{"touch",		1,		dir_touch_file,"create/touch file (dir mode)"},
 	{"dir_compare", 0,		dir_compare,"compare dirs"},
+	{"dir_show_diffs", 0,		dir_show_diffs,"compare diffs dirs"},
 	{"link",		1,		dir_link,"symbolic link (dir mode)"},
 	{"dir_right",	0,		dir_right,"Dir right: view file on enter directory"},
 	{"dir_left",	0,		dir_left,"Dir left: exit viewing file or goto to parent directory"},

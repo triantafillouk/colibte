@@ -188,6 +188,7 @@ int new_shell(num n);
 int dir_left(num n);
 int dir_right(num n);
 int dir_touch_file(num n);
+int dir_show_diffs(num n);
 int dir_new_dir(num n);
 int dir_link(num n);
 int dir_reload(num n);

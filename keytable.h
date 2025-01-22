@@ -490,6 +490,7 @@ KEYTAB keytab_dir[] = {
 	{'=',		dir_select_all,"="},
 	{'*',		dir_select_reverse,"*"},
 	{'w',		dir_compare,"w"},
+	{'f',		dir_show_diffs,"f"},
 	{SPEC1|'C',	dir_right,"Arrow right"},
 	{SPEC1|'D',	dir_left,"Arrow left"},
 	{SPEC|'C',	dir_right,"spec c"},
