@@ -722,16 +722,25 @@ int dir_compare(num n)
 			// MESG("	with j=%d %s",j,f2);
 			if((strcmp(name1,name2)==0) && (ftype1==ftype2)) {
 				d1->selection_tag=1;
+				f1->selected_files++;
 				d2->selection_tag=1;
+				f2->selected_files++;
 				break;
 			};
 		};
 	};
 	set_update(cwp,UPD_ALL);
-	msg_line("dirs compared!");
+	msg_line("%d similar files!",f1->selected_files);
  } else return false;
  return true;
 }
+
+#if	0
+int compare_files(char *name1,char *name2,int type)
+{
+	return strcmp(name1,name2);
+}
+#endif
 
 int dir_show_diffs(num n)
 {
@@ -744,14 +753,17 @@ int dir_show_diffs(num n)
  char name2[MAXFLEN];
  if(f1!=f2) {
  	if(f2->sort_mode !=f1->sort_mode) return false;
-	msg_line("dir compare..");
+	msg_line("dir find diffs..");
 	int i,j;
 	int ftype1=0;
 	int ftype2=0;
-	f1->selected_files=0;
-	f2->selected_files=0;
+	f1->selected_files=f1->dir_list_str->size;
+	f2->selected_files=f2->dir_list_str->size;
 	istr **r1=(istr **) array_data(f1->dir_list_str);
 	istr **r2=(istr **) array_data(f2->dir_list_str);
+	for(j=0;j<f2->dir_list_str->size;j++) {
+		r2[j]->selection_tag=1;
+	};
 	for(i=0;i<f1->dir_list_str->size;i++) {
 		istr *d1=r1[i];
 		d1->selection_tag=1;
@@ -763,13 +775,15 @@ int dir_show_diffs(num n)
 			// MESG("	with j=%d %s",j,f2);
 			if((strcmp(name1,name2)==0) && (ftype1==ftype2)) {
 				d1->selection_tag=0;
+				f1->selected_files--;
 				d2->selection_tag=0;
+				f2->selected_files--;
 				break;
 			};
 		};
 	};
 	set_update(cwp,UPD_ALL);
-	msg_line("dirs compared!");
+	msg_line("%d %d different files!",f1->selected_files,f2->selected_files);
  } else return false;
  return true;
 }
@@ -1059,7 +1073,7 @@ int dir_link(num n)
   
   destination[0]=0;
   sstat=snprintf(sconfirm,MAXLLEN,"Link [%s] to: ",source_name);
-  if(sstat>=MAXLLEN) MESG("dir link fname overflow!");
+  if(sstat>=MAXLLEN) MESG("dir link fname truncated!");
  
   escape_file_name(source_name);
 
@@ -2336,7 +2350,7 @@ if((entry->st_mode & S_IXUSR \
  else
  sstat=snprintf(str,255,"%c%c %10s %02d %3s %2d %02d.%02d %s",
  	mt,mx1,ssize,t1->tm_mday,month[d_month],year,t1->tm_hour,t1->tm_min,entry->d_name);
- if(sstat>255) MESG("truncated 11"); 
+ if(sstat>255) MESG("truncated 12"); 
  return str;
 }
 
@@ -2355,7 +2369,7 @@ int insert_dir(FILEBUF *buf_dir,int retain)
 
  cbfp=buf_dir;
  d1 = buf_dir->b_dname;
- // MESG("insert_dir:");
+ // MESG("insert_dir:[%s]",d1);
  alist *dir_list_str=new_list(0,"dir_as_list");
  if(buf_dir->cdir == NULL) { error_line("cdif is null");return 0;};
  buf_dir->cdir->dir_name = strdup(buf_dir->b_dname);
@@ -2387,6 +2401,7 @@ int insert_dir(FILEBUF *buf_dir,int retain)
 	// MESG("[%s]",fline);
 	free(namelist[i]);	
  };
+ buf_dir->selected_files=0;
  free(namelist);
 
  set_Offset(0);
@@ -2583,6 +2598,11 @@ int list_dir(char *d1,FILEBUF *buf_dir)
 //	MoveLineCol(pdline+1,DIR_NAME_POSITION);
  }
  return stat;
+}
+
+int show_dir_help(num n)
+{
+
 }
 
 /* ---- */
