@@ -699,21 +699,22 @@ int init_system_clipboard()
 /* return the first line from system clipboard */
 char *ext_system_paste_line()
 {
- static char filnam[MAXFLEN];
- static char exec_st[MAXFLEN];
+ static char line[MAXLLEN];
+ char filnam[MAXFLEN];
+ char exec_st[MAXFLEN];
  int status=0;
+ 
+ memset(line,0,sizeof(line));
+	if(!x11_display_ok) return line;
 
-	if(!x11_display_ok) return "";
-	if(dont_edit() || cbfp->b_flag & FSDIRED )return false;
 	status = set_unique_tmp_file(filnam,"paste",MAXFLEN);
-	if(status>=MAXFLEN) return "";
+	if(status>=MAXFLEN) return line;
 	status=snprintf(exec_st,MAXFLEN,"%s > %s 2> /dev/null",clip_copy,filnam);
-	if(status>=MAXFLEN) return "";
+	if(status>=MAXFLEN) return line;
 
 	status = system(exec_st);
 	if(status==0) {
 		FILE *file;
-		static char line[MAXLLEN];
 		char *s=line;
 		file=fopen(filnam,"r");
 		int i;
@@ -730,7 +731,7 @@ char *ext_system_paste_line()
 		return line;
 	};
 
-	return "";
+	return line;
 }    
 
 int utf8charlen_nocheck(int ch);

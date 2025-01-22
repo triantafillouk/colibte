@@ -237,7 +237,7 @@ int file_type_is(char *extention,int check_type)
 int comment_with_string(char *comment_string,int start)
 {
  FILEBUF *fp=cbfp;
-//	MESG("comment_with_string: type=%d",start);
+ 	// MESG("comment_with_string: type=%d",start);
 	if(fp->b_flag<4) {
 		offs curoffs=Offset();
 		offs pos;
@@ -258,14 +258,15 @@ int comment_with_string(char *comment_string,int start)
 		if(pos>=bol_offs) {
 			// delete it!
 			ToLineBegin();
-			textpoint_move(fp->tp_current,pos-bol_offs);
+			// textpoint_move(fp->tp_current,pos-bol_offs);
+			textpoint_set(fp->tp_current,pos);
 			int c = FCharAt(fp,pos+strlen(comment_string));
 			int space=0;
 			if(c==' '||c=='\t') space=1;
 			DeleteBlock(0,strlen(comment_string)+space);
-			if(curoffs>pos)
-				set_Offset(curoffs-strlen(comment_string)-space);
-			else set_Offset(curoffs);
+			if(curoffs==pos+strlen(comment_string)) { set_Offset(curoffs-strlen(comment_string));}
+			else if(curoffs>pos+strlen(comment_string)){ set_Offset(curoffs-strlen(comment_string)-space);} 
+			else {set_Offset(curoffs); }
 			size=-strlen(comment_string)-space;
 		};
 		if(cwp) set_update(cwp,UPD_EDIT);
@@ -277,7 +278,7 @@ int comment_with_string(char *comment_string,int start)
 	}
 }
 
-int comment_c()
+int comment_c(int dummy)
 {
  FILEBUF *fp = cbfp;
  offs pos;
@@ -339,12 +340,12 @@ int comment_c()
 	return 1;
 }
 
-int comment_lua()
+int comment_lua(int dummy)
 {
  FILEBUF *fp = cbfp;
  offs pos;
  offs s0;
-	// MESG("comment_c:");
+	// MESG("comment_lua:");
 	if(cwp->selection) {
 		offs start=tp_offset(cwp->w_smark);
 		offs end=tp_offset(cwp->w_emark);
@@ -437,8 +438,8 @@ int comment_css2()
 
 int comment_cc(int n)
 {
-//	MESG("comment_cc: n=%d",n);
- 	if(n==C_STARTEND) return comment_c();
+// MESG("comment_cc: n=%d",n);
+ 	if(n==C_STARTEND) return comment_c(1);
 	if(n==C_COLSTART) return comment_with_string("//",C_COLSTART);
 	if(n==C_LINEEND) return comment_with_string("//",C_LINEEND);
 	return comment_with_string("//",C_LINEBEG);
@@ -520,6 +521,89 @@ int comment_html(int n)
 		insert_string(fp,"<!--   -->",10);
 		insert_newline(cbfp);
 		set_Offset(s0+5);
+	};
+	set_update(cwp,UPD_MOVE);
+	set_modified(cbfp);
+	return 1;
+}
+
+int comment_md(int comment_type)
+{
+ FILEBUF *fp = cbfp;
+ offs pos;
+ offs s0;
+ offs start=Offset();
+ offs end;
+ // if(n==3) return 0;
+ 	MESG("comment_md: comment_type=%d",comment_type);
+	if(cwp->selection) {
+		start=tp_offset(cwp->w_smark);
+		end=tp_offset(cwp->w_emark);
+		if(start>end) {
+			offs tmp=end;
+			end=start;start=tmp;
+		};
+	};
+	if(cwp->selection && comment_type==C_STARTEND) {
+		// ToLineBegin();
+		set_Offset(start);
+		s0=Offset();
+		pos = find_string_inline("```");
+		if(pos<s0) {
+			set_Offset(s0);
+			insert_string(fp,"```",3);
+			new_line(1);
+			set_Offset(end+3+cwp->w_fp->EolSize);
+			new_line(1);
+			// ToLineEnd();
+			insert_string(fp,"```",3);
+		} else {
+			set_Offset(s0);
+			DeleteBlock(0,3+cwp->w_fp->EolSize);
+			set_Offset(end-6-cwp->w_fp->EolSize);
+			DeleteBlock(0,3+cwp->w_fp->EolSize);
+		};
+		setmark(0);
+		set_update(cwp,UPD_MOVE);
+		set_modified(cbfp);
+		return 1;
+	};
+	if(comment_type==C_COLSTART && cwp->selection) 
+	{
+		set_Offset(start);
+		if(CharAt(start)=='`') {
+			DeleteBlock(0,1);
+			pos=find_string_inline("`");
+			if(pos>Offset()) {
+				set_Offset(pos);
+			} else {
+				set_Offset(end-1);
+			};
+			DeleteBlock(0,1);
+		} else {
+			insert_string(fp,"`",1);
+			set_Offset(end+1);
+			insert_string(fp,"`",1);
+		};
+		set_update(cwp,UPD_MOVE);
+		set_modified(cbfp);
+		return 1;
+	};
+	if(
+		// comment_type==C_LINEBEG && 
+		! cwp->selection) {
+		ToLineBegin();
+		s0 = Offset();
+		set_Offset(s0);
+		pos = find_string_inline("- ");
+		set_Offset(s0);
+		MESG("	s0=%ld pos=%ld",s0,pos);
+		if(pos<s0) {
+			insert_string(fp,"- ",2);
+			set_Offset(s0+2);
+		} else {
+			DeleteBlock(0,2);	
+		};
 	};
 	set_update(cwp,UPD_MOVE);
 	set_modified(cbfp);
@@ -2118,6 +2202,89 @@ void highlight_jscript(int c)
 }
 
 void highlight_perl(int c)
+{
+  if(highlight_note(c)) return;
+
+  switch(c) {
+	case (CHR_RESET) : // initialize
+		hstate=0;
+		slang=LANG_SCRIPT;
+		break;
+	/* single quotes */
+	case CHR_SQUOTE: 
+//		if(hstate!=HS_PREVESC) hquotem = (hquotem)? hquotem & ~H_QUOTE1: H_QUOTE1;
+		if(hstate!=HS_PREVESC) {
+			if(hquotem & H_QUOTE4 && !(hquotem & H_QUOTE2)) {
+				if(hquotem == H_QUOTE4) {
+					hquotem = H_QUOTE1 | H_QUOTE4;
+				} else {
+					hquotem = H_QUOTE4;  
+				}
+			} else hquotem = (hquotem)? hquotem & ~H_QUOTE1: H_QUOTE1;
+		};
+		hstate=0;
+		break;
+	/* double quotes */
+	case CHR_DQUOTE:
+		if(hquotem&H_QUOTE5) break;
+		if(hstate!=HS_PREVESC) {
+			if(hquotem & H_QUOTE4 && !(hquotem & H_QUOTE1)) {
+				if(hquotem == H_QUOTE4) {
+					hquotem = H_QUOTE2 | H_QUOTE4;
+				} else {
+					hquotem = H_QUOTE4;
+				}
+			} else hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
+		};
+		hstate=0;
+		break;
+	/* comments */
+	case '#':
+		if((hstate!=HS_PREVESC) && (hquotem!=H_QUOTE2 && hquotem!=H_QUOTE1)) {
+			hquotem |= H_QUOTE5;
+		};
+		hstate=0;
+		break;
+	case '\\':
+	case '$':{
+		hstate=(hstate==HS_PREVESC)?0:HS_PREVESC;
+		};
+		break;
+	case '\n':
+	case CHR_CR:
+		hquotem &= ~(H_QUOTE6|H_QUOTE4|H_QUOTE5|H_QUOTE9);
+		hstate=HS_LINESTART;
+		break;
+	case '!':
+		if(hstate==HS_PSMALLER) hquotem |= H_QUOTEC;
+		hstate=0;
+		break;
+	case '-':
+		if(hquotem==H_QUOTEC) {
+			if(hstate==HS_END1) hstate=HS_END2;
+			else hstate=HS_END1;
+		} else hstate=0;
+		break;
+	case '?':
+		if(hstate==HS_PSMALLER) hquotem=0;
+		hstate=0;
+		break;
+	case CHR_PARL:
+		hstate=HS_SPEC;
+		break;
+	case ' ':
+	case '\t':
+		if(hstate!=HS_LINESTART && hstate!=HS_PSMALLER && hstate!=HS_SPEC) hstate=0;
+		break;		
+	default: { 
+		if(hstate==HS_PSMALLER && hquotem==0) hquotem = H_QUOTE4;
+		hstate=0;
+	};
+  };
+}
+
+// powershell
+void highlight_ps1(int c)
 {
   if(highlight_note(c)) return;
 

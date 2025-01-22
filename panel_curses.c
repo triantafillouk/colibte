@@ -841,6 +841,7 @@ int text_mouse_function(int move)
 		// MESG("mouse pressed mb=%d move=%d row=%d col=%d",mouse_button,move,mouse_window_row,mouse_window_col);
 	};
 	if(mouse_button==KMOUSE_BUTTON1 && move<KMOUSE_RELEASE){
+		// MESG("	1: mouse button1 press! move=%d < %d",move,KMOUSE_RELEASE);
 		if((mouse_window_col+wp->w_infocol)==wp->w_ntcols) { // on rline (position status line)
 			int start,len;
 			int lines_to_move;

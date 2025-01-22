@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.6 (18/12/2024)"
+#define VERSION 	"#01.6T16 (22/1/2025)"
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
 
@@ -27,15 +27,6 @@
 #define	TARROWS		1	/* Use arrow menus in panel curses  */
 #define	USE_UTF8	1	/* Use utf8 characters  */
 
-#define	USE_SARRAYS	1
-#define	NO_LPAR		1
-#define	SLIM_ON		1	/* remove no needed elements in structure constructs  */
-
-#define	USE_FAST	1 & PCURSES	/* erase line for double width characters in panel_curses  */
-#define TEST_TYPE	1
-#define TWRAP		1	/* wrap mode  */
-
-#define NEW	1	/* new tested code!  */
 #define WRAPD	0	/* wrap debug  */
 
 #if	DARWIN
@@ -150,8 +141,6 @@ typedef long long num;
 /*	Configuration options	*/
 
 #define	CRYPT		1	/* file encryption enabled?			*/
-#define	CTAGS		1	/* ctags support */
-#define DATE		1	/* Insert Date, Time */
 
 
 
@@ -218,9 +207,9 @@ typedef long long num;
 #define MACRO_TRUE	1
 #define	MACRO_MODE2	2
 
-#define	KNORMAL		0
-#define	KENTRY		1
-#define	KCONFIRM	2
+#define	KNORMAL		0	/* normal keyboard entry  */
+#define	KENTRY		1	/* interactive keyboard entry  */
+#define	KCONFIRM	2	/* keyboard entry in confirm state  */
 
 /*	Input History list type definitions */
 #define	LNO  0
@@ -299,10 +288,10 @@ typedef struct notes_struct {
 /*	Virtual screen structures  */
 
 typedef struct vchar {
-	unsigned char uval[8];	/* stores a utf char  */
+	unsigned char uval[8];	/* stores a utf char with 1 accent */
 	short int  attr;
-	short int bcolor;	/* background  */
-	short int fcolor;	/* foreground  */
+	short int bcolor;	/* background  color */
+	short int fcolor;	/* foreground  color */
 #if	NUSE
 	unsigned int display_width;
 	unsigned int display_height;
@@ -412,8 +401,8 @@ typedef struct BTWE {
 #endif
 
 typedef struct ISTR {
-	int index;
-	int selected;
+	short index;
+	short selection_tag;
 	char start;
 } istr;
 
@@ -656,10 +645,9 @@ typedef struct  FILEBUF {
 	struct	dir_l	*rdir;
 	struct	dir_l	*cdir;
 	struct	alist	*dir_list_str;
-	int		flen0;					/* Initial line len  */
+	int		selected_files;
 	int		file_id;				/* file id while reading  */
 // Flags
-#if	1
 	short int	b_nwnd;                 /* Count of windows on buffer   */
 	short int	EolSize;
 	short int	sort_mode;
@@ -677,25 +665,6 @@ typedef struct  FILEBUF {
 	short int	b_infocol;	/* infocol for the buffer  */
 #if	USE_SLOW_DISPLAY
 	short int slow_display;
-#endif
-#else
-	int		b_nwnd;                 /* Count of windows on buffer   */
-	int		EolSize;
-	int		sort_mode;
-	int 	bom_type;				/* file bom type or 0 */
-	int		b_state;
- 	int		b_flag;                 /* buffer state Flags           */
-	char	b_mode;					/* editor mode of this buffer	*/
-	char	view_mode;				/* view mode */
-	int		b_type;			/* buffer,file type */
-	int		scratch_num;	/* scratch number or 0  */
-	int		dir_num;		/* dir number  */
-	int b_lang;		/* document language, 0 is UTF  */
-	int m_mode;		/* parse status flag  */
-	int utf_accent;	/* current utf char is with an accent!  */
-#if	USE_SLOW_DISPLAY
-	int slow_display;
-#endif
 #endif
 	struct  FILEBUF *connect_buffer;
 	num		connect_line;
@@ -718,11 +687,8 @@ typedef struct  FILEBUF {
 	struct tok_struct *end_token;	/* the last (EOF) token in tok_table  */
 	int err;	/* negative if not syntax checked  */
 	BTREE *symbol_tree;	/* local symbol table  */
-#if	TEST_TYPE0
-	BTREE *type_tree;	/* local type table  */
-#else
 	struct alist *type_list;	/* type table list  */
-#endif
+
 	MVAR *symbol_table;	/* instance of variables data  */
 //	Notes structures
 #if	TNOTES

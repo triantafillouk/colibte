@@ -743,6 +743,16 @@ int set_font(char *font_name)
   return(TRUE);
 }
 
+
+int insert_key_string(char *ch)
+{
+	int clen=strlen(ch);
+	int j=0;
+	for(j=0;j<clen;j++) utfokey[j]=ch[j];
+	utfokey[j]=0;
+	return clen;
+}
+
 gboolean
 on_dra0_key_press_event(GtkWidget       *widget,
                         GdkEventKey     *event,
@@ -925,12 +935,23 @@ on_dra0_key_press_event(GtkWidget       *widget,
 	}
 	}
 	else if (ks == 27) { 
-//				ks= CNTRL | 'G'; 
+		//	ks= CNTRL | 'G'; 
 		if(!quote_flag)	key_buf[key_index++]=7;
 		else key_buf[key_index++]=ks;
-	} else { 
-		key_buf[key_index++]=ks;
-		if(flag & CTLX && emacs_emul) key_buf[key_index++]=24; // control_x
+	} else {
+		if(quote_flag){
+		switch(ks) {
+			case 'e': case 'E': n_chars=insert_key_string("€");break;
+			case 'c': case 'C': n_chars=insert_key_string("©");break;
+			case 'r': case 'R': n_chars=insert_key_string("®");break;
+			default:
+				key_buf[key_index++]=ks;
+				if(flag & CTLX && emacs_emul) key_buf[key_index++]=24; // control_x
+		};
+		} else {
+				key_buf[key_index++]=ks;
+				if(flag & CTLX && emacs_emul) key_buf[key_index++]=24; // control_x
+		};
 	};
   	n_chars--;
   } else {
@@ -965,6 +986,7 @@ on_dra0_key_press_event(GtkWidget       *widget,
 		};
 	};
 	nnarg=1;
+	set_update(cwp,UPD_EDIT);
  	update_screen(0);
 	flag = 0;key_index=0;
 //	gtk_widget_grab_focus(widget);
@@ -1164,7 +1186,7 @@ int getstring(char *prompt, char *st1, int maxlen,int disinp)
 	};
 	init_input();
 	strlcpy(st2,st1,MAXLLEN-1);
-//	MESG("getstring: kbdmode=0x%X",kbdmode);
+	// MESG("getstring: kbdmode=0x%X",kbdmode);
 	if(kbdmode==PLAY) {
 		return(set_play_string(st1));
 	};
@@ -1184,7 +1206,6 @@ int getstring(char *prompt, char *st1, int maxlen,int disinp)
 	entry_mode=KENTRY;
 	gtk_widget_show(gs_entry);
 
-
 	gtk_widget_set_can_focus (gs_entry,TRUE);
 	gtk_widget_grab_focus(gs_entry);
 
@@ -1193,7 +1214,6 @@ int getstring(char *prompt, char *st1, int maxlen,int disinp)
 		events_flush();
 		usleep(100000);
 	};
-//	MESG("getstring: end1");
 	if(cbfp->b_lang == 0) {
 		strlcpy(st2,gtk_entry_get_text(GTK_ENTRY(gs_entry)),MAXLLEN);
 		strlcpy(st1,st2,MAXLLEN);
@@ -1651,6 +1671,7 @@ int menu_command(num n)
 
 void start_interactive(char *prompt)
 {
+	// MESG("start_interactive:");
 	if(compact1) {
 		gtk_widget_hide(toolbar1);
 	};
@@ -1659,6 +1680,7 @@ void start_interactive(char *prompt)
 	gtk_label_set_text((GtkLabel *)gs_label,prompt);
 	gtk_widget_show(gs_label);
 	gtk_widget_show(toolbar2);
+	// MESG("start_interactive:end");
 }
 
 void end_interactive()

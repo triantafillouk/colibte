@@ -36,7 +36,7 @@ char *uncompress_command[] = {
 
 /* local define functions */
 int add_to_recent_list(char *full_file_name);
-int is_encrypt(int file_id);
+// int is_encrypt(int file_id);
 
 int default_view_mode=0;
 
@@ -958,9 +958,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->dir_num=dir_num;
 	bp->sort_mode=0;
 	bp->utf_accent=0;
-#if	CRYPT
-	bp->b_key[0]=0;
-#endif
+	bp->b_key[0]=0;	/* encrypt key  */
 #if	NUSE
 	bp->slow_display=0;
 #endif

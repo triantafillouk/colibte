@@ -362,7 +362,7 @@ alist *query_string_columns(sqlite3 *db, char *sql,int *widths)
 		// MESG("%3d : [%s]",rows,txt);
 		istr *data = malloc(sizeof(int)*2+strlen(txt)+1);
 		data->index = row_id;
-		data->selected = 0;
+		data->selection_tag = 0;
 		memcpy(&data->start,txt,strlen(txt)+1);
 		// MESG("%3d : %s",row_id,txt);
 		add_element_to_list((void *)data,a);
@@ -1370,7 +1370,7 @@ int show_category_list(char *category)
 	// MESG("category id %d",tag_id);
 	
 	if(tag_id<1) {notes_db_close(db);return 0;};
-	sprintf(sql,"SELECT rowid,DATE,TITLE FROM NOTES where rowid in (select note_id from tags where tag_id = %d);",tag_id);
+	sprintf(sql,"SELECT rowid,DATE,TITLE FROM NOTES where rowid in (select note_id from tags where tag_id = %d) order by DATE ASC;",tag_id);
 	if(strlen(category)>55) category[55]=0;
 	snprintf(buffer_name,64,"[%s view]",category);
 	cat_view = cls_fout(buffer_name);
@@ -1606,7 +1606,7 @@ int select_tag(num n)
 			istr *dir_str;
 			lbegin(cbfp->dir_list_str);
 			while((dir_str = (istr *)lget_current(cbfp->dir_list_str))!=NULL) {
-				dir_str->selected=0;
+				dir_str->selection_tag=0;
 				lmove_to_next(cbfp->dir_list_str,0);
 			};
 			set_update(cwp,UPD_EDIT);
@@ -1642,7 +1642,7 @@ int select_tag(num n)
 					num_of_selected_tags = iarray_add(sel_tags,tag_id,num_of_selected_tags);
 					add2_sarray(cbfp->hl->w1,strdup(select_word));
 				};
-				tag_istr->selected=1;
+				tag_istr->selection_tag=1;
 			};break;
 			case TAG_UNSELECT_CURRENT: {
 				int ind;
@@ -1651,7 +1651,7 @@ int select_tag(num n)
 					num_of_selected_tags = iarray_remove(sel_tags,ind,num_of_selected_tags);
 					remove_from_sarray(cbfp->hl->w1,select_word);
 				};
-				tag_istr->selected=0;
+				tag_istr->selection_tag=0;
 			};break;
 			case TAG_SELECT_TOGGLE: {
 				int ind;
@@ -1668,8 +1668,8 @@ int select_tag(num n)
 				// cwp->current_tag_line=0;
 				// cwp->top_note_line=0;
 
-				if(tag_istr->selected) tag_istr->selected=0;
-				else tag_istr->selected=1;
+				if(tag_istr->selection_tag) tag_istr->selection_tag=0;
+				else tag_istr->selection_tag=1;
 
 				return show_tag_view(2);
 			};
@@ -2079,7 +2079,7 @@ char *get_notes_status()
  if(cbfp->b_flag & FSNOTES) {
 	row_data = (istr **)array_data(cbfp->b_tag_list);
 	if(cwp->current_note_line<cbfp->b_tag_list->size)
-		sprintf(statuss,"T %3d %d",row_data[cwp->current_tag_line]->index,row_data[cwp->current_tag_line]->selected);
+		sprintf(statuss,"T %3d %d",row_data[cwp->current_tag_line]->index,row_data[cwp->current_tag_line]->selection_tag);
 	else sprintf(statuss,"     ");
  } else {
 	row_data = (istr **)array_data(cbfp->dir_list_str);
