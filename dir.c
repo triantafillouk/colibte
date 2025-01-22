@@ -697,9 +697,10 @@ int dir_compare(num n)
  if(!(cbfp->b_flag & FSNLIST)) return FALSE;
  FILEBUF *f1=cbfp;
  FILEBUF *f2=get_dir_buffer(DIR_OTHER,0);
+ if(f2==NULL) return false;
  if(!(f2->b_flag & FSNLIST)) return FALSE;
- char *name1[MAXFLEN];
- char *name2[MAXFLEN];
+ char name1[MAXFLEN];
+ char name2[MAXFLEN];
  if(f1!=f2) {
  	if(f2->sort_mode !=f1->sort_mode) return false;
 	msg_line("dir compare..");
@@ -709,15 +710,17 @@ int dir_compare(num n)
 	f1->selected_files=0;
 	f2->selected_files=0;
 	istr **r1=(istr **) array_data(f1->dir_list_str);
-	istr **r2=(istr **) array_data(f1->dir_list_str);
+	istr **r2=(istr **) array_data(f2->dir_list_str);
 	for(i=0;i<f1->dir_list_str->size;i++) {
 		istr *d1=r1[i];
 		d1->selection_tag=0;
 		ftype1 = dir_getfile1(f1,name1,1,i);
+		// MESG("	check i=%3 %s",i,f1);
 		for(j=0;j<f2->dir_list_str->size;j++) {
 			istr *d2=r2[j];
 			ftype2 = dir_getfile1(f2,name2,1,j);
-			if(strcmp(name1,name2)==0) {
+			// MESG("	with j=%d %s",j,f2);
+			if((strcmp(name1,name2)==0) && (ftype1==ftype2)) {
 				d1->selection_tag=1;
 				d2->selection_tag=1;
 			};
@@ -944,7 +947,7 @@ int dir_file_rename(num n)
   return(TRUE);
 }
 
-int dir_new_file(num n)
+int dir_touch_file(num n)
 {
   int s1;
   struct stat t;
