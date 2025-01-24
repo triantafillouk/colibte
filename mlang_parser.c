@@ -7,8 +7,6 @@
 	interpreter parser
 */
 
-#define	TEST_PARSER	0
-
 void set_tok_table(FILEBUF *bf, TLIST lex_parser);
 void skip_space1(FILEBUF *bf);
 
