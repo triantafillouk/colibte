@@ -9,6 +9,7 @@
 
 void set_tok_table(FILEBUF *bf, TLIST lex_parser);
 void skip_space1(FILEBUF *bf);
+offs fast_scanner4 (FILEBUF *fb, offs stringlen, char *pat, int patlen,offs start);
 
 offs foffset=0;
 
@@ -450,6 +451,18 @@ int type_init_definition(FILEBUF *bf,BTREE *types_tree,alist *lex_parser, tok_st
  return 1;
 }
 
+// check is there is a tags header and skip it
+void skip_tag_header(FILEBUF *bf)
+{
+ if(FSize(bf)<2) return;
+ if(FCharAt(bf,0)=='-' && FCharAt(bf,1)=='-') {
+	// MESG("check for second --");
+	num end_tags=fast_scanner4(bf,1000,"--",2,3);
+	// MESG("found -- at %ld",start);
+	if(end_tags>0) foffset=end_tags+3;
+ };
+}
+
 /*
  parse a file buffer,
  create/renew the alist of tokens found
@@ -525,6 +538,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 #if	DEBUG_SYNTAX
  save_stage_level=stage_level;
 #endif
+ skip_tag_header(bf);
+
  // MESG("--- Start parsing block loop <--------------------");
  while(getnc1(bf,&cc,&tok_type))
  {
