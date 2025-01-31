@@ -2929,19 +2929,17 @@ void highlight_python(int c)
 		break;
 	/* single quotes */
 	case CHR_SQUOTE: 
-		if(hquotem&H_QUOTEC) break;
+		// if(hquotem&H_QUOTEC) break;
 		if(hstate!=HS_PREVESC) {
 			if(single_quoted==2) {
 				hquotem = (hquotem & H_COMMENT)? hquotem & ~H_COMMENT: H_COMMENT;
 			} else {
 				if(single_quoted==1) {
 					single_quoted=2;
-					double_quoted=0;
 					hquotem = (hquotem)? hquotem & ~H_QUOTE1: H_QUOTE1;
 				} else {
 					hquotem = (hquotem)? hquotem & ~H_QUOTE1: H_QUOTE1;
 					single_quoted=1;
-					double_quoted=1;
 				}
 			}
 		};
@@ -2954,23 +2952,24 @@ void highlight_python(int c)
 		break;
 	/* double quotes */
 	case CHR_DQUOTE:
-		if(hquotem&H_QUOTEC) break;
+		// if(hquotem&H_QUOTEC) break;
 		if(hstate!=HS_PREVESC) {
 			if(double_quoted==2) {
 				hquotem = (hquotem & H_COMMENT)? hquotem & ~H_COMMENT: H_COMMENT;
+				double_quoted=0;
 			} else {
 				if (double_quoted==1) {
 					double_quoted=2;
-					single_quoted=0;
 					hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
 				} else {
 					hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
 					double_quoted=1;
-					single_quoted=0;
 				}
 			}
 		};
 		hstate=0;
+		single_quoted=0;
+		
 		break;
 	case '#': { // comment line
 //		if(hstate==HS_LINESTART) 
