@@ -2430,7 +2430,6 @@ int upperregion(num  n)
 	return (TRUE);
 }
 
-// delete_box: undo information is passed for each line separatly. FIXME
 int delete_box(num n)
 {
  num h,l1,l2,col;
@@ -2455,6 +2454,7 @@ int delete_box(num n)
 
  reset_region_textpoints();
  lbo=LineBegin(tp_offset(cwp->tp_current));
+ beginundogroup(fp->main_undo);
  while(h-->0) {
 	if(LineEnd(lbo)-lbo>col) {
 		offs p1,p2;
@@ -2464,14 +2464,13 @@ int delete_box(num n)
 		p1=MoveToColumn(col);
 		p2=MoveToColumn(col+w);
 
-		beginundogroup(fp->main_undo);
 		fp->main_undo->head_position=Offset();
 
  		DeleteBlock(p2-p1,0);
-		EndUndoGroup(fp->main_undo);
 	};
 	lbo=FNextLine(fp,lbo);
  };
+ EndUndoGroup(fp->main_undo);
  set_Offset(cofs);
  setmark(0);
  set_goal_column(cwp->tp_current->col,"del box");

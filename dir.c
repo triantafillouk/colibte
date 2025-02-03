@@ -1975,7 +1975,7 @@ int dir_getfile(char *fname,int flag)
  };
  // MESG("dir_getfile: b_flag=%X [%s]",cbfp->b_flag,line_str);  
  c=line_str[0];
- if(c=='c') { error_line("cannot view c type files");return -1;};
+ if(c=='c') { msg_line("c type file");return -1;};
  if(c=='s') { error_line("cannot view socket files");return -1;};
  if(c=='#' ||c=='!'||c=='/') ftype=FTYPE_DIR;else ftype=FTYPE_NORMAL;
  c=line_str[1];

@@ -9,6 +9,9 @@
 
 #include	"xe.h"
 #include	"menu.h"
+#include	<sys/stat.h>
+#include	<sys/types.h>
+#include	<dirent.h>
 
 #if	TNOTES
 char *get_notes_key();
@@ -1148,6 +1151,19 @@ int insert_file(num  n)
     return(stat);
 }
 
+int is_system_file(char *fname)
+{
+	// TODO return if block file !!!!!
+	int status;
+	struct stat bp_stat;
+	status=stat(fname,&bp_stat);
+	int bt=bp_stat.st_mode & S_IFMT;
+	if(bt & S_IFBLK || bt & S_IFIFO) {
+		msg_line("system file");
+		return 1;
+	};
+	return 0;
+}
 
 int open_file_named(char *fname)
 {
@@ -1521,7 +1537,8 @@ void set_bfname(char *full_name, char *fname)
 int writeu1(char *fname, FILEBUF *fp)
 {
  int s;
- // MESG("writeu1: fname=[%s] dir=%s name=%s",fname,fp->b_dname,fp->b_fname);
+ MESG("writeu1: fname=[%s] dir=%s name=%s",fname,fp->b_dname,fp->b_fname);
+ fp->b_state |= FS_CHG;
  if ((s=writeout(fname,fp)) == TRUE) {
  	// MESG("writeu1: ok");
 	fp->b_state &= ~FS_CHG;
@@ -1536,7 +1553,7 @@ int writeu1(char *fname, FILEBUF *fp)
  */
 int saveas_file(num n)
 {
-	int    stat;
+	int    status;
     char	fname[MAXFLEN];
 	char	dname[MAXFLEN];
 	int scratch_num=0;
@@ -1550,9 +1567,10 @@ int saveas_file(num n)
 		return 0;
 	};
 #endif
+	if(is_system_file(cbfp->b_fname)) return 0;
 	strlcpy(fname,cbfp->b_fname,MAXFLEN);
 	if(snprintf(save_as_msg,MAXFLEN,"Save as: %s:",get_working_dir())>=MAXFLEN) return FALSE;
-    if ((stat=nextarg(save_as_msg, fname, MAXFLEN,true)) != TRUE) return FALSE;
+    if ((status=nextarg(save_as_msg, fname, MAXFLEN,true)) != TRUE) return FALSE;
 	scratch_num = is_scratch_buffer(cbfp);
 	// MESG("saveas_file: %s",fname);
 	if(scratch_num) 
@@ -1566,13 +1584,15 @@ int saveas_file(num n)
 	if((cbfp->b_flag & FSMMAP)) {
 		FILEBUF *b;
 		FILEBUF *vb=cbfp;
-		int status;
+
 		if(!strcmp(cbfp->b_fname,fname)) {
-			return error_line("cannot write to the same read only file!");
+			msg_line("cannot write to the same read only file!");
+			return 0;
 		};
-		vb->b_state = FS_ACTIVE;	/* set it so we can write it  */
+		vb->b_state = FS_ACTIVE|FS_CHG;	/* set it so we can write it  */
 	    strlcpy(vb->b_fname, fname,MAXFLEN);
 		strlcpy(vb->b_dname,getcwd(dname,MAXFLEN),MAXFLEN);
+		vb->b_flag ^= ~FSMMAP;
 		writeu1(fname,vb);
 		b = new_filebuf(fname,0);
 		select_filebuf(b);
@@ -1588,6 +1608,7 @@ int saveas_file(num n)
  	if(cbfp->b_fname[0]!=CHR_LBRA){
 		add_to_recent_list(get_buf_full_name(cbfp));
 	};
+	cbfp->b_state = FS_ACTIVE|FS_CHG;	/* set it so we can write it  */
 	return(writeu1(fname,cbfp));
 }
 
@@ -1654,6 +1675,7 @@ int rename_file(num n)
 	if ((s=nextarg("New file name: ", fname, MAXFLEN,true)) != TRUE) return (s);
 	strlcpy(cbfp->b_fname, fname,MAXFLEN);
 	cbfp->b_state &= ~FS_VIEW;	/* no longer read only mode */
+	cbfp->b_state |= FS_CHG;
 	update_file_status(cbfp);
     return (TRUE);
 }

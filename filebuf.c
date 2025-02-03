@@ -2087,10 +2087,13 @@ int	writeout(char *name, FILEBUF *bf)
 	offs   act_written;
 	char cr1[2];
 	bool bak_created=0;
-	// MESG("writeout:");
+	MESG("writeout: b_flag=%X",bf->b_flag);
    if(bf->b_flag & FSMMAP)
    {
-      if(!strcmp(name,bf->b_fname)) return true; // same file already saved!
+     if(!strcmp(name,bf->b_fname)) {
+	  	msg_line("already saved!");
+		return true; // same file already saved!
+	 }
 	  msg_line("cannot save a mmap file with different name!");
 	  return FALSE;
    }
