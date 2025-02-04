@@ -1157,12 +1157,15 @@ int is_system_file(char *fname)
 	int status;
 	struct stat bp_stat;
 	status=stat(fname,&bp_stat);
-	int bt=bp_stat.st_mode & S_IFMT;
-	if(bt & S_IFBLK || bt & S_IFIFO) {
-		msg_line("system file");
-		return 1;
+	if(status==0) {
+		int bt=bp_stat.st_mode & S_IFMT;
+		if(bt & S_IFBLK || bt & S_IFIFO) {
+			msg_line("system file");
+			return 1;
+		} else return 0;
 	};
-	return 0;
+	msg_line("cannot open");
+	return 1;
 }
 
 int open_file_named(char *fname)
@@ -1592,7 +1595,7 @@ int saveas_file(num n)
 		vb->b_state = FS_ACTIVE|FS_CHG;	/* set it so we can write it  */
 	    strlcpy(vb->b_fname, fname,MAXFLEN);
 		strlcpy(vb->b_dname,getcwd(dname,MAXFLEN),MAXFLEN);
-		vb->b_flag ^= ~FSMMAP;
+		vb->b_flag =0;
 		writeu1(fname,vb);
 		b = new_filebuf(fname,0);
 		select_filebuf(b);

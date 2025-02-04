@@ -90,7 +90,7 @@ M_element e_file[] =
 	{0, 'G', "Goto on cursor ","", open_file, (struct MENUS *)3, "FG"},
 	{0, 'S', "Save         ^S","^SSave",	save_file, 0 ,"FS"},	
 	{0, 'A', "save As        ","",	saveas_file, 0,"FA" },	
-	{0, 'E', "rEname         ","",rename_file, 0,"FE" },	
+	// {0, 'E', "rEname         ","",rename_file, 0,"FE" },	
 	{0, 'L', "reLoad file    ","",reload_file, 0,"FL"},
 	{0, 'I', "Insert         ","",insert_file, 0,"FI"},	
 	{0, 'H', "Highlight type ","",select_highlight,0,"FH"},
