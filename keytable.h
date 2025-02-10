@@ -470,6 +470,7 @@ KEYTAB keytab_dir[] = {
 	{'e',		dir_edit,"e"},
 	{'c',		dir_copy,"c"},
 	{SPEC1|15,  dir_copy,"F5"},
+	{'o',		dir_clone,"o"},
 	{'l',		dir_link,"l"},
 	{'m',		dir_move,"m"},
 	{'n',		dir_file_rename,"n"},
