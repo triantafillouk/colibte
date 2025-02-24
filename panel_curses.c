@@ -46,6 +46,7 @@ void restore_original_colors();
 int set_tag_view_position(int line,int column);
 int change_sort_mode(int mouse_col);
 int listdir(int dtype);
+void set_mouse_on();
 
 BOX *cbox=NULL; // current box
 BOX *msg_box=NULL;	// current message box
@@ -584,21 +585,18 @@ void drv_size()
 void enable_key_mouse()
 {
  mouse_active=1;
+ // MESG("enable_key_mouse:");
 #if	SOLARIS
 	return;
 #else
- mousemask(ALL_MOUSE_EVENTS|REPORT_MOUSE_POSITION,NULL);
- printf("\033[?1003h");	/* makes terminal report mouse mouvement  */
- if(extended_mouse) {
- 	printf("\033[?1006h");	/* makes terminal extended report mouse mouvement  */
- }
- fflush(stdout);
+ set_mouse_on();
 #endif
 }
 
 void disable_key_mouse()
 {
  mouse_active=0;
+ // MESG("disable_key_mouse:");
 #if	SOLARIS
 	return;
 #else
@@ -645,12 +643,12 @@ void drv_open()
 // setlocale(LC_ALL,"en_US.UTF-8"); 
  setlocale(LC_ALL,"");	// do not use specific locale, get it from the system !!
  init_sighandler();
-
+ 
  initscr();
  noecho();
  raw();
  nonl();
-
+ // MESG("drv_open:");
  if(mcurflag){
 // keypad(stdscr,1);	/* no need for the moment, need a lot of changes!  */
 #if	!SOLARIS
@@ -842,6 +840,7 @@ int text_mouse_function(int move)
 	};
 	if(mouse_button==KMOUSE_BUTTON1 && move<KMOUSE_RELEASE){
 		// MESG("	1: mouse button1 press! move=%d < %d",move,KMOUSE_RELEASE);
+		// setmark(0);
 		if((mouse_window_col+wp->w_infocol)==wp->w_ntcols) { // on rline (position status line)
 			int start,len;
 			int lines_to_move;
@@ -863,7 +862,7 @@ int text_mouse_function(int move)
 				};							
 			} else {
 
-//			MESG("set mouse_started");
+			// MESG("set mouse_started");
 			if(mouse_window_row < start) {
 //				MESG("move up: to %d-%d = %d",top_line,lines_to_move,top_line-lines_to_move);
 				return imove_top_line(top_line-lines_to_move);
@@ -933,7 +932,7 @@ int text_mouse_function(int move)
 			return 0;
 		};
 		if(mouse_started_in_rline) {
-//			MESG("in rline !");
+			// MESG("in rline !");
 			return 0;
 		};
 		// MESG("tp_current:beginning: new_offset=%ld b_flag=%X",new_offset,cbfp->b_flag);
@@ -972,7 +971,7 @@ int text_mouse_function(int move)
 				return 0;
 			 };
 			if(move==0) {
-//				MESG("move_to_new_position mouse_window_col=%ld new_line=%ld",mouse_window_col,new_line);
+				// MESG("move_to_new_position mouse_window_col=%ld new_line=%ld",mouse_window_col,new_line);
 				if(
 #if	TNOTES
 					cwp->w_fp->b_flag & FSNOTES || cwp->w_fp->b_flag & FSNOTESN ||
@@ -992,13 +991,13 @@ int text_mouse_function(int move)
 				move_to_new_position(wrap_column+mouse_window_col,start_line);
 				if(cwp->selection==0) {
 					/* start selection  */
-//					MESG("mouse move: start selection: mouse_col=%d o=%lld charlen=%d start_col=%lld",
-//						mouse_window_col,Offset(),charlen(cwp->w_fp,Offset()),start_col);
+					// MESG("mouse move: start selection: mouse_col=%d o=%lld start_col=%lld",
+					//	mouse_window_col,Offset(),start_col);
 					cwp->selection=1;
 					set_xmark(cwp,start_col,start_line-tp_line(cwp->tp_hline),0);
 				} else {
-//					MESG("mouse move: move  selection: mouse_col=%d o=%lld charlen=%d start_col=%lld",
-//						mouse_window_col,Offset(),charlen(cwp->w_fp,Offset()),start_col);
+					// MESG("mouse move: move  selection: mouse_col=%d o=%lld  start_col=%lld",
+					//	mouse_window_col,Offset(),start_col);
 					set_xmark(cwp,wrap_column+mouse_window_col,new_line - tp_line(cwp->tp_hline),1);
 				};
 				set_update(cwp,UPD_EDIT);
@@ -1013,6 +1012,7 @@ int text_mouse_function(int move)
 			mouse_button = KMOUSE_NONE;
 
 			set_selection(false);
+			setmark(0);
 	   		set_xmark(cwp,mouse_window_col,mouse_window_row,2); /* remove marks */
 			set_update(cwp,UPD_EDIT);
 			return status;
@@ -1064,6 +1064,7 @@ void drv_init(int argc, char **argp)
 /* Close screen driver  */
 void drv_close()
 {
+	// MESG("drv_close:");
 	restore_original_colors();
 #if	!SOLARIS
 	use_default_colors();
@@ -1072,10 +1073,22 @@ void drv_close()
 	endwin();
 }
 
+void set_mouse_on()
+{
+ if(mouse_active) {
+	 mousemask(ALL_MOUSE_EVENTS|REPORT_MOUSE_POSITION,NULL);
+	 printf("\033[?1003h");	/* makes terminal report mouse mouvement  */
+	 if(extended_mouse) {
+	 	printf("\033[?1006h");	/* makes terminal extended report mouse mouvement  */
+	 }
+ };
+}
 
 /* Flush/resync */
 void drv_flush()
 {
+	// MESG("drv_flush:");
+	if(mouse_active) set_mouse_on();
 	refresh();
 }
 
@@ -1342,6 +1355,7 @@ int get_mouse_key()
 		c = get1key();
 		mousex=get1key()-33;
 		mousey=get1key()-33;
+		// MESG("normal_mouse:c=%d x=%d y=%d",c,mousex,mousey);
 	if(c==' ') mouse_key=c;
 	if(c=='#') mouse_key=c;
 	if(c=='`') mouse_key=c;
@@ -1380,12 +1394,13 @@ int get_mouse_key()
 	if(c=='p') mouse_key='a';	/* control scroll down  */
 	if(c=='i') mouse_key='`';	/* alt scroll up  */
 	if(c=='h') mouse_key='a';	/* alt scroll down  */
-	
+	// MESG("mouse_key=%d",mouse_key);
 	} else {	/* extended mouse support  */
 		c='C';	/* set to move  */
 		button = getanum(&last_key);
 		mousex=getanum(&last_key)-1;
  		mousey=getanum(&last_key)-1;
+		// MESG("ext mouse:button=%d x=%d y=%d",button,mousex,mousey);
 		if(button==64||button==65){
 			if(button==64) mouse_key=96;	/* down  */
 			if(button==65) mouse_key=97;	/* up  */

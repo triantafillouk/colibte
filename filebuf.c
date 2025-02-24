@@ -279,6 +279,9 @@ int show_info(num n)
 		if(cbfp->b_mode & EMDOS)   strlcat(s,"dos ",width);
 		sm[i++]=strdup(s);sm[i]=0;
 	};
+#if	0
+	SMESG(" selection: %d",cwp->selection);
+#endif
 	strcpy(s,"Buffer flags: ");
 	if(cbfp->b_state & FS_ACTIVE) 	strlcat(s,"Active,",width);
 	if(cbfp->b_state & FS_CHG) 		strlcat(s,"Changed,",width);
