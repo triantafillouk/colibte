@@ -2035,25 +2035,27 @@ int update_screen(num force)
 	WINDP *wp;
 	// static int count=0;
 	// count++;
+	// MESG("Update_scren:");
+	if(cwp==NULL) return 0;
 	int cw_flag=cwp->w_flag;
 	if (noupdate) return TRUE;
-
 	/* experiment with screen updating  */
 	if(cw_flag==0) return(FALSE);
 
 	if (force == FALSE && kbdmode == PLAY)	return(TRUE);
-
+	// MESG("update_screen:0");
 	/* update any windows that need refreshing */
 	// MESG_time("! update_screen: ---------------");
 	hide_cursor("update_screen: start");
 	// MESG("hide_cursor: ok!");
+	if(cwp!=NULL)
 	if(cwp->selection) {
 		if(cwp->selection == REGION_LINE) 
 			textpoint_set(cwp->w_emark,LineEnd(tp_offset(cwp->tp_current)));
 		else
 			tp_copy(cwp->w_emark,cwp->tp_current);
-	}
-
+	};
+	// MESG("update_screen:1");
 	upd_column_pos();	/* update column position  */
 	// MESG_time("update_screen: 1");
 	/* if screen is garbage, re-plot it */
@@ -2067,15 +2069,15 @@ int update_screen(num force)
 		// MESG(";start of while:");
 		wp=(WINDP *)lget_current(window_list);
 		if(wp==NULL) break;
-		// MESG("	+++ loop1: %d",wp->id);
+		MESG("	+++ loop1: %d",wp->id);
 		_el *l_current = window_list->current;
 		// MESG("	++++ loop window now is %d wrap=%d",wp->id,is_wrap_text(wp->w_fp));
 		if(is_wrap_text(wp->w_fp))	update_window_wrap(wp,force);
 		else update_window_nowrap(wp,force);
 		set_current(window_list,l_current);
-		// MESG(" +++  move to next!");
+		MESG(" +++  move to next!");
 		lmove_to_next(window_list,0);
-		// MESG(" ___ moved!");
+		MESG(" ___ moved!");
 	};
 
 	// MESG("	----- after update");
@@ -2089,7 +2091,7 @@ int update_screen(num force)
 	// MESG_time("update_physical");
 	update_physical_windows();
 	// MESG_time("update_physical end",1);	
-	/* update the cursor and flush the buffers */
+	// /* update the cursor and flush the buffers */
 	update_cursor_position();
 	/* set previous line */
 	// MESG(";update_screen: set new ppline");
