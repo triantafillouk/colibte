@@ -943,7 +943,7 @@ double factor_line_array()
 	RTRN(1.2);
 }
 
-inline MVAR *get_left_slot(int ind)
+ MVAR *get_left_slot(int ind)
 {
 	// MESG("get_left_slot: ind=%d",ind);
 	return &current_stable[ind];

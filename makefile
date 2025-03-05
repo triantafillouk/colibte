@@ -41,7 +41,7 @@ EXTFILE=.$(APP_NAME)_ext_mac
 WSL:=0
 #CC=zig cc -DGVERS='"$(GVERS)"'
 #CC=clang -DGVERS='"$(GVERS)"'
-CC=gcc-14 -DGVERS='"$(GVERS)"'
+CC=gcc -DGVERS='"$(GVERS)"'
 endif
 
 # for Linux
@@ -107,7 +107,7 @@ ifeq ($(CC), clang)
 # the following is needed for clang compiler
 CPU_OPTIONS= -O3  -I/usr/include/x86_64-linux-gnu -D$(OSYSTEM)=1
 else 
-CPU_OPTIONS= -O3  -D$(OSYSTEM)=1  
+CPU_OPTIONS= -O3 -D$(OSYSTEM)=1  
 endif
 
 ifeq ($(WSL), 1)

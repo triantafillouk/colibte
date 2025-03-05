@@ -2691,6 +2691,10 @@ void allocate_virtual_window(WINDP *wp)
  int i;
  // MESG("	- allocate_virtual_window: cols=%d rows=%d",wp->w_ntcols,wp->w_ntrows);
  wp->vs = (VIDEO **) emalloc(sizeof(VIDEO *) * (wp->w_ntrows+3),"allocation virtual window");
+ if(wp->vs==NULL) { 
+ 	ERROR("could not allocate window");
+	exit(1);
+ };
  for(i=0;i< wp->w_ntrows+2;i++) {
  	vp = (VIDEO *) emalloc(sizeof(VIDEO) + (wp->w_ntcols+2) * sizeof(struct vchar),"allocate virtual line");
  	if(vp==NULL) {

@@ -637,27 +637,31 @@ char *xclip_copy="xclip -o";
 char *xclip_paste="xclip -i";
 
 #if	DARWIN
-char *pbpaste="pbpaste";
-char *pbcopy="pbcopy";
-
+char *native_paste0="pbpaste";
+char *native_paste="pbpaste";
+char *native_copy="pbcopy";
+#else
+char *native_paste0="win32yank -i";
+char *native_paste="win32yank -i";
+char *native_copy="win32yank -o";
+#endif
 // check bpcopy/pbpaste on mac
-int check_pbcopy()
+int check_native_copy()
 {
  int status;
  static char exec_st[MAXFLEN];
 
-	status=snprintf(exec_st,MAXFLEN,"pbpaste > /dev/null 2> /dev/null");
+	status=snprintf(exec_st,MAXFLEN,"%s > /dev/null 2> /dev/null",native_paste);
 	if(status>=MAXFLEN) return 0;
 	status = system(exec_st);
 	if(status == 0) {
-		clip_copy=pbpaste;
-		clip_paste=pbcopy;
+		clip_copy=native_paste;
+		clip_paste=native_copy;
 		x11_display_ok=1;
 		return 1;
 	};
 	return 0;
 }
-#endif
 
 int init_system_clipboard()
 {
@@ -665,10 +669,10 @@ int init_system_clipboard()
  int status=0;
 	if(status>=MAXFLEN) return 0;
 
-	display_env = getenv("DISPLAY");
-#if	DARWIN
-	if(check_pbcopy()) return 1;
+#if	DARWIN | WSL
+	if(check_native_copy()) return 1;
 #endif
+	display_env = getenv("DISPLAY");
 	if(display_env == NULL) {
 		return 0; 
 	} else {
