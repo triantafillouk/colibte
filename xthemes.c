@@ -196,36 +196,48 @@ int color_scheme_read()
 			int i;
 			for(i=0;i<COLOR_TYPES;i++) scheme->color_style[i].color_value="#203040";
 			// MESG("	create new scheme %s schemes now %d",name1,color_scheme_list->size);
+		} else {
+			// MESG("-------- read/modify scheme named %s -----------",name1);
 		};
-		// MESG("-------- read scheme named %s -----------",name1);
 		continue;
 	};
 	char **arg_list = split_2_sarray(b,' ');
 	char **sa = arg_list;
 	char *item = *sa++; 
+	// MESG("	item=[%s]",item);
 	j = sarray_index(color_type,item);	/* get color type  */
 	if(j<0) { free_sarray(arg_list); continue;};
 	scheme->color_style[j].color_index=0;
+	// MESG("		item num=%d",j);
 	if(j>=0) {
 	// loop for attributes
 		scheme->color_style[j].color_attr=0;
-		while((item = *sa++) !=NULL) {
+		while(*sa !=NULL) {
+			item=*sa++;
+			// MESG("		value=[%s]",item);
 			i=sarray_index(basic_color_names,item);
+			// MESG("			index=%d",i);
 			if(i>=0) {
 				if(i>7) scheme->color_style[j].color_attr |= FONT_STYLE_BOLD;
 				scheme->color_style[j].color_index=i%8;	/* 8 colors index  */
 			} else {
+				// MESG("		set color index");
 				if(scheme->color_style[j].color_index==0) scheme->color_style[j].color_index=j;
+				// MESG("		color index becomes %d",j);
 				if(!strcasecmp(item,"bold"))	 		scheme->color_style[j].color_attr |= FONT_STYLE_BOLD;
 				else if(!strcasecmp(item,"underline"))  scheme->color_style[j].color_attr |= FONT_STYLE_UNDERLINE;
 				else if(!strcasecmp(item,"italic"))     scheme->color_style[j].color_attr |= FONT_STYLE_ITALIC;
 				else if(!strcasecmp(item,"dim"))        scheme->color_style[j].color_attr |= FONT_STYLE_DIM;
 				else if(!strcasecmp(item,"reverse"))    scheme->color_style[j].color_attr |= FONT_STYLE_REVERSE;
-				else scheme->color_style[j].color_value=strdup(item);	/* otherwise it is a color value  */
+				else {
+					// MESG("		set color to [%s]",item);
+					scheme->color_style[j].color_value=strdup(item);	/* otherwise it is a color value  */
+				};
 			};
 		};
 	};
-	free_sarray(arg_list);
+	// free_sarray(arg_list);
+	MESG("	arg_list freed!");
  };
 	MESG("color file read ok !");
 	fclose(f1);

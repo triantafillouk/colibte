@@ -640,12 +640,15 @@ char *xclip_paste="xclip -i";
 char *native_paste0="pbpaste";
 char *native_paste="pbpaste";
 char *native_copy="pbcopy";
-#else
-char *native_paste0="win32yank -i";
-char *native_paste="win32yank -i";
-char *native_copy="win32yank -o";
 #endif
-// check bpcopy/pbpaste on mac
+#if	WSL
+// The following is for wsl!
+char *native_paste0="win32yank.exe -o --lf";
+char *native_paste="win32yank.exe -o --lf";
+char *native_copy="win32yank.exe -i";
+#endif
+
+#if	DARWIN | WSL
 int check_native_copy()
 {
  int status;
@@ -654,6 +657,7 @@ int check_native_copy()
 	status=snprintf(exec_st,MAXFLEN,"%s > /dev/null 2> /dev/null",native_paste);
 	if(status>=MAXFLEN) return 0;
 	status = system(exec_st);
+	MESG("check_native_copy:[%s] -> %d",exec_st,status);
 	if(status == 0) {
 		clip_copy=native_paste;
 		clip_paste=native_copy;
@@ -662,6 +666,7 @@ int check_native_copy()
 	};
 	return 0;
 }
+#endif
 
 int init_system_clipboard()
 {
