@@ -2248,7 +2248,7 @@ int copy_region(num n)
 
  if(!clipboard_copy(MainClipBoard)) return FALSE;
  export_region(MainClipBoard);
- 
+
  set_update(cwp,UPD_WINDOW);
  setmark(0); // remove selection
 

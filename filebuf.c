@@ -1018,7 +1018,7 @@ int clipboard_copy(ClipBoard *clip)
       clip->height=llabs(line2-line1)+1;
 	  size=((clip->width+1)*clip->height+1)*4;	/* each utf can have 4 bytes  */
       clip->text=(char*)emalloc(size,"clipboard_copy");
-
+		// MESG("clipboard_copy: rect w=%d h=%d size=%d",clip->width,clip->height,size);
       if(!clip->text) {
       	ERROR("clipboard_copy:rect  Not enough memory");
 	 	return(FALSE);
@@ -1034,6 +1034,8 @@ int clipboard_copy(ClipBoard *clip)
 	 		i=0;
 			o=o1;
 			c=0;
+		   // char cline[100];
+		   // char *cp=&cline[0];
 			// go to the start of rectangle column
 
 	    	while(c<col1) {
@@ -1055,7 +1057,10 @@ int clipboard_copy(ClipBoard *clip)
 		  	if(c<col1) k-=(col1-c);
 		  	if(k>(clip->width-i)) k=(clip->width-i);
 		  	i+=k;
-		  	while(k-- >0)  *text_ptr++=' ';
+		  	while(k-- >0)  { 
+				*text_ptr++=' ';
+				// *cp++ =' ';
+			};
 		  	c=c1;
 		  	continue;
 	       } else {;
@@ -1063,17 +1068,25 @@ int clipboard_copy(ClipBoard *clip)
 			int i1;
 		       c+=len;
 		       i+=len;
-		       for(i1=0;i1<4 && uc.uval[i1]!=0;i1++) { *text_ptr++ = uc.uval[i1];};
+		       for(i1=0;i1<4 && uc.uval[i1]!=0;i1++) { 
+			   	*text_ptr++ = uc.uval[i1]; 
+				// *cp++ =uc.uval[i1];
+			   };
 		   }
 	    };
 		// add space at the end of the line till fills rectangle width
 	 	while(i<clip->width) {
 	    	i++;
 	    	*text_ptr++=' ';
+			// *cp++ = ' ';
 	 	};
 		// add a new line at end of each line for X11 exporting reasons!
-		*text_ptr++='\n';o++;
-      }
+		*text_ptr++='\n';
+		// *cp=0;	MESG("added line %d [%s]",j,cline);
+		o++;
+      };
+	  clip->width++;
+	  clip->rect = text_ptr-clip->text;
    }
    else /* !rblock */
    {
@@ -2090,7 +2103,7 @@ int	writeout(char *name, FILEBUF *bf)
 	offs   act_written;
 	char cr1[2];
 	bool bak_created=0;
-	MESG("writeout: b_flag=%X",bf->b_flag);
+	// MESG("writeout: b_flag=%X",bf->b_flag);
    if(bf->b_flag & FSMMAP)
    {
      if(!strcmp(name,bf->b_fname)) {

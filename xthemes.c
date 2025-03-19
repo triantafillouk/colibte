@@ -237,7 +237,7 @@ int color_scheme_read()
 		};
 	};
 	// free_sarray(arg_list);
-	MESG("	arg_list freed!");
+	// MESG("	arg_list freed!");
  };
 	MESG("color file read ok !");
 	fclose(f1);

@@ -918,7 +918,8 @@ FILE *clip_file;
 	// put clipboard to filnam
 	clip_file=fopen(filnam,"w");
 	if(clip_file){
-		fwrite(MainClipBoard->text,MainClipBoard->width,MainClipBoard->height,clip_file);
+		if(MainClipBoard->height>1) fwrite(MainClipBoard->text,MainClipBoard->rect-1,1,clip_file);
+		else fwrite(MainClipBoard->text,MainClipBoard->width,MainClipBoard->height,clip_file);
 		fclose(clip_file);
 		status=snprintf(exec_st,MAXFLEN,"(cat %s |%s)  2> /dev/null",filnam,clip_paste);
 		if(status>=MAXFLEN) return 0;

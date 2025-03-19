@@ -2069,15 +2069,15 @@ int update_screen(num force)
 		// MESG(";start of while:");
 		wp=(WINDP *)lget_current(window_list);
 		if(wp==NULL) break;
-		MESG("	+++ loop1: %d",wp->id);
+		// MESG("	+++ loop1: %d",wp->id);
 		_el *l_current = window_list->current;
 		// MESG("	++++ loop window now is %d wrap=%d",wp->id,is_wrap_text(wp->w_fp));
 		if(is_wrap_text(wp->w_fp))	update_window_wrap(wp,force);
 		else update_window_nowrap(wp,force);
 		set_current(window_list,l_current);
-		MESG(" +++  move to next!");
+		// MESG(" +++  move to next!");
 		lmove_to_next(window_list,0);
-		MESG(" ___ moved!");
+		// MESG(" ___ moved!");
 	};
 
 	// MESG("	----- after update");
