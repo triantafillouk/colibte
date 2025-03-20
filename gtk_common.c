@@ -488,7 +488,7 @@ int x_insert ()
  int nbytes;
  char *dat;
  static GdkAtom targets_atom = GDK_NONE;
- 	// MESG("x_insert:");
+ 	MESG("x_insert:");
 	if(targets_atom == GDK_NONE)
 //	    targets_atom = gdk_atom_intern("COMPOUND_TEXT", FALSE);
 //	    targets_atom = gdk_atom_intern("GTK_TEXT_BUFFER_CONTENTS", FALSE);

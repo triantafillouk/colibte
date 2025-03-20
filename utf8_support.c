@@ -89,6 +89,65 @@ int utf_num_chars(char *utf)
  return utflen;
 }
 
+int utf_num_chars_tnl(char *utf,long *size)
+{
+ int len=strlen(utf);
+ int i,j;
+ int trail=0;
+ int ch;
+ int utflen=0;
+ char *eol=memchr(utf,10,len);
+ if(eol) {
+ 	*size=eol-utf;
+	// if(eol[1]==13) size++;
+	len = *size;
+ } else {
+ 	*size = len;
+ };
+
+ utf_error=0;
+ i=0;
+ while(i<len) {
+ 	ch=utf[i];
+	trail=utf8_countBytes[ch]-1;
+	if(trail<0) {
+		utf_error=trail;
+		return -1;
+	};
+	i++;
+	utflen++;
+	for(j=0;j<trail;j++,i++) {
+		if(i>=len) {
+			utf_error=i-j;
+			return -1;
+		};
+		if(utf[i]<128 || utf[i]>191) {
+			utf_error=i-j;
+			return -1;
+		};
+	};
+ };
+ if(utf[*size]==10) (*size)++;
+ if(utf[*size]==13) (*size)++;
+ return utflen;
+}
+
+void count_strsize(char *utf,long *maxchars,long *height)
+{
+ *maxchars=0;
+ *height=0;
+ long start=0;
+ long ssize=strlen(utf);
+ long chars_in_line=0;
+ while(start<ssize) {
+ 	long line_len=0;
+ 	chars_in_line=utf_num_chars_tnl(utf+start,&line_len);
+	if(chars_in_line>*maxchars) *maxchars=chars_in_line;
+	start += line_len;
+	(*height)++;
+ };
+}
+
 int SUtfCharLen(char *utfstr,int offset,utfchar *uc)
 {
  int ch;
