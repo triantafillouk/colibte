@@ -463,7 +463,7 @@ int set_fontindex(num n) {
 
 int export_region(ClipBoard *clip)
 {
-#if	1
+#if	WSL | DARWIN
  return ext_system_copy();
 #else
  long size;
@@ -475,7 +475,8 @@ int export_region(ClipBoard *clip)
 	gtk_selection_add_target(parent, GDK_SELECTION_PRIMARY,
 				 GDK_SELECTION_TYPE_STRING, 0);
 	/* we need to get it back, otherwise it gets much complicated to paste from onother instance */
-//	XFetchBytes(dis0, &nbytes);
+	XFetchBytes(dis0, &nbytes);
+	// MESG("X11 export region %d bytes",nbytes);
  } else {
 	msg_line("cannot set selection owner");
  }
@@ -1287,7 +1288,11 @@ int system_paste(num n)
 {
  if(dont_edit() || cbfp->b_flag & FSDIRED )return false;
 // hide_cursor("system_paste");
- x_insert();
+#if	0
+ if(ext_system_paste())
+#else
+ if(x_insert())
+#endif
  update_screen(1);
 
  return TRUE;

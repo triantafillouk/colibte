@@ -631,7 +631,7 @@ int filter_buffer(num nuse)
 char *display_env=NULL;
 char *clip_copy=NULL;
 char *clip_paste=NULL;
-int x11_display_ok=0;
+int ext_clipboard_command=0;
 
 char *xclip_copy="xclip -o";
 char *xclip_paste="xclip -i";
@@ -661,7 +661,7 @@ int check_native_copy()
 	if(status == 0) {
 		clip_copy=native_paste;
 		clip_paste=native_copy;
-		x11_display_ok=1;
+		ext_clipboard_command=1;
 		return 1;
 	};
 	return 0;
@@ -684,7 +684,7 @@ int init_system_clipboard()
 		if(strlen(display_env)<1) {
 			return 0;
 		};
-		x11_display_ok=1;
+		ext_clipboard_command=1;
 	};
 // we suppose that we have xclip for start
 // pass clipboard through xclip
@@ -694,14 +694,15 @@ int init_system_clipboard()
 	status = system(exec_st);
 	if((status%256) !=0) {
 		fprintf(stderr,"status %d cannot execute xclip\n",status);
+		ext_clipboard_command=0;
 		return 0;
 	} else {
 		clip_copy=xclip_copy;
 		clip_paste=xclip_paste;
-		x11_display_ok=1;
+		ext_clipboard_command=1;
 		return 1;
 	};
-	x11_display_ok=0;
+	ext_clipboard_command=0;
 	return 0;
 }
 
@@ -714,7 +715,7 @@ char *ext_system_paste_line()
  int status=0;
  
  memset(line,0,sizeof(line));
-	if(!x11_display_ok) return line;
+	if(!ext_clipboard_command) return line;
 
 	status = set_unique_tmp_file(filnam,"paste",MAXFLEN);
 	if(status>=MAXFLEN) return line;
@@ -847,7 +848,7 @@ int ext_system_paste()
  static char exec_st[MAXFLEN];
  int status=0;
 
-	if(!x11_display_ok) return 0;
+	if(!ext_clipboard_command) return 0;
 	status = set_unique_tmp_file(filnam,"command",MAXFLEN);
 	if(status>=MAXFLEN) return 0;
 	status=snprintf(exec_st,MAXFLEN,"%s > %s 2> /dev/null",clip_copy,filnam);
@@ -878,8 +879,9 @@ static char filnam[MAXFLEN];
 static char exec_st[MAXFLEN];
 int status;
 FILE *clip_file; 
-	if(!x11_display_ok) return 0;
-
+	// MESG("ext_system_copy: x11_ok = %d",ext_clipboard_command);
+	if(!ext_clipboard_command) return 0;
+	// MESG("ext_system_copy: %d chars",MainClipBoard->rect);
 	status = set_unique_tmp_file(filnam,"command",MAXFLEN);
 	if(status>=MAXFLEN) return 0;
 	// put clipboard to filnam

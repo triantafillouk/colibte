@@ -253,11 +253,11 @@ ginput3.o: keytable.h input.c
 
 #	The following is with gtk3 library and cairo plot. gplotc(gcanvas)
 ctg3: tplot.o system.o gldisplay.o edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o  utils.o alist.o filebuf.o gplotc3.o  support.o config_init.o convert.o  gtk_support3.o geditdisplay3.o  gcanvas3.o  highlight.o utf8_support.o notes.o mlangf.o
-	${CC} tplot.o system.o gldisplay.o  edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o gplotc3.o  gtk_support3.o config_init.o support.o geditdisplay3.o gcanvas3.o  highlight.o utf8_support.o notes.o mlangf.o -o ctg3  $(GLIB_LIB) $(GTK3_FLAGS) -lm -lX11
+	${CC} tplot.o system.o gldisplay.o  edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o gplotc3.o  gtk_support3.o config_init.o support.o geditdisplay3.o gcanvas3.o  highlight.o utf8_support.o notes.o mlangf.o -o ctg3  $(GTK3_FLAGS) -lm 
 
 #	The following is with gtk2 library and cairo plot. gplotc(gcanvas)
 ctg2 : gmain.o system.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o   gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o plot_cairo.c  config_init.o utf8_support.o notes.o mlangf.o
-	${CC} gmain.o system.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o notes.o mlangf.o -o ctg2  -lX11 $(GTK2_FLAGS)  $(GLIB_LIB) -lm
+	${CC} gmain.o system.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o notes.o mlangf.o -o ctg2  $(GTK2_FLAGS)  -lm
 
 # This is with Xlib library, no plot !
 ctxe : main.o system.o edit.o screen.o  xldisplay.o eval.o mlang.o  file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o  highlight.o dir.o utils.o alist.o filebuf.o support.o config_init.o utf8_support.o mlangf.o notes.o
@@ -268,7 +268,7 @@ ctxe : main.o system.o edit.o screen.o  xldisplay.o eval.o mlang.o  file.o  xinp
 
 # with curses, panel, no plot !
 cte : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o mlangf.o xthemes.c
-	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o -o cte  $(GLIB_LIB) ${LPCURSES} -lm
+	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o -o cte  ${LPCURSES} -lm
 
 ce : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o
 	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o -o ce  $(GLIB_LIB) ${LPCURSES} -lm
