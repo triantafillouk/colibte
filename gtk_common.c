@@ -14,6 +14,7 @@ extern FILEBUF *cbfp;
 GtkWidget *wlist;
 COLOR_SCHEME *get_scheme_by_index(int scheme_num);
 int drv_initialized=0;
+char *import_buffer=NULL;
 
 void set_current_scheme(int scheme)
 {
@@ -521,6 +522,45 @@ int x_insert ()
 
 }
 
+int x_insert_to_file (char *filnam)
+{
+ int nbytes;
+ char *dat;
+ static GdkAtom targets_atom = GDK_NONE;
+	if(targets_atom == GDK_NONE)
+//	    targets_atom = gdk_atom_intern("COMPOUND_TEXT", FALSE);
+//	    targets_atom = gdk_atom_intern("GTK_TEXT_BUFFER_CONTENTS", FALSE);
+	    targets_atom = gdk_atom_intern("UTF8_STRING", TRUE);
+		selection_received_flag=0;
+		gtk_selection_convert(
+		parent, 
+		GDK_SELECTION_PRIMARY,
+		targets_atom, 
+		GDK_CURRENT_TIME
+	);
+    while(selection_received_flag==0) {
+		events_flush();
+    };
+
+	FILE *fp = fopen(filnam,"w");
+	
+    if(import_buffer!=NULL) 
+	{ // got a selection
+		fwrite(import_buffer,import_length,1,fp);
+		fclose(fp);
+	 	MESG("x_insert_to_file:1 %d bytes",import_length);
+		return 0;
+	} else {
+		dat = XFetchBytes (dis0, &nbytes);
+   		if (dat != NULL) {
+			fwrite(dat,nbytes,1,fp);
+			fclose(fp);
+		 	MESG("x_insert_to_file:2 %d bytes",nbytes);
+   	 		XFree (dat);
+   		};
+	   return 0;
+	};
+}
 
 // put a utfchar on virtual screen, convert to local character if error!
 int addutfvchar1(char *str, vchar *vc, int pos,FILEBUF *w_fp)
@@ -1288,7 +1328,7 @@ int system_paste(num n)
 {
  if(dont_edit() || cbfp->b_flag & FSDIRED )return false;
 // hide_cursor("system_paste");
-#if	0
+#if	1
  if(ext_system_paste())
 #else
  if(x_insert())

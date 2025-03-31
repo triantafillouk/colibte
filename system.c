@@ -851,10 +851,16 @@ int ext_system_paste()
 	if(!ext_clipboard_command) return 0;
 	status = set_unique_tmp_file(filnam,"command",MAXFLEN);
 	if(status>=MAXFLEN) return 0;
+
+#if	GTK
+	status = x_insert_to_file(filnam);
+#else
 	status=snprintf(exec_st,MAXFLEN,"%s > %s 2> /dev/null",clip_copy,filnam);
 	if(status>=MAXFLEN) return 0;
 
 	status = system(exec_st);
+#endif
+
 	if(status==0) {
 
 		if(cwp->selection==REGION_COLUMN) {	/* Column past  */

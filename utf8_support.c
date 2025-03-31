@@ -89,6 +89,7 @@ int utf_num_chars(char *utf)
  return utflen;
 }
 
+#if	NUSE
 int utf_num_chars_tnl(char *utf,long *size)
 {
  int len=strlen(utf);
@@ -147,7 +148,7 @@ void count_strsize(char *utf,long *maxchars,long *height)
 	(*height)++;
  };
 }
-
+#endif
 int SUtfCharLen(char *utfstr,int offset,utfchar *uc)
 {
  int ch;
