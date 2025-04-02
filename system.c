@@ -16,6 +16,8 @@ extern int update_all;
 extern FILEBUF *cbfp;
 void set_sval(char *s);
 int main_clipboard_copy();
+int x_insert_to_file(char *filnam);
+int insert_text_file_nl(char *filnam);
 
 struct timeval start_time;	/* editor time started stamp */
 
@@ -818,10 +820,69 @@ int insert_text_file_as_column(char *filnam)
 
 	// goto original position
 	set_Offset(o1);
-	MESG_time("paste_as_column:end");
+	// MESG_time("paste_as_column:end");
 	return 1;
 }
 
+// Insert text file converting with correct nl
+int insert_text_file_nl(char *filnam)
+{
+	// offs o1=Offset();	/* original offset  */
+	FILEBUF *ori_buf = cbfp;
+
+	// const num start_column=tp_col(cbfp->tp_current);
+	// MESG("#insert_text_file_as_column: position %ld ---------------",start_column);
+	
+
+	FILEBUF *tmp_bp = new_filebuf(filnam,0);
+	if(tmp_bp==NULL) return false;
+
+	if(!select_filebuf(tmp_bp)) return false;
+
+	const num max_len = tmp_bp->maxlinelen;
+
+	char *pad_space = (char *)malloc(max_len+2);
+	if(pad_space==NULL) { delete_filebuf(tmp_bp,1); return false;};
+	num line_start=0;
+
+	select_filebuf(ori_buf);
+	char *ml_out;
+	while(line_start<FSize(tmp_bp)) {
+		char *line_text=get_line_at(tmp_bp,line_start);
+		int col=0, in_offset=0;;
+
+		ml_out = pad_space;
+
+		while(in_offset<strlen(line_text)) {
+			utfchar uc;
+			in_offset=SUtfCharAt(line_text,in_offset,&uc);
+			if(uc.uval[0]==CHR_TAB) {col=next_tab(col);}
+			else col+=get_utf_length(&uc);
+			memcpy(ml_out,&uc,utf8charlen_nocheck(uc.uval[0]));
+			ml_out+=utf8charlen_nocheck(uc.uval[0]);
+		};
+
+		line_start = FNextLine(tmp_bp,line_start);
+		
+		if(FEof(cbfp)) {
+			memcpy(ml_out,cbfp->EolStr,cbfp->EolSize);
+			ml_out+=cbfp->EolSize;
+			insert_string(cbfp,pad_space,ml_out-pad_space);
+		} else {
+			insert_string(cbfp,pad_space,ml_out-pad_space);
+			if(!FEofAt(tmp_bp,line_start)) insert_newline(cbfp);
+		};
+	} 
+	free(pad_space);
+	undo_set_noglue();
+	delete_filebuf(tmp_bp,1);
+
+	// goto original position
+	// set_Offset(o1);
+	return 1;
+}
+
+#if	NUSE
 int insert_text_file(char *filnam)
 {
 	offs o1=Offset();	/* original offset  */
@@ -841,6 +902,7 @@ int insert_text_file(char *filnam)
 	return true;
 	} else return false;
 }
+#endif
 
 int ext_system_paste()
 {
@@ -866,7 +928,7 @@ int ext_system_paste()
 		if(cwp->selection==REGION_COLUMN) {	/* Column past  */
 			status=insert_text_file_as_column(filnam);
 		} else {	/* Normal paste  */
-			status=insert_text_file(filnam);
+			status=insert_text_file_nl(filnam);
 		};
 		unlink(filnam);
 		set_update(cwp,UPD_EDIT);

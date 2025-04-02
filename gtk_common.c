@@ -548,14 +548,14 @@ int x_insert_to_file (char *filnam)
 	{ // got a selection
 		fwrite(import_buffer,import_length,1,fp);
 		fclose(fp);
-	 	MESG("x_insert_to_file:1 %d bytes",import_length);
+	 	// MESG("x_insert_to_file:1 %d bytes",import_length);
 		return 0;
 	} else {
 		dat = XFetchBytes (dis0, &nbytes);
    		if (dat != NULL) {
 			fwrite(dat,nbytes,1,fp);
 			fclose(fp);
-		 	MESG("x_insert_to_file:2 %d bytes",nbytes);
+		 	// MESG("x_insert_to_file:2 %d bytes",nbytes);
    	 		XFree (dat);
    		};
 	   return 0;

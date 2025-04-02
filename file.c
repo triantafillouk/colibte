@@ -1130,12 +1130,12 @@ int reload_file(num n)
 }
 
 int insert_text_file_as_column(char *filnam);
+int insert_text_file_nl(char *filnam);
 
 /* Insert a file into current position.  */
 int insert_file(num  n)
 {
     char fname[MAXFLEN];
-	FILEBUF *fp=cbfp;
 	int stat;
 	if(dont_edit()) return FALSE;
 	set_list_type(LDIR);
@@ -1145,7 +1145,8 @@ int insert_file(num  n)
 	if(cwp->selection==REGION_COLUMN){
 		stat=insert_text_file_as_column(fname);
 	} else { 
-		stat=ifile(fp,fname,1);
+		// stat=ifile(fp,fname,1);
+		stat = insert_text_file_nl(fname); // convert to correct newline
 	};
 	set_update(cwp,UPD_WINDOW);
     return(stat);
