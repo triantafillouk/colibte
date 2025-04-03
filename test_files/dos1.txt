@@ -14,15 +14,15 @@ vwxy
 
 Boot manager loaded.
 Entering autoboot mode.
-Type any character to enter command mode.αβγδ 1234 
-Error: /image on /dev/mirror/gmroots1f   εζηθ 5678 
-	does not exist or is not a file      ικλμ 9012 
-umount: /mnt: not a file system root direabcd      ctory
-boot failed                              fghi      
-BOOTMGR[1]> pwd                          jklm      
-unknown command pwd                      nopq      
-BOOTMGR[2]> reboot                       rstu      
-unknown command reload                   vwxy      
+Type any character to enter command mode.
+Error: /image on /dev/mirror/gmroots1f
+	does not exist or is not a file
+umount: /mnt: not a file system root dire
+boot failed
+BOOTMGR[1]> pwd
+unknown command pwd
+BOOTMGR[2]> reboot
+unknown command reload
 
 CPU Microcode Revision:  20hasasd
 CPUID:                   6D8h
