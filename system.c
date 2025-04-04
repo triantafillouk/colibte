@@ -18,6 +18,7 @@ void set_sval(char *s);
 int main_clipboard_copy();
 int x_insert_to_file(char *filnam);
 int insert_text_file_nl(char *filnam);
+int get_current_line();
 
 struct timeval start_time;	/* editor time started stamp */
 
@@ -324,6 +325,7 @@ int shell_cmd1(int  nused)
 	if(!macro_exec){
 		
 	};
+	msg_line("executing ..");
 	status=sysexec(tline);
 
 	if(status) {
@@ -369,15 +371,10 @@ int shell_cmd1(int  nused)
 	/* and get rid of the temporary file */
 	unlink(filnam);
 	unlink(filerr);
-#if	0
-	if(!macro_exec) 
-	{
-		select_filebuf(old_cbfp);
-	};
-#endif
 	msg_line("ok!");
 	return(TRUE);
 	} else {
+		msg_line("error in shell command!");
 		set_update(cwp,UPD_MOVE);
 		return (FALSE);
 	};
@@ -418,11 +415,14 @@ int bg_cmd(num n)
 	strlcat(line," > ",MAXLLEN);strlcat(line,tmp_name,MAXLLEN);
 	strlcat(line," 2> ",MAXLLEN);strlcat(line,tmp_name,MAXLLEN);
 	strlcat(line,".out &",MAXLLEN);
+	msg_line("executing ..");
 	sysexec(line);
+	msg_line("finished");
 	set_update(cwp,UPD_MOVE);
     return (TRUE);
 }
 
+#if NUSE
 char *extension_string(FILEBUF *bp)
 {
  static char ext_string[MAXLLEN];
@@ -441,6 +441,7 @@ char *extension_string(FILEBUF *bp)
 	};
 	return ext_string;
 }
+#endif
 
 /* grep command assigned to alt-5  */
 int grep_cmd(num n)

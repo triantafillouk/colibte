@@ -962,7 +962,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->sort_mode=0;
 	bp->utf_accent=0;
 	bp->b_key[0]=0;	/* encrypt key  */
-#if	NUSE
+#if	USE_SLOW_DISPLAY
 	bp->slow_display=0;
 #endif
 #if	TNOTES
