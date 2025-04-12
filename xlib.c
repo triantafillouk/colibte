@@ -2261,7 +2261,7 @@ void put_wtext(WINDP *wp,int row,int maxcol)
 
 int export_region(ClipBoard *clip)
 {
-#if	1
+#if	WSL | DARWIN
 	return ext_system_copy();
 #else
  long size;

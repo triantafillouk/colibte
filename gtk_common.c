@@ -14,6 +14,7 @@ extern FILEBUF *cbfp;
 GtkWidget *wlist;
 COLOR_SCHEME *get_scheme_by_index(int scheme_num);
 int drv_initialized=0;
+char *import_buffer=NULL;
 
 void set_current_scheme(int scheme)
 {
@@ -463,7 +464,7 @@ int set_fontindex(num n) {
 
 int export_region(ClipBoard *clip)
 {
-#if	1
+#if	WSL | DARWIN
  return ext_system_copy();
 #else
  long size;
@@ -475,7 +476,8 @@ int export_region(ClipBoard *clip)
 	gtk_selection_add_target(parent, GDK_SELECTION_PRIMARY,
 				 GDK_SELECTION_TYPE_STRING, 0);
 	/* we need to get it back, otherwise it gets much complicated to paste from onother instance */
-//	XFetchBytes(dis0, &nbytes);
+	XFetchBytes(dis0, &nbytes);
+	// MESG("X11 export region %d bytes",nbytes);
  } else {
 	msg_line("cannot set selection owner");
  }
@@ -488,7 +490,7 @@ int x_insert ()
  int nbytes;
  char *dat;
  static GdkAtom targets_atom = GDK_NONE;
- 	// MESG("x_insert:");
+ 	MESG("x_insert:");
 	if(targets_atom == GDK_NONE)
 //	    targets_atom = gdk_atom_intern("COMPOUND_TEXT", FALSE);
 //	    targets_atom = gdk_atom_intern("GTK_TEXT_BUFFER_CONTENTS", FALSE);
@@ -520,6 +522,45 @@ int x_insert ()
 
 }
 
+int x_insert_to_file (char *filnam)
+{
+ int nbytes;
+ char *dat;
+ static GdkAtom targets_atom = GDK_NONE;
+	if(targets_atom == GDK_NONE)
+//	    targets_atom = gdk_atom_intern("COMPOUND_TEXT", FALSE);
+//	    targets_atom = gdk_atom_intern("GTK_TEXT_BUFFER_CONTENTS", FALSE);
+	    targets_atom = gdk_atom_intern("UTF8_STRING", TRUE);
+		selection_received_flag=0;
+		gtk_selection_convert(
+		parent, 
+		GDK_SELECTION_PRIMARY,
+		targets_atom, 
+		GDK_CURRENT_TIME
+	);
+    while(selection_received_flag==0) {
+		events_flush();
+    };
+
+	FILE *fp = fopen(filnam,"w");
+	
+    if(import_buffer!=NULL) 
+	{ // got a selection
+		fwrite(import_buffer,import_length,1,fp);
+		fclose(fp);
+	 	// MESG("x_insert_to_file:1 %d bytes",import_length);
+		return 0;
+	} else {
+		dat = XFetchBytes (dis0, &nbytes);
+   		if (dat != NULL) {
+			fwrite(dat,nbytes,1,fp);
+			fclose(fp);
+		 	// MESG("x_insert_to_file:2 %d bytes",nbytes);
+   	 		XFree (dat);
+   		};
+	   return 0;
+	};
+}
 
 // put a utfchar on virtual screen, convert to local character if error!
 int addutfvchar1(char *str, vchar *vc, int pos,FILEBUF *w_fp)
@@ -743,6 +784,16 @@ int set_font(char *font_name)
   return(TRUE);
 }
 
+
+int insert_key_string(char *ch)
+{
+	int clen=strlen(ch);
+	int j=0;
+	for(j=0;j<clen;j++) utfokey[j]=ch[j];
+	utfokey[j]=0;
+	return clen;
+}
+
 gboolean
 on_dra0_key_press_event(GtkWidget       *widget,
                         GdkEventKey     *event,
@@ -925,12 +976,23 @@ on_dra0_key_press_event(GtkWidget       *widget,
 	}
 	}
 	else if (ks == 27) { 
-//				ks= CNTRL | 'G'; 
+		//	ks= CNTRL | 'G'; 
 		if(!quote_flag)	key_buf[key_index++]=7;
 		else key_buf[key_index++]=ks;
-	} else { 
-		key_buf[key_index++]=ks;
-		if(flag & CTLX && emacs_emul) key_buf[key_index++]=24; // control_x
+	} else {
+		if(quote_flag){
+		switch(ks) {
+			case 'e': case 'E': n_chars=insert_key_string("€");break;
+			case 'c': case 'C': n_chars=insert_key_string("©");break;
+			case 'r': case 'R': n_chars=insert_key_string("®");break;
+			default:
+				key_buf[key_index++]=ks;
+				if(flag & CTLX && emacs_emul) key_buf[key_index++]=24; // control_x
+		};
+		} else {
+				key_buf[key_index++]=ks;
+				if(flag & CTLX && emacs_emul) key_buf[key_index++]=24; // control_x
+		};
 	};
   	n_chars--;
   } else {
@@ -965,6 +1027,7 @@ on_dra0_key_press_event(GtkWidget       *widget,
 		};
 	};
 	nnarg=1;
+	set_update(cwp,UPD_EDIT);
  	update_screen(0);
 	flag = 0;key_index=0;
 //	gtk_widget_grab_focus(widget);
@@ -1164,7 +1227,7 @@ int getstring(char *prompt, char *st1, int maxlen,int disinp)
 	};
 	init_input();
 	strlcpy(st2,st1,MAXLLEN-1);
-//	MESG("getstring: kbdmode=0x%X",kbdmode);
+	// MESG("getstring: kbdmode=0x%X",kbdmode);
 	if(kbdmode==PLAY) {
 		return(set_play_string(st1));
 	};
@@ -1184,7 +1247,6 @@ int getstring(char *prompt, char *st1, int maxlen,int disinp)
 	entry_mode=KENTRY;
 	gtk_widget_show(gs_entry);
 
-
 	gtk_widget_set_can_focus (gs_entry,TRUE);
 	gtk_widget_grab_focus(gs_entry);
 
@@ -1193,7 +1255,6 @@ int getstring(char *prompt, char *st1, int maxlen,int disinp)
 		events_flush();
 		usleep(100000);
 	};
-//	MESG("getstring: end1");
 	if(cbfp->b_lang == 0) {
 		strlcpy(st2,gtk_entry_get_text(GTK_ENTRY(gs_entry)),MAXLLEN);
 		strlcpy(st1,st2,MAXLLEN);
@@ -1267,7 +1328,11 @@ int system_paste(num n)
 {
  if(dont_edit() || cbfp->b_flag & FSDIRED )return false;
 // hide_cursor("system_paste");
- x_insert();
+#if	1
+ if(ext_system_paste())
+#else
+ if(x_insert())
+#endif
  update_screen(1);
 
  return TRUE;
@@ -1651,6 +1716,7 @@ int menu_command(num n)
 
 void start_interactive(char *prompt)
 {
+	// MESG("start_interactive:");
 	if(compact1) {
 		gtk_widget_hide(toolbar1);
 	};
@@ -1659,6 +1725,7 @@ void start_interactive(char *prompt)
 	gtk_label_set_text((GtkLabel *)gs_label,prompt);
 	gtk_widget_show(gs_label);
 	gtk_widget_show(toolbar2);
+	// MESG("start_interactive:end");
 }
 
 void end_interactive()

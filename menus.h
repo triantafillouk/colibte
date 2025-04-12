@@ -90,7 +90,7 @@ M_element e_file[] =
 	{0, 'G', "Goto on cursor ","", open_file, (struct MENUS *)3, "FG"},
 	{0, 'S', "Save         ^S","^SSave",	save_file, 0 ,"FS"},	
 	{0, 'A', "save As        ","",	saveas_file, 0,"FA" },	
-	{0, 'E', "rEname         ","",rename_file, 0,"FE" },	
+	// {0, 'E', "rEname         ","",rename_file, 0,"FE" },	
 	{0, 'L', "reLoad file    ","",reload_file, 0,"FL"},
 	{0, 'I', "Insert         ","",insert_file, 0,"FI"},	
 	{0, 'H', "Highlight type ","",select_highlight,0,"FH"},
@@ -399,12 +399,45 @@ M_element e_color[] =
 	{0, 'V',"Velvet   ","", change_color_scheme, (struct MENUS *)10,"MMV"},
 	{0, 0, NULL,"",NULL,0,NULL}
 };
+#else
+M_element e_color[] = 
+{
+	{0,'B',"Background ","",color_edit, (struct MENUS *)0,"CB" },
+	{0,'B',"Menu BG    ","",color_edit, (struct MENUS *)1,"CB" },
+	{0,'B',"Select BG  ","",color_edit, (struct MENUS *)2,"CB" },
+	{0,'B',"Search BG  ","",color_edit, (struct MENUS *)3,"CB" },
+	{0,'B',"Quote BG   ","",color_edit, (struct MENUS *)4,"CB" },
+	{0,'B',"Light BG   ","",color_edit, (struct MENUS *)5,"CB" },
+	{0,'B',"Info BG    ","",color_edit, (struct MENUS *)6,"CB" },
+	{0,'B',"Inactive BG","",color_edit, (struct MENUS *)7,"CB" },
+	{0,'B',"Box BG     ","",color_edit, (struct MENUS *)8,"CB" },
+	{0,'B',"Code BG    ","",color_edit, (struct MENUS *)9,"CB" },
+
+	{0,'B',"Normal FG  ","",color_edit, (struct MENUS *)10,"CB" },
+	{0,'B',"Menu FG    ","",color_edit, (struct MENUS *)11,"CB" },
+	{0,'B',"Standout FG","",color_edit, (struct MENUS *)12,"CB" },
+	{0,'B',"CTRL FG    ","",color_edit, (struct MENUS *)13,"CB" },
+	{0,'B',"Prep FG    ","",color_edit, (struct MENUS *)14,"CB" },
+	{0,'B',"word1 FG   ","",color_edit, (struct MENUS *)15,"CB" },
+	{0,'B',"word2 FG   ","",color_edit, (struct MENUS *)16,"CB" },
+	{0,'B',"word3 FG   ","",color_edit, (struct MENUS *)17,"CB" },
+	{0,'B',"Spec FG    ","",color_edit, (struct MENUS *)18,"CB" },
+	{0,'B',"Squote FG  ","",color_edit, (struct MENUS *)19,"CB" },
+	{0,'B',"Comment FG ","",color_edit, (struct MENUS *)20,"CB" },
+	{0,'B',"Change FG  ","",color_edit, (struct MENUS *)21,"CB" },
+	{0,'B',"Horizon FG ","",color_edit, (struct MENUS *)22,"CB" },
+	{0,'B',"Inactive FG","",color_edit, (struct MENUS *)23,"CB" },
+	{0,'B',"RowCol FG  ","",color_edit, (struct MENUS *)24,"CB" },
+	{0,'B',"Info FG    ","",color_edit, (struct MENUS *)25,"CB" },
+	{0, 0, NULL,"",NULL,0,NULL}
+};
+
+#endif
 
 MENUS m_color = {
 	"Color",
 	50, 1, VERTICAL,e_color
 };
-#endif
 
 #if	USE_GLIB
 M_element e_gconvert[] =
@@ -597,6 +630,9 @@ M_element e_tools[] =
 	{0, 'U', "Update ctags     ","",	update_tags, 0,"TU" },
 	{0, 'P', "recalc Program   ","_+recalc Program",  refresh_current_buffer, 0,"TP"},
 	{0, 'L', "recalc Line      ","_=recal Line",  refresh_current_line, 0,"TL"},
+#if	PCURSES
+	{0, 'S', "Save colors      ","",save_colors,0,"TS" },
+#endif
 #if	TNOTES0
 	{0, 'Y', "Notes EncrYpt key","", 	set_notes_key,0,"TY"},
 	{0, 'N', "init Notes db    ","",    init_notes_db,0,"TN"},
@@ -618,7 +654,7 @@ M_element e_topn[] =
 	{MMENU,'S',"Search","", NULL, &m_search,"S" },
 	{MMENU,'W',"Window","", NULL, &m_window,"W" },
 	{MMENU,'M',"Mode","", NULL, &m_mode,"M" },
-	{MMENU,'T',"Tools   ","", NULL, &m_tools,"T" },
+	{MMENU,'T',"Tools","", NULL, &m_tools,"T" },
 	{MMENU,'H',"Help","", NULL, &m_help,"H"},
 #if	!GTK & TARROWS
 #if	USE_UTF8
@@ -626,6 +662,7 @@ M_element e_topn[] =
 	{0,    '1'," →  ","next", next_hmark, (struct MENUS *)1, "EWF"},
 	{0,    '2'," ↓  ","find next",	find_next, (struct MENUS *)1,"S5" },	
 	{0,    '3'," ↑  ","find previous",	find_previous, (struct MENUS *)1,"S6" },
+	{MMENU,'C'," 🔆 ","Color edit", NULL, &m_color,"CE" },
 #else
 	{0,    '0'," <- ","back", prev_hmark, (struct MENUS *)1, "EWB"},
 	{0,    '1'," -> ","next", next_hmark, (struct MENUS *)1, "EWF"},
@@ -635,6 +672,7 @@ M_element e_topn[] =
 #endif
 	{0, 0, NULL,"",NULL,0,NULL}
 };
+
 
 MENUS m_topn = {
 	"Topn",

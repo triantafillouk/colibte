@@ -581,18 +581,25 @@ void drv_size()
 	refresh();
 }
 
+void set_mouse_on()
+{
+#if	!SOLARIS
+ mousemask(ALL_MOUSE_EVENTS|REPORT_MOUSE_POSITION,NULL);
+#endif
+ printf("\033[?1003h");	/* makes terminal report mouse mouvement  */
+ if(extended_mouse) {
+ 	printf("\033[?1006h");	/* makes terminal extended report mouse mouvement  */
+ }
+ fflush(stdout);
+}
+
 void enable_key_mouse()
 {
  mouse_active=1;
 #if	SOLARIS
 	return;
 #else
- mousemask(ALL_MOUSE_EVENTS|REPORT_MOUSE_POSITION,NULL);
- printf("\033[?1003h");	/* makes terminal report mouse mouvement  */
- if(extended_mouse) {
- 	printf("\033[?1006h");	/* makes terminal extended report mouse mouvement  */
- }
- fflush(stdout);
+	set_mouse_on();
 #endif
 }
 
@@ -653,10 +660,8 @@ void drv_open()
 
  if(mcurflag){
 // keypad(stdscr,1);	/* no need for the moment, need a lot of changes!  */
-#if	!SOLARIS
-	mousemask(ALL_MOUSE_EVENTS|REPORT_MOUSE_POSITION,NULL);
-#endif
-	printf("\033[?1003h\n");	/* makes terminal report mouse mouvement  */
+	set_mouse_on();
+	// printf("\033[?1003h\n");	/* makes terminal report mouse mouvement  */
  };
 
  refresh();
@@ -841,6 +846,7 @@ int text_mouse_function(int move)
 		// MESG("mouse pressed mb=%d move=%d row=%d col=%d",mouse_button,move,mouse_window_row,mouse_window_col);
 	};
 	if(mouse_button==KMOUSE_BUTTON1 && move<KMOUSE_RELEASE){
+		// MESG("	1: mouse button1 press! move=%d < %d",move,KMOUSE_RELEASE);
 		if((mouse_window_col+wp->w_infocol)==wp->w_ntcols) { // on rline (position status line)
 			int start,len;
 			int lines_to_move;
@@ -1075,6 +1081,7 @@ void drv_close()
 /* Flush/resync */
 void drv_flush()
 {
+	set_mouse_on();
 	refresh();
 }
 

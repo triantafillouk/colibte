@@ -324,7 +324,7 @@ double increase_by()
 			// MESG("	increase string val");
 			char *stmp=malloc(strlen(get_sval())+strlen(ls_psval[0]));
 			strcpy(stmp,ls_psval[0]);
-			strcat(stmp,get_sval());	/* check!! TODO  */
+			strcat(stmp,get_sval());
 			free(ls_psval[0]);
 			ls_psval[0]=stmp;
 		} else {
@@ -556,7 +556,7 @@ void initialize_vars()
 int is_mlang(FILEBUF *fp)
 {
  int bt=fp->b_type;
- // MESG("check macro file!");
+ MESG("check macro file!");
  if(fp->b_flag & FSNLIST) {
  	msg_line("dir is not an mlang file! %X",fp->b_flag);
 	return 0;
@@ -569,7 +569,7 @@ int is_mlang(FILEBUF *fp)
 	!file_type_is("DOT",bt) &&
 	!file_type_is("GTEXT",bt)) 
  {
-	// MESG("this is NOT a macro file!!!!!!!!!!!!!!");
+	MESG("this is NOT a macro file!!!!!!!!!!!!!!");
  	msg_line("Not an mlang file bt=%d",bt);
 	return 0;	/* only allowed in selected types  */
  };
@@ -943,7 +943,7 @@ double factor_line_array()
 	RTRN(1.2);
 }
 
-inline MVAR *get_left_slot(int ind)
+ MVAR *get_left_slot(int ind)
 {
 	// MESG("get_left_slot: ind=%d",ind);
 	return &current_stable[ind];
@@ -3077,11 +3077,6 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		if(bp->symbol_tree){
 			delete_symbol_table(local_symbols,bp->symbol_tree->items,0,0);
 			bp->symbol_tree=NULL;
-#if	TEST_TYPE0
-			/* delete the type tree  */
-			delete_type_tree(bp->type_tree);
-			bp->type_tree=NULL;
-#endif
 		};
 		current_stable=old_symbol_table;
 	};
@@ -3140,6 +3135,7 @@ int refresh_current_buffer(num nused)
  /* clear parse list  */
  // MESG("refresh_current_buffer: call empty_tok_table: [%s]",fp->b_fname);
  empty_tok_table(fp);
+ clean_saved_string(0);
  fp->err=-1;
  // MESG("refresh_current_buffer:1 [%s] %d",fp->b_fname,fp->b_type);
  parse_block1(fp,fp->symbol_tree,1,100);	/* init tree,extra 100 symbols  */
@@ -3169,8 +3165,8 @@ int refresh_current_buffer(num nused)
 		// mesg_out("Error %d [%s] at line %d",err_num,err_str,err_line);
 	} else {
 		if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
-		if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
-		if(get_sval()) msg_line("Result is [%s %f]",get_sval(),val);
+		else if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
+		else if(get_sval()) msg_line("Result is [%s %f]",get_sval(),val);
 	};
  } else {
  	msg_line("parse error %d line %d [%s]",err_num,err_line+1,err_str);
@@ -3227,9 +3223,7 @@ int parse_buffer_show_tokens(num n)
 
  /* clear parse list  */
  empty_tok_table(fp);
-#if	TEST_TYPE0
- fp->type_tree=new_btree("type_tree",0);
-#endif
+
  INIT_STAGE;
  // clear out buffer
  cls_fout("[out]");

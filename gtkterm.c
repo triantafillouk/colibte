@@ -75,7 +75,6 @@ void put_to_table(GtkWidget *wdg, GtkWidget *table, int ypos, int xpos, int alig
 void prepare_converter(int local_lang);
 
 GtkSelectionData *seldata0=NULL;
-char *import_buffer=NULL;
 int import_length=0;
 int selection_received_flag=0;
 
@@ -257,10 +256,11 @@ create_parent (void)
 	gtk_widget_show (hbox2);
 	if(compact1) {
 		gtk_box_pack_start (GTK_BOX (vbox1), hbox2, FALSE, FALSE, 0);
-		toolbar1=new_toolbar(parent,hbox2,main_toolbar,0,GTK_ICON_SIZE_BUTTON,0);
+// 		toolbar1=new_toolbar(parent,hbox2,main_toolbar,0,GTK_ICON_SIZE_BUTTON,0);
+		toolbar1=new_toolbar(parent,hbox2,main_toolbar,0,GTK_ICON_SIZE_LARGE_TOOLBAR,0);
 		gtk_toolbar_set_show_arrow(GTK_TOOLBAR(toolbar1),FALSE);
 	} else {
-		toolbar1=new_toolbar(parent,vbox1,main_toolbar,0,GTK_ICON_SIZE_BUTTON,0);
+		toolbar1=new_toolbar(parent,vbox1,main_toolbar,0,GTK_ICON_SIZE_LARGE_TOOLBAR,0);
 		gtk_toolbar_set_show_arrow(GTK_TOOLBAR(toolbar1),TRUE);
 	};
 

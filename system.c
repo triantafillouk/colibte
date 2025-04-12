@@ -16,6 +16,9 @@ extern int update_all;
 extern FILEBUF *cbfp;
 void set_sval(char *s);
 int main_clipboard_copy();
+int x_insert_to_file(char *filnam);
+int insert_text_file_nl(char *filnam);
+int get_current_line();
 
 struct timeval start_time;	/* editor time started stamp */
 
@@ -322,6 +325,7 @@ int shell_cmd1(int  nused)
 	if(!macro_exec){
 		
 	};
+	msg_line("executing ..");
 	status=sysexec(tline);
 
 	if(status) {
@@ -367,15 +371,10 @@ int shell_cmd1(int  nused)
 	/* and get rid of the temporary file */
 	unlink(filnam);
 	unlink(filerr);
-#if	0
-	if(!macro_exec) 
-	{
-		select_filebuf(old_cbfp);
-	};
-#endif
 	msg_line("ok!");
 	return(TRUE);
 	} else {
+		msg_line("error in shell command!");
 		set_update(cwp,UPD_MOVE);
 		return (FALSE);
 	};
@@ -416,11 +415,14 @@ int bg_cmd(num n)
 	strlcat(line," > ",MAXLLEN);strlcat(line,tmp_name,MAXLLEN);
 	strlcat(line," 2> ",MAXLLEN);strlcat(line,tmp_name,MAXLLEN);
 	strlcat(line,".out &",MAXLLEN);
+	msg_line("executing ..");
 	sysexec(line);
+	msg_line("finished");
 	set_update(cwp,UPD_MOVE);
     return (TRUE);
 }
 
+#if NUSE
 char *extension_string(FILEBUF *bp)
 {
  static char ext_string[MAXLLEN];
@@ -439,6 +441,7 @@ char *extension_string(FILEBUF *bp)
 	};
 	return ext_string;
 }
+#endif
 
 /* grep command assigned to alt-5  */
 int grep_cmd(num n)
@@ -631,28 +634,37 @@ int filter_buffer(num nuse)
 char *display_env=NULL;
 char *clip_copy=NULL;
 char *clip_paste=NULL;
-int x11_display_ok=0;
+int ext_clipboard_command=0;
 
 char *xclip_copy="xclip -o";
 char *xclip_paste="xclip -i";
 
 #if	DARWIN
-char *pbpaste="pbpaste";
-char *pbcopy="pbcopy";
+char *native_paste0="pbpaste";
+char *native_paste="pbpaste";
+char *native_copy="pbcopy";
+#endif
+#if	WSL
+// The following is for wsl!
+char *native_paste0="win32yank.exe -o --lf";
+char *native_paste="win32yank.exe -o --lf";
+char *native_copy="win32yank.exe -i";
+#endif
 
-// check bpcopy/pbpaste on mac
-int check_pbcopy()
+#if	DARWIN | WSL
+int check_native_copy()
 {
  int status;
  static char exec_st[MAXFLEN];
 
-	status=snprintf(exec_st,MAXFLEN,"pbpaste > /dev/null 2> /dev/null");
+	status=snprintf(exec_st,MAXFLEN,"%s > /dev/null 2> /dev/null",native_paste);
 	if(status>=MAXFLEN) return 0;
 	status = system(exec_st);
+	MESG("check_native_copy:[%s] -> %d",exec_st,status);
 	if(status == 0) {
-		clip_copy=pbpaste;
-		clip_paste=pbcopy;
-		x11_display_ok=1;
+		clip_copy=native_paste;
+		clip_paste=native_copy;
+		ext_clipboard_command=1;
 		return 1;
 	};
 	return 0;
@@ -665,17 +677,17 @@ int init_system_clipboard()
  int status=0;
 	if(status>=MAXFLEN) return 0;
 
-	display_env = getenv("DISPLAY");
-#if	DARWIN
-	if(check_pbcopy()) return 1;
+#if	DARWIN | WSL
+	if(check_native_copy()) return 1;
 #endif
+	display_env = getenv("DISPLAY");
 	if(display_env == NULL) {
 		return 0; 
 	} else {
 		if(strlen(display_env)<1) {
 			return 0;
 		};
-		x11_display_ok=1;
+		ext_clipboard_command=1;
 	};
 // we suppose that we have xclip for start
 // pass clipboard through xclip
@@ -685,35 +697,37 @@ int init_system_clipboard()
 	status = system(exec_st);
 	if((status%256) !=0) {
 		fprintf(stderr,"status %d cannot execute xclip\n",status);
+		ext_clipboard_command=0;
 		return 0;
 	} else {
 		clip_copy=xclip_copy;
 		clip_paste=xclip_paste;
-		x11_display_ok=1;
+		ext_clipboard_command=1;
 		return 1;
 	};
-	x11_display_ok=0;
+	ext_clipboard_command=0;
 	return 0;
 }
 
 /* return the first line from system clipboard */
 char *ext_system_paste_line()
 {
- static char filnam[MAXFLEN];
- static char exec_st[MAXFLEN];
+ static char line[MAXLLEN];
+ char filnam[MAXFLEN];
+ char exec_st[MAXFLEN];
  int status=0;
+ 
+ memset(line,0,sizeof(line));
+	if(!ext_clipboard_command) return line;
 
-	if(!x11_display_ok) return "";
-	if(dont_edit() || cbfp->b_flag & FSDIRED )return false;
 	status = set_unique_tmp_file(filnam,"paste",MAXFLEN);
-	if(status>=MAXFLEN) return "";
+	if(status>=MAXFLEN) return line;
 	status=snprintf(exec_st,MAXFLEN,"%s > %s 2> /dev/null",clip_copy,filnam);
-	if(status>=MAXFLEN) return "";
+	if(status>=MAXFLEN) return line;
 
 	status = system(exec_st);
 	if(status==0) {
 		FILE *file;
-		static char line[MAXLLEN];
 		char *s=line;
 		file=fopen(filnam,"r");
 		int i;
@@ -730,14 +744,12 @@ char *ext_system_paste_line()
 		return line;
 	};
 
-	return "";
+	return line;
 }    
 
 int utf8charlen_nocheck(int ch);
 void undo_set_lock(FILEBUF *fp);
 void undo_clear_lock(FILEBUF *fp);
-
-#define	TEST1	1
 
 int insert_text_file_as_column(char *filnam)
 {
@@ -746,7 +758,6 @@ int insert_text_file_as_column(char *filnam)
 
 	const num start_column=tp_col(cbfp->tp_current);
 	// MESG("#insert_text_file_as_column: position %ld ---------------",start_column);
-	
 
 	FILEBUF *tmp_bp = new_filebuf(filnam,0);
 	if(tmp_bp==NULL) return false;
@@ -756,20 +767,9 @@ int insert_text_file_as_column(char *filnam)
 
 	const num max_len = tmp_bp->maxlinelen;
 
-#if	TEST1
 	char *pad_space = (char *)malloc(start_column+max_len+2);
 	if(pad_space==NULL) { delete_filebuf(tmp_bp,1); return false;};
 	// memset(pad_space,' ',start_column+max_len+2);
-#else
-	char *pad_space = (char *)malloc(start_column+1);
-	if(pad_space==NULL) { delete_filebuf(tmp_bp,1); return false;};
-	memset(pad_space,' ',start_column+1);
-	char *ml = malloc(max_len+2);
-	if(ml==NULL) {
-		delete_filebuf(tmp_bp,1);
-		return false;
-	};
-#endif
 	// set_Offset(0);
 	num line_start=0;
 
@@ -778,24 +778,14 @@ int insert_text_file_as_column(char *filnam)
 	while(line_start<FSize(tmp_bp)) {
 		char *line_text=get_line_at(tmp_bp,line_start);
 		int col=0, in_offset=0;;
-#if	TEST1
+
 		ml_out = pad_space;
-#else
-		ml_out = ml;
-#endif
 		num line_end_column=tp_col(cbfp->tp_current);
-#if	TEST1
 		// memset(pad_space,'^',start_column+max_len+2);
-#else
-		memset(ml,0,max_len+1);
-#endif
+		// MESG("	line_end=%2d start_column=%2d",line_end_column,start_column);
 		if(line_end_column<start_column) {
-#if	TEST1
 			memset(pad_space,' ',start_column-line_end_column);
 			ml_out=pad_space+(start_column-line_end_column);
-#else
-			insert_string(cbfp,pad_space,start_column-line_end_column);
-#endif
 		};
 		// insert_string(cbfp,"|",1);
 		while(in_offset<strlen(line_text)) {
@@ -811,39 +801,88 @@ int insert_text_file_as_column(char *filnam)
 		line_start = FNextLine(tmp_bp,line_start);
 		
 		if(FEof(cbfp)) {
-#if	TEST1
 			memcpy(ml_out,cbfp->EolStr,cbfp->EolSize);
 			ml_out+=cbfp->EolSize;
 			insert_string(cbfp,pad_space,ml_out-pad_space);
-#else
-			insert_string(cbfp,ml,ml_out-ml);
-			insert_newline(cbfp);
-#endif
 		} else {
-#if	TEST1
 			insert_string(cbfp,pad_space,ml_out-pad_space);
-#else
-			insert_string(cbfp,ml,ml_out-ml);
-#endif
-			if(!next_line(1)) {
+			num current_line = get_current_line();
+			if(current_line==tp_line(cbfp->tp_text_end)){
 				set_Offset(FSize(cbfp));
 				insert_newline(cbfp);
-			};
+			} else {
+				MoveLineCol(current_line+1,start_column);
+			}
 		};
+		// MESG("		after insert %ld",tp_col(cbfp->tp_current));
 	} 
 	free(pad_space);
-#if	!TEST1
-	free(ml);
-#endif
 	undo_set_noglue();
 	delete_filebuf(tmp_bp,1);
 
 	// goto original position
 	set_Offset(o1);
-	MESG_time("paste_as_column:end");
+	// MESG_time("paste_as_column:end");
 	return 1;
 }
 
+// Insert text file converting with correct nl
+int insert_text_file_nl(char *filnam)
+{
+	FILEBUF *ori_buf = cbfp;
+
+	// MESG("#insert_text_file_nl: position  ---------------");
+	
+
+	FILEBUF *tmp_bp = new_filebuf(filnam,0);
+	if(tmp_bp==NULL) return false;
+
+	if(!select_filebuf(tmp_bp)) return false;
+
+	const num max_len = tmp_bp->maxlinelen;
+
+	char *pad_space = (char *)malloc(max_len+2);
+	if(pad_space==NULL) { delete_filebuf(tmp_bp,1); return false;};
+	num line_start=0;
+
+	select_filebuf(ori_buf);
+	char *ml_out;
+	while(line_start<FSize(tmp_bp)) {
+		char *line_text=get_line_at(tmp_bp,line_start);
+		int col=0, in_offset=0;;
+
+		ml_out = pad_space;
+
+		while(in_offset<strlen(line_text)) {
+			utfchar uc;
+			in_offset=SUtfCharAt(line_text,in_offset,&uc);
+			if(uc.uval[0]==CHR_TAB) {col=next_tab(col);}
+			else col+=get_utf_length(&uc);
+			memcpy(ml_out,&uc,utf8charlen_nocheck(uc.uval[0]));
+			ml_out+=utf8charlen_nocheck(uc.uval[0]);
+		};
+
+		line_start = FNextLine(tmp_bp,line_start);
+		
+		if(FEof(cbfp)) {
+			memcpy(ml_out,cbfp->EolStr,cbfp->EolSize);
+			ml_out+=cbfp->EolSize;
+			insert_string(cbfp,pad_space,ml_out-pad_space);
+		} else {
+			insert_string(cbfp,pad_space,ml_out-pad_space);
+			if(!FEofAt(tmp_bp,line_start)) insert_newline(cbfp);
+		};
+	} 
+	free(pad_space);
+	undo_set_noglue();
+	delete_filebuf(tmp_bp,1);
+
+	// goto original position
+	// set_Offset(o1);
+	return 1;
+}
+
+#if	NUSE
 int insert_text_file(char *filnam)
 {
 	offs o1=Offset();	/* original offset  */
@@ -863,6 +902,7 @@ int insert_text_file(char *filnam)
 	return true;
 	} else return false;
 }
+#endif
 
 int ext_system_paste()
 {
@@ -870,19 +910,25 @@ int ext_system_paste()
  static char exec_st[MAXFLEN];
  int status=0;
 
-	if(!x11_display_ok) return 0;
+	if(!ext_clipboard_command) return 0;
 	status = set_unique_tmp_file(filnam,"command",MAXFLEN);
 	if(status>=MAXFLEN) return 0;
+
+#if	GTK
+	status = x_insert_to_file(filnam);
+#else
 	status=snprintf(exec_st,MAXFLEN,"%s > %s 2> /dev/null",clip_copy,filnam);
 	if(status>=MAXFLEN) return 0;
 
 	status = system(exec_st);
+#endif
+
 	if(status==0) {
 
 		if(cwp->selection==REGION_COLUMN) {	/* Column past  */
 			status=insert_text_file_as_column(filnam);
 		} else {	/* Normal paste  */
-			status=insert_text_file(filnam);
+			status=insert_text_file_nl(filnam);
 		};
 		unlink(filnam);
 		set_update(cwp,UPD_EDIT);
@@ -901,14 +947,16 @@ static char filnam[MAXFLEN];
 static char exec_st[MAXFLEN];
 int status;
 FILE *clip_file; 
-	if(!x11_display_ok) return 0;
-
+	// MESG("ext_system_copy: x11_ok = %d",ext_clipboard_command);
+	if(!ext_clipboard_command) return 0;
+	// MESG("ext_system_copy: %d chars",MainClipBoard->rect);
 	status = set_unique_tmp_file(filnam,"command",MAXFLEN);
 	if(status>=MAXFLEN) return 0;
 	// put clipboard to filnam
 	clip_file=fopen(filnam,"w");
 	if(clip_file){
-		fwrite(MainClipBoard->text,MainClipBoard->width,MainClipBoard->height,clip_file);
+		if(MainClipBoard->height>1) fwrite(MainClipBoard->text,MainClipBoard->rect-1,1,clip_file);
+		else fwrite(MainClipBoard->text,MainClipBoard->width,MainClipBoard->height,clip_file);
 		fclose(clip_file);
 		status=snprintf(exec_st,MAXFLEN,"(cat %s |%s)  2> /dev/null",filnam,clip_paste);
 		if(status>=MAXFLEN) return 0;

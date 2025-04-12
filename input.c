@@ -547,6 +547,16 @@ int unassign_key(num n)
 	return(TRUE);
 }
 
+extern int nnarg;
+
+int insert_money_symbol(num n)
+{
+	// MESG("insert_money_symbol:");
+	while(nnarg-- >0)	{insert_string(cbfp,"€",3);}
+	set_update(cwp,UPD_EDIT);
+	return true;
+}
+
 /* Show all assignements in a buffer */
 int show_keys(num n)
 {
@@ -650,6 +660,7 @@ int getckey()
 	strlcpy(key_string,xe_key_name(c),128);
 	return(c);
 }
+
 
 // command key to terminfo string
 char *cmd_to_tstr(int cmd)

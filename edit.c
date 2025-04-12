@@ -812,6 +812,7 @@ int comment_line(num n)
 	// MESG("comment_line: n=%d type=%d buffer_type=%d = %s",n,comment_type,fp->b_type,fp->hl->description);
 	if(cwp->selection) {
 		offs start,end,o,end0;
+		// MESG("comment_line: selection");
 		int size=0;
 		start = tp_offset(cwp->w_smark);
 		end = tp_offset(cwp->w_emark);
@@ -2247,7 +2248,7 @@ int copy_region(num n)
 
  if(!clipboard_copy(MainClipBoard)) return FALSE;
  export_region(MainClipBoard);
- 
+
  set_update(cwp,UPD_WINDOW);
  setmark(0); // remove selection
 
@@ -2429,7 +2430,6 @@ int upperregion(num  n)
 	return (TRUE);
 }
 
-// delete_box: undo information is passed for each line separatly. FIXME
 int delete_box(num n)
 {
  num h,l1,l2,col;
@@ -2454,6 +2454,7 @@ int delete_box(num n)
 
  reset_region_textpoints();
  lbo=LineBegin(tp_offset(cwp->tp_current));
+ beginundogroup(fp->main_undo);
  while(h-->0) {
 	if(LineEnd(lbo)-lbo>col) {
 		offs p1,p2;
@@ -2463,14 +2464,13 @@ int delete_box(num n)
 		p1=MoveToColumn(col);
 		p2=MoveToColumn(col+w);
 
-		beginundogroup(fp->main_undo);
 		fp->main_undo->head_position=Offset();
 
  		DeleteBlock(p2-p1,0);
-		EndUndoGroup(fp->main_undo);
 	};
 	lbo=FNextLine(fp,lbo);
  };
+ EndUndoGroup(fp->main_undo);
  set_Offset(cofs);
  setmark(0);
  set_goal_column(cwp->tp_current->col,"del box");

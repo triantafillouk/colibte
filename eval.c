@@ -11,17 +11,13 @@
 #include	<math.h>
 #include	<stdlib.h>
 #include	"xe.h"
-#if	DATE
 #include	<time.h>
-#endif
 
 #include	"eval.h"
 #include	"alist.h"
 #include	"mlang.h"
 
-#if	DATE
 time_t	tclock;
-#endif
 
 extern BTREE *bt_table;
 extern int nnarg;
@@ -890,7 +886,6 @@ int set_play_string1(char *st1)
 
 void record_key(short ks)
 {
-// MESG("  record_key: %0X",ks);
  if(kbdmode==RECORD) {
 	  *kbdptr++ = ks;
 	if(cbfp->b_lang==0 && ks<256) {
@@ -904,7 +899,7 @@ void record_key(short ks)
 		}
 	};
   };
-#if	RECORD_SESSION
+#if	RSESSION
   if(record_session) {
   	record_session_key(ks);
 	if(cbfp->b_lang==0 && ks<256) {
@@ -932,7 +927,7 @@ void set_record_string(char *st2)
 	};
  *kbdptr++=0x14D; // this is new line editor key!
  };
-#if	RECORD_SESSION
+#if	RSESSION
  if(record_session) {
 	set_record_string1(st2); 
  };
@@ -1038,8 +1033,9 @@ int exec_macro(num ntimes)
 void record_session_key(short ks)
 {
  static int show_message=1;
+ // MESG("record_session_key: %d",record_session);
  if(!record_session) return;
-// MESG("record_session_key: %3d ks=%d = 0x%X",kbdsession_end-&kbdm_session[0]+1,ks,ks);
+ // MESG("record_session_key: %3d ks=%d = 0x%X",kbdsession_end-&kbdm_session[0]+1,ks,ks);
  if(kbdsptr>kbdm_session+MAXSESSION-2) {
 	if(show_message) { 
 		msg_line("keys more than %d!, stopped recording.",MAXSESSION);
@@ -1058,7 +1054,7 @@ int execute_session(char *fname)
  int len,f;
  int i,count;
  record_session=0;
-// MESG("execute_session: read [%s]",fname);
+ // MESG("execute_session: read [%s]",fname);
  f=open(fname, O_RDONLY);
  if(f>2) {
  	count=read(f,(void *)&len,sizeof(int));
@@ -1133,7 +1129,7 @@ int save_session(num n)
  char session_file[MAXFLEN];
  int sstat=0;
 
- sstat=snprintf(session_file,MAXFLEN,"%s/.xe/%s",getenv("HOME"),"session.keys");
+ sstat=snprintf(session_file,MAXFLEN,"%s/.colibte/%s",getenv("HOME"),"session.keys");
  if(sstat>=MAXLLEN) {
  	msg_line("error saving session");
 	return 0;

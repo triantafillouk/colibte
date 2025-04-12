@@ -113,6 +113,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 
 	draw_info_mask(wp,ptr1,info_mask);
 
+	// line_sep=0;
 	for (; i <  llen && wp->vtcol < wp->w_width+wp->w_infocol; i++) 
 	{	// this is the on screen shown area of the line
 		int display_size=0;
@@ -195,6 +196,7 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 
 			svwchar(vc,&double_hline,vc->bcolor,COLOR_COMMENT_FG);	/* double line separator */
 		};
+		// line_sep=0;
 	};
 
 	{

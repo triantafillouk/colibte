@@ -51,6 +51,100 @@ COLOR_SCHEME *get_scheme_by_name(char *name)
  return cs;
 }
 
+int color_step=4;
+
+int color_change(int color,int c)
+{
+ int c1=80 ;
+ if(c=='+'||c=='=') { c1=color+color_step;};
+ if(c=='-') { c1=color-color_step;};
+ if(c==1||c==-1) c1=color+4*c;
+ if(c1<0) c1=0;
+ if(c1>255) c1=255;
+ return c1;
+}
+
+int color_edit(num n)
+{
+ int c;
+ int r,g,b;
+ char original_color[16];
+ strcpy(original_color,current_scheme->color_style[n].color_value);
+ msg_line("in color edit! [%s] (-,+,r,g,b,R,G,B, esc to exit",current_scheme->color_style[n].color_value);
+ current_scheme = get_scheme_by_index(color_scheme_ind);
+ color_step=4;
+ while((c=get1key())!='q'){
+	sscanf(current_scheme->color_style[n].color_value,"#%2X%2X%2X",&r,&g,&b);
+	switch(c) {
+		case '1': case '2': case '4': case '8': 
+			color_step=c-'0';
+			msg_line("set color step to %d",color_step);
+			update_screen(true);
+			continue;
+		case '+':case '=':
+		case '-':
+			r = color_change(r,c);
+			g = color_change(g,c);
+			b = color_change(b,c);
+			break;
+		case 'z': case 'Z': {
+			strcpy(current_scheme->color_style[n].color_value,original_color);
+			sscanf(current_scheme->color_style[n].color_value,"#%2X%2X%2X",&r,&g,&b);;
+			break;
+		};
+		case 'b': b = color_change(b,1);break;
+		case 'g': g = color_change(g,1);break;
+		case 'r': r = color_change(r,1);break;
+		case 'B': b = color_change(b,-1);break;
+		case 'G': g = color_change(g,-1);break;
+		case 'R': r = color_change(r,-1);break;
+		case '#': {
+			nextarg("color # ",current_scheme->color_style[n].color_value,7,true);
+			 	change_color_scheme(color_scheme_ind+1);
+	 			msg_line("new color %s ",current_scheme->color_style[n].color_value);
+				update_screen(true);
+			continue;
+			
+		};
+		case 'S': { color_scheme_save();return true;};
+		case 'i': { 
+			if(current_scheme->color_style[n].color_attr & FONT_STYLE_ITALIC) 
+				current_scheme->color_style[n].color_attr &= ~FONT_STYLE_ITALIC;
+			else current_scheme->color_style[n].color_attr |= FONT_STYLE_ITALIC;
+			break;
+		};
+		case 'u': { 
+			if(current_scheme->color_style[n].color_attr & FONT_STYLE_UNDERLINE) 
+				current_scheme->color_style[n].color_attr &= ~FONT_STYLE_UNDERLINE;
+			else current_scheme->color_style[n].color_attr |= FONT_STYLE_UNDERLINE;
+			break;
+		};
+		case 'm': { 
+			if(current_scheme->color_style[n].color_attr & FONT_STYLE_DIM) 
+				current_scheme->color_style[n].color_attr &= ~FONT_STYLE_DIM;
+			else current_scheme->color_style[n].color_attr |= FONT_STYLE_DIM;
+			break;
+		};
+		case 'd': { 
+			if(current_scheme->color_style[n].color_attr & FONT_STYLE_BOLD) 
+				current_scheme->color_style[n].color_attr &= ~FONT_STYLE_BOLD;
+			else current_scheme->color_style[n].color_attr |= FONT_STYLE_BOLD;
+			break;
+		};
+
+		default:
+			continue;
+	};
+	sprintf(current_scheme->color_style[n].color_value,"#%02X%02X%02X",r,g,b);
+ 	change_color_scheme(color_scheme_ind+1);
+ 	msg_line("new color %s  r=%d g=%d b=%d",current_scheme->color_style[n].color_value,r,g,b);
+	
+	update_screen(true);
+ }; 
+ msg_line(time2a());
+ return true;
+}
+
 int color_scheme_read()
 {
  FILE *f1;
@@ -102,36 +196,48 @@ int color_scheme_read()
 			int i;
 			for(i=0;i<COLOR_TYPES;i++) scheme->color_style[i].color_value="#203040";
 			// MESG("	create new scheme %s schemes now %d",name1,color_scheme_list->size);
+		} else {
+			// MESG("-------- read/modify scheme named %s -----------",name1);
 		};
-		// MESG("-------- read scheme named %s -----------",name1);
 		continue;
 	};
 	char **arg_list = split_2_sarray(b,' ');
 	char **sa = arg_list;
 	char *item = *sa++; 
+	// MESG("	item=[%s]",item);
 	j = sarray_index(color_type,item);	/* get color type  */
 	if(j<0) { free_sarray(arg_list); continue;};
 	scheme->color_style[j].color_index=0;
+	// MESG("		item num=%d",j);
 	if(j>=0) {
 	// loop for attributes
 		scheme->color_style[j].color_attr=0;
-		while((item = *sa++) !=NULL) {
+		while(*sa !=NULL) {
+			item=*sa++;
+			// MESG("		value=[%s]",item);
 			i=sarray_index(basic_color_names,item);
+			// MESG("			index=%d",i);
 			if(i>=0) {
 				if(i>7) scheme->color_style[j].color_attr |= FONT_STYLE_BOLD;
 				scheme->color_style[j].color_index=i%8;	/* 8 colors index  */
 			} else {
+				// MESG("		set color index");
 				if(scheme->color_style[j].color_index==0) scheme->color_style[j].color_index=j;
+				// MESG("		color index becomes %d",j);
 				if(!strcasecmp(item,"bold"))	 		scheme->color_style[j].color_attr |= FONT_STYLE_BOLD;
 				else if(!strcasecmp(item,"underline"))  scheme->color_style[j].color_attr |= FONT_STYLE_UNDERLINE;
 				else if(!strcasecmp(item,"italic"))     scheme->color_style[j].color_attr |= FONT_STYLE_ITALIC;
 				else if(!strcasecmp(item,"dim"))        scheme->color_style[j].color_attr |= FONT_STYLE_DIM;
 				else if(!strcasecmp(item,"reverse"))    scheme->color_style[j].color_attr |= FONT_STYLE_REVERSE;
-				else scheme->color_style[j].color_value=strdup(item);	/* otherwise it is a color value  */
+				else {
+					// MESG("		set color to [%s]",item);
+					scheme->color_style[j].color_value=strdup(item);	/* otherwise it is a color value  */
+				};
 			};
 		};
 	};
-	free_sarray(arg_list);
+	// free_sarray(arg_list);
+	// MESG("	arg_list freed!");
  };
 	MESG("color file read ok !");
 	fclose(f1);

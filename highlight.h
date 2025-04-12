@@ -14,7 +14,7 @@ int c_incword(int c);
 int c_injword(int c);
 int c_incobol_word(int c);
 int c_in_txt_word(int c);
-int comment_c();
+int comment_c(int dummy);
 int comment_cc(int n);
 int comment_perl(int n);
 int comment_html(int n);
@@ -24,8 +24,9 @@ int comment_matlab(int n);
 int comment_none(int n);
 int comment_basic(int n);
 int comment_sql(int n);
-int comment_lua();
+int comment_lua(int dummy);
 int comment_ini(int n);
+int comment_md(int n);
 
 /* character states */
 #if	1
@@ -105,6 +106,7 @@ void highlight_sln(int c);
 void highlight_md(int c);
 void highlight_lua(int c);
 void highlight_bicep(int c);
+void highlight_ps1(int c);
 
 char *c_w[] = { "if","elseif","else","do","while","switch","case","for","return","break","goto","continue","typedef",
 	"namespace","this","throw","try","catch","@property","default","extern","static","const","" };
@@ -233,7 +235,7 @@ char *perl_w[] = { "while","foreach","elsif","do","if","else","end","next","unle
 char *perl_w1[] = { "my","our","printf","print","open","close","mkdir","exit","sprintf","push","chomp","shift","split","local",
 	"or","not","xor","le","lt","ne","eq","and","gt","ge","$self", "" };
 char *ps1_w[] = { "WHILE","FOREACH","ELSIF","DO","IF","ELSE","END","NEXT","UNLESS","CONTINUE",
-	"FUNCTION","UNTIL","FOR","SWITCH","DIE","RETURN","" };
+	"FUNCTION","UNTIL","FOR","SWITCH","DIE","RETURN","TRY","CATCH","" };
 char *ps1_w1[] = { "GLOBAL","WRITE-HOST","OPEN","CLOSE","MKDIR","RM","PARAM","STRING","INT",
 	"OR","NOT","XOR","LE","LT","NE","EQ","AND","GT","GE","CONTAINS", "LIKE","NOTCONTAINS",
 	"GET-CONTENT","GET-CHILDREN","GET-HOST","READ-HOST","" };
@@ -389,7 +391,7 @@ SHLIGHT hts[] = {
  { "MATLAB",0,0,matlab_w,matlab_w1,highlight_matlab,update_highlight,c_incword,matlab_extensions,comment_matlab},
  { "COMPRESS",0,0,none_w,none_w,highlight_text,update_highlight,c_incword,compress_extensions,comment_none},
  { "TAGS",0,0,none_w,none_w, highlight_text,update_highlight_none,c_incobol_word,tags_extensions,comment_none },
- { "PS1",1,0,ps1_w,ps1_w1, highlight_other,update_highlight,c_incword,ps1_extensions,comment_perl },
+ { "PS1",1,0,ps1_w,ps1_w1, highlight_ps1,update_highlight,c_incword,ps1_extensions,comment_perl },
  { "SSG",1,1,ssg_w,ssg_w1, highlight_ecl,update_highlight_line,c_incword,ssg_extensions,comment_ecl },
  { "YAML",0,1,yaml_w,yaml_w1, highlight_yaml,update_highlight_line,c_incword,yaml_extensions,comment_perl },
  { "JSON",0,0,jscript_w,jscript_w1,highlight_json,update_highlight,c_incword,json_extensions,comment_cc },
@@ -403,7 +405,7 @@ SHLIGHT hts[] = {
  { "V", 0,0,v_w,v_w1,highlight_c,update_highlight,c_incword,v_extensions,comment_cc },
  { "JULIA",0,0,julia_w,julia_w1,highlight_julia,update_highlight,c_incword,julia_extensions,comment_perl },
  { "CAL",1,0,none_w,none_w, highlight_cmd,update_highlight_line,c_in_txt_word,gtxt_extensions,comment_perl },
- { "MD",0,0,none_w,none_w, highlight_md, update_highlight, c_in_txt_word,md_extensions,comment_html },
+ { "MD",0,0,none_w,none_w, highlight_md, update_highlight, c_in_txt_word,md_extensions,comment_md },
  { "LUA",0,0,lua_w,lua_w1,highlight_lua,update_highlight,c_incword,lua_extensions,comment_lua },
  { "BICEP",0,0,bicep_w,bicep_w1,highlight_c,update_highlight,c_incword,bicep_extensions,comment_cc },
  { "ZIG", 0,0,zig_w,zig_w1,highlight_zig,update_highlight,c_incword,zig_extensions,comment_cc },

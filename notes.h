@@ -12,7 +12,6 @@
 
 #define	NOTES_PARENT	"~/.colibte"
 						// "~/.colibte/Notes"
-						// "~/.xe/Notes"
 #define NOTES_DIR		NOTES_PARENT"/Notes"
 #define NOTES_DBFILE	NOTES_PARENT"/notes.db"
 #define NOTES_DIR0		"Notes"
