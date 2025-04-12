@@ -263,6 +263,7 @@ FUNCS	ftable[] = {
 	{"listdir2",	0,		listdir2,"Show new dir"},
 	{"dir_exec",	0,		dir_exec,"Execute current file (dir mode)"},
 	{"dir_edit",	0,		dir_edit,"Edit current file (dir mode)"},
+	{"dir_clone",	1,		dir_clone,"Clone/copy file dir mode"},
 	{"dir_copy",	1,		dir_copy,"Copy current file (dir mode)"},
 	{"dir_move",	1,		dir_move,"Move current file (dir mode)"},
 	{"dir_rename",	1,		dir_file_rename,"Rename current file (dir mode)"},

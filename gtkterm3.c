@@ -88,7 +88,6 @@ void put_to_table(GtkWidget *wdg, GtkWidget *table, int ypos, int xpos, int alig
 void prepare_converter(int local_lang);
 
 GtkSelectionData *seldata0=NULL;
-char *import_buffer=NULL;
 int import_length=0;
 int selection_received_flag=0;
 

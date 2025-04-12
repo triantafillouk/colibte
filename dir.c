@@ -634,8 +634,8 @@ int start_edit(int n)
  return true;
 }
 
-// copy file, for the moment no questions asked!
-int copy_1file(char *fname,char *destination,int ftype)
+// copy/clone file, for the moment no questions asked!
+int copy_1file(char *fname,char *destination,int ftype,num cptype)
 {
   struct stat t;
   int s1=stat(destination,&t);
@@ -643,12 +643,18 @@ int copy_1file(char *fname,char *destination,int ftype)
   char sline[MAXLLEN];
 #if	DARWIN
   char *cp_flags="-pcf";
-  if (ftype == FTYPE_DIR) cp_flags="-rcpf";
+  if(cptype>1) {
+	if (ftype == FTYPE_DIR) cp_flags="-rcpf";
+  	else cp_flags="-pcf";
+  } else {
+	if (ftype == FTYPE_DIR) cp_flags="-rpf";
+  	else cp_flags="-pf";
+  };
 #else
   char *cp_flags="-pf";
   if (ftype == FTYPE_DIR) cp_flags="-rpf";
 #endif
-  // MESG("dir_copy:[%s] status=%d",sline,s1);
+  // MESG("copy_1file:[%s] status=%d",sline,s1);
   if(s1==0) {	/* it exists!  */
   	s1=1;
 	destination_is_dir = (t.st_mode & S_IFMT) == S_IFDIR;
@@ -664,7 +670,9 @@ int copy_1file(char *fname,char *destination,int ftype)
 
   // MESG("dir_copy1:sline=[%s]",sline);
   if((s1=(system(sline))) !=0 ) { 
-	return error_line("Error copying %s to %s status=%d",fname,destination,s1);
+	if(cptype>1) error_line("Error cloning %s to %s status=%d",fname,destination,s1);
+	else error_line("Error copying %s to %s status=%d",fname,destination,s1);
+	return(false);
   };
   return(true);
 }
@@ -789,7 +797,7 @@ int dir_show_diffs(num n)
 }
 
 /* simple copy */
-int dir_copy(num n)
+int dir_copy(num cptype)
 {
   // struct stat t;
   int s;
@@ -804,6 +812,8 @@ int dir_copy(num n)
   char sconfirm[MAXLLEN];
   int s1,destination_is_dir=0;
   FILEBUF *dbuf;	/* destination dir buffer  */
+  char *stype;
+  if(cptype>1) stype="Clone";else stype="Copy";
 
   if(!(cbfp->b_flag & FSNLIST)) return FALSE;
   dbuf=get_dir_buffer(DIR_OTHER,0);	/* get destination dir buffer  */
@@ -816,9 +826,9 @@ int dir_copy(num n)
 
   if(cbfp->selected_files==0) {
 	ftype=dir_getfile(fname,1);
-	sstat=snprintf(sconfirm,MAXLLEN,"Copy [%s] to: ",fname);
+	sstat=snprintf(sconfirm,MAXLLEN,"%s [%s] to: ",stype,fname);
   } else {
-	sstat=snprintf(sconfirm,MAXLLEN,"Copy selected to: ");
+	sstat=snprintf(sconfirm,MAXLLEN,"%s selected to: ",stype);
   };
   if(sstat>=MAXLLEN) MESG("truncated 7");
 
@@ -836,7 +846,7 @@ int dir_copy(num n)
 
   if(cbfp->selected_files==0) {
     escape_file_name(fname);
-	s1=copy_1file(fname,destination_escaped,ftype);
+	s1=copy_1file(fname,destination_escaped,ftype,cptype);
   } else {
 	int i;
 	istr **row_data = (istr **) array_data(cbfp->dir_list_str);
@@ -847,7 +857,7 @@ int dir_copy(num n)
 			ftype = dir_getfile1(cbfp,fname,1,i);
 			// MESG("copy line %d name=%s type=%d",i,fname,ftype);
 			if(ftype>=0) {
-				s1+=copy_1file(fname,destination_escaped,ftype);
+				s1+=copy_1file(fname,destination_escaped,ftype,cptype);
 				dir_str->selection_tag=0;
 				cbfp->selected_files--;
 			}
@@ -867,6 +877,11 @@ int dir_copy(num n)
   if(s1==1) msg_line("1 file copied");
   if(s1>1) msg_line("%d files copied",s1);
   return(TRUE);
+}
+
+int dir_clone(num n)
+{
+	return dir_copy(2);
 }
 
 /* simple rename/move */
@@ -1975,7 +1990,7 @@ int dir_getfile(char *fname,int flag)
  };
  // MESG("dir_getfile: b_flag=%X [%s]",cbfp->b_flag,line_str);  
  c=line_str[0];
- if(c=='c') { error_line("cannot view c type files");return -1;};
+ if(c=='c') { msg_line("c type file");return -1;};
  if(c=='s') { error_line("cannot view socket files");return -1;};
  if(c=='#' ||c=='!'||c=='/') ftype=FTYPE_DIR;else ftype=FTYPE_NORMAL;
  c=line_str[1];

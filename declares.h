@@ -207,6 +207,7 @@ int script_exec(num n) ;
 int dir_edit(num n) ;
 int start_edit(int b);
 int dir_copy(num n);
+int dir_clone(num n);
 int dir_move(num n);
 int dir_file_rename(num n);
 int dir_del1(num  n) ;

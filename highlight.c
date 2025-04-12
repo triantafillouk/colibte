@@ -2690,7 +2690,7 @@ void highlight_yaml(int c)
 
   line_col++;
 
-  if(prev_set) hquotem=prev_set;
+  if(prev_set>0) hquotem=prev_set;
   prev_set=0;
 
   switch(c) {
@@ -2706,8 +2706,10 @@ void highlight_yaml(int c)
 		first=1;
 		in_array=0;
 		prev_set=0;
+		hquotem=0;
 		break;
 	case ':' :
+		if(!(hquotem == H_QUOTE6 || hquotem==0)) break;
 		if(hquotem != H_QUOTE6){
 		if(hstate==0) first=0;
 		stop_word_highlight=line_col;
@@ -2724,7 +2726,7 @@ void highlight_yaml(int c)
 		break;
 
 	case CHR_SQUOTE:
-		if(hquotem&H_QUOTEC) break;
+		if(!(hquotem&H_QUOTE1 || hquotem==0)) break;
 		if(hquotem != H_QUOTE6 && !(hquotem&H_QUOTE2)){
 			if(hstate==HS_PREVESC) { hstate=0;break;};
 			if(first) {
@@ -2761,12 +2763,15 @@ void highlight_yaml(int c)
 			hstate=0;
 		};
 		break;
+
 	case '#':
+		if(hstate==0) break;
 		if(hquotem != H_QUOTE1 && hquotem != H_QUOTE2) {
 			hquotem = H_QUOTE6;
 			hstate=0;
 		};
 		break;
+
 	case '\\':
 		if(hquotem != H_QUOTE6)	{
 			hstate=(hstate==HS_PREVESC)?0:HS_PREVESC;
@@ -2794,6 +2799,9 @@ void highlight_yaml(int c)
 			in_array=0;
 			first=1;
 		};
+		break;
+	case ' ':
+	case CHR_TAB: 
 		break;
 	default: { 
 		hstate=0;
@@ -2921,19 +2929,17 @@ void highlight_python(int c)
 		break;
 	/* single quotes */
 	case CHR_SQUOTE: 
-		if(hquotem&H_QUOTEC) break;
+		// if(hquotem&H_QUOTEC) break;
 		if(hstate!=HS_PREVESC) {
 			if(single_quoted==2) {
 				hquotem = (hquotem & H_COMMENT)? hquotem & ~H_COMMENT: H_COMMENT;
 			} else {
 				if(single_quoted==1) {
 					single_quoted=2;
-					double_quoted=0;
 					hquotem = (hquotem)? hquotem & ~H_QUOTE1: H_QUOTE1;
 				} else {
 					hquotem = (hquotem)? hquotem & ~H_QUOTE1: H_QUOTE1;
 					single_quoted=1;
-					double_quoted=1;
 				}
 			}
 		};
@@ -2946,23 +2952,24 @@ void highlight_python(int c)
 		break;
 	/* double quotes */
 	case CHR_DQUOTE:
-		if(hquotem&H_QUOTEC) break;
+		// if(hquotem&H_QUOTEC) break;
 		if(hstate!=HS_PREVESC) {
 			if(double_quoted==2) {
 				hquotem = (hquotem & H_COMMENT)? hquotem & ~H_COMMENT: H_COMMENT;
+				double_quoted=0;
 			} else {
 				if (double_quoted==1) {
 					double_quoted=2;
-					single_quoted=0;
 					hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
 				} else {
 					hquotem = (hquotem)? hquotem & ~H_QUOTE2: H_QUOTE2;
 					double_quoted=1;
-					single_quoted=0;
 				}
 			}
 		};
 		hstate=0;
+		single_quoted=0;
+		
 		break;
 	case '#': { // comment line
 //		if(hstate==HS_LINESTART) 
@@ -3076,7 +3083,7 @@ int highlight_note(int c)
 		slang=LANG_SCRIPT;
 //		MESG("highlight_note: reset: slang=%d",slang);
 		break;
-	/* double quotes */
+	/* single quotes */
 	case CHR_SQUOTE: 
 		if(hstate!=HS_LETTER) {
 			if(hstate!=HS_PREVESC) {

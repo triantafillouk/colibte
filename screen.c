@@ -2035,25 +2035,27 @@ int update_screen(num force)
 	WINDP *wp;
 	// static int count=0;
 	// count++;
+	// MESG("Update_scren:");
+	if(cwp==NULL) return 0;
 	int cw_flag=cwp->w_flag;
 	if (noupdate) return TRUE;
-
 	/* experiment with screen updating  */
 	if(cw_flag==0) return(FALSE);
 
 	if (force == FALSE && kbdmode == PLAY)	return(TRUE);
-
+	// MESG("update_screen:0");
 	/* update any windows that need refreshing */
 	// MESG_time("! update_screen: ---------------");
 	hide_cursor("update_screen: start");
 	// MESG("hide_cursor: ok!");
+	if(cwp!=NULL)
 	if(cwp->selection) {
 		if(cwp->selection == REGION_LINE) 
 			textpoint_set(cwp->w_emark,LineEnd(tp_offset(cwp->tp_current)));
 		else
 			tp_copy(cwp->w_emark,cwp->tp_current);
-	}
-
+	};
+	// MESG("update_screen:1");
 	upd_column_pos();	/* update column position  */
 	// MESG_time("update_screen: 1");
 	/* if screen is garbage, re-plot it */
@@ -2089,7 +2091,7 @@ int update_screen(num force)
 	// MESG_time("update_physical");
 	update_physical_windows();
 	// MESG_time("update_physical end",1);	
-	/* update the cursor and flush the buffers */
+	// /* update the cursor and flush the buffers */
 	update_cursor_position();
 	/* set previous line */
 	// MESG(";update_screen: set new ppline");
@@ -2691,6 +2693,10 @@ void allocate_virtual_window(WINDP *wp)
  int i;
  // MESG("	- allocate_virtual_window: cols=%d rows=%d",wp->w_ntcols,wp->w_ntrows);
  wp->vs = (VIDEO **) emalloc(sizeof(VIDEO *) * (wp->w_ntrows+3),"allocation virtual window");
+ if(wp->vs==NULL) { 
+ 	ERROR("could not allocate window");
+	exit(1);
+ };
  for(i=0;i< wp->w_ntrows+2;i++) {
  	vp = (VIDEO *) emalloc(sizeof(VIDEO) + (wp->w_ntcols+2) * sizeof(struct vchar),"allocate virtual line");
  	if(vp==NULL) {
