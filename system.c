@@ -838,7 +838,7 @@ int insert_text_file_nl(char *filnam)
 	if(tmp_bp==NULL) return false;
 
 	if(!select_filebuf(tmp_bp)) return false;
-
+	if(tmp_bp->maxlinelen==0) tmp_bp->maxlinelen=FSize(tmp_bp);
 	const num max_len = tmp_bp->maxlinelen;
 
 	char *pad_space = (char *)malloc(max_len+2);
