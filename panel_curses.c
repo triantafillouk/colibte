@@ -194,6 +194,7 @@ int select_font_mono(num n)
 sigset_t set, old_set;
 struct sigaction signal_action, old_action;
 
+#if	NUSE
 void SigHandler(int sig)
 {
  if(sig == SIGCONT) {
@@ -208,6 +209,7 @@ void SigHandler(int sig)
 	kill(getpid(),sig);
  }
 }
+#endif
 
 int set_bg(num n)
 {
@@ -651,7 +653,6 @@ void drv_open()
 {
 // setlocale(LC_ALL,"en_US.UTF-8"); 
  setlocale(LC_ALL,"");	// do not use specific locale, get it from the system !!
- init_sighandler();
 
  initscr();
  noecho();
@@ -690,6 +691,7 @@ void drv_open()
 
  // driver specific keyboard bindings
  drv_bindkeys();
+ init_sighandler();
  vswidth=1;
  drv_initialized=1;
  // MESG("drv_open:end");
