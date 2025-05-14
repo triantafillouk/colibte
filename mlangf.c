@@ -517,7 +517,7 @@ double uf_input()
 	char *slocal=get_sval();
 	if(va[0].var_type!=VTYPE_STRING) getstring("Input :",get_sval(),80,true);
 	else getstring(va[0].sval,get_sval(),80,true);
-	if(execmd) slocal[strlen(get_sval())-1]=0;
+	if(execmd) strtok(slocal, "\n");
 	set_vtype(VTYPE_STRING);
 	entry_mode=f_entry;
 	return 0;

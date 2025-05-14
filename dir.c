@@ -2617,7 +2617,7 @@ int list_dir(char *d1,FILEBUF *buf_dir)
 
 int show_dir_help(num n)
 {
-
+ return 0;
 }
 
 /* ---- */

@@ -472,7 +472,8 @@ void set_current_colors()
  for(i=0;i<COLOR_TYPES;i++) {
 	if(!gdk_rgba_parse(&color,current_scheme->color_style[i].color_value )) {
 	  	ERROR("color %s is not in database",current_scheme->color_style[i].color_value);
-		exit(0);
+		// exit(0);
+		continue;
 	};
 	
  	memcpy(current_colors[i],&color,sizeof(GdkRGBA));

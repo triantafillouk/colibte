@@ -579,7 +579,7 @@ char *date_string(num n)
 				break;
 		case 1: res=snprintf(date_str,128,"%4d/%02d/%02d:%02d:%02d:%02d ",tim->tm_year+1900,tim->tm_mon+1,tim->tm_mday,tim->tm_hour,tim->tm_min,tim->tm_sec);
 				break;
-		case 0: res=snprintf(date_str,128,"%s",asctime(tim));
+		case 0: res=snprintf(date_str,128,"%s",asctime(tim));strtok(date_str, "\n");
 				break;
 		case 3: res=snprintf(date_str,128,"%4d%02d%02d-%02d%02d%02d",tim->tm_year+1900,tim->tm_mon+1,tim->tm_mday,tim->tm_hour,tim->tm_min,tim->tm_sec);
 				break;
@@ -593,7 +593,6 @@ char *time2a()
  static char tline[32];
  time(&tclock);
  strlcpy(tline,date_string(0),32);
- tline[strlen(tline)-1]=0;
  return(tline);
 }
 

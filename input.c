@@ -495,13 +495,13 @@ int load_keys()
 
  f1=fopen(fname,"r");
 
- while(fgets(str_line,MAXLLEN,f1)){
+ while(fgets(str_line,sizeof(str_line),f1)){
 	char **a_as;
 	int c;
 	int (*kfunc)(num n);	/* ptr to the requested function */
 	AKEYS *key_reg;
 
-	str_line[strlen(str_line)-1]=0;
+	strtok(str_line, "\n");
 	a_as = split_2_sarray(str_line,'=');
 	c = atoi(a_as[1]);
 	kfunc = get_function(a_as[0]);

@@ -8,6 +8,10 @@
 
 #include "xe.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-prototypes"
+
+#pragma GCC diagnostic ignored "-Wno-deprecated-declarations"
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
 #include <glib.h>

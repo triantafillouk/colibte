@@ -656,17 +656,18 @@ int check_native_copy()
 {
  int status;
  static char exec_st[MAXFLEN];
-
+	ext_clipboard_command=0;
 	status=snprintf(exec_st,MAXFLEN,"%s > /dev/null 2> /dev/null",native_paste);
 	if(status>=MAXFLEN) return 0;
 	status = system(exec_st);
-	MESG("check_native_copy:[%s] -> %d",exec_st,status);
+	// MESG("check_native_copy:[%s] -> %d",exec_st,status);
 	if(status == 0) {
 		clip_copy=native_paste;
 		clip_paste=native_copy;
 		ext_clipboard_command=1;
 		return 1;
 	};
+	fprintf(stderr,"native clipboard command not found!\n");
 	return 0;
 }
 #endif
@@ -676,13 +677,15 @@ int init_system_clipboard()
  static char exec_st[MAXFLEN];
  int status=0;
 	if(status>=MAXFLEN) return 0;
-
+#if	0
 #if	DARWIN | WSL
 	if(check_native_copy()) return 1;
 #endif
+#endif
 	display_env = getenv("DISPLAY");
 	if(display_env == NULL) {
-		return 0; 
+		return(check_native_copy());
+		// return 0; 
 	} else {
 		if(strlen(display_env)<1) {
 			return 0;
@@ -698,15 +701,14 @@ int init_system_clipboard()
 	if((status%256) !=0) {
 		fprintf(stderr,"status %d cannot execute xclip\n",status);
 		ext_clipboard_command=0;
-		return 0;
+		return(check_native_copy());
 	} else {
 		clip_copy=xclip_copy;
 		clip_paste=xclip_paste;
 		ext_clipboard_command=1;
 		return 1;
 	};
-	ext_clipboard_command=0;
-	return 0;
+	return(check_native_copy());
 }
 
 /* return the first line from system clipboard */
@@ -831,7 +833,6 @@ int insert_text_file_nl(char *filnam)
 {
 	FILEBUF *ori_buf = cbfp;
 
-	// MESG("#insert_text_file_nl: position  ---------------");
 	
 
 	FILEBUF *tmp_bp = new_filebuf(filnam,0);
@@ -841,8 +842,9 @@ int insert_text_file_nl(char *filnam)
 	if(tmp_bp->maxlinelen==0) tmp_bp->maxlinelen=FSize(tmp_bp);
 
 	const num max_len = tmp_bp->maxlinelen;
+	// MESG("#insert_text_file_nl: position  --------------- max_len=%d",max_len);
 
-	char *pad_space = (char *)malloc(max_len+2);
+	char *pad_space = (char *)malloc(max_len+3);
 	if(pad_space==NULL) { delete_filebuf(tmp_bp,1); return false;};
 	num line_start=0;
 
@@ -851,7 +853,7 @@ int insert_text_file_nl(char *filnam)
 	while(line_start<FSize(tmp_bp)) {
 		char *line_text=get_line_at(tmp_bp,line_start);
 		int col=0, in_offset=0;;
-
+		// MESG("- in [%s]",line_text);
 		ml_out = pad_space;
 
 		while(in_offset<strlen(line_text)) {
@@ -859,22 +861,29 @@ int insert_text_file_nl(char *filnam)
 			in_offset=SUtfCharAt(line_text,in_offset,&uc);
 			if(uc.uval[0]==CHR_TAB) {col=next_tab(col);}
 			else col+=get_utf_length(&uc);
+			// MESG("	memcpy");
 			memcpy(ml_out,&uc,utf8charlen_nocheck(uc.uval[0]));
 			ml_out+=utf8charlen_nocheck(uc.uval[0]);
 		};
 
 		line_start = FNextLine(tmp_bp,line_start);
-		
 		if(FEof(cbfp)) {
+			// MESG("	eof insert now! [%s] ",pad_space);
 			memcpy(ml_out,cbfp->EolStr,cbfp->EolSize);
+			// MESG("	add new line");
 			ml_out+=cbfp->EolSize;
+			// MESG("	size is %d",ml_out-pad_space);
 			insert_string(cbfp,pad_space,ml_out-pad_space);
 		} else {
+			// MESG("	insert now! [%s]",pad_space);
 			insert_string(cbfp,pad_space,ml_out-pad_space);
 			if(!FEofAt(tmp_bp,line_start)) insert_newline(cbfp);
 		};
-	} 
+		// MESG("		ok1!");
+	};
+	// MESG("ok free now!"); 
 	free(pad_space);
+	// MESG("ok");
 	undo_set_noglue();
 	delete_filebuf(tmp_bp,1);
 

@@ -3667,7 +3667,7 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
  utfchar uc;
  num col=0;;
  num file_size=FSize(fp);
-
+ MESG("FCheckNextLine:");
  if(fp->EolSize>1) {
 	char c0=fp->EolStr[0];
 	char c1=fp->EolStr[1];
@@ -3677,7 +3677,7 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
 				ptr++;
 			} else continue; 
 			if(col>fp->maxlinelen) { fp->maxlinelen=col;*display_size=col;};
-			// MESG("Line_size:2 %ld",*display_size);
+			MESG("Line_size:2 %ld",*display_size);
 			return ptr;
 		};
 		if(uc.uval[0]==CHR_TAB) col=next_tab(col);
@@ -3690,16 +3690,17 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
 		ptr=FUtfCharAt_nocheck(fp,ptr,&uc);
 		if(uc.uval[0]==c0) {
 			if(col>fp->maxlinelen) { fp->maxlinelen=col;*display_size=col;};
-			// MESG("Line_size:1 %ld",*display_size);
+			MESG("Line_size:1 %ld",*display_size);
 			return ptr;
 		};
 		if(uc.uval[0]==CHR_TAB) col=next_tab(col);
 		else col+=get_utf_length(&uc);
 	};
+	MESG("eof?");
  };
  // last line with no new line at the end
  if(col>fp->maxlinelen) { fp->maxlinelen=col;*display_size=col;};
- // MESG("Line_size:0 %ld",*display_size);
+ MESG("Line_size:0 %ld",*display_size);
  return ptr;
 }
 

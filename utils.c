@@ -168,7 +168,7 @@ int read_pairs(char *fname,char delimiter,char ***name,char ***value)
  dlist *sl1;
  delement *e1;
  FILE *f;
- char s[1000];
+ char s[MAXLLEN];
  char *svalue;
  char *cp1,*cp2;
  char *sname;
@@ -179,9 +179,9 @@ int read_pairs(char *fname,char delimiter,char ***name,char ***value)
  f=fopen(fname,"r");
  if(!f) { name=NULL; value=NULL;return 0;};
  
- while(fgets(s,1000,f)) {
+ while(fgets(s,sizeof(s),f)) {
 	int delimit_ok=0;
- 	s[strlen(s)-1]=0; // remove newline
+	strtok(s, "\n");	// remove newline
 	if(strlen(s)==0) continue;
 	if(s[0]=='#' || s[0]==';'||s[0]=='[') continue;
 	cp1=s;

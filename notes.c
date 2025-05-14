@@ -37,7 +37,7 @@ int insert_preamble(FILEBUF *fp,int type)
 	insert_string_nl(fp,"---");
 #endif
 	sprintf(date_header,"#Date: %s",date_string(2));
-	date_header[strlen(date_header)-1]=0;	/* remove new line at the end!  */
+	//date_header[strlen(date_header)-1]=0;	/* remove new line at the end!  */
 	insert_string_nl(fp,date_header);
 
 	if(type<2) type=1;
