@@ -656,7 +656,7 @@ int check_native_copy()
 {
  int status;
  static char exec_st[MAXFLEN];
- fprintf(stderr,"check_native_copy:");
+ MESG("check_native_copy:");
 	ext_clipboard_command=0;
 	status=snprintf(exec_st,MAXFLEN,"%s > /dev/null 2> /dev/null",native_paste);
 	if(status>=MAXFLEN) return 0;
@@ -669,7 +669,7 @@ int check_native_copy()
 		MESG("system clipboard uses %s",native_paste);
 		return 1;
 	};
-	fprintf(stderr,"native clipboard command not found!\n");
+	MESG("native clipboard command not found!\n");
 	return 0;
 }
 #endif
