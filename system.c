@@ -656,15 +656,17 @@ int check_native_copy()
 {
  int status;
  static char exec_st[MAXFLEN];
+ fprintf(stderr,"check_native_copy:");
 	ext_clipboard_command=0;
 	status=snprintf(exec_st,MAXFLEN,"%s > /dev/null 2> /dev/null",native_paste);
 	if(status>=MAXFLEN) return 0;
 	status = system(exec_st);
-	// MESG("check_native_copy:[%s] -> %d",exec_st,status);
+	MESG("check_native_copy:[%s] -> %d",exec_st,status);
 	if(status == 0) {
 		clip_copy=native_paste;
 		clip_paste=native_copy;
 		ext_clipboard_command=1;
+		MESG("system clipboard uses %s",native_paste);
 		return 1;
 	};
 	fprintf(stderr,"native clipboard command not found!\n");
@@ -677,11 +679,7 @@ int init_system_clipboard()
  static char exec_st[MAXFLEN];
  int status=0;
 	if(status>=MAXFLEN) return 0;
-#if	0
-#if	DARWIN | WSL
-	if(check_native_copy()) return 1;
-#endif
-#endif
+	MESG("init_system_clipboard:");
 	display_env = getenv("DISPLAY");
 	if(display_env == NULL) {
 		return(check_native_copy());
@@ -694,17 +692,18 @@ int init_system_clipboard()
 	};
 // we suppose that we have xclip for start
 // pass clipboard through xclip
-	status=snprintf(exec_st,MAXFLEN,"xclip -i > /dev/null 2> /dev/null <xclip -o 2>/dev/null");
+//	status=snprintf(exec_st,MAXFLEN,"xclip -i > /dev/null 2> /dev/null <xclip -o 2>/dev/null");
+	status=snprintf(exec_st,MAXFLEN,"echo \"\" | xclip -i > /dev/null 2> /dev/null");
 	if(status>=MAXFLEN) return 0;
-//	MESG("exec [%s]",exec_st);
 	status = system(exec_st);
-	if((status%256) !=0) {
-		fprintf(stderr,"status %d cannot execute xclip\n",status);
+	// MESG("exec [%s] status=%d",exec_st,status);
+	if((status!=0)) {
 		ext_clipboard_command=0;
 		return(check_native_copy());
 	} else {
 		clip_copy=xclip_copy;
 		clip_paste=xclip_paste;
+		MESG("system clipboard uses xclip");
 		ext_clipboard_command=1;
 		return 1;
 	};
