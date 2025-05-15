@@ -62,7 +62,7 @@ ge_edit_display_event(GtkWidget	*widget, GdkEvent *event)
  static int event_sec=0;
  static int event_usec=0;
  static int double_click=0;
- 
+ static size_t prev_time=0;
  // MESG("ge_edit_display_event:");
  g_return_val_if_fail(widget !=NULL,FALSE);
  g_return_val_if_fail(GTK_IS_EDIT_DISPLAY(widget),FALSE);
@@ -74,13 +74,13 @@ ge_edit_display_event(GtkWidget	*widget, GdkEvent *event)
 	};
 
  if(event->type == GDK_SCROLL) {
-	int unow,now;
  	GdkEventScroll *ev = (GdkEventScroll *)event;
 	struct timeval timev;
 	// MESG("ge_edit_display_event: scroll");
 	gettimeofday(&timev,NULL);
-	unow=(int) timev.tv_usec;
-	now=(int) timev.tv_sec;
+	size_t now_time = timev.tv_usec + timev.tv_sec*1000000000;
+	// unow=(size_t) timev.tv_usec;
+	// now=(size_t) timev.tv_sec;
 
 	switch(ev->direction) {
 		case GDK_SCROLL_UP: {
@@ -88,8 +88,6 @@ ge_edit_display_event(GtkWidget	*widget, GdkEvent *event)
 			// MESG(" SCROLL_UP:");
 			if(wd->wp != cwp) change_window(wd->wp);
 			// if(tp_line(cwp->tp_current)<1) return FALSE;
-			if(now==event_sec && unow-event_usec < 50000) return(FALSE);
-			event_sec=now;event_usec=unow;
 			last_event=GDK_SCROLL;
 
 			move_window_lines(wd->wp,lines);
@@ -100,8 +98,8 @@ ge_edit_display_event(GtkWidget	*widget, GdkEvent *event)
 			// MESG(" SCROLL_DOWN:");
 			if(wd->wp != cwp) change_window(wd->wp);
 			// if(tp_line(cwp->tp_current)==cwp->w_fp->lines-1) return(FALSE); 
-			if(now==event_sec && unow-event_usec < 50000) return(FALSE);
-			event_sec=now;event_usec=unow;
+			// if(now==event_sec && unow-event_usec < 50000) return(FALSE);
+			// event_sec=now;event_usec=unow;
 			last_event=GDK_SCROLL+1;
 
 			move_window_lines(wd->wp,lines);
@@ -109,31 +107,27 @@ ge_edit_display_event(GtkWidget	*widget, GdkEvent *event)
 		};
 #if	GTK3
 		case GDK_SCROLL_SMOOTH: {
-			int lines=ev->delta_y*100;
-			// MESG("gedit_display smooth: dire=%d dy=%f lines=%d",ev->direction,ev->delta_y,lines);
+			int lines=ev->delta_y*1;
 
 			if(ev->delta_y>0) {
-				if(lines<1) return FALSE;
+				if(lines<1) lines=1;
 				if(wd->wp != cwp) change_window(wd->wp);
-				if(now==event_sec && unow-event_usec < 500000) return(FALSE);
-				event_sec=now;event_usec=unow;
+				size_t time_diff = now_time - prev_time;
+				if(time_diff<100000) lines = (100000-time_diff) / 20000 + 1;
+				// MESG("gedit_display smooth: dire=%d dy=%f lines=%d diff=%ld",ev->direction,ev->delta_y,lines,time_diff);
+				prev_time=now_time;
 				last_event=GDK_SCROLL+1;
-				if(wd->cr!=NULL) {
-					// MESG("	drawing!");
-				}; 
-				if(lines<1) {
-					return (TRUE);
-				};
 				// MESG("move up %d lines",lines);
 				move_window_lines(wd->wp,lines);
 				return TRUE;
 			} else if(ev->delta_y<0) {
-				if(lines>-1) return FALSE;
+				if(lines>-1) lines=-1;
 				if(wd->wp != cwp) change_window(wd->wp);
-				if(now==event_sec && unow-event_usec < 500000) return(FALSE);
-				event_sec=now;event_usec=unow;
+				size_t time_diff = now_time - prev_time;
+				if(time_diff<100000) lines = -((100000-time_diff) / 20000 + 1);
+				// MESG("gedit_display smooth: dire=%d dy=%f lines=%d diff=%ld",ev->direction,ev->delta_y,lines,now_time-prev_time);
+				prev_time=now_time;
 				last_event=GDK_SCROLL;
-				// MESG("move down %d lines",lines);
 				move_window_lines(wd->wp,lines);
 				return TRUE;
 			} else {
