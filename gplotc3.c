@@ -495,12 +495,12 @@ void str_tik1(cairo_t *cr,double x,double y,double value,double precision)
  double v;
 
  v=precision; 
- if(v < 0.01) snprintf(st,80,"%1.3f",value);
- else if(v < 0.1) snprintf(st,80,"%1.2f",value);
- else if(v<1) snprintf(st,80,"%1.1f",value);
- else if(v<100) snprintf(st,80,"%2.0f",value);
- else if(v<1000) snprintf(st,80,"%3.0f",value);
- else if(v<10000) snprintf(st,80,"%4.0f",value);
+ if(v < 0.01) snprintf(st,sizeof(st),"%1.3f",value);
+ else if(v < 0.1) snprintf(st,sizeof(st),"%1.2f",value);
+ else if(v<1) snprintf(st,sizeof(st),"%1.1f",value);
+ else if(v<100) snprintf(st,sizeof(st),"%2.0f",value);
+ else if(v<1000) snprintf(st,sizeof(st),"%3.0f",value);
+ else if(v<10000) snprintf(st,sizeof(st),"%4.0f",value);
 
  cairo_set_font_size(cr,8);
  cairo_move_to(cr,x,y);
@@ -870,7 +870,7 @@ gboolean on_plot_motion(GtkWidget *w, GdkEventMotion *ev, gpointer data)
  double xx,yy;
  xx = (ev->x - rx0) / ratx;
  yy = ((plot_height - ev->y) - ry0)/ratx; 
- snprintf(st,64,"%3.2f %3.2f",xx,yy);
+ snprintf(st,sizeof(st),"%3.2f %3.2f",xx,yy);
  plot_status(0,st);
  return TRUE;
 }

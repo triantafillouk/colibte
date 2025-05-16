@@ -794,34 +794,34 @@ void print_array1(char *title,array_dat *adat)
 		out_print("Null array!",1);
 		return;
 	};
-	if(adat->var_tree) snprintf(so,MAXLLEN,"# %s Array %s,%d:(%s) rows=%d cols=%d astat=%d with var_tree",title,ex_name,adat->anum,vtype_names[adat->atype],adat->rows,adat->cols,adat->astat);
-	else snprintf(so,MAXLLEN,"# %s Array %s,%d:(%s) rows=%d cols=%d astat=%d",title,ex_name,adat->anum,vtype_names[adat->atype],adat->rows,adat->cols,adat->astat);
+	if(adat->var_tree) snprintf(so,sizeof(so),"# %s Array %s,%d:(%s) rows=%d cols=%d astat=%d with var_tree",title,ex_name,adat->anum,vtype_names[adat->atype],adat->rows,adat->cols,adat->astat);
+	else snprintf(so,sizeof(so),"# %s Array %s,%d:(%s) rows=%d cols=%d astat=%d",title,ex_name,adat->anum,vtype_names[adat->atype],adat->rows,adat->cols,adat->astat);
 	out_print(so,1);
 	strcpy(so,"");
 	if(adat->astat!=ARRAY_UNALLOCATED) {
 	if(adat->rows>1 && adat->cols>1) {
-		snprintf(so,MAXLLEN,"#  ");
+		snprintf(so,sizeof(so),"#  ");
 		for(i=0;i< adat->cols;i++) { 
-			snprintf(s2,128," %10d  |",i);
+			snprintf(s2,sizeof(s2)," %10d  |",i);
 			strlcat(so,s2,MAXLLEN);
 		};
 		out_print(so,1);
 		MVAR *avars=adat->mval;
 		// MESG("	avars addr=%Xl",(long)avars);
 		for(j=0;j<adat->rows;j++){
-			snprintf(so,128,"%3d: ",j);
+			snprintf(so,sizeof(so),"%3d: ",j);
 			for(i=0;i<adat->cols;i++) {
-				if(adat->atype==VTYPE_ARRAY) snprintf(s2,128," %10.3f |",adat->dval2[j][i]);
-				else if(adat->atype==VTYPE_SARRAY) snprintf(s2,128," %10s] |",adat->sval[j*adat->cols+i]);
+				if(adat->atype==VTYPE_ARRAY) snprintf(s2,sizeof(s2)," %10.3f |",adat->dval2[j][i]);
+				else if(adat->atype==VTYPE_SARRAY) snprintf(s2,sizeof(s2)," %10s] |",adat->sval[j*adat->cols+i]);
 				else {
 					int ind=j*adat->cols+i;
 					// MESG("i=%d j=%d ind=%d type %d",i,j,ind,avars[ind].var_type);
 					if(avars[ind].var_type==VTYPE_NUM) {
 						// MESG("	ind=%d %f",ind,avars[ind].dval);
-						snprintf(s2,128," %10.3f] |",avars[ind].dval);
+						snprintf(s2,sizeof(s2)," %10.3f] |",avars[ind].dval);
 					} else {
 						// MESG("	ind=%d %s",ind,avars[ind].sval);
-						snprintf(s2,128," %10s |",avars[ind].sval);
+						snprintf(s2,sizeof(s2)," %10s |",avars[ind].sval);
 					};
 				};
 				strlcat(so,s2,MAXLLEN);
@@ -831,21 +831,21 @@ void print_array1(char *title,array_dat *adat)
 	} else {
 		if(adat->cols==1) {
 			for(i=0;i<adat->rows;i++) {
-				if(adat->atype==VTYPE_ARRAY) snprintf(so,128," %3d: %f",i,adat->dval[i]);
-				else if(adat->atype==VTYPE_SARRAY) snprintf(so,128," %3d: %s",i,adat->sval[i]);
+				if(adat->atype==VTYPE_ARRAY) snprintf(so,sizeof(so)," %3d: %f",i,adat->dval[i]);
+				else if(adat->atype==VTYPE_SARRAY) snprintf(so,sizeof(so)," %3d: %s",i,adat->sval[i]);
 				else if(adat->atype==VTYPE_AMIXED) {
-					if(adat->mval[i].var_type==VTYPE_NUM) snprintf(so,128," %3d: %f",i,adat->mval[i].dval);
-					else snprintf(so,128," %3d: %s",i,adat->mval[i].sval);
+					if(adat->mval[i].var_type==VTYPE_NUM) snprintf(so,sizeof(so)," %3d: %f",i,adat->mval[i].dval);
+					else snprintf(so,sizeof(so)," %3d: %s",i,adat->mval[i].sval);
 				};
 				out_print(so,1);
 			};
 		} else {
 			for(i=0;i<adat->cols;i++) {
-				if(adat->atype==VTYPE_ARRAY) snprintf(s2,128,"%05.3f(%d) ",adat->dval[i],i);
-				else if(adat->atype==VTYPE_SARRAY) snprintf(s2,128,"%10s(%d) ",adat->sval[i],i);
+				if(adat->atype==VTYPE_ARRAY) snprintf(s2,sizeof(s2),"%05.3f(%d) ",adat->dval[i],i);
+				else if(adat->atype==VTYPE_SARRAY) snprintf(s2,sizeof(s2),"%10s(%d) ",adat->sval[i],i);
 				else if(adat->atype==VTYPE_AMIXED) {
-					if(adat->mval[i].var_type==VTYPE_NUM) snprintf(s2,128,"%05.3f ",adat->mval[i].dval);
-					else snprintf(s2,128,"[%10s] ",adat->mval[i].sval);
+					if(adat->mval[i].var_type==VTYPE_NUM) snprintf(s2,sizeof(s2),"%05.3f ",adat->mval[i].dval);
+					else snprintf(s2,sizeof(s2),"[%10s] ",adat->mval[i].sval);
 				};
 				strlcat(so,s2,MAXLLEN);
 			};

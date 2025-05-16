@@ -87,7 +87,7 @@ int save_keys()
  lbegin(local_key_list);
  while( (key=(AKEYS *)lget(local_key_list))!=NULL)
  {
- 	snprintf(key_line,MAXLLEN,"%s=%d=%s",key->a_function_name,key->c,key->a_key);
+ 	snprintf(key_line,sizeof(key_line),"%s=%d=%s",key->a_function_name,key->c,key->a_key);
 	fprintf(f1,"%s\n",key_line);
  };
  fclose(f1);

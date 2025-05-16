@@ -21,7 +21,7 @@ void mesg_out(const char *fmt, ...)
  static char mline[1024];
     if (fmt != NULL) {
 		va_start(args,fmt);
-		vsnprintf(mline,511,fmt,args);
+		vsnprintf(mline,sizeof(mline),fmt,args);
 		va_end(args);
 		out_print(mline,1);
     }
@@ -39,33 +39,33 @@ char * tok_info2(tok_struct *tok)
 	if(tok->tname!=NULL){
 		switch(tok->ttype){
 			case TOK_SHOW:		
-				snprintf(stok,MAXLLEN,"%d:%d %s :",tok->tline,tok->tnum,TNAME);
+				snprintf(stok,sizeof(stok),"%d:%d %s :",tok->tline,tok->tnum,TNAME);
 				break;
 			case TOK_LCURL:
 			case TOK_RCURL:
-				snprintf(stok,MAXLLEN,"%d:%d %s other is %d",tok->tline,tok->tnum,TNAME,tok->match_tok->tnum);
+				snprintf(stok,sizeof(stok),"%d:%d %s other is %d",tok->tline,tok->tnum,TNAME,tok->match_tok->tnum);
 				break;
 			case TOK_SEP:
-				snprintf(stok,MAXLLEN,"%d:%d %s",tok->tline,tok->tnum,TNAME);
+				snprintf(stok,sizeof(stok),"%d:%d %s",tok->tline,tok->tnum,TNAME);
 				break;
 			case TOK_DIR_IF:
 			case TOK_DIR_ELSE:
 			case TOK_DIR_FOR:
 			case TOK_DIR_WHILE:
-				snprintf(stok,MAXLLEN,"%d:%d %s",tok->tline,tok->tnum,TNAME);
+				snprintf(stok,sizeof(stok),"%d:%d %s",tok->tline,tok->tnum,TNAME);
 				break;
 			case TOK_QUOTE:
-				snprintf(stok,MAXLLEN,"%d:%d %s \"%s\"",tok->tline,tok->tnum,TNAME,(char *)tok->tname);
+				snprintf(stok,sizeof(stok),"%d:%d %s \"%s\"",tok->tline,tok->tnum,TNAME,(char *)tok->tname);
 				break;
 			default:
-				snprintf(stok,MAXLLEN,"%d:%d %s %s",tok->tline,tok->tnum,TNAME,(char *)tok->tname);
+				snprintf(stok,sizeof(stok),"%d:%d %s %s",tok->tline,tok->tnum,TNAME,(char *)tok->tname);
 		};
 	} else {
 		// MESG("token name is null! line %d type %d",last_correct_line,tok->ttype);
-		snprintf(stok,MAXLLEN,"type %d tname is null!",tok->ttype);
+		snprintf(stok,sizeof(stok),"type %d tname is null!",tok->ttype);
 		};
 	} else {
-			snprintf(stok,MAXLLEN,"%2d:%3d %s [%f]",tok->tline,tok->tnum,TNAME,tok->dval);
+			snprintf(stok,sizeof(stok),"%2d:%3d %s [%f]",tok->tline,tok->tnum,TNAME,tok->dval);
 	};
 	return stok;
 }

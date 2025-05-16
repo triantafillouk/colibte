@@ -106,10 +106,10 @@ int select_bmark(num n)
  char **mark_list;
  int ind;
  int i;
- char value[MAXMLEN];
+ char value[MAXSLEN];
  mark_list=(char **)malloc(sizeof(char *)*(bknum+2));
  for(i=0;i<bknum;i++){
-	snprintf(value,BMARKLEN+8,"%-*s :%5ld",BMARKLEN,get_pfname(bmark[i].dname,bmark[i].fname,BMARKLEN),bmark[i].line);
+	snprintf(value,sizeof(value)/*BMARKLEN+8*/,"%-*s :%5ld",BMARKLEN,get_pfname(bmark[i].dname,bmark[i].fname,BMARKLEN),bmark[i].line);
 	mark_list[i]=strdup(value);
  };
  mark_list[i]=0;

@@ -157,7 +157,7 @@ int drv_getc (int quote)
 char *get_font_string()
 {
  static char fstr[128];
- snprintf(fstr,128,"%s %d",current_font_name,font_size);
+ snprintf(fstr,sizeof(fstr),"%s %d",current_font_name,font_size);
  // MESG("get_font_string:[%s]",fstr);
  return fstr;
 }

@@ -227,11 +227,11 @@ int show_key(int key)
 	ptr = function_name(key_function(key,1),&description);
 	d=description;
 	if(ptr[0]!=0) { 
-		if(strcmp("execsub",ptr)==0) snprintf(st,MAXMLEN,"subroutine [%s]",xe_key_name(key));
-		else snprintf(st,MAXMLEN,"%s = %s,",xe_key_name(key),ptr);
+		if(strcmp("execsub",ptr)==0) snprintf(st,sizeof(st),"subroutine [%s]",xe_key_name(key));
+		else snprintf(st,sizeof(st),"%s = %s,",xe_key_name(key),ptr);
 		strlcat(st,d,MAXMLEN);
 	} else {
-		snprintf(st,MAXMLEN,"%s not assigned key=%X!",xe_key_name(key),key);
+		snprintf(st,sizeof(st),"%s not assigned key=%X!",xe_key_name(key),key);
 	};
 	msg_line("%s",st);
 	return FALSE;
@@ -245,7 +245,7 @@ void msg_line(char *fmt, ...)
 	if(macro_exec && !execmd) return;
 
     va_start(args, fmt);
-    vsnprintf(mline,512, fmt, args);
+    vsnprintf(mline,sizeof(mline), fmt, args);
 	
     va_end(args);
 	
@@ -266,7 +266,7 @@ int error_line(char *error_message,...)
  va_list args;
  static char mline[512];
  	va_start(args,error_message);
-	vsnprintf(mline,511,error_message,args);
+	vsnprintf(mline,sizeof(mline),error_message,args);
 	va_end(args);
 	app_error=1;
 	msg_line("%s",mline);
@@ -1033,12 +1033,12 @@ char *set_info_mask(WINDP *wp,num ptr1,num line_num)
 {
  static char info_mask[20];
 	if(wp->w_fp->view_mode == VMLINES) {
-		snprintf(info_mask,11,"%07llu ",line_num+1);
+		snprintf(info_mask,sizeof(info_mask),"%07llu ",line_num+1);
 	} else {
 		if(wp->w_fp->view_mode == VMOFFSET) {
-			snprintf(info_mask,11,"%07llX ",ptr1);
+			snprintf(info_mask,sizeof(info_mask),"%07llX ",ptr1);
 		} else {
-			snprintf(info_mask,11,"==");
+			snprintf(info_mask,sizeof(info_mask),"==");
 		}
 	};
  return info_mask;
@@ -1932,12 +1932,12 @@ int  show_position_info(num short_version)
 			char finfo[MAXFLEN];
 	
 			sstat=dir_getfile(finfo,2);
-			sstat=snprintf(str,MAXSLEN,"%6lld|%s",getcline()+1,finfo);
+			sstat=snprintf(str,sizeof(str),"%6lld|%s",getcline()+1,finfo);
 		} else {
-			sstat=snprintf(str,MAXSLEN,"%6lld",getcline()+1);
+			sstat=snprintf(str,sizeof(str),"%6lld",getcline()+1);
 		};
 	  } else {
-		sstat=snprintf(str,MAXSLEN,"%s",get_notes_status());
+		sstat=snprintf(str,sizeof(str),"%s",get_notes_status());
 	  };
 	} else
 #else
@@ -1948,9 +1948,9 @@ int  show_position_info(num short_version)
 			char finfo[MAXFLEN];
 		
 			sstat=dir_getfile(finfo,2);
-			sstat=snprintf(str,MAXSLEN,"%6lld|%s",getcline()+1,finfo);
+			sstat=snprintf(str,sizeof(str),"%6lld|%s",getcline()+1,finfo);
 		} else {
-			sstat=snprintf(str,MAXSLEN,"%6lld",getcline()+1);
+			sstat=snprintf(str,sizeof(str),"%6lld",getcline()+1);
 		};
 	} else
 #endif 
@@ -1959,8 +1959,8 @@ int  show_position_info(num short_version)
 	// MESG("show_position_info: o=%ld loff=%ld b_flag=%X b_mode=%X b_state=%X",Offset(),loffs,fp->b_flag,fp->b_mode,fp->b_state);
 	if(fp->view_mode & VMHEX) {
 		if(short_version==0) {
-			sstat=snprintf(str,MAXSLEN,"%5lld %5llX (%02lX)",Offset(),Offset(),utf_value());
-		} else sstat=snprintf(str,MAXSLEN,"%5llX",Offset());
+			sstat=snprintf(str,sizeof(str),"%5lld %5llX (%02lX)",Offset(),Offset(),utf_value());
+		} else sstat=snprintf(str,sizeof(str),"%5llX",Offset());
 	} else {
 	  	// MESG("show row/col info");
 #if	1
@@ -1969,16 +1969,16 @@ int  show_position_info(num short_version)
 		col=GetCol()+1;
 #endif
 		if(short_version) {
-			sstat=snprintf(str,MAXSLEN,"%6lld",getcline()+1);
+			sstat=snprintf(str,sizeof(str),"%6lld",getcline()+1);
 		} else {
 			if(Eol()) {
 				if(is_wrap_text(fp)){
-					sstat=snprintf(str,MAXSLEN,"%6lld %7lld ",getcline()+1,loffs);
+					sstat=snprintf(str,sizeof(str),"%6lld %7lld ",getcline()+1,loffs);
 				} else {
 				if(bt_dval("show_coffset")) {
-					sstat=snprintf(str,MAXSLEN,"%6lld %7lld %7lld ",getcline()+1,Offset(),col);
+					sstat=snprintf(str,sizeof(str),"%6lld %7lld %7lld ",getcline()+1,Offset(),col);
 				} else {
-					sstat=snprintf(str,MAXSLEN,"%6lld %7lld %7lld ",getcline()+1,loffs,col);
+					sstat=snprintf(str,sizeof(str),"%6lld %7lld %7lld ",getcline()+1,loffs,col);
 				};
 				}
 				if(FOffset(cwp->w_fp)==FSize(cwp->w_fp)) strlcat(str,"EOF",MAXSLEN);
@@ -1990,7 +1990,7 @@ int  show_position_info(num short_version)
 					else strlcat(str,"    ",MAXSLEN);
 				};
 			} else {
-				sstat=snprintf(str,MAXSLEN,"%6lld ",getcline()+1);
+				sstat=snprintf(str,sizeof(str),"%6lld ",getcline()+1);
 				
 				if(is_wrap_text(fp)){
 					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",loffs);

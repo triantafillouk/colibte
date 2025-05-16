@@ -135,7 +135,7 @@ int confirm(char *title, char *prompt,int always)
 	if(!always && ((int)bt_dval("safe_ops")==0)) {
 		return true;
 	};
-	snprintf(message,256,"%s, %s",title,prompt);
+	snprintf(message,sizeof(message),"%s, %s",title,prompt);
 	start_interactive(message);
 	entry_mode=KCONFIRM;
 	for (;;) {
@@ -256,7 +256,7 @@ function_int key_convert_from_mouse(function_int execf)
 char *drv_info()
 {
   static char info[256];
-  snprintf(info,256,"ncurses colors=%d color pairs=%d basic colors=%d",drv_colors,drv_color_pairs,drv_basic_colors);
+  snprintf(info,sizeof(info),"ncurses colors=%d color pairs=%d basic colors=%d",drv_colors,drv_color_pairs,drv_basic_colors);
   return info;
 }
 
@@ -2170,11 +2170,11 @@ void box_line_print(int line,int start,char *st, int w, int selected,int active_
  // MESG("box_line_print: y=%d h=%d [%s]",y,cbox->y2 - cbox->y -1,st);
 #if	USE_GLIB
  char *normal_st = g_utf8_normalize(st,-1,G_NORMALIZE_ALL_COMPOSE);
- snprintf(string_to_show,256,"%-*s",real_width,normal_st);
+ snprintf(string_to_show,sizeof(string_to_show),"%-*s",real_width,normal_st);
  // MESG("[%s] -> [%s]",st,normal_st);
  g_free(normal_st);
 #else
- snprintf(string_to_show,256,"%-*s",real_width,st);
+ snprintf(string_to_show,sizeof(string_to_show),"%-*s",real_width,st);
 #endif
  utf_string_break(string_to_show,width);
  if(y+1 > (cbox->y2 - cbox->y -1)) return;

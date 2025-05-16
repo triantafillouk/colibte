@@ -2253,9 +2253,9 @@ int copy_region(num n)
  setmark(0); // remove selection
 
  if(MainClipBoard->rect) 
-	snprintf(s,80,"[%lldx%lld bytes copied]",MainClipBoard->width,MainClipBoard->height);
+	snprintf(s,sizeof(s),"[%lldx%lld bytes copied]",MainClipBoard->width,MainClipBoard->height);
  else
-	snprintf(s,80,"[%lld bytes copied]",MainClipBoard->width);
+	snprintf(s,sizeof(s),"[%lld bytes copied]",MainClipBoard->width);
  msg_line(s);
  return TRUE;
 }

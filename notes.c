@@ -116,17 +116,17 @@ int new_note(num type)
 	};
  };
  if(type<2) type=1;
- if(type==1) snprintf(scratch_name,24,"[note %d]",scratch_ind);
+ if(type==1) snprintf(scratch_name,sizeof(scratch_name),"[note %d]",scratch_ind);
  if(type==2) { 
 #if	MD_NOTES
-	res=snprintf(scratch_name,24,"%s_cal.md",date_string(3));
+	res=snprintf(scratch_name,sizeof(scratch_name),"%s_cal.md",date_string(3));
 #else
-	res=snprintf(scratch_name,24,"%s.cal",date_string(3));
+	res=snprintf(scratch_name,sizeof(scratch_name),"%s.cal",date_string(3));
 #endif
 	if(res==25) { error_line("cal name truncated");return false;};
  };
  if(type==3) { 
-	res=snprintf(scratch_name,24,"%s",date_string(3));
+	res=snprintf(scratch_name,sizeof(scratch_name),"%s",date_string(3));
 	if(res==25) { error_line("todo name truncated");return false;};
  };
 
@@ -612,7 +612,7 @@ int save_to_db(notes_struct *note)
  int note_id=0;
  // MESG("save_to_db:0 title [%s] cat=[%s] name=[%s]",note->n_title,note->n_cat,note->n_name);
  // check if found
- if(snprintf(sql,MAXLLEN,"SELECT Category,rowid from notes where Name = '%s';",note->n_name)>=MAXLLEN) {
+ if(snprintf(sql,sizeof(sql),"SELECT Category,rowid from notes where Name = '%s';",note->n_name)>=sizeof(sql)) {
  	ERROR("%s","Notes name too long!");
 	// notes_db_close(db);
 	return false ;
@@ -654,7 +654,7 @@ int save_to_db(notes_struct *note)
 	};
 	// update the title and date if[MCP7 changed!
 	char *note_title = sql_sanitize(note->n_title);
-	if(snprintf(sql,MAXLLEN,"UPDATE notes set Title = \"%s\" where rowid = %d",note_title,note_id)>=MAXLLEN) {
+	if(snprintf(sql,sizeof(sql),"UPDATE notes set Title = \"%s\" where rowid = %d",note_title,note_id)>=sizeof(sql)) {
 		MESG("Title truncated!");
 	} ;
 	// MESG("update title sql=[%s]",sql);
@@ -662,7 +662,7 @@ int save_to_db(notes_struct *note)
 		error_line("Cannot update title");
 	};
 	if(strlen(note->n_date)>0)
-	if(snprintf(sql,MAXLLEN,"UPDATE notes set Date = \"%s\" where rowid = %d",note->n_date,note_id)>=MAXLLEN) {
+	if(snprintf(sql,sizeof(sql),"UPDATE notes set Date = \"%s\" where rowid = %d",note->n_date,note_id)>=sizeof(sql)) {
 		MESG("Title truncated!");
 	} ;
 	// MESG("update: %s",sql);
@@ -717,7 +717,7 @@ int save_tag(sqlite3 *db,int notes_id,char *tag)
 	int tag_id;
 	char sql[MAXMLEN];
 	// MESG("save_tag: %s",tag);
-	if(snprintf(sql,MAXMLEN,"INSERT INTO TAG(NAME) VALUES('%s');",tag)>=MAXMLEN) {
+	if(snprintf(sql,sizeof(sql),"INSERT INTO TAG(NAME) VALUES('%s');",tag)>=sizeof(sql)) {
 		ERROR("tag truncated!");
 		return false;
 	};
@@ -727,7 +727,7 @@ int save_tag(sqlite3 *db,int notes_id,char *tag)
 	} else {
 		tag_id=0;
 		// get tag id!
-		if(snprintf(sql,120,"SELECT rowid from tag where name = '%s';",tag)>=120) MESG("truncated tag!"); 
+		if(snprintf(sql,sizeof(sql),"SELECT rowid from tag where name = '%s';",tag)>=sizeof(sql)) MESG("truncated tag!"); 
 		tag_id = query_rowid(db,sql);
 		//	MESG("tag id is %d",tag_id);
 	};
@@ -1315,7 +1315,7 @@ char *sql_note_str(char *query_string)
 		strlcat(sql_str,s_num,MAXLLEN);
 	};
 	strlcat(sql_str,") then 1 end) = ",MAXLLEN);
-	snprintf(s_num,16,"%d",num_of_selected_tags);
+	snprintf(s_num,sizeof(s_num),"%d",num_of_selected_tags);
 	strlcat(sql_str,s_num,MAXLLEN);
 	strlcat(sql_str,")",MAXLLEN);
 	};
@@ -1372,7 +1372,7 @@ int show_category_list(char *category)
 	if(tag_id<1) {notes_db_close(db);return 0;};
 	sprintf(sql,"SELECT rowid,DATE,TITLE FROM NOTES where rowid in (select note_id from tags where tag_id = %d) order by DATE ASC;",tag_id);
 	if(strlen(category)>55) category[55]=0;
-	snprintf(buffer_name,64,"[%s view]",category);
+	snprintf(buffer_name,sizeof(buffer_name),"[%s view]",category);
 	cat_view = cls_fout(buffer_name);
 
 	if(cbfp->b_flag & FSNOTES) {
@@ -1764,7 +1764,7 @@ time_t get_note_timestamp(char *note_name)
  long int tstamp=0;
  if((db=notes_db_open("get_note_timestamp"))==NULL) return 0;
 
- if(snprintf(sql,MAXLLEN,"SELECT rowid,timestamp from notes where Name = '%s';",note_name)<MAXLLEN) {
+ if(snprintf(sql,sizeof(sql),"SELECT rowid,timestamp from notes where Name = '%s';",note_name)<sizeof(sql)) {
 	tstamp = query_int(db,sql);
  };
  notes_db_close(db);
@@ -1787,7 +1787,7 @@ char *get_current_note_name()
  sprintf(full_name,"SELECT category,rowid from notes where rowid = %d",note_id);
  // MESG("	category,rowid = [%s]",full_name);
  // MESG("	NOTES_DIR=[%s]",NOTES_DIR);
- if(snprintf(notes_name,1024,"%s/%s/",NOTES_DIR,query_string(db,full_name,&note_id))>=1024) {
+ if(snprintf(notes_name,sizeof(notes_name),"%s/%s/",NOTES_DIR,query_string(db,full_name,&note_id))>=sizeof(notes_name)) {
  	error_line("notes file name too long, truncated!"); ; 
  };
  // MESG("	notes_name = [%s]",notes_name);

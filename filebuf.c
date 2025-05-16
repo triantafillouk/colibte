@@ -96,7 +96,7 @@ void MESG_time(const char *fmt, ...)
  if(!(strcmp(cbfp->b_fname,"[out]"))) return;
     if (fmt != NULL) {
 		va_start(args,fmt);
-		vsnprintf(mline,511,fmt,args);
+		vsnprintf(mline,sizeof(mline)-1,fmt,args);
 		va_end(args);
 
 		show_time(mline,1);
@@ -112,7 +112,7 @@ void MESG_time_start(const char *fmt, ...)
  if(!(strcmp(cbfp->b_fname,"[out]"))) return;
     if (fmt != NULL) {
 		va_start(args,fmt);
-		vsnprintf(mline,511,fmt,args);
+		vsnprintf(mline,sizeof(mline)-1,fmt,args);
 		va_end(args);
 
 		show_time(mline,0);
@@ -1733,7 +1733,7 @@ int    LockFile(int fd,bool drop)
 		 };
          fstat(fd,&st);
 
-         snprintf(msg,100,"by prosess %ld",(long)Lock1.l_pid);
+         snprintf(msg,sizeof(msg),"by prosess %ld",(long)Lock1.l_pid);
 
 		if(confirm("File locked",msg,1)) return(0);
 		else return -2;

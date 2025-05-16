@@ -132,10 +132,10 @@ int view_functions(num nused)
 	msg_line("view_functions");
 	events_flush();
 	// create the tag file
-	status=snprintf(tag_file,MAXFLEN,"%s.tag",cbfp->b_fname);
+	status=snprintf(tag_file,sizeof(tag_file),"%s.tag",cbfp->b_fname);
 	if(status>=256) { msg_line("string overflow 1 in view_functions");events_flush();return false;};
 
-	status=snprintf(tag_cmd,MAXFLEN,"ctags -x --c-kinds=%s %s 2>err1 | awk '{printf \"%%4s %%s %%s %%s %%s %%s %%s\\n\", $3,$6,$7,$8,$9,$10,$11}' > %s 2>/dev/null",kind,cbfp->b_fname,tag_file);
+	status=snprintf(tag_cmd,sizeof(tag_cmd),"ctags -x --c-kinds=%s %s 2>err1 | awk '{printf \"%%4s %%s %%s %%s %%s %%s %%s\\n\", $3,$6,$7,$8,$9,$10,$11}' > %s 2>/dev/null",kind,cbfp->b_fname,tag_file);
 	if(status>255) { msg_line("string overflow 2 in view_functions");events_flush();return false;};
 
 	status=system(tag_cmd);
@@ -398,7 +398,7 @@ int bg_cmd(num n)
 	if(cbfp->b_flag & FSDIRED) {
 		s = dir_getfile(fname,1);
 	} else {
-		stat=snprintf(fname,MAXFLEN,"%s/%s",cbfp->b_dname,cbfp->b_fname);
+		stat=snprintf(fname,sizeof(fname),"%s/%s",cbfp->b_dname,cbfp->b_fname);
 		if(stat>=MAXFLEN) fname[stat]=0;
 	};
 
@@ -500,12 +500,12 @@ int grep_cmd(num n)
 	if(n>1) {
 #if	TNOTES
 		if(n==3) 
-			status=snprintf(line,MAXLLEN,"grep %s \"%s\" * 2>/dev/null |grep -v Binary > %s 2> /dev/null",flag_str,tline,filnam);
+			status=snprintf(line,sizeof(line),"grep %s \"%s\" * 2>/dev/null |grep -v Binary > %s 2> /dev/null",flag_str,tline,filnam);
 		else
 #endif
-			status=snprintf(line,MAXLLEN,"grep %s \"%s\" * 2>/dev/null |grep -v Binary > %s 2> /dev/null",flag_str,tline,filnam);
+			status=snprintf(line,sizeof(line),"grep %s \"%s\" * 2>/dev/null |grep -v Binary > %s 2> /dev/null",flag_str,tline,filnam);
 	} else {
-		status=snprintf(line,MAXLLEN,"grep %s \"%s\" * 2>/dev/null |grep -v Binary > %s 2> /dev/null",flag_str,tline,filnam);
+		status=snprintf(line,sizeof(line),"grep %s \"%s\" * 2>/dev/null |grep -v Binary > %s 2> /dev/null",flag_str,tline,filnam);
 	}
 //	MESG("grep: [%s]",line);
 	if(status>MAXFLEN) return FALSE;
@@ -658,7 +658,7 @@ int check_native_copy()
  static char exec_st[MAXFLEN];
  MESG("check_native_copy:");
 	ext_clipboard_command=0;
-	status=snprintf(exec_st,MAXFLEN,"%s > /dev/null 2> /dev/null",native_paste);
+	status=snprintf(exec_st,sizeof(exec_st),"%s > /dev/null 2> /dev/null",native_paste);
 	if(status>=MAXFLEN) return 0;
 	status = system(exec_st);
 	MESG("check_native_copy:[%s] -> %d",exec_st,status);
@@ -692,8 +692,8 @@ int init_system_clipboard()
 	};
 // we suppose that we have xclip for start
 // pass clipboard through xclip
-//	status=snprintf(exec_st,MAXFLEN,"xclip -i > /dev/null 2> /dev/null <xclip -o 2>/dev/null");
-	status=snprintf(exec_st,MAXFLEN,"echo \"\" | xclip -i > /dev/null 2> /dev/null");
+//	status=snprintf(exec_st,sizeof(exec_st),"xclip -i > /dev/null 2> /dev/null <xclip -o 2>/dev/null");
+	status=snprintf(exec_st,sizeof(exec_st),"echo \"\" | xclip -i > /dev/null 2> /dev/null");
 	if(status>=MAXFLEN) return 0;
 	status = system(exec_st);
 	// MESG("exec [%s] status=%d",exec_st,status);
@@ -723,7 +723,7 @@ char *ext_system_paste_line()
 
 	status = set_unique_tmp_file(filnam,"paste",MAXFLEN);
 	if(status>=MAXFLEN) return line;
-	status=snprintf(exec_st,MAXFLEN,"%s > %s 2> /dev/null",clip_copy,filnam);
+	status=snprintf(exec_st,sizeof(exec_st),"%s > %s 2> /dev/null",clip_copy,filnam);
 	if(status>=MAXFLEN) return line;
 
 	status = system(exec_st);
@@ -926,7 +926,7 @@ int ext_system_paste()
 #if	GTK
 	status = x_insert_to_file(filnam);
 #else
-	status=snprintf(exec_st,MAXFLEN,"%s > %s 2> /dev/null",clip_copy,filnam);
+	status=snprintf(exec_st,sizeof(exec_st),"%s > %s 2> /dev/null",clip_copy,filnam);
 	if(status>=MAXFLEN) return 0;
 
 	status = system(exec_st);
@@ -967,7 +967,7 @@ FILE *clip_file;
 		if(MainClipBoard->height>1) fwrite(MainClipBoard->text,MainClipBoard->rect-1,1,clip_file);
 		else fwrite(MainClipBoard->text,MainClipBoard->width,MainClipBoard->height,clip_file);
 		fclose(clip_file);
-		status=snprintf(exec_st,MAXFLEN,"(cat %s |%s)  2> /dev/null",filnam,clip_paste);
+		status=snprintf(exec_st,sizeof(exec_st),"(cat %s |%s)  2> /dev/null",filnam,clip_paste);
 		if(status>=MAXFLEN) return 0;
 
 		status = system(exec_st);

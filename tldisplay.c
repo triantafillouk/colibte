@@ -1368,7 +1368,7 @@ int  show_position_size(WINDP *wp,int short_version)
 	  if(wp->w_fp->b_flag & (FSDIRED|FSNLIST)) {
 	  	if(!short_version) {
 			// sstat=dir_getfile(finfo,2);
-			// sstat=snprintf(str,MAXSLEN,"%4lld|%s",getcline()+1,finfo);
+			// sstat=snprintf(str,sizeof(str),"%4lld|%s",getcline()+1,finfo);
 			size=24;
 		} else {
 			// sstat=snprintf(str,MAXSLEN,"%4lld",getcline()+1);
@@ -1458,7 +1458,7 @@ void status_line(WINDP *wp)
 //	in debug mode print window number at bottom left
 	if(debug_flag()){
 		char snum[10];
-		snprintf(snum,10,"%d",wp->id);
+		snprintf(snum,sizeof(snum),"%d",wp->id);
 		*stp++ = snum[0];
 		if(snum[1]!=0) *stp++ = snum[1];
 	};

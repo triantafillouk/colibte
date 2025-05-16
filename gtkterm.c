@@ -358,7 +358,7 @@ void titletext ()
 {
     char buf[MAXFLEN];
 	if(parent == NULL) return ;
-	snprintf(buf,MAXFLEN,"%s",cbfp->b_fname);
+	snprintf(buf,sizeof(buf),"%s",cbfp->b_fname);
 	gtk_window_set_title(GTK_WINDOW(parent), buf);
 }
 
@@ -1370,7 +1370,7 @@ void color_button_select_fg(GtkWidget *wd, gpointer data)
 {
   color_element *ce = (color_element *)data;
   char label[MAXSLEN];
-  snprintf(label,MAXSLEN,"%s foreground",ce->label);
+  snprintf(label,sizeof(label),"%s foreground",ce->label);
   current_color_element=ce;
   foreground_changed=1;
   color_selection(label,ce->fg);
@@ -1380,7 +1380,7 @@ void color_button_select_bg(GtkWidget *wd, gpointer data)
 {
   color_element *ce = (color_element *)data;
   char label[MAXSLEN];
-  snprintf(label,MAXSLEN,"%s background",ce->label);
+  snprintf(label,sizeof(label),"%s background",ce->label);
   current_color_element=ce;
   foreground_changed=0;
   color_selection(label,ce->bg);
@@ -1581,7 +1581,7 @@ int set_color(num n)
 	return(1);
  }; 
 
- snprintf(wtitle,256,"set color %lld",n);
+ snprintf(wtitle,sizeof(wtitle),"set color %lld",n);
  changed_color=n;
 
  colors_win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
