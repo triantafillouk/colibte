@@ -256,7 +256,7 @@ ge_edit_display_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
 #else
 		current_font_name="Courier";
 #endif	
-		font_size=12;
+		font_size=18;
 		first_time=0;
 		test_pixmap = gdk_pixmap_new(wd->edit_window, 10,10, -1);
 		cr = gdk_cairo_create(test_pixmap);

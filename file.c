@@ -1154,7 +1154,6 @@ int insert_file(num  n)
 
 int is_system_file(char *fname)
 {
-	// TODO return if block file !!!!!
 	int status;
 	struct stat bp_stat;
 	status=stat(fname,&bp_stat);

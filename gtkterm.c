@@ -601,8 +601,10 @@ int put_wtext1(WINDP *wp, int row,int col, int pos_x)
 	 	// PangoLayout *layout;
 		int width=0,height=0;
 		if(wd->layout == NULL) wd->layout = pango_cairo_create_layout (GTK_EDIT_DISPLAY(wp->gwp->draw)->cr);
+		// MESG("pw1: [%s]",vstr);
 		pango_layout_set_text (wd->layout, vstr, -1);
 		// MESG("row=%2d col=%3d [%s][%2X %2X %2X %2X]",row,col,vstr,vstr[0],vstr[1],vstr[2],vstr[3]);
+		 // MESG("!");
 		pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
 		// pango_font_description_free (desc);
 		pango_cairo_show_layout (wd->cr, wd->layout);
@@ -1681,6 +1683,7 @@ int get_pango_length(char *st)
  // MESG("get_pango_length:3");
 
 	pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
+	// MESG("gpl: [%s]",st);
 	pango_layout_set_text (wd->layout, st, -1);
 	pango_layout_get_size (wd->layout, &width, &height);
 	// if(st[0]>0x80)

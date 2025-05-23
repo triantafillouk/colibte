@@ -186,10 +186,9 @@ int put_wstring(WINDP *wp, char *st,int ulen,int attr)
 		pango_attr_list_insert (attrs, pango_attr_underline_new(PANGO_UNDERLINE_NONE));
 		pango_layout_set_attributes (wd->layout, attrs);
  	};
- 
+ // MESG("ps: [%s]",st);
  pango_layout_set_text (wd->layout, st, -1);
  pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
-
  pango_layout_get_size (wd->layout, &width, &height);
  int y_pos_correction=0;
  int c_width=CLEN*ulen;
@@ -209,6 +208,7 @@ int put_wstring(WINDP *wp, char *st,int ulen,int attr)
  pango_cairo_show_layout (wd->cr, wd->layout);
  pango_attr_list_unref (attrs);
  px += ulen*CLEN;
+ // MESG("!");
  return width/PANGO_SCALE;
 }
 
@@ -221,8 +221,10 @@ unsigned int put_wchar(WINDP *wp, char *st)
  	wd->layout = pango_cairo_create_layout (wd->cr);
 	// MESG("put_wchar: new layout!");
  };
+ // MESG("pswc: [%s] %d",st,strlen(st));
  pango_layout_set_text (wd->layout, st, -1);
  pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
+
  // pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_BOLD);
  pango_layout_get_size (wd->layout, &width, &height);
  int y_pos_correction=0;
@@ -236,6 +238,7 @@ unsigned int put_wchar(WINDP *wp, char *st)
  cairo_set_source_rgb(wd->cr,ccolorf.red,ccolorf.green,ccolorf.blue);
  pango_cairo_show_layout (wd->cr, wd->layout);
 
+ // MESG("!");
  px += width/PANGO_SCALE;
  return width/PANGO_SCALE;
 }
@@ -636,10 +639,11 @@ void put_wtext_slow(WINDP *wp, int row,int maxcol)
 		drv_color(fcolor,bcolor); 
 		i1=addutfvchar1(st,&v1[col],i1,wp->w_fp);
 		st[i1]=0;i1=0;
+		// MESG("%d [%s] ",col,st);
 		drv_move(row,col);
 		put_wchar(wp,st);
 	}
-//	MESG("-- end row %d i1=%d [%s]",row,i1,st);
+	// MESG("-- end slow row %d i1=%d [%s]",row,i1,st);
 	expose_line(row,wp);	/* is needed for GTK2!  */
 }
 

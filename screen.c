@@ -507,7 +507,7 @@ void draw_window(int flag, WINDP *wp,char *from)
 	set_window_font(wp);
 
 	// MESG("draw window lines");
-#if	GTK3
+#if	GTK
 	for (i = 0; i < wp->w_ntrows-2+half_last_line; i++) 
 #else
 	for (i = 0; i < wp->w_ntrows-1+half_last_line; i++) 
@@ -528,7 +528,7 @@ void draw_window(int flag, WINDP *wp,char *from)
 			// ulines++;
 		}
 	};
-	// MESG("# -- draw_window:[%s] %d drawned lines %d flag=%X wflag=%X ind=%d",from,wp->id,ulines,flag,wp->w_flag,ind++);
+	// MESG("# -- draw_window:[%s] %d drawned flag=%X wflag=%X",from,wp->id,flag,wp->w_flag);
 	wp->draw_flag=0;
 	expose_window(wp); /* (use this once unstead to expose every line sepatately, is it faster??) */
 	if(flag /* && (wp->w_flag != UPD_STATUS) */) 
