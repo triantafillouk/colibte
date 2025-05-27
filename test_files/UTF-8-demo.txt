@@ -57,7 +57,7 @@ Markus Kuhn [ˈmaʳkʊs kuːn] <http://www.cl.cam.ac.uk/~mgk25/> — 2002-07-25
 ✔   
 
 ❌ ️
-✅❌❎➿		〽	
+✅❌❎➿	〽	
 red:	 	🔴
 green:		🟢
 blue:		🔵

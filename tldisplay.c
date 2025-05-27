@@ -1686,7 +1686,7 @@ int get_utf_length(utfchar *utf_char_str)
 		if(b2==0x80) return 1; 	/* 1/4 en  */
 		if(b2==0x8B) return 0;	/* zero space  */
 		if(b2==0x8C) return 0;	/* zero space  */
-		if(b2==0x8D) return 1;	/* zero space  */
+		if(b2==0x8D) return 2;	/* zero space  */
 		if(b2==0xA6) return 1;
 		return 1;
 #endif
@@ -1704,8 +1704,9 @@ int get_utf_length(utfchar *utf_char_str)
 #else
 	if(b1==0x9c) {
 		int b2=utf_char_str->uval[2];
-		if(b2==0x93||b2==0x94) return 1;
+		if(b2==0x93||0x96) return 1;
 	};
+	if(b1==0x9E) return 2;
 #endif
 	if(b1==0x99) {
 		int b2=utf_char_str->uval[2];

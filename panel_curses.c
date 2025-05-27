@@ -2081,20 +2081,21 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 #else
 		memcpy(vstr,v1->uval,6);
 #endif
-#if	DARWIN
-		// if(vstr[0]>0x20) {MESG("  %2d %2d [%s] [%X %X %X]",row,i,vstr,vstr[0],vstr[1],vstr[2]);};
-		if(vstr[0]==0x20) {vstr[0]=0xC2;vstr[1]=0x80;};
+#if	1
+		// if(vstr[0]==0x20) {vstr[0]=0xC2;vstr[1]=0x80;};
 #endif
-		if	(vstr[0]==0xF0 && vstr[1]==0x9F && vstr[2]!=0x8F && vstr[2]!=0x91 && vstr[2]!=0x92 && vstr[2]!=0x94 && vstr[2]!=0x96 && vstr[2]!=0x98 && vstr[2]!=0xA4 && vstr[2]!=0xA7 ) { 
+#if	1
+		if	(vstr[0]==0xF0 && vstr[1]==0x9F && vstr[2]!=0x8F && vstr[2]!=0x91 && vstr[2]!=0x92 && vstr[2]!=0x94 && vstr[2]!=0x96 && vstr[2]!=0x98 && vstr[2]!=0xA4 && vstr[2]!=0xA6 && vstr[2]!=0xA7 && vstr[2]!=0x9F && vstr[2]!=0xA0) { 
 			wprintw(wp->gwp->draw,"%c",'?');
 			// ccor++;
 		}
+#endif
 		// else if	(vstr[0]==0xF0 && vstr[1]==0x9F && vstr[2]!=0x94) wprintw(wp->gwp->draw,"%c",'?');
 		else if	(vstr[0]==0xF0 && vstr[1]==0x9D) { wprintw(wp->gwp->draw,"%s",unknown1);}
 		else if	(vstr[0]==0xF0 && vstr[1]==0x90 && vstr[2]==0x90) wprintw(wp->gwp->draw,"%c",'#');
 		else if	(vstr[0]==0xF0 && vstr[2]==0x84) wprintw(wp->gwp->draw,"%c",'~');
 		else if	(vstr[0]==0xF3 && vstr[1]==0xA0) wprintw(wp->gwp->draw,"%s",unknown1);
-#if	DARWIN
+#if	DARWIN0
 		else if (vstr[0]==0xE2) { 
 			if ((vstr[1]==0x9D||vstr[1]==0x9C)) wprintw(wp->gwp->draw,"%s","🠓");
 			else 
