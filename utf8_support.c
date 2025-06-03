@@ -216,6 +216,7 @@ int s_is_utf_accent(char *utfstr, int o)
  if(ch==0) return 0;
  ch1=utfstr[o+1];
  if(ch==0) return 0;
+ if(ch==0xEF && ch1==0xB8) return 3;
  // MESG("check accent at %d size=%d ch=%X ch1=%X",o,size,ch,ch1);
  if(((ch==0xCC || ch==0xCD) && (ch1<0xB0 && ch1>0x7F))
 // 	|| (ch==0xCD && (ch1<0xB0))

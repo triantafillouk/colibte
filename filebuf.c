@@ -414,6 +414,7 @@ int is_utf_accent(FILEBUF *fp, offs o)
  int ch,ch1;
  ch=FCharAt(fp,o);
  ch1=FCharAt(fp,o+1);
+ if(ch==0xEF && ch1==0xB8) return 3;
  if(((ch==0xCC || ch==0xCD) && (ch1<0xB0 && ch1>0x7F))
 // 	|| (ch==0xCD && (ch1<0xB0))
  ){	// check for double accent
@@ -490,6 +491,7 @@ int FUtfCharLen(FILEBUF *fp,offs o)
 			if(ch1<128 || ch1>0xBF) { clen_error=4;return 1;};	/* not a middle utf char  */
 			ch1=FCharAt(fp,o+2);
 			if(ch1<128 || ch1>0xBF) { clen_error=5;return 1;};	/* not a middle utf char  */
+			// if(ch==0xEF && ch1==0xB8) fp->utf_accent=1;
 			clen=3;
 		} else if(ch<0xF8) {
 			char ch2,ch3;
@@ -506,11 +508,13 @@ int FUtfCharLen(FILEBUF *fp,offs o)
 			return 1;
 		};
 //#if	DARWIN || PCURSES
-		if(clen<3 && !fp->utf_accent /* && drv_type<2 */) {	/* check next char for accent!  */
-		if(!FEofAt(fp,o+clen+1)){
-			clen += is_utf_accent(fp,o+clen);
-			// if(clen>2) MESG("total size=%d at %ld",clen,o);
-		}};
+		if(clen<4 && !fp->utf_accent /* && drv_type<2 */) 
+		{	/* check next char for accent!  */
+			if(!FEofAt(fp,o+clen+1)){
+				clen += is_utf_accent(fp,o+clen);
+				// if(clen>2) MESG("total size=%d at %ld",clen,o);
+			}
+		};
 //#endif
 	};
 	return clen;

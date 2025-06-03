@@ -1679,7 +1679,7 @@ int get_utf_length(utfchar *utf_char_str)
  if(b0==0xE2) {
 	int b1=utf_char_str->uval[1];
 	if(b1 == 0x80) {
-#if	DARWIN
+#if	DARWIN0
 		return 1;
 #else
 		int b2=utf_char_str->uval[2];
@@ -1699,14 +1699,19 @@ int get_utf_length(utfchar *utf_char_str)
 	};
 	if(b1 == 0x84) return 1;
 	if(b1 == 0x92) return 1;
-#if	DARWIN
+#if	DARWIN0
 	if(b1==0x9C||b1==0x9D||b1==0x9E) return 1;
 #else
 	if(b1==0x9c) {
 		int b2=utf_char_str->uval[2];
-		if(b2==0x93||0x96) return 1;
+		if(b2==0x93||b2==0x96) return 1;
+		return 2;
 	};
-	if(b1==0x9E) return 2;
+	if(b1==0x9E) {
+		int b2=utf_char_str->uval[2];
+		if(b2==0xA1) return 1;
+		return 2;
+	};
 #endif
 	if(b1==0x99) {
 		int b2=utf_char_str->uval[2];
@@ -1724,6 +1729,7 @@ int get_utf_length(utfchar *utf_char_str)
 	};
  	return 2;
  };
+ if(b0==0xE3) return 2;
 #if	1
  if(b0==0xEA) {
  	int b1=utf_char_str->uval[1];
@@ -1795,6 +1801,7 @@ int get_utf_length(utfchar *utf_char_str)
  if(b0>0xEA && b0<0xED) return 2;	/* Korean  */
  if(b0==0xEF) {
 	int b1=utf_char_str->uval[1];
+	if(b1==0xB8) return 2;
 	if(b1==0xBC) {
 		int b2=utf_char_str->uval[2];
 		// if(b2==0x84) return 1;
