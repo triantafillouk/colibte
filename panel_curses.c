@@ -2091,7 +2091,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 		}
 #endif
 		// else if	(vstr[0]==0xF0 && vstr[1]==0x9F && vstr[2]!=0x94) wprintw(wp->gwp->draw,"%c",'?');
-		else if	(vstr[0]==0xF0 && vstr[1]==0x9D) { wprintw(wp->gwp->draw,"%s",unknown1);}
+		// else if	(vstr[0]==0xF0 && vstr[1]==0x9D) { wprintw(wp->gwp->draw,"%s",unknown1);}
 		else if	(vstr[0]==0xF0 && vstr[1]==0x90 && vstr[2]==0x90) wprintw(wp->gwp->draw,"%c",'#');
 		else if	(vstr[0]==0xF0 && vstr[2]==0x84) wprintw(wp->gwp->draw,"%c",'~');
 		else if	(vstr[0]==0xF3 && vstr[1]==0xA0) wprintw(wp->gwp->draw,"%s",unknown1);
