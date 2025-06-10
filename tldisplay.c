@@ -12,6 +12,7 @@
 #include	"support.h"
 #include	"menus.h"
 #include	"panel_curses.h"
+#include	<wchar.h>
 
 char **getdir(char *dirname,char *s_find,int *num);
 int utf_num_chars(char *);
@@ -1651,9 +1652,11 @@ void list_dir1(char *st)
  list_off();
 }
 
+#if	1
 // approximately find length of a character. this is almost black magic..
-// Different for each platform, screen driver
-int get_utf_length(utfchar *utf_char_str)
+// Different for each platform, screen driver, 
+// does not agree totally with wcwidth function
+int get_utf_custom_length(utfchar *utf_char_str)
 {
  int b0;
 
@@ -1670,26 +1673,45 @@ int get_utf_length(utfchar *utf_char_str)
  // accents do take space in WSL exept when converted to composed.
  if((b0==0xCC || b0==0xCD) && utf_char_str->uval[1]< 0xB0) return 1;
 #endif
+ if(b0==0xD6) {
+ 	int b1=utf_char_str->uval[1];
+	if(b1==0xB7 || b1==0xB8) return 0;		/* hebrew nonspace  */
+ };
  if(b0==0xE0) {
 	int b1=utf_char_str->uval[1];
-	if(b1==0xA5) return 0;
+	if(b1==0xA5) {
+		int b2=utf_char_str->uval[2];
+		if(b2==0xA4) return 1;
+		return 0;
+	};
+	if(b1==0xB3) return 0;
+	if(b1==0xB8) {
+		int b2=utf_char_str->uval[2];
+		if(b2==0xb2) return 1;
+		if(b2==0xb3) return 2;
+		if(b2>0xB0 && b2<0xBA) return 0;
+	};
+	if(b1==0xB9) {
+		int b2=utf_char_str->uval[2];
+		if(b2>0x86 && b2<0x8D) return 0;
+	};
+	// if(b1==0xB8 || b1==0xB9) return 0;	/* hindi accents  */
 	return 1; 
  };
  if(b0<0xE1) return 1;
  if(b0==0xE2) {
 	int b1=utf_char_str->uval[1];
 	if(b1 == 0x80) {
-#if	DARWIN0
-		return 1;
-#else
 		int b2=utf_char_str->uval[2];
 		if(b2==0x80) return 1; 	/* 1/4 en  */
 		if(b2==0x8B) return 0;	/* zero space  */
 		if(b2==0x8C) return 0;	/* zero space  */
-		if(b2==0x8D) return 2;	/* zero space  */
+		if(b2==0x8D) {
+			return 0;	/* zero space  */
+		};
+		if(b2==0x8E) return 0;
 		if(b2==0xA6) return 1;
 		return 1;
-#endif
 	};
 	if(b1==0x81 || b1==0x82) return 1; 	/* diacriticals, subscripts, currency symbols  */
 	if(b1 == 0x83) {
@@ -1777,8 +1799,8 @@ int get_utf_length(utfchar *utf_char_str)
 	if(b1==0x99) {
 		int b2=utf_char_str->uval[2];
 		if(b2==0x8C) return 2;
-		if(b2==0x90) return 2;
 		if(b2==0x8D) return 2;
+		if(b2==0x90) return 2;
 		if(b2==0x91) return 2;
 		if(b2==0x92) return 2;
 		if(b2==0x94) return 2;
@@ -1799,9 +1821,12 @@ int get_utf_length(utfchar *utf_char_str)
 #endif
 
  if(b0>0xEA && b0<0xED) return 2;	/* Korean  */
+ if(b0==0xEE) {
+ 	return 1;
+ };
  if(b0==0xEF) {
 	int b1=utf_char_str->uval[1];
-	if(b1==0xB8) return 2;
+	if(b1==0xB8) return 0;
 	if(b1==0xBC) {
 		int b2=utf_char_str->uval[2];
 		// if(b2==0x84) return 1;
@@ -1819,6 +1844,7 @@ int get_utf_length(utfchar *utf_char_str)
 	int b1=utf_char_str->uval[1];
 	if(b1==0x90) {
 		int b2=utf_char_str->uval[2];
+		if(b2==0x80) return 1;
 		if(b2==0x90) return 1;
 		if(b2==0x91) return 1;
 		return 2;
@@ -1835,8 +1861,8 @@ int get_utf_length(utfchar *utf_char_str)
 	};
 	if(b1==0x9F) {
 		int b2=utf_char_str->uval[2];
-#if	DARWIN
 		if (b2==0x84) return 1;
+#if	DARWIN
 		if (b2==0xA6) return 1;	/* not shown in Dawrin  */
 #else
 		if (b2==0x84) return 3;
@@ -1866,6 +1892,30 @@ int get_utf_length(utfchar *utf_char_str)
  return 2;
 }
 
+#define __USE_XOPEN
+#include <wchar.h>
+
+wchar_t utf8_to_wchar(unsigned char* const utf8_str, int *size) ;
+
+int get_utf_length(utfchar *utf_char_str)
+{
+ int clen=0;
+ int code_unit = utf8_to_wchar((unsigned char *)utf_char_str,&clen);
+ if(code_unit<=0x80) return 1;
+ int clen_width = wcwidth(code_unit,&clen);
+ int custom_clen_width = get_utf_custom_length(utf_char_str);
+ if(code_unit>=0xE0041 && code_unit<0xE007B) return custom_clen_width;
+ if(code_unit==0xE33) return custom_clen_width;
+#if	0
+ if(custom_clen_width != clen_width) {
+ 	MESG("U+%5X -> [%s] len=%d custom_len=%d",code_unit,utf_char_str,clen_width,custom_clen_width);
+ };
+#endif
+ return clen_width;
+}
+
+#endif
+
 void set_window_font(WINDP *WP)
 {
 }
@@ -1875,5 +1925,35 @@ void drv_start_window_update(WINDP *wp)
 }
 
 #include "menu_common.c"
+
+int utf8_to_unicode(char *s)
+{
+    int charcode = 0;
+	int ind=0;
+    int t = s[ind++];
+    // coded.pop_front();
+    if (t < 128)
+    {
+        return t;
+    }
+    int high_bit_mask = (1 << 6) -1;
+    int high_bit_shift = 0;
+    int total_bits = 0;
+    const int other_bits = 6;
+    while((t & 0xC0) == 0xC0)
+    {
+        t <<= 1;
+        t &= 0xff;
+        total_bits += 6;
+        high_bit_mask >>= 1; 
+        high_bit_shift++;
+        charcode <<= other_bits;
+        charcode |= s[ind] & ((1 << other_bits)-1);
+        t = s[ind++];;
+    } 
+    charcode |= ((t >> high_bit_shift) & high_bit_mask) << total_bits;
+    return charcode;
+}
+
 
 /* --- */

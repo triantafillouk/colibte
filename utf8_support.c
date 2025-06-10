@@ -8,9 +8,13 @@
 
 #if	!defined _UTF8_SUPPORT
 #define	_UTF8_SUPPORT
+#include <uchar.h>
 
 #include "utf8_support.h"
 #include <string.h>
+#define __USE_XOPEN
+#include <wchar.h>
+
 #include "support.h"
 
 int utf_error=0;
@@ -401,6 +405,126 @@ int utf8_ord(char *str)
  if(ch1<0xF0) return (ch1-0xE0)*0x1000+(ch2-0x80)*64+ch3%0x40;
  ch4=str[3];
  return (ch1-0xF0)*64*0x1000+(ch2-0x80)*0x1000+(ch3-0x80)*64+ch4%0x40;
+}
+
+//Pointer arrays must always include the array size, because pointers do not know about the size of the supposed array size.
+wchar_t utf8_to_wchar(unsigned char* const utf8_str, int *size) 
+{
+	//First, grab the first byte of the UTF-8 string
+	unsigned char* utf8_currentCodeUnit = utf8_str;
+	wchar_t unic=0;
+	// int utf8_str_iterator = 0;
+
+		//Figure out the current code unit to determine the range. It is split into 6 main groups, each of which handles the data
+		//differently from one another.
+		if (*utf8_currentCodeUnit < 0x80) {
+			//0..127, the ASCII range.
+			unic = *utf8_currentCodeUnit;
+			*size=1;
+			return unic;
+		}
+		else if (*utf8_currentCodeUnit < 0xC0) {
+			unic = 0;
+			//0x80..0xBF, we ignore. These are reserved for UTF-8 encoding.
+			// printf("error: reserved for UTF-8 encoding 0x%X\n",*utf8_currentCodeUnit);
+			*size=0;
+			return unic;	/* this is an error!  */
+		}
+		else if (*utf8_currentCodeUnit < 0xE0) {
+			//128..2047, the extended ASCII range, and into the Basic Multilingual Plane.
+
+			//Work on the first code unit.
+			char16_t highShort = (char16_t) ((*utf8_currentCodeUnit) & 0x1F);
+
+			//Increment the current code unit pointer to the next code unit
+			utf8_currentCodeUnit++;
+
+			//Work on the second code unit.
+			char16_t lowShort = (char16_t) ((*utf8_currentCodeUnit) & 0x3F);
+
+			//Increment the current code unit pointer to the next code unit
+			utf8_currentCodeUnit++;
+
+			//Create the UTF-16 code unit, then increment the iterator.
+			//Credits to @tbeu. 
+			//Thanks to @k6l2 for explaining why we need 6 instead of 8.
+			//It's because 0x3F is 6 bits of information from the low short. By shifting 8 bits, you are 
+			//adding 2 extra zeroes in between the actual data of both shorts.
+			int unicode = (highShort << 6) | lowShort;
+
+			//Check to make sure the "unicode" is in the range [0..D7FF] and [E000..FFFF].
+			*size=2;
+			if ((0 <= unicode && unicode <= 0xD7FF) || (0xE000 <= unicode && unicode <= 0xFFFF)) {
+				unic = unicode;
+				return unic;	/* 2 byte utf8  */
+			}
+			// printf("error 2 bytes 0x%X\n",unicode);
+		}
+		else if (*utf8_currentCodeUnit < 0xF0) {
+			//2048..65535, the remaining Basic Multilingual Plane.
+
+			//Work on the UTF-8 code units one by one.
+			//If drawn out, it would be 1110aaaa 10bbbbcc 10ccdddd
+			//Where a is 4th byte, b is 3rd byte, c is 2nd byte, and d is 1st byte.
+			char16_t fourthChar = (char16_t) ((*utf8_currentCodeUnit) & 0xF);
+			utf8_currentCodeUnit++;
+			char16_t thirdChar = (char16_t) ((*utf8_currentCodeUnit) & 0x3C) >> 2;
+			char16_t secondCharHigh = (char16_t) ((*utf8_currentCodeUnit) & 0x3);
+			utf8_currentCodeUnit++;
+			char16_t secondCharLow = (char16_t) ((*utf8_currentCodeUnit) & 0x30) >> 4;
+			char16_t firstChar = (char16_t) ((*utf8_currentCodeUnit) & 0xF);
+			utf8_currentCodeUnit++;
+
+			//Create the resulting UTF-16 code unit, then increment the iterator.
+			int unicode = (fourthChar << 12) | (thirdChar << 8) | (secondCharHigh << 6) | (secondCharLow << 4) | firstChar;
+
+			//Check to make sure the "unicode" is in the range [0..D7FF] and [E000..FFFF].
+			//According to math, UTF-8 encoded "unicode" should always fall within these two ranges.
+			*size=3;
+			if ((0 <= unicode && unicode <= 0xD7FF) || (0xE000 <= unicode && unicode <= 0xFFFF)) {
+				unic = unicode;
+				return unic;	/* 3 byte utf8  */
+			};
+			// printf("error bytes 3 0x%X\n",unicode);
+		}
+		else if (*utf8_currentCodeUnit < 0xF8) {
+			//65536..10FFFF, the Unicode UTF range
+
+			//Work on the UTF-8 code units one by one.
+			//If drawn out, it would be 11110abb 10bbcccc 10ddddee 10eeffff
+			//Where a is 6th byte, b is 5th byte, c is 4th byte, and so on.
+			// char16_t sixthChar = (char16_t) ((*utf8_currentCodeUnit) & 0x4) >> 2;
+			char16_t fifthCharHigh = (char16_t) ((*utf8_currentCodeUnit) & 0x3);
+			utf8_currentCodeUnit++;
+			char16_t fifthCharLow = (char16_t) ((*utf8_currentCodeUnit) & 0x30) >> 4;
+			char16_t fourthChar = (char16_t) ((*utf8_currentCodeUnit) & 0xF);
+			utf8_currentCodeUnit++;
+			char16_t thirdChar = (char16_t) ((*utf8_currentCodeUnit) & 0x3C) >> 2;
+			char16_t secondCharHigh = (char16_t) ((*utf8_currentCodeUnit) & 0x3);
+			utf8_currentCodeUnit++;
+			char16_t secondCharLow = (char16_t) ((*utf8_currentCodeUnit) & 0x30) >> 4;
+			char16_t firstChar = (char16_t) ((*utf8_currentCodeUnit) & 0xF);
+			utf8_currentCodeUnit++;
+
+			unic = firstChar | ((secondCharLow+4*secondCharHigh)) << 4 | (thirdChar << 8) | (fourthChar <<12) | (fifthCharLow+fifthCharHigh*4) << 16; 
+			// printf("unicode : %X\n",unicode);
+			// printf("1 %08X\n",firstChar);
+			// printf("2 %08X\n",((secondCharLow+4*secondCharHigh)) << 4);
+			// printf("3 %08X\n",thirdChar << 8);
+			// printf("4 %08X\n",fourthChar << 12);
+			// printf("5 %08X\n",(fifthCharLow+fifthCharHigh*4) << 16);
+
+			// unic = unicode;
+			*size=4;
+			// printf("	-> %X %X %X %X %X\n",fifthCharLow+fifthCharHigh*4,fourthChar,thirdChar,secondCharLow+4*secondCharHigh,firstChar);
+			return unic;	/* 4 byte code  */
+		}
+		else {
+			//Invalid UTF-8 code unit, we ignore.
+			// printf("error 0x%X > 0xF8\n",*utf8_currentCodeUnit);
+		}
+	/* error !!!  */
+	return 0;
 }
 
 #endif
