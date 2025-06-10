@@ -38,6 +38,7 @@
 #define	_LARGEFILE64_SOURCE	1
 #define UNDERLINE_CURRENT_DIR_LINE	0
 #define	USE_SLOW_DISPLAY	0
+#define	USE_CUSTOM_CELL_WIDTH	0
 
 /****************************************************************/
 #define	DRIVER_CURSES	0

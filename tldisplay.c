@@ -1899,6 +1899,9 @@ wchar_t utf8_to_wchar(unsigned char* const utf8_str, int *size) ;
 
 int get_utf_length(utfchar *utf_char_str)
 {
+#if	USE_CUSTOM_CELL_WIDTH
+ return get_utf_custom_length(utf_char_str);
+#else
  int clen=0;
  int code_unit = utf8_to_wchar((unsigned char *)utf_char_str,&clen);
  if(code_unit<=0x80) return 1;
@@ -1912,6 +1915,7 @@ int get_utf_length(utfchar *utf_char_str)
  };
 #endif
  return clen_width;
+#endif
 }
 
 #endif
