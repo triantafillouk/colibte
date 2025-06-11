@@ -728,7 +728,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		if(c>127) {
 			int size;
 			size=get_utf_length(&uc);
-			if((c==0xE0 /* && uc.uval[1]>=0xB0 */) || c==0xF0) { 	/* slow down for thai chars  */
+			if((c==0xE0 /* && uc.uval[1]>=0xB0 */)||c==0xE2 || c==0xF0) { 	/* slow down for thai chars  */
 				wp->vs[row]->slow_line=1;
 #if	USE_SLOW_DISPLAY
 				wp->w_fp->slow_display=1;

@@ -12,9 +12,12 @@
 
 #include "utf8_support.h"
 #include <string.h>
+#if	DAWRIN
+typedef unsigned short int char16_t;
+#else
 #define __USE_XOPEN
 #include <wchar.h>
-
+#endif
 #include "support.h"
 
 int utf_error=0;
@@ -493,7 +496,7 @@ wchar_t utf8_to_wchar(unsigned char* const utf8_str, int *size)
 			//Work on the UTF-8 code units one by one.
 			//If drawn out, it would be 11110abb 10bbcccc 10ddddee 10eeffff
 			//Where a is 6th byte, b is 5th byte, c is 4th byte, and so on.
-			// char16_t sixthChar = (char16_t) ((*utf8_currentCodeUnit) & 0x4) >> 2;
+			char16_t sixthChar = (char16_t) ((*utf8_currentCodeUnit) & 0x4) >> 2;
 			char16_t fifthCharHigh = (char16_t) ((*utf8_currentCodeUnit) & 0x3);
 			utf8_currentCodeUnit++;
 			char16_t fifthCharLow = (char16_t) ((*utf8_currentCodeUnit) & 0x30) >> 4;
@@ -504,9 +507,9 @@ wchar_t utf8_to_wchar(unsigned char* const utf8_str, int *size)
 			utf8_currentCodeUnit++;
 			char16_t secondCharLow = (char16_t) ((*utf8_currentCodeUnit) & 0x30) >> 4;
 			char16_t firstChar = (char16_t) ((*utf8_currentCodeUnit) & 0xF);
-			utf8_currentCodeUnit++;
+			// utf8_currentCodeUnit++;
 
-			unic = firstChar | ((secondCharLow+4*secondCharHigh)) << 4 | (thirdChar << 8) | (fourthChar <<12) | (fifthCharLow+fifthCharHigh*4) << 16; 
+			unic = firstChar | ((secondCharLow+4*secondCharHigh)) << 4 | (thirdChar << 8) | (fourthChar <<12) | (fifthCharLow+fifthCharHigh*4) << 16 | sixthChar << 20 ; 
 			// printf("unicode : %X\n",unicode);
 			// printf("1 %08X\n",firstChar);
 			// printf("2 %08X\n",((secondCharLow+4*secondCharHigh)) << 4);

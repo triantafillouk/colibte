@@ -12,7 +12,11 @@
 #include	"support.h"
 #include	"menus.h"
 #include	"panel_curses.h"
+#if	DARWIN
+#else
+#define __USE_XOPEN
 #include	<wchar.h>
+#endif
 
 char **getdir(char *dirname,char *s_find,int *num);
 int utf_num_chars(char *);
@@ -1726,13 +1730,19 @@ int get_utf_custom_length(utfchar *utf_char_str)
 #else
 	if(b1==0x9c) {
 		int b2=utf_char_str->uval[2];
-		if(b2==0x93||b2==0x96) return 1;
-		return 2;
+		if(b2==0x85||b2==0x8A||b2==0x8B||b2==0xA8) return 2;
+		return 1;
+	};
+	if(b1==0x9D) {
+		int b2=utf_char_str->uval[2];
+		if(b2==0x8C||b2==0x8E||b2==0x93||b2==0x94||b2==0x95||b2==0x97) return 2;
+		return 1;
 	};
 	if(b1==0x9E) {
 		int b2=utf_char_str->uval[2];
-		if(b2==0xA1) return 1;
-		return 2;
+		if(b2>=0x95 && b2<=0x97) return 2;
+		if(b2==0xB0||b2==0xBF) return 2;
+		return 1;
 	};
 #endif
 	if(b1==0x99) {
@@ -1862,6 +1872,7 @@ int get_utf_custom_length(utfchar *utf_char_str)
 	if(b1==0x9F) {
 		int b2=utf_char_str->uval[2];
 		if (b2==0x84) return 1;
+		if (b2==0xA0) return 1;
 #if	DARWIN
 		if (b2==0xA6) return 1;	/* not shown in Dawrin  */
 #else
@@ -1892,24 +1903,23 @@ int get_utf_custom_length(utfchar *utf_char_str)
  return 2;
 }
 
-#define __USE_XOPEN
-#include <wchar.h>
-
 wchar_t utf8_to_wchar(unsigned char* const utf8_str, int *size) ;
 
 int get_utf_length(utfchar *utf_char_str)
 {
+
 #if	USE_CUSTOM_CELL_WIDTH
  return get_utf_custom_length(utf_char_str);
 #else
  int clen=0;
  int code_unit = utf8_to_wchar((unsigned char *)utf_char_str,&clen);
  if(code_unit<=0x80) return 1;
- int clen_width = wcwidth(code_unit,&clen);
+ int clen_width = wcwidth(code_unit);
  int custom_clen_width = get_utf_custom_length(utf_char_str);
+
  if(code_unit>=0xE0041 && code_unit<0xE007B) return custom_clen_width;
  if(code_unit==0xE33) return custom_clen_width;
-#if	0
+#if	1
  if(custom_clen_width != clen_width) {
  	MESG("U+%5X -> [%s] len=%d custom_len=%d",code_unit,utf_char_str,clen_width,custom_clen_width);
  };
@@ -1930,6 +1940,8 @@ void drv_start_window_update(WINDP *wp)
 
 #include "menu_common.c"
 
+#if	NUSE
+// not sure its ok!!!!
 int utf8_to_unicode(char *s)
 {
     int charcode = 0;
@@ -1958,6 +1970,6 @@ int utf8_to_unicode(char *s)
     charcode |= ((t >> high_bit_shift) & high_bit_mask) << total_bits;
     return charcode;
 }
-
+#endif
 
 /* --- */
