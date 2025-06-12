@@ -12,12 +12,8 @@
 #include	"support.h"
 #include	"menus.h"
 #include	"panel_curses.h"
-#if	DARWIN
 #include	<wchar.h>
-// int wcwidth(int);
-#else
-#include	<wchar.h>
-#endif
+
 char **getdir(char *dirname,char *s_find,int *num);
 int utf_num_chars(char *);
 void drv_restore_wdimensions(WINDP *wp);
@@ -1910,6 +1906,7 @@ int get_utf_length(utfchar *utf_char_str)
  int code_unit = utf8_to_wchar((unsigned char *)utf_char_str,&clen);
  if(code_unit<=0x80) return 1;
  int clen_width = wcwidth(code_unit);
+#if	0
  int custom_clen_width = get_utf_custom_length(utf_char_str);
  if(code_unit>=0xE0041 && code_unit<0xE007B) return custom_clen_width;
  if(code_unit==0xE33) return custom_clen_width;
@@ -1917,6 +1914,7 @@ int get_utf_length(utfchar *utf_char_str)
  if(custom_clen_width != clen_width) {
  	MESG("U+%5X -> [%s] len=%d custom_len=%d",code_unit,utf_char_str,clen_width,custom_clen_width);
  };
+#endif
 #endif
  return clen_width;
 #endif

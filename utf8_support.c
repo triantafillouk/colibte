@@ -12,17 +12,15 @@
 #include "utf8_support.h"
 #include <string.h>
 #if	DARWIN
-#define __USE_XOPEN
-#include <wchar.h>
-// #include <xlocale.h>
 typedef unsigned short int char16_t;
-#else
+#endif
+
 #define __USE_XOPEN
 #include <wchar.h>
-#endif
+
 #include "support.h"
 
-int utf_error=0;
+static int utf_error=0;
 
 int utf8_error()
 {
@@ -398,7 +396,7 @@ int utf8_len(char *str)
  return 4;
 }
 
-
+// this is like utf8_to_wchar but for 4 bytes and no error handlind!
 int utf8_ord(char *str)
 {
  unsigned char ch1,ch2,ch3,ch4;
@@ -412,7 +410,7 @@ int utf8_ord(char *str)
  return (ch1-0xF0)*64*0x1000+(ch2-0x80)*0x1000+(ch3-0x80)*64+ch4%0x40;
 }
 
-//Pointer arrays must always include the array size, because pointers do not know about the size of the supposed array size.
+// Returns the unicode point
 wchar_t utf8_to_wchar(unsigned char* const utf8_str, int *size) 
 {
 	//First, grab the first byte of the UTF-8 string
@@ -433,6 +431,7 @@ wchar_t utf8_to_wchar(unsigned char* const utf8_str, int *size)
 			//0x80..0xBF, we ignore. These are reserved for UTF-8 encoding.
 			// printf("error: reserved for UTF-8 encoding 0x%X\n",*utf8_currentCodeUnit);
 			*size=0;
+			utf_error=1;
 			return unic;	/* this is an error!  */
 		}
 		else if (*utf8_currentCodeUnit < 0xE0) {
@@ -527,6 +526,7 @@ wchar_t utf8_to_wchar(unsigned char* const utf8_str, int *size)
 		else {
 			//Invalid UTF-8 code unit, we ignore.
 			// printf("error 0x%X > 0xF8\n",*utf8_currentCodeUnit);
+			utf_error=1;
 		}
 	/* error !!!  */
 	return 0;
