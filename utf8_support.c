@@ -8,11 +8,13 @@
 
 #if	!defined _UTF8_SUPPORT
 #define	_UTF8_SUPPORT
-#include <uchar.h>
 
 #include "utf8_support.h"
 #include <string.h>
-#if	DAWRIN
+#if	DARWIN
+#define __USE_XOPEN
+#include <wchar.h>
+// #include <xlocale.h>
 typedef unsigned short int char16_t;
 #else
 #define __USE_XOPEN
