@@ -11,11 +11,9 @@
 
 #include "utf8_support.h"
 #include <string.h>
-#if	DARWIN
-typedef unsigned short int char16_t;
-#endif
+#include <uchar.h>
 
-#define __USE_XOPEN
+//#define __USE_XOPEN
 #include <wchar.h>
 
 #include "support.h"

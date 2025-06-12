@@ -12,6 +12,7 @@
 #include	"support.h"
 #include	"menus.h"
 #include	"panel_curses.h"
+#define __USE_XOPEN
 #include	<wchar.h>
 
 char **getdir(char *dirname,char *s_find,int *num);
@@ -1891,9 +1892,6 @@ int get_utf_custom_length(utfchar *utf_char_str)
  }
  return 2;
 }
-
-#define __USE_XOPEN
-#include <wchar.h>
 
 wchar_t utf8_to_wchar(unsigned char* const utf8_str, int *size) ;
 
