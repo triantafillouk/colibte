@@ -1993,8 +1993,8 @@ int check_w_sibling(WINDP *wp,int left,int top,int new_rows)
 // dummy function
 void expose_window(WINDP *wp)
 {
-	wrefresh(wp->gwp->draw);
-	doupdate();
+	wnoutrefresh(wp->gwp->draw);
+	// doupdate();
 }
 
 void drv_clear_line(WINDP *wp,int row)
@@ -2004,8 +2004,9 @@ void drv_clear_line(WINDP *wp,int row)
 	for(i=0;i<wp->w_ntcols;i++) {
 		waddstr(wp->gwp->draw,"-");
 	};
-	wrefresh(wp->gwp->draw);
-	doupdate();
+	touchline(wp->gwp->draw,row,1);
+	// wrefresh(wp->gwp->draw);
+	// doupdate();
 	wmove(wp->gwp->draw,row,0);
 	// MESG("drv_clear_line: %2d",row);
 }
@@ -2118,11 +2119,12 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 #if	USE_SLOW_DISPLAY
 	if(wp->w_fp->slow_display) {
 		wrefresh(wp->gwp->draw);
-		 update_panels();
-		 doupdate();
+		// update_panels();
+		// doupdate();
 	} else
 #endif
-		wnoutrefresh(wp->gwp->draw);
+	touchline(wp->gwp->draw,row,1);
+// 		wnoutrefresh(wp->gwp->draw);
 }
 
 
@@ -2404,6 +2406,7 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
  int bg_color=COLOR_MENU_BG;
  char *status_string = show_string;
  int rpos=utf_num_chars(status_string)+2;
+ hide_cursor("status_line");
 #if	!CLASSIC_STATUS
  if((drv_color_pairs>63 && drv_colors!=8) && cwp!=wp) {	/* if enough color pairs, use them ! */
  	fg_color=COLOR_INACTIVE_FG;
@@ -2817,12 +2820,7 @@ void show_slide(WINDP *wp)
 // MESG("show_slide: window=%d start=%d end=%d len=%d",wp->id,start,end,len);
 
  drv_wcolor(wp->gwp->vline,fg_color,bg_color);
-#if	USE_SLOW_DISPLAY
- if(wp->w_fp->slow_display){
- 	wbkgd(wp->gwp->vline,color_pair(fg_color,bg_color));
-	wrefresh(wp->gwp->vline);
- };
-#endif
+
  for(row=0;row<wp->w_ntrows-1;row++){
 	wmove(wp->gwp->vline,row,0);
 	// wrefresh(wp->gwp->vline);
@@ -2837,15 +2835,11 @@ void show_slide(WINDP *wp)
  if(wp->w_fp->b_flag & (1 << 1)) {
  	drv_wcolor(wp->gwp->vline,COLOR_CTRL_FG,bg_color);
  	wprintw(wp->gwp->vline,"%s","*");
- } else wprintw(wp->gwp->vline,"%s"," ");
-#if	USE_SLOW_DISPLAY
- if(wp->w_fp->slow_display){
- 	wnoutrefresh(wp->gwp->vline);
-	update_panels();
-	doupdate();
- } else
-#endif
-	wnoutrefresh(wp->gwp->vline);
+ } else {
+ 	wprintw(wp->gwp->vline,"%s"," ");
+ };
+//	touchwin(wp->gwp->vline);
+//	wnoutrefresh(wp->gwp->vline);
 }
 
 #include "xthemes.c"

@@ -501,6 +501,7 @@ void draw_window(int flag, WINDP *wp,char *from)
  // static int ind=0;
  register int i;
  // int ulines=0;
+	hide_cursor("draw_window");
 	// MESG(" draw_window: id=%d from=%s ind=%d",wp->id,from,ind);
 	drv_start_window_update(wp);
  	prepare_converter(wp->w_fp->b_lang);
@@ -516,6 +517,7 @@ void draw_window(int flag, WINDP *wp,char *from)
 		/* for each line that needs to be updated*/
 		if ((wp->vs[i]->v_flag) ) 
 		{
+#if	USE_SLOW_DISPLAY
 			if(wp->vs[i]->slow_line==1) wp->vs[i]->slow_line++;
 			else 
 			if(wp->vs[i]->slow_line==2) 
@@ -524,6 +526,7 @@ void draw_window(int flag, WINDP *wp,char *from)
 				wp->vtcol=0;
 				wp->vs[i]->slow_line=0;
 			};
+#endif
 			draw_window_line(wp,i);
 			// ulines++;
 		}
@@ -531,10 +534,12 @@ void draw_window(int flag, WINDP *wp,char *from)
 	// MESG("# -- draw_window:[%s] %d drawned flag=%X wflag=%X",from,wp->id,flag,wp->w_flag);
 	wp->draw_flag=0;
 	expose_window(wp); /* (use this once unstead to expose every line sepatately, is it faster??) */
+#if	0
 	if(flag /* && (wp->w_flag != UPD_STATUS) */) 
 	{
 		show_slide(wp);
 	};
+#endif
 	if(wp->w_flag & UPD_STATUS) {
 		status_line(wp);
 	};

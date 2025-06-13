@@ -9,6 +9,8 @@
 
 #include "xe.h"
 
+long utf8_to_unicode(unsigned char* const utf8_str, int *size) ;
+long int unicode_point();
 extern alist *window_list;
 extern SHLIGHT hts[];
 
@@ -338,10 +340,10 @@ int show_info(num n)
 #endif
 	} else {
 		if(debug_flag()) {
-			SMESG("Position info: line=%lld col=%lld offset=%lld char=[0x%lX]",getcline()+1,GetCol()+1,Offset(),utf_value());
+			SMESG("Position info: line=%lld col=%lld offset=%lld char=[0x%lX] [U+%lX]",getcline()+1,GetCol()+1,Offset(),utf_value(),unicode_point());
 			SMESG(" row %d , %d, %lld",chardline(cwp)+1,getwline(),tp_line(cwp->tp_current)-tp_line(cwp->tp_hline));
 		} else {
-			SMESG("Position info: line=%lld col=%lld offset=%lld char=[0x%lX] row %d",getcline()+1,GetCol()+1,Offset(),utf_value(),getwline());
+			SMESG("Position info: line=%lld col=%lld offset=%lld char=[0x%lX] [U+%lX] row %d",getcline()+1,GetCol()+1,Offset(),utf_value(),unicode_point(),getwline());
 		};
 
 
@@ -1466,6 +1468,29 @@ long int utf_value()
   	uchar += CharAt(o+i);
 	if(i<ulen-1) uchar <<=8;
   };
+  return(uchar);
+ };
+}
+
+long int unicode_point()
+{
+ unsigned char char_string[8];
+
+ if(utf8_error()) { 
+	return Char();
+ };
+ if(cbfp->b_lang!=0) return Char();
+ else {
+  offs o=Offset();
+  int ulen,i;
+  long int uchar=0;
+  ulen=FUtfCharLen(cbfp,o);
+
+  for(i=0;i<ulen;i++){
+  	char_string[i] = CharAt(o+i);
+  };
+  char_string[ulen]=0;
+  uchar = utf8_to_unicode(char_string,&ulen);
   return(uchar);
  };
 }

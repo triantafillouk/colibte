@@ -11,9 +11,8 @@
 
 #include "utf8_support.h"
 #include <string.h>
-#include <uchar.h>
 
-//#define __USE_XOPEN
+#define __USE_XOPEN
 #include <wchar.h>
 
 #include "support.h"
@@ -49,7 +48,7 @@ int utf8_countBytes[256] = {
 	-2,-2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,	// 0xC0
 	2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,	// 0xD0
 	3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,	// 0xE0
-	4,4,4,4,4,-4,-4,-4,-4,-4,-4,-4,-4,-4,-4,-4	// 0xF0
+	4,4,4,4,4,5,5,5,6,-4,-4,-4,-4,-4,-4,-4	// 0xF0
 };
 
 int utf8_countbytes(int c)
@@ -394,7 +393,7 @@ int utf8_len(char *str)
  return 4;
 }
 
-// this is like utf8_to_wchar but for 4 bytes and no error handlind!
+// this is like utf8_to_unicode but for 4 bytes and no error handlind!
 int utf8_ord(char *str)
 {
  unsigned char ch1,ch2,ch3,ch4;
@@ -409,11 +408,11 @@ int utf8_ord(char *str)
 }
 
 // Returns the unicode point
-wchar_t utf8_to_wchar(unsigned char* const utf8_str, int *size) 
+long utf8_to_unicode(unsigned char* const utf8_str, int *size) 
 {
 	//First, grab the first byte of the UTF-8 string
 	unsigned char* utf8_currentCodeUnit = utf8_str;
-	wchar_t unic=0;
+	long unic=0;
 	// int utf8_str_iterator = 0;
 
 		//Figure out the current code unit to determine the range. It is split into 6 main groups, each of which handles the data
@@ -436,13 +435,13 @@ wchar_t utf8_to_wchar(unsigned char* const utf8_str, int *size)
 			//128..2047, the extended ASCII range, and into the Basic Multilingual Plane.
 
 			//Work on the first code unit.
-			char16_t highShort = (char16_t) ((*utf8_currentCodeUnit) & 0x1F);
+			unsigned int highShort = (unsigned int) ((*utf8_currentCodeUnit) & 0x1F);
 
 			//Increment the current code unit pointer to the next code unit
 			utf8_currentCodeUnit++;
 
 			//Work on the second code unit.
-			char16_t lowShort = (char16_t) ((*utf8_currentCodeUnit) & 0x3F);
+			unsigned int lowShort = (unsigned int) ((*utf8_currentCodeUnit) & 0x3F);
 
 			//Increment the current code unit pointer to the next code unit
 			utf8_currentCodeUnit++;
@@ -468,13 +467,13 @@ wchar_t utf8_to_wchar(unsigned char* const utf8_str, int *size)
 			//Work on the UTF-8 code units one by one.
 			//If drawn out, it would be 1110aaaa 10bbbbcc 10ccdddd
 			//Where a is 4th byte, b is 3rd byte, c is 2nd byte, and d is 1st byte.
-			char16_t fourthChar = (char16_t) ((*utf8_currentCodeUnit) & 0xF);
+			unsigned int fourthChar = (unsigned int) ((*utf8_currentCodeUnit) & 0xF);
 			utf8_currentCodeUnit++;
-			char16_t thirdChar = (char16_t) ((*utf8_currentCodeUnit) & 0x3C) >> 2;
-			char16_t secondCharHigh = (char16_t) ((*utf8_currentCodeUnit) & 0x3);
+			unsigned int thirdChar = (unsigned int) ((*utf8_currentCodeUnit) & 0x3C) >> 2;
+			unsigned int secondCharHigh = (unsigned int) ((*utf8_currentCodeUnit) & 0x3);
 			utf8_currentCodeUnit++;
-			char16_t secondCharLow = (char16_t) ((*utf8_currentCodeUnit) & 0x30) >> 4;
-			char16_t firstChar = (char16_t) ((*utf8_currentCodeUnit) & 0xF);
+			unsigned int secondCharLow = (unsigned int) ((*utf8_currentCodeUnit) & 0x30) >> 4;
+			unsigned int firstChar = (unsigned int) ((*utf8_currentCodeUnit) & 0xF);
 			utf8_currentCodeUnit++;
 
 			//Create the resulting UTF-16 code unit, then increment the iterator.
@@ -495,20 +494,21 @@ wchar_t utf8_to_wchar(unsigned char* const utf8_str, int *size)
 			//Work on the UTF-8 code units one by one.
 			//If drawn out, it would be 11110abb 10bbcccc 10ddddee 10eeffff
 			//Where a is 6th byte, b is 5th byte, c is 4th byte, and so on.
-			char16_t sixthChar = (char16_t) ((*utf8_currentCodeUnit) & 0x4) >> 2;
-			char16_t fifthCharHigh = (char16_t) ((*utf8_currentCodeUnit) & 0x3);
+			unsigned int sixthChar = (unsigned int) ((*utf8_currentCodeUnit) & 0x4) >> 2;
+			unsigned int fifthCharHigh = (unsigned int) ((*utf8_currentCodeUnit) & 0x3);
 			utf8_currentCodeUnit++;
-			char16_t fifthCharLow = (char16_t) ((*utf8_currentCodeUnit) & 0x30) >> 4;
-			char16_t fourthChar = (char16_t) ((*utf8_currentCodeUnit) & 0xF);
+			unsigned int fifthCharLow = (unsigned int) ((*utf8_currentCodeUnit) & 0x30) >> 4;
+			unsigned int fourthChar = (unsigned int) ((*utf8_currentCodeUnit) & 0xF);
 			utf8_currentCodeUnit++;
-			char16_t thirdChar = (char16_t) ((*utf8_currentCodeUnit) & 0x3C) >> 2;
-			char16_t secondCharHigh = (char16_t) ((*utf8_currentCodeUnit) & 0x3);
+			unsigned int thirdChar = (unsigned int) ((*utf8_currentCodeUnit) & 0x3C) >> 2;
+			unsigned int secondCharHigh = (unsigned int) ((*utf8_currentCodeUnit) & 0x3);
 			utf8_currentCodeUnit++;
-			char16_t secondCharLow = (char16_t) ((*utf8_currentCodeUnit) & 0x30) >> 4;
-			char16_t firstChar = (char16_t) ((*utf8_currentCodeUnit) & 0xF);
+			unsigned int secondCharLow = (unsigned int) ((*utf8_currentCodeUnit) & 0x30) >> 4;
+			unsigned int firstChar = (unsigned int) ((*utf8_currentCodeUnit) & 0xF);
 			// utf8_currentCodeUnit++;
 
-			unic = firstChar | ((secondCharLow+4*secondCharHigh)) << 4 | (thirdChar << 8) | (fourthChar <<12) | (fifthCharLow+fifthCharHigh*4) << 16 | sixthChar << 20 ; 
+			unic = firstChar | ((secondCharLow+4*secondCharHigh)) << 4 | (thirdChar << 8) | (fourthChar <<12) \
+				| (fifthCharLow+fifthCharHigh*4) << 16 | sixthChar << 20 ; 
 			// printf("unicode : %X\n",unicode);
 			// printf("1 %08X\n",firstChar);
 			// printf("2 %08X\n",((secondCharLow+4*secondCharHigh)) << 4);

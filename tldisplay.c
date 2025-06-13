@@ -1893,7 +1893,7 @@ int get_utf_custom_length(utfchar *utf_char_str)
  return 2;
 }
 
-wchar_t utf8_to_wchar(unsigned char* const utf8_str, int *size) ;
+long utf8_to_unicode(unsigned char* const utf8_str, int *size) ;
 
 int get_utf_length(utfchar *utf_char_str)
 {
@@ -1901,7 +1901,7 @@ int get_utf_length(utfchar *utf_char_str)
  return get_utf_custom_length(utf_char_str);
 #else
  int clen=0;
- int code_unit = utf8_to_wchar((unsigned char *)utf_char_str,&clen);
+ int code_unit = utf8_to_unicode((unsigned char *)utf_char_str,&clen);
  if(code_unit<=0x80) return 1;
  int clen_width = wcwidth(code_unit);
 #if	0
@@ -1930,6 +1930,7 @@ void drv_start_window_update(WINDP *wp)
 
 #include "menu_common.c"
 
+#if	NUSE
 int utf8_to_unicode(char *s)
 {
     int charcode = 0;
@@ -1958,6 +1959,6 @@ int utf8_to_unicode(char *s)
     charcode |= ((t >> high_bit_shift) & high_bit_mask) << total_bits;
     return charcode;
 }
-
+#endif
 
 /* --- */
