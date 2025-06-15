@@ -10,11 +10,55 @@
 extern VAR option_names[];
 extern int nnarg;
 extern FILEBUF *cbfp;
+#define __USE_XOPEN
+#include	<wchar.h>
 
 GtkWidget *wlist;
 COLOR_SCHEME *get_scheme_by_index(int scheme_num);
 int drv_initialized=0;
 char *import_buffer=NULL;
+
+
+int get_pango_length(char *st)
+{
+ int width,height;
+ // MESG("get_pango_length:");
+ if(st[0]<0x80) return 1;	/* suppose that all asci have CLEN display size  */
+ if(cwp==NULL) return 0;
+ if(cwp->gwp==NULL) return 0;
+ if(cwp->gwp->draw==NULL) return 0;
+ // MESG("get_pango_length:1");
+
+	GeEditDisplay *wd = GTK_EDIT_DISPLAY(cwp->gwp->draw);
+ // MESG("get_pango_length:2");
+
+	if(wd->layout==NULL) {
+		// MESG("layout is null!!!");
+		return 0;
+	};
+ // MESG("get_pango_length:3");
+
+	pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
+	// MESG("gpl: [%s]",st);
+	pango_layout_set_text (wd->layout, st, -1);
+	pango_layout_get_size (wd->layout, &width, &height);
+	// if(st[0]>0x80)
+	double wf = (double)width/PANGO_SCALE/CLEN;
+	// MESG("PL:[%s] [%2X %2X %2X %2x] w=%d CLEN=%2.1f  %2.1f",st,st[0],st[1],st[2],st[3],width/PANGO_SCALE,CLEN,wf);
+	if(wf<0.1) return 0;
+	if(wf<1.3) return 1;
+	return 2;
+}
+
+// Different for each platform, screen driver
+int get_utf_length(utfchar *utf_char_str)
+{
+ if(utf_char_str->uval[0]<128) return 1;
+ if(clen_error) { return 1;};
+
+ int plen=get_pango_length((char *)utf_char_str->uval);
+ return plen;
+}
 
 void set_current_scheme(int scheme)
 {
