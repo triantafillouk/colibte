@@ -1361,7 +1361,7 @@ int  show_position_size(WINDP *wp,int short_version)
 {
 	int size=0;
 
-//	MESG("show_position_info: o=%ld loff=%ld",Offset(),loffs);
+//	MESG("show_position_size: o=%ld loff=%ld",Offset(),loffs);
 	if(wp->w_fp->view_mode & VMHEX) {
 		if(short_version==0) 
 			size=17;

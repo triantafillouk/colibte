@@ -2151,10 +2151,13 @@ void update_window_nowrap(WINDP *wp,int force)
 				} else {
 					upd_part(wp,"update_screen: 4");
 				};
-			} else
+			}
+#if	1
+			 else
 			if(update_all) {
 				upd_all_virtual_lines(wp,"update_screen:8");
 			};
+#endif
 		};
 		if ((wp->w_flag & UPD_STATUS) || force) {
 			status_line(wp);	/* update statusline */

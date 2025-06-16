@@ -1682,7 +1682,7 @@ void remove_box()
  cbox=(BOX *) lpop(box_list);
  if(cbox==NULL) return;
  hide_panel(cbox->panel);
- update_panels();
+ // update_panels();
  del_panel(cbox->panel);
  if(cbox->wnd!=NULL) delwin(cbox->wnd);
 
@@ -2124,7 +2124,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 	} else
 #endif
 	touchline(wp->gwp->draw,row,1);
-// 		wnoutrefresh(wp->gwp->draw);
+		// wnoutrefresh(wp->gwp->draw);
 }
 
 
@@ -2427,11 +2427,11 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
 	if(wp->w_ntcols-rpos<10) return;
 	drv_wcolor(wp->gwp->draw,COLOR_ROWCOL_FG,bg_color);
 	wmove(wp->gwp->draw,status_row,wp->w_ntcols-rpos);
-	maxlen=wp->w_ntcols-rpos;
+	maxlen=wp->w_ntcols-rpos-1;
  } else {
 	drv_wcolor(wp->gwp->draw,fg_color,bg_color);
 	wmove(wp->gwp->draw,status_row,0);
-	maxlen=wp->w_ntcols;
+	maxlen=wp->w_ntcols-1;
  };
 
   utf_string_break(status_string,maxlen);
@@ -2832,11 +2832,13 @@ void show_slide(WINDP *wp)
  };
  wmove(wp->gwp->vline,wp->w_ntrows,0);
  /* show change flag at bottom right corner!  */
- if(wp->w_fp->b_flag & (1 << 1)) {
+ if(wp->w_fp->b_state & FS_CHG ) {
  	drv_wcolor(wp->gwp->vline,COLOR_CTRL_FG,bg_color);
- 	wprintw(wp->gwp->vline,"%s","*");
+ 	// wprintw(wp->gwp->vline,"%s","*");
+	waddch(wp->gwp->vline,'*');
  } else {
- 	wprintw(wp->gwp->vline,"%s"," ");
+ 	// wprintw(wp->gwp->vline,"%s"," ");
+	waddch(wp->gwp->vline,' ');
  };
 //	touchwin(wp->gwp->vline);
 //	wnoutrefresh(wp->gwp->vline);
