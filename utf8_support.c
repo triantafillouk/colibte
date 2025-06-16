@@ -153,6 +153,7 @@ void count_strsize(char *utf,long *maxchars,long *height)
  };
 }
 #endif
+
 int SUtfCharLen(char *utfstr,int offset,utfchar *uc)
 {
  int ch;
