@@ -1487,6 +1487,7 @@ int set_tag_view_position(int line,int column)
  static int prev_line=-1;
  static int prev_col=-1;
 #endif
+	
 	// MESG("set_tag_view_position: line=%d column=%d",line,column);
 	if(cwp->w_fp->b_flag & FSNLIST) {
 		cwp->current_note_line=line;
@@ -1498,29 +1499,34 @@ int set_tag_view_position(int line,int column)
 	if(column < NOTES_COLUMN) {
 		cwp->w_fp->b_flag = FSNOTES;
 		column=0;
+		if(line>=0) {
 		line+=cwp->top_tag_line;
 		cwp->current_tag_line = line;
 		// MESG("set tag at line %d",line);
 		if(prev_line==line && prev_col==column) {
 			// toggle tag 
-			select_tag(TAG_SELECT_TOGGLE);
+			if(line>0) select_tag(TAG_SELECT_TOGGLE);
 		};
+		} else line=cwp->current_tag_line;;
 	} else {
 		cwp->w_fp->b_flag = FSNOTESN;
 		column = NOTES_COLUMN+2;
+		if(line>=0) {
 		line+=cwp->top_note_line;
 		if(prev_line==line && prev_col==column) {
-			edit_note(0);
+			if(line>0) edit_note(0);
 //			MESG("set_tag_view_position: after edit_note!");
 		};
 	
 		cwp->current_note_line = line;
+		} else line = cwp->current_note_line;
 		// MESG("set note at line %d",line);
 	};
 	prev_col=column;
 	prev_line=line;
+	if(prev_line<0) prev_line=0;
 #endif
-//	MESG("==: b_flag=%X line=%d col=%d",cwp->w_fp->b_flag,line,column);
+	// MESG("==: b_flag=%X line=%d col=%d",cwp->w_fp->b_flag,line,column);
 	set_update(cwp,UPD_MOVE);
 	return column;
 }
@@ -1557,7 +1563,7 @@ void update_tag_linecol()
 	} else {
 		col=0;
 	};
-//	MESG("update_tag_linecol: b_flag=%X col=%ld",cbfp->b_flag,col);
+	// MESG("update_tag_linecol: b_flag=%X col=%ld",cbfp->b_flag,col);
 	MoveLineCol(line,col);
 	update_hmark();
 }

@@ -1994,7 +1994,7 @@ int check_w_sibling(WINDP *wp,int left,int top,int new_rows)
 void expose_window(WINDP *wp)
 {
 	wnoutrefresh(wp->gwp->draw);
-	// doupdate();
+	doupdate();
 }
 
 void drv_clear_line(WINDP *wp,int row)

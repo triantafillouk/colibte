@@ -665,7 +665,6 @@ int checkwords(FILEBUF *fp,char *line, int *start, char **words,int type)
 
 num utf_FLineLen(FILEBUF *fp, offs ptr);
 
-#if	NEW
 void  vput_normalize(WINDP *wp, utfchar uc)
 {
 int display_size=get_utf_length(&uc);
@@ -681,7 +680,7 @@ int display_size=get_utf_length(&uc);
 	// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
 	if(uc.uval[3]!=0 && uc.uval[0]!=0xF0)
 	{
-		uc.uval[0]='#';uc.uval[1]=0;
+		// uc.uval[0]='#';uc.uval[1]=0;
 		char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
 //				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
 		if(strlen((char *)uc.uval)>strlen(composed)) {
@@ -702,18 +701,14 @@ int display_size=get_utf_length(&uc);
 	{
 		vtputwc(wp,&uc);
 		if(display_size>1){ 	/* put a dummy char to skip  */
-			while(display_size>1)	// this may be unecessary!
-			{
-				memset(uc.uval,0,8);
-				uc.uval[0]=0xFF;
-				uc.uval[1]=0xFF;
-				vtputwc(wp,&uc);
-				display_size--;
-			};		
+			memset(uc.uval,0,8);
+			uc.uval[0]=0xFF;
+			uc.uval[1]=0xFF;
+			vtputwc(wp,&uc);
 		};
 	}
 }
-#endif
+
 /*
 	put a string on a virtual screen at row,start_col,with max_size
 */
@@ -736,7 +731,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
  int rlen=0;	// real line len
  int num_columns=0;	/* columns of line number shown  */
  int last_column=wp->w_ntcols;
-
+ // MESG("vt_str: head=[%s] x=%d y=%d",header,start_col,row);
  line_bcolor=wp->w_bcolor;
 
  if(max_size>0) last_column=start_col+max_size;
@@ -842,52 +837,9 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		if(ptr1>=header_size) break;
 		utfchar uc;
 		memset(uc.uval,0,8);
-		// show selection
 
-		// num char_bytes=ptr1;
 		ptr1 = SUtfCharAt(header,ptr1,&uc);
-		// char_bytes = ptr1-char_bytes;
-#if	NEW
 		vput_normalize(wp, uc);
-#else
-		int display_size=get_utf_length(&uc);
-		// display_size=SUtfCharLen(header,ptr1,&uc);
-		c=uc.uval[0];
-#if USE_GLIB	// Convert to composed character if possible to view it!
-		// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
-		if(uc.uval[3]!=0 && uc.uval[0]!=0xF0)
-		{
-			char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
-//				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
-			if(strlen((char *)uc.uval)>strlen(composed)) {
-				strncpy((char *)uc.uval,composed,sizeof(uc.uval));
-			} else {
-//					MESG("compose normalization failed [%s][%s]",uc.uval,composed);
-				// put a similar character without accent!
-				uc.uval[utf8_countbytes(uc.uval[0])]=0;
-			};
-		};
-#endif
-		if(wp->vtcol==wp->w_ntcols-1 && display_size>1) { // do not show last double width character!
-			memset(uc.uval,0,8);
-			uc.uval[0]=' ';
-			uc.uval[1]=0;
-			vtputwc(wp,&uc);
-		} else 
-		{
-			vtputwc(wp,&uc);
-			if(display_size>1){ 	/* put a dummy char to skip  */
-				while(display_size>1)	// this may be unecessary!
-				{
-					memset(uc.uval,0,8);
-					uc.uval[0]=0xFF;
-					uc.uval[1]=0xFF;
-					vtputwc(wp,&uc);
-					display_size--;
-				};		
-			};
-		}
-#endif
 	};
 	/* highlight according to evaluated mask */
 	int start_color_column=num_columns;
@@ -1303,49 +1255,8 @@ offs vtline(WINDP *wp, offs tp_offs)
 		};
 
 		if(fp->b_lang == 0 && !utf8_error()) {
-			// num char_bytes=ptr1;
 			ptr1 = FUtfCharAt(fp,ptr1,&uc);
-			// char_bytes = ptr1-char_bytes;
-#if	NEW
 			vput_normalize(wp,uc);
-#else
-			int display_size=get_utf_length(&uc);
-			c=uc.uval[0];
-#if USE_GLIB	// Convert to composed character if possible to view it!
-			// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
-			if(uc.uval[3]!=0 && uc.uval[0]!=0xF0)
-			{
-				char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
-//				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
-				if(strlen((char *)uc.uval)>strlen(composed)) {
-					strncpy((char *)uc.uval,composed,sizeof(uc.uval));
-				} else {
-//					MESG("compose normalization failed [%s][%s]",uc.uval,composed);
-					// put a similar character without accent!
-					uc.uval[utf8_countbytes(uc.uval[0])]=0;
-				};
-			};
-#endif
-			if(wp->vtcol==wp->w_ntcols-1 && display_size>1) { // do not show last double width character!
-				memset(uc.uval,0,8);
-				uc.uval[0]=' ';
-				uc.uval[1]=0;
-				vtputwc(wp,&uc);
-			} else 
-			{
-				vtputwc(wp,&uc);
-				if(display_size>1){ 	/* put a dummy char to skip  */
-					while(display_size>1)	// this may be unecessary!
-					{
-						memset(uc.uval,0,8);
-						uc.uval[0]=0xFF;
-						uc.uval[1]=0xFF;
-						vtputwc(wp,&uc);
-						display_size--;
-					};		
-				};
-			}
-#endif
 		} else {
 			vtputc(wp, FCharAt(fp,ptr1++));
 		}

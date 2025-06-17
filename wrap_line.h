@@ -133,62 +133,9 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 		if(fp->b_lang == 0 && !utf8_error()) 
 		{
 			utfchar uc;
-
-			// num char_bytes=ptr1;
 			memset(uc.uval,0,8);
 			ptr1 = FUtfCharAt(fp,ptr1,&uc);
-			// char_bytes = ptr1-char_bytes;
-#if	NEW
 			vput_normalize(wp,uc);
-#else
-			int display_size=get_utf_length(&uc);
-			c=uc.uval[0];
-#if	USE_SLOW_DISPLAY
-			if(c==0xE0 /* && uc.uval[1]>=0xB0 */){
-				wp->vs[wp->vtrow]->slow_line=1;
-				fp->slow_display=1;	/* slow down for thai chars  */
-			};
-#endif
-#if USE_GLIB	// Convert to composed character if possible to view it!
-			// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
-			if(uc.uval[3]!=0)
-			{
-				char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
-//				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
-				if(strlen((char *)uc.uval)>strlen(composed)) {
-					strncpy((char *)uc.uval,composed,sizeof(uc.uval));
-				} else {
-//					MESG("compose normalization failed [%s][%s]",uc.uval,composed);
-					// put a similar character without accent!
-					uc.uval[utf8_countbytes(uc.uval[0])]=0;
-				};
-			} else {
-//				if(uc.uval[2]>0)
-//				MESG("-- %s   ] display_size=%d",uc.uval,display_size);
-			};
-#endif
-			if(wp->vtcol==wp->w_width+wp->w_infocol-1 && display_size>1) { // do not show last double width character!
-				memset(uc.uval,0,8);
-				uc.uval[0]=' ';
-				uc.uval[1]=0;
-				vtputwc(wp,&uc);
-			} else 
-			{
-				vtputwc(wp,&uc);
-//				MESG("	col %d put: size=%d %X",wp->vtcol,display_size,uc.uval[0]);
-				if(display_size>1){ 	/* put a dummy char to skip  */
-					while(display_size>1)	// this may be unecessary!
-					{
-						memset(uc.uval,0,8);
-						uc.uval[0]=0xFF;
-						uc.uval[1]=0xFF;
-						
-						vtputwc(wp,&uc);
-						display_size--;
-					};		
-				};
-			}
-#endif
 		} else {
 			vtputc(wp, FCharAt(fp,ptr1++));
 		}
