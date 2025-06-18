@@ -1,0 +1,2594 @@
+﻿# Some UTF-8 encoded text characters
+# Modified from 
+Markus Kuhn [ˈmaʳkʊs kuːn] <http://www.cl.cam.ac.uk/~mgk25/> — 2002-07-25
+	tab
+क्‍ष
+ರ್ಕ
+✅❌❎
+# Added are some of the emoji characters
+# Note that all this is not supported correctly on all platforms
+
+😀😃😄😁😆😅
+😉😊😇🤣
+🔒🔓🔏🔐🔑	🔨🔧
+⛔
+
+great!
+𝒻𝒶𝓃𝒸𝓎!
+ѕ¢αяу!
+ʎzɐɹɔ
+
+♈♉♊♋♌♍♎♏♐♑♒♓
+
+# Triangles
+[◄ ► ◅ ▻]     [◀ ▶ ▲ ▼]
+
+# Triangles 2
+[⯇ ⯈ ⯅ ⯆]
+
+# downward arrows
+← → ↑ ↓
+
+# up-down:
+ ↔ ↕
+
+↖ ↗ ↘ ↙
+
+# Arrows
+⬅ ( ⮕ ➡ ) ⬆ ⬇
+
+⬉ ⬈ ⬊ ⬋
+⬌ ⬍
+🠐 🠒 🠑 🠓
+
+⭠ ⭢ ⭡ ⭣
+⭤ ⭥
+
+↩ ↪
+
+⤣ ⤤ ⤥ ⤦
+
+➥ ➦
+
+⏩⏪⏫⏬
+🔼
+♀♂
+👈👉👆🖕👇☝👍👎✊👊🤛🤜👏
+💪👶👱🧔
+1
+👨👮👳💆🏃
+✖ ➕➖➗	00000000000000000000000000000000000000000000000000000000000000000000000000000000000000123456789
+✔️
+✔️  
+✔   
+
+❌	0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 ️
+
+✅	1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+❌	2222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
+❎	3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
+➿	4444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444
+〽	5555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555
+
+
+✅❌❎➿	〽	
+red:	 	🔴
+green:		🟢
+blue:		🔵
+😇😜😴😡
+🦘‍🔶🔷🔸🔺🔻
+- - thin space
+- - hair space
+-‌- zero  width space
+――――――― horizontal bar
+————
+The ASCII compatible UTF-8 encoding used in this plain-text file
+is defined in Unicode, ISO 10646-1, and RFC 2279.
+
+
+Using Unicode/UTF-8, you can write in emails and source code things such as
+
+Mathematics and sciences:
+
+  ∮ E⋅da = Q,  n → ∞, ∑ f(i) = ∏ g(i),      ⎧⎡⎛┌─────┐⎞⎤⎫
+                                            ⎪⎢⎜│a²+b³ ⎟⎥⎪
+  ∀x∈ℝ: ⌈x⌉ = −⌊−x⌋, α ∧ ¬β = ¬(¬α ∨ β),    ⎪⎢⎜│───── ⎟⎥⎪
+                                            ⎪⎢⎜⎷ c₈   ⎟⎥⎪
+  ℕ ⊆ ℕ₀ ⊂ ℤ ⊂ ℚ ⊂ ℝ ⊂ ℂ,                   ⎨⎢⎜       ⎟⎥⎬
+                                            ⎪⎢⎜ ∞     ⎟⎥⎪
+  ⊥ < a ≠ b ≡ c ≤ d ≪ ⊤ ⇒ (⟦A⟧ ⇔ ⟪B⟫),      ⎪⎢⎜ ⎲     ⎟⎥⎪
+                                            ⎪⎢⎜ ⎳aⁱ-bⁱ⎟⎥⎪
+  2H₂ + O₂ ⇌ 2H₂O, R = 4.7 kΩ, ⌀ 200 mm     ⎩⎣⎝i=1    ⎠⎦⎭
+
+Linguistics and dictionaries:
+
+  ði ıntəˈnæʃənəl fəˈnɛtık əsoʊsiˈeıʃn
+  Y [ˈʏpsilɔn], Yen [jɛn], Yoga [ˈjoːgɑ]
+
+APL:
+
+  ((V⍳V)=⍳⍴V)/V←,V    ⌷←⍳→⍴∆∇⊃‾⍎⍕⌈
+
+Nicer typography in plain text files:
+
+  ╔══════════════════════════════════════════╗
+  ║                                          ║
+  ║   • ‘single’ and “double” quotes         ║
+  ║                                          ║
+  ║   • Curly apostrophes: “We’ve been here” ║
+  ║                                          ║
+  ║   • Latin-1 apostrophe and accents: '´`  ║
+  ║                                          ║
+  ║   • ‚deutsche‘ „Anführungszeichen“       ║
+  ║                                          ║
+  ║   • †, ‡, ‰, •, 3–4, —, −5/+5, ™, …      ║
+  ║                                          ║
+  ║   • ASCII safety test: 1lI|, 0OD, 8B     ║
+  ║                      ╭─────────╮         ║
+  ║   • the euro symbol: │ 14.95 € │         ║
+  ║                      ╰─────────╯         ║
+  ╚══════════════════════════════════════════╝
+
+Combining characters:
+
+  STARGΛ̊TE SG-1, a = v̇ = r̈, a⃑ ⊥ b⃑
+
+Greek (in Polytonic):
+
+  The Greek anthem:
+
+  Σὲ γνωρίζω ἀπὸ τὴν κόψη
+  τοῦ σπαθιοῦ τὴν τρομερή,
+  σὲ γνωρίζω ἀπὸ τὴν ὄψη
+  ποὺ μὲ βία μετράει τὴ γῆ.
+
+  ᾿Απ᾿ τὰ κόκκαλα βγαλμένη
+  τῶν ῾Ελλήνων τὰ ἱερά
+  καὶ σὰν πρῶτα ἀνδρειωμένη
+  χαῖρε, ὦ χαῖρε, ᾿Ελευθεριά!
+
+  From a speech of Demosthenes in the 4th century BC:
+
+  Οὐχὶ ταὐτὰ παρίσταταί μοι γιγνώσκειν, ὦ ἄνδρες ᾿Αθηναῖοι,
+  ὅταν τ᾿ εἰς τὰ πράγματα ἀποβλέψω καὶ ὅταν πρὸς τοὺς
+  λόγους οὓς ἀκούω· τοὺς μὲν γὰρ λόγους περὶ τοῦ
+  τιμωρήσασθαι Φίλιππον ὁρῶ γιγνομένους, τὰ δὲ πράγματ᾿
+  εἰς τοῦτο προήκοντα,  ὥσθ᾿ ὅπως μὴ πεισόμεθ᾿ αὐτοὶ
+  πρότερον κακῶς σκέψασθαι δέον. οὐδέν οὖν ἄλλο μοι δοκοῦσιν
+  οἱ τὰ τοιαῦτα λέγοντες ἢ τὴν ὑπόθεσιν, περὶ ἧς βουλεύεσθαι,
+  οὐχὶ τὴν οὖσαν παριστάντες ὑμῖν ἁμαρτάνειν. ἐγὼ δέ, ὅτι μέν
+  ποτ᾿ ἐξῆν τῇ πόλει καὶ τὰ αὑτῆς ἔχειν ἀσφαλῶς καὶ Φίλιππον
+  τιμωρήσασθαι, καὶ μάλ᾿ ἀκριβῶς οἶδα· ἐπ᾿ ἐμοῦ γάρ, οὐ πάλαι
+  γέγονεν ταῦτ᾿ ἀμφότερα· νῦν μέντοι πέπεισμαι τοῦθ᾿ ἱκανὸν
+  προλαβεῖν ἡμῖν εἶναι τὴν πρώτην, ὅπως τοὺς συμμάχους
+  σώσομεν. ἐὰν γὰρ τοῦτο βεβαίως ὑπάρξῃ, τότε καὶ περὶ τοῦ
+  τίνα τιμωρήσεταί τις καὶ ὃν τρόπον ἐξέσται σκοπεῖν· πρὶν δὲ
+  τὴν ἀρχὴν ὀρθῶς ὑποθέσθαι, μάταιον ἡγοῦμαι περὶ τῆς
+  τελευτῆς ὁντινοῦν ποιεῖσθαι λόγον.
+
+  Δημοσθένους, Γ´ ᾿Ολυνθιακὸς
+
+Georgian:
+
+  From a Unicode conference invitation:
+
+  გთხოვთ ახლავე გაიაროთ რეგისტრაცია Unicode-ის მეათე საერთაშორისო
+  კონფერენციაზე დასასწრებად, რომელიც გაიმართება 10-12 მარტს,
+  ქ. მაინცში, გერმანიაში. კონფერენცია შეჰკრებს ერთად მსოფლიოს
+  ექსპერტებს ისეთ დარგებში როგორიცაა ინტერნეტი და Unicode-ი,
+  ინტერნაციონალიზაცია და ლოკალიზაცია, Unicode-ის გამოყენება
+  ოპერაციულ სისტემებსა, და გამოყენებით პროგრამებში, შრიფტებში,
+  ტექსტების დამუშავებასა და მრავალენოვან კომპიუტერულ სისტემებში.
+
+Russian:
+
+  From a Unicode conference invitation:
+
+  Зарегистрируйтесь сейчас на Десятую Международную Конференцию по
+  Unicode, которая состоится 10-12 марта 1997 года в Майнце в Германии.
+  Конференция соберет широкий круг экспертов по  вопросам глобального
+  Интернета и Unicode, локализации и интернационализации, воплощению и
+  применению Unicode в различных операционных системах и программных
+  приложениях, шрифтах, верстке и многоязычных компьютерных системах.
+
+Thai (UCS Level 2):
+
+  Excerpt from a poetry on The Romance of The Three Kingdoms (a Chinese
+  classic 'San Gua'):
+
+  [----------------------------|------------------------]
+    ๏ แผ่นดินฮั่นเสื่อมโทรมแสนสังเวช  พระปกเกศกองบู๊กู้ขึ้นใหม่
+  สิบสองกษัตริย์ก่อนหน้าแลถัดไป       สององค์ไซร้โง่เขลาเบาปัญญา
+    ทรงนับถือขันทีเป็นที่พึ่ง           บ้านเมืองจึงวิปริตเป็นนักหนา
+  โฮจิ๋นเรียกทัพทั่วหัวเมืองมา         หมายจะฆ่ามดชั่วตัวสำคัญ
+    เหมือนขับไสไล่เสือจากเคหา      รับหมาป่าเข้ามาเลยอาสัญ
+  ฝ่ายอ้องอุ้นยุแยกให้แตกกัน          ใช้สาวนั้นเป็นชนวนชื่นชวนใจ
+    พลันลิฉุยกุยกีกลับก่อเหตุ          ช่างอาเพศจริงหนาฟ้าร้องไห้
+  ต้องรบราฆ่าฟันจนบรรลัย           ฤๅหาใครค้ำชูกู้บรรลังก์ ฯ
+
+  (The above is a two-column text. If combining characters are handled
+  correctly, the lines of the second column should be aligned with the
+  | character above.)
+
+Ethiopian:
+
+  Proverbs in the Amharic language:
+
+  ሰማይ አይታረስ ንጉሥ አይከሰስ።
+  ብላ ካለኝ እንደአባቴ በቆመጠኝ።
+  ጌጥ ያለቤቱ ቁምጥና ነው።
+  ደሀ በሕልሙ ቅቤ ባይጠጣ ንጣት በገደለው።
+  የአፍ ወለምታ በቅቤ አይታሽም።
+  አይጥ በበላ ዳዋ ተመታ።
+  ሲተረጉሙ ይደረግሙ።
+  ቀስ በቀስ፥ ዕንቁላል በእግሩ ይሄዳል።
+  ድር ቢያብር አንበሳ ያስር።
+  ሰው እንደቤቱ እንጅ እንደ ጉረቤቱ አይተዳደርም።
+  እግዜር የከፈተውን ጉሮሮ ሳይዘጋው አይድርም።
+  የጎረቤት ሌባ፥ ቢያዩት ይስቅ ባያዩት ያጠልቅ።
+  ሥራ ከመፍታት ልጄን ላፋታት።
+  ዓባይ ማደሪያ የለው፥ ግንድ ይዞ ይዞራል።
+  የእስላም አገሩ መካ የአሞራ አገሩ ዋርካ።
+  ተንጋሎ ቢተፉ ተመልሶ ባፉ።
+  ወዳጅህ ማር ቢሆን ጨርስህ አትላሰው።
+  እግርህን በፍራሽህ ልክ ዘርጋ።
+
+Runes:
+
+  ᚻᛖ ᚳᚹᚫᚦ ᚦᚫᛏ ᚻᛖ ᛒᚢᛞᛖ ᚩᚾ ᚦᚫᛗ ᛚᚪᚾᛞᛖ ᚾᚩᚱᚦᚹᛖᚪᚱᛞᚢᛗ ᚹᛁᚦ ᚦᚪ ᚹᛖᛥᚫ
+
+  (Old English, which transcribed into Latin reads 'He cwaeth that he
+  bude thaem lande northweardum with tha Westsae.' and means 'He said
+  that he lived in the northern land near the Western Sea.')
+
+Braille:
+
+  ⡌⠁⠧⠑ ⠼⠁⠒  ⡍⠜⠇⠑⠹⠰⠎ ⡣⠕⠌
+
+  ⡍⠜⠇⠑⠹ ⠺⠁⠎ ⠙⠑⠁⠙⠒ ⠞⠕ ⠃⠑⠛⠔ ⠺⠊⠹⠲ ⡹⠻⠑ ⠊⠎ ⠝⠕ ⠙⠳⠃⠞
+  ⠱⠁⠞⠑⠧⠻ ⠁⠃⠳⠞ ⠹⠁⠞⠲ ⡹⠑ ⠗⠑⠛⠊⠌⠻ ⠕⠋ ⠙⠊⠎ ⠃⠥⠗⠊⠁⠇ ⠺⠁⠎
+  ⠎⠊⠛⠝⠫ ⠃⠹ ⠹⠑ ⠊⠇⠻⠛⠹⠍⠁⠝⠂ ⠹⠑ ⠊⠇⠻⠅⠂ ⠹⠑ ⠥⠝⠙⠻⠞⠁⠅⠻⠂
+  ⠁⠝⠙ ⠹⠑ ⠡⠊⠑⠋ ⠍⠳⠗⠝⠻⠲ ⡎⠊⠗⠕⠕⠛⠑ ⠎⠊⠛⠝⠫ ⠊⠞⠲ ⡁⠝⠙
+  ⡎⠊⠗⠕⠕⠛⠑⠰⠎ ⠝⠁⠍⠑ ⠺⠁⠎ ⠛⠕⠕⠙ ⠥⠏⠕⠝ ⠰⡡⠁⠝⠛⠑⠂ ⠋⠕⠗ ⠁⠝⠹⠹⠔⠛ ⠙⠑
+  ⠡⠕⠎⠑ ⠞⠕ ⠏⠥⠞ ⠙⠊⠎ ⠙⠁⠝⠙ ⠞⠕⠲
+
+  ⡕⠇⠙ ⡍⠜⠇⠑⠹ ⠺⠁⠎ ⠁⠎ ⠙⠑⠁⠙ ⠁⠎ ⠁ ⠙⠕⠕⠗⠤⠝⠁⠊⠇⠲
+
+  ⡍⠔⠙⠖ ⡊ ⠙⠕⠝⠰⠞ ⠍⠑⠁⠝ ⠞⠕ ⠎⠁⠹ ⠹⠁⠞ ⡊ ⠅⠝⠪⠂ ⠕⠋ ⠍⠹
+  ⠪⠝ ⠅⠝⠪⠇⠫⠛⠑⠂ ⠱⠁⠞ ⠹⠻⠑ ⠊⠎ ⠏⠜⠞⠊⠊⠥⠇⠜⠇⠹ ⠙⠑⠁⠙ ⠁⠃⠳⠞
+  ⠁ ⠙⠕⠕⠗⠤⠝⠁⠊⠇⠲ ⡊ ⠍⠊⠣⠞ ⠙⠁⠧⠑ ⠃⠑⠲ ⠔⠊⠇⠔⠫⠂ ⠍⠹⠎⠑⠇⠋⠂ ⠞⠕
+  ⠗⠑⠛⠜⠙ ⠁ ⠊⠕⠋⠋⠔⠤⠝⠁⠊⠇ ⠁⠎ ⠹⠑ ⠙⠑⠁⠙⠑⠌ ⠏⠊⠑⠊⠑ ⠕⠋ ⠊⠗⠕⠝⠍⠕⠝⠛⠻⠹
+  ⠔ ⠹⠑ ⠞⠗⠁⠙⠑⠲ ⡃⠥⠞ ⠹⠑ ⠺⠊⠎⠙⠕⠍ ⠕⠋ ⠳⠗ ⠁⠝⠊⠑⠌⠕⠗⠎
+  ⠊⠎ ⠔ ⠹⠑ ⠎⠊⠍⠊⠇⠑⠆ ⠁⠝⠙ ⠍⠹ ⠥⠝⠙⠁⠇⠇⠪⠫ ⠙⠁⠝⠙⠎
+  ⠩⠁⠇⠇ ⠝⠕⠞ ⠙⠊⠌⠥⠗⠃ ⠊⠞⠂ ⠕⠗ ⠹⠑ ⡊⠳⠝⠞⠗⠹⠰⠎ ⠙⠕⠝⠑ ⠋⠕⠗⠲ ⡹⠳
+  ⠺⠊⠇⠇ ⠹⠻⠑⠋⠕⠗⠑ ⠏⠻⠍⠊⠞ ⠍⠑ ⠞⠕ ⠗⠑⠏⠑⠁⠞⠂ ⠑⠍⠏⠙⠁⠞⠊⠊⠁⠇⠇⠹⠂ ⠹⠁⠞
+  ⡍⠜⠇⠑⠹ ⠺⠁⠎ ⠁⠎ ⠙⠑⠁⠙ ⠁⠎ ⠁ ⠙⠕⠕⠗⠤⠝⠁⠊⠇⠲
+
+  (The first couple of paragraphs of "A Christmas Carol" by Dickens)
+
+Compact font selection example text:
+
+  ABCDEFGHIJKLMNOPQRSTUVWXYZ /0123456789
+  abcdefghijklmnopqrstuvwxyz £©µÀÆÖÞßéöÿ
+  –—‘“”„†•…‰™œŠŸž€ ΑΒΓΔΩαβγδω АБВГДабвгд
+  ∀∂∈ℝ∧∪≡∞ ↑↗↨↻⇣ ┐┼╔╘░►☺♀ ﬁ�⑀₂ἠḂӥẄɐː⍎אԱა
+
+Greetings in various languages:
+
+  Hello world, Καλημέρα κόσμε, コンニチハ
+
+Box drawing alignment tests:                                          █
+                                                                      ▉
+  ╔══╦══╗  ┌──┬──┐  ╭──┬──╮  ╭──┬──╮  ┏━━┳━━┓  ┎┒┏┑   ╷  ╻ ┏┯┓ ┌┰┐    ▊ ╱╲╱╲╳╳╳
+  ║┌─╨─┐║  │╔═╧═╗│  │╒═╪═╕│  │╓─╁─╖│  ┃┌─╂─┐┃  ┗╃╄┙  ╶┼╴╺╋╸┠┼┨ ┝╋┥    ▋ ╲╱╲╱╳╳╳
+  ║│╲ ╱│║  │║   ║│  ││ │ ││  │║ ┃ ║│  ┃│ ╿ │┃  ┍╅╆┓   ╵  ╹ ┗┷┛ └┸┘    ▌ ╱╲╱╲╳╳╳
+  ╠╡ ╳ ╞╣  ├╢   ╟┤  ├┼─┼─┼┤  ├╫─╂─╫┤  ┣┿╾┼╼┿┫  ┕┛┖┚     ┌┄┄┐ ╎ ┏┅┅┓ ┋ ▍ ╲╱╲╱╳╳╳
+  ║│╱ ╲│║  │║   ║│  ││ │ ││  │║ ┃ ║│  ┃│ ╽ │┃  ░░▒▒▓▓██ ┊  ┆ ╎ ╏  ┇ ┋ ▎
+  ║└─╥─┘║  │╚═╤═╝│  │╘═╪═╛│  │╙─╀─╜│  ┃└─╂─┘┃  ░░▒▒▓▓██ ┊  ┆ ╎ ╏  ┇ ┋ ▏
+  ╚══╩══╝  └──┴──┘  ╰──┴──╯  ╰──┴──╯  ┗━━┻━━┛  ▗▄▖▛▀▜   └╌╌┘ ╎ ┗╍╍┛ ┋  ▁▂▃▄▅▆▇█
+                                               ▝▀▘▙▄▟
+
+
+UTF-8 decoder capability and stress test                                      |
+----------------------------------------                                      |
+                                                                              |
+Markus Kuhn <http://www.cl.cam.ac.uk/~mgk25/> - 2002-11-08                    |
+                                                                              |
+This test text examines, how UTF-8 decoders handle various types of           |
+corrupted or otherwise interesting UTF-8 sequences.                           |
+                                                                              |
+According to ISO 10646-1, sections R.7 and 2.3c, a device receiving           |
+UTF-8 shall interpret a "malformed sequence in the same way that it           |
+interprets a character that is outside the adopted subset". This means        |
+usually that the malformed UTF-8 sequence is replaced by a replacement        |
+character (U+FFFD), which looks a bit like an inverted question mark,         |
+or a similar symbol. It might be a good idea to visually distinguish a        |
+malformed UTF-8 sequence from a correctly encoded Unicode character           |
+that is just not available in the current font but otherwise fully            |
+legal. For both cases, a clearly recognisable symbol should be used.          |
+Just ignoring malformed sequences or unavailable characters will make         |
+debugging more difficult and can lead to user confusion.                      |
+                                                                              |
+Test sequences:                                                               |
+                                                                              |
+Check, whether a malformed UTF-8 sequence is (1) represented at all,          |
+(2) represented by exactly one replacement character (or equivalent           |
+signal), and (3) the following quotation mark after an illegal UTF-8          |
+sequence is correctly displayed, i.e. proper resynchronization takes          |
+place. This file says "THE END" in the last line, so if you don't see         |
+that, your decoder crashed somehow before, which is also not nice.            |
+                                                                              |
+All lines in this file are exactly 79 characters long (plus the line          |
+feed). In addition, all lines end with "|", except for the two test           |
+lines 2.1.1 and 2.2.1, which contain non-printable ASCII controls             |
+U+0000 and U+007F. If you display this file with a fixed-width font,          |
+these "|" characters should all line up in column 79 (right margin).          |
+This allows you to test quickly, whether your UTF-8 decoder finds the         |
+correct number of characters in every line.                                   |
+                                                                              |
+Note that as an alternative to the notion of malformed sequence used          |
+here, it is also a perfectly acceptable (and in some situations even          |
+preferable) solution to represent each individual byte of a malformed         |
+sequence by a replacement character. If you follow this strategy in           |
+your decoder, then ignore the "|" column.                                     |
+                                                                              |
+                                                                              |
+Here come the tests:                                                          |
+                                                                              |
+1  Some correct UTF-8 text                                                    |
+                                                                              |
+You should see the Greek word 'kosme':       "κόσμε"                          |
+                                                                              |
+2  Boundary condition test cases                                              |
+                                                                              |
+You should see a correctly encoded character each time (which is not          |
+necessarily an existing character).                                           |
+                                                                              |
+2.1  First possible sequence of a certain length                              |
+                                                                              |
+2.1.2  2 bytes (U-00000080):        ""                                       |
+2.1.3  3 bytes (U-00000800):        "ࠀ"                                       |
+2.1.4  4 bytes (U-00010000):        "𐀀"                                       |
+                                                                              |
+2.2  Last possible sequence of a certain length                               |
+                                                                              |
+2.2.2  2 bytes (U-000007FF):        "߿"                                       |
+2.2.3  3 bytes (U-0000FFFF):        "￿"                                       |
+2.2.4  4 bytes (U-001FFFFF):        "����"                                       |
+                                                                              |
+2.3  Other boundary conditions                                                |
+                                                                              |
+2.3.1  U-0000D7FF = ed 9f bf = "퟿"                                            |
+2.3.2  U-0000E000 = ee 80 80 = ""                                            |
+
+2.3.3  U-0000FFFD = ef bf bd = "�"                                            |
+
+2.3.4  U-0010FFFF = f4 8f bf bf = "􏿿"                                         |
+2.3.5  U-00110000 = f4 90 80 80 = "����"                                         |
+                                                                              |
+3  Malformed sequences                                                        |
+                                                                              |
+3.1  Unexpected continuation bytes                                            |
+                                                                              |
+Each unexpected continuation byte should be separately signalled as a         |
+malformed sequence of its own.                                                |
+                                                                              |
+3.1.1  First continuation byte 0x80: "�"                                      |
+                                                                              |
+3.1.9  Sequence of all 64 possible continuation bytes (0x80-0xbf):            |
+                                                                              |
+3.2  Lonely start characters                                                  |
+                                                                              |
+3.2.1  All 32 first bytes of 2-byte sequences (0xc0-0xdf),                    |
+       each followed by a space character:                                    |
+                                                                              |
+3.3  Sequences with last continuation byte missing                            |
+                                                                              |
+All bytes of an incomplete sequence should be signalled as a single           |
+malformed sequence, i.e., you should see only a single replacement            |
+characters in each of the next 10 tests. (Characters as in section 2)         |
+                                                                              |
+3.4  Concatenation of incomplete sequences                                    |
+                                                                              |
+All the 10 sequences of 3.3 concatenated, you should see 10 malformed         |
+sequences being signalled:                                                    |
+                                                                              |
+3.5  Impossible bytes                                                         |
+                                                                              |
+The following two bytes cannot appear in a correct UTF-8 string               |
+                                                                              |
+4  Overlong sequences                                                         |
+                                                                              |
+The following sequences are not malformed according to the letter of          |
+the Unicode 2.0 standard. However, they are longer then necessary and         |
+a correct UTF-8 encoder is not allowed to produce them. A "safe UTF-8         |
+decoder" should reject them just like malformed sequences for two             |
+reasons: (1) It helps to debug applications if overlong sequences are         |
+not treated as valid representations of characters, because this helps        |
+to spot problems more quickly. (2) Overlong sequences provide                 |
+alternative representations of characters, that could maliciously be          |
+used to bypass filters that check only for ASCII characters. For              |
+instance, a 2-byte encoded line feed (LF) would not be caught by a            |
+line counter that counts only 0x0a bytes, but it would still be               |
+processed as a line feed by an unsafe UTF-8 decoder later in the              |
+pipeline. From a security point of view, ASCII compatibility of UTF-8         |
+sequences means also, that ASCII characters are *only* allowed to be          |
+represented by ASCII bytes in the range 0x00-0x7f. To ensure this             |
+aspect of ASCII compatibility, use only "safe UTF-8 decoders" that            |
+reject overlong UTF-8 sequences for which a shorter encoding exists.          |
+                                                                              |
+4.1  Examples of an overlong ASCII character                                  |
+                                                                              |
+With a safe UTF-8 decoder, all of the following five overlong                 |
+representations of the ASCII character slash ("/") should be rejected         |
+like a malformed UTF-8 sequence, for instance by substituting it with         |
+a replacement character. If you see a slash below, you do not have a          |
+safe UTF-8 decoder!                                                           |
+                                                                              |
+4.2  Maximum overlong sequences                                               |
+                                                                              |
+Below you see the highest Unicode value that is still resulting in an         |
+overlong sequence if represented with the given number of bytes. This         |
+is a boundary test for safe UTF-8 decoders. All five characters should        |
+be rejected like malformed UTF-8 sequences.                                   |
+                                                                              |
+                                                                              |
+4.3  Overlong representation of the NUL character                             |
+                                                                              |
+The following five sequences should also be rejected like malformed           |
+UTF-8 sequences and should not be treated like the ASCII NUL                  |
+character.                                                                    |
+                                                                              |
+                                                                              |
+5  Illegal code positions                                                     |
+                                                                              |
+The following UTF-8 sequences should be rejected like malformed               |
+sequences, because they never represent valid ISO 10646 characters and        |
+a UTF-8 decoder that accepts them might introduce security problems           |
+comparable to overlong UTF-8 sequences.                                       |
+                                                                              |
+5.1 Single UTF-16 surrogates                                                  |
+                                                                              |
+                                                                              |
+5.2 Paired UTF-16 surrogates                                                  |
+                                                                              |
+                                                                              |
+5.3 Other illegal code positions                                              |
+                                                                              |
+5.3.1  U+FFFE = ef bf be = "￾"                                                |
+5.3.2  U+FFFF = ef bf bf = "￿"                                                |
+                                                                              |
+THE END                                                                       |
+# letters with diferent codepage interpratation
+# can be viewed differently depending the font local and file codepage selected
+# use macro set_locale(codepage id)
+# where codepage is from the following table
+# and reload the file
+# ISO characters will be highligted
+
+0	"UTF-8",
+1	"ISO8859-1",
+2	"ISO8859-2",
+3	"ISO8859-3",
+4	"ISO8859-4",
+5	"ISO8859-5",
+6	"ISO8859-6",
+7	"ISO8859-7",
+8	"ISO8859-8",
+9	"ISO8859-9",
+10	"ISO8859-10",
+11	"ISO8859-11",	/* thai */
+12	"ISO8859-13",
+13	"ISO8859-14",
+14	"ISO8859-15",
+15	"ISO8859-16",
+16	"windows-1253",
+17	"KOI8-T",
+18	"CP87",
+19	"CP737"
+
+
+(nul)   0 0000 0x00 | (sp)  32 0040 0x20 | @     64 0100 0x40 | `      96 0140 0x60
+(soh)   1 0001 0x01 | !     33 0041 0x21 | A     65 0101 0x41 | a      97 0141 0x61
+(stx)   2 0002 0x02 | "     34 0042 0x22 | B     66 0102 0x42 | b      98 0142 0x62
+(etx)   3 0003 0x03 | #     35 0043 0x23 | C     67 0103 0x43 | c      99 0143 0x63
+(eot)   4 0004 0x04 | $     36 0044 0x24 | D     68 0104 0x44 | d     100 0144 0x64
+(enq)   5 0005 0x05 | %     37 0045 0x25 | E     69 0105 0x45 | e     101 0145 0x65
+(ack)   6 0006 0x06 | &     38 0046 0x26 | F     70 0106 0x46 | f     102 0146 0x66
+(bel)   7 0007 0x07 | '     39 0047 0x27 | G     71 0107 0x47 | g     103 0147 0x67
+(bs)    8 0010 0x08 | (     40 0050 0x28 | H     72 0110 0x48 | h     104 0150 0x68
+(ht)    9 0011 0x09 | )     41 0051 0x29 | I     73 0111 0x49 | i     105 0151 0x69
+(nl)   10 0012 0x0a | *     42 0052 0x2a | J     74 0112 0x4a | j     106 0152 0x6a
+(vt)   11 0013 0x0b | +     43 0053 0x2b | K     75 0113 0x4b | k     107 0153 0x6b
+(np)   12 0014 0x0c | ,     44 0054 0x2c | L     76 0114 0x4c | l     108 0154 0x6c
+(cr)   13 0015 0x0d | -     45 0055 0x2d | M     77 0115 0x4d | m     109 0155 0x6d
+(so)   14 0016 0x0e | .     46 0056 0x2e | N     78 0116 0x4e | n     110 0156 0x6e
+(si)   15 0017 0x0f | /     47 0057 0x2f | O     79 0117 0x4f | o     111 0157 0x6f
+(dle)  16 0020 0x10 | 0     48 0060 0x30 | P     80 0120 0x50 | p     112 0160 0x70
+(dc1)  17 0021 0x11 | 1     49 0061 0x31 | Q     81 0121 0x51 | q     113 0161 0x71
+(dc2)  18 0022 0x12 | 2     50 0062 0x32 | R     82 0122 0x52 | r     114 0162 0x72
+(dc3)  19 0023 0x13 | 3     51 0063 0x33 | S     83 0123 0x53 | s     115 0163 0x73
+(dc4)  20 0024 0x14 | 4     52 0064 0x34 | T     84 0124 0x54 | t     116 0164 0x74
+(nak)  21 0025 0x15 | 5     53 0065 0x35 | U     85 0125 0x55 | u     117 0165 0x75
+(syn)  22 0026 0x16 | 6     54 0066 0x36 | V     86 0126 0x56 | v     118 0166 0x76
+(etb)  23 0027 0x17 | 7     55 0067 0x37 | W     87 0127 0x57 | w     119 0167 0x77
+(can)  24 0030 0x18 | 8     56 0070 0x38 | X     88 0130 0x58 | x     120 0170 0x78
+(em)   25 0031 0x19 | 9     57 0071 0x39 | Y     89 0131 0x59 | y     121 0171 0x79
+(sub)  26 0032 0x1a | :     58 0072 0x3a | Z     90 0132 0x5a | z     122 0172 0x7a
+(esc)  27 0033 0x1b | ;     59 0073 0x3b | [     91 0133 0x5b | {     123 0173 0x7b
+(fs)   28 0034 0x1c | <     60 0074 0x3c | \     92 0134 0x5c | |     124 0174 0x7c
+(gs)   29 0035 0x1d | =     61 0075 0x3d | ]     93 0135 0x5d | }     125 0175 0x7d
+(rs)   30 0036 0x1e | >     62 0076 0x3e | ^     94 0136 0x5e | ~     126 0176 0x7e
+(us)   31 0037 0x1f | ?     63 0077 0x3f | _     95 0137 0x5f | (del) 127 0177 0x7f
+Char  Dec  Oct  Hex | Chr  Dec  Oct  Hex | Chr  Dec  Oct  Hex | Chr  Dec  Oct   Hex
+-----------------------------------------------------------------------------------
+(nul)   0 0000 0x00 | (sp)  32 0040 0x20 | @     64 0100 0x40 | `      96 0140 0x60
+(soh)   1 0001 0x01 | !     33 0041 0x21 | A     65 0101 0x41 | a      97 0141 0x61
+(stx)   2 0002 0x02 | "     34 0042 0x22 | B     66 0102 0x42 | b      98 0142 0x62
+(etx)   3 0003 0x03 | #     35 0043 0x23 | C     67 0103 0x43 | c      99 0143 0x63
+(eot)   4 0004 0x04 | $     36 0044 0x24 | D     68 0104 0x44 | d     100 0144 0x64
+(enq)   5 0005 0x05 | %     37 0045 0x25 | E     69 0105 0x45 | e     101 0145 0x65
+(ack)   6 0006 0x06 | &     38 0046 0x26 | F     70 0106 0x46 | f     102 0146 0x66
+(bel)   7 0007 0x07 | '     39 0047 0x27 | G     71 0107 0x47 | g     103 0147 0x67
+(bs)    8 0010 0x08 | (     40 0050 0x28 | H     72 0110 0x48 | h     104 0150 0x68
+(ht)    9 0011 0x09 | )     41 0051 0x29 | I     73 0111 0x49 | i     105 0151 0x69
+(nl)   10 0012 0x0a | *     42 0052 0x2a | J     74 0112 0x4a | j     106 0152 0x6a
+(vt)   11 0013 0x0b | +     43 0053 0x2b | K     75 0113 0x4b | k     107 0153 0x6b
+(np)   12 0014 0x0c | ,     44 0054 0x2c | L     76 0114 0x4c | l     108 0154 0x6c
+(cr)   13 0015 0x0d | -     45 0055 0x2d | M     77 0115 0x4d | m     109 0155 0x6d
+(so)   14 0016 0x0e | .     46 0056 0x2e | N     78 0116 0x4e | n     110 0156 0x6e
+(si)   15 0017 0x0f | /     47 0057 0x2f | O     79 0117 0x4f | o     111 0157 0x6f
+(dle)  16 0020 0x10 | 0     48 0060 0x30 | P     80 0120 0x50 | p     112 0160 0x70
+(dc1)  17 0021 0x11 | 1     49 0061 0x31 | Q     81 0121 0x51 | q     113 0161 0x71
+(dc2)  18 0022 0x12 | 2     50 0062 0x32 | R     82 0122 0x52 | r     114 0162 0x72
+(dc3)  19 0023 0x13 | 3     51 0063 0x33 | S     83 0123 0x53 | s     115 0163 0x73
+(dc4)  20 0024 0x14 | 4     52 0064 0x34 | T     84 0124 0x54 | t     116 0164 0x74
+(nak)  21 0025 0x15 | 5     53 0065 0x35 | U     85 0125 0x55 | u     117 0165 0x75
+(syn)  22 0026 0x16 | 6     54 0066 0x36 | V     86 0126 0x56 | v     118 0166 0x76
+(etb)  23 0027 0x17 | 7     55 0067 0x37 | W     87 0127 0x57 | w     119 0167 0x77
+(can)  24 0030 0x18 | 8     56 0070 0x38 | X     88 0130 0x58 | x     120 0170 0x78
+(em)   25 0031 0x19 | 9     57 0071 0x39 | Y     89 0131 0x59 | y     121 0171 0x79
+(sub)  26 0032 0x1a | :     58 0072 0x3a | Z     90 0132 0x5a | z     122 0172 0x7a
+(esc)  27 0033 0x1b | ;     59 0073 0x3b | [     91 0133 0x5b | {     123 0173 0x7b
+(fs)   28 0034 0x1c | <     60 0074 0x3c | \     92 0134 0x5c | |     124 0174 0x7c
+(gs)   29 0035 0x1d | =     61 0075 0x3d | ]     93 0135 0x5d | }     125 0175 0x7d
+(rs)   30 0036 0x1e | >     62 0076 0x3e | ^     94 0136 0x5e | ~     126 0176 0x7e
+(us)   31 0037 0x1f | ?     63 0077 0x3f | _     95 0137 0x5f | (del) 127 0177 0x7f
+// C test file to view various highlight items in C mode 
+// c++ comment
+C comment	/*   */
+/* Multiline c commments
+	ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz
+	1234567890 αβγδεζηθικλμνξοπρστυφχψω
+*/ 
+/* tabs and spaces utf8 and control characters */
+	_ = αβγ 95 5F	[1;3A alt-up		[1;3D	alt-left
+	- = 123 45 2D	[1;3B alt-down		[1;3C  alt-right 
+	+ = αβγ 43 2B
+#if 1
+#include "test.h"
+#define TEST "double quotes"
+#define TEST2 'single quotes'
+/* words1 */ 	if (124.3) else while { return("aa") ; }; 
+/* words2 */  	struct void int double char short 
+typedef struct aa {
+	int b;
+	char cc[30];
+	double aa;
+} aa;
+	if(a==0x44ABC) { test=3;} else { int k=0o11;}	/* words1  */
+#endif
+in line special chars in C && +++ -------- **** ======= +++++++ [ { ( ) } ]
+/* numbers, numerics */
+123456789|1234567890123456789|123456789|123456789|1234567890123456789|123456789|1234567890|1234567890|1234567890|1234567890|1234567890|1234567890|1234567890|1234567890
+         1         2         3         4         5         6         7         8          8          9          10         11
+	Normal text 
+Greek letters and other utf characters 
+	αβγδεζηθικλμνξοπρστυφχψω άέήίόύώ ΆΈΉΊΌΎΏ àèìòù©˙˚¬≈ç√∫ãµ
+	ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ ϊϋ €·§¹²³£§¶°•“ € …†®çœ∑Çé ¿
+
+control characters []
+
+// page separator (^L) (This is a valid character in c programs! (show it as a line break)
+
+
+normal text
+1234567890
+------------
+1234567890
+==========
+-
+# a unix file with double spaced utf characters (ascii and japanese characters)
+
+MULTICAST_ENABLE                  = "マルチキャストでの探索を有効にする"
+TIMEOUT_SETTING                   = "通信エラーとする時間 ："
+TTL                               = "マルチキャストTTL ："
+"｀ａｂｃｄｅｆｇｈｈｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｘｚ｛｜｝～｟｠｡｢｣､30) ："
+"！＂＃＄％＆＇（）＊＋，－．／０１２３４５６７８９：；＜＝＞？"
+"＠ＡＢＣＤＥＦＧＨＩＪＫＬＭＭＯＰＱＲＳＴＵＶＷＸＹＺ［＼］＾＿"
+SC                                = "秒"
+ADD_PORT_WIZARD                   = "EpsonNet Print ポートの追加ウィザード"
+PORT_ADDED                        = "次の EpsonNet Print ポートを追加しようとしています。"
+HOST_NAME_IP                      = "名前またはIPアドレス :"
+
+# Emoji characters
+
+link	🔗
+lock	🔒
+door	🚪
+window	🪟
+litter in bin	🚮
+"🔙"
+# buttons
+right	▶
+left	◀
+up		🔼	🔺
+downn	🔽	🔻
+
+bright	🔆
+
+check mark	✔
+🔠🔡🔢🔣ℹ-
+circles
+red 	🔴
+orange	🟠
+yellow	🟡
+green	🟢
+blue	🔵
+# hands
+👋👌🤞
+👈👉👆👇
+👍👎
+
+total 6259088
+-rw-r--r--  1 kt  staff          0 Sep  5 09:15 f1.lst
+-rwxrwxrwx  1 kt  staff   21721427 Feb 28  2015 Η μαγεία στην αρχαία Ελλάδα.pdf
+-rwxrwxrwx  1 kt  staff   25890506 Feb 28  2015 Η μαγειρική της Αρχαιότητας.pdf
+-rwxrwxrwx  1 kt  staff   33552807 Feb 28  2015 Η καθημερινή ζωή στην αρχαία Ελλάδα.pdf
+-rwxrwxrwx  1 kt  staff    3548677 Feb 28  2015 Τα 7 θαύματα του κόσμου (Οδηγός παράστασης Πλανητάριου).pdf
+-rwxrwxrwx  1 kt  staff     440681 Feb 28  2015 ΚΟΚ - Σήματα Οδήγησης.pdf
+-rwxrwxrwx  1 kt  staff    3812792 Feb 28  2015 ΚΟΚ - Κώδικας Οδικής Κυκλοφορίας 2007 .pdf
+-rwxrwxrwx  1 kt  staff  102301842 Feb 28  2015 Πώς Θα Αναπτύξετε τις Ψυχικές σας Δυνάμεις.pdf
+-rwxrwxrwx  1 kt  staff    2668373 Feb 28  2015 Πώς να επιβιώσετε οικονομικά - Δρόση Χαρούλα.pdf
+-rwxrwxrwx  1 kt  staff   12032599 Feb 28  2015 Πώς να ερμηνεύουμε τα παιδικά σχέδια-Η κρυφή γλώσσα των παιδιών - Crotti Evi-Magni Alberto.pdf
+-rwxrwxrwx  1 kt  staff    1698605 Feb 28  2015 Ζέη Άλκη - Ο Ευρυπίδης.pdf
+-rwxrwxrwx  1 kt  staff   12264378 Feb 28  2015 Ζέη Άλκη - Η αρραβωνιαστικιά του Αχιλλέα.pdf
+-rwxrwxrwx  1 kt  staff    9753200 Feb 28  2015 Μαντά Λένα - Η άλλη πλευρά του νομίσματος.pdf
+-rwxrwxrwx  1 kt  staff  218381961 Feb 28  2015 Μαντά Λένα - Τα 5 κλειδιά.pdf
+-rwxrwxrwx  1 kt  staff    4631957 Feb 28  2015 Μαντά Λένα - Τη μέρα που σε γνώρισα.pdf
+-rwxrwxrwx  1 kt  staff    6700868 Feb 28  2015 Μαντά Λένα - Με λένε Ντάτα.pdf
+-rwxrwxrwx  1 kt  staff   15208301 Feb 28  2015 Μαντά Λένα - Το σπίτι δίπλα στο ποτάμι.pdf
+-rwxrwxrwx  1 kt  staff   10370807 Feb 28  2015 Μαντά Λένα - Το τελευταίο τσιγάρο.pdf
+-rwxrwxrwx  1 kt  staff   15392512 Feb 28  2015 Μαντά Λένα - Βαλς με δώδεκα Θεούς.pdf
+-rwxrwxrwx  1 kt  staff   11280033 Feb 28  2015 Μαντά Λένα - Όσο αντέχει η ψυχή.pdf
+-rw-r--r--  1 kt  staff    9176263 Aug 17  2015 ΒΑΛΑΚΑ ΜΗΤΣΗ - ΚΑΝΕΝΑ ΨΕΜΑ ΔΕΝ ΠΡΟΦΤΑΙΝΕΙ ΝΑ ΓΕΡΑΣΕΙ.pdf
+-rwxrwxrwx  1 kt  staff   14313316 Feb 28  2015 Μαντά Λένα - Χωρίς χειροκρότημα.pdf
+-rwxrwxrwx  1 kt  staff    3893063 Feb 28  2015 Μαντά Λένα - Θεανώ-Η λύκαινα της Πόλης.pdf
+-rwxrwxrwx  1 kt  staff    3646977 Feb 28  2015 Μαντά Λένα - Έρωτας σαν βροχή.pdf
+-rwxrwxrwx  1 kt  staff    2046446 Feb 28  2015 Ξηρός Σάββας - Η μέρα εκείνη.pdf
+-rwxrwxrwx  1 kt  staff    2963091 Feb 28  2015 Μαρής Γιάννης - Έγκλημα στα παρασκήνια.pdf
+-rwxrwxrwx  1 kt  staff    9005851 Feb 28  2015 Ψαθάς Δημήτρης - Η Θέμις έχει κέφια.pdf
+-rwxrwxrwx  1 kt  staff    1577670 Feb 28  2015 Λέκκα Κατερίνα - Ο μάρτυρας της νύχτας.pdf
+-rwxrwxrwx  1 kt  staff    1838320 Feb 28  2015 Δέλτα Πηνελόπη - Για την Πατρίδα.pdf
+-rwxrwxrwx  1 kt  staff    7503538 Feb 28  2015 Δέλτα Πηνελόπη - Τον καιρό του Βουλγαροκτόνου.pdf
+-rwxrwxrwx  1 kt  staff    3703606 Feb 28  2015 Δέλτα Πηνελόπη - Στα μυστικά του βάλτου.pdf
+-rwxrwxrwx  1 kt  staff    5276712 Feb 28  2015 Δέλτα Πηνελόπη - Μάγκας.pdf
+-rwxrwxrwx  1 kt  staff    5959091 Feb 28  2015 Δέλτα Πηνελόπη - Παραμύθι Χωρίς Όνομα.pdf
+-rwxrwxrwx  1 kt  staff    7487163 Feb 28  2015 Δέλτα Πηνελόπη - Παραμύθια και Άλλα.pdf
+-rwxrwxrwx  1 kt  staff     946923 Feb 28  2015 Δέλτα Πηνελόπη - Τρελαντώνης.pdf
+-rwxrwxrwx  1 kt  staff    3339530 Feb 28  2015 Κορτώ Αύγουστος - Ο γιος της Τζοκόντα.pdf
+-rwxrwxrwx  1 kt  staff    1157227 Feb 28  2015 Κορτώ Αύγουστος - Ο άνθρωπος που έτρωγε πολλά.pdf
+-rwxrwxrwx  1 kt  staff    1582370 Feb 28  2015 Κορτώ Αύγουστος - Η λαιμαργία.pdf
+-rwxrwxrwx  1 kt  staff    1096947 Feb 28  2015 Ρήγας Αθανάσιος - Το ταξίδι της αγάπης.pdf
+-rwxrwxrwx  1 kt  staff    1891568 Feb 28  2015 Κορτώ Αύγουστος - Το τετράγωνο.pdf
+-rwxrwxrwx  1 kt  staff    3161040 Feb 28  2015 Ρώσση-Ζαϊρη Ρένα - Αγαπώ θα πει χάνομαι.pdf
+-rwxrwxrwx  1 kt  staff    2671676 Feb 28  2015 Ρώσση-Ζαϊρη Ρένα - Δίδυμα φεγγάρια.pdf
+-rwxrwxrwx  1 kt  staff   10735369 Feb 28  2015 Σικάγο 1886 - Η ιστορία της εργατικής Πρωτομαγιάς - Η προπαγάνδα μέσα από τη δράση.pdf
+-rwxrwxrwx  1 kt  staff    1401860 Feb 28  2015 Φαραζή Έλσα - Η Μεσόγειος των λυγµών.pdf
+-rwxrwxrwx  1 kt  staff    3779510 Feb 28  2015 Ομήρου Ιλιάδα - Μετάφραση Ν.Καζαντζάκη-Ι.Κακριδή.pdf
+-rwxrwxrwx  1 kt  staff     184740 Feb 28  2015 Ρίτσος Γιάννης - Η Σονάτα του  Σεληνόφωτος.pdf
+-rwxrwxrwx  1 kt  staff    2124627 Feb 28  2015 Κράλλη Μεταξία - Μια φορά κι ένα καλοκαίρι.pdf
+-rwxrwxrwx  1 kt  staff    2391825 Feb 28  2015 Κράλλη Μεταξία - Δεύτερη πράξη.pdf
+-rwxrwxrwx  1 kt  staff     217762 Feb 28  2015 Ελύτης Οδυσσέας - Τα ρω του έρωτα.pdf
+-rwxrwxrwx  1 kt  staff     334168 Feb 28  2015 Ελύτης Οδυσσέας - Τα Δημόσια και τα Ιδιωτικά.pdf
+-rwxrwxrwx  1 kt  staff      73715 Feb 28  2015 Ελύτης Οδυσσέας - Το μονόγραμμα.pdf
+-rwxrwxrwx  1 kt  staff    1700243 Feb 28  2015 Ελύτης Οδυσσέας - Άξιον Εστί.pdf
+-rwxrwxrwx  1 kt  staff    1259493 Feb 28  2015 Σχοινά Αγγελική - Καλημέρα και Αντίο.pdf
+-rwxrwxrwx  1 kt  staff   60863433 Feb 28  2015 Ομήρου Οδύσσεια - Μετάφραση Δ.Ν. Μαρωνίτη.pdf
+-rwxrwxrwx  1 kt  staff    1574834 Feb 28  2015 Κοφινά Κατερίνα - Σκισμένες σελίδες.pdf
+-rwxrwxrwx  1 kt  staff   17919617 Feb 28  2015 Παύλος Σιδηρόπουλος - Το μοναχικό μπλουζ του πρίγκηπα (Δηματάτης Ντίνος).pdf
+-rwxrwxrwx  1 kt  staff   10398414 Feb 28  2015 Παύλος Σιδηρόπουλος - Πού να γυρίζεις (Λαδικός Άκης).pdf
+-rwxrwxrwx  1 kt  staff    6209191 Feb 28  2015 Ομηρόλη Εύα - Η αρχή του ταυτόσημου.pdf
+-rwxrwxrwx  1 kt  staff   34364379 Feb 28  2015 Ομηρόλη Εύα - Οι αναλφάβητοι του έρωτα.pdf
+-rwxrwxrwx  1 kt  staff    1736828 Feb 28  2015 Πανταζή Φανή - Η νύχτα των γιασεμιών.pdf
+-rwxrwxrwx  1 kt  staff    7762324 Feb 28  2015 Γαλανού Άννα - Οι τρεις φωτιές.pdf
+-rwxrwxrwx  1 kt  staff    3850306 Feb 28  2015 Πανταζή Φανή - Το κυνήγι της αλεπούς.pdf
+-rwxrwxrwx  1 kt  staff    7630600 Feb 28  2015 Πανταζή Φανή - Το θρόισμα της λεύκας.pdf
+-rwxrwxrwx  1 kt  staff    2048563 Feb 28  2015 Καρατζά Κάλη - Οι Άγγελοι χορεύουν στο ποτάμι.pdf
+-rwxrwxrwx  1 kt  staff    4561170 Feb 28  2015 Καρατζά Κάλη - Δακρυσμένα φεγγάρια.pdf
+-rwxrwxrwx  1 kt  staff   19597872 Feb 28  2015 Τζιρίτα Μαρία - Το παιδί της αγάπης.pdf
+-rwxrwxrwx  1 kt  staff   11013006 Feb 28  2015 Βενέζης Ηλίας - Το νούμερο 31328.pdf
+-rwxrwxrwx  1 kt  staff    4980795 Feb 28  2015 Θέμελης Νίκος - Οι αλήθειες των άλλων.pdf
+-rwxrwxrwx@ 1 kt  staff    1671370 Feb 28  2015 Θέμελης Νίκος - Μια ζωή δυο ζωές.pdf
+-rwxrwxrwx@ 1 kt  staff    1316394 Feb 28  2015 Βενέζης Ηλίας - Γαλήνη.pdf
+-rwxrwxrwx  1 kt  staff    1398537 Feb 28  2015 Βενέζης Ηλίας - Αιολική γη.pdf
+-rwxrwxrwx  1 kt  staff     432786 Feb 28  2015 Γκάτσος Νίκος - Αμοργός.pdf
+-rwxrwxrwx  1 kt  staff    1269435 Feb 28  2015 Τζιρίτα Μαρία - Κλεισμένη πύλη παραδείσουα.pdf
+-rwxrwxrwx  1 kt  staff     795986 Feb 28  2015 Παλαμάς Κωστής - Ο δωδεκάλογος του γύφτου.pdf
+-rwxrwxrwx  1 kt  staff    1171957 Feb 28  2015 Παλαμάς Κωστής - Θάνατος παλληκαριού (1901).pdf
+-rwxrwxrwx  1 kt  staff    1761564 Feb 28  2015 Πολίτης Κοσμάς - Λεμονοδάσος.pdf
+-rwxrwxrwx  1 kt  staff   23118459 Feb 28  2015 Ψυχάρης Γιάννης - Το ταξίδι μου.pdf
+-rwxrwxrwx  1 kt  staff    2391577 Feb 28  2015 Ηλιάδου Κυριακή - Ένα ουράνιο τόξο μέσα στη νύχτα... .pdf
+-rwxrwxrwx  1 kt  staff    1223452 Feb 28  2015 Φακίνου Ευγενία - Έρως, Θέρος, Πόλεμος.pdf
+-rwxrwxrwx  1 kt  staff   34242575 Feb 28  2015 Στάμκος Γιώργος - Νίκολα Τέσλα, Ο απαγορευμένος επιστήμονας.pdf
+-rwxrwxrwx  1 kt  staff    8952793 Feb 28  2015 Στάμκος Γιώργος - Ιστορία του μέλλοντος.pdf
+-rwxrwxrwx  1 kt  staff    3706697 Feb 28  2015 Πολέμης Ιωάννης - Χειμωνανθοί.pdf
+-rwxrwxrwx  1 kt  staff    5185767 Feb 28  2015 Τραυλού Πασχαλιά - Η Μήδεια δεν χόρεψε ποτέ.pdf
+-rwxrwxrwx  1 kt  staff   20773345 Feb 28  2015 Τραυλού Πασχαλιά - Η γυναίκα του φάρου 1 .pdf
+-rwxrwxrwx  1 kt  staff   20759354 Feb 28  2015 Τραυλού Πασχαλιά - Η γυναίκα του φάρου 2 .pdf
+-rwxrwxrwx  1 kt  staff    4737054 Feb 28  2015 Τραυλού Πασχαλιά - Η γυναίκα του φάρου 3 .pdf
+-rwxrwxrwx  1 kt  staff   10223096 Feb 28  2015 Τραυλού Πασχαλιά - Η ματζίκα της αγάπης.pdf
+-rwxrwxrwx  1 kt  staff    8312222 Feb 28  2015 Τραυλού Πασχαλιά - Έστω μια φορά.pdf
+-rwxrwxrwx  1 kt  staff   18655385 Feb 28  2015 Τραυλού Πασχαλιά - Κλειδωμένο συρτάρι.pdf
+-rwxrwxrwx  1 kt  staff     151654 Feb 28  2015 Σολωμός Διονύσιος - Η γυναίκα της Ζάκυνθος.pdf
+-rwxrwxrwx  1 kt  staff    1857119 Feb 28  2015 Σολωμός Διονύσιος - Ύμνος εις την Ελευθερίαν.pdf
+-rwxrwxrwx  1 kt  staff   25570598 Feb 28  2015 Καβάφης Κωνσταντίνος - Άπαντα Ποιήματα και Πεζά.pdf
+-rwxrwxrwx  1 kt  staff    4451268 Feb 28  2015 Ανέκδοτα - Αρχαία Ελληνικά Ανέκδοτα.pdf
+-rwxrwxrwx  1 kt  staff    2973535 Feb 28  2015 Ανέκδοτα με Γιατρούς.pdf
+-rwxrwxrwx  1 kt  staff    4236914 Feb 28  2015 Γαλανάκη Ρέα - Ο Αιώνας των Λαβυρίνθων.pdf
+-rwxrwxrwx  1 kt  staff    6291681 Feb 28  2015 Ζωγράφου Λιλή - Η αγάπη άργησε μια μέρα.pdf
+-rwxrwxrwx  1 kt  staff    1144859 Feb 28  2015 Σωτηρίου Διδώ - Οι νεκροί περιμένουν.pdf
+-rwxrwxrwx  1 kt  staff    1321681 Feb 28  2015 Παπαδάκη Πένυ - Χωρίς δίχτυ ασφαλείας.pdf
+-rwxrwxrwx  1 kt  staff   11773037 Feb 28  2015 Σωτηρίου Διδώ - Ματωμένα χώματα.pdf
+-rwxrwxrwx  1 kt  staff   17235494 Feb 28  2015 Κονδύλης Θάνος - Ο Πέμπτος Ιππότης.pdf
+-rwxrwxrwx  1 kt  staff   11391047 Feb 28  2015 Κονδύλης Θάνος - Τα μάτια του δράκοντα.pdf
+-rwxrwxrwx  1 kt  staff   23108757 Feb 28  2015 Σόμπολος Πάνος - Τα εγκλήματα που συγκλόνισαν την Ελλάδα, όπως τα έζησα.pdf
+-rwxrwxrwx  1 kt  staff     668626 Feb 28  2015 Κοφτερού Ελένη - Περί άνοιξης και άλλων εμμονών (ποίηση).pdf
+-rwxrwxrwx  1 kt  staff   25293778 Feb 28  2015 Κονδύλης Θάνος - Έγκλημα στην Αρχαία Ολυμπία.pdf
+-rwxrwxrwx  1 kt  staff    1783193 Feb 28  2015 Πιλάβιος Νίκος - Ιστορίες της καρδιάς.pdf
+-rwxrwxrwx  1 kt  staff    6502650 Feb 28  2015 Πανούσης Τζίμης - Η ζάλη των τάξεων.pdf
+-rwxrwxrwx  1 kt  staff    5698258 Feb 28  2015 Κουνούνη Θάλεια - Δεν υπήρξα ποτέ.pdf
+-rwxrwxrwx  1 kt  staff    8829684 Feb 28  2015 Πανούσης Τζίμης - Πικρέ μικρέ αράπη.pdf
+-rwxrwxrwx  1 kt  staff    7151629 Feb 28  2015 Γερμανός Φρέντυ - Υγρές Νύχτες.pdf
+-rwxrwxrwx  1 kt  staff   14400663 Feb 28  2015 Πανούσης Τζίμης - Πούστευε και μη ερεύνα.pdf
+-rwxrwxrwx  1 kt  staff   19769899 Feb 28  2015 Πανούσης Τζίμης - Μικροαστική Καταστροφή.pdf
+-rwxrwxrwx  1 kt  staff   26771973 Feb 28  2015 Τερζάκης Άγγελος - Η πριγκιπέσα Ιζαμπώ.pdf
+-rwxrwxrwx  1 kt  staff     867823 Feb 28  2015 Κρητικός Άγγελος - Σαν παραμύθι.pdf
+-rwxrwxrwx  1 kt  staff    1515059 Feb 28  2015 Παπαδάκη Αλκυόνη - Αμάν... αμάν!.pdf
+-rwxrwxrwx  1 kt  staff   10332178 Feb 28  2015 Τερζάκης Άγγελος - Ταξίδι με τον Έσπερο.pdf
+-rwxrwxrwx  1 kt  staff   88351170 Feb 28  2015 Παπαδάκη Αλκυόνη - Βαρκάρισσα της χίμαιρας.pdf
+-rwxrwxrwx  1 kt  staff    8104989 Feb 28  2015 Καλαφάτη Χρυσάνθη - All I want for Christmas... .pdf
+-rwxrwxrwx  1 kt  staff   14746639 Feb 28  2015 Καλαφάτη Χρυσάνθη - Η αγάπη μιας γοργόνας.pdf
+-rwxrwxrwx  1 kt  staff   11357806 Feb 28  2015 Καλαφάτη Χρυσάνθη - Η ταινία της ζωής μου.pdf
+-rwxrwxrwx  1 kt  staff    1774514 Feb 28  2015 Τριβιζάς Ευγένιος - Ο ερωτευμένος πυροσβέστης.pdf
+-rwxrwxrwx  1 kt  staff    3496942 Feb 28  2015 Κρητικός Λευτέρης - Το νήμα της μέλισσας.pdf
+-rwxrwxrwx  1 kt  staff    1455156 Feb 28  2015 Κουμάκης Λεωνίδας - Το θαύμα.pdf
+-rwxrwxrwx  1 kt  staff   28256291 Feb 28  2015 Καλαφάτη Χρυσάνθη - Τα χρώματα του έρωτα.pdf
+-rwxrwxrwx  1 kt  staff    1959037 Feb 28  2015 Κρητικός Λευτέρης - Το οροπέδιο ύψος των μυρμηγκιών.pdf
+-rwxrwxrwx  1 kt  staff   16554416 Feb 28  2015 Καλαφάτη Χρυσάνθη - Εκεί που δεν το περιμένεις.pdf
+-rwxrwxrwx  1 kt  staff    3692667 Feb 28  2015 Κρητικός Λευτέρης - Χωρίς σημεία στίξεως σιωπή.pdf
+-rwxrwxrwx  1 kt  staff   30727511 Feb 28  2015 Κορομηλά Μαριάννα - Ευτυχισμένος που έκανε το ταξίδι του Οδυσσέα.pdf
+-rwxrwxrwx  1 kt  staff   29779194 Feb 28  2015 Δημήτρης Λιαντίνης - Homo Educandus - Η φιλοσοφία της αγωγής.pdf
+-rwxrwxrwx  1 kt  staff    1383722 Feb 28  2015 Δημήτρης Λιαντίνης - Γκέμμα .pdf
+-rwxrwxrwx  1 kt  staff   12999656 Feb 28  2015 Κορνάρος Βιτσέντζος - Ερωτόκριτος.pdf
+-rwxrwxrwx  1 kt  staff    1199121 Feb 28  2015 Χρυσάνθου Ζωή - Στη σκιά της κλεψύδρας.pdf
+-rwxrwxrwx  1 kt  staff    1954755 Feb 28  2015 Καρακάσης Νίκος - Who the hell is Max (Μα ποιος είναι ο Μαξ επιτέλους).pdf
+-rwxrwxrwx  1 kt  staff    5494449 Feb 28  2015 Οικονόμου Καίτη - Ο κήπος με τις μουριές.pdf
+-rwxrwxrwx  1 kt  staff    5980815 Feb 28  2015 Οικονόμου Καίτη - Η καρδιά θυμάται.pdf
+-rwxrwxrwx  1 kt  staff    1140115 Feb 28  2015 Προδρόμου Μαρία - Ο άγγελος της ομίχλης.pdf
+-rwxrwxrwx  1 kt  staff    1758090 Feb 28  2015 Συνοδινού Ράνια - Το άρμα του ήλιου.pdf
+-rwxrwxrwx  1 kt  staff    6179137 Feb 28  2015 Καραφύλλη Ιρένα - Οι δρόμοι της Μοίρας.pdf
+-rwxrwxrwx  1 kt  staff     205668 Feb 28  2015 Πολυδούρη Μαρία - Οι τρίλλιες που σβήνουν.pdf
+-rwxrwxrwx  1 kt  staff    1481316 Feb 28  2015 Προδρόμου Μαρία - Το αρχοντικό της λίμνης.pdf
+-rwxrwxrwx  1 kt  staff    7891608 Feb 28  2015 Οικονόμου Καίτη - Το φθινόπωρο της μάγισσας.pdf
+-rwxrwxrwx  1 kt  staff    4606883 Feb 28  2015 Οικονόμου Καίτη - Το σκουλαρίκι της τύχης.pdf
+-rwxrwxrwx  1 kt  staff    3983447 Feb 28  2015 Οικονόμου Καίτη - Μου το είπε ένας άγγελος.pdf
+-rwxrwxrwx  1 kt  staff     247673 Feb 28  2015 Πολυδούρη Μαρία - Ηχώ στο χάος.pdf
+-rwxrwxrwx  1 kt  staff    6360529 Feb 28  2015 Οικονόμου Καίτη - Λευκή ορχιδέα.pdf
+-rwxrwxrwx  1 kt  staff    1013785 Feb 28  2015 Καββαδίας Νίκος - Πούσι.pdf
+-rwxrwxrwx  1 kt  staff    8040813 Feb 28  2015 Οικονόμου Καίτη - Δράκος στο χιόνι.pdf
+-rwxrwxrwx  1 kt  staff    6447893 Feb 28  2015 Οικονόμου Καίτη - Έρωτας πόλεμος.pdf
+-rwxrwxrwx  1 kt  staff     956650 Feb 28  2015 Προδρόμου Μαρία - Άγριος,γαλάζιος ουρανός.pdf
+-rwxrwxrwx  1 kt  staff    1742840 Feb 28  2015 Προδρόμου Μαρία - Υπάρχουν στιγμές που κρατάνε για πάντα.pdf
+-rwxrwxrwx  1 kt  staff    1432166 Feb 28  2015 Καββαδίας Νίκος - Μαραμπού.pdf
+-rwxrwxrwx  1 kt  staff    1322689 Feb 28  2015 Καββαδίας Νίκος - Τραβέρσο.pdf
+-rwxrwxrwx  1 kt  staff    2817885 Feb 28  2015 Σουβατζής Νίκος - Αναχώρηση.pdf
+-rwxrwxrwx  1 kt  staff    1207344 Feb 28  2015 Συνοδινού Ράνια - Εξομολόγηση.pdf
+-rwxrwxrwx  1 kt  staff    7960879 Feb 28  2015 Καρακάσης Κώστας - Ο βιολονίστας.pdf
+-rwxrwxrwx  1 kt  staff   33018968 Feb 28  2015 Μουρσελάς Κώστας - Βαμμένα κόκκινα μαλλιά.pdf
+-rwxrwxrwx  1 kt  staff   15142459 Feb 28  2015 Παπαχελάς Αλέξης-Τέλλογλου Τάσος - Φάκελος 17 Νοέμβρη.pdf
+-rwxrwxrwx  1 kt  staff   39675279 Feb 28  2015 Ζαμπούνης Χρήστος - Savoir Vivre.pdf
+-rwxrwxrwx  1 kt  staff    9828055 Feb 28  2015 Τριαρίδης Θανάσης - Ο άνεμος σφυρίζει στην Κουπέλα.pdf
+-rwxrwxrwx  1 kt  staff    4590391 Feb 28  2015 Σαμαράκης Αντώνης - Η κόντρα.pdf
+-rwxrwxrwx  1 kt  staff    6803103 Feb 28  2015 Ζαμπούνης Χρήστος - Ο Έλληνας Gentleman.pdf
+-rwxrwxrwx  1 kt  staff    3998191 Feb 28  2015 Σκαρίμπας Γιάννης - Το 1821 και η αλήθεια.pdf
+-rwxrwxrwx  1 kt  staff    6372332 Feb 28  2015 Σκαρίμπας Γιάννης - Το Θείο Τραγί.pdf
+-rwxrwxrwx  1 kt  staff    1750622 Feb 28  2015 Πολυράκης Γιώργος - Τα ηράνθεμα θα ανθίσουν ξανά.pdf
+-rwxrwxrwx  1 kt  staff    6210269 Feb 28  2015 Ξανθούλης Γιάννης - Το Πεθαμένο Λικέρ.pdf
+-rwxrwxrwx  1 kt  staff    1592025 Feb 28  2015 Καλπούζος Γιάννης - Ό,τι αγαπώ είναι δικό σου.pdf
+-rwxrwxrwx  1 kt  staff   13560152 Feb 28  2015 Κούλογλου Στέλιος - Μην πας ποτέ μόνος στο Ταχυδρομείο.pdf
+-rw-r--r--  1 kt  staff    2278625 Aug 17  2015 Αφρόκαλος Νικόλας - Μίλα μου για ξόρκια.pdf
+-rwxrwxrwx  1 kt  staff    4921827 Feb 28  2015 Στυλιανού Στέλιος - Αννέ σημαίνει μάνα.pdf
+-rwxrwxrwx  1 kt  staff   11948091 Feb 28  2015 Καλπούζος Γιάννης - Άγιοι και δαίμονες Εις ταν Πόλιν.pdf
+-rwxrwxrwx  1 kt  staff    5929405 Feb 28  2015 Στυλιανού Στέλιος - Είσαι γυναίκα, είσαι γη.pdf
+-rwxrwxrwx  1 kt  staff   13137122 Feb 28  2015 Καλπούζος Γιάννης - Ιμαρέτ, Στη σκιά του ρολογιού.pdf
+-rwxrwxrwx  1 kt  staff   24618357 Feb 28  2015 Ξανθούλης Γιάννης - Ύστερα, ήρθαν οι μέλισσες.pdf
+-rwxrwxrwx  1 kt  staff   12041547 Feb 28  2015 Πολυράκης Γιώργος - Δωροθέα ντε Ροπ - Πάθος και υπερηφάνεια.pdf
+-rwxrwxrwx  1 kt  staff    6493410 Feb 28  2015 Παπαδάκης Μανώλης - Αθιβολές.pdf
+-rwxrwxrwx  1 kt  staff    5268371 Feb 28  2015 Σαμαράκης Αντώνης - Αρνούμαι.pdf
+-rwxrwxrwx  1 kt  staff  172970688 Feb 28  2015 Πολυράκης Γιώργος - Χορεύοντας στη σιωπή.pdf
+-rwxrwxrwx  1 kt  staff    3294782 Feb 28  2015 Καλπούζος Γιάννης - Ουρανόπετρα, Η δωδέκατη γενιά.pdf
+-rwxrwxrwx  1 kt  staff    5568650 Feb 28  2015 Κοροβέσης Περικλής - Tango Bar.pdf
+-rwxrwxrwx  1 kt  staff   19301975 Feb 28  2015 Λουντέμης Μενέλαος - Ο Ηρακλής.pdf
+-rwxrwxrwx  1 kt  staff    1442816 Feb 28  2015 Κουλούκης Γεώργιος - Οι εποχές της ζωής μας.pdf
+-rwxrwxrwx  1 kt  staff   12038052 Feb 28  2015 Λουντέμης Μενέλαος - Ένα παιδί μετράει τ' άστρα.pdf
+-rwxrwxrwx  1 kt  staff    5046699 Feb 28  2015 Λουντέμης Μενέλαος - Τότε που κυνηγούσα τους ανέμους.pdf
+-rwxrwxrwx  1 kt  staff    4506102 Feb 28  2015 Χορτάτσης Γεώργιος - Ερωφίλη.pdf
+-rwxrwxrwx  1 kt  staff    5130568 Feb 28  2015 Κοροβέσης Περικλής - Επιχείρησις Ιουδίθ.pdf
+-rwxrwxrwx  1 kt  staff    5912468 Feb 28  2015 Κοροβέσης Περικλής - Ανθρωποφύλακες.pdf
+-rwxrwxrwx  1 kt  staff    3958942 Feb 28  2015 Ευσταθίου Ευαγγελία - Αν τον άνεμο ρωτήσεις.pdf
+-rwxrwxrwx  1 kt  staff    3508357 Feb 28  2015 Ευσταθίου Ευαγγελία - Το γυάλινο ρόδο.pdf
+-rwxrwxrwx  1 kt  staff   10099213 Feb 28  2015 Μπαλέρμας Ευάγγελος - Το ημερολόγιο ενός βαρυποινίτη.pdf
+-rwxrwxrwx  1 kt  staff    3001756 Feb 28  2015 Ευσταθίου Ευαγγελία - Βαθύ βελούδινο σκοτάδι.pdf
+-rwxrwxrwx  1 kt  staff     990594 Feb 28  2015 Χωριάτικα Βρωμόλογα - Βλάχος Φίλιππος.pdf
+-rwxrwxrwx  1 kt  staff   21515184 Feb 28  2015 Καρακάσης, Κώστας - Αθηνά, Ευτυχώς που δεν γεννήθηκα όμορφη.pdf
+-rwxrwxrwx  1 kt  staff    6787029 Feb 28  2015 Σολομωνική - Το Κλειδί του Βασιλιά Σολομώντα.pdf
+-rw-r--r--  1 kt  staff    2822721 Aug 17  2015 Βαμβουνάκη Μάρω - Οι παλιές αγάπες πάνε στον παράδεισο.pdf
+-rwxrwxrwx  1 kt  staff   55445951 Feb 28  2015 Μεϊμαρίδη Μάρα - Οι μάγισσες της Σμύρνης.pdf
+-rwxrwxrwx  1 kt  staff    1267268 Feb 28  2015 Ιορδανίδου Μαρία -  Η αυλή μας.pdf
+-rwxrwxrwx  1 kt  staff   10791399 Feb 28  2015 Δημουλίδου Χρύσα - Ο γιος της βροχής.pdf
+-rwxrwxrwx  1 kt  staff    2296233 Feb 28  2015 Δημουλίδου Χρύσα - Η σκοτεινή πλευρά του Ήλιου.pdf
+-rwxrwxrwx  1 kt  staff    5474794 Feb 28  2015 Δημουλίδου Χρύσα - Το βαλς των πορσελάνινων άστρων.pdf
+-rwxrwxrwx  1 kt  staff   10776823 Feb 28  2015 Δημουλίδου Χρύσα - Το φιλί του δράκου.pdf
+-rwxrwxrwx  1 kt  staff   15969386 Feb 28  2015 Δημουλίδου Χρύσα - Τα δάκρυα του Θεού.pdf
+-rwxrwxrwx  1 kt  staff    3496109 Feb 28  2015 Κόντζογλου Μαίρη - Οι μεσημβρινοί της ζωής 1 - Στους ήλιους του έρωτα.pdf
+-rwxrwxrwx  1 kt  staff    6540244 Feb 28  2015 Κόντζογλου Μαίρη - Οι μεσημβρινοί της ζωής 2 - Στα φεγγάρια της αλήθειας.pdf
+-rwxrwxrwx  1 kt  staff    4180053 Feb 28  2015 Κόντζογλου Μαίρη - Οι μεσημβρινοί της ζωής 3 - Στη γη της αγάπης.pdf
+-rwxrwxrwx  1 kt  staff    2534350 Feb 28  2015 Ιορδανίδου Μαρία - Σαν τα τρελά πουλιά.pdf
+-rwxrwxrwx  1 kt  staff   13122858 Feb 28  2015 Δημουλίδου Χρύσα - Μην πυροβολείτε την νύφη.pdf
+-rwxrwxrwx  1 kt  staff    3639831 Feb 28  2015 Ιορδανίδου Μαρία - Στου κύκλου τα γυρίσματα.pdf
+-rwxrwxrwx  1 kt  staff   11116949 Feb 28  2015 Δημουλίδου Χρύσα - Όταν το χιόνι χόρεψε με τη φωτιά.pdf
+-rwxrwxrwx  1 kt  staff   20610268 Feb 28  2015 Δημουλίδου Χρύσα - Πόθοι στα φτερά των αγγέλων.pdf
+-rwxrwxrwx  1 kt  staff   10211371 Feb 28  2015 Κόντζογλου Μαίρη - Περπάτα με τον άγγελό σου.pdf
+-rwxrwxrwx  1 kt  staff    7037070 Feb 28  2015 Ιορδανίδου Μαρία - Διακοπές στον Καύκασο.pdf
+-rwxrwxrwx  1 kt  staff    3544317 Feb 28  2015 Ιορδανίδου Μαρία - Λωξάντρα.pdf
+-rwxrwxrwx  1 kt  staff    2104301 Feb 28  2015 Καρυωτάκης Μίνως-Αθανάσιος - Το λίκνο της ζωής.pdf
+-rwxrwxrwx  1 kt  staff    2955451 Feb 28  2015 Καρυωτάκης Μίνως-Αθανάσιος - Μια σειρά από τρομαχτικά γεγονότα.pdf
+-rwxrwxrwx  1 kt  staff     101030 Feb 28  2015 Καρυωτάκης Κώστας - Ο πόνος του ανθρώπου και των πραγμάτων.pdf
+-rwxrwxrwx  1 kt  staff    2032597 Feb 28  2015 Καρυστιάνη Ιωάννα - Μικρά Αγγλία.pdf
+-rwxrwxrwx  1 kt  staff     724572 Feb 28  2015 Καρυωτάκης Κώστας - Άπαντα.pdf
+-rwxrwxrwx  1 kt  staff     168932 Feb 28  2015 Καρυωτάκης Κώστας - Ελεγεία και Σάτιρες.pdf
+-rwxrwxrwx  1 kt  staff     189554 Feb 28  2015 Καρυωτάκης Κώστας - Νηπενθή.pdf
+-rwxrwxrwx  1 kt  staff     468099 Feb 28  2015 Καρυωτάκης Κώστας - Ποιήματα.pdf
+-rwxrwxrwx  1 kt  staff    4493810 Feb 28  2015 Εφταλιώτης Αργύρης - Η Μαζώχτρα.pdf
+-rwxrwxrwx  1 kt  staff   13387926 Feb 28  2015 Κονδυλάκης Ιωάννης - Όταν ήμουν δάσκαλος.pdf
+-rwxrwxrwx  1 kt  staff    6572784 Feb 28  2015 Σιμόπουλος Διονύσης (Ευγενίδειο Πλανητάριο) - Το Άστρο των Χριστουγέννων.pdf
+-rwxrwxrwx  1 kt  staff    4363298 Feb 28  2015 Σιμόπουλος Διονύσης (Ευγενίδειο Πλανητάριο) - Νέοι Ορίζοντες.pdf
+-rwxrwxrwx  1 kt  staff   12080749 Feb 28  2015 Σιμόπουλος Διονύσης (Ευγενίδειο Πλανητάριο) - Γένεση και Κατακλυσμός, Η Βιογραφία της Γης.pdf
+-rwxrwxrwx  1 kt  staff    1200449 Feb 28  2015 Πρεβελάκης Παντελής - Ο Ήλιος του Θανάτου.pdf
+-rwxrwxrwx  1 kt  staff   43862240 Feb 28  2015 Δημουλίδου Χρυσηϊδα - Ο λύκος της μοναξιάς.pdf
+-rwxrwxrwx  1 kt  staff    9695495 Feb 28  2015 Ξενόπουλος Γρηγόρης - Η τρίμορφη γυναίκα.pdf
+-rwxrwxrwx  1 kt  staff    5271889 Feb 28  2015 Ξενόπουλος Γρηγόρης - Ο Μινώταυρος και άλλα Διηγήματα 1921-1924.pdf
+-rwxrwxrwx  1 kt  staff    4999689 Feb 28  2015 Παπαδούλης Δημήτρης - Η αγγελοκρουσμένη.pdf
+-rwxrwxrwx  1 kt  staff    7421345 Feb 28  2015 Δημουλίδου Χρυσηϊδα - Οι τρεις υποσχέσεις.pdf
+-rwxrwxrwx  1 kt  staff   32981103 Feb 28  2015 Δημουλίδου Χρυσηϊδα - Το σπίτι των σκιών.pdf
+-rwxrwxrwx  1 kt  staff   10808433 Feb 28  2015 Δημουλίδου Χρυσηϊδα - Το κελάρι της ντροπής.pdf
+-rwxrwxrwx  1 kt  staff   12726649 Feb 28  2015 Δημουλίδου Χρυσηϊδα - Το σταυροδρόμι των ψυχών.pdf
+-rwxrwxrwx  1 kt  staff    7469239 Feb 28  2015 Μπουραντάς Δημήτρης - Όλα σου τα 'μαθα, μα ξέχασα μια λέξη.pdf
+-rwxrwxrwx  1 kt  staff    7758450 Feb 28  2015 Μπουραντάς Δημήτρης - Επί σκηνής χωρίς πρόβα.pdf
+-rwxrwxrwx  1 kt  staff   36582345 Feb 28  2015 Ξενόπουλος Γρηγόρης - Πλούσιοι και Φτωχοί (Κοινωνική Τριλογία).pdf
+-rwxrwxrwx  1 kt  staff   16425144 Feb 28  2015 Καζαντζάκη Γαλατεία - Άνθρωποι και Υπεράνθρωποι.pdf
+-rwxrwxrwx  1 kt  staff   15479061 Mar  1  2015 Δημουλίδου Χρυσηϊδα - Μερσέντες Χιλ.pdf
+-rwxrwxrwx  1 kt  staff    3387454 Feb 28  2015 Ξενόπουλος Γρηγόρης - Αναδυόμενη.pdf
+-rwxrwxrwx  1 kt  staff    8453310 Feb 28  2015 Καλλιοντζή Αναστασία - Πες πως ήταν όνειρο.pdf
+-rwxrwxrwx  1 kt  staff    9669599 Feb 28  2015 Καλλιοντζή Αναστασία - Όλα ήταν τόσο μα τόσο υπέροχα... .pdf
+-rwxrwxrwx  1 kt  staff    9587162 Feb 28  2015 Καλλιοντζή Αναστασία - Χαμένο χτες.pdf
+-rwxrwxrwx  1 kt  staff    3641385 Feb 28  2015 Καλλιοντζή Αναστασία - Έσχατοι καιροί.pdf
+-rwxrwxrwx  1 kt  staff   15494975 Feb 28  2015 Καλλιοντζή Αναστασία - Θυμάσαι.pdf
+-rwxrwxrwx  1 kt  staff    3169410 Feb 28  2015 Δεληγιάννη-Τσιούλπα Άννα - Τεθλασμένη ζωή.pdf
+-rwxrwxrwx  1 kt  staff    4306948 Feb 28  2015 Πετροπούλου Μαρίvα - Η άκρη της κλωστής.pdf
+-rwxrwxrwx  1 kt  staff    7657267 Feb 28  2015 Πετρόπουλος Ηλίας - Η εθνική φασουλάδα και η ομελέτα.pdf
+-rwxrwxrwx  1 kt  staff   24285681 Feb 28  2015 Καζαντζάκης Νίκος - Ο καπετάν Μιχάλης.pdf
+-rwxrwxrwx  1 kt  staff    6632271 Feb 28  2015 Καζαντζάκης Νίκος - Ο Χριστός ξανασταυρώνεται.pdf
+-rwxrwxrwx  1 kt  staff    5454527 Feb 28  2015 Καζαντζάκης Νίκος - Ο φτωχούλης του Θεού.pdf
+-rwxrwxrwx  1 kt  staff    4279376 Feb 28  2015 Καζαντζάκης Νίκος - Ο Τελευταίος Πειρασμός.pdf
+-rwxrwxrwx  1 kt  staff   33470052 Feb 28  2015 Πετρόπουλος Ηλίας - Η φουστανέλα.pdf
+-rwxrwxrwx  1 kt  staff    1594993 Feb 28  2015 Σεμερτζίδου Ελένη - Ο Ροδόσταυρος.pdf
+-rwxrwxrwx  1 kt  staff   41439649 Feb 28  2015 Πετρόπουλος Ηλίας - Η ονοματοθεσία οδών και πλατειών.pdf
+-rwxrwxrwx  1 kt  staff   95141175 Feb 28  2015 Πετρόπουλος Ηλίας - Ο Κουραδοκόφτης.pdf
+-rwxrwxrwx  1 kt  staff    1823539 Feb 28  2015 Σεμερτζίδου Ελένη - Το φάντασμα του πέτρινου φάρου.pdf
+-rwxrwxrwx  1 kt  staff    4333421 Feb 28  2015 Πετρόπουλος Ηλίας - Το μπουρδέλο.pdf
+-rwxrwxrwx  1 kt  staff   61806605 Feb 28  2015 Πετρόπουλος Ηλίας - Της φυλακής.pdf
+-rwxrwxrwx  1 kt  staff    1301240 Feb 28  2015 Καζαντζάκης Νίκος - Όφις και Κρίνο.pdf
+-rwxrwxrwx  1 kt  staff   11357507 Feb 28  2015 Καζαντζάκης Νίκος - Βίος και Πολιτεία του Αλέξη Ζορμπά.pdf
+-rwxrwxrwx  1 kt  staff     762846 Feb 28  2015 Σεμερτζίδου Ελένη - Σελήνη-Εκάτη-Άρτεμις.pdf
+-rwxrwxrwx  1 kt  staff    2725436 Feb 28  2015 Σεμερτζίδου Ελένη - Πογκρόμ.pdf
+-rwxrwxrwx  1 kt  staff    5491482 Feb 28  2015 Καζαντζάκης Νίκος - Αφιέρωμα Καθημερινής 1997.pdf
+-rwxrwxrwx  1 kt  staff     195898 Feb 28  2015 Καζαντζάκης Νίκος - Ασκητική.pdf
+-rwxrwxrwx  1 kt  staff    1046195 Feb 28  2015 Πετρόπουλος Ηλίας - Παροιμίες του υποκόσμου.pdf
+-rwxrwxrwx  1 kt  staff    1046082 Feb 28  2015 Καζαντζάκης Νίκος - Συμπόσιον.pdf
+-rwxrwxrwx  1 kt  staff   24593350 Feb 28  2015 Πετρόπουλος Ηλίας - Καλιαρντά.pdf
+-rwxrwxrwx  1 kt  staff    3719781 Feb 28  2015 Πετρόπουλος Ηλίας - Εγχειρίδιον του καλού κλέφτη.pdf
+-rwxrwxrwx  1 kt  staff    1773037 Feb 28  2015 Καζαντζάκης Νίκος - Αδερφοφάδες.pdf
+-rwxrwxrwx  1 kt  staff    1078154 Feb 28  2015 Πετρόπουλος Γιάννης - Ο Χάρης Δεσμώτης.pdf
+-rwxrwxrwx  1 kt  staff     144718 Feb 28  2015 Καρκαβίτσας Ανδρέας - Η θάλασσα.pdf
+-rwxrwxrwx  1 kt  staff    1171639 Feb 28  2015 Καρκαβίτσας Ανδρέας - Ο ζητιάνος.pdf
+-rwxrwxrwx  1 kt  staff     761553 Feb 28  2015 Κουχτσόγλου Σταύρος - Κάτω η μάσκα.pdf
+-rwxrwxrwx  1 kt  staff    8417373 Feb 28  2015 Καρκαβίτσας Ανδρέας - Λόγια της πλώρης.pdf
+-rwxrwxrwx  1 kt  staff   10180758 Feb 28  2015 Παπαχρήστου Κωνσταντίνος - Ο φύλακας του χρόνου.pdf
+-rwxrwxrwx  1 kt  staff    2045504 Feb 28  2015 Πετροπούλου-Λιανού Εύα - Εγώ και ο άλλος μου εαυτός, η σκιά μου.pdf
+-rwxrwxrwx  1 kt  staff    3594686 Feb 28  2015 Παπανικολάου Μάτα - Μη δεις το μάραθο για άνιθο.pdf
+-rwxrwxrwx  1 kt  staff    6385472 Feb 28  2015 Παπανικολάου Μάτα - Τα μυστικά ταξίδευαν ανεμπόδιστα.pdf
+-rwxrwxrwx  1 kt  staff    1868528 Feb 28  2015 Παπανικολάου Μάτα - Μαρία η παχουλή.pdf
+-rwxrwxrwx  1 kt  staff    3350013 Feb 28  2015 Παπανικολάου Μάτα - Βροχή αστεριών.pdf
+-rwxrwxrwx  1 kt  staff    2410634 Feb 28  2015 Κουμανταρέας Μένης - Η κυρία Κούλα.pdf
+-rwxrwxrwx  1 kt  staff     577206 Feb 28  2015 Εγγονόπουλος Νίκος - Η Επιστροφή των πουλιών.pdf
+-rwxrwxrwx  1 kt  staff    6205700 Feb 28  2015 Εγγονόπουλος Νίκος - Μπολιβάρ.pdf
+-rwxrwxrwx  1 kt  staff    1890543 Feb 28  2015 Φραγκοπούλου Μυρτιά - Προμέσσα.pdf
+-rwxrwxrwx  1 kt  staff    4766199 Feb 28  2015 Καρακατσάνης Μάριος - Παραμύθια του μυαλού.pdf
+-rwxrwxrwx  1 kt  staff    1306301 Feb 28  2015 Παπαθεοδώρου Βασίλης - Οι εννέα Καίσαρες.pdf
+-rwxrwxrwx  1 kt  staff   11834596 Feb 28  2015 Παπαθεοδώρου Θοδωρής - Σαν ταξιδιάρικα πουλιά.pdf
+-rwxrwxrwx  1 kt  staff     141831 Feb 28  2015 Παπαδοπούλου Μιράντα - Χωρίς.pdf
+-rwxrwxrwx  1 kt  staff      75116 Feb 28  2015 Παπαδοπούλου Λεονώρα - Γράμμα ενός φυλακισμένου στη γκόμενά του.pdf
+-rwxrwxrwx  1 kt  staff  102599619 Feb 28  2015 Παπαθεοδώρου Θοδωρής - Μάγισσες φέρτε βότανα.pdf
+-rwxrwxrwx  1 kt  staff    3222878 Feb 28  2015 Λαμπαδαρίδου-Πόθου Μαρία - Ο Άγγελος της Στάχτης.pdf
+-rwxrwxrwx  1 kt  staff    9062902 Feb 28  2015 Λαμπαδαρίδου-Πόθου Μαρία - Πήραν την Πόλη, Πήραν την....pdf
+-rwxrwxrwx  1 kt  staff    7734779 Feb 28  2015 Κωνσταντούρου Μαρία - Χωρίς εσένα.pdf
+-rwxrwxrwx  1 kt  staff    7871117 Feb 28  2015 Στασινοπούλου Κρίστη - Επτά φορές στην Αμοργό.pdf
+-rwxrwxrwx  1 kt  staff    1077004 Feb 28  2015 Γιαννακοπούλου Ντόρα - Έρως μετ' εμποδίων.pdf
+-rwxrwxrwx  1 kt  staff    2273506 Feb 28  2015 Μπουραζοπούλου Ιωάννα - Το μπουντουάρ του Ναδίρ.pdf
+-rwxrwxrwx  1 kt  staff    4145133 Feb 28  2015 Σακελλαρόπουλος Μένιος - Δυο μάυρα πουκάμισα.pdf
+-rwxrwxrwx  1 kt  staff    2910485 Feb 28  2015 Παπαθανασοπούλου Μάιρα - Ο Ιούδας φιλούσε υπέροχα.pdf
+-rwxrwxrwx  1 kt  staff    6137364 Feb 28  2015 Παπακωνσταντίνου Μιχάλης - Η γιαγιά μου η Ρούσα.pdf
+# some utf-8 korean random characters
+
+동해물과 
+1234567890
+백두산이 
+1234567890
+마르고
+1234567890
+닳도록 하느님이 보우하사                                                                                   
+1234567890
+ᄒ
+1234567890
+ᅯᆶ
+1234567890
+괋
+
+가
+1234567890
+힢힣
+1234567890
+# This is a text with code segments inside
+
+We must be able to correctly skip the document and parse the script parts
+The script starts and ends with 3 single back quotes at the start of the line
+For the moment the code parts are not correctly highlighted.
+
+```
+cls
+a=1.1
+a!=1	:   1.0
+;b=1	# This is else a comment, separator here is transparent
+! g=a+b: 2.100000
+```
+
+This line is not parsed, but part of the following line is.
+
+# ` a=3.2 `
+# the second code segment in this example is below
+
+```
+d=a+2*b: 5.200000
+# this is a comment line in code
+print(d)
+```
+
+# say Hello to various languages with utf-8
+
+Arabic	السلام عليكم
+Czech	(česky)	Dobrý den
+Danish	(Dansk)	Hej, Goddag
+English	Hello
+Esperanto	Saluton
+Estonian	Tere, Tervist
+FORTRAN	PROGRAM
+Finnish	(Suomi)	Hei
+French	(Français)	Bonjour, Salut
+German	(Deutsch Nord)	Guten Tag
+German	(Deutsch Süd)	Grüß Gott
+Greek	(Ελληνικά)	Γειά σας
+Hebrew	שלום
+Hindi	नमस्ते, नमस्कार।
+Italiano	Ciao, Buon giorno
+Maltese	Ċaw, Saħħa
+Nederlands, Vlaams	Hallo, Dag
+Norwegian	(Norsk)	Hei, God dag
+Polish	Dzień dobry, Hej
+Russian	(Русский)	Здравствуйте!‎
+Slovak	Dobrý deň
+Spanish	(Español)	‎¡Hola!‎
+Swedish	(Svenska)	Hej, Goddag
+Thai	(ภาษาไทย)	สวัสดีครับ, สวัสดีค่ะ
+Turkish	(Türkçe)	Merhaba
+Vietnamese	(Tiếng Việt)	Xin Chào
+Yiddish	(ײַדישע)	דאָס הײַזעלע 
+
+Japanese	(日本語)	こんにちは, ｺﾝﾆﾁﾊ
+Chinese	(中文,普通话,汉语)	你好
+Cantonese	(粵語,廣東話)	早晨, 你好
+Korean	(한글)	안녕하세요, 안녕하십니까
+
+Difference among chinese characters in GB, JIS, KSC, BIG5:‎
+ GB	--	元气	开发
+ JIS	--	元気	開発
+ KSC	--	元氣	開發
+ BIG5	--	元氣	開發
+
+
+# say Hello to various languages with utf-8
+
+Arabic	السلام عليكم
+Czech	(česky)	Dobrý den
+Danish	(Dansk)	Hej, Goddag
+English	Hello
+Esperanto	Saluton
+Estonian	Tere, Tervist
+FORTRAN	PROGRAM
+Finnish	(Suomi)	Hei
+French	(Français)	Bonjour, Salut
+German	(Deutsch Nord)	Guten Tag
+German	(Deutsch Süd)	Grüß Gott
+Greek	(Ελληνικά)	Γειά σας
+Hebrew	שלום
+Hindi	नमस्ते, नमस्कार।
+Italiano	Ciao, Buon giorno
+Maltese	Ċaw, Saħħa
+Nederlands, Vlaams	Hallo, Dag
+Norwegian	(Norsk)	Hei, God dag
+Polish	Dzień dobry, Hej
+Russian	(Русский)	Здравствуйте!‎
+Slovak	Dobrý deň
+Spanish	(Español)	‎¡Hola!‎
+Swedish	(Svenska)	Hej, Goddag
+Thai	(ภาษาไทย)	สวัสดีครับ, สวัสดีค่ะ
+Turkish	(Türkçe)	Merhaba
+Vietnamese	(Tiếng Việt)	Xin Chào
+Yiddish	(ײַדישע)	דאָס הײַזעלע 
+
+Japanese	(日本語)	こんにちは, ｺﾝﾆﾁﾊ
+Chinese	(中文,普通话,汉语)	你好
+Cantonese	(粵語,廣東話)	早晨, 你好
+Korean	(한글)	안녕하세요, 안녕하십니까
+
+Difference among chinese characters in GB, JIS, KSC, BIG5:‎
+ GB	--	元气	开发
+ JIS	--	元気	開発
+ KSC	--	元氣	開發
+ BIG5	--	元氣	開發
+
+#!/usr/bin/bash
+ls -l
+
+
+󠁁 <> 󠁡
+󠁂 <> 󠁢
+󠁃 <> 󠁣
+󠁄 <> 󠁤
+󠁅 <> 󠁥
+󠁆 <> 󠁦
+󠁇 <> 󠁧
+󠁈 <> 󠁨
+󠁉 <> 󠁩
+󠁊 <> 󠁪
+󠁋 <> 󠁫
+󠁌 <> 󠁬
+󠁍 <> 󠁭
+󠁎 <> 󠁮
+󠁏 <> 󠁯
+󠁐 <> 󠁰
+󠁑 <> 󠁱
+󠁒 <> 󠁲
+󠁓 <> 󠁳
+󠁔 <> 󠁴
+󠁕 <> 󠁵
+󠁖 <> 󠁶
+󠁗 <> 󠁷
+󠁘 <> 󠁸
+󠁙 <> 󠁹
+󠁚 <> 󠁺
+
+# Some UTF-8 encoded peculiar characters
+✅❌❎--
+✅.
+❌.
+❌.
+
+Capital letter <> small letter
+
+1482 letters
+
+Ѐ <> ѐ
+Ё <> ё
+Ђ <> ђ
+Ѓ <> ѓ
+Є <> є
+Ѕ <> ѕ
+І <> і
+Ї <> ї
+Ј <> ј
+Љ <> љ
+Њ <> њ
+Ћ <> ћ
+Ќ <> ќ
+Ѝ <> ѝ
+Ў <> ў
+Џ <> џ
+А <> а
+Б <> б
+В <> в
+Г <> г
+Д <> д
+Е <> е
+Ж <> ж
+З <> з
+И <> и
+Й <> й
+К <> к
+Л <> л
+М <> м
+Н <> н
+О <> о
+П <> п
+Р <> р
+С <> с
+Т <> т
+У <> у
+Ф <> ф
+Х <> х
+Ц <> ц
+Ч <> ч
+Ш <> ш
+Щ <> щ
+Ъ <> ъ
+Ы <> ы
+Ь <> ь
+Э <> э
+Ю <> ю
+Я <> я
+Ѡ <> ѡ
+Ѣ <> ѣ
+Ѥ <> ѥ
+Ѧ <> ѧ
+Ѩ <> ѩ
+Ѫ <> ѫ
+Ѭ <> ѭ
+Ѯ <> ѯ
+Ѱ <> ѱ
+Ѳ <> ѳ
+Ѵ <> ѵ
+Ѷ <> ѷ
+Ѹ <> ѹ
+Ѻ <> ѻ
+Ѽ <> ѽ
+Ѿ <> ѿ
+Ҁ <> ҁ
+Ҋ <> ҋ
+Ҍ <> ҍ
+Ҏ <> ҏ
+Ґ <> ґ
+Ғ <> ғ
+Ҕ <> ҕ
+Җ <> җ
+Ҙ <> ҙ
+Қ <> қ
+Ҝ <> ҝ
+Ҟ <> ҟ
+Ҡ <> ҡ
+Ң <> ң
+Ҥ <> ҥ
+Ҧ <> ҧ
+Ҩ <> ҩ
+Ҫ <> ҫ
+Ҭ <> ҭ
+Ү <> ү
+Ұ <> ұ
+Ҳ <> ҳ
+Ҵ <> ҵ
+Ҷ <> ҷ
+Ҹ <> ҹ
+Һ <> һ
+Ҽ <> ҽ
+Ҿ <> ҿ
+Ӂ <> ӂ
+Ӄ <> ӄ
+Ӆ <> ӆ
+Ӈ <> ӈ
+Ӊ <> ӊ
+Ӌ <> ӌ
+Ӎ <> ӎ
+Ӑ <> ӑ
+Ӓ <> ӓ
+Ӕ <> ӕ
+Ӗ <> ӗ
+Ә <> ә
+Ӛ <> ӛ
+Ӝ <> ӝ
+Ӟ <> ӟ
+Ӡ <> ӡ
+Ӣ <> ӣ
+Ӥ <> ӥ
+Ӧ <> ӧ
+Ө <> ө
+Ӫ <> ӫ
+Ӭ <> ӭ
+Ӯ <> ӯ
+Ӱ <> ӱ
+Ӳ <> ӳ
+Ӵ <> ӵ
+Ӷ <> ӷ
+Ӹ <> ӹ
+Ӻ <> ӻ
+Ӽ <> ӽ
+Ӿ <> ӿ
+Ԁ <> ԁ
+Ԃ <> ԃ
+Ԅ <> ԅ
+Ԇ <> ԇ
+Ԉ <> ԉ
+Ԋ <> ԋ
+Ԍ <> ԍ
+Ԏ <> ԏ
+Ԑ <> ԑ
+Ԓ <> ԓ
+Ԕ <> ԕ
+Ԗ <> ԗ
+Ԙ <> ԙ
+Ԛ <> ԛ
+Ԝ <> ԝ
+Ԟ <> ԟ
+Ԡ <> ԡ
+Ԣ <> ԣ
+Ԥ <> ԥ
+Ԧ <> ԧ
+Ա <> ա
+Բ <> բ
+Գ <> գ
+Դ <> դ
+Ե <> ե
+Զ <> զ
+Է <> է
+Ը <> ը
+Թ <> թ
+Ժ <> ժ
+Ի <> ի
+Լ <> լ
+Խ <> խ
+Ծ <> ծ
+Կ <> կ
+Հ <> հ
+Ձ <> ձ
+Ղ <> ղ
+Ճ <> ճ
+Մ <> մ
+Յ <> յ
+Ն <> ն
+Շ <> շ
+Ո <> ո
+Չ <> չ
+Պ <> պ
+Ջ <> ջ
+Ռ <> ռ
+Ս <> ս
+Վ <> վ
+Տ <> տ
+Ր <> ր
+Ց <> ց
+Ւ <> ւ
+Փ <> փ
+Ք <> ք
+Օ <> օ
+Ֆ <> ֆ
+A <> a
+B <> b
+C <> c
+D <> d
+E <> e
+F <> f
+G <> g
+H <> h
+I <> i
+J <> j
+K <> k
+L <> l
+M <> m
+N <> n
+O <> o
+P <> p
+Q <> q
+R <> r
+S <> s
+T <> t
+U <> u
+V <> v
+W <> w
+X <> x
+Y <> y
+Z <> z
+À <> à
+Á <> á
+Â <> â
+Ã <> ã
+Ä <> ä
+Å <> å
+Æ <> æ
+Ç <> ç
+È <> è
+É <> é
+Ê <> ê
+Ë <> ë
+Ì <> ì
+Í <> í
+Î <> î
+Ï <> ï
+Ð <> ð
+Ñ <> ñ
+Ò <> ò
+Ó <> ó
+Ô <> ô
+Õ <> õ
+Ö <> ö
+Ø <> ø
+Ù <> ù
+Ú <> ú
+Û <> û
+Ü <> ü
+Ý <> ý
+Þ <> þ
+Ā <> ā
+Ă <> ă
+Ą <> ą
+Ć <> ć
+Ĉ <> ĉ
+Ċ <> ċ
+Č <> č
+Ď <> ď
+Đ <> đ
+Ē <> ē
+Ĕ <> ĕ
+Ė <> ė
+Ę <> ę
+Ě <> ě
+Ĝ <> ĝ
+Ğ <> ğ
+Ġ <> ġ
+Ģ <> ģ
+Ĥ <> ĥ
+Ħ <> ħ
+Ĩ <> ĩ
+Ī <> ī
+Ĭ <> ĭ
+Į <> į
+Ĳ <> ĳ
+Ĵ <> ĵ
+Ķ <> ķ
+Ĺ <> ĺ
+Ļ <> ļ
+Ľ <> ľ
+Ŀ <> ŀ
+Ł <> ł
+Ń <> ń
+Ņ <> ņ
+Ň <> ň
+Ŋ <> ŋ
+Ō <> ō
+Ŏ <> ŏ
+Ő <> ő
+Œ <> œ
+Ŕ <> ŕ
+Ŗ <> ŗ
+Ř <> ř
+Ś <> ś
+Ŝ <> ŝ
+Ş <> ş
+Š <> š
+Ţ <> ţ
+Ť <> ť
+Ŧ <> ŧ
+Ũ <> ũ
+Ū <> ū
+Ŭ <> ŭ
+Ů <> ů
+Ű <> ű
+Ų <> ų
+Ŵ <> ŵ
+Ŷ <> ŷ
+Ÿ <> ÿ
+Ź <> ź
+Ż <> ż
+Ž <> ž
+Ɓ <> ɓ
+Ƃ <> ƃ
+Ƅ <> ƅ
+Ɔ <> ɔ
+Ƈ <> ƈ
+Ɗ <> ɗ
+Ƌ <> ƌ
+Ǝ <> ɘ
+Ə <> ə
+Ɛ <> ɛ
+Ƒ <> ƒ
+Ɠ <> ɠ
+Ɣ <> ɣ
+Ɩ <> ɩ
+Ɨ <> ɨ
+Ƙ <> ƙ
+Ɯ <> ɯ
+Ɲ <> ɲ
+Ơ <> ơ
+Ƣ <> ƣ
+Ƥ <> ƥ
+Ƨ <> ƨ
+Ʃ <> ʃ
+Ƭ <> ƭ
+Ʈ <> ʈ
+Ư <> ư
+Ʊ <> ʊ
+Ʋ <> ʋ
+Ƴ <> ƴ
+Ƶ <> ƶ
+Ʒ <> ʒ
+Ƹ <> ƹ
+Ƽ <> ƽ
+Ǆ <> ǆ
+Ǉ <> ǉ
+Ǌ <> ǌ
+Ǎ <> ǎ
+Ǐ <> ǐ
+Ǒ <> ǒ
+Ǔ <> ǔ
+Ǖ <> ǖ
+Ǘ <> ǘ
+Ǚ <> ǚ
+Ǜ <> ǜ
+Ǟ <> ǟ
+Ǡ <> ǡ
+Ǣ <> ǣ
+Ǥ <> ǥ
+Ǧ <> ǧ
+Ǩ <> ǩ
+Ǫ <> ǫ
+Ǭ <> ǭ
+Ǯ <> ǯ
+Ǳ <> ǳ
+Ǵ <> ǵ
+Ǹ <> ǹ
+Ǻ <> ǻ
+Ǽ <> ǽ
+Ǿ <> ǿ
+Ȁ <> ȁ
+Ȃ <> ȃ
+Ȅ <> ȅ
+Ȇ <> ȇ
+Ȉ <> ȉ
+Ȋ <> ȋ
+Ȍ <> ȍ
+Ȏ <> ȏ
+Ȑ <> ȑ
+Ȓ <> ȓ
+Ȕ <> ȕ
+Ȗ <> ȗ
+Ș <> ș
+Ț <> ț
+Ȝ <> ȝ
+Ȟ <> ȟ
+Ƞ <> ƞ
+Ȣ <> ȣ
+Ȥ <> ȥ
+Ȧ <> ȧ
+Ȩ <> ȩ
+Ȫ <> ȫ
+Ȭ <> ȭ
+Ȯ <> ȯ
+Ȱ <> ȱ
+Ȳ <> ȳ
+Ⱥ <> ⱥ
+Ȼ <> ȼ
+Ƚ <> ƚ
+Ⱦ <> ⱦ
+Ɂ <> ɂ
+Ƀ <> ƀ
+Ʉ <> ʉ
+Ʌ <> ʌ
+Ɇ <> ɇ
+Ɉ <> ɉ
+Ɍ <> ɍ
+Ɏ <> ɏ
+Ͱ <> ͱ
+Ͳ <> ͳ
+Ͷ <> ͷ
+Ά <> ά
+Έ <> έ
+Ή <> ή
+Ί <> ί
+Ό <> ό
+Ύ <> ύ
+Ώ <> ώ
+Α <> α
+Β <> β
+Γ <> γ
+Δ <> δ
+Ε <> ε
+Ζ <> ζ
+Η <> η
+Θ <> θ
+Ι <> ι
+Κ <> κ
+Λ <> λ
+Μ <> μ
+Ν <> ν
+Ξ <> ξ
+Ο <> ο
+Π <> π
+Ρ <> ρ
+Σ <> σ
+Τ <> τ
+Υ <> υ
+Φ <> φ
+Χ <> χ
+Ψ <> ψ
+Ω <> ω
+Ϊ <> ϊ
+Ϋ <> ϋ
+Ϣ <> ϣ
+Ϥ <> ϥ
+Ϧ <> ϧ
+Ϩ <> ϩ
+Ϫ <> ϫ
+Ϭ <> ϭ
+Ϯ <> ϯ
+Ϸ <> ϸ
+Ϻ <> ϻ
+Ͻ <> ͻ
+Ͼ <> ͼ
+Ͽ <> ͽ
+Ⴀ <> ⴀ
+Ⴁ <> ⴁ
+Ⴂ <> ⴂ
+Ⴃ <> ⴃ
+Ⴄ <> ⴄ
+Ⴅ <> ⴅ
+Ⴆ <> ⴆ
+Ⴇ <> ⴇ
+Ⴈ <> ⴈ
+Ⴉ <> ⴉ
+Ⴊ <> ⴊ
+Ⴋ <> ⴋ
+Ⴌ <> ⴌ
+Ⴍ <> ⴍ
+Ⴎ <> ⴎ
+Ⴏ <> ⴏ
+Ⴐ <> ⴐ
+Ⴑ <> ⴑ
+Ⴒ <> ⴒ
+Ⴓ <> ⴓ
+Ⴔ <> ⴔ
+Ⴕ <> ⴕ
+Ⴖ <> ⴖ
+Ⴗ <> ⴗ
+Ⴘ <> ⴘ
+Ⴙ <> ⴙ
+Ⴚ <> ⴚ
+Ⴛ <> ⴛ
+Ⴜ <> ⴜ
+Ⴝ <> ⴝ
+Ⴞ <> ⴞ
+Ⴟ <> ⴟ
+Ⴠ <> ⴠ
+Ⴡ <> ⴡ
+Ⴢ <> ⴢ
+Ⴣ <> ⴣ
+Ⴤ <> ⴤ
+Ⴥ <> ⴥ
+🔠 <> 🔡
+Ａ <> ａ
+Ｂ <> ｂ
+Ｃ <> ｃ
+Ｄ <> ｄ
+Ｅ <> ｅ
+Ｆ <> ｆ
+Ｇ <> ｇ
+Ｈ <> ｈ
+Ｉ <> ｉ
+Ｊ <> ｊ
+Ｋ <> ｋ
+Ｌ <> ｌ
+Ｍ <> ｍ
+Ｎ <> ｎ
+Ｏ <> ｏ
+Ｐ <> ｐ
+Ｑ <> ｑ
+Ｒ <> ｒ
+Ｓ <> ｓ
+Ｔ <> ｔ
+Ｕ <> ｕ
+Ｖ <> ｖ
+Ｗ <> ｗ
+Ｘ <> ｘ
+Ｙ <> ｙ
+Ｚ <> ｚ
+Ⓐ <> ⓐ
+Ⓑ <> ⓑ
+Ⓒ <> ⓒ
+Ⓓ <> ⓓ
+Ⓔ <> ⓔ
+Ⓕ <> ⓕ
+Ⓖ <> ⓖ
+Ⓗ <> ⓗ
+Ⓘ <> ⓘ
+Ⓙ <> ⓙ
+Ⓚ <> ⓚ
+Ⓛ <> ⓛ
+Ⓜ <> ⓜ
+Ⓝ <> ⓝ
+Ⓞ <> ⓞ
+Ⓟ <> ⓟ
+Ⓠ <> ⓠ
+Ⓡ <> ⓡ
+Ⓢ <> ⓢ
+Ⓣ <> ⓣ
+Ⓤ <> ⓤ
+Ⓥ <> ⓥ
+Ⓦ <> ⓦ
+Ⓧ <> ⓧ
+Ⓨ <> ⓨ
+Ⓩ <> ⓩ
+󠁁 <> 󠁡
+󠁂 <> 󠁢
+󠁃 <> 󠁣
+󠁄 <> 󠁤
+󠁅 <> 󠁥
+󠁆 <> 󠁦
+󠁇 <> 󠁧
+󠁈 <> 󠁨
+󠁉 <> 󠁩
+󠁊 <> 󠁪
+󠁋 <> 󠁫
+󠁌 <> 󠁬
+󠁍 <> 󠁭
+󠁎 <> 󠁮
+󠁏 <> 󠁯
+󠁐 <> 󠁰
+󠁑 <> 󠁱
+󠁒 <> 󠁲
+󠁓 <> 󠁳
+󠁔 <> 󠁴
+󠁕 <> 󠁵
+󠁖 <> 󠁶
+󠁗 <> 󠁷
+󠁘 <> 󠁸
+󠁙 <> 󠁹
+󠁚 <> 󠁺
+Ⰰ <> ⰰ
+Ⰱ <> ⰱ
+Ⰲ <> ⰲ
+Ⰳ <> ⰳ
+Ⰴ <> ⰴ
+Ⰵ <> ⰵ
+Ⰶ <> ⰶ
+Ⰷ <> ⰷ
+Ⰸ <> ⰸ
+Ⰹ <> ⰹ
+Ⰺ <> ⰺ
+Ⰻ <> ⰻ
+Ⰼ <> ⰼ
+Ⰽ <> ⰽ
+Ⰾ <> ⰾ
+Ⰿ <> ⰿ
+Ⱀ <> ⱀ
+Ⱁ <> ⱁ
+Ⱂ <> ⱂ
+Ⱃ <> ⱃ
+Ⱄ <> ⱄ
+Ⱅ <> ⱅ
+Ⱆ <> ⱆ
+Ⱇ <> ⱇ
+Ⱈ <> ⱈ
+Ⱉ <> ⱉ
+Ⱊ <> ⱊ
+Ⱋ <> ⱋ
+Ⱌ <> ⱌ
+Ⱍ <> ⱍ
+Ⱎ <> ⱎ
+Ⱏ <> ⱏ
+Ⱐ <> ⱐ
+Ⱑ <> ⱑ
+Ⱒ <> ⱒ
+Ⱓ <> ⱓ
+Ⱔ <> ⱔ
+Ⱕ <> ⱕ
+Ⱖ <> ⱖ
+Ⱗ <> ⱗ
+Ⱘ <> ⱘ
+Ⱙ <> ⱙ
+Ⱚ <> ⱚ
+Ⱛ <> ⱛ
+Ⱜ <> ⱜ
+Ⱝ <> ⱝ
+Ⱞ <> ⱞ
+Ⱡ <> ⱡ
+Ɫ <> ɫ
+Ᵽ <> ᵽ
+Ɽ <> ɽ
+Ⱨ <> ⱨ
+Ⱪ <> ⱪ
+Ⱬ <> ⱬ
+Ɑ <> ɑ
+Ɱ <> ɱ
+Ɐ <> ɐ
+Ɒ <> ɒ
+Ⱳ <> ⱳ
+Ⱶ <> ⱶ
+ⱽ <> ᵛ
+Ȿ <> ȿ
+Ɀ <> ɀ
+Ⲁ <> ⲁ
+Ⲃ <> ⲃ
+Ⲅ <> ⲅ
+Ⲇ <> ⲇ
+Ⲉ <> ⲉ
+Ⲋ <> ⲋ
+Ⲍ <> ⲍ
+Ⲏ <> ⲏ
+Ⲑ <> ⲑ
+Ⲓ <> ⲓ
+Ⲕ <> ⲕ
+Ⲗ <> ⲗ
+Ⲙ <> ⲙ
+Ⲛ <> ⲛ
+Ⲝ <> ⲝ
+Ⲟ <> ⲟ
+Ⲡ <> ⲡ
+Ⲣ <> ⲣ
+Ⲥ <> ⲥ
+Ⲧ <> ⲧ
+Ⲩ <> ⲩ
+Ⲫ <> ⲫ
+Ⲭ <> ⲭ
+Ⲯ <> ⲯ
+Ⲱ <> ⲱ
+Ⲳ <> ⲳ
+Ⲵ <> ⲵ
+Ⲷ <> ⲷ
+Ⲹ <> ⲹ
+Ⲻ <> ⲻ
+Ⲽ <> ⲽ
+Ⲿ <> ⲿ
+Ⳁ <> ⳁ
+Ⳃ <> ⳃ
+Ⳅ <> ⳅ
+Ⳇ <> ⳇ
+Ⳉ <> ⳉ
+Ⳋ <> ⳋ
+Ⳍ <> ⳍ
+Ⳏ <> ⳏ
+Ⳑ <> ⳑ
+Ⳓ <> ⳓ
+Ⳕ <> ⳕ
+Ⳗ <> ⳗ
+Ⳙ <> ⳙ
+Ⳛ <> ⳛ
+Ⳝ <> ⳝ
+Ⳟ <> ⳟ
+Ⳡ <> ⳡ
+Ⳣ <> ⳣ
+Ⳬ <> ⳬ
+Ⳮ <> ⳮ
+𝐀 <> 𝐚
+𝐁 <> 𝐛
+𝐂 <> 𝐜
+𝐃 <> 𝐝
+𝐄 <> 𝐞
+𝐅 <> 𝐟
+𝐆 <> 𝐠
+𝐇 <> 𝐡
+𝐈 <> 𝐢
+𝐉 <> 𝐣
+𝐊 <> 𝐤
+𝐋 <> 𝐥
+𝐌 <> 𝐦
+𝐍 <> 𝐧
+𝐎 <> 𝐨
+𝐏 <> 𝐩
+𝐐 <> 𝐪
+𝐑 <> 𝐫
+𝐒 <> 𝐬
+𝐓 <> 𝐭
+𝐔 <> 𝐮
+𝐕 <> 𝐯
+𝐖 <> 𝐰
+𝐗 <> 𝐱
+𝐘 <> 𝐲
+𝐙 <> 𝐳
+𝐴 <> 𝑎
+𝐵 <> 𝑏
+𝐶 <> 𝑐
+𝐷 <> 𝑑
+𝐸 <> 𝑒
+𝐹 <> 𝑓
+𝐺 <> 𝑔
+𝐼 <> 𝑖
+𝐽 <> 𝑗
+𝐾 <> 𝑘
+𝐿 <> 𝑙
+𝑀 <> 𝑚
+𝑁 <> 𝑛
+𝑂 <> 𝑜
+𝑃 <> 𝑝
+𝑄 <> 𝑞
+𝑅 <> 𝑟
+𝑆 <> 𝑠
+𝑇 <> 𝑡
+𝑈 <> 𝑢
+𝑉 <> 𝑣
+𝑊 <> 𝑤
+𝑋 <> 𝑥
+𝑌 <> 𝑦
+𝑍 <> 𝑧
+𝑨 <> 𝒂
+𝑩 <> 𝒃
+𝑪 <> 𝒄
+𝑫 <> 𝒅
+𝑬 <> 𝒆
+𝑭 <> 𝒇
+𝑮 <> 𝒈
+𝑯 <> 𝒉
+𝑰 <> 𝒊
+𝑱 <> 𝒋
+𝑲 <> 𝒌
+𝑳 <> 𝒍
+𝑴 <> 𝒎
+𝑵 <> 𝒏
+𝑶 <> 𝒐
+𝑷 <> 𝒑
+𝑸 <> 𝒒
+𝑹 <> 𝒓
+𝑺 <> 𝒔
+𝑻 <> 𝒕
+𝑼 <> 𝒖
+𝑽 <> 𝒗
+𝑾 <> 𝒘
+𝑿 <> 𝒙
+𝒀 <> 𝒚
+𝒁 <> 𝒛
+𝒜 <> 𝒶
+𝒞 <> 𝒸
+𝒟 <> 𝒹
+𝒥 <> 𝒿
+𝒦 <> 𝓀
+𝒩 <> 𝓃
+𝒫 <> 𝓅
+𝒬 <> 𝓆
+𝒮 <> 𝓈
+𝒯 <> 𝓉
+𝒰 <> 𝓊
+𝒱 <> 𝓋
+𝒲 <> 𝓌
+𝒳 <> 𝓍
+𝒴 <> 𝓎
+𝒵 <> 𝓏
+𝓐 <> 𝓪
+𝓑 <> 𝓫
+𝓒 <> 𝓬
+𝓓 <> 𝓭
+𝓔 <> 𝓮
+𝓕 <> 𝓯
+𝓖 <> 𝓰
+𝓗 <> 𝓱
+𝓘 <> 𝓲
+𝓙 <> 𝓳
+𝓚 <> 𝓴
+𝓛 <> 𝓵
+𝓜 <> 𝓶
+𝓝 <> 𝓷
+𝓞 <> 𝓸
+𝓟 <> 𝓹
+𝓠 <> 𝓺
+𝓡 <> 𝓻
+𝓢 <> 𝓼
+𝓣 <> 𝓽
+𝓤 <> 𝓾
+𝓥 <> 𝓿
+𝓦 <> 𝔀
+𝓧 <> 𝔁
+𝓨 <> 𝔂
+𝓩 <> 𝔃
+𝔄 <> 𝔞
+𝔅 <> 𝔟
+𝔇 <> 𝔡
+𝔈 <> 𝔢
+𝔉 <> 𝔣
+𝔊 <> 𝔤
+𝔍 <> 𝔧
+𝔎 <> 𝔨
+𝔏 <> 𝔩
+𝔐 <> 𝔪
+𝔑 <> 𝔫
+𝔒 <> 𝔬
+𝔓 <> 𝔭
+𝔔 <> 𝔮
+𝔖 <> 𝔰
+𝔗 <> 𝔱
+𝔘 <> 𝔲
+𝔙 <> 𝔳
+𝔚 <> 𝔴
+𝔛 <> 𝔵
+𝔜 <> 𝔶
+𝔸 <> 𝕒
+𝔹 <> 𝕓
+𝔻 <> 𝕕
+𝔼 <> 𝕖
+𝔽 <> 𝕗
+𝔾 <> 𝕘
+𝕀 <> 𝕚
+𝕁 <> 𝕛
+𝕂 <> 𝕜
+𝕃 <> 𝕝
+𝕄 <> 𝕞
+𝕆 <> 𝕠
+𝕊 <> 𝕤
+𝕋 <> 𝕥
+𝕌 <> 𝕦
+𝕍 <> 𝕧
+𝕎 <> 𝕨
+𝕏 <> 𝕩
+𝕐 <> 𝕪
+𝕬 <> 𝖆
+𝕭 <> 𝖇
+𝕮 <> 𝖈
+𝕯 <> 𝖉
+𝕰 <> 𝖊
+𝕱 <> 𝖋
+𝕲 <> 𝖌
+𝕳 <> 𝖍
+𝕴 <> 𝖎
+𝕵 <> 𝖏
+𝕶 <> 𝖐
+𝕷 <> 𝖑
+𝕸 <> 𝖒
+𝕹 <> 𝖓
+𝕺 <> 𝖔
+𝕻 <> 𝖕
+𝕼 <> 𝖖
+𝕽 <> 𝖗
+𝕾 <> 𝖘
+𝕿 <> 𝖙
+𝖀 <> 𝖚
+𝖁 <> 𝖛
+𝖂 <> 𝖜
+𝖃 <> 𝖝
+𝖄 <> 𝖞
+𝖅 <> 𝖟
+𝖠 <> 𝖺
+𝖡 <> 𝖻
+𝖢 <> 𝖼
+𝖣 <> 𝖽
+𝖤 <> 𝖾
+𝖥 <> 𝖿
+𝖦 <> 𝗀
+𝖧 <> 𝗁
+𝖨 <> 𝗂
+𝖩 <> 𝗃
+𝖪 <> 𝗄
+𝖫 <> 𝗅
+𝖬 <> 𝗆
+𝖭 <> 𝗇
+𝖮 <> 𝗈
+𝖯 <> 𝗉
+𝖰 <> 𝗊
+𝖱 <> 𝗋
+𝖲 <> 𝗌
+𝖳 <> 𝗍
+𝖴 <> 𝗎
+𝖵 <> 𝗏
+𝖶 <> 𝗐
+𝖷 <> 𝗑
+𝖸 <> 𝗒
+𝖹 <> 𝗓
+𝗔 <> 𝗮
+𝗕 <> 𝗯
+𝗖 <> 𝗰
+𝗗 <> 𝗱
+𝗘 <> 𝗲
+𝗙 <> 𝗳
+𝗚 <> 𝗴
+𝗛 <> 𝗵
+𝗜 <> 𝗶
+𝗝 <> 𝗷
+𝗞 <> 𝗸
+𝗟 <> 𝗹
+𝗠 <> 𝗺
+𝗡 <> 𝗻
+𝗢 <> 𝗼
+𝗣 <> 𝗽
+𝗤 <> 𝗾
+𝗥 <> 𝗿
+𝗦 <> 𝘀
+𝗧 <> 𝘁
+𝗨 <> 𝘂
+𝗩 <> 𝘃
+𝗪 <> 𝘄
+𝗫 <> 𝘅
+𝗬 <> 𝘆
+𝗭 <> 𝘇
+𝘈 <> 𝘢
+𝘉 <> 𝘣
+𝘊 <> 𝘤
+𝘋 <> 𝘥
+𝘌 <> 𝘦
+𝘍 <> 𝘧
+𝘎 <> 𝘨
+𝘏 <> 𝘩
+𝘐 <> 𝘪
+𝘑 <> 𝘫
+𝘒 <> 𝘬
+𝘓 <> 𝘭
+𝘔 <> 𝘮
+𝘕 <> 𝘯
+𝘖 <> 𝘰
+𝘗 <> 𝘱
+𝘘 <> 𝘲
+𝘙 <> 𝘳
+𝘚 <> 𝘴
+𝘛 <> 𝘵
+𝘜 <> 𝘶
+𝘝 <> 𝘷
+𝘞 <> 𝘸
+𝘟 <> 𝘹
+𝘠 <> 𝘺
+𝘡 <> 𝘻
+𝘼 <> 𝙖
+𝘽 <> 𝙗
+𝘾 <> 𝙘
+𝘿 <> 𝙙
+𝙀 <> 𝙚
+𝙁 <> 𝙛
+𝙂 <> 𝙜
+𝙃 <> 𝙝
+𝙄 <> 𝙞
+𝙅 <> 𝙟
+𝙆 <> 𝙠
+𝙇 <> 𝙡
+𝙈 <> 𝙢
+𝙉 <> 𝙣
+𝙊 <> 𝙤
+𝙋 <> 𝙥
+𝙌 <> 𝙦
+𝙍 <> 𝙧
+𝙎 <> 𝙨
+𝙏 <> 𝙩
+𝙐 <> 𝙪
+𝙑 <> 𝙫
+𝙒 <> 𝙬
+𝙓 <> 𝙭
+𝙔 <> 𝙮
+𝙕 <> 𝙯
+𝙰 <> 𝚊
+𝙱 <> 𝚋
+𝙲 <> 𝚌
+𝙳 <> 𝚍
+𝙴 <> 𝚎
+𝙵 <> 𝚏
+𝙶 <> 𝚐
+𝙷 <> 𝚑
+𝙸 <> 𝚒
+𝙹 <> 𝚓
+𝙺 <> 𝚔
+𝙻 <> 𝚕
+𝙼 <> 𝚖
+𝙽 <> 𝚗
+𝙾 <> 𝚘
+𝙿 <> 𝚙
+𝚀 <> 𝚚
+𝚁 <> 𝚛
+𝚂 <> 𝚜
+𝚃 <> 𝚝
+𝚄 <> 𝚞
+𝚅 <> 𝚟
+𝚆 <> 𝚠
+𝚇 <> 𝚡
+𝚈 <> 𝚢
+𝚉 <> 𝚣
+𝚨 <> 𝛂
+𝚩 <> 𝛃
+𝚪 <> 𝛄
+𝚫 <> 𝛅
+𝚬 <> 𝛆
+𝚭 <> 𝛇
+𝚮 <> 𝛈
+𝚯 <> 𝛉
+𝚰 <> 𝛊
+𝚱 <> 𝛋
+𝚲 <> 𝛌
+𝚳 <> 𝛍
+𝚴 <> 𝛎
+𝚵 <> 𝛏
+𝚶 <> 𝛐
+𝚷 <> 𝛑
+𝚸 <> 𝛒
+𝚺 <> 𝛔
+𝚻 <> 𝛕
+𝚼 <> 𝛖
+𝚽 <> 𝛗
+𝚾 <> 𝛘
+𝚿 <> 𝛙
+𝛀 <> 𝛚
+𝛢 <> 𝛼
+𝛣 <> 𝛽
+𝛤 <> 𝛾
+𝛥 <> 𝛿
+𝛦 <> 𝜀
+𝛧 <> 𝜁
+𝛨 <> 𝜂
+𝛩 <> 𝜃
+𝛪 <> 𝜄
+𝛫 <> 𝜅
+𝛬 <> 𝜆
+𝛭 <> 𝜇
+𝛮 <> 𝜈
+𝛯 <> 𝜉
+𝛰 <> 𝜊
+𝛱 <> 𝜋
+𝛲 <> 𝜌
+𝛴 <> 𝜎
+𝛵 <> 𝜏
+𝛶 <> 𝜐
+𝛷 <> 𝜑
+𝛸 <> 𝜒
+𝛹 <> 𝜓
+𝛺 <> 𝜔
+𝜜 <> 𝜶
+𝜝 <> 𝜷
+𝜞 <> 𝜸
+𝜟 <> 𝜹
+𝜠 <> 𝜺
+𝜡 <> 𝜻
+𝜢 <> 𝜼
+𝜣 <> 𝜽
+𝜤 <> 𝜾
+𝜥 <> 𝜿
+𝜦 <> 𝝀
+𝜧 <> 𝝁
+𝜨 <> 𝝂
+𝜩 <> 𝝃
+𝜪 <> 𝝄
+𝜫 <> 𝝅
+𝜬 <> 𝝆
+𝜮 <> 𝝈
+𝜯 <> 𝝉
+𝜰 <> 𝝊
+𝜱 <> 𝝋
+𝜲 <> 𝝌
+𝜳 <> 𝝍
+𝜴 <> 𝝎
+𝝖 <> 𝝰
+𝝗 <> 𝝱
+𝝘 <> 𝝲
+𝝙 <> 𝝳
+𝝚 <> 𝝴
+𝝛 <> 𝝵
+𝝜 <> 𝝶
+𝝝 <> 𝝷
+𝝞 <> 𝝸
+𝝟 <> 𝝹
+𝝠 <> 𝝺
+𝝡 <> 𝝻
+𝝢 <> 𝝼
+𝝣 <> 𝝽
+𝝤 <> 𝝾
+𝝥 <> 𝝿
+𝝦 <> 𝞀
+𝝨 <> 𝞂
+𝝩 <> 𝞃
+𝝪 <> 𝞄
+𝝫 <> 𝞅
+𝝬 <> 𝞆
+𝝭 <> 𝞇
+𝝮 <> 𝞈
+𝞐 <> 𝞪
+𝞑 <> 𝞫
+𝞒 <> 𝞬
+𝞓 <> 𝞭
+𝞔 <> 𝞮
+𝞕 <> 𝞯
+𝞖 <> 𝞰
+𝞗 <> 𝞱
+𝞘 <> 𝞲
+𝞙 <> 𝞳
+𝞚 <> 𝞴
+𝞛 <> 𝞵
+𝞜 <> 𝞶
+𝞝 <> 𝞷
+𝞞 <> 𝞸
+𝞟 <> 𝞹
+𝞠 <> 𝞺
+𝞢 <> 𝞼
+𝞣 <> 𝞽
+𝞤 <> 𝞾
+𝞥 <> 𝞿
+𝞦 <> 𝟀
+𝞧 <> 𝟁
+𝞨 <> 𝟂
+𝟊 <> 𝟋
+ℒ <> ℓ
+ℰ <> ℯ
+Ⅎ <> ⅎ
+ℾ <> ℽ
+ℿ <> ℼ
+ⅅ <> ⅆ
+Ꙁ <> ꙁ
+Ꙃ <> ꙃ
+Ꙅ <> ꙅ
+Ꙇ <> ꙇ
+Ꙉ <> ꙉ
+Ꙋ <> ꙋ
+Ꙍ <> ꙍ
+Ꙏ <> ꙏ
+Ꙑ <> ꙑ
+Ꙓ <> ꙓ
+Ꙕ <> ꙕ
+Ꙗ <> ꙗ
+Ꙙ <> ꙙ
+Ꙛ <> ꙛ
+Ꙝ <> ꙝ
+Ꙟ <> ꙟ
+Ꙡ <> ꙡ
+Ꙣ <> ꙣ
+Ꙥ <> ꙥ
+Ꙧ <> ꙧ
+Ꙩ <> ꙩ
+Ꙫ <> ꙫ
+Ꙭ <> ꙭ
+Ꚁ <> ꚁ
+Ꚃ <> ꚃ
+Ꚅ <> ꚅ
+Ꚇ <> ꚇ
+Ꚉ <> ꚉ
+Ꚋ <> ꚋ
+Ꚍ <> ꚍ
+Ꚏ <> ꚏ
+Ꚑ <> ꚑ
+Ꚓ <> ꚓ
+Ꚕ <> ꚕ
+Ꚗ <> ꚗ
+Ꜣ <> ꜣ
+Ꜥ <> ꜥ
+Ꜧ <> ꜧ
+Ꜩ <> ꜩ
+Ꜫ <> ꜫ
+Ꜭ <> ꜭ
+Ꜯ <> ꜯ
+Ꜳ <> ꜳ
+Ꜵ <> ꜵ
+Ꜷ <> ꜷ
+Ꜹ <> ꜹ
+Ꜻ <> ꜻ
+Ꜽ <> ꜽ
+Ꜿ <> ꜿ
+Ꝁ <> ꝁ
+Ꝃ <> ꝃ
+Ꝅ <> ꝅ
+Ꝇ <> ꝇ
+Ꝉ <> ꝉ
+Ꝋ <> ꝋ
+Ꝍ <> ꝍ
+Ꝏ <> ꝏ
+Ꝑ <> ꝑ
+Ꝓ <> ꝓ
+Ꝕ <> ꝕ
+Ꝗ <> ꝗ
+Ꝙ <> ꝙ
+Ꝛ <> ꝛ
+Ꝝ <> ꝝ
+Ꝟ <> ꝟ
+Ꝡ <> ꝡ
+Ꝣ <> ꝣ
+Ꝥ <> ꝥ
+Ꝧ <> ꝧ
+Ꝩ <> ꝩ
+Ꝫ <> ꝫ
+Ꝭ <> ꝭ
+Ꝯ <> ꝯ
+Ꝺ <> ꝺ
+Ꝼ <> ꝼ
+Ᵹ <> ᵹ
+Ꝿ <> ꝿ
+Ꞁ <> ꞁ
+Ꞃ <> ꞃ
+Ꞅ <> ꞅ
+Ꞇ <> ꞇ
+Ꞌ <> ꞌ
+Ɥ <> ɥ
+Ꞑ <> ꞑ
+Ꞡ <> ꞡ
+Ꞣ <> ꞣ
+Ꞥ <> ꞥ
+Ꞧ <> ꞧ
+Ꞩ <> ꞩ
+𐐀 <> 𐐨
+𐐁 <> 𐐩
+𐐂 <> 𐐪
+𐐃 <> 𐐫
+𐐄 <> 𐐬
+𐐅 <> 𐐭
+𐐆 <> 𐐮
+𐐇 <> 𐐯
+𐐈 <> 𐐰
+𐐉 <> 𐐱
+𐐊 <> 𐐲
+𐐋 <> 𐐳
+𐐌 <> 𐐴
+𐐍 <> 𐐵
+𐐎 <> 𐐶
+𐐏 <> 𐐷
+𐐐 <> 𐐸
+𐐑 <> 𐐹
+𐐒 <> 𐐺
+𐐓 <> 𐐻
+𐐔 <> 𐐼
+𐐕 <> 𐐽
+𐐖 <> 𐐾
+𐐗 <> 𐐿
+𐐘 <> 𐑀
+𐐙 <> 𐑁
+𐐚 <> 𐑂
+𐐛 <> 𐑃
+𐐜 <> 𐑄
+𐐝 <> 𐑅
+𐐞 <> 𐑆
+𐐟 <> 𐑇
+𐐠 <> 𐑈
+𐐡 <> 𐑉
+𐐢 <> 𐑊
+𐐣 <> 𐑋
+𐐤 <> 𐑌
+𐐥 <> 𐑍
+𐐦 <> 𐑎
+𐐧 <> 𐑏
+🄐 <> ⒜
+🄑 <> ⒝
+🄒 <> ⒞
+🄓 <> ⒟
+🄔 <> ⒠
+🄕 <> ⒡
+🄖 <> ⒢
+🄗 <> ⒣
+🄘 <> ⒤
+🄙 <> ⒥
+🄚 <> ⒦
+🄛 <> ⒧
+🄜 <> ⒨
+🄝 <> ⒩
+🄞 <> ⒪
+🄟 <> ⒫
+🄠 <> ⒬
+🄡 <> ⒭
+🄢 <> ⒮
+🄣 <> ⒯
+🄤 <> ⒰
+🄥 <> ⒱
+🄦 <> ⒲
+🄧 <> ⒳
+🄨 <> ⒴
+🄩 <> ⒵
+ᴬ <> ᵃ
+ᴮ <> ᵇ
+ᴰ <> ᵈ
+ᴱ <> ᵉ
+ᴳ <> ᵍ
+ᴴ <> ʰ
+ᴶ <> ʲ
+ᴷ <> ᵏ
+ᴸ <> ˡ
+ᴹ <> ᵐ
+ᴼ <> ᵒ
+ᴾ <> ᵖ
+ᴿ <> ʳ
+ᵀ <> ᵗ
+ᵁ <> ᵘ
+ᵂ <> ʷ
+Ḁ <> ḁ
+Ḃ <> ḃ
+Ḅ <> ḅ
+Ḇ <> ḇ
+Ḉ <> ḉ
+Ḋ <> ḋ
+Ḍ <> ḍ
+Ḏ <> ḏ
+Ḑ <> ḑ
+Ḓ <> ḓ
+Ḕ <> ḕ
+Ḗ <> ḗ
+Ḙ <> ḙ
+Ḛ <> ḛ
+Ḝ <> ḝ
+Ḟ <> ḟ
+Ḡ <> ḡ
+Ḣ <> ḣ
+Ḥ <> ḥ
+Ḧ <> ḧ
+Ḩ <> ḩ
+Ḫ <> ḫ
+Ḭ <> ḭ
+Ḯ <> ḯ
+Ḱ <> ḱ
+Ḳ <> ḳ
+Ḵ <> ḵ
+Ḷ <> ḷ
+Ḹ <> ḹ
+Ḻ <> ḻ
+Ḽ <> ḽ
+Ḿ <> ḿ
+Ṁ <> ṁ
+Ṃ <> ṃ
+Ṅ <> ṅ
+Ṇ <> ṇ
+Ṉ <> ṉ
+Ṋ <> ṋ
+Ṍ <> ṍ
+Ṏ <> ṏ
+Ṑ <> ṑ
+Ṓ <> ṓ
+Ṕ <> ṕ
+Ṗ <> ṗ
+Ṙ <> ṙ
+Ṛ <> ṛ
+Ṝ <> ṝ
+Ṟ <> ṟ
+Ṡ <> ṡ
+Ṣ <> ṣ
+Ṥ <> ṥ
+Ṧ <> ṧ
+Ṩ <> ṩ
+Ṫ <> ṫ
+Ṭ <> ṭ
+Ṯ <> ṯ
+Ṱ <> ṱ
+Ṳ <> ṳ
+Ṵ <> ṵ
+Ṷ <> ṷ
+Ṹ <> ṹ
+Ṻ <> ṻ
+Ṽ <> ṽ
+Ṿ <> ṿ
+Ẁ <> ẁ
+Ẃ <> ẃ
+Ẅ <> ẅ
+Ẇ <> ẇ
+Ẉ <> ẉ
+Ẋ <> ẋ
+Ẍ <> ẍ
+Ẏ <> ẏ
+Ẑ <> ẑ
+Ẓ <> ẓ
+Ẕ <> ẕ
+ẞ <> ß
+Ạ <> ạ
+Ả <> ả
+Ấ <> ấ
+Ầ <> ầ
+Ẩ <> ẩ
+Ẫ <> ẫ
+Ậ <> ậ
+Ắ <> ắ
+Ằ <> ằ
+Ẳ <> ẳ
+Ẵ <> ẵ
+Ặ <> ặ
+Ẹ <> ẹ
+Ẻ <> ẻ
+Ẽ <> ẽ
+Ế <> ế
+Ề <> ề
+Ể <> ể
+Ễ <> ễ
+Ệ <> ệ
+Ỉ <> ỉ
+Ị <> ị
+Ọ <> ọ
+Ỏ <> ỏ
+Ố <> ố
+Ồ <> ồ
+Ổ <> ổ
+Ỗ <> ỗ
+Ộ <> ộ
+Ớ <> ớ
+Ờ <> ờ
+Ở <> ở
+Ỡ <> ỡ
+Ợ <> ợ
+Ụ <> ụ
+Ủ <> ủ
+Ứ <> ứ
+Ừ <> ừ
+Ử <> ử
+Ữ <> ữ
+Ự <> ự
+Ỳ <> ỳ
+Ỵ <> ỵ
+Ỷ <> ỷ
+Ỹ <> ỹ
+Ỻ <> ỻ
+Ỽ <> ỽ
+Ỿ <> ỿ
+Ἀ <> ἀ
+Ἁ <> ἁ
+Ἂ <> ἂ
+Ἃ <> ἃ
+Ἄ <> ἄ
+Ἅ <> ἅ
+Ἆ <> ἆ
+Ἇ <> ἇ
+Ἐ <> ἐ
+Ἑ <> ἑ
+Ἒ <> ἒ
+Ἓ <> ἓ
+Ἔ <> ἔ
+Ἕ <> ἕ
+Ἠ <> ἠ
+Ἡ <> ἡ
+Ἢ <> ἢ
+Ἣ <> ἣ
+Ἤ <> ἤ
+Ἥ <> ἥ
+Ἦ <> ἦ
+Ἧ <> ἧ
+Ἰ <> ἰ
+Ἱ <> ἱ
+Ἲ <> ἲ
+Ἳ <> ἳ
+Ἴ <> ἴ
+Ἵ <> ἵ
+Ἶ <> ἶ
+Ἷ <> ἷ
+Ὀ <> ὀ
+Ὁ <> ὁ
+Ὂ <> ὂ
+Ὃ <> ὃ
+Ὄ <> ὄ
+Ὅ <> ὅ
+Ὑ <> ὑ
+Ὓ <> ὓ
+Ὕ <> ὕ
+Ὗ <> ὗ
+Ὠ <> ὠ
+Ὡ <> ὡ
+Ὢ <> ὢ
+Ὣ <> ὣ
+Ὤ <> ὤ
+Ὥ <> ὥ
+Ὦ <> ὦ
+Ὧ <> ὧ
+Ᾰ <> ᾰ
+Ᾱ <> ᾱ
+Ὰ <> ὰ
+Ά <> ά
+Ὲ <> ὲ
+Έ <> έ
+Ὴ <> ὴ
+Ή <> ή
+Ῐ <> ῐ
+Ῑ <> ῑ
+Ὶ <> ὶ
+Ί <> ί
+Ῠ <> ῠ
+Ῡ <> ῡ
+Ὺ <> ὺ
+Ύ <> ύ
+Ῥ <> ῥ
+Ὸ <> ὸ
+Ό <> ό
+Ὼ <> ὼ
+Ώ <> ώ
+

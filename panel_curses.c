@@ -2082,18 +2082,11 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 #else
 		memcpy(vstr,v1->uval,6);
 #endif
-#if	1
+
 		if(	get_utf_length((utfchar *)vstr)<0) 
 		{
 			wprintw(wp->gwp->draw,"%s",unknown1);
 		} 
-#if	0
-		else
-		if	(vstr[0]==0xF0 && vstr[1]!=0x90 && vstr[1]!=0x9F && vstr[2]!=0x8F && vstr[2]!=0x91 && vstr[2]!=0x92 && vstr[2]!=0x94 && vstr[2]!=0x96 && vstr[2]!=0x98 && vstr[2]!=0xA4 && vstr[2]!=0xA6 && vstr[2]!=0xA7 && vstr[2]!=0x9F && vstr[2]!=0xA0) { 
-			wprintw(wp->gwp->draw,"%c",'?');
-			// ccor++;
-		}
-#endif
 		// else if	(vstr[0]==0xF0 && vstr[1]==0x9F && vstr[2]!=0x94) wprintw(wp->gwp->draw,"%c",'?');
 		// else if	(vstr[0]==0xF0 && vstr[1]==0x9D) { wprintw(wp->gwp->draw,"%s",unknown1);}
 		// else if	(vstr[0]==0xF0 && vstr[1]==0x90 && vstr[2]==0x90) wprintw(wp->gwp->draw,"%c",'#');
@@ -2107,9 +2100,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 		}
 #endif
 		else 
-#endif
 			waddstr(wp->gwp->draw,vstr);
-			// wprintw(wp->gwp->draw,"%s",vstr);
 
 
 		v1++;

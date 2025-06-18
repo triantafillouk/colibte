@@ -1077,6 +1077,18 @@ int bom_type(int file_id)
  	lseek(file_id,0L,SEEK_SET);
 	return (FALSE);
  };
+ if(read(file_id,c+2,1)!=1) {	// read third byte
+ 	lseek(file_id,0L,SEEK_SET);
+	return (FALSE);
+ };
+
+#if	0
+ if(c[0]==0xEF && c[1]==0xBB && c[2]==0xBF) {
+ 	MESG("FTPE_UTF8BOM");
+	lseek(file_id,0L,SEEK_SET);	// ??
+	return(FTYPE_UTF8BOM);
+ };
+#endif
  if(c[0]==0xFF && c[1]==0xFE) {
  	MESG("FTPE_UTF16BOM");
 	lseek(file_id,0L,SEEK_SET);	// ??

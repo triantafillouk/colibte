@@ -1984,7 +1984,10 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	{
 		to_read=st.st_size;
 		// MESG("no memmap!");
-		if(bf->bom_type==FTYPE_UTF8BOM) to_read-=3;
+		if(bf->bom_type==FTYPE_UTF8BOM) {
+			to_read-=3;
+			lseek(file,3,0);
+		};
 		if(bf->bom_type==FTYPE_UTF16BOM) {
 			to_read=get_utf2to16_size(name);
 			// MESG("file %ld -> %ld",st.st_size,to_read);
@@ -3193,6 +3196,9 @@ int   ReplaceTextFromFile(char *file_name,FILEBUF *fp,int fd,offs size,offs *act
 		*act_read=fread16(file_name,fp->buffer+fp->ptr1,size);
 		fp->view_mode = EMDOS;
 	} else {
+		if(fp->bom_type==FTYPE_UTF8BOM) {
+			lseek(fd,3,0);
+		};
 	   *act_read=read(fd,fp->buffer+fp->ptr1,size);
 	};
 
@@ -3490,6 +3496,17 @@ size_t write_utf8_as_utf16(int file_id,char *in,size_t inlen)
  return out_len;
 }
 
+int set_bom(num bom_type)
+{
+ switch (bom_type){
+ 	case 0: cbfp->bom_type=0;break;
+	case 1: cbfp->bom_type=FTYPE_UTF16BOM;break;
+	case 8: cbfp->bom_type=FTYPE_UTF8BOM;break;
+	default: cbfp->bom_type=0;
+ };
+ return 1;
+}
+
 /* operates on cbfp */
 int   WriteBlock(int fd,offs from,offs size,offs *act_written)
 {
@@ -3512,6 +3529,14 @@ int   WriteBlock(int fd,offs from,offs size,offs *act_written)
 	if(write(fd,(char *)&bom16,2)!=2) {
 		*act_written=0;
 		return(false);
+	};
+   };
+   if(fp->bom_type==FTYPE_UTF8BOM) {
+   	unsigned char sbom[3];
+	sbom[0]=0xEF;sbom[1]=0xBB;sbom[2]=0xBF;
+	if(write(fd,sbom,3)!=3) {
+		*act_written=0;
+		return false;
 	};
    };
    if(from>=fp->ptr1) {

@@ -44,6 +44,7 @@ void select_current_word();
 int window_cursor_line(WINDP *wp);
 void set_goal_column(int new_column,char *from);
 void set_xmark(WINDP *smark_wp, int mouse_col,int mouse_row,int f);
+int set_bom(num n);
 void clear_names();
 void clear_snames(char **,int);
 int set_option_val(int vnum,char *value);
