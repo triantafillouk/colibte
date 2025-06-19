@@ -1063,15 +1063,12 @@ char *get_buf_full_name(FILEBUF *fp)
 int bom_type(int file_id)
 {
  char c[8];
+ MESG("bom_type:");
  lseek(file_id,0L,SEEK_SET);
  if(read(file_id,c,1)!=1) return(FALSE);
  if(c[0]==26) {
  	MESG("BOM is encrypted!");
  	return FTYPE_ENCRYPTED;
- };
- if(c[0]<0xEF) {
- 	lseek(file_id,0L,SEEK_SET);
- 	return FALSE;
  };
  if(read(file_id,c+1,1)!=1) {	// read second byte
  	lseek(file_id,0L,SEEK_SET);
@@ -1081,14 +1078,6 @@ int bom_type(int file_id)
  	lseek(file_id,0L,SEEK_SET);
 	return (FALSE);
  };
-
-#if	0
- if(c[0]==0xEF && c[1]==0xBB && c[2]==0xBF) {
- 	MESG("FTPE_UTF8BOM");
-	lseek(file_id,0L,SEEK_SET);	// ??
-	return(FTYPE_UTF8BOM);
- };
-#endif
  if(c[0]==0xFF && c[1]==0xFE) {
  	MESG("FTPE_UTF16BOM");
 	lseek(file_id,0L,SEEK_SET);	// ??
@@ -1099,12 +1088,9 @@ int bom_type(int file_id)
 	lseek(file_id,0L,SEEK_SET);
 	return(FTYPE_UTF16BOM);
  };
- if(c[0]==0xEF && c[1]==0xBB) { // check for utf8 bom
- 	if(read(file_id,c+2,1)!=1) { 
-		lseek(file_id,0L,SEEK_SET);
-		return (FALSE);
-	};
-	if(c[2]==0xBF) return (FTYPE_UTF8BOM);
+ if(c[0]==0xEF && c[1]==0xBB && c[2]==0xBF) { // check for utf8 bom
+	MESG("bom_type: UTF8BOM");
+	return (FTYPE_UTF8BOM);
  };
  if(c[0]==0xFF && c[1]==0xFE) {
  	if(c[2]==0 && c[3]==0) {
@@ -1702,7 +1688,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
  int htype=0;	/* highlight type  */
  char	oext[MAXLLEN], cmd[MAXLLEN];
  *temp_used=0;
- // MESG("init_ftype:[%s] b_type=%d view_mode=0x%X" ,fname,bp->b_type,bp->view_mode);
+ MESG("init_ftype:[%s] b_type=%d view_mode=0x%X" ,fname,bp->b_type,bp->view_mode);
 #if	CRYPT
 	s=resetkey(bp);
 	if (s != TRUE)	return(s);
@@ -1752,7 +1738,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 
 	bp->bytes_read=0;
 	bp->err=-1;
-	// MESG("init_ftype: file_id=%d",bp->file_id);
+	MESG("init_ftype: file_id=%d b_mode=%X",bp->file_id,bp->b_mode);
 	if(bp->b_mode!=VMHEX) {
 		bp->bom_type = bom_type(bp->file_id);
 	};
@@ -1796,7 +1782,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 	htype=get_highlight(bp);
 	set_highlight(bp,htype);
 	
-	// MESG("init_ftype: set highlight b_type=%d b_mode=%X bom_type=%d",bp->b_type,bp->b_mode,bp->bom_type);
+	MESG("init_ftype: set highlight b_type=%d b_mode=%X bom_type=%d",bp->b_type,bp->b_mode,bp->bom_type);
 	if(bp->b_mode & EMCRYPT) {
 		s= resetkey(bp);
 	};
@@ -1870,7 +1856,7 @@ int file_type(char *name, int *compression_type,char *oext)
  };
  ext1[ext_len]=0;	// extension in reverse 
  i--;
- // MESG("file_type: [%s] [%s] len=%d e=%d",name,ext1,ext_len,e);
+ MESG("file_type: [%s] [%s] len=%d e=%d",name,ext1,ext_len,e);
 
  if(e>0 && ext_len>0) {
 	revstr(ext1);

@@ -1,5 +1,7 @@
 ﻿# Some UTF-8 encoded text characters
 # Modified from 
+
+bom?
 Markus Kuhn [ˈmaʳkʊs kuːn] <http://www.cl.cam.ac.uk/~mgk25/> — 2002-07-25
 	tab
 क्‍ष

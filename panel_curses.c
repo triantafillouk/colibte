@@ -2050,6 +2050,12 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 		doupdate();
 	};
 #endif
+#if	USE_ALWAYS_SLOW
+		wclrtoeol(wp->gwp->draw);
+		wrefresh(wp->gwp->draw);
+	 	update_panels();
+		doupdate();
+#endif
 	for(i=0;i<=imax;i++) {
 	 uint32_t ch;
 	 	if(v1->fcolor < 256) fcolor = v1->fcolor+v1->attr;
@@ -2114,7 +2120,11 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 		// doupdate();
 	} else
 #endif
+#if	USE_ALWAYS_SLOW
+	wrefresh(wp->gwp->draw);
+#ense
 	touchline(wp->gwp->draw,row,1);
+#endif
 		// wnoutrefresh(wp->gwp->draw);
 }
 

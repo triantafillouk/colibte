@@ -529,6 +529,10 @@ void draw_window(int flag, WINDP *wp,char *from)
 				wp->vs[i]->slow_line=0;
 			};
 #endif
+#if	USE_ALWAYS_SLOW
+				drv_clear_line(wp,i);
+				wp->vtcol=0;
+#endif
 			draw_window_line(wp,i);
 			// ulines++;
 		}
@@ -673,7 +677,7 @@ int display_size=get_utf_length(&uc);
 	int	c=uc.uval[0];
 		if(c==0xE0 /* && uc.uval[1]>=0xB0 */){
 			wp->vs[wp->vtrow]->slow_line=1;
-			fp->slow_display=1;	/* slow down for thai chars  */
+			wp->w_fp->slow_display=1;	/* slow down for thai chars  */
 		};
 #endif
 #if USE_GLIB	// Convert to composed character if possible to view it!

@@ -299,7 +299,7 @@ int show_info(num n)
 	if(cbfp->b_flag & FSNLIST) 		strlcat(s,"Note list",width);
 // 	if(cbfp->b_flag & FSNCALIST) 	strlcat(s,"Calendar list view",width);
 	sm[i++]=strdup(s);sm[i]=0;
-#if	USE_SLOW_DISPLAY
+#if	USE_SLOW_DISPLAY | USE_ALWAYS_SLOW
 	if(debug_flag()) {
 		if(cbfp->slow_display) { SMESG("buffer slow!");} else { SMESG("buffer fast display");};
 	};
@@ -1907,7 +1907,6 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 		return(i);
 	};
    status=stat(name,&st);
-   // MESG("ifile0: [%s] dir=[%s] name=[%s] status=%d ir_flag=%d",bf->b_fname,bf->b_dname,name,status,ir_flag);
 	MESG_time_start("ifile0: %s",bf->b_fname);
    if(status==-1 && errno==ENOENT)
    {
@@ -1987,6 +1986,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 		if(bf->bom_type==FTYPE_UTF8BOM) {
 			to_read-=3;
 			lseek(file,3,0);
+			MESG("FTYPE+UTF8BOM: to_read = %ld",to_read);
 		};
 		if(bf->bom_type==FTYPE_UTF16BOM) {
 			to_read=get_utf2to16_size(name);
@@ -3161,7 +3161,7 @@ num fread16(char *file_name,char *buffer,num size)
 int   ReadBlock(char *fname,int fd,offs size,offs *act_read)
 {
    FILEBUF *fp=cbfp;
-   // MESG("ReadBlock:[%s] size=%ld",fname,size);
+   MESG("ReadBlock:[%s] size=%ld",fname,size);
    if(fp->b_flag & FSMMAP)  return false;
    if(size==0)   {
       *act_read=0;
@@ -3175,6 +3175,7 @@ int   ReadBlock(char *fname,int fd,offs size,offs *act_read)
 		*act_read=fread16(fname,fp->buffer+fp->ptr1,size);
 		fp->view_mode = EMDOS;
 	} else {
+		MESG("read size=%ld",size);
 	   *act_read=read(fd,fp->buffer+fp->ptr1,size);
 	};
    if(*act_read==-1)	return(false);
