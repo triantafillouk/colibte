@@ -11,6 +11,8 @@
 
 long utf8_to_unicode(unsigned char* const utf8_str, int *size) ;
 long int unicode_point();
+char *get_bom_description(FILEBUF *fp);
+
 extern alist *window_list;
 extern SHLIGHT hts[];
 
@@ -271,7 +273,7 @@ int show_info(num n)
 	};
 	if(bp->connect_buffer) SMESG(" connected to %s",bp->connect_buffer->b_fname);
 	if(debug_flag()) {
-		SMESG("Flags: b_mode=0x%X b_flag=0x%X view_mode=0x%X b_type=0x%X is_wrap=%d",cbfp->b_mode,cbfp->b_flag,cbfp->view_mode,cbfp->b_type,is_wrap_text(cbfp));
+		SMESG("Flags: b_mode=0x%X b_flag=0x%X view_mode=0x%X b_type=0x%X is_wrap=%d bom=%d",cbfp->b_mode,cbfp->b_flag,cbfp->view_mode,cbfp->b_type,is_wrap_text(cbfp),cbfp->bom_type);
 	};
 	if(cbfp->b_mode) {
 		strcpy(s,"Buffer mode: ");	
@@ -279,6 +281,7 @@ int show_info(num n)
 		if(cbfp->b_mode & EMUNIX)  strlcat(s,"unix ",width);
 		if(cbfp->b_mode & EMMAC)   strlcat(s,"mac ",width);
 		if(cbfp->b_mode & EMDOS)   strlcat(s,"dos ",width);
+		strlcat (s," bom type ",width); strlcat(s,get_bom_description(cbfp),width);
 		sm[i++]=strdup(s);sm[i]=0;
 	};
 #if	0
@@ -950,7 +953,7 @@ void  ResetTextPoints(FILEBUF *bp,int flag)
 	textpoint_set(bp->tp_text_end,size);
 	// MESG("	new o=%ld lines=%ld new lines=%ld b_mode=%X",tp_offset(bp->tp_text_end),tp_line(bp->tp_text_end),bp->lines,bp->b_mode);
 	textpoint_set(bp->tp_text_o,size);
-	if( bp->b_mode > VMINP) 
+	if( bp->view_mode > VMINP) 
 	bp->lines=tp_line(bp->tp_text_end);
  };
 }
@@ -1192,14 +1195,14 @@ void check_line_mode(FILEBUF *bf)
  num DosLastLine=0;
  num UnixLastLine=0;
  num MacLastLine=0;
-
+ bf->b_mode=0;
       for(i=0; ; i++) {
 	 	i=ScanForCharForward(bf,i,'\n');
 	 	if(i<0)  break;
 	 	UnixLastLine++;
 	 	if(i>0 && FCharAt_NoCheck(bf,i-1)=='\r')  DosLastLine++;
       };
-//	MESG("check_line_mode d=%ld u=%ld",DosLastLine,UnixLastLine);
+	// MESG("check_line_mode d=%ld u=%ld",DosLastLine,UnixLastLine);
 
 	if(UnixLastLine==0) {
 		for(i=0;;i++) {
@@ -1209,26 +1212,26 @@ void check_line_mode(FILEBUF *bf)
 		};
 	};
 
-//	MESG("	d=%ld u=%ld",DosLastLine,UnixLastLine);
+	// MESG("check_line_mode: d=%ld u=%ld",DosLastLine,UnixLastLine);
 	  // if we permit dos file usage
-      if(UnixLastLine/2<DosLastLine) /* check if the file has unix or dos format */
+      if((UnixLastLine/2) < DosLastLine) /* check if the file has unix or dos format */
       {
 		bf->EolSize=2;
 		strlcpy(bf->EolStr,"\r\n",3);
-		bf->b_mode |= EMDOS;
-		// MESG(";[%10s] check_line_mode: dos mode",bf->b_fname);
+		bf->b_mode = EMDOS;
+		// MESG(";[%10s] check_line_mode: %d dos mode",bf->b_fname,bf->b_mode);
 		textpoint_OrFlags(bf,COLUNDEFINED|LINEUNDEFINED);
       } else  
 	  if(MacLastLine>0){
 		bf->EolSize=1;
 		strlcpy(bf->EolStr,"\r",3);
 		bf->b_mode |= EMMAC;
-		// MESG(";[%10s] check_line_mode: mac mode",bf->b_fname);
+		// MESG(";[%10s] check_line_mode: %d mac mode", bf->b_fname,bf->b_mode);
 		textpoint_OrFlags(bf,COLUNDEFINED|LINEUNDEFINED);
 	  } else
 	  {
-		// MESG(";[%10s] check_line_mode: unix mode",bf->b_fname);
-		bf->b_mode |= EMUNIX;
+		bf->b_mode = EMUNIX;
+		// MESG(";[%10s] check_line_mode: %d unix mode",bf->b_fname,bf->b_mode);
       };
 }
 
@@ -2065,8 +2068,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	update_lines(bf);
 	if(!(bf->b_flag & FSMMAP)) 
 		set_modified(bf);
-
-//	MESG("	check fstat again!");
+	// MESG("ifile0:  after update_lines: b_mode=%d",bf->b_mode);
 	status=fstat(file,&st);
 	if(status==0) {
 	   	bf->FileMode=st.st_mode;
@@ -2080,7 +2082,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	};
 
 	textpoint_set(bf->tp_current,0);	// goto the beginning
-	MESG_time("ifile0: end");
+	// MESG_time("ifile0: b_mode=%d end",bf->b_mode);
 	close(file);
 	if(!execmd) msg_line("%s: chars=%lld,lines=%lld type %s max line len=%ld",bf->b_fname,FSize(bf),bf->lines,bf->hl->description,bf->maxlinelen);
 	if(temp_used) {
@@ -3246,15 +3248,15 @@ int set_view_mode(num n)
 {
 	FILEBUF *fp=cbfp;
 	offs offset=FOffset(fp);
-	// MESG("set_view_mode: to mode %d",n);
+	MESG("set_view_mode: to mode %d",n);
    switch (n) {
 	case 1: // Dos mode
 		if ((fp->b_flag & FSDIRED) && !(fp->b_state & FS_VIEW)) break;
 		if(fp->EolSize==1 || (fp->view_mode & VMHEX) ) {
 		fp->EolSize=2;
 		strlcpy(fp->EolStr,"\r\n",3);
-		fp->b_mode |= EMDOS;
-		fp->b_mode &= ~(EMMAC|EMUNIX);
+		fp->b_mode = EMDOS;
+		// fp->b_mode &= ~(EMMAC|EMUNIX);
 		fp->view_mode &= ~VMHEX;
 		};break;
    case 2: // Unix mode
@@ -3262,8 +3264,8 @@ int set_view_mode(num n)
 		if(fp->EolSize==2 || (fp->view_mode & VMHEX) || (fp->b_mode & EMMAC) ) {
 		fp->EolSize=1;
    		strlcpy(fp->EolStr,"\n",3);
-		fp->b_mode &= ~(EMDOS|EMMAC);
-		fp->b_mode |= EMUNIX;
+		// fp->b_mode &= ~(EMDOS|EMMAC);
+		fp->b_mode = EMUNIX;
 		fp->view_mode &= ~VMHEX;
 		}; break;
 	case 3: // hex mode
@@ -3284,8 +3286,8 @@ int set_view_mode(num n)
 		{
 		fp->EolSize=1;
    		strlcpy(fp->EolStr,"\r",3);
-		fp->b_mode &= ~(EMDOS|EMUNIX);
-		fp->b_mode |= EMMAC;
+		// fp->b_mode &= ~(EMDOS|EMUNIX);
+		fp->b_mode = EMMAC;
 		fp->view_mode &= ~VMHEX;
 		}; break;
 	case 5: // Show lines
@@ -3506,6 +3508,20 @@ int set_bom(num bom_type)
 	default: cbfp->bom_type=0;
  };
  return 1;
+}
+
+char *get_bom_description(FILEBUF *fp)
+{
+	switch (fp->bom_type) {
+		case 1: return "encrypted";
+		case 3: return "UTF16";
+		case 2: return "UTF8";
+		case 4: return "UTF32";
+		case 19: return "UTF16_BE";
+		case 20: return "UTF32_BE";
+		case (0):
+		default: return "plain";
+	};
 }
 
 /* operates on cbfp */

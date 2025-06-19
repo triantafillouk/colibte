@@ -2507,9 +2507,11 @@ int set_optionf(int option_flag,int global)
  if(n==1) {
 	if (global) gmode |= option_flag;
  	fp->b_mode |= option_flag;
+	// MESG("set option 0x%X",option_flag);
  } else {
 	if (global) gmode &= ~option_flag;
  	fp->b_mode &= ~option_flag;
+	// MESG("reset option 0x%X",option_flag);
  };
  update_status();
  return(TRUE);
@@ -2524,12 +2526,12 @@ void toggleoptionf(int option_flag, int global)
  	else gmode |= option_flag;
 
  };
-// MESG("toggleoptionf: f=%d global=%d gmode=%X",option_flag,global,gmode);
 
  if(fp == NULL) return;
 
  if(fp->b_mode & option_flag) fp->b_mode &= ~option_flag;
  else fp->b_mode |= option_flag;
+ // MESG("toggleoptionf: 0x%X",option_flag);
  update_status();
 }
 

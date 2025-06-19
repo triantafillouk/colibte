@@ -658,6 +658,7 @@ typedef struct  FILEBUF {
 	short int	b_state;
  	short int	b_flag;                 /* buffer state Flags           */
 	short int	b_mode;					/* editor mode of this buffer	*/
+	// short int	b_encrypt;
 	short int	view_mode;				/* view mode */
 	short int	b_type;			/* buffer,file type */
 	short int	scratch_num;	/* scratch number or 0  */

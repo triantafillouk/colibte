@@ -880,6 +880,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->b_index = buffer_index++;
     bp->b_flag  = bflag;
 	bp->b_mode  = gmode;
+	// MESG("new_filebuf: b_mode=0x%X",bp->b_mode);
 	bp->b_state = 0;
 	bp->view_mode = 0;
 	bp->scratch_num=is_scratch;
@@ -1063,7 +1064,7 @@ char *get_buf_full_name(FILEBUF *fp)
 int bom_type(int file_id)
 {
  char c[8];
- MESG("bom_type:");
+ // MESG("bom_type:");
  lseek(file_id,0L,SEEK_SET);
  if(read(file_id,c,1)!=1) return(FALSE);
  if(c[0]==26) {
@@ -1338,6 +1339,7 @@ int set_buf_key(FILEBUF *bp)	/* reset encryption key of current file */
 		crypt_string(bp->b_key, strlen(bp->b_key));
 	};
 	bp->b_mode |= EMCRYPT;	
+	// MESG("set_buf_key: b_mode=0x%X",bp->b_mode);
 	return(OK_CLRSL);
 }
 
@@ -1688,7 +1690,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
  int htype=0;	/* highlight type  */
  char	oext[MAXLLEN], cmd[MAXLLEN];
  *temp_used=0;
- MESG("init_ftype:[%s] b_type=%d view_mode=0x%X" ,fname,bp->b_type,bp->view_mode);
+ // MESG("init_ftype:[%s] b_type=%d view_mode=0x%X b_mode=%X" ,fname,bp->b_type,bp->view_mode,bp->b_mode);
 #if	CRYPT
 	s=resetkey(bp);
 	if (s != TRUE)	return(s);
@@ -1738,7 +1740,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 
 	bp->bytes_read=0;
 	bp->err=-1;
-	MESG("init_ftype: file_id=%d b_mode=%X",bp->file_id,bp->b_mode);
+	// MESG("init_ftype: file_id=%d b_mode=%X",bp->file_id,bp->b_mode);
 	if(bp->b_mode!=VMHEX) {
 		bp->bom_type = bom_type(bp->file_id);
 	};
@@ -1751,7 +1753,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 		|| file_type_is("MD",bp->b_type) 
 		|| (bp->b_type >= NOTE_TYPE))
 		 ) {	
-			// MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
+			MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
 			bp->b_mode |= EMCRYPT;
 #if	TNOTES
 			if(bt_dval("notes_recreate") || from_note) 
@@ -1782,7 +1784,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 	htype=get_highlight(bp);
 	set_highlight(bp,htype);
 	
-	MESG("init_ftype: set highlight b_type=%d b_mode=%X bom_type=%d",bp->b_type,bp->b_mode,bp->bom_type);
+	// MESG("init_ftype: set highlight b_type=%d b_mode=%X bom_type=%d",bp->b_type,bp->b_mode,bp->bom_type);
 	if(bp->b_mode & EMCRYPT) {
 		s= resetkey(bp);
 	};
