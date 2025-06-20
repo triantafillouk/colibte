@@ -2051,12 +2051,15 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 	};
 #endif
 #if	USE_ALWAYS_SLOW
-		wclrtoeol(wp->gwp->draw);
-		// touchline(wp->gwp->draw,row,1);
-		wnoutrefresh(wp->gwp->draw);
-		// wrefresh(wp->gwp->draw);
-	 	update_panels();
-		doupdate();
+//	must clear the whole line before write!
+	fcolor = v1->fcolor;
+	bcolor = v1->bcolor;
+	drv_wcolor(wp->gwp->draw,fcolor,bcolor);
+	for(i=0;i<=imax;i++) waddch(wp->gwp->draw,' ');
+	wmove(wp->gwp->draw,row,xcol);
+	// wnoutrefresh(wp->gwp->draw);
+ 	update_panels();
+	doupdate();
 #endif
 	for(i=0;i<=imax;i++) {
 	 uint32_t ch;
