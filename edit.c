@@ -88,7 +88,7 @@ void toggle_val(char *name){
 	if((int)bt_dval(name)) {
 		set_bt_num_val(name,0);
 	} else set_bt_num_val(name,1);
-	// MESG("new value of [%s] is %d",name,(int)bt_dval(name));
+	MESG("new value of [%s] is %d",name,(int)bt_dval(name));
 }
 
 int toggle_parameter(num type)
@@ -100,7 +100,7 @@ int toggle_parameter(num type)
 		int emulation;
 		emulation = (int)bt_dval(option_names[type].name);
 		set_key_emulation(emulation);
-		msg_line("set key amulation to %s",(emulation==0) ? "native":"emacs");
+		msg_line("set key emulation to %s",(emulation==0) ? "native":"emacs");
 		}; break;
 	case EMBEDICONS: // toggle_val("embed_icons");
 //		redraw toolbar (now needs restart)
@@ -169,6 +169,10 @@ int toggle_parameter(num type)
 		};
 	   break;
 	  };
+	case EMSLOWDISP: {
+		// int v1=(int) bt_dval("slow_display");
+		set_update(cwp,UPD_ALL);
+	};
   };  
   return true;
 }

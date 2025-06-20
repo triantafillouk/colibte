@@ -302,14 +302,10 @@ int show_info(num n)
 	if(cbfp->b_flag & FSNLIST) 		strlcat(s,"Note list",width);
 // 	if(cbfp->b_flag & FSNCALIST) 	strlcat(s,"Calendar list view",width);
 	sm[i++]=strdup(s);sm[i]=0;
-#if	USE_SLOW_DISPLAY
-	if(debug_flag()) {
-		if(cbfp->slow_display) { SMESG("buffer slow!");} else { SMESG("buffer fast display");};
-	};
-#endif
-#if	USE_ALWAYS_SLOW
-	SMESG("Always Slowdown display");
-#endif
+
+	if(bt_dval("slow_display")>0) {SMESG("Slowdown display active");}
+	else {SMESG("Slowdown display disabled");};
+
 	if(debug_flag()) {
 		SMESG(" ptr1=%lld ptr2=%lld size=%lld file size=%lld,gap=%lld",bp->ptr1,bp->ptr2,bp->BufferSize,FSize(bp),bp->GapSize);
 	};

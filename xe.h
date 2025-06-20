@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.6T47 (19/6/2025)"
+#define VERSION 	"#01.6T48 (20/6/2025)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -37,8 +37,8 @@
 
 #define	_LARGEFILE64_SOURCE	1
 #define UNDERLINE_CURRENT_DIR_LINE	0
-#define	USE_ALWAYS_SLOW		1
-#define	USE_SLOW_DISPLAY	0
+#define	USE_ALWAYS_SLOW		0
+#define	USE_SLOW_DISPLAY	1
 #define	USE_CUSTOM_CELL_WIDTH	0
 
 /****************************************************************/
@@ -303,7 +303,7 @@ typedef struct vchar {
 
 typedef struct  VIDEO {
 	short int	v_flag;		/* line Flags */
-	short int	slow_line;
+	// short int	slow_line;
 	vchar v_text[1];
 }   VIDEO;
 
@@ -860,7 +860,8 @@ enum env_defs {
 	EMCCASE,		/* exact match  */
 	EMCOVER,		/* overwite  */
 	EMCREGEXP,		/* Use regular expression in search  */
-	EMWRAP			/* wrap lines global mode  */
+	EMWRAP,			/* wrap lines global mode  */
+	EMSLOWDISP		/* slow display mode  */
 };
 
  /* file extensions */

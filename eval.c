@@ -427,6 +427,9 @@ int set_option_val(int vnum,char *svalue)
 		  	set_bt_num_val("xcolor_scheme",v1);
 		  	break;
 		  };
+		  case EMSLOWDISP: {
+		  	set_bt_num_val("slow_display",(int)v1);
+		  };break;
 		  case EMWRAP: {
 		   int infocols=0;
 		   int view_mode=0;

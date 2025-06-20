@@ -519,20 +519,10 @@ void draw_window(int flag, WINDP *wp,char *from)
 		/* for each line that needs to be updated*/
 		if ((wp->vs[i]->v_flag) ) 
 		{
-#if	USE_SLOW_DISPLAY
-			if(wp->vs[i]->slow_line==1) wp->vs[i]->slow_line++;
-			else 
-			if(wp->vs[i]->slow_line==2) 
-			{
+			if(bt_dval("slow_display")>0) {
 				drv_clear_line(wp,i);
 				wp->vtcol=0;
-				wp->vs[i]->slow_line=0;
 			};
-#endif
-#if	USE_ALWAYS_SLOW
-				drv_clear_line(wp,i);
-				wp->vtcol=0;
-#endif
 			draw_window_line(wp,i);
 			// ulines++;
 		}
@@ -673,13 +663,6 @@ void  vput_normalize(WINDP *wp, utfchar uc)
 {
 int display_size=get_utf_length(&uc);
 
-#if	USE_SLOW_DISPLAY
-	int	c=uc.uval[0];
-		if(c==0xE0 /* && uc.uval[1]>=0xB0 */){
-			wp->vs[wp->vtrow]->slow_line=1;
-			wp->w_fp->slow_display=1;	/* slow down for thai chars  */
-		};
-#endif
 #if USE_GLIB	// Convert to composed character if possible to view it!
 	// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
 	if(uc.uval[3]!=0 && uc.uval[0]!=0xF0)
@@ -783,13 +766,6 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		if(c>127) {
 			int size;
 			size=get_utf_length(&uc);
-#if	USE_SLOW_DISPLAY
-			if((c==0xE0 /* && uc.uval[1]>=0xB0 */)||c==0xE2 || c==0xF0) { 	/* slow down for thai chars  */
-				wp->vs[row]->slow_line=1;
-				wp->w_fp->slow_display=1;
-				// MESG("set slow display");
-			}
-#endif
 			col += size-1;
 			c='C';
 		};
@@ -1182,12 +1158,6 @@ offs vtline(WINDP *wp, offs tp_offs)
 			if(c>127) {
 				int size;
 				size=get_utf_length(&uc);
-#if	USE_SLOW_DISPLAY
-				if(c==0xE0 /* &&  uc.uval[1]>=0xB0 */ )  {
-					wp->vs[wp->vtrow]->slow_line=1;
-					fp->slow_display=1; /* slow down for thai chars  */
-				};
-#endif
 				col += size-1;
 				c='m';
 			};
@@ -2677,7 +2647,7 @@ void allocate_virtual_window(WINDP *wp)
 		exit(1);
 	};
 	vp->v_flag=0;
-	vp->slow_line=0;
+	// vp->slow_line=0;
 	wp->vs[i]=vp;
  };
  // set the last one as NULL to know till where to free!

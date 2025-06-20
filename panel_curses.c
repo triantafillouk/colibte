@@ -1999,6 +1999,7 @@ void expose_window(WINDP *wp)
 
 void drv_clear_line(WINDP *wp,int row)
 {
+	return;
 	wmove(wp->gwp->draw,row,0);
 	int i;
 	for(i=0;i<wp->w_ntcols;i++) {
@@ -2041,26 +2042,23 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 	wmove(wp->gwp->draw,row,xcol);
 	imax=maxcol+1;
-#if	USE_SLOW_DISPLAY
-	if(wp->w_fp->slow_display) 
-	{ /* a little bit slower but clears shadow text!  */
-		wclrtoeol(wp->gwp->draw);
-		wrefresh(wp->gwp->draw);
-	 	update_panels();
-		doupdate();
-	};
-#endif
-#if	USE_ALWAYS_SLOW
+
+// #if	USE_ALWAYS_SLOW
 //	must clear the whole line before write!
+	if(bt_dval("slow_display")>0) {
 	fcolor = v1->fcolor;
 	bcolor = v1->bcolor;
 	drv_wcolor(wp->gwp->draw,fcolor,bcolor);
 	for(i=0;i<=imax;i++) waddch(wp->gwp->draw,' ');
 	wmove(wp->gwp->draw,row,xcol);
+	touchline(wp->gwp->draw,row,1);
 	// wnoutrefresh(wp->gwp->draw);
- 	update_panels();
-	doupdate();
-#endif
+	if(row>0) {
+	 	update_panels();
+		doupdate();
+	};
+	};
+// #endif
 	for(i=0;i<=imax;i++) {
 	 uint32_t ch;
 	 	if(v1->fcolor < 256) fcolor = v1->fcolor+v1->attr;
@@ -2069,9 +2067,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 		drv_wcolor(wp->gwp->draw,fcolor,bcolor);
 		ch=v1->uval[0];
-#if	USE_SLOW_DISPLAY
-		if(ch==0xF0) wp->w_fp->slow_display=1;
-#endif
+
 		if(ch==0xFF) { 	/* skip in case of char len > 1  */
 			if(v1->uval[1]==0xFF) 
 			{ 
@@ -2118,17 +2114,9 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 	};
 	// MESG("row %d eol %d",row,i);
 
-#if	USE_SLOW_DISPLAY
-	if(wp->w_fp->slow_display) {
-		wrefresh(wp->gwp->draw);
-		// update_panels();
-		// doupdate();
-	};
-#else
 	touchline(wp->gwp->draw,row,1);
 	// wrefresh(wp->gwp->draw);
 	wnoutrefresh(wp->gwp->draw);
-#endif
 }
 
 
