@@ -2052,7 +2052,9 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 #endif
 #if	USE_ALWAYS_SLOW
 		wclrtoeol(wp->gwp->draw);
-		wrefresh(wp->gwp->draw);
+		// touchline(wp->gwp->draw,row,1);
+		wnoutrefresh(wp->gwp->draw);
+		// wrefresh(wp->gwp->draw);
 	 	update_panels();
 		doupdate();
 #endif
@@ -2118,14 +2120,12 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 		wrefresh(wp->gwp->draw);
 		// update_panels();
 		// doupdate();
-	} else
-#endif
-#if	USE_ALWAYS_SLOW
-	wrefresh(wp->gwp->draw);
-#ense
+	};
+#else
 	touchline(wp->gwp->draw,row,1);
+	// wrefresh(wp->gwp->draw);
+	wnoutrefresh(wp->gwp->draw);
 #endif
-		// wnoutrefresh(wp->gwp->draw);
 }
 
 
@@ -2299,6 +2299,7 @@ int dspv(WINDOW *disp_window,int x,int y,char *st)
  getyx(disp_window,y_pos,x_pos);
  wclrtoeol(disp_window);
  wnoutrefresh(disp_window);
+ // wrefresh(disp_window);
  return(x_pos - x);
 }
 
@@ -2437,6 +2438,8 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
 
   utf_string_break(status_string,maxlen);
   wprintw(wp->gwp->draw,"%s",status_string);
+  touchline(wp->gwp->draw,status_row,1);
+  wnoutrefresh(wp->gwp->draw);
 }
 
 void refresh_menu()
@@ -2841,8 +2844,8 @@ void show_slide(WINDP *wp)
  	// wprintw(wp->gwp->vline,"%s"," ");
 	waddch(wp->gwp->vline,' ');
  };
-//	touchwin(wp->gwp->vline);
-//	wnoutrefresh(wp->gwp->vline);
+	// touchwin(wp->gwp->vline);
+	// wnoutrefresh(wp->gwp->vline);
 }
 
 #include "xthemes.c"

@@ -1710,7 +1710,7 @@ int get_utf_custom_length(utfchar *utf_char_str)
 		if(b2==0x8D) {
 			return 0;	/* zero space  */
 		};
-		if(b2==0x8E) return 0;
+		if(b2==0x8E) return 0;	/* left to right  */
 		if(b2==0xA6) return 1;
 		return 1;
 	};
@@ -1903,14 +1903,16 @@ int get_utf_length(utfchar *utf_char_str)
  int clen=0;
  int code_unit = utf8_to_unicode((unsigned char *)utf_char_str,&clen);
  if(code_unit<=0x80) return 1;
+ if(code_unit==0x200E || code_unit==0x200F || code_unit==0x200B) return -1;	/* ltr, rtl, zero space marks */
  int clen_width = wcwidth(code_unit);
 #if	0
  int custom_clen_width = get_utf_custom_length(utf_char_str);
- if(code_unit>=0xE0041 && code_unit<0xE007B) return custom_clen_width;
- if(code_unit==0xE33) return custom_clen_width;
+ // if(code_unit>=0xE0041 && code_unit<0xE007B) return custom_clen_width;
+ // if(code_unit==0xE33) return custom_clen_width;
 #if	1
  if(custom_clen_width != clen_width) {
- 	MESG("U+%5X -> [%s] len=%d custom_len=%d",code_unit,utf_char_str,clen_width,custom_clen_width);
+ 	MESG("U+%5X -> [%s][%2X%2X%2X] len=%d custom_len=%d",code_unit,utf_char_str,
+		utf_char_str->uval[0],utf_char_str->uval[1],utf_char_str->uval[2],clen_width,custom_clen_width);
  };
 #endif
 #endif
