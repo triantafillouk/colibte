@@ -2046,17 +2046,30 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 // #if	USE_ALWAYS_SLOW
 //	must clear the whole line before write!
 	if(bt_dval("slow_display")>0) {
-	fcolor = v1->fcolor;
-	bcolor = v1->bcolor;
-	drv_wcolor(wp->gwp->draw,fcolor,bcolor);
-	for(i=0;i<=imax;i++) waddch(wp->gwp->draw,' ');
-	wmove(wp->gwp->draw,row,xcol);
-	touchline(wp->gwp->draw,row,1);
-	// wnoutrefresh(wp->gwp->draw);
-	if(row>0) {
-	 	update_panels();
-		doupdate();
-	};
+		fcolor = v1->fcolor;
+		bcolor = v1->bcolor;
+		drv_wcolor(wp->gwp->draw,fcolor,bcolor);
+		for(i=0;i<=imax;i++) waddch(wp->gwp->draw,' ');
+		wmove(wp->gwp->draw,row,xcol);
+		// touchline(wp->gwp->draw,row,1);
+		// wnoutrefresh(wp->gwp->draw);
+		if(row>0) {
+		 	update_panels();
+			doupdate();
+		};
+	} else {	// write the last 2 cell positions
+		fcolor = v1->fcolor;
+		bcolor = v1->bcolor;
+		drv_wcolor(wp->gwp->draw,fcolor,bcolor);
+		wmove(wp->gwp->draw,row,xcol+imax-2);
+		for(i=0;i<=2;i++) waddch(wp->gwp->draw,' ');
+		wmove(wp->gwp->draw,row,xcol);
+		// touchline(wp->gwp->draw,row,1);
+		// wnoutrefresh(wp->gwp->draw);
+		if(row>0) {
+		 	// update_panels();
+			// doupdate();
+		};
 	};
 // #endif
 	for(i=0;i<=imax;i++) {

@@ -1560,7 +1560,7 @@ void status_line(WINDP *wp)
 	put_string_statusline(wp,status_string,0);
 	wp->w_flag &= ~UPD_STATUS;
 	if(wp==cwp) titletext();
-	show_slide(wp);
+	// show_slide(wp);
 }
 
 // dummy commands
