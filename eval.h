@@ -35,6 +35,7 @@ VAR option_names[] = {
 	{"mode_regexp",0,NULL},
 	{"wrap_mode",0,NULL},
 	{"slow_display",0,NULL},
+	{"custom_cell_width",0,NULL},
 	{"x11_x",10,NULL},
 	{"x11_y",10,NULL},
 	{"x11_width",500,NULL},

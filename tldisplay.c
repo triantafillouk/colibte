@@ -1560,7 +1560,7 @@ void status_line(WINDP *wp)
 	put_string_statusline(wp,status_string,0);
 	wp->w_flag &= ~UPD_STATUS;
 	if(wp==cwp) titletext();
-	// show_slide(wp);
+	show_slide(wp);
 }
 
 // dummy commands
@@ -1726,8 +1726,8 @@ int get_utf_custom_length(utfchar *utf_char_str)
 	if(b1==0x9C||b1==0x9D||b1==0x9E) return 1;
 #else
 	if(b1==0x9c) {
-		int b2=utf_char_str->uval[2];
-		if(b2==0x93||b2==0x96) return 1;
+		// int b2=utf_char_str->uval[2];
+		// if(b2==0x93||b2==0x96) return 1;
 		return 2;
 	};
 	if(b1==0x9E) {
@@ -1897,9 +1897,9 @@ long utf8_to_unicode(unsigned char* const utf8_str, int *size) ;
 
 int get_utf_length(utfchar *utf_char_str)
 {
-#if	USE_CUSTOM_CELL_WIDTH
- return get_utf_custom_length(utf_char_str);
-#else
+ if(bt_dval("custom_cell_width")>0) {
+ 	return get_utf_custom_length(utf_char_str);
+ } else {
  int clen=0;
  int code_unit = utf8_to_unicode((unsigned char *)utf_char_str,&clen);
  if(code_unit<=0x80) return 1;
@@ -1917,7 +1917,7 @@ int get_utf_length(utfchar *utf_char_str)
 #endif
 #endif
  return clen_width;
-#endif
+ };
 }
 
 #endif

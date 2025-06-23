@@ -169,10 +169,11 @@ int toggle_parameter(num type)
 		};
 	   break;
 	  };
+	case EMCUSTOMCELLWIDTH: 
 	case EMSLOWDISP: {
 		// int v1=(int) bt_dval("slow_display");
 		set_update(cwp,UPD_ALL);
-	};
+	};break;
   };  
   return true;
 }

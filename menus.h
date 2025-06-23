@@ -241,6 +241,7 @@ M_element e_global_params[] =
 	{MTOGGLE,'H',"save file History    ","save_history",toggle_parameter,(struct MENUS *)EMSAVHIST ,"MGH"},
 	{MTOGGLE,'W',"Wrap lines mode      ","wrap_mode",toggle_parameter,(struct MENUS *)EMWRAP,"MGW"},
 	{MTOGGLE,'S',"Slow display mode    ","slow_display",toggle_parameter,(struct MENUS *)EMSLOWDISP,"MGS"},
+	{MTOGGLE,'C',"Custom cell width    ","custom_cell_width",toggle_parameter,(struct MENUS *)EMCUSTOMCELLWIDTH,"MGS"},
 #if	GTK
 	{MTOGGLE,'T',"large Toolbar icons  ","large_toolbar_icons",toggle_parameter,(struct MENUS *)EMLARGEICONS ,"MGT"},
 	{MTOGGLE,'R',"use titlebaR         ","use_titlebar",toggle_parameter,(struct MENUS *)EMUSETITLEBAR ,"MGR"},

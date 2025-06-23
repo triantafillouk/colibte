@@ -530,12 +530,11 @@ void draw_window(int flag, WINDP *wp,char *from)
 	// MESG("# -- draw_window:[%s] %d drawned flag=%X wflag=%X",from,wp->id,flag,wp->w_flag);
 	wp->draw_flag=0;
 	expose_window(wp); /* (use this once unstead to expose every line sepatately, is it faster??) */
-#if	1
-	if(flag /* && (wp->w_flag != UPD_STATUS) */) 
-	{
+
+	if(flag && (wp->w_flag != UPD_STATUS) ) {
 		show_slide(wp);
 	};
-#endif
+
 	if(wp->w_flag & UPD_STATUS) {
 		status_line(wp);
 	};

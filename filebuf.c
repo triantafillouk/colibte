@@ -305,7 +305,7 @@ int show_info(num n)
 
 	if(bt_dval("slow_display")>0) {SMESG("Slowdown display active");}
 	else {SMESG("Slowdown display disabled");};
-
+	if(bt_dval("custom_cell_width")>0) { SMESG("Custom cell width");};
 	if(debug_flag()) {
 		SMESG(" ptr1=%lld ptr2=%lld size=%lld file size=%lld,gap=%lld",bp->ptr1,bp->ptr2,bp->BufferSize,FSize(bp),bp->GapSize);
 	};

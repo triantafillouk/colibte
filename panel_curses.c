@@ -2043,8 +2043,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 	wmove(wp->gwp->draw,row,xcol);
 	imax=maxcol+1;
 
-// #if	USE_ALWAYS_SLOW
-//	must clear the whole line before write!
+//	SLOW down and clear the whole line before write!
 	if(bt_dval("slow_display")>0) {
 		fcolor = v1->fcolor;
 		bcolor = v1->bcolor;
@@ -2071,7 +2070,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 			// doupdate();
 		};
 	};
-// #endif
+
 	for(i=0;i<=imax;i++) {
 	 uint32_t ch;
 	 	if(v1->fcolor < 256) fcolor = v1->fcolor+v1->attr;
@@ -2089,6 +2088,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 				continue;
 			};
 		};
+		if(bt_dval("custom_cell_width")>0) 	wmove(wp->gwp->draw,row,i);
 #if	USE_GLIB
 		if(ch>128 && v1->uval[1]==0) {	/* this is a local character, convert from local to utf  */
 			 strlcpy(vstr,str_local_to_utf(wp,(char *)v1->uval),6);

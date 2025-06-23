@@ -430,6 +430,9 @@ int set_option_val(int vnum,char *svalue)
 		  case EMSLOWDISP: {
 		  	set_bt_num_val("slow_display",(int)v1);
 		  };break;
+		  case EMCUSTOMCELLWIDTH: {
+		  	set_bt_num_val("custom_cell_width",(int)v1);
+		  };break;
 		  case EMWRAP: {
 		   int infocols=0;
 		   int view_mode=0;
