@@ -285,11 +285,11 @@ int set_option(num n)
  {
 	btn=find_btnode(bt_table,option_names[nv].name);
 #if	1
-	if(btn->node_vtype==VTYPE_STRING) snprintf(prompt,80,"%-10s:[%-5s]",option_names[nv].name,btn->node_sval);
-	else snprintf(prompt,80,"%-10s:[%d]",option_names[nv].name,(int)btn->node_dval);
+	if(btn->node_vtype==VTYPE_STRING) snprintf(prompt,sizeof(prompt),"%-10s:[%-5s]",option_names[nv].name,btn->node_sval);
+	else snprintf(prompt,sizeof(prompt),"%-10s:[%d]",option_names[nv].name,(int)btn->node_dval);
 #else
- 	if(btn->sval != NULL) snprintf(prompt,80,"%-10s:[%-5s]",option_names[nv].name,btn->sval);
-	else snprintf(prompt,80,"%-10s:[%d]",option_names[nv].name,(int)btn->node_val);
+ 	if(btn->sval != NULL) snprintf(prompt,sizeof(prompt),"%-10s:[%-5s]",option_names[nv].name,btn->sval);
+	else snprintf(prompt,sizeof(prompt),"%-10s:[%d]",option_names[nv].name,(int)btn->node_val);
 #endif
 	utf_string_break(prompt,20);
 	option_list[nv]=strdup(prompt);
@@ -304,17 +304,17 @@ int set_option(num n)
 	btn=find_btnode(bt_table,option_names[nv].name);
 #if	1
 	if(btn->node_vtype==VTYPE_STRING) {
-		snprintf(prompt,80,"%s [%s] : ",btn->node_name,btn->node_sval);
+		snprintf(prompt,sizeof(prompt),"%s [%s] : ",btn->node_name,btn->node_sval);
 		strlcpy(value,btn->node_sval,MAXSLEN);
 	} else {
-		snprintf(prompt,80,"%s [%d]: ",btn->node_name,(int)btn->node_dval);
-		snprintf(value,MAXSLEN,"%d",(int)btn->node_dval);
+		snprintf(prompt,sizeof(prompt),"%s [%d]: ",btn->node_name,(int)btn->node_dval);
+		snprintf(value,sizeof(value),"%d",(int)btn->node_dval);
 	};
 #else
-	if(btn->sval!=NULL) snprintf(prompt,80,"%s [%s] : ",btn->node_name,btn->sval);
-	else snprintf(prompt,80,"%s [%d]: ",btn->node_name,(int)btn->node_val);
+	if(btn->sval!=NULL) snprintf(prompt,sizeof(prompt),"%s [%s] : ",btn->node_name,btn->sval);
+	else snprintf(prompt,sizeof(prompt),"%s [%d]: ",btn->node_name,(int)btn->node_val);
 	if(btn->sval!=NULL) strlcpy(value,btn->sval,MAXSLEN);
-	else snprintf(value,MAXSLEN,"%d",(int)btn->node_val);
+	else snprintf(value,sizeof(value),"%d",(int)btn->node_val);
 #endif
 
 	getstring(prompt,value,MAXSLEN,true);
@@ -427,6 +427,12 @@ int set_option_val(int vnum,char *svalue)
 		  	set_bt_num_val("xcolor_scheme",v1);
 		  	break;
 		  };
+		  case EMSLOWDISP: {
+		  	set_bt_num_val("slow_display",(int)v1);
+		  };break;
+		  case EMCUSTOMCELLWIDTH: {
+		  	set_bt_num_val("custom_cell_width",(int)v1);
+		  };break;
 		  case EMWRAP: {
 		   int infocols=0;
 		   int view_mode=0;
@@ -445,7 +451,7 @@ int set_option_val(int vnum,char *svalue)
 			WINDP *wp;
 			while((wp=lget(window_list))!=NULL) {
 				if (!(wp->w_fp->view_mode & VMHEX)
-			 		&& wp->w_fp->b_mode>=FSNLIST) {
+			 		&& wp->w_fp->b_flag>=FSNLIST) {
 					wp->w_infocol = infocols;
 					wp->w_fp->view_mode |= view_mode;
 					wp->w_fp->b_infocol |= view_mode;
@@ -575,13 +581,13 @@ char *date_string(num n)
 	time(&tclock);
 	tim = localtime(&tclock);
 	switch(n) {
-		case 2: res=snprintf(date_str,128,"%4d/%02d/%02d:%d:%d:%d, %s",tim->tm_year+1900,tim->tm_mon+1,tim->tm_mday,tim->tm_hour,tim->tm_min,tim->tm_sec,asctime(tim));
+		case 2: res=snprintf(date_str,sizeof(date_str),"%4d/%02d/%02d:%d:%d:%d, %s",tim->tm_year+1900,tim->tm_mon+1,tim->tm_mday,tim->tm_hour,tim->tm_min,tim->tm_sec,asctime(tim));
 				break;
-		case 1: res=snprintf(date_str,128,"%4d/%02d/%02d:%02d:%02d:%02d ",tim->tm_year+1900,tim->tm_mon+1,tim->tm_mday,tim->tm_hour,tim->tm_min,tim->tm_sec);
+		case 1: res=snprintf(date_str,sizeof(date_str),"%4d/%02d/%02d:%02d:%02d:%02d ",tim->tm_year+1900,tim->tm_mon+1,tim->tm_mday,tim->tm_hour,tim->tm_min,tim->tm_sec);
 				break;
-		case 0: res=snprintf(date_str,128,"%s",asctime(tim));
+		case 0: res=snprintf(date_str,sizeof(date_str),"%s",asctime(tim));strtok(date_str, "\n");
 				break;
-		case 3: res=snprintf(date_str,128,"%4d%02d%02d-%02d%02d%02d",tim->tm_year+1900,tim->tm_mon+1,tim->tm_mday,tim->tm_hour,tim->tm_min,tim->tm_sec);
+		case 3: res=snprintf(date_str,sizeof(date_str),"%4d%02d%02d-%02d%02d%02d",tim->tm_year+1900,tim->tm_mon+1,tim->tm_mday,tim->tm_hour,tim->tm_min,tim->tm_sec);
 				break;
 	}
 	if(res==129) MESG("cal name truncated");
@@ -593,7 +599,6 @@ char *time2a()
  static char tline[32];
  time(&tclock);
  strlcpy(tline,date_string(0),32);
- tline[strlen(tline)-1]=0;
  return(tline);
 }
 
@@ -763,7 +768,7 @@ int dofile(char *fname)
 	FILEBUF *bp;	/* buffer to place file to execute */
 	int status;	/* results of various calls */
 	char bname[MAXFLEN];
-	snprintf(bname,MAXFLEN,"[%s]",fname);
+	snprintf(bname,sizeof(bname),"[%s]",fname);
 	// MESG("# dofile:fname=[%s]",fname);
 	show_stage=0;
 	set_screen_update(false);
@@ -1109,11 +1114,11 @@ for(key=&kbdm_session[0];key<kbdsession_end;key++){
 	 	ptr = function_name(key_function(*key,1),&description);
 		if(ptr[0]!=0) {
 			char *s=&mstr[0];
-			snprintf(mstr,80,"%3d key=%d %s = %s   ",i++,*key,xe_key_name(*key),ptr);
+			snprintf(mstr,sizeof(mstr),"%3d key=%d %s = %s   ",i++,*key,xe_key_name(*key),ptr);
 			out_print(s,1);
 		} else {
 			char *s=&mstr[0];
-			snprintf(mstr,80,"%3d char %d %X",i++,*key,*key);
+			snprintf(mstr,sizeof(mstr),"%3d char %d %X",i++,*key,*key);
 //			MESG("key not found %d  %04X",i++,*key);
 			out_print(s,1);
 		};
@@ -1129,7 +1134,7 @@ int save_session(num n)
  char session_file[MAXFLEN];
  int sstat=0;
 
- sstat=snprintf(session_file,MAXFLEN,"%s/.colibte/%s",getenv("HOME"),"session.keys");
+ sstat=snprintf(session_file,sizeof(session_file),"%s/.colibte/%s",getenv("HOME"),"session.keys");
  if(sstat>=MAXLLEN) {
  	msg_line("error saving session");
 	return 0;

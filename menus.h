@@ -75,6 +75,17 @@ MENUS m_new = {
 };
 #endif
 
+M_element e_bom[] = {
+	{0,'0',"No BOM  ","",set_bom,(struct MENUS *)0 ,"FB0"},
+	{0,'8',"UTF-8   ","",set_bom,(struct MENUS *)8 ,"FB8"},
+	{0,'6',"UTF-16  ","",set_bom,(struct MENUS *)6 ,"FB6"},
+	{0, 0, NULL,"",NULL,0,NULL}
+};
+
+MENUS m_bom = {
+	"Bom",50,14,VERTICAL,e_bom
+};
+
 M_element e_file[] = 
 {
 	{0, 'O', "Open file    ^O","^OOpen file", open_file, (struct MENUS *)0,"FO" },
@@ -95,6 +106,8 @@ M_element e_file[] =
 	{0, 'I', "Insert         ","",insert_file, 0,"FI"},	
 	{0, 'H', "Highlight type ","",select_highlight,0,"FH"},
 	{0, 'M', "Run Macro file ","",exec_file, (struct MENUS *)1,"FM"},
+	{MMENU, 'B', "set file BOM   ", "",  NULL, &m_bom,"FB"},
+
 	{0, 'C', "Close          ","",close_file, 0,"FC"} ,	
 	{0, 'X', "eXit      ALT-X","_XeXit",quit, 0,"FX"} ,	
 	{0, 0, NULL,"",NULL,0,NULL}
@@ -227,6 +240,8 @@ M_element e_global_params[] =
 	{MTOGGLE,'D',"show cursor Data     ","show_cdata",toggle_parameter,(struct MENUS *)EMCDATA ,"MGD"},
 	{MTOGGLE,'H',"save file History    ","save_history",toggle_parameter,(struct MENUS *)EMSAVHIST ,"MGH"},
 	{MTOGGLE,'W',"Wrap lines mode      ","wrap_mode",toggle_parameter,(struct MENUS *)EMWRAP,"MGW"},
+	{MTOGGLE,'S',"Slow display mode    ","slow_display",toggle_parameter,(struct MENUS *)EMSLOWDISP,"MGS"},
+	{MTOGGLE,'C',"Custom cell width    ","custom_cell_width",toggle_parameter,(struct MENUS *)EMCUSTOMCELLWIDTH,"MGS"},
 #if	GTK
 	{MTOGGLE,'T',"large Toolbar icons  ","large_toolbar_icons",toggle_parameter,(struct MENUS *)EMLARGEICONS ,"MGT"},
 	{MTOGGLE,'R',"use titlebaR         ","use_titlebar",toggle_parameter,(struct MENUS *)EMUSETITLEBAR ,"MGR"},
@@ -518,6 +533,7 @@ M_element e_lang[] =
 	{0, 0, NULL,"",NULL,0,NULL}
 };
 
+
 #if	USE_GLIB
 M_element e_local[] =
 {
@@ -547,6 +563,7 @@ M_element e_local[] =
 	{0, 0, NULL,"",NULL,0,NULL}
 };
 #endif
+
 
 #if	USE_GLIB
 MENUS m_lang = {

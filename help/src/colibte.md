@@ -11,6 +11,7 @@
 
 ## Basic characteristics
 	- A console and gtk driver.
+	- a wrap line mode
 	- A directory and file viewer of text docuemets
 	- Highlight support for many programming languages
 	- Multiple windows (vertical and horizontal splitting).
@@ -25,6 +26,8 @@
 	- function keys assignements
 	- Keyboard recording and replay.
 	- Use of previous and next history keys (like in a browser)
+	- Clipboard support in wsl,mac,X11
+	- a vi like mode in view mode
 
 ## Driver and OS support
 
@@ -46,7 +49,8 @@ For the moment there are the following drivers.
 ## Clipboard support
 
   Clipoard support through 'xclip' in Linux and 'pbpaste/pbcopy' on Mac.  
-  For WSL an X11 server must be installed and be active before starting the console version. 
+  For WSL:
+  	- using X11 server must be installed and be active before starting the console version. 
   	Vcxsrv server is open source and free. 
   	Put the following line  
 ```
@@ -55,6 +59,7 @@ For the moment there are the following drivers.
   		"C:\Users\<User Name>\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\vcxsrv.bat"
   	to start automatically
 ```
+	- using win32yank.exe executable (copy win32yank.exe in a dir that exists in $PATH)
 
 ## Keyboard handling
 
@@ -151,7 +156,8 @@ New files open in current window.
 - ^C			saves current selection to clipboard.
 - ^X (^W in emacs mode)	cuts current selection.
 - ^V 			Insert clipboard contents at current position (Paste).
-- ALT-V			Insert system clipboard in current position 
+- ALT-V			Insert system clipboard at current position 
+- ALT-C+ALT-V	Insert system clipboard as a column at current position
 
 During column selection characters are inserted or deleted on all lines at the same column.
 
@@ -263,6 +269,7 @@ A browser like history is maintainted.
  - Show position information on status line.
  - Show current character on status line.
  - Save file history (used to open recent files!).
+ - global wrap mode
 
 
  - Show current offset on status line.

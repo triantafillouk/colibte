@@ -23,7 +23,7 @@
 #define MAXLLEN	1024	/* max line length */
 #define	MAXPLEN 2048	/* max path name length  */
 #define	MAXMLEN	256			/* maximum medium length */
-#define	MAXSLEN	64			/* maximum small length */
+#define	MAXSLEN	128			/* maximum small length */
 
 #define	MAXSTRL	256		/* normal ?? string len */
 #define MAXNLEN	512		/* max base name length */

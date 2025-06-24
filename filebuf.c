@@ -9,6 +9,10 @@
 
 #include "xe.h"
 
+long utf8_to_unicode(unsigned char* const utf8_str, int *size) ;
+long int unicode_point();
+char *get_bom_description(FILEBUF *fp);
+
 extern alist *window_list;
 extern SHLIGHT hts[];
 
@@ -96,7 +100,7 @@ void MESG_time(const char *fmt, ...)
  if(!(strcmp(cbfp->b_fname,"[out]"))) return;
     if (fmt != NULL) {
 		va_start(args,fmt);
-		vsnprintf(mline,511,fmt,args);
+		vsnprintf(mline,sizeof(mline)-1,fmt,args);
 		va_end(args);
 
 		show_time(mline,1);
@@ -112,7 +116,7 @@ void MESG_time_start(const char *fmt, ...)
  if(!(strcmp(cbfp->b_fname,"[out]"))) return;
     if (fmt != NULL) {
 		va_start(args,fmt);
-		vsnprintf(mline,511,fmt,args);
+		vsnprintf(mline,sizeof(mline)-1,fmt,args);
 		va_end(args);
 
 		show_time(mline,0);
@@ -269,7 +273,7 @@ int show_info(num n)
 	};
 	if(bp->connect_buffer) SMESG(" connected to %s",bp->connect_buffer->b_fname);
 	if(debug_flag()) {
-		SMESG("Flags: b_mode=0x%X b_flag=0x%X view_mode=0x%X b_type=0x%X is_wrap=%d",cbfp->b_mode,cbfp->b_flag,cbfp->view_mode,cbfp->b_type,is_wrap_text(cbfp));
+		SMESG("Flags: b_mode=0x%X b_flag=0x%X view_mode=0x%X b_type=0x%X is_wrap=%d bom=%d",cbfp->b_mode,cbfp->b_flag,cbfp->view_mode,cbfp->b_type,is_wrap_text(cbfp),cbfp->bom_type);
 	};
 	if(cbfp->b_mode) {
 		strcpy(s,"Buffer mode: ");	
@@ -277,6 +281,7 @@ int show_info(num n)
 		if(cbfp->b_mode & EMUNIX)  strlcat(s,"unix ",width);
 		if(cbfp->b_mode & EMMAC)   strlcat(s,"mac ",width);
 		if(cbfp->b_mode & EMDOS)   strlcat(s,"dos ",width);
+		strlcat (s," bom type ",width); strlcat(s,get_bom_description(cbfp),width);
 		sm[i++]=strdup(s);sm[i]=0;
 	};
 #if	0
@@ -297,9 +302,10 @@ int show_info(num n)
 	if(cbfp->b_flag & FSNLIST) 		strlcat(s,"Note list",width);
 // 	if(cbfp->b_flag & FSNCALIST) 	strlcat(s,"Calendar list view",width);
 	sm[i++]=strdup(s);sm[i]=0;
-	if(debug_flag()) {
-		if(cbfp->slow_display) { SMESG("buffer slow!");} else { SMESG("buffer fast display");};
-	};
+
+	if(bt_dval("slow_display")>0) {SMESG("Slowdown display active");}
+	else {SMESG("Slowdown display disabled");};
+	if(bt_dval("custom_cell_width")>0) { SMESG("Custom cell width");};
 	if(debug_flag()) {
 		SMESG(" ptr1=%lld ptr2=%lld size=%lld file size=%lld,gap=%lld",bp->ptr1,bp->ptr2,bp->BufferSize,FSize(bp),bp->GapSize);
 	};
@@ -336,10 +342,10 @@ int show_info(num n)
 #endif
 	} else {
 		if(debug_flag()) {
-			SMESG("Position info: line=%lld col=%lld offset=%lld char=[0x%lX]",getcline()+1,GetCol()+1,Offset(),utf_value());
+			SMESG("Position info: line=%lld col=%lld offset=%lld char=[0x%lX] [U+%lX]",getcline()+1,GetCol()+1,Offset(),utf_value(),unicode_point());
 			SMESG(" row %d , %d, %lld",chardline(cwp)+1,getwline(),tp_line(cwp->tp_current)-tp_line(cwp->tp_hline));
 		} else {
-			SMESG("Position info: line=%lld col=%lld offset=%lld char=[0x%lX] row %d",getcline()+1,GetCol()+1,Offset(),utf_value(),getwline());
+			SMESG("Position info: line=%lld col=%lld offset=%lld char=[0x%lX] [U+%lX] row %d",getcline()+1,GetCol()+1,Offset(),utf_value(),unicode_point(),getwline());
 		};
 
 
@@ -412,6 +418,7 @@ int is_utf_accent(FILEBUF *fp, offs o)
  int ch,ch1;
  ch=FCharAt(fp,o);
  ch1=FCharAt(fp,o+1);
+ if(ch==0xEF && ch1==0xB8) return 3;
  if(((ch==0xCC || ch==0xCD) && (ch1<0xB0 && ch1>0x7F))
 // 	|| (ch==0xCD && (ch1<0xB0))
  ){	// check for double accent
@@ -488,6 +495,7 @@ int FUtfCharLen(FILEBUF *fp,offs o)
 			if(ch1<128 || ch1>0xBF) { clen_error=4;return 1;};	/* not a middle utf char  */
 			ch1=FCharAt(fp,o+2);
 			if(ch1<128 || ch1>0xBF) { clen_error=5;return 1;};	/* not a middle utf char  */
+			// if(ch==0xEF && ch1==0xB8) fp->utf_accent=1;
 			clen=3;
 		} else if(ch<0xF8) {
 			char ch2,ch3;
@@ -504,11 +512,13 @@ int FUtfCharLen(FILEBUF *fp,offs o)
 			return 1;
 		};
 //#if	DARWIN || PCURSES
-		if(clen<3 && !fp->utf_accent /* && drv_type<2 */) {	/* check next char for accent!  */
-		if(!FEofAt(fp,o+clen+1)){
-			clen += is_utf_accent(fp,o+clen);
-			// if(clen>2) MESG("total size=%d at %ld",clen,o);
-		}};
+		if(clen<4 && !fp->utf_accent /* && drv_type<2 */) 
+		{	/* check next char for accent!  */
+			if(!FEofAt(fp,o+clen+1)){
+				clen += is_utf_accent(fp,o+clen);
+				// if(clen>2) MESG("total size=%d at %ld",clen,o);
+			}
+		};
 //#endif
 	};
 	return clen;
@@ -942,7 +952,7 @@ void  ResetTextPoints(FILEBUF *bp,int flag)
 	textpoint_set(bp->tp_text_end,size);
 	// MESG("	new o=%ld lines=%ld new lines=%ld b_mode=%X",tp_offset(bp->tp_text_end),tp_line(bp->tp_text_end),bp->lines,bp->b_mode);
 	textpoint_set(bp->tp_text_o,size);
-	if( bp->b_mode > VMINP) 
+	if( bp->view_mode > VMINP) 
 	bp->lines=tp_line(bp->tp_text_end);
  };
 }
@@ -1184,14 +1194,14 @@ void check_line_mode(FILEBUF *bf)
  num DosLastLine=0;
  num UnixLastLine=0;
  num MacLastLine=0;
-
+ bf->b_mode=0;
       for(i=0; ; i++) {
 	 	i=ScanForCharForward(bf,i,'\n');
 	 	if(i<0)  break;
 	 	UnixLastLine++;
 	 	if(i>0 && FCharAt_NoCheck(bf,i-1)=='\r')  DosLastLine++;
       };
-//	MESG("check_line_mode d=%ld u=%ld",DosLastLine,UnixLastLine);
+	// MESG("check_line_mode d=%ld u=%ld",DosLastLine,UnixLastLine);
 
 	if(UnixLastLine==0) {
 		for(i=0;;i++) {
@@ -1201,26 +1211,26 @@ void check_line_mode(FILEBUF *bf)
 		};
 	};
 
-//	MESG("	d=%ld u=%ld",DosLastLine,UnixLastLine);
+	// MESG("check_line_mode: d=%ld u=%ld",DosLastLine,UnixLastLine);
 	  // if we permit dos file usage
-      if(UnixLastLine/2<DosLastLine) /* check if the file has unix or dos format */
+      if((UnixLastLine/2) < DosLastLine) /* check if the file has unix or dos format */
       {
 		bf->EolSize=2;
 		strlcpy(bf->EolStr,"\r\n",3);
-		bf->b_mode |= EMDOS;
-		// MESG(";[%10s] check_line_mode: dos mode",bf->b_fname);
+		bf->b_mode = EMDOS;
+		// MESG(";[%10s] check_line_mode: %d dos mode",bf->b_fname,bf->b_mode);
 		textpoint_OrFlags(bf,COLUNDEFINED|LINEUNDEFINED);
       } else  
 	  if(MacLastLine>0){
 		bf->EolSize=1;
 		strlcpy(bf->EolStr,"\r",3);
 		bf->b_mode |= EMMAC;
-		// MESG(";[%10s] check_line_mode: mac mode",bf->b_fname);
+		// MESG(";[%10s] check_line_mode: %d mac mode", bf->b_fname,bf->b_mode);
 		textpoint_OrFlags(bf,COLUNDEFINED|LINEUNDEFINED);
 	  } else
 	  {
-		// MESG(";[%10s] check_line_mode: unix mode",bf->b_fname);
-		bf->b_mode |= EMUNIX;
+		bf->b_mode = EMUNIX;
+		// MESG(";[%10s] check_line_mode: %d unix mode",bf->b_fname,bf->b_mode);
       };
 }
 
@@ -1460,6 +1470,29 @@ long int utf_value()
   	uchar += CharAt(o+i);
 	if(i<ulen-1) uchar <<=8;
   };
+  return(uchar);
+ };
+}
+
+long int unicode_point()
+{
+ unsigned char char_string[8];
+
+ if(utf8_error()) { 
+	return Char();
+ };
+ if(cbfp->b_lang!=0) return Char();
+ else {
+  offs o=Offset();
+  int ulen,i;
+  long int uchar=0;
+  ulen=FUtfCharLen(cbfp,o);
+
+  for(i=0;i<ulen;i++){
+  	char_string[i] = CharAt(o+i);
+  };
+  char_string[ulen]=0;
+  uchar = utf8_to_unicode(char_string,&ulen);
   return(uchar);
  };
 }
@@ -1733,7 +1766,7 @@ int    LockFile(int fd,bool drop)
 		 };
          fstat(fd,&st);
 
-         snprintf(msg,100,"by prosess %ld",(long)Lock1.l_pid);
+         snprintf(msg,sizeof(msg),"by prosess %ld",(long)Lock1.l_pid);
 
 		if(confirm("File locked",msg,1)) return(0);
 		else return -2;
@@ -1876,7 +1909,6 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 		return(i);
 	};
    status=stat(name,&st);
-   // MESG("ifile0: [%s] dir=[%s] name=[%s] status=%d ir_flag=%d",bf->b_fname,bf->b_dname,name,status,ir_flag);
 	MESG_time_start("ifile0: %s",bf->b_fname);
    if(status==-1 && errno==ENOENT)
    {
@@ -1953,7 +1985,11 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	{
 		to_read=st.st_size;
 		// MESG("no memmap!");
-		if(bf->bom_type==FTYPE_UTF8BOM) to_read-=3;
+		if(bf->bom_type==FTYPE_UTF8BOM) {
+			to_read-=3;
+			lseek(file,3,0);
+			MESG("FTYPE+UTF8BOM: to_read = %ld",to_read);
+		};
 		if(bf->bom_type==FTYPE_UTF16BOM) {
 			to_read=get_utf2to16_size(name);
 			// MESG("file %ld -> %ld",st.st_size,to_read);
@@ -2031,8 +2067,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	update_lines(bf);
 	if(!(bf->b_flag & FSMMAP)) 
 		set_modified(bf);
-
-//	MESG("	check fstat again!");
+	// MESG("ifile0:  after update_lines: b_mode=%d",bf->b_mode);
 	status=fstat(file,&st);
 	if(status==0) {
 	   	bf->FileMode=st.st_mode;
@@ -2046,7 +2081,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	};
 
 	textpoint_set(bf->tp_current,0);	// goto the beginning
-	MESG_time("ifile0: end");
+	// MESG_time("ifile0: b_mode=%d end",bf->b_mode);
 	close(file);
 	if(!execmd) msg_line("%s: chars=%lld,lines=%lld type %s max line len=%ld",bf->b_fname,FSize(bf),bf->lines,bf->hl->description,bf->maxlinelen);
 	if(temp_used) {
@@ -3127,7 +3162,7 @@ num fread16(char *file_name,char *buffer,num size)
 int   ReadBlock(char *fname,int fd,offs size,offs *act_read)
 {
    FILEBUF *fp=cbfp;
-   // MESG("ReadBlock:[%s] size=%ld",fname,size);
+   MESG("ReadBlock:[%s] size=%ld",fname,size);
    if(fp->b_flag & FSMMAP)  return false;
    if(size==0)   {
       *act_read=0;
@@ -3141,6 +3176,7 @@ int   ReadBlock(char *fname,int fd,offs size,offs *act_read)
 		*act_read=fread16(fname,fp->buffer+fp->ptr1,size);
 		fp->view_mode = EMDOS;
 	} else {
+		MESG("read size=%ld",size);
 	   *act_read=read(fd,fp->buffer+fp->ptr1,size);
 	};
    if(*act_read==-1)	return(false);
@@ -3162,6 +3198,9 @@ int   ReplaceTextFromFile(char *file_name,FILEBUF *fp,int fd,offs size,offs *act
 		*act_read=fread16(file_name,fp->buffer+fp->ptr1,size);
 		fp->view_mode = EMDOS;
 	} else {
+		if(fp->bom_type==FTYPE_UTF8BOM) {
+			lseek(fd,3,0);
+		};
 	   *act_read=read(fd,fp->buffer+fp->ptr1,size);
 	};
 
@@ -3208,15 +3247,15 @@ int set_view_mode(num n)
 {
 	FILEBUF *fp=cbfp;
 	offs offset=FOffset(fp);
-	// MESG("set_view_mode: to mode %d",n);
+	MESG("set_view_mode: to mode %d",n);
    switch (n) {
 	case 1: // Dos mode
 		if ((fp->b_flag & FSDIRED) && !(fp->b_state & FS_VIEW)) break;
 		if(fp->EolSize==1 || (fp->view_mode & VMHEX) ) {
 		fp->EolSize=2;
 		strlcpy(fp->EolStr,"\r\n",3);
-		fp->b_mode |= EMDOS;
-		fp->b_mode &= ~(EMMAC|EMUNIX);
+		fp->b_mode = EMDOS;
+		// fp->b_mode &= ~(EMMAC|EMUNIX);
 		fp->view_mode &= ~VMHEX;
 		};break;
    case 2: // Unix mode
@@ -3224,8 +3263,8 @@ int set_view_mode(num n)
 		if(fp->EolSize==2 || (fp->view_mode & VMHEX) || (fp->b_mode & EMMAC) ) {
 		fp->EolSize=1;
    		strlcpy(fp->EolStr,"\n",3);
-		fp->b_mode &= ~(EMDOS|EMMAC);
-		fp->b_mode |= EMUNIX;
+		// fp->b_mode &= ~(EMDOS|EMMAC);
+		fp->b_mode = EMUNIX;
 		fp->view_mode &= ~VMHEX;
 		}; break;
 	case 3: // hex mode
@@ -3246,8 +3285,8 @@ int set_view_mode(num n)
 		{
 		fp->EolSize=1;
    		strlcpy(fp->EolStr,"\r",3);
-		fp->b_mode &= ~(EMDOS|EMUNIX);
-		fp->b_mode |= EMMAC;
+		// fp->b_mode &= ~(EMDOS|EMUNIX);
+		fp->b_mode = EMMAC;
 		fp->view_mode &= ~VMHEX;
 		}; break;
 	case 5: // Show lines
@@ -3459,6 +3498,31 @@ size_t write_utf8_as_utf16(int file_id,char *in,size_t inlen)
  return out_len;
 }
 
+int set_bom(num bom_type)
+{
+ switch (bom_type){
+ 	case 0: cbfp->bom_type=0;break;
+	case 1: cbfp->bom_type=FTYPE_UTF16BOM;break;
+	case 8: cbfp->bom_type=FTYPE_UTF8BOM;break;
+	default: cbfp->bom_type=0;
+ };
+ return 1;
+}
+
+char *get_bom_description(FILEBUF *fp)
+{
+	switch (fp->bom_type) {
+		case 1: return "encrypted";
+		case 3: return "UTF16";
+		case 2: return "UTF8";
+		case 4: return "UTF32";
+		case 19: return "UTF16_BE";
+		case 20: return "UTF32_BE";
+		case (0):
+		default: return "plain";
+	};
+}
+
 /* operates on cbfp */
 int   WriteBlock(int fd,offs from,offs size,offs *act_written)
 {
@@ -3481,6 +3545,14 @@ int   WriteBlock(int fd,offs from,offs size,offs *act_written)
 	if(write(fd,(char *)&bom16,2)!=2) {
 		*act_written=0;
 		return(false);
+	};
+   };
+   if(fp->bom_type==FTYPE_UTF8BOM) {
+   	unsigned char sbom[3];
+	sbom[0]=0xEF;sbom[1]=0xBB;sbom[2]=0xBF;
+	if(write(fd,sbom,3)!=3) {
+		*act_written=0;
+		return false;
 	};
    };
    if(from>=fp->ptr1) {
@@ -3667,7 +3739,7 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
  utfchar uc;
  num col=0;;
  num file_size=FSize(fp);
-
+ MESG("FCheckNextLine:");
  if(fp->EolSize>1) {
 	char c0=fp->EolStr[0];
 	char c1=fp->EolStr[1];
@@ -3677,7 +3749,7 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
 				ptr++;
 			} else continue; 
 			if(col>fp->maxlinelen) { fp->maxlinelen=col;*display_size=col;};
-			// MESG("Line_size:2 %ld",*display_size);
+			MESG("Line_size:2 %ld",*display_size);
 			return ptr;
 		};
 		if(uc.uval[0]==CHR_TAB) col=next_tab(col);
@@ -3690,16 +3762,17 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
 		ptr=FUtfCharAt_nocheck(fp,ptr,&uc);
 		if(uc.uval[0]==c0) {
 			if(col>fp->maxlinelen) { fp->maxlinelen=col;*display_size=col;};
-			// MESG("Line_size:1 %ld",*display_size);
+			MESG("Line_size:1 %ld",*display_size);
 			return ptr;
 		};
 		if(uc.uval[0]==CHR_TAB) col=next_tab(col);
 		else col+=get_utf_length(&uc);
 	};
+	MESG("eof?");
  };
  // last line with no new line at the end
  if(col>fp->maxlinelen) { fp->maxlinelen=col;*display_size=col;};
- // MESG("Line_size:0 %ld",*display_size);
+ MESG("Line_size:0 %ld",*display_size);
  return ptr;
 }
 

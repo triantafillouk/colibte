@@ -74,8 +74,9 @@ int dos2unix(num n)
  if(newsize==oldsize) return false; 	/* no conversion occured!  */
  cfp->EolSize=1;
  strlcpy(cfp->EolStr,"\n",2);
- cfp->b_mode ^= EMDOS;
- cfp->b_mode |= EMUNIX;
+
+ if(cfp->b_mode & EMCRYPT) cfp->b_mode =EMCRYPT|EMUNIX;
+ else cfp->b_mode = EMUNIX;
  textpoint_OrFlags(cfp,COLUNDEFINED|LINEUNDEFINED);
  if(cfp->b_nwnd>0)
  if(cwp->w_fp == cfp) {
@@ -113,8 +114,8 @@ int unix2dos(num n)
 
  newsize=ConvertFromUnixToDos(cfp);
  if(newsize==oldsize) return false;	/* no conversion occured  */
- cfp->b_mode &= ~EMUNIX;
- cfp->b_mode |= EMDOS;
+ if(cfp->b_mode & EMCRYPT) cfp->b_mode=EMCRYPT|EMDOS;
+ else cfp->b_mode = EMDOS;
  
 // textpoint_OrFlags(cfp,COLUNDEFINED|LINEUNDEFINED);
  if(cfp->b_nwnd>0)

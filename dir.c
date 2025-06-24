@@ -596,7 +596,7 @@ int dir_edit(num n)
 	// MESG("file[%s / %s -> %s",cbfp->b_dname,cbfp->b_fname,fname);
     num poffset=tp_offset(cwp->tp_current);;
 	int ppline = tp_line(cwp->tp_current)-tp_line(cwp->tp_hline)+1;
-	if(snprintf(fname,MAXFLEN,"%s/%s",cbfp->b_dname,cbfp->b_fname) >= MAXFLEN) {
+	if(snprintf(fname,sizeof(fname),"%s/%s",cbfp->b_dname,cbfp->b_fname) >= MAXFLEN) {
 		return(FALSE);
 	};
 	// MESG("dir_edit: [%s / %s]",cbfp->b_dname,cbfp->b_fname);
@@ -662,7 +662,7 @@ int copy_1file(char *fname,char *destination,int ftype,num cptype)
   } else s1=0;
 
   escape_file_name(fname);
-  if(snprintf(sline,MAXLLEN,"cp %s %s %s 2> /dev/null",
+  if(snprintf(sline,sizeof(sline),"cp %s %s %s 2> /dev/null",
   	cp_flags,fname,destination)>=MAXLLEN) {
 		msg_line("File name too long!");
 		return(FALSE);
@@ -688,7 +688,7 @@ int move_1file(char *fname,char *destination)
   // MESG("nove_1file: [%s] -> [%s] status=%d",fname,destination,s1);
   escape_file_name(fname);
 
-  if(snprintf(sline,MAXLLEN,"mv %s %s 2> /dev/null",
+  if(snprintf(sline,sizeof(sline),"mv %s %s 2> /dev/null",
   	fname,destination)>=MAXLLEN) {
 		msg_line("move command too long!");
 		return(FALSE);
@@ -826,9 +826,9 @@ int dir_copy(num cptype)
 
   if(cbfp->selected_files==0) {
 	ftype=dir_getfile(fname,1);
-	sstat=snprintf(sconfirm,MAXLLEN,"%s [%s] to: ",stype,fname);
+	sstat=snprintf(sconfirm,sizeof(sconfirm),"%s [%s] to: ",stype,fname);
   } else {
-	sstat=snprintf(sconfirm,MAXLLEN,"%s selected to: ",stype);
+	sstat=snprintf(sconfirm,sizeof(sconfirm),"%s selected to: ",stype);
   };
   if(sstat>=MAXLLEN) MESG("truncated 7");
 
@@ -910,14 +910,14 @@ int dir_move(num n)
   int files_to_move=cbfp->selected_files;
   if(cbfp->selected_files==0) {
 	if(dir_getfile(fname,1)<0) return FALSE;
-	sstat=snprintf(sconfirm,MAXLLEN,"Move [%s] to: ",fname);
+	sstat=snprintf(sconfirm,sizeof(sconfirm),"Move [%s] to: ",fname);
 	if(sstat>=MAXLLEN) { error_line("move prompt truncated");return(false);}
 	if((s1 = nextarg(sconfirm,destination,MAXFLEN,true)) !=TRUE) return(s1);
 	escape_file_name(destination);
 	s2 = move_1file(fname,destination);
 	if(s2 != 0) { return error_line("Error moving %s to %s",fname,destination);};
   } else {
-	sstat=snprintf(sconfirm,MAXLLEN,"Move selected to: ");
+	sstat=snprintf(sconfirm,sizeof(sconfirm),"Move selected to: ");
 	if(sstat>=MAXLLEN) { error_line("move prompt truncated");return(false);}
 	if((s1 = nextarg(sconfirm,destination,MAXFLEN,true)) !=TRUE) return(s1);
 	escape_file_name(destination);
@@ -984,12 +984,12 @@ int dir_file_rename(num n)
   strlcpy(destination,fname,MAXLLEN);
   set_list_type(LDIR2);
 
-  snprintf(sconfirm,MAXLLEN,"Rename to: ");
+  snprintf(sconfirm,sizeof(sconfirm),"Rename to: ");
   if((s1 = nextarg(sconfirm,destination,MAXFLEN,true)) !=TRUE) return(s1);
 
   escape_file_name(fname);
   escape_file_name(destination);
-  if(snprintf(sline,MAXLLEN,"mv %s %s 2> /dev/null",
+  if(snprintf(sline,sizeof(sline),"mv %s %s 2> /dev/null",
   	fname,destination)>=MAXLLEN) {
 	return error_line("Name too long!");
   };
@@ -1028,7 +1028,7 @@ int dir_touch_file(num n)
 	fname[0]=0;
 	if((s1 = nextarg("New file as : ",fname,MAXFLEN,true)) !=TRUE) return(s1);
     escape_file_name(fname);
-	sstat=snprintf(sline,MAXLLEN,"touch %s 2> /dev/null",fname);
+	sstat=snprintf(sline,sizeof(sline),"touch %s 2> /dev/null",fname);
 	if(sstat>=MAXLLEN) return error_line("truncated file at 9");
 
 	s1=chdir(cbfp->b_dname);
@@ -1052,7 +1052,7 @@ int dir_new_dir(num n)
 	set_list_type(LDIR2);
 	if((s1 = nextarg("New dir as : ",fname,MAXFLEN,true)) !=TRUE) return(s1);
     escape_file_name(fname);
-	sstat=snprintf(sline,MAXLLEN,"mkdir %s 2> /dev/null",fname);
+	sstat=snprintf(sline,sizeof(sline),"mkdir %s 2> /dev/null",fname);
 	if(sstat>=MAXLLEN) { return error_line("cannot create new dir! %s");};
 
     s1=chdir(cbfp->b_dname);
@@ -1087,7 +1087,7 @@ int dir_link(num n)
   set_list_type(LDIR2);
   
   destination[0]=0;
-  sstat=snprintf(sconfirm,MAXLLEN,"Link [%s] to: ",source_name);
+  sstat=snprintf(sconfirm,sizeof(sconfirm),"Link [%s] to: ",source_name);
   if(sstat>=MAXLLEN) MESG("dir link fname truncated!");
  
   escape_file_name(source_name);
@@ -1106,7 +1106,7 @@ int dir_link(num n)
   sstat = stat(destination,&t);
   escape_file_name(destination);
   if(S_ISDIR(t.st_mode)) strcat(destination,"/");
-  sstat=snprintf(sline,MAXLLEN,"ln %s %s %s 2>/dev/null",flags,source_name,destination);
+  sstat=snprintf(sline,sizeof(sline),"ln %s %s %s 2>/dev/null",flags,source_name,destination);
   if(sstat>=MAXLLEN) { return error_line("dir link fname overflow!");return FALSE;};
   // MESG("dir_link: cmd=[%s]",sline);
 
@@ -1177,7 +1177,7 @@ int delete_dir(char *fname)
 	status = rmdir(fname);
 	if(status!=0)
 #else
-	sstat=snprintf(rmcmd,MAXFLEN,"rmdir %s 2>/dev/null",fname);
+	sstat=snprintf(rmcmd,sizeof(rmcmd),"rmdir %s 2>/dev/null",fname);
 	if(sstat<MAXFLEN) {
 		status=system(rmcmd);
 		// MESG("delete_dir:[%s] 1 status=%d",fname,status);
@@ -1187,10 +1187,10 @@ int delete_dir(char *fname)
 	if(status) 
 #endif
 	{
-		sstat=snprintf(sconfirm,MAXLLEN,"Dir [%s] not empty",fname);
+		sstat=snprintf(sconfirm,sizeof(sconfirm),"Dir [%s] not empty",fname);
 		if(sstat>=MAXLLEN) { return error_line("command truncated!");};
 		if( confirm(sconfirm,"remove ?",1)) {
-			sstat=snprintf(rmcmd,MAXFLEN,"rm -rf %s 2> /dev/null",fname);
+			sstat=snprintf(rmcmd,sizeof(rmcmd),"rm -rf %s 2> /dev/null",fname);
 			if(sstat<MAXFLEN) { 
 				status=system(rmcmd);
 				// MESG("delete_dir:[%s] 2 status=%d",fname,status);
@@ -1420,7 +1420,7 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 	if(inview) {
 		// sstat=set_unique_tmp_file(tmp_name,"exec",MAXFLEN);
 		cmd_ext=strdup(cmd);
-		sstat=snprintf(cmd,MAXLLEN,"%s %s > /tmp/exec 2>/dev/null",cmd_ext,fname);
+		sstat=snprintf(cmd,sizeof(cmd),"%s %s > /tmp/exec 2>/dev/null",cmd_ext,fname);
 		free(cmd_ext);
 		if(sstat>=MAXLLEN) { return error_line("command 9 truncated!");};
 		sstat=snprintf(fname,MAXFLEN,"/tmp/exec");
@@ -1438,15 +1438,15 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 		sstat=set_unique_tmp_file(tmp_name,fname,MAXFLEN);
 		if(!sstat) return false;
 		/* This is a compressed file. Uncompress to a temporary first */
-		sstat=snprintf(cmd2,MAXLLEN,"gzcat %s > %s 2>/dev/null",fname,tmp_name);
+		sstat=snprintf(cmd2,sizeof(cmd2),"gzcat %s > %s 2>/dev/null",fname,tmp_name);
 		// MESG("exec_ext: uncompress command $s",cmd2);
 		if(sstat<MAXLLEN) {
 			if(system(cmd2)) { return error_line("cannot decompress file");};
 		} else { return error_line("truncated, cannot sysexec");};
 		sync();
-		// sstat=snprintf(tmp_name,MAXFLEN,"%s",tmp_name);
+		// sstat=snprintf(tmp_name,sizeof(tmp_name),"%s",tmp_name);
 		// if(sstat>=MAXFLEN) { return error_line("command 11 truncated!");};
-		sstat=snprintf(cmd2,MAXLLEN,"%s \"%s\" >/dev/null 2>/dev/null &",cmd,tmp_name);
+		sstat=snprintf(cmd2,sizeof(cmd2),"%s \"%s\" >/dev/null 2>/dev/null &",cmd,tmp_name);
 		// MESG("exec_ext: exec command $s",cmd2);
 		if(sstat<MAXLLEN) status = sysexec(cmd2);
 		else { return error_line("truncated, cannot sysexec");};
@@ -1460,7 +1460,7 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 
 	if(!strncmp("/mnt/",cmd_ext+web_view,5)) {
 		char ms_fname[MAXLLEN];
-		sstat=snprintf(ms_fname,MAXLLEN,"%s/%s",tmp_name,fname_ns);
+		sstat=snprintf(ms_fname,sizeof(ms_fname),"%s/%s",tmp_name,fname_ns);
 		if(sstat>=MAXLLEN-1) {
 			return error_line("error return from %s",ms_fname);
 		};
@@ -1470,15 +1470,15 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 			ms_fname[5]=':';
 			// MESG("cmd [%s] fname_ns=[%s]",cmd_ext,ms_fname+4);
 			convert_to_windows_name(ms_fname+4);
-			if(web_view) sstat=snprintf(cmd,MAXLLEN,"%s \"file:///%s\" >/dev/null  2>/dev/null &",cmd_ext+web_view,ms_fname+4);
-			else sstat=snprintf(cmd,MAXLLEN,"%s \"%s\" >/dev/null  2>/dev/null &",cmd_ext,ms_fname+4);
+			if(web_view) sstat=snprintf(cmd,sizeof(cmd),"%s \"file:///%s\" >/dev/null  2>/dev/null &",cmd_ext+web_view,ms_fname+4);
+			else sstat=snprintf(cmd,sizeof(cmd),"%s \"%s\" >/dev/null  2>/dev/null &",cmd_ext,ms_fname+4);
 //			MESG("exec:1 [%s]",cmd);
 		} else {
 			MESG("Cannot open file command cmd=[%s] fname=[%s]",cmd_ext,ms_fname);
 			err=1;
 		};
 	} else {
-		if(web_view) sstat=snprintf(cmd,MAXLLEN,"%s \"file://%s/%s\" >/dev/null  2>/dev/null &",cmd_ext+web_view,tmp_name,fname_ns);
+		if(web_view) sstat=snprintf(cmd,sizeof(cmd),"%s \"file://%s/%s\" >/dev/null  2>/dev/null &",cmd_ext+web_view,tmp_name,fname_ns);
 		else {
 			if(f_vx==FILE_EXEC) { 
 			tmp_name[0]=0;
@@ -1489,7 +1489,7 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 			exec_shell(tmp_name);
 			return true;
 			};
-			sstat=snprintf(cmd,MAXLLEN,"%s \"%s/%s\" >/dev/null  2>/dev/null &",cmd_ext,tmp_name,fname_ns);
+			sstat=snprintf(cmd,sizeof(cmd),"%s \"%s/%s\" >/dev/null  2>/dev/null &",cmd_ext,tmp_name,fname_ns);
 		};
 //		MESG("exec:2 [%s]",cmd);
 	};
@@ -1599,7 +1599,7 @@ int script_exec(num nuse)
 //		MESG("file: scrip=[%s]",script_name);
 	};
 
-	if(snprintf(script_line,MAXLLEN,"%s %s/%s > %s 2>%s",
+	if(snprintf(script_line,sizeof(script_line),"%s %s/%s > %s 2>%s",
 		script_cmd,dir_name,script_name,out_file,err_file)>=MAXLLEN) {
 			msg_line("script name too long!");
 			return FALSE;
@@ -2036,7 +2036,7 @@ int dir_getfile(char *fname,int flag)
 		if(t.st_mode & S_IXOTH) { f[9]='x';perms += 1;};
 
 		if(flag==2){
-			snprintf(fname,MAXFLEN-strlen(fname),"%4d:",perms);
+			snprintf(fname,MAXFLEN,"%4d:",perms);
 			snprintf(fname+strlen(fname),MAXFLEN-strlen(fname)," u=%3u g=%3u",t.st_uid,t.st_gid);
 		};
 		if(flag==3){
@@ -2224,7 +2224,7 @@ char *str_tfile(struct stat *t,char *file_name,int maxsize)
 		i1=stat(lname,t);
 		if(i1<0) strlcat(lname," does not exist!",MAXLLEN);
 	} else {
-		snprintf(lname,MAXLLEN,"file error %d ...",errno);
+		snprintf(lname,sizeof(lname),"file error %d ...",errno);
 	};
  	};mx1='l';
  };
@@ -2262,13 +2262,13 @@ if((t->st_mode & S_IXUSR \
  {
 	if(t->st_size > 9999999999) {
 		double fsize=(double)t->st_size/1000000000;
-		snprintf(ssize,50,"%.1f G",fsize);
+		snprintf(ssize,sizeof(ssize),"%.1f G",fsize);
 	} else 
 	if(t->st_size > 9999999) {
 		double fsize=(double)t->st_size/1000000;
-		snprintf(ssize,50,"%.1f M",fsize);
+		snprintf(ssize,sizeof(ssize),"%.1f M",fsize);
 	} else 
- 	snprintf(ssize,50,"%llu",(unsigned long long)t->st_size);
+ 	snprintf(ssize,sizeof(ssize),"%llu",(unsigned long long)t->st_size);
  };
  d_month=t1->tm_mon;
  if(d_month>11) {
@@ -2276,10 +2276,10 @@ if((t->st_mode & S_IXUSR \
  };
 
  if(maxsize>100 && lname[0]!=0) 
- sstat=snprintf(str,maxsize,"%c%c %10s %02d %3s %2d %02d.%02d %s --> %s",
+ sstat=snprintf(str,sizeof(str),"%c%c %10s %02d %3s %2d %02d.%02d %s --> %s",
  	mt,mx1,ssize,t1->tm_mday,month[d_month],year,t1->tm_hour,t1->tm_min,file_name,lname);
  else
- sstat=snprintf(str,maxsize,"%c%c %10s %02d %3s %2d %02d.%02d %s",
+ sstat=snprintf(str,sizeof(str),"%c%c %10s %02d %3s %2d %02d.%02d %s",
  	mt,mx1,ssize,t1->tm_mday,month[d_month],year,t1->tm_hour,t1->tm_min,file_name);
  if(sstat>maxsize) MESG("truncated 11"); 
  return str;
@@ -2310,7 +2310,7 @@ char *str_efile(struct kdirent *entry)
 		i1=stat(lname,&t);
 		if(i1<0) strlcat(lname," does not exist!",MAXLLEN);
 	} else {
-		snprintf(lname,MAXLLEN,"file error %d ...",errno);
+		snprintf(lname,sizeof(lname),"file error %d ...",errno);
 	};
 	mx1='l';
  };
@@ -2346,13 +2346,13 @@ if((entry->st_mode & S_IXUSR \
  {
 	if(entry->st_size > 9999999999) {
 		double fsize=(double)entry->st_size/1000000000;
-		snprintf(ssize,50,"%.1f G",fsize);
+		snprintf(ssize,sizeof(ssize),"%.1f G",fsize);
 	} else 
 	if(entry->st_size > 9999999) {
 		double fsize=(double)entry->st_size/1000000;
-		snprintf(ssize,50,"%.1f M",fsize);
+		snprintf(ssize,sizeof(ssize),"%.1f M",fsize);
 	} else 
- 	snprintf(ssize,50,"%llu",(unsigned long long)entry->st_size);
+ 	snprintf(ssize,sizeof(ssize),"%llu",(unsigned long long)entry->st_size);
  };
  d_month=t1->tm_mon;
  if(d_month>11) {
@@ -2360,10 +2360,10 @@ if((entry->st_mode & S_IXUSR \
  };
 
  if(lname[0]!=0) 
- sstat=snprintf(str,255,"%c%c %10s %02d %3s %2d %02d.%02d %s --> %s",
+ sstat=snprintf(str,sizeof(str),"%c%c %10s %02d %3s %2d %02d.%02d %s --> %s",
  	mt,mx1,ssize,t1->tm_mday,month[d_month],year,t1->tm_hour,t1->tm_min,entry->d_name,lname);
  else
- sstat=snprintf(str,255,"%c%c %10s %02d %3s %2d %02d.%02d %s",
+ sstat=snprintf(str,sizeof(str),"%c%c %10s %02d %3s %2d %02d.%02d %s",
  	mt,mx1,ssize,t1->tm_mday,month[d_month],year,t1->tm_hour,t1->tm_min,entry->d_name);
  if(sstat>255) MESG("truncated 12"); 
  return str;
@@ -2617,7 +2617,7 @@ int list_dir(char *d1,FILEBUF *buf_dir)
 
 int show_dir_help(num n)
 {
-
+ return 0;
 }
 
 /* ---- */

@@ -421,8 +421,8 @@ void ge_set_initial_font(GtkWidget *widget)
 #else
 		current_font_name="Monospace";
 #endif	
-		font_size=14;
-		status_font_size=14;
+		font_size=16;
+		status_font_size=16;
 
 		region = gdk_window_get_clip_region (wd->edit_window);
 		// MESG("ge_set_initial_font:");

@@ -10,11 +10,55 @@
 extern VAR option_names[];
 extern int nnarg;
 extern FILEBUF *cbfp;
+#define __USE_XOPEN
+#include	<wchar.h>
 
 GtkWidget *wlist;
 COLOR_SCHEME *get_scheme_by_index(int scheme_num);
 int drv_initialized=0;
 char *import_buffer=NULL;
+
+
+int get_pango_length(char *st)
+{
+ int width,height;
+ // MESG("get_pango_length:");
+ if(st[0]<0x80) return 1;	/* suppose that all asci have CLEN display size  */
+ if(cwp==NULL) return 0;
+ if(cwp->gwp==NULL) return 0;
+ if(cwp->gwp->draw==NULL) return 0;
+ // MESG("get_pango_length:1");
+
+	GeEditDisplay *wd = GTK_EDIT_DISPLAY(cwp->gwp->draw);
+ // MESG("get_pango_length:2");
+
+	if(wd->layout==NULL) {
+		// MESG("layout is null!!!");
+		return 0;
+	};
+ // MESG("get_pango_length:3");
+
+	pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
+	// MESG("gpl: [%s]",st);
+	pango_layout_set_text (wd->layout, st, -1);
+	pango_layout_get_size (wd->layout, &width, &height);
+	// if(st[0]>0x80)
+	double wf = (double)width/PANGO_SCALE/CLEN;
+	// MESG("PL:[%s] [%2X %2X %2X %2x] w=%d CLEN=%2.1f  %2.1f",st,st[0],st[1],st[2],st[3],width/PANGO_SCALE,CLEN,wf);
+	if(wf<0.1) return 0;
+	if(wf<1.3) return 1;
+	return 2;
+}
+
+// Different for each platform, screen driver
+int get_utf_length(utfchar *utf_char_str)
+{
+ if(utf_char_str->uval[0]<128) return 1;
+ if(clen_error) { return 1;};
+
+ int plen=get_pango_length((char *)utf_char_str->uval);
+ return plen;
+}
 
 void set_current_scheme(int scheme)
 {
@@ -157,7 +201,7 @@ int drv_getc (int quote)
 char *get_font_string()
 {
  static char fstr[128];
- snprintf(fstr,128,"%s %d",current_font_name,font_size);
+ snprintf(fstr,sizeof(fstr),"%s %d",current_font_name,font_size);
  // MESG("get_font_string:[%s]",fstr);
  return fstr;
 }
@@ -186,10 +230,9 @@ int put_wstring(WINDP *wp, char *st,int ulen,int attr)
 		pango_attr_list_insert (attrs, pango_attr_underline_new(PANGO_UNDERLINE_NONE));
 		pango_layout_set_attributes (wd->layout, attrs);
  	};
- 
+ // MESG("ps: [%s]",st);
  pango_layout_set_text (wd->layout, st, -1);
  pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
-
  pango_layout_get_size (wd->layout, &width, &height);
  int y_pos_correction=0;
  int c_width=CLEN*ulen;
@@ -209,6 +252,7 @@ int put_wstring(WINDP *wp, char *st,int ulen,int attr)
  pango_cairo_show_layout (wd->cr, wd->layout);
  pango_attr_list_unref (attrs);
  px += ulen*CLEN;
+ // MESG("!");
  return width/PANGO_SCALE;
 }
 
@@ -221,8 +265,10 @@ unsigned int put_wchar(WINDP *wp, char *st)
  	wd->layout = pango_cairo_create_layout (wd->cr);
 	// MESG("put_wchar: new layout!");
  };
+ // MESG("pswc: [%s] %d",st,strlen(st));
  pango_layout_set_text (wd->layout, st, -1);
  pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
+
  // pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_BOLD);
  pango_layout_get_size (wd->layout, &width, &height);
  int y_pos_correction=0;
@@ -236,6 +282,7 @@ unsigned int put_wchar(WINDP *wp, char *st)
  cairo_set_source_rgb(wd->cr,ccolorf.red,ccolorf.green,ccolorf.blue);
  pango_cairo_show_layout (wd->cr, wd->layout);
 
+ // MESG("!");
  px += width/PANGO_SCALE;
  return width/PANGO_SCALE;
 }
@@ -636,10 +683,11 @@ void put_wtext_slow(WINDP *wp, int row,int maxcol)
 		drv_color(fcolor,bcolor); 
 		i1=addutfvchar1(st,&v1[col],i1,wp->w_fp);
 		st[i1]=0;i1=0;
+		// MESG("%d [%s] ",col,st);
 		drv_move(row,col);
 		put_wchar(wp,st);
 	}
-//	MESG("-- end row %d i1=%d [%s]",row,i1,st);
+	// MESG("-- end slow row %d i1=%d [%s]",row,i1,st);
 	expose_line(row,wp);	/* is needed for GTK2!  */
 }
 

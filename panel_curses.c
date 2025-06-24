@@ -135,7 +135,7 @@ int confirm(char *title, char *prompt,int always)
 	if(!always && ((int)bt_dval("safe_ops")==0)) {
 		return true;
 	};
-	snprintf(message,256,"%s, %s",title,prompt);
+	snprintf(message,sizeof(message),"%s, %s",title,prompt);
 	start_interactive(message);
 	entry_mode=KCONFIRM;
 	for (;;) {
@@ -194,6 +194,7 @@ int select_font_mono(num n)
 sigset_t set, old_set;
 struct sigaction signal_action, old_action;
 
+#if	NUSE
 void SigHandler(int sig)
 {
  if(sig == SIGCONT) {
@@ -208,6 +209,7 @@ void SigHandler(int sig)
 	kill(getpid(),sig);
  }
 }
+#endif
 
 int set_bg(num n)
 {
@@ -254,7 +256,7 @@ function_int key_convert_from_mouse(function_int execf)
 char *drv_info()
 {
   static char info[256];
-  snprintf(info,256,"ncurses colors=%d color pairs=%d basic colors=%d",drv_colors,drv_color_pairs,drv_basic_colors);
+  snprintf(info,sizeof(info),"ncurses colors=%d color pairs=%d basic colors=%d",drv_colors,drv_color_pairs,drv_basic_colors);
   return info;
 }
 
@@ -651,7 +653,6 @@ void drv_open()
 {
 // setlocale(LC_ALL,"en_US.UTF-8"); 
  setlocale(LC_ALL,"");	// do not use specific locale, get it from the system !!
- init_sighandler();
 
  initscr();
  noecho();
@@ -690,6 +691,7 @@ void drv_open()
 
  // driver specific keyboard bindings
  drv_bindkeys();
+ init_sighandler();
  vswidth=1;
  drv_initialized=1;
  // MESG("drv_open:end");
@@ -1680,7 +1682,7 @@ void remove_box()
  cbox=(BOX *) lpop(box_list);
  if(cbox==NULL) return;
  hide_panel(cbox->panel);
- update_panels();
+ // update_panels();
  del_panel(cbox->panel);
  if(cbox->wnd!=NULL) delwin(cbox->wnd);
 
@@ -1991,19 +1993,21 @@ int check_w_sibling(WINDP *wp,int left,int top,int new_rows)
 // dummy function
 void expose_window(WINDP *wp)
 {
-	wrefresh(wp->gwp->draw);
+	wnoutrefresh(wp->gwp->draw);
 	doupdate();
 }
 
 void drv_clear_line(WINDP *wp,int row)
 {
+	return;
 	wmove(wp->gwp->draw,row,0);
 	int i;
 	for(i=0;i<wp->w_ntcols;i++) {
 		waddstr(wp->gwp->draw,"-");
 	};
-	wrefresh(wp->gwp->draw);
-	doupdate();
+	touchline(wp->gwp->draw,row,1);
+	// wrefresh(wp->gwp->draw);
+	// doupdate();
 	wmove(wp->gwp->draw,row,0);
 	// MESG("drv_clear_line: %2d",row);
 }
@@ -2038,15 +2042,35 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 	wmove(wp->gwp->draw,row,xcol);
 	imax=maxcol+1;
-#if	USE_SLOW_DISPLAY
-	if(wp->w_fp->slow_display) 
-	{ /* a little bit slower but clears shadow text!  */
-		wclrtoeol(wp->gwp->draw);
-		wrefresh(wp->gwp->draw);
-	 	update_panels();
-		doupdate();
+
+//	SLOW down and clear the whole line before write!
+	if(bt_dval("slow_display")>0) {
+		fcolor = v1->fcolor;
+		bcolor = v1->bcolor;
+		drv_wcolor(wp->gwp->draw,fcolor,bcolor);
+		for(i=0;i<=imax;i++) waddch(wp->gwp->draw,' ');
+		wmove(wp->gwp->draw,row,xcol);
+		// touchline(wp->gwp->draw,row,1);
+		// wnoutrefresh(wp->gwp->draw);
+		if(row>0) {
+		 	update_panels();
+			doupdate();
+		};
+	} else {	// write the last 2 cell positions
+		fcolor = v1->fcolor;
+		bcolor = v1->bcolor;
+		drv_wcolor(wp->gwp->draw,fcolor,bcolor);
+		wmove(wp->gwp->draw,row,xcol+imax-2);
+		for(i=0;i<=2;i++) waddch(wp->gwp->draw,' ');
+		wmove(wp->gwp->draw,row,xcol);
+		// touchline(wp->gwp->draw,row,1);
+		// wnoutrefresh(wp->gwp->draw);
+		if(row>0) {
+		 	// update_panels();
+			// doupdate();
+		};
 	};
-#endif
+
 	for(i=0;i<=imax;i++) {
 	 uint32_t ch;
 	 	if(v1->fcolor < 256) fcolor = v1->fcolor+v1->attr;
@@ -2055,9 +2079,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 
 		drv_wcolor(wp->gwp->draw,fcolor,bcolor);
 		ch=v1->uval[0];
-#if	USE_SLOW_DISPLAY
-		if(ch==0xF0) wp->w_fp->slow_display=1;
-#endif
+
 		if(ch==0xFF) { 	/* skip in case of char len > 1  */
 			if(v1->uval[1]==0xFF) 
 			{ 
@@ -2066,6 +2088,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 				continue;
 			};
 		};
+		if(bt_dval("custom_cell_width")>0) 	wmove(wp->gwp->draw,row,i);
 #if	USE_GLIB
 		if(ch>128 && v1->uval[1]==0) {	/* this is a local character, convert from local to utf  */
 			 strlcpy(vstr,str_local_to_utf(wp,(char *)v1->uval),6);
@@ -2079,20 +2102,17 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 #else
 		memcpy(vstr,v1->uval,6);
 #endif
-#if	DARWIN
-		// if(vstr[0]>0x20) {MESG("  %2d %2d [%s] [%X %X %X]",row,i,vstr,vstr[0],vstr[1],vstr[2]);};
-		if(vstr[0]==0x20) {vstr[0]=0xC2;vstr[1]=0x80;};
-#endif
-		if	(vstr[0]==0xF0 && vstr[1]==0x9F && vstr[2]!=0x8F && vstr[2]!=0x91 && vstr[2]!=0x92 && vstr[2]!=0x94 && vstr[2]!=0x96 && vstr[2]!=0x98 && vstr[2]!=0xA4 && vstr[2]!=0xA7 ) { 
-			wprintw(wp->gwp->draw,"%c",'?');
-			// ccor++;
-		}
+
+		if(	get_utf_length((utfchar *)vstr)<0) 
+		{
+			wprintw(wp->gwp->draw,"%s",unknown1);
+		} 
 		// else if	(vstr[0]==0xF0 && vstr[1]==0x9F && vstr[2]!=0x94) wprintw(wp->gwp->draw,"%c",'?');
-		else if	(vstr[0]==0xF0 && vstr[1]==0x9D) { wprintw(wp->gwp->draw,"%s",unknown1);}
-		else if	(vstr[0]==0xF0 && vstr[1]==0x90 && vstr[2]==0x90) wprintw(wp->gwp->draw,"%c",'#');
-		else if	(vstr[0]==0xF0 && vstr[2]==0x84) wprintw(wp->gwp->draw,"%c",'~');
+		// else if	(vstr[0]==0xF0 && vstr[1]==0x9D) { wprintw(wp->gwp->draw,"%s",unknown1);}
+		// else if	(vstr[0]==0xF0 && vstr[1]==0x90 && vstr[2]==0x90) wprintw(wp->gwp->draw,"%c",'#');
+		// else if	(vstr[0]==0xF0 && vstr[2]==0x84) wprintw(wp->gwp->draw,"%c",'~');
 		else if	(vstr[0]==0xF3 && vstr[1]==0xA0) wprintw(wp->gwp->draw,"%s",unknown1);
-#if	DARWIN
+#if	DARWIN0
 		else if (vstr[0]==0xE2) { 
 			if ((vstr[1]==0x9D||vstr[1]==0x9C)) wprintw(wp->gwp->draw,"%s","🠓");
 			else 
@@ -2101,19 +2121,15 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 #endif
 		else 
 			waddstr(wp->gwp->draw,vstr);
-			// wprintw(wp->gwp->draw,"%s",vstr);
+
+
 		v1++;
 	};
 	// MESG("row %d eol %d",row,i);
 
-#if	USE_SLOW_DISPLAY
-	if(wp->w_fp->slow_display) {
-		wrefresh(wp->gwp->draw);
-		 update_panels();
-		 doupdate();
-	} else
-#endif
-		wnoutrefresh(wp->gwp->draw);
+	touchline(wp->gwp->draw,row,1);
+	// wrefresh(wp->gwp->draw);
+	wnoutrefresh(wp->gwp->draw);
 }
 
 
@@ -2168,11 +2184,11 @@ void box_line_print(int line,int start,char *st, int w, int selected,int active_
  // MESG("box_line_print: y=%d h=%d [%s]",y,cbox->y2 - cbox->y -1,st);
 #if	USE_GLIB
  char *normal_st = g_utf8_normalize(st,-1,G_NORMALIZE_ALL_COMPOSE);
- snprintf(string_to_show,256,"%-*s",real_width,normal_st);
+ snprintf(string_to_show,sizeof(string_to_show),"%-*s",real_width,normal_st);
  // MESG("[%s] -> [%s]",st,normal_st);
  g_free(normal_st);
 #else
- snprintf(string_to_show,256,"%-*s",real_width,st);
+ snprintf(string_to_show,sizeof(string_to_show),"%-*s",real_width,st);
 #endif
  utf_string_break(string_to_show,width);
  if(y+1 > (cbox->y2 - cbox->y -1)) return;
@@ -2287,6 +2303,7 @@ int dspv(WINDOW *disp_window,int x,int y,char *st)
  getyx(disp_window,y_pos,x_pos);
  wclrtoeol(disp_window);
  wnoutrefresh(disp_window);
+ // wrefresh(disp_window);
  return(x_pos - x);
 }
 
@@ -2395,6 +2412,7 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
  int bg_color=COLOR_MENU_BG;
  char *status_string = show_string;
  int rpos=utf_num_chars(status_string)+2;
+ hide_cursor("status_line");
 #if	!CLASSIC_STATUS
  if((drv_color_pairs>63 && drv_colors!=8) && cwp!=wp) {	/* if enough color pairs, use them ! */
  	fg_color=COLOR_INACTIVE_FG;
@@ -2415,15 +2433,17 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
 	if(wp->w_ntcols-rpos<10) return;
 	drv_wcolor(wp->gwp->draw,COLOR_ROWCOL_FG,bg_color);
 	wmove(wp->gwp->draw,status_row,wp->w_ntcols-rpos);
-	maxlen=wp->w_ntcols-rpos;
+	maxlen=wp->w_ntcols-rpos-1;
  } else {
 	drv_wcolor(wp->gwp->draw,fg_color,bg_color);
 	wmove(wp->gwp->draw,status_row,0);
-	maxlen=wp->w_ntcols;
+	maxlen=wp->w_ntcols-1;
  };
 
   utf_string_break(status_string,maxlen);
   wprintw(wp->gwp->draw,"%s",status_string);
+  touchline(wp->gwp->draw,status_row,1);
+  wnoutrefresh(wp->gwp->draw);
 }
 
 void refresh_menu()
@@ -2808,12 +2828,7 @@ void show_slide(WINDP *wp)
 // MESG("show_slide: window=%d start=%d end=%d len=%d",wp->id,start,end,len);
 
  drv_wcolor(wp->gwp->vline,fg_color,bg_color);
-#if	USE_SLOW_DISPLAY
- if(wp->w_fp->slow_display){
- 	wbkgd(wp->gwp->vline,color_pair(fg_color,bg_color));
-	wrefresh(wp->gwp->vline);
- };
-#endif
+
  for(row=0;row<wp->w_ntrows-1;row++){
 	wmove(wp->gwp->vline,row,0);
 	// wrefresh(wp->gwp->vline);
@@ -2825,18 +2840,16 @@ void show_slide(WINDP *wp)
  };
  wmove(wp->gwp->vline,wp->w_ntrows,0);
  /* show change flag at bottom right corner!  */
- if(wp->w_fp->b_flag & (1 << 1)) {
+ if(wp->w_fp->b_state & FS_CHG ) {
  	drv_wcolor(wp->gwp->vline,COLOR_CTRL_FG,bg_color);
- 	wprintw(wp->gwp->vline,"%s","*");
- } else wprintw(wp->gwp->vline,"%s"," ");
-#if	USE_SLOW_DISPLAY
- if(wp->w_fp->slow_display){
- 	wnoutrefresh(wp->gwp->vline);
-	update_panels();
-	doupdate();
- } else
-#endif
-	wnoutrefresh(wp->gwp->vline);
+ 	// wprintw(wp->gwp->vline,"%s","*");
+	waddch(wp->gwp->vline,'*');
+ } else {
+ 	// wprintw(wp->gwp->vline,"%s"," ");
+	waddch(wp->gwp->vline,' ');
+ };
+	// touchwin(wp->gwp->vline);
+	// wnoutrefresh(wp->gwp->vline);
 }
 
 #include "xthemes.c"

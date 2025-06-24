@@ -459,7 +459,7 @@ int assign_function(num n)
 	nextarg("Assign: function name :",func_name,MAXFLEN,true);
 	kfunc = get_function(func_name);
 	if (kfunc == NULL) {
-		snprintf(st,256,"[%s] no such function",func_name);
+		snprintf(st,sizeof(st),"[%s] no such function",func_name);
 		msg_line(st);
 		if(macro_exec) error_skip_token(302,st);	/* on error reduce second argument!  */
 		return(FALSE);
@@ -475,7 +475,7 @@ int assign_function(num n)
 	add_element_to_list((void *)key_reg,local_key_list);
 	new_in_key_list++;
 
-	snprintf(st,256,"function assigned to %s",key_string);
+	snprintf(st,sizeof(st),"function assigned to %s",key_string);
 
 	msg_line(st);
 	return(set_key_function(kfunc,c,key_string));
@@ -495,13 +495,13 @@ int load_keys()
 
  f1=fopen(fname,"r");
 
- while(fgets(str_line,MAXLLEN,f1)){
+ while(fgets(str_line,sizeof(str_line),f1)){
 	char **a_as;
 	int c;
 	int (*kfunc)(num n);	/* ptr to the requested function */
 	AKEYS *key_reg;
 
-	str_line[strlen(str_line)-1]=0;
+	strtok(str_line, "\n");
 	a_as = split_2_sarray(str_line,'=');
 	c = atoi(a_as[1]);
 	kfunc = get_function(a_as[0]);
@@ -593,7 +593,7 @@ int show_keys(num n)
 	if(emulation>1) emulation=0;
 	// show by function
 	insert_string_nl(bp,"## Key assignements sorted by function (all key tables)");
-	snprintf(sline,MAXLLEN,"## emulation %s",emulation_name[emulation]);
+	snprintf(sline,sizeof(sline),"## emulation %s",emulation_name[emulation]);
 	insert_string_nl(bp,sline);
 	insert_string_nl(bp,"");
 	
@@ -607,14 +607,14 @@ int show_keys(num n)
 		for (ktp = ktbs[table];ktp->k_fp != NULL;ktp++) {
 			if (ktp->k_fp == ftp->n_func) {
 				if(ktp->k_fp==NOFUNCTION) continue;
-				snprintf(sline,MAXLLEN,"| %-22s | %-15s(%12s) | %11s | %s",ftp->n_name,ktp->macro_name,cmd_to_tstr(ktp->k_code),table_name[table],ftp->n_help);
+				snprintf(sline,sizeof(sline),"| %-22s | %-15s(%12s) | %11s | %s",ftp->n_name,ktp->macro_name,cmd_to_tstr(ktp->k_code),table_name[table],ftp->n_help);
 				insert_string_nl(bp,sline);
 				is_assigned=1;
 			}
 		}
 
 		if (!is_assigned) {
-			snprintf(sline,MAXLLEN,"| %-22s |      -                        | -           | %s",ftp->n_name,ftp->n_help);
+			snprintf(sline,sizeof(sline),"| %-22s |      -                        | -           | %s",ftp->n_name,ftp->n_help);
 			insert_string_nl(bp,sline);
 		}
 	}
@@ -623,7 +623,7 @@ int show_keys(num n)
 	// show by key
 	insert_string_nl(bp,"\n## Sorted by key");
 	for(table=0;table<max_keytables;table++) {
-		snprintf(sline,MAXLLEN,"### %s",table_name[table]);
+		snprintf(sline,sizeof(sline),"### %s",table_name[table]);
 		insert_string_nl(bp,sline);
 
 		insert_string_nl(bp,"| key shortcut    | macro name           | description                          |");
@@ -632,8 +632,8 @@ int show_keys(num n)
 			{
 				if(ktp->k_fp==NOFUNCTION) continue;
 				
-				if(ktp->k_fp==execsub) snprintf(sline,MAXLLEN,"| %-15s | %-20s |  %s",cmd_to_tstr(ktp->k_code),ktp->macro_name,"subroutine");
-				else snprintf(sline,MAXLLEN,"| %-15s | %-20s |  %s",ktp->macro_name,function_name(ktp->k_fp,&description),cmd_to_tstr(ktp->k_code));
+				if(ktp->k_fp==execsub) snprintf(sline,sizeof(sline),"| %-15s | %-sizeof(20s |  %s",cmd_to_tstr(ktp->k_code),ktp->macro_name,"subroutine");
+				else snprintf(sline,sizeof(sline),"| %-15s | %-20s |  %s",ktp->macro_name,function_name(ktp->k_fp,&description),cmd_to_tstr(ktp->k_code));
 				insert_string_nl(bp,sline);
 				is_assigned=1;
 			}

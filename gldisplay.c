@@ -61,7 +61,7 @@ int split_window(num n)
 	listdir(wpnew->w_fp->dir_num + 1);
  };
  events_flush();
- set_cursor(0,"split_window");
+ set_cursor(0,"hsplit_window");
  return(TRUE);
 }
 
@@ -89,6 +89,7 @@ if(!drv_initialized) return 0;
  };
 
  events_flush();
+ set_cursor(0,"vsplit_window");
  return(TRUE);
 }
 
@@ -229,7 +230,7 @@ int show_version(num n)
 {
  char version_str[64];
  int res;
- res=snprintf(version_str,64,"Version %s",VERSION);
+ res=snprintf(version_str,sizeof(version_str),"Version %s",VERSION);
  if(res==64) MESG("version truncated!");
  gtk_show_about_dialog(GTK_WINDOW(parent),
 //        "authors", authors,
@@ -264,7 +265,7 @@ void status_line(WINDP *wp)
     bp = wp->w_fp;
 	// MESG("status_line: %d",wp->id);
 //	in debug mode print window number at bottom left
-	if(debug_flag()) 	snprintf(m_st,32,"%d",wp->id);
+	if(debug_flag()) 	snprintf(m_st,sizeof(m_st),"%d",wp->id);
 	else m_st[0]=0;
 
 	strlcpy(fdname,bp->b_dname,MAXLLEN);

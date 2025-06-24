@@ -2328,7 +2328,7 @@ void highlight_ps1(int c)
 		};
 		hstate=0;
 		break;
-	case '\\':
+	//case '\\':
 	case '$':{
 		hstate=(hstate==HS_PREVESC)?0:HS_PREVESC;
 		};

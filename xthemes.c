@@ -150,7 +150,7 @@ int color_scheme_read()
  FILE *f1;
  char *fname;
  static char name1[MAXFLEN];
- char *b,bline[MAXFLEN];
+ char *b,bline[MAXLLEN];
  int i,j;
  char left;
  COLOR_SCHEME *scheme=NULL;
@@ -165,9 +165,9 @@ int color_scheme_read()
 
  f1=fopen(fname,"r");
  if(f1!=NULL) {
- while((b=fgets(bline,MAXFLEN,f1))!=NULL)
+ while((b=fgets(bline,sizeof(bline),f1))!=NULL)
  {
-	if(strlen(b)>0) b[strlen(b)-1]=0;
+	strtok(b, "\n");
 	int eq_ind=0;
 	char *eq_chr;
 
@@ -183,9 +183,9 @@ int color_scheme_read()
 
 	if(lstartwith(b,CHR_LBRA)) {	/* new color scheme  */
 
-		sscanf(b,"%c%s]\n",&left,name1);
-		name1[strlen(name1)-1]=0;
-		// MESG("read color_scheme [%s]",name1);
+		sscanf(b,"%c%s\n",&left,name1);
+		//MESG("read color_scheme [%s]",name1);
+		name1[strlen(name1)-1]=0;	
 		scheme = get_scheme_by_name(name1);
 
 		if(!scheme) { 	/* a new scheme!!  */
@@ -204,7 +204,7 @@ int color_scheme_read()
 	char **arg_list = split_2_sarray(b,' ');
 	char **sa = arg_list;
 	char *item = *sa++; 
-	// MESG("	item=[%s]",item);
+	// MESG("	[%s] item=[%s]",b,item);
 	j = sarray_index(color_type,item);	/* get color type  */
 	if(j<0) { free_sarray(arg_list); continue;};
 	scheme->color_style[j].color_index=0;

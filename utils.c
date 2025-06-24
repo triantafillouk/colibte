@@ -129,11 +129,11 @@ double  show_time(char *description,int init)
 
 	if(show_no_time)
 	{
-		if(init==0) snprintf(sout,512,"%c[%45s] %d,%06d  %d,%06d --------",c,description,0,0,0,0);
-		else        snprintf(sout,512,"%c[%45s] %d,%06d  %d,%06d",c,description,1,0,0,0);
+		if(init==0) snprintf(sout,sizeof(sout),"%c[%45s] %d,%06d  %d,%06d --------",c,description,0,0,0,0);
+		else        snprintf(sout,sizeof(sout),"%c[%45s] %d,%06d  %d,%06d",c,description,1,0,0,0);
 	} else 	{
-		if(init==0) snprintf(sout,512,"%c[%45s] %d,%06d  %d,%06d --------",c,description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
-		else        snprintf(sout,512,"%c[%45s] %d,%06d  %d,%06d",c,description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
+		if(init==0) snprintf(sout,sizeof(sout),"%c[%45s] %d,%06d  %d,%06d --------",c,description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
+		else        snprintf(sout,sizeof(sout),"%c[%45s] %d,%06d  %d,%06d",c,description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
 	// if(xwin && discmd) MESG("%s",sout);
 	// MESG("%s",sout);
 	};
@@ -168,7 +168,7 @@ int read_pairs(char *fname,char delimiter,char ***name,char ***value)
  dlist *sl1;
  delement *e1;
  FILE *f;
- char s[1000];
+ char s[MAXLLEN];
  char *svalue;
  char *cp1,*cp2;
  char *sname;
@@ -179,9 +179,9 @@ int read_pairs(char *fname,char delimiter,char ***name,char ***value)
  f=fopen(fname,"r");
  if(!f) { name=NULL; value=NULL;return 0;};
  
- while(fgets(s,1000,f)) {
+ while(fgets(s,sizeof(s),f)) {
 	int delimit_ok=0;
- 	s[strlen(s)-1]=0; // remove newline
+	strtok(s, "\n");	// remove newline
 	if(strlen(s)==0) continue;
 	if(s[0]=='#' || s[0]==';'||s[0]=='[') continue;
 	cp1=s;

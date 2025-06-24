@@ -286,12 +286,12 @@ double uf_print()
 				if(i>0) out_print("",1);
 				print_array1("",get_array("102"));break;
 			case VTYPE_NUM:{
-				char *p_out=(char *)malloc(128);
+				char p_out[128];
 				long l0=value;
-				if(l0==value) snprintf(p_out,80,"%ld",l0);
-				else snprintf(p_out,128,"%f",value); 
+				if(l0==value) snprintf(p_out,sizeof(p_out),"%ld",l0);
+				else snprintf(p_out,sizeof(p_out),"%f",value); 
 				out_print(p_out,0);
-				free(p_out);
+				// free(p_out);
 				break;
 			};
 			case VTYPE_STRING:{
@@ -517,7 +517,7 @@ double uf_input()
 	char *slocal=get_sval();
 	if(va[0].var_type!=VTYPE_STRING) getstring("Input :",get_sval(),80,true);
 	else getstring(va[0].sval,get_sval(),80,true);
-	if(execmd) slocal[strlen(get_sval())-1]=0;
+	if(execmd) strtok(slocal, "\n");
 	set_vtype(VTYPE_STRING);
 	entry_mode=f_entry;
 	return 0;

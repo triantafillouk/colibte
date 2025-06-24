@@ -226,7 +226,6 @@ int main(int argc, char **argv)
 #endif
 	{
 		select_filebuf(cbfp);
-		cbfp->b_mode |= gmode;
 	};
 	startup_exe=0;
 	discmd = TRUE;

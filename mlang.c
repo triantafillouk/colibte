@@ -2106,7 +2106,7 @@ double term_plus(double value)
 	if(vtype_is(VTYPE_STRING)) {
 		char svalue[MAXLLEN];
 		int stat;
-		stat=snprintf(svalue,MAXLLEN,"%f%s",value,get_sval());
+		stat=snprintf(svalue,sizeof(svalue),"%f%s",value,get_sval());
 		if(stat>MAXLLEN) MESG("truncated 2");
 		set_sval(svalue);
 		return 0;
@@ -2696,7 +2696,7 @@ void update_ddot_line(char *ddot_out)
  	insert_string(cbfp," ,err ",6);
 	if(err_str!=NULL) insert_string(cbfp,err_str,strlen(err_str));
  };
- free(ddot_out);
+ //free(ddot_out);
  sfb(old_fp);
 }
 
@@ -2723,27 +2723,28 @@ void refresh_ddot_1(double value)
 
  int precision=bt_dval("print_precision");
  int show_hex=bt_dval("show_hex");
- char *ddot_out = (char *)malloc(128);
+ // char *ddot_out = (char *)malloc(128);
+ char ddot_out[128];
 
  // MESG("	ddot_pos=%d end=%d todel=%d",ddot_position,line_end,line_end-ddot_position);
  if(buf->b_state & FS_VIEW) return; // no refresh in view mode
 
  if(vtype_is(VTYPE_STRING)) {	/* string value  */
-	stat=snprintf(ddot_out,128," \"%s\"",get_sval());
+	stat=snprintf(ddot_out,sizeof(ddot_out)," \"%s\"",get_sval());
  }  else if(vtype_is(VTYPE_NUM)) {	/* numeric value  */
 	long int d = (long int)value;
 	if(d==value) {	/* an integer/double value!  */
-		if(show_hex) stat=snprintf(ddot_out,128," %5.0f | 0x%llX | 0o%llo",value,(unsigned long long)value,(unsigned long long)value);
-		else stat=snprintf(ddot_out,128," %5.*f",1,value);
+		if(show_hex) stat=snprintf(ddot_out,sizeof(ddot_out)," %5.0f | 0x%llX | 0o%llo",value,(unsigned long long)value,(unsigned long long)value);
+		else stat=snprintf(ddot_out,sizeof(ddot_out)," %5.*f",1,value);
 	} else {	/* a decimal value!  */
-		stat=snprintf(ddot_out,128," %5.*f",precision,value);
+		stat=snprintf(ddot_out,sizeof(ddot_out)," %5.*f",precision,value);
 	};
 
  } else if(vtype_is(VTYPE_ARRAY) || vtype_is(VTYPE_SARRAY) || vtype_is(VTYPE_AMIXED)) {
 	array_dat *adat = get_array("37");
 	// MESG("refresh_ddot: array: type=%d name=(%s)",adat->atype,adat->array_name);
 
- 	stat=snprintf(ddot_out,128," array %d:[%s] type [%s] , slot %ld type=%d rows %d,cols %d",adat->anum,
+ 	stat=snprintf(ddot_out,sizeof(ddot_out)," array %d:[%s] type [%s] , slot %ld type=%d rows %d,cols %d",adat->anum,
 	adat->array_name,vtype_names[adat->atype],lsslot-current_stable,adat->atype,adat->rows,adat->cols);
 	print_array1(":",adat);
  };
@@ -3272,19 +3273,19 @@ char * tok_info(tok_struct *tok)
 				rows=tok->tok_adat->rows;
 				cols=tok->tok_adat->cols;
 			};
-			snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s] rows=%d cols=%d",
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%12s] [%s] rows=%d cols=%d",
 				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,rows,cols);
 		} else 
-		if(tok->ttype==TOK_SHOW) { snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [:]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME);
+		if(tok->ttype==TOK_SHOW) { snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%12s] [:]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME);
 		} else
 		if(tok->ttype==TOK_LCURL||tok->ttype==TOK_RCURL) {
-				snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] %s other is %d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum);
+				snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%12s] %s other is %d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum);
 		} else
 		if(tok->tgroup>0)
-			snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s] group [%d:%s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup));
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%12s] [%s] group [%d:%s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup));
 		else 
-		if(tok->ttype==TOK_NUM) snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] %f",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);
-		else if(tok->ttype==TOK_QUOTE) snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] \"%s\"",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
+		if(tok->ttype==TOK_NUM) snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%12s] %f",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);
+		else if(tok->ttype==TOK_QUOTE) snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%12s] \"%s\"",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
 		else if(tok->ttype==TOK_VAR) {
 			// MESG("TOK_VAR:");
 			int size=0;
@@ -3300,11 +3301,11 @@ char * tok_info(tok_struct *tok)
 				size = type_tree->items;
 			};
 
-			snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s] type %s %d size %d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,vtype_names[vtype],vtype,size);
-		} else snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%12s] [%s] type %s %d size %d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,vtype_names[vtype],vtype,size);
+		} else snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%12s] [%s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
 // 			
 	} else {
-		     snprintf(stok,MAXLLEN,"%3d:%4d %3d [%2d=%12s] [%f]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);
+		     snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%12s] [%f]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);
 	};
 	// MESG("tok_info: end");
 	return stok;

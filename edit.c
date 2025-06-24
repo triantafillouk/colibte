@@ -88,7 +88,7 @@ void toggle_val(char *name){
 	if((int)bt_dval(name)) {
 		set_bt_num_val(name,0);
 	} else set_bt_num_val(name,1);
-	// MESG("new value of [%s] is %d",name,(int)bt_dval(name));
+	MESG("new value of [%s] is %d",name,(int)bt_dval(name));
 }
 
 int toggle_parameter(num type)
@@ -100,7 +100,7 @@ int toggle_parameter(num type)
 		int emulation;
 		emulation = (int)bt_dval(option_names[type].name);
 		set_key_emulation(emulation);
-		msg_line("set key amulation to %s",(emulation==0) ? "native":"emacs");
+		msg_line("set key emulation to %s",(emulation==0) ? "native":"emacs");
 		}; break;
 	case EMBEDICONS: // toggle_val("embed_icons");
 //		redraw toolbar (now needs restart)
@@ -169,6 +169,11 @@ int toggle_parameter(num type)
 		};
 	   break;
 	  };
+	case EMCUSTOMCELLWIDTH: 
+	case EMSLOWDISP: {
+		// int v1=(int) bt_dval("slow_display");
+		set_update(cwp,UPD_ALL);
+	};break;
   };  
   return true;
 }
@@ -2253,9 +2258,9 @@ int copy_region(num n)
  setmark(0); // remove selection
 
  if(MainClipBoard->rect) 
-	snprintf(s,80,"[%lldx%lld bytes copied]",MainClipBoard->width,MainClipBoard->height);
+	snprintf(s,sizeof(s),"[%lldx%lld bytes copied]",MainClipBoard->width,MainClipBoard->height);
  else
-	snprintf(s,80,"[%lld bytes copied]",MainClipBoard->width);
+	snprintf(s,sizeof(s),"[%lld bytes copied]",MainClipBoard->width);
  msg_line(s);
  return TRUE;
 }
@@ -2507,9 +2512,11 @@ int set_optionf(int option_flag,int global)
  if(n==1) {
 	if (global) gmode |= option_flag;
  	fp->b_mode |= option_flag;
+	// MESG("set option 0x%X",option_flag);
  } else {
 	if (global) gmode &= ~option_flag;
  	fp->b_mode &= ~option_flag;
+	// MESG("reset option 0x%X",option_flag);
  };
  update_status();
  return(TRUE);
@@ -2524,12 +2531,12 @@ void toggleoptionf(int option_flag, int global)
  	else gmode |= option_flag;
 
  };
-// MESG("toggleoptionf: f=%d global=%d gmode=%X",option_flag,global,gmode);
 
  if(fp == NULL) return;
 
  if(fp->b_mode & option_flag) fp->b_mode &= ~option_flag;
  else fp->b_mode |= option_flag;
+ // MESG("toggleoptionf: 0x%X",option_flag);
  update_status();
 }
 

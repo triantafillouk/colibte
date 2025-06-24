@@ -93,7 +93,7 @@ int new_file(num n)
 	};
  };
 
- snprintf(scratch_name,24,"[new %d]",scratch_ind);
+ snprintf(scratch_name,sizeof(scratch_name),"[new %d]",scratch_ind);
  stat=goto_file(scratch_name);
  if(stat) {
 	 cbfp->scratch_num=scratch_ind;
@@ -356,7 +356,7 @@ int load_scratch_files()
  int stat=0;
  int ind=0;
  // MESG("load_scratch_files:");
- stat=snprintf(home_dir,MAXFLEN,"%s/.%s",getenv("HOME"),APPLICATION_NAME);
+ stat=snprintf(home_dir,sizeof(home_dir),"%s/.%s",getenv("HOME"),APPLICATION_NAME);
  if(stat>=MAXFLEN) {error_line("truncated scratch file");return 0;};
 
  d1 = opendir((const char *)home_dir);
@@ -415,7 +415,7 @@ int close_file(num n)
 		{
 			char prompt[MAXLLEN];
 			int lstat=
-			snprintf(prompt,MAXLLEN,"Closing file %s",f_toclose->b_fname);
+			snprintf(prompt,sizeof(prompt),"Closing file %s",f_toclose->b_fname);
 			if(lstat>MAXLLEN) prompt[MAXLLEN-1]=0;
 	        if ( confirm(prompt,"discard all changes?",1) != TRUE) { 
 				return (OK_CLRSL);
@@ -664,7 +664,7 @@ int  list_filebuf(char *title, char *return_string,int f1,int *return_flag)
 				if(bp->b_flag & FSINVS) strlcpy(return_string,bp->b_fname,MAXLLEN);
 				else {
 					int stat;
-					stat=snprintf(return_string,MAXLLEN,"%s/%s",bp->b_dname,bp->b_fname);
+					stat=snprintf(return_string,MAXFLEN,"%s/%s",bp->b_dname,bp->b_fname);
 					if(stat>=MAXLLEN) msg_line("truncated 12 string");
 				};
 				break;
@@ -792,7 +792,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	is_scratch = scratch_ind(base_name);
 	
 	if(is_scratch) {
-		snprintf(dir_name,MAXFLEN,"%s/.%s",getenv("HOME"),APPLICATION_NAME);
+		snprintf(dir_name,sizeof(dir_name),"%s/.%s",getenv("HOME"),APPLICATION_NAME);
 	} else {
 		if(cbfp){
 		if(cbfp->b_dname[0]==0){
@@ -858,7 +858,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 					s=getcwd(dir_name,MAXFLEN);
 				} else {
 					if(is_scratch) {
-						snprintf(dir_name,MAXFLEN,"%s/.%s",getenv("HOME"),APPLICATION_NAME);
+						snprintf(dir_name,sizeof(dir_name),"%s/.%s",getenv("HOME"),APPLICATION_NAME);
 					} else {
 						strcpy(dir_name,"");
 					}
@@ -880,6 +880,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->b_index = buffer_index++;
     bp->b_flag  = bflag;
 	bp->b_mode  = gmode;
+	// MESG("new_filebuf: b_mode=0x%X",bp->b_mode);
 	bp->b_state = 0;
 	bp->view_mode = 0;
 	bp->scratch_num=is_scratch;
@@ -962,9 +963,6 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->sort_mode=0;
 	bp->utf_accent=0;
 	bp->b_key[0]=0;	/* encrypt key  */
-#if	USE_SLOW_DISPLAY
-	bp->slow_display=0;
-#endif
 #if	TNOTES
 	bp->b_note=NULL;
 	bp->b_header=NULL;
@@ -1063,17 +1061,18 @@ char *get_buf_full_name(FILEBUF *fp)
 int bom_type(int file_id)
 {
  char c[8];
+ // MESG("bom_type:");
  lseek(file_id,0L,SEEK_SET);
  if(read(file_id,c,1)!=1) return(FALSE);
  if(c[0]==26) {
  	MESG("BOM is encrypted!");
  	return FTYPE_ENCRYPTED;
  };
- if(c[0]<0xEF) {
- 	lseek(file_id,0L,SEEK_SET);
- 	return FALSE;
- };
  if(read(file_id,c+1,1)!=1) {	// read second byte
+ 	lseek(file_id,0L,SEEK_SET);
+	return (FALSE);
+ };
+ if(read(file_id,c+2,1)!=1) {	// read third byte
  	lseek(file_id,0L,SEEK_SET);
 	return (FALSE);
  };
@@ -1087,12 +1086,9 @@ int bom_type(int file_id)
 	lseek(file_id,0L,SEEK_SET);
 	return(FTYPE_UTF16BOM);
  };
- if(c[0]==0xEF && c[1]==0xBB) { // check for utf8 bom
- 	if(read(file_id,c+2,1)!=1) { 
-		lseek(file_id,0L,SEEK_SET);
-		return (FALSE);
-	};
-	if(c[2]==0xBF) return (FTYPE_UTF8BOM);
+ if(c[0]==0xEF && c[1]==0xBB && c[2]==0xBF) { // check for utf8 bom
+	MESG("bom_type: UTF8BOM");
+	return (FTYPE_UTF8BOM);
  };
  if(c[0]==0xFF && c[1]==0xFE) {
  	if(c[2]==0 && c[3]==0) {
@@ -1154,7 +1150,6 @@ int insert_file(num  n)
 
 int is_system_file(char *fname)
 {
-	// TODO return if block file !!!!!
 	int status;
 	struct stat bp_stat;
 	status=stat(fname,&bp_stat);
@@ -1239,7 +1234,7 @@ int open_file(num n)
 
 	if(!macro_exec && (xwin==2)) return(open_file_dialog(tname,n));
 
-	stat=snprintf(prompt,MAXFLEN,"Open file [%s] : ",tname);
+	stat=snprintf(prompt,sizeof(prompt),"Open file [%s] : ",tname);
 	if(stat>=MAXFLEN) { error_line("truncated prompt when opening file!");return false;};
 	// MESG("	get the file name from nextarg!");
     if (nextarg(prompt, tname, MAXFLEN,true) != TRUE){
@@ -1272,7 +1267,7 @@ int clear_buffer(num n)
 	strlcpy(tname,getcurfword(),MAXFLEN);
 
 	strlcpy(fname,tname,MAXFLEN);
-	stat=snprintf(prompt,MAXFLEN,"Clear buffer [%s] : ",fname);
+	stat=snprintf(prompt,sizeof(prompt),"Clear buffer [%s] : ",fname);
 	if(stat>=MAXFLEN) MESG("truncated prompt when clear_buffer!");
     if (nextarg(prompt, fname, MAXFLEN,true) != TRUE){
 		set_Offset(o1);
@@ -1341,6 +1336,7 @@ int set_buf_key(FILEBUF *bp)	/* reset encryption key of current file */
 		crypt_string(bp->b_key, strlen(bp->b_key));
 	};
 	bp->b_mode |= EMCRYPT;	
+	// MESG("set_buf_key: b_mode=0x%X",bp->b_mode);
 	return(OK_CLRSL);
 }
 
@@ -1490,7 +1486,7 @@ int file_read(FILEBUF *bp, char *fname)
 
  if(is_scratch_buffer(bp)) {
  	char scratch_file[MAXFLEN];
-	stat=snprintf(scratch_file,MAXFLEN,"%s/%s",bp->b_dname,bp->b_fname);
+	stat=snprintf(scratch_file,sizeof(scratch_file),"%s/%s",bp->b_dname,bp->b_fname);
 	if(stat<MAXFLEN) unlink(scratch_file);
  };
  set_update(cwp,UPD_FULL);
@@ -1573,7 +1569,7 @@ int saveas_file(num n)
 #endif
 	if(is_system_file(cbfp->b_fname)) return 0;
 	strlcpy(fname,cbfp->b_fname,MAXFLEN);
-	if(snprintf(save_as_msg,MAXFLEN,"Save as: %s:",get_working_dir())>=MAXFLEN) return FALSE;
+	if(snprintf(save_as_msg,sizeof(save_as_msg),"Save as: %s:",get_working_dir())>=MAXFLEN) return FALSE;
     if ((status=nextarg(save_as_msg, fname, MAXFLEN,true)) != TRUE) return FALSE;
 	scratch_num = is_scratch_buffer(cbfp);
 	// MESG("saveas_file: %s",fname);
@@ -1628,7 +1624,7 @@ int save_file(num n)
 #if	TNOTES
 	if(is_scratch_buffer(cbfp)) {
 		// set file name
-		snprintf(fp->b_fname,24,"%s.cal.md",date_string(3));
+		snprintf(fp->b_fname,MAXFLEN,"%s.cal.md",date_string(3));
 		
 		// insert calendar header
 		goto_bof(1);
@@ -1691,7 +1687,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
  int htype=0;	/* highlight type  */
  char	oext[MAXLLEN], cmd[MAXLLEN];
  *temp_used=0;
- // MESG("init_ftype:[%s] b_type=%d view_mode=0x%X" ,fname,bp->b_type,bp->view_mode);
+ // MESG("init_ftype:[%s] b_type=%d view_mode=0x%X b_mode=%X" ,fname,bp->b_type,bp->view_mode,bp->b_mode);
 #if	CRYPT
 	s=resetkey(bp);
 	if (s != TRUE)	return(s);
@@ -1713,7 +1709,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 	if(tc) {
 		char tmp_name[MAXFLEN];
 		int status = set_unique_tmp_file(tmp_name,"compressed",MAXFLEN);
-			status=snprintf(cmd,MAXLLEN,"%s %s > %s.out 2> %s.err",uncompress_command[tc],fname,tmp_name,tmp_name);
+			status=snprintf(cmd,sizeof(cmd),"%s %s > %s.out 2> %s.err",uncompress_command[tc],fname,tmp_name,tmp_name);
 			if(status>MAXLLEN) { error_line("uncompress command truncated!");return false;};
 			// MESG("uncompress:[%s]",cmd);
 			status=system(cmd);
@@ -1741,7 +1737,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 
 	bp->bytes_read=0;
 	bp->err=-1;
-	// MESG("init_ftype: file_id=%d",bp->file_id);
+	// MESG("init_ftype: file_id=%d b_mode=%X",bp->file_id,bp->b_mode);
 	if(bp->b_mode!=VMHEX) {
 		bp->bom_type = bom_type(bp->file_id);
 	};
@@ -1754,7 +1750,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 		|| file_type_is("MD",bp->b_type) 
 		|| (bp->b_type >= NOTE_TYPE))
 		 ) {	
-			// MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
+			MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
 			bp->b_mode |= EMCRYPT;
 #if	TNOTES
 			if(bt_dval("notes_recreate") || from_note) 
@@ -1859,7 +1855,7 @@ int file_type(char *name, int *compression_type,char *oext)
  };
  ext1[ext_len]=0;	// extension in reverse 
  i--;
- // MESG("file_type: [%s] [%s] len=%d e=%d",name,ext1,ext_len,e);
+ MESG("file_type: [%s] [%s] len=%d e=%d",name,ext1,ext_len,e);
 
  if(e>0 && ext_len>0) {
 	revstr(ext1);

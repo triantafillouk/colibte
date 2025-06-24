@@ -18,7 +18,7 @@ bright	🔆
 check mark	✔
 🔠🔡🔢🔣ℹ-
 circles
-red	🔴
+red 	🔴
 orange	🟠
 yellow	🟡
 green	🟢

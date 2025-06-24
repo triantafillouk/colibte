@@ -413,7 +413,7 @@ int type_init_definition(FILEBUF *bf,BTREE *types_tree,alist *lex_parser, tok_st
 			double val=getnum1(bf,cc,tok);
 			// MESG("	element numeric %f",val);
 			// MESG("	- add element [%s]:numeric default:%f",nword,val);
-			slen=snprintf(line,255,"%-15snumeric :%f",e_name,val);
+			slen=snprintf(line,sizeof(line),"%-15snumeric :%f",e_name,val);
 			if(slen>255) MESG("name out of size!");
 			if(show_tokens) {
 				out_print(line,1);
@@ -423,7 +423,7 @@ int type_init_definition(FILEBUF *bf,BTREE *types_tree,alist *lex_parser, tok_st
 		} else if (tok_type==TOK_QUOTE) {
 			getnstr1(bf,cc,nword);
 			// MESG("	- add element [%s]:string default [%s]",node->node_name,nword);
-			slen=snprintf(line,255,"%-15sstring  :'%s'",e_name,nword);
+			slen=snprintf(line,sizeof(line),"%-15sstring  :'%s'",e_name,nword);
 			if(slen>255) MESG("name out of size!");
 			if(show_tokens) {
 				out_print(line,1);

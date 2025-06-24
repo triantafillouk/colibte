@@ -10,6 +10,8 @@
 #include "xe.h"
 #include "color.h"
 
+#define	NEW	1
+
 void vtputwc(WINDP *wp, utfchar *uc);
 extern int save_trace(int n);
 extern int drv_type;
@@ -227,11 +229,11 @@ int show_key(int key)
 	ptr = function_name(key_function(key,1),&description);
 	d=description;
 	if(ptr[0]!=0) { 
-		if(strcmp("execsub",ptr)==0) snprintf(st,MAXMLEN,"subroutine [%s]",xe_key_name(key));
-		else snprintf(st,MAXMLEN,"%s = %s,",xe_key_name(key),ptr);
+		if(strcmp("execsub",ptr)==0) snprintf(st,sizeof(st),"subroutine [%s]",xe_key_name(key));
+		else snprintf(st,sizeof(st),"%s = %s,",xe_key_name(key),ptr);
 		strlcat(st,d,MAXMLEN);
 	} else {
-		snprintf(st,MAXMLEN,"%s not assigned key=%X!",xe_key_name(key),key);
+		snprintf(st,sizeof(st),"%s not assigned key=%X!",xe_key_name(key),key);
 	};
 	msg_line("%s",st);
 	return FALSE;
@@ -245,7 +247,7 @@ void msg_line(char *fmt, ...)
 	if(macro_exec && !execmd) return;
 
     va_start(args, fmt);
-    vsnprintf(mline,512, fmt, args);
+    vsnprintf(mline,sizeof(mline), fmt, args);
 	
     va_end(args);
 	
@@ -266,7 +268,7 @@ int error_line(char *error_message,...)
  va_list args;
  static char mline[512];
  	va_start(args,error_message);
-	vsnprintf(mline,511,error_message,args);
+	vsnprintf(mline,sizeof(mline),error_message,args);
 	va_end(args);
 	app_error=1;
 	msg_line("%s",mline);
@@ -501,13 +503,14 @@ void draw_window(int flag, WINDP *wp,char *from)
  // static int ind=0;
  register int i;
  // int ulines=0;
+	hide_cursor("draw_window");
 	// MESG(" draw_window: id=%d from=%s ind=%d",wp->id,from,ind);
 	drv_start_window_update(wp);
  	prepare_converter(wp->w_fp->b_lang);
 	set_window_font(wp);
 
 	// MESG("draw window lines");
-#if	GTK3
+#if	GTK
 	for (i = 0; i < wp->w_ntrows-2+half_last_line; i++) 
 #else
 	for (i = 0; i < wp->w_ntrows-1+half_last_line; i++) 
@@ -516,25 +519,22 @@ void draw_window(int flag, WINDP *wp,char *from)
 		/* for each line that needs to be updated*/
 		if ((wp->vs[i]->v_flag) ) 
 		{
-			if(wp->vs[i]->slow_line==1) wp->vs[i]->slow_line++;
-			else 
-			if(wp->vs[i]->slow_line==2) 
-			{
+			if(bt_dval("slow_display")>0) {
 				drv_clear_line(wp,i);
 				wp->vtcol=0;
-				wp->vs[i]->slow_line=0;
 			};
 			draw_window_line(wp,i);
 			// ulines++;
 		}
 	};
-	// MESG("# -- draw_window:[%s] %d drawned lines %d flag=%X wflag=%X ind=%d",from,wp->id,ulines,flag,wp->w_flag,ind++);
+	// MESG("# -- draw_window:[%s] %d drawned flag=%X wflag=%X",from,wp->id,flag,wp->w_flag);
 	wp->draw_flag=0;
 	expose_window(wp); /* (use this once unstead to expose every line sepatately, is it faster??) */
-	if(flag /* && (wp->w_flag != UPD_STATUS) */) 
-	{
+
+	if(flag && (wp->w_flag != UPD_STATUS) ) {
 		show_slide(wp);
 	};
+
 	if(wp->w_flag & UPD_STATUS) {
 		status_line(wp);
 	};
@@ -658,6 +658,43 @@ int checkwords(FILEBUF *fp,char *line, int *start, char **words,int type)
 
 num utf_FLineLen(FILEBUF *fp, offs ptr);
 
+void  vput_normalize(WINDP *wp, utfchar uc)
+{
+int display_size=get_utf_length(&uc);
+
+#if USE_GLIB	// Convert to composed character if possible to view it!
+	// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
+	if(uc.uval[3]!=0 && uc.uval[0]!=0xF0)
+	{
+		// uc.uval[0]='#';uc.uval[1]=0;
+		char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
+//				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
+		if(strlen((char *)uc.uval)>strlen(composed)) {
+			strncpy((char *)uc.uval,composed,sizeof(uc.uval));
+		} else {
+//					MESG("compose normalization failed [%s][%s]",uc.uval,composed);
+			// put a similar character without accent!
+			uc.uval[utf8_countbytes(uc.uval[0])]=0;
+		};
+	};
+#endif
+	if(wp->vtcol==wp->w_ntcols-1 && display_size>1) { // do not show last double width character!
+		memset(uc.uval,0,8);
+		uc.uval[0]=' ';
+		uc.uval[1]=0;
+		vtputwc(wp,&uc);
+	} else 
+	{
+		vtputwc(wp,&uc);
+		if(display_size>1){ 	/* put a dummy char to skip  */
+			memset(uc.uval,0,8);
+			uc.uval[0]=0xFF;
+			uc.uval[1]=0xFF;
+			vtputwc(wp,&uc);
+		};
+	}
+}
+
 /*
 	put a string on a virtual screen at row,start_col,with max_size
 */
@@ -680,7 +717,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
  int rlen=0;	// real line len
  int num_columns=0;	/* columns of line number shown  */
  int last_column=wp->w_ntcols;
-
+ // MESG("vt_str: head=[%s] x=%d y=%d",header,start_col,row);
  line_bcolor=wp->w_bcolor;
 
  if(max_size>0) last_column=start_col+max_size;
@@ -728,13 +765,6 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		if(c>127) {
 			int size;
 			size=get_utf_length(&uc);
-			if((c==0xE0 /* && uc.uval[1]>=0xB0 */) || c==0xF0) { 	/* slow down for thai chars  */
-				wp->vs[row]->slow_line=1;
-#if	USE_SLOW_DISPLAY
-				wp->w_fp->slow_display=1;
-#endif
-				// MESG("set slow display");
-			}
 			col += size-1;
 			c='C';
 		};
@@ -783,51 +813,12 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 	// MESG("vt_str: num_columns=%d vtcol=%d w_infocol=%d",num_columns,wp->vtcol,wp->w_infocol);
 	for (; i <=  llen && wp->vtcol < wp->w_ntcols; i++) 
 	{	// this is the on screen shown area of the line
-		int display_size=0;
 		if(ptr1>=header_size) break;
+		utfchar uc;
 		memset(uc.uval,0,8);
-		// show selection
 
-		num char_bytes=ptr1;
 		ptr1 = SUtfCharAt(header,ptr1,&uc);
-		char_bytes = ptr1-char_bytes;
-		display_size=get_utf_length(&uc);
-		// display_size=SUtfCharLen(header,ptr1,&uc);
-		c=uc.uval[0];
-#if USE_GLIB	// Convert to composed character if possible to view it!
-		// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
-		if(uc.uval[3]!=0)
-		{
-			char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
-//				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
-			if(strlen((char *)uc.uval)>strlen(composed)) {
-				strncpy((char *)uc.uval,composed,sizeof(uc.uval));
-			} else {
-//					MESG("compose normalization failed [%s][%s]",uc.uval,composed);
-				// put a similar character without accent!
-				uc.uval[utf8_countbytes(uc.uval[0])]=0;
-			};
-		};
-#endif
-		if(wp->vtcol==wp->w_ntcols-1 && display_size>1) { // do not show last double width character!
-			memset(uc.uval,0,8);
-			uc.uval[0]=' ';
-			uc.uval[1]=0;
-			vtputwc(wp,&uc);
-		} else 
-		{
-			vtputwc(wp,&uc);
-			if(display_size>1){ 	/* put a dummy char to skip  */
-				while(display_size>1)	// this may be unecessary!
-				{
-					memset(uc.uval,0,8);
-					uc.uval[0]=0xFF;
-					uc.uval[1]=0xFF;
-					vtputwc(wp,&uc);
-					display_size--;
-				};		
-			};
-		}
+		vput_normalize(wp, uc);
 	};
 	/* highlight according to evaluated mask */
 	int start_color_column=num_columns;
@@ -907,6 +898,7 @@ vchar *init_vt_line(WINDP *wp)
 	v_text[i].uval[0]=0;
 	v_text[i].bcolor=wp->w_bcolor;
  };
+ set_utf8_error(0);
  return v_text;
 }
 
@@ -1033,12 +1025,12 @@ char *set_info_mask(WINDP *wp,num ptr1,num line_num)
 {
  static char info_mask[20];
 	if(wp->w_fp->view_mode == VMLINES) {
-		snprintf(info_mask,11,"%07llu ",line_num+1);
+		snprintf(info_mask,sizeof(info_mask),"%07llu ",line_num+1);
 	} else {
 		if(wp->w_fp->view_mode == VMOFFSET) {
-			snprintf(info_mask,11,"%07llX ",ptr1);
+			snprintf(info_mask,sizeof(info_mask),"%07llX ",ptr1);
 		} else {
-			snprintf(info_mask,11,"==");
+			snprintf(info_mask,sizeof(info_mask),"==");
 		}
 	};
  return info_mask;
@@ -1158,18 +1150,13 @@ offs vtline(WINDP *wp, offs tp_offs)
 	else
 	for (i=0;  col<first_column  &&  i < llen; ++i) { // invisible characters before first column shown
 		if(fp->b_lang == 0 && !utf8_error()) {
+			utfchar uc;
 			ptr1 = FUtfCharAt(fp,ptr1,&uc);
 			c=uc.uval[0];
 			
 			if(c>127) {
 				int size;
 				size=get_utf_length(&uc);
-				if(c==0xE0 /* &&  uc.uval[1]>=0xB0 */ )  {
-					wp->vs[wp->vtrow]->slow_line=1;
-#if	USE_SLOW_DISPLAY
-					fp->slow_display=1; /* slow down for thai chars  */
-#endif
-				};
 				col += size-1;
 				c='m';
 			};
@@ -1225,7 +1212,6 @@ offs vtline(WINDP *wp, offs tp_offs)
 	};
 	for (; i <  llen && wp->vtcol < wp->w_ntcols; i++) 
 	{	// this is the on screen shown area of the line
-		int display_size=0;
 		memset(uc.uval,0,8);
 		// show selection
 		if(wp->selection) {
@@ -1242,55 +1228,8 @@ offs vtline(WINDP *wp, offs tp_offs)
 		};
 
 		if(fp->b_lang == 0 && !utf8_error()) {
-			num char_bytes=ptr1;
 			ptr1 = FUtfCharAt(fp,ptr1,&uc);
-			char_bytes = ptr1-char_bytes;
-			display_size=get_utf_length(&uc);
-			c=uc.uval[0];
-			if(c==0xE0 /* && uc.uval[1]>=0xB0 */){
-				wp->vs[wp->vtrow]->slow_line=1;
-#if	USE_SLOW_DISPLAY
-				fp->slow_display=1;	/* slow down for thai chars  */
-#endif
-			};
-#if USE_GLIB	// Convert to composed character if possible to view it!
-			// if(uc.uval[2]==0xCC || uc.uval[2]==0xCD || ((uc.uval[1]==0xCC||uc.uval[1]==0xCD))) 
-			if(uc.uval[3]!=0)
-			{
-				char *composed = g_utf8_normalize((char *)uc.uval,-1,G_NORMALIZE_ALL_COMPOSE);
-//				MESG("[%s] -> [%s] display_size=%d bytes=%d",uc.uval,composed,display_size,char_bytes);
-				if(strlen((char *)uc.uval)>strlen(composed)) {
-					strncpy((char *)uc.uval,composed,sizeof(uc.uval));
-				} else {
-//					MESG("compose normalization failed [%s][%s]",uc.uval,composed);
-					// put a similar character without accent!
-					uc.uval[utf8_countbytes(uc.uval[0])]=0;
-				};
-			} else {
-//				if(uc.uval[2]>0)
-//				MESG("-- %s   ] display_size=%d",uc.uval,display_size);
-			};
-#endif
-			if(wp->vtcol==wp->w_ntcols-1 && display_size>1) { // do not show last double width character!
-				memset(uc.uval,0,8);
-				uc.uval[0]=' ';
-				uc.uval[1]=0;
-				vtputwc(wp,&uc);
-			} else 
-			{
-				vtputwc(wp,&uc);
-//				MESG("	col %d put: size=%d %X",wp->vtcol,display_size,uc.uval[0]);
-				if(display_size>1){ 	/* put a dummy char to skip  */
-					while(display_size>1)	// this may be unecessary!
-					{
-						memset(uc.uval,0,8);
-						uc.uval[0]=0xFF;
-						uc.uval[1]=0xFF;
-						vtputwc(wp,&uc);
-						display_size--;
-					};		
-				};
-			}
+			vput_normalize(wp,uc);
 		} else {
 			vtputc(wp, FCharAt(fp,ptr1++));
 		}
@@ -1932,12 +1871,12 @@ int  show_position_info(num short_version)
 			char finfo[MAXFLEN];
 	
 			sstat=dir_getfile(finfo,2);
-			sstat=snprintf(str,MAXSLEN,"%6lld|%s",getcline()+1,finfo);
+			sstat=snprintf(str,sizeof(str),"%6lld|%s",getcline()+1,finfo);
 		} else {
-			sstat=snprintf(str,MAXSLEN,"%6lld",getcline()+1);
+			sstat=snprintf(str,sizeof(str),"%6lld",getcline()+1);
 		};
 	  } else {
-		sstat=snprintf(str,MAXSLEN,"%s",get_notes_status());
+		sstat=snprintf(str,sizeof(str),"%s",get_notes_status());
 	  };
 	} else
 #else
@@ -1948,9 +1887,9 @@ int  show_position_info(num short_version)
 			char finfo[MAXFLEN];
 		
 			sstat=dir_getfile(finfo,2);
-			sstat=snprintf(str,MAXSLEN,"%6lld|%s",getcline()+1,finfo);
+			sstat=snprintf(str,sizeof(str),"%6lld|%s",getcline()+1,finfo);
 		} else {
-			sstat=snprintf(str,MAXSLEN,"%6lld",getcline()+1);
+			sstat=snprintf(str,sizeof(str),"%6lld",getcline()+1);
 		};
 	} else
 #endif 
@@ -1959,8 +1898,8 @@ int  show_position_info(num short_version)
 	// MESG("show_position_info: o=%ld loff=%ld b_flag=%X b_mode=%X b_state=%X",Offset(),loffs,fp->b_flag,fp->b_mode,fp->b_state);
 	if(fp->view_mode & VMHEX) {
 		if(short_version==0) {
-			sstat=snprintf(str,MAXSLEN,"%5lld %5llX (%02lX)",Offset(),Offset(),utf_value());
-		} else sstat=snprintf(str,MAXSLEN,"%5llX",Offset());
+			sstat=snprintf(str,sizeof(str),"%5lld %5llX (%02lX)",Offset(),Offset(),utf_value());
+		} else sstat=snprintf(str,sizeof(str),"%5llX",Offset());
 	} else {
 	  	// MESG("show row/col info");
 #if	1
@@ -1969,16 +1908,16 @@ int  show_position_info(num short_version)
 		col=GetCol()+1;
 #endif
 		if(short_version) {
-			sstat=snprintf(str,MAXSLEN,"%6lld",getcline()+1);
+			sstat=snprintf(str,sizeof(str),"%6lld",getcline()+1);
 		} else {
 			if(Eol()) {
 				if(is_wrap_text(fp)){
-					sstat=snprintf(str,MAXSLEN,"%6lld %7lld ",getcline()+1,loffs);
+					sstat=snprintf(str,sizeof(str),"%6lld %7lld ",getcline()+1,loffs);
 				} else {
 				if(bt_dval("show_coffset")) {
-					sstat=snprintf(str,MAXSLEN,"%6lld %7lld %7lld ",getcline()+1,Offset(),col);
+					sstat=snprintf(str,sizeof(str),"%6lld %7lld %7lld ",getcline()+1,Offset(),col);
 				} else {
-					sstat=snprintf(str,MAXSLEN,"%6lld %7lld %7lld ",getcline()+1,loffs,col);
+					sstat=snprintf(str,sizeof(str),"%6lld %7lld %7lld ",getcline()+1,loffs,col);
 				};
 				}
 				if(FOffset(cwp->w_fp)==FSize(cwp->w_fp)) strlcat(str,"EOF",MAXSLEN);
@@ -1990,7 +1929,7 @@ int  show_position_info(num short_version)
 					else strlcat(str,"    ",MAXSLEN);
 				};
 			} else {
-				sstat=snprintf(str,MAXSLEN,"%6lld ",getcline()+1);
+				sstat=snprintf(str,sizeof(str),"%6lld ",getcline()+1);
 				
 				if(is_wrap_text(fp)){
 					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",loffs);
@@ -2146,10 +2085,13 @@ void update_window_nowrap(WINDP *wp,int force)
 				} else {
 					upd_part(wp,"update_screen: 4");
 				};
-			} else
+			}
+#if	1
+			 else
 			if(update_all) {
 				upd_all_virtual_lines(wp,"update_screen:8");
 			};
+#endif
 		};
 		if ((wp->w_flag & UPD_STATUS) || force) {
 			status_line(wp);	/* update statusline */
@@ -2704,7 +2646,7 @@ void allocate_virtual_window(WINDP *wp)
 		exit(1);
 	};
 	vp->v_flag=0;
-	vp->slow_line=0;
+	// vp->slow_line=0;
 	wp->vs[i]=vp;
  };
  // set the last one as NULL to know till where to free!

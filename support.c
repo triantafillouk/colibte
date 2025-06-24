@@ -97,53 +97,53 @@ char *get_pfname(char *dir_name,char *file_name,int len)
  if((dlen+flen) < len-1) {
 // 	MESG("len=%d dlen=%d dir_name=[%s] file_name=[%s]",len,dlen,dir_name,file_name);
 	if(dlen) {
-	 	if(flen && dlen>0) snprintf(view_name,MAXFLEN,"%s/%s",dir_name,file_name);
-		else snprintf(view_name,MAXFLEN,"%s",dir_name);
+	 	if(flen && dlen>0) snprintf(view_name,sizeof(view_name),"%s/%s",dir_name,file_name);
+		else snprintf(view_name,sizeof(view_name),"%s",dir_name);
 	} else {
-		snprintf(view_name,MAXFLEN,"%s",file_name);
+		snprintf(view_name,sizeof(view_name),"%s",file_name);
 	}
 	// MESG("get_pfname:1 [%s]",view_name);
 	return view_name;
  };
  if(flen>len-2) {
 #if	TEST3
-	snprintf(view_name,MAXFLEN,">/%s",utf8_rtruncate(file_name,len-2));
+	snprintf(view_name,sizeof(view_name),">/%s",utf8_rtruncate(file_name,len-2));
 #else
  	int start=flen-len+1;
-	snprintf(view_name,MAXFLEN,"./%s",file_name+start);
+	snprintf(view_name,sizeof(view_name),"./%s",file_name+start);
 #endif
 	// MESG("get_pfname:2 [%s]",view_name);
 	return view_name;
  };
  if(flen>len) {
 #if	TEST3
-	snprintf(view_name,MAXFLEN,">/%s",utf8_rtruncate(file_name,len-1));
+	snprintf(view_name,sizeof(view_name),">/%s",utf8_rtruncate(file_name,len-1));
 #else
  	int start=flen-len+1;
- 	snprintf(view_name,MAXFLEN,".%s",file_name+start);
+ 	snprintf(view_name,sizeof(view_name),".%s",file_name+start);
 #endif
 	// MESG("get_pfname:3 [%s]",view_name);
 	return view_name;
  };
  if((dlen-flen) < len-2) {
 #if	TEST3
-	if(flen) snprintf(view_name,MAXFLEN,">%s/%s",utf8_rtruncate(dir_name,len-flen-2),file_name);
-	else snprintf(view_name,MAXFLEN,">%s",utf8_rtruncate(dir_name,len-flen-2));
+	if(flen) snprintf(view_name,sizeof(view_name),">%s/%s",utf8_rtruncate(dir_name,len-flen-2),file_name);
+	else snprintf(view_name,sizeof(view_name),">%s",utf8_rtruncate(dir_name,len-flen-2));
 #else
 	int start= dlen-(len-flen-2);
-	if(flen) snprintf(view_name,MAXFLEN,".%s/%s",dir_name+start,file_name);
-	else snprintf(view_name,MAXFLEN,".%s",dir_name+start);
+	if(flen) snprintf(view_name,sizeof(view_name),".%s/%s",dir_name+start,file_name);
+	else snprintf(view_name,sizeof(view_name),".%s",dir_name+start);
 #endif
  	// MESG("get_pfname:4 [%s]",view_name);
 	return view_name;
  };
 #if	TEST3
- if(flen) snprintf(view_name,MAXFLEN,">%s/%s",utf8_rtruncate(dir_name,len-flen-2),file_name);
- else snprintf(view_name,MAXFLEN,">%s",utf8_rtruncate(dir_name,len-flen-2)); 
+ if(flen) snprintf(view_name,sizeof(view_name),">%s/%s",utf8_rtruncate(dir_name,len-flen-2),file_name);
+ else snprintf(view_name,sizeof(view_name),">%s",utf8_rtruncate(dir_name,len-flen-2)); 
 #else
  int start=dlen-(len-flen-2);
- if(flen) snprintf(view_name,MAXFLEN,".%s/%s",dir_name+start,file_name);
- else snprintf(view_name,MAXFLEN,".%s",dir_name+start); 
+ if(flen) snprintf(view_name,sizeof(view_name),".%s/%s",dir_name+start,file_name);
+ else snprintf(view_name,sizeof(view_name),".%s",dir_name+start); 
 #endif
 
  // MESG("get_pfname:5 [%s]",view_name);
@@ -219,8 +219,8 @@ char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_no
 	int slen=0;
 	// MESG("find_file:fname=[%s] in subdir=[%s] check_start_dir=%d [%s]",fname,subdir,check_start_dir,start_dir_val);	
 	if(check_start_dir) { // check application's start dir
-		if(subdir[0]!=0) slen=snprintf(fspec,MAXFLEN,"%s/%s/%s",start_dir_val,subdir,fname);
-		else slen=snprintf(fspec,MAXFLEN,"%s/%s",get_start_dir(),fname);
+		if(subdir[0]!=0) slen=snprintf(fspec,sizeof(fspec),"%s/%s/%s",start_dir_val,subdir,fname);
+		else slen=snprintf(fspec,sizeof(fspec),"%s/%s",get_start_dir(),fname);
 		if(slen>MAXFLEN) { MESG("truncated!");return NULL;};
 		if(file_exist(fspec)) {
 			// MESG("	found [%s]",fspec);
@@ -229,22 +229,22 @@ char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_no
 	}; 
 	
 	// check the home dir under app dir
-	if(subdir[0]!=0) snprintf(fspec,MAXFLEN,"%s/%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,subdir,fname);
-	else snprintf(fspec,MAXFLEN,"%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,fname);
+	if(subdir[0]!=0) snprintf(fspec,sizeof(fspec),"%s/%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,subdir,fname);
+	else snprintf(fspec,sizeof(fspec),"%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,fname);
 	if(file_exist(fspec)) {
 		// MESG("	found [%s]",fspec);
 		return(fspec);
 	};
 
 	// check the home dir
-	if(subdir[0]!=0) snprintf(fspec,MAXFLEN,"%s/%s/%s",getenv("HOME"),subdir,fname);
-	else snprintf(fspec,MAXFLEN,"%s/%s",getenv("HOME"),fname);
+	if(subdir[0]!=0) snprintf(fspec,sizeof(fspec),"%s/%s/%s",getenv("HOME"),subdir,fname);
+	else snprintf(fspec,sizeof(fspec),"%s/%s",getenv("HOME"),fname);
 	if(file_exist(fspec)) {
 		// MESG("	found [%s]",fspec);
 		return(fspec);
 	};
 
-	snprintf(fspec,MAXFLEN,"%s/%s/%s",APPLICATION_DIR,subdir,fname);
+	snprintf(fspec,sizeof(fspec),"%s/%s/%s",APPLICATION_DIR,subdir,fname);
 
 	if(file_exist(fspec)) {
 		// MESG("	found [%s]",fspec);
@@ -272,8 +272,8 @@ char *find_file(char *subdir, char *fname, int check_start_dir, int create_if_no
 			if (*path == PATHCHR) ++path;
 		};
 	if(create_if_not_found) {	/* Create it in . home dir  */
-		if(subdir) 	slen=snprintf(fspec,MAXFLEN,"%s/%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,subdir,fname);
-		else slen=snprintf(fspec,MAXFLEN,"%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,fname);
+		if(subdir) 	slen=snprintf(fspec,sizeof(fspec),"%s/%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,subdir,fname);
+		else slen=snprintf(fspec,sizeof(fspec),"%s/%s/%s",getenv("HOME"),APPLICATION_DOT_DIR,fname);
 		// MESG("create new file [%s]",fspec);
 		return(fspec);
 	} else
@@ -302,7 +302,7 @@ void ERROR(const char *fmt, ...)
  static char mline[512];
     if (fmt != NULL) {
 		va_start(args,fmt);
-		vsnprintf(mline,511,fmt,args);
+		vsnprintf(mline,sizeof(mline),fmt,args);
 		va_end(args);
 		msg_log(1,mline);
 		msg_line(mline);
@@ -317,7 +317,7 @@ void SYS_ERROR(const char *fmt, ...)
  static char mline[512];
     if (fmt != NULL) {
 		va_start(args,fmt);
-		vsnprintf(mline,511,fmt,args);
+		vsnprintf(mline,sizeof(mline),fmt,args);
 		va_end(args);
 
 		if(errno) {
@@ -343,7 +343,7 @@ void MESG(const char *fmt, ...)
 
     if (fmt != NULL) {
 		va_start(args,fmt);
-		vsnprintf(mline,511,fmt,args);
+		vsnprintf(mline,sizeof(mline),fmt,args);
 		va_end(args);
 
 		if(mline[0]!=0) 	/*   */

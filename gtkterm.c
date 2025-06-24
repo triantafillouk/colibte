@@ -8,6 +8,10 @@
 
 #include "xe.h"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-prototypes"
+
+#pragma GCC diagnostic ignored "-Wno-deprecated-declarations"
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
 #include <glib.h>
@@ -354,7 +358,7 @@ void titletext ()
 {
     char buf[MAXFLEN];
 	if(parent == NULL) return ;
-	snprintf(buf,MAXFLEN,"%s",cbfp->b_fname);
+	snprintf(buf,sizeof(buf),"%s",cbfp->b_fname);
 	gtk_window_set_title(GTK_WINDOW(parent), buf);
 }
 
@@ -597,8 +601,10 @@ int put_wtext1(WINDP *wp, int row,int col, int pos_x)
 	 	// PangoLayout *layout;
 		int width=0,height=0;
 		if(wd->layout == NULL) wd->layout = pango_cairo_create_layout (GTK_EDIT_DISPLAY(wp->gwp->draw)->cr);
+		// MESG("pw1: [%s]",vstr);
 		pango_layout_set_text (wd->layout, vstr, -1);
 		// MESG("row=%2d col=%3d [%s][%2X %2X %2X %2X]",row,col,vstr,vstr[0],vstr[1],vstr[2],vstr[3]);
+		 // MESG("!");
 		pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
 		// pango_font_description_free (desc);
 		pango_cairo_show_layout (wd->cr, wd->layout);
@@ -1366,7 +1372,7 @@ void color_button_select_fg(GtkWidget *wd, gpointer data)
 {
   color_element *ce = (color_element *)data;
   char label[MAXSLEN];
-  snprintf(label,MAXSLEN,"%s foreground",ce->label);
+  snprintf(label,sizeof(label),"%s foreground",ce->label);
   current_color_element=ce;
   foreground_changed=1;
   color_selection(label,ce->fg);
@@ -1376,7 +1382,7 @@ void color_button_select_bg(GtkWidget *wd, gpointer data)
 {
   color_element *ce = (color_element *)data;
   char label[MAXSLEN];
-  snprintf(label,MAXSLEN,"%s background",ce->label);
+  snprintf(label,sizeof(label),"%s background",ce->label);
   current_color_element=ce;
   foreground_changed=0;
   color_selection(label,ce->bg);
@@ -1577,7 +1583,7 @@ int set_color(num n)
 	return(1);
  }; 
 
- snprintf(wtitle,256,"set color %lld",n);
+ snprintf(wtitle,sizeof(wtitle),"set color %lld",n);
  changed_color=n;
 
  colors_win = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -1656,392 +1662,6 @@ void drv_show_menu_popup(GtkWidget *popup_menu)
 	gtk_menu_popup(GTK_MENU(popup_menu),NULL,NULL,NULL,NULL,1,0);
 }
 
-// approximately find length of a character. this is almost black magic..
-int get_pango_length(char *st)
-{
- int width,height;
- // MESG("get_pango_length:");
- if(st[0]<0x80) return CLEN;	/* suppose that all asci have CLEN display size  */
- if(cwp==NULL) return 0;
- if(cwp->gwp==NULL) return 0;
- if(cwp->gwp->draw==NULL) return 0;
- // MESG("get_pango_length:1");
-
-	GeEditDisplay *wd = GTK_EDIT_DISPLAY(cwp->gwp->draw);
- // MESG("get_pango_length:2");
-
-	if(wd->layout==NULL) {
-		// MESG("layout is null!!!");
-		return 0;
-	};
- // MESG("get_pango_length:3");
-
-	pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
-	pango_layout_set_text (wd->layout, st, -1);
-	pango_layout_get_size (wd->layout, &width, &height);
-	// if(st[0]>0x80)
-// 	MESG("pango_len:[%2X %2X %2X %2x] w=%d CLEN=%f",st[0],st[1],st[2],st[3],width/PANGO_SCALE,CLEN);
-	return width/PANGO_SCALE;
-}
-
-// Different for each platform, screen driver
-int get_utf_length(utfchar *utf_char_str)
-{
- int b0;
- if(utf_char_str->uval[0]<128) return 1;
- if(clen_error) { return 1;};
- int plen=get_pango_length((char *)utf_char_str->uval);
- if(plen!=0) {
-	// MESG("utf_length from pango:[%s] %d",(char *)utf_char_str->uval,plen);
- 	if(plen<=(int)CLEN) return 1;
-	else return 2;
- };
-
- // Use manual evaluation of display length !
- b0=utf_char_str->uval[0];
- if(b0==0) return 0;
- if(b0<128) return 1;
-
-#if	DARWIN | 1
- // accents do not take space in mac 
- if((b0==0xCC || b0==0xCD) && utf_char_str->uval[1]< 0xB0) return 0;
-#else
- // accents do take space in WSL exept when converted to composed.
- if((b0==0xCC || b0==0xCD) && utf_char_str->uval[1]< 0xB0) return 1;
-#endif
- if(b0<0xE1) return 1;
- if(b0==0xE2) {
-	int b1=utf_char_str->uval[1];
-	if(b1 == 0x80) {
-		int b2=utf_char_str->uval[2];
-		if(b2==0x80) return 1; 	/* 1/4 en  */
-		if(b2==0x8B) return 0;	/* zero space  */
-		if(b2==0x8C) return 0;	/* zero space  */
-		if(b2==0x8D) return 0;	/* zero space  */
-		return 1;
-	};
-	if(b1==0x81 || b1==0x82) return 1; 	/* diacriticals, subscripts, currency symbols  */
-	if(b1 == 0x83) {
-		int b2=utf_char_str->uval[2];
-		if(b2 > 0x8F && b2< 0xb1) return 0;	/* combining characters */
-		return 1;
-	};
-	if(b1 == 0x92) return 2;
-	if(b1 == 0x93) return 2;
-	if(b1 == 0xB0) {
-		int b2=utf_char_str->uval[2];
-		if(b2==0x80) return 1;
-		if(b2==0x85) return 1;
-		if(b2==0x8D) return 1;
-		if(b2==0x91) return 1;
-		if(b2==0x93) return 1;
-		if(b2==0x98) return 1;
-		if(b2==0x99) return 1;
-		if(b2==0xA0) return 1;
-		if(b2>=0xB0 && b2<0xBF) return 1;
-		return 2;
-	};
-	if(b1 == 0xB1) {
-		int b2=utf_char_str->uval[2];
-		if(b2==0x86) return 2;
-		if(b2==0x92) return 2;
-		if(b2==0xA7) return 2;
-		if(b2==0xA9) return 2;
-		if(b2==0xB2) return 2;
-		if(b2==0xB3) return 2;
-
-		if(b2<=0xBF) return 1;
-		return 2;
-	}
-	if(b1 > 0x83 && b1< 0xBA) {
-		return 1; 	/* should be 2 in most cases ...  */
-	};
- 	return 2;
- };
- if(b0==0xEA) {
- 	int b1=utf_char_str->uval[1];
-	if(b1==0x99) {
-		int b2=utf_char_str->uval[2];
-		if(b2==0x88) return 2;
-		if(b2<0x8C) return 1;
-		if(b2==0x8F) return 1;
-		if(b2==0x97) return 1;
-		if(b2==0x99) return 1;
-		if(b2==0x9F) return 1;
-		if(b2==0xA1) return 1;
-		if(b2==0xA3) return 1;
-		if(b2==0xA5) return 1;
-		if(b2==0xA9) return 1;
-		if(b2==0xAB) return 1;
-		return 2;
-	};
-	if(b1==0x9A) {
-		int b2=utf_char_str->uval[2];
-		if(b2<0x84) return 1;
-		if(b2==0x89) return 1;
-		if(b2==0x8B) return 1;
-		if(b2==0x8C) return 1;
-		if(b2==0x8D) return 1;
-		if(b2==0x8F) return 1;
-		if(b2==0x90) return 1;
-		if(b2==0x91) return 1;
-		if(b2==0x93) return 1;
-		if(b2==0x95) return 1;
-		return 2;
-	};
-	if(b1==0x9C) {
-		int b2=utf_char_str->uval[2];
-		if(b2==0xA8) return 2;
-		if(b2==0xA9) return 2;
-		if(b2<0xB2) return 1;
-		if(b2==0xB9) return 1;
-		if(b2==0xBB) return 1;
-		if(b2==0xBD) return 1;
-		if(b2==0xBF) return 1;
-		return 2;
-	}	
-	if(b1==0x9D) {
-		int b2=utf_char_str->uval[2];
-		if(b2==0x88) return 1;
-		if(b2==0x8F) return 2;
-		if(b2==0x90) return 1;
-		if(b2==0x9A) return 1;
-		if(b2==0xA4) return 1;
-		if(b2==0xA6) return 1;
-		if(b2==0xAE) return 1;
-		if(b2==0xBA) return 1;
-		if(b2==0xBB) return 1;
-		if(b2==0xBC) return 1;
-		if(b2==0xBE) return 1;
-		if(b2==0xAE) return 1;
-		if((b2%2)==1) return 1;
-		return 2;
-	};
-	if(b1==0x9E) {
-		int b2=utf_char_str->uval[2];
-		// if(b2==0x81) return 2;
-		if(b2==0x82) return 2;
-		if(b2==0xA0) return 2;
-		if(b2==0xA2) return 2;
-		if(b2==0xA4) return 2;
-		if(b2==0xA6) return 2;
-		return 1;
-	};
-	return 2;
- };
- if(b0>=0xEA && b0<0xED) return 2;	/* Korean  */
- if(b0==0xEF) {
-	int b1=utf_char_str->uval[1];
-	if(b1==0xBC ) {
-		return 2;	/* comma with added space etc  */
-	};
-	if(b1==0xBD) {
-		int b2=utf_char_str->uval[2];
-		if(b2>=0x80 && b2<0xA1) return 2;
-	};
- 	return 1;
- };
- if(b0==0xF0) {
-	int b1=utf_char_str->uval[1];
-	if(b1==0x90) {
-		int b2=utf_char_str->uval[2];
-		if(b2==0x90) {
-			int b3=utf_char_str->uval[3];
-			if(b3==0x80) return 1;
-			if(b3==0xA8) return 1;
-		};
-		if(b2==0x91) {
-			int b3=utf_char_str->uval[3];
-			if(b3==0x8D) return 1;
-			if(b3==0x8E) return 1;
-			if(b3==0x8F) return 1;
-		};
-		return 2;
-	};
-	if(b1==0x9F) {
-// 		int b2=utf_char_str->uval[2];
-		// if (b2==0x84) return 1;
-		return 2;
-	};
-	if(b1==0x9D) {
-		int b2=utf_char_str->uval[2];
-		if(b2==0x90) {
-			int b3=utf_char_str->uval[3];
-			if(b3==0x85) return 1;
-			if(b3==0x88) return 1;
-			if(b3==0x89) return 1;
-			if(b3==0x8F) return 1;
-			if(b3==0x92) return 1;
-
-			if(b3< 0x99) return 2;
-			if(b3==0xA6) return 2;
-			if(b3==0xB0) return 2;
-			if(b3==0xB6) return 2;
-			if(b3==0xB7) return 2;
-			if(b3==0xB8) return 2;
-			if(b3==0xBA) return 2;
-		return 1;
-		};
-		if(b2==0x91) {
-			int b3=utf_char_str->uval[3];
-			if(b3==0x80) return 2;
-			if(b3==0x81) return 2;
-			if(b3==0x82) return 2;
-			if(b3==0x84) return 2;
-			// if(b3==0x87) return 2;
-			if(b3==0x88) return 2;
-			// if(b3==0x89) return 2;
-			if(b3==0x8A) return 2;
-			// if(b3==0x8B) return 2;
-			// if(b3==0x8C) return 2;
-			if(b3==0xAB) return 2;
-			if(b3==0xAC) return 2;
-			if(b3==0xAD) return 2;
-			if(b3==0xAE) return 2;
-			if(b3==0xAF) return 2;
-			if(b3==0xB2) return 2;
-			if(b3==0xB4) return 2;
-			if(b3==0xB5) return 2;
-			if(b3==0xB6) return 2;
-			// if(b3==0xB7) return 2;
-			if(b3==0xB8) return 2;
-			// if(b3==0xBB) return 2;
-			if(b3==0xBC) return 2;
-			if(b3==0xBD) return 2;
-			if(b3==0xBE) return 2;
-			if(b3==0xBF) return 2;
-			return 1;
-		};
-		if(b2==0x9A) {
-			int b3=utf_char_str->uval[3];
-			if(b3<=0xA3) return 1;
-
-			if(b3==0xAB) return 2;
-			if(b3==0xAE) return 2;
-			if(b3==0xAF) return 2;
-			if(b3==0xB1) return 2;
-			if(b3==0xB2) return 2;
-			if(b3==0xB3) return 2;
-			if(b3==0xB4) return 2;
-			if(b3==0xB5) return 2;
-			if(b3==0xB6) return 2;
-			if(b3==0xB7) return 2;
-			if(b3==0xBB) return 2;
-			if(b3==0xBC) return 2;
-			if(b3==0xBD) return 2;
-			if(b3==0xBE) return 2;
-			if(b3==0xBF) return 2;
-			return 1;
-		};
-		if(b2==0x9B) {
-			int b3=utf_char_str->uval[3];
-			if(b3==0x80) return 2;
-			if(b3==0x97) return 2;
-			if(b3==0x99) return 2;
-			if(b3==0x9A) return 2;
-			if(b3==0xA8) return 2;
-			if(b3==0xA9) return 2;
-			if(b3==0xAB) return 2;
-			// if(b3==0xAC) return 2;
-			if(b3==0xAD) return 2;
-			if(b3==0xAE) return 2;
-			if(b3==0xAF) return 2;
-			if(b3==0xB0) return 2;
-			if(b3==0xB1) return 2;
-			// if(b3==0xB2) return 2;
-			if(b3==0xB4) return 2;
-			// if(b3==0xB5) return 2;
-			if(b3==0xB6) return 2;
-			if(b3==0xB7) return 2;
-			// if(b3==0xB8) return 2;
-			if(b3==0xB9) return 2;
-			if(b3==0xBA) return 2;
-			return 1;
-		};
-		if(b2==0x9C) {
-			int b3=utf_char_str->uval[3];
-			// if(b3==0x91) return 2;
-			if(b3==0x93) return 2;
-			if(b3==0x94) return 2;
-
-			if(b3==0xA2) return 2;
-			if(b3==0xA3) return 2;
-			if(b3==0xA7) return 2;
-			if(b3==0xA8) return 2;
-			// if(b3==0xA9) return 2;
-			if(b3==0xAA) return 2;
-			if(b3==0xAB) return 2;
-			// if(b3==0xAC) return 2;
-			// if(b3==0xAF) return 2;
-			if(b3==0xAE) return 2;
-			if(b3==0xB0) return 2;
-			if(b3==0xB1) return 2;
-			if(b3==0xB2) return 2;
-			if(b3==0xB3) return 2;
-			if(b3==0xB4) return 2;
-			if(b3==0xB2) return 2;
-			return 1;
-		};
-		if(b2==0x9D) {
-			int b3=utf_char_str->uval[3];
-			// if(b3==0x8B) return 2;
-			if(b3==0x8D) return 2;
-			if(b3==0x8E) return 2;
-			if(b3==0x9C) return 2;
-			if(b3==0x9D) return 2;
-			if(b3==0xA4) return 2;
-			if(b3==0xAB) return 2;
-			if(b3==0xAD) return 2;
-			if(b3==0xAE) return 2;
-			return 1;
-		};
-		if(b2==0x9E) {
-			int b3=utf_char_str->uval[3];
-			if(b3==0x85) return 2;
-			if(b3==0x88) return 2;
-			if(b3==0x96) return 2;
-			if(b3==0x97) return 2;
-			if(b3==0x9B) return 2;
-			if(b3==0x9E) return 2;
-			if(b3==0x9F) return 2;
-			if(b3==0xA4) return 2;
-			if(b3==0xA5) return 2;
-			if(b3==0xA6) return 2;
-			if(b3==0xA7) return 2;
-			if(b3==0xA8) return 2;
-			if(b3==0xBF) return 2;
-			if(b3==0xA4) return 2;
-			if(b3==0xA4) return 2;
-			return 1;
-		}
-		if(b2==0x9F) {
-			int b3=utf_char_str->uval[3];
-			if(b3==0x81) return 2;
-			if(b3==0x82) return 2;
-		};
-		return 1;
-	}
- 	return 2;
- };
- if(b0==0xF1 || b0==0xF2) return 1;	/* do not exist in apple terminal  */
- if(b0==0xF3) return 1;
- if(b0==0xE1) {
-	int b1=utf_char_str->uval[1];
-	return 1;
- 	if(b1==0) return 1;
-	if(b1>0x83) return 2;
-	return 1;
- };
- if(b0==0xE3) {
- 	int b1=utf_char_str->uval[1];
-	if(b1==0x82) {
-		int b2=utf_char_str->uval[2];
-		if(b2==0x99) return 0;/* dakuten */
-		if(b2==0x9A) return 0;/* handakuten */
-	}
- }
- return 2;
-}
 
 #include "gtk_common.c"
 #include "menu_common.c"
