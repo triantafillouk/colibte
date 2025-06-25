@@ -74,7 +74,7 @@ int view_note(num n);
 int notes_menu_command(num n);
 int delete_tagnote(num n);
 int save_as_note(num n);
-char *get_notes_key();
-void set_local_notes_key(char *key);
-int set_notes_key(num n);
+char *get_notes_key(int key_type);
+void set_local_notes_key(char *key,int key_type);
+int set_notes_key(num key_type);
 

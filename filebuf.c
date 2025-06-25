@@ -1909,7 +1909,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 		return(i);
 	};
    status=stat(name,&st);
-	MESG_time_start("ifile0: %s",bf->b_fname);
+	// MESG_time_start("ifile0: %s",bf->b_fname);
    if(status==-1 && errno==ENOENT)
    {
 	if(name[0]!=CHR_LBRA)	msg_line("New file \"%s\"",name);
@@ -2138,7 +2138,7 @@ int	writeout(char *name, FILEBUF *bf)
 	offs   act_written;
 	char cr1[2];
 	bool bak_created=0;
-	// MESG("writeout: b_flag=%X",bf->b_flag);
+	// MESG("writeout:0 [%s][%s] b_flag=%X b_mode=%X",name,bf->b_fname, bf->b_flag,bf->b_mode);
    if(bf->b_flag & FSMMAP)
    {
      if(!strcmp(name,bf->b_fname)) {
@@ -2150,6 +2150,7 @@ int	writeout(char *name, FILEBUF *bf)
    }
 
 	if(bf->b_mode & EMCRYPT) {
+		// MESG("writeout:1 go resetkey");
 		resetkey(bf);
 		cr1[0]=26;
 		cr1[1]=0;
@@ -2158,6 +2159,7 @@ int	writeout(char *name, FILEBUF *bf)
    
    if(stat(name,&st)!=-1)
    {
+ 	 // MESG("writeout:2 stat ok!");
      if(!CheckMode(st.st_mode)) return(false);
 
 	 if(bf->FileTime != st.st_mtime)
@@ -2173,7 +2175,7 @@ int	writeout(char *name, FILEBUF *bf)
       	} else bak_created=TRUE;
 	 };
    }   else   {
-
+	 // MESG("writeout: cannot stat file %s",name);
      if(errno!=ENOENT) {
        FError(name);
        return(false);
@@ -2183,13 +2185,13 @@ int	writeout(char *name, FILEBUF *bf)
 
    errno=0;
    nfile=open(name,O_CREAT|O_RDWR|O_TRUNC,st.st_mode);
-
+	// MESG("writeout: file descriptor %d",nfile);
    if(nfile==-1)
    {
      FError(name);
 	 return error_line("cannot open file %s to write",name);
    }
-
+	// MESG("writeout: check if file is locked!");
    int lock_res=LockFile(nfile,false);
    if(lock_res==-1)   {
      close(nfile);
@@ -2197,19 +2199,21 @@ int	writeout(char *name, FILEBUF *bf)
    };
 
    if(lock_res==-2) msg_line("Warning: file %s locking failed",name);
-
+	// MESG("writeout: write buffer contents encrypt=%X",bf->b_mode);
    /* write the buffer contents */
    errno=0;
 	if(bf->b_mode & EMCRYPT) {
 		if(write(nfile,cr1,1)!=1) { SYS_ERROR("cannot write");close(nfile);return(false);};
+		// MESG("	write crypt bom: size=%ld",FSize(bf));
 	};	
+	// MESG("writeout: start writeblock size=%ld",FSize(bf));
    if(WriteBlock(nfile,0,FSize(bf),&act_written)!=true)
    {
      if(errno) FError(name);
      close(nfile);
      return(false);
    };
-
+	// MESG("writeout: act_written %ld",act_written);
 
    if(bf->bom_type!=FTYPE_UTF16BOM && act_written!=FSize(bf))
    {
@@ -3528,7 +3532,7 @@ int   WriteBlock(int fd,offs from,offs size,offs *act_written)
 {
    FILEBUF *fp=cbfp;
    offs   leftsize;
-	// MESG("writeblock: bom=%d",fp->bom_type);
+   // MESG("writeblock: bom=%d from=%ld ptr1=%ld ptr2=%ld size=%ld b_mode=%X",fp->bom_type,from,fp->ptr1,fp->ptr2,size,fp->b_mode);
    if(from<0) {
      size+=from;
      from=0;
@@ -3556,11 +3560,15 @@ int   WriteBlock(int fd,offs from,offs size,offs *act_written)
 	};
    };
    if(from>=fp->ptr1) {
-	if(fp->b_mode & EMCRYPT) crypt_string(fp->buffer+from+fp->ptr2-fp->ptr1,size);
+	if(fp->b_mode & EMCRYPT) {
+		// MESG("writeblock: crypt string %ld",size);
+		crypt_string(fp->buffer+from+fp->ptr2-fp->ptr1,size);
+	};
 	if(fp->bom_type==FTYPE_UTF16BOM) 
 		*act_written=(unsigned long int)write_utf8_as_utf16(fd,fp->buffer+from+fp->ptr2-fp->ptr1,size);
     else 
 		*act_written=write(fd,fp->buffer+from+fp->ptr2-fp->ptr1,size);
+	// MESG("writeblock: act_written %ld",*act_written);
 
 	if(fp->b_mode & EMCRYPT){
 		resetkey(fp);

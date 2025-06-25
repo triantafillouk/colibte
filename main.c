@@ -41,6 +41,7 @@ alist *color_scheme_list;
 void help_arguments(int f);
 void set_screen_update(int flag);
 void set_default_view_mode(int flag);
+void init_note_keys();
 
 struct array_dat *main_args=NULL;
 int dofile(char *fname);
@@ -106,6 +107,7 @@ int main(int argc, char **argv)
 	parse_command_line(argc,argv);
 	// MESG("main:start1");
 	set_start_dir(NULL);
+	init_note_keys();
 	if(!execmd) {
 		// MESG("init_system_clipboard");
 		init_system_clipboard();
