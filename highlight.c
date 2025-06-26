@@ -239,19 +239,19 @@ int comment_with_string(char *comment_string,int start)
  FILEBUF *fp=cbfp;
  	// MESG("comment_with_string: type=%d",start);
 	if(fp->b_flag<4) {
-		offs curoffs=Offset();
+		offs curoffs=FOffset(fp);
 		offs pos;
 		offs bol_offs;
 		int size;
 		ToLineBegin();
-		bol_offs = Offset();
+		bol_offs = FOffset(fp);
 		pos = find_string_inline(comment_string);
 		if(pos<bol_offs) {	/* not found !  */
 			if(start==C_COLSTART) ToStartColumn();
 			if(start==C_LINEEND) ToLineEnd();
 			if(start==C_LINEBEG) ToLineBegin();
-			insert_string(cbfp,comment_string,strlen(comment_string));
-			insert_string(cbfp," ",1);
+			insert_string(fp,comment_string,strlen(comment_string));
+			insert_string(fp," ",1);
 			set_Offset(curoffs+strlen(comment_string)+1);
 			size=strlen(comment_string)+1;
 		};
@@ -263,14 +263,14 @@ int comment_with_string(char *comment_string,int start)
 			int c = FCharAt(fp,pos+strlen(comment_string));
 			int space=0;
 			if(c==' '||c=='\t') space=1;
-			DeleteBlock(0,strlen(comment_string)+space);
+			DeleteBlock(fp,0,strlen(comment_string)+space);
 			if(curoffs==pos+strlen(comment_string)) { set_Offset(curoffs-strlen(comment_string));}
 			else if(curoffs>pos+strlen(comment_string)){ set_Offset(curoffs-strlen(comment_string)-space);} 
 			else {set_Offset(curoffs); }
 			size=-strlen(comment_string)-space;
 		};
 		if(cwp) set_update(cwp,UPD_EDIT);
-		set_modified(cbfp);
+		set_modified(fp);
 		return(size);
 	} else {
 		msg_line("read only!");
@@ -293,7 +293,7 @@ int comment_c(int dummy)
 		};
 		set_Offset(start);
 		// ToLineBegin();
-		s0=Offset();
+		s0=FOffset(fp);
 		pos = find_string_inline("/*");
 		if(pos<s0) {
 			set_Offset(s0);
@@ -303,9 +303,9 @@ int comment_c(int dummy)
 			insert_string(fp," */",3);
 		} else {
 			set_Offset(s0);
-			DeleteBlock(0,3);
+			DeleteBlock(fp,0,3);
 			set_Offset(end-6);
-			DeleteBlock(0,3);
+			DeleteBlock(fp,0,3);
 		};
 		setmark(0);
 	} else { 
@@ -317,19 +317,19 @@ int comment_c(int dummy)
 			set_Offset(pos+3);	
 		} else {
 			ToLineEnd();
-			pos = Offset();
+			pos = FOffset(fp);
 			insert_string(fp,"	/*   */",8);
 			set_Offset(pos+4);
 		};
 #else
 		ToLineBegin();
-		s0 = Offset();
+		s0 = FOffset(fp);
 		pos = find_string_inline("//");
 		if(pos>=s0) {
 			set_Offset(pos+3);	
 		} else {
 			ToLineEnd();
-			pos = Offset();
+			pos = FOffset(fp);
 			insert_string(fp,"	// ",4);
 			set_Offset(pos+4);
 		};
@@ -355,7 +355,7 @@ int comment_lua(int dummy)
 		};
 		set_Offset(start);
 		// ToLineBegin();
-		s0=Offset();
+		s0=FOffset(fp);
 		pos = find_string_inline("--[[");
 		if(pos<s0) {
 			set_Offset(s0);
@@ -365,20 +365,20 @@ int comment_lua(int dummy)
 			insert_string(fp," --]]",3);
 		} else {
 			set_Offset(s0);
-			DeleteBlock(0,3);
+			DeleteBlock(fp,0,3);
 			set_Offset(end-6);
-			DeleteBlock(0,3);
+			DeleteBlock(fp,0,3);
 		};
 		setmark(0);
 	} else { 
 		ToLineBegin();
-		s0 = Offset();
+		s0 = FOffset(fp);
 		pos = find_string_inline("--");
 		if(pos>=s0) {
 			set_Offset(pos+3);	
 		} else {
 			ToLineEnd();
-			pos = Offset();
+			pos = FOffset(fp);
 			insert_string(fp,"	-- ",4);
 			set_Offset(pos+4);
 		};
@@ -402,7 +402,7 @@ int comment_css2()
 		};
 		set_Offset(start);
 		// ToLineBegin();
-		s0=Offset();
+		s0=FOffset(fp);
 		pos = find_string_inline("/*");
 		if(pos<s0) {
 			set_Offset(s0);
@@ -412,20 +412,20 @@ int comment_css2()
 			insert_string(fp," */",3);
 		} else {
 			set_Offset(s0);
-			DeleteBlock(0,3);
+			DeleteBlock(fp,0,3);
 			set_Offset(end-6);
-			DeleteBlock(0,3);
+			DeleteBlock(fp,0,3);
 		};
 		setmark(0);
 	} else { 
 		ToLineBegin();
-		s0 = Offset();
+		s0 = FOffset(fp);
 		pos = find_string_inline("/*");
 		if(pos>=s0) {
 			set_Offset(pos+3);	
 		} else {
 			ToLineEnd();
-			pos = Offset();
+			pos = FOffset(fp);
 			insert_string(fp,"	/*  */ ",8);
 			set_Offset(pos+4);
 		};
@@ -500,7 +500,7 @@ int comment_html(int n)
 		};
 		set_Offset(start);
 		// ToLineBegin();
-		s0=Offset();
+		s0=FOffset(fp);
 		pos = find_string_inline("<!--");
 		if(pos<s0) {
 			set_Offset(s0);
@@ -510,14 +510,14 @@ int comment_html(int n)
 			insert_string(fp," -->",4);
 		} else {
 			set_Offset(s0);
-			DeleteBlock(0,5);
+			DeleteBlock(fp,0,5);
 			set_Offset(end-9);
-			DeleteBlock(0,4);
+			DeleteBlock(fp,0,4);
 		};
 		setmark(0);
 	} else { 
 		ToLineBegin();
-		s0 = Offset();
+		s0 = FOffset(fp);
 		insert_string(fp,"<!--   -->",10);
 		insert_newline(cbfp);
 		set_Offset(s0+5);
@@ -532,7 +532,7 @@ int comment_md(int comment_type)
  FILEBUF *fp = cbfp;
  offs pos;
  offs s0;
- offs start=Offset();
+ offs start=FOffset(fp);
  offs end;
  // if(n==3) return 0;
  	MESG("comment_md: comment_type=%d",comment_type);
@@ -547,7 +547,7 @@ int comment_md(int comment_type)
 	if(cwp->selection && comment_type==C_STARTEND) {
 		// ToLineBegin();
 		set_Offset(start);
-		s0=Offset();
+		s0=FOffset(fp);
 		pos = find_string_inline("```");
 		if(pos<s0) {
 			set_Offset(s0);
@@ -559,9 +559,9 @@ int comment_md(int comment_type)
 			insert_string(fp,"```",3);
 		} else {
 			set_Offset(s0);
-			DeleteBlock(0,3+cwp->w_fp->EolSize);
+			DeleteBlock(fp,0,3+cwp->w_fp->EolSize);
 			set_Offset(end-6-cwp->w_fp->EolSize);
-			DeleteBlock(0,3+cwp->w_fp->EolSize);
+			DeleteBlock(fp,0,3+cwp->w_fp->EolSize);
 		};
 		setmark(0);
 		set_update(cwp,UPD_MOVE);
@@ -572,41 +572,41 @@ int comment_md(int comment_type)
 	{
 		set_Offset(start);
 		if(CharAt(start)=='`') {
-			DeleteBlock(0,1);
+			DeleteBlock(fp,0,1);
 			pos=find_string_inline("`");
-			if(pos>Offset()) {
+			if(pos>FOffset(fp)) {
 				set_Offset(pos);
 			} else {
 				set_Offset(end-1);
 			};
-			DeleteBlock(0,1);
+			DeleteBlock(fp,0,1);
 		} else {
 			insert_string(fp,"`",1);
 			set_Offset(end+1);
 			insert_string(fp,"`",1);
 		};
 		set_update(cwp,UPD_MOVE);
-		set_modified(cbfp);
+		set_modified(fp);
 		return 1;
 	};
 	if(
 		// comment_type==C_LINEBEG && 
 		! cwp->selection) {
 		ToLineBegin();
-		s0 = Offset();
+		s0 = FOffset(fp);
 		set_Offset(s0);
 		pos = find_string_inline("- ");
 		set_Offset(s0);
-		MESG("	s0=%ld pos=%ld",s0,pos);
+		// MESG("	s0=%ld pos=%ld",s0,pos);
 		if(pos<s0) {
 			insert_string(fp,"- ",2);
 			set_Offset(s0+2);
 		} else {
-			DeleteBlock(0,2);	
+			DeleteBlock(fp,0,2);	
 		};
 	};
 	set_update(cwp,UPD_MOVE);
-	set_modified(cbfp);
+	set_modified(fp);
 	return 1;
 }
 

@@ -1275,10 +1275,14 @@ int recreate_notes_db(num init_db)
 						bp->b_key[0]=0;
 						bp->b_type=NOTE_TYPE;
 						// MESG(" -2 [%s] ",fname);
-						FILEBUF *ori_buf=cbfp;
-						cbfp=bp;
+#if	1
+						// FILEBUF *ori_buf=cbfp;
+						// cbfp=bp;
 						writeout(fname,bp);
-						cbfp = ori_buf;
+						// cbfp = ori_buf;
+#endif
+						MESG("	- file [%s] is encrypted",fname);
+
 						set_bt_num_val("notes_key",0);
 						notes_same++;
 					}};

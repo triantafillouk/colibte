@@ -976,7 +976,8 @@ int valid_offset(offs o_in_line,int column_goal)
 /* Scroll forward by a specified number of pages */
 int next_page(num n)
 {
- int headline=(cbfp->b_header!=NULL);
+ FILEBUF *fp=cwp->w_fp;
+ int headline=(fp->b_header!=NULL);
  num toline;
  num topline;
  if(!discmd) {
@@ -989,19 +990,19 @@ int next_page(num n)
 	n *= cwp->w_ntrows-1;
 	// MESG("next_page: n=%d w=%d",n,cwp->w_width);
 #if	TNOTES
-	if(cbfp->b_flag==FSNOTES) {
+	if(fp->b_flag==FSNOTES) {
 		set_goal_column(0,"next_page:1");
-		if(cbfp->b_tags < cwp->current_tag_line+n+headline) n=cbfp->b_tags-cwp->current_tag_line-headline;
+		if(fp->b_tags < cwp->current_tag_line+n+headline) n=fp->b_tags-cwp->current_tag_line-headline;
 		if(n==0) return FALSE;
-		// MESG("next_page: FSNOTES from %d + %d = %d max=%d",cwp->current_tag_line,n,cwp->current_tag_line+n,cbfp->b_tags);
+		// MESG("next_page: FSNOTES from %d + %d = %d max=%d",cwp->current_tag_line,n,cwp->current_tag_line+n,fp->b_tags);
 		cwp->current_tag_line+=n;
 		set_update(cwp,UPD_MOVE|UPD_WINDOW);
 		return (OK_CLRSL);
 	} else
 #endif
-	if(cbfp->b_flag & FSNOTESN || cbfp->b_flag & FSNLIST) {
+	if(fp->b_flag & FSNOTESN || fp->b_flag & FSNLIST) {
 		set_goal_column(NOTES_COLUMN+2,"next_page:2");
-		if(cbfp->b_notes < cwp->current_note_line+n+headline) n=cbfp->b_notes-cwp->current_note_line-headline;
+		if(fp->b_notes < cwp->current_note_line+n+headline) n=fp->b_notes-cwp->current_note_line-headline;
 		if(n==0) return FALSE;
 		cwp->current_note_line+=n;
 		set_update(cwp,UPD_MOVE|UPD_WINDOW);
@@ -1009,18 +1010,18 @@ int next_page(num n)
 	};
 
 #if	1
-	if(is_wrap_text(cbfp)) {
-		if(FSize(cbfp) - FOffset(cbfp)<cwp->w_width) return FALSE; 
+	if(is_wrap_text(fp)) {
+		if(FSize(fp) - FOffset(fp)<cwp->w_width) return FALSE; 
 	} else {
-		if(tp_line(cbfp->tp_current)+2>cbfp->lines) return FALSE;
-		if (FEof(cbfp)) return FALSE;
+		if(tp_line(fp->tp_current)+2>fp->lines) return FALSE;
+		if (FEof(fp)) return FALSE;
 	};
 #else
-	if (FEof(cbfp)) return FALSE;
+	if (FEof(fp)) return FALSE;
 #endif
 
 	toline=tp_line(cwp->tp_current);
-	if(is_wrap_text(cbfp)) {
+	if(is_wrap_text(fp)) {
 		// set new topline
 		offs o=tp_offset(cwp->tp_hline);
 		// offs co=tp_offset(cwp->tp_current);
@@ -1045,8 +1046,8 @@ int next_page(num n)
 	} else {
 	cwp->w_ppline = tp_line(cwp->tp_current)-tp_line(cwp->tp_hline)+1;
 	topline=tp_line(cwp->tp_hline);
-	if(toline+n > cbfp->lines) {
-		toline=cbfp->lines;
+	if(toline+n > fp->lines) {
+		toline=fp->lines;
 		topline=toline-cwp->w_ntrows/2;
 		if(topline<0) topline=0;
 	} else {
@@ -1069,10 +1070,11 @@ int next_page(num n)
 /* Scroll backward by a specified number of pages. */
 int prev_page(num num_pages)
 {
+ FILEBUF *fp = cwp->w_fp;
  num toline;
- int headline=(cbfp->b_header!=NULL);
+ int headline=(fp->b_header!=NULL);
  int num_lines = num_pages*(cwp->w_ntrows-1)+1;
- if(is_wrap_text(cbfp)) num_lines = num_pages*(cwp->w_ntrows-1);
+ if(is_wrap_text(fp)) num_lines = num_pages*(cwp->w_ntrows-1);
  if(!discmd) {
 	// no page defined yet without window!
 	// we must define a default page lenght
@@ -1082,7 +1084,7 @@ int prev_page(num num_pages)
  if (num_pages<0) return (next_page(-num_pages));
 
 #if	TNOTES
-	if(cbfp->b_flag==FSNOTES) {
+	if(fp->b_flag==FSNOTES) {
 		set_goal_column(0,"prev_page:1");
 		if(num_lines > cwp->current_tag_line+headline) num_lines=cwp->current_tag_line;
 		if(num_lines==0) return FALSE;
@@ -1093,8 +1095,8 @@ int prev_page(num num_pages)
 		return (OK_CLRSL);
 	} else
 #endif
-	// MESG("prev_page: b_flag=%X num_lines=%d",cbfp->b_flag,num_lines);
-	if(cbfp->b_flag & FSNOTESN || cbfp->b_flag & FSNLIST) {
+	// MESG("prev_page: b_flag=%X num_lines=%d",fp->b_flag,num_lines);
+	if(fp->b_flag & FSNOTESN || fp->b_flag & FSNLIST) {
 		set_goal_column(NOTES_COLUMN+2,"prev_page:1");
 		if(num_lines > cwp->current_note_line+headline) num_lines=cwp->current_note_line;
 
@@ -1107,9 +1109,9 @@ int prev_page(num num_pages)
 		return (OK_CLRSL);
 	};
 
- if(FBof(cbfp)) return (false);
+ if(FBof(fp)) return (false);
  toline=tp_line(cwp->tp_current);
- if(is_wrap_text(cbfp)) {
+ if(is_wrap_text(fp)) {
  	offs o=tp_offset(cwp->tp_hline);
 	// int num_lines=n;
 	int nline=num_lines;
@@ -1515,7 +1517,7 @@ int twiddle(num n)
 		ts[i]=CharAt(p1+i);
 	};ts[i]=0;
 // delete it (from p1-p2)
-	DeleteBlock(0,p2-p1);
+	DeleteBlock(cbfp,0,p2-p1);
 	MoveRightChar(cbfp);
 	if(is_utf_accent(cbfp,Offset())) MoveRightChar(cbfp);
 // insert deleted
@@ -1853,7 +1855,7 @@ int insert_chr(int n,int c)
 		s1+=ccol;
 		set_Offset(s1);
 		if(gmode_over && !Eol()) {
-			DeleteBlock(n*l,0);
+			DeleteBlock(cbfp,n*l,0);
 		};
 	 	InsertBlock(cbfp,s,n*l,0,0);
 
@@ -1936,7 +1938,7 @@ int forw_delete(long n)
 		n = o-Offset();
 	};
 	}
-	if(!DeleteBlock(0,n)) return FALSE;
+	if(!DeleteBlock(cbfp,0,n)) return FALSE;
 	check_update_highlight(2);
 	set_update(cwp,UPD_EDIT);	/* ????  */
 	set_modified(cbfp);
@@ -1989,9 +1991,9 @@ int back_delete(long n)
 		// MESG("	delete: chars=%d ccol=%d ncol=%d ncol0=%d start=%d end=%d",chars_to_delete,ccol,ncol,ncol0,s1-ncol,s1);
 		if(chars_to_delete==0) {
 			chars_to_delete=n;
-			DeleteBlock(chars_to_delete,0);
+			DeleteBlock(cbfp,chars_to_delete,0);
 		} else {
-			DeleteBlock(0,chars_to_delete);
+			DeleteBlock(cbfp,0,chars_to_delete);
 		};
 		s1 = LineEnd(s1)+1;
 		s2 += n;
@@ -2021,7 +2023,7 @@ int set_linetext(char *txt)
 	int stat;
 	/* delete the current line */
 	ToLineBegin();
-	DeleteBlock(0,LineEnd(Offset())-LineBegin(Offset()));
+	DeleteBlock(cbfp,0,LineEnd(Offset())-LineBegin(Offset()));
 	len=strlen(txt);
 	stat=InsertBlock(cbfp,txt,len,0,0);
 	set_update(cwp,UPD_EDIT);
@@ -2049,7 +2051,7 @@ int trim_line(num n)
 	trimmed_at_end = todelete-ptr;
 	if(trimmed_at_end>0)
 	{
-	  DeleteBlock(0,todelete-ptr);
+	  DeleteBlock(cbfp,0,todelete-ptr);
 	  cbfp->oldptr2=cbfp->ptr2;
 	  set_update(cwp,UPD_EDIT);
 	  set_modified(cwp->w_fp);
@@ -2068,7 +2070,7 @@ int trim_line(num n)
 	trimmed_at_start=ptr-todelete;
 	if(trimmed_at_start>0)
 	{
-	  DeleteBlock(ptr-todelete,0);
+	  DeleteBlock(cbfp,ptr-todelete,0);
 	  cbfp->oldptr2=cbfp->ptr2;
 	  set_modified(cwp->w_fp);
 	  set_update(cwp,UPD_EDIT);
@@ -2154,7 +2156,7 @@ int delete_line(num n)
  }
  set_Offset(start);
  // MESG("delete_line: from %ld size=%ld",start,end-start);
- status=DeleteBlock(0,end-start);
+ status=DeleteBlock(cbfp,0,end-start);
 
  set_update(cwp,UPD_EDIT);
  set_modified(cwp->w_fp);
@@ -2201,7 +2203,7 @@ int cut_region(num flag)
 	if(flag) beginundogroup(cbfp->main_undo);
 	if(flag) cbfp->main_undo->head_position=Offset();
 
-	if(DeleteBlock(0,len)) {
+	if(DeleteBlock(cbfp,0,len)) {
 		if(flag) {
 			EndUndoGroup(cbfp->main_undo);
 		};
@@ -2235,7 +2237,7 @@ int delete_region()
 
 	if(cwp->selection == REGION_COLUMN) return(delete_box(0));
  	check_update_highlight(0);
-	if(DeleteBlock(0,len)) {
+	if(DeleteBlock(cbfp,0,len)) {
 		if(!check_update_highlight(2)) {
 				cbfp->line_from=GetLine();
 				cbfp->line_to=LastLine();
@@ -2471,7 +2473,7 @@ int delete_box(num n)
 
 		fp->main_undo->head_position=Offset();
 
- 		DeleteBlock(p2-p1,0);
+ 		DeleteBlock(fp,p2-p1,0);
 	};
 	lbo=FNextLine(fp,lbo);
  };

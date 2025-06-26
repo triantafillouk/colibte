@@ -76,10 +76,10 @@ byte   Char();
 void   MoveLineCol(num l,num c);
 void   HardMove(num l,num c);
 void   NewLine();
-int  InsertChar(char ch);
+int  InsertChar(FILEBUF *fp,char ch);
 void   ExpandTab();
 void    DeleteChar();
-int   WriteBlock(int fd,offs from,offs size,offs *act_written);
+int   WriteBlock(int fd,FILEBUF *fp,offs from,offs size,offs *act_written);
 void   PreModify(FILEBUF *);
 UNDOS *undo_new();
 void show_points(FILEBUF *bf,FILE *fp);
@@ -1269,27 +1269,28 @@ offs MoveToColumn(int go_col)
 // operates on cbfp
 void   HardMove(num l,num c)
 {
+   FILEBUF *fp=cbfp;
    MoveLineCol(l,0);
    while(GetCol()<c) {
    		if(Eol()) break;
-		MoveRightChar(cbfp);
+		MoveRightChar(fp);
 	}
-   if(FEof(cbfp)) {	// insert as many lines as needed to reach specified line
+   if(FEof(fp)) {	// insert as many lines as needed to reach specified line
       while(GetLine()<l){
 	  	NewLine();
-	  	textpoint_move(cbfp->tp_current,cbfp->EolSize);
+	  	textpoint_move(fp->tp_current,cbfp->EolSize);
 	  };
 	};
-   if(Eol()) {	// insert as many spaces as needed to go to specified column
+   if(FEol(fp)) {	// insert as many spaces as needed to go to specified column
       while(GetCol()<c) { 
-	  	InsertChar(' ');
-	  	MoveRightChar(cbfp);
+	  	InsertChar(fp,' ');
+	  	MoveRightChar(fp);
 	  };
 	};
    if(GetCol()>c) {
-		MoveLeftChar(cbfp);
+		MoveLeftChar(fp);
       ExpandTab();
-      while(GetCol()<c) MoveRightChar(cbfp);
+      while(GetCol()<c) MoveRightChar(fp);
    }
 }
 
@@ -1334,6 +1335,11 @@ byte  FCharAt(FILEBUF *bf, offs offset)
 	};
 
    return(0);
+}
+
+byte FChar(FILEBUF *fp)
+{
+	return FCharAt(fp,FOffset(fp));
 }
 
 // specific on current buffer */
@@ -1418,9 +1424,10 @@ offs CSize()
 void   ExpandTab()
 {
  int i,size;
+ FILEBUF *fp=cbfp;
 	if(Char()!='\t') return;
 	size=tabsize-GetCol()%tabsize;
-	for(i=size; i>0; i--) InsertChar(' ');
+	for(i=size; i>0; i--) InsertChar(fp,' ');
 	DeleteChar();
 	textpoint_move(cbfp->tp_current,-size);
 }
@@ -1663,7 +1670,7 @@ void    DeleteChar()
  int len;
 	FUtfCharAt(cbfp,FOffset(cbfp),&uc);
 	len=get_utf_length(&uc);
-	DeleteBlock(0,len);
+	DeleteBlock(cbfp,0,len);
 	set_modified(cbfp);
 }
 
@@ -1720,6 +1727,12 @@ int FBolAt(FILEBUF *bf,offs o)
  return stat;
 }
 
+
+int FEol(FILEBUF *fp)
+{
+	return(FEolAt(fp,FOffset(fp)));
+}
+
 int Eol()
 {
    return(EolAt(Offset()));
@@ -1730,10 +1743,11 @@ int Bol()
    return(BolAt(Offset()));
 }
 
-int  InsertChar(char ch)
+
+int  InsertChar(FILEBUF *fp,char ch)
 {
-   return(InsertBlock(cbfp,&ch,1,NULL,0));
-   set_modified(cbfp);
+   return(InsertBlock(fp,&ch,1,NULL,0));
+   // set_modified(fp);
 }
 
 // read write lock
@@ -2207,7 +2221,7 @@ int	writeout(char *name, FILEBUF *bf)
 		// MESG("	write crypt bom: size=%ld",FSize(bf));
 	};	
 	// MESG("writeout: start writeblock size=%ld",FSize(bf));
-   if(WriteBlock(nfile,0,FSize(bf),&act_written)!=true)
+   if(WriteBlock(nfile,bf,0,FSize(bf),&act_written)!=true)
    {
      if(errno) FError(name);
      close(nfile);
@@ -2547,7 +2561,7 @@ void undo_change_undo(undo_Change *uc)
       break;
    case INSERT:
       set_Offset(uc->pos+uc->left_size);
-      DeleteBlock(uc->left_size,uc->right_size);
+      DeleteBlock(cbfp,uc->left_size,uc->right_size);
       break;
    };
 	set_modified(cbfp);
@@ -2560,7 +2574,7 @@ void undo_change_redo(undo_Change *uc)
    switch(uc->undo_type)
    {
    case DELETE:
-      DeleteBlock(uc->left_size,uc->right_size);
+      DeleteBlock(cbfp,uc->left_size,uc->right_size);
       break;
    case INSERT:
       InsertBlock(cbfp,uc->left,uc->left_size,uc->right,uc->right_size);
@@ -3528,9 +3542,8 @@ char *get_bom_description(FILEBUF *fp)
 }
 
 /* operates on cbfp */
-int   WriteBlock(int fd,offs from,offs size,offs *act_written)
+int   WriteBlock(int fd,FILEBUF *fp,offs from,offs size,offs *act_written)
 {
-   FILEBUF *fp=cbfp;
    offs   leftsize;
    // MESG("writeblock: bom=%d from=%ld ptr1=%ld ptr2=%ld size=%ld b_mode=%X",fp->bom_type,from,fp->ptr1,fp->ptr2,size,fp->b_mode);
    if(from<0) {
@@ -3649,8 +3662,7 @@ void show_textpoints(char *title,FILEBUF *fp)
 #include "replaceblock.c"
 
 /* delete a block from left to right offset */
-/* operates on cbfp */
-int   DeleteBlock(offs left,offs right)
+int   DeleteBlock(FILEBUF *fp,offs left,offs right)
 {
    offs  base;	// start of delete
    offs   size;	// size of delete
@@ -3659,7 +3671,7 @@ int   DeleteBlock(offs left,offs right)
    num   deleted_lines;
    int   join_at;
    int   break_at;
-   FILEBUF *fp=cbfp;
+   // FILEBUF *fp=cbfp;
 //	MESG("DeleteBlock: at %ld l=%ld r=%ld ptr2=%ld size=%ld",FOffset(fp),left,right,fp->ptr2,fp->BufferSize);
    if(left<1 && right<1)  return(true);
    if(fp->b_flag & FSMMAP)  return false;

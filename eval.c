@@ -1285,11 +1285,11 @@ int refresh_current_line(num nused)
 	
 	// goto the begining of the line
 	set_Offset(sl+ddot_pos);
-	if(is_ddot) DeleteBlock(0,dsize-ddot_pos);
+	if(is_ddot) DeleteBlock(cbfp,0,dsize-ddot_pos);
 	set_Offset(sl);
 	get_text_offs(cbfp,text_line,sl,MAXLLEN);
 	set_Offset(sl);
-	if(is_ddot) DeleteBlock(0,ddot_pos);	/* clear the line!  */
+	if(is_ddot) DeleteBlock(cbfp,0,ddot_pos);	/* clear the line!  */
 	set_Offset(sl);
 	// MESG("refresh_current_line:[%s] %d",text_line,ddot_pos);
 	value = compute_string(text_line,text_line);

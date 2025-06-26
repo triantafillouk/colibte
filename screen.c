@@ -1040,6 +1040,7 @@ int draw_info_mask(WINDP *wp,num ptr1,char *info_mask)
 {
  int i0;
  int num_columns=wp->w_infocol;
+ FILEBUF *fp = wp->w_fp;
 	wp->vtcol=0;
 	if(num_columns>2){
 		for(i0=0;i0<num_columns;i0++){	/* put the info columns  */
@@ -1047,7 +1048,7 @@ int draw_info_mask(WINDP *wp,num ptr1,char *info_mask)
 		};
 	} else {
 		for(i0=0;i0<num_columns;i0++){	/* put the info columns  */
-			if(BolAt(ptr1)) vtputc(wp,'*');	// vtputc(wp,CHR_SPACE);
+			if(FBolAt(fp,ptr1)) vtputc(wp,'*');	// vtputc(wp,CHR_SPACE);
 			else vtputc(wp,'-');
 		};
 	};

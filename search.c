@@ -776,7 +776,7 @@ qprompt:
 int delins(int dlength, char *instr)
 {
 	// MESG("delins: o=%ld delete %d chars, insert [%s]",Offset(),dlength,instr);
-	if(!DeleteBlock(0,dlength)) return FALSE;
+	if(!DeleteBlock(cbfp,0,dlength)) return FALSE;
 	if(!InsertBlock(cbfp,instr,strlen(instr),0,0)) return FALSE;
 	return (TRUE);
 }
@@ -836,22 +836,23 @@ fail:;			/* continue to search */
  */
 int nextch(int dir)
 {
+ FILEBUF *fp=cbfp;
 	if (dir == FORWARD) {
-		if(curoffs>FSize(cbfp)) return -1;
+		if(curoffs>FSize(fp)) return -1;
 
 		if(EolAt(curoffs)) { 
-			curoffs+=cbfp->EolSize;
+			curoffs += fp->EolSize;
 			return '\n';
 		};
-		return CharAt(curoffs++);
+		return FCharAt(fp,curoffs++);
 	} else {
-		if(BolAt(curoffs)) {
-			curoffs-=cbfp->EolSize;
+		if(FBolAt(fp,curoffs)) {
+			curoffs-=fp->EolSize;
 			if(curoffs<0) return -1;
 			return '\n';
 		};
 		if(curoffs<1) return -1;
-		return CharAt(--curoffs);
+		return FCharAt(fp,--curoffs);
 	};
 }
 

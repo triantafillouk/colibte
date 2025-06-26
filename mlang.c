@@ -2682,16 +2682,16 @@ void update_ddot_line(char *ddot_out)
  dsize=el-sl;
  ddot_pos=el-sl;
 	for(i=sl;i<el;i++) {
-		if(CharAt(i)==':') { 
+		if(FCharAt(buf,i)==':') { 
 			is_ddot=!(cbfp->b_state & FS_VIEW);
 			ddot_pos=i-sl+1;break;};
 	};
  
 // replace text
  textpoint_set(buf->tp_current,sl+ddot_pos);
- if(is_ddot) DeleteBlock(0,dsize-ddot_pos);
+ if(is_ddot) DeleteBlock(buf,0,dsize-ddot_pos);
 
- insert_string(cbfp,ddot_out,strlen(ddot_out));
+ insert_string(buf,ddot_out,strlen(ddot_out));
  if(err_num>0) {
  	insert_string(cbfp," ,err ",6);
 	if(err_str!=NULL) insert_string(cbfp,err_str,strlen(err_str));
