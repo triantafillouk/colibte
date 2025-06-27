@@ -29,7 +29,6 @@ int comment_ini(int n);
 int comment_md(int n);
 
 /* character states */
-#if	1
 #define HS_LINESTART	1
 #define HS_PREVAST		2
 #define HS_PREVSLASH	4
@@ -44,22 +43,8 @@ int comment_md(int n);
 #define HS_PREVSPACE	2048
 #define HS_TAG			4096
 #define HS_ASSIGN		8192		
-#else
-#define HS_LINESTART	1
-#define HS_PREVAST		2
-#define HS_PREVSLASH	4
-#define HS_PREVESC		5
-#define HS_PSMALLER		6
-#define HS_END1			7
-#define HS_END2			8
-#define	HS_SPEC			9	// special
-#define HS_QMARK		10
-#define HS_ES2			25
-#define HS_LETTER		30	// alpha
-#define HS_PREVSPACE	64
-#define HS_TAG			128
-#endif
-	/* inserted script language  */
+
+/* inserted script language  */
 
 /* flags */
 // Escape character

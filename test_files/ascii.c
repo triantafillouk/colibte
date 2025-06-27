@@ -11,19 +11,19 @@ C comment	/*   */
 	+ = αβγ 43 2B
 #if 1
 #include "test.h"
-#define TEST "double quotes"
-#define TEST2 'single quotes'
+#define TEST "double quotes'"
+#define TEST2 '"'
 /* words1 */ 	if (124.3) else while { return("aa") ; }; 
 /* words2 */  	struct void int double char short 
 typedef struct aa {
 	int b;
 	char cc[30];
 	double aa;
-} aa;
+} aa; 
 	if(a==0x44ABC) { test=3;} else { int k=0o11;}	/* words1  */
 #endif
 in line special chars in C && +++ -------- **** ======= +++++++ [ { ( ) } ]
-/* numbers, numerics */
+/* numbers, numerics '*/
 123456789|1234567890123456789|123456789|123456789|1234567890123456789|123456789|1234567890|1234567890|1234567890|1234567890|1234567890|1234567890|1234567890|1234567890
          1         2         3         4         5         6         7         8          8          9          10         11
 	Normal text 
