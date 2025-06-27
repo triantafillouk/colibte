@@ -1571,6 +1571,7 @@ double factor_env()
 /* user interupt on, set also break flag  */
 void set_break()
 {
+	// MESG("set_break:");
 	is_break1=1;
 	// tok->tgroup=TOK_EOF;
 	// tok->ttype=TOK_EOF;
@@ -2921,7 +2922,7 @@ double tok_dir_while()
 	tok_struct *start_block;	// element at block start
 	tok_struct *end_block=NULL;	/* at the block end  */
 	int old_active_flag=current_active_flag;
-
+	// MESG("tok_dir_while:");
 	NTOKEN2;	/* go to next token after while */
 
 	check_element=tok;	/* this is the check element!  */
@@ -2937,6 +2938,7 @@ double tok_dir_while()
 	end_block=tok;
 
 	// set tok pointer here
+	drv_start_checking_break();
 	do {
 		// set tlist to tok pointer
 		tok=check_element;
@@ -2946,7 +2948,7 @@ double tok_dir_while()
 			tok=start_block;
 			tok->directive();
 			if(current_active_flag==0) {	/* only after break  */
-				if(is_break1) { tok=cbfp->end_token;return(0);};
+				// if(is_break1) { tok=cbfp->end_token;return(0);};
 				break;
 			};
 		} else {
@@ -2954,6 +2956,7 @@ double tok_dir_while()
 		};
 
 	} while(1); 
+	// drv_stop_checking_break();
 	tok=end_block;	/* to the end of executable block  */
 	current_active_flag=old_active_flag;
 	return 1;

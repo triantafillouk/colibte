@@ -1060,6 +1060,7 @@ int getstring(char *prompt, char *st1,int maxlen,int disinp)
 void drv_post_windows_update()
 {
 	top_menu(0);
+	update_panels();
 	doupdate();
 }
 
@@ -1129,7 +1130,10 @@ void drv_start_checking_break()
 	nodelay(stdscr,TRUE);
 	qiflush();
 #endif
-	if(drv_initialized) checking_break_key=1;
+	if(drv_initialized) {
+		// MESG("start_checking_break!");
+		checking_break_key=1;
+	};
 }
 
 void drv_stop_checking_break()
@@ -1150,7 +1154,7 @@ int drv_check_break_key()
  if(checking_break_key) {
  count++;
  // MESG("drv_check_break_key: %d",count);
- if(count>10000) {
+ if(count>10) {
  	key=getch();
 	count=0;
  };
