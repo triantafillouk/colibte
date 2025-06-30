@@ -2956,7 +2956,7 @@ double tok_dir_while()
 		};
 
 	} while(1); 
-	// drv_stop_checking_break();
+	drv_stop_checking_break();
 	tok=end_block;	/* to the end of executable block  */
 	current_active_flag=old_active_flag;
 	return 1;

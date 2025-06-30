@@ -403,6 +403,7 @@ int drv_search_dialog(int f)
 }
 
 void drv_flush() {	
+	events_flush();
 	gdk_flush();
 }
 

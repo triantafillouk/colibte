@@ -1467,13 +1467,16 @@ int edit_file(char *fname)
 int file_read(FILEBUF *bp, char *fname)
 {
  int stat=0;
+ int display_messages=discmd;
+ discmd=0;
  // MESG("file_read: fname=[%s] view_mode=%d",fname,bp->view_mode);
- if(fname[0]!=CHR_LBRA) if(!execmd) msg_line(" reading file:[%s]",fname);
+ if(fname[0]!=CHR_LBRA) if(!execmd && discmd) msg_line(" reading file:[%s]",fname);
 
  /* clear the buffer */
  if(empty_filebuf(bp)!=TRUE) return FALSE;
  if(fname!=bp->b_fname) strlcpy(bp->b_fname, fname,MAXFLEN);
  if(! ifile(bp,fname,0) && fname[0]!=CHR_LBRA) {
+ 	discmd=display_messages;
 // 	msg_line("No lines for file %s",fname);
 	return(FALSE);
  };
@@ -1491,6 +1494,7 @@ int file_read(FILEBUF *bp, char *fname)
  	bp->b_state |= FS_VIEW;
  	// MESG("set as view only");
  };
+ 	discmd=display_messages;
  // MESG("file_read: end: b_type=%d b_state=%X",bp->b_type,bp->b_state);
  return TRUE; 
 }

@@ -952,25 +952,30 @@ void out_print(char *s,int nl)
 	// MESG("out_print: current buffer is [%s] discmd=%d",cbfp->b_fname,discmd);
 	if(s==NULL) return;
 #if	1
-	if(!discmd && !debug_flag()) {
-		if(nl) printf("%s\n",s);
-		else printf("%s",s);
+	if(!discmd) return ;
+#else
+	if(!discmd) {
+		if(debug_flag()) {
+			if(nl) fprintf(stderr,"%s\n",s);
+			else fprintf(stderr,"%s",s);
+		} else {
+			if(nl) fprintf(stdout,"%s\n",s);
+			else fprintf(stdout,"%s",s);
+		}
 		return;
 	};
+#endif
 	if(debug_flag()) {
 		if(nl) fprintf(stderr,"%s\n",s);
 		else fprintf(stderr,"%s",s);
-		// return;
 	};
-#endif
+
 	if((bp=new_filebuf("[out]",0)) !=NULL) {
 		if(!activate_file(bp)) return;
 	} else {
 		msg_log(1,"cannot create output buffer [out][%s]",s);
 		return;
 	};
-
-	// sfb(bp);
 
 	// insert string
 	insert_string(bp,s,strlen(s));

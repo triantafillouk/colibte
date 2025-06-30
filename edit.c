@@ -582,7 +582,7 @@ int next_line(num n)
     if (n < 0)  return (prev_line(-n));
 	if(n==0) return(FALSE);
 
-	if(is_wrap_text(cbfp) & !execmd) return next_wrap_line(n);
+	if(!execmd && is_wrap_text(cbfp) ) return next_wrap_line(n);
 
 	// get the current line
 	current_line=get_current_line();
@@ -715,7 +715,7 @@ int prev_line(num n)
  int status=0;
 	if (n==0) return FALSE;
    	if (n < 0) return (next_line(-n));
-	if(is_wrap_text(cbfp) & !execmd) return prev_wrap_line(n);
+	if(!execmd && is_wrap_text(cbfp) ) return prev_wrap_line(n);
 
 	current_line=get_current_line();
 	cwp->w_prev_line=current_line;

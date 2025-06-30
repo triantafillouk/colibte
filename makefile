@@ -197,7 +197,7 @@ tldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h menu.h
 xldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h
 	${CC} tldisplay.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -funsigned-char -o xldisplay.o
 
-gtkterm.o: gtkterm.c gtkterm.h xthemes.h color.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h gtk_common.c xthemes.c
+gtkterm.o: gtkterm.c gtkterm.h xthemes.h color.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h gtk_common.c xthemes.c btreei.h
 
 highlight.o: highlight.c highlight.h
 

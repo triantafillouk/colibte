@@ -97,7 +97,7 @@ void MESG_time(const char *fmt, ...)
  if(!debug_flag()) return;
  va_list args;
  static char mline[512];
- if(!(strcmp(cbfp->b_fname,"[out]"))) return;
+ if(cbfp) if(!(strcmp(cbfp->b_fname,"[out]"))) return;
     if (fmt != NULL) {
 		va_start(args,fmt);
 		vsnprintf(mline,sizeof(mline)-1,fmt,args);
@@ -2077,7 +2077,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 		}
    };
 	check_line_mode(bf);
-
+	MESG_time("go update lines");
 	update_lines(bf);
 	if(!(bf->b_flag & FSMMAP)) 
 		set_modified(bf);
@@ -2097,7 +2097,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	textpoint_set(bf->tp_current,0);	// goto the beginning
 	// MESG_time("ifile0: b_mode=%d end",bf->b_mode);
 	close(file);
-	if(!execmd) msg_line("%s: chars=%lld,lines=%lld type %s max line len=%ld",bf->b_fname,FSize(bf),bf->lines,bf->hl->description,bf->maxlinelen);
+	if(!execmd && discmd) msg_line("%s: chars=%lld,lines=%lld type %s max line len=%ld",bf->b_fname,FSize(bf),bf->lines,bf->hl->description,bf->maxlinelen);
 	if(temp_used) {
 		// MESG("remove temporary %s",name);
 		unlink(name);
@@ -3047,11 +3047,13 @@ int   InsertBlock(FILEBUF *fp, char *block_left,offs size_left,char *block_right
    offs  oldoffset;
    num   num_of_lines,num_of_columns,oldline;
    int   break_at;
+   int	 display_messages=discmd;
    offs	 size;
    if(fp->b_flag & FSMMAP) return false;
    size=size_left+size_right;
    if(size==0) return(true);
-	// MESG("InsertBlock:%s pos=%ld l=%ld r=%ld",fp->b_fname,FOffset(fp),size_left,size_right);
+	discmd=0;
+	// MESG_time("InsertBlock:%s pos=%ld l=%ld r=%ld",fp->b_fname,FOffset(fp),size_left,size_right);
    PreModify(fp);
 
    if(size_left>0) {
@@ -3120,6 +3122,7 @@ int   InsertBlock(FILEBUF *fp, char *block_left,offs size_left,char *block_right
 	// set_modified(fp);
 	fp->b_state |= FS_CHG;
 	update_lines(fp);
+	discmd=display_messages;
 	return(true);
 }
 
@@ -3128,7 +3131,7 @@ num fread16(char *file_name,char *buffer,num size)
  FILE *fi=fopen(file_name,"r");
  char *out = buffer;
  if(fi!=NULL) {
- MESG("fread16: %s size to read %ld",file_name,size);
+ // MESG("fread16: %s size to read %ld",file_name,size);
  	size_t res;
 	// size_t in_chars=0;
 	// size_t out_chars=0;
