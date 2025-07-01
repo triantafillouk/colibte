@@ -951,7 +951,7 @@ void out_print(char *s,int nl)
 	// FILEBUF *oldfp = cbfp;
 	// MESG("out_print: current buffer is [%s] discmd=%d",cbfp->b_fname,discmd);
 	if(s==NULL) return;
-#if	1
+#if	0
 	if(!discmd) return ;
 #else
 	if(!discmd) {

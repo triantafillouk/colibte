@@ -32,6 +32,12 @@ extern FILEBUF *cbfp;
 extern int clen_error;
 extern WINDOW *mesg_window;	/* message line curses window  */
 
+#define	RED_BLACK	0
+#if	RED_BLACK
+#include "btreei.h"
+RB_ITREE *utf_lengths=NULL;
+#endif
+
 int drv_numrow=0;		// current driver screen rows
 int drv_numcol=0;		// current driver screen columns
 int drv_colors=0;
@@ -117,6 +123,12 @@ void vtinit(int argc, char **argp)
 {
 	drv_init(argc,argp);
 	drv_open();		/* open the screen */
+#if	RED_BLACK
+	if(utf_lengths==NULL) {
+		MESG("-- new red_black tree");
+ 		utf_lengths=new_rb_itree("utf8");
+	};
+#endif
 	drv_post_init();
 	resize_screen(2);
 	cwp = dublicate_window(0);	/* creates first window  */
@@ -1895,16 +1907,28 @@ int get_utf_custom_length(utfchar *utf_char_str)
 
 long utf8_to_unicode(unsigned char* const utf8_str, int *size) ;
 
+extern int custom_cell_width;
+
 int get_utf_length(utfchar *utf_char_str)
 {
- if(bt_dval("custom_cell_width")>0) {
+#if	1
+ if(custom_cell_width>0) {
  	return get_utf_custom_length(utf_char_str);
- } else {
+ } else
+#endif 
+ {
  int clen=0;
+ if(utf_char_str->uval[0]<0x81) return 1;
  int code_unit = utf8_to_unicode((unsigned char *)utf_char_str,&clen);
- if(code_unit<=0x80) return 1;
- if(code_unit==0x200E || code_unit==0x200F || code_unit==0x200B) return -1;	/* ltr, rtl, zero space marks */
+#if	RED_BLACK
+ int uni_len = get_rb_ival(utf_lengths,code_unit);
+ if(uni_len>=0) return uni_len;
+#endif
+ // if(code_unit==0x200E || code_unit==0x200F || code_unit==0x200B) return -1;	/* ltr, rtl, zero space marks */
  int clen_width = wcwidth(code_unit);
+#if	RED_BLACK
+ set_rb_ival(utf_lengths,code_unit,clen_width);
+#endif
 #if	0
  int custom_clen_width = get_utf_custom_length(utf_char_str);
  // if(code_unit>=0xE0041 && code_unit<0xE007B) return custom_clen_width;

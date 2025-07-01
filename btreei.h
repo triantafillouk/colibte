@@ -1,57 +1,49 @@
-
-typedef struct IBTNODE {
-	struct IBTNODE *left;
-	struct IBTNODE *right;
-	struct IBTNODE *up;	/* for rb trees  */
+/* Red black key implementation with key is an integer
+  */
+typedef struct RB_INODE {
+	struct RB_INODE *left;
+	struct RB_INODE *right;
+	struct RB_INODE *up;	/* for rb trees  */
 	int color;	/* for rb trees  */
 
 	int  node_index;
 	int node_ival;
-} IBTNODE;
+} RB_INODE;
 
-typedef struct IBTREE {
-	struct IBTNODE *root;
+typedef struct RB_ITREE {
+	struct RB_INODE *root;
 	char *tree_name;
 	int	new_flag;
 	long items;
-} IBTREE;
+} RB_ITREE;
 
 #define	RB_BLACK	0
 #define	RB_RED		1
 
 
-IBTNODE *find_ibtnode(IBTREE *bt,int index);
-void irebalance(IBTREE *tree, IBTNODE *node);
+static RB_INODE *find_rb_inode(RB_ITREE *bt,int index);
+static void rb_irebalance(RB_ITREE *tree, RB_INODE *node);
 
-IBTNODE *isibling(IBTNODE *node)
+inline static RB_INODE *isibling(RB_INODE *node)
 {
-#if	0
-	if(node!=NULL) MESG("		isibling node ok");
-	else 	 MESG("		isibling node not ok!");
-	
-	if(node->up !=NULL ) MESG("		up ok!");
-	else 
-	if(node->up->left)	MESG("		up left ok!");
-	if(node->up->right)	MESG("		up right ok!");
-#endif
-	IBTNODE *sibling = (node == node->up->left) ? node->up->right : node->up->left;
+	RB_INODE *sibling = (node == node->up->left) ? node->up->right : node->up->left;
 	return sibling;
 }
 
-int is_right_ichild(IBTNODE *node)
+inline static int is_right_ichild(RB_INODE *node)
 {
 	return (node->up->right == node);
 }
 
-int is_left_ichild(IBTNODE *node)
+inline static int is_left_ichild(RB_INODE *node)
 {
 	return (node->up->left == node);
 }
 
-void left_irotate(IBTREE *tree, IBTNODE *p)
+static void left_rb_irotate(RB_ITREE *tree, RB_INODE *p)
 {
-	IBTNODE *q = p->right;
-	IBTNODE **sup;
+	RB_INODE *q = p->right;
+	RB_INODE **sup;
 	// MESG("		left rotate");	
 	if (p->up)
 		sup = is_left_ichild(p) ? &(p->up->left) : &(p->up->right);
@@ -66,10 +58,10 @@ void left_irotate(IBTREE *tree, IBTNODE *p)
 	*sup = q;
 }
 
-void right_irotate(IBTREE *tree, IBTNODE *p)
+static void right_rb_irotate(RB_ITREE *tree, RB_INODE *p)
 {
-	IBTNODE *q = p->left;
-	IBTNODE **sup;
+	RB_INODE *q = p->left;
+	RB_INODE **sup;
 	// MESG("		right rotate");	
 	if (p->up)
 		sup = is_left_ichild(p) ? &(p->up->left) : &(p->up->right);
@@ -88,12 +80,12 @@ void right_irotate(IBTREE *tree, IBTNODE *p)
 /*
  * newly entered node is RED; check balance recursively as required 
  */
-void irebalance(IBTREE *tree, IBTNODE *node)
+static void rb_irebalance(RB_ITREE *tree, RB_INODE *node)
 {
-	IBTNODE *up = node->up;
+	RB_INODE *up = node->up;
 	if (up == NULL || up->color == RB_BLACK) return;
-	// MESG("		irebalance");
-	IBTNODE *sibling_up = isibling(up);
+	// MESG("		rb_irebalance");
+	RB_INODE *sibling_up = isibling(up);
 	if (sibling_up && sibling_up->color == RB_RED)
 	{
 		up->color = RB_BLACK;
@@ -101,19 +93,19 @@ void irebalance(IBTREE *tree, IBTNODE *node)
 		if (up->up->up)
 		{
 			up->up->color = RB_RED;
-			irebalance(tree, up->up);
+			rb_irebalance(tree, up->up);
 		}
 	}
 	else
 	{
 		if (is_left_ichild(node) && is_right_ichild(up))
 		{
-			right_irotate(tree, up);
+			right_rb_irotate(tree, up);
 			node = node->right;
 		}
 		else if (is_right_ichild(node) && is_left_ichild(up))
 		{
-			left_irotate(tree, up);
+			left_rb_irotate(tree, up);
 			node = node->left;
 		}
 
@@ -121,27 +113,27 @@ void irebalance(IBTREE *tree, IBTNODE *node)
 		node->up->up->color = RB_RED;
 
 		if (is_left_ichild(node)) // && is_left_child(node->up)
-			right_irotate(tree, node->up->up);
+			right_rb_irotate(tree, node->up->up);
 		else 
-			left_irotate(tree, node->up->up);
+			left_rb_irotate(tree, node->up->up);
 	}
 }
 
-IBTREE *new_ibtree(char *name)
+RB_ITREE *new_rb_itree(char *name)
 {
- IBTREE *bt;
- bt=(IBTREE *)malloc(sizeof(struct IBTREE));
+ RB_ITREE *bt;
+ bt=(RB_ITREE *)malloc(sizeof(struct RB_ITREE));
  bt->root=NULL;
  bt->tree_name=strdup(name);
  bt->items=0;
- // MESG("		new_ibtree: ok!");
+ // MESG("		new_RB_ITREE: ok!");
  return(bt);
 }
 
-IBTNODE *new_ibtnode()
+static RB_INODE *new_rb_inode()
 {
- IBTNODE *btn;
- btn=(IBTNODE *)malloc(sizeof(struct IBTNODE));
+ RB_INODE *btn;
+ btn=(RB_INODE *)malloc(sizeof(struct RB_INODE));
 
  btn->left=NULL;
  btn->right=NULL;
@@ -153,13 +145,13 @@ IBTNODE *new_ibtnode()
  return(btn);
 }
 
-IBTNODE *add_ibtnode(IBTREE *bt,int index)
+static RB_INODE *add_RB_INODE(RB_ITREE *bt,int index)
 {
- IBTNODE *btn;	/* new node  */
+ RB_INODE *btn;	/* new node  */
  int depth=0;
 	// MESG("		add %X",index);
  	if(bt->root==NULL) {
-		btn=new_ibtnode();
+		btn=new_rb_inode();
 		// MESG("		new root created");
 		btn->node_index=index;
 		bt->root=btn;
@@ -174,26 +166,26 @@ IBTNODE *add_ibtnode(IBTREE *bt,int index)
 		};
 		if(index>btn->node_index) {
 			if(btn->right==NULL) {
-				btn->right = new_ibtnode();
+				btn->right = new_rb_inode();
 				// MESG("		new right");
 				btn->right->up=btn;	/* RB  */
 				btn->right->color=1;
 				btn=btn->right;
 				btn->node_index=index;
 				bt->new_flag=1;
-				irebalance(bt,btn);
+				rb_irebalance(bt,btn);
 				return(btn);
 			} else	btn=btn->right;
 		} else {
 			if(btn->left==NULL) {
-				btn->left = new_ibtnode();
+				btn->left = new_rb_inode();
 				// MESG("		new left");
 				btn->left->up=btn;	/* RB  */
 				btn->left->color=1;
 				btn=btn->left;
 				btn->node_index=index;
 				bt->new_flag=1;
-				irebalance(bt,btn);
+				rb_irebalance(bt,btn);
 				return(btn);
 			} else btn=btn->left;
 		};
@@ -206,25 +198,26 @@ IBTNODE *add_ibtnode(IBTREE *bt,int index)
 
 
 /* insert a new node in btree table and initialize */
-IBTNODE * insert_bt_ielement(IBTREE *bt,int index,int ival)
+void set_rb_ival(RB_ITREE *bt,int index,int ival)
 {
- IBTNODE *node;
-	node = add_ibtnode(bt,index);
+ RB_INODE *node;
+	node = add_RB_INODE(bt,index);
 	// MESG("		new ielement: %X %d",index,ival);
 	if(bt->new_flag) {
 		node->node_index=index;
-		node->node_ival=ival;
 		bt->new_flag=0;
 //		MESG("insert:b index=%d: type=%d [%s]",index,type,value);
 	};
+	node->node_ival=ival;
 	// MESG("	inserted: index=%d ival=%d",index,ival);
-	return(node);
+	// return(node);
 }
 
-int btnival(IBTREE *bt, int ind)
+/* returns -1 if error or not found! */
+int get_rb_ival(RB_ITREE *bt, int ind)
 {
- IBTNODE *btn;
- btn = find_ibtnode(bt,ind);
+ RB_INODE *btn;
+ btn = find_rb_inode(bt,ind);
  if(btn) {
  	return(btn->node_ival);
  } else {
@@ -232,9 +225,9 @@ int btnival(IBTREE *bt, int ind)
  };
 }
 
-IBTNODE *find_ibtnode(IBTREE *bt,int index)
+static RB_INODE *find_rb_inode(RB_ITREE *bt,int index)
 {
- IBTNODE *btn;
+ RB_INODE *btn;
 	btn=bt->root;
 
 	while(btn!=NULL) {
@@ -254,4 +247,3 @@ IBTNODE *find_ibtnode(IBTREE *bt,int index)
 
 	return(NULL);
 }
-

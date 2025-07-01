@@ -72,6 +72,8 @@ extern int drv_numrow;		// current driver screen rows
 extern int drv_numcol;		// current driver screen columns
 extern int drv_colors;
 extern int drv_max_colors;
+extern int custom_cell_width;
+
 int	drv_color_pairs=64;
 int drv_basic_colors=8;
 int drv_accent_size=1;
@@ -2092,7 +2094,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 				continue;
 			};
 		};
-		if(bt_dval("custom_cell_width")>0) 	wmove(wp->gwp->draw,row,i);
+		if(custom_cell_width>0) 	wmove(wp->gwp->draw,row,i);
 #if	USE_GLIB
 		if(ch>128 && v1->uval[1]==0) {	/* this is a local character, convert from local to utf  */
 			 strlcpy(vstr,str_local_to_utf(wp,(char *)v1->uval),6);

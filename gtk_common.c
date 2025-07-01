@@ -18,28 +18,35 @@ COLOR_SCHEME *get_scheme_by_index(int scheme_num);
 int drv_initialized=0;
 char *import_buffer=NULL;
 
-#include "btreei.h"
 
 long utf8_to_unicode(unsigned char* const utf8_str, int *size) ;
 
-IBTREE *utf_lengths=NULL;
+#define RED_BLACK	1
+
+#if	RED_BLACK
+#include "btreei.h"
+RB_ITREE *utf_lengths=NULL;
+#else
+#include "btree_iavl.h"
+AVL_ITREE *utf_lengths=NULL;
+#endif
 
 int get_pango_length(char *st)
 {
  int width,height;
   
- // if(st[0]<0x80) return 1;	/* suppose that all asci have CLEN display size  */
  if(cwp==NULL) return 0;
  if(cwp->gwp==NULL) return 0;
  if(cwp->gwp->draw==NULL) return 0;
  // MESG("get_pango_length:1");
- if(utf_lengths==NULL) {
- 	utf_lengths=new_ibtree("utf8");
-	// MESG("new_ibtree:");
- };
+
  int clen;
  int code_unit = utf8_to_unicode((unsigned char *)st,&clen);
- int uni_len = btnival(utf_lengths,code_unit);
+#if	RED_BLACK
+ int uni_len = get_rb_ival(utf_lengths,code_unit);
+#else
+ int uni_len = get_avl_ival(utf_lengths,code_unit);
+#endif
  if(uni_len>=0) return uni_len;
 	// MESG("get_pango_length:[%s] 0x%X",st,st[0]);
 	GeEditDisplay *wd = GTK_EDIT_DISPLAY(cwp->gwp->draw);
@@ -63,7 +70,11 @@ int get_pango_length(char *st)
 	else uni_len=2;
 
 	// MESG("	insert U%X len=%d",code_unit,uni_len);
-	insert_bt_ielement(utf_lengths,code_unit,uni_len);
+#if	RED_BLACK
+	set_rb_ival(utf_lengths,code_unit,uni_len);
+#else
+	set_avl_ival(utf_lengths,code_unit,uni_len);
+#endif
 	return(uni_len);
 }
 
@@ -360,8 +371,17 @@ int init_drv_env()
 
 void drv_init(int argc, char **argv)
 {
+  MESG("drv_init:");
   setlocale(LC_CTYPE,"");
-//  gtk_set_locale();
+  if(utf_lengths==NULL) {
+#if	RED_BLACK
+	MESG("-- new red_black tree");
+ 	utf_lengths=new_rb_itree("utf8");
+#else
+	MESG("-- new avl tree");
+ 	utf_lengths=new_avl_itree("utf8");
+#endif
+ };
   gtk_init (&argc, &argv);
 }
 
@@ -836,7 +856,7 @@ int set_font(char *font_name)
  GeEditDisplay *wd;
  current_font_name = font_name;
  if(!window_list) return FALSE; 
- // MESG("set_font:");
+ MESG("set_font:");
  /* change cairo font for all windows */
  lbegin(window_list);
  hide_cursor("set_font");

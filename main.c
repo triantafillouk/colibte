@@ -227,7 +227,9 @@ int main(int argc, char **argv)
 	} else
 #endif
 	{
+		MESG_time_start("select_filebuf");
 		select_filebuf(cbfp);
+		MESG_time("filebuf selected");
 	};
 	startup_exe=0;
 	discmd = TRUE;
@@ -243,7 +245,7 @@ int main(int argc, char **argv)
 	/* setup to process commands */
 	
 	init_highlight();
-	// MESG("main: start main_loop:");
+	MESG_time("main: start main_loop:");
 	main_loop();
 	return(0);
 }

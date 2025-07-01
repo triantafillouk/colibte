@@ -34,6 +34,7 @@ extern int record_session;
 int dofile(char *fname);
 void set_vtype(int type);
 int vtype_is(int type);
+int custom_cell_width=0;
 
 // Editor variables
 char *fvars[] = {
@@ -432,6 +433,7 @@ int set_option_val(int vnum,char *svalue)
 		  };break;
 		  case EMCUSTOMCELLWIDTH: {
 		  	set_bt_num_val("custom_cell_width",(int)v1);
+			custom_cell_width=v1;
 		  };break;
 		  case EMWRAP: {
 		   int infocols=0;

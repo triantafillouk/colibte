@@ -13,6 +13,7 @@ long utf8_to_unicode(unsigned char* const utf8_str, int *size) ;
 long int unicode_point();
 char *get_bom_description(FILEBUF *fp);
 
+extern int custom_cell_width;
 extern alist *window_list;
 extern SHLIGHT hts[];
 
@@ -305,7 +306,7 @@ int show_info(num n)
 
 	if(bt_dval("slow_display")>0) {SMESG("Slowdown display active");}
 	else {SMESG("Slowdown display disabled");};
-	if(bt_dval("custom_cell_width")>0) { SMESG("Custom cell width");};
+	if(custom_cell_width>0) { SMESG("Custom cell width");};
 	if(debug_flag()) {
 		SMESG(" ptr1=%lld ptr2=%lld size=%lld file size=%lld,gap=%lld",bp->ptr1,bp->ptr2,bp->BufferSize,FSize(bp),bp->GapSize);
 	};
