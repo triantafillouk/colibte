@@ -31,6 +31,25 @@ RB_ITREE *utf_lengths=NULL;
 AVL_ITREE *utf_lengths=NULL;
 #endif
 
+long pango_queries=0;
+
+long get_bt_isize(long *queries)
+{
+	*queries=pango_queries;	
+	if(utf_lengths) return utf_lengths->items;
+	else return 1;
+}
+
+#if	GTK_PROFILE
+void gtk_profile(char *from)
+{
+	long int queries=0;
+	long inserts = get_bt_isize(&queries);
+	// MESG("gtk_profile:");
+	MESG("From  %s: inserts=%ld queries=%ld",from,inserts,queries);
+}
+#endif
+
 int get_pango_length(char *st)
 {
  int width,height;
@@ -47,6 +66,7 @@ int get_pango_length(char *st)
 #else
  int uni_len = get_avl_ival(utf_lengths,code_unit);
 #endif
+ pango_queries++;
  if(uni_len>=0) return uni_len;
 	// MESG("get_pango_length:[%s] 0x%X",st,st[0]);
 	GeEditDisplay *wd = GTK_EDIT_DISPLAY(cwp->gwp->draw);

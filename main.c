@@ -91,6 +91,10 @@ FILEBUF *get_first_scratch_buffer()
 	return bp;
 }
 
+#if	GTK && GTK_PROFILE
+void gtk_profile(char *from);
+#endif
+
 int main(int argc, char **argv)
 {
 	lc_lang=getenv("LC_ALL");
@@ -243,9 +247,12 @@ int main(int argc, char **argv)
 	set_hmark(1,"start");
 
 	/* setup to process commands */
-	
+
+
 	init_highlight();
-	MESG_time("main: start main_loop:");
+#if	GTK && GTK_PROFILE
+	gtk_profile("main: start main loop");
+#endif
 	main_loop();
 	return(0);
 }

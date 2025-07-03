@@ -31,6 +31,10 @@ extern FILEBUF *cbfp;
 extern int record_session;
 #endif
 
+#if	GTK && GTK_PROFILE
+void gtk_profile(char *from);
+#endif
+
 int dofile(char *fname);
 void set_vtype(int type);
 int vtype_is(int type);
@@ -692,7 +696,7 @@ int exec_named_function(char *name)
     FILEBUF *bp;		/* ptr to buffer to execute */
     char bufn[MAXFLEN+2];		/* name of buffer to execute */
 	int ival;
-
+	// MESG("exec_named_function:");
 	/* find out what buffer to execute */
 	strlcpy(bufn+1,name,MAXFLEN);
 
@@ -716,7 +720,9 @@ int exec_named_function(char *name)
 	};
 
 	ival = (int)exec_function(bp,NULL,0);
-
+#if	GTK && GTK_PROFILE
+	gtk_profile("exec_named_function:");
+#endif
 	return(ival);
 }
 

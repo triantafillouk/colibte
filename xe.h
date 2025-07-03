@@ -29,6 +29,7 @@
 #define	USE_UTF8	1	/* Use utf8 characters  */
 
 #define WRAPD	0	/* wrap debug  */
+#define	GTK_PROFILE	1
 
 #if	DARWIN
 #define	_FILE_OFFSET_BITS	64

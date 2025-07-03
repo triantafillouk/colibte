@@ -152,6 +152,7 @@ static RB_INODE *add_RB_INODE(RB_ITREE *bt,int index)
 	// MESG("		add %X",index);
  	if(bt->root==NULL) {
 		btn=new_rb_inode();
+		bt->items++;
 		// MESG("		new root created");
 		btn->node_index=index;
 		bt->root=btn;
@@ -167,6 +168,7 @@ static RB_INODE *add_RB_INODE(RB_ITREE *bt,int index)
 		if(index>btn->node_index) {
 			if(btn->right==NULL) {
 				btn->right = new_rb_inode();
+				bt->items++;
 				// MESG("		new right");
 				btn->right->up=btn;	/* RB  */
 				btn->right->color=1;
@@ -179,6 +181,7 @@ static RB_INODE *add_RB_INODE(RB_ITREE *bt,int index)
 		} else {
 			if(btn->left==NULL) {
 				btn->left = new_rb_inode();
+				bt->items++;
 				// MESG("		new left");
 				btn->left->up=btn;	/* RB  */
 				btn->left->color=1;

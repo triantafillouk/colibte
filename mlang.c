@@ -24,6 +24,10 @@ extern FILEBUF *cbfp;
 extern array_dat *main_args;
 FILEBUF *exe_buffer=NULL;
 
+#if	 GTK_PROFILE
+void gtk_profile(char *from);
+#endif
+
 #if	SYNTAX_DEBUG
 
 int stage_level=0;	/* stage level  */
@@ -3018,7 +3022,7 @@ double exec_block1_break(FILEBUF *fp)
 	// MESG("	after!");
 	// MESG(" [%s]",tok_info(tok));
    };
-   // MESG("exec_block1: end!");
+  // MESG("exec_block1: end!");
 	return(val);
 }
 
