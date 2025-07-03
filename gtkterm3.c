@@ -326,11 +326,9 @@ create_parent (void)
   g_signal_connect (GTK_WIDGET (parent), "key_press_event",
                       (GCallback) on_parent_key_press_event,
                       NULL);
-#if	0
   g_signal_connect (parent, "configure_event",
                       (GCallback) on_parent_configure,
                       NULL);
-#endif
   g_signal_connect (parent, "delete_event",
   						(GCallback) on_parent_destroy, NULL);
   
@@ -392,13 +390,11 @@ void drv_update_styles()
 }
 
 void drv_flush() {	
-	MESG("drv_flush:");
-	events_flush();
+//	events_flush();
 }
 
 void drv_win_flush(WINDP *wp)
 {
-	MESG("drv_win_flush:");
 //	events_flush();
 }
 
@@ -416,7 +412,7 @@ void drv_set_default_bgcolor()
 void window_bg_clear(WINDP *wp)
 {
 	drv_set_default_bgcolor();
-	MESG("window_bg_clear: id=%d",wp->id);
+//	MESG("window_bg_clear: id=%d",wp->id);
 	if(wp!=NULL) {
 		if(wp->gwp!=NULL) {
 		if(GTK_EDIT_DISPLAY(wp->gwp->draw)!=NULL) {
@@ -550,7 +546,6 @@ void show_cursor (char *from)
 	ppy=py;
 	cpposx=cposx;cpposy=cposy;
 	cursor_showing = 1;
-	drv_flush();
 	// MESG("show_cursor [%s] id=%d x=%d y=%d %d>",from,cwp->id,cposx,cposy,ind++);
 }
 
