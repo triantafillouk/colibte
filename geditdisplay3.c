@@ -262,7 +262,7 @@ int on_parent_configure              (GtkWidget       *widget,
 	set_bt_num_val("x11_width",p_width);
 	set_bt_num_val("x11_height",p_height);
 
-//	MESG("on_parent_configure: x=%d y=%d [%d,%d]",event->x,event->y,event->width,event->height);
+	MESG("on_parent_configure: x=%d y=%d [%d,%d]",event->x,event->y,event->width,event->height);
 //	MESG("window width=%d height=%d",p_width,p_height);
 
   return(FALSE);
@@ -324,7 +324,7 @@ ge_edit_display_realize (GtkWidget *widget)
 	gtk_widget_set_realized(widget,TRUE);
 	wd->ge_font_desc=NULL;
 
-	// MESG("ge_edit_display_realize: realized!!");
+	MESG("ge_edit_display_realize: realized!!");
 	// gtk_widget_add_events(GTK_WIDGET(widget),GDK_SCROLL_MASK);
 	// g_signal_connect(widget, "scroll-event", G_CALLBACK(mouse_wscroll), NULL);
 }
@@ -362,7 +362,7 @@ cairo_t *begin_draw(GeEditDisplay *wd,cairo_region_t *region,char *from)
  	// wd->act=0;
 #if	NUSE
 	if(wd->in_draw) { 
-//		MESG("	in draw, return cr! from %s",from);
+	// MESG("	in draw, return cr! from %s",from);
 		return wd->cr;
 	}
 #endif

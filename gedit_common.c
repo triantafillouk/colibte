@@ -63,7 +63,7 @@ ge_edit_display_event(GtkWidget	*widget, GdkEvent *event)
  static int event_usec=0;
  static int double_click=0;
  static size_t prev_time=0;
- // MESG("ge_edit_display_event:");
+ MESG("ge_edit_display_event:");
  g_return_val_if_fail(widget !=NULL,FALSE);
  g_return_val_if_fail(GTK_IS_EDIT_DISPLAY(widget),FALSE);
  wd = GTK_EDIT_DISPLAY(widget);
@@ -219,8 +219,9 @@ ge_edit_display_event(GtkWidget	*widget, GdkEvent *event)
 	    mouse_x = ev->x / CLEN; mouse_y = ev->y / CHEIGHTI;
 		position_x = ev->x;
 		position_y = ev->y;
-		// MESG("ge_edit_display_event:motion");
+		MESG("ge_edit_display_event:motion");
 		if(prev_x==mouse_x && prev_y==mouse_y) {
+			drv_flush();
 			return(true);
 		};
 		if(last_event==GDK_BUTTON_PRESS) {
@@ -248,10 +249,12 @@ ge_edit_display_event(GtkWidget	*widget, GdkEvent *event)
 				set_xmark(cwp,mouse_x-cwp->w_infocol,mouse_y,1);
 				};
 			};
-		}
+		};
 		last_event = GDK_MOTION_NOTIFY;
+		drv_flush();
 		return TRUE;
 	};
+	drv_flush();
 	// MESG("event: end!");
 	return FALSE;
  } else {
