@@ -1799,7 +1799,8 @@ int get_current_note_id()
  // MESG("get_current_note_id: ind=%d",ind);
  istr **row_data = (istr **)array_data(cbfp->dir_list_str);
  if(row_data==NULL) return -1;
- int note_id = row_data[ind]->index;
+ int note_id=-1;
+ if(row_data[ind]) note_id = row_data[ind]->index;
  // MESG("get_current_note_id: = %d",note_id);
  return note_id;
 }
@@ -1857,7 +1858,7 @@ int edit_note(num n)
   char *full_name = get_current_note_name();
  
  if(full_name==NULL) {
- 	error_line("edit_note: note name is null!");
+ 	error_line("edit_note: note does not exist!");
 	return false;
  };
  FILEBUF *bp;
@@ -2140,24 +2141,34 @@ char *get_notes_status()
 {
  static char statuss[MAXLLEN];
  istr **row_data;
+ // MESG("get_notes_status:");
  if(cbfp->b_flag & FSNLIST) {
+ 	// MESG("get_notes_status: FSNLIST");
+ 	// MESG("get_notes_status: FSNLIST current_note_line=%ld",cwp->current_note_line);
+	if(cbfp->dir_list_str){
 	row_data = (istr **)array_data(cbfp->dir_list_str);
+	if(row_data)
 	if(cwp->current_note_line<cbfp->dir_list_str->size)
 		sprintf(statuss,"N %3d",row_data[cwp->current_note_line]->index);
-	else sprintf(statuss,"     ");
+	};
  } else 
  if(cbfp->b_flag & FSNOTES) {
+ 	// MESG("get_notes_status: FSNOTES");
+ 	// MESG("get_notes_status: FSNOTES %s",cwp->current_tag_line);
 	row_data = (istr **)array_data(cbfp->b_tag_list);
-	if(cwp->current_note_line<cbfp->b_tag_list->size)
+	if(row_data)
+	if(cwp->current_note_line<cbfp->b_tag_list->size) {
 		sprintf(statuss,"T %3d %d",row_data[cwp->current_tag_line]->index,row_data[cwp->current_tag_line]->selection_tag);
-	else sprintf(statuss,"     ");
+	};
  } else {
+ 	// MESG("get_notes_status: dir list ?");
+ 	// MESG("get_notes_status: else %d",cwp->current_note_line);
 	row_data = (istr **)array_data(cbfp->dir_list_str);
+	if(row_data)
 	if(cwp->current_note_line<cbfp->dir_list_str->size)
 		sprintf(statuss,"N %3d",row_data[cwp->current_note_line]->index);
-	else sprintf(statuss,"     ");
  };
- 
+ sprintf(statuss,"-----");
  return statuss;
 }
 #endif

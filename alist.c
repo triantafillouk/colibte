@@ -766,9 +766,10 @@ void **array_data(alist *list)
 {
  int i;
  _el *pel;
- // MESG("array_data:");
+ // MESG("array_data: size=%d",list->size);
  if(!list->array_valid) {
  	if(list->data!=NULL) free(list->data);
+	if(list->size==0) return NULL;
 	list->data = (void **) malloc(sizeof(void*)*(list->size+1));
 	 i=0;
 	 for(pel=list->head;pel!=NULL;pel=pel->next) {
