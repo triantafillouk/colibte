@@ -9,7 +9,7 @@
 
 #include "xe.h"
 
-long utf8_to_unicode(unsigned char* const utf8_str, int *size) ;
+long utf8_to_unicode(unsigned char* const utf8_str) ;
 long int unicode_point();
 char *get_bom_description(FILEBUF *fp);
 
@@ -1371,11 +1371,13 @@ offs  FUtfCharAt(FILEBUF *bf, offs offset, utfchar *uc)
 
 offs  FUtfCharAt_nocheck(FILEBUF *bf, offs offset, utfchar *uc)
 {
- int i,ulen;
+ int i,ulen=1;
  offs o=offset;
 	// ulen=FUtfCharLen(bf,o);
 	char ch=FCharAt_NoCheck(bf,o);
-	ulen = utf8charlen_nocheck(ch);
+	if(utf8_error() || bf->b_lang>0 || clen_error) ulen=1;
+	else ulen = utf8charlen_nocheck(ch);
+
 	memset(uc->uval,0,8);
 	for(i=0;i<ulen;i++){
 			uc->uval[i]=FCharAt_NoCheck(bf,o+i);
@@ -1492,15 +1494,15 @@ long int unicode_point()
  if(cbfp->b_lang!=0) return Char();
  else {
   offs o=Offset();
-  int ulen,i;
+  int i;
   long int uchar=0;
-  ulen=FUtfCharLen(cbfp,o);
+  int ulen=FUtfCharLen(cbfp,o);
 
   for(i=0;i<ulen;i++){
   	char_string[i] = CharAt(o+i);
   };
   char_string[ulen]=0;
-  uchar = utf8_to_unicode(char_string,&ulen);
+  uchar = utf8_to_unicode(char_string);
   return(uchar);
  };
 }
@@ -1508,6 +1510,7 @@ long int unicode_point()
 long int utf_value_len(int *len)
 {
  if(utf8_error()) { 
+	*len=1;
 	return Char();
  };
  if(cbfp->b_lang!=0) {
@@ -2819,7 +2822,8 @@ void   MoveLeftChar(FILEBUF *fp)
 				cl=FUtfCharLen(fp,o-i);
 #else			
 				int c0=FCharAt(fp,o-i);
-				cl=utf8charlen_nocheck(c0);
+				if(clen_error>0 || utf8_error()) cl=1;
+				else cl=utf8charlen_nocheck(c0);
 #endif
 //				MESG("prev_char: o=%ld i=%d cl=%d accent=%d",o,i,cl,fp->utf_accent);
 				if(cl==i) {
@@ -3184,7 +3188,7 @@ num fread16(char *file_name,char *buffer,num size)
 int   ReadBlock(char *fname,int fd,offs size,offs *act_read)
 {
    FILEBUF *fp=cbfp;
-   MESG("ReadBlock:[%s] size=%ld",fname,size);
+   // MESG("ReadBlock:[%s] size=%ld",fname,size);
    if(fp->b_flag & FSMMAP)  return false;
    if(size==0)   {
       *act_read=0;
