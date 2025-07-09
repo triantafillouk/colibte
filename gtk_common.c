@@ -19,7 +19,7 @@ int drv_initialized=0;
 char *import_buffer=NULL;
 
 
-long utf8_to_unicode(unsigned char* const utf8_str, int *size) ;
+long utf8_to_unicode(unsigned char* const utf8_str) ;
 
 #define RED_BLACK	1
 
@@ -40,13 +40,14 @@ int get_pango_length(char *st)
  if(cwp->gwp->draw==NULL) return 0;
  // MESG("get_pango_length:1");
 
- int clen;
- int code_unit = utf8_to_unicode((unsigned char *)st,&clen);
+ int code_unit = utf8_to_unicode((unsigned char *)st);
+
 #if	RED_BLACK
  int uni_len = get_rb_ival(utf_lengths,code_unit);
 #else
  int uni_len = get_avl_ival(utf_lengths,code_unit);
 #endif
+
  if(uni_len>=0) return uni_len;
 	// MESG("get_pango_length:[%s] 0x%X",st,st[0]);
 	GeEditDisplay *wd = GTK_EDIT_DISPLAY(cwp->gwp->draw);
@@ -68,6 +69,7 @@ int get_pango_length(char *st)
 	if(wf<0.1) uni_len=0;
 	else if(wf<1.3) uni_len=1;
 	else uni_len=2;
+	 // MESG("	[%s] unit=U%X, uni_len=%d wf=%f",st,code_unit,uni_len,wf);
 
 	// MESG("	insert U%X len=%d",code_unit,uni_len);
 #if	RED_BLACK
@@ -79,37 +81,15 @@ int get_pango_length(char *st)
 }
 
 // Different for each platform, screen driver
-#if	1
 int get_utf_length(utfchar *utf_char_str)
 {
  if(utf_char_str->uval[0]<0x81) return 1;
  if(clen_error) { return 1;};
 
  int plen=get_pango_length((char *)utf_char_str->uval);
+ if(plen>4) plen=1;
  return plen;
 }
-#else
-int get_utf_length(utfchar *utf_char_str)
-{
- int clen=0;
- int code_unit = utf8_to_unicode((unsigned char *)utf_char_str,&clen);
- if(code_unit<=0x80) return 1;
- if(code_unit==0x200E || code_unit==0x200F || code_unit==0x200B) return -1;	/* ltr, rtl, zero space marks */
- int clen_width = wcwidth(code_unit);
-#if	0
- int custom_clen_width = get_utf_custom_length(utf_char_str);
- // if(code_unit>=0xE0041 && code_unit<0xE007B) return custom_clen_width;
- // if(code_unit==0xE33) return custom_clen_width;
-#if	1
- if(custom_clen_width != clen_width) {
- 	MESG("U+%5X -> [%s][%2X%2X%2X] len=%d custom_len=%d",code_unit,utf_char_str,
-		utf_char_str->uval[0],utf_char_str->uval[1],utf_char_str->uval[2],clen_width,custom_clen_width);
- };
-#endif
-#endif
- return clen_width;
-}
-#endif
 
 void set_current_scheme(int scheme)
 {

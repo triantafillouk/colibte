@@ -1905,7 +1905,7 @@ int get_utf_custom_length(utfchar *utf_char_str)
  return 2;
 }
 
-long utf8_to_unicode(unsigned char* const utf8_str, int *size) ;
+long utf8_to_unicode(unsigned char* const utf8_str) ;
 
 extern int custom_cell_width;
 
@@ -1917,9 +1917,10 @@ int get_utf_length(utfchar *utf_char_str)
  } else
 #endif 
  {
- int clen=0;
  if(utf_char_str->uval[0]<0x81) return 1;
- int code_unit = utf8_to_unicode((unsigned char *)utf_char_str,&clen);
+
+ int code_unit = utf8_to_unicode((unsigned char *)utf_char_str);
+
 #if	RED_BLACK
  int uni_len = get_rb_ival(utf_lengths,code_unit);
  if(uni_len>=0) return uni_len;
@@ -1956,35 +1957,5 @@ void drv_start_window_update(WINDP *wp)
 
 #include "menu_common.c"
 
-#if	NUSE
-int utf8_to_unicode(char *s)
-{
-    int charcode = 0;
-	int ind=0;
-    int t = s[ind++];
-    // coded.pop_front();
-    if (t < 128)
-    {
-        return t;
-    }
-    int high_bit_mask = (1 << 6) -1;
-    int high_bit_shift = 0;
-    int total_bits = 0;
-    const int other_bits = 6;
-    while((t & 0xC0) == 0xC0)
-    {
-        t <<= 1;
-        t &= 0xff;
-        total_bits += 6;
-        high_bit_mask >>= 1; 
-        high_bit_shift++;
-        charcode <<= other_bits;
-        charcode |= s[ind] & ((1 << other_bits)-1);
-        t = s[ind++];;
-    } 
-    charcode |= ((t >> high_bit_shift) & high_bit_mask) << total_bits;
-    return charcode;
-}
-#endif
 
 /* --- */
