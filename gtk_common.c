@@ -267,23 +267,64 @@ int put_wstring(WINDP *wp, char *st,int ulen,int attr)
  pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
  pango_layout_get_size (wd->layout, &width, &height);
  int y_pos_correction=0;
+#if	!FAST_GTK_SCREEN
  int c_width=CLEN*ulen;
  if(width<(int)(CLEN*PANGO_SCALE*ulen)) {
 	px=0 ;
 	return -1;
 	c_width=width/PANGO_SCALE+2*CLEN;
  };
+#endif
  // MESG("put_wstring %d %d ulen=%d",width,(int)(CLEN*PANGO_SCALE*ulen),ulen);	/*   */
  cairo_set_source_rgb(wd->cr,ccolorb.red,ccolorb.green,ccolorb.blue);
  // c_width=width/PANGO_SCALE+2*CLEN;
  if(height>CHEIGHTI*PANGO_SCALE) y_pos_correction = height/PANGO_SCALE-CHEIGHTI;
+#if	FAST_GTK_SCREEN
+ cairo_rectangle(wd->cr, px, py, width,CHEIGHTI);
+#else
  cairo_rectangle(wd->cr, px, py, c_width,CHEIGHTI);
+#endif
  cairo_fill(wd->cr);
  cairo_move_to(wd->cr,px+1,py+1-y_pos_correction);
  cairo_set_source_rgb(wd->cr,ccolorf.red,ccolorf.green,ccolorf.blue);
  pango_cairo_show_layout (wd->cr, wd->layout);
  pango_attr_list_unref (attrs);
  px += ulen*CLEN;
+ // MESG("!");
+ return width/PANGO_SCALE;
+}
+
+int width_wstring(WINDP *wp, char *st,int ulen,int attr)
+{
+ GeEditDisplay *wd = GTK_EDIT_DISPLAY(wp->gwp->draw);
+// show text line
+ int width=0,height=0;	/* Pango measurements  */
+ if(wd->layout==NULL){
+ 	wd->layout = pango_cairo_create_layout (wd->cr);
+	// MESG("put_wstring: new layout!");
+ };
+
+	if(attr & FONT_STYLE_BOLD) pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_HEAVY);
+	else pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_NORMAL);
+
+ 	if(attr & FONT_STYLE_ITALIC) pango_font_description_set_style(wd->ge_font_desc,PANGO_STYLE_OBLIQUE);
+	else pango_font_description_set_style(wd->ge_font_desc,PANGO_STYLE_NORMAL);
+
+ 	PangoAttrList * attrs = pango_attr_list_new ();
+	if(attr & FONT_STYLE_UNDERLINE) { 
+		pango_attr_list_insert (attrs, pango_attr_underline_new(PANGO_UNDERLINE_DOUBLE));
+		pango_layout_set_attributes (wd->layout, attrs);
+ 	} else {
+		pango_attr_list_insert (attrs, pango_attr_underline_new(PANGO_UNDERLINE_NONE));
+		pango_layout_set_attributes (wd->layout, attrs);
+ 	};
+ // MESG("ps: [%s]",st);
+ pango_layout_set_text (wd->layout, st, -1);
+ pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
+ pango_layout_get_size (wd->layout, &width, &height);
+ // int y_pos_correction=0;
+
+ pango_attr_list_unref (attrs);
  // MESG("!");
  return width/PANGO_SCALE;
 }
@@ -777,10 +818,14 @@ void put_wtext(WINDP *wp, int row,int maxcol)
 			if(i1>0) {
 				st[i1]=0;
 				drv_move(row,imove);
+#if	FAST_GTK_SCREEN
+				put_wstring(wp,st,col-imove,attr_p);
+#else
 				if(put_wstring(wp,st,col-imove,attr_p)==-1) {
 					put_wtext_slow(wp,row,maxcol);
 					return;
 				};
+#endif
 			};
 			drv_color(fcolor,bcolor);
 			i1=0;
@@ -794,12 +839,83 @@ void put_wtext(WINDP *wp, int row,int maxcol)
 	};
 	if(i1>0) {
 		st[i1]=0;
+#if	FAST_GTK_SCREEN
+		put_wstring(wp,st,col-imove,cattr);
+#else
 		if(put_wstring(wp,st,col-imove,cattr)==-1) {
 			put_wtext_slow(wp,row,maxcol);
 		};
+#endif
 	};
 //	MESG("-- end row %d i1=%d [%s]",row,i1,st);
 	expose_line(row,wp);	/* is needed for GTK2!  */
+}
+
+int set_cursor_xpos(int row,int maxcol)
+{
+ int col;
+ int imax=0;
+ int imin=0;
+ int i1;
+ int xpos=0;
+ if(maxcol==0) return 0;
+ vchar *v1;
+ VIDEO *vp1;
+ int fcolor,bcolor,cattr=0;
+ char st[MAXBLEN];
+ int fcolor_p,bcolor_p,attr_p;
+ int imove=0;
+ vp1 = cwp->vs[row];
+ v1 = vp1->v_text;
+ // MESG("set_cursor_xpos:");
+
+ imin=0;
+ fcolor=v1[0].fcolor;
+ bcolor=v1[0].bcolor;
+ cattr =v1[0].attr;
+ fcolor_p=fcolor;
+ bcolor_p=bcolor;
+ attr_p = cattr;
+ 
+ MESG("---> draw row %d col %d",row,maxcol);
+ 	// drv_color(fcolor,bcolor);
+	imax=maxcol;
+
+	/* count of trailing spaces is maxcol-imtrax */
+	// drv_move(row,imin);
+
+	for(col=imin,i1=0;col<imax;col++) {
+		if(v1[col].uval[0]==0xFF) {	/* skip space of wide utf chars  */
+			// imove--;
+			if(v1[col].uval[1]==0xFF) continue;
+		};
+		fcolor=v1[col].fcolor;
+		bcolor=v1[col].bcolor;
+		cattr =v1[col].attr;
+		
+		if(fcolor!=fcolor_p || bcolor!=bcolor_p || cattr!=attr_p) {
+			if(i1>0) {
+				st[i1]=0;
+				// drv_move(row,imove);
+				xpos+=width_wstring(cwp,st,col-imove,attr_p);
+			};
+			// drv_color(fcolor,bcolor);
+			i1=0;
+			imove=col; 
+			fcolor_p=fcolor;bcolor_p=bcolor;attr_p=cattr;
+		};
+		// if(v1[col].uval[0]==0x20) p_space=1;
+		i1=addutfvchar1(st,&v1[col],i1,cwp->w_fp);
+		st[i1]=0;
+		// if(v1[col+1].uval[0]!=0xFF) p_space=0;
+	};
+	if(i1>0) {
+		st[i1]=0;
+		xpos+=width_wstring(cwp,st,col-imove,cattr);
+	};
+//	MESG("-- end row %d i1=%d [%s]",row,i1,st);
+	// MESG("set_cursor_xpos: xpos=%d, %D",xpos,xpos/PANGO_SCALE);
+	return xpos;
 }
 
 int select_font_mono(num n)

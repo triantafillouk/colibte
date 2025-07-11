@@ -46,6 +46,7 @@ void restore_original_colors();
 int set_tag_view_position(int line,int column);
 int change_sort_mode(int mouse_col);
 int listdir(int dtype);
+int slow_screen();
 
 BOX *cbox=NULL; // current box
 BOX *msg_box=NULL;	// current message box
@@ -2050,7 +2051,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 	imax=maxcol+1;
 
 //	SLOW down and clear the whole line before write!
-	if(bt_dval("slow_display")>0) {
+	if(slow_screen()) {
 		fcolor = v1->fcolor;
 		bcolor = v1->bcolor;
 		drv_wcolor(wp->gwp->draw,fcolor,bcolor);

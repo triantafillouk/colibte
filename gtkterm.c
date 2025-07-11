@@ -39,6 +39,7 @@ int put_wtext1(WINDP *wp, int row,int pos_x,int col);
 void set_cursor(int val,char *from);
 char **get_scheme_names();
 void upd_all_wrap_lines(WINDP *wp,char *from);
+int set_cursor_xpos(int row,int current_column);
 
 /* local variables */
 int color_scheme_ind;
@@ -500,6 +501,11 @@ void show_cursor (char *from)
 
 	wd = GTK_EDIT_DISPLAY(cwp->gwp->draw);
 
+#if	FAST_GTK_SCREEN
+	px=set_cursor_xpos(cposy,cposx);
+#endif
+
+	// MESG("show_cursor: xpos=%d px=%d",xpos,px);
 #if	SHOW_CLINE
 	area.x = 0;
 	area.height = 2;	/* current line height  */

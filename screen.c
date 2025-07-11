@@ -48,6 +48,7 @@ extern int sel_tags[11];
 extern int num_of_selected_tags;
 
 int col0,col1;
+int slow_screen_flag=0;
 
 extern int cursor_showing;
 extern alist *window_list;
@@ -87,6 +88,11 @@ int addutfvchar(char *str, vchar *vc, int pos, FILEBUF *w_fp)
 void set_screen_update(int flag)
 {
 	noupdate = flag ? 0:1;
+}
+
+int slow_screen()
+{
+	return slow_screen_flag;
 }
 
 /* set virtual character with color */
@@ -505,6 +511,7 @@ void draw_window(int flag, WINDP *wp,char *from)
  // int ulines=0;
 	hide_cursor("draw_window");
 	// MESG(" draw_window: id=%d from=%s ind=%d",wp->id,from,ind);
+	if(bt_dval("slow_display")>0) slow_screen_flag=1;else slow_screen_flag=0;
 	drv_start_window_update(wp);
  	prepare_converter(wp->w_fp->b_lang);
 	set_window_font(wp);
@@ -519,7 +526,7 @@ void draw_window(int flag, WINDP *wp,char *from)
 		/* for each line that needs to be updated*/
 		if ((wp->vs[i]->v_flag) ) 
 		{
-			if(bt_dval("slow_display")>0) {
+			if(slow_screen()) {
 				drv_clear_line(wp,i);
 				wp->vtcol=0;
 			};

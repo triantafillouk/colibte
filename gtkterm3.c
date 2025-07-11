@@ -34,6 +34,7 @@ void set_window_font(WINDP *wp);
 void ge_edit_display_expose_area(GtkWidget *widget, GdkRectangle *area);
 char **get_scheme_names();
 void upd_all_wrap_lines(WINDP *wp,char *from);
+int set_cursor_xpos(int row,int current_column);
 
 GdkRGBA *current_colors[COLOR_TYPES];
 
@@ -496,7 +497,12 @@ void show_cursor (char *from)
 		// MESG("show_cursor: already shown! %d>",ind++);
 		return;
 	};
-	// MESG("show_cursor: start from %s",from);
+	MESG("show_cursor:");
+#if	FAST_GTK_SCREEN
+	px=set_cursor_xpos(cposy,cposx);
+#endif
+
+	MESG("show_cursor: start from %s px=%d",from,px);
 #if	SHOW_CLINE
 	area.x = 0;
 	area.height = 5;	/* current line height  */
