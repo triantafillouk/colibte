@@ -148,7 +148,7 @@ static RB_INODE *new_rb_inode()
 static RB_INODE *add_RB_INODE(RB_ITREE *bt,int index)
 {
  RB_INODE *btn;	/* new node  */
- int depth=0;
+ // int depth=0;
 	// MESG("		add %X",index);
  	if(bt->root==NULL) {
 		btn=new_rb_inode();
@@ -189,7 +189,7 @@ static RB_INODE *add_RB_INODE(RB_ITREE *bt,int index)
 				return(btn);
 			} else btn=btn->left;
 		};
-		depth++;
+		// depth++;
 	};
 	/* should not pass from here!! */
 	return(NULL);

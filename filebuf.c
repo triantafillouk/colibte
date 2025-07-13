@@ -8,6 +8,7 @@
 */
 
 #include "xe.h"
+#include	<wchar.h>
 
 long utf8_to_unicode(unsigned char* const utf8_str) ;
 long int unicode_point();
@@ -416,6 +417,13 @@ int show_info(num n)
 /* return the byte size of accents at offset */
 int is_utf_accent(FILEBUF *fp, offs o)
 {
+#if	0
+ utfchar uc;
+ FUtfCharAt(fp,o,&uc);
+ int code_unit = utf8_to_unicode(uc.uval);
+ int u1=wcwidth(code_unit);
+ if(u1==0) return 1;else return 0;
+#else
  int ch,ch1;
  ch=FCharAt(fp,o);
  ch1=FCharAt(fp,o+1);
@@ -436,6 +444,7 @@ int is_utf_accent(FILEBUF *fp, offs o)
 		return 2;
 	};
  } else return 0;
+#endif
 }
 
 

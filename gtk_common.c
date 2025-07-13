@@ -48,8 +48,8 @@ int get_pango_length(char *st)
  int uni_len = get_avl_ival(utf_lengths,code_unit);
 #endif
 
+	// MESG("get_pango_length:[%s] 0x%X U%X len=%d",st,st[0],code_unit,uni_len);
  if(uni_len>=0) return uni_len;
-	// MESG("get_pango_length:[%s] 0x%X",st,st[0]);
 	GeEditDisplay *wd = GTK_EDIT_DISPLAY(cwp->gwp->draw);
 
 	if(wd->layout==NULL) {
@@ -70,6 +70,8 @@ int get_pango_length(char *st)
 	else if(wf<1.3) uni_len=1;
 	else uni_len=2;
 	 // MESG("	[%s] unit=U%X, uni_len=%d wf=%f",st,code_unit,uni_len,wf);
+	int u1 = wcwidth(code_unit);
+	if(u1==0) uni_len=0;
 
 	// MESG("	insert U%X len=%d",code_unit,uni_len);
 #if	RED_BLACK
@@ -85,7 +87,13 @@ int get_utf_length(utfchar *utf_char_str)
 {
  if(utf_char_str->uval[0]<0x81) return 1;
  if(clen_error) { return 1;};
-
+#if	0
+ if(utf_char_str->uval[0]==0xCC) { 
+ 	int plen=get_pango_length((char *)utf_char_str->uval);
+	MESG("accent [%s] plen=%d",utf_char_str->uval,plen);
+	return 0;
+ };
+#endif
  int plen=get_pango_length((char *)utf_char_str->uval);
  if(plen>4) plen=1;
  return plen;
@@ -877,7 +885,7 @@ int set_cursor_xpos(int row,int maxcol)
  bcolor_p=bcolor;
  attr_p = cattr;
  
- MESG("---> draw row %d col %d",row,maxcol);
+	//  MESG("---> draw row %d col %d",row,maxcol);
  	// drv_color(fcolor,bcolor);
 	imax=maxcol;
 
