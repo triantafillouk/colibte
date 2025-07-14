@@ -75,7 +75,7 @@ void end_draw(GeEditDisplay *wd,char *message);
 char **mono_fonts_list;
 int mono_fonts_number;
 
-GtkStyle *st1a,*st1i,*st3a,*st3i;
+// GtkStyle *st1a,*st1i,*st3a,*st3i;
 static GtkIMContext *im_context;
 GtkWidget *table1,*colors_win=NULL;
 void set_box_background_color(GtkWidget *box,char *color);

@@ -737,6 +737,7 @@ int addutfvchar1(char *str, vchar *vc, int pos,FILEBUF *w_fp)
  return pos;
 }
 
+#if	0
 void put_wtext_slow(WINDP *wp, int row,int maxcol)
 {
  int col;
@@ -780,6 +781,7 @@ void put_wtext_slow(WINDP *wp, int row,int maxcol)
 	// MESG("-- end slow row %d i1=%d [%s]",row,i1,st);
 	expose_line(row,wp);	/* is needed for GTK2!  */
 }
+#endif
 
 // draw window row on screen
 void put_wtext(WINDP *wp, int row,int maxcol)
@@ -856,7 +858,8 @@ void put_wtext(WINDP *wp, int row,int maxcol)
 #endif
 	};
 //	MESG("-- end row %d i1=%d [%s]",row,i1,st);
-	expose_line(row,wp);	/* is needed for GTK2!  */
+	// expose_line(row,wp);
+	// gdk_flush();
 }
 
 int set_cursor_xpos(int row,int maxcol)
@@ -960,7 +963,7 @@ int set_font(char *font_name)
  GeEditDisplay *wd;
  current_font_name = font_name;
  if(!window_list) return FALSE; 
- MESG("set_font:");
+ // MESG("set_font:");
  /* change cairo font for all windows */
  lbegin(window_list);
  hide_cursor("set_font");

@@ -546,6 +546,7 @@ void show_cursor (char *from)
 	cpposx=cposx;
 	cpposy=cposy;
 	cursor_showing=1;
+	expose_line(area.y/CHEIGHTI,cwp);	/* is needed for GTK2!  */
 }
 
 // draw window character on screen
@@ -661,7 +662,7 @@ void hide_cursor (char *from)
 	put_wtext1(cwp,cpposy,cpposx,ppx);
 	ge_edit_display_expose_area(cwp->gwp->draw,&area);
 #endif
-// 	gdk_flush();
+	expose_line(ppy/CHEIGHTI,cwp);
 }
 
 char *get_font_string();
@@ -1093,35 +1094,39 @@ GWINDP * ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype)
  new_gwp->hstatus = gtk_hbox_new(FALSE,1);
  new_gwp->evb_hstatus = gtk_event_box_new();
  gtk_container_set_border_width(GTK_CONTAINER(new_gwp->evb_hstatus),0);
- gtk_container_set_border_width(GTK_CONTAINER(new_gwp->hstatus),0);
+ gtk_container_set_border_width(GTK_CONTAINER(new_gwp->hstatus),1);
  gtk_container_add (GTK_CONTAINER(new_gwp->evb_hstatus), new_gwp->hstatus);
  gtk_event_box_set_above_child ((GtkEventBox *)new_gwp->evb_hstatus,0);
  new_gwp->status2 = gtk_entry_new();
- new_gwp->status1 = gtk_entry_new();
- new_gwp->status3 = gtk_entry_new();
  gtk_entry_set_has_frame((GtkEntry *)new_gwp->status2,0);
+
+ new_gwp->status1 = gtk_entry_new();
+
+ new_gwp->status3 = gtk_entry_new();
+ gtk_entry_set_editable((GtkEntry *)new_gwp->status3,FALSE);
+ gtk_entry_set_inner_border((GtkEntry *)new_gwp->status3,NULL);
+ gtk_entry_set_width_chars (GTK_ENTRY (new_gwp->status3), 20);
+ gtk_entry_set_alignment((GtkEntry *)new_gwp->status3,1);
+ gtk_entry_set_has_frame((GtkEntry *)new_gwp->status3,FALSE);
+ gtk_widget_set_style(new_gwp->status3,st3a);
+
 
  gtk_entry_set_editable((GtkEntry *)new_gwp->status1,FALSE);
  gtk_entry_set_inner_border((GtkEntry *)new_gwp->status1,NULL);
  gtk_entry_set_editable((GtkEntry *)new_gwp->status2,FALSE);
  gtk_entry_set_inner_border((GtkEntry *)new_gwp->status2,NULL);
- gtk_entry_set_editable((GtkEntry *)new_gwp->status3,FALSE);
- gtk_entry_set_inner_border((GtkEntry *)new_gwp->status3,NULL);
 
- gtk_entry_set_width_chars (GTK_ENTRY (new_gwp->status3), 20);
  gtk_entry_set_width_chars (GTK_ENTRY (new_gwp->status2), 5);
  if(wp->w_fp!=NULL) gtk_entry_set_text((GtkEntry *)new_gwp->status1,wp->w_fp->b_fname);
- gtk_entry_set_alignment((GtkEntry *)new_gwp->status3,1);
 
  gtk_entry_set_has_frame((GtkEntry *)new_gwp->status2,FALSE);
  gtk_entry_set_has_frame((GtkEntry *)new_gwp->status1,FALSE);
- gtk_entry_set_has_frame((GtkEntry *)new_gwp->status3,FALSE);
 
  // clear the default style
 // gtk_widget_set_style(new_gwp->evb_hstatus,st1i); 
  gtk_widget_set_style(new_gwp->status1,st1a); 
- gtk_widget_set_style(new_gwp->status3,st3a);
  gtk_widget_set_style(new_gwp->status2,st3a); 
+ gtk_widget_set_style(new_gwp->status3,st3a); 
  gtk_box_pack_start (GTK_BOX (new_gwp->hbox), (GtkWidget *)new_gwp->scroll_bar, FALSE, FALSE, 0);
  
  gtk_box_pack_start (GTK_BOX (new_gwp->box), (GtkWidget *)new_gwp->evb_hstatus, FALSE, TRUE, 0);
