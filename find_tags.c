@@ -134,7 +134,7 @@ int main(int arg_count,char **args)
  int total_tags=0;
  for(i=0;file_names[i]!=NULL;i++) {
 	struct stat st;
-	if(!stat(file_names[i],&st))
+	if(!stat(file_names[i],&st)){
 	if(!S_ISDIR(st.st_mode)) 
 	{
 		if(size<10) continue;
@@ -153,7 +153,7 @@ int main(int arg_count,char **args)
 		total_tags+=check_for_tags(file_names[i],st.st_size);
 		//FILEBUF *bp;
 		};
-	} else total_dirs++;
+	}} else { total_dirs++;};
  };
  MESG("total %d files in %d dirs to parse, total_tags=%d",total_files,total_dirs,total_tags);
  return 0;
