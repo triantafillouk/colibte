@@ -121,7 +121,6 @@ short   kbdm_session[MAXSESSION];			/* keyboard session buffer  */
 short	*kbdsptr=&kbdm_session[0];		/* current position in keyboard session buf */
 short	*kbdsession_end = &kbdm_session[0];	/* ptr to end of the keyboard session buffer*/
 #endif
-int	macbug = 0;		/* macro debuging flag		*/
 extern int show_stage;
 
 extern char search_pattern[];	// search pattern
@@ -175,27 +174,6 @@ BTNODE *find_bt_element(char *name)
  return(btn);
 }
 
-int set_debug(num n)
-{
-	macbug=n;
-	return true;
-}
-
-int debug_flag()
-{
-	return macbug;
-}
-
-void increase_debug_flag()
-{
-	macbug++;
-}
-
-void decrease_debug_flag()
-{
-	macbug--;
-	if(macbug<0) macbug=0;
-}
 
 /* This is editors environment get function */
 double get_env(int vnum)
@@ -239,7 +217,7 @@ double get_env(int vnum)
 		case EVNWORD:	
 			strlcpy(svalue,getnword(),MAXLLEN);
 			break;
-		case EVDEBUG:	v1=macbug; return(v1); break;
+		case EVDEBUG:	v1=debug_flag(); return(v1); break;
 
 		case EVFCOLOR:	v1=cwp->w_fcolor;break;
 		case EVBCOLOR:	v1=cwp->w_bcolor;break;
@@ -522,7 +500,7 @@ void set_env(int vnum,char *svalue,double value)
 		// _found is read only
 		// _next_word is read only
 		case EVDEBUG: 
-				macbug = v1;
+				set_debug((int) v1);
 				return;
 				break;
 		case EVFCOLOR: 

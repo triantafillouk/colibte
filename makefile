@@ -266,6 +266,9 @@ ctg3: tplot.o gsystem.o gldisplay.o edit.o gtkterm3.o dir.o screen3.o  eval.o ml
 ctg2 : gmain.o gsystem.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o   gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o plot_cairo.c  config_init.o utf8_support.o notes.o mlangf.o
 	${CC} gmain.o gsystem.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o notes.o mlangf.o -o ctg2  $(GTK2_FLAGS)  -lm
 
+find_tags: find_tags.c support.o alist.o
+	${CC} find_tags.c support.o alist.o -o find_tags
+
 # This is with Xlib library, no plot !
 ctxe : main.o system.o edit.o screen.o  xldisplay.o eval.o mlang.o  file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o  highlight.o dir.o utils.o alist.o filebuf.o support.o config_init.o utf8_support.o mlangf.o notes.o
 	${CC} main.o system.o edit.o screen.o   xldisplay.o eval.o mlang.o file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o highlight.o dir.o utils.o alist.o  filebuf.o support.o config_init.o utf8_support.o mlangf.o notes.o -o ctxe -lm  $(GLIB_LIB) ${X11lib} 
