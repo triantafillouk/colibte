@@ -1777,6 +1777,8 @@ void highlight_jscript(int c)
 		break;
 	/* single quotes */
 	case CHR_SQUOTE: 
+		if(hquotem & H_QUOTE4) break;
+		if(hquotem & H_QUOTE2) break;
 		if(hquotem&H_QUOTEC) break;
 		if(hstate==HS_PREVESC) { hstate=0;break;};
 		if(!(hquotem & H_QUOTE7)) {
@@ -1791,7 +1793,7 @@ void highlight_jscript(int c)
 		hstate=0;
 		break;
 	/* double quotes */
-	case '`':
+	// case '`':
 	case CHR_DQUOTE:
 		if(hquotem&H_QUOTEC) break;
 		if(hstate==HS_PREVESC) { hstate=0;break;};
@@ -1808,6 +1810,8 @@ void highlight_jscript(int c)
 		break;
 	/* c comments */
 	case '*': 
+		if(hquotem & H_QUOTE2) break;
+		if(hquotem & H_QUOTE4) break;
 		if(hstate==HS_PREVESC) { hstate=0;break;};
 		if(hquotem!=H_QUOTE5) {
 			if(hstate==HS_PREVSLASH) hquotem = H_QUOTEC;
@@ -1815,11 +1819,15 @@ void highlight_jscript(int c)
 		hstate=HS_PREVAST;
 		break;
 	case '#':
+		if(hquotem & H_QUOTE2) break;
+		if(hquotem & H_QUOTE4) break;
 		if(hstate==HS_LINESTART) hquotem = (hquotem)? hquotem : H_QUOTE6;
 		hstate=0;
 		break;
 	/* comments */
 	case '/':
+		if(hquotem & H_QUOTE2) break;
+		if(hquotem & H_QUOTE4) break;
 		if(hstate==HS_ASSIGN) { 
 			hstate=0;
 			hquotem=H_QUOTE12;break;

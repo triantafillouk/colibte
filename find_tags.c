@@ -92,15 +92,13 @@ int check_for_tags(char *fname,size_t size)
 	size_t bytes_read=fread(buffer,size,1,f);
  	// MESG("Check for tags in %s size %ld",fname,size);
 	tags_num=find_tags(fname,buffer,size);
-	
  	free(buffer);
  } else { 
  	MESG("cannot allocate memory of %ld bytes",size);
- 	fclose(f);
-	return 0;
  };
-   return tags_num;
- } else { MESG("cannot open file %s",fname);return 0;}; 
+	fclose(f);
+ } else { MESG("cannot open file %s",fname);}; 
+ return tags_num;
 }
 
 
