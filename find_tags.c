@@ -66,7 +66,8 @@ int find_tags(char *fname,char *buffer,size_t size)
 			if(tag_node==NULL) {
 				add_btnode(tags_tree,tag);
 				discrete_tags++;
-				MESG("	new tag [%s]  at position %d  of %s",tag,tag_position,get_base_name(fname));
+				// MESG("	new tag [%s]  at position %d  of %s",tag,tag_position,get_base_name(fname));
+				MESG("	new tag [%s]  at position %d  of %s",tag,tag_position,fname);
 			} else {
 				// MESG("	old tag [%s] %X at position %d size %d",tag,tag[tag_size],tag_position,tag_size);
 			};
@@ -85,9 +86,9 @@ int find_tags(char *fname,char *buffer,size_t size)
 int check_for_tags(char *fname,size_t size)
 {
  FILE *f = fopen(fname,"r");
+ int tags_num=0;
  if(f) {
  char *buffer = malloc(size);
- int tags_num=0;
  if(buffer) {
 	size_t bytes_read=fread(buffer,size,1,f);
  	// MESG("Check for tags in %s size %ld",fname,size);
@@ -122,14 +123,16 @@ int main(int arg_count,char **args)
  sprintf(tmp_file,"/tmp/notes_contents.out");
  sprintf(cmd,"find -L %s  >%s 2>/dev/null",dir_name,tmp_file);
  status = system(cmd);
- if(status!=0) { MESG("cannot read directory %s!",dir_name);return 2;};
+ if(status%0x100!=0) { MESG("cannot read directory %s! status=%d",dir_name,status);return 2;};
  sync();
  tags_tree = new_btree("tag_tree",0);
 
  file_names = read_sarray(tmp_file,&size);
+ MESG("found %ld files",size);
  int i,total_files=0;
  int total_dirs=0;
  int total_tags=0;
+ int total_fails=0;
  for(i=0;file_names[i]!=NULL;i++) {
 	struct stat st;
 	if(!stat(file_names[i],&st)){
@@ -151,8 +154,12 @@ int main(int arg_count,char **args)
 		total_tags+=check_for_tags(file_names[i],st.st_size);
 		//FILEBUF *bp;
 		};
-	}} else { total_dirs++;};
+	} else {total_dirs++;} 
+	} else {
+		total_fails++;
+		MESG("# ---- fail to stat %s",file_names[i]);
+	};
  };
- MESG("total %d files in %d dirs to parse, total_tags=%d",total_files,total_dirs,total_tags);
+ MESG("total %d files in %d dirs, %d fails , total_tags=%d",total_files,total_dirs,total_fails,total_tags);
  return 0;
 }
