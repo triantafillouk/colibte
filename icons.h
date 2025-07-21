@@ -1011,7 +1011,7 @@ char *run_xpm[] = {
 "yyyyyyyyyy +yyyyyyyyyy",
 "yyyyyyyyyyyyyyyyyyyyyy"
 };
-#if	GTK3
+#if	GTK3 | GTK4
 static char * exact_xpm[] = {
 "18 18 29 1",
 " 	c None",

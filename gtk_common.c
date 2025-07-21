@@ -2012,6 +2012,18 @@ int new_shell(num n)
 	else return(TRUE);
 }
 
+#if	GTK4
+
+void ge_edit_display_realize (GtkWidget *widget);
+
+static void activate(GtkApplication *app, gpointer user_data)
+{
+ GtkWidget *window = gtk_application_window_new (app);
+ ge_edit_display_realize(window);
+ gtk_window_present (GTK_WINDOW (window));
+}
+#endif
+
 void main_loop()
 {
 	update_screen(TRUE);
@@ -2022,7 +2034,19 @@ void main_loop()
 		usleep(10000);
 	};
 #else
+#if	GTK4
+	MESG("start application!");
+	GtkApplication *app;
+	int status;
+
+	app = gtk_application_new ("org.gtk.example", G_APPLICATION_DEFAULT_FLAGS);
+	g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
+	status = g_application_run (G_APPLICATION (app), argc, argv);
+	g_object_unref (app);
+	exit(0);
+#else
 	gtk_main();
+#endif
 #endif
 }
 

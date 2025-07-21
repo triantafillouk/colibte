@@ -46,6 +46,7 @@
 #define	DRIVER_XLIB		1
 #define	DRIVER_GTK2		2
 #define DRIVER_GTK3		3
+#define DRIVER_GTK4		4
 
 #define DIR_NAME_POSITION	30
 #define	TAGS_WIDTH	15
@@ -330,7 +331,7 @@ typedef struct GWINDP {
  GtkWidget *box;
  GtkBox *hbox;
  void *draw;	// geditdisplay widget
- GtkVScrollbar *scroll_bar;	// scrollbar
+ GtkScrollbar *scroll_bar;	// scrollbar
  GtkAdjustment *draw_adj;
  int ptype; 	/* parent type 1->vertical, 2->horizontal, 0->no split allowed */
  struct BTWE *bte;
@@ -390,7 +391,7 @@ typedef struct BTWE {
 	int id;		/* needed for debugging */
 	int	type; /* 0=root left=1, right=2 */
 	GtkBox *pbox;
-	GtkVBox *pan;
+	GtkBox *pan;
 } BTWE;
 #else
 typedef struct BTWE {
