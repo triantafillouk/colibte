@@ -920,7 +920,7 @@ void  FindOffset(TextPoint *tp)
 	o=FUtfCharAt(fp,o,&uc);
 	if(uc.uval[0]=='\n'||uc.uval[0]=='\r') {
 		o--;
-		error_line("FindOffset: EOL, column bigger than expected! %d %d",c,tp->col);
+		// error_line("FindOffset: EOL, column bigger than expected! %d %d",c,tp->col);
 		break;
 	};
 	if(uc.uval[0]=='\t') c=next_tab(c);
