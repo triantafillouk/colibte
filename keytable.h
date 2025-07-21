@@ -469,7 +469,7 @@ KEYTAB keytab_dir[] = {
 	{CNTRL|'M',	dir_exec,"^M"},
 	{'e',		dir_edit,"e"},
 	{'c',		dir_copy,"c"},
-	{SPEC1|15,  dir_copy,"F5"},
+	{SPEC1|15,  find_next,"F5 or ^KEY-DOWN"},
 	{'o',		dir_clone,"o"},
 	{'l',		dir_link,"l"},
 	{'m',		dir_move,"m"},

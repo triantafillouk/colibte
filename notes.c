@@ -18,6 +18,7 @@ extern FILEBUF *cbfp;
 offs find_str_reol(FILEBUF *fp, offs start, char *needle_string, char *return_string,int max_len);
 #endif
 extern int scratch_files[];
+int bom_type(int file_id);
 
 #if	TNOTES
 notes_struct *init_note();
@@ -26,6 +27,7 @@ char *get_current_tag_name();
 time_t get_note_timestamp(char *note_name);
 long int query_int(sqlite3 *db,char *sql_string);
 void set_highlight(FILEBUF *bf,int type);
+void init_note_keys();
 
 int insert_preamble(FILEBUF *fp,int type)
 {
@@ -177,7 +179,7 @@ notes_struct *init_note()
 		note->n_title[0]=0;
 		note->n_cat[0]=0;
 		note->n_tags[0]=0;
-		note->encrypt_flag=0;
+		// note->encrypt_flag=0;
 		note->timestamp=0;
 	};
 	return note;
@@ -1155,7 +1157,9 @@ int init_notes_db(num n)
  int stat;
 
 //	MESG("init_notes_db: sqlite3 version is %s",sqlite3_libversion());
-	if((db=notes_db_open("init_notes_db"))==NULL) return false;
+	if((db=notes_db_open("init_notes_db"))==NULL) {
+		return false;
+	};
 	// MESG("init_notes_db: db file opened!");
 	char *sql = "DROP TABLE IF EXISTS notes;"\
 				"CREATE TABLE notes(Id int primary key, Name TEXT, Title TEXT, Date TEXT, Category TEXT, Encrypt int, Timestamp int);"\
@@ -1179,6 +1183,9 @@ int init_notes_db(num n)
 }
 
 
+#define	INIT_DB		1
+#define	RESET_KEY	2
+
 // reconstruct notes database from file contents.
 int recreate_notes_db(num init_db)
 {
@@ -1191,9 +1198,9 @@ int recreate_notes_db(num init_db)
 	// MESG("--- recreate_notes_db: ---- n=%d",n);
 	set_bt_num_val("notes_recreate",1);
 	// create notes db
-	if(init_db){
-		// MESG("recreate_note_db: Initialize database!");
-		status = init_notes_db(1);
+	if(init_db==INIT_DB){
+		MESG("recreate_note_db: Initialize database!");
+		if(!init_notes_db(1)) return false;
 	};
 	set_bfname(notes_dir,NOTES_DIR);
 	// set_notes_key(1);
@@ -1214,7 +1221,7 @@ int recreate_notes_db(num init_db)
 	int start_notes=0;
 	start_notes = sindex(notes_files[0],"/Notes")+6;
 	char notes_name[MAXFLEN];
-
+	init_note_keys();
 	for(i=0 ;notes_files[i]!=NULL;i++){
 		struct stat st;
 		// MESG("---- insert %d: [%s]",i,notes_files[i]);
@@ -1246,14 +1253,47 @@ int recreate_notes_db(num init_db)
 					};
 				};
 
-				// FILEBUF *current_buffer=cbfp;
+
+				// MESG("  #%3d: go parse %s",i,notes_files[i]);
 				bp=new_filebuf(notes_files[i],0);
-				
+
+				if(init_db == RESET_KEY) {
+#if	1
+					char fname[MAXFLEN];
+					if(snprintf(fname,sizeof(fname),"%s/%s",bp->b_dname,bp->b_fname)<sizeof(fname)) {
+					bp->file_id = open(fname,O_RDONLY);
+					bp->bom_type = bom_type(bp->file_id);
+					if (bp->bom_type == FTYPE_ENCRYPTED) {
+						close(bp->file_id);
+						// MESG("update crypt password for [%s]",fname);
+						set_bt_num_val("notes_key",0);
+						activate_file(bp);
+						bp->b_mode |= EMCRYPT;
+						// MESG("	-1 [%s] b_mode=%X",bp->b_fname,bp->b_mode);
+						set_bt_num_val("notes_key",1);
+						bp->b_state = FS_CHG;
+						bp->b_key[0]=0;
+						bp->b_type=NOTE_TYPE;
+						// MESG(" -2 [%s] ",fname);
+#if	1
+						// FILEBUF *ori_buf=cbfp;
+						// cbfp=bp;
+						writeout(fname,bp);
+						// cbfp = ori_buf;
+#endif
+						MESG("	- file [%s] is encrypted",fname);
+
+						set_bt_num_val("notes_key",0);
+						notes_same++;
+					}};
+					delete_filebuf(bp,1);
+					continue;
+#endif
+				};
 
 				bp->b_note = s_note;
-				// select_filebuf(bp);
 				activate_file(bp);
-				// MESG("  #%3d: go parse %s",i,notes_files[i]);
+
 				if(!parse_note(bp)) {
 					msg_line(" file [%s] Not a note file !!!!!!!!!!!!",notes_files[i]);
 					delete_filebuf(bp,1);
@@ -1262,12 +1302,13 @@ int recreate_notes_db(num init_db)
 					notes_failparse++;
 					continue;					
 				};
-				// MESG("  %3d: add - n=[%s] title=[%s] cat=[%s] tags=[%s]",i,s_note->n_name,s_note->n_title,s_note->n_cat,s_note->n_tags);
+				MESG("  %3d: add - n=[%s] title=[%s] cat=[%s] tags=[%s] cr=[%s]",i,s_note->n_name,s_note->n_title,s_note->n_cat,s_note->n_tags,bp->b_key);
 				s_note->timestamp = st.st_mtime;
 				status=save_to_db(s_note);
 				notes_new++;
 				// select_filebuf(current_buffer);
 				delete_filebuf(bp,1);
+
 				// MESG("	+ %3d note added [%s]!",i,notes_files[i]);
 			} else {
 				dirs++;
@@ -1758,7 +1799,8 @@ int get_current_note_id()
  // MESG("get_current_note_id: ind=%d",ind);
  istr **row_data = (istr **)array_data(cbfp->dir_list_str);
  if(row_data==NULL) return -1;
- int note_id = row_data[ind]->index;
+ int note_id=-1;
+ if(row_data[ind]) note_id = row_data[ind]->index;
  // MESG("get_current_note_id: = %d",note_id);
  return note_id;
 }
@@ -1816,7 +1858,7 @@ int edit_note(num n)
   char *full_name = get_current_note_name();
  
  if(full_name==NULL) {
- 	error_line("edit_note: note name is null!");
+ 	error_line("edit_note: note does not exist!");
 	return false;
  };
  FILEBUF *bp;
@@ -2040,26 +2082,49 @@ int save_as_note(num n)
 	return true;
 }
 
-char *notes_key=NULL;
+char *note_keys[2];
 
-char *get_notes_key()
+void init_note_keys()
 {
-	return notes_key;
+	// set_bt_num_val("notes_key",0);
+	if(note_keys[0]!=NULL) {
+		free(note_keys[0]);
+		note_keys[0]=NULL;
+	};
+	if(note_keys[1]!=NULL) {
+		free(note_keys[0]);
+		note_keys[1]=NULL;
+	};
 }
 
-void set_local_notes_key(char *key)
+char *get_notes_key(int key_type)
 {
-	if(notes_key==NULL) notes_key=(char *)malloc(MAXSLEN);
+	// MESG("get_notes_key: %d",key_type);
+	if(note_keys[key_type]==NULL) 
+		set_notes_key(key_type);
+	return note_keys[key_type];
+}
+
+#define	OLD_NOTES_KEY	0
+#define	NEW_NOTES_KEY	1
+
+void set_local_notes_key(char *key,int key_type)
+{
+	if(note_keys[key_type]==NULL) note_keys[key_type]=(char *)malloc(MAXSLEN);
 	if(strlen(key)>MAXSLEN) ERROR("notes key too big");
-	strlcpy(notes_key,key,MAXSLEN);	
+	strlcpy(note_keys[key_type],key,MAXSLEN);	
 }
 
-int set_notes_key(num n)
+
+int set_notes_key(num key_type)
 {
 	char b_key[MAXSLEN];
 	int status=1;
 	b_key[0]=0;
 	// MESG("set_notes_key:");
+	if(key_type) 
+	status = nextarg("New Notes Encryption String: ", b_key, MAXSLEN,false);
+	else
 	status = nextarg("Notes Encryption String: ", b_key, MAXSLEN,false);
 //	disinp = odisinp;
 	if (status != TRUE)  return(status);
@@ -2067,8 +2132,8 @@ int set_notes_key(num n)
 	/* and encrypt it */
 	crypt_string(NULL, 0L);
 	crypt_string(b_key, strlen(b_key));
-	set_local_notes_key(b_key);
-	msg_line("notes key set ok!");
+	set_local_notes_key(b_key,key_type);
+	// msg_line("notes key %ld set ok!",key_type);
 	return true;
 }
 
@@ -2076,24 +2141,34 @@ char *get_notes_status()
 {
  static char statuss[MAXLLEN];
  istr **row_data;
+ // MESG("get_notes_status:");
  if(cbfp->b_flag & FSNLIST) {
+ 	// MESG("get_notes_status: FSNLIST");
+ 	// MESG("get_notes_status: FSNLIST current_note_line=%ld",cwp->current_note_line);
+	if(cbfp->dir_list_str){
 	row_data = (istr **)array_data(cbfp->dir_list_str);
+	if(row_data)
 	if(cwp->current_note_line<cbfp->dir_list_str->size)
 		sprintf(statuss,"N %3d",row_data[cwp->current_note_line]->index);
-	else sprintf(statuss,"     ");
+	};
  } else 
  if(cbfp->b_flag & FSNOTES) {
+ 	// MESG("get_notes_status: FSNOTES");
+ 	// MESG("get_notes_status: FSNOTES %s",cwp->current_tag_line);
 	row_data = (istr **)array_data(cbfp->b_tag_list);
-	if(cwp->current_note_line<cbfp->b_tag_list->size)
+	if(row_data)
+	if(cwp->current_note_line<cbfp->b_tag_list->size) {
 		sprintf(statuss,"T %3d %d",row_data[cwp->current_tag_line]->index,row_data[cwp->current_tag_line]->selection_tag);
-	else sprintf(statuss,"     ");
+	};
  } else {
+ 	// MESG("get_notes_status: dir list ?");
+ 	// MESG("get_notes_status: else %d",cwp->current_note_line);
 	row_data = (istr **)array_data(cbfp->dir_list_str);
+	if(row_data)
 	if(cwp->current_note_line<cbfp->dir_list_str->size)
 		sprintf(statuss,"N %3d",row_data[cwp->current_note_line]->index);
-	else sprintf(statuss,"     ");
  };
- 
+ sprintf(statuss,"-----");
  return statuss;
 }
 #endif

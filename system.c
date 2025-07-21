@@ -916,7 +916,6 @@ int insert_text_file(char *filnam)
 int ext_system_paste()
 {
  static char filnam[MAXFLEN];
- static char exec_st[MAXFLEN];
  int status=0;
 
 	if(!ext_clipboard_command) return 0;
@@ -926,6 +925,7 @@ int ext_system_paste()
 #if	GTK
 	status = x_insert_to_file(filnam);
 #else
+	static char exec_st[MAXFLEN];
 	status=snprintf(exec_st,sizeof(exec_st),"%s > %s 2> /dev/null",clip_copy,filnam);
 	if(status>=MAXFLEN) return 0;
 

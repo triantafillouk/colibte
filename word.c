@@ -107,6 +107,7 @@ int goto_eow(num n)
 int delete_word(num  n)
 {
 	offs curoffs;
+	FILEBUF *fp=cbfp;
 	register int c;		/* temp char */
 	long size;		/* # of chars to delete */
 	
@@ -114,7 +115,7 @@ int delete_word(num  n)
 	if (n < 1)	return (FALSE);
 
 	/* save the current cursor position */
-	curoffs=Offset();
+	curoffs=FOffset(fp);
 	/* figure out how many characters to give the axe */
 	size = 0;
 
@@ -133,8 +134,8 @@ int delete_word(num  n)
 	
 			/* if we are at EOL; skip to the beginning of the next */
 			while(Eol()) {
-				set_Offset(FNextLine(cbfp,Offset()));
-				size+=cbfp->EolSize;
+				set_Offset(FNextLine(fp,Offset()));
+				size+=fp->EolSize;
 			};
 			/* move forward till we are at the end of the word */
 			while (inword() == TRUE) {
@@ -159,7 +160,7 @@ int delete_word(num  n)
 		};
 	/* restore the original position and delete the words */
 	set_Offset(curoffs);
-	if(DeleteBlock(0,size))	
+	if(DeleteBlock(fp,0,size))	
 	{
 		set_update(cwp,UPD_EDIT|UPD_MOVE);
 		return OK_RSTGOAL;
@@ -174,34 +175,34 @@ int delbword(num n)
 {
 	long size=0;
 	offs o;
-   
+	FILEBUF *fp=cbfp;   
 	if(dont_edit()) return FALSE;
 	if (n < 1)	return (FALSE);
 	textpoint_set(cwp->w_emark,Offset());
 
-	if(Offset()<1) return FALSE;
-	if(Offset()==1) return del_prev_char(1);
-	o=Offset()-2;
+	if(FOffset(fp)<1) return FALSE;
+	if(FOffset(fp)==1) return del_prev_char(1);
+	o=FOffset(fp)-2;
 
 	// if more than one space remove spaces
-	if(isspace(CharAt(Offset()-1)) && isspace(CharAt(Offset()-2))) {
+	if(isspace(CharAt(FOffset(fp)-1)) && isspace(FCharAt(fp,Offset()-2))) {
 		size=1;
-		while(isspace(CharAt(o))) {
+		while(isspace(FCharAt(fp,o))) {
 			size++;
 			if(o<1) break;
 			o--;
 		};
 		size--;
-		if(!DeleteBlock(size,0)) return FALSE;
+		if(!DeleteBlock(fp,size,0)) return FALSE;
 		set_update(cwp,UPD_EDIT|UPD_MOVE);
 		return(TRUE);
 	};
 
-	o=Offset()-1;size=1;	// check for quoted string!
-	if(CharAt(o)=='"') {
+	o=FOffset(fp)-1;size=1;	// check for quoted string!
+	if(FCharAt(fp,o)=='"') {
 	  if(o>0){
 	  o--;size++;
-	  while(CharAt(o-1)!='"'){
+	  while(FCharAt(fp,o-1)!='"'){
 	  	if(o>=0) size++;
 		if(o<1)break;
 		o--;
@@ -209,17 +210,17 @@ int delbword(num n)
 	  };
 	}
 	else {
-	o=Offset()-2;size=1;
+	o=FOffset(fp)-2;size=1;
 	while(n--) {
 	// if(isspace(CharAt(o))) {o--;size++;};
-	while(cbfp->hl->c_inword(CharAt(o))) {
+	while(fp->hl->c_inword(FCharAt(fp,o))) {
 		if(o>=0) size++;
 		if(o<1) break;
 		o--;
 	};
 	};
 	};
-	if(!DeleteBlock(size,0)) return FALSE;
+	if(!DeleteBlock(fp,size,0)) return FALSE;
 
 	set_update(cwp,UPD_EDIT|UPD_MOVE);
 	return(TRUE);
@@ -231,11 +232,12 @@ int delbword(num n)
  */
 int inword()
 {
+	FILEBUF *fp=cbfp;
 	register int	c;
-	if(Eol()) return (FALSE);
-	c=Char();
+	if(FEol(fp)) return (FALSE);
+	c=FChar(fp);
 //	MESG("inword:c=%d %c",c,c);
-	return cbfp->hl->c_inword(c);
+	return fp->hl->c_inword(c);
 }
 
 
@@ -256,6 +258,7 @@ int fillpara (num n)	/* Fill the current paragraph according to the current fill
 	int	maxcol;
 	char wbuf[MAXLLEN];		/* buffer for current word	*/
 	char *pbuf,*p0;
+	FILEBUF *fp=cbfp;
 
 	if(dont_edit()) return FALSE;
 	if (bt_dval("fillcol") == 0) set_bt_num_val("fillcol",76);
@@ -265,18 +268,18 @@ int fillpara (num n)	/* Fill the current paragraph according to the current fill
 	/* record the pointer to the line just past the EOP */
 	/* To work ok I must be in the middle of the paragraph */
 	goto_bop (1);
-	bop1=Offset();
+	bop1=FOffset(fp);
 	goto_eop (1);
 	plen1=Offset()-bop1;
 	plen2=(plen1/(bt_dval("fillcol")-bt_dval("lmargin")))*(4+bt_dval("lmargin")+bt_dval("fillcol"));
 	p0=pbuf=(char *)malloc(plen2+20);	// maximum size of the new paragraph
 
-	eop_offs = FNextLine(cbfp,Offset());
+	eop_offs = FNextLine(fp,FOffset(fp));
 	/* and back top the beginning of the paragraph */
 	goto_bop(1);
 	/* initialize various info */
-	clength=tp_col(cbfp->tp_current); // current column
-	if(clength && CharAt(LineBegin(Offset())=='\t')) clength = 8;
+	clength=tp_col(fp->tp_current); // current column
+	if(clength && CharAt(LineBegin(FOffset(fp))=='\t')) clength = 8;
 
 	wordlen = 0;
 	utf_wordlen = 0;
@@ -288,9 +291,9 @@ int fillpara (num n)	/* Fill the current paragraph according to the current fill
 		/* get the next character in the paragraph */
 		if(Eol()) {
 			c=' ';
-			if(FNextLine(cbfp,Offset())>=eop_offs) eopflag = TRUE;
+			if(FNextLine(fp,FOffset(fp))>=eop_offs) eopflag = TRUE;
 		} else {
-			FUtfCharAt(cbfp,Offset(),&uc);
+			FUtfCharAt(fp,FOffset(fp),&uc);
 			c=uc.uval[0];
 		}
 		if(c==12) { eopflag=TRUE;continue;}
@@ -339,7 +342,7 @@ int fillpara (num n)	/* Fill the current paragraph according to the current fill
 		next_character(1);
 	};
 	/* add a line at the end of the paragraph */
-	if(cbfp->b_mode & EMDOS) {
+	if(fp->b_mode & EMDOS) {
 		*p0++='\r';
 		*p0++='\n';
 	} else {
@@ -350,10 +353,10 @@ int fillpara (num n)	/* Fill the current paragraph according to the current fill
 	/* and add a last newline for the end of our new paragraph */
 	// remove old paragraph
 	set_Offset(bop1);
-	DeleteBlock(0,plen1);
+	DeleteBlock(fp,0,plen1);
 
 	// insert new one
-	insert_string(cbfp,pbuf,p0-pbuf);
+	insert_string(fp,pbuf,p0-pbuf);
 	free(pbuf);
 	set_update(cwp,UPD_WINDOW);
 	return(OK_RSTGOAL);
@@ -463,13 +466,13 @@ int linefill(num indent)
  offs curoffs,o1;
  num len,new_len;
  char *lbuf,*lo;
-
+ FILEBUF *fp=cbfp;
  /* delete double spaces and compute words = w */
- len=LineEnd(Offset())-LineBegin(Offset());
+ len=FLineEnd(fp,FOffset(fp))-FLineBegin(fp,FOffset(fp));
  lo=lbuf=(char *)malloc(4*right+1);	/* max for utf chars  */
  
- set_Offset(LineBegin(Offset()));
- o1=curoffs=Offset();
+ set_Offset(FLineBegin(fp,FOffset(fp)));
+ o1=curoffs=FOffset(fp);
 
  spaces=words_in_line(curoffs,&nospace)-1;
 
@@ -485,12 +488,12 @@ int linefill(num indent)
  big_space=new_space-x1*(spaces-1);	// first or last space
 
 // go to first word
- while(!EolAt(o1)) {
- 	if((c=CharAt(o1))!=' ' && c!=CHR_TAB) break;
+ while(!FEolAt(fp,o1)) {
+ 	if((c=FCharAt(fp,o1))!=' ' && c!=CHR_TAB) break;
  	o1++;
  };
- while(!EolAt(o1)) {
- 	if((c=CharAt(o1))==' ' || c==CHR_TAB) { // in every space
+ while(!FEolAt(fp,o1)) {
+ 	if((c=FCharAt(fp,o1))==' ' || c==CHR_TAB) { // in every space
 		spaces--;
 		if(spaces==0) {	// last space
 			for(i=0;i<big_space;i++) *lo++ = ' ';
@@ -502,7 +505,7 @@ int linefill(num indent)
 	} else {
 		utfchar uc;
 		int i;
-		o1=FUtfCharAt(cbfp,o1,&uc);	
+		o1=FUtfCharAt(fp,o1,&uc);	
 		for(i=0;i<4;i++) {
 			if(uc.uval[i]) *lo++ = uc.uval[i];
 			else break;
@@ -512,9 +515,9 @@ int linefill(num indent)
  *lo=0;
  new_len=lo-lbuf;
 
- DeleteBlock(0,len);
+ DeleteBlock(fp,0,len);
 
- insert_string(cbfp,lbuf,new_len);
+ insert_string(fp,lbuf,new_len);
  free(lbuf);
  set_update(cwp,UPD_EDIT|UPD_MOVE);
  return 0;

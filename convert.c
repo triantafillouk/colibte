@@ -14,11 +14,6 @@
 void  textpoint_OrFlags(FILEBUF *fp,int mask);
 void reset_points(FILEBUF *bf);
 
-void update_file_lines(FILEBUF *fp)
-{
-
-}
-
 num  ConvertFromUnixToDos(FILEBUF *fp)
 {
  num ptr=0L;
@@ -29,7 +24,7 @@ num  ConvertFromUnixToDos(FILEBUF *fp)
  while(size>0) {
       if(CharAt(ptr)=='\n') {
 	 	textpoint_set(fp->tp_current,ptr);
-	 	InsertChar('\r');
+	 	InsertChar(fp,'\r');
 	 	ptr++;
 		line++;
 //		MESG("u2d line=%d e=%lld lines=%lld col=%lld f=%d",line,te->offset,te->line,te->col,te->flags);
@@ -199,7 +194,7 @@ int convert_char(num n)
 	  };
 	  *c2=0;
 	  textpoint_set(cwp->tp_current,lbegin);
-	  DeleteBlock(0,len);
+	  DeleteBlock(cfp,0,len);
 	  textpoint_set(cwp->tp_current,lbegin);
 	  InsertBlock(cfp,cc1,c2-cc1,0,0);
 	  op=lbegin=FNextLine(cfp,lbegin);
@@ -223,7 +218,7 @@ int convert_char(num n)
 		cc2=g_convert(cc1,len,codepage_str[default_local_codepage],"UTF-8",&r,&w,NULL);
 
 	  textpoint_set(cwp->tp_current,lbegin);
-	  DeleteBlock(0,len);
+	  DeleteBlock(cfp, 0,len);
 	  textpoint_set(cwp->tp_current,lbegin);
 	  InsertBlock(cfp,cc2,w,0,0);
 	  op=lbegin=FNextLine(cfp,lbegin);

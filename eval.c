@@ -34,6 +34,7 @@ extern int record_session;
 int dofile(char *fname);
 void set_vtype(int type);
 int vtype_is(int type);
+int custom_cell_width=0;
 
 // Editor variables
 char *fvars[] = {
@@ -120,7 +121,6 @@ short   kbdm_session[MAXSESSION];			/* keyboard session buffer  */
 short	*kbdsptr=&kbdm_session[0];		/* current position in keyboard session buf */
 short	*kbdsession_end = &kbdm_session[0];	/* ptr to end of the keyboard session buffer*/
 #endif
-int	macbug = 0;		/* macro debuging flag		*/
 extern int show_stage;
 
 extern char search_pattern[];	// search pattern
@@ -174,27 +174,6 @@ BTNODE *find_bt_element(char *name)
  return(btn);
 }
 
-int set_debug(num n)
-{
-	macbug=n;
-	return true;
-}
-
-int debug_flag()
-{
-	return macbug;
-}
-
-void increase_debug_flag()
-{
-	macbug++;
-}
-
-void decrease_debug_flag()
-{
-	macbug--;
-	if(macbug<0) macbug=0;
-}
 
 /* This is editors environment get function */
 double get_env(int vnum)
@@ -238,7 +217,7 @@ double get_env(int vnum)
 		case EVNWORD:	
 			strlcpy(svalue,getnword(),MAXLLEN);
 			break;
-		case EVDEBUG:	v1=macbug; return(v1); break;
+		case EVDEBUG:	v1=debug_flag(); return(v1); break;
 
 		case EVFCOLOR:	v1=cwp->w_fcolor;break;
 		case EVBCOLOR:	v1=cwp->w_bcolor;break;
@@ -432,6 +411,7 @@ int set_option_val(int vnum,char *svalue)
 		  };break;
 		  case EMCUSTOMCELLWIDTH: {
 		  	set_bt_num_val("custom_cell_width",(int)v1);
+			custom_cell_width=v1;
 		  };break;
 		  case EMWRAP: {
 		   int infocols=0;
@@ -520,7 +500,7 @@ void set_env(int vnum,char *svalue,double value)
 		// _found is read only
 		// _next_word is read only
 		case EVDEBUG: 
-				macbug = v1;
+				set_debug((int) v1);
 				return;
 				break;
 		case EVFCOLOR: 
@@ -1285,11 +1265,11 @@ int refresh_current_line(num nused)
 	
 	// goto the begining of the line
 	set_Offset(sl+ddot_pos);
-	if(is_ddot) DeleteBlock(0,dsize-ddot_pos);
+	if(is_ddot) DeleteBlock(cbfp,0,dsize-ddot_pos);
 	set_Offset(sl);
 	get_text_offs(cbfp,text_line,sl,MAXLLEN);
 	set_Offset(sl);
-	if(is_ddot) DeleteBlock(0,ddot_pos);	/* clear the line!  */
+	if(is_ddot) DeleteBlock(cbfp,0,ddot_pos);	/* clear the line!  */
 	set_Offset(sl);
 	// MESG("refresh_current_line:[%s] %d",text_line,ddot_pos);
 	value = compute_string(text_line,text_line);

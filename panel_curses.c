@@ -46,6 +46,7 @@ void restore_original_colors();
 int set_tag_view_position(int line,int column);
 int change_sort_mode(int mouse_col);
 int listdir(int dtype);
+int slow_screen();
 
 BOX *cbox=NULL; // current box
 BOX *msg_box=NULL;	// current message box
@@ -72,6 +73,8 @@ extern int drv_numrow;		// current driver screen rows
 extern int drv_numcol;		// current driver screen columns
 extern int drv_colors;
 extern int drv_max_colors;
+extern int custom_cell_width;
+
 int	drv_color_pairs=64;
 int drv_basic_colors=8;
 int drv_accent_size=1;
@@ -1060,6 +1063,7 @@ int getstring(char *prompt, char *st1,int maxlen,int disinp)
 void drv_post_windows_update()
 {
 	top_menu(0);
+	update_panels();
 	doupdate();
 }
 
@@ -1129,7 +1133,10 @@ void drv_start_checking_break()
 	nodelay(stdscr,TRUE);
 	qiflush();
 #endif
-	if(drv_initialized) checking_break_key=1;
+	if(drv_initialized) {
+		// MESG("start_checking_break!");
+		checking_break_key=1;
+	};
 }
 
 void drv_stop_checking_break()
@@ -1150,7 +1157,7 @@ int drv_check_break_key()
  if(checking_break_key) {
  count++;
  // MESG("drv_check_break_key: %d",count);
- if(count>10000) {
+ if(count>10) {
  	key=getch();
 	count=0;
  };
@@ -2044,7 +2051,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 	imax=maxcol+1;
 
 //	SLOW down and clear the whole line before write!
-	if(bt_dval("slow_display")>0) {
+	if(slow_screen()) {
 		fcolor = v1->fcolor;
 		bcolor = v1->bcolor;
 		drv_wcolor(wp->gwp->draw,fcolor,bcolor);
@@ -2088,7 +2095,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 				continue;
 			};
 		};
-		if(bt_dval("custom_cell_width")>0) 	wmove(wp->gwp->draw,row,i);
+		if(custom_cell_width>0) 	wmove(wp->gwp->draw,row,i);
 #if	USE_GLIB
 		if(ch>128 && v1->uval[1]==0) {	/* this is a local character, convert from local to utf  */
 			 strlcpy(vstr,str_local_to_utf(wp,(char *)v1->uval),6);
