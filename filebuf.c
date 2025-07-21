@@ -8,11 +8,13 @@
 */
 
 #include "xe.h"
+#include	<wchar.h>
 
-long utf8_to_unicode(unsigned char* const utf8_str, int *size) ;
+long utf8_to_unicode(unsigned char* const utf8_str) ;
 long int unicode_point();
 char *get_bom_description(FILEBUF *fp);
 
+extern int custom_cell_width;
 extern alist *window_list;
 extern SHLIGHT hts[];
 
@@ -76,10 +78,10 @@ byte   Char();
 void   MoveLineCol(num l,num c);
 void   HardMove(num l,num c);
 void   NewLine();
-int  InsertChar(char ch);
+int  InsertChar(FILEBUF *fp,char ch);
 void   ExpandTab();
 void    DeleteChar();
-int   WriteBlock(int fd,offs from,offs size,offs *act_written);
+int   WriteBlock(int fd,FILEBUF *fp,offs from,offs size,offs *act_written);
 void   PreModify(FILEBUF *);
 UNDOS *undo_new();
 void show_points(FILEBUF *bf,FILE *fp);
@@ -97,7 +99,7 @@ void MESG_time(const char *fmt, ...)
  if(!debug_flag()) return;
  va_list args;
  static char mline[512];
- if(!(strcmp(cbfp->b_fname,"[out]"))) return;
+ if(cbfp) if(!(strcmp(cbfp->b_fname,"[out]"))) return;
     if (fmt != NULL) {
 		va_start(args,fmt);
 		vsnprintf(mline,sizeof(mline)-1,fmt,args);
@@ -305,7 +307,7 @@ int show_info(num n)
 
 	if(bt_dval("slow_display")>0) {SMESG("Slowdown display active");}
 	else {SMESG("Slowdown display disabled");};
-	if(bt_dval("custom_cell_width")>0) { SMESG("Custom cell width");};
+	if(custom_cell_width>0) { SMESG("Custom cell width");};
 	if(debug_flag()) {
 		SMESG(" ptr1=%lld ptr2=%lld size=%lld file size=%lld,gap=%lld",bp->ptr1,bp->ptr2,bp->BufferSize,FSize(bp),bp->GapSize);
 	};
@@ -415,6 +417,13 @@ int show_info(num n)
 /* return the byte size of accents at offset */
 int is_utf_accent(FILEBUF *fp, offs o)
 {
+#if	0
+ utfchar uc;
+ FUtfCharAt(fp,o,&uc);
+ int code_unit = utf8_to_unicode(uc.uval);
+ int u1=wcwidth(code_unit);
+ if(u1==0) return 1;else return 0;
+#else
  int ch,ch1;
  ch=FCharAt(fp,o);
  ch1=FCharAt(fp,o+1);
@@ -435,6 +444,7 @@ int is_utf_accent(FILEBUF *fp, offs o)
 		return 2;
 	};
  } else return 0;
+#endif
 }
 
 
@@ -952,7 +962,7 @@ void  ResetTextPoints(FILEBUF *bp,int flag)
 	textpoint_set(bp->tp_text_end,size);
 	// MESG("	new o=%ld lines=%ld new lines=%ld b_mode=%X",tp_offset(bp->tp_text_end),tp_line(bp->tp_text_end),bp->lines,bp->b_mode);
 	textpoint_set(bp->tp_text_o,size);
-	if( bp->view_mode > VMINP) 
+	if( bp->view_mode > VMINP  && bp->view_mode<VMWRAP) 
 	bp->lines=tp_line(bp->tp_text_end);
  };
 }
@@ -1269,27 +1279,28 @@ offs MoveToColumn(int go_col)
 // operates on cbfp
 void   HardMove(num l,num c)
 {
+   FILEBUF *fp=cbfp;
    MoveLineCol(l,0);
    while(GetCol()<c) {
    		if(Eol()) break;
-		MoveRightChar(cbfp);
+		MoveRightChar(fp);
 	}
-   if(FEof(cbfp)) {	// insert as many lines as needed to reach specified line
+   if(FEof(fp)) {	// insert as many lines as needed to reach specified line
       while(GetLine()<l){
 	  	NewLine();
-	  	textpoint_move(cbfp->tp_current,cbfp->EolSize);
+	  	textpoint_move(fp->tp_current,cbfp->EolSize);
 	  };
 	};
-   if(Eol()) {	// insert as many spaces as needed to go to specified column
+   if(FEol(fp)) {	// insert as many spaces as needed to go to specified column
       while(GetCol()<c) { 
-	  	InsertChar(' ');
-	  	MoveRightChar(cbfp);
+	  	InsertChar(fp,' ');
+	  	MoveRightChar(fp);
 	  };
 	};
    if(GetCol()>c) {
-		MoveLeftChar(cbfp);
+		MoveLeftChar(fp);
       ExpandTab();
-      while(GetCol()<c) MoveRightChar(cbfp);
+      while(GetCol()<c) MoveRightChar(fp);
    }
 }
 
@@ -1336,6 +1347,11 @@ byte  FCharAt(FILEBUF *bf, offs offset)
    return(0);
 }
 
+byte FChar(FILEBUF *fp)
+{
+	return FCharAt(fp,FOffset(fp));
+}
+
 // specific on current buffer */
 byte  CharAt(offs offset)
 {
@@ -1364,11 +1380,13 @@ offs  FUtfCharAt(FILEBUF *bf, offs offset, utfchar *uc)
 
 offs  FUtfCharAt_nocheck(FILEBUF *bf, offs offset, utfchar *uc)
 {
- int i,ulen;
+ int i,ulen=1;
  offs o=offset;
 	// ulen=FUtfCharLen(bf,o);
 	char ch=FCharAt_NoCheck(bf,o);
-	ulen = utf8charlen_nocheck(ch);
+	if(utf8_error() || bf->b_lang>0 || clen_error) ulen=1;
+	else ulen = utf8charlen_nocheck(ch);
+
 	memset(uc->uval,0,8);
 	for(i=0;i<ulen;i++){
 			uc->uval[i]=FCharAt_NoCheck(bf,o+i);
@@ -1418,9 +1436,10 @@ offs CSize()
 void   ExpandTab()
 {
  int i,size;
+ FILEBUF *fp=cbfp;
 	if(Char()!='\t') return;
 	size=tabsize-GetCol()%tabsize;
-	for(i=size; i>0; i--) InsertChar(' ');
+	for(i=size; i>0; i--) InsertChar(fp,' ');
 	DeleteChar();
 	textpoint_move(cbfp->tp_current,-size);
 }
@@ -1484,15 +1503,15 @@ long int unicode_point()
  if(cbfp->b_lang!=0) return Char();
  else {
   offs o=Offset();
-  int ulen,i;
+  int i;
   long int uchar=0;
-  ulen=FUtfCharLen(cbfp,o);
+  int ulen=FUtfCharLen(cbfp,o);
 
   for(i=0;i<ulen;i++){
   	char_string[i] = CharAt(o+i);
   };
   char_string[ulen]=0;
-  uchar = utf8_to_unicode(char_string,&ulen);
+  uchar = utf8_to_unicode(char_string);
   return(uchar);
  };
 }
@@ -1500,6 +1519,7 @@ long int unicode_point()
 long int utf_value_len(int *len)
 {
  if(utf8_error()) { 
+	*len=1;
 	return Char();
  };
  if(cbfp->b_lang!=0) {
@@ -1663,7 +1683,7 @@ void    DeleteChar()
  int len;
 	FUtfCharAt(cbfp,FOffset(cbfp),&uc);
 	len=get_utf_length(&uc);
-	DeleteBlock(0,len);
+	DeleteBlock(cbfp,0,len);
 	set_modified(cbfp);
 }
 
@@ -1720,6 +1740,12 @@ int FBolAt(FILEBUF *bf,offs o)
  return stat;
 }
 
+
+int FEol(FILEBUF *fp)
+{
+	return(FEolAt(fp,FOffset(fp)));
+}
+
 int Eol()
 {
    return(EolAt(Offset()));
@@ -1730,10 +1756,11 @@ int Bol()
    return(BolAt(Offset()));
 }
 
-int  InsertChar(char ch)
+
+int  InsertChar(FILEBUF *fp,char ch)
 {
-   return(InsertBlock(cbfp,&ch,1,NULL,0));
-   set_modified(cbfp);
+   return(InsertBlock(fp,&ch,1,NULL,0));
+   // set_modified(fp);
 }
 
 // read write lock
@@ -1909,7 +1936,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 		return(i);
 	};
    status=stat(name,&st);
-	MESG_time_start("ifile0: %s",bf->b_fname);
+	// MESG_time_start("ifile0: %s",bf->b_fname);
    if(status==-1 && errno==ENOENT)
    {
 	if(name[0]!=CHR_LBRA)	msg_line("New file \"%s\"",name);
@@ -2063,7 +2090,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 		}
    };
 	check_line_mode(bf);
-
+	MESG_time("go update lines");
 	update_lines(bf);
 	if(!(bf->b_flag & FSMMAP)) 
 		set_modified(bf);
@@ -2083,7 +2110,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	textpoint_set(bf->tp_current,0);	// goto the beginning
 	// MESG_time("ifile0: b_mode=%d end",bf->b_mode);
 	close(file);
-	if(!execmd) msg_line("%s: chars=%lld,lines=%lld type %s max line len=%ld",bf->b_fname,FSize(bf),bf->lines,bf->hl->description,bf->maxlinelen);
+	if(!execmd && discmd) msg_line("%s: chars=%lld,lines=%lld type %s max line len=%ld",bf->b_fname,FSize(bf),bf->lines,bf->hl->description,bf->maxlinelen);
 	if(temp_used) {
 		// MESG("remove temporary %s",name);
 		unlink(name);
@@ -2138,7 +2165,7 @@ int	writeout(char *name, FILEBUF *bf)
 	offs   act_written;
 	char cr1[2];
 	bool bak_created=0;
-	// MESG("writeout: b_flag=%X",bf->b_flag);
+	// MESG("writeout:0 [%s][%s] b_flag=%X b_mode=%X",name,bf->b_fname, bf->b_flag,bf->b_mode);
    if(bf->b_flag & FSMMAP)
    {
      if(!strcmp(name,bf->b_fname)) {
@@ -2150,6 +2177,7 @@ int	writeout(char *name, FILEBUF *bf)
    }
 
 	if(bf->b_mode & EMCRYPT) {
+		// MESG("writeout:1 go resetkey");
 		resetkey(bf);
 		cr1[0]=26;
 		cr1[1]=0;
@@ -2158,6 +2186,7 @@ int	writeout(char *name, FILEBUF *bf)
    
    if(stat(name,&st)!=-1)
    {
+ 	 // MESG("writeout:2 stat ok!");
      if(!CheckMode(st.st_mode)) return(false);
 
 	 if(bf->FileTime != st.st_mtime)
@@ -2173,7 +2202,7 @@ int	writeout(char *name, FILEBUF *bf)
       	} else bak_created=TRUE;
 	 };
    }   else   {
-
+	 // MESG("writeout: cannot stat file %s",name);
      if(errno!=ENOENT) {
        FError(name);
        return(false);
@@ -2183,13 +2212,13 @@ int	writeout(char *name, FILEBUF *bf)
 
    errno=0;
    nfile=open(name,O_CREAT|O_RDWR|O_TRUNC,st.st_mode);
-
+	// MESG("writeout: file descriptor %d",nfile);
    if(nfile==-1)
    {
      FError(name);
 	 return error_line("cannot open file %s to write",name);
    }
-
+	// MESG("writeout: check if file is locked!");
    int lock_res=LockFile(nfile,false);
    if(lock_res==-1)   {
      close(nfile);
@@ -2197,19 +2226,21 @@ int	writeout(char *name, FILEBUF *bf)
    };
 
    if(lock_res==-2) msg_line("Warning: file %s locking failed",name);
-
+	// MESG("writeout: write buffer contents encrypt=%X",bf->b_mode);
    /* write the buffer contents */
    errno=0;
 	if(bf->b_mode & EMCRYPT) {
 		if(write(nfile,cr1,1)!=1) { SYS_ERROR("cannot write");close(nfile);return(false);};
+		// MESG("	write crypt bom: size=%ld",FSize(bf));
 	};	
-   if(WriteBlock(nfile,0,FSize(bf),&act_written)!=true)
+	// MESG("writeout: start writeblock size=%ld",FSize(bf));
+   if(WriteBlock(nfile,bf,0,FSize(bf),&act_written)!=true)
    {
      if(errno) FError(name);
      close(nfile);
      return(false);
    };
-
+	// MESG("writeout: act_written %ld",act_written);
 
    if(bf->bom_type!=FTYPE_UTF16BOM && act_written!=FSize(bf))
    {
@@ -2543,7 +2574,7 @@ void undo_change_undo(undo_Change *uc)
       break;
    case INSERT:
       set_Offset(uc->pos+uc->left_size);
-      DeleteBlock(uc->left_size,uc->right_size);
+      DeleteBlock(cbfp,uc->left_size,uc->right_size);
       break;
    };
 	set_modified(cbfp);
@@ -2556,7 +2587,7 @@ void undo_change_redo(undo_Change *uc)
    switch(uc->undo_type)
    {
    case DELETE:
-      DeleteBlock(uc->left_size,uc->right_size);
+      DeleteBlock(cbfp,uc->left_size,uc->right_size);
       break;
    case INSERT:
       InsertBlock(cbfp,uc->left,uc->left_size,uc->right,uc->right_size);
@@ -2800,7 +2831,8 @@ void   MoveLeftChar(FILEBUF *fp)
 				cl=FUtfCharLen(fp,o-i);
 #else			
 				int c0=FCharAt(fp,o-i);
-				cl=utf8charlen_nocheck(c0);
+				if(clen_error>0 || utf8_error()) cl=1;
+				else cl=utf8charlen_nocheck(c0);
 #endif
 //				MESG("prev_char: o=%ld i=%d cl=%d accent=%d",o,i,cl,fp->utf_accent);
 				if(cl==i) {
@@ -3029,11 +3061,13 @@ int   InsertBlock(FILEBUF *fp, char *block_left,offs size_left,char *block_right
    offs  oldoffset;
    num   num_of_lines,num_of_columns,oldline;
    int   break_at;
+   int	 display_messages=discmd;
    offs	 size;
    if(fp->b_flag & FSMMAP) return false;
    size=size_left+size_right;
    if(size==0) return(true);
-	// MESG("InsertBlock:%s pos=%ld l=%ld r=%ld",fp->b_fname,FOffset(fp),size_left,size_right);
+	discmd=0;
+	// MESG_time("InsertBlock:%s pos=%ld l=%ld r=%ld",fp->b_fname,FOffset(fp),size_left,size_right);
    PreModify(fp);
 
    if(size_left>0) {
@@ -3102,6 +3136,7 @@ int   InsertBlock(FILEBUF *fp, char *block_left,offs size_left,char *block_right
 	// set_modified(fp);
 	fp->b_state |= FS_CHG;
 	update_lines(fp);
+	discmd=display_messages;
 	return(true);
 }
 
@@ -3110,7 +3145,7 @@ num fread16(char *file_name,char *buffer,num size)
  FILE *fi=fopen(file_name,"r");
  char *out = buffer;
  if(fi!=NULL) {
- MESG("fread16: %s size to read %ld",file_name,size);
+ // MESG("fread16: %s size to read %ld",file_name,size);
  	size_t res;
 	// size_t in_chars=0;
 	// size_t out_chars=0;
@@ -3162,7 +3197,7 @@ num fread16(char *file_name,char *buffer,num size)
 int   ReadBlock(char *fname,int fd,offs size,offs *act_read)
 {
    FILEBUF *fp=cbfp;
-   MESG("ReadBlock:[%s] size=%ld",fname,size);
+   // MESG("ReadBlock:[%s] size=%ld",fname,size);
    if(fp->b_flag & FSMMAP)  return false;
    if(size==0)   {
       *act_read=0;
@@ -3524,11 +3559,10 @@ char *get_bom_description(FILEBUF *fp)
 }
 
 /* operates on cbfp */
-int   WriteBlock(int fd,offs from,offs size,offs *act_written)
+int   WriteBlock(int fd,FILEBUF *fp,offs from,offs size,offs *act_written)
 {
-   FILEBUF *fp=cbfp;
    offs   leftsize;
-	// MESG("writeblock: bom=%d",fp->bom_type);
+   // MESG("writeblock: bom=%d from=%ld ptr1=%ld ptr2=%ld size=%ld b_mode=%X",fp->bom_type,from,fp->ptr1,fp->ptr2,size,fp->b_mode);
    if(from<0) {
      size+=from;
      from=0;
@@ -3556,11 +3590,15 @@ int   WriteBlock(int fd,offs from,offs size,offs *act_written)
 	};
    };
    if(from>=fp->ptr1) {
-	if(fp->b_mode & EMCRYPT) crypt_string(fp->buffer+from+fp->ptr2-fp->ptr1,size);
+	if(fp->b_mode & EMCRYPT) {
+		// MESG("writeblock: crypt string %ld",size);
+		crypt_string(fp->buffer+from+fp->ptr2-fp->ptr1,size);
+	};
 	if(fp->bom_type==FTYPE_UTF16BOM) 
 		*act_written=(unsigned long int)write_utf8_as_utf16(fd,fp->buffer+from+fp->ptr2-fp->ptr1,size);
     else 
 		*act_written=write(fd,fp->buffer+from+fp->ptr2-fp->ptr1,size);
+	// MESG("writeblock: act_written %ld",*act_written);
 
 	if(fp->b_mode & EMCRYPT){
 		resetkey(fp);
@@ -3641,8 +3679,7 @@ void show_textpoints(char *title,FILEBUF *fp)
 #include "replaceblock.c"
 
 /* delete a block from left to right offset */
-/* operates on cbfp */
-int   DeleteBlock(offs left,offs right)
+int   DeleteBlock(FILEBUF *fp,offs left,offs right)
 {
    offs  base;	// start of delete
    offs   size;	// size of delete
@@ -3651,7 +3688,7 @@ int   DeleteBlock(offs left,offs right)
    num   deleted_lines;
    int   join_at;
    int   break_at;
-   FILEBUF *fp=cbfp;
+   // FILEBUF *fp=cbfp;
 //	MESG("DeleteBlock: at %ld l=%ld r=%ld ptr2=%ld size=%ld",FOffset(fp),left,right,fp->ptr2,fp->BufferSize);
    if(left<1 && right<1)  return(true);
    if(fp->b_flag & FSMMAP)  return false;

@@ -34,6 +34,7 @@ void set_window_font(WINDP *wp);
 void ge_edit_display_expose_area(GtkWidget *widget, GdkRectangle *area);
 char **get_scheme_names();
 void upd_all_wrap_lines(WINDP *wp,char *from);
+int set_cursor_xpos(int row,int current_column);
 
 GdkRGBA *current_colors[COLOR_TYPES];
 
@@ -74,7 +75,7 @@ void end_draw(GeEditDisplay *wd,char *message);
 char **mono_fonts_list;
 int mono_fonts_number;
 
-GtkStyle *st1a,*st1i,*st3a,*st3i;
+// GtkStyle *st1a,*st1i,*st3a,*st3i;
 static GtkIMContext *im_context;
 GtkWidget *table1,*colors_win=NULL;
 void set_box_background_color(GtkWidget *box,char *color);
@@ -496,7 +497,12 @@ void show_cursor (char *from)
 		// MESG("show_cursor: already shown! %d>",ind++);
 		return;
 	};
-	// MESG("show_cursor: start from %s",from);
+	MESG("show_cursor:");
+#if	FAST_GTK_SCREEN
+	px=set_cursor_xpos(cposy,cposx);
+#endif
+
+	MESG("show_cursor: start from %s px=%d",from,px);
 #if	SHOW_CLINE
 	area.x = 0;
 	area.height = 5;	/* current line height  */

@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	"#01.6T50 (23/6/2025)"
+#define VERSION 	 "#01.6T64 (17/7/2025)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -29,6 +29,7 @@
 #define	USE_UTF8	1	/* Use utf8 characters  */
 
 #define WRAPD	0	/* wrap debug  */
+#define	FAST_GTK_SCREEN	1
 
 #if	DARWIN
 #define	_FILE_OFFSET_BITS	64
@@ -282,7 +283,7 @@ typedef struct notes_struct {
 	char n_title[512];
 	char n_cat[512];
 	char n_tags[512];
-	int encrypt_flag;
+	// int encrypt_flag;
 	long long timestamp;
 } notes_struct;
 #endif

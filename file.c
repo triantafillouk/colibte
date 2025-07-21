@@ -14,7 +14,7 @@
 #include	<dirent.h>
 
 #if	TNOTES
-char *get_notes_key();
+char *get_notes_key(int key_type);
 #endif
 
 /* external defined functions  */
@@ -1065,7 +1065,7 @@ int bom_type(int file_id)
  lseek(file_id,0L,SEEK_SET);
  if(read(file_id,c,1)!=1) return(FALSE);
  if(c[0]==26) {
- 	MESG("BOM is encrypted!");
+ 	// MESG("BOM is encrypted!");
  	return FTYPE_ENCRYPTED;
  };
  if(read(file_id,c+1,1)!=1) {	// read second byte
@@ -1077,12 +1077,12 @@ int bom_type(int file_id)
 	return (FALSE);
  };
  if(c[0]==0xFF && c[1]==0xFE) {
- 	MESG("FTPE_UTF16BOM");
+ 	// MESG("FTPE_UTF16BOM");
 	lseek(file_id,0L,SEEK_SET);	// ??
 	return(FTYPE_UTF16BOM);
  };
  if(c[0]==0xFE && c[1]==0xFF) {	// ??
- 	MESG("FTPE_UTF16BOM_BE");
+ 	// MESG("FTPE_UTF16BOM_BE");
 	lseek(file_id,0L,SEEK_SET);
 	return(FTYPE_UTF16BOM);
  };
@@ -1310,18 +1310,15 @@ int set_buf_key(FILEBUF *bp)	/* reset encryption key of current file */
 
 	/* get the string to use as an encrytion string */
 	bp->b_key[0]=0;
-	// MESG("set_buf_key: b_type=%d %d size=%d",bp->b_type,NOTE_TYPE,sizeof(bp->b_key));
+	// MESG("set_buf_key: b_type=%d  size=%d",bp->b_type,sizeof(bp->b_key));
 #if	TNOTES
 	if(bp->b_type & NOTE_TYPE
 		|| bp->b_type & NOTE_CAL_TYPE
 		|| bp->b_type & NOTE_TODO_TYPE
 	) {
-
-		if(get_notes_key() == NULL) {
-			set_notes_key(1);
-		};
-		if(get_notes_key()) {
-			strlcpy(bp->b_key,get_notes_key(),sizeof(bp->b_key));
+		int key_type = bt_dval("notes_key");
+		if(get_notes_key(key_type)) {
+			strlcpy(bp->b_key,get_notes_key(key_type),sizeof(bp->b_key));
 		} else return false;
 	} else 
 #endif
@@ -1404,7 +1401,7 @@ void crypt_string(char *ctr,num len)
 int resetkey(FILEBUF *bp)	/* reset the encryption key if needed */
 {
 	register int s;	/* return status */
-
+	// MESG("	resetkey: [%s] b_mode=%X",bp->b_fname,bp->b_mode);
 	/* turn off the encryption flag */
 	/* if we are in crypt mode */
 	if (bp->b_mode & EMCRYPT) {
@@ -1470,13 +1467,16 @@ int edit_file(char *fname)
 int file_read(FILEBUF *bp, char *fname)
 {
  int stat=0;
+ int display_messages=discmd;
+ discmd=0;
  // MESG("file_read: fname=[%s] view_mode=%d",fname,bp->view_mode);
- if(fname[0]!=CHR_LBRA) if(!execmd) msg_line(" reading file:[%s]",fname);
+ if(fname[0]!=CHR_LBRA) if(!execmd && discmd) msg_line(" reading file:[%s]",fname);
 
  /* clear the buffer */
  if(empty_filebuf(bp)!=TRUE) return FALSE;
  if(fname!=bp->b_fname) strlcpy(bp->b_fname, fname,MAXFLEN);
  if(! ifile(bp,fname,0) && fname[0]!=CHR_LBRA) {
+ 	discmd=display_messages;
 // 	msg_line("No lines for file %s",fname);
 	return(FALSE);
  };
@@ -1494,6 +1494,7 @@ int file_read(FILEBUF *bp, char *fname)
  	bp->b_state |= FS_VIEW;
  	// MESG("set as view only");
  };
+ 	discmd=display_messages;
  // MESG("file_read: end: b_type=%d b_state=%X",bp->b_type,bp->b_state);
  return TRUE; 
 }
@@ -1537,7 +1538,7 @@ void set_bfname(char *full_name, char *fname)
 int writeu1(char *fname, FILEBUF *fp)
 {
  int s;
- MESG("writeu1: fname=[%s] dir=%s name=%s",fname,fp->b_dname,fp->b_fname);
+ // MESG("writeu1: fname=[%s] dir=%s name=%s",fname,fp->b_dname,fp->b_fname);
  fp->b_state |= FS_CHG;
  if ((s=writeout(fname,fp)) == TRUE) {
  	// MESG("writeu1: ok");
@@ -1750,22 +1751,30 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 		|| file_type_is("MD",bp->b_type) 
 		|| (bp->b_type >= NOTE_TYPE))
 		 ) {	
-			MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
+			// MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
 			bp->b_mode |= EMCRYPT;
 #if	TNOTES
 			if(bt_dval("notes_recreate") || from_note) 
 			{
+#if	1
+				int key_type = bt_dval("notes_key");
+
+				if(get_notes_key(key_type))
+				strlcpy(bp->b_key,get_notes_key(key_type),sizeof(bp->b_key));
+				else return false;
+#else
 				// MESG("Notes recreate!");
-				if(get_notes_key()==NULL) {
+				if(get_notes_key(0)==NULL) {
  					// MESG("get new notes key");
-					set_notes_key(1);
-					if(get_notes_key()) {
-						strlcpy(bp->b_key,get_notes_key(),sizeof(bp->b_key));
+					set_notes_key(0);
+					if(get_notes_key(0)) {
+						strlcpy(bp->b_key,get_notes_key(0),sizeof(bp->b_key));
 					} else return false;
 				} else {
 					// MESG("set key from notes key!");
-					strlcpy(bp->b_key,get_notes_key(),sizeof(bp->b_key));
+					strlcpy(bp->b_key,get_notes_key(0),sizeof(bp->b_key));
 				};
+#endif
 				s=true;
 			} else 
 #endif
@@ -1855,7 +1864,7 @@ int file_type(char *name, int *compression_type,char *oext)
  };
  ext1[ext_len]=0;	// extension in reverse 
  i--;
- MESG("file_type: [%s] [%s] len=%d e=%d",name,ext1,ext_len,e);
+ // MESG("file_type: [%s] [%s] len=%d e=%d",name,ext1,ext_len,e);
 
  if(e>0 && ext_len>0) {
 	revstr(ext1);

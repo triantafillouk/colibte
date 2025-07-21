@@ -174,6 +174,7 @@ edit.o: edit.c xe.h
 
 gldisplay.o: xe.h screen.c menus.h
 
+
 screen.o: xe.h screen.c wrap_line.h
 	${CC} $(FLAGS1) -DGTK3=0 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char screen.c -o screen.o
 
@@ -197,7 +198,7 @@ tldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h menu.h
 xldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h
 	${CC} tldisplay.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -funsigned-char -o xldisplay.o
 
-gtkterm.o: gtkterm.c gtkterm.h xthemes.h color.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h gtk_common.c xthemes.c
+gtkterm.o: gtkterm.c gtkterm.h xthemes.h color.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h gtk_common.c xthemes.c btreei.h
 
 highlight.o: highlight.c highlight.h
 
@@ -217,6 +218,12 @@ panel_curses.o: panel_curses.c color.h menus.h keytable.h xthemes.h color.h rgb_
 
 gtk_support.o: gtk_support.c gtk_support.h
 	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o gtk_support.o gtk_support.c
+
+gsystem.o: xe.h system.c
+	${CC} $(FLAGS1) -c -DGTK=1 -Wall $(CPU_OPTIONS) $(GTKINCLUDE3) -funsigned-char system.c -o gsystem.o
+
+system.o: xe.h system.c
+	${CC} system.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o system.o 
 
 # For GTK3
 gtkterm3.o: xe.h gtkterm3.c gtkterm3.h xthemes.h color.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h geditdisplay3.h gtk_common.c xthemes.c
@@ -252,12 +259,15 @@ ginput3.o: keytable.h input.c
 	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE3)  -funsigned-char input.c -o ginput3.o
 
 #	The following is with gtk3 library and cairo plot. gplotc(gcanvas)
-ctg3: tplot.o system.o gldisplay.o edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o  utils.o alist.o filebuf.o gplotc3.o  support.o config_init.o convert.o  gtk_support3.o geditdisplay3.o  gcanvas3.o  highlight.o utf8_support.o notes.o mlangf.o
-	${CC} tplot.o system.o gldisplay.o  edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o gplotc3.o  gtk_support3.o config_init.o support.o geditdisplay3.o gcanvas3.o  highlight.o utf8_support.o notes.o mlangf.o -o ctg3  $(GTK3_FLAGS) -lm 
+ctg3: tplot.o gsystem.o gldisplay.o edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o  utils.o alist.o filebuf.o gplotc3.o  support.o config_init.o convert.o  gtk_support3.o geditdisplay3.o  gcanvas3.o  highlight.o utf8_support.o notes.o mlangf.o
+	${CC} tplot.o gsystem.o gldisplay.o  edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o gplotc3.o  gtk_support3.o config_init.o support.o geditdisplay3.o gcanvas3.o  highlight.o utf8_support.o notes.o mlangf.o -o ctg3  $(GTK3_FLAGS) -lm 
 
 #	The following is with gtk2 library and cairo plot. gplotc(gcanvas)
-ctg2 : gmain.o system.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o   gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o plot_cairo.c  config_init.o utf8_support.o notes.o mlangf.o
-	${CC} gmain.o system.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o notes.o mlangf.o -o ctg2  $(GTK2_FLAGS)  -lm
+ctg2 : gmain.o gsystem.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o   gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o plot_cairo.c  config_init.o utf8_support.o notes.o mlangf.o
+	${CC} gmain.o gsystem.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o notes.o mlangf.o -o ctg2  $(GTK2_FLAGS)  -lm
+
+find_tags: find_tags.c support.o alist.o
+	${CC} $(CPU_OPTIONS) find_tags.c support.o alist.o -o find_tags
 
 # This is with Xlib library, no plot !
 ctxe : main.o system.o edit.o screen.o  xldisplay.o eval.o mlang.o  file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o  highlight.o dir.o utils.o alist.o filebuf.o support.o config_init.o utf8_support.o mlangf.o notes.o

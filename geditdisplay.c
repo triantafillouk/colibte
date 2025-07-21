@@ -254,7 +254,7 @@ ge_edit_display_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
 #if	DARWIN
 		current_font_name="Menlo";
 #else
-		current_font_name="Courier";
+		current_font_name="Monospace";
 #endif	
 		font_size=18;
 		first_time=0;
@@ -275,7 +275,7 @@ ge_edit_display_size_allocate (GtkWidget *widget, GtkAllocation *allocation)
 			mono = pango_font_family_is_monospace(families[i]);
 			if(mono) {
 				mono_fonts_list[j] = strdup(pango_font_family_get_name(families[i]));
-//				MESG("		mono font [%s]",mono_fonts_list[j]);
+				// MESG("		mono font [%s]",mono_fonts_list[j]);
 				j++;
 			};
 		};
@@ -424,7 +424,7 @@ ge_edit_display_draw_focus (GtkWidget *widget)
 #if	NUSE
  GdkRectangle rect;
  GeEditDisplay *wd;
- MESG("ge_edit_display_draw_focus:");
+ // MESG("ge_edit_display_draw_focus:");
  g_return_if_fail(widget !=NULL);
  g_return_if_fail(GTK_IS_EDIT_DISPLAY(widget));
 

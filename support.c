@@ -17,14 +17,15 @@
 #include <syslog.h>
 #include <errno.h>
 #include <stdarg.h>
+#include <stdbool.h>
 
 #include "support.h"
 #include "alist.h"
 
 int utf_num_chars(char *utf);
-int debug_flag();
 void msg_line(char *);
 char * utf8_rtruncate(char *utf_string, int len);
+int	macbug = 0;		/* macro debuging flag		*/
 
 extern int xwin;
 extern int discmd;
@@ -32,6 +33,28 @@ extern int discmd;
 // Application starting dir
 char start_dir_val[MAXFLEN] = ".";
 char current_working_dir[MAXFLEN];
+
+int set_debug(long long n)
+{
+	macbug=n;
+	return true;
+}
+
+int debug_flag()
+{
+	return macbug;
+}
+
+void increase_debug_flag()
+{
+	macbug++;
+}
+
+void decrease_debug_flag()
+{
+	macbug--;
+	if(macbug<0) macbug=0;
+}
 
 char *get_start_dir()
 {
@@ -73,82 +96,6 @@ char *get_working_dir()
 }
 
 #define	TEST3	1
-/* print full file name in limited space */
-char *get_pfname(char *dir_name,char *file_name,int len)
-{
- static char view_name[MAXFLEN];
- int flen=0;
- int dlen=0;
-
- flen=utf_num_chars(file_name);
- // MESG("get_pfname: file_name [%s] %d",file_name,flen);
- if(flen<0) flen=strlen(file_name);
-
- if(file_name[0]=='[' && file_name[1]!='D') {
-	dir_name[0]=0; 
- };
-
- dlen=utf_num_chars(dir_name);
- // MESG("         : dir_name [%s] %d",dir_name,dlen);
- if(dlen<0) flen=strlen(dir_name);
-
- if(len>MAXFLEN-1) len=MAXFLEN-1;
-
- if((dlen+flen) < len-1) {
-// 	MESG("len=%d dlen=%d dir_name=[%s] file_name=[%s]",len,dlen,dir_name,file_name);
-	if(dlen) {
-	 	if(flen && dlen>0) snprintf(view_name,sizeof(view_name),"%s/%s",dir_name,file_name);
-		else snprintf(view_name,sizeof(view_name),"%s",dir_name);
-	} else {
-		snprintf(view_name,sizeof(view_name),"%s",file_name);
-	}
-	// MESG("get_pfname:1 [%s]",view_name);
-	return view_name;
- };
- if(flen>len-2) {
-#if	TEST3
-	snprintf(view_name,sizeof(view_name),">/%s",utf8_rtruncate(file_name,len-2));
-#else
- 	int start=flen-len+1;
-	snprintf(view_name,sizeof(view_name),"./%s",file_name+start);
-#endif
-	// MESG("get_pfname:2 [%s]",view_name);
-	return view_name;
- };
- if(flen>len) {
-#if	TEST3
-	snprintf(view_name,sizeof(view_name),">/%s",utf8_rtruncate(file_name,len-1));
-#else
- 	int start=flen-len+1;
- 	snprintf(view_name,sizeof(view_name),".%s",file_name+start);
-#endif
-	// MESG("get_pfname:3 [%s]",view_name);
-	return view_name;
- };
- if((dlen-flen) < len-2) {
-#if	TEST3
-	if(flen) snprintf(view_name,sizeof(view_name),">%s/%s",utf8_rtruncate(dir_name,len-flen-2),file_name);
-	else snprintf(view_name,sizeof(view_name),">%s",utf8_rtruncate(dir_name,len-flen-2));
-#else
-	int start= dlen-(len-flen-2);
-	if(flen) snprintf(view_name,sizeof(view_name),".%s/%s",dir_name+start,file_name);
-	else snprintf(view_name,sizeof(view_name),".%s",dir_name+start);
-#endif
- 	// MESG("get_pfname:4 [%s]",view_name);
-	return view_name;
- };
-#if	TEST3
- if(flen) snprintf(view_name,sizeof(view_name),">%s/%s",utf8_rtruncate(dir_name,len-flen-2),file_name);
- else snprintf(view_name,sizeof(view_name),">%s",utf8_rtruncate(dir_name,len-flen-2)); 
-#else
- int start=dlen-(len-flen-2);
- if(flen) snprintf(view_name,sizeof(view_name),".%s/%s",dir_name+start,file_name);
- else snprintf(view_name,sizeof(view_name),".%s",dir_name+start); 
-#endif
-
- // MESG("get_pfname:5 [%s]",view_name);
- return view_name;
-}
 
 /* 
  remove the directory name from the file name 
@@ -340,7 +287,7 @@ void MESG(const char *fmt, ...)
  va_list args;
  static char mline[512];
  if(!debug_flag()) return;
-
+ // printf("mesg:\n");
     if (fmt != NULL) {
 		va_start(args,fmt);
 		vsnprintf(mline,sizeof(mline),fmt,args);

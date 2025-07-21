@@ -19,24 +19,44 @@ int drv_initialized=0;
 char *import_buffer=NULL;
 
 
+long utf8_to_unicode(unsigned char* const utf8_str) ;
+
+#define RED_BLACK	1
+
+#if	RED_BLACK
+#include "btreei.h"
+RB_ITREE *utf_lengths=NULL;
+#else
+#include "btree_iavl.h"
+AVL_ITREE *utf_lengths=NULL;
+#endif
+
 int get_pango_length(char *st)
 {
  int width,height;
- // MESG("get_pango_length:");
- if(st[0]<0x80) return 1;	/* suppose that all asci have CLEN display size  */
+  
  if(cwp==NULL) return 0;
  if(cwp->gwp==NULL) return 0;
  if(cwp->gwp->draw==NULL) return 0;
  // MESG("get_pango_length:1");
 
+ int code_unit = utf8_to_unicode((unsigned char *)st);
+
+#if	RED_BLACK
+ int uni_len = get_rb_ival(utf_lengths,code_unit);
+#else
+ int uni_len = get_avl_ival(utf_lengths,code_unit);
+#endif
+
+	// MESG("get_pango_length:[%s] 0x%X U%X len=%d",st,st[0],code_unit,uni_len);
+ if(uni_len>=0) return uni_len;
 	GeEditDisplay *wd = GTK_EDIT_DISPLAY(cwp->gwp->draw);
- // MESG("get_pango_length:2");
 
 	if(wd->layout==NULL) {
 		// MESG("layout is null!!!");
 		return 0;
 	};
- // MESG("get_pango_length:3");
+	 // MESG("	get_pango_length:3");
 
 	pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
 	// MESG("gpl: [%s]",st);
@@ -44,19 +64,38 @@ int get_pango_length(char *st)
 	pango_layout_get_size (wd->layout, &width, &height);
 	// if(st[0]>0x80)
 	double wf = (double)width/PANGO_SCALE/CLEN;
-	// MESG("PL:[%s] [%2X %2X %2X %2x] w=%d CLEN=%2.1f  %2.1f",st,st[0],st[1],st[2],st[3],width/PANGO_SCALE,CLEN,wf);
-	if(wf<0.1) return 0;
-	if(wf<1.3) return 1;
-	return 2;
+	// MESG("	PL:[%s] [%2X %2X %2X %2x] w=%d CLEN=%2.1f  %2.1f",st,st[0],st[1],st[2],st[3],width/PANGO_SCALE,CLEN,wf);
+	
+	if(wf<0.1) uni_len=0;
+	else if(wf<1.3) uni_len=1;
+	else uni_len=2;
+	 // MESG("	[%s] unit=U%X, uni_len=%d wf=%f",st,code_unit,uni_len,wf);
+	int u1 = wcwidth(code_unit);
+	if(u1==0) uni_len=0;
+
+	// MESG("	insert U%X len=%d",code_unit,uni_len);
+#if	RED_BLACK
+	set_rb_ival(utf_lengths,code_unit,uni_len);
+#else
+	set_avl_ival(utf_lengths,code_unit,uni_len);
+#endif
+	return(uni_len);
 }
 
 // Different for each platform, screen driver
 int get_utf_length(utfchar *utf_char_str)
 {
- if(utf_char_str->uval[0]<128) return 1;
+ if(utf_char_str->uval[0]<0x81) return 1;
  if(clen_error) { return 1;};
-
+#if	0
+ if(utf_char_str->uval[0]==0xCC) { 
+ 	int plen=get_pango_length((char *)utf_char_str->uval);
+	MESG("accent [%s] plen=%d",utf_char_str->uval,plen);
+	return 0;
+ };
+#endif
  int plen=get_pango_length((char *)utf_char_str->uval);
+ if(plen>4) plen=1;
  return plen;
 }
 
@@ -137,6 +176,7 @@ void drv_open()
 	// MESG("parent showed!");
 	gtk_widget_grab_focus(cwp->gwp->draw);
 	// MESG("drv_open: end");
+	events_flush();
 	drv_initialized=1;
 }
 
@@ -235,23 +275,64 @@ int put_wstring(WINDP *wp, char *st,int ulen,int attr)
  pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
  pango_layout_get_size (wd->layout, &width, &height);
  int y_pos_correction=0;
+#if	!FAST_GTK_SCREEN
  int c_width=CLEN*ulen;
  if(width<(int)(CLEN*PANGO_SCALE*ulen)) {
 	px=0 ;
 	return -1;
 	c_width=width/PANGO_SCALE+2*CLEN;
  };
+#endif
  // MESG("put_wstring %d %d ulen=%d",width,(int)(CLEN*PANGO_SCALE*ulen),ulen);	/*   */
  cairo_set_source_rgb(wd->cr,ccolorb.red,ccolorb.green,ccolorb.blue);
  // c_width=width/PANGO_SCALE+2*CLEN;
  if(height>CHEIGHTI*PANGO_SCALE) y_pos_correction = height/PANGO_SCALE-CHEIGHTI;
+#if	FAST_GTK_SCREEN
+ cairo_rectangle(wd->cr, px, py, width,CHEIGHTI);
+#else
  cairo_rectangle(wd->cr, px, py, c_width,CHEIGHTI);
+#endif
  cairo_fill(wd->cr);
  cairo_move_to(wd->cr,px+1,py+1-y_pos_correction);
  cairo_set_source_rgb(wd->cr,ccolorf.red,ccolorf.green,ccolorf.blue);
  pango_cairo_show_layout (wd->cr, wd->layout);
  pango_attr_list_unref (attrs);
  px += ulen*CLEN;
+ // MESG("!");
+ return width/PANGO_SCALE;
+}
+
+int width_wstring(WINDP *wp, char *st,int ulen,int attr)
+{
+ GeEditDisplay *wd = GTK_EDIT_DISPLAY(wp->gwp->draw);
+// show text line
+ int width=0,height=0;	/* Pango measurements  */
+ if(wd->layout==NULL){
+ 	wd->layout = pango_cairo_create_layout (wd->cr);
+	// MESG("put_wstring: new layout!");
+ };
+
+	if(attr & FONT_STYLE_BOLD) pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_HEAVY);
+	else pango_font_description_set_weight(wd->ge_font_desc, PANGO_WEIGHT_NORMAL);
+
+ 	if(attr & FONT_STYLE_ITALIC) pango_font_description_set_style(wd->ge_font_desc,PANGO_STYLE_OBLIQUE);
+	else pango_font_description_set_style(wd->ge_font_desc,PANGO_STYLE_NORMAL);
+
+ 	PangoAttrList * attrs = pango_attr_list_new ();
+	if(attr & FONT_STYLE_UNDERLINE) { 
+		pango_attr_list_insert (attrs, pango_attr_underline_new(PANGO_UNDERLINE_DOUBLE));
+		pango_layout_set_attributes (wd->layout, attrs);
+ 	} else {
+		pango_attr_list_insert (attrs, pango_attr_underline_new(PANGO_UNDERLINE_NONE));
+		pango_layout_set_attributes (wd->layout, attrs);
+ 	};
+ // MESG("ps: [%s]",st);
+ pango_layout_set_text (wd->layout, st, -1);
+ pango_layout_set_font_description (wd->layout, wd->ge_font_desc);
+ pango_layout_get_size (wd->layout, &width, &height);
+ // int y_pos_correction=0;
+
+ pango_attr_list_unref (attrs);
  // MESG("!");
  return width/PANGO_SCALE;
 }
@@ -319,8 +400,17 @@ int init_drv_env()
 
 void drv_init(int argc, char **argv)
 {
+  MESG("drv_init:");
   setlocale(LC_CTYPE,"");
-//  gtk_set_locale();
+  if(utf_lengths==NULL) {
+#if	RED_BLACK
+	MESG("-- new red_black tree");
+ 	utf_lengths=new_rb_itree("utf8");
+#else
+	MESG("-- new avl tree");
+ 	utf_lengths=new_avl_itree("utf8");
+#endif
+ };
   gtk_init (&argc, &argv);
 }
 
@@ -463,7 +553,7 @@ int drv_check_break_key()
  // MESG("drv_check_break_key:");
  if(checking_break_key) {
  count++;
- if(count>10000) {
+ if(count>10) {
 	events_flush();
 	if(key_index>0) {
 		key=key_buf[key_index];
@@ -647,6 +737,7 @@ int addutfvchar1(char *str, vchar *vc, int pos,FILEBUF *w_fp)
  return pos;
 }
 
+#if	0
 void put_wtext_slow(WINDP *wp, int row,int maxcol)
 {
  int col;
@@ -690,6 +781,7 @@ void put_wtext_slow(WINDP *wp, int row,int maxcol)
 	// MESG("-- end slow row %d i1=%d [%s]",row,i1,st);
 	expose_line(row,wp);	/* is needed for GTK2!  */
 }
+#endif
 
 // draw window row on screen
 void put_wtext(WINDP *wp, int row,int maxcol)
@@ -736,10 +828,14 @@ void put_wtext(WINDP *wp, int row,int maxcol)
 			if(i1>0) {
 				st[i1]=0;
 				drv_move(row,imove);
+#if	FAST_GTK_SCREEN
+				put_wstring(wp,st,col-imove,attr_p);
+#else
 				if(put_wstring(wp,st,col-imove,attr_p)==-1) {
 					put_wtext_slow(wp,row,maxcol);
 					return;
 				};
+#endif
 			};
 			drv_color(fcolor,bcolor);
 			i1=0;
@@ -753,12 +849,84 @@ void put_wtext(WINDP *wp, int row,int maxcol)
 	};
 	if(i1>0) {
 		st[i1]=0;
+#if	FAST_GTK_SCREEN
+		put_wstring(wp,st,col-imove,cattr);
+#else
 		if(put_wstring(wp,st,col-imove,cattr)==-1) {
 			put_wtext_slow(wp,row,maxcol);
 		};
+#endif
 	};
 //	MESG("-- end row %d i1=%d [%s]",row,i1,st);
-	expose_line(row,wp);	/* is needed for GTK2!  */
+	// expose_line(row,wp);
+	// gdk_flush();
+}
+
+int set_cursor_xpos(int row,int maxcol)
+{
+ int col;
+ int imax=0;
+ int imin=0;
+ int i1;
+ int xpos=0;
+ if(maxcol==0) return 0;
+ vchar *v1;
+ VIDEO *vp1;
+ int fcolor,bcolor,cattr=0;
+ char st[MAXBLEN];
+ int fcolor_p,bcolor_p,attr_p;
+ int imove=0;
+ vp1 = cwp->vs[row];
+ v1 = vp1->v_text;
+ // MESG("set_cursor_xpos:");
+
+ imin=0;
+ fcolor=v1[0].fcolor;
+ bcolor=v1[0].bcolor;
+ cattr =v1[0].attr;
+ fcolor_p=fcolor;
+ bcolor_p=bcolor;
+ attr_p = cattr;
+ 
+	//  MESG("---> draw row %d col %d",row,maxcol);
+ 	// drv_color(fcolor,bcolor);
+	imax=maxcol;
+
+	/* count of trailing spaces is maxcol-imtrax */
+	// drv_move(row,imin);
+
+	for(col=imin,i1=0;col<imax;col++) {
+		if(v1[col].uval[0]==0xFF) {	/* skip space of wide utf chars  */
+			// imove--;
+			if(v1[col].uval[1]==0xFF) continue;
+		};
+		fcolor=v1[col].fcolor;
+		bcolor=v1[col].bcolor;
+		cattr =v1[col].attr;
+		
+		if(fcolor!=fcolor_p || bcolor!=bcolor_p || cattr!=attr_p) {
+			if(i1>0) {
+				st[i1]=0;
+				// drv_move(row,imove);
+				xpos+=width_wstring(cwp,st,col-imove,attr_p);
+			};
+			// drv_color(fcolor,bcolor);
+			i1=0;
+			imove=col; 
+			fcolor_p=fcolor;bcolor_p=bcolor;attr_p=cattr;
+		};
+		// if(v1[col].uval[0]==0x20) p_space=1;
+		i1=addutfvchar1(st,&v1[col],i1,cwp->w_fp);
+		st[i1]=0;
+		// if(v1[col+1].uval[0]!=0xFF) p_space=0;
+	};
+	if(i1>0) {
+		st[i1]=0;
+		xpos+=width_wstring(cwp,st,col-imove,cattr);
+	};
+//	MESG("-- end row %d i1=%d [%s]",row,i1,st);
+	// MESG("set_cursor_xpos: xpos=%d, %D",xpos,xpos/PANGO_SCALE);
+	return xpos;
 }
 
 int select_font_mono(num n)

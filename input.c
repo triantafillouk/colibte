@@ -948,21 +948,28 @@ void out_print(char *s,int nl)
 	static FILEBUF *bp=NULL;
 	time_t t0;
 	static time_t ptime=0;
-	FILEBUF *oldfp = cbfp;
+	// FILEBUF *oldfp = cbfp;
 	// MESG("out_print: current buffer is [%s] discmd=%d",cbfp->b_fname,discmd);
 	if(s==NULL) return;
-#if	1
-	if(!discmd && !debug_flag()) {
-		if(nl) printf("%s\n",s);
-		else printf("%s",s);
-		return;
-	};
-	if(debug_flag()) {
-		if(nl) fprintf(stderr,"%s\n",s);
-		else fprintf(stderr,"%s",s);
+#if	0
+	if(!discmd) return ;
+#else
+	if(!discmd) {
+		if(debug_flag()) {
+			if(nl) fprintf(stderr,"%s\n",s);
+			else fprintf(stderr,"%s",s);
+		} else {
+			if(nl) fprintf(stdout,"%s\n",s);
+			else fprintf(stdout,"%s",s);
+		}
 		return;
 	};
 #endif
+	if(debug_flag()) {
+		if(nl) fprintf(stderr,"%s\n",s);
+		else fprintf(stderr,"%s",s);
+	};
+
 	if((bp=new_filebuf("[out]",0)) !=NULL) {
 		if(!activate_file(bp)) return;
 	} else {
@@ -970,12 +977,10 @@ void out_print(char *s,int nl)
 		return;
 	};
 
-	sfb(bp);
-
 	// insert string
 	insert_string(bp,s,strlen(s));
 	if(nl) insert_newline(bp);
-	sfb(oldfp);
+	// sfb(oldfp);
 
 	time(&t0);
 
@@ -1000,16 +1005,16 @@ void out_fprint(char *bname, char *s,int nl)
 
 	if(s==NULL) return;
 	if((bp=new_filebuf(bname,0)) !=FALSE) {
-		FILEBUF *oldfp = cbfp;
+		// FILEBUF *oldfp = cbfp;
 
 		if(!activate_file(bp)) return;
 
-		sfb(bp);
+		// sfb(bp);
 
 		// insert string
 		insert_string(bp,s,strlen(s));
 		if(nl) insert_newline(bp);
-		sfb(oldfp);
+		// sfb(oldfp);
 
 
 	} else {
