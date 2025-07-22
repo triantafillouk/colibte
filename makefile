@@ -16,9 +16,9 @@ USE_GLIB=1
 TNOTES=1
 GVERS := $(shell git log -1 --pretty=tformat:%h,%s)
 
+GTKINCLUDE=`pkg-config gtk+-2.0 --cflags`
 GTKINCLUDE3=`pkg-config gtk+-3.0 --cflags`
-GTKINCLUDE3=`pkg-config gtk+-3.0 --cflags`
-GTKINCLUDE4=`pkg-config gtk+-3.0 --cflags`
+GTKINCLUDE4=`pkg-config gtk4 --cflags`
 _X11_=0
 
 OSYSTEM=OTHERUNIX
@@ -40,8 +40,8 @@ X11include=-I/opt/X11/include/
 X11lib0= -lX11 -L/opt/X11/lib $(GLIB_LIB)
 EXTFILE=.$(APP_NAME)_ext_mac
 WSL:=0
-CC=zig cc -DGVERS='"$(GVERS)"'
-#CC=clang -DGVERS='"$(GVERS)"'
+#CC=zig cc -DGVERS='"$(GVERS)"'
+CC=clang -DGVERS='"$(GVERS)"'
 #CC=gcc -DGVERS='"$(GVERS)"'
 endif
 
@@ -133,16 +133,16 @@ ctg2 gldisplay.o : GTK2=1
 
 FLAGS1 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DWSL=$(WSL) -DPCURSES=$(PCURSES) -DTNOTES=$(TNOTES) -DGTK=$(GTK) $(GLIBINCLUDE) -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) -DTNOTES=$(TNOTES) -DUSE_GLIB=$(USE_GLIB) $(X11include) -I/usr/include/ncurses
 
-FLAGS3 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) $(X11include) $(GLIBINCLUDE)
+FLAGS3 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) $(X11include) $(GLIBINCLUDE) -DGTK3=1 -DGTK=1
 
-FLAGS4 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DWSL=$(WSL) -DPCURSES=$(PCURSES) -DTNOTES=$(TNOTES) -DGTK4=1 -DGTK=1 $(GLIBINCLUDE) -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) -DTNOTES=$(TNOTES) -DUSE_GLIB=$(USE_GLIB) $(X11include) -I/usr/include/ncurses -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
+FLAGS4 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DWSL=$(WSL) -DGDK=1 -DGDK4=1 -DPCURSES=$(PCURSES) -DTNOTES=$(TNOTES) -DGTK4=1 -DGTK=1 $(GLIBINCLUDE) -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) -DTNOTES=$(TNOTES) -DUSE_GLIB=$(USE_GLIB) $(X11include) -I/usr/include/ncurses -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
 
 ctg2 pixmp gdk2 : GTKINCLUDE=`pkg-config gtk+-2.0 --cflags` -DGTK2=1 
 
 tplot c3 ge3 ctg3: GTKINCLUDE=`pkg-config gtk+-3.0 --cflags` -DGTK3=1 
 tplot c3 ge3 ctg3: GTKINCLUDE3=`pkg-config gtk+-3.0 --cflags` -DGTK3=1 
 
-ctg4: GTKINCLUDE4=`pkg-config gtk4 --cflags` -DGTK4=1 
+ctg4 gtkterm4.o screen.o gplot4.o: GTKINCLUDE4=`pkg-config gtk4 --cflags` -DGTK4=1 
 
 ifeq ($(TNOTES), 1)
 GTK2_FLAGS=`pkg-config gtk+-2.0 --libs` $(X11lib) ${SQLITE3}
@@ -272,8 +272,8 @@ geditdisplay3.o: geditdisplay3.c geditdisplay3.h gedit_common.c
 gtkterm4.o: xe.h gtkterm4.c gtkterm4.h xthemes.h color.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h geditdisplay3.h gtk_common.c xthemes.c
 	${CC} $(FLAGS4) -c -DGTK=1 -Wall $(CPU_OPTIONS) $(GTKINCLUDE4) -funsigned-char gtkterm4.c -o gtkterm4.o
 
-gplotc4.o: gplotc3.c gplot3.h plot_cairo3.c plot_commonc.c
-	${CC}  -c ${FLAGS4}  ${GTKINCLUDE4} -o gplotc4.o  gplotc3.c
+gplotc4.o: gplotc4.c gplot4.h plot_cairo3.c plot_commonc.c
+	${CC}  -c ${FLAGS4}  ${GTKINCLUDE4} -o gplotc4.o  gplotc4.c
 
 gtk_support4.o: gtk_support3.c gtk_support.h
 	${CC}  -c ${FLAGS4}  ${GTKINCLUDE4} -o gtk_support4.o gtk_support3.c
@@ -306,8 +306,8 @@ ctg3: tplot.o gsystem.o gldisplay.o edit.o gtkterm3.o dir.o screen3.o  eval.o ml
 	${CC} tplot.o gsystem.o gldisplay.o  edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o gplotc3.o  gtk_support3.o config_init.o support.o geditdisplay3.o gcanvas3.o  highlight.o utf8_support.o notes.o mlangf.o -o ctg3  $(GTK3_FLAGS) -lm 
 
 #	The following is with gtk4 library and cairo plot. gplotc(gcanvas)
-ctg4: tplot.o gsystem.o gldisplay.o edit.o gtkterm4.o dir.o screen4.o  eval.o mlangg.o  file.o ginput4.o help.o search.o  word.o window.o marks.o  utils.o alist.o filebuf.o gplotc4.o  support.o config_init.o convert.o  gtk_support4.o geditdisplay4.o  gcanvas4.o  highlight.o utf8_support.o notes.o mlangf.o
-	${CC} tplot.o gsystem.o gldisplay.o  edit.o gtkterm4.o dir.o screen4.o  eval.o mlangg.o  file.o ginput4.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o gplotc4.o  gtk_support4.o config_init.o support.o geditdisplay4.o gcanvas4.o  highlight.o utf8_support.o notes.o mlangf.o -o ctg4  $(GTK4_FLAGS) -lm 
+ctg4: tplot.o gsystem.o gldisplay.o edit.o gtkterm4.o dir.o screen4.o  eval.o mlangg.o  file.o ginput4.o help.o search.o  word.o window.o marks.o  utils.o alist.o filebuf.o   support.o config_init.o convert.o  gtk_support4.o geditdisplay4.o   highlight.o utf8_support.o notes.o mlangf.o
+	${CC} tplot.o gsystem.o gldisplay.o  edit.o gtkterm4.o dir.o screen4.o  eval.o mlangg.o  file.o ginput4.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o  gtk_support4.o config_init.o support.o geditdisplay4.o   highlight.o utf8_support.o notes.o mlangf.o -o ctg4  $(GTK4_FLAGS) -lm 
 
 #	The following is with gtk2 library and cairo plot. gplotc(gcanvas)
 ctg2 : gmain.o gsystem.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o   gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o plot_cairo.c  config_init.o utf8_support.o notes.o mlangf.o
@@ -333,9 +333,6 @@ ce : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file
 gplotc.o: gplotc.c plot_cairo.c plot_commonc.c gplot.h
 	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o $*.o  $*.c
 
-#stroker: demos/stroker.c
-#	gcc demos/stroker.c -o stroker `pkg-config gtk+-3.0 --cflags --libs`
-
 #expose: demos/expose.c
 #	gcc demos/expose.c -o expose `pkg-config gtk+-3.0 --cflags --libs`
 
@@ -345,7 +342,7 @@ gplotc.o: gplotc.c plot_cairo.c plot_commonc.c gplot.h
 #listbox-dnd: demos/listbox-dnd.c
 #	gcc demos/listbox-dnd.c -o listbox-dnd `pkg-config gtk+-3.0 --cflags --libs`
 
-all : cleanall cte ctg3 ctg2 ctxe ce
+all : cleanall cte ctg3 ctg2 ctg4 ctxe ce
 
 # test make conditionals
 test: 

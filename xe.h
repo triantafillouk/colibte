@@ -124,7 +124,9 @@
 #include <curses.h>
 #include <panel.h>
 #else
+#if	!GTK4
 typedef	int		bool;	/* define our own bool type  */
+#endif
 #endif
 
 #if	XLIB
