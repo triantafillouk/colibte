@@ -9,7 +9,7 @@
 
 #include "xe.h"
 #include "color.h"
-#include "geditdisplay3.h"
+#include "geditdisplay4.h"
 
 int x_insert ();
 
@@ -276,7 +276,7 @@ static gboolean mouse_wscroll (GtkWidget *widget,
     return TRUE;
 }
 
-static void
+void
 ge_edit_display_realize (GtkWidget *widget)
 {
     GdkWindowAttr		attributes;

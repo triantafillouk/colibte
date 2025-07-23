@@ -11,9 +11,9 @@
 
 #include <glib.h>
 
-#include "geditdisplay3.h"
+#include "geditdisplay4.h"
 #include "gtk_support.h"
-#include "gtkterm3.h"
+#include "gtkterm4.h"
 #include "xkeys.h"
 #include "xthemes.h"
 #include <X11/Xlib.h>
