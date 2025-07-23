@@ -1918,36 +1918,34 @@ int  show_position_info(num short_version)
 		if(short_version) {
 			sstat=snprintf(str,sizeof(str),"%6lld",getcline()+1);
 		} else {
-			if(Eol()) {
-				if(is_wrap_text(fp)){
-					sstat=snprintf(str,sizeof(str),"%6lld %7lld ",getcline()+1,loffs);
-				} else {
+#if	0
+			if(0) {
+				{
 				if(bt_dval("show_coffset")) {
-					sstat=snprintf(str,sizeof(str),"%6lld %7lld %7lld ",getcline()+1,Offset(),col);
+					sstat=snprintf(str,sizeof(str),"%6lld %7lld %4lld",getcline()+1,Offset(),col+1);
 				} else {
-					sstat=snprintf(str,sizeof(str),"%6lld %7lld %7lld ",getcline()+1,loffs,col);
+					sstat=snprintf(str,sizeof(str),"%6lld %7lld %4lld",getcline()+1,loffs,col+1);
 				};
 				}
-				if(FOffset(cwp->w_fp)==FSize(cwp->w_fp)) strlcat(str,"EOF",MAXSLEN);
+				if(FOffset(cwp->w_fp)==FSize(cwp->w_fp)) strlcat(str,"|  EOF ",MAXSLEN);
 				else
 				if((int)bt_dval("show_cdata")) { 
-					if(cwp->w_fp->b_mode & EMDOS) strlcat(str,"0D0A",MAXSLEN);
-					else if(cwp->w_fp->b_mode & EMUNIX) strlcat(str,"000A",MAXSLEN);
-					else if(cwp->w_fp->b_mode & EMMAC) strlcat(str,"000D",MAXSLEN);
+					if(cwp->w_fp->b_mode & EMDOS)       strlcat(str,"|  CR LF ",MAXSLEN);
+					else if(cwp->w_fp->b_mode & EMUNIX) strlcat(str,"|    LF  ",MAXSLEN);
+					else if(cwp->w_fp->b_mode & EMMAC)  strlcat(str,"|    CR  ",MAXSLEN);
 					else strlcat(str,"    ",MAXSLEN);
 				};
-			} else {
-				sstat=snprintf(str,sizeof(str),"%6lld ",getcline()+1);
-				
-				if(is_wrap_text(fp)){
-					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",loffs);
-				} else {
+			} else 
+#endif
+			{
+				sstat=snprintf(str,sizeof(str),"%7lld ",getcline()+1);
+				{
 					if(bt_dval("show_coffset")) {
 						sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",Offset());
 					} else {
-						sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",loffs);
+						sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%4lld ",loffs);
 					};
-					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",col);
+					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%4lld",col+1);
 				};
 
 				if((int)bt_dval("show_cdata")) {
@@ -1955,11 +1953,12 @@ int  show_position_info(num short_version)
 					long value=utf_value_len(&size);
 					// if(debug_flag()) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX %d",value,size);
 					// else 
-					if(value==0x9) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str)," TAB");
-					else if(value==0x20) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str)," SPC");
-					else if(value==0x0A) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str)," NL ");
-					else if(value==0x0D) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str)," CR ");
-					else sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX",value);
+					if(value==0x9) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|   TAB  ");
+					else if(value==0x20) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"| SPACE  ");
+					else if(value==0x0A) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|   NL   ");
+					else if(value==0x0D) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|   CR   ");
+					else if(value==0x0D0A) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|  CRLF  ");
+					else sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|%08lX",value);
 				};
 				if(strlen(str) < 10) short_version=1;
 			};

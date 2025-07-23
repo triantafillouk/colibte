@@ -2439,7 +2439,7 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
 	};
 	if(wp->w_ntcols-rpos<10) return;
 	drv_wcolor(wp->gwp->draw,COLOR_ROWCOL_FG,bg_color);
-	wmove(wp->gwp->draw,status_row,wp->w_ntcols-rpos);
+	wmove(wp->gwp->draw,status_row,wp->w_ntcols-rpos+1);
 	maxlen=wp->w_ntcols-rpos-1;
  } else {
 	drv_wcolor(wp->gwp->draw,fg_color,bg_color);
