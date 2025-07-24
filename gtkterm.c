@@ -501,7 +501,7 @@ void show_cursor (char *from)
 
 	wd = GTK_EDIT_DISPLAY(cwp->gwp->draw);
 
-#if	FAST_GTK_SCREEN
+#if	FAST_GTK_SCREEN1
 	px=set_cursor_xpos(cposy,cposx);
 #endif
 
@@ -1094,7 +1094,7 @@ GWINDP * ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype)
  new_gwp->hstatus = gtk_hbox_new(FALSE,1);
  new_gwp->evb_hstatus = gtk_event_box_new();
  gtk_container_set_border_width(GTK_CONTAINER(new_gwp->evb_hstatus),0);
- gtk_container_set_border_width(GTK_CONTAINER(new_gwp->hstatus),1);
+ gtk_container_set_border_width(GTK_CONTAINER(new_gwp->hstatus),5);
  gtk_container_add (GTK_CONTAINER(new_gwp->evb_hstatus), new_gwp->hstatus);
  gtk_event_box_set_above_child ((GtkEventBox *)new_gwp->evb_hstatus,0);
  new_gwp->status2 = gtk_entry_new();
@@ -1103,27 +1103,31 @@ GWINDP * ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype)
  new_gwp->status1 = gtk_entry_new();
 
  new_gwp->status3 = gtk_entry_new();
- gtk_entry_set_editable((GtkEntry *)new_gwp->status3,FALSE);
- gtk_entry_set_inner_border((GtkEntry *)new_gwp->status3,NULL);
- gtk_entry_set_width_chars (GTK_ENTRY (new_gwp->status3), 20);
+ // gtk_entry_set_editable((GtkEntry *)new_gwp->status3,FALSE);
+ // gtk_entry_set_inner_border((GtkEntry *)new_gwp->status3,NULL);
+ gtk_entry_set_width_chars (GTK_ENTRY (new_gwp->status3), 15);
  gtk_entry_set_alignment((GtkEntry *)new_gwp->status3,1);
  gtk_entry_set_has_frame((GtkEntry *)new_gwp->status3,FALSE);
  gtk_widget_set_style(new_gwp->status3,st3a);
+ gtk_entry_set_editable((GtkEntry *)new_gwp->status3,FALSE);
 
 
  gtk_entry_set_editable((GtkEntry *)new_gwp->status1,FALSE);
  gtk_entry_set_inner_border((GtkEntry *)new_gwp->status1,NULL);
  gtk_entry_set_editable((GtkEntry *)new_gwp->status2,FALSE);
  gtk_entry_set_inner_border((GtkEntry *)new_gwp->status2,NULL);
-
+ gtk_entry_set_inner_border((GtkEntry *)new_gwp->status3,NULL);
+ gtk_entry_set_alignment ((GtkEntry *)new_gwp->status3,1);
  gtk_entry_set_width_chars (GTK_ENTRY (new_gwp->status2), 5);
+ gtk_entry_set_width_chars (GTK_ENTRY (new_gwp->status1), 100);
  if(wp->w_fp!=NULL) gtk_entry_set_text((GtkEntry *)new_gwp->status1,wp->w_fp->b_fname);
-
- gtk_entry_set_has_frame((GtkEntry *)new_gwp->status2,FALSE);
- gtk_entry_set_has_frame((GtkEntry *)new_gwp->status1,FALSE);
+ // gtk_entry_set_text((GtkEntry *)new_gwp->status3,"#########");
+ gtk_entry_set_has_frame((GtkEntry *)new_gwp->status1,TRUE);
+ gtk_entry_set_has_frame((GtkEntry *)new_gwp->status2,TRUE);
+ gtk_entry_set_has_frame((GtkEntry *)new_gwp->status3,TRUE);
 
  // clear the default style
-// gtk_widget_set_style(new_gwp->evb_hstatus,st1i); 
+ // gtk_widget_set_style(new_gwp->evb_hstatus,st1i); 
  gtk_widget_set_style(new_gwp->status1,st1a); 
  gtk_widget_set_style(new_gwp->status2,st3a); 
  gtk_widget_set_style(new_gwp->status3,st3a); 
@@ -1138,17 +1142,17 @@ GWINDP * ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype)
  
 
  gtk_widget_realize(new_gwp->hstatus);
- gtk_widget_show(new_gwp->evb_hstatus);
  gtk_event_box_set_above_child ((GtkEventBox *)new_gwp->evb_hstatus,0);
  
- gtk_widget_show(new_gwp->hstatus);
- gtk_widget_show(new_gwp->evb_hstatus);
  
+ gtk_widget_set_size_request((GtkWidget *)new_gwp->hstatus,600,45);
+ gtk_widget_set_size_request((GtkWidget *)new_gwp->evb_hstatus,600,45);
+
  gtk_widget_show(new_gwp->status2);
  gtk_widget_show(new_gwp->status1);
- gtk_widget_set_size_request((GtkWidget *)new_gwp->hstatus,600,-1);
-
  gtk_widget_show(new_gwp->status3);
+ gtk_widget_show(new_gwp->hstatus);
+ gtk_widget_show(new_gwp->evb_hstatus);
 // if(window_list->size>1) 
  {
  	connect_exit_button(GTK_BOX (new_gwp->hstatus),(GCallback) cb_close_window,(void *)wp);
@@ -1176,7 +1180,10 @@ void put_string_statusline(WINDP *wp, char *st, int position)
 	gtk_widget_set_style(GTK_WIDGET(wp->gwp->status2),st3i);
 	gtk_widget_set_style(GTK_WIDGET(wp->gwp->status3),st3i);
  };
- if(position>0) gtk_entry_set_text(GTK_ENTRY(wp->gwp->status3),st);
+ if(position>0) {
+ 	gtk_entry_set_text(GTK_ENTRY(wp->gwp->status3),"");
+ 	gtk_entry_set_text(GTK_ENTRY(wp->gwp->status3),st);
+ };
  if(position==0) gtk_entry_set_text(GTK_ENTRY(wp->gwp->status1),st);
  if(position<0) gtk_entry_set_text(GTK_ENTRY(wp->gwp->status2),st);
 }

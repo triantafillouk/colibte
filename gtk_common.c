@@ -737,53 +737,8 @@ int addutfvchar1(char *str, vchar *vc, int pos,FILEBUF *w_fp)
  return pos;
 }
 
-#if	0
-void put_wtext_slow(WINDP *wp, int row,int maxcol)
-{
- int col;
- int imax=0;
- int imin=0;
- int i1;
- vchar *v1, *vtext;
- VIDEO *vp1;
- int fcolor,bcolor;
- // int cattr;
- char st[MAXBLEN];
-
- vp1 = wp->vs[row];
- v1=vtext=vp1->v_text;
-
- imin=0;
- fcolor=v1[0].fcolor;
- bcolor=v1[0].bcolor;
- // MESG("---> draw row slow %d",row);
- drv_color(fcolor,bcolor);
-	imax=maxcol;
-
-	/* count of trailing spaces is maxcol-imax */
-	drv_move(row,imin);
-
-	for(col=imin,i1=0;col<imax;col++) {
-		// drv_move(row,col);
-		if(v1[col].uval[0]==0xFF) {	/* skip space of wide utf chars  */
-			if(v1[col].uval[1]==0xFF) continue;
-		};
-		fcolor=v1[col].fcolor;
-		bcolor=v1[col].bcolor;
-
-		drv_color(fcolor,bcolor); 
-		i1=addutfvchar1(st,&v1[col],i1,wp->w_fp);
-		st[i1]=0;i1=0;
-		// MESG("%d [%s] ",col,st);
-		drv_move(row,col);
-		put_wchar(wp,st);
-	}
-	// MESG("-- end slow row %d i1=%d [%s]",row,i1,st);
-	expose_line(row,wp);	/* is needed for GTK2!  */
-}
-#endif
-
-// draw window row on screen
+#if	FAST_GTK_SCREEN
+// fast draw window row on screen
 void put_wtext(WINDP *wp, int row,int maxcol)
 {
  int col;
@@ -828,14 +783,7 @@ void put_wtext(WINDP *wp, int row,int maxcol)
 			if(i1>0) {
 				st[i1]=0;
 				drv_move(row,imove);
-#if	FAST_GTK_SCREEN
 				put_wstring(wp,st,col-imove,attr_p);
-#else
-				if(put_wstring(wp,st,col-imove,attr_p)==-1) {
-					put_wtext_slow(wp,row,maxcol);
-					return;
-				};
-#endif
 			};
 			drv_color(fcolor,bcolor);
 			i1=0;
@@ -849,18 +797,57 @@ void put_wtext(WINDP *wp, int row,int maxcol)
 	};
 	if(i1>0) {
 		st[i1]=0;
-#if	FAST_GTK_SCREEN
 		put_wstring(wp,st,col-imove,cattr);
-#else
-		if(put_wstring(wp,st,col-imove,cattr)==-1) {
-			put_wtext_slow(wp,row,maxcol);
-		};
-#endif
 	};
 //	MESG("-- end row %d i1=%d [%s]",row,i1,st);
 	// expose_line(row,wp);
 	// gdk_flush();
 }
+#else
+void put_wtext(WINDP *wp, int row,int maxcol)
+{
+ int col;
+ int imax=0;
+ int imin=0;
+ int i1;
+ vchar *v1, *vtext;
+ VIDEO *vp1;
+ int fcolor,bcolor;
+ // int cattr;
+ char st[MAXBLEN];
+
+ vp1 = wp->vs[row];
+ v1=vtext=vp1->v_text;
+
+ imin=0;
+ fcolor=v1[0].fcolor;
+ bcolor=v1[0].bcolor;
+ // MESG("---> draw row slow %d",row);
+ drv_color(fcolor,bcolor);
+	imax=maxcol;
+
+	/* count of trailing spaces is maxcol-imax */
+	drv_move(row,imin);
+
+	for(col=imin,i1=0;col<imax;col++) {
+		// drv_move(row,col);
+		if(v1[col].uval[0]==0xFF) {	/* skip space of wide utf chars  */
+			if(v1[col].uval[1]==0xFF) continue;
+		};
+		fcolor=v1[col].fcolor;
+		bcolor=v1[col].bcolor;
+
+		drv_color(fcolor,bcolor); 
+		i1=addutfvchar1(st,&v1[col],i1,wp->w_fp);
+		st[i1]=0;i1=0;
+		// MESG("%d [%s] ",col,st);
+		drv_move(row,col);
+		put_wchar(wp,st);
+	}
+	// MESG("-- end slow row %d i1=%d [%s]",row,i1,st);
+	expose_line(row,wp);	/* is needed for GTK2!  */
+}
+#endif
 
 int set_cursor_xpos(int row,int maxcol)
 {
