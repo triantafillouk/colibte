@@ -7,6 +7,7 @@
 /* gtk2 screen driver */
 
 #include "xe.h"
+#include "display_driver.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-prototypes"
@@ -205,6 +206,12 @@ GtkWidget *color_dialog;
 
 extern int startup_exe;
 
+GWINDP	*curgwp=NULL;	/* Current window meta structure data 	*/
+
+void set_curgwp()
+{
+	curgwp = cwp->gwp;
+}
 
 GtkWidget*
 create_parent (void)
@@ -1105,8 +1112,8 @@ GWINDP * ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype)
  new_gwp->status3 = gtk_entry_new();
  // gtk_entry_set_editable((GtkEntry *)new_gwp->status3,FALSE);
  // gtk_entry_set_inner_border((GtkEntry *)new_gwp->status3,NULL);
- gtk_entry_set_width_chars (GTK_ENTRY (new_gwp->status3), 15);
- gtk_entry_set_alignment((GtkEntry *)new_gwp->status3,1);
+ gtk_entry_set_width_chars (GTK_ENTRY (new_gwp->status3), 20);
+ gtk_entry_set_alignment((GtkEntry *)new_gwp->status3,0);
  gtk_entry_set_has_frame((GtkEntry *)new_gwp->status3,FALSE);
  gtk_widget_set_style(new_gwp->status3,st3a);
  gtk_entry_set_editable((GtkEntry *)new_gwp->status3,FALSE);
@@ -1117,14 +1124,14 @@ GWINDP * ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype)
  gtk_entry_set_editable((GtkEntry *)new_gwp->status2,FALSE);
  gtk_entry_set_inner_border((GtkEntry *)new_gwp->status2,NULL);
  gtk_entry_set_inner_border((GtkEntry *)new_gwp->status3,NULL);
- gtk_entry_set_alignment ((GtkEntry *)new_gwp->status3,1);
+ gtk_entry_set_alignment ((GtkEntry *)new_gwp->status3,0);
  gtk_entry_set_width_chars (GTK_ENTRY (new_gwp->status2), 5);
  gtk_entry_set_width_chars (GTK_ENTRY (new_gwp->status1), 100);
  if(wp->w_fp!=NULL) gtk_entry_set_text((GtkEntry *)new_gwp->status1,wp->w_fp->b_fname);
  // gtk_entry_set_text((GtkEntry *)new_gwp->status3,"#########");
- gtk_entry_set_has_frame((GtkEntry *)new_gwp->status1,TRUE);
- gtk_entry_set_has_frame((GtkEntry *)new_gwp->status2,TRUE);
- gtk_entry_set_has_frame((GtkEntry *)new_gwp->status3,TRUE);
+ gtk_entry_set_has_frame((GtkEntry *)new_gwp->status1,FALSE);
+ gtk_entry_set_has_frame((GtkEntry *)new_gwp->status2,FALSE);
+ gtk_entry_set_has_frame((GtkEntry *)new_gwp->status3,FALSE);
 
  // clear the default style
  // gtk_widget_set_style(new_gwp->evb_hstatus,st1i); 

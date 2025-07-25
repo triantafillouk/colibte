@@ -26,6 +26,7 @@
 #include	"xthemes.h"
 #include	"menu.h"
 #include	"panel_curses.h"
+#include	"display_driver.h"
 
 int color_scheme_ind;
 COLOR_SCHEME *current_scheme=NULL;
@@ -123,6 +124,13 @@ void update_selection();
 extern void clear_message_line();
 void show_subw1();
 int x_insert ();
+
+GWINDP	*curgwp=NULL;	/* Current window meta structure data 	*/
+
+void set_curgwp()
+{
+	curgwp = cwp->gwp;
+}
 
 extern void update_box(int,int,int,int);
 extern int update_screen(num);

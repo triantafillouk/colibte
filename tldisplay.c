@@ -12,6 +12,7 @@
 #include	"support.h"
 #include	"menus.h"
 #include	"panel_curses.h"
+#include	"display_driver.h"
 #define __USE_XOPEN
 #include	<wchar.h>
 

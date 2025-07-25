@@ -26,12 +26,14 @@ typedef struct {
 
 int found=0;
 
+void set_current_file_buffer(FILEBUF *bp);
+FILEBUF *current_file_buffer();
+
 char	search_pattern[MAXLLEN];            /* Search pattern	*/
 char	replace_pattern[MAXLLEN];			/* replacement pattern		*/
 char	search_lowercase_pattern[MAXLLEN];		/* lower case search pattern  */
 void MESG_time_start(const char *fmt, ...);
 num prof_count=0;
-extern FILEBUF *cbfp;
 
 unsigned int	matchlen = 0;	/* lenght of matched string  */
 char		patmatch[MAXLLEN];	/* string that satisfies the search command.  */
@@ -126,7 +128,7 @@ void get_uppercase_string(char *upper, char *string)
 int forwsearch(num n)
 {
 	register int status = TRUE;
-
+	FILEBUF *fp=current_file_buffer();;
 //	MESG("forwsearch: n=%d macro_exec=%d",n,macro_exec);
 	if(n==0) return FALSE;
 	/* If n is negative, search backwards. */
@@ -142,14 +144,14 @@ int forwsearch(num n)
 	// MESG("forwsearch: pattern=%s",search_pattern);
 		get_lowercase_string(search_lowercase_pattern,search_pattern);
 #if	TNOTES
-		if(cbfp->b_flag & FSNOTES) ToLineEnd();
+		if(fp->b_flag & FSNOTES) ToLineEnd();
 #endif
 		found=forw_stat(n);
 	} else found=0;
 	
 
 #if	TNOTES
-	if(cbfp->b_flag & FSNOTES) update_tag_linecol();
+	if(fp->b_flag & FSNOTES) update_tag_linecol();
 #endif
 	if(found) { 
 		set_hmark(1,"forw_search");
@@ -166,6 +168,8 @@ char *get_line_at(FILEBUF *fb,offs offset);
 
 int find_next(num n)
 {
+ FILEBUF *fp=current_file_buffer();
+
 	if (n < 0)	return(find_previous(-n));
 	if (search_pattern[0] == 0)
 	{
@@ -177,14 +181,14 @@ int find_next(num n)
 	/* Search for the pattern for as long as
 	 * n is positive	 */
 #if	TNOTES
-	if(cbfp->b_flag & FSNOTES) {
+	if(fp->b_flag & FSNOTES) {
 		ToLineEnd();
 	};
 #endif
 	found=forw_stat(n);
-//	MESG("find_next: n=%d [%s] found=%d FSNVTAG=%X b_flag=%X",n,search_pattern,found,FSNVTAG,cbfp->b_flag);
+//	MESG("find_next: n=%d [%s] found=%d FSNVTAG=%X b_flag=%X",n,search_pattern,found,FSNVTAG,fp->b_flag);
 #if	TNOTES
-	if(cbfp->b_flag & FSNOTES) update_tag_linecol();
+	if(fp->b_flag & FSNOTES) update_tag_linecol();
 #endif
 	if(found) {
 		set_hmark(0,"find_next");
@@ -197,6 +201,7 @@ int find_next(num n)
  */
 int backsearch(num n)
 {
+ FILEBUF *fp=current_file_buffer();
 	register int status = TRUE;
 	if(n==0) return FALSE;
 
@@ -205,7 +210,7 @@ int backsearch(num n)
 
 	set_list_type(LSRC);
 #if	TNOTES
-	if(cbfp->b_flag & FSNOTES) ToLineBegin();
+	if(fp->b_flag & FSNOTES) ToLineBegin();
 #endif
 	if ((status = readpattern("Reverse search", &search_pattern[0], TRUE))==TRUE) 
 	{
@@ -215,9 +220,9 @@ int backsearch(num n)
 	} else found=0;
 	
 
-//	MESG("backsearch: n=%d [%s] found=%d b_flag=%X",n,search_pattern,found,cbfp->b_flag);
+//	MESG("backsearch: n=%d [%s] found=%d b_flag=%X",n,search_pattern,found,fp->b_flag);
 #if	TNOTES
-	if(cbfp->b_flag & FSNOTES) update_tag_linecol();
+	if(fp->b_flag & FSNOTES) update_tag_linecol();
 #endif
 	set_update(cwp,UPD_FULL);
 	return(found);
@@ -228,12 +233,13 @@ int backsearch(num n)
  */
 int find_previous(num n)
 {
+ FILEBUF *fp=current_file_buffer();
 	if(n==0) return FALSE;
 	if (n < 0)	return(find_next(-n));
 
 //	MESG("find_previous: [%s]",search_pattern);
 #if	TNOTES
-	if(cbfp->b_flag & FSNOTES) ToLineBegin();
+	if(fp->b_flag & FSNOTES) ToLineBegin();
 #endif
 	if (search_pattern[0] == '\0')
 	{
@@ -241,9 +247,9 @@ int find_previous(num n)
 		return FALSE;
 	}
 	found=back_stat(n);
-//	MESG("find_previous: n=%d [%s] FSNVTAG=%X found=%d b_flag=%X",n,FSNVTAG,search_pattern,found,cbfp->b_flag);
+//	MESG("find_previous: n=%d [%s] FSNVTAG=%X found=%d b_flag=%X",n,FSNVTAG,search_pattern,found,fp->b_flag);
 #if	TNOTES
-	if(cbfp->b_flag & FSNOTES) update_tag_linecol();
+	if(fp->b_flag & FSNOTES) update_tag_linecol();
 #endif
 	return(found);
 }
@@ -462,7 +468,7 @@ int	setpattern(char apat[], char *st,int srch)
 void savematch(int direction)
 {
  num o;
-
+ FILEBUF *fp=current_file_buffer();
  if(!gmode_reg_exp) {
  	strlcpy(patmatch,search_pattern,MAXLLEN);
 	matchlen=strlen(search_pattern);
@@ -478,7 +484,7 @@ void savematch(int direction)
  match_offs = o;
 
  /* get the matched text! */ 
-	get_text_offs(cbfp,patmatch,o,matchlen);
+	get_text_offs(fp,patmatch,o,matchlen);
 	patmatch[matchlen]=0;
 //	MESG("savematch: [%s] len=%d",patmatch,matchlen);
 }
@@ -533,9 +539,9 @@ int	replaces(int query, int next_only, num n)
 	int nlflag;		/* last char of search string a <NL>? */
 	int nlrepl;		/* was a replace done on the last line? */
 	int c;			/* input char for query */
-	FILEBUF *fp=cbfp;
+	FILEBUF *fp=current_file_buffer();
 
-	offs current_offset=tp_offset(cbfp->tp_current);
+	offs current_offset=tp_offset(fp->tp_current);
 	offs initial_offset=current_offset;
 	
 	offs last_offset;
@@ -546,7 +552,7 @@ int	replaces(int query, int next_only, num n)
 	REXP_PAT rpattern[MAXLLEN];	// regexp pattern
 	// MESG("replaces:=== smark=%lld emark=%lld",tp_offset(cwp->w_smark),tp_offset(cwp->w_emark));
 
-	offs  end_offset=tp_offset(cbfp->tp_text_end);
+	offs  end_offset=tp_offset(fp->tp_text_end);
 	if(cwp)
 	if(cwp->selection){
 		end_offset = tp_offset(cwp->w_emark);
@@ -619,7 +625,7 @@ int	replaces(int query, int next_only, num n)
 		stat=snprintf(lline,1024,"Replacing '%s' with '%s' please wait ..",pattern_ori,replace_pattern);
 		if(stat>=256) MESG("truncated 4");
 		if(!execmd) msg_line(lline);
-		events_flush();
+		// events_flush();
 	};
 
 	prof_count=0;
@@ -775,9 +781,10 @@ qprompt:
  */
 int delins(int dlength, char *instr)
 {
+	FILEBUF *fp=current_file_buffer();
 	// MESG("delins: o=%ld delete %d chars, insert [%s]",Offset(),dlength,instr);
-	if(!DeleteBlock(cbfp,0,dlength)) return FALSE;
-	if(!InsertBlock(cbfp,instr,strlen(instr),0,0)) return FALSE;
+	if(!DeleteBlock(fp,0,dlength)) return FALSE;
+	if(!InsertBlock(fp,instr,strlen(instr),0,0)) return FALSE;
 	return (TRUE);
 }
 
@@ -836,7 +843,7 @@ fail:;			/* continue to search */
  */
 int nextch(int dir)
 {
- FILEBUF *fp=cbfp;
+ FILEBUF *fp=current_file_buffer();
 	if (dir == FORWARD) {
 		if(curoffs>FSize(fp)) return -1;
 
@@ -861,22 +868,22 @@ char *strcasestr(const char *haystack, const char *needle);;
 int forw_stat(num n)
 {
  int status=0;
-
+ FILEBUF *fp=current_file_buffer();
  REXP_PAT rpattern[MAXLLEN];	// regexp pattern
  regexp_str(search_pattern,search_lowercase_pattern,rpattern,FORWARD);
 // MESG("forwstat: exact=%d  [%s]",gmode_exact_case,search_pattern);
 // MESG("	sp=[%s] rp=[%s]",search_pattern,rpattern);
 
- if(cbfp->b_flag >=FSNOTES) {
+ if(fp->b_flag >=FSNOTES) {
  	// set current
 	int ind=-1;
 	istr *idata;
 	alist *search_list=NULL;
 	int current_line=0;
-	if(cbfp->b_flag & FSNLIST) {search_list=cbfp->dir_list_str;current_line=cwp->current_note_line;};
+	if(fp->b_flag & FSNLIST) {search_list=fp->dir_list_str;current_line=cwp->current_note_line;};
 #if	TNOTES
-	if(cbfp->b_flag & FSNOTESN) {search_list=cbfp->dir_list_str;current_line=cwp->current_note_line;};
-	if(cbfp->b_flag & FSNOTES) {search_list=cbfp->b_tag_list;current_line=cwp->current_tag_line;};
+	if(fp->b_flag & FSNOTESN) {search_list=fp->dir_list_str;current_line=cwp->current_note_line;};
+	if(fp->b_flag & FSNOTES) {search_list=fp->b_tag_list;current_line=cwp->current_tag_line;};
 #endif
 	lbegin(search_list);
 	// printf("search pattern: [%s] current_line=%d\n",&search_pattern[0],current_line);
@@ -895,7 +902,7 @@ int forw_stat(num n)
 		if(strstr(tmp_str,&search_pattern[0])!=NULL) 
 		{
 #if	TNOTES
-			if(cbfp->b_flag & FSNOTES)
+			if(fp->b_flag & FSNOTES)
 				cwp->current_tag_line=ind;
 			else
 #endif
@@ -943,19 +950,19 @@ int back_stat(num n)
  char reverse_pattern[MAXLLEN];
  REXP_PAT reverse_rpattern[MAXLLEN];	// reverse regular expression pattern
  char reverse_lower_pattern[MAXLLEN];
+ FILEBUF *fp=current_file_buffer();
 
-
- if(cbfp->b_flag >=FSNOTES) {
+ if(fp->b_flag >=FSNOTES) {
  	// set current
 	int ind=-1;
 	int is_last=1;
 	istr *idata;
 	alist *search_list=NULL;
 	int current_line=0;
-	if(cbfp->b_flag & FSNLIST) {search_list=cbfp->dir_list_str;current_line=cwp->current_note_line;};
+	if(fp->b_flag & FSNLIST) {search_list=fp->dir_list_str;current_line=cwp->current_note_line;};
 #if	TNOTES
-	if(cbfp->b_flag & FSNOTESN) {search_list=cbfp->dir_list_str;current_line=cwp->current_note_line;};
-	if(cbfp->b_flag & FSNOTES) {search_list=cbfp->b_tag_list;current_line=cwp->current_tag_line;};
+	if(fp->b_flag & FSNOTESN) {search_list=fp->dir_list_str;current_line=cwp->current_note_line;};
+	if(fp->b_flag & FSNOTES) {search_list=fp->b_tag_list;current_line=cwp->current_tag_line;};
 #endif
 	if(current_line==0) return 0;
 	
@@ -993,7 +1000,7 @@ int back_stat(num n)
 		if(strstr(tmp_str,&search_pattern[0])!=NULL) {
 			// printf("found ind=%d [%s] in [%s]\n",ind,&search_pattern[0],str);
 #if	TNOTES
-			if(cbfp->b_flag & FSNOTES)
+			if(fp->b_flag & FSNOTES)
 				cwp->current_tag_line=ind+is_last;
 			else
 #endif
@@ -1308,7 +1315,7 @@ int find_tag(num n)
  int stat=0;
  backup_gmode();
  // MESG("find_tag:");
-
+ 
 // get the current word or another word
 	set_hmark(1,"find_tag");
 	strlcpy(tword+1,getcurcword(),127);
@@ -1322,7 +1329,7 @@ int find_tag(num n)
 	// add a space at the end
 	tword[i]=' ';
 	tword[i+1]=0;
-	cbp = cbfp;
+	cbp = current_file_buffer();
 
 	if((tagb=get_filebuf("[tagx.tags]",NULL,0)) == NULL) {
 		// new buffer, create it and read from current dir
@@ -1427,7 +1434,7 @@ offs pattern_line;
 int grep_buffer(num nuse)
 {
 	int status;		/* return status from CLI */
-	FILEBUF *bp=cbfp;	/* pointer to buffer */
+	FILEBUF *fp=current_file_buffer();	/* pointer to buffer */
     char sline[256];
 	int pattern_len=0;
 	char *sline2=NULL;
@@ -1436,7 +1443,7 @@ int grep_buffer(num nuse)
 	long int count=0;
 	int stat=0;
 
-	offs buffer_size=FSize(cbfp);
+	offs buffer_size=FSize(fp);
 	/* get the filter name and its args */
 	set_list_type(LSRC);
 	search_pattern[0]=0;
@@ -1470,21 +1477,21 @@ int grep_buffer(num nuse)
 	stat=snprintf(sline,256,"filter for [%s], working ..",search_pattern);
 	if(stat<256) msg_line(sline);
 	discmd=0;
-	cbfp = bp;
+	set_current_file_buffer(fp);
 	set_Offset(0);
 	curoffs=0;
 
-	while((curoffs = fast_scanner4(bp,buffer_size ,search_pattern,pattern_len,curoffs)))
+	while((curoffs = fast_scanner4(fp,buffer_size ,search_pattern,pattern_len,curoffs)))
 	{
 		stat=snprintf(sline,256,"%08lld: ",pattern_line);
 		if(stat>=256) MESG("truncated 5");
-		sline2=get_line_at(bp,curoffs);
+		sline2=get_line_at(fp,curoffs);
 
 		insert_string(filter_buffer,sline,strlen(sline));
 		insert_string_nl(filter_buffer,sline2);
 
 		count++;
-		while(FCharAt(bp,curoffs)!=bp->EolStr[0] && curoffs< (bp->BufferSize-1)) curoffs++;
+		while(FCharAt(fp,curoffs)!=fp->EolStr[0] && curoffs< (fp->BufferSize-1)) curoffs++;
 		pattern_line++;
 	};
 
@@ -1512,6 +1519,7 @@ offs fast_scanner4 (FILEBUF *fb, offs stringlen, char *pat, int patlen,offs star
 {
     register offs i;
 	register offs start1=0;
+	FILEBUF *fp=current_file_buffer();
 
     i = 0;
     while (i < (stringlen-start)) {
@@ -1525,7 +1533,7 @@ offs fast_scanner4 (FILEBUF *fb, offs stringlen, char *pat, int patlen,offs star
 			return start+i;
         }
         i = start1;
-		if(cbfp->EolStr[0]==FCharAt(fb,i+start)) {pattern_line++;};
+		if(fp->EolStr[0]==FCharAt(fb,i+start)) {pattern_line++;};
     }
     return 0;
 }

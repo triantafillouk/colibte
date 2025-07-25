@@ -9,14 +9,12 @@
 
 #include "xe.h"
 #include "color.h"
-
+#include "display_driver.h"
 #define	NEW	1
 
 void vtputwc(WINDP *wp, utfchar *uc);
 extern int save_trace(int n);
 extern int drv_type;
-void set_window_font(WINDP *wp);
-void drv_start_window_update(WINDP *wp);
 int get_utf_length(utfchar *utf_char_str);
 int  SUtfCharAt(char *utfstr, int offset, utfchar *uc);
 int eq1(int x,int y,int z);
@@ -26,7 +24,6 @@ void upd_move(WINDP *wp,char *from);
 void vteeol(WINDP *wp, int selected,int inside);
 int SUtfCharLen(char *utfstr,int offset,utfchar *uc);
 int line_bcolor=0;
-void drv_clear_line(WINDP *wp,int row);
 void upd_all_wrap_lines(WINDP *wp,char *from);
 void update_window_nowrap(WINDP *wp,int force);
 void update_window_wrap(WINDP *wp,int force);
@@ -2526,7 +2523,7 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 	if(wp->w_fp->b_flag!=FSNOTES && wp->w_fp->b_flag!=FSNOTESN && !(wp->w_fp->b_flag & FSNLIST)) 
 	{	/* Buffer view  */
 		// MESG("update virtual from buffer! wp=%d top offs=%ld",wp->id,lp_offs);
-		for(sline=head;sline < wp->w_ntrows;sline++) 
+		for(sline=head;sline <= wp->w_ntrows;sline++) 
 		{
 			/* and update the virtual line */
 			wp->vs[sline]->v_flag =1;

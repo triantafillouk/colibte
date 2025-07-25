@@ -8,6 +8,7 @@
 */
 
 #include "xe.h"
+#include "display_driver.h"
 #include	<wchar.h>
 
 long utf8_to_unicode(unsigned char* const utf8_str) ;
@@ -61,6 +62,7 @@ int chardline(WINDP *wp);
 offs  FUtfCharAt_nocheck(FILEBUF *bf, offs offset, utfchar *uc);
 
 FILEBUF *cbfp=NULL;
+
 int clen_error=0;
 void undo_CheckSize(UNDOS *u);
 void undo_change_undo(undo_Change *uc);
@@ -93,6 +95,16 @@ offs   FPrevLine(FILEBUF *fp,offs ptr);
 offs   LineEnd(offs ptr);
 
 void FindLineCol(TextPoint *tp);
+
+FILEBUF *current_file_buffer()
+{
+ return cbfp;
+}
+
+void set_current_file_buffer(FILEBUF *bp)
+{
+	cbfp=bp;
+}
 
 void MESG_time(const char *fmt, ...)
 {
@@ -931,7 +943,7 @@ void  FindOffset(TextPoint *tp)
    tp->offset=o;
    tp->flags = FULLDEFINED;
 #if	WRAPD
-   sprintf(mesgs,"(o=%lld l=%lld c=%lld t [%s]) (o=%lld l=%lld c=%lld) beg=%lld final=%lld",
+   MESG("(o=%lld l=%lld c=%lld t [%s]) (o=%lld l=%lld c=%lld) beg=%lld final=%lld",
    	o0,l0,c0,tp_name[t0],o1,l1,c1,o2,o);
 #endif
 }

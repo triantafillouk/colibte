@@ -199,6 +199,13 @@ GtkWidget *color_dialog;
 
 extern int startup_exe;
 
+GWINDP	*curgwp=NULL;	/* Current window meta structure data 	*/
+
+void set_curgwp()
+{
+	curgwp = cwp->gwp;
+}
+
 GtkWidget *parent_title_bar=NULL;
 
 GtkWidget*

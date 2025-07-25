@@ -8,6 +8,7 @@
 /*	Spawn:	System access commands */
 
 #include	"xe.h"
+#include	"display_driver.h"
 #include	<sys/stat.h>
 
 #include	<signal.h>

@@ -8,6 +8,7 @@
 */
 
 #include "xe.h"
+#include "display_driver.h"
 #include "geditdisplay.h"
 
 int x_insert ();

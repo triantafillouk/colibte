@@ -17,6 +17,7 @@
 #include	<sys/types.h>
 #include	<syslog.h>
 #include	"mlang.h"
+#include	"display_driver.h"
 
 char *startfile=NULL;	/* startfile to execute */
 #if	RSESSION

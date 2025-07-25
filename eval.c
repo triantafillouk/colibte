@@ -16,6 +16,7 @@
 #include	"eval.h"
 #include	"alist.h"
 #include	"mlang.h"
+#include	"display_driver.h"
 
 time_t	tclock;
 

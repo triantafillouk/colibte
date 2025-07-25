@@ -16,6 +16,7 @@
 #include	"xe.h"
 #include	"keytable.h"
 #include	"mlang.h"
+#include	"display_driver.h"
 
 #if	USE_GLIB
 /* Translate output to ISO-8859-7 , IBMPC 737 */

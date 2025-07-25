@@ -26,12 +26,14 @@
 #define DIR_CURRENT	0
 #define	DIR_OTHER	1
 
+void set_current_file_buffer(FILEBUF *bp);
+FILEBUF *current_file_buffer();
+
 char **f_extcmd;
 char **f_extension;
 
 extern int dont_edit();
 extern alist *file_list;
-extern FILEBUF *cbfp;
 extern int drv_initialized;
 
 #define	SORT_FUNC	0	/* Use different functions for dir sorting  */
@@ -359,7 +361,8 @@ int change_sort_mode(int mouse_col)
 
 int update_line(int size)
 {
-	istr **row_data = (istr **)array_data(cbfp->dir_list_str);
+ FILEBUF *fp=current_file_buffer();
+	istr **row_data = (istr **)array_data(fp->dir_list_str);
 	istr *current_str = row_data[cwp->current_note_line];
 	char *line_str = &current_str->start;
 	// MESG("update_line: [%s]",line_str);
@@ -374,7 +377,8 @@ int update_line(int size)
 
 int update_uline(char *s)
 {
-	istr **row_data = (istr **)array_data(cbfp->dir_list_str);
+ FILEBUF *fp=current_file_buffer();
+	istr **row_data = (istr **)array_data(fp->dir_list_str);
 	istr *current_str = row_data[cwp->current_note_line];
 	char *line_str = &current_str->start;
 	// MESG("update_line: [%s]",line_str);
@@ -585,28 +589,29 @@ void set_todirname(char *base_name,int dir_num)
 int dir_edit(num n) 
 {
   char fname[MAXFLEN];
+	FILEBUF *fp=current_file_buffer();
 
-  // MESG("dir_edit: b_flag=%X b_type=%d",cbfp->b_flag,cbfp->b_type);
-  if(!(cbfp->b_flag & FSNLIST))
+  // MESG("dir_edit: b_flag=%X b_type=%d",fp->b_flag,fp->b_type);
+  if(!(fp->b_flag & FSNLIST))
   {
-	// int old_type=cbfp->b_type;
-	if(cbfp->b_flag & FSINVS) return(TRUE);
-	if(!IS_FLAG(cbfp->b_state,FS_VIEWA)) return (TRUE);
+	// int old_type=fp->b_type;
+	if(fp->b_flag & FSINVS) return(TRUE);
+	if(!IS_FLAG(fp->b_state,FS_VIEWA)) return (TRUE);
 
-	// MESG("file[%s / %s -> %s",cbfp->b_dname,cbfp->b_fname,fname);
+	// MESG("file[%s / %s -> %s",fp->b_dname,fp->b_fname,fname);
     num poffset=tp_offset(cwp->tp_current);;
 	int ppline = tp_line(cwp->tp_current)-tp_line(cwp->tp_hline)+1;
-	if(snprintf(fname,sizeof(fname),"%s/%s",cbfp->b_dname,cbfp->b_fname) >= MAXFLEN) {
+	if(snprintf(fname,sizeof(fname),"%s/%s",fp->b_dname,fp->b_fname) >= MAXFLEN) {
 		return(FALSE);
 	};
-	// MESG("dir_edit: [%s / %s]",cbfp->b_dname,cbfp->b_fname);
-	if(empty_filebuf(cbfp)!=TRUE) return FALSE;
-	cbfp->b_flag &= ~(FSDIRED|FSMMAP);
+	// MESG("dir_edit: [%s / %s]",fp->b_dname,fp->b_fname);
+	if(empty_filebuf(fp)!=TRUE) return FALSE;
+	fp->b_flag &= ~(FSDIRED|FSMMAP);
 	
-	 if(! ifile(cbfp,fname,0)) return(FALSE);
+	 if(! ifile(fp,fname,0)) return(FALSE);
  
 	igotooffset(poffset,ppline);
-	cbfp->b_state &= ~FS_CHG;
+	fp->b_state &= ~FS_CHG;
 	set_update(cwp,UPD_FULL);
 	set_hmark(1,"dir_edit:a");
 	return TRUE;
@@ -619,9 +624,9 @@ int dir_edit(num n)
 	// MESG("dir_edit: ftype=%d fname=[%s]",ftype,fname);
   	if(ftype<0) return(FALSE);
   	if(ftype==FTYPE_NORMAL) {
-		set_full_name(dname,cbfp->b_dname,fname,MAXFLEN);
+		set_full_name(dname,fp->b_dname,fname,MAXFLEN);
 		status=goto_file(dname);
-		set_working_dir(cbfp->b_dname);
+		set_working_dir(fp->b_dname);
 		set_hmark(1,"dir_edit:b");
   	} else msg_line("not normal");
 	return(status);
@@ -702,8 +707,8 @@ int move_1file(char *fname,char *destination)
 
 int dir_compare(num n)
 {
- if(!(cbfp->b_flag & FSNLIST)) return FALSE;
- FILEBUF *f1=cbfp;
+ FILEBUF *f1=current_file_buffer();;
+ if(!(f1->b_flag & FSNLIST)) return FALSE;
  FILEBUF *f2=get_dir_buffer(DIR_OTHER,0);
  if(f2==NULL) return false;
  if(!(f2->b_flag & FSNLIST)) return FALSE;
@@ -752,8 +757,9 @@ int compare_files(char *name1,char *name2,int type)
 
 int dir_show_diffs(num n)
 {
- if(!(cbfp->b_flag & FSNLIST)) return FALSE;
- FILEBUF *f1=cbfp;
+ FILEBUF *f1=current_file_buffer();
+
+ if(!(f1->b_flag & FSNLIST)) return FALSE;
  FILEBUF *f2=get_dir_buffer(DIR_OTHER,0);
  if(f2==NULL) return false;
  if(!(f2->b_flag & FSNLIST)) return FALSE;
@@ -807,6 +813,7 @@ int dir_copy(num cptype)
   char destination[MAXFLEN];
   char destination_escaped[MAXFLEN];
   char fname[MAXFLEN];
+	FILEBUF *fp=current_file_buffer();
 
   // MESG("dir_multi_copy:-----------------------------");
   char sconfirm[MAXLLEN];
@@ -815,7 +822,7 @@ int dir_copy(num cptype)
   char *stype;
   if(cptype>1) stype="Clone";else stype="Copy";
 
-  if(!(cbfp->b_flag & FSNLIST)) return FALSE;
+  if(!(fp->b_flag & FSNLIST)) return FALSE;
   dbuf=get_dir_buffer(DIR_OTHER,0);	/* get destination dir buffer  */
   if(dbuf!=NULL) {
   	strlcpy(destination,dbuf->b_dname,MAXFLEN);
@@ -824,7 +831,7 @@ int dir_copy(num cptype)
   };
   set_list_type(LDIR2);
 
-  if(cbfp->selected_files==0) {
+  if(fp->selected_files==0) {
 	ftype=dir_getfile(fname,1);
 	sstat=snprintf(sconfirm,sizeof(sconfirm),"%s [%s] to: ",stype,fname);
   } else {
@@ -836,30 +843,30 @@ int dir_copy(num cptype)
 
   strlcpy(destination_escaped,destination,MAXFLEN);
 
-  s1=chdir(cbfp->b_dname);
+  s1=chdir(fp->b_dname);
   // MESG("current dir is [%s]",getcwd(NULL,MAXFLEN));
-  // MESG(" buffer dir is [%s]",cbfp->b_dname);
+  // MESG(" buffer dir is [%s]",fp->b_dname);
   escape_file_name(destination_escaped);
 
 
 // ----- start
 
-  if(cbfp->selected_files==0) {
+  if(fp->selected_files==0) {
     escape_file_name(fname);
 	s1=copy_1file(fname,destination_escaped,ftype,cptype);
   } else {
 	int i;
-	istr **row_data = (istr **) array_data(cbfp->dir_list_str);
+	istr **row_data = (istr **) array_data(fp->dir_list_str);
 	s1=0;
- 	for(i=0;i<cbfp->dir_list_str->size;i++) {
+ 	for(i=0;i<fp->dir_list_str->size;i++) {
 		istr *dir_str = row_data[i];
 		if(dir_str->selection_tag) {
-			ftype = dir_getfile1(cbfp,fname,1,i);
+			ftype = dir_getfile1(fp,fname,1,i);
 			// MESG("copy line %d name=%s type=%d",i,fname,ftype);
 			if(ftype>=0) {
 				s1+=copy_1file(fname,destination_escaped,ftype,cptype);
 				dir_str->selection_tag=0;
-				cbfp->selected_files--;
+				fp->selected_files--;
 			}
 		};
 	};
@@ -868,9 +875,9 @@ int dir_copy(num cptype)
 
 //	MESG("result status =%d",s1);
 	if(strstr(destination,"/")!=NULL) is_other_dir=1;
-	s1=chdir(cbfp->b_dname);
+	s1=chdir(fp->b_dname);
 	if(destination_is_dir || is_other_dir) {
-//		cbfp->b_state &= ~FS_CHG;
+//		fp->b_state &= ~FS_CHG;
 		dir_other_reload(1);
 		return(TRUE);
 	} else dir_reload(1);
@@ -896,8 +903,9 @@ int dir_move(num n)
   char destination[MAXFLEN],fname[MAXFLEN];
   FILEBUF *dbuf;	/* destination dir buffer  */
   int sstat=0;
+	FILEBUF *fp=current_file_buffer();
 
-  if(!(cbfp->b_flag & FSNLIST)) return FALSE;
+  if(!(fp->b_flag & FSNLIST)) return FALSE;
 
   set_list_type(LDIR2);
   dbuf=get_dir_buffer(DIR_OTHER,0);	/* get destination dir buffer  */
@@ -906,9 +914,9 @@ int dir_move(num n)
   } else {
   	destination[0]=0;
   };
-  // MESG("selected files=%d",cbfp->selected_files);
-  int files_to_move=cbfp->selected_files;
-  if(cbfp->selected_files==0) {
+  // MESG("selected files=%d",fp->selected_files);
+  int files_to_move=fp->selected_files;
+  if(fp->selected_files==0) {
 	if(dir_getfile(fname,1)<0) return FALSE;
 	sstat=snprintf(sconfirm,sizeof(sconfirm),"Move [%s] to: ",fname);
 	if(sstat>=MAXLLEN) { error_line("move prompt truncated");return(false);}
@@ -922,24 +930,24 @@ int dir_move(num n)
 	if((s1 = nextarg(sconfirm,destination,MAXFLEN,true)) !=TRUE) return(s1);
 	escape_file_name(destination);
 	int i;
-	istr **row_data = (istr **) array_data(cbfp->dir_list_str);
+	istr **row_data = (istr **) array_data(fp->dir_list_str);
 	s1=0;
- 	for(i=0;i<cbfp->dir_list_str->size;i++) {
+ 	for(i=0;i<fp->dir_list_str->size;i++) {
 		istr *dir_str = row_data[i];
 		if(dir_str->selection_tag) {
-			int ftype = dir_getfile1(cbfp,fname,1,i);
+			int ftype = dir_getfile1(fp,fname,1,i);
 			// MESG("move file in line %d name=%s type=%d",i,fname,ftype);
 			if(ftype>=0) {
 				s2=move_1file(fname,destination);
 				if(s2==0) {
-					cbfp->selected_files--;
+					fp->selected_files--;
 					dir_str->selection_tag=0;
 				};
 			}
 		};
 	};
-	if(files_to_move==cbfp->selected_files) s2=files_to_move;else s2=0;
-	if(cbfp->selected_files>0) { error_line("Cannot move %d files",cbfp->selected_files);};
+	if(files_to_move==fp->selected_files) s2=files_to_move;else s2=0;
+	if(fp->selected_files>0) { error_line("Cannot move %d files",fp->selected_files);};
   };
   {
 	// check if moved to other dir
@@ -954,14 +962,14 @@ int dir_move(num n)
 			// MESG("other reloaded!");
 			dbuf->b_state &= ~FS_CHG;
 		};
-		s1=chdir(cbfp->b_dname);
-		// MESG("chdir to %s",cbfp->b_dname);
+		s1=chdir(fp->b_dname);
+		// MESG("chdir to %s",fp->b_dname);
 		// MESG("set update!");
 		set_update(cwp,UPD_ALL);
 		return(TRUE);
 	} else { /* a simple rename */
 		reload_file(1);
-		cbfp->b_state &= ~FS_CHG;
+		fp->b_state &= ~FS_CHG;
 	};
   };
   msg_line("ok!");
@@ -978,8 +986,9 @@ int dir_file_rename(num n)
   int destination_is_dir=0;
   char sconfirm[MAXLLEN];
   char destination[MAXFLEN],fname[MAXFLEN],sline[MAXLLEN];
+	FILEBUF *fp=current_file_buffer();
 
-  if(!(cbfp->b_flag & FSNLIST)) return FALSE;
+  if(!(fp->b_flag & FSNLIST)) return FALSE;
   if(dir_getfile(fname,1)<0) return FALSE;
   strlcpy(destination,fname,MAXLLEN);
   set_list_type(LDIR2);
@@ -994,7 +1003,7 @@ int dir_file_rename(num n)
 	return error_line("Name too long!");
   };
 
-  s1=chdir(cbfp->b_dname);
+  s1=chdir(fp->b_dname);
   s1=stat(destination,&t);
   if(s1==0) {	/* it exists!  */
   	s1=1;
@@ -1024,6 +1033,8 @@ int dir_touch_file(num n)
   struct stat t;
   char fname[MAXFLEN],sline[MAXLLEN];
   int sstat=0;
+	FILEBUF *fp=current_file_buffer();
+
 	set_list_type(LDIR2);
 	fname[0]=0;
 	if((s1 = nextarg("New file as : ",fname,MAXFLEN,true)) !=TRUE) return(s1);
@@ -1031,7 +1042,7 @@ int dir_touch_file(num n)
 	sstat=snprintf(sline,sizeof(sline),"touch %s 2> /dev/null",fname);
 	if(sstat>=MAXLLEN) return error_line("truncated file at 9");
 
-	s1=chdir(cbfp->b_dname);
+	s1=chdir(fp->b_dname);
 	s1=system(sline);
 	if(s1 != 0) { return error_line("Error creating file %s",fname);};
 	// insert file ..
@@ -1047,6 +1058,7 @@ int dir_new_dir(num n)
   struct stat t;
   char fname[MAXFLEN],sline[MAXLLEN];
   int sstat=0;
+	FILEBUF *fp=current_file_buffer();
 
 	fname[0]=0;
 	set_list_type(LDIR2);
@@ -1055,13 +1067,13 @@ int dir_new_dir(num n)
 	sstat=snprintf(sline,sizeof(sline),"mkdir %s 2> /dev/null",fname);
 	if(sstat>=MAXLLEN) { return error_line("cannot create new dir! %s");};
 
-    s1=chdir(cbfp->b_dname);
+    s1=chdir(fp->b_dname);
 	s1=system(sline);
 	if(s1 != 0) { return error_line("Error creating dir %s",fname);};
 	// insert file ..
 	s1=stat(fname,&t);
 	str_tfile(&t,fname,250);
-	cbfp->b_state &= ~FS_CHG;
+	fp->b_state &= ~FS_CHG;
 	dir_reload(1);
 	return 1;
 }
@@ -1077,10 +1089,10 @@ int dir_link(num n)
   int sstat=0;
   char *flags="-s";
   struct stat t;
-
+  FILEBUF *fp=current_file_buffer();
   FILEBUF *dbuf;	/* destination dir buffer  */
 //  MESG("dir_link:");
-  if(!(cbfp->b_flag & FSNLIST)) return FALSE;
+  if(!(fp->b_flag & FSNLIST)) return FALSE;
   if(dir_getfile(fname,1)<0) return FALSE;
 
   set_full_name(source_name,getcwd(current_dir,MAXLLEN),fname,MAXLLEN);
@@ -1110,7 +1122,7 @@ int dir_link(num n)
   if(sstat>=MAXLLEN) { return error_line("dir link fname overflow!");return FALSE;};
   // MESG("dir_link: cmd=[%s]",sline);
 
-  s1=chdir(cbfp->b_dname);
+  s1=chdir(fp->b_dname);
   s2=system(sline);
   if(s2 != 0) { return error_line("Error linking file to %s",destination);};
 // refresh other buffer if onscreen
@@ -1120,12 +1132,13 @@ int dir_link(num n)
 
 int dir_reload(num n)
 {
-	pdline = cbfp->cdir->cline-1;
-	reinit_dir(cbfp);
+	FILEBUF *fp=current_file_buffer();
+	pdline = fp->cdir->cline-1;
+	reinit_dir(fp);
 	set_update(cwp,UPD_EDIT);
-	if(cbfp->sort_mode == -1) cbfp->sort_mode=0;
-	current_sort_mode=cbfp->sort_mode;
-	list_dir(cbfp->cdir->dir_name,cbfp);
+	if(fp->sort_mode == -1) fp->sort_mode=0;
+	current_sort_mode=fp->sort_mode;
+	list_dir(fp->cdir->dir_name,fp);
 	return 1;
 }
 
@@ -1150,6 +1163,7 @@ int dir_other_reload(num n)
 
 void delete_current_list_line()
 {
+	FILEBUF *fp=current_file_buffer();
 	int i=0;
 	int current_line=cwp->current_note_line;
 	if(cwp->w_fp->b_notes==0) return;
@@ -1163,7 +1177,7 @@ void delete_current_list_line()
 	};
 	// MESG("delete_current_list_line: new size=%d %d",cwp->w_fp->dir_list_str->size-1,cwp->w_fp->b_notes);
 	set_update(cwp,UPD_EDIT);
-	cbfp->b_state &= ~FS_CHG;
+	fp->b_state &= ~FS_CHG;
 }
 
 
@@ -1205,11 +1219,12 @@ int dir_del1(num  n)
 {
   int status;
   char fname[MAXFLEN];
+	FILEBUF *fp=current_file_buffer();
   // MESG("\ndir_del1:");
-  if(!(cbfp->b_flag & FSNLIST)) return FALSE;
-  status=chdir(cbfp->b_dname);
+  if(!(fp->b_flag & FSNLIST)) return FALSE;
+  status=chdir(fp->b_dname);
  
-  if(cbfp->selected_files==0) {
+  if(fp->selected_files==0) {
    
   status=dir_getfile(fname,1);
   escape_file_name(fname);
@@ -1245,13 +1260,13 @@ int dir_del1(num  n)
   } else {
 	if(confirm("Delete files","delete selected files ?",1)){
 	int i;
-	istr **row_data = (istr **) array_data(cbfp->dir_list_str);
+	istr **row_data = (istr **) array_data(fp->dir_list_str);
 	int s1=0;
-	int files_to_delete=cbfp->selected_files;
-	 	for(i=0;i<cbfp->dir_list_str->size;i++) {
+	int files_to_delete=fp->selected_files;
+	 	for(i=0;i< fp->dir_list_str->size;i++) {
 			istr *dir_str = row_data[i];
 			if(dir_str->selection_tag) {
-				int ftype = dir_getfile1(cbfp,fname,0,i);
+				int ftype = dir_getfile1(fp,fname,0,i);
 				// MESG("delete line %d name='%s' type=%d",i,fname,ftype);
 				if(ftype>=0) {
 					if(ftype==FTYPE_DIR) {
@@ -1263,13 +1278,13 @@ int dir_del1(num  n)
 					// MESG("	s1=%d",s1);
 					if(s1==0) {
 						dir_str->selection_tag=0;
-						cbfp->selected_files--;
+						fp->selected_files--;
 					};
 				}
 			};
 		};
-		if(cbfp->selected_files<files_to_delete) {
-			if(cbfp->selected_files>0) error_line("Not all files deleted");
+		if(fp->selected_files<files_to_delete) {
+			if(fp->selected_files>0) error_line("Not all files deleted");
 			else msg_line("%d files deleted",files_to_delete);
 			dir_reload(1);
 		} else {
@@ -1283,31 +1298,32 @@ int dir_del1(num  n)
 int movein_dir(char *fname)
 {
  int status;
-   cbfp->cdir->cline = getcline();
-   status=chdir(cbfp->b_dname);
+ FILEBUF *fp=current_file_buffer();
+   fp->cdir->cline = getcline();
+   status=chdir(fp->b_dname);
    status=chdir(fname);
    if(status!=0) {
     return error_line("No access in '%s'",fname);
    };
-   // MESG("movein_dir: cline=%ld pdline=%ld",cbfp->cdir->cline,pdline);
+   // MESG("movein_dir: cline=%ld pdline=%ld",fp->cdir->cline,pdline);
    pdline = -1;
 	msg_line("");
-	push_dir(cbfp);
+	push_dir(fp);
 	// create a new one!!
-	cbfp->cdir = (dir_l *)malloc(sizeof(struct dir_l));
-	cbfp->cdir->dir_name = getcwd(NULL,MAXFLEN);
-	strlcpy(cbfp->b_dname,cbfp->cdir->dir_name,MAXFLEN);
-	set_working_dir(cbfp->b_dname);
-//	MESG("movin_dir b_dname=[%s] full_name=[%s]",cbfp->b_dname,cbfp->b_fname);
-//	MESG("dir_num = %d",cbfp->dir_num);
-	if(cbfp->dir_num >= DIR_NOTES) {
-		char *notes_dir = strstr(cbfp->b_dname,"Notes");
-		sprintf(cbfp->b_fname,"[%s]",notes_dir);
-//		MESG("new notes [%s]",cbfp->b_fname);
+	fp->cdir = (dir_l *)malloc(sizeof(struct dir_l));
+	fp->cdir->dir_name = getcwd(NULL,MAXFLEN);
+	strlcpy(fp->b_dname,fp->cdir->dir_name,MAXFLEN);
+	set_working_dir(fp->b_dname);
+//	MESG("movin_dir b_dname=[%s] full_name=[%s]",fp->b_dname,fp->b_fname);
+//	MESG("dir_num = %d",fp->dir_num);
+	if(fp->dir_num >= DIR_NOTES) {
+		char *notes_dir = strstr(fp->b_dname,"Notes");
+		sprintf(fp->b_fname,"[%s]",notes_dir);
+//		MESG("new notes [%s]",fp->b_fname);
 	};
-	cbfp->cdir->cline=cwp->current_note_line;
+	fp->cdir->cline=cwp->current_note_line;
 	cwp->current_note_line=0;
-	return insert_dir(cbfp,0);
+	return insert_dir(fp,0);
 }
 
 /* view a file in dir mode */
@@ -1315,9 +1331,11 @@ int dir_view(num n)
 {
   int is_dir;
   char fname[512];
-  if(!(cbfp->b_flag & FSNLIST)) return FALSE;
+  FILEBUF *fp=current_file_buffer();
+  MESG("dir_view:");
+  if(!(fp->b_flag & FSNLIST)) return FALSE;
   is_dir=dir_getfile(fname,0);
-
+  MESG("dir_view:[%s]",fname);
   if(is_dir<0) {
   	return error_line("Not a directory! '%s'",fname);
   };
@@ -1513,12 +1531,13 @@ int dir_exec(num n)
   int status;
   char fname[512];
   // MESG("dir_exec:");
-  if(!(cbfp->b_flag & FSNLIST)) return 0;
+	FILEBUF *fp=current_file_buffer();
+  if(!(fp->b_flag & FSNLIST)) return 0;
   /* No need for escaped characters here!.
 	 The file name will finally be enclosed in double quotes
   */
   ftype=dir_getfile(fname,0); 	
-  status=chdir(cbfp->b_dname);
+  status=chdir(fp->b_dname);
   // MESG("dir_exec: ftype=%d",ftype);
 
   if(ftype==FTYPE_LINK || ftype<0) return FALSE;
@@ -1537,9 +1556,10 @@ int dir_right(num n)
   char fname[512];
   char fname_ns[512];
   int status=FALSE;
+	FILEBUF *fp=current_file_buffer();
 
-  // MESG("dir_right: b_flag=%X",cbfp->b_flag);
-  if(!(cbfp->b_flag & FSNLIST)) return false;
+  // MESG("dir_right: b_flag=%X",fp->b_flag);
+  if(!(fp->b_flag & FSNLIST)) return false;
 
   ftype=dir_getfile(fname,1);
   if(ftype<0) return false;	/* no file in dir!  */
@@ -1550,7 +1570,7 @@ int dir_right(num n)
   };
 
   if(ftype==FTYPE_NORMAL) { // view the file
-	cbfp->cdir->cline = getcline();
+	fp->cdir->cline = getcline();
 
 	cwp->w_ppline = window_cursor_line(cwp)+1;
 	status=exec_ext(fname,fname_ns,FILE_VIEW);
@@ -1577,7 +1597,7 @@ int script_exec(num nuse)
 	WINDP *win_ori=cwp;
 
 	s=set_unique_tmp_file(out_file,"out",MAXFLEN);
-	s=set_unique_tmp_file(err_file,"out",MAXFLEN);
+	s=set_unique_tmp_file(err_file,"err",MAXFLEN);
 
 	/* get the filter name and its args */
 	set_list_type(LSHELL);
@@ -1585,7 +1605,7 @@ int script_exec(num nuse)
     if ((s=nextarg("Script command > ", script_cmd, MAXFLEN,true)) != TRUE) return(s);
 
 	/* setup the proper file names */
-	bp = cbfp;
+	bp = current_file_buffer();
 
 	strlcpy(dir_name,bp->b_dname,MAXFLEN);
 	escape_file_name(dir_name);
@@ -1655,7 +1675,7 @@ int script_exec(num nuse)
 		select_filebuf(out_buffer);
 		set_Offset(0);
 		cwp = win_ori;
-		select_filebuf(bp);
+		// select_filebuf(bp);
 		next_window(1);
 		set_update(cwp,UPD_EDIT+UPD_ALL);
 //		MESG("filtered");
@@ -1668,6 +1688,7 @@ FILEBUF *get_valid_buffer(FILEBUF *bf)
 {
  FILEBUF *bp;
  FILEBUF *prev=NULL;
+ FILEBUF *fp=current_file_buffer();
  // MESG("get_valide_buffer: 0");
 	lbegin(file_list);
 	while((bp=(FILEBUF *)lget(file_list))!=NULL)
@@ -1682,7 +1703,7 @@ FILEBUF *get_valid_buffer(FILEBUF *bf)
 	while((bp=(FILEBUF *)lget(file_list))!=NULL)
 	{
 		if(bp->b_flag & FSINVS) continue;
-		if(bp==cbfp) {
+		if(bp==fp) {
 			if(prev!=NULL) {
 				// MESG("	found prev buffer %s",prev->b_fname);
 				return prev;
@@ -1701,6 +1722,7 @@ FILEBUF *get_valid_buffer(FILEBUF *bf)
 FILEBUF *get_dir_buffer(int flag,int dnum)
 {
  FILEBUF *bp=NULL;
+ FILEBUF *fp=current_file_buffer();
  if(flag==DIR_NOTES) {
 //	MESG("get destination notes buffer id=%d",dnum);
 	lbegin(file_list);
@@ -1714,7 +1736,7 @@ FILEBUF *get_dir_buffer(int flag,int dnum)
  };
 
  if(dnum==DIR_DEFAULT) {
-	 dnum = cbfp->dir_num;
+	 dnum = fp->dir_num;
 
 	 if(flag==DIR_OTHER){
 	 	if(dnum==DIR_PRIMARY) dnum=DIR_SECONDARY;else dnum=DIR_PRIMARY;
@@ -1723,7 +1745,7 @@ FILEBUF *get_dir_buffer(int flag,int dnum)
 		while((bp=(FILEBUF *)lget(file_list))!=NULL)
 		{
 			if(bp->dir_num>0 && bp->b_nwnd > 0) {
-				if(bp->dir_num!=cbfp->dir_num){
+				if(bp->dir_num!=fp->dir_num){
 
 					return(bp);
 				};
@@ -1748,18 +1770,19 @@ FILEBUF *get_dir_buffer(int flag,int dnum)
 
 int view_next(num n)
 {
+ FILEBUF *fp=current_file_buffer();
 #if	TNOTES
- if(cbfp->b_flag==FSNOTES) return(0);
+ if(fp->b_flag==FSNOTES) return(0);
 #endif
  dir_left(0);
- // MESG("view_next: b_flag=%X",cbfp->b_flag);
- if(cbfp->b_flag & FSDIRED) {
+ // MESG("view_next: b_flag=%X",fp->b_flag);
+ if(fp->b_flag & FSDIRED) {
  	dir_right(1);
 	set_update(cwp,UPD_EDIT|UPD_STATUS);
  }
 #if	TNOTES
  else
- if(cbfp->b_flag & FSNOTESN || cbfp->b_flag & FSNLIST) {
+ if(fp->b_flag & FSNOTESN || fp->b_flag & FSNLIST) {
  	next_line(1);
 	view_note(1);
 	set_update(cwp,UPD_EDIT|UPD_STATUS);
@@ -1770,22 +1793,23 @@ int view_next(num n)
 
 int view_previous(num n)
 {
+ FILEBUF *fp=current_file_buffer();
 #if	TNOTES
- if(cbfp->b_flag==FSNOTES) return(0);
+ if(fp->b_flag==FSNOTES) return(0);
 #endif
  dir_left(0);
- // MESG("view_previous: b_flag=%X",cbfp->b_flag);
+ // MESG("view_previous: b_flag=%X",fp->b_flag);
  prev_line(1);
- if(cbfp->b_flag & FSDIRED) {
-	// MESG("view_previous: %d %d",cwp->current_note_line,cbfp->b_notes);
-	// if(cwp->current_note_line<cbfp->b_notes-2)
- 		prev_line(1);
+ if(fp->b_flag & FSDIRED) {
+	// MESG("view_previous: %d %d",cwp->current_note_line,fp->b_notes);
+	// if(cwp->current_note_line<fp->b_notes-2)
+ 	prev_line(1);
  	dir_right(1);
 	set_update(cwp,UPD_EDIT|UPD_STATUS);
  }
 #if	TNOTES
  else 
- if(cbfp->b_flag & FSNOTESN || cbfp->b_flag & FSNLIST) {
+ if(fp->b_flag & FSNOTESN || fp->b_flag & FSNLIST) {
  	view_note(1);
 	set_update(cwp,UPD_EDIT|UPD_STATUS);
  };
@@ -1795,22 +1819,21 @@ int view_previous(num n)
 
 int dir_left(num n)
 {
- FILEBUF *bf;
+ FILEBUF *previous_buffer;
  FILEBUF *vbuf;
- int dir_num = cbfp->dir_num;
+ FILEBUF *fp=current_file_buffer();
  int stat=0;
 
-
- if(cbfp->connect_buffer==NULL && cbfp->b_flag != FSNLIST+FSDIRED) return(prev_character(1));
+ if(fp->connect_buffer==NULL && fp->b_flag != FSNLIST+FSDIRED) return(prev_character(1));
 #if	TNOTES
- if(IS_FLAG(cbfp->b_flag,FSNOTES)) return false;
- // MESG("dir_left: b_state=0x%X b_type=0x%X b_flag=0x%X",cbfp->b_state,cbfp->b_type,cbfp->b_flag);
+ if(IS_FLAG(fp->b_flag,FSNOTES)) return false;
+ // MESG("dir_left: b_state=0x%X b_type=0x%X b_flag=0x%X",fp->b_state,fp->b_type,fp->b_flag);
  if(
- 	IS_FLAG(cbfp->b_state,FS_VIEWA) &&
-	// !(cbfp->b_flag & FSNLIST) &&
- 	(IS_FLAG(cbfp->b_type,NOTE_TYPE)||
-	 IS_FLAG(cbfp->b_type,NOTE_CAL_TYPE)||
-	 IS_FLAG(cbfp->b_type,NOTE_TODO_TYPE)
+ 	IS_FLAG(fp->b_state,FS_VIEWA) &&
+	// !(fp->b_flag & FSNLIST) &&
+ 	(IS_FLAG(fp->b_type,NOTE_TYPE)||
+	 IS_FLAG(fp->b_type,NOTE_CAL_TYPE)||
+	 IS_FLAG(fp->b_type,NOTE_TODO_TYPE)
 	))
  {
 	num top_line=0;
@@ -1819,73 +1842,76 @@ int dir_left(num n)
 
 	if(cwp->tp_current->col > 0 && n==1) return(prev_character(1));
 	// MESG("dir_left: quick_close");
-	bf = cbfp->connect_buffer;
-	to_line = cbfp->connect_line;
-	to_col = cbfp->connect_column;
-	top_line = cbfp->connect_top_line;
-	int top_note = cbfp->connect_top_note;
+	previous_buffer = fp->connect_buffer;
+	to_line = fp->connect_line;
+	to_col = fp->connect_column;
+	top_line = fp->connect_top_line;
+	int top_note = fp->connect_top_note;
 	quick_close(1);
 //	MESG("dir left: buffer [%s] line=%ld col=%ld",cwp->w_fp->b_fname,tp_line(cwp->tp_current),tp_col(cwp->tp_current));
 
 //	We should select the notes tag view here !!
-	// bf=get_filebuf("[Tag view]",NULL,0);
-	select_filebuf(bf);
+	// previous_buffer=get_filebuf("[Tag view]",NULL,0);
+	select_filebuf(previous_buffer);
 	// MESG("dir_left: line=%ld",to_line);
 	cwp->current_tag_line = to_line;
 	cwp->current_note_line = to_col;
-	// MESG("dir_left: new note_line=%d %d",cwp->current_note_line,cbfp->b_notes);
+	// MESG("dir_left: new note_line=%d %d",cwp->current_note_line,fp->b_notes);
 	cwp->top_tag_line=top_line;
 	cwp->top_note_line=top_note;
 //	update_status();
 	return (OK_CLRSL);
  };
 #endif
- 	if(!(cbfp->b_flag & FSNLIST)) 
+ 	if(!(fp->b_flag & FSNLIST)) 
 	{ // we are in view mode!
-		vbuf=cbfp;
+		vbuf=fp;
 #if	1
 		// if not at bol go one character left
 		if(cwp->tp_current->col > 0 && n==1) return(prev_character(1));
 #endif
-		int connect_column=cbfp->connect_column;
+		int connect_column=fp->connect_column;
 		// MESG("try get valid buffer!");
-		bf = get_valid_buffer(cbfp->connect_buffer);
+		previous_buffer = get_valid_buffer(fp->connect_buffer);
 		// MESG("dir_left: 1");
-		if(bf==NULL) {
+#if	1
+		if(previous_buffer==NULL) {
 			// MESG("No buffer left!");
 			return(false);
 		};
-		if(bf==NULL) {
-			bf = new_filebuf(dir_name(dir_num),0);
+#else
+		if(previous_buffer==NULL) {
+			previous_buffer = new_filebuf(dir_name(fp->dir_num),0);
 		};
-   		select_filebuf(bf);
+#endif
+   		select_filebuf(previous_buffer);
 		delete_filebuf(vbuf,1);	/* remove the view file buffer */
-		if(bf->cdir!=NULL) {
-			MoveLineCol(bf->cdir->cline,connect_column);
+		if(previous_buffer->cdir!=NULL) {
+			MoveLineCol(previous_buffer->cdir->cline,connect_column);
 			next_line(1);
-			// MESG("dir_left: new note_line=%d %d",cwp->current_note_line,cbfp->b_notes);
+			// MESG("dir_left: new note_line=%d %d",cwp->current_note_line,fp->b_notes);
 		};
 		set_update(cwp,UPD_EDIT|UPD_STATUS);
 
-		cbfp->b_state &= ~FS_CHG;
+		fp->b_state &= ~FS_CHG;
 		return(OK_CLRSL);
 	} else {
-		bf = cbfp;
+		previous_buffer = fp;
  	};
-	if(bf->cdir!= bf->rdir) 
+	if(previous_buffer->cdir!= previous_buffer->rdir) 
 	{
-		pop_dir(bf);
-		pdline = bf->cdir->cline;
+		pop_dir(previous_buffer);
+		pdline = previous_buffer->cdir->cline;
 //		MESG("poped dir name=[%s]",bf->cdir->dir_name);
-		if(bf->dir_num >= DIR_NOTES) {
-			char *notes_dir = strstr(bf->cdir->dir_name,"Notes");
-			sprintf(bf->b_fname,"[%s]",notes_dir);
+		if(previous_buffer->dir_num >= DIR_NOTES) {
+			char *notes_dir = strstr(previous_buffer->cdir->dir_name,"Notes");
+			sprintf(previous_buffer->b_fname,"[%s]",notes_dir);
 //			MESG("pop new notes b_dname=[%s]",bf->b_dname);
 //			MESG("pop new notes b_fname=[%s]",bf->b_fname);
 		};
 	} else {
-		if(bf->dir_num >= DIR_NOTES) return (FALSE);
-  		if(strcmp(bf->cdir->dir_name,"/")==0) { 
+		if(previous_buffer->dir_num >= DIR_NOTES) return (FALSE);
+  		if(strcmp(previous_buffer->cdir->dir_name,"/")==0) { 
 			msg_line("we are at root dir!");
 			return(FALSE);
 		};
@@ -1894,26 +1920,28 @@ int dir_left(num n)
 			return(false);
 		};
 		msg_line(time2a());
-		reinit_dir(bf);
+		reinit_dir(previous_buffer);
 	};
   set_update(cwp,UPD_EDIT|UPD_STATUS);
-  stat = list_dir(bf->cdir->dir_name,bf);
-  cwp->current_note_line=bf->cdir->cline+1;
-  if(cwp->current_note_line > bf->dir_list_str->size-1) cwp->current_note_line=bf->dir_list_str->size-1;
+  stat = list_dir(previous_buffer->cdir->dir_name,previous_buffer);
+  cwp->current_note_line=previous_buffer->cdir->cline+1;
+  if(cwp->current_note_line > previous_buffer->dir_list_str->size-1) cwp->current_note_line=previous_buffer->dir_list_str->size-1;
   return(stat);
 }
 
 int dir_tag(num n) 
 {
-  if(!(cbfp->b_flag & FSNLIST)) return FALSE;
-  istr **row_data = (istr **) array_data(cbfp->dir_list_str);
+ FILEBUF *fp=current_file_buffer();
+
+  if(!(fp->b_flag & FSNLIST)) return FALSE;
+  istr **row_data = (istr **) array_data(fp->dir_list_str);
   istr *dir_str = row_data[cwp->current_note_line];
   if(dir_str->selection_tag) {
   	dir_str->selection_tag=0;
-	cbfp->selected_files--;
+	fp->selected_files--;
   } else {
   	dir_str->selection_tag=1;
-	cbfp->selected_files++;
+	fp->selected_files++;
   };
   // MESG("dir_tag: %d",dir_str->selection_tag);
   next_line(1);
@@ -1971,24 +1999,25 @@ int dir_getfile(char *fname,int flag)
  int perms=0;
  fname[0]=0;
  // MESG("dir_getfile:start f=%d line=%d",flag,cwp->current_note_line);
+ FILEBUF *fp=current_file_buffer();
 
  char *line_str;
- if(cbfp->b_flag & FSNLIST) {
-	// MESG("dir_getfile: size of dir=%d line %d",cbfp->dir_list_str->size,cwp->current_note_line);
-	if(cbfp->dir_list_str->size==0) return -1;	// no lines
+ if(fp->b_flag & FSNLIST) {
+	// MESG("dir_getfile: size of dir=%d line %d",fp->dir_list_str->size,cwp->current_note_line);
+	if(fp->dir_list_str->size==0) return -1;	// no lines
 
-	istr **row_data = (istr **)array_data(cbfp->dir_list_str);
+	istr **row_data = (istr **)array_data(fp->dir_list_str);
 	// MESG("dir_getfile: 2");
-	if(cwp->current_note_line > cbfp->dir_list_str->size-1) return -1;
+	if(cwp->current_note_line > fp->dir_list_str->size-1) return -1;
 	istr *current_str = row_data[cwp->current_note_line];
 	// MESG("current index=%d",current_str->index);
 	line_str = &current_str->start;
 	// MESG("line_str:[%s]",line_str); 
  } else {
 	// MESG("dir_getfile not in FSNLIST!");
- 	line_str=get_line_at(cbfp,Offset());
+ 	line_str=get_line_at(fp,Offset());
  };
- // MESG("dir_getfile: b_flag=%X [%s]",cbfp->b_flag,line_str);  
+ // MESG("dir_getfile: b_flag=%X [%s]",fp->b_flag,line_str);  
  c=line_str[0];
  if(c=='c') { msg_line("c type file");return -1;};
  if(c=='s') { error_line("cannot view socket files");return -1;};
@@ -2134,34 +2163,31 @@ int dir_getfile1(FILEBUF *fp,char *fname,int flag,int file_index)
 void view_file(char *fname)
 {
  FILEBUF *view;
- // char cwd[MAXFLEN],*cwdp;
- // int dir_num=cbfp->dir_num;
-
+ FILEBUF *fp=current_file_buffer();
+ MESG("view_file:[%s]",fname);
  view = new_filebuf("[view]",FSMMAP);	/* use memory map for viewing, its faster */
- // MESG("view_file: set connect buffer: [%s]",cbfp->b_fname);
- view->connect_buffer = cbfp;
+ // MESG("view_file: set connect buffer: [%s]",fp->b_fname);
+ view->connect_buffer = fp;
  view->connect_line = GetLine()+1;
  view->connect_column = GetCol();
- view->dir_num=cbfp->dir_num;
+ view->dir_num=fp->dir_num;
 
  // strlcpy(view->b_dname,cwdp,MAXFLEN);
- strlcpy(view->b_dname,cbfp->b_dname,MAXFLEN);
+ strlcpy(view->b_dname,fp->b_dname,MAXFLEN);
  set_working_dir(view->b_dname);
  select_filebuf(view);
 
 // get a new view for every file, remove only if return to dir mode with left_dir
- file_read(cbfp,fname);
+ file_read(view,fname);
 
  goto_bof(1);
  set_goal_column(0,"view_file");
  set_update(cwp,UPD_STATUS);
 
- cbfp->b_flag |= FSDIRED ;
- cbfp->b_state |= FS_VIEW;
- cbfp->b_state &= ~FS_CHG;
- // cbfp->dir_num=dir_num;
-
-
+ view->b_flag |= FSDIRED ;
+ view->b_state |= FS_VIEW;
+ view->b_state &= ~FS_CHG;
+ // fp->dir_num=dir_num;
 }
 
  
@@ -2372,7 +2398,7 @@ if((entry->st_mode & S_IXUSR \
 // insert file list in an editor window
 int insert_dir(FILEBUF *buf_dir,int retain)
 {
- FILEBUF *oldbuf=cbfp;
+ FILEBUF *oldbuf=current_file_buffer();
  int i;
  struct kdirent *ff;
  struct kdirent **namelist=NULL;
@@ -2382,7 +2408,7 @@ int insert_dir(FILEBUF *buf_dir,int retain)
  char *fline;
  int stat=0;
 
- cbfp=buf_dir;
+ set_current_file_buffer(buf_dir);
  d1 = buf_dir->b_dname;
  // MESG("insert_dir:[%s]",d1);
  alist *dir_list_str=new_list(0,"dir_as_list");
@@ -2420,43 +2446,43 @@ int insert_dir(FILEBUF *buf_dir,int retain)
  free(namelist);
 
  set_Offset(0);
- switch(cbfp->sort_mode){
+ switch(buf_dir->sort_mode){
 	case 0:
-	case -1: cbfp->b_header = " Perms   Size  Date          ↓Name                 ";break;
-	case 1:  cbfp->b_header = " Perms   Size  Date          ↑Name                 ";break;
-	case 2:  cbfp->b_header = " Perms  ↓Size  Date           Name                 ";break;
-	case 3:  cbfp->b_header = " Perms  ↑Size  Date           Name                 ";break;
+	case -1: buf_dir->b_header = " Perms   Size  Date          ↓Name                 ";break;
+	case 1:  buf_dir->b_header = " Perms   Size  Date          ↑Name                 ";break;
+	case 2:  buf_dir->b_header = " Perms  ↓Size  Date           Name                 ";break;
+	case 3:  buf_dir->b_header = " Perms  ↑Size  Date           Name                 ";break;
 	case 4:  
 	case 6:  
-	case 8:  cbfp->b_header = " Perms   Size ↓Date           Name                 ";break;
+	case 8:  buf_dir->b_header = " Perms   Size ↓Date           Name                 ";break;
 	case 5:
 	case 7:
-	case 9:  cbfp->b_header = " Perms   Size ↑Date           Name                 ";break;
+	case 9:  buf_dir->b_header = " Perms   Size ↑Date           Name                 ";break;
 	
 	default:
-		cbfp->b_header = " Perms  Size  Date            Name                 ";
+		buf_dir->b_header = " Perms  Size  Date            Name                 ";
  }; 
- cbfp->b_flag = FSNLIST|FSDIRED;
- cbfp->b_state = FS_VIEW|FS_ACTIVE;
- cbfp->dir_list_str = dir_list_str;
- cbfp->b_notes = cbfp->dir_list_str->size;
+ buf_dir->b_flag = FSNLIST|FSDIRED;
+ buf_dir->b_state = FS_VIEW|FS_ACTIVE;
+ buf_dir->dir_list_str = dir_list_str;
+ buf_dir->b_notes = buf_dir->dir_list_str->size;
 
- if(cbfp->dir_num==0) cbfp->dir_num=1;
+ if(buf_dir->dir_num==0) buf_dir->dir_num=1;
  discmd=true;
 
  set_highlight(buf_dir,highlight_type("DIR"));
 
  set_update(cwp,UPD_WINDOW);
- stat=chdir(cbfp->b_dname) ;
+ stat=chdir(buf_dir->b_dname) ;
 
- cbfp=oldbuf;
+ set_current_file_buffer(oldbuf);
  if(stat) return (FALSE);
  return(TRUE);
 }
 
 int dir_select_none(num dummy)
 {
- FILEBUF *fp=cbfp;
+ FILEBUF *fp=current_file_buffer();
  istr **row_data = (istr **) array_data(fp->dir_list_str);
  int i;
  for(i=0;i<fp->dir_list_str->size;i++) {
@@ -2471,7 +2497,7 @@ int dir_select_none(num dummy)
 
 int dir_select_all(num dummy)
 {
- FILEBUF *fp=cbfp;
+ FILEBUF *fp=current_file_buffer();;
  
  istr **row_data = (istr **) array_data(fp->dir_list_str);
  int i;
@@ -2488,7 +2514,7 @@ int dir_select_all(num dummy)
 
 int dir_select_reverse(num dummy)
 {
- FILEBUF *fp=cbfp;
+ FILEBUF *fp=current_file_buffer();;
  istr **row_data = (istr **) array_data(fp->dir_list_str);
  int i;
  fp->selected_files=0;
@@ -2511,14 +2537,15 @@ int listdir(int dtype)
 { 
  int stat;
  char go_name[MAXFLEN];
+ FILEBUF *fp=current_file_buffer();
 
  if(!drv_initialized) return false;
- if(is_scratch_buffer(cbfp)) {
+ if(is_scratch_buffer(fp)) {
  	if(chdir(get_start_dir())) return false;
  };
  set_bfname(go_name,".");
- if(cbfp->sort_mode==-1) cbfp->sort_mode=0;
- current_sort_mode=cbfp->sort_mode;
+ if(fp->sort_mode==-1) fp->sort_mode=0;
+ current_sort_mode=fp->sort_mode;
  stat=goto_dir(go_name,dtype);
  set_hmark(0,"dir_name");
 
@@ -2547,13 +2574,14 @@ int listdir2()
 int open_dir(char *full_name,int type)
 {
  int stat=0;
+ FILEBUF *fp=current_file_buffer();
+
 #if	TNOTES
  if(type == DIR_NOTES) {
 		FILEBUF *bp;
 		bp=get_dir_buffer(DIR_NOTES,DIR_DEFAULT);
 		if(bp==NULL) { 	/* create a new dir buffer as 1 !  */
 			bp = new_filebuf(dir_name(1),FSDIRED);
-
 		};
 		strlcpy(bp->b_dname,full_name,MAXFLEN);
 		bp->b_flag |= FSDIRED;
@@ -2565,10 +2593,10 @@ int open_dir(char *full_name,int type)
 		return(stat);
  };
 #endif
-// MESG("open_dir: dir_num=%d",cbfp->dir_num);
-	if(cbfp->dir_num!=0) { 	/* we are in dir mode, use this buffer!  */
-		strlcpy(cbfp->b_dname,full_name,MAXFLEN);
-		stat=insert_dir(cbfp,0);
+// MESG("open_dir: dir_num=%d",fp->dir_num);
+	if(fp->dir_num!=0) { 	/* we are in dir mode, use this buffer!  */
+		strlcpy(fp->b_dname,full_name,MAXFLEN);
+		stat=insert_dir(fp,0);
 		return stat;
 	} else {
 		FILEBUF *bp;
@@ -2605,7 +2633,7 @@ int list_dir(char *d1,FILEBUF *buf_dir)
 {
  int stat;
  strlcpy(buf_dir->b_dname,d1,MAXFLEN);
- if(buf_dir!=cbfp) {
+ if(buf_dir!=current_file_buffer()) {
  	stat=select_filebuf(buf_dir);
  } else {
  	stat=insert_dir(buf_dir,0);

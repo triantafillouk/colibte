@@ -7,6 +7,8 @@
 /* gtk3 screen driver */
 	
 #include "xe.h"
+#include "display_driver.h"
+
 #define	GTK_SEARCH	0	/* use a different dialog for search operations. */
 
 #include <glib.h>
@@ -198,6 +200,13 @@ int gs_entry_return_flag;
 GtkWidget *color_dialog;
 
 extern int startup_exe;
+
+GWINDP	*curgwp=NULL;	/* Current window meta structure data 	*/
+
+void set_curgwp()
+{
+	curgwp = cwp->gwp;
+}
 
 GtkWidget *parent_title_bar=NULL;
 

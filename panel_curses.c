@@ -27,6 +27,7 @@
 
 #include "rgb_colors.h"
 #include "xthemes.h"
+#include "display_driver.h"
 
 #define	TLEFT	1
 #define TRIGHT	0
@@ -263,6 +264,12 @@ char *drv_info()
   return info;
 }
 
+GWINDP	*curgwp=NULL;	/* Current window meta structure data 	*/
+
+void set_curgwp()
+{
+	curgwp = cwp->gwp;
+}
 
 GWINDP * drv_new_twinp()
 {

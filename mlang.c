@@ -10,7 +10,7 @@
 #include	<math.h>
 #include	<stdlib.h>
 #include	"xe.h"
-
+#include	"display_driver.h"
 #include	"alist.h"
 #include	"mlang.h"
 #include	"func.h"

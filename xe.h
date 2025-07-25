@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.6T67 (24/7/2025)"
+#define VERSION 	 "#01.6T68 (25/7/2025)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -558,7 +558,7 @@ typedef struct  WINDP {
 	short	w_width;				/* for wrap width  */
 	num		w_lcol;					/* offset of text in the window */
 	num		w_plcol;				/* previous w_lcol */
-	struct GWINDP *gwp;				/* internal window structure (gtk or other) */
+	struct GWINDP *gwp;				/* driver specific window structure (gtk or other) */
 	int 	id;
 
 	int		w_ppline;				/* previous window physical line */
