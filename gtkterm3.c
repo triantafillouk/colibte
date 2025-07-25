@@ -1030,7 +1030,7 @@ void new_gwp_draw(GWINDP *gwp,WINDP *wp,GtkWidget *parent,int ptype)
  GtkBox *sb2;
  GeEditDisplay *wd;
  int minimum_height=10;
- int minimum_width=50;
+ int minimum_width=55;
  gwp->draw = ge_edit_display_new();
  wd = (GeEditDisplay *)gwp->draw;
  gtk_widget_add_events((GtkWidget *)wd, GDK_SCROLL_MASK);

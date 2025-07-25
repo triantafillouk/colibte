@@ -9,6 +9,7 @@
  */
 
 #include	"xe.h"
+#include	"display_driver.h"
 
 extern int quote_flag;
 extern int describe_flag;
@@ -21,10 +22,8 @@ void free_virtual_window(WINDP *wp);
 char *time2a();
 int listdir(int dtype);
 
-//int newxy(WINDP *wp);
 WINDP * make_split(WINDP *oldwindow);
 GWINDP *ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype);
-void delete_gwindow(WINDP *wp);
 void drv_free_win(WINDP *wp);
 void set_cursor(int flag,char *from);
 

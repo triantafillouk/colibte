@@ -59,10 +59,12 @@ ge_edit_display_event(GtkWidget	*widget, GdkEvent *event)
  static int motion_button=0;
  static int position_x=0, position_y=0;
  static int mouse_x=0, mouse_y=0, prev_x=0, prev_y=0;
+ static int double_click=0;
+#if	GTK3 | GTK4
  static int event_sec=0;
  static int event_usec=0;
- static int double_click=0;
  static size_t prev_time=0;
+#endif
  // MESG("ge_edit_display_event:");
  g_return_val_if_fail(widget !=NULL,FALSE);
  g_return_val_if_fail(GTK_IS_EDIT_DISPLAY(widget),FALSE);
@@ -78,7 +80,9 @@ ge_edit_display_event(GtkWidget	*widget, GdkEvent *event)
 	struct timeval timev;
 	// MESG("ge_edit_display_event: scroll");
 	gettimeofday(&timev,NULL);
+#if	GTK3 | GTK4
 	size_t now_time = timev.tv_usec + timev.tv_sec*1000000000;
+#endif
 	// unow=(size_t) timev.tv_usec;
 	// now=(size_t) timev.tv_sec;
 
@@ -105,7 +109,7 @@ ge_edit_display_event(GtkWidget	*widget, GdkEvent *event)
 			move_window_lines(wd->wp,lines);
 			return TRUE;
 		};
-#if	GTK3
+#if	GTK3 | GTK4
 		case GDK_SCROLL_SMOOTH: {
 			int lines=ev->delta_y*1;
 

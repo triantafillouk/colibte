@@ -9,6 +9,7 @@
 
 #include "xe.h"
 #include "color.h"
+#include "display_driver.h"
 #include "geditdisplay4.h"
 
 int x_insert ();

@@ -1890,13 +1890,13 @@ int  show_position_info(num short_version)
 		// MESG("show dir info");
 		if(!short_version) {
 			char finfo[MAXFLEN];
-		
 			sstat=dir_getfile(finfo,2);
 			sstat=snprintf(str,sizeof(str),"%6lld|%s",getcline()+1,finfo);
 		} else {
 			sstat=snprintf(str,sizeof(str),"%6lld",getcline()+1);
 		};
 	} else
+
 #endif 
 	{
 	loffs=Offset()-LineBegin(Offset())+1;
@@ -1907,62 +1907,36 @@ int  show_position_info(num short_version)
 		} else sstat=snprintf(str,sizeof(str),"%5llX",Offset());
 	} else {
 	  	// MESG("show row/col info");
-#if	1
 		col=tp_col(cwp->tp_current);
-#else
-		col=GetCol()+1;
-#endif
 		if(short_version) {
 			sstat=snprintf(str,sizeof(str),"%6lld",getcline()+1);
 		} else {
-#if	0
-			if(0) {
-				{
-				if(bt_dval("show_coffset")) {
-					sstat=snprintf(str,sizeof(str),"%6lld %7lld %4lld",getcline()+1,Offset(),col+1);
-				} else {
-					sstat=snprintf(str,sizeof(str),"%6lld %7lld %4lld",getcline()+1,loffs,col+1);
-				};
-				}
-				if(FOffset(cwp->w_fp)==FSize(cwp->w_fp)) strlcat(str,"|  EOF ",MAXSLEN);
-				else
-				if((int)bt_dval("show_cdata")) { 
-					if(cwp->w_fp->b_mode & EMDOS)       strlcat(str,"|  CR LF ",MAXSLEN);
-					else if(cwp->w_fp->b_mode & EMUNIX) strlcat(str,"|    LF  ",MAXSLEN);
-					else if(cwp->w_fp->b_mode & EMMAC)  strlcat(str,"|    CR  ",MAXSLEN);
-					else strlcat(str,"    ",MAXSLEN);
-				};
-			} else 
-#endif
-			{
-				sstat=snprintf(str,sizeof(str),"%7lld ",getcline()+1);
-				{
-					if(bt_dval("show_coffset")) {
-						sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",Offset());
-					} else {
-						sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%4lld ",loffs);
-					};
-					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%4lld",col+1);
-				};
-
-				if((int)bt_dval("show_cdata")) {
-					int size=1;
-					long value=utf_value_len(&size);
-					// if(debug_flag()) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX %d",value,size);
-					// else 
-					if(value==0x9) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|   TAB  ");
-					else if(value==0x20) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"| SPACE  ");
-					else if(value==0x0A) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|   NL   ");
-					else if(value==0x0D) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|   CR   ");
-					else if(value==0x0D0A) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|  CRLF  ");
-					else sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|%08lX",value);
-				};
-				if(strlen(str) < 10) short_version=1;
+			// MESG("long version");
+			sstat=snprintf(str,sizeof(str),"%7lld ",getcline()+1);
+			if(bt_dval("show_coffset")) {
+				sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",Offset());
+			} else {
+				sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%4lld ",loffs);
 			};
+			sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%4lld",col+1);
+
+			if((int)bt_dval("show_cdata")) {
+				int size=1;
+				long value=utf_value_len(&size);
+
+				if(value==0x9) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|   TAB  ");
+				else if(value==0x20) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"| SPACE  ");
+				else if(value==0x0A) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|   NL   ");
+				else if(value==0x0D) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|   CR   ");
+				else if(value==0x0D0A) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|  CRLF  ");
+				else sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|%08lX",value);
+			};
+			if(strlen(str) < 10) short_version=1;
 	  };
 	};
 	};
 	if(sstat){
+
 	if(short_version==1) put_string_statusline(cwp, str, 2);
 	else put_string_statusline(cwp, str, 1);
 	};
@@ -1998,7 +1972,7 @@ int update_screen(num force)
 		else
 			tp_copy(cwp->w_emark,cwp->tp_current);
 	};
-	// MESG("update_screen:1");
+
 	upd_column_pos();	/* update column position  */
 	// MESG_time("update_screen: 1");
 	/* if screen is garbage, re-plot it */

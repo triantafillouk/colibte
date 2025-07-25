@@ -13,7 +13,6 @@ XPLOT=0
 EMBED_ICONS=0
 USE_GLIB=1
 # include support for notes database in sqlite3
-TNOTES=1
 GVERS := $(shell git log -1 --pretty=tformat:%h,%s)
 
 GTKINCLUDE=`pkg-config gtk+-2.0 --cflags`
@@ -86,15 +85,16 @@ ctxe : PCURSES=0
 cteg2 : XPLOT=1
 
 cte  : PCURSES=1
+cte: TNOTES=1
+ctg2 cte ctg3 ctg4: SQLITE3=`pkg-config sqlite3 --libs`
+
 ce : PCURSES=1
 ce : TNOTES=0
 ce : GLIB_LIB=
 ce : USE_GLIB=0
 ce : SQLITE3=
 
-ifeq ($(TNOTES),1)
 SQLITE3=`pkg-config sqlite3 --libs`
-endif
 
 ifeq ($(TNOTES), 1)
 LPCURSES=$(LPCURSES0) ${SQLITE3}
@@ -119,13 +119,16 @@ endif
 
 
 ctg2 pixmp ctg3 ctg4: GTK=1 
+ctg2: TNOTES=1
 
 ctg3: GTK3=1
 ctg3: XPLOT=1
+ctg3: TNOTES=1
 
 ctg4: GTK3=1
 ctg4: XPLOT=1
 ctg4: GTK4=1
+ctg4: TNOTES=1
 
 ctg2 ctg3 ctg4: _X11_=1 
 
@@ -303,15 +306,15 @@ ginput4.o: keytable.h input.c
 
 #	The following is with gtk3 library and cairo plot. gplotc(gcanvas)
 ctg3: tplot.o gsystem.o gldisplay.o edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o  utils.o alist.o filebuf.o gplotc3.o  support.o config_init.o convert.o  gtk_support3.o geditdisplay3.o  gcanvas3.o  highlight.o utf8_support.o notes.o mlangf.o
-	${CC} tplot.o gsystem.o gldisplay.o  edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o gplotc3.o  gtk_support3.o config_init.o support.o geditdisplay3.o gcanvas3.o  highlight.o utf8_support.o notes.o mlangf.o -o ctg3  $(GTK3_FLAGS) -lm 
+	${CC} tplot.o gsystem.o gldisplay.o  edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o gplotc3.o  gtk_support3.o config_init.o support.o geditdisplay3.o gcanvas3.o  highlight.o utf8_support.o notes.o mlangf.o -o ctg3  $(GTK3_FLAGS)  ${SQLITE3} -lm 
 
 #	The following is with gtk4 library and cairo plot. gplotc(gcanvas)
 ctg4: tplot.o gsystem.o gldisplay.o edit.o gtkterm4.o dir.o screen4.o  eval.o mlangg.o  file.o ginput4.o help.o search.o  word.o window.o marks.o  utils.o alist.o filebuf.o   support.o config_init.o convert.o  gtk_support4.o geditdisplay4.o   highlight.o utf8_support.o notes.o mlangf.o
-	${CC} tplot.o gsystem.o gldisplay.o  edit.o gtkterm4.o dir.o screen4.o  eval.o mlangg.o  file.o ginput4.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o  gtk_support4.o config_init.o support.o geditdisplay4.o   highlight.o utf8_support.o notes.o mlangf.o -o ctg4  $(GTK4_FLAGS) -lm 
+	${CC} tplot.o gsystem.o gldisplay.o  edit.o gtkterm4.o dir.o screen4.o  eval.o mlangg.o  file.o ginput4.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o  gtk_support4.o config_init.o support.o geditdisplay4.o   highlight.o utf8_support.o notes.o mlangf.o -o ctg4  $(GTK4_FLAGS)  ${SQLITE3} -lm 
 
 #	The following is with gtk2 library and cairo plot. gplotc(gcanvas)
 ctg2 : gmain.o gsystem.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o   gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o plot_cairo.c  config_init.o utf8_support.o notes.o mlangf.o
-	${CC} gmain.o gsystem.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o notes.o mlangf.o -o ctg2  $(GTK2_FLAGS)  -lm
+	${CC} gmain.o gsystem.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o notes.o mlangf.o -o ctg2  $(GTK2_FLAGS)  ${SQLITE3}  -lm
 
 find_tags: find_tags.c support.o alist.o
 	${CC} $(CPU_OPTIONS) find_tags.c support.o alist.o -o find_tags
@@ -325,7 +328,7 @@ ctxe : main.o system.o edit.o screen.o  xldisplay.o eval.o mlang.o  file.o  xinp
 
 # with curses, panel, no plot !
 cte : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o mlangf.o xthemes.c
-	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o -o cte  ${LPCURSES} -lm
+	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o -o cte  ${LPCURSES}  ${SQLITE3} -lm
 
 ce : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o
 	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o -o ce  $(GLIB_LIB) ${LPCURSES} -lm

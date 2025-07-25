@@ -10,6 +10,7 @@
 #include "xe.h"
 #include "display_driver.h"
 #include "geditdisplay.h"
+#include "display_driver.h"
 
 int x_insert ();
 

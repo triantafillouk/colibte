@@ -128,7 +128,9 @@ void get_uppercase_string(char *upper, char *string)
 int forwsearch(num n)
 {
 	register int status = TRUE;
-	FILEBUF *fp=current_file_buffer();;
+#if	TNOTES
+	FILEBUF *fp=current_file_buffer();
+#endif
 //	MESG("forwsearch: n=%d macro_exec=%d",n,macro_exec);
 	if(n==0) return FALSE;
 	/* If n is negative, search backwards. */
@@ -168,8 +170,9 @@ char *get_line_at(FILEBUF *fb,offs offset);
 
 int find_next(num n)
 {
+#if	TNOTES
  FILEBUF *fp=current_file_buffer();
-
+#endif
 	if (n < 0)	return(find_previous(-n));
 	if (search_pattern[0] == 0)
 	{
@@ -201,7 +204,9 @@ int find_next(num n)
  */
 int backsearch(num n)
 {
+#if	TNOTES
  FILEBUF *fp=current_file_buffer();
+#endif
 	register int status = TRUE;
 	if(n==0) return FALSE;
 
@@ -233,7 +238,9 @@ int backsearch(num n)
  */
 int find_previous(num n)
 {
+#if	TNOTES
  FILEBUF *fp=current_file_buffer();
+#endif
 	if(n==0) return FALSE;
 	if (n < 0)	return(find_next(-n));
 

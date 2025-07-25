@@ -42,7 +42,9 @@ alist *color_scheme_list;
 void help_arguments(int f);
 void set_screen_update(int flag);
 void set_default_view_mode(int flag);
+#if	TNOTES
 void init_note_keys();
+#endif
 
 struct array_dat *main_args=NULL;
 int dofile(char *fname);
@@ -108,7 +110,9 @@ int main(int argc, char **argv)
 	parse_command_line(argc,argv);
 	// MESG("main:start1");
 	set_start_dir(NULL);
+#if	TNOTES
 	init_note_keys();
+#endif
 	if(!execmd) {
 		// MESG("init_system_clipboard");
 		init_system_clipboard();
