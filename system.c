@@ -679,8 +679,11 @@ int init_system_clipboard()
 {
  static char exec_st[MAXFLEN];
  int status=0;
-	if(status>=MAXFLEN) return 0;
+	// if(status>=MAXFLEN) return 0;
 	MESG("init_system_clipboard:");
+//#if	(WSL | DARWIN) & PCURSES
+	if(check_native_copy()) return 1;
+// #endif
 	display_env = getenv("DISPLAY");
 	if(display_env == NULL) {
 		return(check_native_copy());
@@ -691,6 +694,7 @@ int init_system_clipboard()
 		};
 		ext_clipboard_command=1;
 	};
+
 // we suppose that we have xclip for start
 // pass clipboard through xclip
 //	status=snprintf(exec_st,sizeof(exec_st),"xclip -i > /dev/null 2> /dev/null <xclip -o 2>/dev/null");

@@ -1101,7 +1101,7 @@ GWINDP * ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype)
  new_gwp->hstatus = gtk_hbox_new(FALSE,1);
  new_gwp->evb_hstatus = gtk_event_box_new();
  gtk_container_set_border_width(GTK_CONTAINER(new_gwp->evb_hstatus),0);
- gtk_container_set_border_width(GTK_CONTAINER(new_gwp->hstatus),5);
+ gtk_container_set_border_width(GTK_CONTAINER(new_gwp->hstatus),1);
  gtk_container_add (GTK_CONTAINER(new_gwp->evb_hstatus), new_gwp->hstatus);
  gtk_event_box_set_above_child ((GtkEventBox *)new_gwp->evb_hstatus,0);
  new_gwp->status2 = gtk_entry_new();
@@ -1152,8 +1152,8 @@ GWINDP * ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype)
  gtk_event_box_set_above_child ((GtkEventBox *)new_gwp->evb_hstatus,0);
  
  
- gtk_widget_set_size_request((GtkWidget *)new_gwp->hstatus,600,45);
- gtk_widget_set_size_request((GtkWidget *)new_gwp->evb_hstatus,600,45);
+ gtk_widget_set_size_request((GtkWidget *)new_gwp->hstatus,600,30);
+ gtk_widget_set_size_request((GtkWidget *)new_gwp->evb_hstatus,600,30);
 
  gtk_widget_show(new_gwp->status2);
  gtk_widget_show(new_gwp->status1);
