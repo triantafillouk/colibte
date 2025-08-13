@@ -157,7 +157,7 @@ void drv_open()
 {
  static int opened=0;
  char *display_name = NULL;
-
+ MESG("drv_open:");
  if(opened) return;	// only once!
  opened=1;
 
@@ -178,6 +178,7 @@ void drv_open()
 	// MESG("drv_open: end");
 	events_flush();
 	drv_initialized=1;
+	MESG("drv_open: init ok!");
 }
 
 void show_cursor_dl(int pos)
@@ -384,19 +385,6 @@ void top_menu(num init) {
 }
 
 /* init environment */
-int init_drv_env()
-{
- half_last_line=1;
-
- slide_flag=0; 
- xwin=2;
- {
-	color_scheme_ind=4;
- }
-
- default_lang=0;	// default is utf
- return DRIVER_GTK2;
-}
 
 void drv_init(int argc, char **argv)
 {
@@ -1507,10 +1495,10 @@ WINDP * make_split(WINDP *wp)
 int set_sposition(WINDP *wp, int *st, int *l)
 {
  int cline;
-
+ MESG("set_sposition:");
  if(wp != NULL) {
 	if(wp->w_fp == NULL) { cline=0;*st=0;*l=0;return(cline);};
-
+	
 
 	if(wp->w_fp->b_flag & FSNLIST) cline=wp->top_note_line;
 #if	TNOTES

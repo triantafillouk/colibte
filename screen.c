@@ -1786,26 +1786,38 @@ int check_cursor_position_wrap(WINDP *wp)
 void set_top_hline(WINDP *wp,offs cof,char *from)
 {
 	offs b0=0;
+	MESG("set_top_hline:");
 	if(is_wrap_text(wp->w_fp)) b0=cof;
 	else b0=FLineBegin(wp->w_fp,cof);
+	MESG("set_top_hline:1");
 	textpoint_set(wp->tp_hline,b0);
+	MESG("set_top_hline:2");
+#if	0
 	if((tp_col(wp->tp_hline) % wp->w_width)!=0) {
-		textpoint_set_lc(wp->tp_hline,tp_line(wp->tp_hline),0);
+		//textpoint_set_lc(wp->tp_hline,tp_line(wp->tp_hline),0);
+		textpoint_set_lc(wp->tp_hline,0,0);
 		// MESG("set_top_hline: error correct!!!!!!");
 	};
-	// MESG("set_top_hline:[%s] l=%ld o=%ld c=%ld",from,tp_line(wp->tp_hline),tp_offset(wp->tp_hline),tp_col(wp->tp_hline));
+#endif
+	MESG("set_top_hline:ok");
+	MESG("set_top_hline:[%s] l=%ld o=%ld c=%ld",from,tp_line(wp->tp_hline),tp_offset(wp->tp_hline),tp_col(wp->tp_hline));
 }
 
 /*	check_cursor_position:	check to see if the cursor is on screen */
 int check_cursor_position(WINDP *wp)
 {
+	MESG("check_cursor_position:");
 	if(is_wrap_text(wp->w_fp))return(check_cursor_position_wrap(wp));
+	MESG("check_cursor_position:1");
 
 	offs cur_offs,cof;
 	int i;
 	FILEBUF *fp = wp->w_fp;
+	if(fp==NULL) return 0;
+	MESG("check_cursor_position:2");
 	int force_reposition=0;
 	int head=(wp->w_fp->b_header!=NULL);
+	MESG("check_cursor_position:3");
 
 	if(
 #if	TNOTES
@@ -1821,6 +1833,7 @@ int check_cursor_position(WINDP *wp)
 		force_reposition=1;
 //		MESG("check_cursor_position: reposition!!");
 	};
+	MESG("check_cursor_position:3");
 	if(!force_reposition) {
 		if(is_wrap_text(wp->w_fp)) {
 			// MESG("	Not force_reposition!");
@@ -1833,7 +1846,7 @@ int check_cursor_position(WINDP *wp)
 	wp->w_flag = UPD_FULL;
 	/* reaching here, we need a window refresh */
 	i= wp->w_ppline;
-	// MESG("check_cursor_position: refresh! ppline=%d",i);
+	MESG("check_cursor_position: refresh! ppline=%d",i);
 	/* how far back to go? */
 	if (i > 0) {
 		if (--i >= wp->w_ntrows) i = wp->w_ntrows-2;
@@ -1842,16 +1855,21 @@ int check_cursor_position(WINDP *wp)
 		if(i==0) i = wp->w_ntrows / 2;
 		else i=1;
 	};
+	MESG("check_cursor_position:5");
 	/* backup to new line at top of window */
 	cof=cur_offs;
 	while (i-- && cof>0) {
 		cof=FPrevLine(fp,cof);
 	};
+	MESG("check_cursor_position:6");
 	/* and reset the current line at top of window */
 	tp_copy(wp->prev_hline,wp->tp_hline);
+	MESG("check_cursor_position:7");
 	set_top_hline(wp,cof,"check_cursor_position");
+	MESG("check_cursor_position:8");
 	wp->w_flag |= UPD_WINDOW;
 	if(update_all) wp->w_flag |= UPD_FULL;
+	MESG("check_cursor_position:end");
 	return(TRUE);
 }
 
@@ -1952,7 +1970,7 @@ int update_screen(num force)
 	WINDP *wp;
 	// static int count=0;
 	// count++;
-	// MESG("Update_scren:");
+	MESG("Update_scren:");
 	if(cwp==NULL) return 0;
 	int cw_flag=cwp->w_flag;
 	if (noupdate) return TRUE;
@@ -1964,7 +1982,7 @@ int update_screen(num force)
 	/* update any windows that need refreshing */
 	// MESG_time("! update_screen: ---------------");
 	hide_cursor("update_screen: start");
-	// MESG("hide_cursor: ok!");
+	MESG("hide_cursor: ok!");
 	if(cwp!=NULL)
 	if(cwp->selection) {
 		if(cwp->selection == REGION_LINE) 
@@ -1974,38 +1992,42 @@ int update_screen(num force)
 	};
 
 	upd_column_pos();	/* update column position  */
-	// MESG_time("update_screen: 1");
+	MESG_time("update_screen: 1");
 	/* if screen is garbage, re-plot it */
 	if (update_all)	{ 
 		updgar();
 	};
 
-	// MESG("loop windows");
+	MESG("loop windows");
 	lbegin(window_list);
 	while(1) {
-		// MESG(";start of while:");
+		MESG(";start of while:");
 		wp=(WINDP *)lget_current(window_list);
 		if(wp==NULL) break;
-		// MESG("	+++ loop1: %d",wp->id);
+		if(wp->w_fp == NULL) continue;
+		MESG("	++ loop1: %d",wp->id);
 		_el *l_current = window_list->current;
-		// MESG("	++++ loop window now is %d wrap=%d",wp->id,is_wrap_text(wp->w_fp));
+		MESG("	+++ loop window now is %d wrap=%d",wp->id,is_wrap_text(wp->w_fp));
 		if(is_wrap_text(wp->w_fp))	update_window_wrap(wp,force);
 		else update_window_nowrap(wp,force);
+		MESG("	++++");
 		set_current(window_list,l_current);
-		// MESG(" +++  move to next!");
+		MESG("	+++++  move to next!");
 		lmove_to_next(window_list,0);
-		// MESG(" ___ moved!");
+		MESG(" ___ moved!");
 	};
 
-	// MESG("	----- after update");
+	MESG("	----- after update");
 	lbegin(window_list);
 	while((wp=(WINDP *)lget(window_list))!=NULL){
-		wp->w_fp->line_from=-1;	
-		wp->w_fp->line_to=-1;	
+		if(wp->w_fp) {
+			wp->w_fp->line_from=-1;	
+			wp->w_fp->line_to=-1;	
+		};
 	};
 	// MESG("go update physical");
 	/* update the virtual screen to the physical screen */
-	// MESG_time("update_physical");
+	MESG_time("update_physical");
 	update_physical_windows();
 	// MESG_time("update_physical end",1);	
 	// /* update the cursor and flush the buffers */
@@ -2024,9 +2046,14 @@ int update_screen(num force)
 void update_window_nowrap(WINDP *wp,int force)
 {
 	int cw_flag=cwp->w_flag;
+	MESG("update_window_nowrap:");
 		if (wp==cwp) {
+			MESG("update cwp!");
+			if(wp->w_fp==NULL) {MESG("null file for window!");return;};
 			check_cursor_position(wp); /* check if on screen */
+			MESG("update_window_nowrap: 1");
 			wp->currow = window_cursor_line(wp);
+			MESG("update_window_nowrap: 2");
 
 			if(wp->selection || (wp->w_flag & UPD_WINDOW) || force||update_all) 
 			{
@@ -2046,6 +2073,7 @@ void update_window_nowrap(WINDP *wp,int force)
 				upd_move(wp,"update_screen: 2");
 			};
 		} else {
+			MESG("update other windows!");
 			if((wp->w_fp == cwp->w_fp 
 				&& ((cw_flag & UPD_EDIT)
 				|| (cw_flag & UPD_LINE))
@@ -2485,7 +2513,7 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 	if(!(wp->w_fp->view_mode & VMHEX)) wp->w_fp->hl->h_update(wp);
 	 set_selection(0);
 	
-	// MESG("upd_all_virtual_lines:w=%d vinfo=%f from[%s] left=%d b_flag=0x%X w_flag=0x%X",wp->id,bt_dval("show_vinfo"),from,wp->w_lcol,wp->w_fp->b_flag,wp->w_flag);
+	MESG("upd_all_virtual_lines:w=%d vinfo=%f from[%s] left=%d b_flag=0x%X w_flag=0x%X",wp->id,bt_dval("show_vinfo"),from,wp->w_lcol,wp->w_fp->b_flag,wp->w_flag);
 	/* search down the lines, updating them */
 	lp_offs = tp_offset(wp->tp_hline);
 

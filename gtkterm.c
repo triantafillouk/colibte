@@ -213,6 +213,20 @@ void set_curgwp()
 	curgwp = cwp->gwp;
 }
 
+int init_drv_env()
+{
+ half_last_line=1;
+
+ slide_flag=0; 
+ xwin=2;
+ {
+	color_scheme_ind=4;
+ }
+
+ default_lang=0;	// default is utf
+ return DRIVER_GTK2;
+}
+
 GtkWidget*
 create_parent (void)
 {

@@ -55,6 +55,7 @@ void init_lists()
 {
  // fprintf(stderr,"init_lists: size of struct list=%ld\n",sizeof(struct alist));
  file_list=new_list(0,"file_list");
+ // fprintf(stderr,"create linked lists, init_lists: file_list=%lX\n",(long)file_list);
  window_list=new_list(0,"window_list");
  var_list=new_list(0,"var_list");
  shell_list=new_list(0,"shell_list");
@@ -82,17 +83,8 @@ int mmnote=0;
 int mmtodo=0;
 int mmcal=0;
 
-FILEBUF *get_first_scratch_buffer()
-{
- FILEBUF *bp=NULL;
-	// get first scratch buffer
-	lbegin(file_list);
-	while((bp = (FILEBUF *)lget(file_list))!=NULL){
-//		MESG("select buffer: [%s]",bp->b_fname);
-		if(strncmp("[new",bp->b_fname,4)==0) break;
-	};
-	return bp;
-}
+FILEBUF *get_first_scratch_buffer();
+void list_buffers(char *position);
 
 int main(int argc, char **argv)
 {
@@ -121,7 +113,6 @@ int main(int argc, char **argv)
 		// MESG("set_start_time");
 		// set_start_time();
 		// MESG("init_drv_env");
-		driver_type=init_drv_env();	// driver depending variable initialization
 		// MESG("load_config");
 		// load_config();
 		set_key_emulation((int)bt_dval("keyboard_emulation"));
@@ -137,8 +128,10 @@ int main(int argc, char **argv)
 		if(startfile==NULL) {
 			startfile=find_file("",APPLICATION_RC,1,0);
 		};
+		driver_type=init_drv_env();	// driver depending variable initialization
 	};
-	// MESG("execute statup file");
+	MESG("execute statup file");
+	list_buffers("0");
 	/* execute startup file here */
 	if(startfile!=NULL) {
 		if(firstbp!=NULL){
@@ -150,7 +143,9 @@ int main(int argc, char **argv)
 				dofile(startfile);
 			};
 		} else {
+			list_buffers("000");
 			dofile(startfile);
+			list_buffers("001");
 		};
 		// MESG("show errors");
 		if(err_num) {	/* show any errors in start file!!  */
@@ -162,9 +157,10 @@ int main(int argc, char **argv)
 		start_err_num=12;
 		start_err_str="Could not find a start file!";
 	};
-	// MESG("set_screen_update");
+	list_buffers("1");
+	MESG("set_screen_update");
 	set_screen_update(true);
-	// MESG("startfile status: %d [%s]",start_err_num,start_err_str);
+	MESG("startfile status: %d [%s]",start_err_num,start_err_str);
 	scratch_files[0] = load_scratch_files();
 
 #if	TNOTES
@@ -192,21 +188,22 @@ int main(int argc, char **argv)
 #endif
 	{
 	if(firstbp==NULL) {
-		// MESG("no start file! scratch=%d",scratch_files[0]);
+		MESG("no start file! scratch=%d",scratch_files[0]);
 		if(scratch_files[0]==0) {
 		// no files, or no scratch files, create new scratch file!
 			edinit("[new 1]");
 			scratch_files[0]=1;
 			activate_file(cbfp);
-		// MESG("start with new scratch file!");
+			MESG("start with new scratch file!");
 		};
-		// MESG("Scratch files are %d",scratch_files[0]);
+		MESG("Scratch files are %d",scratch_files[0]);
 		cbfp = get_first_scratch_buffer();
+		activate_file(cbfp);
 	} else {
 		cbfp = firstbp;
 	};
-	}
-	// MESG("call vtinit:");
+	};
+	MESG("call vtinit:");
 	vtinit(argc,argv);		/* Display */
 #if	TNOTES
 	if(mmnote){
@@ -239,7 +236,7 @@ int main(int argc, char **argv)
 	startup_exe=0;
 	discmd = TRUE;
 	// MESG("main:");
-	events_flush();
+	// events_flush();
 #if	RSESSION
 	if(sessionfile!=NULL) {
 		execute_session(sessionfile);
@@ -250,7 +247,7 @@ int main(int argc, char **argv)
 	/* setup to process commands */
 	
 	init_highlight();
-	MESG_time("main: start main_loop:");
+	MESG_time("main: start main_loop: cbfp=%lX",(long)cbfp);
 	main_loop();
 	return(0);
 }
