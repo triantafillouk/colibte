@@ -251,7 +251,7 @@ create_parent (void)
 	  parent_x = get_cfg_int("x11_x",parent_x);
 	  parent_y = get_cfg_int("x11_y",parent_y);
 #else
-	if(get_cfg_int("reset_position")==0) { 
+	if((int)bt_dval("reset_position")==0) { 
 	  parent_width  = (int)bt_dval("x11_width");
 	  parent_height = (int)bt_dval("x11_height");
 	  parent_x      = (int)bt_dval("x11_x");

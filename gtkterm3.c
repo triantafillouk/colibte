@@ -261,12 +261,14 @@ create_parent (void)
 	  parent_x = get_cfg_int("x11_x",parent_x);
 	  parent_y = get_cfg_int("x11_y",parent_y);
 #else
+	if((int)bt_dval("reset_position")==0) { 
 	  parent_width  = (int)bt_dval("x11_width");
 	  parent_height = (int)bt_dval("x11_height");
 	  parent_x      = (int)bt_dval("x11_x");
 	  parent_y      = (int)bt_dval("x11_y");
-	  if(parent_x > 1920-parent_width) parent_x=10;
-	  if(parent_y > 1080-parent_height) parent_y=10;
+	};
+	  // if(parent_x > 1920-parent_width) parent_x=10;
+	  // if(parent_y > 1080-parent_height) parent_y=10;
 #endif
   };
 //  MESG("create_parent: x=%d y=%d w=%d h=%d",parent_x,parent_y,parent_width,parent_height);
