@@ -392,10 +392,10 @@ void drv_init(int argc, char **argv)
   setlocale(LC_CTYPE,"");
   if(utf_lengths==NULL) {
 #if	RED_BLACK
-	MESG("-- new red_black tree");
+	// MESG("-- new red_black tree");
  	utf_lengths=new_rb_itree("utf8");
 #else
-	MESG("-- new avl tree");
+	// MESG("-- new avl tree");
  	utf_lengths=new_avl_itree("utf8");
 #endif
  };
@@ -615,7 +615,7 @@ int x_insert ()
  int nbytes;
  char *dat;
  static GdkAtom targets_atom = GDK_NONE;
- 	MESG("x_insert:");
+ 	// MESG("x_insert:");
 	if(targets_atom == GDK_NONE)
 //	    targets_atom = gdk_atom_intern("COMPOUND_TEXT", FALSE);
 //	    targets_atom = gdk_atom_intern("GTK_TEXT_BUFFER_CONTENTS", FALSE);
@@ -1087,7 +1087,7 @@ on_dra0_key_press_event(GtkWidget       *widget,
 			int ks1=0;
 			outkey=g_convert(utfokey,-1,codepage_str[default_local_codepage],"UTF-8",&r,&w,NULL);
 			ks1=ks=outkey[0];
-			MESG("ks<0xFE00: ks=%X ks1=%X [%s]",ks,ks1,utfokey);
+			// MESG("ks<0xFE00: ks=%X ks1=%X [%s]",ks,ks1,utfokey);
 			n_chars=0;
 			utflen=0;
 			utfokey[0]=0;
@@ -1495,7 +1495,7 @@ WINDP * make_split(WINDP *wp)
 int set_sposition(WINDP *wp, int *st, int *l)
 {
  int cline;
- MESG("set_sposition:");
+ // MESG("set_sposition:");
  if(wp != NULL) {
 	if(wp->w_fp == NULL) { cline=0;*st=0;*l=0;return(cline);};
 	

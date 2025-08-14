@@ -131,7 +131,7 @@ int main(int argc, char **argv)
 		driver_type=init_drv_env();	// driver depending variable initialization
 	};
 	MESG("execute statup file");
-	list_buffers("0");
+	// list_buffers("0");
 	/* execute startup file here */
 	if(startfile!=NULL) {
 		if(firstbp!=NULL){
@@ -143,9 +143,9 @@ int main(int argc, char **argv)
 				dofile(startfile);
 			};
 		} else {
-			list_buffers("000");
+			// list_buffers("000");
 			dofile(startfile);
-			list_buffers("001");
+			// list_buffers("001");
 		};
 		// MESG("show errors");
 		if(err_num) {	/* show any errors in start file!!  */
@@ -157,10 +157,9 @@ int main(int argc, char **argv)
 		start_err_num=12;
 		start_err_str="Could not find a start file!";
 	};
-	list_buffers("1");
-	MESG("set_screen_update");
+	// MESG("set_screen_update");
 	set_screen_update(true);
-	MESG("startfile status: %d [%s]",start_err_num,start_err_str);
+	// MESG("startfile status: %d [%s]",start_err_num,start_err_str);
 	scratch_files[0] = load_scratch_files();
 
 #if	TNOTES
@@ -188,22 +187,22 @@ int main(int argc, char **argv)
 #endif
 	{
 	if(firstbp==NULL) {
-		MESG("no start file! scratch=%d",scratch_files[0]);
+		// MESG("no start file! scratch=%d",scratch_files[0]);
 		if(scratch_files[0]==0) {
 		// no files, or no scratch files, create new scratch file!
 			edinit("[new 1]");
 			scratch_files[0]=1;
 			activate_file(cbfp);
-			MESG("start with new scratch file!");
+			// MESG("start with new scratch file!");
 		};
-		MESG("Scratch files are %d",scratch_files[0]);
+		// MESG("Scratch files are %d",scratch_files[0]);
 		cbfp = get_first_scratch_buffer();
 		activate_file(cbfp);
 	} else {
 		cbfp = firstbp;
 	};
 	};
-	MESG("call vtinit:");
+	// MESG("call vtinit:");
 	vtinit(argc,argv);		/* Display */
 #if	TNOTES
 	if(mmnote){
@@ -267,6 +266,7 @@ void parse_command_line(int argc, char **argv)
 #if	CRYPT
 	cryptflag = FALSE;	/* no encryption by default */
 #endif
+	set_bt_num_val("reset_position",0);
 	for (carg = 1; carg < argc; ++carg) {
 
 		/* Process Switches */
