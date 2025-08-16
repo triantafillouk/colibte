@@ -21,6 +21,9 @@ char *get_notes_key(int key_type);
 char *getcurfword();
 int open_file_dialog(char *,num n);
 
+void list_buffers(char *position);
+void add_to_file_list(FILEBUF *bp);
+
 extern alist *file_list;
 extern alist *window_list;
 extern SHLIGHT hts[] ;
@@ -29,6 +32,37 @@ extern MENUS m_sort;
 extern MENUS *start_menu;
 extern FILEBUF *cbfp;
 
+void add_to_file_list(FILEBUF *bp)
+{
+	// MESG(" add buffer0:[%d] [%s]",bp->b_index,bp->b_fname);
+	add_element_to_list((void *)bp,file_list);
+	// MESG(" add buffer1:[%d] [%s]",bp->b_index,bp->b_fname);
+}
+
+
+void list_buffers(char *position)
+{
+ FILEBUF *bp=NULL;
+	MESG("list_buffers: %s",position);
+	// get first scratch buffer
+	lbegin(file_list);
+	while((bp = (FILEBUF *)lget(file_list))!=NULL){
+		MESG(" [%s] - buffer:[%d] [%s] %lX",position,bp->b_index,bp->b_fname,(long)bp);
+	};
+}
+
+FILEBUF *get_first_scratch_buffer()
+{
+ FILEBUF *bp=NULL;
+	// get first scratch buffer
+	lbegin(file_list);
+	while((bp = (FILEBUF *)lget(file_list))!=NULL){
+		// MESG("select buffer:[%d] [%s]",bp->b_index,bp->b_fname);
+		if(strncmp("[new",bp->b_fname,4)==0) break;
+	};
+	return bp;
+}
+
 char *uncompress_command[] = {
 #if	DARWIN
 	"","gzcat","unzip -l","bzcat","gzcat","bzcat","bzcat","zcat -l",""
@@ -36,6 +70,11 @@ char *uncompress_command[] = {
 	"","zcat","unzip -l","bzcat","gzcat","bzcat","bzcat","zcat -l",""
 #endif
 };
+
+void show_buffer(FILEBUF *bp)
+{
+	MESG(" show buffer:[%d] [%s]",bp->b_index,bp->b_fname);
+}
 
 /* local define functions */
 int add_to_recent_list(char *full_file_name);
@@ -875,12 +914,10 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	if ((bp=(FILEBUF *)malloc(sizeof(FILEBUF))) == NULL) return (NULL);
 	/* find the place in the list to insert this buffer */
 
-	add_element_to_list((void *)bp,file_list);
 	/* and set up the other buffer fields */
 	bp->b_index = buffer_index++;
     bp->b_flag  = bflag;
 	bp->b_mode  = gmode;
-	// MESG("new_filebuf: b_mode=0x%X",bp->b_mode);
 	bp->b_state = 0;
 	bp->view_mode = 0;
 	bp->scratch_num=is_scratch;
@@ -974,6 +1011,13 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->save_current_note=0;
 #endif
 	strlcpy(bp->b_fname, base_name,255);
+	// MESG("new_filebuf: created [%d][%s] b_mode=0x%X",bp->b_index,bp->b_fname,bp->b_mode);
+	// MESG("	bp = %lX",(long)bp);
+	// add_element_to_list((void *)bp,file_list);
+	// show_buffer(bp);
+	add_to_file_list(bp);
+	// list_buffers(bp->b_fname);
+	// MESG("	created [%d][%s] b_mode=0x%X",bp->b_index,bp->b_fname,bp->b_mode);
 	if(is_scratch) {
 		set_highlight(bp,highlight_index("TEXT",&ind2));
 		bp->b_type=1;

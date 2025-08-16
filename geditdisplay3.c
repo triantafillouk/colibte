@@ -263,8 +263,8 @@ int on_parent_configure              (GtkWidget       *widget,
 	set_bt_num_val("x11_width",p_width);
 	set_bt_num_val("x11_height",p_height);
 
-//	MESG("on_parent_configure: x=%d y=%d [%d,%d]",event->x,event->y,event->width,event->height);
-//	MESG("window width=%d height=%d",p_width,p_height);
+	// MESG("on_parent_configure: x=%d y=%d [%d,%d]",event->x,event->y,event->width,event->height);
+	// MESG("window width=%d height=%d",p_width,p_height);
 
   return(FALSE);
 }
@@ -359,20 +359,22 @@ ge_edit_display_unrealize (GtkWidget *widget)
 cairo_t *begin_draw(GeEditDisplay *wd,cairo_region_t *region,char *from)
 {
  unsigned long lwd;
+ // MESG("begin_draw:");
+
  lwd = (unsigned long) (wd->edit_window);
  	// wd->act=0;
-#if	NUSE
+#if	1
 	if(wd->in_draw) { 
-//		MESG("	in draw, return cr! from %s",from);
+		// MESG("	in draw, return cr! from %s",from);
 		return wd->cr;
 	}
 #endif
 	if(wd->cr !=NULL) {
-//		MESG("	cr not null, return cr! from %s",from);
+		// MESG("	cr not null, return cr! from %s",from);
 		return wd->cr;
 	};
 	
-	// MESG("begin_draw: from %s",from);
+	// MESG("begin_draw: new cr, from %s",from);
 	wd->edit_gdk_context = gdk_window_begin_draw_frame (wd->edit_window,region);
 	wd->cr = gdk_drawing_context_get_cairo_context (wd->edit_gdk_context);
 	wd->region=region;

@@ -55,6 +55,7 @@ void init_lists()
 {
  // fprintf(stderr,"init_lists: size of struct list=%ld\n",sizeof(struct alist));
  file_list=new_list(0,"file_list");
+ // fprintf(stderr,"create linked lists, init_lists: file_list=%lX\n",(long)file_list);
  window_list=new_list(0,"window_list");
  var_list=new_list(0,"var_list");
  shell_list=new_list(0,"shell_list");
@@ -82,17 +83,8 @@ int mmnote=0;
 int mmtodo=0;
 int mmcal=0;
 
-FILEBUF *get_first_scratch_buffer()
-{
- FILEBUF *bp=NULL;
-	// get first scratch buffer
-	lbegin(file_list);
-	while((bp = (FILEBUF *)lget(file_list))!=NULL){
-//		MESG("select buffer: [%s]",bp->b_fname);
-		if(strncmp("[new",bp->b_fname,4)==0) break;
-	};
-	return bp;
-}
+FILEBUF *get_first_scratch_buffer();
+void list_buffers(char *position);
 
 FILEBUF *get_scratch_file()
 {
@@ -139,7 +131,6 @@ int main(int argc, char **argv)
 		// MESG("set_start_time");
 		// set_start_time();
 		// MESG("init_drv_env");
-		driver_type=init_drv_env();	// driver depending variable initialization
 		// MESG("load_config");
 		// load_config();
 		set_key_emulation((int)bt_dval("keyboard_emulation"));
@@ -155,8 +146,10 @@ int main(int argc, char **argv)
 		if(startfile==NULL) {
 			startfile=find_file("",APPLICATION_RC,1,0);
 		};
+		driver_type=init_drv_env();	// driver depending variable initialization
 	};
 	// MESG("execute statup file");
+	// list_buffers("0");
 	/* execute startup file here */
 	if(startfile!=NULL) {
 		if(firstbp!=NULL){
@@ -168,7 +161,9 @@ int main(int argc, char **argv)
 				dofile(startfile);
 			};
 		} else {
+			// list_buffers("000");
 			dofile(startfile);
+			// list_buffers("001");
 		};
 		// MESG("show errors");
 		if(err_num) {	/* show any errors in start file!!  */
@@ -241,7 +236,7 @@ int main(int argc, char **argv)
 	startup_exe=0;
 	discmd = TRUE;
 	// MESG("main:");
-	events_flush();
+	// events_flush();
 #if	RSESSION
 	if(sessionfile!=NULL) {
 		execute_session(sessionfile);
@@ -252,7 +247,7 @@ int main(int argc, char **argv)
 	/* setup to process commands */
 	
 	init_highlight();
-	MESG_time("main: start main_loop:");
+	MESG_time("main: start main_loop: cbfp=%lX",(long)cbfp);
 	main_loop();
 	return(0);
 }
@@ -272,6 +267,7 @@ void parse_command_line(int argc, char **argv)
 #if	CRYPT
 	cryptflag = FALSE;	/* no encryption by default */
 #endif
+	set_bt_num_val("reset_position",0);
 	for (carg = 1; carg < argc; ++carg) {
 
 		/* Process Switches */

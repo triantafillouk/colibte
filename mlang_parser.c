@@ -923,7 +923,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 
 		if(is_storelines) {
 			// if(tok->tok_node!=NULL) MESG("function already registered!");
-			if(proc_name==NULL) { proc_name=strdup(nword) ; MESG("new function %s",nword);};
+			if(proc_name==NULL) { 
+				proc_name=strdup(nword) ; 
+				// MESG("new function %s",nword);
+			};
 		};		
 
 		if(tok->tok_node==NULL) { // a NEW variable name or directive
