@@ -94,6 +94,20 @@ FILEBUF *get_first_scratch_buffer()
 	return bp;
 }
 
+FILEBUF *get_scratch_file()
+{
+	// MESG("get_scratch_file:");
+		if(scratch_files[0]==0) {
+		// no files, or no scratch files, create new scratch file!
+			edinit("[new 1]");
+		};
+		scratch_files[0]=1;
+		activate_file(cbfp);
+	if(cbfp==NULL) MESG("get_scratch_file: NULL cbfp");
+	return(cbfp);
+}
+
+
 int main(int argc, char **argv)
 {
 	lc_lang=getenv("LC_ALL");
@@ -108,6 +122,10 @@ int main(int argc, char **argv)
 	set_start_time();
 	load_config();
 	parse_command_line(argc,argv);
+	if(firstbp==NULL) {
+		// scratch_files[0] = load_scratch_files();
+		firstbp=get_scratch_file();
+	};
 	// MESG("main:start1");
 	set_start_dir(NULL);
 #if	TNOTES
@@ -188,24 +206,8 @@ int main(int argc, char **argv)
 		edinit("[calendar view]");
 		activate_file(cbfp);
 		set_update(cwp,UPD_EDIT);
-	} else
-#endif
-	{
-	if(firstbp==NULL) {
-		// MESG("no start file! scratch=%d",scratch_files[0]);
-		if(scratch_files[0]==0) {
-		// no files, or no scratch files, create new scratch file!
-			edinit("[new 1]");
-			scratch_files[0]=1;
-			activate_file(cbfp);
-		// MESG("start with new scratch file!");
-		};
-		// MESG("Scratch files are %d",scratch_files[0]);
-		cbfp = get_first_scratch_buffer();
-	} else {
-		cbfp = firstbp;
 	};
-	}
+#endif
 	// MESG("call vtinit:");
 	vtinit(argc,argv);		/* Display */
 #if	TNOTES
@@ -378,11 +380,9 @@ void parse_command_line(int argc, char **argv)
 			// MESG("main: new input file: [%s]",bname);
 			if(mmapflag) bflag |= FSMMAP;
 			bp=new_filebuf(bname,bflag);
+			if(firstbp==NULL) { firstbp=bp;cbfp=bp;};
 			// MESG("after new_filenbuf: view_mode=%d",bp->view_mode);
-			if(bp) {
-			if (firstbp==NULL) {
-				firstbp = bp;
-			} } else {
+			if(bp==NULL) {
 				start_err_num=11;
 				start_err_str="cannot create file ";
 			};
@@ -403,4 +403,9 @@ void parse_command_line(int argc, char **argv)
 #endif
 		}
 	};
+#if	0
+	if (firstbp==NULL) {
+				firstbp = get_scratch_file();
+	}
+#endif
 }
