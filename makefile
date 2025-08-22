@@ -134,7 +134,10 @@ ctg2 ctg3 ctg4: _X11_=1
 
 ctg2 gldisplay.o : GTK2=1
 
-FLAGS1 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DWSL=$(WSL) -DPCURSES=$(PCURSES) -DTNOTES=$(TNOTES) -DGTK=$(GTK) $(GLIBINCLUDE) -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) -DTNOTES=$(TNOTES) -DUSE_GLIB=$(USE_GLIB) $(X11include) -I/usr/include/ncurses
+
+FLAGS1 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DWSL=$(WSL) -DPCURSES=$(PCURSES) -DTNOTES=$(TNOTES) -DGTK=$(GTK) $(GLIBINCLUDE) -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) -DTNOTES=$(TNOTES) -DUSE_GLIB=$(USE_GLIB)  -I/usr/include/ncurses
+
+FLAGS2 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DWSL=$(WSL) -DPCURSES=$(PCURSES) -DTNOTES=$(TNOTES) -DGTK=$(GTK) $(GLIBINCLUDE) -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) -DTNOTES=$(TNOTES) -DUSE_GLIB=$(USE_GLIB) $(X11include) -I/usr/include/ncurses
 
 FLAGS3 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) $(X11include) $(GLIBINCLUDE) -DGTK3=1 -DGTK=1
 
@@ -169,7 +172,7 @@ xe.h :
 #	${CC}  -c -Wall -I/usr/local/pgsql/src/include -funsigned-char $*.c
 #	${CC}  -c -Wall -O2 -mcpu=pentium -I/usr/local/pgsql/src/include -funsigned-char $*.c 
 #	${CC}  -c -Wall -O2 -mcpu=pentium -I/usr/include/gtk-1.2 -I/usr/include/glib-1.2 -funsigned-char $*.c 
-	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char  $(GLIBINCLUDE) $*.c 
+	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS)  -funsigned-char  $(GLIBINCLUDE) $*.c 
 #	${CC}  -c -Wall -O2 -mcpu=pentium -I/usr/include/gtk-2.0 -I/usr/include/glib-1.2 -funsigned-char $*.c 
 
 #	This for SCO. -J is for unsigned char
@@ -195,7 +198,10 @@ gldisplay.o: xe.h screen.c menus.h
 
 
 screen.o: xe.h screen.c wrap_line.h
-	${CC} $(FLAGS1) -DGTK3=0 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char screen.c -o screen.o
+	${CC} $(FLAGS1) -DGTK3=0 -c -Wall $(CPU_OPTIONS)  -funsigned-char screen.c -o screen.o
+
+screen2.o: xe.h screen.c wrap_line.h
+	${CC} $(FLAGS2) -DGTK3=0 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char screen.c -o screen.o
 
 screen3.o: xe.h screen.c wrap_line.h
 	${CC} $(FLAGS1) -DGTK3=1 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE)  -funsigned-char screen.c -o screen3.o

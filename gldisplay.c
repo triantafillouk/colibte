@@ -256,7 +256,7 @@ void status_line(WINDP *wp)
 	char m_st[32]; // mode string
 	char fdname[MAXLLEN];
 	char modecode[]=MODECODE;
-
+	static FILEBUF *previous_file_buffer=NULL;
 	if(!discmd) return;
 	if(wp==NULL) return;
 
@@ -340,7 +340,10 @@ void status_line(WINDP *wp)
 	put_string_statusline(wp,m_st,-1);	
 	put_string_statusline(wp,st,0);	
 	wp->w_flag &= ~UPD_STATUS;
-	if(wp==cwp) titletext();
+	if(wp==cwp && previous_file_buffer!=wp->w_fp) {
+		previous_file_buffer=wp->w_fp;
+		titletext();
+	};
 }
 
 // dummy function

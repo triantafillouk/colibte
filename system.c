@@ -681,17 +681,17 @@ int init_system_clipboard()
  int status=0;
 	// if(status>=MAXFLEN) return 0;
 	MESG("init_system_clipboard:");
-//#if	(WSL | DARWIN) & PCURSES
+#if	(WSL | DARWIN) & PCURSES
 	if(check_native_copy()) return 1;
-// #endif
+#endif
 	display_env = getenv("DISPLAY");
 	if(display_env == NULL) {
-		return(check_native_copy());
-		// return 0; 
+		return 0; 
 	} else {
 		if(strlen(display_env)<1) {
 			return 0;
 		};
+
 		ext_clipboard_command=1;
 	};
 
@@ -704,7 +704,7 @@ int init_system_clipboard()
 	// MESG("exec [%s] status=%d",exec_st,status);
 	if((status!=0)) {
 		ext_clipboard_command=0;
-		return(check_native_copy());
+		return(0);
 	} else {
 		clip_copy=xclip_copy;
 		clip_paste=xclip_paste;
@@ -712,7 +712,6 @@ int init_system_clipboard()
 		ext_clipboard_command=1;
 		return 1;
 	};
-	return(check_native_copy());
 }
 
 /* return the first line from system clipboard */
