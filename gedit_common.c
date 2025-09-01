@@ -175,7 +175,7 @@ ge_edit_display_event(GtkWidget	*widget, GdkEvent *event)
 			prev_x=mouse_x;
 			prev_y=mouse_y;
 //			MESG("button 1 ->sc");
-//			show_cursor("button_press 1");
+			show_cursor("button_press 1");
 			};
 //			MESG("return from press button");
 			return TRUE;
@@ -277,7 +277,7 @@ void update_from_mouse(WINDP *wp,int x,int y,int button, int reset)
 
  count ++;
  num new_line;
- offs new_offset;
+ offs new_offset=0;
  // MESG("update_from_mouse: x=%d y=%d button=%d reset=%d",x,y,button,reset);
  if(reset) { prow=-1;pcol=-1; 
 	// MESG("update_from_mouse: reset");

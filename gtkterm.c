@@ -553,14 +553,22 @@ void show_cursor (char *from)
 //	MESG("show_cursor:[%s] wid=%d",from,cwp->id);
 	cairo_set_operator(wd->cr,CAIRO_OPERATOR_OVER);
 	cairo_set_source_rgba(wd->cr,1,0,0.1,0.6);	// this must be a color different from background FIXEME!
+	// for wrap mode
+	int px1;
+	if(is_wrap_text(cwp->w_fp)) {
+		int infolen=(int)cwp->w_infocol*CLEN;
+		int wrap_column = tp_col(cwp->tp_current) % (cwp->vtcol-cwp->w_infocol);
+		px1 = wrap_column*CLEN+infolen;
+	} else px1 = px;
+
 	cairo_rectangle(wd->cr,
-			px+1, py ,
+			px1+1, py ,
 		       CLEN,
 		       CH1 );
 	cairo_fill(wd->cr);
 	cairo_set_operator(wd->cr,CAIRO_OPERATOR_OVER);
 
-	area.x = px;
+	area.x = px1;
 	area.y = py;
 	area.width = CLEN;
 	area.height = CH1;
@@ -571,7 +579,7 @@ void show_cursor (char *from)
 	cpposx=cposx;
 	cpposy=cposy;
 	cursor_showing=1;
-	expose_line(area.y/CHEIGHTI,cwp);	/* is needed for GTK2!  */
+	// expose_line(area.y/CHEIGHTI,cwp);	/* is needed for GTK2!  */
 }
 
 // draw window character on screen

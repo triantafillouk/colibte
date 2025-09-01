@@ -559,7 +559,17 @@ void show_cursor (char *from)
 	end_draw(wd,"show_cursor:line end");
 #endif
 	/* get current cursor area */
-	area.x = (px+1)%(wd->wp->w_width * CLENI);
+
+	int px1;
+	if(is_wrap_text(cwp->w_fp)) {
+		int infolen=(int)cwp->w_infocol*CLENI;
+		int wrap_column = tp_col(cwp->tp_current) % (cwp->vtcol-1);
+		px1 = wrap_column*CLENI+infolen;
+		area.x = (px1);
+	} else {
+		px1 = px;
+		area.x = (px1+1)%(wd->wp->w_width * CLENI);
+	}
 	area.y = py;
 
 	area.width = CLEN;
