@@ -524,10 +524,6 @@ void show_cursor (char *from)
 	wd = (GeEditDisplay *)(cwp->gwp->draw);
 	// MESG("show_cursor: start ind=%d showing=%d from %s",ind,cursor_showing,from);
 
-	if(wd->cr == NULL) { 
-		// MESG("show_cursor: null cr!");
-		return;
-	};
 	if(ind==2) cursor_showing=0;
 	if (cursor_showing) {
 		// MESG("show_cursor: already shown! %d>",ind++);

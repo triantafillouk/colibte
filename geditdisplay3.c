@@ -158,8 +158,8 @@ ge_edit_draw_event(GtkWidget *widget,cairo_t *cr)
 		cairo_rectangle(cr,	clip_rect.x, clip_rect.y,clip_rect.width,clip_rect.height);
 		cairo_fill(cr);
 
-		expose_window(wd->wp);
 		wd->in_draw=0;
+		expose_window(wd->wp);
 		// MESG(" draw_event: fill (w=%d h=%d) end small return !!, %d",clip_rect.width,clip_rect.height,ind++);
 		return RVAL;
 	}
@@ -364,7 +364,7 @@ cairo_t *begin_draw(GeEditDisplay *wd,cairo_region_t *region,char *from)
 
  lwd = (unsigned long) (wd->edit_window);
  	// wd->act=0;
-#if	1
+#if	NUSE
 	if(wd->in_draw) { 
 		// MESG("	in draw, return cr! from %s",from);
 		return wd->cr;
