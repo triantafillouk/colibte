@@ -561,7 +561,7 @@ void show_cursor (char *from)
 		// int wrap_line = tp_col(cwp->tp_current) / (cwp->w_width);
 		px1 = wrap_column*CLEN+infolen;
 		// MESG("px1=%d wc=%d vtcol=%d ww=%d",px1,wrap_column,cwp->vtcol,cwp->w_width);
-	} else px1 = (px)%(wd->wp->w_width * CLEN);
+	} else px1 = (px)%(wd->wp->w_width * CLENI);
 
 	cairo_rectangle(wd->cr,
 			px1, py ,
