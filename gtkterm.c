@@ -557,12 +557,14 @@ void show_cursor (char *from)
 	int px1;
 	if(is_wrap_text(cwp->w_fp)) {
 		int infolen=(int)cwp->w_infocol*CLEN;
-		int wrap_column = tp_col(cwp->tp_current) % (cwp->vtcol-cwp->w_infocol);
+		int wrap_column = tp_col(cwp->tp_current) % (cwp->w_width);
+		// int wrap_line = tp_col(cwp->tp_current) / (cwp->w_width);
 		px1 = wrap_column*CLEN+infolen;
-	} else px1 = px;
+		// MESG("px1=%d wc=%d vtcol=%d ww=%d",px1,wrap_column,cwp->vtcol,cwp->w_width);
+	} else px1 = (px)%(wd->wp->w_width * CLEN);
 
 	cairo_rectangle(wd->cr,
-			px1+1, py ,
+			px1, py ,
 		       CLEN,
 		       CH1 );
 	cairo_fill(wd->cr);

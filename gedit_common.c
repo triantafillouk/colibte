@@ -175,7 +175,7 @@ ge_edit_display_event(GtkWidget	*widget, GdkEvent *event)
 			prev_x=mouse_x;
 			prev_y=mouse_y;
 //			MESG("button 1 ->sc");
-			show_cursor("button_press 1");
+			// show_cursor("button_press 1");
 			};
 //			MESG("return from press button");
 			return TRUE;

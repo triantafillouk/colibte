@@ -519,10 +519,11 @@ void show_cursor (char *from)
 	GeEditDisplay *wd;
 	static int ind=0;
 	if(drv_initialized==0) return;
-	// MESG("show_cursor: start ind=%d showing=%d",ind,cursor_showing);
 	if(!cbfp) return;
 	if(!(cbfp->b_flag==FSNOTES || cbfp->b_flag==FSNOTESN || cbfp->b_flag & FSNLIST)) {
 	wd = (GeEditDisplay *)(cwp->gwp->draw);
+	// MESG("show_cursor: start ind=%d showing=%d from %s",ind,cursor_showing,from);
+
 	if(wd->cr == NULL) { 
 		// MESG("show_cursor: null cr!");
 		return;
@@ -535,6 +536,7 @@ void show_cursor (char *from)
 #if	FAST_GTK_SCREEN
 	px=set_cursor_xpos(cposy,cposx);
 #endif
+	// py=cposy*CHEIGHTI;
 
 	// MESG("show_cursor: start from %s px=%d",from,px);
 #if	SHOW_CLINE
@@ -542,14 +544,14 @@ void show_cursor (char *from)
 	area.height = 5;	/* current line height  */
 	area.y = py+CHEIGHTI-area.height;
 	area.width = cwp->gwp->width;
-	// MESG("show_cursor: from %s <%d y=%d y=%d",from,ind,area.x,area.y);	
+	// MESG("show_cursor: from %s <%d y=%d y=%d",from,ind,area.x,area.y);
+	// MESG("show_cursor: line  x=%d y=%d h=%d w=%d",area.x,area.y,area.height,area.width);
 	if(area.height + area.width < 2 ) {
 		return;
 	};
 
 	region = cairo_region_create_rectangle((cairo_rectangle_int_t *)&area);
 	wd->cr = begin_draw(wd,region,"show_cursor");
-
 	cairo_set_operator(wd->cr,CAIRO_OPERATOR_OVER);
 	cairo_set_source_rgba(wd->cr,0.4,0.4,0.4,0.5);
 
@@ -563,15 +565,18 @@ void show_cursor (char *from)
 	int px1;
 	if(is_wrap_text(cwp->w_fp)) {
 		int infolen=(int)cwp->w_infocol*CLENI;
-		int wrap_column = tp_col(cwp->tp_current) % (cwp->vtcol-1);
+		int wrap_column = tp_col(cwp->tp_current) % (cwp->w_width);
+		// int wrap_line = tp_col(cwp->tp_current) / (cwp->w_width);
 		px1 = wrap_column*CLENI+infolen;
 		area.x = (px1);
+		// MESG("ww=%d col=%ld wc = %d wl=%d py=%d px1=%d cposx=%d cposy=%d",cwp->w_width,tp_col(cwp->tp_current),wrap_column,wrap_line,py,px1,cposx,cposy);
 	} else {
-		px1 = px;
-		area.x = (px1+1)%(wd->wp->w_width * CLENI);
+		px1 = (px)%(wd->wp->w_width * CLENI);
 	}
-	area.y = py;
 
+	area.x = px1;
+	area.y = py;
+	MESG("show_cursor: x=%d %d y=%d",px,px1,py);
 	area.width = CLEN;
 	area.height = CHEIGHTI;
 
