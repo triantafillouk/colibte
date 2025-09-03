@@ -1774,18 +1774,21 @@ int view_next(num n)
 #if	TNOTES
  if(fp->b_flag==FSNOTES) return(0);
 #endif
- dir_left(0);
  // MESG("view_next: b_flag=%X",fp->b_flag);
+ dir_left(0);
  if(fp->b_flag & FSDIRED) {
  	dir_right(1);
 	set_update(cwp,UPD_EDIT|UPD_STATUS);
  }
 #if	TNOTES
- else
- if(fp->b_flag & FSNOTESN || fp->b_flag & FSNLIST) {
- 	next_line(1);
-	view_note(1);
-	set_update(cwp,UPD_EDIT|UPD_STATUS);
+ else {
+	// MESG("check for notes %X %X",fp->b_flag,cwp->w_fp->b_flag);
+	 if(cwp->w_fp->b_flag & FSNOTESN || cwp->w_fp->b_flag & FSNLIST) {
+	 	// MESG("this is notes");
+	 	next_line(1);
+		view_note(1);
+		set_update(cwp,UPD_EDIT|UPD_STATUS);
+	 };
  };
 #endif
  return(1); 
