@@ -1812,7 +1812,7 @@ int view_previous(num n)
  }
 #if	TNOTES
  else 
- if(fp->b_flag & FSNOTESN || fp->b_flag & FSNLIST) {
+ if(cwp->w_fp->b_flag & FSNOTESN || cwp->w_fp->b_flag & FSNLIST) {
  	view_note(1);
 	set_update(cwp,UPD_EDIT|UPD_STATUS);
  };
