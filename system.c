@@ -735,6 +735,7 @@ char *ext_system_paste_line()
 		FILE *file;
 		char *s=line;
 		file=fopen(filnam,"r");
+		if(file==NULL) return NULL;
 		int i;
 		char ch;
 		size_t stat;

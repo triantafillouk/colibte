@@ -1884,6 +1884,7 @@ num get_lines(FILEBUF *bp)
 num get_utf2to16_size(char *file_name)
 {
  FILE *fi=fopen(file_name,"r");
+ if(fi==NULL) { MESG("cannot get file size!"); return 0;};
  size_t res;
  unsigned short in_i;
  num size=0;

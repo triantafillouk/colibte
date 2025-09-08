@@ -495,7 +495,7 @@ int load_keys()
  if((fname=find_file("",name1,0,0)) == NULL) return FALSE;
 
  f1=fopen(fname,"r");
-
+ if(f1==NULL) { MESG("cannot load keys!");return(0);};
  while(fgets(str_line,sizeof(str_line),f1)){
 	char **a_as;
 	int c;

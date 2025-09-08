@@ -177,6 +177,8 @@ int next_file(num n)
 /* check if we have read the file and read it if not! */
 int activate_file(FILEBUF *bp)
 {
+	// MESG("activate_file:");
+	if(bp==NULL) { fprintf(stderr,"cannot create buffer!\n"); exit(4);};
 	if(bp->b_dname[0]!=0) if(chdir(bp->b_dname)!=0) return false;
 	// MESG("activate_file:[%s] b_type=%d b_flag=%X mll=%ld ",bp->b_fname,bp->b_type,bp->b_flag,bp->maxlinelen);
 	if ((bp->b_state & FS_ACTIVE) ==0)
@@ -292,7 +294,8 @@ int set_window_filebuf(WINDP *wp,FILEBUF *bp)
 int select_filebuf(FILEBUF *bp)
 {
 	if(bp==NULL) return false;
-	if(!activate_file(bp)) return false;
+	// MESG("select_filebuf:");
+	if(!activate_file(bp)) { MESG("cannot activate file!");return false;};
 	if(!is_special_buffer(bp)) set_working_dir(bp->b_dname);
 
 	if(discmd==FALSE) { cbfp=bp; return (TRUE); }
@@ -394,7 +397,7 @@ int load_scratch_files()
  char scratch_name[MAXFLEN];
  int stat=0;
  int ind=0;
- // MESG("load_scratch_files:");
+ MESG("load_scratch_files:");
  stat=snprintf(home_dir,sizeof(home_dir),"%s/.%s",getenv("HOME"),APPLICATION_NAME);
  if(stat>=MAXFLEN) {error_line("truncated scratch file");return 0;};
 
@@ -826,7 +829,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	if(bflag==NOTE_TYPE) { bflag=0;from_note=1;}; 
 
 	create_base_name(base_name,bname);
-	// MESG("new_filebuf:base_name=[%s] bname=[%s] bflag=%X",base_name,bname,bflag);
+	MESG("new_filebuf:base_name=[%s] bname=[%s] bflag=%X",base_name,bname,bflag);
 	dir_name[0]=0;
 	is_scratch = scratch_ind(base_name);
 	
@@ -843,7 +846,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 			strlcpy(dir_name,get_start_dir(),MAXFLEN);
 		}
 	};
-
+	MESG("In dir %s",dir_name);
 	update_base_dir(dir_name,bname);
 	if(strlen(bname)>1 && (bname[2]=='1' || bname[2]=='2')) {
 		dir_num=bname[2]-'0';
@@ -910,7 +913,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 		err=stat(dir_name,&bp_stat);
 		if(err<0 && bname[0]!=CHR_LBRA) return FALSE;
 	};
-
+	// MESG("err = %d",err);
 	if ((bp=(FILEBUF *)malloc(sizeof(FILEBUF))) == NULL) return (NULL);
 	/* find the place in the list to insert this buffer */
 
@@ -947,7 +950,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 #endif
 	bp->dir_list_str=NULL;
 
-	// MESG("new_filebuf: dir_list!");
+	// MESG("new_filebuf: 1!");
 	if(bflag & FSDIRED) {
 		bp->cdir = bp->rdir;
 		bp->cdir->dir_name = NULL;
@@ -1069,6 +1072,7 @@ FILEBUF *cls_fout(char *bname)
  FILEBUF *bp;
  WINDP *wp;
  if((bp=new_filebuf(bname,0)) !=FALSE) {
+	if(bp==NULL) { MESG("cannot create fout!");return NULL;};
 	if((bp->b_state & FS_ACTIVE)==0) activate_file(bp);
 	EmptyText(bp);
 // update the buffer if on screen
@@ -1468,7 +1472,7 @@ int resetkey(FILEBUF *bp)	/* reset the encryption key if needed */
 int goto_file(char *file_name)
 {
     FILEBUF *bp;
-	// MESG("goto_file:[%s][%s]",cbfp->b_dname,file_name);
+	MESG("goto_file:[%s][%s]",cbfp->b_dname,file_name);
 	if(edit_file(file_name)) return(TRUE);
 	if((bp=new_filebuf(file_name,0))==NULL) {
     	msg_line("Cannot create buffer [%s]",file_name);
@@ -1978,9 +1982,10 @@ int file_type(char *name, int *compression_type,char *oext)
 void edinit(char *bname)
 {
     register FILEBUF *bp;
-
+	// MESG("edinit:");
     bp = new_filebuf(bname,0);             /* First buffer         */
     if (bp==NULL) { ERROR("cannot create buffer [%s]",bname); exit(1);};
+	
 	select_filebuf(bp);
 }
 

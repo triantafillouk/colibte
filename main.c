@@ -92,9 +92,12 @@ FILEBUF *get_scratch_file()
 		if(scratch_files[0]==0) {
 		// no files, or no scratch files, create new scratch file!
 			edinit("[new 1]");
+
 		};
 		scratch_files[0]=1;
-		activate_file(cbfp);
+		if(!activate_file(cbfp)) {
+			MESG("cannot activate scratch file!");
+		};
 	if(cbfp==NULL) MESG("get_scratch_file: NULL cbfp");
 	return(cbfp);
 }
@@ -107,11 +110,13 @@ int main(int argc, char **argv)
 	else if(lc_lang[0]==0) lc_lang=getenv("LANG");
 	errno=0;
 
+	// check_config_dir();
 	init_hash();
 	discmd = FALSE;
 	init_lists();
 	scratch_files[0]=0;
 	set_start_time();
+
 	load_config();
 	parse_command_line(argc,argv);
 	if(firstbp==NULL) {

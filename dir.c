@@ -438,6 +438,7 @@ int dir_size(num n)
   int status=system(sline);
   if(status==0) {
 	fid=fopen(tmp_name,"r");
+	if(fid==0) { MESG("cannot stat dir [%s]!",tmp_name);return(0);};
 	int num=fscanf(fid,"%s %s",sline,dir_name);
 	fclose(fid);
 	unlink(tmp_name);
