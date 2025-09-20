@@ -24,9 +24,11 @@ cteg2 : XPLOT=1
 cte: PCURSES=1
 cte: TNOTES=1
 # cte: GTKINCLUDE=
+# cte: SQLITE3=`pkg-config sqlite3 --libs`
 cte ctg2 ctg3 ctg4: USE_GLIB=1
 
-ctg2 cte ctg3 ctg4: TNOTES=1 SQLITE3=`pkg-config sqlite3 --libs`
+ctg2 cte ctg3 ctg4: TNOTES=1
+ctg2 cte ctg3 ctg4: SQLITE3=`pkg-config sqlite3 --libs`
 ctg2: GTKINCLUDE=`pkg-config gtk+-2.0 --cflags` -DGTK2=1 
 ctg3: GTKINCLUDE=`pkg-config gtk+-3.0 --cflags` -DGTK3=1 
 ctg4: GTKINCLUDE=`pkg-config gtk4 --cflags` -DGTK4=1 
@@ -179,6 +181,7 @@ xe.h :
 #	cc -c -J -O2 -b elf $*.c
 
 main.o: main.c xe.h globals.h  keytable.h func.h
+	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS) -funsigned-char  $(GLIBINCLUDE) $*.c -o main.o
 
 gmain.o: main.c xe.h globals.h  keytable.h func.h
 	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char main.c -o gmain.o
