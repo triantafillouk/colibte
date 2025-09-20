@@ -12,7 +12,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-prototypes"
 
-#pragma GCC diagnostic ignored "-Wno-deprecated-declarations"
+// #pragma GCC diagnostic ignored "-Wno-deprecated-declarations"
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
 #include <glib.h>
@@ -1098,7 +1098,7 @@ GWINDP * ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype)
 	btep->left = btel;
 	btep->right = bter;
 	btep->gw = NULL;
-	btep->pan = (GtkVBox *)pan;
+	btep->pan = (GtkBox *)pan;
 	btel->pan=bter->pan=NULL;
 	btel->left=btel->right=bter->left=bter->right=NULL;
 	btel->parent=bter->parent=btep;
@@ -1119,7 +1119,7 @@ GWINDP * ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype)
  new_gwp->draw_adj = (GtkAdjustment *)gtk_adjustment_new(50.0,0.0,100.0,1.0,5.0,10.0);
 
  /* scroll bar */
- new_gwp->scroll_bar = (GtkVScrollbar *)gtk_vscrollbar_new ( new_gwp->draw_adj );
+ new_gwp->scroll_bar = (GtkScrollbar *)gtk_vscrollbar_new ( new_gwp->draw_adj );
  gtk_signal_connect(GTK_OBJECT(new_gwp->draw_adj), "value_changed", GTK_SIGNAL_FUNC(cb_set_position),new_gwp->draw);
 
  im_context = gtk_im_context_simple_new ();

@@ -15,12 +15,12 @@
 
 #include "geditdisplay3.h"
 #include "gtk_support.h"
+#include "icon.h"
 #include "gtkterm3.h"
 #include "xkeys.h"
 #include "xthemes.h"
 #include <X11/Xlib.h>
 #include "menus.h"
-#include "icon.h"
 
 #define	SHOW_CLINE	1
 #define	LABEL_STATUS	0
