@@ -644,8 +644,8 @@ char *xclip_paste="xclip -i";
 char *native_paste0="pbpaste";
 char *native_paste="pbpaste";
 char *native_copy="pbcopy";
-asdasdasd asd
-#elseif	WSL
+#else 
+#if	WSL
 // The following is for wsl!
 char *native_paste0="win32yank.exe -o --lf";
 char *native_paste="win32yank.exe -o --lf";
@@ -653,6 +653,7 @@ char *native_copy="win32yank.exe -i";
 #else
 char *native_copy="xclip -o";
 char *native_paste="xclip -i";
+#endif
 #endif
 
 #if	DARWIN | WSL

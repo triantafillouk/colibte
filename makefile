@@ -47,15 +47,15 @@ SHAREDDIR=/usr/share
 # for Darwin
 ifeq ($(UNAME), Darwin)
 # GLIBINCLUDE=`pkg-config glib-2.0 --cflags`
-LPCURSES0=-lpanel -lncurses -L/opt/local/lib $(GLIB_LIB)
+LPCURSES0=-lpanel -lncurses  $(GLIB_LIB)
 OSYSTEM=DARWIN
 SHAREDDIR=/usr/local/share
 X11include=-I/opt/X11/include/
 X11lib0= -lX11 -L/opt/X11/lib $(GLIB_LIB)
 EXTFILE=.$(APP_NAME)_ext_mac
 WSL:=0
-#CC=zig cc -DGVERS='"$(GVERS)"'
-CC=clang -DGVERS='"$(GVERS)"'
+CC=zig cc -DGVERS='"$(GVERS)"'
+#CC=clang -DGVERS='"$(GVERS)"'
 #CC=gcc -DGVERS='"$(GVERS)"'
 endif
 
@@ -102,7 +102,7 @@ endif
 
 ifeq ($(CC), clang)
 # the following is needed for clang compiler
-CPU_OPTIONS= -O3  -I/usr/include/x86_64-linux-gnu -D$(OSYSTEM)=1
+CPU_OPTIONS= -O3  -D$(OSYSTEM)=1
 else 
 CPU_OPTIONS= -O3 -D$(OSYSTEM)=1  
 endif
@@ -268,10 +268,10 @@ curses.o: curses.c color.h menus.h keytable.h
 	${CC} curses.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o curses.o
  
 panel_curses.o: panel_curses.c color.h menus.h keytable.h xthemes.h color.h rgb_colors.h xthemes.c
-	${CC} panel_curses.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o panel_curses.o 
+	${CC} panel_curses.c -I/opt/local/include $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o panel_curses.o 
 
 panel_curses_ce.o: panel_curses.c color.h menus.h keytable.h xthemes.h color.h rgb_colors.h xthemes.c
-	${CC} panel_curses.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o panel_curses_ce.o 
+	${CC} panel_curses.c -I/opt/local/include $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o panel_curses_ce.o 
 
 gtk_support.o: gtk_support.c gtk_support.h
 	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o gtk_support.o gtk_support.c
@@ -364,7 +364,7 @@ cte : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  fil
 	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o -o cte  ${LPCURSES}  ${SQLITE3} -lm
 
 ce : main_ce.o filebuf.o system.o edit_ce.o screen_ce.o  tldisplay_ce.o eval.o mlang_ce.o  file_ce.o input_ce.o help.o search_ce.o  word.o window.o marks.o convert_ce.o  panel_curses_ce.o  highlight.o dir_ce.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes_ce.o
-	${CC} main_ce.o filebuf.o system.o edit_ce.o screen_ce.o  tldisplay_ce.o eval.o mlang_ce.o  file_ce.o input_ce.o help.o search_ce.o  word.o window.o marks.o convert_ce.o  panel_curses_ce.o highlight.o dir_ce.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes_ce.o -o ce  $(GLIB_LIB) ${LPCURSES} ${SQLITE3} -lm
+	${CC} main_ce.o filebuf.o system.o edit_ce.o screen_ce.o  tldisplay_ce.o eval.o mlang_ce.o  file_ce.o input_ce.o help.o search_ce.o  word.o window.o marks.o convert_ce.o  panel_curses_ce.o highlight.o dir_ce.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes_ce.o -o ce  ${LPCURSES} ${SQLITE3} -lm 
 
 gplotc.o: gplotc.c plot_cairo.c plot_commonc.c gplot.h
 	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o $*.o  $*.c
