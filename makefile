@@ -241,8 +241,8 @@ mlangg4.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang_functions.c ml
 tldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h menu.h
 	${CC} tldisplay.c $(FLAGS1)  -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o tldisplay.o
 
-tldisplayn.o: xe.h tldisplay.c screen.c menus.h keytable.h menu.h
-	${CC} tldisplay.c $(FLAGS1)  -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o tldisplayn.o
+tldisplay_ce.o: xe.h tldisplay.c screen.c menus.h keytable.h menu.h
+	${CC} tldisplay.c $(FLAGS1)  -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o tldisplay_ce.o
 
 xldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h
 	${CC} tldisplay.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -funsigned-char -o xldisplay.o
@@ -363,8 +363,8 @@ ctxe : main.o system.o edit.o screen.o  xldisplay.o eval.o mlang.o  file.o  xinp
 cte : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o mlangf.o xthemes.c
 	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o -o cte  ${LPCURSES}  ${SQLITE3} -lm
 
-ce : main_ce.o filebuf.o system.o edit_ce.o screen_ce.o  tldisplayn.o eval.o mlang_ce.o  file_ce.o input_ce.o help.o search_ce.o  word.o window.o marks.o convert_ce.o  panel_curses_ce.o  highlight.o dir_ce.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes_ce.o
-	${CC} main_ce.o filebuf.o system.o edit_ce.o screen_ce.o  tldisplayn.o eval.o mlang_ce.o  file_ce.o input_ce.o help.o search_ce.o  word.o window.o marks.o convert_ce.o  panel_curses_ce.o highlight.o dir_ce.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes_ce.o -o ce  $(GLIB_LIB) ${LPCURSES} ${SQLITE3} -lm
+ce : main_ce.o filebuf.o system.o edit_ce.o screen_ce.o  tldisplay_ce.o eval.o mlang_ce.o  file_ce.o input_ce.o help.o search_ce.o  word.o window.o marks.o convert_ce.o  panel_curses_ce.o  highlight.o dir_ce.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes_ce.o
+	${CC} main_ce.o filebuf.o system.o edit_ce.o screen_ce.o  tldisplay_ce.o eval.o mlang_ce.o  file_ce.o input_ce.o help.o search_ce.o  word.o window.o marks.o convert_ce.o  panel_curses_ce.o highlight.o dir_ce.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes_ce.o -o ce  $(GLIB_LIB) ${LPCURSES} ${SQLITE3} -lm
 
 gplotc.o: gplotc.c plot_cairo.c plot_commonc.c gplot.h
 	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o $*.o  $*.c
