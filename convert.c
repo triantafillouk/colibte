@@ -59,6 +59,7 @@ num  ConvertFromDosToUnix(FILEBUF *fp)
    return(ptr);
 }
 
+
 int dos2unix(num n)
 {
  FILEBUF *cfp=current_filebuf();

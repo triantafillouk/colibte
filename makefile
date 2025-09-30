@@ -3,57 +3,50 @@
 # Last modified 2020/09/10
 
 # default values for flags
-UNAME := $(shell uname)
-APP_NAME=colibte
+UNAME = $(shell uname)
+WSL = $(shell uname -a|grep "icrosoft" |wc -l)
 
 PCURSES=0
 XLIB=0
 GTK=0
 XPLOT=0
 EMBED_ICONS=0
-USE_GLIB=1
+
 # include support for notes database in sqlite3
 GVERS := $(shell git log -1 --pretty=tformat:%h,%s)
 
 ctxe : XLIB=1
 ctxe : _X11_=1
 ctxe : PCURSES=0 
-# ctxe : CTGINCLUDE=
 cteg2 : XPLOT=1
 
 cte: PCURSES=1
 cte: TNOTES=1
-# cte: GTKINCLUDE=
-# cte: SQLITE3=`pkg-config sqlite3 --libs`
-cte ctg2 ctg3 ctg4: USE_GLIB=1
 
 ctg2 cte ctg3 ctg4: TNOTES=1
 ctg2 cte ctg3 ctg4: SQLITE3=`pkg-config sqlite3 --libs`
+ctg2 cte ctg3 ctg4: USE_GLIB=1
+ctg2 cte ctg3 ctg4: GLIBINCLUDE=`pkg-config glib-2.0 --cflags`
+ctg2 cte ctg3 ctg4: GLIB_LIB=`pkg-config glib-2.0 --libs`
 ctg2: GTKINCLUDE=`pkg-config gtk+-2.0 --cflags` -DGTK2=1 
 ctg3: GTKINCLUDE=`pkg-config gtk+-3.0 --cflags` -DGTK3=1 
 ctg4: GTKINCLUDE=`pkg-config gtk4 --cflags` -DGTK4=1 
 
 ce : PCURSES=1
-ce : TNOTES=0
+ce : TNOTES=1
 ce : GLIB_LIB=
+ce : SQLITE3=`pkg-config sqlite3 --libs`
 ce : USE_GLIB=0
-ce : SQLITE3=
-# ce : GTKINCLUDE=
+ce : GLIBINCLUDE=
 
 _X11_=0
 
 OSYSTEM=OTHERUNIX
 SHAREDDIR=/usr/share
 
-ifeq ($(USE_GLIB),1)
-GLIB_LIB=`pkg-config glib-2.0 --libs`
-else
-GLIB_LIB=
-endif
-
 # for Darwin
 ifeq ($(UNAME), Darwin)
-GLIBINCLUDE=`pkg-config glib-2.0 --cflags`
+# GLIBINCLUDE=`pkg-config glib-2.0 --cflags`
 LPCURSES0=-lpanel -lncurses -L/opt/local/lib $(GLIB_LIB)
 OSYSTEM=DARWIN
 SHAREDDIR=/usr/local/share
@@ -68,13 +61,11 @@ endif
 
 # for Linux
 ifeq ($(UNAME), Linux)
-GLIBINCLUDE=`pkg-config glib-2.0 --cflags`
+# GLIBINCLUDE=`pkg-config glib-2.0 --cflags`
 LPCURSES0=-lpanelw -lncursesw  $(GLIB_LIB)
 OSYSTEM=LINUX
 X11include=-I/opt/X11/include/
 X11lib0=-L/usr/X11R6/lib -lX11 -L/opt/X11/lib 
-WSL:=`uname -a|grep "icrosoft" |wc -l`
-EXTFILE:=.$(APP_NAME)_ext_$(WSL)
 CC=gcc -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
 #CC=zig cc -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
 endif
@@ -94,7 +85,7 @@ endif
 # for cygwin
 ifeq ($(UNAME), CYGWIN_NT-10.0)
 GLIBINCLUDE=`pkg-config glib-2.0 --cflags`
-LPCURSES0=-lpanelw -lncursesw  $(gGLIB_LIB)
+LPCURSES0=-lpanelw -lncursesw  $(GLIB_LIB)
 OSYSTEM=CYGWIN
 WSL=0
 ##CC=gcc -DGVERS='"$(GVERS)"'
@@ -183,6 +174,18 @@ xe.h :
 main.o: main.c xe.h globals.h  keytable.h func.h
 	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS) -funsigned-char  $(GLIBINCLUDE) $*.c -o main.o
 
+main_ce.o: main.c xe.h globals.h  keytable.h func.h
+	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS) -funsigned-char  $(GLIBINCLUDE) main.c -o main_ce.o
+
+file_ce.o: file.c xe.h
+	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS) -funsigned-char  $(GLIBINCLUDE) file.c -o file_ce.o
+
+dir_ce.o: dir.c xe.h
+	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS) -funsigned-char  $(GLIBINCLUDE) dir.c -o dir_ce.o
+
+edit_ce.o: edit.c xe.h
+	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS) -funsigned-char  $(GLIBINCLUDE) edit.c -o edit_ce.o
+
 gmain.o: main.c xe.h globals.h  keytable.h func.h
 	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char main.c -o gmain.o
 
@@ -191,6 +194,9 @@ gmain4.o: main.c xe.h globals.h  keytable.h func.h
 
 input.o: keytable.h input.c 
 	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char input.c 
+
+input_ce.o: keytable.h input.c 
+	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char input.c -o input_ce.o 
 
 ginput.o: keytable.h input.c
 	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char input.c -o ginput.o
@@ -202,6 +208,9 @@ gldisplay.o: xe.h screen.c menus.h
 
 screen.o: xe.h screen.c wrap_line.h
 	${CC} $(FLAGS1) -DGTK3=0 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char screen.c -o screen.o
+
+screen_ce.o: xe.h screen.c wrap_line.h
+	${CC} $(FLAGS1) -DGTK3=0 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char screen.c -o screen_ce.o
 
 convert_ce.o: convert.c xe.h
 	${CC} $(FLAGS1) -DGTK3=0 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char convert.c -o convert_ce.o
@@ -217,6 +226,9 @@ eval.o: xe.h eval.c eval.h alist.h
 config_init.o: config_init.c
 
 mlang.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang_functions.c mlang.h alist.h xe.h func.h token_table.h
+
+mlang_ce.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang_functions.c mlang.h alist.h xe.h func.h token_table.h
+	${CC} mlang.c $(FLAGS1)  -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o mlang_ce.o
 
 mlangf.o: xe.h mlangf.c mlangf.h mlang.h
 
@@ -247,7 +259,10 @@ alist.o: alist.c alist.h avl_tree.c rb_tree.c
 
 filebuf.o: xe.h filebuf.c undo.h replaceblock.c findlinecol1.c
 
-search.o: xe.h search.c
+search.o: xe.h search.c 
+
+search_ce.o: xe.h search.c 
+	${CC} search.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o search_ce.o
 
 curses.o: curses.c color.h menus.h keytable.h
 	${CC} curses.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o curses.o
@@ -348,8 +363,8 @@ ctxe : main.o system.o edit.o screen.o  xldisplay.o eval.o mlang.o  file.o  xinp
 cte : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o mlangf.o xthemes.c
 	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o -o cte  ${LPCURSES}  ${SQLITE3} -lm
 
-ce : main.o filebuf.o system.o edit.o screen.o  tldisplayn.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert_ce.o  panel_curses_ce.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes_ce.o
-	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplayn.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert_ce.o  panel_curses_ce.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes_ce.o -o ce  $(GLIB_LIB) ${LPCURSES} -lm
+ce : main_ce.o filebuf.o system.o edit_ce.o screen_ce.o  tldisplayn.o eval.o mlang_ce.o  file_ce.o input_ce.o help.o search_ce.o  word.o window.o marks.o convert_ce.o  panel_curses_ce.o  highlight.o dir_ce.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes_ce.o
+	${CC} main_ce.o filebuf.o system.o edit_ce.o screen_ce.o  tldisplayn.o eval.o mlang_ce.o  file_ce.o input_ce.o help.o search_ce.o  word.o window.o marks.o convert_ce.o  panel_curses_ce.o highlight.o dir_ce.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes_ce.o -o ce  $(GLIB_LIB) ${LPCURSES} ${SQLITE3} -lm
 
 gplotc.o: gplotc.c plot_cairo.c plot_commonc.c gplot.h
 	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o $*.o  $*.c

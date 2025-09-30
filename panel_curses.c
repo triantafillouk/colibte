@@ -21,7 +21,9 @@
 #include	<termios.h>
 #include	<sys/ioctl.h>
 #include	<fcntl.h>
+#if	USE_GLIB
 #include	<glib.h>
+#endif
 #include	<signal.h>
 #include "menu.h"
 
@@ -1713,24 +1715,6 @@ void xupdate_box()
 	wrefresh(cbox->wnd);
 }
 
-#if	USE_GLIB
-/* Convert a current local string to utf for output */
-char *str_local_to_utf(WINDP *wp,char *in)
-{
- char *slocal;
- gsize r,w;
- static char *space=" ";
- int lcp=default_local_codepage;
- if(wp->w_fp->b_lang!=0) lcp=wp->w_fp->b_lang;
- slocal = g_convert(in,-1,"UTF-8",codepage_str[lcp],&r,&w,NULL);
-
- if(slocal!=NULL) {
- 	return slocal;
- }
- else return space;
-}
-#endif
-
 int check_v_sibling(WINDP *wp,int left,int top,int new_cols)
 {
  WINDP *wp1;
@@ -2002,6 +1986,24 @@ int check_w_sibling(WINDP *wp,int left,int top,int new_rows)
 
  return true;
 }
+
+#if	USE_GLIB
+/* Convert a current local string to utf for output */
+char *str_local_to_utf(WINDP *wp,char *in)
+{
+ char *slocal;
+ gsize r,w;
+ static char *space=" ";
+ int lcp=default_local_codepage;
+ if(wp->w_fp->b_lang!=0) lcp=wp->w_fp->b_lang;
+ slocal = g_convert(in,-1,"UTF-8",codepage_str[lcp],&r,&w,NULL);
+
+ if(slocal!=NULL) {
+ 	return slocal;
+ }
+ else return space;
+}
+#endif
 
 
 // dummy function

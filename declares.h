@@ -97,9 +97,6 @@ int select_highlight(num);
 int check_update_highlight(int flag);
 int file_type_is(char *extention,int check_type);
 void open_log(char *program_name);
-#if	USE_GLIB0
-void set_cfg_int(char *label,int ival);
-#endif
 #if	!USE_GLIB
 char *lstr_to_upper(char *s);
 char *lstr_to_lower(char *s);

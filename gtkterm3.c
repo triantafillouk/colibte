@@ -253,14 +253,9 @@ create_parent (void)
 	gtk_widget_show(parent_title_bar);
 	gtk_header_bar_set_show_close_button((GtkHeaderBar *)parent_title_bar,1);
   };
+
   // MESG("create_parent: reset_position=%d",(int)bt_dval("reset_position"));
   if(!(int)bt_dval("reset_position")) {
-#if	USE_GLIB0
-	  parent_width = get_cfg_int("x11_width",parent_width);
-	  parent_height = get_cfg_int("x11_height",parent_height);
-	  parent_x = get_cfg_int("x11_x",parent_x);
-	  parent_y = get_cfg_int("x11_y",parent_y);
-#else
 	if((int)bt_dval("reset_position")==0) { 
 	  parent_width  = (int)bt_dval("x11_width");
 	  parent_height = (int)bt_dval("x11_height");
@@ -269,7 +264,6 @@ create_parent (void)
 	};
 	  // if(parent_x > 1920-parent_width) parent_x=10;
 	  // if(parent_y > 1080-parent_height) parent_y=10;
-#endif
   };
 //  MESG("create_parent: x=%d y=%d w=%d h=%d",parent_x,parent_y,parent_width,parent_height);
 #if	DARWIN
