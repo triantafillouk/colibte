@@ -1582,6 +1582,7 @@ num physical_column(num vcol)
 
 num WGetCol()
 {
+ // MESG("WGetCol:");
 // num col1;
  num col2;
 //	col1 = tp_col(cwp->tp_current) - cwp->w_lcol;

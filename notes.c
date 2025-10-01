@@ -2137,6 +2137,7 @@ int set_notes_key(num key_type)
 	return true;
 }
 
+#if	TNOTES
 char *get_notes_status()
 {
  static char statuss[MAXLLEN];
@@ -2171,6 +2172,7 @@ char *get_notes_status()
  sprintf(statuss,"-----");
  return statuss;
 }
+#endif
 #endif
 
 /*

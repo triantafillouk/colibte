@@ -410,7 +410,6 @@ int goto_eof(num n)
 	int toline=0;
 // MESG("goto_eof: b_flag=%X",cbfp->b_flag);
 #if	TNOTES
-
 	if(cbfp->b_flag==FSNOTES) {
 		set_goal_column(0,"goto_eof");
 		toline=cbfp->b_tags-headline;

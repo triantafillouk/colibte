@@ -2167,15 +2167,13 @@ void view_file(char *fname)
 {
  FILEBUF *view;
  FILEBUF *fp=current_file_buffer();
- MESG("view_file:[%s]",fname);
+ // MESG("view_file:[%s]",fname);
  view = new_filebuf("[view]",FSMMAP);	/* use memory map for viewing, its faster */
  // MESG("view_file: set connect buffer: [%s]",fp->b_fname);
  view->connect_buffer = fp;
  view->connect_line = GetLine()+1;
  view->connect_column = GetCol();
  view->dir_num=fp->dir_num;
-
- // strlcpy(view->b_dname,cwdp,MAXFLEN);
  strlcpy(view->b_dname,fp->b_dname,MAXFLEN);
  set_working_dir(view->b_dname);
  select_filebuf(view);
@@ -2190,7 +2188,6 @@ void view_file(char *fname)
  view->b_flag |= FSDIRED ;
  view->b_state |= FS_VIEW;
  view->b_state &= ~FS_CHG;
- // fp->dir_num=dir_num;
 }
 
  

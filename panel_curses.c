@@ -1606,6 +1606,7 @@ void hide_cursor(char *from)
 void show_cursor(char *from) 
 {
 	if(!entry_mode) {
+	// MESG("show_cursor:");
 		if(
 #if	TNOTES
 			cbfp->b_flag==FSNOTES || cbfp->b_flag==FSNOTESN || 

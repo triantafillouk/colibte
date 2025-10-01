@@ -1872,7 +1872,6 @@ int  show_position_info(num short_version)
 	if(cwp==NULL) return false;
 	FILEBUF *fp = cwp->w_fp;
 	// MESG("show_position_info:");
-#if	TNOTES
 	if(fp->b_flag>=FSNOTES) {
 	  if(fp->b_flag & FSDIRED) 
 	  {
@@ -1885,24 +1884,13 @@ int  show_position_info(num short_version)
 		} else {
 			sstat=snprintf(str,sizeof(str),"%6lld",getcline()+1);
 		};
-	  } else {
+	  }
+#if	TNOTES 
+	  else {
 		sstat=snprintf(str,sizeof(str),"%s",get_notes_status());
 	  };
+#endif
 	} else
-#else
-	if(fp->b_flag & FSDIRED) 
-	{
-		// MESG("show dir info");
-		if(!short_version) {
-			char finfo[MAXFLEN];
-			sstat=dir_getfile(finfo,2);
-			sstat=snprintf(str,sizeof(str),"%6lld|%s",getcline()+1,finfo);
-		} else {
-			sstat=snprintf(str,sizeof(str),"%6lld",getcline()+1);
-		};
-	} else
-
-#endif 
 	{
 	loffs=Offset()-LineBegin(Offset())+1;
 	// MESG("show_position_info: o=%ld loff=%ld b_flag=%X b_mode=%X b_state=%X",Offset(),loffs,fp->b_flag,fp->b_mode,fp->b_state);

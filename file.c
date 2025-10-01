@@ -829,7 +829,6 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	if(bflag==NOTE_TYPE) { bflag=0;from_note=1;}; 
 
 	create_base_name(base_name,bname);
-	MESG("new_filebuf:base_name=[%s] bname=[%s] bflag=%X",base_name,bname,bflag);
 	dir_name[0]=0;
 	is_scratch = scratch_ind(base_name);
 	
@@ -846,7 +845,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 			strlcpy(dir_name,get_start_dir(),MAXFLEN);
 		}
 	};
-	MESG("In dir %s",dir_name);
+	MESG("new_filebuf:base_name=[%s] bname=[%s] bflag=%X dir=%s",base_name,bname,bflag,dir_name);
 	update_base_dir(dir_name,bname);
 	if(strlen(bname)>1 && (bname[2]=='1' || bname[2]=='2')) {
 		dir_num=bname[2]-'0';

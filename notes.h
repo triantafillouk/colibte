@@ -46,6 +46,9 @@ int show_sqlite_tables(char *fname);
 /* ----- notes utility functions ----- */
 int insert_preamble(FILEBUF *fp,int type);
 int new_note(num n);
+int new_cal_note(num n);
+int new_todo_note(num n);
+
 int save_to_db(notes_struct *note);
 int save_tag(sqlite3 *db,int notes_id,char *tag);
 // Parse note and create db fields
@@ -58,6 +61,10 @@ int view_notes_by_date(num n);	/* TBD  */
 // Initialize notes database 
 int init_notes_db(num n);
 int recreate_notes_db(num n);
+int show_calendar_list(num n);
+int show_todo_list(num n);
+char *get_notes_status();
+int reload_tag_view();
 
 int show_tag_view(num n);
 int create_note_with_current_file(num n);

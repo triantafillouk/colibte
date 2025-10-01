@@ -845,22 +845,6 @@ void print_sarray(char **sarray,char *title);
 
 void skip_token();
 
-#if	TNOTES
-int new_note(num n);
-int new_cal_note(num n);
-int new_todo_note(num n);
-int save_note();
-int open_notes_dir(num n);
-int search_notes_dir(num n);
-int search_notes_tagged(num n);
-int view_notes_by_date(num n);
-int create_notes_db(num n);
-int show_calendar_list(num n);
-int show_todo_list(num n);
-char *get_notes_status();
-int reload_tag_view();
-#endif
-
 #if	!DARWIN
 /*
  * '_cups_strlcat()' - Safely concatenate two strings.

@@ -144,7 +144,8 @@ void vtinit(int argc, char **argp)
 void movecursor(int row, int col)
 {
  static int t=0;
-    if(row<drv_numrow-1) {
+ // MESG("movecursor:"); 
+   if(row<drv_numrow-1) {
 		if(cwp->w_ntcols>40) show_position_info(0);
 		else if(cwp->w_ntcols>25) show_position_info(1);
 		else show_position_info(-1);
@@ -961,19 +962,27 @@ extern BOX *cbox;
 
 void update_cursor_position()
 {
+ // MESG("update_cursor_position:");
 	if(!entry_mode)
 	{
 		if(!in_menu) {
-#if	TNOTES
+#if	1
 			if(cwp->w_fp->b_flag == FSNOTES) movecursor(cwp->current_tag_line-cwp->top_tag_line+(cwp->w_fp->b_header!=NULL), WGetCol());
 			else if(cwp->w_fp->b_flag & FSNOTESN) movecursor(cwp->current_note_line-cwp->top_note_line+(cwp->w_fp->b_header!=NULL), WGetCol());
 			else 
 #endif
-			if(cwp->w_fp->b_flag & FSNLIST) movecursor(cwp->current_note_line-cwp->top_note_line+(cwp->w_fp->b_header!=NULL), 0);
-			else if(is_wrap_text(cwp->w_fp)) {
+			if(cwp->w_fp->b_flag & FSNLIST) {
+				// MESG("update_cursor_position: fsnlist");
+				movecursor(cwp->current_note_line-cwp->top_note_line+(cwp->w_fp->b_header!=NULL), 0);
+			} else if(is_wrap_text(cwp->w_fp)) {
+				// MESG("update_cursor_position: wrap");
 				// MESG("update_cursor_position: row=%d col=%d %d",cwp->currow,cwp->curcol,WGetCol());
 				movecursor(cwp->currow,cwp->curcol);
-			} else movecursor(cwp->currow+(cwp->w_fp->b_header!=NULL), WGetCol());
+			} else {
+				// MESG("update_cursor_position: regular");
+				movecursor(cwp->currow+(cwp->w_fp->b_header!=NULL), WGetCol());
+			};
+			// MESG("update_cursor_position: go show_cusor");
 			show_cursor("update_cursor_position");
 		};
 	};

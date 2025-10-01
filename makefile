@@ -19,9 +19,13 @@ ctxe : XLIB=1
 ctxe : _X11_=1
 ctxe : PCURSES=0 
 cteg2 : XPLOT=1
+ctxe: TNOTES=1
+ctxe: USE_GLIB=0
+ctxe : SQLITE3=`pkg-config sqlite3 --libs`
 
 cte: PCURSES=1
 cte: TNOTES=1
+cte: GTKINCLUDE=
 
 ctg2 cte ctg3 ctg4: TNOTES=1
 ctg2 cte ctg3 ctg4: SQLITE3=`pkg-config sqlite3 --libs`
@@ -33,11 +37,12 @@ ctg3: GTKINCLUDE=`pkg-config gtk+-3.0 --cflags` -DGTK3=1
 ctg4: GTKINCLUDE=`pkg-config gtk4 --cflags` -DGTK4=1 
 
 ce : PCURSES=1
-ce : TNOTES=1
+ce : TNOTES=0
 ce : GLIB_LIB=
 ce : SQLITE3=`pkg-config sqlite3 --libs`
 ce : USE_GLIB=0
 ce : GLIBINCLUDE=
+ce : GTKINCLUDE=
 
 _X11_=0
 
@@ -54,8 +59,8 @@ X11include=-I/opt/X11/include/
 X11lib0= -lX11 -L/opt/X11/lib $(GLIB_LIB)
 EXTFILE=.$(APP_NAME)_ext_mac
 WSL:=0
-CC=zig cc -DGVERS='"$(GVERS)"'
-#CC=clang -DGVERS='"$(GVERS)"'
+#CC=zig cc -DGVERS='"$(GVERS)"'
+CC=clang -DGVERS='"$(GVERS)"'
 #CC=gcc -DGVERS='"$(GVERS)"'
 endif
 
@@ -146,13 +151,11 @@ FLAGS4 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DWSL=$(WSL) -DGDK=1 -DGDK4=1 -DPCURSES=
 ifeq ($(TNOTES), 1)
 GTK2_FLAGS=`pkg-config gtk+-2.0 --libs` $(X11lib) ${SQLITE3}
 GTK3_FLAGS=`pkg-config gtk+-3.0 --libs` $(X11lib) ${SQLITE3}
-#GTK4_FLAGS=`pkg-config gtk+-3.0 --libs` $(X11lib) ${SQLITE3}
 GTK4_FLAGS=`pkg-config gtk4 --libs` $(X11lib) ${SQLITE3}
 else
 GTK2_FLAGS=`pkg-config gtk+-2.0 --libs` $(X11lib) 
 GTK3_FLAGS=`pkg-config gtk+-3.0 --libs` $(X11lib) 
-GTK4_FLAGS=`pkg-config gtk+-3.0 --libs` $(X11lib) 
-#GTK4_FLAGS=`pkg-config gtk4 --libs` $(X11lib) 
+GTK4_FLAGS=`pkg-config gtk4 --libs` $(X11lib) 
 endif
 
 xe.h : 
@@ -354,7 +357,7 @@ find_tags: find_tags.c support.o alist.o
 
 # This is with Xlib library, no plot !
 ctxe : main.o system.o edit.o screen.o  xldisplay.o eval.o mlang.o  file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o  highlight.o dir.o utils.o alist.o filebuf.o support.o config_init.o utf8_support.o mlangf.o notes.o
-	${CC} main.o system.o edit.o screen.o   xldisplay.o eval.o mlang.o file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o highlight.o dir.o utils.o alist.o  filebuf.o support.o config_init.o utf8_support.o mlangf.o notes.o -o ctxe -lm  $(GLIB_LIB) ${X11lib} 
+	${CC} main.o system.o edit.o screen.o   xldisplay.o eval.o mlang.o file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o highlight.o dir.o utils.o alist.o  filebuf.o support.o config_init.o utf8_support.o mlangf.o notes.o -o ctxe -lm  $(GLIB_LIB) ${X11lib} ${SQLITE3}
 
 #	This is for SCO and Xlib. -lsocket is needed at the end of every X application
 #	cc -b elf main.o system.o edit.o  display.o eval.om lang.o file.o input.o help.o search.o  word.o window.o marks.o convert.o   xlib.o -o emacs  -lm -L/usr/X11R6/lib -lX11 -lsocket
@@ -369,36 +372,7 @@ ce : main_ce.o filebuf.o system.o edit_ce.o screen_ce.o  tldisplay_ce.o eval.o m
 gplotc.o: gplotc.c plot_cairo.c plot_commonc.c gplot.h
 	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o $*.o  $*.c
 
-#expose: demos/expose.c
-#	gcc demos/expose.c -o expose `pkg-config gtk+-3.0 --cflags --libs`
-
-#button_test : demos/button_test.c
-#	gcc demos/button_test.c `pkg-config gtk+-3.0 --cflags --libs`  -o button_test
-
-#listbox-dnd: demos/listbox-dnd.c
-#	gcc demos/listbox-dnd.c -o listbox-dnd `pkg-config gtk+-3.0 --cflags --libs`
-
-all : cleanall cte ctg3 ctg2 ctg4 ctxe ce
-
-# test make conditionals
-test: 
-	WSL1 := $(WsL)
-	if [ $(WSL1) = '1' ]; then \
-		echo "Microsoft Linux";\
-	else \
-		echo "Native LInux" ;\
-	fi
-	echo $(EXTFILE)
-	echo $(WSL1)
-	echo $(CC)
-
-test1:
-	ifeq ("$(WSL)" ,"1")
-		EXTF="linux wsl"
-	else
-		EXTF="linux native"
-	endif
-	echl $(EXTF)
+all : cleanall cte ctg3 ctg2 ctg4 ctxe 
 
 clean :
 	echo clean all files!
