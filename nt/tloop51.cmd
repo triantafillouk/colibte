@@ -3,7 +3,7 @@
 cls
 
 p=0; l=0; 
-print(_time)	:
+print(_time)	: "Thu Oct  2 16:44:43 2025"
 show_time("Start fori test loop 1",0)
 
 fori(i=1;101;1){ 
@@ -11,7 +11,7 @@ fori(i=1;101;1){
 		l = i*j+32.1;
 		p += l
 	} 
-	# show_time("loop:"+i+" p="+p,1);
+	show_time("loop:"+i+" p="+p,1);
 }
 _time	: "Wed Feb 24 19:48:43 2016"
 #message(_version+" i<"+i+" and j< "+j+" sets p="+p)

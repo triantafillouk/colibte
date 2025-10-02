@@ -219,7 +219,7 @@ int	err_eval_fun1(tok_struct *tok0)
 	ia=0;
 	while(1){
 		// MESG("function arg tnum=%d ttype=%d ia=%d",tok->tnum,tok->ttype,ia);
-		if(tok->ttype==TOK_RPAR||tok->ttype==TOK_SEP) break;
+		if(tok->ttype==TOK_RPAR||tok->ttype==TOK_SEP ||tok->ttype==TOK_EOF) break;
 		if(tok->ttype==TOK_COMMA) NTOKEN_ERR(403);
 		ia++;
 		err_num=err_num_expression();

@@ -119,7 +119,7 @@ int main(int argc, char **argv)
 
 	load_config();
 	parse_command_line(argc,argv);
-	if(firstbp==NULL) {
+	if(firstbp==NULL && !execmd) {
 		// scratch_files[0] = load_scratch_files();
 		firstbp=get_scratch_file();
 	};

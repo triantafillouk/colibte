@@ -1166,7 +1166,7 @@ int drv_check_break_key()
  if(checking_break_key) {
  count++;
  // MESG("drv_check_break_key: %d",count);
- if(count>10) {
+ if(count>100) {
  	key=getch();
 	count=0;
  };

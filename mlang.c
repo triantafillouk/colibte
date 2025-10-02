@@ -2967,7 +2967,6 @@ double exec_block1(FILEBUF *fp)
 {
  double val=0;
  INIT_STAGE;
- TDS("exec_block1");
  // MESG("exec_block1: starting at tok %d type=%d err=%d",tok->tnum,tok->ttype,err_num);
 	exe_buffer=fp;
 	// MESG("exec_block1:[%s] size of tok_struct is %d",fp->b_fname,sizeof(tok_struct));
