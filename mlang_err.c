@@ -563,7 +563,7 @@ int err_factor()
  static int pre_symbol=0;
  TDSERR("factor");
  // MESG("# err_factor: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
- // MESG("# err_factor: %s",tok_info(tok));
+ MESG("# err_factor: %s",tok_info(tok));
  int save_macro_exec;
  tok_struct *tok0; 
 
@@ -595,7 +595,8 @@ int err_factor()
 		RT_MESG1(xpos);
 #endif
 	case TOK_SHOW:
-		// xpos=477;syntax_error(": in factor",xpos);
+		MESG("err_factor: TOK_SHOW ..............");
+		set_tok_function(tok,0);
 		RT_MESG1(xpos);
 	case TOK_LBRAKET:{	/* array definition  */
 		// MESG("err: TOK_LBRAKET, array definition for [%s]",tok0->tname);
@@ -1290,7 +1291,7 @@ int err_check_sentence1()
 {
  TDSERR("sentence");
  SHOW_STAGE(621);
-
+ // MESG("err_check_sentence: ttype=%d",tok->ttype);
  switch(tok->ttype) {
 	case TOK_EOF:
 		err_num=0;
@@ -1507,6 +1508,8 @@ int err_check_block1()
 			NTOKEN_ERR(6741);
 			continue;
 		case TOK_SHOW:
+			MESG("err_check_block1: TOK_SHOW");
+			tok->factor_function = factor_funcs[tok->ttype];
 			NTOKEN_ERR(674);
 			continue;
 		case TOK_RCURL:

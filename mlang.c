@@ -63,6 +63,8 @@ void set_vtype(int type);
 int vtype_is(int type);
 char *str_mul(char *sval, double v1);
 char *str_cat(char *sval, char *add);
+void refresh_ddot_1(double value);
+double factor_refresh_ddot();
 
 double assign_val(double none);
 double assign_env(double none);
@@ -1925,6 +1927,7 @@ double factor_rcurl(){
 	// MESG("RCURL");
 	NTOKEN2;
 	lstoken=NULL;
+	// current_active_flag=0;
 	return -1;
 }
 
@@ -1949,7 +1952,7 @@ FFunction factor_funcs[] = {
 	factor_quote,	// TOK_QUOTE
 	factor_lpar,	// TOK_LPAR
 	factor_error,	// TOK_RPAR	
-	factor_none,	// TOK_SHOW
+	factor_refresh_ddot,	// TOK_SHOW
 	factor_none,	// TOK_COMMENT	,
 	factor_variable,	// TOK_VAR	level 0 variable
 	factor_option,	// TOK_OPTION	,	// editor option
@@ -2065,7 +2068,7 @@ void set_term_function(tok_struct *tok, TFunction term_function)
 	// MESG(" t tok %2d: %s set term function",tok->tnum,tok->tname);
 }
 
-// Directove functions
+// Directive functions
 
 static double inline dir_lcurl()
 {
@@ -2719,6 +2722,7 @@ void refresh_ddot_1(double value)
 		} else printf(";	: '%s'\n",get_sval());
 	 } else if(vtype_is(VTYPE_ARRAY)||vtype_is(VTYPE_SARRAY)||vtype_is(VTYPE_AMIXED)) print_array1(";",get_array("36"));
 	 lstoken=NULL;
+	 NTOKEN2;
 	 return;
  };
 
@@ -2728,7 +2732,7 @@ void refresh_ddot_1(double value)
  char ddot_out[128];
 
  // MESG("	ddot_pos=%d end=%d todel=%d",ddot_position,line_end,line_end-ddot_position);
- if(buf->b_state & FS_VIEW) return; // no refresh in view mode
+ if(buf->b_state & FS_VIEW) {NTOKEN2;return;}; // no refresh in view mode
 
  if(vtype_is(VTYPE_STRING)) {	/* string value  */
 	stat=snprintf(ddot_out,sizeof(ddot_out)," \"%s\"",get_sval());
@@ -2752,6 +2756,15 @@ void refresh_ddot_1(double value)
  if(stat>MAXLLEN) MESG("truncated");
 
  update_ddot_line(ddot_out);
+ NTOKEN2;
+}
+
+double factor_refresh_ddot()
+{
+ double value = get_val();
+ MESG("TOK_SHOW factor_refresh_ddot");
+ refresh_ddot_1(value);
+ return value;
 }
 
 double tok_dir_type()
@@ -2963,12 +2976,42 @@ double tok_dir_while()
 }
 
 /* exec multiple sentences at the same level */
+#if	0
 double exec_block1(FILEBUF *fp)
 {
  double val=0;
  INIT_STAGE;
- // MESG("exec_block1: starting at tok %d type=%d err=%d",tok->tnum,tok->ttype,err_num);
-	exe_buffer=fp;
+ exe_buffer=fp;
+	// MESG("exec_block1:[%s] size of tok_struct is %d",fp->b_fname,sizeof(tok_struct));
+   if(!current_active_flag) return(val);
+   while(tok->ttype!=TOK_EOF) 
+   {
+	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
+	if(tok->ttype==TOK_SEP){ NTOKEN2;
+		// MESG("factor_sep: [%s %d]",tok->tname,tok->ttype);
+		if(tok->ttype==TOK_VAR) lstoken=tok;
+		else lstoken=NULL;
+		continue;
+	};
+	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(val);};
+	if(tok->ttype==TOK_COMMA) { NTOKEN2;};
+#if	0
+	if(tok->ttype==TOK_SHOW) {
+		refresh_ddot_1(val);continue;
+	};
+#endif
+ 	val=tok->directive();
+	if(!current_active_flag) break;
+   };
+   // MESG("exec_block1: end!");
+	return(val);
+}
+#else
+double exec_block1(FILEBUF *fp)
+{
+ double val=0;
+ INIT_STAGE;
+ exe_buffer=fp;
 	// MESG("exec_block1:[%s] size of tok_struct is %d",fp->b_fname,sizeof(tok_struct));
    if(!current_active_flag) return(val);
    while(tok->ttype!=TOK_EOF) 
@@ -2983,7 +3026,7 @@ double exec_block1(FILEBUF *fp)
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(val);};
 	if(tok->ttype==TOK_COMMA) { NTOKEN2;};
 	if(tok->ttype==TOK_SHOW) {
-		refresh_ddot_1(val);NTOKEN2;continue;
+		refresh_ddot_1(val);continue;
 	};
  	val=tok->directive();
 	if(!current_active_flag) break;
@@ -2991,6 +3034,7 @@ double exec_block1(FILEBUF *fp)
    // MESG("exec_block1: end!");
 	return(val);
 }
+#endif
 
 double exec_block1_break(FILEBUF *fp)
 {
@@ -3000,20 +3044,24 @@ double exec_block1_break(FILEBUF *fp)
 	// MESG("#exec_block:%d ttype=%d [%s]",tok->tnum,tok->ttype,tok_info(tok));
    while(tok->ttype!=TOK_EOF && current_active_flag) 
    {
+	tok_struct *tok0=tok;
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
 	if(tok->ttype==TOK_SEP){ NTOKEN2;continue;	};
-	if(tok->ttype==TOK_RCURL) { NTOKEN2;return(val);};
+	// if(tok->ttype==TOK_RCURL) { NTOKEN2;return(val);};
 	if(tok->ttype==TOK_COMMA) { NTOKEN2;};
+#if	0
 	if(tok->ttype==TOK_SHOW) {
 		// MESG("	tok_show:");
-		refresh_ddot_1(val);NTOKEN2;continue;
+		// refresh_ddot_1(val);
+		// factor_refresh_ddot();
+		tok->factor_function();
+		continue;
 	};
-	if(drv_check_break_key()){
-		syntax_error("user interruption",100);
-		if(is_break1) return 0;
-	};
+#endif
 	// MESG("	before directive!");
  	val=tok->directive();
+	drv_check_break_key();
+	if(tok0->ttype==TOK_RCURL) break;
 	// MESG("	after!");
 	// MESG(" [%s]",tok_info(tok));
    };
