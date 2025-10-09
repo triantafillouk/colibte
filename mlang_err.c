@@ -147,7 +147,7 @@ int check_skip_token_err1(int type,char *mesg,int err)
 	// MESG("	check_skip_token_err: (%s)",tok_info(tok));
  	if(tok->ttype==type) 
  	{
-		// MESG("	check_skip_token_err: %s type=%d",tok->tname,tok->ttype);
+		MESG_TOK_INFO(" check_skip_token",tok);
 		NTOKEN2;
  		return(0);
  	} else {
@@ -219,7 +219,9 @@ int	err_eval_fun1(tok_struct *tok0)
 	ia=0;
 	while(1){
 		// MESG("function arg tnum=%d ttype=%d ia=%d",tok->tnum,tok->ttype,ia);
-		if(tok->ttype==TOK_RPAR||tok->ttype==TOK_SEP ||tok->ttype==TOK_EOF) break;
+		if(tok->ttype==TOK_RPAR||tok->ttype==TOK_SEP ||tok->ttype==TOK_EOF) {
+			break;
+		}
 		if(tok->ttype==TOK_COMMA) NTOKEN_ERR(403);
 		ia++;
 		err_num=err_num_expression();
@@ -404,6 +406,7 @@ int err_assign_args1(int nargs)
 int err_assign_val()
 {
  TDSERR("assign_val");
+ // MESG("# tok assign_val: %s",tok_info(tok));
  SHOW_STAGE(440);
 	// MESG("err_assign_val");
 	if(!simple){
@@ -420,7 +423,7 @@ int err_increase_by()
 {
  TDSERR("increase_by");
  SHOW_STAGE(443);
-
+ // MESG("# increase_by: %s",tok_info(tok));
 	if(!simple){
 		xpos=443;
 		syntax_error("bogus assignement!!!!",xpos);
@@ -435,6 +438,7 @@ int err_mul_by()
 {
  TDSERR("mul_by");
  SHOW_STAGE(443);
+ // MESG("# mul_by	: %s",tok_info(tok));
 
 	if(!simple){
 		xpos=443;
@@ -450,6 +454,7 @@ int err_decrease_by()
 {
  TDSERR("decrease_by");
  SHOW_STAGE(443);
+ MESG_TOK_INFO("decrease_by",tok);
 
 	if(!simple){
 		xpos=443;
@@ -464,6 +469,7 @@ int err_decrease_by()
 int err_increase_val()
 {
  TDSERR("increase_val");
+ MESG_TOK_INFO("increase_val",tok);
  SHOW_STAGE(444);
  if(!vtype_is(VTYPE_NUM)) {
 	set_error(tok,444,"increase_val not numeric!");
@@ -477,6 +483,7 @@ int err_increase_val()
 int err_decrease_val()
 {
  TDSERR("decrease_val");
+ MESG_TOK_INFO("# decrease_val",tok);
  SHOW_STAGE(446);
  if(!vtype_is(VTYPE_NUM)) {
 	set_error(tok,446,"decrease_val not numeric!");
@@ -490,6 +497,7 @@ int err_decrease_val()
 int err_assign_env()
 {
  TDSERR("assign_env");
+ MESG_TOK_INFO("# assign_env",tok);
 
  SHOW_STAGE(450);
 	if(!simple){
@@ -562,8 +570,7 @@ int err_factor()
 {
  static int pre_symbol=0;
  TDSERR("factor");
- // MESG("# err_factor: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
- MESG("# err_factor: %s",tok_info(tok));
+ MESG_TOK_INFO("- tok_factor",tok);
  int save_macro_exec;
  tok_struct *tok0; 
 
@@ -952,8 +959,10 @@ int err_factor()
 				// MESG("arg %d tok=[%s %d]",i,tok->tname,tok->ttype);
 #if	1
 				if(!check_end) {
-					if(tok->ttype==TOK_RPAR || tok->ttype==TOK_SEP) break;
-					else {
+					if(tok->ttype==TOK_RPAR || tok->ttype==TOK_SEP) {
+						MESG_TOK_INFO("# check RPAR:1",tok);
+						break;
+					} else {
 						syntax_error("argument not correct!",xpos);
 					};
 				}
@@ -980,6 +989,7 @@ int err_factor()
 				} else {
 					CHECK_TOK(520);
 					if(tok->ttype==TOK_RPAR) {
+						MESG_TOK_INFO("# check RPAR:2",tok);
 						break;
 					};
 				};
@@ -1020,14 +1030,14 @@ int err_factor()
 		// MESG("tok_rbtacket");
 		RT_MESG1(5262);
 	case TOK_ASSIGN:
-		// MESG("TOK_ASSIGN");
+		MESG("TOK_ASSIGN");
 	case TOK_INCREASEBY:
 	case TOK_MULBY:
 	case TOK_DECREASEBY:
 		tok0->tname="assign";
 		RT_MESG1(527);
 	case TOK_ASSIGN_TYPE:{
-		// MESG("TOK_ASSIGN_TYPE: tok0 [%s] tnum=%d ttype=%d",tok0->tname,tok0->tnum,tok0->ttype);
+		MESG("TOK_ASSIGN_TYPE: tok0 [%s] tnum=%d ttype=%d",tok0->tname,tok0->tnum,tok0->ttype);
 		// MESG("	tok [%s] tnum %d ttype %d",tok->tname,tok->tnum,tok->ttype);
 		if(err_skip_type_args(tok0)) {
 			set_error(tok0,2000,"TOK_ASSIGN_TYPE: error in argument list");
@@ -1143,7 +1153,7 @@ int err_num_expression()
 		}
 	};
  };
- // MESG("end expression: ttype=%d",tok->ttype);
+ MESG_TOK_INFO("! end expression",tok);
  RT_MESG1(599);
 }
 
@@ -1152,7 +1162,7 @@ int err_cexpression();
 int err_lexpression()
 {
  TDSERR("lexpression");
-
+ 
 	// slval[0]=0;
 	simple=1;
 	// MESG("err_lexpression: [%s]",tok_info(tok));
@@ -1165,6 +1175,7 @@ int err_lexpression()
 	switch(tok->ttype){
 		case TOK_OR: {	/* TOK_OR  */
 			// tok->term_function = logical_or;
+			MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_or);
 			NTOKEN_ERR(704);
 			err_num=err_lexpression();
@@ -1175,6 +1186,7 @@ int err_lexpression()
 		};
 		case TOK_XOR: {	
 			// tok->term_function = logical_xor;
+			MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_xor);
 			NTOKEN_ERR(709);
 			err_num=err_lexpression();
@@ -1185,6 +1197,7 @@ int err_lexpression()
 		};
 		case TOK_NOR: {	
 			// tok->term_function = logical_nor;
+			MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_nor);
 			NTOKEN_ERR(7091);
 			err_num=err_lexpression();
@@ -1195,6 +1208,7 @@ int err_lexpression()
 		};
 		case TOK_AND: {	
 			// tok->term_function = logical_and;
+			MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_and);
 			NTOKEN_ERR(709);
 			err_num=err_lexpression();
@@ -1205,6 +1219,7 @@ int err_lexpression()
 		};
 		case TOK_NAND: {	
 			// tok->term_function = logical_nand;
+			MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_nand);
 			NTOKEN_ERR(7092);
 			err_num=err_lexpression();
@@ -1215,6 +1230,7 @@ int err_lexpression()
 		};
 		case TOK_ASSIGN: {
 			// tok->term_function = assign_val;
+			MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,assign_val);
 			NTOKEN_ERR(710);
 			err_num=err_assign_val();
@@ -1222,6 +1238,7 @@ int err_lexpression()
 		};
 		case TOK_INCREASEBY: {
 			// tok->term_function = increase_by;
+			MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,increase_by);
 			tok->tname = "+=";
 			NTOKEN_ERR(710);
@@ -1230,6 +1247,7 @@ int err_lexpression()
 		};
 		case TOK_MULBY: {
 			// tok->term_function = mul_by;
+			MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,mul_by);
 			tok->tname = "*=";
 			NTOKEN_ERR(710);
@@ -1238,6 +1256,7 @@ int err_lexpression()
 		};
 		case TOK_DECREASEBY: {
 			// tok->term_function = decrease_by;
+			MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,decrease_by);
 			tok->tname = "-=";
 			NTOKEN_ERR(710);
@@ -1246,12 +1265,14 @@ int err_lexpression()
 		};
 		case TOK_ASSIGNENV:
 			// tok->term_function = assign_env;
+			MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,assign_env);
 			NTOKEN_ERR(710);
 			err_num=err_assign_env();
 			RT_MESG1(7141);
 		case TOK_ASSIGNOPT:
 			// tok->term_function = assign_option;
+			MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,assign_option);
 			NTOKEN_ERR(710);
 			err_num=err_assign_env();
@@ -1292,18 +1313,22 @@ int err_check_sentence1()
 {
  TDSERR("sentence");
  SHOW_STAGE(621);
+ 
  // MESG("err_check_sentence: ttype=%d",tok->ttype);
  switch(tok->ttype) {
 	case TOK_EOF:
+		MESG_TOK_INFO("# err_check_sentence",tok);
 		err_num=0;
 		RT_MESG1(625);
 
 	case TOK_RCURL:
+		MESG_TOK_INFO("# err_check_sentence",tok);
 		CHECK_TOK(626);
 		break;
  	case TOK_LCURL:
 	{	
 		// tok->directive = dir_lcurl;
+		// MESG("# err_check_sentence: %s",tok_info(tok));
 		if(execmd) set_tok_directive(tok,dir_lcurl);
 		else set_tok_directive(tok,dir_lcurl_break);
 		NTOKEN_ERR(627);
@@ -1315,7 +1340,7 @@ int err_check_sentence1()
 	case TOK_DIR_IF:
 		{
 		tok_struct *tok0=tok;
-		// MESG("err: TOK_DIR_IF!");
+		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,tok_dir_if);
 		NTOKEN_ERR(631);	/* go to next token after if */
 		xpos=632;
@@ -1357,13 +1382,18 @@ int err_check_sentence1()
 		tok_struct *start_block;	// element at block start
 		tok_struct *end_block;	/* at the block end  */
 		int is_block=0;
-		// tok->directive = tok_dir_fori;
+		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,tok_dir_fori);
 		NTOKEN_ERR(640);	/* go to next token after for */
 
 		if(tok->ttype==TOK_VAR) {
+			MESG_TOK_INFO(" loop var",tok);
 			NTOKEN_ERR(6403);
-			if(tok->ttype!=TOK_ASSIGN) ERROR("6404:for i error");
+			if(tok->ttype!=TOK_ASSIGN) {
+				ERROR("6404:for i error");
+			} else {
+				MESG_TOK_INFO(" equal to",tok);
+			};
 		} else ERROR("6405:for i syntax error");
 		NTOKEN_ERR(64053);
 		err_num=err_num_expression();	/* initial   */
@@ -1402,7 +1432,7 @@ int err_check_sentence1()
 	case TOK_DIR_FOR:
 		{
 		tok_struct *start_block;	// element at block start
-		// tok->directive=tok_dir_for;
+		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,tok_dir_for);
 		NTOKEN_ERR(641);	/* go to next token after for */
 
@@ -1432,7 +1462,7 @@ int err_check_sentence1()
 		{
 			tok_struct *check_element; // check element pointer
 			tok_struct *start_block;	// element at block start
-			// tok->directive=tok_dir_while;
+			// MESG("# err_check_sentence: %s",tok_info(tok));
 			set_tok_directive(tok,tok_dir_while);
 			NTOKEN_ERR(654);	/* go to next toke after while */
 
@@ -1457,12 +1487,12 @@ int err_check_sentence1()
 		break;
 
 	case TOK_DIR_BREAK:
-		// tok->directive = dir_break;
+		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,dir_break);
 		NTOKEN_ERR(663);
 		RT_MESG;
 	case TOK_DIR_RETURN:
-		// tok->directive = dir_return;
+		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,dir_return);
 		// MESG(" err TOK_DIR_RetURN");
 
@@ -1473,10 +1503,11 @@ int err_check_sentence1()
 		// MESG(" err TOK_DIR_RETURN: after lexpression: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype); 
 		RT_MESG1(666);
 	case TOK_SEP:
+		MESG_TOK_INFO("# err_check_sentence",tok);
 		RT_MESG;
 	case TOK_DIR_TYPE:
 		{
-		// tok_struct *tok0=tok;
+		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,tok_dir_type);
 		// MESG("--> err: TOK_DIR_TYPE: %s",tok->tname);
 		NTOKEN_ERR(671);	// this is the type name
@@ -1494,6 +1525,7 @@ int err_check_block1()
 {
  TDSERR("block");
    SHOW_STAGE(671);
+	
    // MESG("err_check_block1: --------------------------------");
    // MESG("   num: name          ttype tind");
    while(1) {
@@ -1501,21 +1533,30 @@ int err_check_block1()
 	// MESG(" - %3d: %-15s %3d %3d",tok->tnum,tok->tname,tok->ttype,tok->tind);
 	switch(tok->ttype) {
 		case TOK_EOF: 
+			MESG_TOK_INFO("# err_check_block1",tok);
 			// MESG(">>>>>>>>>>>>>>> end error_check!");
 			RT_MESG1(673);
 		case TOK_SEP:
+			MESG_TOK_INFO("# err_check_block1",tok);
+			NTOKEN_ERR(6741);
+			continue;
 		case TOK_RPAR:	/* problem if removed  */
+			MESG_TOK_INFO("# err_check_block1",tok);
 			NTOKEN_ERR(6741);
 			continue;
 		case TOK_COMMA:
 		case TOK_SHOW:
+			MESG_TOK_INFO("# err_check_block1",tok);
 			// MESG("err_check_block1: TOK_SHOW");
 			tok->factor_function = factor_funcs[tok->ttype];
 			NTOKEN_ERR(674);
 			continue;
 		case TOK_RCURL:
+			MESG_TOK_INFO("# err_check_block1",tok);
 			NTOKEN_ERR(675);
 			RT_MESG1(6751);
+		default:
+			// MESG_TOK_INFO("# check_block1 default",tok);
 	};
  	err_num=err_check_sentence1();
 	if(err_num) return(err_num);

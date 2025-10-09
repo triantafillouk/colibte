@@ -74,6 +74,7 @@ void get_uppercase_string(char *lower, char *string);
 double cexpression();
 double exec_block1_break(FILEBUF *fp);
 char * tok_info(tok_struct *tok);
+void MESG_TOK_INFO(char *title,tok_struct *tok);
 void set_vtype(int type);
 int vtype_is(int type);
 int get_vtype();
@@ -2043,7 +2044,7 @@ FFunction factor_funcs[] = {
 
 void set_tok_function(tok_struct *tok, int type)
 {
-	// MESG("set_tok_function: type=%d ttype=%d",type,tok->ttype);
+	// MESG("set_tok_function: %s",tok_info(tok));
 	switch(type) {
 		case 0:
 			if(tok->ttype==TOK_FUNC) {
@@ -2065,13 +2066,13 @@ void set_tok_function(tok_struct *tok, int type)
 void set_tok_directive(tok_struct *tok, FFunction directive)
 {
 	tok->directive = directive;
-	// MESG(" d tok %2d: %s set directive function",tok->tnum,tok->tname);
+	MESG_TOK_INFO("# tok_directive",tok);
 }
 
 void set_term_function(tok_struct *tok, TFunction term_function)
 {
 	tok->term_function = term_function;
-	// MESG(" t tok %2d: %s set term function",tok->tnum,tok->tname);
+	MESG_TOK_INFO(" term",tok);
 }
 
 // Directive functions
@@ -2373,7 +2374,7 @@ double logical_nand(double value)
 double assign_option(double none)
 {
 double	value=lexpression();
-	// MESG("assign_option:");
+	MESG("assign_option:");
 	if(var_node->node_vtype==VTYPE_STRING) {free(var_node->node_sval);};
 	if(vtype_is(VTYPE_STRING)){
 		var_node->node_vtype=VTYPE_STRING;
@@ -2768,7 +2769,7 @@ void refresh_ddot_1(double value)
 double factor_refresh_ddot()
 {
  double value = get_val();
- MESG("TOK_SHOW factor_refresh_ddot");
+ // MESG("TOK_SHOW factor_refresh_ddot");
  refresh_ddot_1(value);
  return value;
 }
@@ -3022,7 +3023,7 @@ double exec_block1(FILEBUF *fp)
    if(!current_active_flag) return(val);
    while(tok->ttype!=TOK_EOF) 
    {
-	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
+	// MESG_TOK_INFO("- exec_block1",tok);
 	if(tok->ttype==TOK_SEP){ NTOKEN2;
 		// MESG("factor_sep: [%s %d]",tok->tname,tok->ttype);
 		if(tok->ttype==TOK_VAR) lstoken=tok;
@@ -3300,6 +3301,15 @@ int parse_buffer_show_tokens(num n)
  	msg_line("No errors!");
  	return(1);
  };
+}
+
+void MESG_TOK_INFO(char *title,tok_struct *tok)
+{
+	static int prev_tok_num=-1;
+	if(tok->tnum!=prev_tok_num) {
+		MESG("%-20s : %s",title,tok_info(tok));
+		prev_tok_num=tok->tnum;
+	};
 }
 
 char * tok_info(tok_struct *tok)

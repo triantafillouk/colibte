@@ -1,7 +1,6 @@
 # test loop with fori
 
 cls
-
 p=0, l=0; 
 print(_time)	: "Wed Oct  8 15:13:47 2025"
 show_time("Start fori test loop 1",0)
