@@ -1936,6 +1936,12 @@ double factor_sep(){
 	return 0.0;
 }
 
+double factor_comma(){
+	MESG("factor_comma:");
+	NTOKEN2;
+	return 0.0;
+}
+
 double factor_eof(){
 	// MESG("factor_eof!!!!");
 	current_active_flag=0;
@@ -1975,7 +1981,7 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_DIR_RETURN	,
 	factor_none,	// TOK_DIR_WHILE	,
 	factor_none,	// TOK_DIR_FOR		,
-	factor_none,	// TOK_COMMA		,
+	factor_comma,	// TOK_COMMA		,
 	factor_none,	// TOK_DIR_FORI	,
 
 	/* bool operators  */
@@ -3024,10 +3030,6 @@ double exec_block1(FILEBUF *fp)
 		continue;
 	};
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(val);};
-	if(tok->ttype==TOK_COMMA) { NTOKEN2;};
-	if(tok->ttype==TOK_SHOW) {
-		refresh_ddot_1(val);continue;
-	};
  	val=tok->directive();
 	if(!current_active_flag) break;
    };
@@ -3042,26 +3044,17 @@ double exec_block1_break(FILEBUF *fp)
  INIT_STAGE;
  exe_buffer=fp;
 	// MESG("#exec_block:%d ttype=%d [%s]",tok->tnum,tok->ttype,tok_info(tok));
-   while(tok->ttype!=TOK_EOF && current_active_flag) 
+   while(tok->ttype!=TOK_EOF) 
    {
 	tok_struct *tok0=tok;
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
 	if(tok->ttype==TOK_SEP){ NTOKEN2;continue;	};
 	// if(tok->ttype==TOK_RCURL) { NTOKEN2;return(val);};
-	if(tok->ttype==TOK_COMMA) { NTOKEN2;};
-#if	0
-	if(tok->ttype==TOK_SHOW) {
-		// MESG("	tok_show:");
-		// refresh_ddot_1(val);
-		// factor_refresh_ddot();
-		tok->factor_function();
-		continue;
-	};
-#endif
+	// if(tok->ttype==TOK_COMMA) { NTOKEN2;};
 	// MESG("	before directive!");
  	val=tok->directive();
-	drv_check_break_key();
 	if(tok0->ttype==TOK_RCURL) break;
+	if(drv_check_break_key()) break;
 	// MESG("	after!");
 	// MESG(" [%s]",tok_info(tok));
    };

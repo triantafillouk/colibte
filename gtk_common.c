@@ -539,9 +539,9 @@ int drv_check_break_key()
  int key=0;
  static int count=0;
  // MESG("drv_check_break_key:");
- if(checking_break_key) {
+ // if(checking_break_key) {
  count++;
- if(count>10) {
+ if(count>10000000) {
 	events_flush();
 	if(key_index>0) {
 		key=key_buf[key_index];
@@ -554,7 +554,7 @@ int drv_check_break_key()
 		return 1;
 	};
  };
- };
+ // };
  return 0;
 }
 

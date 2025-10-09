@@ -594,8 +594,9 @@ int err_factor()
 		// syntax_error("separator in factor!",xpos);
 		RT_MESG1(xpos);
 #endif
+	case TOK_COMMA:
 	case TOK_SHOW:
-		MESG("err_factor: TOK_SHOW ..............");
+		// MESG("err_factor: TOK_SHOW ..............");
 		set_tok_function(tok,0);
 		RT_MESG1(xpos);
 	case TOK_LBRAKET:{	/* array definition  */
@@ -1503,12 +1504,12 @@ int err_check_block1()
 			// MESG(">>>>>>>>>>>>>>> end error_check!");
 			RT_MESG1(673);
 		case TOK_SEP:
-		case TOK_COMMA:
 		case TOK_RPAR:	/* problem if removed  */
 			NTOKEN_ERR(6741);
 			continue;
+		case TOK_COMMA:
 		case TOK_SHOW:
-			MESG("err_check_block1: TOK_SHOW");
+			// MESG("err_check_block1: TOK_SHOW");
 			tok->factor_function = factor_funcs[tok->ttype];
 			NTOKEN_ERR(674);
 			continue;

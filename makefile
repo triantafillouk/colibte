@@ -61,7 +61,7 @@ EXTFILE=.$(APP_NAME)_ext_mac
 WSL:=0
 #CC=zig cc -DGVERS='"$(GVERS)"'
 CC=clang -DGVERS='"$(GVERS)"'
-#CC=gcc -DGVERS='"$(GVERS)"'
+#CC=gcc-14 -DGVERS='"$(GVERS)"'
 endif
 
 # for Linux
