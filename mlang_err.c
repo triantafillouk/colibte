@@ -1555,8 +1555,6 @@ int err_check_block1()
 			MESG_TOK_INFO("# err_check_block1",tok);
 			NTOKEN_ERR(675);
 			RT_MESG1(6751);
-		default:
-			// MESG_TOK_INFO("# check_block1 default",tok);
 	};
  	err_num=err_check_sentence1();
 	if(err_num) return(err_num);

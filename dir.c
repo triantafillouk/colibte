@@ -1896,7 +1896,7 @@ int dir_left(num n)
 		};
 		set_update(cwp,UPD_EDIT|UPD_STATUS);
 
-		fp->b_state &= ~FS_CHG;
+		cwp->w_fp->b_state &= ~FS_CHG;
 		return(OK_CLRSL);
 	} else {
 		previous_buffer = fp;
