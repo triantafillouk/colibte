@@ -1883,6 +1883,7 @@ static double term1_div(double v1)
 				case VTYPE_NUM:	// numeric * numeric
 					if(v2!=0){
 					v1=v1/v2;
+					ex_var.dval=v1;
 					return v1;
 					};
 					/* RT error  */
@@ -1929,7 +1930,7 @@ double factor_rcurl(){
 	NTOKEN2;
 	lstoken=NULL;
 	// current_active_flag=0;
-	return -1;
+	return ex_var.dval;
 }
 
 double factor_sep(){
@@ -2291,6 +2292,7 @@ double num_term2()
 		// MESG("while: TERM2");
 		v1 = tok->term_function(v1);
 	 };
+	 // ex_var.dval=v1;
  // MESG("		term2 end %f",v1);
  RTRN(v1);
 }
@@ -2307,6 +2309,7 @@ double num_term1()
 		v1 = tok->term_function(v1);
 		if(err_num) break;
 	 };
+	 // ex_var.dval=v1;
 	// MESG("	num_term1: end %f",v1);
  RTRN(v1);
 }
@@ -2770,6 +2773,7 @@ double factor_refresh_ddot()
 {
  double value = get_val();
  // MESG("TOK_SHOW factor_refresh_ddot");
+ // MESG("	val=%f",value);
  refresh_ddot_1(value);
  return value;
 }
@@ -3054,6 +3058,8 @@ double exec_block1_break(FILEBUF *fp)
 	// if(tok->ttype==TOK_COMMA) { NTOKEN2;};
 	// MESG("	before directive!");
  	val=tok->directive();
+	// MESG("	val after dir: %f",val);
+	ex_var.dval=val;
 	if(tok0->ttype==TOK_RCURL) break;
 	if(drv_check_break_key()) break;
 	// MESG("	after!");
