@@ -59,6 +59,7 @@ typedef struct fcolor_t {
 
 /* editors toolbar  */
 T_ELEMENT main_toolbar[] = {
+#if	0
 	{ ESTOCK,"fileopen.xpm","document-open",		fileopen_xpm,"File open", open_file, 1},
 	{ ESTOCK,"filesave.xpm" ,"document-save",  		filesave_xpm,"File save", save_file,1},
 	{ ESTOCK,"editcopy.xpm" , "edit-copy",  		editcopy_xpm,"Edit copy", copy_region,1},
@@ -66,14 +67,33 @@ T_ELEMENT main_toolbar[] = {
 	{ ESTOCK,"queue.xpm"    , "go-next", 		queue_xpm,  "Next File", next_file ,3},
 	{ ESTOCK,"undo.xpm"     , "edit-undo",  		undo_xpm,   "Undo",undo,1},
 	{ ESTOCK,"redo.xpm"     , "edit-redo",  		redo_xpm,   "Redo",redo,1},
+#endif
 //	{ ESTOCK,"rc1-20.xpm"	, "indent",		right_20_xpm, "Indent", insert_tab,1},
 //	{ ESTOCK,"lc1-20.xpm"	, "unindent",	left_20_xpm, "Unindent", remove_tab,1},
 	{ ESTOCK,"rec.xpm"      , "media-record",rec_xpm,    "Record macro", record_macro,3},
 	{ ESTOCK,"run.xpm"      , "media-playback-start", 	run_xpm,    "Run macro", exec_macro,1},
-	{ ESTOCK,"lc1-20.xpm"   , "media-seek-backward",  	left_20_xpm,"go back", prev_hmark, 1},
-	{ ESTOCK,"rc1-20.xpm"   , "media-seek-forward",	right_20_xpm,"go forward", next_hmark, 1},
-	{ ESTOCK,"up.xpm"       , "go-up",  		up_xpm,     "Find previous", find_previous, 1},
+
+	// { ESTOCK,"lc1-20.xpm"   , "media-seek-backward",  	left_20_xpm,"go back", prev_hmark, 1},
+	// { ESTOCK,"rc1-20.xpm"   , "media-seek-forward",	right_20_xpm,"go forward", next_hmark, 1},
+	{ ESTOCK,"lc1-20.xpm"   , "back",  	left_20_xpm,"go back", prev_hmark, 1},
+	{ ESTOCK,"rc1-20.xpm"   , "next",	right_20_xpm,"go forward", next_hmark, 1},
+#if	0
+	{ ESTOCK,"up.xpm"       , "go-up",  	up_xpm,     "Find previous", find_previous, 1},
 	{ ESTOCK,"down.xpm"     , "go-down", 	down_xpm,   "Find next", find_next, 1},
+#endif
+	{ 0,NULL, NULL , NULL, NULL,NULL,0 }
+};
+
+T_ELEMENT main_toolbar2[] = {
+	{ ESTOCK,"up.xpm"       , "go-up",  	up_xpm,     "Find previous", find_previous, 1},
+	{ ESTOCK,"down.xpm"     , "go-down", 	down_xpm,   "Find next", find_next, 1},
+	{ 0,NULL, NULL , NULL, NULL,NULL,0 }
+};
+
+T_ELEMENT space_toolbar[] = {
+	{ ESTOCK,"up.xpm"       , "go-up",  	up_xpm,     "Find previous", find_previous, 1},
+	{ ESTOCK,"down.xpm"     , "go-down", 	down_xpm,   "Find next", find_next, 1},
+// 	{ ESTOCK,""       , "emblem-important",  	up_xpm,     "Find next", find_next, 1},
 	{ 0,NULL, NULL , NULL, NULL,NULL,0 }
 };
 
@@ -81,14 +101,8 @@ T_ELEMENT main_toolbar[] = {
 T_ELEMENT input_toolbar[] = {
 // object-select-symbolic, system-shutdown, view-fullscreen, view-refresh
 // application-exit, emblem-default
-#if	1
-	{ 2,"ok2.xpm"    , "emblem-default", ok2_xpm,"Ok!", input_line_ok_event, 1},
-	{ 2,"cancel2.xpm", "window-close", exit_xpm, "Cancel!", input_line_cancel_event, 1},
-#else
-	{ 2,"ok2.xpm"    , "emblem-default", ok2_xpm,"Ok!", on_gs_entry_ok_event, 1},
-	{ 2,"cancel2.xpm", "window-close", exit_xpm, "Cancel!", on_gs_entry_cancel_event, 1},
-#endif
-//	{ 2,"ok2.xpm"    , "go-jump", ok2_xpm,"Ok!", on_gs_entry_ok_event, 1},
+	{ ESTOCK,"", "dialog-ok", ok2_xpm,"Ok !",    input_line_ok_event, 1},
+	{ ESTOCK,"", "cancel", exit_xpm,  "Cancel!", input_line_cancel_event, 1},
 	{ 0,NULL, NULL, NULL, NULL,NULL,0 }
 };
 
@@ -96,7 +110,7 @@ T_ELEMENT input_toolbar[] = {
 T_ELEMENT search_tbar[] = {
 // object-select-symbolic, system-shutdown, view-fullscreen, view-refresh
 // application-exit, emblem-default
-	{ 2,"ok2.xpm"    , "emblem-default", ok2_xpm,"Ok!", input_line_ok_event, 1},
+	{ 2,"ok2.xpm"    , "emblem-default", exit_xpm,"Ok3!", input_line_ok_event, 1},
 //	{ 2,"cancel2.xpm", "window-close", exit_xpm, "Cancel!", on_gs_entry_cancel_event, 1},
 // edit-delete,
 // edit-find, 

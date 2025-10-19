@@ -194,14 +194,14 @@ GdkColormap *cmap;
 GtkWidget *parent;
 
 GtkWidget *gs_label;
-GtkWidget *toolbar1,*toolbar2;
+GtkWidget *toolbar1,*toolbar2,*toolbar_space;
 GtkWidget *gs_entry;
 char gs_entry_txt[512];
 
 GtkWidget *entry_ok, *entry_cancel;
 GtkWidget *statusbar1;
 int gs_entry_return_flag;
-GtkWidget *search_dialog;
+// GtkWidget *search_dialog;
 GtkWidget *color_dialog;
 
 extern int startup_exe;
@@ -267,7 +267,12 @@ create_parent (void)
   gtk_widget_show (vbox1);
   gtk_container_add (GTK_CONTAINER (parent), vbox1);
 
-  create_main_menu(vbox1, parent, &m_topn,accel_group);
+	hbox2 = gtk_hbox_new (FALSE, 0);
+	gtk_widget_show (hbox2);
+
+		gtk_box_pack_start (GTK_BOX (vbox1), hbox2, FALSE, FALSE, 0);
+
+  create_main_menu(hbox2, parent, &m_topn,accel_group);
 
   popup_select_on = create_top_menu( &m_select_on, parent, accel_group);
   popup_select_off = create_top_menu( &m_select_off, parent, accel_group);
@@ -276,17 +281,12 @@ create_parent (void)
   popup_tag_menu = create_top_menu( &m_notes_tag, parent, accel_group);
   popup_notes_menu = create_top_menu( &m_note_popup, parent, accel_group);
 
-	hbox2 = gtk_hbox_new (FALSE, 0);
-	gtk_widget_show (hbox2);
-	if(compact1) {
-		gtk_box_pack_start (GTK_BOX (vbox1), hbox2, FALSE, FALSE, 0);
-// 		toolbar1=new_toolbar(parent,hbox2,main_toolbar,0,GTK_ICON_SIZE_BUTTON,0);
-		toolbar1=new_toolbar(parent,hbox2,main_toolbar,0,GTK_ICON_SIZE_LARGE_TOOLBAR,0);
+
+
+		toolbar1=new_toolbar(parent,hbox2,main_toolbar,0,GTK_ICON_SIZE_SMALL_TOOLBAR,0);
+		toolbar_space=new_toolbar(parent,hbox2,space_toolbar,0,GTK_ICON_SIZE_SMALL_TOOLBAR,0);
 		gtk_toolbar_set_show_arrow(GTK_TOOLBAR(toolbar1),FALSE);
-	} else {
-		toolbar1=new_toolbar(parent,vbox1,main_toolbar,0,GTK_ICON_SIZE_LARGE_TOOLBAR,0);
-		gtk_toolbar_set_show_arrow(GTK_TOOLBAR(toolbar1),TRUE);
-	};
+		gtk_toolbar_set_show_arrow(GTK_TOOLBAR(toolbar_space),FALSE);
 
 	/* create the drawing window with scrollbar and statusline */
   if(cwp==NULL) { /* create a new one */
@@ -307,7 +307,7 @@ create_parent (void)
 
   gtk_box_pack_start (GTK_BOX (hbox2), gs_entry, TRUE, TRUE, 0);
 
-  toolbar2=new_toolbar(parent,hbox2,input_toolbar,0,GTK_ICON_SIZE_MENU,0);
+  toolbar2=new_toolbar(parent,hbox2,input_toolbar,0,GTK_ICON_SIZE_SMALL_TOOLBAR,0);
 
   gtk_toolbar_set_show_arrow(GTK_TOOLBAR(toolbar2),FALSE);
   gtk_widget_hide(toolbar2);

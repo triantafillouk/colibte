@@ -3020,11 +3020,11 @@ double exec_block1(FILEBUF *fp)
 #else
 double exec_block1(FILEBUF *fp)
 {
- double val=0;
+//  double val=0;
  INIT_STAGE;
  exe_buffer=fp;
 	// MESG("exec_block1:[%s] size of tok_struct is %d",fp->b_fname,sizeof(tok_struct));
-   if(!current_active_flag) return(val);
+   if(!current_active_flag) return(ex_var.dval);
    while(tok->ttype!=TOK_EOF) 
    {
 	// MESG_TOK_INFO("- exec_block1",tok);
@@ -3034,39 +3034,40 @@ double exec_block1(FILEBUF *fp)
 		else lstoken=NULL;
 		continue;
 	};
-	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(val);};
- 	val=tok->directive();
+	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
+ 	ex_var.dval=tok->directive();
+	// ex_var.dval=val;
 	if(!current_active_flag) break;
    };
    // MESG("exec_block1: end!");
-	return(val);
+	return(ex_var.dval);
 }
 #endif
 
 double exec_block1_break(FILEBUF *fp)
 {
- double val=0;
+ // double val=0;
  INIT_STAGE;
  exe_buffer=fp;
 	// MESG("#exec_block:%d ttype=%d [%s]",tok->tnum,tok->ttype,tok_info(tok));
+   if(!current_active_flag) return(ex_var.dval);
    while(tok->ttype!=TOK_EOF) 
    {
-	tok_struct *tok0=tok;
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
-	if(tok->ttype==TOK_SEP){ NTOKEN2;continue;	};
-	// if(tok->ttype==TOK_RCURL) { NTOKEN2;return(val);};
-	// if(tok->ttype==TOK_COMMA) { NTOKEN2;};
-	// MESG("	before directive!");
- 	val=tok->directive();
+	if(tok->ttype==TOK_SEP){ NTOKEN2;
+		// MESG("factor_sep: [%s %d]",tok->tname,tok->ttype);
+		if(tok->ttype==TOK_VAR) lstoken=tok;
+		else lstoken=NULL;
+		continue;
+	};
+	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
+ 	ex_var.dval=tok->directive();
 	// MESG("	val after dir: %f",val);
-	ex_var.dval=val;
-	if(tok0->ttype==TOK_RCURL) break;
+	// ex_var.dval=val;
 	if(drv_check_break_key()) break;
-	// MESG("	after!");
 	// MESG(" [%s]",tok_info(tok));
    };
-   // MESG("exec_block1: end!");
-	return(val);
+	return(ex_var.dval);
 }
 
 /* execute a block from a file  */

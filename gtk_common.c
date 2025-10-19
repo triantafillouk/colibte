@@ -1039,7 +1039,9 @@ on_dra0_key_press_event(GtkWidget       *widget,
 
 	gtk_widget_hide(gs_entry);
 	gtk_widget_hide(toolbar2);
+#if	GTK3
 	gtk_widget_hide((GtkWidget *)search_tbar);
+#endif
 	return(FALSE);
  };
 
