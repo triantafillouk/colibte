@@ -1933,7 +1933,7 @@ int delete_note_file(char *full_name)
 	stat = unlink(full_name);
 	if(stat!=0) {
 		error_line("cannot delete file [%s]",full_name);
-		if( confirm("Cannot delete the note file", "delete note from db?",1)) stat=0;
+		if( confirm("Note file","Cannot delete, delete note from db?",1)) stat=0;
 	};
 	return stat;
 }
@@ -2003,7 +2003,7 @@ int delete_tagnote(num force)
 
 	int tag_id = get_current_tag_id();
 	strlcpy(tag_name, get_current_tag_name(),sizeof(tag_name));
-	if(!confirm("Delete tag",tag_name,0)) return false;
+	if(!confirm("Delete tag?",tag_name,0)) return false;
 	// MESG("delete_tagnote: line=%d tag_id=%d name %s",cwp->current_tag_line,tag_id,tag_name);
 
 	sprintf(sql_str,"select count (tag_id) from tags where tag_id = %d;",tag_id);
@@ -2025,7 +2025,7 @@ int delete_tagnote(num force)
   } else {		/* delete note  */
 	int note_id = get_current_note_id();
 	char *full_name = get_current_note_name();
-	if(!confirm("Delete note",full_name,0)) return false;
+	if(!confirm("Delete note?",full_name,0)) return false;
 	// delete the file
 	if(!delete_note_file(full_name))
 	{

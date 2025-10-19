@@ -457,9 +457,9 @@ int close_file(num n)
 		{
 			char prompt[MAXLLEN];
 			int lstat=
-			snprintf(prompt,sizeof(prompt),"Closing file %s",f_toclose->b_fname);
+			snprintf(prompt,sizeof(prompt),"Discard all changes of %s?",f_toclose->b_fname);
 			if(lstat>MAXLLEN) prompt[MAXLLEN-1]=0;
-	        if ( confirm(prompt,"discard all changes?",1) != TRUE) { 
+	        if ( confirm("Closing",prompt,1) != TRUE) { 
 				return (OK_CLRSL);
 			};
 		};
@@ -1058,7 +1058,7 @@ int empty_filebuf(FILEBUF *bp)
 	if(!macro_exec){
         if ((bp->b_flag&FSINVS) == 0            /* Not internal file.  */
         && (bp->b_state & FS_CHG) != 0              /* Something changed    */
-        && (confirm("Clear all text", "discard all changes?",1)) != TRUE
+        && (confirm("Clear text", "discard all changes?",1)) != TRUE
 		) { return (OK_CLRSL);};
 	};
 	EmptyText(bp);

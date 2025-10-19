@@ -1203,7 +1203,7 @@ int delete_dir(char *fname)
 	{
 		sstat=snprintf(sconfirm,sizeof(sconfirm),"Dir [%s] not empty",fname);
 		if(sstat>=MAXLLEN) { return error_line("command truncated!");};
-		if( confirm(sconfirm,"remove ?",1)) {
+		if( confirm("Remove?",sconfirm,1)) {
 			sstat=snprintf(rmcmd,sizeof(rmcmd),"rm -rf %s 2> /dev/null",fname);
 			if(sstat<MAXFLEN) { 
 				status=system(rmcmd);
@@ -1228,7 +1228,7 @@ int dir_del1(num  n)
    
   status=dir_getfile(fname,1);
   escape_file_name(fname);
-  if(!confirm("Delete file",fname,0)) return FALSE;
+  if(!confirm("Delete file ?",fname,0)) return FALSE;
 
   // MESG("dir_del1: [%s] ---------",fname);
   if(status<0) {

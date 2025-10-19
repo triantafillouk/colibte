@@ -2206,13 +2206,13 @@ int	writeout(char *name, FILEBUF *bf)
 	 if(bf->FileTime != st.st_mtime)
 	 {
 	 	if(discmd)
-		if(!confirm("File changed by other","Replace? ",1)) return(false);
+		if(!confirm("Replace?","File changed by other",1)) return(false);
      }
      inodeinfo_set(bf,&st);
      if((int)bt_dval("make_backup")==1) 
      {
 	 	if(CreateBak(bf)!=true)	 {
-			if(!confirm("Cannot create backup file", "continue ?",0)) return(false);
+			if(!confirm("Continue ?","Cannot create backup file",0)) return(false);
       	} else bak_created=TRUE;
 	 };
    }   else   {
