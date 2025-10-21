@@ -39,7 +39,7 @@ int insert_preamble(FILEBUF *fp,int type)
 	insert_string_nl(fp,"---");
 #endif
 	sprintf(date_header,"#Date: %s",date_string(2));
-	//date_header[strlen(date_header)-1]=0;	/* remove new line at the end!  */
+	date_header[strlen(date_header)-1]=0;	/* remove new line at the end!  */
 	insert_string_nl(fp,date_header);
 
 	if(type<2) type=1;
@@ -61,7 +61,8 @@ int insert_preamble(FILEBUF *fp,int type)
 			strlcat(fp->b_note->n_name,".cal",sizeof(fp->b_note->n_name));
 #endif
 			strlcpy(fp->b_note->n_date,fp->b_fname,sizeof(fp->b_note->n_date));
-			insert_string_nl(fp,"# Untitled note");
+			insert_string_nl(fp,"# ");
+			insert_string_nl(fp,"#Tags:");
 			};break;
 		case 3: {	/* todo note */
 			strlcpy(fp->b_note->n_name,fp->b_fname,sizeof(fp->b_note->n_name));
