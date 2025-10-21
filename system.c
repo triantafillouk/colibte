@@ -116,7 +116,7 @@ int update_tags(num nused)
 }
 
 /* update tag file */
-int view_functions(num nused)
+int view_functions (num nused)
 {
  // FILEBUF *tagb;
  // FILEBUF *old_cbfp;
@@ -134,10 +134,10 @@ int view_functions(num nused)
 	events_flush();
 	// create the tag file
 	status=snprintf(tag_file,sizeof(tag_file),"%s.tag",cbfp->b_fname);
-	if(status>=256) { msg_line("string overflow 1 in view_functions");events_flush();return false;};
+	if(status>=sizeof(tag_file)) { msg_line("string overflow 1 in view_functions");events_flush();return false;};
 
 	status=snprintf(tag_cmd,sizeof(tag_cmd),"ctags -x --c-kinds=%s %s 2>err1 | awk '{printf \"%%4s %%s %%s %%s %%s %%s %%s\\n\", $3,$6,$7,$8,$9,$10,$11}' > %s 2>/dev/null",kind,cbfp->b_fname,tag_file);
-	if(status>255) { msg_line("string overflow 2 in view_functions");events_flush();return false;};
+	if(status>sizeof(tag_cmd)) { msg_line("string overflow 2 in view_functions");events_flush();return false;};
 
 	status=system(tag_cmd);
 	if(status!=0) {

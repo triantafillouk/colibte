@@ -157,7 +157,8 @@ int in_slide=0;
 BTWE rootbtwe;	/* root btree window element  */
 int btindex=0;
 
-GtkWidget *list1;
+GtkWidget *list1=NULL;
+GtkWidget *main_menu_bar=NULL;
 int index_value=0;
 
 Display *dis0;

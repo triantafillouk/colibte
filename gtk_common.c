@@ -1036,7 +1036,6 @@ on_dra0_key_press_event(GtkWidget       *widget,
 
 	if(ks==GDK_KEY_Return || ks==GDK_KEY_Escape || ((ks==106 || ks==103) && (key_state & GDK_CONTROL_MASK))) 
 		entry_mode=KNORMAL;
-
 	gtk_widget_hide(gs_entry);
 	gtk_widget_hide(toolbar2);
 #if	GTK3
@@ -1914,7 +1913,9 @@ void start_interactive(char *prompt)
 		gtk_widget_hide(toolbar1);
 	};
 	gtk_widget_hide(statusbar1);
-
+#if	GTK2
+	gtk_widget_hide(main_menu_bar);
+#endif
 	gtk_label_set_text((GtkLabel *)gs_label,prompt);
 	gtk_widget_show(gs_label);
 	gtk_widget_show(toolbar2);
@@ -1927,7 +1928,9 @@ void end_interactive()
 	gtk_widget_hide(gs_label);
 
 	gtk_widget_show(statusbar1);
-
+#if	GTK2
+	gtk_widget_show(main_menu_bar);
+#endif
 	entry_mode=KNORMAL;
 
 	if(compact1) {

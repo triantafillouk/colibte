@@ -53,7 +53,7 @@ GtkWidget* create_dummy_pixmap(GtkWidget *widget);
 /* Use this function to set the directory containing installed pixmaps. */
 void  add_pixmap_directory  (const gchar     *directory);
 
-void create_main_menu(GtkWidget *vbox, GtkWidget *parent, MENUS *menu,GtkAccelGroup *accel_group);
+GtkWidget *  create_main_menu(GtkWidget *vbox, GtkWidget *parent, MENUS *menu,GtkAccelGroup *accel_group);
 
 GtkWidget *  create_menu(M_element *element, GtkWidget *pelement, GtkWidget *parent,GtkAccelGroup  *menu_accels, guint alt_flag);
 

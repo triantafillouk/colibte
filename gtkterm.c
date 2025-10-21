@@ -138,6 +138,7 @@ void init_color();
 int set_font(char *);
 void sinsert_nl(char *dat,int nbytes);
 
+
 WINDP * make_split(WINDP *oldwindow);
 void expose_line(int i, WINDP *wp);
 int set_fontindex(num);
@@ -153,7 +154,8 @@ int in_slide=0;
 BTWE rootbtwe;
 int btindex=0;
 
-GtkWidget *list1;
+GtkWidget *list1=NULL;
+GtkWidget *main_menu_bar=NULL;
 int index_value=0;
 
 Display *dis0;
@@ -272,7 +274,7 @@ create_parent (void)
 
 		gtk_box_pack_start (GTK_BOX (vbox1), hbox2, FALSE, FALSE, 0);
 
-  create_main_menu(hbox2, parent, &m_topn,accel_group);
+  main_menu_bar = create_main_menu(hbox2, parent, &m_topn,accel_group);
 
   popup_select_on = create_top_menu( &m_select_on, parent, accel_group);
   popup_select_off = create_top_menu( &m_select_off, parent, accel_group);
