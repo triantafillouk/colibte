@@ -17,14 +17,13 @@ extern int color_scheme_ind;
 extern VAR option_names[];
 
 char *find_file(char *subdir,char *fname,int cflag,int create_if_not_found);
+void check_config_dir();
 
 void load_config()
 {
  int i=0;
- // fprintf(stderr,"load config\n");
-
  char *fname = find_file("",CONFIGFILE,0,0);
-
+ check_config_dir();
  if(fname) {
  char **name_array;
  char **value_array;
@@ -48,6 +47,33 @@ void load_config()
  };
  set_key_emulation((int)bt_dval("keyboard_emulation"));
 
+}
+
+// check if config dir exists and if not create it!
+void check_config_dir()
+{
+ struct stat s;
+
+ char app_dir[MAXFLEN];
+ int status=snprintf(app_dir,sizeof(app_dir),"%s/%s",getenv("HOME"),APPLICATION_DOT_DIR);
+ if(status!=strlen(app_dir)) { fprintf(stderr,"home dir name to big!\n");exit(1); };
+
+ status = stat(app_dir,&s);
+	// fprintf(stderr,"check %s status=%d\n",app_dir, status);
+	// fprintf(stderr,"check dir %d\n",S_ISDIR(s.st_mode));
+ if(status == 0 && S_ISDIR(s.st_mode)) return;
+ status = mkdir(app_dir,S_IRWXU);
+ if(status!=0) {
+ 	fprintf(stderr,"cannot create dir %s\n",app_dir);
+	exit(2);
+ };
+#if	0
+	fprintf(stderr,"new application dir '%s' created\n",app_dir);
+	status = stat(app_dir,&s);
+	fprintf(stderr,"check %s status=%d\n",app_dir, status);
+	fprintf(stderr,"check dir %d\n",S_ISDIR(s.st_mode));
+#endif
+// MESG("new application home dir created!");
 }
 
 void save_config()

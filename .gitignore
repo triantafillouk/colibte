@@ -13,4 +13,5 @@ err
 err1
 *.out
 *.err
+err*
 

@@ -9,14 +9,12 @@
 
 #include "xe.h"
 #include "color.h"
-
+#include "display_driver.h"
 #define	NEW	1
 
 void vtputwc(WINDP *wp, utfchar *uc);
 extern int save_trace(int n);
 extern int drv_type;
-void set_window_font(WINDP *wp);
-void drv_start_window_update(WINDP *wp);
 int get_utf_length(utfchar *utf_char_str);
 int  SUtfCharAt(char *utfstr, int offset, utfchar *uc);
 int eq1(int x,int y,int z);
@@ -26,7 +24,6 @@ void upd_move(WINDP *wp,char *from);
 void vteeol(WINDP *wp, int selected,int inside);
 int SUtfCharLen(char *utfstr,int offset,utfchar *uc);
 int line_bcolor=0;
-void drv_clear_line(WINDP *wp,int row);
 void upd_all_wrap_lines(WINDP *wp,char *from);
 void update_window_nowrap(WINDP *wp,int force);
 void update_window_wrap(WINDP *wp,int force);
@@ -324,7 +321,7 @@ void upd_column_pos()
 	cwp->curcol = tp_col(fp->tp_current);
 #if	1
 	if(tp_col(fp->tp_current)!=FColumn(,FOffset(fp))) {
-		MESG("	upd_column_pos: ERROR! o=%ld %ld != %ld",tp_col(fp->tp_current),FColumn(fp,FOffset(fp)));
+		// MESG("	upd_column_pos: ERROR! o=%ld %ld != %ld",tp_col(fp->tp_current),FColumn(fp,FOffset(fp)));
 	};
 #endif
 #else
@@ -1789,24 +1786,30 @@ int check_cursor_position_wrap(WINDP *wp)
 void set_top_hline(WINDP *wp,offs cof,char *from)
 {
 	offs b0=0;
+	// MESG("set_top_hline:");
 	if(is_wrap_text(wp->w_fp)) b0=cof;
 	else b0=FLineBegin(wp->w_fp,cof);
 	textpoint_set(wp->tp_hline,b0);
+#if	0
 	if((tp_col(wp->tp_hline) % wp->w_width)!=0) {
-		textpoint_set_lc(wp->tp_hline,tp_line(wp->tp_hline),0);
+		//textpoint_set_lc(wp->tp_hline,tp_line(wp->tp_hline),0);
+		textpoint_set_lc(wp->tp_hline,0,0);
 		// MESG("set_top_hline: error correct!!!!!!");
 	};
+#endif
 	// MESG("set_top_hline:[%s] l=%ld o=%ld c=%ld",from,tp_line(wp->tp_hline),tp_offset(wp->tp_hline),tp_col(wp->tp_hline));
 }
 
 /*	check_cursor_position:	check to see if the cursor is on screen */
 int check_cursor_position(WINDP *wp)
 {
+	// MESG("check_cursor_position:");
 	if(is_wrap_text(wp->w_fp))return(check_cursor_position_wrap(wp));
 
 	offs cur_offs,cof;
 	int i;
 	FILEBUF *fp = wp->w_fp;
+	if(fp==NULL) return 0;
 	int force_reposition=0;
 	int head=(wp->w_fp->b_header!=NULL);
 
@@ -1822,7 +1825,6 @@ int check_cursor_position(WINDP *wp)
 	{
 		// we are out of bounds. reposition!
 		force_reposition=1;
-//		MESG("check_cursor_position: reposition!!");
 	};
 	if(!force_reposition) {
 		if(is_wrap_text(wp->w_fp)) {
@@ -1870,7 +1872,6 @@ int  show_position_info(num short_version)
 	if(cwp==NULL) return false;
 	FILEBUF *fp = cwp->w_fp;
 	// MESG("show_position_info:");
-#if	TNOTES
 	if(fp->b_flag>=FSNOTES) {
 	  if(fp->b_flag & FSDIRED) 
 	  {
@@ -1883,24 +1884,13 @@ int  show_position_info(num short_version)
 		} else {
 			sstat=snprintf(str,sizeof(str),"%6lld",getcline()+1);
 		};
-	  } else {
+	  }
+#if	TNOTES 
+	  else {
 		sstat=snprintf(str,sizeof(str),"%s",get_notes_status());
 	  };
+#endif
 	} else
-#else
-	if(fp->b_flag & FSDIRED) 
-	{
-		// MESG("show dir info");
-		if(!short_version) {
-			char finfo[MAXFLEN];
-		
-			sstat=dir_getfile(finfo,2);
-			sstat=snprintf(str,sizeof(str),"%6lld|%s",getcline()+1,finfo);
-		} else {
-			sstat=snprintf(str,sizeof(str),"%6lld",getcline()+1);
-		};
-	} else
-#endif 
 	{
 	loffs=Offset()-LineBegin(Offset())+1;
 	// MESG("show_position_info: o=%ld loff=%ld b_flag=%X b_mode=%X b_state=%X",Offset(),loffs,fp->b_flag,fp->b_mode,fp->b_state);
@@ -1910,63 +1900,36 @@ int  show_position_info(num short_version)
 		} else sstat=snprintf(str,sizeof(str),"%5llX",Offset());
 	} else {
 	  	// MESG("show row/col info");
-#if	1
 		col=tp_col(cwp->tp_current);
-#else
-		col=GetCol()+1;
-#endif
 		if(short_version) {
 			sstat=snprintf(str,sizeof(str),"%6lld",getcline()+1);
 		} else {
-			if(Eol()) {
-				if(is_wrap_text(fp)){
-					sstat=snprintf(str,sizeof(str),"%6lld %7lld ",getcline()+1,loffs);
-				} else {
-				if(bt_dval("show_coffset")) {
-					sstat=snprintf(str,sizeof(str),"%6lld %7lld %7lld ",getcline()+1,Offset(),col);
-				} else {
-					sstat=snprintf(str,sizeof(str),"%6lld %7lld %7lld ",getcline()+1,loffs,col);
-				};
-				}
-				if(FOffset(cwp->w_fp)==FSize(cwp->w_fp)) strlcat(str,"EOF",MAXSLEN);
-				else
-				if((int)bt_dval("show_cdata")) { 
-					if(cwp->w_fp->b_mode & EMDOS) strlcat(str,"0D0A",MAXSLEN);
-					else if(cwp->w_fp->b_mode & EMUNIX) strlcat(str,"000A",MAXSLEN);
-					else if(cwp->w_fp->b_mode & EMMAC) strlcat(str,"000D",MAXSLEN);
-					else strlcat(str,"    ",MAXSLEN);
-				};
+			// MESG("long version");
+			sstat=snprintf(str,sizeof(str),"%7lld ",getcline()+1);
+			if(bt_dval("show_coffset")) {
+				sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",Offset());
 			} else {
-				sstat=snprintf(str,sizeof(str),"%6lld ",getcline()+1);
-				
-				if(is_wrap_text(fp)){
-					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",loffs);
-				} else {
-					if(bt_dval("show_coffset")) {
-						sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",Offset());
-					} else {
-						sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",loffs);
-					};
-					sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%7lld ",col);
-				};
-
-				if((int)bt_dval("show_cdata")) {
-					int size=1;
-					long value=utf_value_len(&size);
-					// if(debug_flag()) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX %d",value,size);
-					// else 
-					if(value==0x9) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str)," TAB");
-					else if(value==0x20) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str)," SPC");
-					else if(value==0x0A) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str)," NL ");
-					else if(value==0x0D) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str)," CR ");
-					else sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%04lX",value);
-				};
-				if(strlen(str) < 10) short_version=1;
+				sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%4lld ",loffs);
 			};
+			sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"%4lld",col+1);
+
+			if((int)bt_dval("show_cdata")) {
+				int size=1;
+				long value=utf_value_len(&size);
+
+				if(value==0x9) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|   TAB  ");
+				else if(value==0x20) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"| SPACE  ");
+				else if(value==0x0A) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|   NL   ");
+				else if(value==0x0D) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|   CR   ");
+				else if(value==0x0D0A) sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|  CRLF  ");
+				else sstat=snprintf(str+strlen(str),MAXSLEN-strlen(str),"|%08lX",value);
+			};
+			if(strlen(str) < 10) short_version=1;
 	  };
 	};
 	};
 	if(sstat){
+
 	if(short_version==1) put_string_statusline(cwp, str, 2);
 	else put_string_statusline(cwp, str, 1);
 	};
@@ -2002,9 +1965,9 @@ int update_screen(num force)
 		else
 			tp_copy(cwp->w_emark,cwp->tp_current);
 	};
-	// MESG("update_screen:1");
+
 	upd_column_pos();	/* update column position  */
-	// MESG_time("update_screen: 1");
+
 	/* if screen is garbage, re-plot it */
 	if (update_all)	{ 
 		updgar();
@@ -2013,29 +1976,24 @@ int update_screen(num force)
 	// MESG("loop windows");
 	lbegin(window_list);
 	while(1) {
-		// MESG(";start of while:");
 		wp=(WINDP *)lget_current(window_list);
 		if(wp==NULL) break;
-		// MESG("	+++ loop1: %d",wp->id);
+		if(wp->w_fp == NULL) continue;
 		_el *l_current = window_list->current;
-		// MESG("	++++ loop window now is %d wrap=%d",wp->id,is_wrap_text(wp->w_fp));
 		if(is_wrap_text(wp->w_fp))	update_window_wrap(wp,force);
 		else update_window_nowrap(wp,force);
 		set_current(window_list,l_current);
-		// MESG(" +++  move to next!");
 		lmove_to_next(window_list,0);
-		// MESG(" ___ moved!");
 	};
 
-	// MESG("	----- after update");
 	lbegin(window_list);
 	while((wp=(WINDP *)lget(window_list))!=NULL){
-		wp->w_fp->line_from=-1;	
-		wp->w_fp->line_to=-1;	
+		if(wp->w_fp) {
+			wp->w_fp->line_from=-1;	
+			wp->w_fp->line_to=-1;	
+		};
 	};
-	// MESG("go update physical");
 	/* update the virtual screen to the physical screen */
-	// MESG_time("update_physical");
 	update_physical_windows();
 	// MESG_time("update_physical end",1);	
 	// /* update the cursor and flush the buffers */
@@ -2054,9 +2012,14 @@ int update_screen(num force)
 void update_window_nowrap(WINDP *wp,int force)
 {
 	int cw_flag=cwp->w_flag;
+	// MESG("update_window_nowrap:");
 		if (wp==cwp) {
+			// MESG("update cwp!");
+			if(wp->w_fp==NULL) { MESG("null file for window!");return;};
 			check_cursor_position(wp); /* check if on screen */
+			// MESG("update_window_nowrap: 1");
 			wp->currow = window_cursor_line(wp);
+			// MESG("update_window_nowrap: 2");
 
 			if(wp->selection || (wp->w_flag & UPD_WINDOW) || force||update_all) 
 			{
@@ -2076,6 +2039,7 @@ void update_window_nowrap(WINDP *wp,int force)
 				upd_move(wp,"update_screen: 2");
 			};
 		} else {
+			// MESG("update other windows!");
 			if((wp->w_fp == cwp->w_fp 
 				&& ((cw_flag & UPD_EDIT)
 				|| (cw_flag & UPD_LINE))
@@ -2527,7 +2491,7 @@ void upd_all_virtual_lines(WINDP *wp,char *from)
 	if(wp->w_fp->b_flag!=FSNOTES && wp->w_fp->b_flag!=FSNOTESN && !(wp->w_fp->b_flag & FSNLIST)) 
 	{	/* Buffer view  */
 		// MESG("update virtual from buffer! wp=%d top offs=%ld",wp->id,lp_offs);
-		for(sline=head;sline < wp->w_ntrows;sline++) 
+		for(sline=head;sline <= wp->w_ntrows;sline++) 
 		{
 			/* and update the virtual line */
 			wp->vs[sline]->v_flag =1;

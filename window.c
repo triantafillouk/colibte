@@ -9,6 +9,7 @@
 
 #include	"xe.h"
 #include	"color.h"
+#include	"display_driver.h"
 
 extern alist *window_list;
 extern int *color;
@@ -132,7 +133,7 @@ void set_current_window(WINDP *new_wp,char *title)
  if(new_wp) if(cwp!=new_wp){
 	WINDP *previous_wp=cwp;
 	cwp = new_wp;
-	curgwp = cwp->gwp;
+	set_curgwp();
 	if(/* wp->w_fp->b_dname!=NULL && */ new_wp->w_fp->b_dname[0]!=0)
 		if(chdir(new_wp->w_fp->b_dname)!=0) msg_line("cannot set current window dir [%s]",new_wp->w_fp->b_dname);
 	cbfp=new_wp->w_fp;
@@ -282,7 +283,6 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines)
  	num col=tp_col(pwl) - num_lines*wp->w_width;
 	/// if(tp_col(pwl)%wp->w_width < cwp->goal_column) col += cwp->goal_column - tp_col(pwl)%wp->w_width;
 	// if(col%wp->w_width < wp->goal_column) col += (wp->goal_column - col%wp->w_width);
-	strcpy(mesgs,"init");
 
 	textpoint_set_lc(pwl,line,col);
 	o1=tp_offset(pwl);
@@ -292,7 +292,7 @@ offs   FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines)
 	{
 		MESG("!FPrev_wrap_line: backtrack %ld cols o1=%ld diffcol %ld prev col=%ld pos=%ld new col=%ld pos=%ld",
 			num_lines*wp->w_width,o1,diffcol,prev_col,prev_col%wp->w_width,col,col%wp->w_width);
-		MESG(" from %s pos=%d goal=%d %d %d",mesgs,wp->goal_column,col_position,col%wp->w_width,diffcol%wp->w_width);
+		MESG(" from init pos=%d goal=%d %d %d",wp->goal_column,col_position,col%wp->w_width,diffcol%wp->w_width);
 	};
 #endif
  	// MESG(";FPre_line:num_lines=%d pline=%ld -> line=%ld  col %ld -> %ld o1=%ld >= width %d rows=%d",num_lines,pline,line,prev_col,tp_col(pwl),o1,wp->w_width,wp->w_ntrows);

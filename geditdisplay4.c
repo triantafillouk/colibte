@@ -10,7 +10,7 @@
 #include "xe.h"
 #include "color.h"
 #include "display_driver.h"
-#include "geditdisplay3.h"
+#include "geditdisplay4.h"
 
 int x_insert ();
 
@@ -136,7 +136,7 @@ ge_edit_draw_event(GtkWidget *widget,cairo_t *cr)
 		// MESG(" ge_edit_draw_event: already in draw, return! %d",ind++);
 		return RVAL;
 	};
-	MESG("ge_edit_draw_event:");
+	// MESG("ge_edit_draw_event:");
 	if(wd->cr!=NULL) {
 		// MESG("ge_edit_draw_event: wd->cr !NULL, end_draw and return! %d",ind++);
 		gdk_window_end_draw_frame(wd->edit_window,wd->edit_gdk_context);
@@ -213,11 +213,10 @@ ge_edit_draw_event(GtkWidget *widget,cairo_t *cr)
 		wd->wp->w_fp->line_from=line_from;
 		wd->wp->w_fp->line_to=line_to;
 		// MESG("update some from %d to %d",line_from,line_to);
-		if(is_wrap_text(wd->wp->w_fp)) {
-			upd_all_wrap_lines(wd->wp,"cb_set_position 3");
-		} else {
-			upd_some_virtual_lines(wd->wp,"ge_edit_draw_event:");
-		};
+	if(is_wrap_text(wd->wp->w_fp)) 
+	upd_all_wrap_lines(wd->wp,"cb_set_position 3");
+	else
+		upd_some_virtual_lines(wd->wp,"ge_edit_draw_event:");
 		// MESG("	ge_edit_draw_event: newxy, before_drawing window!");
 		wd->wp->w_flag=UPD_FORCE;
 		draw_window(1,wd->wp,"ge_edit_draw_event");
@@ -264,8 +263,8 @@ int on_parent_configure              (GtkWidget       *widget,
 	set_bt_num_val("x11_width",p_width);
 	set_bt_num_val("x11_height",p_height);
 
-	// MESG("on_parent_configure: x=%d y=%d [%d,%d]",event->x,event->y,event->width,event->height);
-	// MESG("window width=%d height=%d",p_width,p_height);
+//	MESG("on_parent_configure: x=%d y=%d [%d,%d]",event->x,event->y,event->width,event->height);
+//	MESG("window width=%d height=%d",p_width,p_height);
 
   return(FALSE);
 }
@@ -278,7 +277,7 @@ static gboolean mouse_wscroll (GtkWidget *widget,
     return TRUE;
 }
 
-static void
+void
 ge_edit_display_realize (GtkWidget *widget)
 {
     GdkWindowAttr		attributes;
@@ -360,22 +359,20 @@ ge_edit_display_unrealize (GtkWidget *widget)
 cairo_t *begin_draw(GeEditDisplay *wd,cairo_region_t *region,char *from)
 {
  unsigned long lwd;
- // MESG("begin_draw:");
-
  lwd = (unsigned long) (wd->edit_window);
  	// wd->act=0;
 #if	NUSE
 	if(wd->in_draw) { 
-		// MESG("	in draw, return cr! from %s",from);
+//		MESG("	in draw, return cr! from %s",from);
 		return wd->cr;
 	}
 #endif
 	if(wd->cr !=NULL) {
-		// MESG("	cr not null, return cr! from %s",from);
+//		MESG("	cr not null, return cr! from %s",from);
 		return wd->cr;
 	};
 	
-	// MESG("begin_draw: new cr, from %s",from);
+	// MESG("begin_draw: from %s",from);
 	wd->edit_gdk_context = gdk_window_begin_draw_frame (wd->edit_window,region);
 	wd->cr = gdk_drawing_context_get_cairo_context (wd->edit_gdk_context);
 	wd->region=region;
@@ -395,7 +392,7 @@ void end_draw(GeEditDisplay *wd,char *from)
 		// MESG("end_draw: from[%s], still in draw!",from);
 		return;
 	};
-	MESG("end_draw: finish from %s",from);
+	// MESG("end_draw: finish from %s",from);
 
 	if(wd->region) {
 		// MESG("end_draw: call queue_draw_region");
@@ -409,7 +406,6 @@ void end_draw(GeEditDisplay *wd,char *from)
 	wd->cr=NULL;
 	wd->region=NULL;
 	wd->act=1;
-	// wd->in_draw=0;
 }
 
 void ge_set_initial_font(GtkWidget *widget)

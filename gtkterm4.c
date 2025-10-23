@@ -7,20 +7,18 @@
 /* gtk3 screen driver */
 	
 #include "xe.h"
-#include "display_driver.h"
-
 #define	GTK_SEARCH	0	/* use a different dialog for search operations. */
 
 #include <glib.h>
 
-#include "geditdisplay3.h"
+#include "geditdisplay4.h"
 #include "gtk_support.h"
-#include "icon.h"
-#include "gtkterm3.h"
+#include "gtkterm4.h"
 #include "xkeys.h"
 #include "xthemes.h"
 #include <X11/Xlib.h>
 #include "menus.h"
+#include "icon.h"
 
 #define	SHOW_CLINE	1
 #define	LABEL_STATUS	0
@@ -44,7 +42,6 @@ extern int update_all;
 extern short  *kbdsptr;
 extern FILEBUF *cbfp;
 extern int clen_error;
-extern int drv_initialized;
 
 void set_box_font_size(GtkWidget *widget,int font_size);
 void set_box_color(GtkWidget *box,char *color,char *bgcolor);
@@ -157,8 +154,7 @@ int in_slide=0;
 BTWE rootbtwe;	/* root btree window element  */
 int btindex=0;
 
-GtkWidget *list1=NULL;
-GtkWidget *main_menu_bar=NULL;
+GtkWidget *list1;
 int index_value=0;
 
 Display *dis0;
@@ -212,20 +208,6 @@ void set_curgwp()
 
 GtkWidget *parent_title_bar=NULL;
 
-int init_drv_env()
-{
- half_last_line=1;
-
- slide_flag=0; 
- xwin=2;
- {
-	color_scheme_ind=4;
- }
-
- default_lang=0;	// default is utf
- return DRIVER_GTK3;
-}
-
 GtkWidget*
 create_parent (void)
 {
@@ -238,7 +220,7 @@ create_parent (void)
   int parent_height=500;
   int parent_x=10;
   int parent_y=10;
-  MESG("create_parent:");
+
  /* Create the menubar in vbox */
   accel_group = gtk_accel_group_new ();
   parent = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -254,17 +236,13 @@ create_parent (void)
 	gtk_widget_show(parent_title_bar);
 	gtk_header_bar_set_show_close_button((GtkHeaderBar *)parent_title_bar,1);
   };
-
   // MESG("create_parent: reset_position=%d",(int)bt_dval("reset_position"));
   if(!(int)bt_dval("reset_position")) {
-	if((int)bt_dval("reset_position")==0) { 
+
 	  parent_width  = (int)bt_dval("x11_width");
 	  parent_height = (int)bt_dval("x11_height");
 	  parent_x      = (int)bt_dval("x11_x");
 	  parent_y      = (int)bt_dval("x11_y");
-	};
-	  // if(parent_x > 1920-parent_width) parent_x=10;
-	  // if(parent_y > 1080-parent_height) parent_y=10;
   };
 //  MESG("create_parent: x=%d y=%d w=%d h=%d",parent_x,parent_y,parent_width,parent_height);
 #if	DARWIN
@@ -383,7 +361,7 @@ create_parent (void)
 
 	cwp = make_split(NULL);
 	curgwp = ge_cedit_new(vbox1, cwp,0);
-  MESG("parent created!");
+  // MESG("parent created!");
   return parent;
 }
 
@@ -392,7 +370,6 @@ void titletext ()
 {
     char buf[MAXFLEN];
 	if(parent == NULL) return ;
-	if(cbfp==NULL) return;
 	snprintf(buf,sizeof(buf),"%s",cbfp->b_fname);
 	gtk_window_set_title(GTK_WINDOW(parent), buf);
 	if(parent_title_bar){
@@ -437,7 +414,7 @@ void drv_set_default_bgcolor()
 void window_bg_clear(WINDP *wp)
 {
 	drv_set_default_bgcolor();
-	// MESG("window_bg_clear: id=%d",wp->id);
+//	MESG("window_bg_clear: id=%d",wp->id);
 	if(wp!=NULL) {
 		if(wp->gwp!=NULL) {
 		if(GTK_EDIT_DISPLAY(wp->gwp->draw)!=NULL) {
@@ -460,7 +437,6 @@ void window_clear(WINDP *wp)
 void drv_color(int fcol,int bcol) 
 {
  GdkRGBA *gcolorf,*gcolorb;
-
 #if	NUSE
  if(bcol>COLOR_TYPES) {
 	MESG("drv_color: bcol=%d > %d",bcol,COLOR_TYPES);
@@ -484,7 +460,7 @@ void drv_color(int fcol,int bcol)
 void init_color()
 {
  int i;
-  MESG("init_color:");
+  // MESG("init_color:");
   /* Read the colors from the conf files  */
   color_scheme_read();
   for(i=0;i<COLOR_TYPES;i++) 
@@ -513,36 +489,34 @@ void show_cursor (char *from)
 	cairo_region_t *region;
 	GeEditDisplay *wd;
 	static int ind=0;
-	if(drv_initialized==0) return;
-	if(!cbfp) return;
+
+	// MESG("show_cursor: start ind=%d showing=%d",ind,cursor_showing);
 	if(!(cbfp->b_flag==FSNOTES || cbfp->b_flag==FSNOTESN || cbfp->b_flag & FSNLIST)) {
 	wd = (GeEditDisplay *)(cwp->gwp->draw);
-	// MESG("show_cursor: start ind=%d showing=%d from %s",ind,cursor_showing,from);
-
 	if(ind==2) cursor_showing=0;
 	if (cursor_showing) {
 		// MESG("show_cursor: already shown! %d>",ind++);
 		return;
 	};
+	MESG("show_cursor:");
 #if	FAST_GTK_SCREEN
 	px=set_cursor_xpos(cposy,cposx);
 #endif
-	// py=cposy*CHEIGHTI;
 
-	// MESG("show_cursor: start from %s px=%d",from,px);
+	MESG("show_cursor: start from %s px=%d",from,px);
 #if	SHOW_CLINE
 	area.x = 0;
 	area.height = 5;	/* current line height  */
 	area.y = py+CHEIGHTI-area.height;
 	area.width = cwp->gwp->width;
-	// MESG("show_cursor: from %s <%d y=%d y=%d",from,ind,area.x,area.y);
-	// MESG("show_cursor: line  x=%d y=%d h=%d w=%d",area.x,area.y,area.height,area.width);
+	// MESG("show_cursor: from %s <%d y=%d y=%d",from,ind,area.x,area.y);	
 	if(area.height + area.width < 2 ) {
 		return;
 	};
 
 	region = cairo_region_create_rectangle((cairo_rectangle_int_t *)&area);
 	wd->cr = begin_draw(wd,region,"show_cursor");
+
 	cairo_set_operator(wd->cr,CAIRO_OPERATOR_OVER);
 	cairo_set_source_rgba(wd->cr,0.4,0.4,0.4,0.5);
 
@@ -552,22 +526,9 @@ void show_cursor (char *from)
 	end_draw(wd,"show_cursor:line end");
 #endif
 	/* get current cursor area */
-
-	int px1;
-	if(is_wrap_text(cwp->w_fp)) {
-		int infolen=(int)cwp->w_infocol*CLENI;
-		int wrap_column = tp_col(cwp->tp_current) % (cwp->w_width);
-		// int wrap_line = tp_col(cwp->tp_current) / (cwp->w_width);
-		px1 = wrap_column*CLENI+infolen;
-		area.x = (px1);
-		// MESG("ww=%d col=%ld wc = %d wl=%d py=%d px1=%d cposx=%d cposy=%d",cwp->w_width,tp_col(cwp->tp_current),wrap_column,wrap_line,py,px1,cposx,cposy);
-	} else {
-		px1 = (px)%(wd->wp->w_width * CLENI);
-	}
-
-	area.x = px1;
+	area.x = (px+1)%(wd->wp->w_width * CLENI);
 	area.y = py;
-	MESG("show_cursor: x=%d %d y=%d",px,px1,py);
+
 	area.width = CLEN;
 	area.height = CHEIGHTI;
 
@@ -619,10 +580,8 @@ void hide_cursor (char *from)
 	cairo_region_t *region;
 	GdkRectangle area;
 	// static int ind=0;
-	if(drv_initialized==0) return;
-	// MESG("hide_cursor: %d",cursor_showing);
+	// MESG("hide_cursor: %d ind=%d",cursor_showing,ind);
 	if (cursor_showing == 0) return;
-	if(!cbfp) return;
 #if	1
 	if(cbfp->b_flag==FSNOTES || cbfp->b_flag==FSNOTESN || cbfp->b_flag & FSNLIST) {
 	cursor_showing = 0;
@@ -654,7 +613,6 @@ void hide_cursor (char *from)
 	// MESG("hide_cursor: end");
 	cursor_showing = 0;
 	// ind++;
-	// MESG("hide_cursor: ok!");
 	return;
 }
 
@@ -662,7 +620,7 @@ char *get_font_string();
 
 void set_edit_font(GeEditDisplay *wd)
 {
- // MESG("set_edit_font:");
+ 
  if(current_font_name == NULL) return;
  if(wd->width==1) return;
  if(wd->cr == NULL) { 
@@ -714,7 +672,6 @@ int select_font(num n)
  int status;
  gchar *st;
 
- MESG("select_font:");
 // prepare_converter(default_local_codepage);
 // st = g_convert_with_iconv(sst,-1,cd,&r,&w,NULL);
  st = strdup("ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ");	/* utf string  */
@@ -812,7 +769,7 @@ GtkWidget * create_select_window()
   GtkListStore *mlist1;	// model
   GtkTreeSelection *list1_select=NULL;
   char *stitles[] = { "value",NULL };
-  // MESG("create_select_window:");
+//  MESG("create_select_window:");
   select_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 
   gtk_window_set_modal(GTK_WINDOW(select_window),1); // allow input only from this window
@@ -857,7 +814,6 @@ GtkWidget * create_select_window()
   g_signal_connect (G_OBJECT (list1), "row-activated",
                       (GCallback) on_list1_activate_row,
                       mlist1);
- // MESG("select_window: created!");
  return(select_window);
 }
 
@@ -1066,7 +1022,7 @@ void new_gwp_draw(GWINDP *gwp,WINDP *wp,GtkWidget *parent,int ptype)
  GtkBox *sb2;
  GeEditDisplay *wd;
  int minimum_height=10;
- int minimum_width=55;
+ int minimum_width=50;
  gwp->draw = ge_edit_display_new();
  wd = (GeEditDisplay *)gwp->draw;
  gtk_widget_add_events((GtkWidget *)wd, GDK_SCROLL_MASK);
@@ -1165,7 +1121,6 @@ void new_gwp_draw(GWINDP *gwp,WINDP *wp,GtkWidget *parent,int ptype)
  g_signal_connect(gwp->draw,"scroll_event",G_CALLBACK(ge_edit_display_scroll),NULL);
 #endif
  gtk_widget_show(gwp->draw);
- // MESG("new_gwp_draw: ok!");
 }
 
 /* combine edit display creation */
@@ -1246,7 +1201,7 @@ GWINDP * ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype)
 	btel->pbox=pbox1;
 	bter->pbox=pbox2;
  };
- // MESG("new_gwp: ok!");
+
  return (new_gwp);
 }
 
@@ -1354,7 +1309,7 @@ void cb_set_position(GtkAdjustment *adj, GtkWidget *widget)
  int prev_line; // previous line
  int gline;
  num lines;
- if(!cbfp) return;
+
  WINDP *pwp;	// previous window if changed
  GeEditDisplay *wd = GTK_EDIT_DISPLAY(widget);
  // MESG("cb_set_position: slide_flag=%d in_draw=%d in_slide=%d cursor=%d",slide_flag,wd->in_draw,in_slide,cursor_showing);

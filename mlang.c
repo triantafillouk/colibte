@@ -10,7 +10,7 @@
 #include	<math.h>
 #include	<stdlib.h>
 #include	"xe.h"
-
+#include	"display_driver.h"
 #include	"alist.h"
 #include	"mlang.h"
 #include	"func.h"
@@ -63,6 +63,8 @@ void set_vtype(int type);
 int vtype_is(int type);
 char *str_mul(char *sval, double v1);
 char *str_cat(char *sval, char *add);
+void refresh_ddot_1(double value);
+double factor_refresh_ddot();
 
 double assign_val(double none);
 double assign_env(double none);
@@ -72,6 +74,7 @@ void get_uppercase_string(char *lower, char *string);
 double cexpression();
 double exec_block1_break(FILEBUF *fp);
 char * tok_info(tok_struct *tok);
+void MESG_TOK_INFO(char *title,tok_struct *tok);
 void set_vtype(int type);
 int vtype_is(int type);
 int get_vtype();
@@ -556,7 +559,7 @@ void initialize_vars()
 int is_mlang(FILEBUF *fp)
 {
  int bt=fp->b_type;
- MESG("check macro file!");
+ // MESG("check macro file!");
  if(fp->b_flag & FSNLIST) {
  	msg_line("dir is not an mlang file! %X",fp->b_flag);
 	return 0;
@@ -1816,7 +1819,7 @@ static double term1_mul(double v1)
 			char *news=str_mul(sval,v2);
 			// MESG(";; news=%s",news);
 			set_sval(news);
-			MESG("ok!");
+			// MESG("ok!");
 			return v2;
 		};
 	};
@@ -1880,6 +1883,7 @@ static double term1_div(double v1)
 				case VTYPE_NUM:	// numeric * numeric
 					if(v2!=0){
 					v1=v1/v2;
+					ex_var.dval=v1;
 					return v1;
 					};
 					/* RT error  */
@@ -1925,10 +1929,17 @@ double factor_rcurl(){
 	// MESG("RCURL");
 	NTOKEN2;
 	lstoken=NULL;
-	return -1;
+	// current_active_flag=0;
+	return ex_var.dval;
 }
 
 double factor_sep(){
+	NTOKEN2;
+	return 0.0;
+}
+
+double factor_comma(){
+	// MESG("factor_comma:");
 	NTOKEN2;
 	return 0.0;
 }
@@ -1949,7 +1960,7 @@ FFunction factor_funcs[] = {
 	factor_quote,	// TOK_QUOTE
 	factor_lpar,	// TOK_LPAR
 	factor_error,	// TOK_RPAR	
-	factor_none,	// TOK_SHOW
+	factor_refresh_ddot,	// TOK_SHOW
 	factor_none,	// TOK_COMMENT	,
 	factor_variable,	// TOK_VAR	level 0 variable
 	factor_option,	// TOK_OPTION	,	// editor option
@@ -1972,7 +1983,7 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_DIR_RETURN	,
 	factor_none,	// TOK_DIR_WHILE	,
 	factor_none,	// TOK_DIR_FOR		,
-	factor_none,	// TOK_COMMA		,
+	factor_comma,	// TOK_COMMA		,
 	factor_none,	// TOK_DIR_FORI	,
 
 	/* bool operators  */
@@ -2034,7 +2045,7 @@ FFunction factor_funcs[] = {
 
 void set_tok_function(tok_struct *tok, int type)
 {
-	// MESG("set_tok_function: type=%d ttype=%d",type,tok->ttype);
+	// MESG("set_tok_function: %s",tok_info(tok));
 	switch(type) {
 		case 0:
 			if(tok->ttype==TOK_FUNC) {
@@ -2056,16 +2067,16 @@ void set_tok_function(tok_struct *tok, int type)
 void set_tok_directive(tok_struct *tok, FFunction directive)
 {
 	tok->directive = directive;
-	// MESG(" d tok %2d: %s set directive function",tok->tnum,tok->tname);
+	MESG_TOK_INFO("# tok_directive",tok);
 }
 
 void set_term_function(tok_struct *tok, TFunction term_function)
 {
 	tok->term_function = term_function;
-	// MESG(" t tok %2d: %s set term function",tok->tnum,tok->tname);
+	MESG_TOK_INFO(" term",tok);
 }
 
-// Directove functions
+// Directive functions
 
 static double inline dir_lcurl()
 {
@@ -2281,6 +2292,7 @@ double num_term2()
 		// MESG("while: TERM2");
 		v1 = tok->term_function(v1);
 	 };
+	 // ex_var.dval=v1;
  // MESG("		term2 end %f",v1);
  RTRN(v1);
 }
@@ -2297,6 +2309,7 @@ double num_term1()
 		v1 = tok->term_function(v1);
 		if(err_num) break;
 	 };
+	 // ex_var.dval=v1;
 	// MESG("	num_term1: end %f",v1);
  RTRN(v1);
 }
@@ -2719,6 +2732,7 @@ void refresh_ddot_1(double value)
 		} else printf(";	: '%s'\n",get_sval());
 	 } else if(vtype_is(VTYPE_ARRAY)||vtype_is(VTYPE_SARRAY)||vtype_is(VTYPE_AMIXED)) print_array1(";",get_array("36"));
 	 lstoken=NULL;
+	 NTOKEN2;
 	 return;
  };
 
@@ -2728,7 +2742,7 @@ void refresh_ddot_1(double value)
  char ddot_out[128];
 
  // MESG("	ddot_pos=%d end=%d todel=%d",ddot_position,line_end,line_end-ddot_position);
- if(buf->b_state & FS_VIEW) return; // no refresh in view mode
+ if(buf->b_state & FS_VIEW) {NTOKEN2;return;}; // no refresh in view mode
 
  if(vtype_is(VTYPE_STRING)) {	/* string value  */
 	stat=snprintf(ddot_out,sizeof(ddot_out)," \"%s\"",get_sval());
@@ -2752,6 +2766,16 @@ void refresh_ddot_1(double value)
  if(stat>MAXLLEN) MESG("truncated");
 
  update_ddot_line(ddot_out);
+ NTOKEN2;
+}
+
+double factor_refresh_ddot()
+{
+ double value = get_val();
+ // MESG("TOK_SHOW factor_refresh_ddot");
+ // MESG("	val=%f",value);
+ refresh_ddot_1(value);
+ return value;
 }
 
 double tok_dir_type()
@@ -2963,13 +2987,12 @@ double tok_dir_while()
 }
 
 /* exec multiple sentences at the same level */
+#if	0
 double exec_block1(FILEBUF *fp)
 {
  double val=0;
  INIT_STAGE;
- TDS("exec_block1");
- // MESG("exec_block1: starting at tok %d type=%d err=%d",tok->tnum,tok->ttype,err_num);
-	exe_buffer=fp;
+ exe_buffer=fp;
 	// MESG("exec_block1:[%s] size of tok_struct is %d",fp->b_fname,sizeof(tok_struct));
    if(!current_active_flag) return(val);
    while(tok->ttype!=TOK_EOF) 
@@ -2983,43 +3006,68 @@ double exec_block1(FILEBUF *fp)
 	};
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(val);};
 	if(tok->ttype==TOK_COMMA) { NTOKEN2;};
+#if	0
 	if(tok->ttype==TOK_SHOW) {
-		refresh_ddot_1(val);NTOKEN2;continue;
+		refresh_ddot_1(val);continue;
 	};
+#endif
  	val=tok->directive();
 	if(!current_active_flag) break;
    };
    // MESG("exec_block1: end!");
 	return(val);
 }
+#else
+double exec_block1(FILEBUF *fp)
+{
+//  double val=0;
+ INIT_STAGE;
+ exe_buffer=fp;
+	// MESG("exec_block1:[%s] size of tok_struct is %d",fp->b_fname,sizeof(tok_struct));
+   if(!current_active_flag) return(ex_var.dval);
+   while(tok->ttype!=TOK_EOF) 
+   {
+	// MESG_TOK_INFO("- exec_block1",tok);
+	if(tok->ttype==TOK_SEP){ NTOKEN2;
+		// MESG("factor_sep: [%s %d]",tok->tname,tok->ttype);
+		if(tok->ttype==TOK_VAR) lstoken=tok;
+		else lstoken=NULL;
+		continue;
+	};
+	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
+ 	ex_var.dval=tok->directive();
+	// ex_var.dval=val;
+	if(!current_active_flag) break;
+   };
+   // MESG("exec_block1: end!");
+	return(ex_var.dval);
+}
+#endif
 
 double exec_block1_break(FILEBUF *fp)
 {
- double val=0;
+ // double val=0;
  INIT_STAGE;
  exe_buffer=fp;
 	// MESG("#exec_block:%d ttype=%d [%s]",tok->tnum,tok->ttype,tok_info(tok));
-   while(tok->ttype!=TOK_EOF && current_active_flag) 
+   if(!current_active_flag) return(ex_var.dval);
+   while(tok->ttype!=TOK_EOF) 
    {
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
-	if(tok->ttype==TOK_SEP){ NTOKEN2;continue;	};
-	if(tok->ttype==TOK_RCURL) { NTOKEN2;return(val);};
-	if(tok->ttype==TOK_COMMA) { NTOKEN2;};
-	if(tok->ttype==TOK_SHOW) {
-		// MESG("	tok_show:");
-		refresh_ddot_1(val);NTOKEN2;continue;
+	if(tok->ttype==TOK_SEP){ NTOKEN2;
+		// MESG("factor_sep: [%s %d]",tok->tname,tok->ttype);
+		if(tok->ttype==TOK_VAR) lstoken=tok;
+		else lstoken=NULL;
+		continue;
 	};
-	if(drv_check_break_key()){
-		syntax_error("user interruption",100);
-		if(is_break1) return 0;
-	};
-	// MESG("	before directive!");
- 	val=tok->directive();
-	// MESG("	after!");
+	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
+ 	ex_var.dval=tok->directive();
+	// MESG("	val after dir: %f",val);
+	// ex_var.dval=val;
+	if(drv_check_break_key()) break;
 	// MESG(" [%s]",tok_info(tok));
    };
-   // MESG("exec_block1: end!");
-	return(val);
+	return(ex_var.dval);
 }
 
 /* execute a block from a file  */
@@ -3260,6 +3308,15 @@ int parse_buffer_show_tokens(num n)
  	msg_line("No errors!");
  	return(1);
  };
+}
+
+void MESG_TOK_INFO(char *title,tok_struct *tok)
+{
+	static int prev_tok_num=-1;
+	if(tok->tnum!=prev_tok_num) {
+		MESG("%-20s : %s",title,tok_info(tok));
+		prev_tok_num=tok->tnum;
+	};
 }
 
 char * tok_info(tok_struct *tok)

@@ -1,5 +1,6 @@
 #include "xe.h"
 #include "mlang.h"
+#include "display_driver.h"
 
 extern array_dat *main_args;
 extern char *ex_name;

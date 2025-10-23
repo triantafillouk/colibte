@@ -3,56 +3,74 @@
 # Last modified 2020/09/10
 
 # default values for flags
-UNAME := $(shell uname)
-APP_NAME=colibte
+UNAME = $(shell uname)
+WSL = $(shell uname -a|grep "icrosoft" |wc -l)
 
 PCURSES=0
 XLIB=0
 GTK=0
 XPLOT=0
 EMBED_ICONS=0
-USE_GLIB=1
+
 # include support for notes database in sqlite3
-TNOTES=1
 GVERS := $(shell git log -1 --pretty=tformat:%h,%s)
 
-GTKINCLUDE3=`pkg-config gtk+-3.0 --cflags`
-GTKINCLUDE3=`pkg-config gtk+-3.0 --cflags`
+ctxe : XLIB=1
+ctxe : _X11_=1
+ctxe : PCURSES=0 
+cteg2 : XPLOT=1
+ctxe: TNOTES=1
+ctxe: USE_GLIB=0
+ctxe : SQLITE3=`pkg-config sqlite3 --libs`
+
+cte: PCURSES=1
+cte: TNOTES=1
+cte: GTKINCLUDE=
+
+ctg2 cte ctg3 ctg4: TNOTES=1
+ctg2 cte ctg3 ctg4: SQLITE3=`pkg-config sqlite3 --libs`
+ctg2 cte ctg3 ctg4: USE_GLIB=1
+ctg2 cte ctg3 ctg4: GLIBINCLUDE=`pkg-config glib-2.0 --cflags`
+ctg2 cte ctg3 ctg4: GLIB_LIB=`pkg-config glib-2.0 --libs`
+ctg2: GTKINCLUDE=`pkg-config gtk+-2.0 --cflags` -DGTK2=1 
+ctg3: GTKINCLUDE=`pkg-config gtk+-3.0 --cflags` -DGTK3=1 
+ctg4: GTKINCLUDE=`pkg-config gtk4 --cflags` -DGTK4=1 
+
+ce : PCURSES=1
+ce : TNOTES=0
+ce : GLIB_LIB=
+ce : SQLITE3=`pkg-config sqlite3 --libs`
+ce : USE_GLIB=0
+ce : GLIBINCLUDE=
+ce : GTKINCLUDE=
+
 _X11_=0
 
 OSYSTEM=OTHERUNIX
 SHAREDDIR=/usr/share
 
-ifeq ($(USE_GLIB),1)
-GLIB_LIB=`pkg-config glib-2.0 --libs`
-else
-GLIB_LIB=
-endif
-
 # for Darwin
 ifeq ($(UNAME), Darwin)
-GLIBINCLUDE=`pkg-config glib-2.0 --cflags`
-LPCURSES0=-lpanel -lncurses -L/opt/local/lib $(GLIB_LIB)
+# GLIBINCLUDE=`pkg-config glib-2.0 --cflags`
+LPCURSES0=-lpanel -lncurses  $(GLIB_LIB)
 OSYSTEM=DARWIN
 SHAREDDIR=/usr/local/share
 X11include=-I/opt/X11/include/
 X11lib0= -lX11 -L/opt/X11/lib $(GLIB_LIB)
 EXTFILE=.$(APP_NAME)_ext_mac
 WSL:=0
-CC=zig cc -DGVERS='"$(GVERS)"'
-#CC=clang -DGVERS='"$(GVERS)"'
-#CC=gcc -DGVERS='"$(GVERS)"'
+#CC=zig cc -DGVERS='"$(GVERS)"'
+CC=clang -DGVERS='"$(GVERS)"'
+#CC=gcc-14 -DGVERS='"$(GVERS)"'
 endif
 
 # for Linux
 ifeq ($(UNAME), Linux)
-GLIBINCLUDE=`pkg-config glib-2.0 --cflags`
+# GLIBINCLUDE=`pkg-config glib-2.0 --cflags`
 LPCURSES0=-lpanelw -lncursesw  $(GLIB_LIB)
 OSYSTEM=LINUX
 X11include=-I/opt/X11/include/
 X11lib0=-L/usr/X11R6/lib -lX11 -L/opt/X11/lib 
-WSL:=`uname -a|grep "icrosoft" |wc -l`
-EXTFILE:=.$(APP_NAME)_ext_$(WSL)
 CC=gcc -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
 #CC=zig cc -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
 endif
@@ -78,22 +96,6 @@ WSL=0
 ##CC=gcc -DGVERS='"$(GVERS)"'
 endif
 
-ctxe : XLIB=1
-ctxe : _X11_=1
-ctxe : PCURSES=0 
-
-cteg2 : XPLOT=1
-
-cte  : PCURSES=1
-ce : PCURSES=1
-ce : TNOTES=0
-ce : GLIB_LIB=
-ce : USE_GLIB=0
-ce : SQLITE3=
-
-ifeq ($(TNOTES),1)
-SQLITE3=`pkg-config sqlite3 --libs`
-endif
 
 ifeq ($(TNOTES), 1)
 LPCURSES=$(LPCURSES0) ${SQLITE3}
@@ -105,7 +107,7 @@ endif
 
 ifeq ($(CC), clang)
 # the following is needed for clang compiler
-CPU_OPTIONS= -O3  -I/usr/include/x86_64-linux-gnu -D$(OSYSTEM)=1
+CPU_OPTIONS= -O3  -D$(OSYSTEM)=1
 else 
 CPU_OPTIONS= -O3 -D$(OSYSTEM)=1  
 endif
@@ -117,30 +119,43 @@ LIN:=native
 endif
 
 
-ctg2 pixmp ctg3 : GTK=1 
+ctg2 pixmp ctg3 ctg4: GTK=1 
+ctg2: TNOTES=1
 
 ctg3: GTK3=1
 ctg3: XPLOT=1
+ctg3: TNOTES=1
 
-ctg2 ctg3 : _X11_=1 
+ctg4: GTK4=1
+ctg4: XPLOT=1
+ctg4: GTK4=1
+ctg4: TNOTES=1
+
+ctg2 ctg3 ctg4: _X11_=1 
 
 ctg2 gldisplay.o : GTK2=1
 
 FLAGS1 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DWSL=$(WSL) -DPCURSES=$(PCURSES) -DTNOTES=$(TNOTES) -DGTK=$(GTK) $(GLIBINCLUDE) -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) -DTNOTES=$(TNOTES) -DUSE_GLIB=$(USE_GLIB) $(X11include) -I/usr/include/ncurses
 
-FLAGS3 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) $(X11include) $(GLIBINCLUDE)
+FLAGS3 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) $(X11include) $(GLIBINCLUDE) -DGTK3=1 -DGTK=1
 
-ctg2 pixmp gdk2 : GTKINCLUDE=`pkg-config gtk+-2.0 --cflags` -DGTK2=1 
+FLAGS4 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DWSL=$(WSL) -DGDK=1 -DGDK4=1 -DPCURSES=$(PCURSES) -DTNOTES=$(TNOTES) -DGTK4=1 -DGTK=1 $(GLIBINCLUDE) -DXPLOT=$(XPLOT) -DEMBED_ICONS=${EMBED_ICONS} -D_X11_=$(_X11_) -DTNOTES=$(TNOTES) -DUSE_GLIB=$(USE_GLIB) $(X11include) -I/usr/include/ncurses -DGDK_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED
 
-tplot c3 ge3 ctg3: GTKINCLUDE=`pkg-config gtk+-3.0 --cflags` -DGTK3=1 
-tplot c3 ge3 ctg3: GTKINCLUDE3=`pkg-config gtk+-3.0 --cflags` -DGTK3=1 
+#ctg2 pixmp gdk2 : GTKINCLUDE=`pkg-config gtk+-2.0 --cflags` -DGTK2=1 
+
+#tplot c3 ge3 ctg3: GTKINCLUDE=`pkg-config gtk+-3.0 --cflags` -DGTK3=1 
+#tplot c3 ge3 ctg3: GTKINCLUDE3=`pkg-config gtk+-3.0 --cflags` -DGTK3=1 
+
+#ctg4 gtkterm4.o screen.o gplot4.o: GTKINCLUDE4=`pkg-config gtk4 --cflags` -DGTK4=1 
 
 ifeq ($(TNOTES), 1)
 GTK2_FLAGS=`pkg-config gtk+-2.0 --libs` $(X11lib) ${SQLITE3}
 GTK3_FLAGS=`pkg-config gtk+-3.0 --libs` $(X11lib) ${SQLITE3}
+GTK4_FLAGS=`pkg-config gtk4 --libs` $(X11lib) ${SQLITE3}
 else
 GTK2_FLAGS=`pkg-config gtk+-2.0 --libs` $(X11lib) 
 GTK3_FLAGS=`pkg-config gtk+-3.0 --libs` $(X11lib) 
+GTK4_FLAGS=`pkg-config gtk4 --libs` $(X11lib) 
 endif
 
 xe.h : 
@@ -160,12 +175,31 @@ xe.h :
 #	cc -c -J -O2 -b elf $*.c
 
 main.o: main.c xe.h globals.h  keytable.h func.h
+	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS) -funsigned-char  $(GLIBINCLUDE) $*.c -o main.o
+
+main_ce.o: main.c xe.h globals.h  keytable.h func.h
+	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS) -funsigned-char  $(GLIBINCLUDE) main.c -o main_ce.o
+
+file_ce.o: file.c xe.h
+	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS) -funsigned-char  $(GLIBINCLUDE) file.c -o file_ce.o
+
+dir_ce.o: dir.c xe.h
+	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS) -funsigned-char  $(GLIBINCLUDE) dir.c -o dir_ce.o
+
+edit_ce.o: edit.c xe.h
+	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS) -funsigned-char  $(GLIBINCLUDE) edit.c -o edit_ce.o
 
 gmain.o: main.c xe.h globals.h  keytable.h func.h
 	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char main.c -o gmain.o
 
+gmain4.o: main.c xe.h globals.h  keytable.h func.h
+	${CC} $(FLAGS4) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char main.c -o gmain.o
+
 input.o: keytable.h input.c 
 	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char input.c 
+
+input_ce.o: keytable.h input.c 
+	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char input.c -o input_ce.o 
 
 ginput.o: keytable.h input.c
 	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char input.c -o ginput.o
@@ -178,8 +212,17 @@ gldisplay.o: xe.h screen.c menus.h
 screen.o: xe.h screen.c wrap_line.h
 	${CC} $(FLAGS1) -DGTK3=0 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char screen.c -o screen.o
 
+screen_ce.o: xe.h screen.c wrap_line.h
+	${CC} $(FLAGS1) -DGTK3=0 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char screen.c -o screen_ce.o
+
+convert_ce.o: convert.c xe.h
+	${CC} $(FLAGS1) -DGTK3=0 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char convert.c -o convert_ce.o
+
 screen3.o: xe.h screen.c wrap_line.h
 	${CC} $(FLAGS1) -DGTK3=1 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE)  -funsigned-char screen.c -o screen3.o
+
+screen4.o: xe.h screen.c wrap_line.h
+	${CC} $(FLAGS4) -DGTK3=1 -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE)  -funsigned-char screen.c -o screen4.o
 
 eval.o: xe.h eval.c eval.h alist.h 
 
@@ -187,18 +230,29 @@ config_init.o: config_init.c
 
 mlang.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang_functions.c mlang.h alist.h xe.h func.h token_table.h
 
+mlang_ce.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang_functions.c mlang.h alist.h xe.h func.h token_table.h
+	${CC} mlang.c $(FLAGS1)  -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o mlang_ce.o
+
 mlangf.o: xe.h mlangf.c mlangf.h mlang.h
 
 mlangg.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang_functions.c mlang.h alist.h xe.h
 	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char mlang.c -o mlangg.o
 
+mlangg4.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang_functions.c mlang.h alist.h xe.h
+	${CC} $(FLAGS4) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char mlang.c -o mlangg.o
+
 tldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h menu.h
 	${CC} tldisplay.c $(FLAGS1)  -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o tldisplay.o
+
+tldisplay_ce.o: xe.h tldisplay.c screen.c menus.h keytable.h menu.h
+	${CC} tldisplay.c $(FLAGS1)  -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o tldisplay_ce.o
 
 xldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h
 	${CC} tldisplay.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -funsigned-char -o xldisplay.o
 
 gtkterm.o: gtkterm.c gtkterm.h xthemes.h color.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h gtk_common.c xthemes.c btreei.h
+
+gtkterm4.o: gtkterm.c gtkterm.h xthemes.h color.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h gtk_common.c xthemes.c btreei.h
 
 highlight.o: highlight.c highlight.h
 
@@ -208,117 +262,117 @@ alist.o: alist.c alist.h avl_tree.c rb_tree.c
 
 filebuf.o: xe.h filebuf.c undo.h replaceblock.c findlinecol1.c
 
-search.o: xe.h search.c
+search.o: xe.h search.c 
+
+search_ce.o: xe.h search.c 
+	${CC} search.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o search_ce.o
 
 curses.o: curses.c color.h menus.h keytable.h
 	${CC} curses.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o curses.o
  
 panel_curses.o: panel_curses.c color.h menus.h keytable.h xthemes.h color.h rgb_colors.h xthemes.c
-	${CC} panel_curses.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o panel_curses.o 
+	${CC} panel_curses.c -I/opt/local/include $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o panel_curses.o 
+
+panel_curses_ce.o: panel_curses.c color.h menus.h keytable.h xthemes.h color.h rgb_colors.h xthemes.c
+	${CC} panel_curses.c -I/opt/local/include $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o panel_curses_ce.o 
 
 gtk_support.o: gtk_support.c gtk_support.h
 	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o gtk_support.o gtk_support.c
 
 gsystem.o: xe.h system.c
-	${CC} $(FLAGS1) -c -DGTK=1 -Wall $(CPU_OPTIONS) $(GTKINCLUDE3) -funsigned-char system.c -o gsystem.o
+	${CC} $(FLAGS1) -c -DGTK=1 -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char system.c -o gsystem.o
 
 system.o: xe.h system.c
 	${CC} system.c $(FLAGS1) -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o system.o 
 
 # For GTK3
 gtkterm3.o: xe.h gtkterm3.c gtkterm3.h xthemes.h color.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h geditdisplay3.h gtk_common.c xthemes.c
-	${CC} $(FLAGS1) -c -DGTK=1 -Wall $(CPU_OPTIONS) $(GTKINCLUDE3) -funsigned-char gtkterm3.c -o gtkterm3.o
+	${CC} $(FLAGS1) -c -DGTK=1 -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char gtkterm3.c -o gtkterm3.o
 
 gplotc3.o: gplotc3.c gplot3.h plot_cairo3.c plot_commonc.c
-	${CC}  -c ${FLAGS1}  ${GTKINCLUDE3} -o gplotc3.o  gplotc3.c
+	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o gplotc3.o  gplotc3.c
 
 gcanvas3.o: gcanvas3.c 
-	${CC}  -c ${FLAGS1}  ${GTKINCLUDE3} -o gcanvas3.o gcanvas3.c
+	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o gcanvas3.o gcanvas3.c
 
 gtk_support3.o: gtk_support3.c gtk_support.h
-	${CC}  -c ${FLAGS1}  ${GTKINCLUDE3} -o gtk_support3.o gtk_support3.c
+	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o gtk_support3.o gtk_support3.c
 
 geditdisplay.o: geditdisplay.c geditdisplay.h gedit_common.c
-#	${CC}  -c ${FLAGS1} -D${OSYSTEM}  ${GTKINCLUDE3} -o geditdisplay.o geditdisplay.c
+#	${CC}  -c ${FLAGS1} -D${OSYSTEM}  ${GTKINCLUDE} -o geditdisplay.o geditdisplay.c
 
 geditdisplay3.o: geditdisplay3.c geditdisplay3.h gedit_common.c
-	${CC}  -c ${FLAGS1} -D${OSYSTEM}  ${GTKINCLUDE3} -o geditdisplay3.o geditdisplay3.c
+	${CC}  -c ${FLAGS1} -D${OSYSTEM}  ${GTKINCLUDE} -o geditdisplay3.o geditdisplay3.c
+
+# For GTK4
+gtkterm4.o: xe.h gtkterm4.c gtkterm4.h xthemes.h color.h xkeys.h menus.h keytable.h  icon.h icons.h keytable.h geditdisplay3.h gtk_common.c xthemes.c
+	${CC} $(FLAGS4) -c -DGTK=1 -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char gtkterm4.c -o gtkterm4.o
+
+gplotc4.o: gplotc4.c gplot4.h plot_cairo3.c plot_commonc.c
+	${CC}  -c ${FLAGS4}  ${GTKINCLUDE} -o gplotc4.o  gplotc4.c
+
+gtk_support4.o: gtk_support3.c gtk_support.h
+	${CC}  -c ${FLAGS4}  ${GTKINCLUDE} -o gtk_support4.o gtk_support3.c
+
+gcanvas4.o: gcanvas3.c 
+	${CC}  -c ${FLAGS4}  ${GTKINCLUDE} -o gcanvas4.o gcanvas3.c
+
+geditdisplay4.o: geditdisplay4.c geditdisplay4.h gedit_common.c
+	${CC}  -c ${FLAGS4} -D${OSYSTEM}  ${GTKINCLUDE} -o geditdisplay4.o geditdisplay4.c
 
 ifeq ($(TNOTES), 1)
 tplot.o: main.c xe.h plot_cairo3.c
-	${CC} -DKKK=1 -c ${FLAGS3} -DTNOTES=$(TNOTES) -DGTK=1 ${GTKINCLUDE3} -o tplot.o main.c
+	${CC} -DKKK=1 -c ${FLAGS3} -DTNOTES=$(TNOTES) -DGTK=1 ${GTKINCLUDE} -o tplot.o main.c
 else
 tplot.o: main.c xe.h plot_cairo3.c
-	${CC} -DKKK=1 -c ${FLAGS3} -DGTK=1 ${GTKINCLUDE3} -o tplot.o main.c
+	${CC} -DKKK=1 -c ${FLAGS3} -DGTK=1 ${GTKINCLUDE} -o tplot.o main.c
 endif
 
+notes_ce.o: notes.c notes.h
+	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char notes.c -o notes_ce.o
+
 xinput.o: keytable.h input.c
-	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE3) -funsigned-char input.c -o xinput.o
+	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char input.c -o xinput.o
 
 ginput3.o: keytable.h input.c
-	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE3)  -funsigned-char input.c -o ginput3.o
+	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE)  -funsigned-char input.c -o ginput3.o
+
+ginput4.o: keytable.h input.c
+	${CC} $(FLAGS4) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE)  -funsigned-char input.c -o ginput4.o
 
 #	The following is with gtk3 library and cairo plot. gplotc(gcanvas)
 ctg3: tplot.o gsystem.o gldisplay.o edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o  utils.o alist.o filebuf.o gplotc3.o  support.o config_init.o convert.o  gtk_support3.o geditdisplay3.o  gcanvas3.o  highlight.o utf8_support.o notes.o mlangf.o
-	${CC} tplot.o gsystem.o gldisplay.o  edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o gplotc3.o  gtk_support3.o config_init.o support.o geditdisplay3.o gcanvas3.o  highlight.o utf8_support.o notes.o mlangf.o -o ctg3  $(GTK3_FLAGS) -lm 
+	${CC} tplot.o gsystem.o gldisplay.o  edit.o gtkterm3.o dir.o screen3.o  eval.o mlangg.o  file.o ginput3.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o gplotc3.o  gtk_support3.o config_init.o support.o geditdisplay3.o gcanvas3.o  highlight.o utf8_support.o notes.o mlangf.o -o ctg3  $(GTK3_FLAGS)  ${SQLITE3} -lm 
+
+#	The following is with gtk4 library and cairo plot. gplotc(gcanvas)
+ctg4: tplot.o gsystem.o gldisplay.o edit.o gtkterm4.o dir.o screen4.o  eval.o mlangg.o  file.o ginput4.o help.o search.o  word.o window.o marks.o  utils.o alist.o filebuf.o   support.o config_init.o convert.o  gtk_support4.o geditdisplay4.o   highlight.o utf8_support.o notes.o mlangf.o
+	${CC} tplot.o gsystem.o gldisplay.o  edit.o gtkterm4.o dir.o screen4.o  eval.o mlangg.o  file.o ginput4.o help.o search.o  word.o window.o marks.o convert.o  utils.o alist.o filebuf.o  gtk_support4.o config_init.o support.o geditdisplay4.o   highlight.o utf8_support.o notes.o mlangf.o -o ctg4  $(GTK4_FLAGS)  ${SQLITE3} -lm 
 
 #	The following is with gtk2 library and cairo plot. gplotc(gcanvas)
 ctg2 : gmain.o gsystem.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o   gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o plot_cairo.c  config_init.o utf8_support.o notes.o mlangf.o
-	${CC} gmain.o gsystem.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o notes.o mlangf.o -o ctg2  $(GTK2_FLAGS)  -lm
+	${CC} gmain.o gsystem.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o notes.o mlangf.o -o ctg2  $(GTK2_FLAGS)  ${SQLITE3}  -lm
 
 find_tags: find_tags.c support.o alist.o
 	${CC} $(CPU_OPTIONS) find_tags.c support.o alist.o -o find_tags
 
 # This is with Xlib library, no plot !
 ctxe : main.o system.o edit.o screen.o  xldisplay.o eval.o mlang.o  file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o  highlight.o dir.o utils.o alist.o filebuf.o support.o config_init.o utf8_support.o mlangf.o notes.o
-	${CC} main.o system.o edit.o screen.o   xldisplay.o eval.o mlang.o file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o highlight.o dir.o utils.o alist.o  filebuf.o support.o config_init.o utf8_support.o mlangf.o notes.o -o ctxe -lm  $(GLIB_LIB) ${X11lib} 
+	${CC} main.o system.o edit.o screen.o   xldisplay.o eval.o mlang.o file.o  xinput.o help.o search.o  word.o window.o marks.o convert.o   xlib.o highlight.o dir.o utils.o alist.o  filebuf.o support.o config_init.o utf8_support.o mlangf.o notes.o -o ctxe -lm  $(GLIB_LIB) ${X11lib} ${SQLITE3}
 
 #	This is for SCO and Xlib. -lsocket is needed at the end of every X application
 #	cc -b elf main.o system.o edit.o  display.o eval.om lang.o file.o input.o help.o search.o  word.o window.o marks.o convert.o   xlib.o -o emacs  -lm -L/usr/X11R6/lib -lX11 -lsocket
 
 # with curses, panel, no plot !
 cte : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o notes.o mlangf.o xthemes.c
-	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o -o cte  ${LPCURSES} -lm
+	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o -o cte  ${LPCURSES}  ${SQLITE3} -lm
 
-ce : main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o  highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o
-	${CC} main.o filebuf.o system.o edit.o screen.o  tldisplay.o eval.o mlang.o  file.o input.o help.o search.o  word.o window.o marks.o convert.o  panel_curses.o highlight.o dir.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes.o -o ce  $(GLIB_LIB) ${LPCURSES} -lm
+ce : main_ce.o filebuf.o system.o edit_ce.o screen_ce.o  tldisplay_ce.o eval.o mlang_ce.o  file_ce.o input_ce.o help.o search_ce.o  word.o window.o marks.o convert_ce.o  panel_curses_ce.o  highlight.o dir_ce.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes_ce.o
+	${CC} main_ce.o filebuf.o system.o edit_ce.o screen_ce.o  tldisplay_ce.o eval.o mlang_ce.o  file_ce.o input_ce.o help.o search_ce.o  word.o window.o marks.o convert_ce.o  panel_curses_ce.o highlight.o dir_ce.o utils.o alist.o support.o config_init.o utf8_support.o mlangf.o notes_ce.o -o ce  ${LPCURSES} ${SQLITE3} -lm 
 
 gplotc.o: gplotc.c plot_cairo.c plot_commonc.c gplot.h
 	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o $*.o  $*.c
 
-#stroker: demos/stroker.c
-#	gcc demos/stroker.c -o stroker `pkg-config gtk+-3.0 --cflags --libs`
-
-#expose: demos/expose.c
-#	gcc demos/expose.c -o expose `pkg-config gtk+-3.0 --cflags --libs`
-
-#button_test : demos/button_test.c
-#	gcc demos/button_test.c `pkg-config gtk+-3.0 --cflags --libs`  -o button_test
-
-#listbox-dnd: demos/listbox-dnd.c
-#	gcc demos/listbox-dnd.c -o listbox-dnd `pkg-config gtk+-3.0 --cflags --libs`
-
-all : cleanall cte ctg3 ctg2 ctxe ce
-
-# test make conditionals
-test: 
-	WSL1 := $(WsL)
-	if [ $(WSL1) = '1' ]; then \
-		echo "Microsoft Linux";\
-	else \
-		echo "Native LInux" ;\
-	fi
-	echo $(EXTFILE)
-	echo $(WSL1)
-	echo $(CC)
-
-test1:
-	ifeq ("$(WSL)" ,"1")
-		EXTF="linux wsl"
-	else
-		EXTF="linux native"
-	endif
-	echl $(EXTF)
+all : cleanall cte ctg3 ctg2 ctg4 ctxe 
 
 clean :
 	echo clean all files!

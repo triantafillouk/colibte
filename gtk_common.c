@@ -157,7 +157,7 @@ void drv_open()
 {
  static int opened=0;
  char *display_name = NULL;
-
+ MESG("drv_open:");
  if(opened) return;	// only once!
  opened=1;
 
@@ -178,6 +178,7 @@ void drv_open()
 	// MESG("drv_open: end");
 	events_flush();
 	drv_initialized=1;
+	MESG("drv_open: init ok!");
 }
 
 void show_cursor_dl(int pos)
@@ -384,19 +385,6 @@ void top_menu(num init) {
 }
 
 /* init environment */
-int init_drv_env()
-{
- half_last_line=1;
-
- slide_flag=0; 
- xwin=2;
- {
-	color_scheme_ind=4;
- }
-
- default_lang=0;	// default is utf
- return DRIVER_GTK2;
-}
 
 void drv_init(int argc, char **argv)
 {
@@ -404,10 +392,10 @@ void drv_init(int argc, char **argv)
   setlocale(LC_CTYPE,"");
   if(utf_lengths==NULL) {
 #if	RED_BLACK
-	MESG("-- new red_black tree");
+	// MESG("-- new red_black tree");
  	utf_lengths=new_rb_itree("utf8");
 #else
-	MESG("-- new avl tree");
+	// MESG("-- new avl tree");
  	utf_lengths=new_avl_itree("utf8");
 #endif
  };
@@ -551,9 +539,9 @@ int drv_check_break_key()
  int key=0;
  static int count=0;
  // MESG("drv_check_break_key:");
- if(checking_break_key) {
+ // if(checking_break_key) {
  count++;
- if(count>10) {
+ if(count>10000000) {
 	events_flush();
 	if(key_index>0) {
 		key=key_buf[key_index];
@@ -566,7 +554,7 @@ int drv_check_break_key()
 		return 1;
 	};
  };
- };
+ // };
  return 0;
 }
 
@@ -627,7 +615,7 @@ int x_insert ()
  int nbytes;
  char *dat;
  static GdkAtom targets_atom = GDK_NONE;
- 	MESG("x_insert:");
+ 	// MESG("x_insert:");
 	if(targets_atom == GDK_NONE)
 //	    targets_atom = gdk_atom_intern("COMPOUND_TEXT", FALSE);
 //	    targets_atom = gdk_atom_intern("GTK_TEXT_BUFFER_CONTENTS", FALSE);
@@ -737,53 +725,8 @@ int addutfvchar1(char *str, vchar *vc, int pos,FILEBUF *w_fp)
  return pos;
 }
 
-#if	0
-void put_wtext_slow(WINDP *wp, int row,int maxcol)
-{
- int col;
- int imax=0;
- int imin=0;
- int i1;
- vchar *v1, *vtext;
- VIDEO *vp1;
- int fcolor,bcolor;
- // int cattr;
- char st[MAXBLEN];
-
- vp1 = wp->vs[row];
- v1=vtext=vp1->v_text;
-
- imin=0;
- fcolor=v1[0].fcolor;
- bcolor=v1[0].bcolor;
- // MESG("---> draw row slow %d",row);
- drv_color(fcolor,bcolor);
-	imax=maxcol;
-
-	/* count of trailing spaces is maxcol-imax */
-	drv_move(row,imin);
-
-	for(col=imin,i1=0;col<imax;col++) {
-		// drv_move(row,col);
-		if(v1[col].uval[0]==0xFF) {	/* skip space of wide utf chars  */
-			if(v1[col].uval[1]==0xFF) continue;
-		};
-		fcolor=v1[col].fcolor;
-		bcolor=v1[col].bcolor;
-
-		drv_color(fcolor,bcolor); 
-		i1=addutfvchar1(st,&v1[col],i1,wp->w_fp);
-		st[i1]=0;i1=0;
-		// MESG("%d [%s] ",col,st);
-		drv_move(row,col);
-		put_wchar(wp,st);
-	}
-	// MESG("-- end slow row %d i1=%d [%s]",row,i1,st);
-	expose_line(row,wp);	/* is needed for GTK2!  */
-}
-#endif
-
-// draw window row on screen
+#if	FAST_GTK_SCREEN
+// fast draw window row on screen
 void put_wtext(WINDP *wp, int row,int maxcol)
 {
  int col;
@@ -828,14 +771,7 @@ void put_wtext(WINDP *wp, int row,int maxcol)
 			if(i1>0) {
 				st[i1]=0;
 				drv_move(row,imove);
-#if	FAST_GTK_SCREEN
 				put_wstring(wp,st,col-imove,attr_p);
-#else
-				if(put_wstring(wp,st,col-imove,attr_p)==-1) {
-					put_wtext_slow(wp,row,maxcol);
-					return;
-				};
-#endif
 			};
 			drv_color(fcolor,bcolor);
 			i1=0;
@@ -849,18 +785,57 @@ void put_wtext(WINDP *wp, int row,int maxcol)
 	};
 	if(i1>0) {
 		st[i1]=0;
-#if	FAST_GTK_SCREEN
 		put_wstring(wp,st,col-imove,cattr);
-#else
-		if(put_wstring(wp,st,col-imove,cattr)==-1) {
-			put_wtext_slow(wp,row,maxcol);
-		};
-#endif
 	};
 //	MESG("-- end row %d i1=%d [%s]",row,i1,st);
 	// expose_line(row,wp);
 	// gdk_flush();
 }
+#else
+void put_wtext(WINDP *wp, int row,int maxcol)
+{
+ int col;
+ int imax=0;
+ int imin=0;
+ int i1;
+ vchar *v1, *vtext;
+ VIDEO *vp1;
+ int fcolor,bcolor;
+ // int cattr;
+ char st[MAXBLEN];
+
+ vp1 = wp->vs[row];
+ v1=vtext=vp1->v_text;
+
+ imin=0;
+ fcolor=v1[0].fcolor;
+ bcolor=v1[0].bcolor;
+ // MESG("---> draw row slow %d",row);
+ drv_color(fcolor,bcolor);
+	imax=maxcol;
+
+	/* count of trailing spaces is maxcol-imax */
+	drv_move(row,imin);
+
+	for(col=imin,i1=0;col<imax;col++) {
+		// drv_move(row,col);
+		if(v1[col].uval[0]==0xFF) {	/* skip space of wide utf chars  */
+			if(v1[col].uval[1]==0xFF) continue;
+		};
+		fcolor=v1[col].fcolor;
+		bcolor=v1[col].bcolor;
+
+		drv_color(fcolor,bcolor); 
+		i1=addutfvchar1(st,&v1[col],i1,wp->w_fp);
+		st[i1]=0;i1=0;
+		// MESG("%d [%s] ",col,st);
+		drv_move(row,col);
+		put_wchar(wp,st);
+	}
+	// MESG("-- end slow row %d i1=%d [%s]",row,i1,st);
+	expose_line(row,wp);	/* is needed for GTK2!  */
+}
+#endif
 
 int set_cursor_xpos(int row,int maxcol)
 {
@@ -1061,10 +1036,11 @@ on_dra0_key_press_event(GtkWidget       *widget,
 
 	if(ks==GDK_KEY_Return || ks==GDK_KEY_Escape || ((ks==106 || ks==103) && (key_state & GDK_CONTROL_MASK))) 
 		entry_mode=KNORMAL;
-
 	gtk_widget_hide(gs_entry);
 	gtk_widget_hide(toolbar2);
+#if	GTK3
 	gtk_widget_hide((GtkWidget *)search_tbar);
+#endif
 	return(FALSE);
  };
 
@@ -1112,7 +1088,7 @@ on_dra0_key_press_event(GtkWidget       *widget,
 			int ks1=0;
 			outkey=g_convert(utfokey,-1,codepage_str[default_local_codepage],"UTF-8",&r,&w,NULL);
 			ks1=ks=outkey[0];
-			MESG("ks<0xFE00: ks=%X ks1=%X [%s]",ks,ks1,utfokey);
+			// MESG("ks<0xFE00: ks=%X ks1=%X [%s]",ks,ks1,utfokey);
 			n_chars=0;
 			utflen=0;
 			utfokey[0]=0;
@@ -1520,10 +1496,10 @@ WINDP * make_split(WINDP *wp)
 int set_sposition(WINDP *wp, int *st, int *l)
 {
  int cline;
-
+ // MESG("set_sposition:");
  if(wp != NULL) {
 	if(wp->w_fp == NULL) { cline=0;*st=0;*l=0;return(cline);};
-
+	
 
 	if(wp->w_fp->b_flag & FSNLIST) cline=wp->top_note_line;
 #if	TNOTES
@@ -1937,7 +1913,9 @@ void start_interactive(char *prompt)
 		gtk_widget_hide(toolbar1);
 	};
 	gtk_widget_hide(statusbar1);
-
+#if	GTK2
+	gtk_widget_hide(main_menu_bar);
+#endif
 	gtk_label_set_text((GtkLabel *)gs_label,prompt);
 	gtk_widget_show(gs_label);
 	gtk_widget_show(toolbar2);
@@ -1950,7 +1928,9 @@ void end_interactive()
 	gtk_widget_hide(gs_label);
 
 	gtk_widget_show(statusbar1);
-
+#if	GTK2
+	gtk_widget_show(main_menu_bar);
+#endif
 	entry_mode=KNORMAL;
 
 	if(compact1) {
@@ -2012,6 +1992,18 @@ int new_shell(num n)
 	else return(TRUE);
 }
 
+#if	GTK4
+
+void ge_edit_display_realize (GtkWidget *widget);
+
+static void activate(GtkApplication *app, gpointer user_data)
+{
+ GtkWidget *window = gtk_application_window_new (app);
+ ge_edit_display_realize(window);
+ gtk_window_present (GTK_WINDOW (window));
+}
+#endif
+
 void main_loop()
 {
 	update_screen(TRUE);
@@ -2022,7 +2014,19 @@ void main_loop()
 		usleep(10000);
 	};
 #else
+#if	GTK4
+	MESG("start application!");
+	GtkApplication *app;
+	int status;
+
+	app = gtk_application_new ("org.gtk.example", G_APPLICATION_DEFAULT_FLAGS);
+	g_signal_connect (app, "activate", G_CALLBACK (activate), NULL);
+	status = g_application_run (G_APPLICATION (app), argc, argv);
+	g_object_unref (app);
+	exit(0);
+#else
 	gtk_main();
+#endif
 #endif
 }
 

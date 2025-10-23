@@ -121,7 +121,7 @@ pixbuf_icon(const char **embeded_icon)
 }
 
 // Create menus in the start of a gtk widget (vbox1), in a parent window
-void create_main_menu(GtkWidget *vbox, GtkWidget *parent, MENUS *menu,GtkAccelGroup *accel_group)
+GtkWidget * create_main_menu(GtkWidget *vbox, GtkWidget *parent, MENUS *menu,GtkAccelGroup *accel_group)
 {
  GtkWidget *menubar;
  int i;
@@ -139,6 +139,7 @@ void create_main_menu(GtkWidget *vbox, GtkWidget *parent, MENUS *menu,GtkAccelGr
  for(i=0;menu->element[i].high!=0; i++) {
    create_menu_element( &menu->element[i], menubar, parent, accel_group, 1);
  };
+ return menubar;
 }
 
 GtkWidget *  create_menu_element(M_element *element, GtkWidget *menu, GtkWidget *parent, GtkAccelGroup  *menu_accels, guint alt_flag)

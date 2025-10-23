@@ -8,6 +8,7 @@
 /*	Spawn:	System access commands */
 
 #include	"xe.h"
+#include	"display_driver.h"
 #include	<sys/stat.h>
 
 #include	<signal.h>
@@ -115,7 +116,7 @@ int update_tags(num nused)
 }
 
 /* update tag file */
-int view_functions(num nused)
+int view_functions (num nused)
 {
  // FILEBUF *tagb;
  // FILEBUF *old_cbfp;
@@ -133,10 +134,10 @@ int view_functions(num nused)
 	events_flush();
 	// create the tag file
 	status=snprintf(tag_file,sizeof(tag_file),"%s.tag",cbfp->b_fname);
-	if(status>=256) { msg_line("string overflow 1 in view_functions");events_flush();return false;};
+	if(status>=sizeof(tag_file)) { msg_line("string overflow 1 in view_functions");events_flush();return false;};
 
 	status=snprintf(tag_cmd,sizeof(tag_cmd),"ctags -x --c-kinds=%s %s 2>err1 | awk '{printf \"%%4s %%s %%s %%s %%s %%s %%s\\n\", $3,$6,$7,$8,$9,$10,$11}' > %s 2>/dev/null",kind,cbfp->b_fname,tag_file);
-	if(status>255) { msg_line("string overflow 2 in view_functions");events_flush();return false;};
+	if(status>sizeof(tag_cmd)) { msg_line("string overflow 2 in view_functions");events_flush();return false;};
 
 	status=system(tag_cmd);
 	if(status!=0) {
@@ -643,12 +644,16 @@ char *xclip_paste="xclip -i";
 char *native_paste0="pbpaste";
 char *native_paste="pbpaste";
 char *native_copy="pbcopy";
-#endif
+#else 
 #if	WSL
 // The following is for wsl!
 char *native_paste0="win32yank.exe -o --lf";
 char *native_paste="win32yank.exe -o --lf";
 char *native_copy="win32yank.exe -i";
+#else
+char *native_copy="xclip -o";
+char *native_paste="xclip -i";
+#endif
 #endif
 
 #if	DARWIN | WSL
@@ -678,18 +683,22 @@ int init_system_clipboard()
 {
  static char exec_st[MAXFLEN];
  int status=0;
-	if(status>=MAXFLEN) return 0;
+	// if(status>=MAXFLEN) return 0;
 	MESG("init_system_clipboard:");
+#if	(WSL | DARWIN) & PCURSES
+	if(check_native_copy()) return 1;
+#endif
 	display_env = getenv("DISPLAY");
 	if(display_env == NULL) {
-		return(check_native_copy());
-		// return 0; 
+		return 0; 
 	} else {
 		if(strlen(display_env)<1) {
 			return 0;
 		};
+
 		ext_clipboard_command=1;
 	};
+
 // we suppose that we have xclip for start
 // pass clipboard through xclip
 //	status=snprintf(exec_st,sizeof(exec_st),"xclip -i > /dev/null 2> /dev/null <xclip -o 2>/dev/null");
@@ -699,7 +708,7 @@ int init_system_clipboard()
 	// MESG("exec [%s] status=%d",exec_st,status);
 	if((status!=0)) {
 		ext_clipboard_command=0;
-		return(check_native_copy());
+		return(0);
 	} else {
 		clip_copy=xclip_copy;
 		clip_paste=xclip_paste;
@@ -707,7 +716,6 @@ int init_system_clipboard()
 		ext_clipboard_command=1;
 		return 1;
 	};
-	return(check_native_copy());
 }
 
 /* return the first line from system clipboard */
@@ -731,6 +739,7 @@ char *ext_system_paste_line()
 		FILE *file;
 		char *s=line;
 		file=fopen(filnam,"r");
+		if(file==NULL) return NULL;
 		int i;
 		char ch;
 		size_t stat;

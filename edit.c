@@ -8,6 +8,7 @@
 */
 
 #include	"xe.h"
+#include	"display_driver.h"
 
 int delete_region();
 
@@ -409,7 +410,6 @@ int goto_eof(num n)
 	int toline=0;
 // MESG("goto_eof: b_flag=%X",cbfp->b_flag);
 #if	TNOTES
-
 	if(cbfp->b_flag==FSNOTES) {
 		set_goal_column(0,"goto_eof");
 		toline=cbfp->b_tags-headline;
@@ -1376,7 +1376,7 @@ int quit(num n)
 		|| n>1
         || changes_occured() == FALSE         /* All buffers clean.   */
 						/* User says it's OK.   */
-        || (confirm("Modified files exist","Leave anyway?",1)) == TRUE) {
+        || (confirm("quit","Modified files exist, leave anyway?",1)) == TRUE) {
 		// MESG("quit!!!");
 		msg_line("");
 		save_scratch_files();
@@ -2137,7 +2137,7 @@ int delete_line(num n)
 		|| cbfp->b_type & NOTE_CAL_TYPE
 		|| cbfp->b_type & NOTE_TODO_TYPE) && dont_edit()
 	) {
-	if(confirm("Delete note","",0)) {	
+	if(confirm("Note","Delete note",0)) {	
 	 	dir_left(0);
 		delete_tagnote(1);
 	};

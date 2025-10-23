@@ -9,6 +9,7 @@
  */
 
 #include	"xe.h"
+#include	"display_driver.h"
 
 extern int quote_flag;
 extern int describe_flag;
@@ -21,10 +22,8 @@ void free_virtual_window(WINDP *wp);
 char *time2a();
 int listdir(int dtype);
 
-//int newxy(WINDP *wp);
 WINDP * make_split(WINDP *oldwindow);
 GWINDP *ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype);
-void delete_gwindow(WINDP *wp);
 void drv_free_win(WINDP *wp);
 void set_cursor(int flag,char *from);
 
@@ -257,7 +256,7 @@ void status_line(WINDP *wp)
 	char m_st[32]; // mode string
 	char fdname[MAXLLEN];
 	char modecode[]=MODECODE;
-
+	static FILEBUF *previous_file_buffer=NULL;
 	if(!discmd) return;
 	if(wp==NULL) return;
 
@@ -341,7 +340,10 @@ void status_line(WINDP *wp)
 	put_string_statusline(wp,m_st,-1);	
 	put_string_statusline(wp,st,0);	
 	wp->w_flag &= ~UPD_STATUS;
-	if(wp==cwp) titletext();
+	if(wp==cwp && previous_file_buffer!=wp->w_fp) {
+		previous_file_buffer=wp->w_fp;
+		titletext();
+	};
 }
 
 // dummy function

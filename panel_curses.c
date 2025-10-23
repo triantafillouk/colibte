@@ -21,12 +21,15 @@
 #include	<termios.h>
 #include	<sys/ioctl.h>
 #include	<fcntl.h>
+#if	USE_GLIB
 #include	<glib.h>
+#endif
 #include	<signal.h>
 #include "menu.h"
 
 #include "rgb_colors.h"
 #include "xthemes.h"
+#include "display_driver.h"
 
 #define	TLEFT	1
 #define TRIGHT	0
@@ -263,6 +266,12 @@ char *drv_info()
   return info;
 }
 
+GWINDP	*curgwp=NULL;	/* Current window meta structure data 	*/
+
+void set_curgwp()
+{
+	curgwp = cwp->gwp;
+}
 
 GWINDP * drv_new_twinp()
 {
@@ -1152,17 +1161,16 @@ void drv_stop_checking_break()
 
 int drv_check_break_key()
 {
- int key=0;
  static int count=0;
- if(checking_break_key) {
+ // if(checking_break_key) {
  count++;
  // MESG("drv_check_break_key: %d",count);
- if(count>10) {
- 	key=getch();
+ if(count>10000000) {
+ 	int key=getch();
 	count=0;
+	if(key==3) { set_break();return 1;}
  };
- if(key==3) { set_break();return 1;}
- };
+ // };
  return 0;
 }
 
@@ -1597,6 +1605,7 @@ void hide_cursor(char *from)
 void show_cursor(char *from) 
 {
 	if(!entry_mode) {
+	// MESG("show_cursor:");
 		if(
 #if	TNOTES
 			cbfp->b_flag==FSNOTES || cbfp->b_flag==FSNOTESN || 
@@ -1705,24 +1714,6 @@ void xupdate_box()
 {
 	wrefresh(cbox->wnd);
 }
-
-#if	USE_GLIB
-/* Convert a current local string to utf for output */
-char *str_local_to_utf(WINDP *wp,char *in)
-{
- char *slocal;
- gsize r,w;
- static char *space=" ";
- int lcp=default_local_codepage;
- if(wp->w_fp->b_lang!=0) lcp=wp->w_fp->b_lang;
- slocal = g_convert(in,-1,"UTF-8",codepage_str[lcp],&r,&w,NULL);
-
- if(slocal!=NULL) {
- 	return slocal;
- }
- else return space;
-}
-#endif
 
 int check_v_sibling(WINDP *wp,int left,int top,int new_cols)
 {
@@ -1995,6 +1986,24 @@ int check_w_sibling(WINDP *wp,int left,int top,int new_rows)
 
  return true;
 }
+
+#if	USE_GLIB
+/* Convert a current local string to utf for output */
+char *str_local_to_utf(WINDP *wp,char *in)
+{
+ char *slocal;
+ gsize r,w;
+ static char *space=" ";
+ int lcp=default_local_codepage;
+ if(wp->w_fp->b_lang!=0) lcp=wp->w_fp->b_lang;
+ slocal = g_convert(in,-1,"UTF-8",codepage_str[lcp],&r,&w,NULL);
+
+ if(slocal!=NULL) {
+ 	return slocal;
+ }
+ else return space;
+}
+#endif
 
 
 // dummy function
@@ -2439,7 +2448,7 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
 	};
 	if(wp->w_ntcols-rpos<10) return;
 	drv_wcolor(wp->gwp->draw,COLOR_ROWCOL_FG,bg_color);
-	wmove(wp->gwp->draw,status_row,wp->w_ntcols-rpos);
+	wmove(wp->gwp->draw,status_row,wp->w_ntcols-rpos+1);
 	maxlen=wp->w_ntcols-rpos-1;
  } else {
 	drv_wcolor(wp->gwp->draw,fg_color,bg_color);

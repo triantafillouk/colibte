@@ -14,7 +14,6 @@ int half_last_line=0;	// this is 1 for gtkterm, 0 for curses, 0 for xlib, denote
 int tabsize=4;			// default tabsize
 int syntaxh=1;	// highlight flags
 int	entry_mode=0;	// we are in keyboard entry mode
-char mesgs[512];
 int  xwin;
 
 int default_lang=0;		/* utf-8 */
@@ -48,7 +47,6 @@ int	kbdmode = STOP;		/* current keyboard macro mode	*/
 int	lastkey = 0;		/* last keystoke		*/
 
 WINDP	*cwp=NULL;				/* Current window pointer       */
-GWINDP	*curgwp=NULL;	/* Current window meta structure data 	*/
 
 
 #else
@@ -76,8 +74,6 @@ extern	int mcurflag;
 extern	int kbdmode;			/* current keyboard macro mode	*/
 extern	int lastkey;			/* last keystoke		*/
 extern  WINDP  *cwp;                 	/* Current window               */
-extern  GWINDP	*curgwp;
-extern char mesgs[512];
 
 #endif
 

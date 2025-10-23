@@ -7,11 +7,12 @@
 /* gtk2 screen driver */
 
 #include "xe.h"
+#include "display_driver.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-prototypes"
 
-#pragma GCC diagnostic ignored "-Wno-deprecated-declarations"
+// #pragma GCC diagnostic ignored "-Wno-deprecated-declarations"
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>
 #include <glib.h>
@@ -137,6 +138,7 @@ void init_color();
 int set_font(char *);
 void sinsert_nl(char *dat,int nbytes);
 
+
 WINDP * make_split(WINDP *oldwindow);
 void expose_line(int i, WINDP *wp);
 int set_fontindex(num);
@@ -152,7 +154,8 @@ int in_slide=0;
 BTWE rootbtwe;
 int btindex=0;
 
-GtkWidget *list1;
+GtkWidget *list1=NULL;
+GtkWidget *main_menu_bar=NULL;
 int index_value=0;
 
 Display *dis0;
@@ -193,18 +196,38 @@ GdkColormap *cmap;
 GtkWidget *parent;
 
 GtkWidget *gs_label;
-GtkWidget *toolbar1,*toolbar2;
+GtkWidget *toolbar1,*toolbar2,*toolbar_space;
 GtkWidget *gs_entry;
 char gs_entry_txt[512];
 
 GtkWidget *entry_ok, *entry_cancel;
 GtkWidget *statusbar1;
 int gs_entry_return_flag;
-GtkWidget *search_dialog;
+// GtkWidget *search_dialog;
 GtkWidget *color_dialog;
 
 extern int startup_exe;
 
+GWINDP	*curgwp=NULL;	/* Current window meta structure data 	*/
+
+void set_curgwp()
+{
+	curgwp = cwp->gwp;
+}
+
+int init_drv_env()
+{
+ half_last_line=1;
+
+ slide_flag=0; 
+ xwin=2;
+ {
+	color_scheme_ind=4;
+ }
+
+ default_lang=0;	// default is utf
+ return DRIVER_GTK2;
+}
 
 GtkWidget*
 create_parent (void)
@@ -224,17 +247,15 @@ create_parent (void)
   parent = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   // MESG("create_parent: reset_position=$d",bt_dval("reset_position"));
   if(bt_dval("reset_position")==0) {
-#if	USE_GLIB0
-	  parent_width = get_cfg_int("x11_width",parent_width);
-	  parent_height = get_cfg_int("x11_height",parent_height);
-	  parent_x = get_cfg_int("x11_x",parent_x);
-	  parent_y = get_cfg_int("x11_y",parent_y);
-#else
+
+	if((int)bt_dval("reset_position")==0) { 
 	  parent_width  = (int)bt_dval("x11_width");
 	  parent_height = (int)bt_dval("x11_height");
 	  parent_x      = (int)bt_dval("x11_x");
 	  parent_y      = (int)bt_dval("x11_y");
-#endif
+	};
+	  // if(parent_x > 1920-parent_width) parent_x=10;
+	  // if(parent_y > 1080-parent_height) parent_y=10;
   };
 #if	DARWIN
   if(parent_y>=22) parent_y -= 22;
@@ -248,7 +269,12 @@ create_parent (void)
   gtk_widget_show (vbox1);
   gtk_container_add (GTK_CONTAINER (parent), vbox1);
 
-  create_main_menu(vbox1, parent, &m_topn,accel_group);
+	hbox2 = gtk_hbox_new (FALSE, 0);
+	gtk_widget_show (hbox2);
+
+		gtk_box_pack_start (GTK_BOX (vbox1), hbox2, FALSE, FALSE, 0);
+
+  main_menu_bar = create_main_menu(hbox2, parent, &m_topn,accel_group);
 
   popup_select_on = create_top_menu( &m_select_on, parent, accel_group);
   popup_select_off = create_top_menu( &m_select_off, parent, accel_group);
@@ -257,17 +283,12 @@ create_parent (void)
   popup_tag_menu = create_top_menu( &m_notes_tag, parent, accel_group);
   popup_notes_menu = create_top_menu( &m_note_popup, parent, accel_group);
 
-	hbox2 = gtk_hbox_new (FALSE, 0);
-	gtk_widget_show (hbox2);
-	if(compact1) {
-		gtk_box_pack_start (GTK_BOX (vbox1), hbox2, FALSE, FALSE, 0);
-// 		toolbar1=new_toolbar(parent,hbox2,main_toolbar,0,GTK_ICON_SIZE_BUTTON,0);
-		toolbar1=new_toolbar(parent,hbox2,main_toolbar,0,GTK_ICON_SIZE_LARGE_TOOLBAR,0);
+
+
+		toolbar1=new_toolbar(parent,hbox2,main_toolbar,0,GTK_ICON_SIZE_SMALL_TOOLBAR,0);
+		toolbar_space=new_toolbar(parent,hbox2,space_toolbar,0,GTK_ICON_SIZE_SMALL_TOOLBAR,0);
 		gtk_toolbar_set_show_arrow(GTK_TOOLBAR(toolbar1),FALSE);
-	} else {
-		toolbar1=new_toolbar(parent,vbox1,main_toolbar,0,GTK_ICON_SIZE_LARGE_TOOLBAR,0);
-		gtk_toolbar_set_show_arrow(GTK_TOOLBAR(toolbar1),TRUE);
-	};
+		gtk_toolbar_set_show_arrow(GTK_TOOLBAR(toolbar_space),FALSE);
 
 	/* create the drawing window with scrollbar and statusline */
   if(cwp==NULL) { /* create a new one */
@@ -288,7 +309,7 @@ create_parent (void)
 
   gtk_box_pack_start (GTK_BOX (hbox2), gs_entry, TRUE, TRUE, 0);
 
-  toolbar2=new_toolbar(parent,hbox2,input_toolbar,0,GTK_ICON_SIZE_MENU,0);
+  toolbar2=new_toolbar(parent,hbox2,input_toolbar,0,GTK_ICON_SIZE_SMALL_TOOLBAR,0);
 
   gtk_toolbar_set_show_arrow(GTK_TOOLBAR(toolbar2),FALSE);
   gtk_widget_hide(toolbar2);
@@ -501,7 +522,7 @@ void show_cursor (char *from)
 
 	wd = GTK_EDIT_DISPLAY(cwp->gwp->draw);
 
-#if	FAST_GTK_SCREEN
+#if	FAST_GTK_SCREEN1
 	px=set_cursor_xpos(cposy,cposx);
 #endif
 
@@ -528,14 +549,24 @@ void show_cursor (char *from)
 //	MESG("show_cursor:[%s] wid=%d",from,cwp->id);
 	cairo_set_operator(wd->cr,CAIRO_OPERATOR_OVER);
 	cairo_set_source_rgba(wd->cr,1,0,0.1,0.6);	// this must be a color different from background FIXEME!
+	// for wrap mode
+	int px1;
+	if(is_wrap_text(cwp->w_fp)) {
+		int infolen=(int)cwp->w_infocol*CLEN;
+		int wrap_column = tp_col(cwp->tp_current) % (cwp->w_width);
+		// int wrap_line = tp_col(cwp->tp_current) / (cwp->w_width);
+		px1 = wrap_column*CLEN+infolen;
+		// MESG("px1=%d wc=%d vtcol=%d ww=%d",px1,wrap_column,cwp->vtcol,cwp->w_width);
+	} else px1 = (px)%(wd->wp->w_width * CLENI);
+
 	cairo_rectangle(wd->cr,
-			px+1, py ,
+			px1, py ,
 		       CLEN,
 		       CH1 );
 	cairo_fill(wd->cr);
 	cairo_set_operator(wd->cr,CAIRO_OPERATOR_OVER);
 
-	area.x = px;
+	area.x = px1;
 	area.y = py;
 	area.width = CLEN;
 	area.height = CH1;
@@ -546,7 +577,7 @@ void show_cursor (char *from)
 	cpposx=cposx;
 	cpposy=cposy;
 	cursor_showing=1;
-	expose_line(area.y/CHEIGHTI,cwp);	/* is needed for GTK2!  */
+	// expose_line(area.y/CHEIGHTI,cwp);	/* is needed for GTK2!  */
 }
 
 // draw window character on screen
@@ -1063,7 +1094,7 @@ GWINDP * ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype)
 	btep->left = btel;
 	btep->right = bter;
 	btep->gw = NULL;
-	btep->pan = (GtkVBox *)pan;
+	btep->pan = (GtkBox *)pan;
 	btel->pan=bter->pan=NULL;
 	btel->left=btel->right=bter->left=bter->right=NULL;
 	btel->parent=bter->parent=btep;
@@ -1084,7 +1115,7 @@ GWINDP * ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype)
  new_gwp->draw_adj = (GtkAdjustment *)gtk_adjustment_new(50.0,0.0,100.0,1.0,5.0,10.0);
 
  /* scroll bar */
- new_gwp->scroll_bar = (GtkVScrollbar *)gtk_vscrollbar_new ( new_gwp->draw_adj );
+ new_gwp->scroll_bar = (GtkScrollbar *)gtk_vscrollbar_new ( new_gwp->draw_adj );
  gtk_signal_connect(GTK_OBJECT(new_gwp->draw_adj), "value_changed", GTK_SIGNAL_FUNC(cb_set_position),new_gwp->draw);
 
  im_context = gtk_im_context_simple_new ();
@@ -1103,27 +1134,31 @@ GWINDP * ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype)
  new_gwp->status1 = gtk_entry_new();
 
  new_gwp->status3 = gtk_entry_new();
- gtk_entry_set_editable((GtkEntry *)new_gwp->status3,FALSE);
- gtk_entry_set_inner_border((GtkEntry *)new_gwp->status3,NULL);
+ // gtk_entry_set_editable((GtkEntry *)new_gwp->status3,FALSE);
+ // gtk_entry_set_inner_border((GtkEntry *)new_gwp->status3,NULL);
  gtk_entry_set_width_chars (GTK_ENTRY (new_gwp->status3), 20);
- gtk_entry_set_alignment((GtkEntry *)new_gwp->status3,1);
+ gtk_entry_set_alignment((GtkEntry *)new_gwp->status3,0);
  gtk_entry_set_has_frame((GtkEntry *)new_gwp->status3,FALSE);
  gtk_widget_set_style(new_gwp->status3,st3a);
+ gtk_entry_set_editable((GtkEntry *)new_gwp->status3,FALSE);
 
 
  gtk_entry_set_editable((GtkEntry *)new_gwp->status1,FALSE);
  gtk_entry_set_inner_border((GtkEntry *)new_gwp->status1,NULL);
  gtk_entry_set_editable((GtkEntry *)new_gwp->status2,FALSE);
  gtk_entry_set_inner_border((GtkEntry *)new_gwp->status2,NULL);
-
+ gtk_entry_set_inner_border((GtkEntry *)new_gwp->status3,NULL);
+ gtk_entry_set_alignment ((GtkEntry *)new_gwp->status3,0);
  gtk_entry_set_width_chars (GTK_ENTRY (new_gwp->status2), 5);
+ gtk_entry_set_width_chars (GTK_ENTRY (new_gwp->status1), 100);
  if(wp->w_fp!=NULL) gtk_entry_set_text((GtkEntry *)new_gwp->status1,wp->w_fp->b_fname);
-
- gtk_entry_set_has_frame((GtkEntry *)new_gwp->status2,FALSE);
+ // gtk_entry_set_text((GtkEntry *)new_gwp->status3,"#########");
  gtk_entry_set_has_frame((GtkEntry *)new_gwp->status1,FALSE);
+ gtk_entry_set_has_frame((GtkEntry *)new_gwp->status2,FALSE);
+ gtk_entry_set_has_frame((GtkEntry *)new_gwp->status3,FALSE);
 
  // clear the default style
-// gtk_widget_set_style(new_gwp->evb_hstatus,st1i); 
+ // gtk_widget_set_style(new_gwp->evb_hstatus,st1i); 
  gtk_widget_set_style(new_gwp->status1,st1a); 
  gtk_widget_set_style(new_gwp->status2,st3a); 
  gtk_widget_set_style(new_gwp->status3,st3a); 
@@ -1138,17 +1173,17 @@ GWINDP * ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype)
  
 
  gtk_widget_realize(new_gwp->hstatus);
- gtk_widget_show(new_gwp->evb_hstatus);
  gtk_event_box_set_above_child ((GtkEventBox *)new_gwp->evb_hstatus,0);
  
- gtk_widget_show(new_gwp->hstatus);
- gtk_widget_show(new_gwp->evb_hstatus);
  
+ gtk_widget_set_size_request((GtkWidget *)new_gwp->hstatus,600,30);
+ gtk_widget_set_size_request((GtkWidget *)new_gwp->evb_hstatus,600,30);
+
  gtk_widget_show(new_gwp->status2);
  gtk_widget_show(new_gwp->status1);
- gtk_widget_set_size_request((GtkWidget *)new_gwp->hstatus,600,-1);
-
  gtk_widget_show(new_gwp->status3);
+ gtk_widget_show(new_gwp->hstatus);
+ gtk_widget_show(new_gwp->evb_hstatus);
 // if(window_list->size>1) 
  {
  	connect_exit_button(GTK_BOX (new_gwp->hstatus),(GCallback) cb_close_window,(void *)wp);
@@ -1176,7 +1211,10 @@ void put_string_statusline(WINDP *wp, char *st, int position)
 	gtk_widget_set_style(GTK_WIDGET(wp->gwp->status2),st3i);
 	gtk_widget_set_style(GTK_WIDGET(wp->gwp->status3),st3i);
  };
- if(position>0) gtk_entry_set_text(GTK_ENTRY(wp->gwp->status3),st);
+ if(position>0) {
+ 	gtk_entry_set_text(GTK_ENTRY(wp->gwp->status3),"");
+ 	gtk_entry_set_text(GTK_ENTRY(wp->gwp->status3),st);
+ };
  if(position==0) gtk_entry_set_text(GTK_ENTRY(wp->gwp->status1),st);
  if(position<0) gtk_entry_set_text(GTK_ENTRY(wp->gwp->status2),st);
 }

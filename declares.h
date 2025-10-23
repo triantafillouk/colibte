@@ -12,7 +12,7 @@ int noop(num n);
 void msg_line(char *fmt, ...);
 void MESG_time(const char *fmt, ...);
 void MESG_time_start(const char *fmt, ...);
-int init_drv_env();
+// int init_drv_env();
 void init_common();
 int load_keys();
 int save_keys();
@@ -97,9 +97,6 @@ int select_highlight(num);
 int check_update_highlight(int flag);
 int file_type_is(char *extention,int check_type);
 void open_log(char *program_name);
-#if	USE_GLIB0
-void set_cfg_int(char *label,int ival);
-#endif
 #if	!USE_GLIB
 char *lstr_to_upper(char *s);
 char *lstr_to_lower(char *s);
@@ -696,32 +693,9 @@ void set_1window();
 void window_clear(WINDP *wp);
 
 /* low level terminal driver functions */
-void drv_init(int, char **);
-void drv_post_init();
-void drv_open();
-void drv_close();
-int drv_getc(int quote);
-void drv_flush();
-void drv_move(int,int);
-void drv_color(int,int);
 void prepare_converter(int);
-void drv_update_styles();
-void drv_msg_line(char *);
-void drv_win_move(WINDP *wp,int row,int col);
-void drv_win_flush(WINDP *wp);
-void drv_start_checking_break();
-void drv_stop_checking_break();
-int drv_check_break_key();
-void drv_window_delete(WINDP *wp);
-void drv_free_win(WINDP *wp);
-void drv_start_window_update(WINDP *wp);
 int text_mouse_key(int *c);
 int mouse_button_in_box(int mouse_button);
-char *drv_info();
-GWINDP * drv_new_twinp();
-void events_flush();
-
-GWINDP *new_twinp();
 
 
 void out_print(char *s,int nl);
@@ -870,22 +844,6 @@ void print_sarray(char **sarray,char *title);
 #include "utils.h"
 
 void skip_token();
-
-#if	TNOTES
-int new_note(num n);
-int new_cal_note(num n);
-int new_todo_note(num n);
-int save_note();
-int open_notes_dir(num n);
-int search_notes_dir(num n);
-int search_notes_tagged(num n);
-int view_notes_by_date(num n);
-int create_notes_db(num n);
-int show_calendar_list(num n);
-int show_todo_list(num n);
-char *get_notes_status();
-int reload_tag_view();
-#endif
 
 #if	!DARWIN
 /*

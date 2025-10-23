@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.6T64 (17/7/2025)"
+#define VERSION 	 "#01.7 (23/10/2025)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -29,7 +29,7 @@
 #define	USE_UTF8	1	/* Use utf8 characters  */
 
 #define WRAPD	0	/* wrap debug  */
-#define	FAST_GTK_SCREEN	1
+#define	FAST_GTK_SCREEN	0
 
 #if	DARWIN
 #define	_FILE_OFFSET_BITS	64
@@ -46,6 +46,7 @@
 #define	DRIVER_XLIB		1
 #define	DRIVER_GTK2		2
 #define DRIVER_GTK3		3
+#define DRIVER_GTK4		4
 
 #define DIR_NAME_POSITION	30
 #define	TAGS_WIDTH	15
@@ -123,7 +124,9 @@
 #include <curses.h>
 #include <panel.h>
 #else
+#if	!GTK4
 typedef	int		bool;	/* define our own bool type  */
+#endif
 #endif
 
 #if	XLIB
@@ -330,7 +333,7 @@ typedef struct GWINDP {
  GtkWidget *box;
  GtkBox *hbox;
  void *draw;	// geditdisplay widget
- GtkVScrollbar *scroll_bar;	// scrollbar
+ GtkScrollbar *scroll_bar;	// scrollbar
  GtkAdjustment *draw_adj;
  int ptype; 	/* parent type 1->vertical, 2->horizontal, 0->no split allowed */
  struct BTWE *bte;
@@ -390,7 +393,7 @@ typedef struct BTWE {
 	int id;		/* needed for debugging */
 	int	type; /* 0=root left=1, right=2 */
 	GtkBox *pbox;
-	GtkVBox *pan;
+	GtkBox *pan;
 } BTWE;
 #else
 typedef struct BTWE {
@@ -555,7 +558,7 @@ typedef struct  WINDP {
 	short	w_width;				/* for wrap width  */
 	num		w_lcol;					/* offset of text in the window */
 	num		w_plcol;				/* previous w_lcol */
-	struct GWINDP *gwp;				/* internal window structure (gtk or other) */
+	struct GWINDP *gwp;				/* driver specific window structure (gtk or other) */
 	int 	id;
 
 	int		w_ppline;				/* previous window physical line */

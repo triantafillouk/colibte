@@ -20,7 +20,7 @@ typedef struct _GePlotAreaClass GePlotAreaClass;
 
 struct _GePlotAreaClass
 {
-	GtkVBoxClass parent_class;
+	GtkBoxClass parent_class;
 	GdkColor	bgcolor;
 	GdkColor	fgcolor;
 };

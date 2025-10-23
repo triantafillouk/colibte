@@ -8,6 +8,7 @@
 */
 
 #include "xe.h"
+#include "display_driver.h"
 #include	<wchar.h>
 
 long utf8_to_unicode(unsigned char* const utf8_str) ;
@@ -61,6 +62,7 @@ int chardline(WINDP *wp);
 offs  FUtfCharAt_nocheck(FILEBUF *bf, offs offset, utfchar *uc);
 
 FILEBUF *cbfp=NULL;
+
 int clen_error=0;
 void undo_CheckSize(UNDOS *u);
 void undo_change_undo(undo_Change *uc);
@@ -93,6 +95,16 @@ offs   FPrevLine(FILEBUF *fp,offs ptr);
 offs   LineEnd(offs ptr);
 
 void FindLineCol(TextPoint *tp);
+
+FILEBUF *current_file_buffer()
+{
+ return cbfp;
+}
+
+void set_current_file_buffer(FILEBUF *bp)
+{
+	cbfp=bp;
+}
 
 void MESG_time(const char *fmt, ...)
 {
@@ -920,7 +932,7 @@ void  FindOffset(TextPoint *tp)
 	o=FUtfCharAt(fp,o,&uc);
 	if(uc.uval[0]=='\n'||uc.uval[0]=='\r') {
 		o--;
-		error_line("FindOffset: EOL, column bigger than expected! %d %d",c,tp->col);
+		// error_line("FindOffset: EOL, column bigger than expected! %d %d",c,tp->col);
 		break;
 	};
 	if(uc.uval[0]=='\t') c=next_tab(c);
@@ -931,7 +943,7 @@ void  FindOffset(TextPoint *tp)
    tp->offset=o;
    tp->flags = FULLDEFINED;
 #if	WRAPD
-   sprintf(mesgs,"(o=%lld l=%lld c=%lld t [%s]) (o=%lld l=%lld c=%lld) beg=%lld final=%lld",
+   MESG("(o=%lld l=%lld c=%lld t [%s]) (o=%lld l=%lld c=%lld) beg=%lld final=%lld",
    	o0,l0,c0,tp_name[t0],o1,l1,c1,o2,o);
 #endif
 }
@@ -1570,6 +1582,7 @@ num physical_column(num vcol)
 
 num WGetCol()
 {
+ // MESG("WGetCol:");
 // num col1;
  num col2;
 //	col1 = tp_col(cwp->tp_current) - cwp->w_lcol;
@@ -1872,6 +1885,7 @@ num get_lines(FILEBUF *bp)
 num get_utf2to16_size(char *file_name)
 {
  FILE *fi=fopen(file_name,"r");
+ if(fi==NULL) { MESG("cannot get file size!"); return 0;};
  size_t res;
  unsigned short in_i;
  num size=0;
@@ -2192,13 +2206,13 @@ int	writeout(char *name, FILEBUF *bf)
 	 if(bf->FileTime != st.st_mtime)
 	 {
 	 	if(discmd)
-		if(!confirm("File changed by other","Replace? ",1)) return(false);
+		if(!confirm("Replace?","File changed by other",1)) return(false);
      }
      inodeinfo_set(bf,&st);
      if((int)bt_dval("make_backup")==1) 
      {
 	 	if(CreateBak(bf)!=true)	 {
-			if(!confirm("Cannot create backup file", "continue ?",0)) return(false);
+			if(!confirm("Continue ?","Cannot create backup file",0)) return(false);
       	} else bak_created=TRUE;
 	 };
    }   else   {
@@ -3776,7 +3790,7 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
  utfchar uc;
  num col=0;;
  num file_size=FSize(fp);
- MESG("FCheckNextLine:");
+ // MESG("FCheckNextLine:");
  if(fp->EolSize>1) {
 	char c0=fp->EolStr[0];
 	char c1=fp->EolStr[1];
@@ -3786,7 +3800,7 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
 				ptr++;
 			} else continue; 
 			if(col>fp->maxlinelen) { fp->maxlinelen=col;*display_size=col;};
-			MESG("Line_size:2 %ld",*display_size);
+			// MESG("Line_size:2 %ld",*display_size);
 			return ptr;
 		};
 		if(uc.uval[0]==CHR_TAB) col=next_tab(col);
@@ -3799,17 +3813,17 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
 		ptr=FUtfCharAt_nocheck(fp,ptr,&uc);
 		if(uc.uval[0]==c0) {
 			if(col>fp->maxlinelen) { fp->maxlinelen=col;*display_size=col;};
-			MESG("Line_size:1 %ld",*display_size);
+			// MESG("Line_size:1 %ld",*display_size);
 			return ptr;
 		};
 		if(uc.uval[0]==CHR_TAB) col=next_tab(col);
 		else col+=get_utf_length(&uc);
 	};
-	MESG("eof?");
+	// MESG("eof?");
  };
  // last line with no new line at the end
  if(col>fp->maxlinelen) { fp->maxlinelen=col;*display_size=col;};
- MESG("Line_size:0 %ld",*display_size);
+ // MESG("Line_size:0 %ld",*display_size);
  return ptr;
 }
 
