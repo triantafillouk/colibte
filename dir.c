@@ -1332,10 +1332,10 @@ int dir_view(num n)
   int is_dir;
   char fname[512];
   FILEBUF *fp=current_file_buffer();
-  MESG("dir_view:");
+  // MESG("dir_view:");
   if(!(fp->b_flag & FSNLIST)) return FALSE;
   is_dir=dir_getfile(fname,0);
-  MESG("dir_view:[%s]",fname);
+  // MESG("dir_view:[%s]",fname);
   if(is_dir<0) {
   	return error_line("Not a directory! '%s'",fname);
   };

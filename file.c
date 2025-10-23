@@ -397,7 +397,7 @@ int load_scratch_files()
  char scratch_name[MAXFLEN];
  int stat=0;
  int ind=0;
- MESG("load_scratch_files:");
+ // MESG("load_scratch_files:");
  stat=snprintf(home_dir,sizeof(home_dir),"%s/.%s",getenv("HOME"),APPLICATION_NAME);
  if(stat>=MAXFLEN) {error_line("truncated scratch file");return 0;};
 

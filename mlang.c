@@ -559,7 +559,7 @@ void initialize_vars()
 int is_mlang(FILEBUF *fp)
 {
  int bt=fp->b_type;
- MESG("check macro file!");
+ // MESG("check macro file!");
  if(fp->b_flag & FSNLIST) {
  	msg_line("dir is not an mlang file! %X",fp->b_flag);
 	return 0;
@@ -1819,7 +1819,7 @@ static double term1_mul(double v1)
 			char *news=str_mul(sval,v2);
 			// MESG(";; news=%s",news);
 			set_sval(news);
-			MESG("ok!");
+			// MESG("ok!");
 			return v2;
 		};
 	};
@@ -1939,7 +1939,7 @@ double factor_sep(){
 }
 
 double factor_comma(){
-	MESG("factor_comma:");
+	// MESG("factor_comma:");
 	NTOKEN2;
 	return 0.0;
 }
@@ -2377,7 +2377,7 @@ double logical_nand(double value)
 double assign_option(double none)
 {
 double	value=lexpression();
-	MESG("assign_option:");
+	// MESG("assign_option:");
 	if(var_node->node_vtype==VTYPE_STRING) {free(var_node->node_sval);};
 	if(vtype_is(VTYPE_STRING)){
 		var_node->node_vtype=VTYPE_STRING;
