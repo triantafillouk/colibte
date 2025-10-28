@@ -2073,7 +2073,7 @@ void set_tok_directive(tok_struct *tok, FFunction directive)
 void set_term_function(tok_struct *tok, TFunction term_function)
 {
 	tok->term_function = term_function;
-	MESG_TOK_INFO(" term",tok);
+	// MESG_TOK_INFO(" term",tok);
 }
 
 // Directive functions
@@ -3314,7 +3314,7 @@ void MESG_TOK_INFO(char *title,tok_struct *tok)
 {
 	static int prev_tok_num=-1;
 	if(tok->tnum!=prev_tok_num) {
-		MESG("%-20s : %s",title,tok_info(tok));
+		MESG("%-25s : %s",title,tok_info(tok));
 		prev_tok_num=tok->tnum;
 	};
 }
@@ -3322,6 +3322,7 @@ void MESG_TOK_INFO(char *title,tok_struct *tok)
 char * tok_info(tok_struct *tok)
 {
  static char stok[MAXLLEN];
+	if(tok==NULL) { return "null token";};
 	// MESG("tok_info: start");
 	// MESG("tok_info: ttype=%d",tok->ttype);
 	if(tok->tname!=NULL){
