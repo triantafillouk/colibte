@@ -17,7 +17,11 @@
 #include	"token_table.h"
 
 #define	SYNTAX_DEBUG	0
-#define	NTOKEN2	tok++
+#if	1
+#define NTOKEN2 tok++
+#else
+#define	NTOKEN2	ntoken2()
+#endif
 #define FACTOR_FUNCTION tok->factor_function()
 void mesg_out(const char *fmt, ...);
 extern FILEBUF *cbfp;
@@ -102,6 +106,7 @@ int err_num=0;
 static int err_line=0;
 int last_correct_line=0;
 static tok_struct *tok;	/* current token!!  */
+void ntoken2() { tok++;MESG("NTOKEN");};
 
 char *err_str;
 BTNODE *var_node=NULL;
@@ -2112,6 +2117,12 @@ double term_plus(double value)
  double d1;
  if(vtype_is(VTYPE_NUM)) {
 	NTOKEN2;
+#if	0
+ if(tok->ttype==TOK_VAR) {
+ 	// MESG("lexpression var:%s",tok_info(tok));
+	d1 = factor_variable();
+ } else
+#endif
 	d1=num_term1();
 	// MESG("term_plus");
 	if(vtype_is(VTYPE_NUM)) return value+d1;
@@ -2337,41 +2348,56 @@ double expression(char *title)
 
 double logical_or(double value)
 {
- int v2;
-	v2=(int) lexpression();
-//	MESG("logical_or: v2=%d || value=%f",v2,value);
-	return v2 || value;
+ // MESG("<< logical or: %s",tok_info(tok));
+ NTOKEN2;
+ int v2 = FACTOR_FUNCTION > 0;
+ int ires=(value>0) | v2;
+
+ set_dval((double) ires);
+ return ires;
 }
 
 double logical_xor(double value)
 {
- int v2;
-	v2=(int) lexpression();
-//	MESG("%d XOR %d = %d",value,v2,value^v2);
-	// set_vtype(VTYPE_NUM);
-	return ((int)value)^v2;
+ NTOKEN2;
+ int v2 = FACTOR_FUNCTION > 0;
+ int ires=(value>0) ^ v2;
+
+ set_dval((double) ires);
+ return ires;
 }
 
 double logical_nor(double value)
 {
- int v2=(int) lexpression() >0;;
-	// set_vtype(VTYPE_NUM);
-	return (!((value>0) || v2));
+ NTOKEN2;
+ int v2 = FACTOR_FUNCTION > 0;
+ int ires=!((value>0) || v2);
+
+ set_dval((double) ires);
+ return ires;
 }
 
 double logical_and(double value)
 {
- int v2=(int) lexpression() >0;
-	// set_vtype(VTYPE_NUM);
-	return v2 && (int)value;
+ // MESG("<< logical and: %s",tok_info(tok));
+ NTOKEN2;
+ int v2 = FACTOR_FUNCTION > 0;
+ // NTOKEN2;
+ // MESG("-- logical and: next is [%s] res=%d",tok_info(tok),v2);
+ int ires=(value>0) & v2;
+ set_dval((double) ires);
+ // MESG(">> logical_and:k %f & %d -> %d",value,v2,ires);
+ 	return ires;
 }
 
 double logical_nand(double value)
 {
- int v2;
-	v2=(int) lexpression();
-	// set_vtype(VTYPE_NUM);
-	return !(v2 && (int)value);
+ NTOKEN2;
+ int v2 = FACTOR_FUNCTION > 0;
+ int ires=!((value>0) && v2);
+
+ set_dval((double) ires);
+ return ires;
 }
 
 double assign_option(double none)
@@ -2400,26 +2426,33 @@ double lexpression()
 {
  double value;
  TDS("lexpression");
- // MESG(";lexpression: [%s]",tok_info(tok));
+ // MESG("# lexpression:0 start [%s]",tok_info(tok));
  value = cexpression();
- // MESG("lexpression : [%s] cexpression result = %f",tok_info(tok),value);
+ // MESG("  lexpression :1 		[%s] cexpression result = %f",tok_info(tok),value);
  if(tok->tgroup == TOK_TERM0){
+ 	// MESG("  lexpression:1a term0! group=%d %d %d",tok->tgroup,TOK_BOOL,TOK_TERM0);
 	tok_struct *tok0=tok;
  	NTOKEN2;
-	RTRN(tok0->term_function(value));
+	value = tok0->term_function(value);
+
+	set_vdval(value);
+	RTRN(value);
  };
+ // MESG("  lexpression:2 start loop --- %s",tok_info(tok));
  while(tok->tgroup==TOK_BOOL){
 	// MESG("while: BOOL");
 	tok_struct *tok0=tok;
-//	MESG("lexpression in loop!: [%s] value=%f",tok_info(tok),value);
- 	NTOKEN2;
-	value =tok0->term_function(value);
-//	MESG("lexression result is %f",value);
+	// NTOKEN2
+	// MESG(" -lexpression:3 in loop! [%s] value=%f",tok_info(tok),value);
+	double value1 =tok0->term_function(value);
+	// MESG(" -lexression:4 in loop, result is %f -> %f",value,value1);
+	// NTOKEN2;
 	// set_vtype(VTYPE_NUM);
+	value=value1;
 	set_vdval(value);
  };
  
-	// MESG("lexpression return value %f [%s]",value,tok_info(tok));	
+	// MESG("! lexpression:4 return value %f [%s]",value,tok_info(tok));	
 	RTRN(value);
 }
 
@@ -2679,6 +2712,29 @@ void skip_sentence1()
 }
 
 
+char *ddot_string()
+{
+ static char ddot_string[256];
+ TextPoint *tp = tok->ddot;
+ FILEBUF *buf = tp->fp;
+ offs ddot_pos = tp_offset(tok->ddot);
+ offs i,sl,el; // current offset, start,end of line
+
+ el=FLineEnd(buf,ddot_pos);
+ sl=FLineBegin(buf,ddot_pos);
+
+ ddot_pos=el-sl;
+	for(i=sl;i<el;i++) {
+		int c=FCharAt(buf,i);
+		if( c==':' || i-sl>sizeof(ddot_string)-1) { 
+			ddot_string[i-sl]=0;
+			break;
+		};
+		ddot_string[i-sl]=c;
+	};
+  return ddot_string;
+}
+
 void update_ddot_line(char *ddot_out)
 {
  FILEBUF *old_fp;
@@ -2723,14 +2779,12 @@ void refresh_ddot_1(double value)
  // MESG("refresh_ddot: %d",get_vtype());
  if(execmd) {
 	 if(vtype_is(VTYPE_NUM)) {
-		if(lstoken) {
-			printf(";%s	: %.3f\n",lstoken->tname,value);
-		} else printf(";	: %.3f\n",value);
+		printf("%s	: %.3f\n",ddot_string(),value);
 	 } else if(vtype_is(VTYPE_STRING)) {
-	 	if(lstoken) {
-			printf(";%s	: %s\n",lstoken->tname,get_sval());
-		} else printf(";	: '%s'\n",get_sval());
-	 } else if(vtype_is(VTYPE_ARRAY)||vtype_is(VTYPE_SARRAY)||vtype_is(VTYPE_AMIXED)) print_array1(";",get_array("36"));
+		printf("%s	: %s\n",ddot_string(),get_sval());
+	 } else if(vtype_is(VTYPE_ARRAY)||vtype_is(VTYPE_SARRAY)||vtype_is(VTYPE_AMIXED)) {
+	 	print_array1(ddot_string(),get_array("36"));
+	 };
 	 lstoken=NULL;
 	 NTOKEN2;
 	 return;

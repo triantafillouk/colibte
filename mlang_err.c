@@ -351,8 +351,7 @@ int  err_push_args_1(int *nargs)
 
 void stack_push(char *title,tok_struct *tok)
 {
- MESG("PUSH %-25s : %s",title,tok_info(tok));
- // MESG_TOK_INFO(title,tok);
+ // MESG("PUSH %-25s : %s",title,tok_info(tok));
 }
 
 int err_assign_args1(int nargs)
@@ -576,7 +575,7 @@ int err_factor()
 {
  static int pre_symbol=0;
  TDSERR("factor");
- // MESG_TOK_INFO("-- push factor",tok);
+ MESG_TOK_INFO("-- factor",tok);
  stack_push("-- push factor",tok);
  int save_macro_exec;
  tok_struct *tok0; 
@@ -1079,7 +1078,6 @@ int err_num_term3(tok_struct *tok1)
  // tok_struct *tok0=tok;
  // MESG("-- term2 start: %s",tok_info(tok));
  err_num = err_factor();
- // MESG_TOK_INFO("-- push term3",tok1);
  stack_push("-- push term3",tok1);
  if(err_num) RT_MESG1(err_num);
 
@@ -1089,13 +1087,12 @@ int err_num_term3(tok_struct *tok1)
 	set_term_function(tok,factor_funcs[tok->ttype]);
 	tok_struct *tok0=tok;
 
-	if(tok0->ttype==TOK_MOD) {
+	if(tok1->ttype==TOK_MOD) {
 		NTOKEN_ERR(544);
 		// MESG("# term3 function [%s]",tok_info(tok0));
 		err_num = err_num_term3(tok0);
 	} else {
 		NTOKEN_ERR(544);
-		// MESG_TOK_INFO("-- push term3 function",tok1);
 		stack_push("-- push term3 function",tok1);
 		err_num = err_num_term3(tok0);
 	};
@@ -1194,8 +1191,7 @@ int err_num_expression()
 		set_term_function(tok,term_plus);
 		NTOKEN_ERR(568);
 		err_num=err_num_term1();
-		// MESG_TOK_INFO("-- push expression func",tok0);
-		stack_push("-- push expression func",tok0);
+		// stack_push("-- push expression func",tok0);
 		if(err_num) return (err_num);
 		CHECK_TOK(569);
 		simple=0;
@@ -1210,22 +1206,20 @@ int err_num_expression()
 		}
 	};
 	if(tok->ttype==TOK_MINUS) {	/* TOK_MINUS  */
-		// tok->term_function = term_minus;
 		set_term_function(tok,term_minus);
 		NTOKEN_ERR(571);
 		if(expression_type==VTYPE_STRING) {	// operator on first chars of strings. numeric result
 			err_num=err_num_term1();
-			// MESG_TOK_INFO("-- push exp function",tok0);
-			stack_push("-- push exp function",tok0);
+			// stack_push("-- push exp function",tok0);
 			CHECK_TOK(573);
 			simple=0;
 		} else 	{
 			err_num=err_num_term1();
-			// MESG_TOK_INFO("-- push exp function",tok0);
-			stack_push("-- push exp function",tok0);
+			// stack_push("-- push exp function",tok0);
 			CHECK_TOK(574);
 		}
 	};
+	stack_push("-- push expression end",tok0);
  };
  // MESG_TOK_INFO("! end expression",tok);
  RT_MESG1(599);
@@ -1251,6 +1245,7 @@ int err_lexpression()
 			// tok->term_function = logical_or;
 			MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_or);
+			tok->tgroup=TOK_BOOL;
 			NTOKEN_ERR(704);
 			err_num=err_lexpression();
 			if(err_num) return err_num;
@@ -1262,6 +1257,7 @@ int err_lexpression()
 			// tok->term_function = logical_xor;
 			MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_xor);
+			tok->tgroup=TOK_BOOL;
 			NTOKEN_ERR(709);
 			err_num=err_lexpression();
 			if(err_num) return err_num;
@@ -1273,6 +1269,7 @@ int err_lexpression()
 			// tok->term_function = logical_nor;
 			MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_nor);
+			tok->tgroup=TOK_BOOL;
 			NTOKEN_ERR(7091);
 			err_num=err_lexpression();
 			if(err_num) return err_num;
@@ -1284,6 +1281,7 @@ int err_lexpression()
 			// tok->term_function = logical_and;
 			MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_and);
+			tok->tgroup=TOK_BOOL;
 			NTOKEN_ERR(709);
 			err_num=err_lexpression();
 			if(err_num) return err_num;
@@ -1295,6 +1293,7 @@ int err_lexpression()
 			// tok->term_function = logical_nand;
 			MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_nand);
+			tok->tgroup=TOK_BOOL;
 			NTOKEN_ERR(7092);
 			err_num=err_lexpression();
 			if(err_num) return err_num;
