@@ -2117,12 +2117,6 @@ double term_plus(double value)
  double d1;
  if(vtype_is(VTYPE_NUM)) {
 	NTOKEN2;
-#if	0
- if(tok->ttype==TOK_VAR) {
- 	// MESG("lexpression var:%s",tok_info(tok));
-	d1 = factor_variable();
- } else
-#endif
 	d1=num_term1();
 	// MESG("term_plus");
 	if(vtype_is(VTYPE_NUM)) return value+d1;
@@ -2433,10 +2427,7 @@ double lexpression()
  	// MESG("  lexpression:1a term0! group=%d %d %d",tok->tgroup,TOK_BOOL,TOK_TERM0);
 	tok_struct *tok0=tok;
  	NTOKEN2;
-	value = tok0->term_function(value);
-
-	set_vdval(value);
-	RTRN(value);
+	RTRN(tok0->term_function(value));
  };
  // MESG("  lexpression:2 start loop --- %s",tok_info(tok));
  while(tok->tgroup==TOK_BOOL){
@@ -2449,7 +2440,7 @@ double lexpression()
 	// NTOKEN2;
 	// set_vtype(VTYPE_NUM);
 	value=value1;
-	set_vdval(value);
+	// set_vdval(value);
  };
  
 	// MESG("! lexpression:4 return value %f [%s]",value,tok_info(tok));	
