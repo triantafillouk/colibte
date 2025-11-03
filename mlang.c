@@ -2112,6 +2112,7 @@ static double inline dir_return()
 	return(val);
 }
 
+
 double term_plus(double value)
 {
  double d1;
@@ -2340,11 +2341,29 @@ double expression(char *title)
 	return num_expression();
 }
 
+double logical_term2()
+{
+ double v1 = FACTOR_FUNCTION > 0;
+	while(tok->ttype==TOK_AND||tok->ttype==TOK_NAND) {
+		v1 = tok->term_function(v1);
+	};
+	return v1;
+}
+
+double logical_term1()
+{
+ double v1 = logical_term2();
+ while(tok->ttype==TOK_OR || tok->ttype==TOK_NOR) {
+ 	v1 = tok->term_function(v1);
+ };
+ return v1;
+}
+
 double logical_or(double value)
 {
  // MESG("<< logical or: %s",tok_info(tok));
  NTOKEN2;
- int v2 = FACTOR_FUNCTION > 0;
+ int v2 = logical_term1() > 0;
  int ires=(value>0) | v2;
 
  set_dval((double) ires);
@@ -2354,7 +2373,7 @@ double logical_or(double value)
 double logical_xor(double value)
 {
  NTOKEN2;
- int v2 = FACTOR_FUNCTION > 0;
+ int v2 = logical_term1() > 0;
  int ires=(value>0) ^ v2;
 
  set_dval((double) ires);
@@ -2364,7 +2383,7 @@ double logical_xor(double value)
 double logical_nor(double value)
 {
  NTOKEN2;
- int v2 = FACTOR_FUNCTION > 0;
+ int v2 = logical_term1() > 0;
  int ires=!((value>0) || v2);
 
  set_dval((double) ires);
