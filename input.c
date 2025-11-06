@@ -59,7 +59,7 @@ int liston=0;
 
 extern char subname[MAXFLEN];
 
-#define	NOFUNCTION	(int(*)())(-1)
+#define	NOFUNCTION	(int(*)(num))(-1)
 
 /* input lists */
 
@@ -394,7 +394,7 @@ int assign_sub(num n)
 /* 
  * return the function given the macro name
  */
-int (*get_function(char *fname))() 
+int (*get_function(char *fname))(num) 
 {
 	BTNODE *bte;
 	int var_index;
@@ -686,7 +686,7 @@ int set_key_emulation(num emulation)
 
 /*	Return the function assigned to a key in current key assignement table. */
 /* if f is 1 then looks only the main key table */
-int (*key_function(int c,int f))()
+int (*key_function(int c,int f))(num)
 {
 	KEYTAB *ktp;
 	FILEBUF *fp=cbfp;
@@ -729,7 +729,7 @@ char * xe_key_name(int c)
 /* 	
  Returns the macro name of a function.
 */
-char *function_name(int (*func)(),char **description)
+char *function_name(int (*func)(num),char **description)
 {
 	FUNCS *ftp;
 

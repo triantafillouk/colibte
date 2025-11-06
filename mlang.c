@@ -1993,12 +1993,12 @@ FFunction factor_funcs[] = {
 
 	/* bool operators  */
 	factor_none,	// TOK_COMPARE		,
-	cexpr_notequal,	// TOK_NOTEQUAL	,
-	cexpr_smaller,	// TOK_SMALLER		,	/* <  */
-	cexpr_bigger,	// TOK_BIGGER		,	/* >  */
-	cexpr_equal,	// TOK_EQUAL		,	/* ==  */
-	cexpr_smallereq,	// TOK_SMALLEREQ	,	/* <=  */
-	cexpr_biggereq,	// TOK_BIGGEREQ	,	/* >=  */
+	(FFunction)cexpr_notequal,	// TOK_NOTEQUAL	,
+	(FFunction)cexpr_smaller,	// TOK_SMALLER		,	/* <  */
+	(FFunction)cexpr_bigger,	// TOK_BIGGER		,	/* >  */
+	(FFunction)cexpr_equal,	// TOK_EQUAL		,	/* ==  */
+	(FFunction)cexpr_smallereq,	// TOK_SMALLEREQ	,	/* <=  */
+	(FFunction)cexpr_biggereq,	// TOK_BIGGEREQ	,	/* >=  */
 
 	factor_none,	// TOK_BOOL		,
 	factor_none,	// TOK_AND			,	/* &  */
@@ -2010,10 +2010,10 @@ FFunction factor_funcs[] = {
 	/* term operators  */
 	factor_plus,	// TOK_PLUS		,
 	factor_minus,	// TOK_MINUS		,
-	term2_power,	// TOK_POWER		,	/* ** */
-	term2_modulo,	// TOK_MOD			,	/* %  */
-	term1_mul,	// TOK_MUL			,
-	term1_div,	// TOK_DIV			,
+	(FFunction)term2_power,	// TOK_POWER		,	/* ** */
+	(FFunction)term2_modulo,	// TOK_MOD			,	/* %  */
+	(FFunction)term1_mul,	// TOK_MUL			,
+	(FFunction)term1_div,	// TOK_DIV			,
 
 	factor_line_array,	// TOK_LBRAKET		,
 	factor_error,	// TOK_RBRAKET		,
@@ -2063,7 +2063,7 @@ void set_tok_function(tok_struct *tok, int type)
 			};
 			break;
 		case 1:
-			tok->cexpr_function = factor_funcs[tok->ttype];
+			tok->cexpr_function = (EFunction)factor_funcs[tok->ttype];
 			// MESG(" c tok %2d: %s type [%d %s] set cepr function",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype]);
 
 	};

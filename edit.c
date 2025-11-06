@@ -2629,7 +2629,7 @@ int toggle_just(num n)
 int read_colors(num n)
 {
 // MESG("read_colors:n=%d",n);
- if(color_scheme_read())
+ if(color_scheme_read(1))
  {
 	msg_line("Read from color file!");
 	change_color_scheme(color_scheme_ind+1);

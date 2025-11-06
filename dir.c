@@ -2552,7 +2552,7 @@ int listdir(int dtype)
  return stat;
 }
 
-int listdir1()
+int listdir1(num dummy)
 {
  int stat=0;
  stat=listdir(1);
@@ -2560,7 +2560,7 @@ int listdir1()
  return(stat);
 }
 
-int listdir2()
+int listdir2(num dummy)
 {
  int stat=0;
  stat=listdir(2);

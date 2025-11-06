@@ -1084,7 +1084,7 @@ int err_num_term3(tok_struct *tok1)
  if(tok->tgroup==TOK_TERM2) {
  	CHECK_TOK(543);
 	// tok->term_function = factor_funcs[tok->ttype];
-	set_term_function(tok,factor_funcs[tok->ttype]);
+	set_term_function(tok,(TFunction)factor_funcs[tok->ttype]);
 	tok_struct *tok0=tok;
 
 	if(tok1->ttype==TOK_MOD) {
@@ -1115,7 +1115,7 @@ int err_num_term2()
  if(tok->tgroup==TOK_TERM2) {
  	CHECK_TOK(543);
 	// tok->term_function = factor_funcs[tok->ttype];
-	set_term_function(tok,factor_funcs[tok->ttype]);
+	set_term_function(tok,(TFunction)factor_funcs[tok->ttype]);
 	tok_struct *tok0=tok;
 
 	if(tok0->ttype==TOK_MOD) {
@@ -1150,7 +1150,7 @@ int err_num_term1()
  	// tok1=tok;
  	// tok->term_function = factor_funcs[tok->ttype];
 	tok0=tok;
-	set_term_function(tok,factor_funcs[tok->ttype]);
+	set_term_function(tok,(TFunction)factor_funcs[tok->ttype]);
 	CHECK_TOK(553);
 	NTOKEN_ERR(5531);
 	err_num=err_num_term2();
@@ -1312,7 +1312,7 @@ int err_lexpression()
 		case TOK_INCREASEBY: {
 			// tok->term_function = increase_by;
 			MESG_TOK_INFO("# err_lexpression",tok);
-			set_term_function(tok,increase_by);
+			set_term_function(tok,(TFunction)increase_by);
 			tok->tname = "+=";
 			NTOKEN_ERR(710);
 			err_num=err_increase_by();
@@ -1321,7 +1321,7 @@ int err_lexpression()
 		case TOK_MULBY: {
 			// tok->term_function = mul_by;
 			MESG_TOK_INFO("# err_lexpression",tok);
-			set_term_function(tok,mul_by);
+			set_term_function(tok,(TFunction)mul_by);
 			tok->tname = "*=";
 			NTOKEN_ERR(710);
 			err_num=err_mul_by();
@@ -1330,7 +1330,7 @@ int err_lexpression()
 		case TOK_DECREASEBY: {
 			// tok->term_function = decrease_by;
 			MESG_TOK_INFO("# err_lexpression",tok);
-			set_term_function(tok,decrease_by);
+			set_term_function(tok,(TFunction)decrease_by);
 			tok->tname = "-=";
 			NTOKEN_ERR(710);
 			err_num=err_decrease_by();

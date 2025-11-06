@@ -272,7 +272,7 @@ void show_menu_line(int line,M_element *element,int bcolor,int fcolor)
 	xdab(line+1,element->high, text_line,bcolor,fcolor);
 }
 
-int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
+int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))(num)
 {
  int i,j,c,iol=0;
  int sx,sy,nu,maxl;
@@ -280,7 +280,7 @@ int (*get_menucmd(MENUS *m1,int first,int pos_x,int pos_y))()
  int orient;
  int bch=color_menu_bg;
  int fch=color_menu_fg;
- int (*execf)();
+ int (*execf)(num);
  int border=1;
 
  sx=sy=maxl=nu=0;
@@ -572,7 +572,7 @@ extern int mousey,mousex;
 int execute_menu(num fixed)	/* execute menu */
 {
  register int status=FALSE;
- register int (*execfunc)(int);		/* ptr to function to execute */
+ register int (*execfunc)(num);		/* ptr to function to execute */
  int line=1;
  short key;
  long int repeat = repeat_arg;
@@ -677,7 +677,7 @@ int selectl(char *title,char *m_array[],int nu,int max_height,int sx,int sy,int 
  int border=0;
 
  char name[MAXFLEN];
- int (*execf)();
+ int (*execf)(num);
  char *title_shown=strdup(title);
  int slen=0; 
 
@@ -1005,7 +1005,7 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
  int quotef;
  int ci;	/* character to insert  */
  int cw=0;	/* character width  */
- int (*execf)();
+ int (*execf)(num);
  utfchar uc;
  char st[MAXLLEN];	// this is the string to display (asterix for encrypted)
  char st2[MAXLLEN];	// this is the real string

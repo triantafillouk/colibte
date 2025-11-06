@@ -82,7 +82,7 @@ int show_position_info(num short_version);
 void draw_window(int,WINDP *wp,char *from);
 void expose_window(WINDP *wp);
 void change_window(WINDP *wp);
-int (*key_function(int c,int f))();
+int (*key_function(int c,int f))(num);
 short int get_next_key(num mode);
 char *date_string(num n);
 int insert_date(num n);
@@ -111,7 +111,7 @@ int execute_session(char *);
 int parse_check_current_buffer(num n);
 int parse_buffer_show_tokens(num n);
 int set_color(num);
-int color_scheme_read();
+int color_scheme_read(num);
 
 int set_sort_mode(num mode);
 
@@ -300,8 +300,8 @@ int insert_dir(FILEBUF *buf_dir,int retain);
 int set_ddir(FILEBUF *file_buf);
 int list_dir(char *d1,FILEBUF *file_buf);
 void list_dir1(char *st);
-int listdir1();
-int listdir2();
+int listdir1(num);
+int listdir2(num);
 
 void set_todirname(char *base_name,int dir_num);
 int selectl(char *title,char *m[],int nu,int lmax,int sx,int sy,int width,int active);
@@ -344,7 +344,7 @@ int getckey();
 int startup(char *sfname);
 char *find_file(char *subdir,char *fname,int cflag,int create_if_not_found);
 char *cmdstr(int c);
-char *function_name(int (*func)(), char **description);
+char *function_name(int (*func)(num), char **description);
 
 // crypt.c
 int set_key( num n);
