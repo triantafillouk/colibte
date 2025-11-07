@@ -1352,8 +1352,6 @@ void init_extensions()
 {
  char *fname;
 
- set_start_dir(NULL);
-
  if((fname = find_file("",APPLICATION_EXTENSIONS,1,0))==NULL) return;
 
  read_pairs(fname,'=',&f_extension,&f_extcmd);

@@ -109,6 +109,7 @@ int main(int argc, char **argv)
 	if(lc_lang==NULL) lc_lang=getenv("LANG");
 	else if(lc_lang[0]==0) lc_lang=getenv("LANG");
 	errno=0;
+	set_start_dir(NULL);
 
 	// check_config_dir();
 	init_hash();
@@ -123,8 +124,6 @@ int main(int argc, char **argv)
 		// scratch_files[0] = load_scratch_files();
 		firstbp=get_scratch_file();
 	};
-	// MESG("main:start1");
-	set_start_dir(NULL);
 #if	TNOTES
 	init_note_keys();
 #endif
@@ -153,6 +152,7 @@ int main(int argc, char **argv)
 		};
 		driver_type=init_drv_env();	// driver depending variable initialization
 	};
+
 	// MESG("execute statup file");
 	// list_buffers("0");
 	/* execute startup file here */
@@ -403,7 +403,8 @@ void parse_command_line(int argc, char **argv)
 			}
 #endif
 		}
-	};
+	}
+	;
 #if	0
 	if (firstbp==NULL) {
 				firstbp = get_scratch_file();

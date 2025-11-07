@@ -1207,8 +1207,7 @@ int is_system_file(char *fname)
 			return 1;
 		} else return 0;
 	};
-	msg_line("cannot open");
-	return 1;
+	return 0;
 }
 
 int open_file_named(char *fname)
@@ -1239,6 +1238,7 @@ int open_file(num n)
  char fname[MAXFLEN];	/* file user wishes to find */
  char tname[MAXFLEN];
  char prompt[MAXFLEN];
+
  offs o1=Offset();
  int err=0;
  int stat=0;
@@ -1262,8 +1262,9 @@ int open_file(num n)
 	} else tname[0]=0;
 	if(! (cbfp->b_flag & FSDIRED)){
 	if(cbfp->b_fname[0]==CHR_LBRA) {
+		// MESG("open_file: cwd=[%s] start_dir=[%s]",getcwd(dir_name,MAXFLEN),get_start_dir());
 		if(chdir(get_start_dir())) {
-			error_line("cannot open file in dir [%s]",cbfp->b_dname);
+			error_line("cannot open file in dir [%s]",get_start_dir());
 			return false;
 		};
 	} else {
@@ -1471,7 +1472,7 @@ int resetkey(FILEBUF *bp)	/* reset the encryption key if needed */
 int goto_file(char *file_name)
 {
     FILEBUF *bp;
-	MESG("goto_file:[%s][%s]",cbfp->b_dname,file_name);
+	// MESG("goto_file:[%s][%s]",cbfp->b_dname,file_name);
 	if(edit_file(file_name)) return(TRUE);
 	if((bp=new_filebuf(file_name,0))==NULL) {
     	msg_line("Cannot create buffer [%s]",file_name);
@@ -1576,8 +1577,18 @@ void set_bfname(char *full_name, char *fname)
 	} else if(fname[0]=='.' && fname[1]==0) {
 		strlcpy(full_name,getcwd(dir_name,MAXFLEN),MAXFLEN);
 	} else {
-		if(cbfp) set_full_name(full_name,cbfp->b_dname,fname,MAXFLEN);
-		else set_full_name(full_name,getcwd(dir_name,MAXFLEN),fname,MAXFLEN);
+		int f1 = fname[0]=='[';
+		
+		if(cbfp) {
+			f1 = f1 || (cbfp->b_fname[0]=='[' && cbfp->b_fname[1]=='D');
+		};
+		// MESG("set_bfame: f1=%d",f1);
+		if(f1) {
+			if(cbfp) set_full_name(full_name,cbfp->b_dname,fname,MAXFLEN);
+			else set_full_name(full_name,getcwd(dir_name,MAXFLEN),fname,MAXFLEN);
+		} else {
+			set_full_name(full_name,get_start_dir(),fname,MAXFLEN);
+		};
 	};
 }
 
@@ -1615,7 +1626,9 @@ int saveas_file(num n)
 		return 0;
 	};
 #endif
+	// do not save if block file of fifo!
 	if(is_system_file(cbfp->b_fname)) return 0;
+
 	strlcpy(fname,cbfp->b_fname,MAXFLEN);
 	if(snprintf(save_as_msg,sizeof(save_as_msg),"Save as: %s:",get_working_dir())>=MAXFLEN) return FALSE;
     if ((status=nextarg(save_as_msg, fname, MAXFLEN,true)) != TRUE) return FALSE;
@@ -1981,7 +1994,6 @@ int file_type(char *name, int *compression_type,char *oext)
 void edinit(char *bname)
 {
     register FILEBUF *bp;
-	// MESG("edinit:");
     bp = new_filebuf(bname,0);             /* First buffer         */
     if (bp==NULL) { ERROR("cannot create buffer [%s]",bname); exit(1);};
 	
