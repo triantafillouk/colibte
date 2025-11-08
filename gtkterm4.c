@@ -462,7 +462,7 @@ void init_color()
  int i;
   // MESG("init_color:");
   /* Read the colors from the conf files  */
-  color_scheme_read();
+  color_scheme_read(1);
   for(i=0;i<COLOR_TYPES;i++) 
   	current_colors[i]=(GdkRGBA *)malloc(sizeof(GdkRGBA));
 }

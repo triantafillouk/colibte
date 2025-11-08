@@ -56,7 +56,7 @@ LPCURSES0=-lpanel -lncurses  $(GLIB_LIB)
 OSYSTEM=DARWIN
 SHAREDDIR=/usr/local/share
 X11include=-I/opt/X11/include/
-X11lib0= -lX11 -L/opt/X11/lib $(GLIB_LIB)
+X11lib0= -lX11 -L/opt/X11/lib
 EXTFILE=.$(APP_NAME)_ext_mac
 WSL:=0
 CC=zig cc -DGVERS='"$(GVERS)"'
@@ -149,11 +149,11 @@ FLAGS4 =  -DXLIB=$(XLIB) -D$(OSYSTEM)=1 -DWSL=$(WSL) -DGDK=1 -DGDK4=1 -DPCURSES=
 #ctg4 gtkterm4.o screen.o gplot4.o: GTKINCLUDE4=`pkg-config gtk4 --cflags` -DGTK4=1 
 
 ifeq ($(TNOTES), 1)
-GTK2_FLAGS=`pkg-config gtk+-2.0 --libs` $(X11lib) ${SQLITE3}
+GTK2_FLAGS=`pkg-config gtk+-2.0 --libs` ${SQLITE3}
 GTK3_FLAGS=`pkg-config gtk+-3.0 --libs` $(X11lib) ${SQLITE3}
 GTK4_FLAGS=`pkg-config gtk4 --libs` $(X11lib) ${SQLITE3}
 else
-GTK2_FLAGS=`pkg-config gtk+-2.0 --libs` $(X11lib) 
+GTK2_FLAGS=`pkg-config gtk+-2.0 --libs`
 GTK3_FLAGS=`pkg-config gtk+-3.0 --libs` $(X11lib) 
 GTK4_FLAGS=`pkg-config gtk4 --libs` $(X11lib) 
 endif
@@ -350,7 +350,7 @@ ctg4: tplot.o gsystem.o gldisplay.o edit.o gtkterm4.o dir.o screen4.o  eval.o ml
 
 #	The following is with gtk2 library and cairo plot. gplotc(gcanvas)
 ctg2 : gmain.o gsystem.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o   gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o plot_cairo.c  config_init.o utf8_support.o notes.o mlangf.o
-	${CC} gmain.o gsystem.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o notes.o mlangf.o -o ctg2  $(GTK2_FLAGS)  ${SQLITE3}  -lm
+	${CC} gmain.o gsystem.o edit.o  screen.o  gldisplay.o eval.o mlangg.o  file.o ginput.o help.o search.o  word.o window.o marks.o convert.o  gtkterm.o gplotc.o support.o geditdisplay.o gcanvasc.o highlight.o dir.o utils.o alist.o filebuf.o gtk_support.o  config_init.o utf8_support.o notes.o mlangf.o -o ctg2  $(GTK2_FLAGS)  ${SQLITE3} 
 
 find_tags: find_tags.c support.o alist.o
 	${CC} $(CPU_OPTIONS) find_tags.c support.o alist.o -o find_tags
