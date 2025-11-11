@@ -671,7 +671,7 @@ int exec_named_function(char *name)
     FILEBUF *bp;		/* ptr to buffer to execute */
     char bufn[MAXFLEN+2];		/* name of buffer to execute */
 	int ival;
-
+	// MESG("exec_named_function: %s",name);
 	/* find out what buffer to execute */
 	strlcpy(bufn+1,name,MAXFLEN);
 
@@ -688,7 +688,8 @@ int exec_named_function(char *name)
 	bp->b_type=1;	/* set file type to cmd  */
 
 	/* parse the block if not already parsed  */
-	parse_block1(bp,NULL,0,0);	/* do not init if already parsed!  */
+	if(bp->m_mode != M_PARSED)
+	parse_block1(bp,NULL,0);	/* do not init if already parsed!  */
 
 	if((err_num=check_init(bp))>0) {
 		return(0);

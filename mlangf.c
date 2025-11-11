@@ -794,3 +794,16 @@ double uf_list_tokens()
  return 0;
 }
 
+double uf_test_loop()
+{
+	long int lmax= (long int) get_numeric_arg();
+	double p=0;
+	double l=1;
+	int j=1;
+	int i=1;
+	for(j=1;j<lmax;j++) {
+		l = i*j+32;
+		p = p + l + 6;
+	};
+	return p;
+}

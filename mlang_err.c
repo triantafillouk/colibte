@@ -545,7 +545,7 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
     };
 	*bf=bp;
 	// MESG("err_exec_function: call parse_block1");
-	parsed=parse_block1(bp,NULL,0,0);	/* do not init if already parsed!, returns 0 if parsed  */
+	parsed=parse_block1(bp,NULL,0);	/* do not init if already parsed!, returns 0 if parsed  */
 	// MESG("err_exec_function: return from parse_block1");
 	if(parsed==0) {	/* already parsed, no need to check again!  */
 		// MESG("	already parsed!");
@@ -1240,14 +1240,16 @@ int err_lexpression()
 	while(1)
 	{
 	CHECK_TOK(702);
+	tok_struct *tok0=tok;
 	switch(tok->ttype){
 		case TOK_OR: {	/* TOK_OR  */
 			// tok->term_function = logical_or;
-			MESG_TOK_INFO("# err_lexpression",tok);
+			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_or);
 			tok->tgroup=TOK_BOOL;
 			NTOKEN_ERR(704);
 			err_num=err_lexpression();
+			MESG_TOK_INFO("#2 err_lexpression",tok0);
 			if(err_num) return err_num;
 			CHECK_TOK(706);
 			simple=0;
@@ -1255,11 +1257,12 @@ int err_lexpression()
 		};
 		case TOK_XOR: {	
 			// tok->term_function = logical_xor;
-			MESG_TOK_INFO("# err_lexpression",tok);
+			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_xor);
 			tok->tgroup=TOK_BOOL;
 			NTOKEN_ERR(709);
 			err_num=err_lexpression();
+			MESG_TOK_INFO("#2 err_lexpression",tok0);
 			if(err_num) return err_num;
 			CHECK_TOK(712);
 			simple=0;
@@ -1267,11 +1270,12 @@ int err_lexpression()
 		};
 		case TOK_NOR: {	
 			// tok->term_function = logical_nor;
-			MESG_TOK_INFO("# err_lexpression",tok);
+			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_nor);
 			tok->tgroup=TOK_BOOL;
 			NTOKEN_ERR(7091);
 			err_num=err_lexpression();
+			MESG_TOK_INFO("#2 err_lexpression",tok0);
 			if(err_num) return err_num;
 			CHECK_TOK(712);
 			simple=0;
@@ -1279,11 +1283,12 @@ int err_lexpression()
 		};
 		case TOK_AND: {	
 			// tok->term_function = logical_and;
-			MESG_TOK_INFO("# err_lexpression",tok);
+			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_and);
 			tok->tgroup=TOK_BOOL;
 			NTOKEN_ERR(709);
-			err_num=err_lexpression();
+			err_num=err_cexpression();
+			MESG_TOK_INFO("#2 err_lexpression",tok0);
 			if(err_num) return err_num;
 			CHECK_TOK(712);
 			simple=0;
@@ -1295,7 +1300,8 @@ int err_lexpression()
 			set_term_function(tok,logical_nand);
 			tok->tgroup=TOK_BOOL;
 			NTOKEN_ERR(7092);
-			err_num=err_lexpression();
+			err_num=err_cexpression();
+			MESG_TOK_INFO("#2 err_lexpression",tok0);
 			if(err_num) return err_num;
 			CHECK_TOK(712);
 			simple=0;

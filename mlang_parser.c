@@ -467,7 +467,7 @@ void skip_tag_header(FILEBUF *bf)
  parse a file buffer,
  create/renew the alist of tokens found
 */
-int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
+int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 {
  double value=0;
  int cc=0;
@@ -499,7 +499,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
  tok_struct *array_tok=NULL;
  int skip_token=0;
  // int start_of_line=1;
-
+ MESG("parse_block1: check if parsed!");
  // return if already parsed and not forced to parse
  if(bf->tok_table !=NULL && init==0) return (0);
 
@@ -1083,10 +1083,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init,int extra)
 	};
 
 	bf->m_mode=M_PARSED;
-
- if(init) {
-	// bf->symbol_tree->max_items = bf->symbol_tree->items+extra;
- };
 
  // MESG("parse_block1: create token table from token list");
  set_tok_table(bf, lex_parser);

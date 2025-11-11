@@ -461,6 +461,7 @@ tok_struct *new_tok()
 char *tname(int type)
 {
  int ind=type%1000;
+ 	if(ind>TOK_OTHER) return("unknown!");
 	// return(tok_name[ind]);
 	return(token_table[ind].tok_name);
 }
@@ -706,7 +707,7 @@ int check_init(FILEBUF *bf)
  if(tok_table==NULL) 
  {
  	// MESG("create token table [%s]",bf->b_fname);
-	parse_block1(bf,NULL,1,0);
+	parse_block1(bf,NULL,1);
 	// MESG("block parsed err = %d",err_num);
 	if(err_num>0) {
 		msg_line("found parsed errors: err_num=%d %s",err_num,err_str);
@@ -807,7 +808,7 @@ MVAR * push_args_1(int nargs)
  TDS("push_args");
 
  err_num=0;
- // MESG("push_args: args=%d",nargs);
+ // MESG("push_args:< args=%d",nargs);
 
  // if(tok->ttype!=TOK_RPAR && nargs!=0)
  if(nargs>0)
@@ -818,11 +819,14 @@ MVAR * push_args_1(int nargs)
  if(va){
  MVAR *va_i=va;
  for(i=0;i<nargs;i++,va_i++){
+	va_i->var_type=0;
+	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
 	value = num_expression();
 	va_i->var_type=get_vtype();
 	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
+	// MESG(";		i=%d, var_type = %d",i,va_i->var_type);
 	if(vtype_is(VTYPE_NUM)) {
-			// MESG("	arg:%d numeric %f",value);
+			// MESG("	arg:%d numeric %f",i,value);
 			va_i->dval=value;
 	} else
 	if(vtype_is(VTYPE_STRING)) {
@@ -840,10 +844,13 @@ MVAR * push_args_1(int nargs)
 			err_num=202;
 			clear_args(va,i); return(NULL);
 	}
-	// MESG("		vtype is %d",va_i->var_type);
+
+	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
+	// exit(0);
 	NTOKEN2; // skip separator or right parenthesis!
  };
- }
+ };
+	// MESG(">	push_args_1:end [%s]",tok_info(tok));
  };
  return(va);
 }
@@ -2290,16 +2297,15 @@ double term_minus(double value)
 double num_term2()
 {
  TDS("num_term2");
- // MESG("		num_term2: [%s]",tok_info(tok));
+ // MESG("			num_term2: [%s]",tok_info(tok));
  double v1 = FACTOR_FUNCTION;
- // MESG("		factor function executed! v1=%f",v1);
+ // MESG("				factor function executed! v1=%f",v1);
 	 while(tok->tgroup==TOK_TERM2)
 	 {
 		// MESG("while: TERM2");
 		v1 = tok->term_function(v1);
 	 };
-	 // ex_var.dval=v1;
- // MESG("		term2 end %f",v1);
+ // MESG("			term2 end %f",v1);
  RTRN(v1);
 }
 
@@ -2307,7 +2313,7 @@ double num_term2()
 double num_term1()
 {
  TDS("num_term1");
- // MESG("	num_term1: [%s]",tok_info(tok));
+ // MESG("		num_term1: [%s]",tok_info(tok));
  double v1 = num_term2();
 	 while(tok->tgroup==TOK_TERM1)
 	 {
@@ -2316,7 +2322,7 @@ double num_term1()
 		if(err_num) break;
 	 };
 	 // ex_var.dval=v1;
-	// MESG("	num_term1: end %f",v1);
+ 	// MESG("		num_term1: end %f",v1);
  RTRN(v1);
 }
 
@@ -2325,11 +2331,11 @@ double num_expression()
 {
  double value;
  TDS("num_expression");
- // MESG(";num_expression: [%s]",tok_info(tok));
+ // MESG(";	num_expression: [%s]",tok_info(tok));
  // set_vdval(0);
  value = num_term1();
  while(tok->tgroup==TOK_TERM) {
-	// MESG("while: TERM");
+	// MESG("	num_expression: while: TERM [%s]",tok_info(tok));
 	value = tok->term_function(value);
  };
  // MESG(";num_expression:end ttnum=%d type=%d return value=%f slval=[%s]",tok->tnum,get_vtype(),value,get_sval());
@@ -3138,7 +3144,7 @@ double exec_block1_break(FILEBUF *fp)
 double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 {
  double val=0;
- int extra=0;
+ // int extra=0;
  MVAR *local_symbols;
  MVAR *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
@@ -3156,7 +3162,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	if(start==0 && current_stable!=NULL) {
 		old_items=use_fp->symbol_tree->items;
 	};
-	parse_block1(bp,use_fp->symbol_tree,start,extra);
+	parse_block1(bp,use_fp->symbol_tree,start);
 	// MESG("parse_block: ended! err=%d start=%d",err_num,start);
 	if(err_num) return(0);
 	if(start || current_stable==NULL) {
@@ -3254,7 +3260,7 @@ int refresh_current_buffer(num nused)
  clean_saved_string(0);
  fp->err=-1;
  // MESG("refresh_current_buffer:1 [%s] %d",fp->b_fname,fp->b_type);
- parse_block1(fp,fp->symbol_tree,1,100);	/* init tree,extra 100 symbols  */
+ parse_block1(fp,fp->symbol_tree,1);
 
  if(err_num<1){	/* if no errors  */
 	fp->symbol_table=new_symbol_table(fp->symbol_tree->items);
@@ -3389,6 +3395,14 @@ char * tok_info(tok_struct *tok)
 	if(tok==NULL) { return "null token";};
 	// MESG("tok_info: start");
 	// MESG("tok_info: ttype=%d",tok->ttype);
+#if	0
+	if(tok->tname!=NULL) {
+		snprintf(stok,MAXLLEN,"%3d: %s",tok->tnum,tok->tname);
+	} else {
+		snprintf(stok,MAXLLEN,"%3d: null name",tok->tnum);
+	};
+	return stok;
+#else
 	if(tok->tname!=NULL){
 		if(tok->ttype==TOK_ARRAY1 || tok->ttype==TOK_ARRAY2) {
 			int rows=0;
@@ -3432,6 +3446,7 @@ char * tok_info(tok_struct *tok)
 	} else {
 		     snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%12s] [%f]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);
 	};
+#endif
 	// MESG("tok_info: end");
 	return stok;
 }
@@ -3454,7 +3469,7 @@ int show_parse_buffer(num n)
  show_stage=0;
  /* clear parse list  */
  empty_tok_table(fp);
- parse_block1(fp,fp->symbol_tree,1,0);
+ parse_block1(fp,fp->symbol_tree,1);
 
  tok_table=fp->tok_table;
  tok_ind=tok_table;
