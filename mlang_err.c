@@ -351,7 +351,7 @@ int  err_push_args_1(int *nargs)
 
 void stack_push(char *title,tok_struct *tok)
 {
- // MESG("PUSH %-25s : %s",title,tok_info(tok));
+ MESG("PUSH %-25s : %s",title,tok_info(tok));
 }
 
 int err_assign_args1(int nargs)
@@ -575,7 +575,7 @@ int err_factor()
 {
  static int pre_symbol=0;
  TDSERR("factor");
- MESG_TOK_INFO("-- factor",tok);
+ // MESG_TOK_INFO("-- factor",tok);
  stack_push("-- push factor",tok);
  int save_macro_exec;
  tok_struct *tok0; 
@@ -684,12 +684,14 @@ int err_factor()
 			tok->dval=1;
 			// tok->tgroup=TOK_TERM2;
 			set_tok_function(tok,0);
+			stack_push("INC",tok);
 			NTOKEN_ERR(498);
 		} else
 		if(tok->ttype==TOK_DECREASE) {
 			// tok->tgroup=TOK_TERM2;
 			tok->dval=-1;
 			set_tok_function(tok,0);
+			stack_push("DEC",tok);
 			NTOKEN_ERR(498);
 		};
 #if	1
@@ -1191,6 +1193,8 @@ int err_num_expression()
 		set_term_function(tok,term_plus);
 		NTOKEN_ERR(568);
 		err_num=err_num_term1();
+		// stack_push("TOK_PLUS",tok0);
+
 		// stack_push("-- push expression func",tok0);
 		if(err_num) return (err_num);
 		CHECK_TOK(569);
@@ -1250,6 +1254,7 @@ int err_lexpression()
 			NTOKEN_ERR(704);
 			err_num=err_lexpression();
 			MESG_TOK_INFO("#2 err_lexpression",tok0);
+			stack_push("TOK_OR",tok0);
 			if(err_num) return err_num;
 			CHECK_TOK(706);
 			simple=0;
@@ -1263,6 +1268,7 @@ int err_lexpression()
 			NTOKEN_ERR(709);
 			err_num=err_lexpression();
 			MESG_TOK_INFO("#2 err_lexpression",tok0);
+			stack_push("TOK_XOR",tok0);
 			if(err_num) return err_num;
 			CHECK_TOK(712);
 			simple=0;
@@ -1276,6 +1282,7 @@ int err_lexpression()
 			NTOKEN_ERR(7091);
 			err_num=err_lexpression();
 			MESG_TOK_INFO("#2 err_lexpression",tok0);
+			stack_push("TOK_NOR",tok0);
 			if(err_num) return err_num;
 			CHECK_TOK(712);
 			simple=0;
@@ -1289,6 +1296,7 @@ int err_lexpression()
 			NTOKEN_ERR(709);
 			err_num=err_cexpression();
 			MESG_TOK_INFO("#2 err_lexpression",tok0);
+			stack_push("TOK_AND",tok0);
 			if(err_num) return err_num;
 			CHECK_TOK(712);
 			simple=0;
@@ -1302,6 +1310,7 @@ int err_lexpression()
 			NTOKEN_ERR(7092);
 			err_num=err_cexpression();
 			MESG_TOK_INFO("#2 err_lexpression",tok0);
+			stack_push("TOK_NAND",tok0);
 			if(err_num) return err_num;
 			CHECK_TOK(712);
 			simple=0;
@@ -1313,6 +1322,7 @@ int err_lexpression()
 			set_term_function(tok,assign_val);
 			NTOKEN_ERR(710);
 			err_num=err_assign_val();
+			stack_push("TOK_ASSIGN",tok0);
 			RT_MESG1(714);
 		};
 		case TOK_INCREASEBY: {
