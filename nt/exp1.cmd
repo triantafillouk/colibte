@@ -1,9 +1,9 @@
 # logical expression 
 
 
-a=0:
+a=0: 
 b=5: 
-c=6:
+c=0: 
 
 
 a & b: 
@@ -16,4 +16,9 @@ k = a & (b | c) :
 # b & a | c : 
 # c | a & b : 
 # c | b & a : 
-
+a & b xor c: 
+a & (b xor c): 
+ 
+a nor b & c: 
+a nor (b & c): 
+(a nor b) & c: 

@@ -214,3 +214,34 @@ enum {
 };
 
 
+
+/*
+ // token groups
+	TOK_BOOL
+TOK_TAB token_groups[] = {
+	{TOK_DIR,		"TOK_DIR",0},	// directives, if, else, fori, ...
+	{TOK_VAR,		"TOK_VAR",0},	// variables,numerics,strings,arrays,options,..
+	{TOK_FUN,		"TOK_FUN",0},	// functions ?
+	{TOK_COMPARE,	"TOK_COMPARE",0},
+	{TOK_TERM0,		"TOK_TERM0",0},	// =, and,nand, *=,+=,-=,setenv,setoption
+	{TOK_TERM2,		"TOK_TERM2",0},	// **, %, INC, DEC
+	{TOK_BOOL,		"TOK_BOOL",0},	// or,nor,xor
+	{TOK_TERM1,		"TOK_TERM1",0},	// *, /
+	{TOK_TERM,		"TOK_TERM",0},	// +, - 
+	{TOK_SEP,		"TOK_SEP",0},
+	
+}	
+
+lexpression
+	cexpression
+		num_expression
+			num_term1
+				num_term2
+					factor_function
+
+lexpression := 
+	cexpression , term0
+	cexpression , bool ..
+
+
+*/

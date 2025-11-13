@@ -738,6 +738,7 @@ int check_init(FILEBUF *bf)
 	return bf->err;
  };
  bf->m_mode |= M_CHECKED;
+ exit(0);
  return(0);
 }
 
@@ -2471,6 +2472,7 @@ double lexpression()
 	// MESG("! lexpression:4 return value %f [%s]",value,tok_info(tok));	
 	RTRN(value);
 }
+
 
 double cexpression()
 {
