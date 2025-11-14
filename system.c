@@ -661,12 +661,12 @@ int check_native_copy()
 {
  int status;
  static char exec_st[MAXFLEN];
- MESG("check_native_copy:");
+ // MESG("check_native_copy:");
 	ext_clipboard_command=0;
 	status=snprintf(exec_st,sizeof(exec_st),"%s > /dev/null 2> /dev/null",native_paste);
 	if(status>=MAXFLEN) return 0;
 	status = system(exec_st);
-	MESG("check_native_copy:[%s] -> %d",exec_st,status);
+	// MESG("check_native_copy:[%s] -> %d",exec_st,status);
 	if(status == 0) {
 		clip_copy=native_paste;
 		clip_paste=native_copy;
@@ -684,7 +684,7 @@ int init_system_clipboard()
  static char exec_st[MAXFLEN];
  int status=0;
 	// if(status>=MAXFLEN) return 0;
-	MESG("init_system_clipboard:");
+	// MESG("init_system_clipboard:");
 #if	(WSL | DARWIN) & PCURSES
 	if(check_native_copy()) return 1;
 #endif

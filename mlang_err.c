@@ -133,14 +133,21 @@ char show_type=' ';
 
 void stack_push(char *title,tok_struct *tok)
 {
- static ind=0;
- MESG("%3d PUSH %-25s : %s",ind++,title,tok_info(tok));
+ static int ind=0;
+ MESG("%3d %-20s : %s",ind++,title,tok_info(tok));
+}
+
+void stack_push_replace(char *title,tok_struct *tok)
+{
+ // static int ind=0;
+ // MESG("%3d rep %-20s : %s",ind++,title,tok_info(tok));
 }
 
 int check_skip_token1( int type)
 {
  	if(tok->ttype==type) 
  	{ 
+		MESG("skip_token1");
 		NTOKEN2;
  		return(1);
  	} else {
@@ -180,7 +187,6 @@ void set_error(tok_struct *tok,int err,char *description)
 	err_str=description;
 	return;
  };
- // MESG("set_error:----------------");
  err_line=tok->tline;
  err_num=err;
  // MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
@@ -227,10 +233,13 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 		// MESG("function arg tnum=%d ttype=%d ia=%d",tok->tnum,tok->ttype,ia);
 		if(tok->ttype==TOK_RPAR||tok->ttype==TOK_SEP ||tok->ttype==TOK_EOF) {
 			// MESG("end function parameters");
-			// stack_push("end function",tok);
+			if(tok->ttype==TOK_RPAR) stack_push("eval_function RPAR",tok);
 			break;
 		}
-		if(tok->ttype==TOK_COMMA) NTOKEN_ERR(403);
+		if(tok->ttype==TOK_COMMA) {
+			stack_push("eval_function ,",tok);
+			NTOKEN_ERR(403);
+		}
 		ia++;
 		err_num=err_num_expression();
 	};
@@ -244,7 +253,7 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 
 	if(tok->ttype==TOK_RPAR) {
 		// MESG("err_eval_fun1: skip RPAR!!");
-		if(lpar) stack_push(" func rpar",tok);
+		if(lpar) stack_push("eval_func rpar",tok);
 		NTOKEN_ERR(404);
 	};
 	tok0->number_of_args=ia;
@@ -292,7 +301,7 @@ int err_skip_type_args(tok_struct *tok0)
 			nargs=0;
 		};	
 	};
-	stack_push(" func RPAR",tok);
+	stack_push("skip_args RPAR",tok);
 	NTOKEN_ERR(670);
 	// MESG("err_skip_type_args: Data definition of [%s] at line %d rows=%d args=%d",tok0->tname,tok0->tline,rows+1,args0);
  };
@@ -494,7 +503,7 @@ int err_increase_val()
 int err_decrease_val()
 {
  TDSERR("decrease_val");
- MESG_TOK_INFO("# decrease_val",tok);
+ // MESG_TOK_INFO("# decrease_val",tok);
  SHOW_STAGE(446);
  if(!vtype_is(VTYPE_NUM)) {
 	set_error(tok,446,"decrease_val not numeric!");
@@ -508,7 +517,7 @@ int err_decrease_val()
 int err_assign_env()
 {
  TDSERR("assign_env");
- MESG_TOK_INFO("# assign_env",tok);
+ // MESG_TOK_INFO("# assign_env",tok);
 
  SHOW_STAGE(450);
 	if(!simple){
@@ -583,7 +592,7 @@ int err_factor()
  TDSERR("factor");
  int lpar=0;
  // MESG_TOK_INFO("-- factor",tok);
- stack_push("-- push factor",tok);
+ stack_push("factor",tok);
  int save_macro_exec;
  tok_struct *tok0; 
 
@@ -638,7 +647,7 @@ int err_factor()
 				RT_MESG1(xpos);
 			};
 			if(tok->ttype==TOK_SEP || tok->ttype==TOK_COMMA) {
-				// MESG("	tok_sep [%s]",tok->tname);
+				MESG("	tok_sep [%s]",tok->tname);
 				NTOKEN2;
 				continue;
 			};
@@ -659,7 +668,7 @@ int err_factor()
 				i=0;
 				// j++;
 				cdim++;if(cdim>rows) rows=cdim;
-				// MESG("		new row2");
+				MESG("		new row2");
 				NTOKEN2;
 				continue;
 			};
@@ -681,7 +690,6 @@ int err_factor()
 		xpos=479;
 		pnum--;
 		// syntax_error("wrong argument number",xpos);
-		// stack_push("RPAR",tok);
 		RT_MESG1(480);
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
@@ -1027,7 +1035,7 @@ int err_factor()
 		CHECK_TOK(522);
 		macro_exec = save_macro_exec;
 		if(check_par){ 
-		MESG(" ---- skip tok_rpar");
+		// MESG(" ---- skip tok_rpar");
 		if(!check_skip_token_err1(TOK_RPAR,"editor command",xpos)) 
 		{
 			pnum--;
@@ -1091,7 +1099,7 @@ int err_num_term3(tok_struct *tok1)
  // tok_struct *tok0=tok;
  // MESG("-- term2 start: %s",tok_info(tok));
  err_num = err_factor();
- stack_push("-- push term3",tok1);
+ stack_push("term3",tok1);
  if(err_num) RT_MESG1(err_num);
 
  if(tok->tgroup==TOK_TERM2) {
@@ -1106,7 +1114,7 @@ int err_num_term3(tok_struct *tok1)
 		err_num = err_num_term3(tok0);
 	} else {
 		NTOKEN_ERR(544);
-		stack_push("-- push term3 function",tok1);
+		stack_push("term3 function",tok1);
 		err_num = err_num_term3(tok0);
 	};
 	// if(tok0->ttype==TOK_MOD) MESG("# term2 function after [%s]",tok_info(tok0));
@@ -1137,7 +1145,7 @@ int err_num_term2()
 	} else {
 		NTOKEN_ERR(544);
 		// MESG_TOK_INFO("-- push term2 function",tok0);
-		stack_push("-- push term2 function",tok0);
+		stack_push("num_term2",tok0);
 		err_num = err_num_term2();
 	};
 	// if(tok0->ttype==TOK_MOD) MESG("# term2 function after [%s]",tok_info(tok0));
@@ -1169,7 +1177,7 @@ int err_num_term1()
 	err_num=err_num_term2();
 	// tok1 = tok;
 	// MESG_TOK_INFO("-- push term1 function",tok0);
-	stack_push("-- push term1 function",tok0);
+	stack_push("num_term1",tok0);
 
 	if(err_num) RT_MESG1(5531);
 	CHECK_TOK(554);
@@ -1190,7 +1198,7 @@ int err_num_expression()
  xpos=561;
 
  SHOW_STAGE(561);
- MESG("# start expression!");
+ // MESG("# start expression!");
  err_num = err_num_term1();
  if(err_num) return(err_num);
 
@@ -1206,7 +1214,6 @@ int err_num_expression()
 		err_num=err_num_term1();
 		stack_push("TOK_PLUS",tok0);
 
-		// stack_push("-- push expression func",tok0);
 		if(err_num) return (err_num);
 		CHECK_TOK(569);
 		simple=0;
@@ -1225,17 +1232,15 @@ int err_num_expression()
 		NTOKEN_ERR(571);
 		if(expression_type==VTYPE_STRING) {	// operator on first chars of strings. numeric result
 			err_num=err_num_term1();
-			stack_push("TOK_MINUS",tok0);
+			stack_push("TOK_MINUS string",tok0);
 			CHECK_TOK(573);
 			simple=0;
 		} else 	{
 			err_num=err_num_term1();
-			stack_push("TOK_MINUS",tok0);
-			// stack_push("-- push exp function",tok0);
+			stack_push("TOK_MINUS num",tok0);
 			CHECK_TOK(574);
 		}
 	};
-	// stack_push("-- push expression end",tok0);
  };
  // MESG_TOK_INFO("! end expression",tok);
  RT_MESG1(599);
@@ -1251,6 +1256,8 @@ int err_lexpression()
 	simple=1;
 	// MESG("err_lexpression: [%s]",tok_info(tok));
 	SHOW_STAGE(701);
+
+	tok_struct *tok_l = tok;
 	err_num = err_cexpression();
 	if(err_num) return err_num;
 	while(1)
@@ -1280,7 +1287,7 @@ int err_lexpression()
 			NTOKEN_ERR(709);
 			err_num=err_lexpression();
 			// MESG_TOK_INFO("#2 err_lexpression",tok0);
-			stack_push("TOK_XOR",tok0);
+			stack_push(" TOK_XOR",tok0);
 			if(err_num) return err_num;
 			CHECK_TOK(712);
 			simple=0;
@@ -1316,7 +1323,7 @@ int err_lexpression()
 		};
 		case TOK_NAND: {	
 			// tok->term_function = logical_nand;
-			MESG_TOK_INFO("# err_lexpression",tok);
+			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_nand);
 			tok->tgroup=TOK_BOOL;
 			NTOKEN_ERR(7092);
@@ -1330,53 +1337,67 @@ int err_lexpression()
 		};
 		case TOK_ASSIGN: {
 			// tok->term_function = assign_val;
-			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,assign_val);
+			// MESG_TOK_INFO("# err_lexpression",tok);
 			NTOKEN_ERR(710);
 			err_num=err_assign_val();
-			stack_push("TOK_ASSIGN",tok0);
+			stack_push_replace("tok l",tok_l);
+			stack_push("TOK_ASSIGN 1",tok0);
 			RT_MESG1(714);
 		};
 		case TOK_INCREASEBY: {
 			// tok->term_function = increase_by;
-			MESG_TOK_INFO("# err_lexpression",tok);
+			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,(TFunction)increase_by);
 			tok->tname = "+=";
+			// tok0=tok;
 			NTOKEN_ERR(710);
 			err_num=err_increase_by();
+			stack_push_replace("tok l",tok_l);
+			stack_push("+=",tok0);
 			RT_MESG1(714);
 		};
 		case TOK_MULBY: {
 			// tok->term_function = mul_by;
-			MESG_TOK_INFO("# err_lexpression",tok);
+			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,(TFunction)mul_by);
 			tok->tname = "*=";
+			// tok0=tok;
 			NTOKEN_ERR(710);
 			err_num=err_mul_by();
+			stack_push_replace("tok l",tok_l);
+			stack_push("*=",tok0);
 			RT_MESG1(714);
 		};
 		case TOK_DECREASEBY: {
 			// tok->term_function = decrease_by;
-			MESG_TOK_INFO("# err_lexpression",tok);
+			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,(TFunction)decrease_by);
 			tok->tname = "-=";
+			// tok0=tok;
 			NTOKEN_ERR(710);
 			err_num=err_decrease_by();
+			stack_push_replace("tok l",tok_l);
+			stack_push("-=",tok0);
 			RT_MESG1(714);
 		};
 		case TOK_ASSIGNENV:
 			// tok->term_function = assign_env;
-			MESG_TOK_INFO("# err_lexpression",tok);
+			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,assign_env);
 			NTOKEN_ERR(710);
 			err_num=err_assign_env();
+			stack_push_replace("tok l",tok_l);
+			stack_push("assign env",tok0);
 			RT_MESG1(7141);
 		case TOK_ASSIGNOPT:
 			// tok->term_function = assign_option;
-			MESG_TOK_INFO("# err_lexpression",tok);
+			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,assign_option);
 			NTOKEN_ERR(710);
 			err_num=err_assign_env();
+			stack_push_replace("tok l",tok_l);
+			stack_push("assign option",tok0);
 			RT_MESG1(7141);
 		default:
 			RT_MESG1(715);
@@ -1431,11 +1452,10 @@ int err_check_sentence1()
 		break;
  	case TOK_LCURL:
 	{	
-		// tok->directive = dir_lcurl;
-		MESG("# err_check_sentence: %s",tok_info(tok));
+		// MESG("# err_check_sentence: %s",tok_info(tok));
 		if(execmd) set_tok_directive(tok,dir_lcurl);
 		else set_tok_directive(tok,dir_lcurl_break);
-		stack_push("sentence LCURL",tok);
+		stack_push("sentence LCURL {",tok);
 		NTOKEN_ERR(627);
 		CHECK_TOK(628);
 		err_num=err_check_block1();
@@ -1445,7 +1465,7 @@ int err_check_sentence1()
 	case TOK_DIR_IF:
 		{
 		tok_struct *tok0=tok;
-		MESG("# err_check_sentence: %s",tok_info(tok));
+		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,tok_dir_if);
 		stack_push("DIR_IF",tok);
 		NTOKEN_ERR(631);	/* go to next token after if */
@@ -1476,6 +1496,7 @@ int err_check_sentence1()
 		if(tok->ttype==TOK_DIR_ELSE) {
 			// MESG("we have an else statement!");
 			tok0=tok;
+			stack_push("else",tok);
 			NTOKEN2;
 			err_num=err_check_sentence1();	/* body of else  */
 			xpos=638;
@@ -1496,14 +1517,14 @@ int err_check_sentence1()
 		NTOKEN_ERR(640);	/* go to next token after for */
 		tok_struct *tok0=NULL;
 		if(tok->ttype==TOK_VAR) {
-			MESG_TOK_INFO(" loop var",tok);
-			stack_push("i var",tok);
+			// MESG_TOK_INFO(" loop var",tok);
+			stack_push("loop var",tok);
 			NTOKEN_ERR(6403);
 			if(tok->ttype!=TOK_ASSIGN) {
 				ERROR("6404:for i error");
 			} else {
 				tok0=tok;
-				MESG_TOK_INFO(" equal to",tok);
+				// MESG_TOK_INFO(" equal to",tok);
 			};
 		} else ERROR("6405:for i syntax error");
 		NTOKEN_ERR(64053);
@@ -1511,11 +1532,11 @@ int err_check_sentence1()
 		stack_push("for i assign",tok0);
 		if(err_num) return(err_num);
 		CHECK_TOK(6406);
-		stack_push(" fori sep 1",tok);
+		stack_push("fori sep 1",tok);
 		NTOKEN_ERR(6407);	/* skip separator! */
 		err_num=err_num_expression();
 		if(err_num) return(err_num);
-		stack_push(" fori sep 2",tok);
+		stack_push("fori sep 2",tok);
 		NTOKEN_ERR(6408);
 		err_num=err_num_expression();
 		if(err_num) return(err_num);
@@ -1624,9 +1645,9 @@ int err_check_sentence1()
 		RT_MESG;
 	case TOK_DIR_TYPE:
 		{
-		// MESG("# err_check_sentence: %s",tok_info(tok));
+		MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,tok_dir_type);
-		// MESG("--> err: TOK_DIR_TYPE: %s",tok->tname);
+		MESG("--> err: TOK_DIR_TYPE: %s",tok->tname);
 		NTOKEN_ERR(671);	// this is the type name
 		xpos=632;
 	};break;
@@ -1652,11 +1673,11 @@ int err_check_block1()
 		case TOK_EOF: 
 			// MESG_TOK_INFO("# err_check_block1",tok);
 			// MESG(">>>>>>>>>>>>>>> end error_check!");
-			stack_push("-- EOF ",tok);
+			stack_push("EOF ",tok);
 			RT_MESG1(673);
 		case TOK_SEP:
 			// MESG_TOK_INFO("# err_check_block1",tok);
-			stack_push("separator --------------",tok);
+			stack_push("--------------",tok);
 			NTOKEN_ERR(6741);
 			continue;
 		case TOK_RPAR:	/* problem if removed  */
@@ -1667,13 +1688,13 @@ int err_check_block1()
 		case TOK_COMMA:
 		case TOK_SHOW:
 			// MESG_TOK_INFO("# err_check_block1",tok);
-			stack_push("Show or comma ",tok);
+			stack_push("Show or comma",tok);
 			tok->factor_function = factor_funcs[tok->ttype];
 			NTOKEN_ERR(674);
 			continue;
 		case TOK_RCURL:
-			MESG_TOK_INFO("# err_check_block1",tok);
-			stack_push("rcurl ",tok);
+			// MESG_TOK_INFO("# err_check_block1",tok);
+			stack_push("RCURL }",tok);
 			NTOKEN_ERR(675);
 			RT_MESG1(6751);
 		// default:

@@ -82,6 +82,7 @@ void MESG_TOK_INFO(char *title,tok_struct *tok);
 void set_vtype(int type);
 int vtype_is(int type);
 int get_vtype();
+int bnf_debug();
 
 TLIST ctoklist=NULL;
 int is_break1=0;
@@ -738,7 +739,7 @@ int check_init(FILEBUF *bf)
 	return bf->err;
  };
  bf->m_mode |= M_CHECKED;
- exit(0);
+ if(bnf_debug()) exit(0);
  return(0);
 }
 
@@ -2080,7 +2081,7 @@ void set_tok_function(tok_struct *tok, int type)
 void set_tok_directive(tok_struct *tok, FFunction directive)
 {
 	tok->directive = directive;
-	MESG_TOK_INFO("# tok_directive",tok);
+	// MESG_TOK_INFO("# tok_directive",tok);
 }
 
 void set_term_function(tok_struct *tok, TFunction term_function)

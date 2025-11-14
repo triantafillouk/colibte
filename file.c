@@ -845,7 +845,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 			strlcpy(dir_name,get_start_dir(),MAXFLEN);
 		}
 	};
-	MESG("new_filebuf:base_name=[%s] bname=[%s] bflag=%X dir=%s",base_name,bname,bflag,dir_name);
+	// MESG("new_filebuf:base_name=[%s] bname=[%s] bflag=%X dir=%s",base_name,bname,bflag,dir_name);
 	update_base_dir(dir_name,bname);
 	if(strlen(bname)>1 && (bname[2]=='1' || bname[2]=='2')) {
 		dir_num=bname[2]-'0';
