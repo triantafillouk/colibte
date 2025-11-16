@@ -27,6 +27,7 @@ void mesg_out(const char *fmt, ...);
 extern FILEBUF *cbfp;
 extern array_dat *main_args;
 FILEBUF *exe_buffer=NULL;
+FILEBUF *check_buffer=NULL;
 
 #if	SYNTAX_DEBUG
 
@@ -106,6 +107,7 @@ char *ex_name=NULL;	/* variable name of the previous array  */
 int err_num=0;
 static int err_line=0;
 int last_correct_line=0;
+
 static tok_struct *tok;	/* current token!!  */
 void ntoken2() { tok++;MESG("NTOKEN");};
 
@@ -187,6 +189,16 @@ void init_btree_table()
 	bt_table=new_btree("table",0);
 	directiv_table=new_btree("directives",0);
 	global_types_tree=new_btree("types",0);
+}
+
+void stack_push(char *title,tok_struct *tok)
+{
+ static int ind=0;
+ // check_buffer->tok_table_bnf[check_buffer->tok_bnf_index]=tok;
+ memcpy((void *)check_buffer->tok_bnf,(void *)tok,sizeof(tok_struct));
+ check_buffer->tok_bnf++;
+ check_buffer->tok_bnf_index++;
+ MESG("%3d %-20s : %s [%s]",ind++,title,tok_info(tok),check_buffer->b_fname);
 }
 
 void clear_args(MVAR *va,int nargs)
@@ -702,9 +714,11 @@ void show_error(char *from,char *name)
 int check_init(FILEBUF *bf)
 {
  tok_struct *tok_table=bf->tok_table;
+ FILEBUF *ori_buffer = check_buffer;
+ check_buffer = bf;
  int err=0;
  INIT_STAGE;
- // MESG("check_init: [%s] %d",bf->b_fname,bf->b_type);
+ MESG("check_init: [%s] %d",bf->b_fname,bf->b_type);
  if(tok_table==NULL) 
  {
  	// MESG("create token table [%s]",bf->b_fname);
@@ -712,11 +726,13 @@ int check_init(FILEBUF *bf)
 	// MESG("block parsed err = %d",err_num);
 	if(err_num>0) {
 		msg_line("found parsed errors: err_num=%d %s",err_num,err_str);
+		check_buffer = ori_buffer;
 		return(err_num);
 	}
 	tok_table=bf->tok_table;
 	if(tok_table==NULL)	{
 		ERROR("cannot parse file");
+		check_buffer = ori_buffer;
 		return(201);
 	}
  };
@@ -735,11 +751,16 @@ int check_init(FILEBUF *bf)
 
  tok=tok_table;
  // MESG("check_init:end [%s] %d",bf->b_fname,bf->b_type);
+
  if(bf->err>0) {
 	return bf->err;
  };
  bf->m_mode |= M_CHECKED;
- if(bnf_debug()) exit(0);
+ bf->tok_bnf_index = 0;
+ bf->tok_bnf = bf->tok_table_bnf;
+ check_buffer = ori_buffer;
+ MESG("! bnf table of [%s] initialized! ------------",bf->b_fname);
+ if(bnf_debug() && check_buffer==NULL) exit(0);
  return(0);
 }
 
@@ -867,6 +888,7 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	MVAR *old_symbol_table=current_stable;
 	// MESG("exec_function:2");
 	tok=bp->tok_table;	/* start of function  */
+	bp->tok_bnf_index=0;
 	// MESG("exec_function: first token is [%s] type=%d",tok->tname,tok->ttype);
 	current_stable=new_symbol_table(bp->symbol_tree->items+nargs);	/* create new symbol table  */
 

@@ -470,6 +470,8 @@ void skip_tag_header(FILEBUF *bf)
 int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 {
  double value=0;
+ FILEBUF *buffer_ori = check_buffer;
+ check_buffer = bf;
  int cc=0;
  char nword[256];
  int slen=0;
@@ -499,10 +501,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  tok_struct *array_tok=NULL;
  int skip_token=0;
  // int start_of_line=1;
- MESG("parse_block1: check if parsed!");
+ MESG("parse_block1: [%s] check if parsed!",bf->b_fname);
  // return if already parsed and not forced to parse
- if(bf->tok_table !=NULL && init==0) return (0);
-
+ if(bf->tok_table !=NULL && init==0) {
+ 	check_buffer = buffer_ori;
+	return (0);
+ };
  // MESG("- Parse block [%s] type=%d <---------------------",bf->b_fname,bf->b_type);
  if(is_mlang(bf)) script_active=1;	/* initial script state  */
 
@@ -547,8 +551,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 
 	// MESG("parse- cc=%d %c type=%3d [%10s]",cc,cc,tok_type,tname(tok_type));
 
-	if(err_num>0) return 0.0;
-
+	if(err_num>0) {
+		check_buffer = buffer_ori;
+		return 0.0;
+	}
 	value=0;
 	nword[0]=0;
 	switch(tok_type) {
@@ -582,7 +588,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			// MESG("TOK_NUM: old num=%d type=%d name %s,new type %d ",tok->tnum,tok->ttype,tok->tname,tok_type);
 			value=getnum1(bf,cc,tok);
 			// MESG("parse: TOK_NUM: num=%d type=%d val=%f",tok->tnum,tok->ttype,value);
-			if(err_num>0) return(0);
+			if(err_num>0) {
+				check_buffer = buffer_ori;
+				return(0);
+			};
 			break;
 		case TOK_LCURL:
 			is_now_curl=1;
@@ -592,7 +601,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 		case TOK_RCURL:
 			{ 
 				curl_level--;cc=1;
-				if(curl_level<0) {err_num=102;err_str="curls dont match!";return(0);};
+				if(curl_level<0) {
+					err_num=102;err_str="curls dont match!";
+					check_buffer = buffer_ori;
+					return(0);
+				};
 				if(curl_level==store_level && is_storelines) {
 					// MESG(" TOK_RCURL: go create_function_buffer");
 					create_function_buffer(bf,proc_name,start_proc_offset,foffset);
@@ -808,6 +821,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			err_num=103;
 			if(tok_line) err_line=tok_line;else err_line=last_correct_line;
 			err_str="character unrecognised";
+			check_buffer = buffer_ori;
 			return(0);
 			};
 	};
@@ -953,6 +967,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 					{
 						// set_error(tok,111,"type_definition parse error");
 						MESG("after setting 111 error");
+						check_buffer = buffer_ori;
 						return 0;
 					} else {
 						// MESG("after check type type_init_definition! ttype=%d",tok->ttype);
@@ -1095,7 +1110,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 #endif
 	if(bf->symbol_tree==NULL)MESG("--- parse_block1:[%s] > end.",bf->b_fname);
 	else MESG(": parse_block1:[%s] > end. Number of tokens %d",bf->b_fname,bf->symbol_tree->items);
- // MESG("partse_block1: end"); 
+ MESG("parse_block1: [%s] >> end",bf->b_fname); 
+ check_buffer = buffer_ori;
  return(TRUE); 
 }
 
@@ -1107,14 +1123,19 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
  tok_struct *tok;
  tok_struct *tok_table=NULL;
  int isize=0;
- // MESG("set_tok_table: create token table from token list size of %d!",lex_parser->size);
+ MESG("set_tok_table: [%s] create token table from token list size of %d!",bf->b_fname,lex_parser->size);
  if(bf->tok_table != NULL) {
-	// MESG("set_tok_table: tok_table not NULL, free it!");
  	free(bf->tok_table);
+ };
+ if(bf->tok_table_bnf != NULL) {
+ 	free(bf->tok_table_bnf);
  };
  tok_table=(void *)malloc(sizeof(struct tok_struct)*(lex_parser->size+1));
  bf->tok_table = (void *) tok_table;
- // MESG("----> set_tok_table: bf=[%s]",bf->b_fname);
+ bf->tok_table_bnf=(void *)malloc(sizeof(struct tok_struct)*(lex_parser->size+1));
+ bf->tok_bnf_index=0;
+ bf->tok_bnf = bf->tok_table_bnf;
+ MESG("----> set_tok_table: bf=[%s]",bf->b_fname);
  lbegin(lex_parser);
  tlist=lex_parser;
  tok_to = tok_table;

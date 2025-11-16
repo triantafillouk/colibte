@@ -130,24 +130,18 @@ char * tok_info2(tok_struct *tok)
 
 int parse_level=0;
 char show_type=' ';
-
-void stack_push(char *title,tok_struct *tok)
-{
- static int ind=0;
- MESG("%3d %-20s : %s",ind++,title,tok_info(tok));
-}
-
+#if	0
 void stack_push_replace(char *title,tok_struct *tok)
 {
  // static int ind=0;
  // MESG("%3d rep %-20s : %s",ind++,title,tok_info(tok));
 }
-
+#endif
 int check_skip_token1( int type)
 {
  	if(tok->ttype==type) 
  	{ 
-		MESG("skip_token1");
+		// MESG("skip_token1");
 		NTOKEN2;
  		return(1);
  	} else {
@@ -160,7 +154,7 @@ int check_skip_token_err1(int type,char *mesg,int err)
 	// MESG("	check_skip_token_err: (%s)",tok_info(tok));
  	if(tok->ttype==type) 
  	{
-		MESG_TOK_INFO(" check_skip_token",tok);
+		// MESG_TOK_INFO(" check_skip_token",tok);
 		NTOKEN2;
  		return(0);
  	} else {
@@ -1257,7 +1251,7 @@ int err_lexpression()
 	// MESG("err_lexpression: [%s]",tok_info(tok));
 	SHOW_STAGE(701);
 
-	tok_struct *tok_l = tok;
+	// tok_struct *tok_l = tok;
 	err_num = err_cexpression();
 	if(err_num) return err_num;
 	while(1)
@@ -1341,7 +1335,7 @@ int err_lexpression()
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			NTOKEN_ERR(710);
 			err_num=err_assign_val();
-			stack_push_replace("tok l",tok_l);
+			// stack_push_replace("tok l",tok_l);
 			stack_push("TOK_ASSIGN 1",tok0);
 			RT_MESG1(714);
 		};
@@ -1353,7 +1347,7 @@ int err_lexpression()
 			// tok0=tok;
 			NTOKEN_ERR(710);
 			err_num=err_increase_by();
-			stack_push_replace("tok l",tok_l);
+			// stack_push_replace("tok l",tok_l);
 			stack_push("+=",tok0);
 			RT_MESG1(714);
 		};
@@ -1365,7 +1359,7 @@ int err_lexpression()
 			// tok0=tok;
 			NTOKEN_ERR(710);
 			err_num=err_mul_by();
-			stack_push_replace("tok l",tok_l);
+			// stack_push_replace("tok l",tok_l);
 			stack_push("*=",tok0);
 			RT_MESG1(714);
 		};
@@ -1377,7 +1371,7 @@ int err_lexpression()
 			// tok0=tok;
 			NTOKEN_ERR(710);
 			err_num=err_decrease_by();
-			stack_push_replace("tok l",tok_l);
+			// stack_push_replace("tok l",tok_l);
 			stack_push("-=",tok0);
 			RT_MESG1(714);
 		};
@@ -1387,7 +1381,7 @@ int err_lexpression()
 			set_term_function(tok,assign_env);
 			NTOKEN_ERR(710);
 			err_num=err_assign_env();
-			stack_push_replace("tok l",tok_l);
+			// stack_push_replace("tok l",tok_l);
 			stack_push("assign env",tok0);
 			RT_MESG1(7141);
 		case TOK_ASSIGNOPT:
@@ -1396,7 +1390,7 @@ int err_lexpression()
 			set_term_function(tok,assign_option);
 			NTOKEN_ERR(710);
 			err_num=err_assign_env();
-			stack_push_replace("tok l",tok_l);
+			// stack_push_replace("tok l",tok_l);
 			stack_push("assign option",tok0);
 			RT_MESG1(7141);
 		default:

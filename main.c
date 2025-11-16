@@ -308,8 +308,8 @@ void parse_command_line(int argc, char **argv)
 				case 'b':	/* open as binary file  */
 					binflag=1;
 					break;
-					// MESG("show_tokens!");
 				case 'g':
+					show_bnf_tokens=1;
 					set_debug(2);
 					execmd=1;
 					carg++;

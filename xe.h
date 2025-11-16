@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.7T9test (13/11/2025)"
+#define VERSION 	 "#01.7T8test (15/11/2025)"
 
 
 // merged from kle4 #776T46 (28/7/2022)
@@ -693,6 +693,9 @@ typedef struct  FILEBUF {
 // Macro language sructures
 	struct tok_struct *tok_table;
 	struct tok_struct *end_token;	/* the last (EOF) token in tok_table  */
+	struct tok_struct *tok_table_bnf;
+	int tok_bnf_index;
+	struct tok_struct *tok_bnf;
 	int err;	/* negative if not syntax checked  */
 	BTREE *symbol_tree;	/* local symbol table  */
 	struct alist *type_list;	/* type table list  */
