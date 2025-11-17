@@ -15,6 +15,7 @@ int err_check_sentence1();
 int err_assign_val();
 int err_assign_env();
 
+
 void mesg_out(const char *fmt, ...)
 {
  va_list args;
@@ -227,7 +228,7 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 		// MESG("function arg tnum=%d ttype=%d ia=%d",tok->tnum,tok->ttype,ia);
 		if(tok->ttype==TOK_RPAR||tok->ttype==TOK_SEP ||tok->ttype==TOK_EOF) {
 			// MESG("end function parameters");
-			if(tok->ttype==TOK_RPAR) stack_push("eval_function RPAR",tok);
+			if(tok->ttype==TOK_RPAR) stack_push("eval_function )",tok);
 			break;
 		}
 		if(tok->ttype==TOK_COMMA) {
@@ -247,7 +248,7 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 
 	if(tok->ttype==TOK_RPAR) {
 		// MESG("err_eval_fun1: skip RPAR!!");
-		if(lpar) stack_push("eval_func rpar",tok);
+		if(lpar) stack_push("eval_func )",tok);
 		NTOKEN_ERR(404);
 	};
 	tok0->number_of_args=ia;
@@ -295,7 +296,7 @@ int err_skip_type_args(tok_struct *tok0)
 			nargs=0;
 		};	
 	};
-	stack_push("skip_args RPAR",tok);
+	stack_push("skip_args )",tok);
 	NTOKEN_ERR(670);
 	// MESG("err_skip_type_args: Data definition of [%s] at line %d rows=%d args=%d",tok0->tname,tok0->tline,rows+1,args0);
  };
@@ -341,6 +342,7 @@ int  err_push_args_1(int *nargs)
 	if(tok->ttype==TOK_RPAR) {
 		break;
 	} else if (tok->ttype==TOK_COMMA) {
+		stack_push("arg ,",tok);
 		NTOKEN_ERR(416);
 		continue;
 	}
@@ -381,7 +383,7 @@ int err_assign_args1(int nargs)
 		}
 		xpos=423;	/* this should be a var token  */
 
-		err_num_expression();
+		err_cexpression();
 		// MESG("err_assign: after lexpression: [%s] %d",tok->tname,tok->ttype);
 		if(tok->ttype==TOK_RPAR)  {
 			break;
@@ -529,6 +531,7 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 #if	DEBUG1
  int save_stage_level=stage_level;
 #endif
+	tok_struct *tok_latest=NULL;
  	// MESG("err_exec_funtion: %s",name);
     FILEBUF *bp;		/* ptr to buffer to execute */
     char bufn[MAXFLEN+2];		/* name of buffer to execute */
@@ -562,6 +565,7 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 	};
 	/* and now execute it as asked */
 	// MESG("err_exec_function: call check_init");
+	tok_latest=tok;
 	if((check_init(bp))>0) {
 		ERROR("found syntax errors in function!");
 		RT_MESG1(464);
@@ -569,11 +573,17 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 #if	DEBUG1
 	stage_level=save_stage_level;
 #endif
-	CHECK_TOK(465);
+	tok=tok_latest;
+
 	tok=bp->tok_table;
+	no_push=1;
 	err_num=err_assign_args1(nargs);
-	tok=bp->tok_table;
+	no_push=0;
 	CHECK_TOK(466);
+
+	tok=tok_latest;
+	NTOKEN2;
+	NTOKEN2;
 	err_num=err_check_sentence1();
 	// MESG("err_exec_func: err_num=%d",err_num);
 	RT_MESG1(467);
@@ -932,7 +942,7 @@ int err_factor()
 		CHECK_TOK(504);
 		tok=after_proc;
 		// MESG("	TOK_PROC: end function tnum=%d",tok->tnum);
-		stack_push("proc RPAR ",tok);
+		stack_push("proc ) ",tok);
 		check_skip_token_err1(TOK_RPAR,"no right parenthesis",505);
 		// MESG("err TOK_PROC: end ttype=%d",tok->ttype);
 		RT_MESG;
@@ -1449,7 +1459,7 @@ int err_check_sentence1()
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		if(execmd) set_tok_directive(tok,dir_lcurl);
 		else set_tok_directive(tok,dir_lcurl_break);
-		stack_push("sentence LCURL {",tok);
+		stack_push("sentence {",tok);
 		NTOKEN_ERR(627);
 		CHECK_TOK(628);
 		err_num=err_check_block1();
@@ -1473,7 +1483,7 @@ int err_check_sentence1()
 			return err_num;
 		};
 		// MESG("err: TOK_DIR_IF! check rpar! of %d",tok->tnum);
-		stack_push("if RPAR",tok);
+		stack_push("if )",tok);
 		check_skip_token_err1(TOK_RPAR,"tok_dir_if",xpos);
 
 		CHECK_TOK(634);
@@ -1535,7 +1545,7 @@ int err_check_sentence1()
 		err_num=err_num_expression();
 		if(err_num) return(err_num);
 		CHECK_TOK(6409);
-		stack_push("fori RPAR",tok);
+		stack_push("fori )",tok);
 		if(tok->ttype!=TOK_RPAR) ERROR("6409:for i: error ");
 		NTOKEN_ERR(64010);	/* skip right parenthesis  */
 		// set block start
@@ -1575,7 +1585,7 @@ int err_check_sentence1()
 
 		err_num=err_lexpression();	/* check loop statement  */
 		CHECK_TOK(647);
-		stack_push("for RPAR",tok);
+		stack_push("for )",tok);
 		if(!check_skip_token1(TOK_RPAR)) { set_error(tok,xpos,"RPAR"); RT_MESG1(6471);};
 
 		start_block=tok;
@@ -1601,7 +1611,7 @@ int err_check_sentence1()
 			check_element=tok;
 			err_num=err_check_sentence1();
 			CHECK_TOK(657);
-			stack_push("while RPAR",tok);
+			stack_push("while )",tok);
 			check_skip_token_err1(TOK_RPAR,"tok_dir_while:",xpos);
 			CHECK_TOK(658);
 			start_block=tok;
@@ -1630,7 +1640,7 @@ int err_check_sentence1()
 		NTOKEN_ERR(664);
 		if(tok->ttype!=TOK_SEP&&tok->ttype!=TOK_RPAR) 	
 			err_num=err_lexpression();
-		stack_push("dir return RPAR",tok);
+		stack_push("dir return )",tok);
 		check_skip_token1(TOK_RPAR);
 		// MESG(" err TOK_DIR_RETURN: after lexpression: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype); 
 		RT_MESG1(666);
@@ -1639,9 +1649,9 @@ int err_check_sentence1()
 		RT_MESG;
 	case TOK_DIR_TYPE:
 		{
-		MESG("# err_check_sentence: %s",tok_info(tok));
+		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,tok_dir_type);
-		MESG("--> err: TOK_DIR_TYPE: %s",tok->tname);
+		// MESG("--> err: TOK_DIR_TYPE: %s",tok->tname);
 		NTOKEN_ERR(671);	// this is the type name
 		xpos=632;
 	};break;

@@ -11,7 +11,15 @@ function fact(num)
  }
 }
 
+function tadd(a1, a2)
+{
+	return(a1+a2)
+}
+
+
 fact(3):     6
+
+tadd(1,2):
 
 p=0; l=0; 
 print(_time)	: "Mon Dec 28 12:53:58 2015"

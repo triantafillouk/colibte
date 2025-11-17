@@ -1123,6 +1123,7 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
  tok_struct *tok;
  tok_struct *tok_table=NULL;
  int isize=0;
+ int table_size = lex_parser->size+1;
  MESG("set_tok_table: [%s] create token table from token list size of %d!",bf->b_fname,lex_parser->size);
  if(bf->tok_table != NULL) {
  	free(bf->tok_table);
@@ -1130,25 +1131,26 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
  if(bf->tok_table_bnf != NULL) {
  	free(bf->tok_table_bnf);
  };
- tok_table=(void *)malloc(sizeof(struct tok_struct)*(lex_parser->size+1));
+ tok_table=(void *)malloc(sizeof(struct tok_struct)*table_size);
  bf->tok_table = (void *) tok_table;
- bf->tok_table_bnf=(void *)malloc(sizeof(struct tok_struct)*(lex_parser->size+1));
+ bf->tok_table_bnf=(void *)malloc(sizeof(struct tok_struct)*table_size);
  bf->tok_bnf_index=0;
  bf->tok_bnf = bf->tok_table_bnf;
- MESG("----> set_tok_table: bf=[%s]",bf->b_fname);
+ MESG("-----------> set_tok_table: bf=[%s]",bf->b_fname);
  lbegin(lex_parser);
  tlist=lex_parser;
  tok_to = tok_table;
+ isize=0;
  while(tlist->current)
  {
 	tok=(tok_struct *)tlist->current->data;
-
+	
 	memcpy((void *)tok_to,(void *)tok,sizeof(tok_struct));
 	if(tok->ttype==TOK_LCURL || tok->ttype==TOK_RCURL) {
 		tok_to->match_tok = tok_table + tok_to->tcurl->num;
 	};
 	tlist->current=tlist->current->next;
-	// MESG(";%3d: t=[%s] ",isize,tok_info(tok));
+	MESG(";[%s] %3d: t=[%s] ",bf->b_fname,isize,tok_info(tok));
 	isize++;
 	tok_to++;
  };
