@@ -175,7 +175,7 @@ char *vtype_names[] = {
 
 /* Function definitions */
 #include "mlang_functions.c"
-
+#include "bnf_expr.c"
 
 void delete_type_tree(BTREE *type_tree)
 {
@@ -190,17 +190,6 @@ void init_btree_table()
 	bt_table=new_btree("table",0);
 	directiv_table=new_btree("directives",0);
 	global_types_tree=new_btree("types",0);
-}
-
-void stack_push(char *title,tok_struct *tok)
-{
- static int ind=0;
- if(no_push) { MESG("stack_push: skip %s",tok_info(tok));return;};
- // check_buffer->tok_table_bnf[check_buffer->tok_bnf_index]=tok;
- memcpy((void *)check_buffer->tok_bnf,(void *)tok,sizeof(tok_struct));
- check_buffer->tok_bnf++;
- check_buffer->tok_bnf_index++;
- MESG("P[%10s] %3d %-15s : %s",check_buffer->b_fname,ind++,title,tok_info(tok));
 }
 
 void clear_args(MVAR *va,int nargs)

@@ -14,7 +14,7 @@ TOK_TAB token_table[]= {
 	{TOK_QUOTE			,"quote",0},
 	{TOK_LPAR			," ( ",0},	// 7
 	{TOK_RPAR			," ) ",0},	// 8
-	{TOK_SHOW			,":",0},	// 9
+	{TOK_SHOW			," : ",0},	// 9
 	{TOK_COMMENT		,"comment",0},	// 10
 	{TOK_VAR			,"var",0},	// 11 level 0 variable
 	{TOK_OPTION			,"option",0},	// 12 editor option

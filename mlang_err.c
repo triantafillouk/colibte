@@ -131,13 +131,7 @@ char * tok_info2(tok_struct *tok)
 
 int parse_level=0;
 char show_type=' ';
-#if	0
-void stack_push_replace(char *title,tok_struct *tok)
-{
- // static int ind=0;
- // MESG("%3d rep %-20s : %s",ind++,title,tok_info(tok));
-}
-#endif
+
 int check_skip_token1( int type)
 {
  	if(tok->ttype==type) 
