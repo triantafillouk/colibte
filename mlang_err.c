@@ -942,16 +942,16 @@ int err_factor()
 		RT_MESG;
 	};
 	case TOK_CMD:	{ // 3 editor command
-		int var_index;
+		int index;
 		int check_par;
 
 		/* variable's name in tok0->tname */
 		xpos=506;
 		var_node=tok0->tok_node;
-		var_index = var_node->node_index;
+		index = var_node->node_index;
 		// MESG("err: TOK_CMD");
 		pre_symbol=0;
-		if(ftable[var_index].arg==0) check_par=0;else check_par=1;
+		if(ftable[index].arg==0) check_par=0;else check_par=1;
 		if(check_par) 
 		{	xpos=507;
 			pnum++;
@@ -966,7 +966,7 @@ int err_factor()
 		save_macro_exec=macro_exec;
 		macro_exec=MACRO_MODE2;
 		{
-			int args=ftable[var_index].arg;
+			int args=ftable[index].arg;
 			int check_end=1;
 			int i;
 			if(args<0) {	/* undefined number of arguments ...  */

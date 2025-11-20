@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.7T10 test (18/11/2025)"
+#define VERSION 	 "#01.7T11 test (20/11/2025)"
 
 
 // merged from kle4 #776T46 (28/7/2022)
@@ -317,14 +317,16 @@ typedef struct  VIDEO {
 #define HEX_LINE_LEN	16
 
 typedef struct MVAR {
-	short	var_index;
-	short	var_type;
-	char *var_name;
+	// short	var_index;
+	int	var_type;
+	// char *var_name;
 	union {
+		// long int ival;
 		double dval;
 		char *sval;
 		struct array_dat *adat;
 		struct BTREE *btree1;
+		struct MVAR *var_pointer;
 	};
 } MVAR;
 
@@ -484,7 +486,7 @@ typedef struct MLQUOTES {
 #define	VTYPE_TREE		12	/* btree pairs  */
 #define VTYPE_TREE_EL	13	/* tree element  */
 #define	VTYPE_AMIXED	14	/* mixed array  */
-#define VTYPE_MIXEDEL	15	/* element of mixed array  */
+#define VTYPE_POINTER	15	/* a variable pointer  */
 
 /* textpoint */
 #define  FULLDEFINED	0

@@ -602,7 +602,7 @@ MVAR *new_symbol_table(int size)
  MVAR *td=malloc(sizeof(struct MVAR)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
  for(i=0;i<size;i++) {
-	td[i].var_index=i;
+	// td[i].var_index=i;
  	td[i].var_type=VTYPE_NUM;
 	td[i].dval=0;
  };
@@ -616,7 +616,7 @@ MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
  td=realloc(td,sizeof(struct MVAR)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
  for(i=old_size;i<size;i++) {
-	td[i].var_index=i;
+	// td[i].var_index=i;
  	td[i].var_type=VTYPE_NUM;
 	td[i].dval=0;
  };
@@ -691,12 +691,10 @@ void init_exec_flags()
 
 void show_error(char *from,char *name)
 {
- int var_index=-1;
- if(tok) if(tok->tok_node) var_index=tok->tok_node->node_index;
- if(var_index>=0)
-	ERROR("%s error %d file %s tok=%s var_index=%d after line %d: [%s]",
-		from,err_num,name,tok->tname,var_index,err_line,err_str);
- else {
+ if(tok) {
+	ERROR("%s error %d %s file %s [%s]",
+		from,err_num,name,err_str,tok_info(tok));	 
+ } else {
 	ERROR("%s error %d file %s line %d: [%s]",from,err_num,name,err_line,err_str);
  };
 }
@@ -973,10 +971,10 @@ double factor_line_array()
 	RTRN(1.2);
 }
 
- MVAR *get_left_slot(int ind)
+inline MVAR *get_left_slot(int ind)
 {
 	// MESG("get_left_slot: ind=%d",ind);
-	return &current_stable[ind];
+	return current_stable+ind;
 }
 
 double factor_type_element()
@@ -1027,6 +1025,7 @@ double factor_variable()
 {	
 	// MESG("factor_variable:");
  	lsslot = get_left_slot(tok->tind);
+	// lsslot = current_stable+tok->tind;
 	lstoken = tok;
 
 	set_vtype(lsslot->var_type);
@@ -1082,7 +1081,7 @@ void node_to_mvar(BTNODE *node,void *p)
  int index=node->node_index;
  MVAR *mvar_array = (MVAR *)p;
 	mvar_array[index].var_type=node->node_vtype;
-	mvar_array[index].var_index=node->node_index;
+	// mvar_array[index].var_index=node->node_index;
 	if(node->node_vtype==VTYPE_NUM) {
 		mvar_array[index].dval=node->node_dval;
 		// mvar_array[index].var_len=0;
@@ -1513,7 +1512,7 @@ double factor_array_l2()
 
 double factor_cmd()
 { // 3 editor command
-	int var_index;
+	int function_index;
 	int check_par=0;
 	int save_macro_exec;
 	double status=1;
@@ -1522,8 +1521,8 @@ double factor_cmd()
 
 	// set_vtype(VTYPE_NUM);
 	// MESG(";factor_cmd: ttype=%d command=%d",tok->ttype,tok->tok_node->node_index);
-	var_index = tok->tok_node->node_index;
-	ed_command = ftable+var_index;
+	function_index = tok->tok_node->node_index;
+	ed_command = ftable+function_index;
 
 	NTOKEN2;
 	save_macro_exec=macro_exec;
@@ -1578,7 +1577,7 @@ double factor_cmd()
 	};
 
 	if(err_num>0) {
-		// ERROR("error %d after function [%s] at line %d: %s",err_num,ftable[var_index].n_name,err_line,err_str);
+		// ERROR("error %d after function [%s] at line %d: %s",err_num,ftable[function_index].n_name,err_line,err_str);
 		show_error("Factor","factor_cmd");
 		RTRN(status);
 	};
@@ -2536,19 +2535,20 @@ double assign_env(double none)
 
 double assign_val(double none)
 {
-	double v1;
-	int stype=get_vtype();
+	// int stype=get_vtype();
 	TDS("assign_val");
 	// MESG("assign_val: lsslot ind=%d [%s] vtype=%d ex_vtype=%d",lsslot->var_index,lstoken->tname,lsslot->var_type,stype);
 	tok_struct *lstok=lstoken;
 	MVAR *sslot=lsslot;
-	v1=lexpression();
+	double v1=lexpression();
 	// MESG("assign_val: after lexpression! slot vtype=%d ex_vtype=%d\n",sslot->var_type,get_vtype());
-	if(vtype_is(sslot->var_type) && vtype_is(VTYPE_NUM)) {
+	if(vtype_is(sslot->var_type) && vtype_is(VTYPE_NUM)) 
+	{
 			sslot->dval=v1;
 			return(v1);
 	};
 	
+	int stype=sslot->var_type;;
 	// MESG("assign_val: check diffs! %d %d %d",get_vtype(),stype,sslot->var_type);
 	if(!vtype_is(sslot->var_type)){
 		// MESG("assign_val: different vtype %d != sslot_vtype %d",get_vtype(),sslot->var_type);
@@ -3566,7 +3566,7 @@ int vtype_is(int type)
 	return type==ex_var.var_type;
 }
 
-void set_vtype(int type)
+inline void set_vtype(int type)
 {
 	// MESG("set_vtype:");
 	ex_var.var_type=type;
@@ -3590,13 +3590,13 @@ void set_sval(char *s)
  ex_var.var_type=VTYPE_STRING;
 }
 
-void set_vdval(double value){
+inline void set_vdval(double value){
 	// MESG("set_vdval: %f",value);
 	ex_var.var_type=VTYPE_NUM;
 	ex_var.dval=value;
 }
 
-void set_dval(double value)
+inline void set_dval(double value)
 {
 	// MESG("set_dval: %f",value);
 	ex_var.dval=value;

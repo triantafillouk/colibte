@@ -255,7 +255,7 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 	tok->ttype=btn->node_type;
 	ex_edenv=tok->ttype;
 	btn->node_vtype=VTYPE_NONE;
-	// MESG("	set_var: new variable name=%s tind=%d ttype=%d",name,tok->tind,tok->ttype);
+	MESG("	set_var: new variable name=%s tind=%d ttype=%d",name,tok->tind,tok->ttype);
 	// if(stree->max_items < tok->tind) ERROR("exceeded item list of %d !! CHECK!",stree->max_items);
 }
 

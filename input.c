@@ -397,13 +397,13 @@ int assign_sub(num n)
 int (*get_function(char *fname))(num) 
 {
 	BTNODE *bte;
-	int var_index;
+	int index;
 
 	bte = find_bt_element(fname);
 	if(bte) {
 		if(bte->node_type==TOK_CMD) {
-			var_index=bte->node_index;
-			return(ftable[var_index].n_func);
+			index=bte->node_index;
+			return(ftable[index].n_func);
 		};
 	};
 	msg_line("No such Function [%s]",fname);
