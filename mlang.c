@@ -670,6 +670,7 @@ void init_error()
 
 void init_ex_var()
 {
+	MESG("init_ex_var:");
 	ex_var.var_type=VTYPE_NUM;
 	ex_var.dval=0;
 }
@@ -2137,6 +2138,7 @@ static double inline dir_return()
 double term_plus(double value)
 {
  double d1;
+ // MESG("term_plus: value=%f",value);
  if(vtype_is(VTYPE_NUM)) {
 	NTOKEN2;
 	d1=num_term1();
@@ -2152,6 +2154,7 @@ double term_plus(double value)
 	};
 	if(vtype_is(VTYPE_ARRAY)) { // num + array
 		array_dat *new_array = get_array("18");
+		// MESG("term_plus: numeric + array");
 		if(new_array->astat==ARRAY_LOCAL) {
 			set_array(dup_array_add1(new_array,value));
 			ex_name="New array,add to numeric";
@@ -2209,14 +2212,18 @@ double term_plus(double value)
 		 		NTOKEN2;
 				d1=num_term1();
 				if(vtype_is(VTYPE_NUM)) { // add numeric to array
+					MESG("	array + numeric");
 					if(loc_array->astat==ARRAY_LOCAL) {
-						loc_array=dup_array_add1(loc_array,d1);
+						array_dat *new_array;
+						new_array=dup_array_add1(loc_array,d1);
+						set_array(new_array);
+						print_array1("after a+num",new_array);
 					} else {
 						array_add1(loc_array,d1);
 					};
 					set_vtype(VTYPE_ARRAY);
-					set_array(loc_array);
 					ex_name="Add to numeric";
+					MESG("	array + numeric: ok!");
 					return 0;
 				} else if(vtype_is(VTYPE_ARRAY)) {	// array addition
 					array_dat *loc_array2;
@@ -2808,14 +2815,17 @@ void refresh_ddot_1(double value)
  int stat=0;
  TextPoint *tp = tok->ddot;
  FILEBUF *buf = tp->fp;
- // MESG("refresh_ddot: %d",get_vtype());
+ MESG("refresh_ddot: %d",get_vtype());
+
  if(execmd) {
 	 if(vtype_is(VTYPE_NUM)) {
 		printf("%s	: %.3f\n",ddot_string(),value);
 	 } else if(vtype_is(VTYPE_STRING)) {
 		printf("%s	: %s\n",ddot_string(),get_sval());
 	 } else if(vtype_is(VTYPE_ARRAY)||vtype_is(VTYPE_SARRAY)||vtype_is(VTYPE_AMIXED)) {
-	 	print_array1(ddot_string(),get_array("36"));
+		MESG("	show_array!");
+		print_array1("array: ",get_array("36"));
+	 	// print_array1(ddot_string(),get_array("36"));
 	 };
 	 lstoken=NULL;
 	 NTOKEN2;
@@ -3109,6 +3119,7 @@ double exec_block1(FILEBUF *fp)
 //  double val=0;
  INIT_STAGE;
  exe_buffer=fp;
+ double val=0;
 	// MESG("exec_block1:[%s] size of tok_struct is %d",fp->b_fname,sizeof(tok_struct));
    if(!current_active_flag) return(ex_var.dval);
    while(tok->ttype!=TOK_EOF) 
@@ -3121,8 +3132,8 @@ double exec_block1(FILEBUF *fp)
 		continue;
 	};
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
- 	ex_var.dval=tok->directive();
-	// ex_var.dval=val;
+ 	val=tok->directive();
+	if(ex_var.var_type==1) ex_var.dval=val;
 	if(!current_active_flag) break;
    };
    // MESG("exec_block1: end!");
@@ -3525,7 +3536,8 @@ double get_val()
 
 array_dat *get_array(char *pos)
 {
-	// MESG("get_array:[%s] num=%d type=%d tok [%s]  ind=%d num=%d type=%d atype=%d",
+	// if(ex_var.adat==NULL) MESG("ex_var.adat at %s is NULL!",pos);
+	// else MESG("get_array:[%s] num=%d type=%d tok [%s]  ind=%d num=%d type=%d atype=%d",
 		// pos,ex_var.adat->anum,ex_var.var_type,tok->tname,tok->tind,tok->tnum,tok->ttype,ex_var.adat->atype);
 	// if(ex_var.var_type==1) return NULL;
 	return ex_var.adat;
@@ -3568,7 +3580,7 @@ int vtype_is(int type)
 
 inline void set_vtype(int type)
 {
-	// MESG("set_vtype:");
+	// MESG("set_vtype: %X",type);
 	ex_var.var_type=type;
 }
 

@@ -31,11 +31,12 @@ void stack_push(char *title,tok_struct *tok)
 
 double bnf_not()
 {
-
+	return 1.0;
 }
 
 double bnf_op1()
 {
+	return 1.0;
 
 }
 
@@ -67,6 +68,7 @@ double bnf_plus()
 double bnf_assign()
 {
  
+	return 1.0;
 }
 
 double bnf_expression()
