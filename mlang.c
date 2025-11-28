@@ -1663,6 +1663,7 @@ static inline double factor_plus()
 
 static inline double factor_minus()
 {
+	MESG("factor_minus:");
 	NTOKEN2;
 	return (- FACTOR_FUNCTION);
 }
@@ -2164,6 +2165,7 @@ double term_plus(double value)
 		};
 		set_vtype(VTYPE_ARRAY);
 		ex_name="Add to numeric";
+		// MESG("tem_plus: end ok!");
 		return 0;
 	};
 	err_num=217;
@@ -2852,12 +2854,13 @@ void refresh_ddot_1(double value)
 	};
 
  } else if(vtype_is(VTYPE_ARRAY) || vtype_is(VTYPE_SARRAY) || vtype_is(VTYPE_AMIXED)) {
+	MESG("refresh_ddot:1");
 	array_dat *adat = get_array("37");
-	// MESG("refresh_ddot: array: type=%d name=(%s)",adat->atype,adat->array_name);
+	MESG("refresh_ddot: array: type=%d name=(%s)",adat->atype,adat->array_name);
 
  	stat=snprintf(ddot_out,sizeof(ddot_out)," array %d:[%s] type [%s] , slot %ld type=%d rows %d,cols %d",adat->anum,
-	adat->array_name,vtype_names[adat->atype],lsslot-current_stable,adat->atype,adat->rows,adat->cols);
-	print_array1(":",adat);
+		adat->array_name,vtype_names[adat->atype],lsslot-current_stable,adat->atype,adat->rows,adat->cols);
+	// print_array1(":",adat);
  };
  if(stat>MAXLLEN) MESG("truncated");
 
@@ -3536,6 +3539,7 @@ double get_val()
 
 array_dat *get_array(char *pos)
 {
+	MESG("get_array: %s",pos);
 	// if(ex_var.adat==NULL) MESG("ex_var.adat at %s is NULL!",pos);
 	// else MESG("get_array:[%s] num=%d type=%d tok [%s]  ind=%d num=%d type=%d atype=%d",
 		// pos,ex_var.adat->anum,ex_var.var_type,tok->tname,tok->tind,tok->tnum,tok->ttype,ex_var.adat->atype);
@@ -3545,7 +3549,7 @@ array_dat *get_array(char *pos)
 
 void set_array(array_dat *a)
 {
-	// MESG("set_array:num=%d type %d allocated=%d name=%s",a->anum,a->atype,a->astat,a->array_name);
+	MESG("set_array:num=%d type %d allocated=%d name=%s",a->anum,a->atype,a->astat,a->array_name);
 	ex_var.adat=a;
 	ex_var.var_type=a->atype;
 }

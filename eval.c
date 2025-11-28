@@ -32,8 +32,6 @@ extern FILEBUF *cbfp;
 extern int record_session;
 #endif
 
-int dofile(char *fname);
-void set_vtype(int type);
 int vtype_is(int type);
 int custom_cell_width=0;
 
@@ -111,8 +109,6 @@ enum {
 void set_screen_update(int flag);
 double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start);
 int   GetBlock(FILEBUF *fp,char *copy,offs from,offs size);
-
-extern int drv_type;
 
 short   kbdm[MAXLLEN];			/* keyboard macro buffer  */
 short	*kbdptr;		/* current position in keyboard buf */
@@ -769,9 +765,8 @@ int dofile(char *fname)
 		if((bp->b_state & FS_ACTIVE)==0) {
 			activate_file(bp);
 			if ((status = file_read1(bp,fname)) != TRUE) {
-
-			return(status);
-		};
+				return(status);
+			};
 		} else {
 			activate_file(bp);
 		};
