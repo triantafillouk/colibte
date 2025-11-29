@@ -91,7 +91,7 @@ void free_array(char *spos,struct array_dat *adat)
 void allocate_array(struct array_dat *adat)
 {
  int i;
- MESG("allocate_array: rows=%d cols=%d astat=%d type=%d",adat->rows,adat->cols,adat->astat,adat->atype);
+ // MESG("allocate_array: rows=%d cols=%d astat=%d type=%d",adat->rows,adat->cols,adat->astat,adat->atype);
  
  if(adat->astat==ARRAY_UNALLOCATED || adat->atype==VTYPE_AMIXED) {	/* new/renew  */
  	if(adat->atype==VTYPE_ARRAY) {	/* allocate num array  */
@@ -178,7 +178,7 @@ struct array_dat *new_array(int rows,int cols)
 array_dat * dup_array_add1(array_dat *a,double plus)
 {
  array_dat *na;	/* new array  */
- MESG("dup_array_add1:");
+ // MESG("dup_array_add1:");
  na=new_array_similar(a);
  	if(na->atype==VTYPE_ARRAY) {	/* allocate num array  */
 		int i,j,dim=1;

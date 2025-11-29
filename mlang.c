@@ -670,7 +670,7 @@ void init_error()
 
 void init_ex_var()
 {
-	MESG("init_ex_var:");
+	// MESG("init_ex_var:");
 	ex_var.var_type=VTYPE_NUM;
 	ex_var.dval=0;
 }
@@ -1185,7 +1185,7 @@ double factor_assign_type()
 				// MESG("	%2d: type=%d val=[%s]",i,ex_var.var_type,get_sval());
 				row_var[i].sval=strdup(get_sval());
 			} else {
-				// MESG("	%2d: type=%d val=%f %f",i,ex_var.var_type,ex_var.dval,value);
+				MESG("	%2d: type=%d val=%f %f",i,ex_var.var_type,ex_var.dval,value);
 				row_var[i].dval=value;
 			};
 			// MESG("next toke type is %s",tok_info(tok));
@@ -2817,7 +2817,7 @@ void refresh_ddot_1(double value)
  int stat=0;
  TextPoint *tp = tok->ddot;
  FILEBUF *buf = tp->fp;
- MESG("refresh_ddot: %d",get_vtype());
+ // MESG("refresh_ddot: %d",get_vtype());
 
  if(execmd) {
 	 if(vtype_is(VTYPE_NUM)) {
@@ -2825,7 +2825,7 @@ void refresh_ddot_1(double value)
 	 } else if(vtype_is(VTYPE_STRING)) {
 		printf("%s	: %s\n",ddot_string(),get_sval());
 	 } else if(vtype_is(VTYPE_ARRAY)||vtype_is(VTYPE_SARRAY)||vtype_is(VTYPE_AMIXED)) {
-		MESG("	show_array!");
+		// MESG("	show_array!");
 		print_array1("array: ",get_array("36"));
 	 	// print_array1(ddot_string(),get_array("36"));
 	 };
@@ -2854,9 +2854,9 @@ void refresh_ddot_1(double value)
 	};
 
  } else if(vtype_is(VTYPE_ARRAY) || vtype_is(VTYPE_SARRAY) || vtype_is(VTYPE_AMIXED)) {
-	MESG("refresh_ddot:1");
+	// MESG("refresh_ddot:1");
 	array_dat *adat = get_array("37");
-	MESG("refresh_ddot: array: type=%d name=(%s)",adat->atype,adat->array_name);
+	// MESG("refresh_ddot: array: type=%d name=(%s)",adat->atype,adat->array_name);
 
  	stat=snprintf(ddot_out,sizeof(ddot_out)," array %d:[%s] type [%s] , slot %ld type=%d rows %d,cols %d",adat->anum,
 		adat->array_name,vtype_names[adat->atype],lsslot-current_stable,adat->atype,adat->rows,adat->cols);
@@ -3140,7 +3140,7 @@ double exec_block1(FILEBUF *fp)
 	if(!current_active_flag) break;
    };
    // MESG("exec_block1: end!");
-	return(ex_var.dval);
+	return(val);
 }
 #endif
 
@@ -3149,6 +3149,7 @@ double exec_block1_break(FILEBUF *fp)
  // double val=0;
  INIT_STAGE;
  exe_buffer=fp;
+ double val=0;
 	// MESG("#exec_block:%d ttype=%d [%s]",tok->tnum,tok->ttype,tok_info(tok));
    if(!current_active_flag) return(ex_var.dval);
    while(tok->ttype!=TOK_EOF) 
@@ -3161,13 +3162,13 @@ double exec_block1_break(FILEBUF *fp)
 		continue;
 	};
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
- 	ex_var.dval=tok->directive();
-	// MESG("	val after dir: %f",val);
-	// ex_var.dval=val;
+ 	val=tok->directive();
+	if(ex_var.var_type==1) ex_var.dval=val;
+
 	if(drv_check_break_key()) break;
 	// MESG(" [%s]",tok_info(tok));
    };
-	return(ex_var.dval);
+	return(val);
 }
 
 /* execute a block from a file  */
@@ -3539,8 +3540,8 @@ double get_val()
 
 array_dat *get_array(char *pos)
 {
-	MESG("get_array: %s",pos);
-	// if(ex_var.adat==NULL) MESG("ex_var.adat at %s is NULL!",pos);
+	// MESG("get_array: %s",pos);
+	if(ex_var.adat==NULL) MESG("ex_var.adat at %s is NULL!",pos);
 	// else MESG("get_array:[%s] num=%d type=%d tok [%s]  ind=%d num=%d type=%d atype=%d",
 		// pos,ex_var.adat->anum,ex_var.var_type,tok->tname,tok->tind,tok->tnum,tok->ttype,ex_var.adat->atype);
 	// if(ex_var.var_type==1) return NULL;
@@ -3549,7 +3550,7 @@ array_dat *get_array(char *pos)
 
 void set_array(array_dat *a)
 {
-	MESG("set_array:num=%d type %d allocated=%d name=%s",a->anum,a->atype,a->astat,a->array_name);
+	// MESG("set_array:num=%d type %d allocated=%d name=%s",a->anum,a->atype,a->astat,a->array_name);
 	ex_var.adat=a;
 	ex_var.var_type=a->atype;
 }
