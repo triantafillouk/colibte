@@ -590,7 +590,8 @@ int err_factor()
  TDSERR("factor");
  int lpar=0;
  // MESG_TOK_INFO("-- factor",tok);
- stack_push("factor",tok);
+ if(tok->ttype!=TOK_NOT)
+ 	stack_push("factor",tok);
  int save_macro_exec;
  tok_struct *tok0; 
 
@@ -612,7 +613,8 @@ int err_factor()
 	return(err_num);
  };
  set_tok_function(tok0,0);
- // MESG("switch: tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
+ MESG("switch    : tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
+ MESG("previous	 : tok type=%d err=%d %s %LX",tok->ttype,err_num,tok->tname,tok->factor_function);
  switch(tok0->ttype) {
 	/*  the following ends factor  */
 #if	1
@@ -849,6 +851,14 @@ int err_factor()
 	case TOK_NUM:
 		pre_symbol=0;
 		ex_nums++;
+		xpos=4871;
+		MESG("tok_num: ");
+		MESG("	next is: %s",tok_info(tok));
+		if(tok->ttype==TOK_INCREASE||tok->ttype==TOK_INCREASEBY ||tok->ttype==TOK_DECREASE||tok->ttype==TOK_DECREASEBY) {
+			tok--;
+			set_error(tok0,xpos,"cannot change constant value!");
+			RT_MESG1(xpos);
+		};
 		tok0->tname="numeric";
 		RT_MESG1(487);
 	case TOK_QUOTE:	 { // string 
@@ -864,7 +874,17 @@ int err_factor()
 		RT_MESG1(4891);
 		};
 	case TOK_MINUS:
+		MESG("tok_minus: %d",pre_symbol);
+		if(pre_symbol>1) {
+			xpos=490;
+			syntax_error("too many symbols(+) infront of factor",xpos);
+			RT_MESG1(490);
+		};
+		CHECK_TOK(491);
+		err_factor();
+		RT_MESG1(4911);
 	case TOK_PLUS:
+		MESG("tok_plus: %d",pre_symbol);
 		if(pre_symbol>1) {
 			xpos=490;
 			syntax_error("too many symbols(+) infront of factor",xpos);
@@ -878,7 +898,9 @@ int err_factor()
 		if(pre_symbol) { syntax_error("symbol before not",xpos);RT_MESG;};
 		pre_symbol=0;
 		CHECK_TOK(xpos);
-		return(err_factor());
+		int stat=err_factor();
+		stack_push("NOT",tok0);
+		return(stat);
 	case TOK_OPTION:// 5 editor option
 		/* variable's name in tok0->tname */
 		xpos=494;

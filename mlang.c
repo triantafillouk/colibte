@@ -238,11 +238,13 @@ static inline double factor_none()
 /* Used in increase, decrease  */
 double update_val()
 {
-	// MESG("update_val: tnum=%d vtype=%d group=%d",tok->tnum,get_vtype(),tok->tgroup);
+	MESG("update_val: tnum=%d vtype=%d group=%d",tok->tnum,get_vtype(),tok->tgroup);
 
 	if(vtype_is(VTYPE_NUM)) {
 		double v0=0;
-		// MESG("	vtype is NUM");
+		MESG("	vtype is NUM");
+		if(lsslot==NULL) MESG("lsslot is NULL!");
+		if(lstoken==NULL) MESG("lstoken is NULL!");
 		if(lstoken->ttype==TOK_ARRAY_L1 || lstoken->ttype==TOK_ARRAY1) {
 			// MESG("	array1 element!");
 			v0=*ls_pdval;
@@ -255,8 +257,11 @@ double update_val()
 					*ls_pdval += tok->dval;
 				};
 			} else {
+				MESG("update_val: numeric");
+				if(lsslot==NULL) MESG("lsslot is NULL!");
 				v0=lsslot->dval;
 				lsslot->dval += tok->dval;
+				MESG("update_val:1");
 			};
 		};
 		NTOKEN2;
@@ -692,12 +697,7 @@ void init_exec_flags()
 
 void show_error(char *from,char *name)
 {
- if(tok) {
-	ERROR("%s error %d %s file %s [%s]",
-		from,err_num,name,err_str,tok_info(tok));	 
- } else {
 	ERROR("%s error %d file %s line %d: [%s]",from,err_num,name,err_line,err_str);
- };
 }
 
 /* Check for any errors and initialize parsed list  */
@@ -708,7 +708,7 @@ int check_init(FILEBUF *bf)
  check_buffer = bf;
  int err=0;
  INIT_STAGE;
- MESG("check_init: [%s] %d",bf->b_fname,bf->b_type);
+ // MESG("check_init: [%s] %d",bf->b_fname,bf->b_type);
  if(tok_table==NULL) 
  {
  	// MESG("create token table [%s]",bf->b_fname);
