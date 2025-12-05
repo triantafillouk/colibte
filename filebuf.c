@@ -14,6 +14,7 @@
 long utf8_to_unicode(unsigned char* const utf8_str) ;
 long int unicode_point();
 char *get_bom_description(FILEBUF *fp);
+void escape_file_name(char *fname);
 
 extern int custom_cell_width;
 extern alist *window_list;
@@ -1017,21 +1018,29 @@ int clipboard_copy(ClipBoard *clip)
 	if(cbfp->b_flag & FSNLIST && cbfp->b_flag & FSDIRED)
 	{
 		char fname[MAXFLEN];
+		char dir_name[MAXFLEN];
 		dir_getfile(fname,1);
+		if(full_path==2) escape_file_name(fname);
 		clip->rect=0;
 		clip->height=1;
 		clip->width=strlen(fname);
-		if(full_path) clip->width+=strlen(cbfp->b_dname)+1;
+		if(full_path) {
+			strcpy(dir_name,cbfp->b_dname);
+			if(full_path==2) escape_file_name(dir_name);
+			clip->width+=strlen(dir_name)+1;
+		};
 		clip->text=(char*)emalloc(clip->width,"dir name");
 		if(full_path) {
-			strcpy(clip->text,cbfp->b_dname);
+			strcpy(clip->text,dir_name);
 			clip->text[strlen(clip->text)]='/';
 			strcpy(clip->text+strlen(clip->text),fname);
-			full_path=0;
+			//full_path=0;
 		} else {
-			full_path=1;
+			// full_path++;
 			strcpy(clip->text,fname);
 		};
+		full_path++;
+		if(full_path>2) full_path=0;
 		return(TRUE);
 	} else
 #endif
