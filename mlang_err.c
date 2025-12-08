@@ -613,8 +613,8 @@ int err_factor()
 	return(err_num);
  };
  set_tok_function(tok0,0);
- MESG("switch    : tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
- MESG("previous	 : tok type=%d err=%d %s %LX",tok->ttype,err_num,tok->tname,tok->factor_function);
+ // MESG("switch    : tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
+ // MESG("previous	 : tok type=%d err=%d %s %LX",tok->ttype,err_num,tok->tname,tok->factor_function);
  switch(tok0->ttype) {
 	/*  the following ends factor  */
 #if	1
@@ -693,7 +693,8 @@ int err_factor()
 		RT_MESG1(480);
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
-		// MESG("TOK_VAR: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
+		MESG("TOK_VAR: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
+		MESG("	TOK_VAR: var ind=%d type is %d",tok0->tind,current_stable[tok0->tind].var_type);
 		pre_symbol=0;
 		ex_nvars++;
 		if(tok->ttype==TOK_INCREASE) {
@@ -852,13 +853,14 @@ int err_factor()
 		pre_symbol=0;
 		ex_nums++;
 		xpos=4871;
-		MESG("tok_num: ");
-		MESG("	next is: %s",tok_info(tok));
+		// MESG("tok_num: ");
+		// MESG("	next is: %s",tok_info(tok));
 		if(tok->ttype==TOK_INCREASE||tok->ttype==TOK_INCREASEBY ||tok->ttype==TOK_DECREASE||tok->ttype==TOK_DECREASEBY) {
 			tok--;
 			set_error(tok0,xpos,"cannot change constant value!");
 			RT_MESG1(xpos);
 		};
+		set_vtype(VTYPE_NUM);
 		tok0->tname="numeric";
 		RT_MESG1(487);
 	case TOK_QUOTE:	 { // string 

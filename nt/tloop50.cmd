@@ -19,7 +19,7 @@ fori(i=1;101;1){
 		i2++
 	  }
 	} 
-#	show_time("loop:"+i+" p="+p,1);
+	show_time("loop:"+i+" p="+p,1);
 }
 #_time	: "Wed Feb 24 19:48:43 2016"
 ":i1="+i1+" i2="+i2 :

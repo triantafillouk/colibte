@@ -238,11 +238,11 @@ static inline double factor_none()
 /* Used in increase, decrease  */
 double update_val()
 {
-	MESG("update_val: tnum=%d vtype=%d group=%d",tok->tnum,get_vtype(),tok->tgroup);
+	// MESG("update_val: tnum=%d vtype=%d group=%d",tok->tnum,get_vtype(),tok->tgroup);
 
 	if(vtype_is(VTYPE_NUM)) {
 		double v0=0;
-		MESG("	vtype is NUM");
+		// MESG("	vtype is NUM");
 		if(lsslot==NULL) MESG("lsslot is NULL!");
 		if(lstoken==NULL) MESG("lstoken is NULL!");
 		if(lstoken->ttype==TOK_ARRAY_L1 || lstoken->ttype==TOK_ARRAY1) {
@@ -257,11 +257,11 @@ double update_val()
 					*ls_pdval += tok->dval;
 				};
 			} else {
-				MESG("update_val: numeric");
+				// MESG("update_val: numeric");
 				if(lsslot==NULL) MESG("lsslot is NULL!");
 				v0=lsslot->dval;
 				lsslot->dval += tok->dval;
-				MESG("update_val:1");
+				// MESG("update_val:1");
 			};
 		};
 		NTOKEN2;
@@ -1083,7 +1083,9 @@ void node_to_mvar(BTNODE *node,void *p)
  MVAR *mvar_array = (MVAR *)p;
 	mvar_array[index].var_type=node->node_vtype;
 	// mvar_array[index].var_index=node->node_index;
+	mvar_array[index].var_type=0;
 	if(node->node_vtype==VTYPE_NUM) {
+		mvar_array[index].var_type=VTYPE_NUM;
 		mvar_array[index].dval=node->node_dval;
 		// mvar_array[index].var_len=0;
 		// MESG("![%10s] ind=%2d type=%d %f",node->node_name,index,node->node_vtype,node->node_dval);
@@ -1111,7 +1113,7 @@ double factor_assign_type()
 	int columns = var_tree->items;
 	MVAR *svar = btree_to_mvar(var_tree);
 	int size2=1;
-	// MESG("factor_assign_type: [%s]",tok_info(tok));
+	MESG("factor_assign_type: [%s]",tok_info(tok));
 	// if(lsslot) MESG("	lsslot ind=%d type=%d",lsslot->var_index,lsslot->var_type);
 	// MESG("factor_assign_type: -- var_slot ind=%d vtype=%d",var_slot->var_index,var_slot->var_type);
 	// MESG(" factor_assign_type: $$$$$ name=[%s] type %d vtype=%d line=%d size=%d",tok->tname,tok->ttype,var_slot->var_type,tok->tline,size);
@@ -2546,19 +2548,22 @@ double assign_val(double none)
 {
 	// int stype=get_vtype();
 	TDS("assign_val");
-	// MESG("assign_val: lsslot ind=%d [%s] vtype=%d ex_vtype=%d",lsslot->var_index,lstoken->tname,lsslot->var_type,stype);
+	
+	MESG("assign_val: lsslot  [%s] vtype=%d ex_vtype=%d",lstoken->tname,lsslot->var_type);
 	tok_struct *lstok=lstoken;
 	MVAR *sslot=lsslot;
 	double v1=lexpression();
-	// MESG("assign_val: after lexpression! slot vtype=%d ex_vtype=%d\n",sslot->var_type,get_vtype());
+	MESG("assign_val: after lexpression! slot vtype=%d ex_vtype=%d\n",sslot->var_type,get_vtype());
 	if(vtype_is(sslot->var_type) && vtype_is(VTYPE_NUM)) 
 	{
+
 			sslot->dval=v1;
+			sslot->var_type=VTYPE_NUM;
 			return(v1);
 	};
-	
+
 	int stype=sslot->var_type;;
-	// MESG("assign_val: check diffs! %d %d %d",get_vtype(),stype,sslot->var_type);
+	MESG("assign_val: check diffs! %d %d %d",get_vtype(),stype,sslot->var_type);
 	if(!vtype_is(sslot->var_type)){
 		// MESG("assign_val: different vtype %d != sslot_vtype %d",get_vtype(),sslot->var_type);
 		if(vtype_is(VTYPE_AMIXED)) {
@@ -3423,8 +3428,8 @@ void MESG_TOK_INFO(char *title,tok_struct *tok)
 char * tok_info(tok_struct *tok)
 {
  static char stok[MAXLLEN];
-	if(tok==NULL) { return "null token";};
-	// MESG("tok_info: start");
+	if(tok==NULL) { MESG("tok_info: NULL token!");return "null token";};
+ // return "token info";
 	// MESG("tok_info: ttype=%d",tok->ttype);
 #if	0
 	if(tok->tname!=NULL) {
@@ -3435,6 +3440,10 @@ char * tok_info(tok_struct *tok)
 	return stok;
 #else
 	if(tok->tname!=NULL){
+		// return tok->tname;
+		// snprintf(stok,sizeof(stok),"%s %d",tok->tname,tok->tline);
+		// MESG("tok_info: %d %s %d",tok->tind,tok->tname,tok->tline);
+		// return stok;
 		if(tok->ttype==TOK_ARRAY1 || tok->ttype==TOK_ARRAY2) {
 			int rows=0;
 			int cols=0;
@@ -3449,20 +3458,27 @@ char * tok_info(tok_struct *tok)
 		if(tok->ttype==TOK_SHOW) { snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [:]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME);
 		} else
 		if(tok->ttype==TOK_LCURL||tok->ttype==TOK_RCURL) {
+				// snprintf(stok,sizeof(stok),"%3d:%4d CURL",tok->tnum,tok->tline);
 				snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %s other is %d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum);
 		} else
-		if(tok->tgroup>0)
+		if(tok->tgroup>0) {
+			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
 			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%s] group [%d:%s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup));
-		else 
-		if(tok->ttype==TOK_NUM) snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %f",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);
-		else if(tok->ttype==TOK_QUOTE) snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\"",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
-		else if(tok->ttype==TOK_VAR) {
+		} else 
+			if(tok->ttype==TOK_NUM) { 
+			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %f",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);
+		} else if(tok->ttype==TOK_QUOTE) {
+			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\"",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
+		} else if(tok->ttype==TOK_VAR) {
 			// MESG("TOK_VAR:");
 			int size=0;
 			int vtype=VTYPE_NONE;
 			if(current_stable) {
 				struct MVAR *var_slot=get_left_slot(tok->tind);
 				if(var_slot) vtype=var_slot->var_type;
+				MESG("vtype=%d",vtype);
 			};
 			// MESG("tok_info var! ind=[%d] group=%d vtype=%d",tok->tind,tok->tgroup,vtype);
 			if(vtype==VTYPE_TREE) {
@@ -3470,12 +3486,17 @@ char * tok_info(tok_struct *tok)
 				BTREE *type_tree=(BTREE *)tok_node->node_dat;
 				size = type_tree->items;
 			};
+			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
 
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%s] type %s %d size %d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,vtype_names[vtype],vtype,size);
-		} else snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%s] type %s %d size %d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,"var type name" /*vtype_names[vtype]*/,vtype,size);
+		} else {
+			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
+		};
 // 			
 	} else {
-		     snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%f]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);
+			return "null tok name !!!!!!!!!!!!!!!!!!!!!!!!!!!";
+		     snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%f]",tok->tnum,tok->tline,tok->tind,tok->ttype,"null name",tok->dval);
 	};
 #endif
 	// MESG("tok_info: end");
@@ -3575,6 +3596,10 @@ double next_value()
 
 int get_vtype()
 {
+	if(ex_var.var_type>=VTYPE_OTHER || ex_var.var_type<0) {
+		ex_var.var_type=VTYPE_NONE;
+		return VTYPE_NONE;
+	};
 	return ex_var.var_type;
 }
 

@@ -488,6 +488,7 @@ typedef struct MLQUOTES {
 #define VTYPE_TREE_EL	13	/* tree element  */
 #define	VTYPE_AMIXED	14	/* mixed array  */
 #define VTYPE_POINTER	15	/* a variable pointer  */
+#define VTYPE_OTHER		16
 
 /* textpoint */
 #define  FULLDEFINED	0

@@ -476,7 +476,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  char nword[256];
  int slen=0;
  int is_storelines=0;
- int tok_line=1;
+ int tok_line=0;
  int curl_level=0;
  int is_now_sep=0;
  int is_now_curl=0;
@@ -1150,9 +1150,11 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
 		tok_to->match_tok = tok_table + tok_to->tcurl->num;
 	};
 	tlist->current=tlist->current->next;
+	// MESG(";[%s ---",bf->b_fname);
 	MESG(";[%s] %3d: t=[%s] ",bf->b_fname,isize,tok_info(tok));
 	isize++;
 	tok_to++;
  };
+ MESG("<----------- set_tok_table : end");
  bf->end_token=tok_table+(isize-2);	/* save end token, just before EOF  */
 }
