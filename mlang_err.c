@@ -313,7 +313,7 @@ int  err_push_args_1(int *nargs)
 	};
  
  while(1){
-	set_vtype(VTYPE_NUM);
+	// set_vtype(VTYPE_NUM);
 	xpos=412;
 	
 	if(tok->ttype==TOK_RPAR) {
@@ -595,7 +595,7 @@ int err_factor()
  int save_macro_exec;
  tok_struct *tok0; 
 
- set_vtype(VTYPE_NUM);
+ // set_vtype(VTYPE_NUM);
  ex_edenv=0;
 
  SHOW_STAGE(470);
@@ -693,8 +693,8 @@ int err_factor()
 		RT_MESG1(480);
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
-		MESG("TOK_VAR: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
-		MESG("	TOK_VAR: var ind=%d type is %d",tok0->tind,current_stable[tok0->tind].var_type);
+		// MESG("TOK_VAR: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
+		// MESG("	TOK_VAR: var ind=%d type is %d",tok0->tind,current_stable[tok0->tind].var_type);
 		pre_symbol=0;
 		ex_nvars++;
 		if(tok->ttype==TOK_INCREASE) {
@@ -860,19 +860,19 @@ int err_factor()
 			set_error(tok0,xpos,"cannot change constant value!");
 			RT_MESG1(xpos);
 		};
-		set_vtype(VTYPE_NUM);
+		// set_vtype(VTYPE_NUM);
 		tok0->tname="numeric";
 		RT_MESG1(487);
 	case TOK_QUOTE:	 { // string 
 		xpos=488;
 		if(pre_symbol) { syntax_error("symbol before string",xpos);RT_MESG1(4881);};
-		set_vtype(VTYPE_STRING);
+		// set_vtype(VTYPE_STRING);
 		ex_nquote++;
 		RT_MESG1(4882);
 	 	};
 	case TOK_AT: {
 		xpos=489;
-		set_vtype(VTYPE_NUM);
+		// set_vtype(VTYPE_NUM);
 		RT_MESG1(4891);
 		};
 	case TOK_MINUS:
@@ -911,7 +911,7 @@ int err_factor()
 
 		ex_edenv=0;
 #if	1
-		set_vtype(var_node->node_vtype);
+		// set_vtype(var_node->node_vtype);
 #else
 		if(var_node->sval!=NULL) { /* there is a valid string value CHECK !!*/
 			set_vtype(VTYPE_STRING);
@@ -1215,7 +1215,7 @@ int err_num_expression()
 
  // init_expression_stack();
 
- set_vtype(VTYPE_NUM);
+ // set_vtype(VTYPE_NUM);
  // slval[0]=0;
  xpos=561;
 
@@ -1243,7 +1243,7 @@ int err_num_expression()
 		if(expression_type==VTYPE_STRING) { /* catanate string */
 			if(get_vtype()) {
 			} else {
-				set_vtype(VTYPE_STRING);
+				// set_vtype(VTYPE_STRING);
 				expression_type=get_vtype();
 			}
 		} else {
