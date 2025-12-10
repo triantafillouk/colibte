@@ -3170,6 +3170,7 @@ double exec_block1_break(FILEBUF *fp)
  	val=tok->directive();
 	if(ex_var.var_type==1) ex_var.dval=val;
 
+	if(!current_active_flag) break;
 	if(drv_check_break_key()) break;
 	// MESG(" [%s]",tok_info(tok));
    };

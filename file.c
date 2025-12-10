@@ -996,6 +996,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->bytes_read=0L;
     bp->b_nwnd  = 0;
 	bp->tok_table=NULL;
+	bp->tok_table_bnf=NULL;
 	bp->err=-1;
 	bp->m_mode=0;
 	bp->dir_num=dir_num;

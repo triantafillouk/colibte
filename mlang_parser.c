@@ -1128,9 +1128,12 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
  if(bf->tok_table != NULL) {
  	free(bf->tok_table);
  };
+	MESG("1");
+#if	TBNF
  if(bf->tok_table_bnf != NULL) {
  	free(bf->tok_table_bnf);
  };
+#endif
  tok_table=(void *)malloc(sizeof(struct tok_struct)*table_size);
  bf->tok_table = (void *) tok_table;
  bf->tok_table_bnf=(void *)malloc(sizeof(struct tok_struct)*table_size);
@@ -1150,7 +1153,6 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
 		tok_to->match_tok = tok_table + tok_to->tcurl->num;
 	};
 	tlist->current=tlist->current->next;
-	// MESG(";[%s ---",bf->b_fname);
 	MESG(";[%s] %3d: t=[%s] ",bf->b_fname,isize,tok_info(tok));
 	isize++;
 	tok_to++;
