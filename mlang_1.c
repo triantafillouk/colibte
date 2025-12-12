@@ -888,7 +888,7 @@ MVAR * push_args_1(int nargs,int vars_num)
 }
 
 
-double exec_function(FILEBUF *bp,int nargs)
+double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 {
 	double value=0;
 	// static long level=0;
@@ -898,7 +898,24 @@ double exec_function(FILEBUF *bp,int nargs)
 	tok=bp->tok_table;	/* start of function  */
 	bp->tok_bnf_index=0;
 	// MESG("exec_function: first token is [%s] type=%d",tok->tname,tok->ttype);
-	assign_args1(current_stable,nargs);
+	MVAR *old_symbol_table=current_stable;
+#if	1
+	MVAR *nst = new_symbol_table(bp->symbol_tree->items+nargs);	/* create new symbol table  */
+	current_stable=nst;
+
+	if(current_stable==NULL) { 
+		err_num=208;
+		ERROR("cannot create new function symbol table!");
+		set_break();
+		// level=0;
+		current_stable=old_symbol_table;
+		return 0;
+	};
+	current_stable=vargs;
+#else
+	current_stable=vargs;
+#endif
+	assign_args1(vargs,nargs);
 #if	0
 	show_vars(vargs,bp->symbol_tree->items+nargs,"after assign_args");
 	show_vars(current_stable,bp->symbol_tree->items+nargs,"after assign_args");
@@ -908,7 +925,12 @@ double exec_function(FILEBUF *bp,int nargs)
 	value=tok->directive();
 	// MESG("exec_function: before delete_symbol_table, ex_value=%f",ex_value);
 	/* remove local variable tree and restore the old one  */
+#if	1
+	delete_symbol_table(nst,bp->symbol_tree->items,nargs);
+#endif
+	current_stable=old_symbol_table;
 	// MESG("exec_function: before clear_args");
+	// clear_args(vargs,nargs);	/* allocated args already cleared above in delete_symbol_table! */
 	// level--;
 	return(value);
 }
@@ -1701,18 +1723,15 @@ double factor_proc()
 	/* function */
 	// MESG("factor_proc: tok0 [%d %s] args=%d",tok0->tnum,tok0->tname,tok0->tind);
 	// MESG("factor_proc: tok  [%d %s] %d ",tok->tnum,tok->tname,tok->tind);
-	MVAR *old_symbol_table=current_stable;
-	current_stable = push_args_1(tok0->t_nargs,exe_buffer->symbol_tree->items);
+	MVAR *vargs = push_args_1(tok0->t_nargs,exe_buffer->symbol_tree->items);
 	// show_vars(vargs,exe_buffer->symbol_tree->items+tok0->t_nargs,"after push_args");
 	after_proc=tok;
 	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
-	value=exec_function(exe_buffer,tok0->t_nargs);
+	value=exec_function(exe_buffer,vargs,tok0->t_nargs);
 	// MESG("factor_proc: return val=%f",value);
 	tok=after_proc;
 	current_active_flag=1;	/* start checking again  */
-	// free(vargs);
-	delete_symbol_table(current_stable,exe_buffer->symbol_tree->items,tok0->t_nargs);
-	current_stable=old_symbol_table;
+	free(vargs);
 	exe_buffer=cbuf;
 	RTRN(value);
 }

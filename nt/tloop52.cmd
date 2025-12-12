@@ -6,7 +6,8 @@ function fact(num)
  {
  	return(1)
  } else {
-	f=num*fact(n1-1)
+	n1=num-1
+	f=num*fact(n1)
 	return(f)
  }
 }
@@ -28,7 +29,7 @@ show_time("Loop with proc 51",0)
 fori(i=1;11;1){ 
 	fori(j=1;800001;1) { 
 		l = i*j+32
-		p = p+l+fact(30)
+		p = p+l+fact(10)
 	} 
 	show_time("loop:"+i+" p="+p,1);
 }
