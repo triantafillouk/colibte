@@ -602,42 +602,59 @@ int is_mlang(FILEBUF *fp)
 
 MVAR *new_symbol_table(int size)
 {
- int i;
  // MESG("Initialize new_symbol_table: size %d",size);
  MVAR *td=malloc(sizeof(struct MVAR)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
- for(i=0;i<size;i++) {
+#if	1
+ MVAR *tdp=&td[0];
+ while(tdp<td+size) {
+ 	tdp->var_type=VTYPE_NUM;
+	tdp->dval=0;
+	tdp++;
+ };
+#else
+ int i=0;
+ for(;i<size;i++) {
 	// td[i].var_index=i;
  	td[i].var_type=VTYPE_NUM;
 	td[i].dval=0;
  };
+#endif
  return td;
 }
 
 MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
 {
- int i;
  // MESG("realloc_symbol_table: size %d",size);
  td=realloc(td,sizeof(struct MVAR)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
+#if	1
+ MVAR *tdp=&td[old_size];
+ while(tdp<td+size) {
+ 	tdp->var_type=VTYPE_NUM;
+	tdp->dval=0;
+	tdp++;
+ };
+#else
+ int i;
  for(i=old_size;i<size;i++) {
 	// td[i].var_index=i;
  	td[i].var_type=VTYPE_NUM;
 	td[i].dval=0;
  };
+#endif
  return td;
 }
 
 /* free symbol table after execute */
-void delete_symbol_table(MVAR *td, int size,int level,int nargs)
+void delete_symbol_table(MVAR *td, int size,int nargs)
 {
- int i;
- // MESG("delete_symbol_table: size=%d level=%d",size,level);
+ // MESG("delete_symbol_table: nargs=%d size=%d",nargs,size);
  if(td) {
- for(i=nargs;i<size;i++) {
-	MVAR *sslot;
- 	sslot=&td[i];
-
+ MVAR *sslot=&td[nargs];
+ // for(i=nargs;i<size;i++) 
+ for(;sslot < td+size;sslot++) 
+ {
 	if(sslot->var_type==VTYPE_STRING) {
 		// MESG("delete_symbol_table:%d [%s] free %X",i,sslot->sval,sslot->sval);
 		 	if(sslot->sval!=NULL)  free(sslot->sval);
@@ -811,28 +828,25 @@ int check_token(int type)
 }
 
 
-MVAR * push_args_1(int nargs)
+MVAR * push_args_1(int nargs,int vars_num)
 {
- int i=0;
+ // int i=0;
 
  double value=0;
- MVAR *va=NULL;
-
  TDS("push_args");
 
  err_num=0;
  // MESG("push_args:< args=%d",nargs);
 
  // if(tok->ttype!=TOK_RPAR && nargs!=0)
- if(nargs>0)
- {
-
- va=(MVAR *) malloc(sizeof(MVAR)*(nargs));
+ // if(nargs>0)
+ // va=(MVAR *) malloc(sizeof(MVAR)*(nargs+vars_num));
+ MVAR *va = new_symbol_table(nargs+vars_num);
 
  if(va){
  MVAR *va_i=va;
- for(i=0;i<nargs;i++,va_i++){
-	va_i->var_type=0;
+ for(;va_i<va+nargs;va_i++){
+	// va_i->var_type=0;
 	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
 	value = num_expression();
 	va_i->var_type=get_vtype();
@@ -855,13 +869,12 @@ MVAR * push_args_1(int nargs)
 	} else {
 			ERROR("error: wrong type arg %d",get_vtype());
 			err_num=202;
-			clear_args(va,i); return(NULL);
+			clear_args(va,nargs+vars_num); return(NULL);
 	}
 
 	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
 	// exit(0);
 	NTOKEN2; // skip separator or right parenthesis!
- };
  };
 	// MESG(">	push_args_1:end [%s]",tok_info(tok));
  };
@@ -872,8 +885,8 @@ MVAR * push_args_1(int nargs)
 double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 {
 	double value=0;
-	static long level=0;
-	level++;
+	// static long level=0;
+	// level++;
 	// MESG("exec_function: bp=[%s] nargs=%d level=%d",bp->b_fname,nargs,level);
 	MVAR *old_symbol_table=current_stable;
 	// MESG("exec_function:2");
@@ -884,23 +897,24 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 
 	if(current_stable==NULL) { 
 		err_num=208;
-		ERROR("cannot create new symbol table! proc level is %ld",level);
+		ERROR("cannot create new function symbol table!");
 		set_break();
-		level=0;
+		// level=0;
+		current_stable=old_symbol_table;
 		return 0;
 	};
 
-	assign_args1(vargs,current_stable,nargs);
+	assign_args1(vargs,nargs);
 	// MESG("exec_function: after assign_args1 [%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
 	value=tok->directive();
 	// MESG("exec_function: before delete_symbol_table, ex_value=%f",ex_value);
 	/* remove local variable tree and restore the old one  */
-	delete_symbol_table(current_stable,bp->symbol_tree->items,level,nargs);
+	delete_symbol_table(current_stable,bp->symbol_tree->items,nargs);
 	current_stable=old_symbol_table;
 
 	// MESG("exec_function: before clear_args");
 	// clear_args(vargs,nargs);	/* allocated args already cleared above in delete_symbol_table! */
-	level--;
+	// level--;
 	return(value);
 }
 
@@ -1690,10 +1704,9 @@ double factor_proc()
 	// MESG("factor_proc: filebuf=%s",exe_buffer->b_fname);
 	NTOKEN2;
 	/* function */
-	MVAR *vargs = NULL;
 	// MESG("factor_proc: tok0 [%d %s] args=%d",tok0->tnum,tok0->tname,tok0->tind);
 	// MESG("factor_proc: tok  [%d %s] %d ",tok->tnum,tok->tname,tok->tind);
-	vargs = push_args_1(tok0->t_nargs);
+	MVAR *vargs = push_args_1(tok0->t_nargs,exe_buffer->symbol_tree->items);
 	after_proc=tok;
 	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
 	value=exec_function(exe_buffer,vargs,tok0->t_nargs);
@@ -2070,6 +2083,8 @@ FFunction factor_funcs[] = {
 	factor_assign_type,	// TOK_ASSIGN_TYPE,
 	factor_type_element,	// TOK_TYPE_ELEMENT
 	factor_none,	// TOK_DOT,
+	factor_none,	// TOK_INCBEFORE
+	factor_none,	// TOK_DECBEFORE
 	factor_none		// TOK_OTHER,
 };
 
@@ -2663,7 +2678,7 @@ double assign_val(double none)
 	};
 }
 
-int assign_args1(MVAR *va,MVAR *symbols,int nargs)
+int assign_args1(MVAR *va, int nargs)
 {
  TDS("assign_args1");
  // MESG("\n# assign_args1: tok=[%d %s] %d nargs=%d",tok->tnum,tok->tname,tok->ttype,nargs);
@@ -2671,6 +2686,7 @@ int assign_args1(MVAR *va,MVAR *symbols,int nargs)
  if(va) 
  {
 	int i;
+	MVAR *symbols=va;
 	// MESG("assign_args1: pos1 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
 	for(i=0;i<nargs;i++,va++) {
 		MVAR *arg_dat=&symbols[tok->tind];
@@ -3234,7 +3250,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	if(start) {
 		if(local_symbols)
 		if(bp->symbol_tree){
-			delete_symbol_table(local_symbols,bp->symbol_tree->items,0,0);
+			delete_symbol_table(local_symbols,bp->symbol_tree->items,0);
 			bp->symbol_tree=NULL;
 		};
 		current_stable=old_symbol_table;

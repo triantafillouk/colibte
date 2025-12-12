@@ -98,7 +98,7 @@ typedef struct term_type {
 void init_token_mask();
 double assign(int is_edenv);
 int parse_block1(FILEBUF *bf,BTREE *stree,int start);
-int assign_args1( MVAR *va,MVAR *td,int nargs);
+int assign_args1( MVAR *va,int nargs);
 double factor_1();
 double term1_1();
 double term2_1();
@@ -210,6 +210,8 @@ enum {
 	TOK_ASSIGN_TYPE,	// 78
 	TOK_TYPE_ELEMENT,	// 79
 	TOK_DOT,
+	TOK_INCBEFORE,
+	TOK_DECBEFORE,
 	TOK_OTHER			// 81
 };
 
