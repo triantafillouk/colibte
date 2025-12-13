@@ -898,12 +898,36 @@ double exec_function(FILEBUF *bp,int nargs)
 	tok=bp->tok_table;	/* start of function  */
 	bp->tok_bnf_index=0;
 	// MESG("exec_function: first token is [%s] type=%d",tok->tname,tok->ttype);
-	assign_args1(current_stable,nargs);
+	// assign_args1(current_stable,nargs);
+	tok+=nargs*2+1;
+
+	// show_vars(current_stable,bp->symbol_tree->items+nargs,"after assign_args");
 #if	0
 	show_vars(vargs,bp->symbol_tree->items+nargs,"after assign_args");
 	show_vars(current_stable,bp->symbol_tree->items+nargs,"after assign_args");
 	exit(0);
 #endif
+	// MESG("exec_function: after assign_args1 [%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
+	value=tok->directive();
+	// MESG("exec_function: before delete_symbol_table, ex_value=%f",ex_value);
+	/* remove local variable tree and restore the old one  */
+	// MESG("exec_function: before clear_args");
+	// level--;
+	return(value);
+}
+
+double exec_function1(FILEBUF *bp,tok_struct *tok1)
+{
+	double value=0;
+	// static long level=0;
+	// level++;
+	// MESG("exec_function: bp=[%s] nargs=%d",bp->b_fname,nargs);
+	// MESG("exec_function:2");
+	tok=tok1;
+	bp->tok_bnf_index=0;
+	// MESG("exec_function: first token is [%s] type=%d",tok->tname,tok->ttype);
+	// assign_args1(current_stable,nargs);
+	// show_vars(current_stable,bp->symbol_tree->items+nargs,"after assign_args");
 	// MESG("exec_function: after assign_args1 [%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
 	value=tok->directive();
 	// MESG("exec_function: before delete_symbol_table, ex_value=%f",ex_value);
@@ -1703,9 +1727,10 @@ double factor_proc()
 	// MESG("factor_proc: tok  [%d %s] %d ",tok->tnum,tok->tname,tok->tind);
 	MVAR *old_symbol_table=current_stable;
 	current_stable = push_args_1(tok0->t_nargs,exe_buffer->symbol_tree->items);
-	// show_vars(vargs,exe_buffer->symbol_tree->items+tok0->t_nargs,"after push_args");
+	// show_vars(current_stable,exe_buffer->symbol_tree->items+tok0->t_nargs,"after push_args");
 	after_proc=tok;
 	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
+	// value=exec_function1(exe_buffer,tok);
 	value=exec_function(exe_buffer,tok0->t_nargs);
 	// MESG("factor_proc: return val=%f",value);
 	tok=after_proc;
@@ -2681,6 +2706,9 @@ int assign_args1(MVAR *va, int nargs)
 {
  TDS("assign_args1");
  // MESG("\n# assign_args1: tok=[%d %s] %d nargs=%d",tok->tnum,tok->tname,tok->ttype,nargs);
+#if	1
+ tok+=nargs*2+1;
+#else
  NTOKEN2; /* skip name */
  if(va) 
  {
@@ -2688,10 +2716,11 @@ int assign_args1(MVAR *va, int nargs)
 	MVAR *symbols=va;
 	// MESG("assign_args1: pos1 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
 	for(i=0;i<nargs;i++,va++) {
-		MVAR *arg_dat=&symbols[tok->tind];
-		arg_dat->var_type=va->var_type;
+		// MVAR *arg_dat=&symbols[tok->tind];
+		// arg_dat->var_type=va->var_type;
 		// MESG("assign_args1:arg %d: pos2 tok=[%d %s] ttype=%d tind=%d",i,tok->tnum,tok->tname,tok->ttype,tok->tind);
 
+#if	0
 		switch(va->var_type) {
 			case VTYPE_NUM:
 				arg_dat->dval=va->dval;
@@ -2709,7 +2738,7 @@ int assign_args1(MVAR *va, int nargs)
 				arg_dat->sval="";
 				arg_dat->dval=0;
 		};
-
+#endif
 		// MESG("assign_args1:arg %d: pos3 after args tok=[%s] %d",i,tok->tname,tok->ttype);
 		NTOKEN2;	/* skip separator or end parenthesis */
 		if(tok->ttype==TOK_RPAR) break;
@@ -2721,6 +2750,7 @@ int assign_args1(MVAR *va, int nargs)
 	while(tok->ttype!=TOK_RPAR && tok->ttype!=TOK_END) NTOKEN2;
  };
  NTOKEN2;
+#endif
  // MESG("assign_args1: end! pos5 after args tok=[%s] %d",tok->tname,tok->ttype);
  return(1);
 }
