@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.7T21 test (13/12/2025)"
+#define VERSION 	 "#01.7T22 test (14/12/2025)"
 
 
 // merged from kle4 #776T46 (28/7/2022)
@@ -676,7 +676,10 @@ typedef struct  FILEBUF {
 	short int slow_display;
 #endif
 	struct  FILEBUF *connect_buffer;
-	num		connect_line;
+	union {
+		num		connect_line;
+		num		function_called;
+	};
 	num		connect_column;
 	num		connect_top_line;
 	num		connect_top_note;

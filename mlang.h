@@ -45,7 +45,7 @@ typedef struct tok_struct {
 		struct tok_struct *next_tok;	/* for directives  */
 		TextPoint *ddot;				/* ddot text point  */
 		struct array_dat *tok_adat;		/* used in array definition only in LB  */
-		struct FILEBUF *tbuf;
+		struct FILEBUF *proc_buffer;
 	};
 } tok_struct;
 
