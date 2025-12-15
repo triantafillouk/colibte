@@ -604,7 +604,7 @@ double compute_string(char *s,char *new_string)
  double value;
  FILEBUF *fp=NULL;
  char *bname="[dofile_string]";
-
+	// MESG("compute_string:");
 	if ((fp = new_filebuf(bname, 0)) == NULL) /* get the needed buffer */
 		return(FALSE);
 
@@ -1245,7 +1245,7 @@ int refresh_current_line(num nused)
  // if special file type return
  if(cbfp->b_flag & (FSNLIST|FSDIRED|FSNOTES|FSNOTESN)) return 0;
 	macro_exec=1;
- // MESG("refresh_current_line:");
+ 	// MESG("refresh_current_line:");
 	tpo=tp_offset(cwp->tp_current);
 	
 	sl=FLineBegin(cbfp,tpo);
@@ -1270,26 +1270,30 @@ int refresh_current_line(num nused)
 	set_Offset(sl);
 	// MESG("refresh_current_line:[%s] %d",text_line,ddot_pos);
 	value = compute_string(text_line,text_line);
+	// MESG("refresh_current_line: after compute_string");
 
 	if(is_ddot) {
 		insert_string(cbfp,text_line,strlen(text_line));
 	};
 
-	if(err_num>0) 
- 		msg_line("Error[%d]=%s :: 0x%lX = %12.3f",err_num,err_str,(int)value,value);
- 	else {
- 		if(vtype_is(VTYPE_STRING)) msg_line(" %15.3f,[%s]",value,get_sval());
+	macro_exec=0;
+	if(err_num>0) {
+ 		msg_line("Error [%d] %s",err_num,err_str);
+		set_update(cwp,UPD_EDIT);
+		return (FALSE);
+ 	} else {
+ 		if(vtype_is(VTYPE_STRING)) msg_line("res=[%s]",value,get_sval());
 		else {
-			msg_line(" %15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
+			msg_line("res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
 		}
  	};
+	// MESG("refresh_current_line: 2");
 	if(is_ddot){
 		el=FLineEnd(cbfp,sl);
 		textpoint_set(cwp->tp_current,el);	/* at the end of the line  */
 	} else {
 		textpoint_set(cwp->tp_current,tpo);	/* where it was !  */
 	};
-	macro_exec=0;
 	set_update(cwp,UPD_EDIT);
  	return(TRUE);
 }

@@ -1124,11 +1124,11 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
  tok_struct *tok_table=NULL;
  int isize=0;
  int table_size = lex_parser->size+1;
- MESG("set_tok_table: [%s] create token table from token list size of %d!",bf->b_fname,lex_parser->size);
+ // MESG("set_tok_table: [%s] create token table from token list size of %d!",bf->b_fname,lex_parser->size);
  if(bf->tok_table != NULL) {
  	free(bf->tok_table);
  };
-	MESG("1");
+// 	MESG("1");
 #if	TBNF
  if(bf->tok_table_bnf != NULL) {
  	free(bf->tok_table_bnf);

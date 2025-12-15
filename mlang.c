@@ -239,7 +239,7 @@ static inline double factor_none()
 /* Used in increase, decrease  */
 double update_val()
 {
-	// MESG("update_val: tnum=%d vtype=%d group=%d",tok->tnum,get_vtype(),tok->tgroup);
+	MESG("update_val: tnum=%d vtype=%d group=%d",tok->tnum,get_vtype(),tok->tgroup);
 
 	if(vtype_is(VTYPE_NUM)) {
 		double v0=0;
@@ -305,14 +305,19 @@ double increase_by()
 	MVAR *sslot=lsslot;
 	// MESG("increase_by: slot_index=%d ",sslot->var_index);
 	int ori_type=lstoken->ttype;
+
 	tok_struct *lstok=lstoken;
+	if(ori_type!=TOK_VAR) {
+		set_error(lstok,1022,"increase constant not supported!");
+		return(0);
+	};
 	v1=num_expression();
 	// MESG("		>>   : by %f",v1);
-	if(sslot->var_type==VTYPE_NUM) {
-		// MESG("		VTYPE_NUM:");
-		v0=sslot->dval;
-		sslot->dval = v0+v1;
-		return(v0);
+
+	if(sslot->var_type==VTYPE_NUM)
+	if(vtype_is(VTYPE_NUM)) {
+		sslot->dval += v1;
+		return(sslot->dval);
 	};
 
 	if(sslot->var_type==VTYPE_ARRAY) {
@@ -607,8 +612,10 @@ MVAR *new_symbol_table(int size)
  MVAR *td=malloc(sizeof(struct MVAR)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
 #if	1
- MVAR *tdp=&td[0];
- while(tdp<td+size) {
+ // initialize as numeric
+ MVAR *tdp=td;
+ MVAR *td_end=td+size+1;
+ while(tdp<td_end) {
  	tdp->var_type=VTYPE_NUM;
 	tdp->dval=0;
 	tdp++;
@@ -651,7 +658,6 @@ MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
 void delete_symbol_table(MVAR *td, int size,int nargs)
 {
  // MESG("delete_symbol_table: nargs=%d size=%d",nargs,size);
- if(td) {
  MVAR *sslot=&td[nargs];
  // for(i=nargs;i<size;i++) 
  for(;sslot < td+size;sslot++) 
@@ -668,7 +674,6 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 	};
  };
  free(td);
- };
 }
 
 /* double equality */
@@ -973,7 +978,11 @@ double factor_line_array()
 	// set_vtype(adat->atype);
 	// print_array1("",adat);
 	set_array(adat);
+	// MESG("factor_line_array: end %s",tok_info(tok));
+	// MESG("NTOKEN");
 	NTOKEN2;
+	// MESG("factor_line_array: return");
+	// MESG("factor_line_array: end %s",tok_info(tok));
 	RTRN(1.2);
 }
 
@@ -1038,11 +1047,10 @@ double factor_variable()
 	// MESG("	factor_variable:[%s] tind=%d ,var ind=%d ex_vtype=%d ttype=%d vtype=%d",
 		// tok->tname,tok->tnum,lsslot->var_index,get_vtype(),tok->ttype,lsslot->var_type);
 	switch(get_vtype()) {
-		case VTYPE_NUM:{
-			double val=lsslot->dval; 
-			// MESG("		>> val=%f",val);
+		case VTYPE_NUM:
+		{
 			NTOKEN2;
-			RTRN(val);
+			return(lsslot->dval);
 			};
 		case VTYPE_STRING:
 			set_sval(lsslot->sval);
@@ -2857,7 +2865,7 @@ void refresh_ddot_1(double value)
  int stat=0;
  TextPoint *tp = tok->ddot;
  FILEBUF *buf = tp->fp;
- // MESG("refresh_ddot: %d",get_vtype());
+ MESG("refresh_ddot: %d",get_vtype());
 
  if(execmd) {
 	 if(vtype_is(VTYPE_NUM)) {
@@ -3126,44 +3134,13 @@ double tok_dir_while()
 }
 
 /* exec multiple sentences at the same level */
-#if	0
-double exec_block1(FILEBUF *fp)
-{
- double val=0;
- INIT_STAGE;
- exe_buffer=fp;
-	// MESG("exec_block1:[%s] size of tok_struct is %d",fp->b_fname,sizeof(tok_struct));
-   if(!current_active_flag) return(val);
-   while(tok->ttype!=TOK_EOF) 
-   {
-	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
-	if(tok->ttype==TOK_SEP){ NTOKEN2;
-		// MESG("factor_sep: [%s %d]",tok->tname,tok->ttype);
-		if(tok->ttype==TOK_VAR) lstoken=tok;
-		else lstoken=NULL;
-		continue;
-	};
-	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(val);};
-	if(tok->ttype==TOK_COMMA) { NTOKEN2;};
-#if	0
-	if(tok->ttype==TOK_SHOW) {
-		refresh_ddot_1(val);continue;
-	};
-#endif
- 	val=tok->directive();
-	if(!current_active_flag) break;
-   };
-   // MESG("exec_block1: end!");
-	return(val);
-}
-#else
 double exec_block1(FILEBUF *fp)
 {
 //  double val=0;
  INIT_STAGE;
  exe_buffer=fp;
  double val=0;
-	// MESG("exec_block1:[%s] size of tok_struct is %d",fp->b_fname,sizeof(tok_struct));
+	MESG("exec_block1:[%s] size of tok_struct is %d",fp->b_fname,sizeof(tok_struct));
    if(!current_active_flag) return(ex_var.dval);
    while(tok->ttype!=TOK_EOF) 
    {
@@ -3175,14 +3152,17 @@ double exec_block1(FILEBUF *fp)
 		continue;
 	};
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
+
  	val=tok->directive();
+
+
 	if(ex_var.var_type==1) ex_var.dval=val;
+
 	if(!current_active_flag) break;
    };
    // MESG("exec_block1: end!");
 	return(val);
 }
-#endif
 
 double exec_block1_break(FILEBUF *fp)
 {
@@ -3190,6 +3170,7 @@ double exec_block1_break(FILEBUF *fp)
  INIT_STAGE;
  exe_buffer=fp;
  double val=0;
+ if(fp->symbol_table==NULL) return 0;
 	// MESG("#exec_block_break:%d ttype=%d [%s]",tok->tnum,tok->ttype,tok_info(tok));
    if(!current_active_flag) return(ex_var.dval);
    while(tok->ttype!=TOK_EOF) 
@@ -3202,13 +3183,17 @@ double exec_block1_break(FILEBUF *fp)
 		continue;
 	};
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
+	// MESG("		<<");
  	val=tok->directive();
+	// MESG("		>>");
+	// MESG(";exec_block_break: after directive %s",tok_info(tok));
 	if(ex_var.var_type==1) ex_var.dval=val;
 
 	if(!current_active_flag) break;
 	if(drv_check_break_key()) break;
 	// MESG(" [%s]",tok_info(tok));
    };
+	// MESG("exec_block1_break: end");
 	return(val);
 }
 
@@ -3220,7 +3205,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  MVAR *local_symbols;
  MVAR *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
-	MESG("# [%-15s %s ---------------------------------------------",bp->b_fname,VERSION);
+	// MESG("# [%-15s %s ---------------------------------------------",bp->b_fname,VERSION);
  if(show_tokens) {
 	parse_buffer_show_tokens(1);
 	return(0);	
@@ -3264,11 +3249,12 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	else val=exec_block1_break(bp);
 
 	drv_stop_checking_break();
-
+	// MESG("	start cleaning");
 	/* cleaning  */
 	if(start) {
 		if(local_symbols)
 		if(bp->symbol_tree){
+			// MESG("delete_symbole_table");
 			delete_symbol_table(local_symbols,bp->symbol_tree->items,0);
 			bp->symbol_tree=NULL;
 		};

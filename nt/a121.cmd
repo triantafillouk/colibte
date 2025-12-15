@@ -11,5 +11,8 @@ function fact(num)
  }
 }
 
-fact(3):   6.0
-
+fact(3):
+a=10
+#s="fact of "+a," is "+fact(a)
+"fact of "+a:
+#print(s)
