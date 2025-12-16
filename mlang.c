@@ -659,6 +659,7 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 {
  // MESG("delete_symbol_table: nargs=%d size=%d",nargs,size);
  MVAR *sslot=&td[nargs];
+
  // for(i=nargs;i<size;i++) 
  for(;sslot < td+size;sslot++) 
  {
@@ -756,6 +757,7 @@ int check_init(FILEBUF *bf)
 	if(!(bf->m_mode & M_CHECKED))	/* not checked  */
 	{
 		err=err_check_block1();
+		// MESG("	check err=%d",err);
 		bf->err=err;
 		bf->m_mode |= M_CHECKED;
 		// MESG("Block checked! err=%d",err);
@@ -895,7 +897,8 @@ MVAR * push_args_1(int nargs,int vars_num)
 double exec_function(FILEBUF *bp,int nargs)
 {
 	double value=0;
-	// MESG("exec_function: bp=[%s] nargs=%d",bp->b_fname,nargs);
+	MESG("exec_function: bp=[%s] nargs=%d",bp->b_fname,nargs);
+	current_active_flag=1;
 	// MESG("exec_function:2");
 	tok=bp->tok_table;	/* start of function  */
 	bp->tok_bnf_index=0;
@@ -3170,7 +3173,9 @@ double exec_block1_break(FILEBUF *fp)
  INIT_STAGE;
  exe_buffer=fp;
  double val=0;
- if(fp->symbol_table==NULL) return 0;
+ // if(fp->symbol_table==NULL) MESG("exec_block1_break: fp symbol table is NULL!");
+ // if(current_stable==NULL) MESG("exec_block1_break: current_stable is NULL!");
+
 	// MESG("#exec_block_break:%d ttype=%d [%s]",tok->tnum,tok->ttype,tok_info(tok));
    if(!current_active_flag) return(ex_var.dval);
    while(tok->ttype!=TOK_EOF) 
@@ -3205,7 +3210,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  MVAR *local_symbols;
  MVAR *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
-	// MESG("# [%-15s %s ---------------------------------------------",bp->b_fname,VERSION);
+	// MESG("# [%-15s %s ------------------------",bp->b_fname,VERSION);
  if(show_tokens) {
 	parse_buffer_show_tokens(1);
 	return(0);	
@@ -3220,8 +3225,9 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		old_items=use_fp->symbol_tree->items;
 	};
 	parse_block1(bp,use_fp->symbol_tree,start);
-	// MESG("parse_block: ended! err=%d start=%d",err_num,start);
-	if(err_num) return(0);
+	// MESG("parse_block: ended! err=%d start=%d items=%d",err_num,start,use_fp->symbol_tree->items);
+	if(err_num) { execmd=0;return(0);};
+	// MESG("	comput_block: start=%d",start);
 	if(start || current_stable==NULL) {
 		// MESG("new current_stable with %d items",use_fp->symbol_tree->items);
 		local_symbols=new_symbol_table(use_fp->symbol_tree->items);
@@ -3238,6 +3244,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	{
 		// mesg_out("Error %d %s line %d ex_vtype=%d ex_value=%f slval=[%s]!",err_num,err_str,err_line,get_vtype(),get_val(),get_sval());
 		show_error("Check init",bp->b_fname);
+		execmd=0;
 		return(0);
 	};
 	init_exec_flags();

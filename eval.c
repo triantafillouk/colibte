@@ -635,9 +635,13 @@ int docmd(char *cmd)
 {
  double value=0;
  value = compute_string(cmd,NULL);
- if(err_num>0) { msg_line("Error!: %s",err_str);return(FALSE);}
- else {
+ if(err_num>0) { 
+ 	msg_line("Error!: %s",err_str);
+	init_error();
+ 	return(FALSE);
+ } else {
  	msg_line("Result of [%s] is : %f",cmd,value);
+
 	return (TRUE);
  };
 }
@@ -774,6 +778,7 @@ int dofile(char *fname)
 	/* go execute it! */
 	int backup_caf=current_active_flag;
 	double d = compute_block(bp,bp,1);
+	init_error();
 	set_vdval(d);
 	current_active_flag=backup_caf;
 	/* if not displayed, remove the now unneeded macro buffer and exit */

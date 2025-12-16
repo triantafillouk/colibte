@@ -1110,7 +1110,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 #endif
 	if(bf->symbol_tree==NULL)MESG("--- parse_block1:[%s] > end.",bf->b_fname);
 	else MESG(": parse_block1:[%s] > end. Number of tokens %d",bf->b_fname,bf->symbol_tree->items);
- MESG("parse_block1: [%s] >> end",bf->b_fname); 
+ // MESG("parse_block1: [%s] >> end",bf->b_fname); 
  check_buffer = buffer_ori;
  return(TRUE); 
 }
