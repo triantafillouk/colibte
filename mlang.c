@@ -123,6 +123,13 @@ double *ls_pdval=NULL;
 MVAR *lmvar=NULL;
 int firt_var=1;
 MVAR *current_stable=NULL; 	/* current symbol table ...  */
+#define USE_CALL_STACK	1
+#if	USE_CALL_STACK
+MVAR call_stack[256];
+MVAR *call_stack_end=call_stack;
+MVAR *max_call_stack_end=call_stack;
+MVAR *call_stack_available=call_stack+256;
+#endif
 
 int show_stage=0;
 int xpos=0;		/* stage position  */
@@ -204,7 +211,12 @@ void clear_args(MVAR *va,int nargs)
 	 		free(va[i].sval);
 		}
 	 };
+#if	USE_CALL_STACK
+	MESG("clear_args: call_stack=%lld",call_stack_end-call_stack);
+	call_stack_end -= nargs;
+#else
 	 free(va);
+#endif
 }
 
 void clean_saved_string(int new_size)
@@ -607,7 +619,19 @@ int is_mlang(FILEBUF *fp)
 MVAR *new_symbol_table(int size)
 {
  // MESG("Initialize new_symbol_table: size %d",size);
+#if	USE_CALL_STACK
+ MVAR *td=call_stack_end;
+ // MESG("new_symbol_table: at %lld",td-call_stack);
+ call_stack_end += size;
+ if(max_call_stack_end<call_stack_end) {
+ 	max_call_stack_end=call_stack_end;
+	if(call_stack_end>call_stack_available) {
+		printf("call_stack limit overflow: %ld",call_stack_end-call_stack);
+	};
+ }
+#else
  MVAR *td=malloc(sizeof(struct MVAR)*(size+1));
+#endif
  if(td==NULL) { err_num=101;return NULL;};
 
  // initialize as numeric
@@ -623,16 +647,27 @@ MVAR *new_symbol_table(int size)
 
 MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
 {
+#if	USE_CALL_STACK
+  call_stack_end += size-old_size;
+ if(max_call_stack_end<call_stack_end) {
+ 	max_call_stack_end=call_stack_end;
+	if(call_stack_end>call_stack_available) {
+		printf("call_stack limit overflow: %ld",call_stack_end-call_stack);
+	};
+ };
+#else
  // MESG("realloc_symbol_table: size %d",size);
  td=realloc(td,sizeof(struct MVAR)*(size+1));
- if(td==NULL) { err_num=101;return NULL;};
 
+ if(td==NULL) { err_num=101;return NULL;};
+#endif
  MVAR *tdp=&td[old_size];
  while(tdp<td+size) {
  	tdp->var_type=VTYPE_NUM;
 	tdp->dval=0;
 	tdp++;
  };
+
  return td;
 }
 
@@ -656,7 +691,13 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 		};
 	};
  };
+#if	USE_CALL_STACK
+ // MESG("delete_symbol_table from: %lld",call_stack_end-call_stack);
+ call_stack_end -= size+nargs;
+ // MESG("                    at  : %lld",call_stack_end-call_stack);
+#else
  free(td);
+#endif
 }
 
 /* double equality */
@@ -3252,7 +3293,8 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	val=0;
  };
  tok=old_tok;
- // MESG("compute_block return %f",val);
+ MESG("compute_block return %f",val);
+ MESG("call_stack_used: %lld", max_call_stack_end-call_stack);
  return(val); 
 }
 
