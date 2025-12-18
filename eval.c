@@ -778,6 +778,8 @@ int dofile(char *fname)
 	/* go execute it! */
 	int backup_caf=current_active_flag;
 	double d = compute_block(bp,bp,1);
+	MESG("dofile: after compute_block:");
+	if(err_num>0) return (FALSE);
 	init_error();
 	set_vdval(d);
 	current_active_flag=backup_caf;

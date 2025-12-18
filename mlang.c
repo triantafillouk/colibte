@@ -123,12 +123,13 @@ double *ls_pdval=NULL;
 MVAR *lmvar=NULL;
 int firt_var=1;
 MVAR *current_stable=NULL; 	/* current symbol table ...  */
+
 #define USE_CALL_STACK	1
 #if	USE_CALL_STACK
-MVAR call_stack[256];
-MVAR *call_stack_end=call_stack;
-MVAR *max_call_stack_end=call_stack;
-MVAR *call_stack_available=call_stack+256;
+MVAR *call_stack;
+MVAR *call_stack_used;
+MVAR *max_call_stack_end;
+MVAR *call_stack_available;
 #endif
 
 int show_stage=0;
@@ -187,18 +188,63 @@ char *vtype_names[] = {
 
 void delete_type_tree(BTREE *type_tree)
 {
+	MESG("delete_type_tree:");
 	free_btnode(type_tree->root);
 	free(type_tree);
 }
 
 array_dat *transpose(array_dat *array1);
 
+#if	USE_CALL_STACK
+void initialize_call_stack(int initial_size)
+{
+	// fprintf(stderr,"Initialize call_stack with %d size\n",initial_size);
+	call_stack=(MVAR *)malloc(sizeof(struct MVAR)*initial_size);
+	call_stack_used=call_stack;
+	max_call_stack_end=call_stack;
+	call_stack_available=call_stack+initial_size;
+	// fprintf(stderr,"	initial call_stack=%p\n",(void *)call_stack);
+}
+#endif
+
+#if	USE_CALL_STACK
+MVAR *realloc_call_stack(int additional_size)
+{
+	// if(call_stack_end>call_stack_available) {
+	int required_size = call_stack_used-call_stack;
+	int new_size = required_size+additional_size;
+	int initial_size = call_stack_available-call_stack;
+	int alloc_size = new_size*sizeof(struct MVAR);
+	MESG("realloc_call_stack %p",call_stack);
+	MESG("call_stack realloc: initial=%d required=%d new=%d alloc=%d",initial_size,required_size,new_size,alloc_size);
+		show_vars(call_stack,initial_size,"reallo_call_stack");
+		call_stack=(MVAR *)realloc(call_stack,alloc_size);
+		if(call_stack) {
+			call_stack_used=call_stack+required_size;
+			max_call_stack_end=call_stack_used;
+			call_stack_available=call_stack+new_size;
+			
+			// show_vars(call_stack,initial_size,"after reallocation");
+			MESG("call_stack reallocated from %d to %d ----------------",initial_size,new_size);
+		} else {
+			return NULL;
+		};
+	// };
+	MESG("	new  call_stack=%lX",(void *)call_stack);
+	return call_stack;
+}
+#endif
+
 void init_btree_table()
 {
 	bt_table=new_btree("table",0);
 	directiv_table=new_btree("directives",0);
 	global_types_tree=new_btree("types",0);
+#if	USE_CALL_STACK
+	initialize_call_stack(256);
+#endif
 }
+
 
 void clear_args(MVAR *va,int nargs)
 {
@@ -212,8 +258,8 @@ void clear_args(MVAR *va,int nargs)
 		}
 	 };
 #if	USE_CALL_STACK
-	MESG("clear_args: call_stack=%lld",call_stack_end-call_stack);
-	call_stack_end -= nargs;
+	call_stack_used -= nargs;
+	// MESG("clear_args: call_stack=%lld upto %lld",call_stack_used-call_stack,call_stack_used-call_stack+nargs);
 #else
 	 free(va);
 #endif
@@ -618,25 +664,47 @@ int is_mlang(FILEBUF *fp)
 
 MVAR *new_symbol_table(int size)
 {
- // MESG("Initialize new_symbol_table: size %d",size);
 #if	USE_CALL_STACK
- MVAR *td=call_stack_end;
- // MESG("new_symbol_table: at %lld",td-call_stack);
- call_stack_end += size;
- if(max_call_stack_end<call_stack_end) {
- 	max_call_stack_end=call_stack_end;
-	if(call_stack_end>call_stack_available) {
-		printf("call_stack limit overflow: %ld",call_stack_end-call_stack);
+ // MESG("Initialize new_symbol_table: size %d",size);
+ MVAR *td=call_stack_used;
+ // MESG("		new symbol table starts at ind=%d",td-call_stack);
+ // int size_call_stack_used = call_stack_used - call_stack;
+ // MESG("		new_symbol_table: at %lld",td-call_stack);
+ call_stack_used += size;
+ if(max_call_stack_end<call_stack_used) {
+ 	max_call_stack_end=call_stack_used;
+
+	if(call_stack_used>call_stack_available) {
+		if(execmd) {
+			printf("new_symbol_table: overflow: available=%ld required=%ld\n",call_stack_available-call_stack,call_stack_used-call_stack);
+			// printf("execmd=%d\n",execmd);
+			exit(0);
+		} else {
+
+			msg_line("new_symbol_table: overflow: available=%d required=%d",call_stack_available-call_stack,call_stack_used-call_stack);
+		};
+		err_num=101;
+		current_active_flag=0;
+		tok=exe_buffer->end_token;
+		return NULL;
+#if	0
+		if(	(call_stack=realloc_call_stack(256))==NULL) return NULL;
+		td = call_stack+size_call_stack_used;
+		MESG("	after realloc new symbol table starts at ind=%d",td-call_stack);
+#endif
 	};
  }
 #else
  MVAR *td=malloc(sizeof(struct MVAR)*(size+1));
-#endif
  if(td==NULL) { err_num=101;return NULL;};
+#endif
 
  // initialize as numeric
  MVAR *tdp=td;
- MVAR *td_end=td+size+1;
+ MVAR *td_end=td+size;
+#if	USE_CALL_STACK
+ // MESG("initialize as numeric: from %ld to %ld",td-call_stack,td_end-call_stack-1);
+#endif
  while(tdp<td_end) {
  	tdp->var_type=VTYPE_NUM;
 	tdp->dval=0;
@@ -648,11 +716,12 @@ MVAR *new_symbol_table(int size)
 MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
 {
 #if	USE_CALL_STACK
-  call_stack_end += size-old_size;
- if(max_call_stack_end<call_stack_end) {
- 	max_call_stack_end=call_stack_end;
-	if(call_stack_end>call_stack_available) {
-		printf("call_stack limit overflow: %ld",call_stack_end-call_stack);
+	MESG("realloc_symbol_table: ---------------");
+  call_stack_used += size-old_size;
+ if(max_call_stack_end<call_stack_used) {
+ 	max_call_stack_end=call_stack_used;
+	if(call_stack_used>call_stack_available) {
+		printf("call_stack limit overflow: %ld",call_stack_used-call_stack);
 	};
  };
 #else
@@ -685,6 +754,7 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 		 	if(sslot->sval!=NULL)  free(sslot->sval);
 	};
 	if(sslot->var_type==VTYPE_ARRAY) {
+		MESG("delete_symbol_table: array ");
 		if(sslot->adat!=NULL) {
 			free_array_dat(sslot->adat);
 			free(sslot->adat);
@@ -692,9 +762,10 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 	};
  };
 #if	USE_CALL_STACK
- // MESG("delete_symbol_table from: %lld",call_stack_end-call_stack);
- call_stack_end -= size+nargs;
- // MESG("                    at  : %lld",call_stack_end-call_stack);
+ // MESG("delete_symbol_table from: %lld",call_stack_used-call_stack);
+ call_stack_used -= size+nargs;
+ // MESG("delete_symbol_table: call_stack=%lld upto %lld",call_stack_used-call_stack,call_stack_used-call_stack+nargs+size-1);
+ // MESG("                    at  : %lld",call_stack_used-call_stack);
 #else
  free(td);
 #endif
@@ -873,7 +944,7 @@ MVAR * push_args_1(int nargs,int vars_num)
  // if(nargs>0)
  // va=(MVAR *) malloc(sizeof(MVAR)*(nargs+vars_num));
  MVAR *va = new_symbol_table(nargs+vars_num);
-
+ if(va==NULL) { MESG("push_args: null symbol table!");return NULL;};
  if(va){
  MVAR *va_i=va;
  for(;va_i<va+nargs;va_i++)
@@ -914,6 +985,7 @@ MVAR * push_args_1(int nargs,int vars_num)
  };
 	// MESG(">	push_args_1:end [%s]",tok_info(tok));
  };
+ // MESG("push_args: end");
  return(va);
 }
 
@@ -921,7 +993,7 @@ double exec_function(FILEBUF *bp,int nargs)
 {
 	// double value=0;
 	// MESG("exec_function: bp=[%s] nargs=%d",bp->b_fname,nargs);
-	current_active_flag=1;
+	if(err_num>0) { tok=bp->end_token;current_active_flag=0;return 0;};
 	// MESG("exec_function:2");
 	tok=bp->tok_table;	/* start of function  */
 	bp->tok_bnf_index=0;
@@ -933,6 +1005,7 @@ double exec_function(FILEBUF *bp,int nargs)
 	exit(0);
 #endif
 	// MESG("exec_function: after assign_args1 [%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
+	// MESG("exec_function: err_num=%d",err_num);
 	return tok->directive();
 	// MESG("exec_function: before delete_symbol_table, ex_value=%f",ex_value);
 	/* remove local variable tree and restore the old one  */
@@ -1598,7 +1671,7 @@ double factor_cmd()
 
 	macro_exec = MACRO_MODE2;
 
-	err_num=0;
+	// err_num=0;
 	err_line=tok->tline;
 	err_str=NULL;
 	// tok_struct *tok1=tok;
@@ -1621,6 +1694,8 @@ double factor_cmd()
 	if(err_num>0) {
 		// ERROR("error %d after function [%s] at line %d: %s",err_num,ftable[function_index].n_name,err_line,err_str);
 		show_error("Factor","factor_cmd");
+		current_active_flag=0;
+		tok=exe_buffer->end_token;
 		RTRN(status);
 	};
 	// MESG(";factor_cmd:end tnum=%d value=%f ex_value=%f",tok->tnum,value,ex_value);
@@ -1735,10 +1810,17 @@ double factor_proc()
 	MVAR *old_symbol_table=current_stable;
 	current_stable = push_args_1(tok0->t_nargs,exe_buffer->symbol_tree->items);
 	// show_vars(current_stable,exe_buffer->symbol_tree->items+tok0->t_nargs,"after push_args");
+	
+	if(current_stable==NULL) { 
+		err_num=1001;
+		tok=tok0->proc_buffer->end_token;
+		MESG("factor_proc: error end");return 0;
+	};
 	after_proc=tok;
 	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
 	value=exec_function(exe_buffer,tok0->t_nargs);
 	// MESG("factor_proc: return val=%f",value);
+	if(err_num) { tok=exe_buffer->end_token; return 0;};
 	tok=after_proc;
 	current_active_flag=1;	/* start checking again  */
 	// free(vargs);
@@ -2155,7 +2237,12 @@ void set_term_function(tok_struct *tok, TFunction term_function)
 static double inline dir_lcurl()
 {
 	NTOKEN2;
-	return exec_block1(exe_buffer);
+	// MESG("dir_lcurl:");
+	double val=exec_block1(exe_buffer);
+	if(err_num>0 || current_active_flag==0) {
+		tok=exe_buffer->end_token;
+	};
+	return val;
 }
 
 static double inline dir_lcurl_break()
@@ -2833,7 +2920,7 @@ char *ddot_string()
 
  el=FLineEnd(buf,ddot_pos);
  sl=FLineBegin(buf,ddot_pos);
-
+ // MESG("ddot_string:");
  ddot_pos=el-sl;
 	for(i=sl;i<el;i++) {
 		int c=FCharAt(buf,i);
@@ -2843,6 +2930,7 @@ char *ddot_string()
 		};
 		ddot_string[i-sl]=c;
 	};
+  // MESG("ddot_string=[%s]",ddot_string);
   return ddot_string;
 }
 
@@ -2857,6 +2945,7 @@ void update_ddot_line(char *ddot_out)
  offs i,sl,el; // current offset, start,end of line
  old_fp=cbfp;
  sfb(buf);
+ // MESG("update_ddot_line:[%s]",ddot_out);
  el=FLineEnd(buf,ddot_pos);
  sl=FLineBegin(buf,ddot_pos);
 
@@ -2887,10 +2976,11 @@ void refresh_ddot_1(double value)
  int stat=0;
  TextPoint *tp = tok->ddot;
  FILEBUF *buf = tp->fp;
- MESG("refresh_ddot: %d",get_vtype());
+ // MESG("refresh_ddot_1:start vtype=%d",get_vtype());
 
  if(execmd) {
 	 if(vtype_is(VTYPE_NUM)) {
+		// MESG("refresh_ddot_1: 1");
 		printf("%s	: %.3f\n",ddot_string(),value);
 	 } else if(vtype_is(VTYPE_STRING)) {
 		printf("%s	: %s\n",ddot_string(),get_sval());
@@ -2901,6 +2991,7 @@ void refresh_ddot_1(double value)
 	 };
 	 lstoken=NULL;
 	 NTOKEN2;
+	 // MESG("refresh_ddot_1: return1");
 	 return;
  };
 
@@ -2911,11 +3002,12 @@ void refresh_ddot_1(double value)
 
  // MESG("	ddot_pos=%d end=%d todel=%d",ddot_position,line_end,line_end-ddot_position);
  if(buf->b_state & FS_VIEW) {NTOKEN2;return;}; // no refresh in view mode
-
+ // MESG("refresh_ddot_1: 2");
  if(vtype_is(VTYPE_STRING)) {	/* string value  */
 	stat=snprintf(ddot_out,sizeof(ddot_out)," \"%s\"",get_sval());
  }  else if(vtype_is(VTYPE_NUM)) {	/* numeric value  */
 	long int d = (long int)value;
+	// MESG("refresh_ddot_1: 3");
 	if(d==value) {	/* an integer/double value!  */
 		if(show_hex) stat=snprintf(ddot_out,sizeof(ddot_out)," %5.0f | 0x%llX | 0o%llo",value,(unsigned long long)value,(unsigned long long)value);
 		else stat=snprintf(ddot_out,sizeof(ddot_out)," %5.*f",1,value);
@@ -2924,7 +3016,7 @@ void refresh_ddot_1(double value)
 	};
 
  } else if(vtype_is(VTYPE_ARRAY) || vtype_is(VTYPE_SARRAY) || vtype_is(VTYPE_AMIXED)) {
-	// MESG("refresh_ddot:1");
+	 // MESG("refresh_ddot_1: 4");
 	array_dat *adat = get_array("37");
 	// MESG("refresh_ddot: array: type=%d name=(%s)",adat->atype,adat->array_name);
 
@@ -2933,9 +3025,11 @@ void refresh_ddot_1(double value)
 	// print_array1(":",adat);
  };
  if(stat>MAXLLEN) MESG("truncated");
+ // MESG("refresh_ddot_1: 5");
 
  update_ddot_line(ddot_out);
  NTOKEN2;
+ // MESG("refresh_ddot_1: end");
 }
 
 double factor_refresh_ddot()
@@ -2944,6 +3038,9 @@ double factor_refresh_ddot()
  // MESG("TOK_SHOW factor_refresh_ddot");
  // MESG("	val=%f",value);
  refresh_ddot_1(value);
+#if	USE_CALL_STACK
+ // MESG("factor_refresh_ddot: end call_stack pos=%d",call_stack_used-call_stack);
+#endif
  return value;
 }
 
@@ -3161,8 +3258,12 @@ double exec_block1(FILEBUF *fp)
  INIT_STAGE;
  exe_buffer=fp;
  double val=0;
-	// MESG("exec_block1:[%s] size of tok_struct is %d",fp->b_fname,sizeof(tok_struct));
-   if(!current_active_flag) return(ex_var.dval);
+   // MESG("exec_block1:[%s] err_num= %d %d",fp->b_fname,err_num,current_active_flag);
+   if(!current_active_flag|| err_num>0) {
+		tok=fp->end_token;
+		current_active_flag=0;
+		return(ex_var.dval);
+   };
    while(tok->ttype!=TOK_EOF) 
    {
 	// MESG_TOK_INFO("- exec_block1",tok);
@@ -3181,7 +3282,7 @@ double exec_block1(FILEBUF *fp)
 
 	if(!current_active_flag) break;
    };
-   // MESG("exec_block1: end!");
+   // MESG("exec_block1: end!, err=%d",err_num);
 	return(val);
 }
 
@@ -3195,7 +3296,11 @@ double exec_block1_break(FILEBUF *fp)
  // if(current_stable==NULL) MESG("exec_block1_break: current_stable is NULL!");
 
 	// MESG("#exec_block_break:%d ttype=%d [%s]",tok->tnum,tok->ttype,tok_info(tok));
-   if(!current_active_flag) return(ex_var.dval);
+   if(!current_active_flag|| err_num>0) {
+		NTOKEN2;
+		current_active_flag=0;
+		return(ex_var.dval);
+   };
    while(tok->ttype!=TOK_EOF) 
    {
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
@@ -3228,7 +3333,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  MVAR *local_symbols;
  MVAR *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
-	// MESG("# [%-15s %s ------------------------",bp->b_fname,VERSION);
+	// MESG("# [%-15s compute_block: %s ------------------------",bp->b_fname,VERSION);
  if(show_tokens) {
 	parse_buffer_show_tokens(1);
 	return(0);	
@@ -3252,7 +3357,8 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	} else {
 		// MESG("use current_stable new items = %d",use_fp->symbol_tree->items);
 		local_symbols=realloc_symbol_table(current_stable,use_fp->symbol_tree->items,old_items);
-	}
+	};
+	if(local_symbols==NULL) return 0;
 	current_stable=local_symbols;
 
  if(bp->m_mode<2)	/* if not already checked!  */
@@ -3269,13 +3375,19 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	tok=bp->tok_table;
 
 	drv_start_checking_break();
-	// MESG("	call exec_block1");
+	// MESG("	compute_block: call exec_block1");
 	if(execmd) val=exec_block1(bp);
 	else val=exec_block1_break(bp);
-
+	// MESG("compute_block:1");
 	drv_stop_checking_break();
 	// MESG("	start cleaning");
 	/* cleaning  */
+	// MESG("cleaning!");
+	if(err_num) {
+		// execmd=0;
+		// msg_line("error %d",err_num);
+		return 0;
+	} else
 	if(start) {
 		if(local_symbols)
 		if(bp->symbol_tree){
@@ -3293,8 +3405,10 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	val=0;
  };
  tok=old_tok;
- MESG("compute_block return %f",val);
- MESG("call_stack_used: %lld", max_call_stack_end-call_stack);
+ // MESG("compute_block return %f",val);
+#if	USE_CALL_STACK
+ // MESG("max call_stack_used: %lld", max_call_stack_end-call_stack);
+#endif
  return(val); 
 }
 
@@ -3337,7 +3451,7 @@ int refresh_current_buffer(num nused)
  INIT_STAGE;
 
  /* clear parse list  */
- // MESG("refresh_current_buffer: call empty_tok_table: [%s]",fp->b_fname);
+ MESG("refresh_current_buffer: call empty_tok_table: [%s]",fp->b_fname);
  empty_tok_table(fp);
  clean_saved_string(0);
  fp->err=-1;
@@ -3362,8 +3476,8 @@ int refresh_current_buffer(num nused)
 	init_exec_flags();
 	tok=fp->tok_table;
 	val=exec_block1_break(fp);
-	drv_stop_checking_break();
 	if(err_num>0) {
+		return 0;
 		show_error("refresh buffer",fp->b_fname);
 		// msg_line("Error %d [%s] at line %d",err_num,err_str,err_line);
 		// mesg_out("Error %d [%s] at line %d",err_num,err_str,err_line);
@@ -3372,6 +3486,7 @@ int refresh_current_buffer(num nused)
 		else if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
 		else if(get_sval()) msg_line("Result is [%s %f]",get_sval(),val);
 	};
+	drv_stop_checking_break();
  } else {
  	msg_line("parse error %d line %d [%s]",err_num,err_line+1,err_str);
 	return(0);
