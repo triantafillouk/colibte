@@ -29,11 +29,10 @@ void load_config()
  char **value_array;
  char *flag_name;
  int pair_nums=0;
-
+ // fprintf(stderr,"load_config: from [%s]\n",fname);
  pair_nums=read_pairs(fname,'=',&name_array,&value_array);
  if(pair_nums) {
 	for(flag_name=name_array[i];(flag_name=name_array[i])!=NULL;i++){
-		// MESG("	- set [%s] to %d",flag_name,atoi(value_array[i]));
 		// set_btval(flag_name,-1,NULL,atoi(value_array[i]));
 		set_bt_num_val(flag_name,atoi(value_array[i]));
 		// fprintf(stderr,"	- %20s %d\n",flag_name,atoi(value_array[i]));
@@ -82,11 +81,12 @@ void save_config()
  FILE *f = fopen(fname,"w");
  if(f) {
  int i=0;
-
+ MESG("save_confg: to [%s]",fname);
  fprintf(f,"[%s]\n",APPLICATION_NAME);
  VAR *var;
  i=0;var=&option_names[i];
  while(var->name) {
+	// fprintf(stderr,"%s=%d\n",var->name,(int)bt_dval(var->name));
 	fprintf(f,"%s=%d\n",var->name,(int)bt_dval(var->name));
 	i++;var=&option_names[i];
  };

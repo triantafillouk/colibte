@@ -73,6 +73,8 @@ int dir_select_reverse(num dummy);
 int dir_select_all(num dummy);
 int dir_select_none(num dummy);
 
+void initialize_call_stack(int initial_size);
+
 double next_value();
 int set_arg(num n);
 void status_line(WINDP *wp);

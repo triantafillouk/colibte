@@ -198,7 +198,7 @@ array_dat *transpose(array_dat *array1);
 #if	USE_CALL_STACK
 void initialize_call_stack(int initial_size)
 {
-	// fprintf(stderr,"Initialize call_stack with %d size\n",initial_size);
+	fprintf(stderr,"Initialize call_stack with %d size\n",initial_size);
 	call_stack=(MVAR *)malloc(sizeof(struct MVAR)*initial_size);
 	call_stack_used=call_stack;
 	max_call_stack_end=call_stack;
@@ -217,7 +217,7 @@ MVAR *realloc_call_stack(int additional_size)
 	int alloc_size = new_size*sizeof(struct MVAR);
 	MESG("realloc_call_stack %p",call_stack);
 	MESG("call_stack realloc: initial=%d required=%d new=%d alloc=%d",initial_size,required_size,new_size,alloc_size);
-		show_vars(call_stack,initial_size,"reallo_call_stack");
+		// show_vars(call_stack,initial_size,"reallo_call_stack");
 		call_stack=(MVAR *)realloc(call_stack,alloc_size);
 		if(call_stack) {
 			call_stack_used=call_stack+required_size;
@@ -241,7 +241,7 @@ void init_btree_table()
 	directiv_table=new_btree("directives",0);
 	global_types_tree=new_btree("types",0);
 #if	USE_CALL_STACK
-	initialize_call_stack(256);
+	// initialize_call_stack(bt_dval("call_stack_size"));
 #endif
 }
 
@@ -540,7 +540,7 @@ char *tname(int type)
 void init_token_mask()
 {
  int ind;
-
+ // fprintf(stderr,"init_token_mask:\n");
  for(ind=0;ind<255;ind++) {
  	if((ind>='a' && ind<='z') ||(ind>='A' && ind<='Z') || ind=='_' || ind>=128) 
  	tok_mask[ind]=TOK_LETTER;
@@ -945,7 +945,7 @@ MVAR * push_args_1(int nargs,int vars_num)
  // va=(MVAR *) malloc(sizeof(MVAR)*(nargs+vars_num));
  MVAR *va = new_symbol_table(nargs+vars_num);
  if(va==NULL) { MESG("push_args: null symbol table!");return NULL;};
- if(va){
+ // if(va){
  MVAR *va_i=va;
  for(;va_i<va+nargs;va_i++)
  {
@@ -984,7 +984,7 @@ MVAR * push_args_1(int nargs,int vars_num)
 	va_i->dval=0;
  };
 	// MESG(">	push_args_1:end [%s]",tok_info(tok));
- };
+ //};
  // MESG("push_args: end");
  return(va);
 }
@@ -993,7 +993,7 @@ double exec_function(FILEBUF *bp,int nargs)
 {
 	// double value=0;
 	// MESG("exec_function: bp=[%s] nargs=%d",bp->b_fname,nargs);
-	if(err_num>0) { tok=bp->end_token;current_active_flag=0;return 0;};
+	// if(err_num>0) { tok=bp->end_token;current_active_flag=0;return 0;};
 	// MESG("exec_function:2");
 	tok=bp->tok_table;	/* start of function  */
 	bp->tok_bnf_index=0;
@@ -1810,12 +1810,13 @@ double factor_proc()
 	MVAR *old_symbol_table=current_stable;
 	current_stable = push_args_1(tok0->t_nargs,exe_buffer->symbol_tree->items);
 	// show_vars(current_stable,exe_buffer->symbol_tree->items+tok0->t_nargs,"after push_args");
-	
+#if	0	
 	if(current_stable==NULL) { 
 		err_num=1001;
 		tok=tok0->proc_buffer->end_token;
 		MESG("factor_proc: error end");return 0;
 	};
+#endif
 	after_proc=tok;
 	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
 	value=exec_function(exe_buffer,tok0->t_nargs);
@@ -2239,9 +2240,11 @@ static double inline dir_lcurl()
 	NTOKEN2;
 	// MESG("dir_lcurl:");
 	double val=exec_block1(exe_buffer);
+#if	0
 	if(err_num>0 || current_active_flag==0) {
 		tok=exe_buffer->end_token;
 	};
+#endif
 	return val;
 }
 
@@ -3477,7 +3480,7 @@ int refresh_current_buffer(num nused)
 	tok=fp->tok_table;
 	val=exec_block1_break(fp);
 	if(err_num>0) {
-		return 0;
+		// return 0;
 		show_error("refresh buffer",fp->b_fname);
 		// msg_line("Error %d [%s] at line %d",err_num,err_str,err_line);
 		// mesg_out("Error %d [%s] at line %d",err_num,err_str,err_line);
