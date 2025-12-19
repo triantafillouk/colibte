@@ -198,7 +198,7 @@ array_dat *transpose(array_dat *array1);
 #if	USE_CALL_STACK
 void initialize_call_stack(int initial_size)
 {
-	fprintf(stderr,"Initialize call_stack with %d size\n",initial_size);
+	MESG("Initialize call_stack with %d size",initial_size);
 	call_stack=(MVAR *)malloc(sizeof(struct MVAR)*initial_size);
 	call_stack_used=call_stack;
 	max_call_stack_end=call_stack;
@@ -240,9 +240,6 @@ void init_btree_table()
 	bt_table=new_btree("table",0);
 	directiv_table=new_btree("directives",0);
 	global_types_tree=new_btree("types",0);
-#if	USE_CALL_STACK
-	// initialize_call_stack(bt_dval("call_stack_size"));
-#endif
 }
 
 
