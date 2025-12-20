@@ -124,7 +124,6 @@ MVAR *lmvar=NULL;
 int firt_var=1;
 MVAR *current_stable=NULL; 	/* current symbol table ...  */
 
-#define USE_CALL_STACK	1
 #if	USE_CALL_STACK
 MVAR *call_stack;
 MVAR *call_stack_used;
@@ -672,6 +671,7 @@ MVAR *new_symbol_table(int size)
  	max_call_stack_end=call_stack_used;
 
 	if(call_stack_used>call_stack_available) {
+#if	1
 		if(execmd) {
 			printf("new_symbol_table: overflow: available=%ld required=%ld\n",call_stack_available-call_stack,call_stack_used-call_stack);
 			// printf("execmd=%d\n",execmd);
@@ -680,12 +680,10 @@ MVAR *new_symbol_table(int size)
 
 			msg_line("new_symbol_table: overflow: available=%d required=%d",call_stack_available-call_stack,call_stack_used-call_stack);
 		};
-		err_num=101;
-		current_active_flag=0;
-		tok=exe_buffer->end_token;
+		set_error(tok,101,"call_stack overflow");
 		return NULL;
-#if	0
-		if(	(call_stack=realloc_call_stack(256))==NULL) return NULL;
+#else
+		if(	(call_stack=realloc_call_stack(256))==NULL) { err_num=101;return NULL;};
 		td = call_stack+size_call_stack_used;
 		MESG("	after realloc new symbol table starts at ind=%d",td-call_stack);
 #endif
@@ -941,6 +939,7 @@ MVAR * push_args_1(int nargs,int vars_num)
  // if(nargs>0)
  // va=(MVAR *) malloc(sizeof(MVAR)*(nargs+vars_num));
  MVAR *va = new_symbol_table(nargs+vars_num);
+ if(va==NULL) return NULL;
  if(va==NULL) { MESG("push_args: null symbol table!");return NULL;};
  // if(va){
  MVAR *va_i=va;
@@ -1103,7 +1102,6 @@ double factor_type_element()
 			ind = (int)(el_node->node_index);
 			tok->dval=ind;
 		} else {
-			MESG("error element not found!");
 			set_error(tok,501,"element not found!");
 			return(0);
 		};
@@ -1690,9 +1688,8 @@ double factor_cmd()
 
 	if(err_num>0) {
 		// ERROR("error %d after function [%s] at line %d: %s",err_num,ftable[function_index].n_name,err_line,err_str);
+		set_error(tok,105,"factor_cmd");
 		show_error("Factor","factor_cmd");
-		current_active_flag=0;
-		tok=exe_buffer->end_token;
 		RTRN(status);
 	};
 	// MESG(";factor_cmd:end tnum=%d value=%f ex_value=%f",tok->tnum,value,ex_value);
@@ -1808,11 +1805,7 @@ double factor_proc()
 	current_stable = push_args_1(tok0->t_nargs,exe_buffer->symbol_tree->items);
 	// show_vars(current_stable,exe_buffer->symbol_tree->items+tok0->t_nargs,"after push_args");
 #if	0	
-	if(current_stable==NULL) { 
-		err_num=1001;
-		tok=tok0->proc_buffer->end_token;
-		MESG("factor_proc: error end");return 0;
-	};
+	if(current_stable==NULL) { set_error(tok,1001,"factor_proc: error end");return 0;};
 #endif
 	after_proc=tok;
 	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
@@ -2795,8 +2788,10 @@ int assign_args1(MVAR *va, int nargs)
  TDS("assign_args1");
  // MESG("\n# assign_args1: tok=[%d %s] %d nargs=%d",tok->tnum,tok->tname,tok->ttype,nargs);
  NTOKEN2; /* skip name */
+#if	0
  if(va) 
  {
+#endif
 	int i;
 	MVAR *symbols=va;
 	// MESG("assign_args1: pos1 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
@@ -2829,10 +2824,13 @@ int assign_args1(MVAR *va, int nargs)
 		// MESG("		ntoken");
 		if(nargs>0) NTOKEN2;
 	};
+#if	0
  } else { // we send no arguments!
+	MESG("Assign_args: no args!");
 	// skip till end parenthesis setting default values for arguments!!??
 	while(tok->ttype!=TOK_RPAR && tok->ttype!=TOK_END) NTOKEN2;
  };
+#endif
  NTOKEN2;
  // MESG("assign_args1: end! pos5 after args tok=[%s] %d",tok->tname,tok->ttype);
  return(1);
@@ -3368,7 +3366,6 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	{
 		// mesg_out("Error %d %s line %d ex_vtype=%d ex_value=%f slval=[%s]!",err_num,err_str,err_line,get_vtype(),get_val(),get_sval());
 		show_error("Check init",bp->b_fname);
-		execmd=0;
 		return(0);
 	};
 	init_exec_flags();
@@ -3477,10 +3474,8 @@ int refresh_current_buffer(num nused)
 	tok=fp->tok_table;
 	val=exec_block1_break(fp);
 	if(err_num>0) {
-		// return 0;
+		macro_exec=0;
 		show_error("refresh buffer",fp->b_fname);
-		// msg_line("Error %d [%s] at line %d",err_num,err_str,err_line);
-		// mesg_out("Error %d [%s] at line %d",err_num,err_str,err_line);
 	} else {
 		if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
 		else if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
@@ -3517,7 +3512,7 @@ int parse_check_current_buffer(num n)
  cls_fout("[out]");
  // MESG("clear output");
  err_num=check_init(fp);
- MESG("parse_check_current_buffer: after check_init");
+ // MESG("parse_check_current_buffer: after check_init");
  if(err_num>0) {
 	macro_exec=0;
 	msg_line("syntax error %d line %d [%s]",err_num,err_line,err_str);

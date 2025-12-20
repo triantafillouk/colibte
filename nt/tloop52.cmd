@@ -17,6 +17,13 @@ function tadd(a1, a2)
 	return(a1+a2)
 }
 
+#function showtime()
+#{
+#	print("time")
+#}
+
+#tadd()
+#showtime
 
 fact(3):     6
 
