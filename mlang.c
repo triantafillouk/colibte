@@ -689,7 +689,7 @@ MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
 }
 
 /* free symbol table after execute */
-void delete_symbol_table(MVAR *td, int size,int level,int nargs)
+void delete_symbol_table(MVAR *td, int size,int nargs)
 {
  int i;
  // MESG("delete_symbol_table: size=%d level=%d",size,level);
@@ -878,7 +878,7 @@ int check_token(int type)
 }
 
 
-MVAR * push_args_1(int nargs)
+MVAR * push_args_1(int nargs,int vars_num)
 {
  int i=0;
 
@@ -893,9 +893,11 @@ MVAR * push_args_1(int nargs)
  // if(tok->ttype!=TOK_RPAR && nargs!=0)
  if(nargs>0)
  {
-
+#if	USE_CALL_STACK
+ va = new_symbol_table(nargs+vars_num);
+#else
  va=(MVAR *) malloc(sizeof(MVAR)*(nargs));
-
+#endif
  if(va){
  MVAR *va_i=va;
  for(i=0;i<nargs;i++,va_i++){
@@ -956,13 +958,12 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 		level=0;
 		return 0;
 	};
-
 	assign_args1(vargs,current_stable,nargs);
 	// MESG("exec_function: after assign_args1 [%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
 	value=tok->directive();
 	// MESG("exec_function: before delete_symbol_table, ex_value=%f",ex_value);
 	/* remove local variable tree and restore the old one  */
-	delete_symbol_table(current_stable,bp->symbol_tree->items,level,nargs);
+	delete_symbol_table(current_stable,bp->symbol_tree->items,nargs);
 	current_stable=old_symbol_table;
 
 	// MESG("exec_function: before clear_args");
@@ -1751,24 +1752,38 @@ double factor_proc()
 	tok_struct *tok0=tok;
 	double value;
 	// MESG("factor_proc:----------------");
-	FILEBUF *cbuf=exe_buffer;
+	// FILEBUF *cbuf=exe_buffer;
 	exe_buffer=tok0->proc_buffer;
+#if	TPROFILE
+	exe_buffer->function_called++;
+#endif
 	// MESG("factor_proc: cbuf=%s ----------------",cbuf);
-	// MESG("factor_proc: filebuf=%s",exe_buffer->b_fname);
 	NTOKEN2;
 	/* function */
-	MVAR *vargs = NULL;
 	// MESG("factor_proc: tok0 [%d %s] args=%d",tok0->tnum,tok0->tname,tok0->tind);
 	// MESG("factor_proc: tok  [%d %s] %d ",tok->tnum,tok->tname,tok->tind);
-	vargs = push_args_1(tok0->t_nargs);
+	MVAR *old_symbol_table=current_stable;
+	current_stable = push_args_1(tok0->t_nargs,exe_buffer->symbol_tree->items);
+	// show_vars(current_stable,exe_buffer->symbol_tree->items+tok0->t_nargs,"after push_args");
 	after_proc=tok;
 	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
+#if	1
+	tok = exe_buffer->tok_table + tok0->t_nargs+2;
+	value = tok->directive();
+#else	
 	value=exec_function(exe_buffer,vargs,tok0->t_nargs);
+#endif
 	// MESG("factor_proc: return val=%f",value);
+	if(err_num) { tok=exe_buffer->end_token; return 0;};
 	tok=after_proc;
 	current_active_flag=1;	/* start checking again  */
+#if	USE_CALL_STACK
+	delete_symbol_table(current_stable,exe_buffer->symbol_tree->items,tok0->t_nargs);
+#else
 	free(vargs);
-	exe_buffer=cbuf;
+#endif
+	current_stable=old_symbol_table;
+	// exe_buffer=cbuf;
 	RTRN(value);
 }
 
@@ -2732,11 +2747,8 @@ double assign_val(double none)
 
 int assign_args1(MVAR *va,MVAR *symbols,int nargs)
 {
- TDS("assign_args1");
- // MESG("\n# assign_args1: tok=[%d %s] %d nargs=%d",tok->tnum,tok->tname,tok->ttype,nargs);
+ // MESG("assign_args1: va!=symbols! ++++++++++");
  NTOKEN2; /* skip name */
- if(va) 
- {
 	int i;
 	// MESG("assign_args1: pos1 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
 	for(i=0;i<nargs;i++,va++) {
@@ -2768,10 +2780,6 @@ int assign_args1(MVAR *va,MVAR *symbols,int nargs)
 		// MESG("		ntoken");
 		if(nargs>0) NTOKEN2;
 	};
- } else { // we send no arguments!
-	// skip till end parenthesis setting default values for arguments!!??
-	while(tok->ttype!=TOK_RPAR && tok->ttype!=TOK_END) NTOKEN2;
- };
  NTOKEN2;
  // MESG("assign_args1: end! pos5 after args tok=[%s] %d",tok->tname,tok->ttype);
  return(1);
@@ -3301,7 +3309,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	if(start) {
 		if(local_symbols)
 		if(bp->symbol_tree){
-			delete_symbol_table(local_symbols,bp->symbol_tree->items,0,0);
+			delete_symbol_table(local_symbols,bp->symbol_tree->items,0);
 			bp->symbol_tree=NULL;
 		};
 		current_stable=old_symbol_table;

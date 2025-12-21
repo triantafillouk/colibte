@@ -673,7 +673,8 @@ int err_factor()
 				continue;
 			};
 			// MESG("ttype=%d %s",tok->ttype,tname(tok->ttype));
-		};cdim--;
+		};
+		cdim--;
 		};
 		// MESG("set array dat! [%s] rows=%d cols=%d",tok0->tname,rows,cols);
 		// set array dat
@@ -684,6 +685,11 @@ int err_factor()
 		tok0->tok_adat = new_array(rows,cols);
 		// MESG("	err: CREATED new array %d [%d %d]",tok0->tok_adat->anum,rows,cols);
 		NTOKEN_ERR(4789)
+		// MESG("	token after array: %s",tok_info(tok));
+		if(tok->ttype!=TOK_SEP) {
+			xpos=4789;
+			set_error(tok,xpos,"missing separator after array declare");
+		};
 		RT_MESG1(4789);
 		};
 	case TOK_RPAR:
@@ -837,8 +843,6 @@ int err_factor()
 #endif
 			if(tok->ttype !=TOK_RPAR) {
 				xpos=4850;
-				MESG(" +++++++++++  %s: %d -> %d type=%d",tok->tname,tok->tnum,tok->tnum,tok->ttype);
-
 				set_error(tok0,xpos,"FAC1_err: No closing parenthesis");
 				// syntax_error(" FAC1_err: No closing parenthesis",xpos);
 				RT_MESG1(485);
@@ -955,6 +959,7 @@ int err_factor()
 		};
 		if(bp!=NULL) {
 			tok0->proc_buffer=bp;
+			bp->function_called=0;
 			// MESG("	set function buffer");
 		};
 		CHECK_TOK(504);
