@@ -29,6 +29,8 @@
 #define	TARROWS		1	/* Use arrow menus in panel curses  */
 #define	USE_UTF8	1	/* Use utf8 characters  */
 #define	TBNF		1	/* convert to bnf notation test  */
+#define	TPROFILE	0	/* profile flag  */
+#define	USE_CALL_STACK	1
 
 #define WRAPD	0	/* wrap debug  */
 #define	FAST_GTK_SCREEN	0

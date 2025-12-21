@@ -123,6 +123,13 @@ MVAR *lmvar=NULL;
 int firt_var=1;
 MVAR *current_stable=NULL; 	/* current symbol table ...  */
 
+#if	USE_CALL_STACK
+MVAR *call_stack;
+MVAR *call_stack_used;
+MVAR *max_call_stack_end;
+MVAR *call_stack_available;
+#endif
+
 int show_stage=0;
 int xpos=0;		/* stage position  */
 int current_active_flag=1;	/* on to execute procedure!  */
@@ -185,6 +192,45 @@ void delete_type_tree(BTREE *type_tree)
 
 array_dat *transpose(array_dat *array1);
 
+#if	USE_CALL_STACK
+void initialize_call_stack(int initial_size)
+{
+	MESG("Initialize call_stack with %d size",initial_size);
+	call_stack=(MVAR *)malloc(sizeof(struct MVAR)*initial_size);
+	call_stack_used=call_stack;
+	max_call_stack_end=call_stack;
+	call_stack_available=call_stack+initial_size;
+	// fprintf(stderr,"	initial call_stack=%p\n",(void *)call_stack);
+}
+#endif
+
+#if	USE_CALL_STACK0
+// Not used, realloc_call_stack is difficult to implement. All previous positions must be reassigned!!!
+MVAR *realloc_call_stack(int additional_size)
+{
+	int required_size = call_stack_used-call_stack;
+	int new_size = required_size+additional_size;
+	int initial_size = call_stack_available-call_stack;
+	int alloc_size = new_size*sizeof(struct MVAR);
+	MESG("realloc_call_stack %p",call_stack);
+	MESG("call_stack realloc: initial=%d required=%d new=%d alloc=%d",initial_size,required_size,new_size,alloc_size);
+		// show_vars(call_stack,initial_size,"reallo_call_stack");
+		call_stack=(MVAR *)realloc(call_stack,alloc_size);
+		if(call_stack) {
+			call_stack_used=call_stack+required_size;
+			max_call_stack_end=call_stack_used;
+			call_stack_available=call_stack+new_size;
+			
+			// show_vars(call_stack,initial_size,"after reallocation");
+			MESG("call_stack reallocated from %d to %d ----------------",initial_size,new_size);
+		} else {
+			return NULL;
+		};
+	MESG("	new  call_stack=%lX",(void *)call_stack);
+	return call_stack;
+}
+#endif
+
 void init_btree_table()
 {
 	bt_table=new_btree("table",0);
@@ -204,7 +250,12 @@ void clear_args(MVAR *va,int nargs)
 	 		free(va[i].sval);
 		}
 	 };
+#if	USE_CALL_STACK
+	call_stack_used -= nargs;
+	// MESG("clear_args: call_stack=%lld upto %lld",call_stack_used-call_stack,call_stack_used-call_stack+nargs);
+#else
 	 free(va);
+#endif
  };
 }
 
@@ -602,6 +653,80 @@ int is_mlang(FILEBUF *fp)
 
 MVAR *new_symbol_table(int size)
 {
+#if	USE_CALL_STACK
+ // MESG("Initialize new_symbol_table: size %d",size);
+ MVAR *td=call_stack_used;
+ // MESG("		new symbol table starts at ind=%d",td-call_stack);
+ // int size_call_stack_used = call_stack_used - call_stack;
+ // MESG("		new_symbol_table: at %lld",td-call_stack);
+ call_stack_used += size;
+ if(max_call_stack_end<call_stack_used) {
+ 	max_call_stack_end=call_stack_used;
+
+	if(call_stack_used>call_stack_available) {
+#if	1
+		if(execmd) {
+			printf("new_symbol_table: overflow: available=%ld required=%ld\n",call_stack_available-call_stack,call_stack_used-call_stack);
+			// printf("execmd=%d\n",execmd);
+			exit(0);
+		} else {
+
+			msg_line("new_symbol_table: overflow: available=%d required=%d",call_stack_available-call_stack,call_stack_used-call_stack);
+		};
+		set_error(tok,101,"call_stack overflow");
+		return NULL;
+#else
+		if(	(call_stack=realloc_call_stack(256))==NULL) { err_num=101;return NULL;};
+		td = call_stack+size_call_stack_used;
+		MESG("	after realloc new symbol table starts at ind=%d",td-call_stack);
+#endif
+	};
+ }
+#else
+ MVAR *td=malloc(sizeof(struct MVAR)*(size+1));
+ if(td==NULL) { err_num=101;return NULL;};
+#endif
+
+ // initialize as numeric
+ MVAR *tdp=td;
+ MVAR *td_end=td+size;
+ while(tdp<td_end) {
+ 	tdp->var_type=VTYPE_NUM;
+	tdp->dval=0;
+	tdp++;
+ };
+ return td;
+}
+
+MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
+{
+#if	USE_CALL_STACK
+	MESG("realloc_symbol_table: ---------------");
+  call_stack_used += size-old_size;
+ if(max_call_stack_end<call_stack_used) {
+ 	max_call_stack_end=call_stack_used;
+	if(call_stack_used>call_stack_available) {
+		printf("call_stack limit overflow: %ld",call_stack_used-call_stack);
+	};
+ };
+#else
+ // MESG("realloc_symbol_table: size %d",size);
+ td=realloc(td,sizeof(struct MVAR)*(size+1));
+
+ if(td==NULL) { err_num=101;return NULL;};
+#endif
+ MVAR *tdp=&td[old_size];
+ while(tdp<td+size) {
+ 	tdp->var_type=VTYPE_NUM;
+	tdp->dval=0;
+	tdp++;
+ };
+
+ return td;
+}
+#if	0
+MVAR *new_symbol_table(int size)
+{
  // MESG("Initialize new_symbol_table: size %d",size);
  MVAR *td=malloc(sizeof(struct MVAR)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
@@ -645,6 +770,7 @@ MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
 #endif
  return td;
 }
+#endif
 
 /* free symbol table after execute */
 void delete_symbol_table(MVAR *td, int size,int nargs)
@@ -666,7 +792,14 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 		};
 	};
  };
+#if	USE_CALL_STACK
+ // MESG("delete_symbol_table from: %lld",call_stack_used-call_stack);
+ call_stack_used -= size+nargs;
+ // MESG("delete_symbol_table: call_stack=%lld upto %lld",call_stack_used-call_stack,call_stack_used-call_stack+nargs+size-1);
+ // MESG("                    at  : %lld",call_stack_used-call_stack);
+#else
  free(td);
+#endif
  };
 }
 
@@ -1699,7 +1832,7 @@ double factor_proc()
 	double value;
 	// MESG("factor_proc:----------------");
 	FILEBUF *cbuf=exe_buffer;
-	exe_buffer=tok0->tbuf;
+	exe_buffer=tok0->proc_buffer;
 	// MESG("factor_proc: cbuf=%s ----------------",cbuf);
 	// MESG("factor_proc: filebuf=%s",exe_buffer->b_fname);
 	NTOKEN2;

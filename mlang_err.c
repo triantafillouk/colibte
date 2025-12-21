@@ -954,7 +954,7 @@ int err_factor()
 			return(err_num);
 		};
 		if(bp!=NULL) {
-			tok0->tbuf=bp;
+			tok0->proc_buffer=bp;
 			// MESG("	set function buffer");
 		};
 		CHECK_TOK(504);
