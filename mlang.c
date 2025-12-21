@@ -206,10 +206,10 @@ void initialize_call_stack(int initial_size)
 }
 #endif
 
-#if	USE_CALL_STACK
+#if	USE_CALL_STACK0
+// Not used, realloc_call_stack is difficult to implement. All previous positions must be reassigned!!!
 MVAR *realloc_call_stack(int additional_size)
 {
-	// if(call_stack_end>call_stack_available) {
 	int required_size = call_stack_used-call_stack;
 	int new_size = required_size+additional_size;
 	int initial_size = call_stack_available-call_stack;
@@ -228,7 +228,6 @@ MVAR *realloc_call_stack(int additional_size)
 		} else {
 			return NULL;
 		};
-	// };
 	MESG("	new  call_stack=%lX",(void *)call_stack);
 	return call_stack;
 }
@@ -697,9 +696,6 @@ MVAR *new_symbol_table(int size)
  // initialize as numeric
  MVAR *tdp=td;
  MVAR *td_end=td+size;
-#if	USE_CALL_STACK
- // MESG("initialize as numeric: from %ld to %ld",td-call_stack,td_end-call_stack-1);
-#endif
  while(tdp<td_end) {
  	tdp->var_type=VTYPE_NUM;
 	tdp->dval=0;
@@ -987,26 +983,9 @@ MVAR * push_args_1(int nargs,int vars_num)
 
 double exec_function(FILEBUF *bp,int nargs)
 {
-	// double value=0;
-	// MESG("exec_function: bp=[%s] nargs=%d",bp->b_fname,nargs);
-	// if(err_num>0) { tok=bp->end_token;current_active_flag=0;return 0;};
-	// MESG("exec_function:2");
-	tok=bp->tok_table;	/* start of function  */
-	bp->tok_bnf_index=0;
-	// MESG("exec_function: first token is [%s] type=%d",tok->tname,tok->ttype);
-	assign_args1(current_stable,nargs);
-#if	0
-	show_vars(vargs,bp->symbol_tree->items+nargs,"after assign_args");
-	show_vars(current_stable,bp->symbol_tree->items+nargs,"after assign_args");
-	exit(0);
-#endif
-	// MESG("exec_function: after assign_args1 [%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
-	// MESG("exec_function: err_num=%d",err_num);
+	// bp->tok_bnf_index=0;
+	tok = bp->tok_table + nargs+2;
 	return tok->directive();
-	// MESG("exec_function: before delete_symbol_table, ex_value=%f",ex_value);
-	/* remove local variable tree and restore the old one  */
-	// MESG("exec_function: before clear_args");
-	// return(value);
 }
 
 /* ---------------------- Factor functions ------------------------------------ */
@@ -1111,9 +1090,8 @@ double factor_type_element()
 	};
 	// MESG("	ind = %d",ind);
 	if(adat->mval[ind].var_type==VTYPE_NUM) {
-		set_vtype(VTYPE_NUM);
 		value=adat->mval[ind].dval;
-		set_dval(value);
+		set_vdval(value);
 		// MESG("	return type dval %f",value);
 	} else {
 		set_vtype(VTYPE_STRING);
@@ -1541,10 +1519,9 @@ double factor_array_l1()
 	// MESG("	ind = %d",ind1);
 	lmvar=&adat->mval[ind1];
 	if(adat->mval[ind1].var_type==VTYPE_NUM) {
-		set_vtype(VTYPE_NUM);
 		value=adat->mval[ind1].dval;
 		ls_pdval = &adat->mval[ind1].dval;
-		set_dval(value);
+		set_vdval(value);
 		// MESG("	return type dval %f",value);
 	} else {
 		set_vtype(VTYPE_STRING);
@@ -1602,10 +1579,9 @@ double factor_array_l2()
 	// MESG("	ind = %d",ind1);
 	lmvar=&adat->mval[ind1];
 	if(adat->mval[ind1].var_type==VTYPE_NUM) {
-		set_vtype(VTYPE_NUM);
 		value=adat->mval[ind1].dval;
 		ls_pdval = &adat->mval[ind1].dval;
-		set_dval(value);
+		set_vdval(value);
 		// MESG("	return type dval %f",value);
 	} else {
 		set_vtype(VTYPE_STRING);
@@ -1809,7 +1785,12 @@ double factor_proc()
 #endif
 	after_proc=tok;
 	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
+#if	1
+	tok = exe_buffer->tok_table + tok0->t_nargs+2;
+	value = tok->directive();
+#else
 	value=exec_function(exe_buffer,tok0->t_nargs);
+#endif
 	// MESG("factor_proc: return val=%f",value);
 	if(err_num) { tok=exe_buffer->end_token; return 0;};
 	tok=after_proc;
@@ -2623,13 +2604,12 @@ double lexpression()
 
 double cexpression()
 {
- tok_struct *tok0;
  TDS("cexpression");
  // MESG(";cexpression [%s]",tok_info(tok));
  double value = num_expression();
 
  if(tok->tgroup!=TOK_COMPARE) RTRN(value);
- tok0=tok;
+ tok_struct *tok0=tok;
  NTOKEN2;
  if(vtype_is(VTYPE_STRING)) {
 	static char svalue[MAXLLEN];
@@ -2676,10 +2656,8 @@ double assign_val(double none)
 	// MESG("assign_val: after lexpression! slot vtype=%d ex_vtype=%d\n",sslot->var_type,get_vtype());
 	if(vtype_is(sslot->var_type) && vtype_is(VTYPE_NUM)) 
 	{
-
-			sslot->dval=v1;
-			sslot->var_type=VTYPE_NUM;
-			return(v1);
+		sslot->dval=v1;
+		return(v1);
 	};
 
 	int stype=sslot->var_type;;
@@ -2783,57 +2761,17 @@ double assign_val(double none)
 	};
 }
 
-int assign_args1(MVAR *va, int nargs)
+void assign_args1(int nargs)
 {
- TDS("assign_args1");
  // MESG("\n# assign_args1: tok=[%d %s] %d nargs=%d",tok->tnum,tok->tname,tok->ttype,nargs);
  NTOKEN2; /* skip name */
-#if	0
- if(va) 
- {
-#endif
-	int i;
-	MVAR *symbols=va;
-	// MESG("assign_args1: pos1 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
-	for(i=0;i<nargs;i++,va++) {
-		MVAR *arg_dat=&symbols[tok->tind];
-		arg_dat->var_type=va->var_type;
-		// MESG("assign_args1:arg %d: pos2 tok=[%d %s] ttype=%d tind=%d",i,tok->tnum,tok->tname,tok->ttype,tok->tind);
-
-		switch(va->var_type) {
-			case VTYPE_NUM:
-				arg_dat->dval=va->dval;
-				// MESG("		nuneric arg: dval=%f",va->dval);
-				break;
-			case VTYPE_STRING:
-				// MESG("		string arg: %d [%s] %X",i,va->sval,va->sval);
-				arg_dat->sval=va->sval;break;
-			case VTYPE_ARRAY:
-			case VTYPE_SARRAY:
-			case VTYPE_AMIXED:
-				arg_dat->adat=va->adat;break;
-			default:
-				ERROR("		array argn_args:[%d] type is wrong! (%d)",i,va->var_type);
-				arg_dat->sval="";
-				arg_dat->dval=0;
-		};
-
-		// MESG("assign_args1:arg %d: pos3 after args tok=[%s] %d",i,tok->tname,tok->ttype);
+	int i=0;
+	for(;i<nargs;i++) {
 		NTOKEN2;	/* skip separator or end parenthesis */
 		if(tok->ttype==TOK_RPAR) break;
-		// MESG("		ntoken");
-		if(nargs>0) NTOKEN2;
 	};
-#if	0
- } else { // we send no arguments!
-	MESG("Assign_args: no args!");
-	// skip till end parenthesis setting default values for arguments!!??
-	while(tok->ttype!=TOK_RPAR && tok->ttype!=TOK_END) NTOKEN2;
- };
-#endif
  NTOKEN2;
  // MESG("assign_args1: end! pos5 after args tok=[%s] %d",tok->tname,tok->ttype);
- return(1);
 }
 
 
@@ -3716,7 +3654,7 @@ char * key_str1()
  return (get_sval());
 }
 
-double get_val()
+inline double get_val()
 {
 	return ex_var.dval;
 }
@@ -3747,13 +3685,6 @@ char *get_sval()
 		// MESG("get_sval: new saved_string! [%s]",saved_string);
 	};
 	return(saved_string);
-}
-
-double next_value()
-{
- double v;
- v=atof(get_sval());
- return(v);
 }
 
 inline int get_vtype()

@@ -126,7 +126,7 @@ extern char patmatch[];
 
 extern int found;
 
-double exec_function(FILEBUF *vp,VAR *vargs,int nargs);
+double exec_function(FILEBUF *vp,int nargs);
 void show_points(FILEBUF *bf,FILE *fp);
 int check_init(FILEBUF *bf);
 void set_record_string1(char *st2);
@@ -695,7 +695,7 @@ int exec_named_function(char *name)
 		return(0);
 	};
 
-	ival = (int)exec_function(bp,NULL,0);
+	ival = (int)exec_function(bp,0);
 
 	return(ival);
 }
