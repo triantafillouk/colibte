@@ -6,8 +6,7 @@ function fact(num)
  {
  	return(1)
  } else {
-	n1=num-1
-	f=num*fact(n1)
+	f=num*fact(num-1)
 	return(f)
  }
 }

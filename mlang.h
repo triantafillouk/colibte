@@ -98,7 +98,7 @@ typedef struct term_type {
 void init_token_mask();
 double assign(int is_edenv);
 int parse_block1(FILEBUF *bf,BTREE *stree,int start);
-void assign_args1(int nargs);
+int assign_args1( MVAR *va,MVAR *current_stable,int nargs);
 double factor_1();
 double term1_1();
 double term2_1();
