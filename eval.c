@@ -126,7 +126,7 @@ extern char patmatch[];
 
 extern int found;
 
-double exec_function(FILEBUF *vp,int nargs);
+double exec_function(FILEBUF *vp,VAR *vargs,int nargs);
 void show_points(FILEBUF *bf,FILE *fp);
 int check_init(FILEBUF *bf);
 void set_record_string1(char *st2);
@@ -604,7 +604,7 @@ double compute_string(char *s,char *new_string)
  double value;
  FILEBUF *fp=NULL;
  char *bname="[dofile_string]";
-	// MESG("compute_string:");
+
 	if ((fp = new_filebuf(bname, 0)) == NULL) /* get the needed buffer */
 		return(FALSE);
 
@@ -694,7 +694,7 @@ int exec_named_function(char *name)
 		return(0);
 	};
 
-	ival = (int)exec_function(bp,0);
+	ival = (int)exec_function(bp,NULL,0);
 
 	return(ival);
 }
@@ -1251,7 +1251,7 @@ int refresh_current_line(num nused)
  // if special file type return
  if(cbfp->b_flag & (FSNLIST|FSDIRED|FSNOTES|FSNOTESN)) return 0;
 	macro_exec=1;
- 	// MESG("refresh_current_line:");
+ // MESG("refresh_current_line:");
 	tpo=tp_offset(cwp->tp_current);
 	
 	sl=FLineBegin(cbfp,tpo);
@@ -1276,7 +1276,6 @@ int refresh_current_line(num nused)
 	set_Offset(sl);
 	// MESG("refresh_current_line:[%s] %d",text_line,ddot_pos);
 	value = compute_string(text_line,text_line);
-	// MESG("refresh_current_line: after compute_string");
 
 	if(is_ddot) {
 		insert_string(cbfp,text_line,strlen(text_line));
@@ -1293,7 +1292,6 @@ int refresh_current_line(num nused)
 			msg_line("res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
 		}
  	};
-	// MESG("refresh_current_line: 2");
 	if(is_ddot){
 		el=FLineEnd(cbfp,sl);
 		textpoint_set(cwp->tp_current,el);	/* at the end of the line  */

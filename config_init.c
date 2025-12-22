@@ -29,7 +29,7 @@ void load_config()
  char **value_array;
  char *flag_name;
  int pair_nums=0;
- // fprintf(stderr,"load_config: from [%s]\n",fname);
+
  pair_nums=read_pairs(fname,'=',&name_array,&value_array);
  if(pair_nums) {
 	for(flag_name=name_array[i];(flag_name=name_array[i])!=NULL;i++){
@@ -86,7 +86,6 @@ void save_config()
  VAR *var;
  i=0;var=&option_names[i];
  while(var->name) {
-	// fprintf(stderr,"%s=%d\n",var->name,(int)bt_dval(var->name));
 	fprintf(f,"%s=%d\n",var->name,(int)bt_dval(var->name));
 	i++;var=&option_names[i];
  };

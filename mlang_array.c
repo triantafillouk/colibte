@@ -95,7 +95,7 @@ void allocate_array(struct array_dat *adat)
  
  if(adat->astat==ARRAY_UNALLOCATED || adat->atype==VTYPE_AMIXED) {	/* new/renew  */
  	if(adat->atype==VTYPE_ARRAY) {	/* allocate num array  */
-	// MESG("	allocate num array");
+
  if(adat->rows >1 && adat->cols>1) {
  	int i,j;
  	if(adat->dval2 != NULL) { 
@@ -113,8 +113,7 @@ void allocate_array(struct array_dat *adat)
 
  	if(adat->dval != NULL) free(adat->dval);
 	if(adat->rows > 1) dim=adat->rows; else dim=adat->cols;
-	// MESG("allocate_array: dim=%d",dim);
- 	adat->dval=(double *)malloc(sizeof(double)*(dim));
+ 	adat->dval=(double *)malloc(sizeof(double)*dim);
 	for(i=0;i<dim;i++) adat->dval[i]=0;
  };
 
@@ -857,7 +856,6 @@ void print_array1(char *title,array_dat *adat)
 		};		
 	};};
 	out_print("---------------------------------------------",1);
-	MESG("end of print array!");
 }
 
 #if	0
