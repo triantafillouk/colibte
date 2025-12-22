@@ -183,7 +183,9 @@ char *vtype_names[] = {
 
 /* Function definitions */
 #include "mlang_functions.c"
+#if	TBNF
 #include "bnf_expr.c"
+#endif
 
 void delete_type_tree(BTREE *type_tree)
 {
@@ -866,11 +868,13 @@ int check_init(FILEBUF *bf)
 	return bf->err;
  };
  bf->m_mode |= M_CHECKED;
+ check_buffer = ori_buffer;
+#if	TBNF
  bf->tok_bnf_index = 0;
  bf->tok_bnf = bf->tok_table_bnf;
- check_buffer = ori_buffer;
  MESG("! bnf table of [%s] initialized! ------------",bf->b_fname);
  if(bnf_debug() && check_buffer==NULL) exit(0);
+#endif
  return(0);
 }
 
@@ -1005,7 +1009,9 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	MVAR *old_symbol_table=current_stable;
 	// MESG("exec_function:2");
 	tok=bp->tok_table;	/* start of function  */
+#if	TBNF
 	bp->tok_bnf_index=0;
+#endif
 	// MESG("exec_function: first token is [%s] type=%d",tok->tname,tok->ttype);
 	current_stable=new_symbol_table(bp->symbol_tree->items+nargs);	/* create new symbol table  */
 

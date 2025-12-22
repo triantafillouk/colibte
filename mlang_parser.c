@@ -1133,12 +1133,12 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
  if(bf->tok_table_bnf != NULL) {
  	free(bf->tok_table_bnf);
  };
-#endif
- tok_table=(void *)malloc(sizeof(struct tok_struct)*table_size);
- bf->tok_table = (void *) tok_table;
  bf->tok_table_bnf=(void *)malloc(sizeof(struct tok_struct)*table_size);
  bf->tok_bnf_index=0;
  bf->tok_bnf = bf->tok_table_bnf;
+#endif
+ tok_table=(void *)malloc(sizeof(struct tok_struct)*table_size);
+ bf->tok_table = (void *) tok_table;
  MESG("-----------> set_tok_table: bf=[%s]",bf->b_fname);
  lbegin(lex_parser);
  tlist=lex_parser;

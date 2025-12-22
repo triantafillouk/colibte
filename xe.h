@@ -699,9 +699,11 @@ typedef struct  FILEBUF {
 // Macro language sructures
 	struct tok_struct *tok_table;
 	struct tok_struct *end_token;	/* the last (EOF) token in tok_table  */
+#if	TBNF
 	struct tok_struct *tok_table_bnf;
 	int tok_bnf_index;
 	struct tok_struct *tok_bnf;
+#endif
 	int err;	/* negative if not syntax checked  */
 	BTREE *symbol_tree;	/* local symbol table  */
 	struct alist *type_list;	/* type table list  */
