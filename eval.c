@@ -611,7 +611,6 @@ double compute_string(char *s,char *new_string)
 	fp->b_flag |= FSINVS;
 	EmptyText(fp);
  	init_error();
-	initialize_vars();
 	insert_string(fp,s,strlen(s));
 	// MESG("compute_string [%s]",s);
 	fp->b_type=1;

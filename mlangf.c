@@ -540,7 +540,6 @@ double uf_dinput()
 double uf_init()
 {
 	ntoken();
-	initialize_vars();
 	return 0;
 }
 

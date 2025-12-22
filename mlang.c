@@ -194,6 +194,25 @@ void delete_type_tree(BTREE *type_tree)
 
 array_dat *transpose(array_dat *array1);
 
+void init_vars(MVAR *head,int size)
+{
+ // initialize as numeric
+#if	1
+ MVAR *tdp,*tdp_end=head+size;
+ for(tdp=head;tdp<tdp_end;tdp++) {
+ 	tdp->var_type=VTYPE_NUM;
+	tdp->dval=0;
+ };
+#else
+ int i=0;
+ for(;i<size;i++) {
+	// td[i].var_index=i;
+ 	head[i].var_type=VTYPE_NUM;
+	head[i].dval=0;
+ };
+#endif
+}
+
 #if	USE_CALL_STACK
 void initialize_call_stack(int initial_size)
 {
@@ -620,12 +639,6 @@ void init_hash()
  init_common();
 }
 
-void initialize_vars()
-{
- // MESG("initialize_vars");
-}
-
-
 /* test if a file is macro lanuage ...  */
 int is_mlang(FILEBUF *fp)
 {
@@ -684,14 +697,19 @@ MVAR *new_symbol_table(int size)
 #else
  MVAR *td=malloc(sizeof(struct MVAR)*(size+1));
 #endif
- int i;
+
  // MESG("Initialize new_symbol_table: size %d",size);
  if(td==NULL) { err_num=101;return NULL;};
+#if	1
+ init_vars(td,size);
+#else
+ int i;
  for(i=0;i<size;i++) {
 	// td[i].var_index=i;
  	td[i].var_type=VTYPE_NUM;
 	td[i].dval=0;
  };
+#endif
  return td;
 }
 
@@ -710,6 +728,10 @@ MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
  td=realloc(td,sizeof(struct MVAR)*(size+1));
  if(td==NULL) { err_num=101;return NULL;};
 #endif
+
+#if	1
+ init_vars(td+old_size,size-old_size);
+#else
  int i;
  // MESG("realloc_symbol_table: size %d",size);
  for(i=old_size;i<size;i++) {
@@ -717,6 +739,7 @@ MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
  	td[i].var_type=VTYPE_NUM;
 	td[i].dval=0;
  };
+#endif
  return td;
 }
 
@@ -959,10 +982,14 @@ MVAR * push_args_1(int nargs,int vars_num)
 	// exit(0);
 	NTOKEN2; // skip separator or right parenthesis!
  };
+#if	1
+ init_vars(va_i,nargs+vars_num);
+#else
  for(;va_i<va+nargs+vars_num;va_i++){
  	va_i->var_type=VTYPE_NUM;
 	va_i->dval=0;
  };
+#endif
 	// MESG(">	push_args_1:end [%s]",tok_info(tok));
  };
  return(va);
