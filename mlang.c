@@ -1012,14 +1012,7 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 #endif
 	// MESG("exec_function: first token is [%s] type=%d",tok->tname,tok->ttype);
 	current_stable=new_symbol_table(bp->symbol_tree->items+nargs);	/* create new symbol table  */
-#if	0
-	if(current_stable==NULL) { 
-		err_num=208;
-		ERROR("cannot create new symbol table!");
-		set_break();
-		return 0;
-	};
-#endif
+
 	assign_args1(vargs,current_stable,nargs);
 	// MESG("exec_function: after assign_args1 [%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
 	value=tok->directive();
@@ -1822,17 +1815,12 @@ double factor_proc()
 	MVAR *old_symbol_table=current_stable;
 	current_stable = push_args_1(tok0->t_nargs,exe_buffer->symbol_tree->items);
 	// show_vars(current_stable,exe_buffer->symbol_tree->items+tok0->t_nargs,"after push_args");
-#if	0	
+#if	!CALL_STACK	
 	if(current_stable==NULL) { set_error(tok,1001,"factor_proc: error end");return 0;};
 #endif
 	after_proc=tok;
 	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
-#if	1
-	tok = exe_buffer->tok_table + tok0->t_nargs+2;
-	value = tok->directive();
-#else	
-	value=exec_function(exe_buffer,vargs,tok0->t_nargs);
-#endif
+	value=exec_function(exe_buffer,current_stable,tok0->t_nargs);
 	// MESG("factor_proc: return val=%f",value);
 	if(err_num) { tok=exe_buffer->end_token; return 0;};
 	tok=after_proc;
@@ -2808,9 +2796,10 @@ int assign_args1(MVAR *va,MVAR *symbols,int nargs)
 	// MESG("assign_args1: pos1 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
 	for(i=0;i<nargs;i++) {
 		memcpy(symbols+tok->tind,va++,sizeof(MVAR));
+		// MESG("assign_args: %d type=%d v=%f",(symbols+tok->tind)->var_type,(symbols+tok->tind)->dval);
 		// MESG("assign_args1:arg %d: pos3 after args tok=[%s] %d",i,tok->tname,tok->ttype);
 		NTOKEN2;	/* skip separator or end parenthesis */
-		// if(tok->ttype==TOK_RPAR) break;
+		if(tok->ttype==TOK_RPAR) break;
 		NTOKEN2;
 	};
  NTOKEN2;
