@@ -686,7 +686,7 @@ int err_factor()
 		// MESG("	err: CREATED new array %d [%d %d]",tok0->tok_adat->anum,rows,cols);
 		NTOKEN_ERR(4789)
 		// MESG("	token after array: %s",tok_info(tok));
-		if(tok->ttype!=TOK_SEP) {
+		if(tok->ttype!=TOK_SEP && tok->ttype!=TOK_EOF) {
 			xpos=4789;
 			set_error(tok,xpos,"missing separator after array declare");
 		};

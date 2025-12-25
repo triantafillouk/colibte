@@ -1005,7 +1005,6 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	double value=0;
 	// MESG("exec_function: bp=[%s] nargs=%d level=%d",bp->b_fname,nargs,level);
 	MVAR *old_symbol_table=current_stable;
-	// MESG("exec_function:2");
 	tok=bp->tok_table;	/* start of function  */
 #if	TBNF
 	bp->tok_bnf_index=0;
@@ -1021,8 +1020,6 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	delete_symbol_table(current_stable,bp->symbol_tree->items,nargs);
 	current_stable=old_symbol_table;
 
-	// MESG("exec_function: before clear_args");
-	// clear_args(vargs,nargs);	/* allocated args already cleared above in delete_symbol_table! */
 	return(value);
 }
 
@@ -2788,7 +2785,7 @@ double assign_val(double none)
 	};
 }
 
-int assign_args1(MVAR *va,MVAR *symbols,int nargs)
+void  assign_args1(MVAR *va,MVAR *symbols,int nargs)
 {
  // MESG("assign_args1: va!=symbols! ++++++++++");
  NTOKEN2; /* skip name */
@@ -2798,13 +2795,12 @@ int assign_args1(MVAR *va,MVAR *symbols,int nargs)
 		memcpy(symbols+tok->tind,va++,sizeof(MVAR));
 		// MESG("assign_args: %d type=%d v=%f",(symbols+tok->tind)->var_type,(symbols+tok->tind)->dval);
 		// MESG("assign_args1:arg %d: pos3 after args tok=[%s] %d",i,tok->tname,tok->ttype);
-		NTOKEN2;	/* skip separator or end parenthesis */
+		NTOKEN2;	/* arg */
 		if(tok->ttype==TOK_RPAR) break;
-		NTOKEN2;
+		NTOKEN2;	/* skip separator  */
 	};
- NTOKEN2;
+ NTOKEN2;	/* skip right parenthesis  */
  // MESG("assign_args1: end! pos5 after args tok=[%s] %d",tok->tname,tok->ttype);
- return(1);
 }
 
 #include "mlang_parser.c"

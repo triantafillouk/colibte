@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.7T35 (24/12/2025)"
+#define VERSION 	 "#01.7T36 (25/12/2025)"
 
 
 // merged from kle4 #776T46 (28/7/2022)
