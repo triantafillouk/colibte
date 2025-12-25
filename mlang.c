@@ -698,20 +698,11 @@ MVAR *new_symbol_table(int size)
  }
 #else
  MVAR *td=malloc(sizeof(struct MVAR)*(size+1));
+ if(td==NULL) { err_num=101;return NULL;};
 #endif
 
  // MESG("Initialize new_symbol_table: size %d",size);
- if(td==NULL) { err_num=101;return NULL;};
-#if	1
  init_vars(td,size);
-#else
- int i;
- for(i=0;i<size;i++) {
-	// td[i].var_index=i;
- 	td[i].var_type=VTYPE_NUM;
-	td[i].dval=0;
- };
-#endif
  return td;
 }
 
@@ -731,17 +722,7 @@ MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
  if(td==NULL) { err_num=101;return NULL;};
 #endif
 
-#if	1
  init_vars(td+old_size,size-old_size);
-#else
- int i;
- // MESG("realloc_symbol_table: size %d",size);
- for(i=old_size;i<size;i++) {
-	// td[i].var_index=i;
- 	td[i].var_type=VTYPE_NUM;
-	td[i].dval=0;
- };
-#endif
  return td;
 }
 
@@ -937,11 +918,6 @@ int check_token(int type)
 
 MVAR * push_args_1(int nargs,int vars_num)
 {
- int i=0;
-
- double value=0;
- MVAR *va=NULL;
-
  TDS("push_args");
 
  err_num=0;
@@ -949,16 +925,18 @@ MVAR * push_args_1(int nargs,int vars_num)
 
  // if(tok->ttype!=TOK_RPAR && nargs!=0)
 #if	USE_CALL_STACK
- va = new_symbol_table(nargs+vars_num);
+ MVAR *va = new_symbol_table(nargs+vars_num);
 #else
- va=(MVAR *) malloc(sizeof(MVAR)*(nargs));
+ MVAR *va=(MVAR *) malloc(sizeof(MVAR)*(nargs));
 #endif
- if(va){
+ if(va==NULL) return NULL;
+
  MVAR *va_i=va;
- for(i=0;i<nargs;i++,va_i++){
-	va_i->var_type=0;
+ for(;va_i<va+nargs;va_i++)
+ {
+	// va_i->var_type=0;
 	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
-	value = num_expression();
+	double value = num_expression();
 	va_i->var_type=get_vtype();
 	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
 	// MESG(";		i=%d, var_type = %d",i,va_i->var_type);
@@ -979,23 +957,16 @@ MVAR * push_args_1(int nargs,int vars_num)
 	} else {
 			ERROR("error: wrong type arg %d",get_vtype());
 			err_num=202;
-			clear_args(va,i); return(NULL);
+			clear_args(va,nargs); return(NULL);
 	}
 
 	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
 	// exit(0);
 	NTOKEN2; // skip separator or right parenthesis!
  };
-#if	1
+
  init_vars(va_i,nargs+vars_num);
-#else
- for(;va_i<va+nargs+vars_num;va_i++){
- 	va_i->var_type=VTYPE_NUM;
-	va_i->dval=0;
- };
-#endif
-	// MESG(">	push_args_1:end [%s]",tok_info(tok));
- };
+ // MESG(">	push_args_1:end [%s]",tok_info(tok));
  return(va);
 }
 
