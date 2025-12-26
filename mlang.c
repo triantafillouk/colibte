@@ -25,7 +25,7 @@
 #define FACTOR_FUNCTION tok->factor_function()
 void mesg_out(const char *fmt, ...);
 extern FILEBUF *cbfp;
-extern array_dat *main_args;
+// extern array_dat *main_args;
 FILEBUF *exe_buffer=NULL;
 FILEBUF *check_buffer=NULL;
 void show_vars(MVAR *va, int size,char *title);
@@ -981,14 +981,15 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 	bp->tok_bnf_index=0;
 #endif
 	// MESG("exec_function: first token is [%s] type=%d",tok->tname,tok->ttype);
-	current_stable=new_symbol_table(bp->symbol_tree->items+nargs);	/* create new symbol table  */
+	int items = bp->symbol_tree->items;
+	current_stable=new_symbol_table(items+nargs);	/* create new symbol table  */
 
 	assign_args1(vargs,current_stable,nargs);
 	// MESG("exec_function: after assign_args1 [%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype);
 	value=tok->directive();
 	// MESG("exec_function: before delete_symbol_table, ex_value=%f",ex_value);
 	/* remove local variable tree and restore the old one  */
-	delete_symbol_table(current_stable,bp->symbol_tree->items,nargs);
+	delete_symbol_table(current_stable,items,nargs);
 	current_stable=old_symbol_table;
 
 	return(value);
@@ -1769,11 +1770,11 @@ double factor_proc()
 	tok_struct *after_proc;
 	tok_struct *tok0=tok;
 	double value;
-	// MESG("factor_proc:----------------");
-	// FILEBUF *cbuf=exe_buffer;
+	FILEBUF *cbuf=exe_buffer;
+	// if(exe_buffer!=tok0->proc_buffer) MESG("factor_proc:------------%s -- %s--",exe_buffer->b_fname,tok0->proc_buffer->b_fname);
 	exe_buffer=tok0->proc_buffer;
 #if	TPROFILE
-	exe_buffer->function_called++;
+	tok0->proc_buffer->function_called++;
 #endif
 	// MESG("factor_proc: cbuf=%s ----------------",cbuf);
 	NTOKEN2;
@@ -1781,25 +1782,25 @@ double factor_proc()
 	// MESG("factor_proc: tok0 [%d %s] args=%d",tok0->tnum,tok0->tname,tok0->tind);
 	// MESG("factor_proc: tok  [%d %s] %d ",tok->tnum,tok->tname,tok->tind);
 	MVAR *old_symbol_table=current_stable;
-	current_stable = push_args_1(tok0->t_nargs,exe_buffer->symbol_tree->items);
+	current_stable = push_args_1(tok0->t_nargs,tok0->proc_buffer->symbol_tree->items);
 	// show_vars(current_stable,exe_buffer->symbol_tree->items+tok0->t_nargs,"after push_args");
 #if	!CALL_STACK	
 	if(current_stable==NULL) { set_error(tok,1001,"factor_proc: error end");return 0;};
 #endif
 	after_proc=tok;
 	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
-	value=exec_function(exe_buffer,current_stable,tok0->t_nargs);
+	value=exec_function(tok0->proc_buffer,current_stable,tok0->t_nargs);
 	// MESG("factor_proc: return val=%f",value);
-	if(err_num) { tok=exe_buffer->end_token; return 0;};
+	if(err_num) { tok=tok0->proc_buffer->end_token; exe_buffer=cbuf; return 0;};
 	tok=after_proc;
 	current_active_flag=1;	/* start checking again  */
 #if	USE_CALL_STACK
-	delete_symbol_table(current_stable,exe_buffer->symbol_tree->items,tok0->t_nargs);
+	delete_symbol_table(current_stable,tok0->proc_buffer->symbol_tree->items,tok0->t_nargs);
 #else
 	free(vargs);
 #endif
 	current_stable=old_symbol_table;
-	// exe_buffer=cbuf;
+	exe_buffer=cbuf;
 	RTRN(value);
 }
 
@@ -2779,7 +2780,6 @@ void  assign_args1(MVAR *va,MVAR *symbols,int nargs)
 // skip next sentence in a list
 void skip_sentence1()
 {
- int plevel=0;
  TDS("skip_sentence1");
  // MESG("skip_sentence: ttype=%d",tok->ttype);
  if(tok->ttype==TOK_LCURL) {
@@ -2788,6 +2788,7 @@ void skip_sentence1()
 		return; 
  };
 
+ int plevel=0;
  for(;tok->ttype!=TOK_EOF;NTOKEN2)
  {
  	// MESG("	skip [%s]",tok_info(tok));
@@ -2847,15 +2848,15 @@ char *ddot_string()
 
 void update_ddot_line(char *ddot_out)
 {
- FILEBUF *old_fp;
+ // FILEBUF *old_fp;
  TextPoint *tp = tok->ddot;
  FILEBUF *buf = tp->fp;
  int dsize=0;
  int is_ddot=0;
  offs ddot_pos=tp_offset(tp);
  offs i,sl,el; // current offset, start,end of line
- old_fp=cbfp;
- sfb(buf);
+ // old_fp=cbfp;
+ // sfb(buf);
  el=FLineEnd(buf,ddot_pos);
  sl=FLineBegin(buf,ddot_pos);
 
@@ -2863,7 +2864,7 @@ void update_ddot_line(char *ddot_out)
  ddot_pos=el-sl;
 	for(i=sl;i<el;i++) {
 		if(FCharAt(buf,i)==':') { 
-			is_ddot=!(cbfp->b_state & FS_VIEW);
+			is_ddot=!(buf->b_state & FS_VIEW);
 			ddot_pos=i-sl+1;break;};
 	};
  
@@ -2871,13 +2872,13 @@ void update_ddot_line(char *ddot_out)
  textpoint_set(buf->tp_current,sl+ddot_pos);
  if(is_ddot) DeleteBlock(buf,0,dsize-ddot_pos);
 
- insert_string(buf,ddot_out,strlen(ddot_out));
  if(err_num>0) {
- 	insert_string(cbfp," ,err ",6);
-	if(err_str!=NULL) insert_string(cbfp,err_str,strlen(err_str));
- };
- //free(ddot_out);
- sfb(old_fp);
+ 	insert_string(buf," ,err ",6);
+	if(err_str!=NULL) insert_string(buf,err_str,strlen(err_str));
+ } else {
+	insert_string(buf,ddot_out,strlen(ddot_out));
+ }
+ // sfb(old_fp);
 }
 
 void refresh_ddot_1(double value)
@@ -3029,7 +3030,7 @@ double tok_dir_for()
 		};
 //		MESG("before next loop: val=%f",val);		
 	};
-	if(is_break1) { tok=cbfp->end_token;return(0);};
+	if(is_break1) { tok=exe_buffer->end_token;return(0);};
 	tok=end_block;
 	current_active_flag=old_active_flag;
 //	MESG("-- end for loop: active = %d",current_active_flag);	
@@ -3084,7 +3085,7 @@ double tok_dir_fori()
 			tok=start_block;
 			tok->directive();
 			if(current_active_flag==0) {
-				if(is_break1) { tok=cbfp->end_token;return(0);};
+				if(is_break1) { tok=exe_buffer->end_token;return(0);};
 				break;
 			};
 		};
@@ -3093,14 +3094,13 @@ double tok_dir_fori()
 			tok=start_block;
 			tok->directive();
 			if(current_active_flag==0) {
-				if(is_break1) { tok=cbfp->end_token;return(0);};
+				if(is_break1) { tok=exe_buffer->end_token;return(0);};
 				break;
 			};
 		};
 	} else {
 		err_num=226;
 		ERROR("error: infinite fori loop %d",err_num);
-		tok=end_block;
 	};
 	tok=end_block;
 	current_active_flag=old_active_flag;
@@ -3139,7 +3139,7 @@ double tok_dir_while()
 			tok=start_block;
 			tok->directive();
 			if(current_active_flag==0) {	/* only after break  */
-				// if(is_break1) { tok=cbfp->end_token;return(0);};
+				// if(is_break1) { tok=tok->fp->end_token;return(0);};
 				break;
 			};
 		} else {
@@ -3177,7 +3177,7 @@ double exec_block1(FILEBUF *fp)
 	};
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
  	val=tok->directive();
-	if(ex_var.var_type==1) ex_var.dval=val;
+	if(ex_var.var_type==VTYPE_NUM) ex_var.dval=val;
 	if(!current_active_flag) break;
    };
    // MESG("exec_block1: end!");
@@ -3322,6 +3322,7 @@ int refresh_current_buffer(num nused)
 {
  double val=0;
  FILEBUF *fp=cbfp;
+ exe_buffer=cbfp;
  num curline = tp_line(cwp->tp_current);
 
  if(!is_mlang(fp)) return 0;
