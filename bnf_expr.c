@@ -18,19 +18,6 @@ void bnf_stack_init()
 	value=0;
 }
 
-void stack_push(char *title,tok_struct *tok)
-{
-#if	0
- static int ind=0;
- if(no_push) { MESG("stack_push:%s skip %s",title,tok_info(tok));return;};
- if(tok!=NULL) {
- memcpy((void *)check_buffer->tok_bnf,(void *)tok,sizeof(tok_struct));
- check_buffer->tok_bnf++;
- check_buffer->tok_bnf_index++;
- MESG("P[%10s] %3d %-15s :%s %s",check_buffer->b_fname,ind++,tok->tname,title,tok_info(tok));
- } else MESG("P [%s] null token!!!",title);
-#endif
-}
 
 double bnf_not()
 {

@@ -18,7 +18,8 @@
 
 #define	SYNTAX_DEBUG	0
 #if	1
-#define NTOKEN2 tok++
+#define NTOKEN2 ntoken2()
+// #define NTOKEN2 tok++
 #else
 #define	NTOKEN2	ntoken2()
 #endif
@@ -111,7 +112,7 @@ static int err_line=0;
 int last_correct_line=0;
 
 static tok_struct *tok;	/* current token!!  */
-void ntoken2() { tok++;MESG("NTOKEN");};
+void ntoken2() { tok++;};
 
 char *err_str;
 BTNODE *var_node=NULL;
@@ -186,6 +187,20 @@ char *vtype_names[] = {
 #if	TBNF
 #include "bnf_expr.c"
 #endif
+
+void stack_push(char *title,tok_struct *tok)
+{
+#if	TBNF
+ static int ind=0;
+ if(no_push) { MESG("stack_push:%s skip %s",title,tok_info(tok));return;};
+ if(tok!=NULL) {
+ // memcpy((void *)check_buffer->tok_bnf,(void *)tok,sizeof(tok_struct));
+ // check_buffer->tok_bnf++;
+ // check_buffer->tok_bnf_index++;
+ MESG("P[%10s] %3d %-15s :%s %s",check_buffer->b_fname,ind++,tok->tname,title,tok_info(tok));
+ } else MESG("P [%s] null token!!!",title);
+#endif
+}
 
 void delete_type_tree(BTREE *type_tree)
 {
@@ -1809,17 +1824,17 @@ double cexpr_notequal(double v1,double v2)
  return v1!=v2 ? 1.0:0.0;
 }
 
-double cexpr_smaller(double v1,double v2)
+static inline double cexpr_smaller(double v1,double v2)
 {
  return v1<v2 ? 1.0: 0.0;
 }
 
-double cexpr_bigger(double v1,double v2)
+static inline double cexpr_bigger(double v1,double v2)
 {
  return v1>v2 ? 1.0: 0.0;
 }
 
-double cexpr_equal(double v1,double v2)
+static inline double cexpr_equal(double v1,double v2)
 {
  return v1==v2 ? 1.0: 0.0;
 }
@@ -1950,6 +1965,11 @@ static double term1_mul(double v1)
 			set_sval(news);
 			// MESG("ok!");
 			return v2;
+		};
+		if(vtype_is(VTYPE_STRING)) {
+			syntax_error("cannot multiply str * str!",2102);
+			set_break();
+			return(0);
 		};
 	};
 	if(vtype_is(VTYPE_ARRAY)){
@@ -2176,19 +2196,25 @@ FFunction factor_funcs[] = {
 
 void set_tok_function(tok_struct *tok, int type)
 {
-	// MESG("set_tok_function: %s",tok_info(tok));
+	MESG("set_tok_function: type=%d",type);
+	MESG("set_tok_function: %s",tok_info(tok));
+	if(tok==NULL) MESG("set_tok_function: NULL! token");
 	switch(type) {
 		case 0:
+			MESG("	type 0");
 			if(tok->ttype==TOK_FUNC) {
+				if(tok->tok_node==NULL) { set_error(tok,3003,"tok_node is null!");
+				return;};
 				int findex = tok->tok_node->node_index;
-				// MESG(" F tok %2d: %s type [%d %s] set factor function %d",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype],findex);
+				MESG(" F tok %2d: %s type [%d -s] set factor function %d",tok->tnum,tok->tname,tok->ttype,findex);
 				tok->factor_function = m_functions[findex].ffunction;
 			} else {
 	 			tok->factor_function = factor_funcs[tok->ttype];
-				// MESG(" f tok %2d: %s type [%d %s] set factor function",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype]);
+				MESG(" f tok %2d: %s type [%d -s] set factor function",tok->tnum,tok->tname,tok->ttype);
 			};
 			break;
 		case 1:
+			MESG("	type 1");
 			tok->cexpr_function = (EFunction)factor_funcs[tok->ttype];
 			// MESG(" c tok %2d: %s type [%d %s] set cepr function",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype]);
 

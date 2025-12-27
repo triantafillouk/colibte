@@ -525,7 +525,7 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 #if	DEBUG1
  int save_stage_level=stage_level;
 #endif
-	tok_struct *tok_latest=NULL;
+	// tok_struct *tok_latest=NULL;
  	// MESG("err_exec_funtion: %s",name);
     FILEBUF *bp;		/* ptr to buffer to execute */
     char bufn[MAXFLEN+2];		/* name of buffer to execute */
@@ -559,7 +559,7 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 	};
 	/* and now execute it as asked */
 	// MESG("err_exec_function: call check_init");
-	tok_latest=tok;
+	// tok_latest=tok;
 	if((check_init(bp))>0) {
 		ERROR("found syntax errors in function!");
 		RT_MESG1(464);
@@ -567,17 +567,16 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 #if	DEBUG1
 	stage_level=save_stage_level;
 #endif
-	tok=tok_latest;
+	// tok=tok_latest;
 
 	tok=bp->tok_table;
 	no_push=1;
 	err_num=err_assign_args1(nargs);
+	tok=bp->tok_table;
 	no_push=0;
 	CHECK_TOK(466);
 
-	tok=tok_latest;
-	NTOKEN2;
-	NTOKEN2;
+	// tok=tok_latest;
 	err_num=err_check_sentence1();
 	// MESG("err_exec_func: err_num=%d",err_num);
 	RT_MESG1(467);
