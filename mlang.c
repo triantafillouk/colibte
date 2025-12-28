@@ -125,12 +125,11 @@ MVAR *lmvar=NULL;
 int firt_var=1;
 MVAR *current_stable=NULL; 	/* current symbol table ...  */
 
-#if	USE_CALL_STACK
+// CALL_STACK variables
 MVAR *call_stack;
 MVAR *call_stack_used;
 MVAR *max_call_stack_end;
 MVAR *call_stack_available;
-#endif
 
 int show_stage=0;
 int xpos=0;		/* stage position  */
@@ -230,7 +229,6 @@ void init_vars(MVAR *head,int size)
 #endif
 }
 
-#if	USE_CALL_STACK
 void initialize_call_stack(int initial_size)
 {
 	MESG("Initialize call_stack with %d size",initial_size);
@@ -240,7 +238,6 @@ void initialize_call_stack(int initial_size)
 	call_stack_available=call_stack+initial_size;
 	// fprintf(stderr,"	initial call_stack=%p\n",(void *)call_stack);
 }
-#endif
 
 #if	USE_CALL_STACK0
 // Not used, realloc_call_stack is difficult to implement. All previous positions must be reassigned!!!
@@ -288,12 +285,8 @@ void clear_args(MVAR *va,int nargs)
 	 		free(va[i].sval);
 		}
 	 };
-#if	USE_CALL_STACK
 	call_stack_used -= nargs;
 	// MESG("clear_args: call_stack=%lld upto %lld",call_stack_used-call_stack,call_stack_used-call_stack+nargs);
-#else
-	 free(va);
-#endif
 }
 
 void clean_saved_string(int new_size)
@@ -688,7 +681,6 @@ int is_mlang(FILEBUF *fp)
 
 MVAR *new_symbol_table(int size)
 {
-#if	USE_CALL_STACK
  // MESG("Initialize new_symbol_table: size %d",size);
  MVAR *td=call_stack_used;
  // MESG("		new symbol table starts at ind=%d",td-call_stack);
@@ -711,10 +703,6 @@ MVAR *new_symbol_table(int size)
 		return NULL;
 	};
  }
-#else
- MVAR *td=malloc(sizeof(struct MVAR)*(size+1));
- if(td==NULL) { err_num=101;return NULL;};
-#endif
 
  // MESG("Initialize new_symbol_table: size %d",size);
  init_vars(td,size);
@@ -723,19 +711,15 @@ MVAR *new_symbol_table(int size)
 
 MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
 {
-#if	USE_CALL_STACK
-	MESG("realloc_symbol_table: ---------------");
+  MESG("realloc_symbol_table: ---------------");
   call_stack_used += size-old_size;
  if(max_call_stack_end<call_stack_used) {
  	max_call_stack_end=call_stack_used;
 	if(call_stack_used>call_stack_available) {
-		printf("call_stack limit overflow: %ld",call_stack_used-call_stack);
+		fprintf(stderr,"call_stack limit overflow: %ld",call_stack_used-call_stack);
+		quit(true);
 	};
  };
-#else
- td=realloc(td,sizeof(struct MVAR)*(size+1));
- if(td==NULL) { err_num=101;return NULL;};
-#endif
 
  init_vars(td+old_size,size-old_size);
  return td;
@@ -761,14 +745,10 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 		};
 	};
  };
-#if	USE_CALL_STACK
  // MESG("delete_symbol_table from: %lld",call_stack_used-call_stack);
  call_stack_used -= size+nargs;
  // MESG("delete_symbol_table: call_stack=%lld upto %lld",call_stack_used-call_stack,call_stack_used-call_stack+nargs+size-1);
  // MESG("                    at  : %lld",call_stack_used-call_stack);
-#else
- free(td);
-#endif
 }
 
 /* double equality */
@@ -939,11 +919,7 @@ MVAR * push_args_1(int nargs,int vars_num)
  // MESG("push_args:< args=%d",nargs);
 
  // if(tok->ttype!=TOK_RPAR && nargs!=0)
-#if	USE_CALL_STACK
  MVAR *va = new_symbol_table(nargs+vars_num);
-#else
- MVAR *va=(MVAR *) malloc(sizeof(MVAR)*(nargs));
-#endif
  if(va==NULL) return NULL;
 
  MVAR *va_i=va;
@@ -1782,10 +1758,9 @@ static inline double factor_not()
 
 double factor_proc()
 {
-	tok_struct *after_proc;
 	tok_struct *tok0=tok;
-	double value;
 	FILEBUF *cbuf=exe_buffer;
+
 	// if(exe_buffer!=tok0->proc_buffer) MESG("factor_proc:------------%s -- %s--",exe_buffer->b_fname,tok0->proc_buffer->b_fname);
 	exe_buffer=tok0->proc_buffer;
 #if	TPROFILE
@@ -1799,21 +1774,16 @@ double factor_proc()
 	MVAR *old_symbol_table=current_stable;
 	current_stable = push_args_1(tok0->t_nargs,tok0->proc_buffer->symbol_tree->items);
 	// show_vars(current_stable,exe_buffer->symbol_tree->items+tok0->t_nargs,"after push_args");
-#if	!CALL_STACK	
-	if(current_stable==NULL) { set_error(tok,1001,"factor_proc: error end");return 0;};
-#endif
-	after_proc=tok;
+
+	tok_struct *after_proc=tok;
 	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
-	value=exec_function(tok0->proc_buffer,current_stable,tok0->t_nargs);
+	double value=exec_function(tok0->proc_buffer,current_stable,tok0->t_nargs);
 	// MESG("factor_proc: return val=%f",value);
 	if(err_num) { tok=tok0->proc_buffer->end_token; exe_buffer=cbuf; return 0;};
 	tok=after_proc;
 	current_active_flag=1;	/* start checking again  */
-#if	USE_CALL_STACK
 	delete_symbol_table(current_stable,tok0->proc_buffer->symbol_tree->items,tok0->t_nargs);
-#else
-	free(vargs);
-#endif
+
 	current_stable=old_symbol_table;
 	exe_buffer=cbuf;
 	RTRN(value);
@@ -2196,25 +2166,25 @@ FFunction factor_funcs[] = {
 
 void set_tok_function(tok_struct *tok, int type)
 {
-	MESG("set_tok_function: type=%d",type);
-	MESG("set_tok_function: %s",tok_info(tok));
-	if(tok==NULL) MESG("set_tok_function: NULL! token");
+	// MESG("set_tok_function: type=%d",type);
+	// MESG("set_tok_function: %s",tok_info(tok));
+	// if(tok==NULL) MESG("set_tok_function: NULL! token");
 	switch(type) {
 		case 0:
-			MESG("	type 0");
+			// MESG("	type 0");
 			if(tok->ttype==TOK_FUNC) {
 				if(tok->tok_node==NULL) { set_error(tok,3003,"tok_node is null!");
 				return;};
 				int findex = tok->tok_node->node_index;
-				MESG(" F tok %2d: %s type [%d -s] set factor function %d",tok->tnum,tok->tname,tok->ttype,findex);
+				// MESG(" F tok %2d: %s type [%d -s] set factor function %d",tok->tnum,tok->tname,tok->ttype,findex);
 				tok->factor_function = m_functions[findex].ffunction;
 			} else {
 	 			tok->factor_function = factor_funcs[tok->ttype];
-				MESG(" f tok %2d: %s type [%d -s] set factor function",tok->tnum,tok->tname,tok->ttype);
+				// MESG(" f tok %2d: %s type [%d -s] set factor function",tok->tnum,tok->tname,tok->ttype);
 			};
 			break;
 		case 1:
-			MESG("	type 1");
+			// MESG("	type 1");
 			tok->cexpr_function = (EFunction)factor_funcs[tok->ttype];
 			// MESG(" c tok %2d: %s type [%d %s] set cepr function",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype]);
 

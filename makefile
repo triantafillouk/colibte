@@ -63,6 +63,7 @@ LIBLM=
 CC=zig cc -DGVERS='"$(GVERS)"'
 #CC=clang -DGVERS='"$(GVERS)"'
 #CC=gcc-mp-14 -DGVERS='"$(GVERS)"'
+#sudo codesign --force --sign - /usr/local/bin/e
 endif
 
 # for Linux

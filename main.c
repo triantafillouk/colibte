@@ -120,10 +120,7 @@ int main(int argc, char **argv)
 
 	load_config();
 	parse_command_line(argc,argv);
-#if	USE_CALL_STACK
 	initialize_call_stack((int)bt_dval("call_stack_size"));
-	// initialize_call_stack(16);
-#endif
 	if(firstbp==NULL && !execmd) {
 		// scratch_files[0] = load_scratch_files();
 		firstbp=get_scratch_file();
