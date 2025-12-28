@@ -566,7 +566,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 				// MESG("TOK_SEP: 1");
 				break;
 			};
-
+			break;
 		case TOK_NL: 
 			tok_line++;
 			// MESG("		line %d [%c]",tok_line,cc);

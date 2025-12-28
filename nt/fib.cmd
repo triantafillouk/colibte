@@ -32,4 +32,5 @@ show_time("fib1" ,1);
 print("result for fib2_inner "+fib2_inner(0 ,1 ,fib_num))
 show_time("fib2_inner" ,1);
 show_time("end " ,2)
+for(i=100;i<1000;i+=100) print("fib2_inner(",i,")=",fib2_inner(0 ,1 ,i))
 

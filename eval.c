@@ -184,9 +184,12 @@ double get_env(int vnum)
 	/* fetch the appropriate value */
 	if(cbfp == NULL) return(0.0);
 	switch (vnum) {
-		case EVCFNAME:	strlcpy(svalue,cbfp->b_fname,MAXLLEN);
+		case EVCFNAME:	
+			strlcpy(svalue,cbfp->b_fname,MAXLLEN);
+			svalue[strlen(svalue)-1]=0;
 			break;
-		case EVCDNAME:	strlcpy(svalue,cbfp->b_dname,MAXLLEN);
+		case EVCDNAME:	
+			strlcpy(svalue,cbfp->b_dname,MAXLLEN);
 			break;
 		case EVCBFLAG:	v1 = cbfp->b_flag; break;
 		case EVSTARTDIR: strlcpy(svalue,get_start_dir(),MAXLLEN);
@@ -226,7 +229,8 @@ double get_env(int vnum)
 			v1=tabsize;
 			break;
 		case EVVERSION:
-			strlcpy(svalue,VERSION,MAXLLEN);break;
+			strlcpy(svalue,VERSION,MAXLLEN);
+			break;
 		default:
 			ERROR("GET_ENV: Not a valid function err=503");
 			return value;
@@ -777,7 +781,7 @@ int dofile(char *fname)
 	/* go execute it! */
 	int backup_caf=current_active_flag;
 	double d = compute_block(bp,bp,1);
-	MESG("dofile: after compute_block:");
+	// MESG("dofile: after compute_block:");
 	if(err_num>0) return (FALSE);
 	init_error();
 	set_vdval(d);

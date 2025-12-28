@@ -2778,12 +2778,13 @@ void skip_sentence1()
 {
  TDS("skip_sentence1");
  // MESG("skip_sentence: ttype=%d",tok->ttype);
+#if	1
  if(tok->ttype==TOK_LCURL) {
 		tok=tok->match_tok; 
 		NTOKEN2;
 		return; 
  };
-
+#endif
  int plevel=0;
  for(;tok->ttype!=TOK_EOF;NTOKEN2)
  {
@@ -3005,7 +3006,11 @@ double tok_dir_for()
 	start_block=tok;
 
 	// find token after the end of block
+#if	0
+	tok=tok->match_tok;NTOKEN2;
+#else
 	skip_sentence1();
+#endif
 	end_block=tok;
 
 	// while(!is_break1) 
@@ -3061,13 +3066,17 @@ double tok_dir_fori()
 
 	dstep=num_expression();
 	// MESG("fori: from %f to %f step %f",dinit,dmax,dstep);
-	if(tok->ttype!=TOK_RPAR) { err_num=226;ERROR("for i: error %d",err_num);};
+	//if(tok->ttype!=TOK_RPAR) { err_num=226;ERROR("for i: error %d",err_num);};
 	NTOKEN2;	/* skip right parenthesis  */
 	// set block start
 	start_block=tok;	/* this is a block start or a simple sentence  */
 
 	// find token after the end of block
+#if	1
 	skip_sentence1();
+#else
+	tok=tok->match_tok;NTOKEN2;
+#endif
 	end_block=tok;
 
 	if(dinit==dmax) {
