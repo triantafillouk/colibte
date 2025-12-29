@@ -84,7 +84,7 @@ VAR option_names[] = {
 	{"x11_y",10,NULL},
 	{"x11_width",500,NULL},
 	{"x11_height",300,NULL},
-	{"call_stack_size",512,NULL},
+	{"call_stack_size",32768,NULL},
 	{NULL,0},
 };
 

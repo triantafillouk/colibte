@@ -18,8 +18,8 @@
 
 #define	SYNTAX_DEBUG	0
 #if	1
-#define NTOKEN2 ntoken2()
-// #define NTOKEN2 tok++
+// #define NTOKEN2 ntoken2()
+#define NTOKEN2 tok++
 #else
 #define	NTOKEN2	ntoken2()
 #endif
@@ -30,6 +30,7 @@ extern FILEBUF *cbfp;
 FILEBUF *exe_buffer=NULL;
 FILEBUF *check_buffer=NULL;
 void show_vars(MVAR *va, int size,char *title);
+void set_term_function(tok_struct *tok, TFunction term_function);
 
 #if	SYNTAX_DEBUG
 
@@ -110,9 +111,7 @@ char *ex_name=NULL;	/* variable name of the previous array  */
 int err_num=0;
 static int err_line=0;
 int last_correct_line=0;
-
-static tok_struct *tok;	/* current token!!  */
-void ntoken2() { tok++;};
+static tok_struct *tok=NULL;	/* current token!!  */
 
 char *err_str;
 BTNODE *var_node=NULL;
@@ -359,17 +358,26 @@ double update_val()
 	return(0);
 }
 
+double decrease_by_num()
+{
+	MVAR *sslot=lsslot;
+	double v1=num_expression();
+	sslot->dval -= v1;
+	return(sslot->dval);
+}
+
 double decrease_by()
 {
-	double v1,v0;
+	double v1;
 	MVAR *sslot=lsslot;
+	tok_struct *ptok=tok;
 	TDS("decrease_val");
 	// MESG("decrease_by: ");
 	v1=num_expression();
 	if(sslot->var_type==VTYPE_NUM) {
-		v0=sslot->dval;
-		sslot->dval =v0-v1;
-		return(v0);
+		set_term_function(ptok,(TFunction)decrease_by_num);
+		sslot->dval -= v1;
+		return(sslot->dval);
 	};
 	if(sslot->var_type==VTYPE_ARRAY) {
 		// MESG("	array decrease_by");
@@ -379,11 +387,21 @@ double decrease_by()
 	return(-1);
 }
 
+double increase_by_num()
+{
+	MVAR *sslot=lsslot;
+	double v1=num_expression();
+	sslot->dval += v1;
+	return(sslot->dval);
+}
+
 double increase_by()
 {
 	double v1,v0;
 	MVAR *sslot=lsslot;
 	// MESG("increase_by: slot_index=%d ",sslot->var_index);
+	tok_struct *ptok=tok-1;
+	// MESG("increase_by: tok type=%d",ptok->ttype);
 	int ori_type=lstoken->ttype;
 	tok_struct *lstok=lstoken;
 	if(ori_type!=TOK_VAR) {
@@ -395,6 +413,7 @@ double increase_by()
 
 	if(sslot->var_type==VTYPE_NUM)
 	if(vtype_is(VTYPE_NUM)) {
+		set_term_function(ptok,(TFunction)increase_by_num);
 		sslot->dval += v1;
 		return(sslot->dval);
 	};
@@ -455,11 +474,20 @@ double increase_by()
 
 void sarray_mul1(array_dat *sarray, double factor);
 
+double mul_by_num()
+{
+	MVAR *sslot=lsslot;
+	double v1=num_expression();
+	sslot->dval *= v1;
+	return(sslot->dval);
+}
+
 double mul_by()
 {
 	double v1,v0;
 	// MESG("mul_by:");
 	MVAR *sslot=lsslot;
+	tok_struct *ptok=tok;
 	// TDS("mul_by");
 	int ori_type=lstoken->ttype;
 	tok_struct *ltok = tok;
@@ -467,8 +495,8 @@ double mul_by()
 	v1=num_expression();
 
 	if(sslot->var_type==VTYPE_NUM) {
-		v0=sslot->dval;
-		sslot->dval = v0*v1;
+		set_term_function(ptok,(TFunction)mul_by_num);
+		sslot->dval *= v1;
 		return(sslot->dval);
 	};
 	if(sslot->var_type==VTYPE_ARRAY) {
@@ -1743,7 +1771,7 @@ static inline double factor_plus()
 
 static inline double factor_minus()
 {
-	MESG("factor_minus:");
+	// MESG("factor_minus:");
 	NTOKEN2;
 	return (- FACTOR_FUNCTION);
 }
@@ -1902,11 +1930,20 @@ char *str_cat(char *sval, char *add)
  return sval;
 }
 
+static double term1_mul_num(double v1)
+{
+	NTOKEN2;
+	v1=v1*num_term2();
+	return v1;
+}
+
+
 static double term1_mul(double v1)
 {
  double v2;
  TDS("term1_mul");
- // MESG("term1_mul: ex_vtype=%d",ex_vtype);
+ tok_struct *ptok=tok;
+ // MESG("term1_mul: tok type=%d ind=%d",ptok->ttype,ptok->tind);
 	if(vtype_is(VTYPE_NUM)){
 		NTOKEN2;
 		v2=num_term2();
@@ -1914,6 +1951,7 @@ static double term1_mul(double v1)
 		switch(get_vtype())
 		{
 			case VTYPE_NUM:	// numeric * numeric
+				set_term_function(ptok,term1_mul_num);
 				v1=v1*v2;
 				return v1;
 
@@ -2106,7 +2144,7 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_DIR_FORI	,
 
 	/* bool operators  */
-	factor_none,	// TOK_COMPARE		,
+	factor_none,	// TOK_COMPARE		,33
 	(FFunction)cexpr_notequal,	// TOK_NOTEQUAL	,
 	(FFunction)cexpr_smaller,	// TOK_SMALLER		,	/* <  */
 	(FFunction)cexpr_bigger,	// TOK_BIGGER		,	/* >  */
@@ -2114,7 +2152,7 @@ FFunction factor_funcs[] = {
 	(FFunction)cexpr_smallereq,	// TOK_SMALLEREQ	,	/* <=  */
 	(FFunction)cexpr_biggereq,	// TOK_BIGGEREQ	,	/* >=  */
 
-	factor_none,	// TOK_BOOL		,
+	factor_none,	// TOK_BOOL		,40
 	factor_none,	// TOK_AND			,	/* &  */
 	factor_none,	// TOK_OR			,	/* |  */
 	factor_not,		// TOK_NOT	/* !  */
@@ -2122,14 +2160,14 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_NOR			,	/* !|  */
 	factor_none,	// TOK_XOR			,	/* ^  */
 	/* term operators  */
-	factor_plus,	// TOK_PLUS		,
+	factor_plus,	// TOK_PLUS		,47
 	factor_minus,	// TOK_MINUS		,
 	(FFunction)term2_power,	// TOK_POWER		,	/* ** */
 	(FFunction)term2_modulo,	// TOK_MOD			,	/* %  */
 	(FFunction)term1_mul,	// TOK_MUL			,
 	(FFunction)term1_div,	// TOK_DIV			,
 
-	factor_line_array,	// TOK_LBRAKET		,
+	factor_line_array,	// TOK_LBRAKET		,53
 	factor_error,	// TOK_RBRAKET		,
 	factor_none,	// TOK_SQUOTE		,
 	factor_at,		// TOK_AT			,
@@ -2137,9 +2175,9 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_BQUOTE
 	factor_none,	// TOK_DOLAR		,
 	factor_none,	// TOK_TILDA		,
-	update_val,		// TOK_INCREASE	,
-	update_val,		// TOK_DECREASE	,
-	factor_none,	// TOK_INCREASEBY
+	update_val,		// TOK_INCREASE	,61
+	update_val,		// TOK_DECREASE	,62
+	factor_none,	// TOK_INCREASEBY 63
 	mul_by,			// TOK_MULBY
 	decrease_by,	// TOK_DECREASEBY
 	factor_none,	// TOK_BSLASH		,
@@ -2234,16 +2272,25 @@ static double inline dir_return()
 	return(val);
 }
 
+static inline double term_plus_num(double value)
+{
+	NTOKEN2;
+	return value+num_term1();
+}
 
 double term_plus(double value)
 {
  double d1;
- // MESG("term_plus: value=%f",value);
+ tok_struct *ptok=tok;
+ // MESG("term_plus: value=%f tok type=%d",value,ptok->ttype);
  if(vtype_is(VTYPE_NUM)) {
 	NTOKEN2;
 	d1=num_term1();
 	// MESG("term_plus");
-	if(vtype_is(VTYPE_NUM)) return value+d1;
+	if(vtype_is(VTYPE_NUM)) {
+		set_term_function(ptok,term_plus_num);
+		return value+d1;
+	};
 	if(vtype_is(VTYPE_STRING)) {
 		char svalue[MAXLLEN];
 		int stat;
@@ -2345,14 +2392,24 @@ double term_plus(double value)
  return 0;
 }
 
+double term_minus_num(double value)
+{
+	NTOKEN2;
+	return value-num_term1();
+}
+
 double term_minus(double value)
 {
  double d1;
  if(vtype_is(VTYPE_NUM)) {	/* numeric  !!  */
+	tok_struct *ptok=tok;
 	NTOKEN2;
 	d1=num_term1();
 
-	if(vtype_is(VTYPE_NUM)) return value-d1;
+	if(vtype_is(VTYPE_NUM)) {
+		set_term_function(ptok,term_minus_num);
+		return value-d1;
+	};
 	if(vtype_is(VTYPE_ARRAY)) {
 		array_dat *new_array=get_array("22");
 		if(new_array->astat==ARRAY_LOCAL) {
@@ -2636,18 +2693,31 @@ double assign_env(double none)
 	return(v1);
 }
 
+double assign_val_num(double none)
+{
+	MVAR *sslot=lsslot;
+	double v1=lexpression();
+	sslot->dval=v1;
+	return(v1);
+}
+
 double assign_val(double none)
 {
 	// int stype=get_vtype();
 	TDS("assign_val");
 	
 	// MESG("assign_val: lsslot  [%s] vtype=%d ex_vtype=%d",lstoken->tname,lsslot->var_type);
+	// MESG("assign_val: tok type=%d ind=%d",tok->ttype,tok->tind);
+	tok_struct *ptok = tok-1;
+	// MESG("assign_val: tok type=%d ind=%d",ptok->ttype,ptok->tind);
+
 	tok_struct *lstok=lstoken;
 	MVAR *sslot=lsslot;
 	double v1=lexpression();
 	// MESG("assign_val: after lexpression! slot vtype=%d ex_vtype=%d\n",sslot->var_type,get_vtype());
 	if(vtype_is(sslot->var_type) && vtype_is(VTYPE_NUM)) 
 	{
+		set_term_function(ptok,assign_val_num);
 		sslot->dval=v1;
 		return(v1);
 	};
