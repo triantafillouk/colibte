@@ -1807,7 +1807,7 @@ double factor_proc()
 	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
 	double value=exec_function(tok0->proc_buffer,current_stable,tok0->t_nargs);
 	// MESG("factor_proc: return val=%f",value);
-	if(err_num) { tok=tok0->proc_buffer->end_token; exe_buffer=cbuf; return 0;};
+	// if(err_num) { tok=tok0->proc_buffer->end_token; exe_buffer=cbuf; return 0;};
 	tok=after_proc;
 	current_active_flag=1;	/* start checking again  */
 	delete_symbol_table(current_stable,tok0->proc_buffer->symbol_tree->items,tok0->t_nargs);
@@ -2638,11 +2638,11 @@ double lexpression()
 	tok_struct *tok0=tok;
 	// NTOKEN2
 	// MESG(" -lexpression:3 in loop! [%s] value=%f",tok_info(tok),value);
-	double value1 =tok0->term_function(value);
+	value =tok0->term_function(value);
 	// MESG(" -lexression:4 in loop, result is %f -> %f",value,value1);
 	// NTOKEN2;
 	// set_vtype(VTYPE_NUM);
-	value=value1;
+	// value=value1;
 	// set_vdval(value);
  };
  

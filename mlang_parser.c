@@ -572,7 +572,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			// MESG("		line %d [%c]",tok_line,cc);
 			last_correct_line=tok_line;
 			skip_line1(bf,cc);
-			if(is_now_sep || after_rpar) continue;
+			if(is_now_sep || after_rpar || is_now_curl) continue;
 			is_now_sep=1;
 			tok_type=TOK_SEP;
 			// MESG("TOK_NL->TOK_SEP");

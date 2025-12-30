@@ -6,7 +6,7 @@ print(_time)	:
 show_time("Start fori test loop 1",0)
 
 fori(i=1;101;1){ 
-	fori(j=1;800001;1) { 
+	fori(j=1;800001;1) {
 		l = i*j+32.1;
 		p += l
 	} 
