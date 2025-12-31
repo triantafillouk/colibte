@@ -585,7 +585,7 @@ int	replaces(int query, int next_only, num n)
 	set_list_type(LSRC);
 	if(macro_exec) {
 		nextarg("replace",search_pattern,MAXLLEN,true);
-		num_expression();
+		expression("search");
 		if (gmode_exact_case == 0) {
 			get_uppercase_string(search_pattern,search_pattern);
 		};

@@ -50,7 +50,7 @@ void get_function_args (int number_of_args)
 			tok=current_token();
 			MESG("get_function_args:%d: [%d %s]",i,tok->tnum,tok->tname);
 #endif
-			double value = num_expression();
+			double value = expression("function_args");
 			va[i].var_type=get_vtype();
 			if(vtype_is(VTYPE_STRING)) { 
 				va[i].sval=strdup(get_sval());
@@ -90,7 +90,7 @@ void get_numeric_args (int number_of_args)
 	// MESG("get_numeric_args: %d",number_of_args);
 	for(i=0;i< number_of_args;i++ ) { 
 		ntoken();
-		double value = num_expression();
+		double value = expression("numeric_args");
 		va[i].var_type=get_vtype();
 		va[i].dval=value;
 	};
@@ -101,7 +101,7 @@ double get_numeric_arg ()
 {
 	// MESG("get_numeric_args:");
 	ntoken();
-	double value = num_expression();
+	double value = expression("numeric_arg");
 	set_vtype(VTYPE_NUM);
 	ntoken();
 	return value;
@@ -279,7 +279,7 @@ double uf_print()
 		ntoken();
 		tok=current_token();
 		// MESG("	eval arg %d tnum=%d ttype=%d",i,tok->tnum,tok->ttype);
-		value=num_expression();
+		value=expression("uf_print");
 		// MESG("		val=%f s='%s'",value,get_sval());
 		switch(get_vtype()) {
 			case VTYPE_ARRAY:

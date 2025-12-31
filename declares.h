@@ -384,7 +384,7 @@ char *time2a();
 void getnc() ;
 void getntok(char *var_name);
 
-double num_expression();
+double expression(char *);
 double lexpression();
 double modulo(double value,double factor);
 double lterm1();
