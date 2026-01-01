@@ -203,13 +203,13 @@ void syntax_error(char *description,int err)
 int	err_eval_fun1(tok_struct *tok0,int lpar)
 {
 	TDSERR("eval_fun1");
-	int ia;
-	int ia0;
+	int ia=0;
+	int ia0=0;
 	int f_entry;
 	BTNODE 	*var_node = tok0->tok_node;
 	int fnum = var_node->node_index;
 	ia0=m_functions[fnum].f_args;
-	// MESG("err_eval_fun1: <<  args=%d",ia0);
+	// MESG("err_eval_fun1:lpar=%d <<  f_args=%d",lpar,ia0);
 	// MESG("err_eval_fun1: [%s] args=%d tnum=%d ttype=%d",m_functions[fnum].f_name,ia,tok->tnum,tok->ttype);
 
 	f_entry=entry_mode;
@@ -218,19 +218,27 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 	SHOW_STAGE(401);
 
 	ia=0;
+	// int plevel=0;
+
 	while(1){
+		// if(tok->ttype==TOK_LPAR) {plevel++; NTOKEN_ERR(402); continue;};
 		// MESG("function arg tnum=%d ttype=%d ia=%d",tok->tnum,tok->ttype,ia);
+		// if(tok->ttype==TOK_RPAR) {
+			// if(plevel>0) { plevel--;NTOKEN_ERR(402); continue;};
+		// };
 		if(tok->ttype==TOK_RPAR||tok->ttype==TOK_SEP ||tok->ttype==TOK_EOF) {
 			// MESG("end function parameters");
 			if(tok->ttype==TOK_RPAR) stack_push("eval_function )",tok);
 			break;
 		}
 		if(tok->ttype==TOK_COMMA) {
+			// MESG("	found comma! %s",tok_info(tok));
 			stack_push("eval_function ,",tok);
 			NTOKEN_ERR(403);
 		}
 		ia++;
-		err_num=err_num_expression();
+		// MESG("	ia=%d [%s]",ia,tok_info(tok));
+		err_num=err_lexpression();
 	};
 
 	// Check for correct number of args, this sould not happen!
@@ -851,7 +859,13 @@ int err_factor()
 			};
 			RT_MESG1(486);
 	 	};
-		break;	
+		break;
+#if	1
+	case TOK_EQUAL:
+		NTOKEN_ERR(444);
+		// err_cexpression();
+		RT_MESG1(444);;	
+#endif
 	case TOK_NUM:
 		pre_symbol=0;
 		ex_nums++;
@@ -1222,7 +1236,6 @@ int err_num_expression()
  // set_vtype(VTYPE_NUM);
  // slval[0]=0;
  xpos=561;
-
  SHOW_STAGE(561);
  // MESG("# start expression!");
  err_num = err_num_term1();

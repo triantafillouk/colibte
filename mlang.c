@@ -1725,6 +1725,7 @@ static inline double factor_lpar()
 {
  double value;
  NTOKEN2;
+ // set_vdval(0);
  value = lexpression();
  NTOKEN2;	/* skip corresponding right parenthesis!  */
  return value;
@@ -1829,6 +1830,8 @@ static inline double cexpr_bigger(double v1,double v2)
 
 static inline double cexpr_equal(double v1,double v2)
 {
+ // MESG("cexpr_equal: %f == %f",v1,v2);
+ set_vtype(VTYPE_NUM);
  return v1==v2 ? 1.0: 0.0;
 }
 
@@ -1928,8 +1931,7 @@ char *str_cat(char *sval, char *add)
 static double term1_mul_num(double v1)
 {
 	NTOKEN2;
-	v1=v1*num_term2();
-	return v1;
+	return v1*num_term2();;
 }
 
 
@@ -1947,8 +1949,7 @@ static double term1_mul(double v1)
 		{
 			case VTYPE_NUM:	// numeric * numeric
 				set_term_function(ptok,term1_mul_num);
-				v1=v1*v2;
-				return v1;
+				return v1*v2;
 
 			case VTYPE_ARRAY:	// numeric * array
 				set_array(dup_array_mul1(get_array("9"),v1));
@@ -2259,7 +2260,7 @@ static double inline dir_break()
 }
 
 static double inline dir_return()
-{	double val;
+{	double val=0;
 	NTOKEN2;
 	if(tok->ttype==TOK_SEP || tok->ttype==TOK_RPAR) { val=0;set_vtype(VTYPE_NUM);}
 	else val=lexpression();
@@ -2332,11 +2333,11 @@ double term_plus(double value)
 				long l0;
 				set_vtype(VTYPE_STRING);
 				l0=d1;
-				MESG("s+n %s ",get_sval());
+				// MESG("s+n %s ",get_sval());
 				clean_saved_string(80);
 				if(l0==d1)snprintf(saved_string,80,"%ld",l0);
 				else snprintf(saved_string,80,"%f",d1);
-				MESG("s+n saved_string [%s] svalue=[%s]",saved_string,svalue);
+				// MESG("s+n saved_string [%s] svalue=[%s]",saved_string,svalue);
 				strlcat(svalue,get_sval(),sizeof(svalue));
 				value=0;
 				set_sval(svalue);
@@ -2556,7 +2557,8 @@ static inline double num_expression()
 
 double expression(char *from)
 {
-	return num_expression();
+	// set_vdval(0);
+	return lexpression();
 }
 
 double logical_term2()
@@ -2617,7 +2619,7 @@ double logical_and(double value)
  // MESG("-- logical and: next is [%s] res=%d",tok_info(tok),v2);
  int ires=(value>0) & v2;
  set_dval((double) ires);
- // MESG(">> logical_and:k %f & %d -> %d",value,v2,ires);
+ MESG(">> logical_and: %f & %d -> %d",value,v2,ires);
  	return ires;
 }
 

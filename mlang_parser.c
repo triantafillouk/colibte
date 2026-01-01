@@ -500,13 +500,14 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  int script_active=0;
  tok_struct *array_tok=NULL;
  int skip_token=0;
- // int start_of_line=1;
- MESG("parse_block1: [%s] check if parsed!",bf->b_fname);
+
+ // MESG("parse_block1: [%s] check if parsed!",bf->b_fname);
  // return if already parsed and not forced to parse
  if(bf->tok_table !=NULL && init==0) {
  	check_buffer = buffer_ori;
 	return (0);
  };
+
  // MESG("- Parse block [%s] type=%d <---------------------",bf->b_fname,bf->b_type);
  if(is_mlang(bf)) script_active=1;	/* initial script state  */
 
@@ -875,6 +876,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	if(tok->ttype==TOK_QUOTE) {
 		tok->tname=strdup(nword);
 	};
+#if	0
+	if(tok->ttype==TOK_EQUAL) {
+		tok->tgroup=TOK_COMPARE;
+	};
+#endif
 	if(tok->ttype==TOK_AT) {
 		tok->tname=strdup(nword);
 	};
@@ -1153,10 +1159,10 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
 		tok_to->match_tok = tok_table + tok_to->tcurl->num;
 	};
 	tlist->current=tlist->current->next;
-	MESG(";[%s] %3d: t=[%s] ",bf->b_fname,isize,tok_info(tok));
+	// MESG(";[%s] %3d: t=[%s] ",bf->b_fname,isize,tok_info(tok));
 	isize++;
 	tok_to++;
  };
- MESG("<----------- set_tok_table : end");
+ // MESG("<----------- set_tok_table : end");
  bf->end_token=tok_table+(isize-2);	/* save end token, just before EOF  */
 }
