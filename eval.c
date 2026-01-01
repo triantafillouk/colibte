@@ -689,7 +689,7 @@ int exec_named_function(char *name)
 		return(FALSE);
     };
 	bp->b_type=1;	/* set file type to cmd  */
-
+	init_exec_flags();
 	/* parse the block if not already parsed  */
 	if(bp->m_mode != M_PARSED)
 	parse_block1(bp,NULL,0);	/* do not init if already parsed!  */
