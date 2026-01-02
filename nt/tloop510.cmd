@@ -7,7 +7,7 @@ show_time("Start fori test loop 1",0)
 
 fori(i=1;101;1){ 
 	fori(j=1;800001;1) { p += i*j+32.1	}
-	# show_time("loop:"+i+" p="+p,1);
+	 show_time("loop:"+i+" p="+p,1);
 }
 _time	: 
 #message(_version+" i<"+i+" and j< "+j+" sets p="+p)

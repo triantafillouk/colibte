@@ -9,7 +9,7 @@ extern BTREE *global_types_tree;
 extern char *vtype_names[];
 
 void mesg_out(const char *fmt, ...);
-
+void init_stack();
 tok_struct *current_token();
 void set_vtype(int type);
 int vtype_is(int type);
@@ -535,6 +535,8 @@ double uf_dinput()
 
 double uf_init()
 {
+	MESG("initialize: uf_init");
+	init_stack();
 	ntoken();
 	return 0;
 }

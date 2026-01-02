@@ -190,8 +190,8 @@ void set_error(tok_struct *tok,int err,char *description)
  if(tok==NULL) return;
  tok->ttype=TOK_EOF;
  set_tok_directive(tok,factor_eof);
- tok->tgroup=TOK_EOF;
- tok->ttype=TOK_END;
+ tok->tgroup=TOK_END;
+ tok->ttype=TOK_EOF;
 }
 
 void syntax_error(char *description,int err)

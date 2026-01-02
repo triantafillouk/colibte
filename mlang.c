@@ -756,6 +756,7 @@ MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
  return td;
 }
 
+
 /* free symbol table after execute */
 void delete_symbol_table(MVAR *td, int size,int nargs)
 {
@@ -784,10 +785,12 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 			};
 	};
 	if(sslot->var_type==VTYPE_ARRAY) {
-		// MESG("delete_symbol_table:%d array",i);
+		// MESG("delete_symbol_table:array %s",sslot->adat->array_name);
 		if(sslot->adat!=NULL) {
 			free_array_dat(sslot->adat);
 			free(sslot->adat);
+			sslot->var_type=VTYPE_NUM;
+			sslot->dval=0;
 		};
 	};
  };
@@ -795,6 +798,11 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
  call_stack_used -= size+nargs;
  // MESG("delete_symbol_table: call_stack=%lld upto %lld",call_stack_used-call_stack,call_stack_used-call_stack+nargs+size-1);
  // MESG("                    at  : %lld",call_stack_used-call_stack);
+}
+
+void init_stack()
+{
+	delete_symbol_table(call_stack,call_stack_used-call_stack,0);
 }
 
 /* double equality */
@@ -981,12 +989,17 @@ MVAR * push_args_1(int nargs,int vars_num)
 		// MESG("	arg:%d string [%s]",i,get_sval());
 		va_i->sval=strdup(get_sval());
 		clean_saved_string(0);
-	} else 
+	} 
+#if	0
+	else 
 	if(vtype_is(VTYPE_ARRAY)||vtype_is(VTYPE_SARRAY)||vtype_is(VTYPE_AMIXED)) {
 			va_i->adat=get_array("1");
 			// MESG("	arg:%d array type %d",i,va_i->adat->atype);
 			// MESG("	pushed array type=%d stat=%d",va_i->var_type,va_i->adat->astat);
-	} else {
+	}
+#endif
+	else {
+		// just copy the pointer to real data
 		memcpy(va_i,&ex_var,sizeof(MVAR));
 	}
 	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
@@ -2088,6 +2101,8 @@ double factor_rcurl(){
 
 double factor_sep(){
 	NTOKEN2;
+	if(tok->ttype==TOK_VAR) lstoken=tok;
+	else lstoken=NULL;
 	return 0.0;
 }
 
@@ -3271,30 +3286,33 @@ double tok_dir_while()
 /* exec multiple sentences at the same level */
 double exec_block1(FILEBUF *fp)
 {
-//  double val=0;
  INIT_STAGE;
  exe_buffer=fp;
  double val=0;
    // MESG("exec_block1:[%s] err_num= %d %d",fp->b_fname,err_num,current_active_flag);
-   if(!current_active_flag|| err_num>0) {
+   if(!current_active_flag) {
 		tok=fp->end_token;
-		current_active_flag=0;
 		return(ex_var.dval);
    };
-   while(tok->ttype!=TOK_EOF) 
+   while(tok->tgroup!=TOK_END) 
    {
 	// MESG_TOK_INFO("- exec_block1",tok);
+#if	1
 	if(tok->ttype==TOK_SEP){ NTOKEN2;
 		// MESG("factor_sep: [%s %d]",tok->tname,tok->ttype);
 		if(tok->ttype==TOK_VAR) lstoken=tok;
 		else lstoken=NULL;
 		continue;
 	};
+#endif
+#if	0
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
+#endif
  	val=tok->directive();
 	if(ex_var.var_type==VTYPE_NUM) ex_var.dval=val;
 	if(!current_active_flag) break;
    };
+
    // MESG("exec_block1: end!");
 	return(val);
 }
@@ -3307,20 +3325,23 @@ double exec_block1_break(FILEBUF *fp)
  double val=0;
 	// MESG("#exec_block_break:%d ttype=%d [%s]",tok->tnum,tok->ttype,tok_info(tok));
    if(!current_active_flag|| err_num>0) {
-		NTOKEN2;
-		current_active_flag=0;
+		tok=fp->end_token;
 		return(ex_var.dval);
    };
-   while(tok->ttype!=TOK_EOF) 
+   while(tok->tgroup!=TOK_END) 
    {
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
+#if	1
 	if(tok->ttype==TOK_SEP){ NTOKEN2;
 		// MESG("factor_sep: [%s %d]",tok->tname,tok->ttype);
 		if(tok->ttype==TOK_VAR) lstoken=tok;
 		else lstoken=NULL;
 		continue;
 	};
+#endif
+#if	0
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
+#endif
  	val=tok->directive();
 	if(ex_var.var_type==1) ex_var.dval=val;
 

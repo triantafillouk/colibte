@@ -913,6 +913,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			tok->tname=" RCURL";
 			tcr->num=tcl->num;
 			tcl->num=tok->tnum;
+			tok->tgroup=TOK_END;
 	};
 	};
 	
@@ -1096,6 +1097,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	tok->tind=0;
 	tok->tline=tok_line;
 	tok->tname="eof";
+	tok->tgroup=TOK_END;
 	if(curl_level!=0 && err_num<1) set_error(tok,106,"parse error: invalid number of curls");
 
 	if(par_level!=0 && err_num<1) { 
