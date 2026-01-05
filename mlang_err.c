@@ -620,8 +620,8 @@ int err_factor()
 	return(err_num);
  };
  set_tok_function(tok0,0);
- // MESG("switch    : tok0 type=%d err=%d %s %LX",tok0->ttype,err_num,tok0->tname,tok0->factor_function);
- // MESG("previous	 : tok type=%d err=%d %s %LX",tok->ttype,err_num,tok->tname,tok->factor_function);
+ // MESG("switch  : tok0 %s",tok_info(tok0));
+ // MESG("now     : tok  %s",tok_info(tok));
  switch(tok0->ttype) {
 	/*  the following ends factor  */
 #if	1
@@ -1103,6 +1103,7 @@ int err_factor()
 	case TOK_DECREASEBY:
 		tok0->tname="assign";
 		RT_MESG1(527);
+#if	USE_TYPE_VARS
 	case TOK_ASSIGN_TYPE:{
 		MESG("TOK_ASSIGN_TYPE: tok0 [%s] tnum=%d ttype=%d",tok0->tname,tok0->tnum,tok0->ttype);
 		// MESG("	tok [%s] tnum %d ttype %d",tok->tname,tok->tnum,tok->ttype);
@@ -1112,6 +1113,7 @@ int err_factor()
 		// MESG("	TOK_ASSIGN_TYPE: end tnum=%d",tok->tnum);
 		RT_MESG1(528);
 		};
+#endif
 #if	1
 	case TOK_TYPE_ELEMENT:
 		// MESG("TOK_TYPE_ELEMENT: [%s]",tok0->tname);

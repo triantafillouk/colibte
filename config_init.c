@@ -29,7 +29,7 @@ void load_config()
  char **value_array;
  char *flag_name;
  int pair_nums=0;
-
+ // printf("load_config: << -----\n");
  pair_nums=read_pairs(fname,'=',&name_array,&value_array);
  if(pair_nums) {
 	for(flag_name=name_array[i];(flag_name=name_array[i])!=NULL;i++){
@@ -45,6 +45,7 @@ void load_config()
  sarray_clear(value_array);
  };
  set_key_emulation((int)bt_dval("keyboard_emulation"));
+ // printf("load_config:end >> -----\n");
 
 }
 

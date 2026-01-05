@@ -255,8 +255,9 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 	tok->ttype=btn->node_type;
 	ex_edenv=tok->ttype;
 	btn->node_vtype=VTYPE_NONE;
-	MESG("	set_var: new variable name=%s tind=%d ttype=%d",name,tok->tind,tok->ttype);
-	// if(stree->max_items < tok->tind) ERROR("exceeded item list of %d !! CHECK!",stree->max_items);
+	btn->node_name=strdup(name);
+	//tok->tok_node=btn;
+	// MESG("	set_var: new variable name=%s tind=%d ttype=%d",name,tok->tind,tok->ttype);
 }
 
 void set_dot_var(FILEBUF *bf,tok_struct *tok)
@@ -307,6 +308,7 @@ int change_script_state(int tok_type,int *script_active)
 	return 0;
 }
 
+#if USE_TYPE_VARS
 void set_global_type(BTNODE *node,BTREE *type_dat,char *name,tok_struct *tok_var)
 {
  	node->node_vtype=VTYPE_TREE;
@@ -351,7 +353,7 @@ int type_init_definition(FILEBUF *bf,BTREE *types_tree,alist *lex_parser, tok_st
  BTNODE *global_type_node = add_btnode(global_types_tree,nword);
  if(global_type_node && global_types_tree->new_flag) 
  {
-	// MESG("Add new global type named [%s] in global_types_tree",nword);
+	MESG("Add new global type named [%s] in global_types_tree",nword);
 	set_global_type(global_type_node,type_dat,nword,tok_var);
  } else {
 	if(global_type_node) {
@@ -450,6 +452,7 @@ int type_init_definition(FILEBUF *bf,BTREE *types_tree,alist *lex_parser, tok_st
  // show_bt_table_ordered(type_dat);
  return 1;
 }
+#endif
 
 // check is there is a tags header and skip it
 void skip_tag_header(FILEBUF *bf)
@@ -921,9 +924,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 		// MESG("	parser: TOK_LETTER: check element in bt [%s]",nword);
 		tok->tok_node  = find_btnode(bt_table,nword); // check main table
 
+#if	USE_TYPE_VARS
 		if(tok->tok_node==NULL) {
 			// MESG("		: not found in bt, check global_types!");
-			
 			BTNODE *var_node = find_btnode(global_types_tree,nword);
 			if(var_node!=NULL) {
 				// MESG("	%s found in global types tree! ==========================",nword);
@@ -941,7 +944,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 		} else {
 			// MESG("	parser: [%s] found in main bt_table!",nword);
 		};
-
+#endif
 		if(is_storelines) {
 			// if(tok->tok_node!=NULL) MESG("function already registered!");
 			if(proc_name==NULL) { 
@@ -967,9 +970,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 					store_level=curl_level;
 					start_proc_offset=foffset;
 				};
-
+#if	USE_TYPE_VARS
 				if(tok->ttype == TOK_DIR_TYPE) {
-					// MESG("	found type_definition!");
+					MESG("	found type_definition!");
 					if(!type_init_definition(bf,stree,lex_parser,tok)) 
 					{
 						// set_error(tok,111,"type_definition parse error");
@@ -980,13 +983,14 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 						// MESG("after check type type_init_definition! ttype=%d",tok->ttype);
 						continue;
 					};
-				};
+				}
+#endif
 				// MESG("this is a directive: [%s]",nword);
 			};			
 
 			if(tok->tok_node==NULL){	/* not a directive or typed var but a normal variable  */
 				// MESG("		check for variable!");
-				// MESG("		[%s] is a variable !!!!!!!!!!",nword);
+				// MESG("		[%s] is a new variable !!!!!!!!!!",nword);
 
 				tok->tname=strdup(nword);
 				tok->tind=slen;
@@ -1002,6 +1006,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 						tok->tind = var_node->node_index;
 						tok->ttype=TOK_VAR;
 						tok->tok_node=var_node;
+						MESG("new var %s %s",nword,var_node->node_name);
 						// tok->tvtype = var_node->node_vtype;
 						if(next_token_type(bf)==TOK_DOT) {
 							if(array_tok) {
@@ -1016,6 +1021,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 					} else {
 						// MESG("		[%s] not found!!! in stree",nword);
 						set_var(stree,tok,nword);
+						
 					};
 					if(next_token_type(bf)==TOK_LBRAKET) {
 						// MESG("	parser: next is TOK_LBRAKET !!!!");
@@ -1031,7 +1037,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			};
 		} else {
 			tok->tname=tok->tok_node->node_name;
-			// MESG("	%d: token name [%s] found in bt, type %d  !!!!",tok->tnum,tok->tname,tok->tok_node->node_type);
+			// MESG("	%d: token name [%s] found in bt, ind=%d type %d vtype=%d!",
+			// tok->tnum,tok->tname,tok->tok_node->node_index,tok->tok_node->node_type,tok->tok_node->node_vtype);
 			switch(tok->tok_node->node_type) {
 				case TOK_VAR:	/* 0  */
 					tok->ttype=TOK_VAR; 

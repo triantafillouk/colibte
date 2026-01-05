@@ -132,6 +132,12 @@ MVAR *call_stack_used;
 MVAR *max_call_stack_end;
 MVAR *call_stack_available;
 
+#if	TBNF
+MVAR *exec_stack;
+MVAR *exec_stack_current;
+MVAR *exec_stack_max;
+#endif
+
 int show_stage=0;
 int xpos=0;		/* stage position  */
 int current_active_flag=1;	/* on to execute procedure!  */
@@ -146,8 +152,9 @@ extern VAR option_names[];
 
 BTREE *bt_table;
 BTREE *directiv_table;
+#if	USE_TYPE_VARS
 BTREE *global_types_tree;
-
+#endif
 int simple=0;
 
 static inline double num_term1();
@@ -175,10 +182,10 @@ term_type term_types[] = {
 };
 
 char *vtype_names[] = {
-	"UNDEFINED","NUMERIC","ARRAY","SARRAY","LIST",
+	"UNDEF","NUM","ARRAY","SARRAY","LIST",
 	"SLIST","ALIST","ASLIST","STRING","BUFFER",
 	"ARRAY_EL1","ARRAY_EL2","TREE","TREE_EL",
-	"AMIXED","MIXEDEL",NULL
+	"AMIXED","POINTER","PROC","OPTION","FUNCTION",NULL
 };
 
 /* Function definitions */
@@ -191,12 +198,13 @@ void stack_push(char *title,tok_struct *tok)
 {
 #if	TBNF
  static int ind=0;
- if(no_push) { MESG("stack_push:%s skip %s",title,tok_info(tok));return;};
+ // if(no_push) { MESG("stack_push:%s skip %s",title,tok_info(tok));return;};
  if(tok!=NULL) {
  // memcpy((void *)check_buffer->tok_bnf,(void *)tok,sizeof(tok_struct));
  // check_buffer->tok_bnf++;
  // check_buffer->tok_bnf_index++;
- MESG("P[%10s] %3d %-15s :%s %s",check_buffer->b_fname,ind++,tok->tname,title,tok_info(tok));
+ if(tok->ttype==TOK_LPAR) { MESG("skip left paranthesis!");return;};
+	MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,ind++,title,tok_info(tok));
  } else MESG("P [%s] null token!!!",title);
 #endif
 }
@@ -238,32 +246,36 @@ void initialize_call_stack(int initial_size)
 	max_call_stack_end=call_stack;
 	call_stack_available=call_stack+initial_size;
 	// fprintf(stderr,"	initial call_stack=%p\n",(void *)call_stack);
+#if	TBNF
+	exec_stack=(MVAR *)malloc(sizeof(struct MVAR)*512);
+	exec_stack_current=exec_stack;
+	exec_stack_max=exec_stack+512;
+#endif
 }
 
 #if	USE_CALL_STACK0
 // Not used, realloc_call_stack is difficult to implement. All previous positions must be reassigned!!!
-MVAR *realloc_call_stack(int additional_size)
+MVAR *realloc_exec_stack(int additional_size)
 {
-	int required_size = call_stack_used-call_stack;
+	int required_size = exec_stack_current-call_stack;
 	int new_size = required_size+additional_size;
-	int initial_size = call_stack_available-call_stack;
+	int initial_size = exec_stack_max-exec_stack;
 	int alloc_size = new_size*sizeof(struct MVAR);
-	MESG("realloc_call_stack %p",call_stack);
-	MESG("call_stack realloc: initial=%d required=%d new=%d alloc=%d",initial_size,required_size,new_size,alloc_size);
+	// MESG("realloc_call_stack %p",call_stack);
+	// MESG("call_stack realloc: initial=%d required=%d new=%d alloc=%d",initial_size,required_size,new_size,alloc_size);
 		// show_vars(call_stack,initial_size,"reallo_call_stack");
-		call_stack=(MVAR *)realloc(call_stack,alloc_size);
-		if(call_stack) {
-			call_stack_used=call_stack+required_size;
-			max_call_stack_end=call_stack_used;
-			call_stack_available=call_stack+new_size;
+		exec_stack=(MVAR *)realloc(exec_stack,alloc_size);
+		if(exec_stack) {
+			exec_stack_current=exec_stack+required_size;
+			exec_stack_max=exec_stack+new_size;;
 			
 			// show_vars(call_stack,initial_size,"after reallocation");
-			MESG("call_stack reallocated from %d to %d ----------------",initial_size,new_size);
+			// MESG("call_stack reallocated from %d to %d ----------------",initial_size,new_size);
 		} else {
 			return NULL;
 		};
-	MESG("	new  call_stack=%lX",(void *)call_stack);
-	return call_stack;
+	MESG("	new  exec_stack=%lX",(void *)call_stack);
+	return exec_stack;
 }
 #endif
 
@@ -271,7 +283,9 @@ void init_btree_table()
 {
 	bt_table=new_btree("table",0);
 	directiv_table=new_btree("directives",0);
+#if	USE_TYPE_VARS
 	global_types_tree=new_btree("types",0);
+#endif
 }
 
 
@@ -665,6 +679,7 @@ void init_hash()
 		option_node=set_btdval(bt_table,option_names[i].name,option_names[i].dval);
 	};
 	option_node->node_type=TOK_OPTION;
+    // printf("OPTION %15s ind=%2d type %d vtype=%d\n",option_names[i].name,option_node->node_index,option_node->node_type,option_node->node_vtype);
  };
 	// eval_btree(bt_table->root,print_node);
 
@@ -1219,6 +1234,7 @@ MVAR *btree_to_mvar(BTREE *bt)
  return mvar_array;
 }
 
+#if	USE_TYPE_VARS
 double factor_assign_type()
 {
 	double value=0;
@@ -1321,6 +1337,7 @@ double factor_assign_type()
 	// print_array1("type array",adat);
 	return 1;
 }
+#endif
 
 double factor_array2()
 {
@@ -2205,7 +2222,11 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_ASSIGNOPT	,
 	factor_none,	// TOK_END,
 	factor_none,	// TOK_DEFINE_TYPE,
+#if	USE_TYPE_VARS
 	factor_assign_type,	// TOK_ASSIGN_TYPE,
+#else
+	factor_none,	// TOK_ASSIGN_TYPE,
+#endif
 	factor_type_element,	// TOK_TYPE_ELEMENT
 	factor_none,	// TOK_DOT,
 	factor_none,	// TOK_INCBEFORE
@@ -2875,6 +2896,8 @@ double assign_val(double none)
 
 void  skip_args1(int nargs)
 {
+ // static int skips[]={2,3,5,7,9,11};
+ // tok += skips[nargs];
  // MESG("skip_args1: va!=symbols! ++++++++++");
  NTOKEN2; /* skip name */
 	int i;
@@ -2886,6 +2909,7 @@ void  skip_args1(int nargs)
  NTOKEN2;	/* skip right parenthesis  */
 }
 
+#if	NUSE
 // skip args and goto function block
 void  assign_args1(MVAR *va,MVAR *symbols,int nargs)
 {
@@ -2904,6 +2928,7 @@ void  assign_args1(MVAR *va,MVAR *symbols,int nargs)
  NTOKEN2;	/* skip right parenthesis  */
  // MESG("assign_args1: end! pos5 after args tok=[%s] %d",tok->tname,tok->ttype);
 }
+#endif
 
 #include "mlang_parser.c"
 
@@ -3608,16 +3633,8 @@ char * tok_info(tok_struct *tok)
 {
  static char stok[MAXLLEN];
 	if(tok==NULL) { MESG("tok_info: NULL token!");return "null token";};
- // return "token info";
 	// MESG("tok_info: ttype=%d",tok->ttype);
-#if	0
-	if(tok->tname!=NULL) {
-		snprintf(stok,MAXLLEN,"%3d: %s",tok->tnum,tok->tname);
-	} else {
-		snprintf(stok,MAXLLEN,"%3d: null name",tok->tnum);
-	};
-	return stok;
-#else
+
 	if(tok->tname!=NULL){
 		// MESG("tok_info: %d %s %d",tok->tind,tok->tname,tok->tline);
 		if(tok->ttype==TOK_ARRAY1 || tok->ttype==TOK_ARRAY2) {
@@ -3628,7 +3645,7 @@ char * tok_info(tok_struct *tok)
 				rows=tok->tok_adat->rows;
 				cols=tok->tok_adat->cols;
 			};
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%s] rows=%d cols=%d",
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] rows=%d cols=%d",
 				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,rows,cols);
 		} else 
 		if(tok->ttype==TOK_SHOW) { snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [:]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME);
@@ -3639,11 +3656,11 @@ char * tok_info(tok_struct *tok)
 		} else
 		if(tok->tgroup>0) {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%s] group [%d:%s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup));
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] [%2d:%5s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup));
 		} else 
 			if(tok->ttype==TOK_NUM) { 
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %f",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %5.1f",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);
 		} else if(tok->ttype==TOK_QUOTE) {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
 			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\"",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
@@ -3652,19 +3669,14 @@ char * tok_info(tok_struct *tok)
 			BTNODE *var_node = tok->tok_node;
 			int size=0;
 			int vtype=0;
+#if	0
 			char *var_name="unknown";
 			if(var_node!=NULL) {
 				vtype=var_node->node_vtype;
 				var_name=var_node->node_name;
 			};
-			// MESG("TOK_VAR: vtype=%d",vtype);
-#if	0
-			if(current_stable) {
-				struct MVAR *var_slot=get_left_slot(tok->tind);
-				if(var_slot) vtype=var_slot->var_type;
-				MESG("vtype=%d",vtype);
-			} else MESG("current_stable is NULL tok vtype=%d",var_node->node_vtype) ;
 #endif
+			// MESG("TOK_VAR: vtype=%d",vtype);
 			// MESG("tok_info var! ind=[%d] group=%d vtype=%d",tok->tind,tok->tgroup,vtype);
 			if(vtype==VTYPE_TREE) {
 				BTREE *type_tree=(BTREE *)var_node->node_dat;
@@ -3672,18 +3684,17 @@ char * tok_info(tok_struct *tok)
 			};
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
 
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%s] type %s %d size %d vnam=%s",
-				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,vtype_names[vtype] ,vtype,size,var_name);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] %8s %d size %d",
+				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,vtype_names[vtype] ,vtype,size);
 		} else {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
 		};
 // 			
 	} else {
 			return "null tok name !!!!!!!!!!!!!!!!!!!!!!!!!!!";
-		     snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%f]",tok->tnum,tok->tline,tok->tind,tok->ttype,"null name",tok->dval);
+		     snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5.1f]",tok->tnum,tok->tline,tok->tind,tok->ttype,"null name",tok->dval);
 	};
-#endif
 	// MESG("tok_info: end");
 	return stok;
 }
@@ -3877,7 +3888,7 @@ char * bt_sval(char *name)
 void set_bt_num_val(char *name,double val)
 {
  BTNODE *node = set_btdval(bt_table,name,val);
- node->node_type=-1;
+ node->node_type=TOK_OPTION;
  node->node_vtype=VTYPE_NUM;
 }
 
