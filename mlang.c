@@ -1111,6 +1111,7 @@ inline MVAR *get_left_slot(int ind)
 	return current_stable+ind;
 }
 
+#if	USE_TYPE_VARS
 double factor_type_element()
 {
  double value=0;
@@ -1152,12 +1153,21 @@ double factor_type_element()
  NTOKEN2;
  return value;
 }
+#endif
+
+double factor_variable_num()
+{
+ 	lsslot = get_left_slot(tok->tind);
+	NTOKEN2;
+	return(lsslot->dval);
+}
 
 double factor_variable()
-{	
+{
 	// MESG("factor_variable:");
  	lsslot = get_left_slot(tok->tind);
 	// lsslot = current_stable+tok->tind;
+	int ptype=get_vtype();
 	lstoken = tok;
 	// MESG("factor_variable: %d",tok->tind);
 	set_vtype(lsslot->var_type);
@@ -1166,6 +1176,7 @@ double factor_variable()
 	switch(get_vtype()) {
 		case VTYPE_NUM:
 		{
+			if(ptype==VTYPE_NUM) tok->factor_function = factor_variable_num;
 			NTOKEN2;
 			return(lsslot->dval);
 			};
@@ -1721,6 +1732,7 @@ double factor_cmd()
 	RTRN(status);
 }
 
+// Editor env variable
 double factor_env()
 {
 	BTNODE *bte;
@@ -1764,7 +1776,6 @@ static inline double factor_lpar()
 static inline double factor_num()
 {
 	double val=tok->dval;
-	// MESG("factor_num:");
 	set_vtype(VTYPE_NUM);
 	NTOKEN2;
 	RTRN(val);
@@ -2055,15 +2066,32 @@ static double term1_mul(double v1)
 	return(1);
 }
 
+static double term1_div_num(double v1)
+{
+ NTOKEN2;
+ double v2=num_term2();
+	if(v2!=0){
+		v1=v1/v2;
+		ex_var.dval=v1;
+		return v1;
+	};
+	/* RT error  */
+		syntax_error("Division by zero",212);
+		v1 = 9999999999.9;
+		RTRN(v1);
+}
+
 static double term1_div(double v1)
 {
  double v2;
+ tok_struct *ptok=tok;
 	if(vtype_is(VTYPE_NUM)){
 		NTOKEN2;
 		v2=num_term2();
 			switch(get_vtype())
 			{
 				case VTYPE_NUM:	// numeric * numeric
+					set_term_function(ptok,term1_div_num);
 					if(v2!=0){
 					v1=v1/v2;
 					ex_var.dval=v1;
@@ -2224,10 +2252,11 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_DEFINE_TYPE,
 #if	USE_TYPE_VARS
 	factor_assign_type,	// TOK_ASSIGN_TYPE,
+	factor_type_element,	// TOK_TYPE_ELEMENT
 #else
 	factor_none,	// TOK_ASSIGN_TYPE,
+	factor_none,	// TOK_TYPE_ELEMENT
 #endif
-	factor_type_element,	// TOK_TYPE_ELEMENT
 	factor_none,	// TOK_DOT,
 	factor_none,	// TOK_INCBEFORE
 	factor_none,	// TOK_DECBEFORE

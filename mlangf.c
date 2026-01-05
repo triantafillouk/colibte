@@ -405,7 +405,11 @@ double uf_rand()
 {
  // static long =
  long max=(long) get_numeric_arg();
+#if	DARWIN
+ long value=arc4random_uniform(max);
+#else
  long value=random() % max;
+#endif
  // MESG("uf_rand:%ld",value);
  return (double)value;
 }

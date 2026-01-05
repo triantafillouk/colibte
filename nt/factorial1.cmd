@@ -10,4 +10,4 @@ function fact(num)
  }
 }
 
-fact(3):     6
+fact(4):     6
