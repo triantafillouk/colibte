@@ -596,13 +596,12 @@ int err_factor()
  static int pre_symbol=0;
  TDSERR("factor");
  int lpar=0;
- // MESG_TOK_INFO("-- factor",tok);
+ // MESG("-- factor %s",tok_info(tok));
  if(tok->ttype!=TOK_NOT)
  	stack_push("factor",tok);
  int save_macro_exec;
  tok_struct *tok0; 
 
- // set_vtype(VTYPE_NUM);
  ex_edenv=0;
 
  SHOW_STAGE(470);
@@ -1593,7 +1592,8 @@ int err_check_sentence1()
 			end_block++;
 			is_block=1;
 		} else {
-			end_block=NULL;
+			skip_sentence1();
+			end_block=tok;
 		};
 //		for(;index->dval < dmax;index->dval +=dstep) 
 		{

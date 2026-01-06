@@ -39,7 +39,6 @@ typedef struct tok_struct {
 	FFunction directive;
 	union {	
 		int	number_of_args;
-		struct BTNODE *tok_node;
 		struct MVAR *var_pointer;
 		struct curl_struct *tcurl;
 		struct tok_struct *match_tok;	/* for curl, parenthesis, bracket  */
@@ -47,6 +46,7 @@ typedef struct tok_struct {
 		TextPoint *ddot;				/* ddot text point  */
 		struct array_dat *tok_adat;		/* used in array definition only in LB  */
 		struct FILEBUF *proc_buffer;
+		struct BTNODE *tok_node;
 	};
 } tok_struct;
 
