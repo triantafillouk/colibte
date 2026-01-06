@@ -508,11 +508,16 @@ double mul_by()
 	// TDS("mul_by");
 	int ori_type=lstoken->ttype;
 	tok_struct *ltok = tok;
-	// MESG("mul_by: ori_type=%d vtype=%d",ori_type,sslot->var_type);
+
+	if(ori_type!=TOK_VAR) {
+		set_error(lstoken,1022,"mul by constant not supported!");
+		return(0);
+	};
 	v1=num_expression();
 
 	if(sslot->var_type==VTYPE_NUM) {
-		set_term_function(ptok,(TFunction)mul_by_num);
+		if(ori_type==VTYPE_NUM)
+			set_term_function(ptok,(TFunction)mul_by_num);
 		sslot->dval *= v1;
 		return(sslot->dval);
 	};
@@ -528,7 +533,7 @@ double mul_by()
 		};
 	};
 	if(sslot->var_type==VTYPE_STRING) {
-		// MESG("increase by:");
+		// MESG("mul by:");
 		set_sval(str_mul(sslot->sval,v1));
 		return(0);
 	};
@@ -536,12 +541,12 @@ double mul_by()
 	if(sslot->var_type==VTYPE_SARRAY) {
 		if(vtype_is(VTYPE_NUM) && v1>0) {
 		if(ori_type!=TOK_VAR) {
-			// MESG("	increase string val");
+			// MESG("	mul string val");
 			char *stmp=str_mul(ls_psval[0],v1);
 			free(ls_psval[0]);
 			ls_psval[0]=stmp;
 		} else {
-			// MESG("	increase sarray! sslot ind=%d %d %s",sslot->var_index,get_vtype(),get_sval());
+			// MESG("	mul sarray! sslot ind=%d %d %s",sslot->var_index,get_vtype(),get_sval());
 			sarray_mul1(sslot->adat,v1);
 		};
 		};
@@ -875,7 +880,12 @@ int check_init(FILEBUF *bf)
  check_buffer = bf;
  int err=0;
  INIT_STAGE;
- // MESG("check_init: [%s] %d",bf->b_fname,bf->b_type);
+ // MESG("-check_init: [%s] %d",bf->b_fname,bf->b_type);
+ if(execmd) 
+ {
+ 	fprintf(stderr,"exec [%s] ----------------\n",bf->b_fname);
+ 	fprintf(stdout,"exec [%s] ----------------\n",bf->b_fname);
+ };
  if(tok_table==NULL) 
  {
  	// MESG("create token table [%s]",bf->b_fname);
