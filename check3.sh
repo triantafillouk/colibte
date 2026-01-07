@@ -1,2 +1,1 @@
-rm $2.out
-time for i in cmds2/*.cmd;do echo $i;$1 -x $i;done >> $2.out
+time for i in cmds2/*.cmd;do echo $i;./cte -x $i;done 2> $1.err |tee $1.out

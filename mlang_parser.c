@@ -504,7 +504,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  tok_struct *array_tok=NULL;
  int skip_token=0;
 
- // MESG("parse_block1: [%s] check if parsed!",bf->b_fname);
+ MESG("parse_block1: [%s] check if parsed!",bf->b_fname);
  // return if already parsed and not forced to parse
  if(bf->tok_table !=NULL && init==0) {
  	check_buffer = buffer_ori;
@@ -553,7 +553,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  {
 	if(change_script_state(tok_type,&script_active)) continue;
 
-	// MESG("parse- cc=%d %c type=%3d [%10s]",cc,cc,tok_type,tname(tok_type));
+	MESG("parse- cc=%d %c type=%3d [%10s] line=%d",cc,cc,tok_type,tname(tok_type),tok_line);
 
 	if(err_num>0) {
 		check_buffer = buffer_ori;
@@ -669,14 +669,21 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			// MESG("end of array definition tnum=%d ",tok->tnum);
 			cc=1;
 			if(next_token_type(bf)==TOK_LBRAKET) {
-				// MESG("	next is LBRAKET");
-				array_tok->ttype=TOK_ARRAY2;
+				MESG("	next is LBRAKET");
+				// array_tok=tok;
+				if(array_tok)		// ??????????????????? CHECK!!!!!
+					array_tok->ttype=TOK_ARRAY2;
+				else tok_type=TOK_ARRAY2;
+				// tok_type=TOK_ARRAY2;
 				// array_tok->tname="index2";
 				skip_token=1;
 			};
 			if(next_token_type(bf)==TOK_DOT) {
 				// MESG("	next is DOT L2!");
-				array_tok->ttype=TOK_ARRAY_L2;
+				if(array_tok) 
+					array_tok->ttype=TOK_ARRAY_L2;
+				else tok_type=TOK_ARRAY_L2;
+				// tok_type=TOK_ARRAY_L2;
 				// array_tok->tname="dot el2";
 			};			
 			break;
@@ -829,12 +836,13 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			return(0);
 			};
 	};
+	MESG("	apply");
 	if(tok_type==TOK_NL) {
 		// start_of_line = 1;
 		continue;
 	};
 	// if(tok_type==TOK_RCURL) MESG("	TOK_RCURL");
-	// MESG("	- token type=[%d %s] previous token is [%d %s]",tok_type,tname(tok_type),previous_ttype,tname(previous_ttype));
+	MESG("	- token type=[%d %s] previous token is [%d %s]",tok_type,tname(tok_type),previous_ttype,tname(previous_ttype));
 	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {
 	if(!(is_now_sep && (tok_type==TOK_LCURL||tok_type==TOK_RCURL) )){
@@ -842,7 +850,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			/* check for else statement!!  */
 		if(!(tok_type==TOK_LETTER && !strcmp(nword,"else"))){
 			if(tok_type==TOK_LBRAKET && previous_ttype==TOK_RBRAKET){
-				// MESG("skip tok_lbraket!");
+				MESG("skip tok_lbraket!");
 				continue;
 			} else {
 				if(tok_type==TOK_DOT && previous_ttype==TOK_RBRAKET){

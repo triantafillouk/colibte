@@ -203,8 +203,8 @@ void stack_push(char *title,tok_struct *tok)
  // memcpy((void *)check_buffer->tok_bnf,(void *)tok,sizeof(tok_struct));
  // check_buffer->tok_bnf++;
  // check_buffer->tok_bnf_index++;
- if(tok->ttype==TOK_LPAR) { MESG("skip left paranthesis!");return;};
-	MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,ind++,title,tok_info(tok));
+ // if(tok->ttype==TOK_LPAR) { MESG("skip left paranthesis!");return;};
+	// MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,ind++,title,tok_info(tok));
  } else MESG("P [%s] null token!!!",title);
 #endif
 }
@@ -814,7 +814,7 @@ MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
 /* free symbol table after execute */
 void delete_symbol_table(MVAR *td, int size,int nargs)
 {
- // MESG("delete_symbol_table: nargs=%d size=%d",nargs,size);
+ MESG("delete_symbol_table: nargs=%d size=%d",nargs,size);
  MVAR *sslot=td;
  // int i=0;
  for(;sslot < td+nargs;sslot++)
@@ -3390,14 +3390,14 @@ double exec_block1(FILEBUF *fp)
  INIT_STAGE;
  exe_buffer=fp;
  double val=0;
-   // MESG("exec_block1:[%s] err_num= %d %d",fp->b_fname,err_num,current_active_flag);
+   // MESG("exec_block1:[%s] err_num= %d %d tok=[%s]",fp->b_fname,err_num,current_active_flag,tok_info(tok));
    if(!current_active_flag) {
 		tok=fp->end_token;
 		return(ex_var.dval);
    };
    while(tok->tgroup!=TOK_END) 
    {
-	// MESG_TOK_INFO("- exec_block1",tok);
+	// MESG_TOK_INFO("- exec_block1 [%s]",tok);
 #if	1
 	if(tok->ttype==TOK_SEP){ NTOKEN2;
 		// MESG("factor_sep: [%s %d]",tok->tname,tok->ttype);
@@ -3413,6 +3413,7 @@ double exec_block1(FILEBUF *fp)
 	if(ex_var.var_type==VTYPE_NUM) ex_var.dval=val;
 	if(!current_active_flag) break;
    };
+	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
 
    // MESG("exec_block1: end!");
 	return(val);
@@ -3450,6 +3451,7 @@ double exec_block1_break(FILEBUF *fp)
 	if(drv_check_break_key()) break;
 	// MESG(" [%s]",tok_info(tok));
    };
+	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
 	return(val);
 }
 
@@ -3501,13 +3503,14 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	tok=bp->tok_table;
 
 	drv_start_checking_break();
-	// MESG("	call exec_block1");
+	MESG("	call exec_block1 ------");
 	if(execmd) val=exec_block1(bp);
 	else val=exec_block1_break(bp);
-
+	MESG("	after exec_block1 !!!!!");
 	drv_stop_checking_break();
 
 	/* cleaning  */
+	MESG("cleaning:");
 	if(start) {
 		if(local_symbols)
 		if(bp->symbol_tree){
@@ -3524,7 +3527,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	val=0;
  };
  tok=old_tok;
- // MESG("compute_block return %f",val);
+ MESG("compute_block return %f",val);
  return(val); 
 }
 
