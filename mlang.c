@@ -387,23 +387,53 @@ static inline double decrease_by_num()
 
 double decrease_by()
 {
-	double v1;
+	double v1,v0;
 	MVAR *sslot=lsslot;
-	tok_struct *ptok=tok;
-	TDS("decrease_val");
-	// MESG("decrease_by: ");
-	v1=num_expression();
-	if(sslot->var_type==VTYPE_NUM) {
+	// MESG("decrease_by: slot_index=%d ",sslot->var_index);
+	tok_struct *ptok=tok-1;
+	// MESG("decrease_by: tok type=%d",ptok->ttype);
+	int ori_type=lstoken->ttype;
+	tok_struct *lstok=lstoken;
+#if	0
+	if(ori_type!=TOK_VAR && ori_type!=TOK_ARRAY_L1 && ori_type!=TOK_ARRAY1) {
+		MESG("decrease_by: ori_type=%d ",ori_type);
+		set_error(lstok,1022,"decrease constant not supported!");
+		return(0);
+	};
+#endif
+	v1=-num_expression();
+	// MESG("		>>   : by %f",v1);
+
+	if(sslot->var_type==VTYPE_NUM)
+	if(vtype_is(VTYPE_NUM)) {
 		set_term_function(ptok,(TFunction)decrease_by_num);
-		sslot->dval -= v1;
+		sslot->dval += v1;
 		return(sslot->dval);
 	};
+
 	if(sslot->var_type==VTYPE_ARRAY) {
-		// MESG("	array decrease_by");
-		array_add1(sslot->adat,-v1);
-		return(-v1);
+		// MESG("		VTYPE_ARRAY:");
+		if(ori_type!=TOK_VAR) {
+			v0=*ls_pdval;
+			*ls_pdval = v0+v1;
+			return(v0);
+		} else {
+			array_add1(sslot->adat,v1);
+			set_array(sslot->adat);
+			return(v1);
+		};
 	};
-	return(-1);
+
+	if(sslot->var_type==VTYPE_AMIXED) {
+		if(lmvar->var_type==VTYPE_NUM) {
+			double v0=lmvar->dval;
+			lmvar->dval+=v1;
+			return v0;
+		}
+	};
+
+	set_error(lstok,1024,"decrease operation not supported!");
+	return(v1);
 }
 
 static inline double increase_by_num()
@@ -422,10 +452,13 @@ double increase_by()
 	// MESG("increase_by: tok type=%d",ptok->ttype);
 	int ori_type=lstoken->ttype;
 	tok_struct *lstok=lstoken;
-	if(ori_type!=TOK_VAR) {
+#if	0
+	if(ori_type!=TOK_VAR && ori_type!=TOK_ARRAY_L1 && ori_type!=TOK_ARRAY1) {
+		MESG("increase_by: ori_type=%d ",ori_type);
 		set_error(lstok,1022,"increase constant not supported!");
 		return(0);
 	};
+#endif
 	v1=num_expression();
 	// MESG("		>>   : by %f",v1);
 
@@ -508,11 +541,12 @@ double mul_by()
 	// TDS("mul_by");
 	int ori_type=lstoken->ttype;
 	tok_struct *ltok = tok;
-
+#if	0
 	if(ori_type!=TOK_VAR) {
 		set_error(lstoken,1022,"mul by constant not supported!");
 		return(0);
 	};
+#endif
 	v1=num_expression();
 
 	if(sslot->var_type==VTYPE_NUM) {
@@ -1168,6 +1202,7 @@ double factor_type_element()
 double factor_variable_num()
 {
  	lsslot = get_left_slot(tok->tind);
+	lstoken = tok;
 	NTOKEN2;
 	return(lsslot->dval);
 }
@@ -2778,7 +2813,7 @@ double cexpression()
 	strlcpy(svalue,get_sval(),MAXLLEN);
 	num_expression();
 	if(!vtype_is(VTYPE_STRING)) {
-		syntax_error("string comparison error",223);
+		syntax_error("string with no string comparison error",223);
 		set_vtype(VTYPE_NUM);
 		RTRN(0);	/* it is an error to compare string with number  */
 	};

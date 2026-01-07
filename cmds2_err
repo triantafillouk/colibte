@@ -1,0 +1,90 @@
+exec [a1.cmd]] ----------------
+exec [a2.cmd]] ----------------
+exec [array3.cmd]] ----------------
+exec [array4.cmd]] ----------------
+./check3.sh: line 2:  2213 Segmentation fault      (core dumped) $1 -x $i
+exec [array6.cmd]] ----------------
+exec [[parray]] ----------------
+exec [array7.cmd]] ----------------
+exec [array71.cmd]] ----------------
+exec [bool1.cmd]] ----------------
+exec [factorial1.cmd]] ----------------
+exec [[fact]] ----------------
+exec [i1.cmd]] ----------------
+exec [interest.cmd]] ----------------
+Error:212 [numeric] tnum=99 ttype=23 Division by zero line 16
+exec [linear1.cmd]] ----------------
+exec [r1.cmd]] ----------------
+exec [r2.cmd]] ----------------
+exec [r3.cmd]] ----------------
+exec [recreate.cmd]] ----------------
+exec [recursive1.cmd]] ----------------
+exec [[doll]] ----------------
+exec [[fact]] ----------------
+exec [[fact2]] ----------------
+exec [sarray1.cmd]] ----------------
+exec [tall1.cmd]] ----------------
+exec [[tadd]] ----------------
+exec [tall2.cmd]] ----------------
+exec [[tadd]] ----------------
+exec [tall3.cmd]] ----------------
+exec [tall4.cmd]] ----------------
+exec [tall5.cmd]] ----------------
+exec [tassign1.cmd]] ----------------
+exec [tassign2.cmd]] ----------------
+exec [tbreak1.cmd]] ----------------
+exec [tbreak2.cmd]] ----------------
+exec [tcall1.cmd]] ----------------
+exec [tcall2.cmd]] ----------------
+exec [tcolor1.cmd]] ----------------
+./check3.sh: line 2:  2241 Segmentation fault      (core dumped) $1 -x $i
+exec [tcomb1.cmd]] ----------------
+Error:3007 [ ( ] tnum=83 ttype=7 factor :wrong character found: line 24
+Error:3007 [ ( ] tnum=91 ttype=7 factor :wrong character found: line 24
+exec [tcomb2.cmd]] ----------------
+Error:3007 [ ( ] tnum=57 ttype=7 factor :wrong character found: line 17
+Error:3007 [ ( ] tnum=65 ttype=7 factor :wrong character found: line 17
+Error:3007 [ ( ] tnum=73 ttype=7 factor :wrong character found: line 17
+exec [tdiv01.cmd]] ----------------
+Error:216 [ : ] tnum=11 ttype=9 division op not supported line 5
+exec [test1.cmd]] ----------------
+exec [texec1.cmd]] ----------------
+exec [tfile1.cmd]] ----------------
+./check3.sh: line 2:  2249 Segmentation fault      (core dumped) $1 -x $i
+exec [tfile2.cmd]] ----------------
+./check3.sh: line 2:  2250 Segmentation fault      (core dumped) $1 -x $i
+exec [tfile3.cmd]] ----------------
+./check3.sh: line 2:  2251 Segmentation fault      (core dumped) $1 -x $i
+exec [tfile4.cmd]] ----------------
+Error:3023 [empty] tnum=61 ttype=23 factor :wrong character found: line 17
+exec [tif1.cmd]] ----------------
+exec [tif2.cmd]] ----------------
+exec [timput2.cmd]] ----------------
+exec [tinput1.cmd]] ----------------
+exec [tmath1.cmd]] ----------------
+exec [tmath2.cmd]] ----------------
+exec [tmessage1.cmd]] ----------------
+exec [tnum1.cmd]] ----------------
+exec [tnum2.cmd]] ----------------
+exec [todo.cmd]] ----------------
+exec [toption1.cmd]] ----------------
+exec [tproc1.cmd]] ----------------
+exec [[test2]] ----------------
+exec [[test3]] ----------------
+exec [tproc3.cmd]] ----------------
+exec [[aa]] ----------------
+exec [tproc4.cmd]] ----------------
+exec [[test2]] ----------------
+exec [tshell1.cmd]] ----------------
+exec [tstring1.cmd]] ----------------
+exec [twhile1.cmd]] ----------------
+Error:3007 [ ( ] tnum=113 ttype=7 factor :wrong character found: line 27
+Error:3007 [ ( ] tnum=121 ttype=7 factor :wrong character found: line 27
+Error:3007 [ ( ] tnum=129 ttype=7 factor :wrong character found: line 27
+Error:3007 [ ( ] tnum=137 ttype=7 factor :wrong character found: line 27
+exec [twindow2.cmd]] ----------------
+exec [twindow3.cmd]] ----------------
+
+real	0m31.472s
+user	0m0.578s
+sys	0m6.953s

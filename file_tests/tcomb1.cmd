@@ -22,7 +22,7 @@ while (i<loops)
 		j=j+1
 	}
 	message(i)
-	insert(str$(i)+"   "+str$(p))
+	insert(i+"   "+p)
 	newline(1)
 	print("i="+i)
 	i=i+1
@@ -31,8 +31,8 @@ _time	: [Sat Oct  4 16:39:43 2014]
 insert(_time)
 newline(1)
 next_line(1)
-message("i<"+str$(i)+" and j<"+str$(j)+" sets p="+str$(p))
-insert("i<"+str$(i)+" and j<"+str$(j)+" sets p="+str$(p))
+message("i<"+i+" and j<"+j+" sets p="+p)
+insert("i<"+i+" and j<"+j+" sets p="+p)
 }
 #unmark_buffer
 # quit()

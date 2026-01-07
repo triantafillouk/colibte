@@ -9,15 +9,15 @@ fori(j=1;100;1)
 # show on message line
 #message_wait("kostas")
 # wait to get a character
-a	:     0
-a1=""	: ""
+
 insert("l")
-s_asc("ko")	:   107
+s_asc("ko")	: 107.0
 lmargin = 10
-a = lmargin	:    10
-seed = 33
-b = seed	:    33
-b1 = rand(1000)	: 1457850878
+a = lmargin	:  10.0
+b1 = rand(1000)	: 124.0
+insert("random "+b1)
 #message_wait(rand())
 print("test end")
+save_file()
+close_file()
 
