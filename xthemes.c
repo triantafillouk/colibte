@@ -145,7 +145,7 @@ int color_edit(num n)
  return true;
 }
 
-int color_scheme_read()
+int color_scheme_read(num dummy)
 {
  FILE *f1;
  char *fname;

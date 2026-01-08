@@ -29,11 +29,10 @@ void load_config()
  char **value_array;
  char *flag_name;
  int pair_nums=0;
-
+ // printf("load_config: << -----\n");
  pair_nums=read_pairs(fname,'=',&name_array,&value_array);
  if(pair_nums) {
 	for(flag_name=name_array[i];(flag_name=name_array[i])!=NULL;i++){
-		// MESG("	- set [%s] to %d",flag_name,atoi(value_array[i]));
 		// set_btval(flag_name,-1,NULL,atoi(value_array[i]));
 		set_bt_num_val(flag_name,atoi(value_array[i]));
 		// fprintf(stderr,"	- %20s %d\n",flag_name,atoi(value_array[i]));
@@ -46,6 +45,7 @@ void load_config()
  sarray_clear(value_array);
  };
  set_key_emulation((int)bt_dval("keyboard_emulation"));
+ // printf("load_config:end >> -----\n");
 
 }
 
@@ -82,7 +82,7 @@ void save_config()
  FILE *f = fopen(fname,"w");
  if(f) {
  int i=0;
-
+ MESG("save_confg: to [%s]",fname);
  fprintf(f,"[%s]\n",APPLICATION_NAME);
  VAR *var;
  i=0;var=&option_names[i];

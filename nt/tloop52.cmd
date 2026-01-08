@@ -11,7 +11,22 @@ function fact(num)
  }
 }
 
+function tadd(a1, a2)
+{
+	return(a1+a2)
+}
+
+#function showtime()
+#{
+#	print("time")
+#}
+
+#tadd()
+#showtime
+
 fact(3):     6
+
+tadd(1,2):
 
 p=0; l=0; 
 print(_time)	: "Mon Dec 28 12:53:58 2015"
@@ -20,9 +35,9 @@ show_time("Loop with proc 51",0)
 fori(i=1;11;1){ 
 	fori(j=1;800001;1) { 
 		l = i*j+32
-		p = p+l+fact(3)
+		p = p+l+fact(10)
 	} 
-	show_time("loop:"+i+" p="+p,1);
+	show_time("loop:"+i+" p="+p,1)
 }
 _time	: "Mon Dec 28 12:54:09 2015"
 # message("i<"+i+" and j< "+j+" sets p="+p)

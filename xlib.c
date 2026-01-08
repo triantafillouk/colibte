@@ -888,7 +888,7 @@ void init_colors()
  color_menu_fg=COLOR_MENU_FG;
  color_menu_bg=COLOR_MENU_BG;
 
- color_scheme_read();
+ color_scheme_read(1);
  default_depth = DefaultDepth(dis0,screen_num);
  default_visual = DefaultVisual(dis0,screen_num);
  cmap = DefaultColormap (dis0,screen_num);

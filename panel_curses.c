@@ -136,7 +136,7 @@ void drv_window_delete(WINDP *wp)
 int confirm(char *title, char *prompt,int always)
 {
 	int c;
-	int (*execf)();
+	int (*execf)(num);
 	char message[256];
 	if(!always && ((int)bt_dval("safe_ops")==0)) {
 		return true;
@@ -571,7 +571,7 @@ void drv_restore_wdimensions(WINDP *wp)
 
 
 
-int set_key_function(int (*kfunc)(int), int c,char *);
+int set_key_function(int (*kfunc)(num), int c,char *);
 int getkcmd(char *k);
 
 int init_sighandler();
@@ -689,7 +689,7 @@ void drv_open()
 	drv_colors=16;
  };
  save_original_colors();
- color_scheme_read();
+ color_scheme_read(1);
 
  if(drv_colors>drv_max_colors) drv_colors=drv_max_colors;
 	// MESG("set drv_colors to %d color pairs are %d",drv_colors,drv_color_pairs);
@@ -1190,7 +1190,7 @@ void drv_back_color()
 #endif
 }
 
-extern int 	(*get_function(char *))();
+extern int 	(*get_function(char *))(num);
 
 struct  BFK {
 	char *func_name;
@@ -1277,7 +1277,7 @@ void drv_bindkeys()
 {
  int i;
  char *k1;
- int (*kfunc)(int);
+ int (*kfunc)(num);
  const char *termvalue;
  char default_mouse_str[] = { 27,'[','M',0 };
 // MESG("drv_bindkeys:");

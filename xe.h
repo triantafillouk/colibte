@@ -11,7 +11,8 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.7 (23/10/2025)"
+#define VERSION 	 "#01.7T53 (8/1/2026)"
+
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -27,6 +28,10 @@
 #endif
 #define	TARROWS		1	/* Use arrow menus in panel curses  */
 #define	USE_UTF8	1	/* Use utf8 characters  */
+#define	TBNF		1	/* convert to bnf notation test  */
+#define	TPROFILE	0	/* profile flag  */
+#define	USE_CALL_STACK	0
+#define	USE_TYPE_VARS	1
 
 #define WRAPD	0	/* wrap debug  */
 #define	FAST_GTK_SCREEN	0
@@ -36,10 +41,7 @@
 #define _DARWIN_USE_64_BIT_INODE	1
 #endif
 
-#define	_LARGEFILE64_SOURCE	1
 #define UNDERLINE_CURRENT_DIR_LINE	0
-#define	USE_SLOW_DISPLAY	1
-#define	USE_CUSTOM_CELL_WIDTH	0
 
 /****************************************************************/
 #define	DRIVER_CURSES	0
@@ -316,14 +318,17 @@ typedef struct  VIDEO {
 #define HEX_LINE_LEN	16
 
 typedef struct MVAR {
-	short	var_index;
-	short	var_type;
-	char *var_name;
+	// short	var_index;
+	int	var_type;
+	// char *var_name;
 	union {
+		// long int ival;
 		double dval;
 		char *sval;
 		struct array_dat *adat;
 		struct BTREE *btree1;
+		struct MVAR *var_pointer;
+		struct tok_struct *proc_pointer;
 	};
 } MVAR;
 
@@ -483,7 +488,11 @@ typedef struct MLQUOTES {
 #define	VTYPE_TREE		12	/* btree pairs  */
 #define VTYPE_TREE_EL	13	/* tree element  */
 #define	VTYPE_AMIXED	14	/* mixed array  */
-#define VTYPE_MIXEDEL	15	/* element of mixed array  */
+#define VTYPE_POINTER	15	/* a variable pointer  */
+#define VTYPE_PROC		16	/* proc pointer  */
+#define VTYPE_OPTION	17	/* editor option   */
+#define VTYPE_FUNCTION	18	/* editor function  */
+#define VTYPE_OTHER		19
 
 /* textpoint */
 #define  FULLDEFINED	0
@@ -674,7 +683,10 @@ typedef struct  FILEBUF {
 	short int slow_display;
 #endif
 	struct  FILEBUF *connect_buffer;
-	num		connect_line;
+	union {
+		num		connect_line;
+		num		function_called;
+	};
 	num		connect_column;
 	num		connect_top_line;
 	num		connect_top_note;
@@ -692,6 +704,11 @@ typedef struct  FILEBUF {
 // Macro language sructures
 	struct tok_struct *tok_table;
 	struct tok_struct *end_token;	/* the last (EOF) token in tok_table  */
+#if	TBNF
+	struct tok_struct *tok_table_bnf;
+	int tok_bnf_index;
+	struct tok_struct *tok_bnf;
+#endif
 	int err;	/* negative if not syntax checked  */
 	BTREE *symbol_tree;	/* local symbol table  */
 	struct alist *type_list;	/* type table list  */

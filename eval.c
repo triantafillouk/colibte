@@ -32,8 +32,6 @@ extern FILEBUF *cbfp;
 extern int record_session;
 #endif
 
-int dofile(char *fname);
-void set_vtype(int type);
 int vtype_is(int type);
 int custom_cell_width=0;
 
@@ -112,8 +110,6 @@ void set_screen_update(int flag);
 double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start);
 int   GetBlock(FILEBUF *fp,char *copy,offs from,offs size);
 
-extern int drv_type;
-
 short   kbdm[MAXLLEN];			/* keyboard macro buffer  */
 short	*kbdptr;		/* current position in keyboard buf */
 short	*kbdend = &kbdm[0];	/* ptr to end of the keyboard buffer */
@@ -188,9 +184,12 @@ double get_env(int vnum)
 	/* fetch the appropriate value */
 	if(cbfp == NULL) return(0.0);
 	switch (vnum) {
-		case EVCFNAME:	strlcpy(svalue,cbfp->b_fname,MAXLLEN);
+		case EVCFNAME:	
+			strlcpy(svalue,cbfp->b_fname,MAXLLEN);
+			svalue[strlen(svalue)-1]=0;
 			break;
-		case EVCDNAME:	strlcpy(svalue,cbfp->b_dname,MAXLLEN);
+		case EVCDNAME:	
+			strlcpy(svalue,cbfp->b_dname,MAXLLEN);
 			break;
 		case EVCBFLAG:	v1 = cbfp->b_flag; break;
 		case EVSTARTDIR: strlcpy(svalue,get_start_dir(),MAXLLEN);
@@ -230,7 +229,8 @@ double get_env(int vnum)
 			v1=tabsize;
 			break;
 		case EVVERSION:
-			strlcpy(svalue,VERSION,MAXLLEN);break;
+			strlcpy(svalue,VERSION,MAXLLEN);
+			break;
 		default:
 			ERROR("GET_ENV: Not a valid function err=503");
 			return value;
@@ -615,7 +615,6 @@ double compute_string(char *s,char *new_string)
 	fp->b_flag |= FSINVS;
 	EmptyText(fp);
  	init_error();
-	initialize_vars();
 	insert_string(fp,s,strlen(s));
 	// MESG("compute_string [%s]",s);
 	fp->b_type=1;
@@ -639,9 +638,13 @@ int docmd(char *cmd)
 {
  double value=0;
  value = compute_string(cmd,NULL);
- if(err_num>0) { msg_line("Error!: %s",err_str);return(FALSE);}
- else {
+ if(err_num>0) { 
+ 	msg_line("Error!: %s",err_str);
+	init_error();
+ 	return(FALSE);
+ } else {
  	msg_line("Result of [%s] is : %f",cmd,value);
+
 	return (TRUE);
  };
 }
@@ -671,7 +674,7 @@ int exec_named_function(char *name)
     FILEBUF *bp;		/* ptr to buffer to execute */
     char bufn[MAXFLEN+2];		/* name of buffer to execute */
 	int ival;
-
+	// MESG("exec_named_function: %s",name);
 	/* find out what buffer to execute */
 	strlcpy(bufn+1,name,MAXFLEN);
 
@@ -686,9 +689,10 @@ int exec_named_function(char *name)
 		return(FALSE);
     };
 	bp->b_type=1;	/* set file type to cmd  */
-
+	init_exec_flags();
 	/* parse the block if not already parsed  */
-	parse_block1(bp,NULL,0,0);	/* do not init if already parsed!  */
+	if(bp->m_mode != M_PARSED)
+	parse_block1(bp,NULL,0);	/* do not init if already parsed!  */
 
 	if((err_num=check_init(bp))>0) {
 		return(0);
@@ -728,12 +732,12 @@ int exec_file(num n)
 		if(get_filebuf(fname,NULL,0)!=NULL) fspec=fname;
 		else return FALSE;
 	};
-//	MESG("exec_file: [%s]",fspec);
+	MESG("exec_file: [%s]",fspec);
 	/* otherwise, execute it */
 	while (n-- > 0) 
 	{
 		status=dofile(fspec);
-//		MESG("exec_file: return status = %d",status);
+		MESG("exec_file: return status = %d val=%f",status,get_val());
 		
 		if (status != TRUE) return(status);
 	};
@@ -768,9 +772,8 @@ int dofile(char *fname)
 		if((bp->b_state & FS_ACTIVE)==0) {
 			activate_file(bp);
 			if ((status = file_read1(bp,fname)) != TRUE) {
-
-			return(status);
-		};
+				return(status);
+			};
 		} else {
 			activate_file(bp);
 		};
@@ -778,6 +781,9 @@ int dofile(char *fname)
 	/* go execute it! */
 	int backup_caf=current_active_flag;
 	double d = compute_block(bp,bp,1);
+	// MESG("dofile: after compute_block:");
+	if(err_num>0) return (FALSE);
+	init_error();
 	set_vdval(d);
 	current_active_flag=backup_caf;
 	/* if not displayed, remove the now unneeded macro buffer and exit */
@@ -1279,12 +1285,15 @@ int refresh_current_line(num nused)
 		insert_string(cbfp,text_line,strlen(text_line));
 	};
 
-	if(err_num>0) 
- 		msg_line("Error[%d]=%s :: 0x%lX = %12.3f",err_num,err_str,(int)value,value);
- 	else {
- 		if(vtype_is(VTYPE_STRING)) msg_line(" %15.3f,[%s]",value,get_sval());
+	macro_exec=0;
+	if(err_num>0) {
+ 		msg_line("Error [%d] %s",err_num,err_str);
+		set_update(cwp,UPD_EDIT);
+		return (FALSE);
+ 	} else {
+ 		if(vtype_is(VTYPE_STRING)) msg_line("res=[%s]",value,get_sval());
 		else {
-			msg_line(" %15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
+			msg_line("res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
 		}
  	};
 	if(is_ddot){
@@ -1293,7 +1302,6 @@ int refresh_current_line(num nused)
 	} else {
 		textpoint_set(cwp->tp_current,tpo);	/* where it was !  */
 	};
-	macro_exec=0;
 	set_update(cwp,UPD_EDIT);
  	return(TRUE);
 }

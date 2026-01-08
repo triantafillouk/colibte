@@ -109,6 +109,7 @@ int main(int argc, char **argv)
 	if(lc_lang==NULL) lc_lang=getenv("LANG");
 	else if(lc_lang[0]==0) lc_lang=getenv("LANG");
 	errno=0;
+	set_start_dir(NULL);
 
 	// check_config_dir();
 	init_hash();
@@ -119,12 +120,11 @@ int main(int argc, char **argv)
 
 	load_config();
 	parse_command_line(argc,argv);
+	initialize_call_stack((int)bt_dval("call_stack_size"));
 	if(firstbp==NULL && !execmd) {
 		// scratch_files[0] = load_scratch_files();
 		firstbp=get_scratch_file();
 	};
-	// MESG("main:start1");
-	set_start_dir(NULL);
 #if	TNOTES
 	init_note_keys();
 #endif
@@ -153,6 +153,7 @@ int main(int argc, char **argv)
 		};
 		driver_type=init_drv_env();	// driver depending variable initialization
 	};
+
 	// MESG("execute statup file");
 	// list_buffers("0");
 	/* execute startup file here */
@@ -308,9 +309,18 @@ void parse_command_line(int argc, char **argv)
 				case 'b':	/* open as binary file  */
 					binflag=1;
 					break;
+				case 'g':
+					show_bnf_tokens=1;
+					set_debug(2);
+					execmd=1;
+					carg++;
+					startfile=argv[carg];
+						main_args = new_list_array(argc-carg-1);
+						allocate_array(main_args);
+						a_arg=0;
+					break;
 				case 't':
 					show_tokens=1;
-					// MESG("show_tokens!");
 				case 'x':	/* execute file and quit */
 					execmd=1;
 				case 'X':	/* execute file as statrup */
@@ -403,7 +413,8 @@ void parse_command_line(int argc, char **argv)
 			}
 #endif
 		}
-	};
+	}
+	;
 #if	0
 	if (firstbp==NULL) {
 				firstbp = get_scratch_file();

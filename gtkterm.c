@@ -484,7 +484,7 @@ void init_color()
 {
  int i;
  /* Read the colors from the conf files  */
-  color_scheme_read();
+  color_scheme_read(1);
   cmap = gdk_colormap_get_system ();	/* use the system colormap */
 
  for(i=0;i<COLOR_TYPES;i++) 

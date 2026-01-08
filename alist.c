@@ -1005,7 +1005,7 @@ BTNODE *set_btdval(BTREE *bt, char *name,double value)
  btn = find_btnode(bt,name);
  if(btn) {
 	if(btn->node_vtype==VTYPE_STRING) {
-		MESG("set_btdval: free string");
+		// MESG("set_btdval: free string");
 		free(btn->node_sval);btn->node_vtype=VTYPE_NUM;
 		btn->node_vtype=VTYPE_NUM;
 	};
@@ -1013,6 +1013,7 @@ BTNODE *set_btdval(BTREE *bt, char *name,double value)
  } else {
 	btn=add_btnode(bt,name);
 	btn->node_dval=value;
+	btn->node_type=-1;
 	btn->node_vtype=VTYPE_NUM;
  };
  return(btn);

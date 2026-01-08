@@ -78,3 +78,18 @@ or
 >  yum install bind-utils
 >  yum install bzip2
 >  yum install gtk2-devel
+
+### arch linux
+> as root install sudo, which
+> sudo pacman -Sy gcc 
+> sudo pacman -Sy make
+> 
+> sudo pacman -Sy glib2
+> sudo pacman -Sy sqlite
+> sudo pacman -Sy glib2
+> sudo pacman -Sy pkgconfig
+### optional
+> sudo pacman -Sy ctags
+> sudo pacman -Sy git
+> sudo pacman -Sy less
+

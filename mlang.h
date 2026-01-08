@@ -27,8 +27,8 @@ typedef struct tok_struct {
 	short tnum;	/* token number for debugging  */
 	short ttype;	/* token type */
 	short tgroup;	/* token group  */
-	short tind1;	/* index1 for type elements  */
-	short tind2;	/* index2 for type elements  */
+	// short tind1;	/* index1 for type elements  */
+	// short tind2;	/* index2 for type elements  */
 	char *tname;	// token name or string value
 	double dval;	// double value
 	union {
@@ -39,13 +39,14 @@ typedef struct tok_struct {
 	FFunction directive;
 	union {	
 		int	number_of_args;
-		struct BTNODE *tok_node;
+		struct MVAR *var_pointer;
 		struct curl_struct *tcurl;
 		struct tok_struct *match_tok;	/* for curl, parenthesis, bracket  */
 		struct tok_struct *next_tok;	/* for directives  */
 		TextPoint *ddot;				/* ddot text point  */
 		struct array_dat *tok_adat;		/* used in array definition only in LB  */
-		struct FILEBUF *tbuf;
+		struct FILEBUF *proc_buffer;
+		struct BTNODE *tok_node;
 	};
 } tok_struct;
 
@@ -97,8 +98,8 @@ typedef struct term_type {
 
 void init_token_mask();
 double assign(int is_edenv);
-int parse_block1(FILEBUF *bf,BTREE *stree,int start,int extra);
-int assign_args1( MVAR *va,MVAR *td,int nargs);
+int parse_block1(FILEBUF *bf,BTREE *stree,int start);
+void assign_args1( MVAR *va,MVAR *current_stable,int nargs);
 double factor_1();
 double term1_1();
 double term2_1();
@@ -210,7 +211,23 @@ enum {
 	TOK_ASSIGN_TYPE,	// 78
 	TOK_TYPE_ELEMENT,	// 79
 	TOK_DOT,
+	TOK_INCBEFORE,
+	TOK_DECBEFORE,
 	TOK_OTHER			// 81
 };
 
 
+/*
+lexpression
+	cexpression
+		num_expression
+			num_term1
+				num_term2
+					factor_function
+
+lexpression := 
+	cexpression , term0
+	cexpression , bool ..
+
+
+*/

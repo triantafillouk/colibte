@@ -26,7 +26,7 @@ int utf_num_chars(char *utf);
 void msg_line(char *);
 char * utf8_rtruncate(char *utf_string, int len);
 int	macbug = 0;		/* macro debuging flag		*/
-
+int bnf_flag = 0;
 extern int xwin;
 extern int discmd;
 
@@ -37,12 +37,18 @@ char current_working_dir[MAXFLEN];
 int set_debug(long long n)
 {
 	macbug=n;
+	if(n>1) bnf_flag=1;
 	return true;
 }
 
 int debug_flag()
 {
 	return macbug;
+}
+
+int bnf_debug()
+{
+	return bnf_flag;
 }
 
 void increase_debug_flag()
