@@ -18,18 +18,19 @@ function fib2_inner(a,b,n)
 #	print("fib2_iner: a="+a+" b="+b+" n="+n)
 	if(n==0) { return(a) }
 #	print ("fib2_iner: "+n+" "+fib2_inner(b,a+b,n-1))
-	return fib2_inner(b ,a+b ,n-1);
+	return fib2_inner(b ,a+b ,n-1)
 }
 
 fib_num =  35
 cls
-print ("Evaluate fibonachi "+fib_num)
+#print ("Evaluate fibonachi "+fib_num)
 show_time("Fibonachi start" ,0)
-print("result for fib :"+fib(fib_num))
-show_time("fib" ,1);
-print("result for fib1 :"+fib1(fib_num))
-show_time("fib1" ,1);
-print("result for fib2_inner "+fib2_inner(0 ,1 ,fib_num))
+#print("result for fib :"+fib(fib_num))
+#show_time("fib" ,1);
+#print("result for fib1 :"+fib1(fib_num))
+#show_time("fib1" ,1);
+#print("result for fib2_inner "+fib2_inner(0 ,1 ,fib_num))
 show_time("fib2_inner" ,1);
+for(i=100;i<1500;i+=100) {print("fib2_inner(",i,")=",fib2_inner(0 ,1 ,i));}
 show_time("end " ,2)
 

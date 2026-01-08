@@ -9,7 +9,7 @@ extern BTREE *global_types_tree;
 extern char *vtype_names[];
 
 void mesg_out(const char *fmt, ...);
-
+void init_stack();
 tok_struct *current_token();
 void set_vtype(int type);
 int vtype_is(int type);
@@ -50,7 +50,7 @@ void get_function_args (int number_of_args)
 			tok=current_token();
 			MESG("get_function_args:%d: [%d %s]",i,tok->tnum,tok->tname);
 #endif
-			double value = num_expression();
+			double value = expression("function_args");
 			va[i].var_type=get_vtype();
 			if(vtype_is(VTYPE_STRING)) { 
 				va[i].sval=strdup(get_sval());
@@ -90,7 +90,7 @@ void get_numeric_args (int number_of_args)
 	// MESG("get_numeric_args: %d",number_of_args);
 	for(i=0;i< number_of_args;i++ ) { 
 		ntoken();
-		double value = num_expression();
+		double value = expression("numeric_args");
 		va[i].var_type=get_vtype();
 		va[i].dval=value;
 	};
@@ -101,7 +101,8 @@ double get_numeric_arg ()
 {
 	// MESG("get_numeric_args:");
 	ntoken();
-	double value = num_expression();
+	double value = expression("numeric_arg");
+	set_vtype(VTYPE_NUM);
 	ntoken();
 	return value;
 }
@@ -278,7 +279,7 @@ double uf_print()
 		ntoken();
 		tok=current_token();
 		// MESG("	eval arg %d tnum=%d ttype=%d",i,tok->tnum,tok->ttype);
-		value=num_expression();
+		value=expression("uf_print");
 		// MESG("		val=%f s='%s'",value,get_sval());
 		switch(get_vtype()) {
 			case VTYPE_ARRAY:
@@ -296,10 +297,7 @@ double uf_print()
 				break;
 			};
 			case VTYPE_STRING:{
-				char *p_out=strdup(get_sval());
-				set_vtype(VTYPE_STRING);
-				out_print(p_out,0);
-				free(p_out);
+				out_print(get_sval(),0);
 			};
 		};
 		// MESG("	if: after switch!");
@@ -352,7 +350,7 @@ double uf_lower()
 		clean_saved_string(strlen(va[0].sval));
 		get_lowercase_string(get_sval(),va[0].sval);
 	} else {
-		syntax_error("lower: wrong_type of args",100);
+		syntax_error("lower: needs a string argument",100);
 		set_sval("");
 	};
 	set_vtype(VTYPE_STRING);
@@ -366,7 +364,7 @@ double uf_ascii()
 	if(va[0].var_type==VTYPE_STRING) {
 	 value=va[0].sval[0];
 	} else {
-		syntax_error("ascii: wrong_type of args",100);
+		syntax_error("s_acs: needs a string argument",100);
 	};
 	set_vtype(VTYPE_NUM);
 	// free(va);
@@ -407,8 +405,11 @@ double uf_rand()
 {
  // static long =
  long max=(long) get_numeric_arg();
- set_vtype(VTYPE_NUM);
+#if	DARWIN
+ long value=arc4random_uniform(max);
+#else
  long value=random() % max;
+#endif
  // MESG("uf_rand:%ld",value);
  return (double)value;
 }
@@ -416,7 +417,6 @@ double uf_rand()
 double uf_seed()
 {
 	long seed=(long) get_numeric_arg();
-	set_vtype(VTYPE_NUM);
 	srand(seed);
 	return 0;
 }
@@ -539,8 +539,9 @@ double uf_dinput()
 
 double uf_init()
 {
+	MESG("initialize: uf_init");
+	init_stack();
 	ntoken();
-	initialize_vars();
 	return 0;
 }
 
@@ -559,13 +560,7 @@ double uf_sqrt()
 {
 	double value=get_numeric_arg();
 	// MESG("sqrt(%f)",value);
-	if(vtype_is(VTYPE_NUM)) {
-		value=sqrt(value);
-	} else {
-		// MESG("error! vtype=%X",get_vtype());
-		syntax_error("sqrt: wrong argument",305);
-	};
-	// MESG("	is %f",value);
+	value=sqrt(value);
 	return value;
 }
 
@@ -573,13 +568,7 @@ double uf_cbrt()
 {
 	double value=get_numeric_arg();
 	// MESG("cbrt(%f)",value);
-	if(vtype_is(VTYPE_NUM)) {
-		value=cbrt(value);
-	} else {
-		// MESG("error! vtype=%X",get_vtype());
-		syntax_error("cbrt: wrong argument",305);
-	};
-	// MESG("	is %f",value);
+	value=cbrt(value);
 
 	return value;
 }
@@ -595,67 +584,56 @@ double uf_dbg_message()
 double uf_sin()
 {
 	double value=get_numeric_arg();
-	if(vtype_is(VTYPE_NUM))	
-		value=sin(value);
-	else {
-		syntax_error("sin: wrong argument",305);
-	};
+	value=sin(value);
 	return value;
 }
 
 double uf_cos()
 {
 	double value=get_numeric_arg();
-	if(vtype_is(VTYPE_NUM))	value=cos(value);
-	else syntax_error("cos: wrong argument",305);
+	value=cos(value);
 	return value;
 }
 
 double uf_tan()
 {
 	double value=get_numeric_arg();
-	if(vtype_is(VTYPE_NUM)) value=tan(value);
-	else syntax_error("tan: wrong arguments",100);
+	value=tan(value);
 	return value;
 }
 
 double uf_log10()
 {
 	double value=get_numeric_arg();
-	if(vtype_is(VTYPE_NUM))	value=log10(value);
-	else syntax_error("log10: wrong argument",305);
+	value=log10(value);
 	return value;
 }
 
 double uf_atan()
 {
 	double value=get_numeric_arg();
-	if(vtype_is(VTYPE_NUM))	value=atan(value);
-	else syntax_error("atan: wrong argument",305);
+	value=atan(value);
 	return value;
 }
 
 double uf_log()
 {
 	double value=get_numeric_arg();
-	if(vtype_is(VTYPE_NUM))	value=log(value);
-	else syntax_error("log: wrong argument",305);
+	value=log(value);
 	return value;
 }
 
 double uf_trunc()
 {
 	double value=get_numeric_arg();
-	if(vtype_is(VTYPE_NUM))	value=trunc(value);
-	else syntax_error("trunc: wrong argument",305);
+	value=trunc(value);
 	return value;
 }
 
 double uf_round()
 {
 	double value=get_numeric_arg();
-	if(vtype_is(VTYPE_NUM))	value=round(value);
-	else syntax_error("round: wrong argument",305);
+	value=round(value);
 	return value;
 }
 
@@ -684,7 +662,6 @@ double uf_deq()
 {
 	get_numeric_args(2);
 	double value = deq(va[0].dval,va[1].dval);
-	set_vtype(VTYPE_NUM);
 	return value;
 }
 
@@ -770,11 +747,12 @@ double uf_show_vars()
 
 	mesg_out("Ind Name       Type             Value      local vars",exe_buffer->symbol_tree->items);
 	eval_btree(exe_buffer->symbol_tree->root,show_var_node);
-
+#if	USE_TYPE_VARS
 	if(global_types_tree->root) {
 	mesg_out("Ind Name       Type             Value      global vars/types",exe_buffer->symbol_tree->items);
 		eval_btree(global_types_tree->root,show_var_node);
 	} else mesg_out("global_types_tree: empty!");
+#endif
 	return 0;
 }
 
@@ -794,3 +772,16 @@ double uf_list_tokens()
  return 0;
 }
 
+double uf_test_loop()
+{
+	long int lmax= (long int) get_numeric_arg();
+	double p=0;
+	double l=1;
+	int j=1;
+	int i=1;
+	for(j=1;j<lmax;j++) {
+		l = i*j+32;
+		p = p + l + 6;
+	};
+	return p;
+}

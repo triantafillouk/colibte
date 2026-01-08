@@ -9,7 +9,7 @@
 
 typedef struct  {
         int		k_code;                 /* Key code                     */
-        int     (*k_fp)();              /* Routine to handle it         */
+        int     (*k_fp)(num);              /* Routine to handle it         */
 		char 	*macro_name;				/* macro name */} KEYTAB;
 
 KEYTAB  keytab_emacs[MAXASSIGNS] = {

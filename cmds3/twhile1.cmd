@@ -25,9 +25,9 @@ while (i<3)
 	m1 = "while i="+i+" p="+p+" i1="+i1+" i2="+i2	: [while i=2.000000 p=2.000000 i1=0.000000 i2=5]
 	message_wait(m1)
 #	getchar()
-	message("loop "+str$(i)+"|"+str$(k)+"|"+str$(l)+"|"+str$(p))
-	message("i = "+str$(i))
-	i=i+1
+	message("loop "+i+"|"+k+"|"+l+"|"+p)
+	message("i = "+i++)
+	i++
 }
 print("test end total is:"+total)
 total

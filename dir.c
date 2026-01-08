@@ -1352,8 +1352,6 @@ void init_extensions()
 {
  char *fname;
 
- set_start_dir(NULL);
-
  if((fname = find_file("",APPLICATION_EXTENSIONS,1,0))==NULL) return;
 
  read_pairs(fname,'=',&f_extension,&f_extcmd);
@@ -2552,7 +2550,7 @@ int listdir(int dtype)
  return stat;
 }
 
-int listdir1()
+int listdir1(num dummy)
 {
  int stat=0;
  stat=listdir(1);
@@ -2560,7 +2558,7 @@ int listdir1()
  return(stat);
 }
 
-int listdir2()
+int listdir2(num dummy)
 {
  int stat=0;
  stat=listdir(2);

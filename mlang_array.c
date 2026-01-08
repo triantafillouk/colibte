@@ -92,6 +92,7 @@ void allocate_array(struct array_dat *adat)
 {
  int i;
  // MESG("allocate_array: rows=%d cols=%d astat=%d type=%d",adat->rows,adat->cols,adat->astat,adat->atype);
+ 
  if(adat->astat==ARRAY_UNALLOCATED || adat->atype==VTYPE_AMIXED) {	/* new/renew  */
  	if(adat->atype==VTYPE_ARRAY) {	/* allocate num array  */
 
@@ -135,6 +136,7 @@ void allocate_array(struct array_dat *adat)
 		// MESG("dynamic array initialized! type=%d",adat->atype);
 	};
  };
+ adat->array_name="allocated";
  adat->astat=ARRAY_ALLOCATED;
  // MESG("	array %d allocated , type=%d!",adat->anum,adat->atype);
 }
@@ -191,7 +193,8 @@ array_dat * dup_array_add1(array_dat *a,double plus)
  na->astat=ARRAY_ALLOCATED;
  return(na);
 }
-	/* subtruct array from variable  */
+
+/* subtruct array from variable  */
 array_dat * dup_array_sub1(array_dat *a,double plus)
 {
  array_dat *na;	/* new array  */

@@ -2018,6 +2018,7 @@ void highlight_ps1(int c)
 		break;
 	//case '\\':
 	case '$':{
+		if(hquotem == H_QUOTE1) break;
 		hstate=(hstate==HS_PREVESC)?0:HS_PREVESC;
 		};
 		break;

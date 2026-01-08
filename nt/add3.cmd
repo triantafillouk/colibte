@@ -11,7 +11,7 @@ function add3(a,b,c)
 cls
 
 result = add3(1 ,2 ,2)
-result:   3.0
+result: 
 
 `
  this should act as a multiline comment

@@ -15,7 +15,7 @@ bof()
 a=_text
 a: <0.00000>[Sat Nov  8 19:07:32 2014]
 print("first line set to ["+a+"]")
-message("i<"+str$(i)+" and j<"+str$(j)+" sets p="+str$(p))
+message("i<"+i+" and j<"+j+" sets p="+p)
 save_file(1)
 }
 

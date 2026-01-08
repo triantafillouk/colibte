@@ -22,6 +22,9 @@ k=k+1
 #print()
 #a: <3.00000 | 0x3 | 0o3>
 print("test end: a="+a+" c="+c+" d="+d)
+a:   3.0
+c:   0.0
+d:   1.0
 
-if(a==3 & c==0 & d==1) print("test end ok!")
+if((a==3) & (c==0) & (d==1)) print("test end ok!")
 else print("test false!")

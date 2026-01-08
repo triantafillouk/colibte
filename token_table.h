@@ -14,7 +14,7 @@ TOK_TAB token_table[]= {
 	{TOK_QUOTE			,"quote",0},
 	{TOK_LPAR			," ( ",0},	// 7
 	{TOK_RPAR			," ) ",0},	// 8
-	{TOK_SHOW			,":",0},	// 9
+	{TOK_SHOW			," : ",0},	// 9
 	{TOK_COMMENT		,"comment",0},	// 10
 	{TOK_VAR			,"var",0},	// 11 level 0 variable
 	{TOK_OPTION			,"option",0},	// 12 editor option
@@ -24,8 +24,8 @@ TOK_TAB token_table[]= {
 	{TOK_ENV			,"env",0},	// editor environment function
 	{TOK_TERM0			,"term0",0},	// term0 group
 	{TOK_TERM			,"term",0},	// term operators (+,-)
-	{TOK_TERM1			,"term1",0},	// 19 term2 operators (*,/) 
-	{TOK_TERM2			,"term2",0},	// 20 term1 operators (%,^)
+	{TOK_TERM1			,"term1",0},	// 19 term1 operators (*,/) 
+	{TOK_TERM2			,"term2",0},	// 20 term2 operators (%,^)
 	{TOK_ASSIGN			," = ", TOK_TERM0},	// 21 assignment
 	{TOK_EOF			,"EOF",0},	// 22 end of file token
 	{TOK_NUM			,"numeric",0},	// 23 numeric
@@ -50,7 +50,7 @@ TOK_TAB token_table[]= {
 	{TOK_OR				," OR ",TOK_BOOL},	/* |  */
 	{TOK_NOT			," NOT ",0},	/* !  */
 	{TOK_NAND			," NAND ",TOK_TERM0},	/* !&  */
-	{TOK_NOR			," NOR ",TOK_TERM0},	/* !|  */
+	{TOK_NOR			," NOR ",TOK_BOOL},	/* !|  */
 	{TOK_XOR			," XOR ",TOK_BOOL},	/* ^  */
 	{TOK_PLUS			," + ",TOK_TERM},	// 47
 	{TOK_MINUS			," - ",TOK_TERM},	// 48
