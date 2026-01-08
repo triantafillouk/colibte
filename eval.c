@@ -732,12 +732,12 @@ int exec_file(num n)
 		if(get_filebuf(fname,NULL,0)!=NULL) fspec=fname;
 		else return FALSE;
 	};
-//	MESG("exec_file: [%s]",fspec);
+	MESG("exec_file: [%s]",fspec);
 	/* otherwise, execute it */
 	while (n-- > 0) 
 	{
 		status=dofile(fspec);
-//		MESG("exec_file: return status = %d",status);
+		MESG("exec_file: return status = %d val=%f",status,get_val());
 		
 		if (status != TRUE) return(status);
 	};

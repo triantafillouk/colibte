@@ -859,7 +859,7 @@ int err_factor()
 			RT_MESG1(486);
 	 	};
 		break;
-#if	1
+#if	0
 	case TOK_EQUAL:
 		NTOKEN_ERR(444);
 		// err_cexpression();
@@ -1347,6 +1347,18 @@ int err_lexpression()
 			simple=0;
 			continue;
 		};
+		case TOK_EQUAL:
+		case TOK_NOTEQUAL:
+		case TOK_SMALLER:
+		case TOK_BIGGER:
+		case TOK_SMALLEREQ:
+		case TOK_BIGGEREQ:
+			tok->tgroup=TOK_BOOL;
+			NTOKEN_ERR(708);
+			err_num=err_cexpression();
+			stack_push("compare",tok0);
+			simple=0;
+			continue;
 		case TOK_AND: {	
 			// tok->term_function = logical_and;
 			// MESG_TOK_INFO("# err_lexpression",tok);

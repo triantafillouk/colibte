@@ -197,7 +197,7 @@ char *vtype_names[] = {
 void stack_push(char *title,tok_struct *tok)
 {
 #if	TBNF
- static int ind=0;
+ //static int ind=0;
  // if(no_push) { MESG("stack_push:%s skip %s",title,tok_info(tok));return;};
  if(tok!=NULL) {
  // memcpy((void *)check_buffer->tok_bnf,(void *)tok,sizeof(tok_struct));
@@ -1749,14 +1749,11 @@ double factor_cmd()
 	// err_num=0;
 	err_line=tok->tline;
 	err_str=NULL;
-	// tok_struct *tok1=tok;
 	// MESG(";factor_cmd: execute function! current token is [%s] tnum=%d value=%d",tok->tname,tok->tnum,(int)value);
 	status=ed_command->n_func((int)value);
-	// MESG("toknum1 = %d",tok1->tnum);
-	// tok=tok1;
-	// MESG(";TOC_CMD: tnum=%d status=%d check_par=%d",tok->tnum,status,check_par);
-	set_vdval(status);
 
+	value=get_val();
+	// MESG("TOC_CMD: result %f",get_val());
 	macro_exec = save_macro_exec;
 
 	if(check_par) { 
@@ -1765,16 +1762,15 @@ double factor_cmd()
 			// MESG("right parenthesis skipped!");
 		};
 	};
-#if	1
+	if(status>0) MESG("failed subroutine!");
 	if(err_num>0) {
 		// ERROR("error %d after function [%s] at line %d: %s",err_num,ftable[function_index].n_name,err_line,err_str);
 		set_error(tok,105,"factor_cmd");
 		show_error("Factor","factor_cmd");
-		RTRN(status);
 	};
-#endif
-	// MESG(";factor_cmd:end tnum=%d value=%f ex_value=%f",tok->tnum,value,ex_value);
-	RTRN(status);
+
+	// MESG(";factor_cmd:end tnum=%d value=%f ex_value=%f status=%f",tok->tnum,value,ex_var.dval,status);
+	RTRN(value);
 }
 
 // Editor env variable
