@@ -764,6 +764,12 @@ int is_mlang(FILEBUF *fp)
  return 1; 
 }
 
+void set_symbol_table(MVAR *stable)
+{
+	current_stable=stable;
+}
+
+
 MVAR *new_symbol_table(int const size)
 {
  // MESG("Initialize new_symbol_table: size %d",size);
@@ -967,6 +973,11 @@ int check_init(FILEBUF *bf)
  return(0);
 }
 
+void set_current_token(tok_struct *tnew)
+{
+	tok=tnew;
+}
+
 tok_struct *current_token()
 {
 	return(tok);
@@ -1149,7 +1160,7 @@ double factor_line_array()
 	RTRN(1.2);
 }
 
-inline MVAR *get_left_slot(int ind)
+MVAR *get_left_slot(int ind)
 {
 	// MESG("get_left_slot: ind=%d",ind);
 	return current_stable+ind;
@@ -1749,20 +1760,24 @@ double factor_cmd()
 	// err_num=0;
 	err_line=tok->tline;
 	err_str=NULL;
-	// MESG(";factor_cmd: execute function! current token is [%s] tnum=%d value=%d",tok->tname,tok->tnum,(int)value);
-	status=ed_command->n_func((int)value);
-
-	value=get_val();
+	MESG(";factor_cmd: execute function! current token is [%s] tnum=%d value=%d",tok->tname,tok->tnum,(int)value);
+	value=ed_command->n_func((int)value);
+	status=value;
+	// value=get_val();
 	// MESG("TOC_CMD: result %f",get_val());
 	macro_exec = save_macro_exec;
 
 	if(check_par) { 
 		if(check_rparenthesis()) {
 			NTOKEN2;
-			// MESG("right parenthesis skipped!");
+			MESG("right parenthesis skipped!");
 		};
 	};
-	if(status>0) MESG("failed subroutine!");
+	if(status==false) {
+		MESG("failed subroutine!");
+		//err_num=102;
+		set_break();
+	};
 	if(err_num>0) {
 		// ERROR("error %d after function [%s] at line %d: %s",err_num,ftable[function_index].n_name,err_line,err_str);
 		set_error(tok,105,"factor_cmd");

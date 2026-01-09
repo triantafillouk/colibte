@@ -126,7 +126,7 @@ extern char patmatch[];
 
 extern int found;
 
-double exec_function(FILEBUF *vp,VAR *vargs,int nargs);
+double exec_function(FILEBUF *vp,MVAR *vargs,int nargs);
 void show_points(FILEBUF *bf,FILE *fp);
 int check_init(FILEBUF *bf);
 void set_record_string1(char *st2);
@@ -668,6 +668,14 @@ int macro_line(num nused)
 	return(status);
 }
 
+MVAR * push_args_1(int nargs,int vars_num);
+extern FILEBUF *exe_buffer;
+void set_current_token(tok_struct *tnew);
+tok_struct *current_token();
+MVAR *new_symbol_table(int const size);
+void set_symbol_table(MVAR *stable);
+MVAR *get_left_slot(int ind);
+void delete_symbol_table(MVAR *td, int size,int nargs);
 
 int exec_named_function(char *name)
 {
@@ -697,9 +705,17 @@ int exec_named_function(char *name)
 	if((err_num=check_init(bp))>0) {
 		return(0);
 	};
-
+	
+	if(bp->symbol_table == NULL) {
+		MESG("create symbol_table size=%d",bp->symbol_tree->items);
+		bp->symbol_table = new_symbol_table(bp->symbol_tree->items);
+	};
+	MVAR *ori_stable = get_left_slot(0);
+	set_symbol_table(bp->symbol_table);
 	ival = (int)exec_function(bp,NULL,0);
-
+	delete_symbol_table(bp->symbol_table,bp->symbol_tree->items,0);
+	bp->symbol_table=NULL;
+	set_symbol_table(ori_stable);
 	return(ival);
 }
 
