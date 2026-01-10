@@ -32,6 +32,9 @@ FILEBUF *check_buffer=NULL;
 void show_vars(MVAR *va, int size,char *title);
 void set_term_function(tok_struct *tok, TFunction term_function);
 void  skip_args1(int nargs);
+int check_init(FILEBUF *bf);
+double exec_function(FILEBUF *bp,int nargs);
+MVAR * push_args_1(int nargs,int vars_num);
 
 #if	SYNTAX_DEBUG
 
@@ -820,7 +823,7 @@ MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
 /* free symbol table after execute */
 void delete_symbol_table(MVAR *td, int size,int nargs)
 {
- MESG("delete_symbol_table: nargs=%d size=%d",nargs,size);
+ // MESG("delete_symbol_table: nargs=%d size=%d",nargs,size);
  MVAR *sslot=td;
  // int i=0;
  for(;sslot < td+nargs;sslot++)
@@ -905,6 +908,40 @@ void init_exec_flags()
  INIT_STAGE;
  ex_nvars=0;ex_nquote=0;ex_nums=0;	/* initialize table counters  */
  // MESG("init_exec_flags:end");
+}
+
+int exec_named_function(char *name)
+{
+    FILEBUF *bp;		/* ptr to buffer to execute */
+    char bufn[MAXFLEN+2];		/* name of buffer to execute */
+
+	// MESG("exec_named_function: %s",name);
+	/* find out what buffer to execute */
+	strlcpy(bufn+1,name,MAXFLEN);
+
+	/* construct the buffer name */
+	bufn[0] = CHR_LBRA;
+	strlcat(bufn, "]",MAXFLEN);
+	// MESG("exec_named_function: name=%s bufn=%s",name,bufn);	
+	/* find the pointer to that buffer */
+    if ((bp=get_filebuf(bufn,NULL,FSINVS)) == NULL) 
+	{
+		msg_line("No function named %s",bufn);
+		return(FALSE);
+    };
+	bp->b_type=1;	/* set file type to cmd  */
+	init_exec_flags();
+	/* parse the block if not already parsed  */
+	if(bp->m_mode != M_PARSED)
+	parse_block1(bp,NULL,0);	/* do not init if already parsed!  */
+
+	if((err_num=check_init(bp))>0) {
+		return(0);
+	};
+
+	double value=exec_function(bp,0);
+
+	return((int)value);
 }
 
 void show_error(char *from,char *name)
@@ -1082,8 +1119,21 @@ MVAR * push_args_1(int nargs,int vars_num)
 }
 
 
-double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
+double exec_function(FILEBUF *proc_buffer,int nargs)
 {
+#if	1
+	MVAR *old_symbol_table=current_stable;
+	current_stable = push_args_1(nargs,proc_buffer->symbol_tree->items);
+	tok_struct *after_proc=tok;
+	
+	tok=proc_buffer->tok_table;	/* start of function  */
+	skip_args1(nargs);
+	double value=tok->directive();
+	delete_symbol_table(current_stable,proc_buffer->symbol_tree->items,nargs);
+	current_stable=old_symbol_table;
+	tok=after_proc;
+	return value;
+#else
 	// MESG("exec_function: bp=[%s] nargs=%d level=%d",bp->b_fname,nargs,level);
 	tok=bp->tok_table;	/* start of function  */
 #if	TBNF
@@ -1091,6 +1141,7 @@ double exec_function(FILEBUF *bp,MVAR *vargs,int nargs)
 #endif
 	skip_args1(nargs);
 	return tok->directive();
+#endif
 }
 
 /* ---------------------- Factor functions ------------------------------------ */
@@ -1892,20 +1943,13 @@ double factor_proc()
 	NTOKEN2;	// skip proc name
 	// MESG("factor_proc: tok0 [%d %s] args=%d",tok0->tnum,tok0->tname,tok0->tind);
 	// MESG("factor_proc: tok  [%d %s] %d ",tok->tnum,tok->tname,tok->tind);
-	MVAR *old_symbol_table=current_stable;
 
-	current_stable = push_args_1(tok0->t_nargs,tok0->proc_buffer->symbol_tree->items);
-	// show_vars(current_stable,exe_buffer->symbol_tree->items+tok0->t_nargs,"after push_args");
+	double value = exec_function(tok0->proc_buffer,tok0->t_nargs);
 
-	tok_struct *after_proc=tok;
-	// MESG("factor_proc: tok after push [%d %s]",tok->tnum,tok->tname);
-	double value=exec_function(tok0->proc_buffer,current_stable,tok0->t_nargs);
 	// MESG("factor_proc: return val=%f",value);
-	tok=after_proc;
-	current_active_flag=1;	/* start checking again  */
-	delete_symbol_table(current_stable,tok0->proc_buffer->symbol_tree->items,tok0->t_nargs);
 
-	current_stable=old_symbol_table;
+	current_active_flag=1;	/* start checking again  */
+
 	exe_buffer=cbuf;
 	RTRN(value);
 }
@@ -3592,8 +3636,7 @@ int refresh_current_buffer(num nused)
  parse_block1(fp,fp->symbol_tree,1);
 
  if(err_num<1){	/* if no errors  */
-	fp->symbol_table=new_symbol_table(fp->symbol_tree->items);
-	current_stable=fp->symbol_table;
+	current_stable=new_symbol_table(fp->symbol_tree->items);
 
  	msg_line("checking ...");
 	drv_start_checking_break();

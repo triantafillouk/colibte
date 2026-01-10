@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.7T54 (9/1/2026)"
+#define VERSION 	 "#01.7T55 (10/1/2026)"
 
 
 // merged from kle4 #776T46 (28/7/2022)
@@ -713,7 +713,7 @@ typedef struct  FILEBUF {
 	BTREE *symbol_tree;	/* local symbol table  */
 	struct alist *type_list;	/* type table list  */
 
-	MVAR *symbol_table;	/* instance of variables data  */
+	//MVAR *symbol_table;	/* instance of variables data  */
 //	Notes structures
 #if	TNOTES
 	notes_struct *b_note;

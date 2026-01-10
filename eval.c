@@ -126,7 +126,7 @@ extern char patmatch[];
 
 extern int found;
 
-double exec_function(FILEBUF *vp,MVAR *vargs,int nargs);
+double exec_function(FILEBUF *vp,int nargs);
 void show_points(FILEBUF *bf,FILE *fp);
 int check_init(FILEBUF *bf);
 void set_record_string1(char *st2);
@@ -668,56 +668,6 @@ int macro_line(num nused)
 	return(status);
 }
 
-MVAR * push_args_1(int nargs,int vars_num);
-extern FILEBUF *exe_buffer;
-void set_current_token(tok_struct *tnew);
-tok_struct *current_token();
-MVAR *new_symbol_table(int const size);
-void set_symbol_table(MVAR *stable);
-MVAR *get_left_slot(int ind);
-void delete_symbol_table(MVAR *td, int size,int nargs);
-
-int exec_named_function(char *name)
-{
-    FILEBUF *bp;		/* ptr to buffer to execute */
-    char bufn[MAXFLEN+2];		/* name of buffer to execute */
-	int ival;
-	// MESG("exec_named_function: %s",name);
-	/* find out what buffer to execute */
-	strlcpy(bufn+1,name,MAXFLEN);
-
-	/* construct the buffer name */
-	bufn[0] = CHR_LBRA;
-	strlcat(bufn, "]",MAXFLEN);
-	// MESG("exec_named_function: name=%s bufn=%s",name,bufn);	
-	/* find the pointer to that buffer */
-    if ((bp=get_filebuf(bufn,NULL,FSINVS)) == NULL) 
-	{
-		msg_line("No function named %s",bufn);
-		return(FALSE);
-    };
-	bp->b_type=1;	/* set file type to cmd  */
-	init_exec_flags();
-	/* parse the block if not already parsed  */
-	if(bp->m_mode != M_PARSED)
-	parse_block1(bp,NULL,0);	/* do not init if already parsed!  */
-
-	if((err_num=check_init(bp))>0) {
-		return(0);
-	};
-	
-	if(bp->symbol_table == NULL) {
-		MESG("create symbol_table size=%d",bp->symbol_tree->items);
-		bp->symbol_table = new_symbol_table(bp->symbol_tree->items);
-	};
-	MVAR *ori_stable = get_left_slot(0);
-	set_symbol_table(bp->symbol_table);
-	ival = (int)exec_function(bp,NULL,0);
-	delete_symbol_table(bp->symbol_table,bp->symbol_tree->items,0);
-	bp->symbol_table=NULL;
-	set_symbol_table(ori_stable);
-	return(ival);
-}
 
 int execsub(num n)
 {
