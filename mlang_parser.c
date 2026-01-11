@@ -553,7 +553,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  {
 	if(change_script_state(tok_type,&script_active)) continue;
 
-	MESG("parse- cc=%d %c type=%3d [%10s] line=%d",cc,cc,tok_type,tname(tok_type),tok_line);
+	// MESG("parse- cc=%d %c type=%3d [%10s] line=%d",cc,cc,tok_type,tname(tok_type),tok_line);
 
 	if(err_num>0) {
 		check_buffer = buffer_ori;
@@ -836,13 +836,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			return(0);
 			};
 	};
-	MESG("	apply");
+	// MESG("	apply");
 	if(tok_type==TOK_NL) {
 		// start_of_line = 1;
 		continue;
 	};
-	// if(tok_type==TOK_RCURL) MESG("	TOK_RCURL");
-	MESG("	- token type=[%d %s] previous token is [%d %s]",tok_type,tname(tok_type),previous_ttype,tname(previous_ttype));
+	// MESG("	- token type=[%d %s] previous token is [%d %s]",tok_type,tname(tok_type),previous_ttype,tname(previous_ttype));
 	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {
 	if(!(is_now_sep && (tok_type==TOK_LCURL||tok_type==TOK_RCURL) )){

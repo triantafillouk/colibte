@@ -941,7 +941,6 @@ int exec_named_function(char *name)
 
 	double value=exec_function(bp,0);
 
-	set_break();
 	return((int)value);
 }
 
@@ -1212,7 +1211,7 @@ double factor_line_array()
 	RTRN(1.2);
 }
 
-MVAR *get_left_slot(int ind)
+inline MVAR *get_left_slot(int ind)
 {
 	// MESG("get_left_slot: ind=%d",ind);
 	return current_stable+ind;
@@ -3050,7 +3049,8 @@ void skip_sentence1()
  // MESG("skip_sentence: ttype=%d",tok->ttype);
  if(tok->ttype==TOK_LCURL) {
 		tok=tok->match_tok; 
-		//NTOKEN2;
+		// NTOKEN2;
+		// MESG("skip_sentence1");
 		return; 
  };
 
@@ -3538,14 +3538,14 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	tok=bp->tok_table;
 
 	drv_start_checking_break();
-	MESG("	call exec_block1 ------");
+	// MESG("	call exec_block1 ------");
 	if(execmd) val=exec_block1(bp);
 	else val=exec_block1_break(bp);
-	MESG("	after exec_block1 !!!!!");
+	// MESG("	after exec_block1 !!!!!");
 	drv_stop_checking_break();
 
 	/* cleaning  */
-	MESG("cleaning:");
+	// MESG("cleaning:");
 	if(start) {
 		if(local_symbols)
 		if(bp->symbol_tree){
@@ -3562,7 +3562,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	val=0;
  };
  tok=old_tok;
- MESG("compute_block return %f",val);
+ // MESG("compute_block return %f",val);
  return(val); 
 }
 

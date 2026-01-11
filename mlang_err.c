@@ -1562,7 +1562,6 @@ int err_check_sentence1()
 		{
 		tok_struct *start_block;	// element at block start
 		tok_struct *end_block;	/* at the block end  */
-		// int is_block=0;
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,tok_dir_fori);
 		stack_push("DIR_FORI",tok);
