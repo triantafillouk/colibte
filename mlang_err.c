@@ -1025,7 +1025,7 @@ int err_factor()
 #if	1
 				if(!check_end) {
 					if(tok->ttype==TOK_RPAR || tok->ttype==TOK_SEP) {
-						MESG_TOK_INFO("# check RPAR:1",tok);
+						// MESG_TOK_INFO("# check RPAR:1",tok);
 						break;
 					} else {
 						syntax_error("argument not correct!",xpos);

@@ -1764,15 +1764,13 @@ double factor_array_l2()
 }
 
 double factor_cmd()
-{ // 3 editor command
+{ // 3 editor command returns an int (??)
 	int function_index;
 	int check_par=0;
 	int save_macro_exec;
-	int status=1;
 	double value=1;
 	FUNCS *ed_command;
 
-	// set_vtype(VTYPE_NUM);
 	// MESG(";factor_cmd: ttype=%d command=%d",tok->ttype,tok->tok_node->node_index);
 	function_index = tok->tok_node->node_index;
 	ed_command = ftable+function_index;
@@ -1812,10 +1810,10 @@ double factor_cmd()
 	// err_num=0;
 	err_line=tok->tline;
 	err_str=NULL;
-	MESG(";factor_cmd: execute function! current token is [%s] tnum=%d value=%d",tok->tname,tok->tnum,(int)value);
+	// MESG(";factor_cmd: execute function! current token is [%s] tnum=%d value=%d",tok->tname,tok->tnum,(int)value);
 	value=ed_command->n_func((int)value);
-	// status=(int)value;
-	status=(int)get_val();
+
+	set_vdval(value);
 	// value=get_val();
 	// MESG("TOC_CMD: result %f",get_val());
 	macro_exec = save_macro_exec;
@@ -1823,24 +1821,17 @@ double factor_cmd()
 	if(check_par) { 
 		if(check_rparenthesis()) {
 			NTOKEN2;
-			MESG("right parenthesis skipped!");
-			set_break();
+			// MESG("right parenthesis skipped!");
 		};
 	};
-#if	0
-	if(status==false && tok==NULL) {
-		MESG("failed subroutine! status=%d value=%f",status,value);
-		//err_num=102;
-		set_break();
-	};
-#endif
+
 	if(err_num>0) {
 		// ERROR("error %d after function [%s] at line %d: %s",err_num,ftable[function_index].n_name,err_line,err_str);
 		set_error(tok,105,"factor_cmd");
 		show_error("Factor","factor_cmd");
 	};
 
-	MESG(";factor_cmd:end value=%f status=%d err=%d",value,status,err_num);
+	// MESG(";factor_cmd:end value=%f status=%d err=%d",value,status,err_num);
 	RTRN(value);
 }
 
