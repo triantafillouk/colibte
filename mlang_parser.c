@@ -1175,7 +1175,7 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
 	
 	memcpy((void *)tok_to,(void *)tok,sizeof(tok_struct));
 	if(tok->ttype==TOK_LCURL || tok->ttype==TOK_RCURL) {
-		tok_to->match_tok = tok_table + tok_to->tcurl->num;
+		tok_to->match_tok = tok_table + tok_to->tcurl->num+1;
 	};
 	tlist->current=tlist->current->next;
 	// MESG(";[%s] %3d: t=[%s] ",bf->b_fname,isize,tok_info(tok));

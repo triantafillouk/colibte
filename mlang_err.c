@@ -1562,7 +1562,7 @@ int err_check_sentence1()
 		{
 		tok_struct *start_block;	// element at block start
 		tok_struct *end_block;	/* at the block end  */
-		int is_block=0;
+		// int is_block=0;
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,tok_dir_fori);
 		stack_push("DIR_FORI",tok);
@@ -1599,6 +1599,10 @@ int err_check_sentence1()
 		// set block start
 		start_block=tok;
 		CHECK_TOK(64011);
+#if	1
+		skip_sentence1();
+		end_block=tok;
+#else
 		if(tok->ttype==TOK_LCURL) {
 			end_block=tok->match_tok; 
 			end_block++;
@@ -1607,14 +1611,16 @@ int err_check_sentence1()
 			skip_sentence1();
 			end_block=tok;
 		};
-//		for(;index->dval < dmax;index->dval +=dstep) 
-		{
-			tok=start_block;
-			err_num=err_check_sentence1();
-			CHECK_TOK(64015);
-			if(is_block) tok=end_block;
-			else skip_sentence1();
-		};
+#endif
+		tok=start_block;
+		err_num=err_check_sentence1();
+		CHECK_TOK(64015);
+#if	1
+		tok=end_block;
+#else
+		if(is_block) tok=end_block;
+		else skip_sentence1();
+#endif
 		CHECK_TOK(64020);
 		}; 
 		break;

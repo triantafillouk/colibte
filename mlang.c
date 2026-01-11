@@ -941,6 +941,7 @@ int exec_named_function(char *name)
 
 	double value=exec_function(bp,0);
 
+	set_break();
 	return((int)value);
 }
 
@@ -1767,7 +1768,7 @@ double factor_cmd()
 	int function_index;
 	int check_par=0;
 	int save_macro_exec;
-	double status=1;
+	int status=1;
 	double value=1;
 	FUNCS *ed_command;
 
@@ -1813,7 +1814,8 @@ double factor_cmd()
 	err_str=NULL;
 	MESG(";factor_cmd: execute function! current token is [%s] tnum=%d value=%d",tok->tname,tok->tnum,(int)value);
 	value=ed_command->n_func((int)value);
-	status=value;
+	// status=(int)value;
+	status=(int)get_val();
 	// value=get_val();
 	// MESG("TOC_CMD: result %f",get_val());
 	macro_exec = save_macro_exec;
@@ -1822,20 +1824,23 @@ double factor_cmd()
 		if(check_rparenthesis()) {
 			NTOKEN2;
 			MESG("right parenthesis skipped!");
+			set_break();
 		};
 	};
-	if(status==false) {
-		MESG("failed subroutine!");
+#if	0
+	if(status==false && tok==NULL) {
+		MESG("failed subroutine! status=%d value=%f",status,value);
 		//err_num=102;
 		set_break();
 	};
+#endif
 	if(err_num>0) {
 		// ERROR("error %d after function [%s] at line %d: %s",err_num,ftable[function_index].n_name,err_line,err_str);
 		set_error(tok,105,"factor_cmd");
 		show_error("Factor","factor_cmd");
 	};
 
-	// MESG(";factor_cmd:end tnum=%d value=%f ex_value=%f status=%f",tok->tnum,value,ex_var.dval,status);
+	MESG(";factor_cmd:end value=%f status=%d err=%d",value,status,err_num);
 	RTRN(value);
 }
 
@@ -3027,6 +3032,10 @@ double assign_val(double none)
 
 void  skip_args1(int nargs)
 {
+#if    1
+ if(nargs) tok +=1+2*nargs;
+ else tok+=2;
+#else
  // static int skips[]={2,3,5,7,9,11};
  // tok += skips[nargs];
  // MESG("skip_args1: va!=symbols! ++++++++++");
@@ -3038,28 +3047,8 @@ void  skip_args1(int nargs)
 		NTOKEN2;	/* skip separator  */
 	};
  NTOKEN2;	/* skip right parenthesis  */
-}
-
-#if	NUSE
-// skip args and goto function block
-void  assign_args1(MVAR *va,MVAR *symbols,int nargs)
-{
- // MESG("assign_args1: va!=symbols! ++++++++++");
- NTOKEN2; /* skip name */
-	int i;
-	// MESG("assign_args1: pos1 tok=[%d %s] %d",tok->tnum,tok->tname,tok->ttype);
-	for(i=0;i<nargs;i++) {
-		//memcpy(symbols+tok->tind,va++,sizeof(MVAR));
-		// MESG("assign_args: %d type=%d v=%f",(symbols+tok->tind)->var_type,(symbols+tok->tind)->dval);
-		// MESG("assign_args1:arg %d: pos3 after args tok=[%s] %d",i,tok->tname,tok->ttype);
-		NTOKEN2;	/* arg */
-		if(tok->ttype==TOK_RPAR) break;
-		NTOKEN2;	/* skip separator  */
-	};
- NTOKEN2;	/* skip right parenthesis  */
- // MESG("assign_args1: end! pos5 after args tok=[%s] %d",tok->tname,tok->ttype);
-}
 #endif
+}
 
 #include "mlang_parser.c"
 
@@ -3070,7 +3059,7 @@ void skip_sentence1()
  // MESG("skip_sentence: ttype=%d",tok->ttype);
  if(tok->ttype==TOK_LCURL) {
 		tok=tok->match_tok; 
-		NTOKEN2;
+		//NTOKEN2;
 		return; 
  };
 
