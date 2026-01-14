@@ -200,14 +200,12 @@ char *vtype_names[] = {
 void stack_push(char *title,tok_struct *tok)
 {
 #if	TBNF
- //static int ind=0;
  // if(no_push) { MESG("stack_push:%s skip %s",title,tok_info(tok));return;};
  if(tok!=NULL) {
  // memcpy((void *)check_buffer->tok_bnf,(void *)tok,sizeof(tok_struct));
  // check_buffer->tok_bnf++;
- // check_buffer->tok_bnf_index++;
- // if(tok->ttype==TOK_LPAR) { MESG("skip left paranthesis!");return;};
-	// MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,ind++,title,tok_info(tok));
+ if(tok->ttype==TOK_LPAR) { MESG("skip left paranthesis!");return;};
+	MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index++,title,tok_info(tok));
  } else MESG("P [%s] null token!!!",title);
 #endif
 }
@@ -3769,7 +3767,7 @@ char * tok_info(tok_struct *tok)
 		} else
 		if(tok->tgroup>0) {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] [%2d:%5s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup));
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] [%2d:%5s]!!",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup));
 		} else 
 			if(tok->ttype==TOK_NUM) { 
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);

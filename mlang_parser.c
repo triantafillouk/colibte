@@ -578,7 +578,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			if(is_now_sep || after_rpar || is_now_curl) continue;
 			is_now_sep=1;
 			tok_type=TOK_SEP;
-			// MESG("TOK_NL->TOK_SEP");
+			// ADD_TOKEN("separator");
+			// previous_ttype=tok->ttype;
+			// continue;
 			break;
 		case TOK_SPACE: 
 			skip_space1(bf);
@@ -614,9 +616,13 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 					create_function_buffer(bf,proc_name,start_proc_offset,foffset);
 
 					tok->ttype=TOK_SEP;
-					tok->tind='p';	// ??
+					tok->tind=0;	// ??
 					is_now_sep=1;
 					is_storelines=0;
+					tok->tname=" ;; ";
+					tok->tgroup=TOK_SEP;
+					// if(tok->tok_node) { MESG("token after function: node name=%s",tok->tok_node->node_name);}
+					// else { MESG("token after function: token name=%s",tok->tname);};
 					// restore stage_level
 					free(proc_name);
 					proc_name=NULL;
@@ -858,14 +864,34 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 					previous_ttype=tok->ttype;
 					// MESG("	-- token [%s] %d ttype=%d ind=%d",tok->tname,tok->tnum,tok->ttype,tok->tind);
 					continue;
-				} else
-				ADD_TOKEN("letter");
+				} else {
+#if	1
+					MESG("	add_token function line=%d  nword=[%s] store=%d",tok_line,nword,is_storelines);
+					BTNODE *node=find_btnode(directiv_table,nword);
+					if(node!=NULL){
+						if(node->node_index==TOK_PROC) {
+							is_storelines=1;
+							store_level=curl_level;
+							start_proc_offset=foffset;
+							MESG("	start function at %ld set storelines",foffset);
+							previous_ttype=node->node_index;;
+							// ADD_TOKEN("function");
+							continue;
+						} else {
+							MESG("	found directiv [%s] ind=%d vtype=%d",node->node_name,node->node_index,node->node_vtype);
+							ADD_TOKEN("other directive!");
+						};
+					} else 
+#endif
+					ADD_TOKEN("letter");
+				}
 			};
 		} else {
 			if(is_now_sep) {
 				tok_type=TOK_DIR_ELSE;
 				is_now_sep=0;
 			} else {
+				MESG("	add separator!");
 				ADD_TOKEN("separator");
 			};
 		};
@@ -958,7 +984,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			// if(tok->tok_node!=NULL) MESG("function already registered!");
 			if(proc_name==NULL) { 
 				proc_name=strdup(nword) ; 
-				// MESG("new function %s",nword);
+				MESG("new function proc_name=%s",nword);
 			};
 		};		
 
@@ -1003,7 +1029,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 
 				tok->tname=strdup(nword);
 				tok->tind=slen;
-				// MESG("	this is a variable! [%s] slen=%d",nword,slen);
+				MESG("	this is a variable! [%s] slen=%d",nword,slen);
 				if(is_storelines) {
 					tok->ttype=TOK_PROC;
 				} else {
