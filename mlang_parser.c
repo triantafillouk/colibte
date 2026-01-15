@@ -7,7 +7,7 @@
 	interpreter parser
 */
 
-void set_tok_table(FILEBUF *bf, TLIST lex_parser);
+void set_tok_table(FILEBUF *bf);
 void skip_space1(FILEBUF *bf);
 offs fast_scanner4 (FILEBUF *fb, offs stringlen, char *pat, int patlen,offs start);
 
@@ -39,15 +39,15 @@ int next_token_type(FILEBUF *bf)
  return(c1);
 }
 
-#define ADD_TOKEN(from) tok=add_token(lex_parser,tok_type,cc,nword,from,tok_line);
+#define ADD_TOKEN(from) tok=add_token(bf,tok_type,cc,nword,from,tok_line);
 
-tok_struct *add_token(TLIST lex_parser,int tok_type,int cc,char *label,char *from,int line)
+tok_struct *add_token(FILEBUF *bf,int tok_type,int cc,char *label,char *from,int line)
 {
  tok_struct *tok=NULL;
 	tok=new_tok();
-	add_element_to_list((void *)tok,lex_parser);
-	tok->tnum=lex_parser->size-1;
-	// MESG("; add [%s] %3d %3d: cc=%d type=[%s] name=[%s]",from,line,tok->tnum,cc,tname(tok_type),label);
+	add_element_to_list((void *)tok,bf->lex_parser);
+	tok->tnum=bf->lex_parser->size-1;
+	// MESG(";[%s] add [%s] %3d %3d: cc=%d type=[%s] name=[%s] tok=%p",bf->b_fname,from,line,tok->tnum,cc,tname(tok_type),label,tok);
 	return tok;
 }
 
@@ -323,7 +323,7 @@ void set_global_type(BTNODE *node,BTREE *type_dat,char *name,tok_struct *tok_var
 	tok_var->t_nargs = global_types_tree->items-1;
 }
 
-int type_init_definition(FILEBUF *bf,BTREE *types_tree,alist *lex_parser, tok_struct *tok_var)
+int type_init_definition(FILEBUF *bf,BTREE *types_tree, tok_struct *tok_var)
 {
  int tok_type=TOK_NONE;
  int cc=0;
@@ -331,6 +331,7 @@ int type_init_definition(FILEBUF *bf,BTREE *types_tree,alist *lex_parser, tok_st
  char line[256];
  char e_name[128];
  int slen=0;
+ // alist *lex_parser = bf->lex_parser;
  // MESG("type_init_definition: num=%d name=%s",tok_var->tind,tok_var->tname);
 
  tok_type=next_token_type(bf);
@@ -493,7 +494,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  offs start_proc_offset=0;
  offs ddot_offset=0;
  char *proc_name=NULL;
- alist *lex_parser=NULL;
  BTREE *stree=use_stree;
  tok_struct *tok=NULL;
  int previous_ttype=0;
@@ -504,7 +504,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  tok_struct *array_tok=NULL;
  int skip_token=0;
 
- MESG("parse_block1: [%s] check if parsed!",bf->b_fname);
+ // MESG("parse_block1: [%s] check if parsed!",bf->b_fname);
  // return if already parsed and not forced to parse
  if(bf->tok_table !=NULL && init==0) {
  	check_buffer = buffer_ori;
@@ -520,7 +520,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	free(bf->tok_table);
 	bf->tok_table=NULL;
  };
- lex_parser=new_list(0,"lex_parser");
+ bf->lex_parser=new_list(0,"lex_parser");
 
  if(init==1 || stree==NULL) {	/* create a new symbo table if needed  */
 	if(bf->symbol_tree) free_btree(bf->symbol_tree);
@@ -866,19 +866,19 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 					continue;
 				} else {
 #if	1
-					MESG("	add_token function line=%d  nword=[%s] store=%d",tok_line,nword,is_storelines);
+					// MESG("	add_token function line=%d  nword=[%s] store=%d",tok_line,nword,is_storelines);
 					BTNODE *node=find_btnode(directiv_table,nword);
 					if(node!=NULL){
 						if(node->node_index==TOK_PROC) {
 							is_storelines=1;
 							store_level=curl_level;
 							start_proc_offset=foffset;
-							MESG("	start function at %ld set storelines",foffset);
+							// MESG("	start function at %ld set storelines",foffset);
 							previous_ttype=node->node_index;;
 							// ADD_TOKEN("function");
 							continue;
 						} else {
-							MESG("	found directiv [%s] ind=%d vtype=%d",node->node_name,node->node_index,node->node_vtype);
+							// MESG("	found directiv [%s] ind=%d vtype=%d",node->node_name,node->node_index,node->node_vtype);
 							ADD_TOKEN("other directive!");
 						};
 					} else 
@@ -937,7 +937,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	};
 	if(tok->ttype==TOK_LCURL) {
 		struct curl_struct *tcl;
-			tcl=new_curl(curl_level,tok_line,lex_parser->last);
+			tcl=new_curl(curl_level,tok_line,bf->lex_parser->last);
 			tcl->num=tok->tnum;
 			tok->tname=" LCURL";
 			lpush(tcl,curl_stack);
@@ -945,7 +945,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	} else
 	if(tok->ttype==TOK_RCURL) {
 		struct curl_struct *tcl,*tcr;
-			tcr=new_curl(curl_level,tok_line,lex_parser->last);
+			tcr=new_curl(curl_level,tok_line,bf->lex_parser->last);
 			tcl=(curl_struct *)lpop(curl_stack);
 			tok->tcurl=tcr;
 			tok->tname=" RCURL";
@@ -984,7 +984,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			// if(tok->tok_node!=NULL) MESG("function already registered!");
 			if(proc_name==NULL) { 
 				proc_name=strdup(nword) ; 
-				MESG("new function proc_name=%s",nword);
+				// MESG("new function proc_name=%s",nword);
 			};
 		};		
 
@@ -1008,7 +1008,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 #if	USE_TYPE_VARS
 				if(tok->ttype == TOK_DIR_TYPE) {
 					MESG("	found type_definition!");
-					if(!type_init_definition(bf,stree,lex_parser,tok)) 
+					if(!type_init_definition(bf,stree,tok)) 
 					{
 						// set_error(tok,111,"type_definition parse error");
 						MESG("after setting 111 error");
@@ -1029,7 +1029,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 
 				tok->tname=strdup(nword);
 				tok->tind=slen;
-				MESG("	this is a variable! [%s] slen=%d",nword,slen);
+				// MESG("	this is a variable! [%s] slen=%d",nword,slen);
 				if(is_storelines) {
 					tok->ttype=TOK_PROC;
 				} else {
@@ -1150,9 +1150,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	bf->m_mode=M_PARSED;
 
  // MESG("parse_block1: create token table from token list");
- set_tok_table(bf, lex_parser);
+ set_tok_table(bf);
 
- free_list(lex_parser,"lex_parser");
+ free_list(bf->lex_parser,"lex_parser");
+ bf->lex_parser=NULL;
  free_list(curl_stack,"cstack");
 
 #if	DEBUG_SYNTAX
@@ -1166,12 +1167,13 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 }
 
 /* create token table from token list  */
-void set_tok_table(FILEBUF *bf, TLIST lex_parser)
+void set_tok_table(FILEBUF *bf)
 {
  TLIST tlist;
  tok_struct *tok_to;
  tok_struct *tok;
  tok_struct *tok_table=NULL;
+ alist *lex_parser = bf->lex_parser;
  int isize=0;
  int table_size = lex_parser->size+1;
  // MESG("set_tok_table: [%s] create token table from token list size of %d!",bf->b_fname,lex_parser->size);
@@ -1203,10 +1205,10 @@ void set_tok_table(FILEBUF *bf, TLIST lex_parser)
 		tok_to->match_tok = tok_table + tok_to->tcurl->num+1;
 	};
 	tlist->current=tlist->current->next;
-	// MESG(";[%s] %3d: t=[%s] ",bf->b_fname,isize,tok_info(tok));
+	MESG(";TT[%s] %3d: t=[%s] %p",bf->b_fname,isize,tok_info(tok_to),tok_to);
 	isize++;
 	tok_to++;
  };
- // MESG("<----------- set_tok_table : end");
+ MESG("<----------- set_tok_table : %s end",bf->b_fname);
  bf->end_token=tok_table+(isize-2);	/* save end token, just before EOF  */
 }

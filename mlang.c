@@ -202,11 +202,16 @@ void stack_push(char *title,tok_struct *tok)
 #if	TBNF
  // if(no_push) { MESG("stack_push:%s skip %s",title,tok_info(tok));return;};
  if(tok!=NULL) {
- // memcpy((void *)check_buffer->tok_bnf,(void *)tok,sizeof(tok_struct));
- // check_buffer->tok_bnf++;
- if(tok->ttype==TOK_LPAR) { MESG("skip left paranthesis!");return;};
-	MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index++,title,tok_info(tok));
+	if(tok->pushed>=0) {
+		// MESG("P[%10s already pushed at %3d %-15s|%s %p",check_buffer->b_fname,tok->pushed,title,tok_info(tok),tok);
+	} else {
+		memcpy((void *)check_buffer->tok_bnf+check_buffer->tok_bnf_index,(void *)tok,sizeof(tok_struct));
+		if(tok->ttype==TOK_LPAR) { MESG("skip left paranthesis!");return;};
+    	tok->pushed=check_buffer->tok_bnf_index;
+ 		MESG("P[%10s %3d %-15s|%s %p",check_buffer->b_fname,check_buffer->tok_bnf_index++,title,tok_info(tok),tok);
+   }
  } else MESG("P [%s] null token!!!",title);
+ 
 #endif
 }
 
@@ -628,6 +633,7 @@ tok_struct *new_tok()
  tok->dval=0;
  tok->ttype=0;
  tok->tgroup=0;
+ tok->pushed=-1;
  tok->factor_function=factor_none;
  tok->directive=lexpression;
  tok->tok_node=NULL;

@@ -1015,6 +1015,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 	bp->save_current_tag=0;
 	bp->save_current_note=0;
 #endif
+	bp->lex_parser=NULL;
 	strlcpy(bp->b_fname, base_name,255);
 	// MESG("new_filebuf: created [%d][%s] b_mode=0x%X",bp->b_index,bp->b_fname,bp->b_mode);
 	// MESG("	bp = %lX",(long)bp);
