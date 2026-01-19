@@ -1188,6 +1188,8 @@ void set_tok_table(FILEBUF *bf)
  bf->tok_table_bnf=(void *)malloc(sizeof(struct tok_struct)*table_size);
  bf->tok_bnf_index=0;
  bf->tok_bnf = bf->tok_table_bnf;
+ 
+ MESG("-----> set tok_table_bnf: bf=[%s] at %p size %d",bf->b_fname,bf->tok_table_bnf,table_size);
 #endif
  tok_table=(void *)malloc(sizeof(struct tok_struct)*table_size);
  bf->tok_table = (void *) tok_table;
@@ -1210,5 +1212,5 @@ void set_tok_table(FILEBUF *bf)
 	tok_to++;
  };
  MESG("<----------- set_tok_table : %s end",bf->b_fname);
- bf->end_token=tok_table+(isize-2);	/* save end token, just before EOF  */
+ bf->end_token=tok_table+(isize-1);	/* save end token, just before EOF  */
 }

@@ -205,10 +205,15 @@ void stack_push(char *title,tok_struct *tok)
 	if(tok->pushed>=0) {
 		// MESG("P[%10s already pushed at %3d %-15s|%s %p",check_buffer->b_fname,tok->pushed,title,tok_info(tok),tok);
 	} else {
-		memcpy((void *)check_buffer->tok_bnf+check_buffer->tok_bnf_index,(void *)tok,sizeof(tok_struct));
-		if(tok->ttype==TOK_LPAR) { MESG("skip left paranthesis!");return;};
+		tok_struct *dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
+		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
+		if(tok->ttype==TOK_LPAR) { 
+			// MESG("skip left paranthesis!");
+			return;
+		};
     	tok->pushed=check_buffer->tok_bnf_index;
- 		MESG("P[%10s %3d %-15s|%s %p",check_buffer->b_fname,check_buffer->tok_bnf_index++,title,tok_info(tok),tok);
+ 		// MESG("P[%10s %3d %-15s|%s %p",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(tok),dest);
+		check_buffer->tok_bnf_index++;
    }
  } else MESG("P [%s] null token!!!",title);
  
@@ -953,6 +958,24 @@ void show_error(char *from,char *name)
 	ERROR("%s error %d file %s line %d: [%s]",from,err_num,name,err_line,err_str);
 }
 
+void show_token_table(char *title, FILEBUF *bf,tok_struct *token_start,int size)
+{
+ int i=0;
+ tok_struct *tokp=token_start;
+ // tok_struct *tokp1=token_start;
+ MESG("---- %s token table of %s size %d ----",title,bf->b_fname,size);
+ // MESG("---- tok_bnf %p",bf->tok_bnf);
+ // MESG("---- tok_table_bnf %p",bf->tok_table_bnf);
+ for(i=0;i<size;i++) {
+	// tokp=token_start+i;
+ 	// MESG("!T %3d %p %s",i,tokp,tok_info(tokp));
+	MESG("!T %3d %s",i,tok_info(tokp));
+	tokp++;
+	// tokp1++;
+ };
+ MESG("------------------------------------------");
+}
+
 /* Check for any errors and initialize parsed list  */
 int check_init(FILEBUF *bf)
 {
@@ -999,16 +1022,16 @@ int check_init(FILEBUF *bf)
 
  tok=tok_table;
  // MESG("check_init:end [%s] %d",bf->b_fname,bf->b_type);
-
+ show_token_table("Token table ",bf,bf->tok_table,bf->end_token - bf->tok_table+1);
  if(bf->err>0) {
 	return bf->err;
  };
  bf->m_mode |= M_CHECKED;
  check_buffer = ori_buffer;
 #if	TBNF
- bf->tok_bnf_index = 0;
- bf->tok_bnf = bf->tok_table_bnf;
- MESG("! bnf table of [%s] initialized! ------------",bf->b_fname);
+ // bf->tok_bnf_index = 0;
+ // bf->tok_bnf = bf->tok_table_bnf;
+ show_token_table("BNF ",bf,bf->tok_table_bnf,bf->tok_bnf_index);
  if(bnf_debug() && check_buffer==NULL) exit(0);
 #endif
  return(0);
@@ -1141,7 +1164,7 @@ double exec_function(FILEBUF *proc_buffer,int nargs)
 	// MESG("exec_function: bp=[%s] nargs=%d level=%d",bp->b_fname,nargs,level);
 	tok=bp->tok_table;	/* start of function  */
 #if	TBNF
-	bp->tok_bnf_index=0;
+	// bp->tok_bnf_index=0;
 #endif
 	skip_args1(nargs);
 	return tok->directive();
