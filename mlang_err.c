@@ -432,7 +432,7 @@ int err_assign_val()
 		syntax_error("bogus assignement!!!!",xpos);
 		RT_MESG1(440);
 	};
-	err_num=err_lexpression();
+	err_num=err_cexpression();
 
 	RT_MESG1(442);
 }

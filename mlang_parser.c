@@ -504,7 +504,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  tok_struct *array_tok=NULL;
  int skip_token=0;
 
- // MESG("parse_block1: [%s] check if parsed!",bf->b_fname);
+ MESG("parse_block1: [%s] check if parsed!",bf->b_fname);
  // return if already parsed and not forced to parse
  if(bf->tok_table !=NULL && init==0) {
  	check_buffer = buffer_ori;
@@ -865,7 +865,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 					// MESG("	-- token [%s] %d ttype=%d ind=%d",tok->tname,tok->tnum,tok->ttype,tok->tind);
 					continue;
 				} else {
-#if	1
 					// MESG("	add_token function line=%d  nword=[%s] store=%d",tok_line,nword,is_storelines);
 					BTNODE *node=find_btnode(directiv_table,nword);
 					if(node!=NULL){
@@ -881,9 +880,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 							// MESG("	found directiv [%s] ind=%d vtype=%d",node->node_name,node->node_index,node->node_vtype);
 							ADD_TOKEN("other directive!");
 						};
-					} else 
-#endif
-					ADD_TOKEN("letter");
+					} else {
+						ADD_TOKEN("letter");
+					};
 				}
 			};
 		} else {
@@ -1193,7 +1192,7 @@ void set_tok_table(FILEBUF *bf)
 #endif
  tok_table=(void *)malloc(sizeof(struct tok_struct)*table_size);
  bf->tok_table = (void *) tok_table;
- MESG("-----------> set_tok_table: bf=[%s]",bf->b_fname);
+ // MESG("-----------> set_tok_table: bf=[%s]",bf->b_fname);
  lbegin(lex_parser);
  tlist=lex_parser;
  tok_to = tok_table;
@@ -1207,10 +1206,10 @@ void set_tok_table(FILEBUF *bf)
 		tok_to->match_tok = tok_table + tok_to->tcurl->num+1;
 	};
 	tlist->current=tlist->current->next;
-	MESG(";TT[%s] %3d: t=[%s] %p",bf->b_fname,isize,tok_info(tok_to),tok_to);
+	// MESG(";TT[%s] %3d: t=[%s] %p",bf->b_fname,isize,tok_info(tok_to),tok_to);
 	isize++;
 	tok_to++;
  };
- MESG("<----------- set_tok_table : %s end",bf->b_fname);
+ // MESG("<----------- set_tok_table : %s end",bf->b_fname);
  bf->end_token=tok_table+(isize-1);	/* save end token, just before EOF  */
 }

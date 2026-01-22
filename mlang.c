@@ -35,6 +35,12 @@ void  skip_args1(int nargs);
 int check_init(FILEBUF *bf);
 double exec_function(FILEBUF *bp,int nargs);
 MVAR * push_args_1(int nargs,int vars_num);
+double compare_notequal(double value);
+double compare_smaller(double value);
+double compare_bigger(double value);
+double compare_smallereq(double value);
+double compare_biggereq(double value);
+double compare_equal(double v1);
 
 #if	SYNTAX_DEBUG
 
@@ -984,12 +990,14 @@ int check_init(FILEBUF *bf)
  check_buffer = bf;
  int err=0;
  INIT_STAGE;
- // MESG("-check_init: [%s] %d",bf->b_fname,bf->b_type);
+ MESG("---- check_init: [%s] %d",bf->b_fname,bf->b_type);
+#if	0
  if(execmd) 
  {
  	fprintf(stderr,"exec [%s] ----------------\n",bf->b_fname);
  	fprintf(stdout,"exec [%s] ----------------\n",bf->b_fname);
  };
+#endif
  if(tok_table==NULL) 
  {
  	// MESG("create token table [%s]",bf->b_fname);
@@ -1022,7 +1030,7 @@ int check_init(FILEBUF *bf)
 
  tok=tok_table;
  // MESG("check_init:end [%s] %d",bf->b_fname,bf->b_type);
- show_token_table("Token table ",bf,bf->tok_table,bf->end_token - bf->tok_table+1);
+ // show_token_table("Token table ",bf,bf->tok_table,bf->end_token - bf->tok_table+1);
  if(bf->err>0) {
 	return bf->err;
  };
@@ -1031,7 +1039,7 @@ int check_init(FILEBUF *bf)
 #if	TBNF
  // bf->tok_bnf_index = 0;
  // bf->tok_bnf = bf->tok_table_bnf;
- show_token_table("BNF ",bf,bf->tok_table_bnf,bf->tok_bnf_index);
+ // show_token_table("BNF ",bf,bf->tok_table_bnf,bf->tok_bnf_index);
  if(bnf_debug() && check_buffer==NULL) exit(0);
 #endif
  return(0);
@@ -2323,13 +2331,21 @@ FFunction factor_funcs[] = {
 
 	/* bool operators  */
 	factor_none,	// TOK_COMPARE		,33
+#if	1
+	compare_notequal,	// TOK_NOTEQUAL	,
+	compare_smaller,	// TOK_SMALLER		,	/* <  */
+	compare_bigger,	// TOK_BIGGER		,	/* >  */
+	compare_equal,	// TOK_EQUAL		,	/* ==  */
+	compare_smallereq,	// TOK_SMALLEREQ	,	/* <=  */
+	compare_biggereq,	// TOK_BIGGEREQ	,	/* >=  */
+#else
 	(FFunction)cexpr_notequal,	// TOK_NOTEQUAL	,
 	(FFunction)cexpr_smaller,	// TOK_SMALLER		,	/* <  */
 	(FFunction)cexpr_bigger,	// TOK_BIGGER		,	/* >  */
 	(FFunction)cexpr_equal,	// TOK_EQUAL		,	/* ==  */
 	(FFunction)cexpr_smallereq,	// TOK_SMALLEREQ	,	/* <=  */
 	(FFunction)cexpr_biggereq,	// TOK_BIGGEREQ	,	/* >=  */
-
+#endif
 	factor_none,	// TOK_BOOL		,40
 	factor_none,	// TOK_AND			,	/* &  */
 	factor_none,	// TOK_OR			,	/* |  */
@@ -2874,6 +2890,212 @@ double lexpression()
 	RTRN(value);
 }
 
+static inline double num_smaller(double v1)
+{
+ NTOKEN2;
+ double v2=num_expression();
+ return v1<v2 ? 1.0: 0.0;
+}
+
+static inline double num_notequal(double v1)
+{
+ NTOKEN2;
+ double v2=num_expression();
+ return v1!=v2 ? 1.0: 0.0;
+}
+
+static inline double num_equal(double v1)
+{
+ NTOKEN2;
+ double v2=num_expression();
+ return v1==v2 ? 1.0: 0.0;
+}
+
+static inline double num_smallereq(double v1)
+{
+ NTOKEN2;
+ double v2=num_expression();
+ return v1<=v2 ? 1.0: 0.0;
+}
+
+static inline double num_biggereq(double v1)
+{
+ NTOKEN2;
+ double v2=num_expression();
+ return v1>=v2 ? 1.0: 0.0;
+}
+
+static inline double num_bigger(double v1)
+{
+ NTOKEN2;
+ double v2=num_expression();
+ return v1>v2 ? 1.0: 0.0;
+}
+
+double compare_smaller(double v1)
+{
+ tok_struct *tok0=tok;
+ int vtype1=get_vtype();
+ static char svalue[MAXLLEN];
+ NTOKEN2;
+ if(vtype1==VTYPE_STRING) {
+	strlcpy(svalue,get_sval(),MAXLLEN);
+ };
+ double v2=num_expression();
+ int vtype2=get_vtype();
+ if(vtype1==VTYPE_STRING && vtype2==VTYPE_STRING) {
+		set_vtype(VTYPE_NUM);
+		int lresult=scmp(svalue,get_sval());
+		return (lresult < 0 ? 1.0: 0.0);
+ } else 
+ if(vtype1==VTYPE_NUM && vtype2==VTYPE_NUM) {
+		MESG("change smaller function!");
+		tok0->term_function = num_smaller;
+		return v1 < v2 ? 1.0: 0.0;
+ };
+	syntax_error("comparison error",223);
+	MESG("comparison error type1=%d type2=%d",vtype1,vtype2);
+	set_vdval(0);
+	return 0;
+}
+
+double compare_notequal(double v1)
+{
+ tok_struct *tok0=tok;
+ int vtype1=get_vtype();
+ static char svalue[MAXLLEN];
+ NTOKEN2;
+ if(vtype1==VTYPE_STRING) {
+	strlcpy(svalue,get_sval(),MAXLLEN);
+ };
+ double v2=num_expression();
+ int vtype2=get_vtype();
+ if(vtype1==VTYPE_STRING && vtype2==VTYPE_STRING) {
+		set_vtype(VTYPE_NUM);
+		int lresult=scmp(svalue,get_sval());
+		return (lresult != 0 ? 1.0: 0.0);
+ } else 
+ if(vtype1==VTYPE_NUM && vtype2==VTYPE_NUM) {
+		MESG("change notequal function!");
+		tok0->term_function = num_smaller;
+		return v1 != v2 ? 1.0: 0.0;
+ };
+	syntax_error("comparison error",223);
+	MESG("comparison error type1=%d type2=%d",vtype1,vtype2);
+	set_vdval(0);
+	return 0;
+}
+
+
+double compare_bigger(double v1)
+{
+ tok_struct *tok0=tok;
+ int vtype1=get_vtype();
+ static char svalue[MAXLLEN];
+ NTOKEN2;
+ if(vtype1==VTYPE_STRING) {
+	strlcpy(svalue,get_sval(),MAXLLEN);
+ };
+ double v2=num_expression();
+ int vtype2=get_vtype();
+ if(vtype1==VTYPE_STRING && vtype2==VTYPE_STRING) {
+		set_vtype(VTYPE_NUM);
+		int lresult=scmp(svalue,get_sval());
+		return (lresult > 0 ? 1.0: 0.0);
+ } else 
+ if(vtype1==VTYPE_NUM && vtype2==VTYPE_NUM) {
+		MESG("change bigger function!");
+		tok0->term_function = num_bigger;
+		return v1 > v2 ? 1.0: 0.0;
+ };
+	syntax_error("comparison error",223);
+	MESG("comparison error type1=%d type2=%d",vtype1,vtype2);
+	set_vdval(0);
+	return 0;
+}
+
+double compare_equal(double v1)
+{
+ tok_struct *tok0=tok;
+ int vtype1=get_vtype();
+ static char svalue[MAXLLEN];
+ NTOKEN2;
+ if(vtype1==VTYPE_STRING) {
+	strlcpy(svalue,get_sval(),MAXLLEN);
+ };
+ double v2=num_expression();
+ int vtype2=get_vtype();
+ if(vtype1==VTYPE_STRING && vtype2==VTYPE_STRING) {
+		set_vtype(VTYPE_NUM);
+		int lresult=scmp(svalue,get_sval());
+		return (lresult == 0 ? 1.0: 0.0);
+ } else 
+ if(vtype1==VTYPE_NUM && vtype2==VTYPE_NUM) {
+		MESG("change equal function!");
+		tok0->term_function = num_equal;
+		return v1 == v2 ? 1.0: 0.0;
+ };
+	syntax_error("comparison error",223);
+	MESG("comparison error type1=%d type2=%d",vtype1,vtype2);
+	set_vdval(0);
+	return 0;
+}
+
+double compare_smallereq(double v1)
+{
+ tok_struct *tok0=tok;
+ int vtype1=get_vtype();
+ static char svalue[MAXLLEN];
+ NTOKEN2;
+ if(vtype1==VTYPE_STRING) {
+	strlcpy(svalue,get_sval(),MAXLLEN);
+ };
+ double v2=num_expression();
+ int vtype2=get_vtype();
+ if(vtype1==VTYPE_STRING && vtype2==VTYPE_STRING) {
+		set_vtype(VTYPE_NUM);
+		int lresult=scmp(svalue,get_sval());
+		return (lresult <= 0 ? 1.0: 0.0);
+ } else 
+ if(vtype1==VTYPE_NUM && vtype2==VTYPE_NUM) {
+		MESG("change smaller equal function!");
+		tok0->term_function = num_smallereq;
+		return v1 <= v2 ? 1.0: 0.0;
+ };
+	syntax_error("comparison error",223);
+	MESG("comparison error type1=%d type2=%d",vtype1,vtype2);
+	set_vdval(0);
+	return 0;
+}
+
+double compare_biggereq(double v1)
+{
+ tok_struct *tok0=tok;
+ int vtype1=get_vtype();
+ static char svalue[MAXLLEN];
+ NTOKEN2;
+ if(vtype1==VTYPE_STRING) {
+	strlcpy(svalue,get_sval(),MAXLLEN);
+ };
+ double v2=num_expression();
+ int vtype2=get_vtype();
+ if(vtype1==VTYPE_STRING && vtype2==VTYPE_STRING) {
+		set_vtype(VTYPE_NUM);
+		int lresult=scmp(svalue,get_sval());
+		return (lresult >= 0 ? 1.0: 0.0);
+ } else 
+ if(vtype1==VTYPE_NUM && vtype2==VTYPE_NUM) {
+		MESG("change bigger equal function!");
+		tok0->term_function = num_biggereq;
+		return v1 >= v2 ? 1.0: 0.0;
+ };
+	syntax_error("comparison error",223);
+	MESG("comparison error type1=%d type2=%d",vtype1,vtype2);
+	set_vdval(0);
+	return 0;
+}
+
+
 
 double cexpression()
 {
@@ -2882,27 +3104,8 @@ double cexpression()
  double value = num_expression();
 
  if(tok->tgroup!=TOK_COMPARE) RTRN(value);
- tok_struct *tok0=tok;
- NTOKEN2;
- if(vtype_is(VTYPE_STRING)) {
-	static char svalue[MAXLLEN];
-	 
-	strlcpy(svalue,get_sval(),MAXLLEN);
-	num_expression();
-	if(!vtype_is(VTYPE_STRING)) {
-		syntax_error("string with no string comparison error",223);
-		set_vtype(VTYPE_NUM);
-		RTRN(0);	/* it is an error to compare string with number  */
-	};
-	set_vtype(VTYPE_NUM);
-	int lresult=scmp(svalue,get_sval());
-
-	// clean_saved_string(0);
-	RTRN(tok0->cexpr_function(lresult,0));
- } else {
-	double v2=num_expression();
-	RTRN(tok0->cexpr_function(value,v2));
- }
+ else return 
+	tok->term_function(value);	// compare function
 }
 
 double assign_env(double none)
@@ -2920,8 +3123,11 @@ double assign_env(double none)
 double assign_val_num(double none)
 {
 	MVAR *sslot=lsslot;
-	double v1=lexpression();
+	//tok_struct *tok0=tok;
+	double v1=cexpression();
 	sslot->dval=v1;
+	set_dval(v1);
+	// MESG("assign_val_num: %s to %f",tok0->tname,v1);
 	return(v1);
 }
 
@@ -2934,15 +3140,17 @@ double assign_val(double none)
 	// MESG("assign_val: tok type=%d ind=%d",tok->ttype,tok->tind);
 	tok_struct *ptok = tok-1;
 	// MESG("assign_val: tok type=%d ind=%d",ptok->ttype,ptok->tind);
-
+	
 	tok_struct *lstok=lstoken;
 	MVAR *sslot=lsslot;
-	double v1=lexpression();
+	double v1=cexpression();
 	// MESG("assign_val: after lexpression! slot vtype=%d ex_vtype=%d\n",sslot->var_type,get_vtype());
 	if(vtype_is(sslot->var_type) && vtype_is(VTYPE_NUM)) 
 	{
 		set_term_function(ptok,assign_val_num);
 		sslot->dval=v1;
+		set_vdval(v1);
+		// MESG("assign_val: %s to %f",lstok->tname,v1);
 		return(v1);
 	};
 
