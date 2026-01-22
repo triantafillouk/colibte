@@ -1298,6 +1298,7 @@ double factor_type_element()
 
 double factor_variable_num()
 {
+	// MESG("factor_variable_num:");
  	lsslot = get_left_slot(tok->tind);
 	lstoken = tok;
 	NTOKEN2;
@@ -1306,12 +1307,14 @@ double factor_variable_num()
 
 double factor_variable()
 {
-	// MESG("factor_variable:");
  	lsslot = get_left_slot(tok->tind);
+	// MESG("factor_variable:--[%s] ind=%d type=%d",tok->tname,tok->tind,tok->ttype);
 	// lsslot = current_stable+tok->tind;
 	int ptype=get_vtype();
-	lstoken = tok;
-	// MESG("factor_variable: %d",tok->tind);
+	if(lstoken==NULL) { 
+		lstoken = tok;
+	};
+	// MESG("factor_variable: %d type %d",tok->tind,lsslot->var_type);
 	set_vtype(lsslot->var_type);
 	// MESG("	factor_variable:[%s] tind=%d ,var ind=%d ex_vtype=%d ttype=%d vtype=%d",
 		// tok->tname,tok->tnum,lsslot->var_index,get_vtype(),tok->ttype,lsslot->var_type);
@@ -2275,14 +2278,16 @@ double factor_rcurl(){
 }
 
 double factor_sep(){
+	MESG("factor_sep:");
 	NTOKEN2;
-	if(tok->ttype==TOK_VAR) lstoken=tok;
-	else lstoken=NULL;
+	// if(tok->ttype==TOK_VAR) lstoken=tok;
+	// else 
+	lstoken=NULL;
 	return 0.0;
 }
 
 double factor_comma(){
-	// MESG("factor_comma:");
+	MESG("factor_comma:");
 	NTOKEN2;
 	return 0.0;
 }
@@ -3031,7 +3036,7 @@ double compare_equal(double v1)
 		return (lresult == 0 ? 1.0: 0.0);
  } else 
  if(vtype1==VTYPE_NUM && vtype2==VTYPE_NUM) {
-		MESG("change equal function!");
+		MESG("change equal function! v1=%f v2=%f",v1,v2);
 		tok0->term_function = num_equal;
 		return v1 == v2 ? 1.0: 0.0;
  };
@@ -3123,8 +3128,8 @@ double assign_env(double none)
 double assign_val_num(double none)
 {
 	MVAR *sslot=lsslot;
-	//tok_struct *tok0=tok;
-	double v1=cexpression();
+	// tok_struct *tok0=tok;
+	double v1=lexpression();
 	sslot->dval=v1;
 	set_dval(v1);
 	// MESG("assign_val_num: %s to %f",tok0->tname,v1);
@@ -3143,14 +3148,14 @@ double assign_val(double none)
 	
 	tok_struct *lstok=lstoken;
 	MVAR *sslot=lsslot;
-	double v1=cexpression();
+	double v1=lexpression();
 	// MESG("assign_val: after lexpression! slot vtype=%d ex_vtype=%d\n",sslot->var_type,get_vtype());
 	if(vtype_is(sslot->var_type) && vtype_is(VTYPE_NUM)) 
 	{
 		set_term_function(ptok,assign_val_num);
 		sslot->dval=v1;
 		set_vdval(v1);
-		// MESG("assign_val: %s to %f",lstok->tname,v1);
+		MESG("assign_val: %s to %f",lstok->tname,v1);
 		return(v1);
 	};
 
@@ -3669,10 +3674,9 @@ double exec_block1(FILEBUF *fp)
    {
 	// MESG_TOK_INFO("- exec_block1 [%s]",tok);
 #if	1
-	if(tok->ttype==TOK_SEP){ NTOKEN2;
-		// MESG("factor_sep: [%s %d]",tok->tname,tok->ttype);
-		if(tok->ttype==TOK_VAR) lstoken=tok;
-		else lstoken=NULL;
+	if(tok->ttype==TOK_SEP){ 
+		NTOKEN2;
+		lstoken=NULL;
 		continue;
 	};
 #endif
@@ -3680,11 +3684,11 @@ double exec_block1(FILEBUF *fp)
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
 #endif
  	val=tok->directive();
+	// lstoken=NULL;MESG("exec_block1: reset lstoken");
 	if(ex_var.var_type==VTYPE_NUM) ex_var.dval=val;
 	if(!current_active_flag) break;
    };
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
-
    // MESG("exec_block1: end!");
 	return(val);
 }
@@ -3705,9 +3709,7 @@ double exec_block1_break(FILEBUF *fp)
 	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
 #if	1
 	if(tok->ttype==TOK_SEP){ NTOKEN2;
-		// MESG("factor_sep: [%s %d]",tok->tname,tok->ttype);
-		if(tok->ttype==TOK_VAR) lstoken=tok;
-		else lstoken=NULL;
+		lstoken=NULL;
 		continue;
 	};
 #endif
