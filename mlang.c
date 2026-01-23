@@ -1301,6 +1301,7 @@ double factor_variable_num()
 	// MESG("factor_variable_num:");
  	lsslot = get_left_slot(tok->tind);
 	lstoken = tok;
+	set_vdval(lsslot->dval);
 	NTOKEN2;
 	return(lsslot->dval);
 }
@@ -1322,6 +1323,7 @@ double factor_variable()
 		case VTYPE_NUM:
 		{
 			if(ptype==VTYPE_NUM) tok->factor_function = factor_variable_num;
+			set_vdval(lsslot->dval);
 			NTOKEN2;
 			return(lsslot->dval);
 			};
@@ -2489,15 +2491,18 @@ double term_plus(double value)
  double d1;
  tok_struct *ptok=tok;
  // MESG("term_plus: value=%f tok type=%d",value,ptok->ttype);
- if(vtype_is(VTYPE_NUM)) {
+ int vtype1=get_vtype();
+ int vtype2=-1;
+ if(vtype1==VTYPE_NUM) {
 	NTOKEN2;
 	d1=num_term1();
+	vtype2=get_vtype();
 	// MESG("term_plus");
-	if(vtype_is(VTYPE_NUM)) {
+	if(vtype2==VTYPE_NUM) {
 		set_term_function(ptok,term_plus_num);
 		return value+d1;
 	};
-	if(vtype_is(VTYPE_STRING)) {
+	if(vtype2==VTYPE_STRING) {
 		char svalue[MAXLLEN];
 		int stat;
 		stat=snprintf(svalue,sizeof(svalue),"%f%s",value,get_sval());
@@ -2505,7 +2510,7 @@ double term_plus(double value)
 		set_sval(svalue);
 		return 0;
 	};
-	if(vtype_is(VTYPE_ARRAY)) { // num + array
+	if(vtype2==VTYPE_ARRAY) { // num + array
 		array_dat *new_array = get_array("18");
 		// MESG("term_plus: numeric + array");
 		if(new_array->astat==ARRAY_LOCAL) {
@@ -2526,20 +2531,21 @@ double term_plus(double value)
 	RTRN(0);
  };
 
- if(vtype_is(VTYPE_STRING)) {	// set local value
+ if(vtype1==VTYPE_STRING) {	// set local value
 	char svalue[MAXLLEN];
 	strlcpy(svalue,get_sval(),MAXLLEN);
 
 		NTOKEN2;
 		d1=num_term1();
+		vtype2=get_vtype();
 		 /* catanate string */
-			if(vtype_is(VTYPE_STRING)) {	/* string catenate  */
+			if(vtype2==VTYPE_STRING) {	/* string catenate  */
 				strlcat(svalue,get_sval(),sizeof(svalue));
 				value=atof(svalue);
 				set_sval(svalue);
 				return value;
 			};
-			if(vtype_is(VTYPE_NUM))	{	/* string, numeric catanate  */
+			if(vtype2==VTYPE_NUM)	{	/* string, numeric catanate  */
 				long l0;
 				set_vtype(VTYPE_STRING);
 				l0=d1;
@@ -2553,7 +2559,7 @@ double term_plus(double value)
 				set_sval(svalue);
 				return value;
 			};
-			if(vtype_is(VTYPE_ARRAY)) {
+			if(vtype2==VTYPE_ARRAY) {
 				err_num=218;
 				ERROR("Add array to string not supported err %d",err_num);
 				RTRN(value);				
@@ -2563,11 +2569,11 @@ double term_plus(double value)
 			RTRN(value);				
  };
 
- if(vtype_is(VTYPE_ARRAY)) {
+ if(vtype1==VTYPE_ARRAY) {
   	array_dat *loc_array=get_array("20");
 		 		NTOKEN2;
-				d1=num_term1();
-				if(vtype_is(VTYPE_NUM)) { // add numeric to array
+				d1=num_term1(); vtype2=get_vtype();
+				if(vtype2==VTYPE_NUM) { // add numeric to array
 					MESG("	array + numeric");
 					if(loc_array->astat==ARRAY_LOCAL) {
 						array_dat *new_array;
@@ -2581,26 +2587,34 @@ double term_plus(double value)
 					ex_name="Add to numeric";
 					MESG("	array + numeric: ok!");
 					return 0;
-				} else if(vtype_is(VTYPE_ARRAY)) {	// array addition
+				} else if(vtype2==VTYPE_ARRAY) {	// array addition
 					array_dat *loc_array2;
 					loc_array2=array_add2(loc_array,get_array("21"));
 					set_vtype(VTYPE_ARRAY);
 					set_array(loc_array2);
 					ex_name="Add to array";
 					RTRN(value);
-				} else {
+				}
+#if	1
+				 else if(vtype2==VTYPE_STRING) {
+				 	MESG("add string [%s] to an array",get_sval());
+					ERROR("operation not_supported err %d vtype1=%d vtype2=%d",err_num,vtype1,vtype2);
+					return value;
+				}
+#endif 
+				else {
 					err_num=220;
-					ERROR("operation not_supported err %d",err_num);
+					ERROR("operation not_supported err %d vtype1=%d vtype2=%d",err_num,vtype1,vtype2);
 					RTRN(value);
 				};		
  };
 
 #if	1
- if(vtype_is(VTYPE_AMIXED)) {
+ if(vtype1==VTYPE_AMIXED) {
   	array_dat *loc_array=get_array("20");
 		 		NTOKEN2;
-				d1=num_term1();
-				if(vtype_is(VTYPE_NUM)) { // add numeric to array
+				d1=num_term1();vtype2=get_vtype();
+				if(vtype2==VTYPE_NUM) { // add numeric to array
 					MESG("	mixed array + numeric");
 					if(loc_array->astat==ARRAY_LOCAL) {
 						array_dat *new_array;
@@ -2614,7 +2628,7 @@ double term_plus(double value)
 					ex_name="Add to numeric";
 					MESG("	array + numeric: ok!");
 					return 0;
-				} else if(vtype_is(VTYPE_ARRAY)) {	// array addition
+				} else if(vtype2==VTYPE_ARRAY) {	// array addition
 					array_dat *loc_array2;
 					loc_array2=array_add2(loc_array,get_array("21"));
 					set_vtype(VTYPE_ARRAY);
@@ -2622,8 +2636,8 @@ double term_plus(double value)
 					ex_name="Add to array";
 					RTRN(value);
 				} else {
-					err_num=220;
-					ERROR("operation not_supported err %d",err_num);
+					err_num=221;
+					ERROR("operation not_supported err %d vtype1=%d vtype2=%d",err_num,vtype1,vtype2);
 					RTRN(value);
 				};		
  };
@@ -2631,7 +2645,8 @@ double term_plus(double value)
 
 	// ERROR("term_plus: operation not supported!, vtype=%d line %d",ex_var.var_type,tok->tline);
 	NTOKEN2;
-	set_error(tok,221,"operation not supported");
+	ERROR("operation not_supported err %d vtype1=%d vtype2=%d",err_num,vtype1,vtype2);
+	set_error(tok,222,"operation not supported");
  return 0;
 }
 
@@ -3155,7 +3170,7 @@ double assign_val(double none)
 		set_term_function(ptok,assign_val_num);
 		sslot->dval=v1;
 		set_vdval(v1);
-		MESG("assign_val: %s to %f",lstok->tname,v1);
+		// MESG("assign_val: %s to %f",lstok->tname,v1);
 		return(v1);
 	};
 

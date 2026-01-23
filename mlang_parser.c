@@ -504,7 +504,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  tok_struct *array_tok=NULL;
  int skip_token=0;
 
- MESG("parse_block1: [%s] check if parsed!",bf->b_fname);
+ // MESG("parse_block1: [%s] check if parsed!",bf->b_fname);
  // return if already parsed and not forced to parse
  if(bf->tok_table !=NULL && init==0) {
  	check_buffer = buffer_ori;

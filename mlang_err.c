@@ -558,7 +558,7 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 		RT_MESG;
     };
 	*bf=bp;
-	MESG("err_exec_function: %s args=%d",bp->b_fname,nargs);
+	// MESG("err_exec_function: %s args=%d",bp->b_fname,nargs);
 	parsed=parse_block1(bp,NULL,0);	/* do not init if already parsed!, returns 0 if parsed  */
 	// MESG("err_exec_function: return from parse_block1");
 	if(parsed==0) {	/* already parsed, no need to check again!  */
