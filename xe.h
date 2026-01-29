@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.7T62 (23/1/2026)"
+#define VERSION 	 "#01.7T63 (29/1/2026)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -359,8 +359,8 @@ typedef struct	GWINDP {
 	PANEL *panel;
 	WINDOW *vline;
 	PANEL *vline_panel;
-	int back_xpos;
-	int back_ypos;
+	// int back_xpos;
+	// int back_ypos;
 	int back_rows;
 	int back_cols;
 	int h_flags;	/* horizon update flags  */
@@ -379,8 +379,8 @@ typedef struct	GWINDP {
 	GC top_gc,botom_gc;
 	GC sgc,sgm;
 	Drawable status;
-	int back_xpos;
-	int back_ypos;
+	// int back_xpos;
+	// int back_ypos;
 	int back_height;
 	int back_width;
 	int h_flags;	/* horizon update flags  */

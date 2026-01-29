@@ -1989,6 +1989,7 @@ double factor_proc()
 	RTRN(value);
 }
 
+#if	NUSE
 double cexpr_notequal(double v1,double v2)
 {
  return v1!=v2 ? 1.0:0.0;
@@ -2020,6 +2021,7 @@ double cexpr_biggereq(double v1,double v2)
 {
  return v1 >= v2 ? 1.0: 0.0;
 }
+#endif
 
 static double term2_power(double v1)
 {
@@ -2997,7 +2999,7 @@ double compare_notequal(double v1)
  } else 
  if(vtype1==VTYPE_NUM && vtype2==VTYPE_NUM) {
 		MESG("change notequal function!");
-		tok0->term_function = num_smaller;
+		tok0->term_function = num_notequal;
 		return v1 != v2 ? 1.0: 0.0;
  };
 	syntax_error("comparison error",223);

@@ -1,4 +1,3 @@
-assign_sub ("show_out","M-,")
 
 function show_out()
 {
@@ -9,6 +8,8 @@ function show_out()
 	prev_window()
  }
 }
+
+assign_sub ("show_out","M-,")
 
 cls
 

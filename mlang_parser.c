@@ -478,6 +478,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  check_buffer = bf;
  int cc=0;
  char nword[256];
+ char proc_name[256];
  int slen=0;
  int is_storelines=0;
  int tok_line=0;
@@ -493,7 +494,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 #endif
  offs start_proc_offset=0;
  offs ddot_offset=0;
- char *proc_name=NULL;
  BTREE *stree=use_stree;
  tok_struct *tok=NULL;
  int previous_ttype=0;
@@ -503,8 +503,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  int script_active=0;
  tok_struct *array_tok=NULL;
  int skip_token=0;
-
- // MESG("parse_block1: [%s] check if parsed!",bf->b_fname);
+ proc_name[0]=0;
+ MESG("parse_block1: [%s] check if parsed!",bf->b_fname);
  // return if already parsed and not forced to parse
  if(bf->tok_table !=NULL && init==0) {
  	check_buffer = buffer_ori;
@@ -528,7 +528,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	stree=bf->symbol_tree;
 	// stree->max_items=999999;
  };
- // MESG("parse_block1: pos2");
+
  {	/* clear ddot textpoints  */
 	TextPoint *scan,*nscan;
 	for(scan=bf->tp_last; scan;) {
@@ -553,7 +553,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  {
 	if(change_script_state(tok_type,&script_active)) continue;
 
-	// MESG("parse- cc=%d %c type=%3d [%10s] line=%d",cc,cc,tok_type,tname(tok_type),tok_line);
+	MESG("[%s] parse- cc=%d %c type=%3d [%10s] line=%d",bf->b_fname,cc,cc,tok_type,tname(tok_type),tok_line);
 
 	if(err_num>0) {
 		check_buffer = buffer_ori;
@@ -561,6 +561,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	}
 	value=0;
 	nword[0]=0;
+
 	switch(tok_type) {
 		case TOK_SEP:
 			if(is_now_sep) continue;
@@ -587,7 +588,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			continue;
 		case TOK_LETTER: 
 			slen=getnword1(bf,cc,nword);
-			// MESG("parse: TOK_LETTER 		[%s]",nword);
+			MESG("[%s] parse: TOK_LETTER 		[%s]",bf->b_fname,nword);
+			if(previous_ttype==15) {
+				strcpy(proc_name,nword);
+				MESG("[%s]		set proc_name to [%s]",bf->b_fname,proc_name);
+			};
 			break;
 		case TOK_NUM:
 			// MESG("TOK_NUM: old num=%d type=%d name %s,new type %d ",tok->tnum,tok->ttype,tok->tname,tok_type);
@@ -605,6 +610,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			break;
 		case TOK_RCURL:
 			{ 
+				MESG("[%s]	RCURL:",bf->b_fname);
 				curl_level--;cc=1;
 				if(curl_level<0) {
 					err_num=102;err_str="curls dont match!";
@@ -612,20 +618,21 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 					return(0);
 				};
 				if(curl_level==store_level && is_storelines) {
-					// MESG(" TOK_RCURL: go create_function_buffer");
+					// MESG(" <TOK_RCURL: go create_function_buffer");
 					create_function_buffer(bf,proc_name,start_proc_offset,foffset);
-
-					tok->ttype=TOK_SEP;
-					tok->tind=0;	// ??
+					if(tok) {
+						tok->ttype=TOK_SEP;
+						tok->tind=0;	// ??
+						tok->tname=" ;; ";
+						tok->tgroup=TOK_SEP;
+					};
 					is_now_sep=1;
 					is_storelines=0;
-					tok->tname=" ;; ";
-					tok->tgroup=TOK_SEP;
 					// if(tok->tok_node) { MESG("token after function: node name=%s",tok->tok_node->node_name);}
 					// else { MESG("token after function: token name=%s",tok->tname);};
-					// restore stage_level
-					free(proc_name);
-					proc_name=NULL;
+					// MESG("	> end of saving buffer");
+					// free(proc_name);
+					proc_name[0]=0;
 					continue;
 				} else {
 					int tt=1;
@@ -675,7 +682,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			// MESG("end of array definition tnum=%d ",tok->tnum);
 			cc=1;
 			if(next_token_type(bf)==TOK_LBRAKET) {
-				MESG("	next is LBRAKET");
+				MESG("[%s]	next is LBRAKET",bf->b_fname);
 				// array_tok=tok;
 				if(array_tok)		// ??????????????????? CHECK!!!!!
 					array_tok->ttype=TOK_ARRAY2;
@@ -842,12 +849,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			return(0);
 			};
 	};
-	// MESG("	apply");
+
 	if(tok_type==TOK_NL) {
 		// start_of_line = 1;
 		continue;
 	};
-	// MESG("	- token type=[%d %s] previous token is [%d %s]",tok_type,tname(tok_type),previous_ttype,tname(previous_ttype));
+	// MESG("	- token type=[%d %s] previous token is [%d %s] nword=[%s],store=%d",tok_type,tname(tok_type),previous_ttype,tname(previous_ttype),nword,is_storelines);
 	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {
 	if(!(is_now_sep && (tok_type==TOK_LCURL||tok_type==TOK_RCURL) )){
@@ -855,7 +862,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			/* check for else statement!!  */
 		if(!(tok_type==TOK_LETTER && !strcmp(nword,"else"))){
 			if(tok_type==TOK_LBRAKET && previous_ttype==TOK_RBRAKET){
-				MESG("skip tok_lbraket!");
+				MESG("		skip tok_lbraket!");
 				continue;
 			} else {
 				if(tok_type==TOK_DOT && previous_ttype==TOK_RBRAKET){
@@ -890,7 +897,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 				tok_type=TOK_DIR_ELSE;
 				is_now_sep=0;
 			} else {
-				MESG("	add separator!");
+				MESG("		add separator!");
 				ADD_TOKEN("separator");
 			};
 		};
@@ -952,10 +959,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			tcl->num=tok->tnum;
 			tok->tgroup=TOK_END;
 	};
-	};
 	
 	if(tok_type==TOK_LETTER) {
-		// MESG("	parser: TOK_LETTER: check element in bt [%s]",nword);
+		MESG("[%s]	parser: TOK_LETTER: check element in bt [%s] store=%d",bf->b_fname,nword,is_storelines);
 		tok->tok_node  = find_btnode(bt_table,nword); // check main table
 
 #if	USE_TYPE_VARS
@@ -979,14 +985,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			// MESG("	parser: [%s] found in main bt_table!",nword);
 		};
 #endif
-		if(is_storelines) {
-			// if(tok->tok_node!=NULL) MESG("function already registered!");
-			if(proc_name==NULL) { 
-				proc_name=strdup(nword) ; 
-				// MESG("new function proc_name=%s",nword);
-			};
-		};		
-
 		if(tok->tok_node==NULL) { // a NEW variable name or directive
 			// MESG("		check if directive!");
 			tok->tok_node=find_btnode(directiv_table,nword);
@@ -1006,11 +1004,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 				};
 #if	USE_TYPE_VARS
 				if(tok->ttype == TOK_DIR_TYPE) {
-					MESG("	found type_definition!");
+					MESG("		found type_definition!");
 					if(!type_init_definition(bf,stree,tok)) 
 					{
 						// set_error(tok,111,"type_definition parse error");
-						MESG("after setting 111 error");
+						MESG("	after setting 111 error");
 						check_buffer = buffer_ori;
 						return 0;
 					} else {
@@ -1110,8 +1108,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			};
 		};
 	};
-	// MESG("parse: end token switch!");
+	// MESG("[%s] parse: end token switch!",bf->b_fname);
 	previous_ttype=tok->ttype;
+    }; // end check is_storelines
 	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
   
@@ -1158,8 +1157,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 #if	DEBUG_SYNTAX
  stage_level=save_stage_level;
 #endif
-	if(bf->symbol_tree==NULL)MESG("--- parse_block1:[%s] > end.",bf->b_fname);
-	else MESG(": parse_block1:[%s] > end. Number of tokens %d",bf->b_fname,bf->symbol_tree->items);
+	if(bf->symbol_tree==NULL)MESG("[%s]: --- parse_block1: > end.",bf->b_fname);
+	else MESG("[%s]: parse_block1 > end. Number of tokens %d",bf->b_fname,bf->symbol_tree->items);
  // MESG("parse_block1: [%s] >> end",bf->b_fname); 
  check_buffer = buffer_ori;
  return(TRUE); 

@@ -6,7 +6,7 @@ a=human
 
 function pass1(r1,k)
 {
-	print(r1.age)
+	print("age:",r1.age)
 	r1.age =30*k
 	r1.name="kt"
 	k=3

@@ -284,8 +284,8 @@ GWINDP * drv_new_twinp()
  gwp->panel=NULL;
  gwp->vline=NULL;		// right vertical line window
  gwp->vline_panel=NULL;	// right vertical line panel
- gwp->back_xpos=0;
- gwp->back_ypos=0;
+ // gwp->back_xpos=0;
+ // gwp->back_ypos=0;
  gwp->back_rows=0;
  gwp->back_cols=0;
  gwp->h_flags=0;
@@ -553,8 +553,8 @@ void drv_set_wvs(WINDP *wp)
 
 	create_rline(wp);
 //	backup also dimensions
-	wp->gwp->back_xpos=wp->gwp->t_xpos;
-	wp->gwp->back_ypos=wp->gwp->t_ypos;
+	// wp->gwp->back_xpos=wp->gwp->t_xpos;
+	// wp->gwp->back_ypos=wp->gwp->t_ypos;
 	wp->gwp->back_rows=wp->w_ntrows;
 	wp->gwp->back_cols=wp->w_ntcols;
 	wp->gwp->h_flags=0;

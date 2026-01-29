@@ -1962,7 +1962,10 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	// MESG_time_start("ifile0: %s",bf->b_fname);
    if(status==-1 && errno==ENOENT)
    {
-	if(name[0]!=CHR_LBRA)	msg_line("New file \"%s\"",name);
+	if(name[0]!=CHR_LBRA) {
+		if(execmd) fprintf(stderr,"File %s not found\n",name);
+		else		msg_line("New file \"%s\"",name);
+	};
 	return(false);
    } ;
    if(!CheckMode(st.st_mode)) {
