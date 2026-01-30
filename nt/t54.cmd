@@ -9,12 +9,11 @@ function pass1(r1,k)
 	print("age:",r1.age)
 	r1.age =30*k
 	r1.name="kt"
-	k=3
 }
  
 p=2
 pass1(a,p)
 
-print(a.age)
-print(a.name)
-print(p)
+print("a.age=",a.age)
+print("a.name=",a.name)
+print("p=",p)

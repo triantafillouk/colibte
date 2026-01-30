@@ -35,7 +35,7 @@ show_time("Loop with proc 51",0)
 fori(i=1;11;1){ 
 	fori(j=1;800001;1) { 
 		l = i*j+32
-		p += i*j+32+fact(10)
+		p += l+fact(10)
 	} 
 	show_time("loop:"+i+" p="+p,1);
 }

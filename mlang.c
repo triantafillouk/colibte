@@ -352,6 +352,15 @@ static inline double factor_none()
 	return 0.0;	/* continue  */
 }
 
+double update_val_num()
+{
+ double v0=lsslot->dval;
+ lsslot->dval += tok->dval;
+ NTOKEN2;
+ return(v0);
+}
+
+
 /* Used in increase, decrease  */
 double update_val()
 {
@@ -375,9 +384,14 @@ double update_val()
 				};
 			} else {
 				// MESG("update_val: numeric");
-				if(lsslot==NULL) MESG("lsslot is NULL!");
-				v0=lsslot->dval;
-				lsslot->dval += tok->dval;
+				if(lsslot==NULL) {
+					MESG("lsslot is NULL!");
+				} else {
+					MESG("set term function to update_val_num!");
+					set_term_function(tok,(TFunction)update_val_num);
+					v0=lsslot->dval;
+					lsslot->dval += tok->dval;
+				};
 				// MESG("update_val:1");
 			};
 		};
