@@ -270,8 +270,8 @@ void initialize_call_stack(int initial_size)
 #endif
 }
 
-#if	USE_CALL_STACK0
-// Not used, realloc_call_stack is difficult to implement. All previous positions must be reassigned!!!
+#if	NUSE
+// Not used, realloc_exec_stack is difficult to implement. All previous positions must be reassigned!!!
 MVAR *realloc_exec_stack(int additional_size)
 {
 	int required_size = exec_stack_current-call_stack;
@@ -305,7 +305,7 @@ void init_btree_table()
 #endif
 }
 
-
+#if	NUSE
 void clear_args(MVAR *va,int nargs)
 {
 #if	0
@@ -324,6 +324,7 @@ void clear_args(MVAR *va,int nargs)
 	call_stack_used -= nargs;
 	// MESG("clear_args: call_stack=%lld upto %lld",call_stack_used-call_stack,call_stack_used-call_stack+nargs);
 }
+#endif
 
 void clean_saved_string(int new_size)
 {
@@ -1004,7 +1005,7 @@ int check_init(FILEBUF *bf)
  check_buffer = bf;
  int err=0;
  INIT_STAGE;
- MESG("---- check_init: [%s] %d",bf->b_fname,bf->b_type);
+ // MESG("---- check_init: [%s] %d",bf->b_fname,bf->b_type);
 #if	0
  if(execmd) 
  {
@@ -1044,7 +1045,7 @@ int check_init(FILEBUF *bf)
 
  tok=tok_table;
  // MESG("check_init:end [%s] %d",bf->b_fname,bf->b_type);
- // show_token_table("Token table ",bf,bf->tok_table,bf->end_token - bf->tok_table+1);
+ show_token_table("Token table ",bf,bf->tok_table,bf->end_token - bf->tok_table+1);
  if(bf->err>0) {
 	return bf->err;
  };
@@ -1053,7 +1054,7 @@ int check_init(FILEBUF *bf)
 #if	TBNF
  // bf->tok_bnf_index = 0;
  // bf->tok_bnf = bf->tok_table_bnf;
- // show_token_table("BNF ",bf,bf->tok_table_bnf,bf->tok_bnf_index);
+ show_token_table("BNF ",bf,bf->tok_table_bnf,bf->tok_bnf_index);
  if(bnf_debug() && check_buffer==NULL) exit(0);
 #endif
  return(0);
@@ -2120,10 +2121,10 @@ char *str_cat(char *sval, char *add)
  return sval;
 }
 
-static double term1_mul_num(double v1)
+inline static double term1_mul_num(double v1)
 {
 	NTOKEN2;
-	return v1*num_term2();;
+	return v1*num_term2();
 }
 
 

@@ -342,6 +342,7 @@ int  err_push_args_1(int *nargs)
 	xpos=415;
 	
 	if(tok->ttype==TOK_RPAR) {
+		
 		break;
 	} else if (tok->ttype==TOK_COMMA) {
 		stack_push("arg ,",tok);
@@ -356,7 +357,7 @@ int  err_push_args_1(int *nargs)
 	}
  };
 	*nargs=num_args;
-	// MESG("err_push+args: args=%d err=%d",num_args,err_num);
+	// MESG("err_push_args: args=%d err=%d",num_args,err_num);
  	return(err_num);
  } else {	/* no arguments!  */
 	xpos=418;
@@ -534,7 +535,7 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
  int save_stage_level=stage_level;
 #endif
 	// tok_struct *tok_latest=NULL;
- 	// MESG("err_exec_funtion: %s",name);
+ 	// MESG("err_exec_funtion: << %s",name);
     FILEBUF *bp;		/* ptr to buffer to execute */
     char bufn[MAXFLEN+2];		/* name of buffer to execute */
 	int parsed;
@@ -563,6 +564,7 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 	// MESG("err_exec_function: return from parse_block1");
 	if(parsed==0) {	/* already parsed, no need to check again!  */
 		// MESG("	already parsed!");
+		// MESG("err_exec_function: already parsed! >>");
 		RT_MESG1(463);
 	};
 	/* and now execute it as asked */
@@ -585,7 +587,9 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 	CHECK_TOK(466);
 
 	// tok=tok_latest;
+	// MESG("err_exec_function: before check_sentence1");
 	err_num=err_check_sentence1();
+	// MESG("err_exec_function: end >>");
 	// MESG("err_exec_func: err_num=%d",err_num);
 	RT_MESG1(467);
 }
@@ -596,7 +600,7 @@ int err_factor()
  static int pre_symbol=0;
  TDSERR("factor");
  int lpar=0;
- // MESG("-- factor %s",tok_info(tok));
+ // MESG("-- err_factor %s",tok_info(tok));
  if(tok->ttype!=TOK_NOT)
  	stack_push("factor",tok);
  int save_macro_exec;
@@ -892,7 +896,7 @@ int err_factor()
 		RT_MESG1(4891);
 		};
 	case TOK_MINUS:
-		MESG("tok_minus: %d",pre_symbol);
+		// MESG("tok_minus: %d",pre_symbol);
 		if(pre_symbol>1) {
 			xpos=490;
 			syntax_error("too many symbols(+) infront of factor",xpos);
@@ -948,7 +952,6 @@ int err_factor()
 		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)
 		int nargs=0;
-		FILEBUF *bp;
 		tok_struct *after_proc;	// this is needed for recursive functions
 		xpos=501;
 		// MESG("err TOK_PROC:");
@@ -956,29 +959,31 @@ int err_factor()
 
 		/* function */
 		pre_symbol=0;
-
+		// MESG("	err check:	TOK_PROC: ");
 		err_num = err_push_args_1(&nargs);
 		if(err_num) return(err_num);
-		// MESG("-err call TOK_PROC: args=%d",nargs);
+		// MESG("	err check: TOK_PROC: args=%d",nargs);
 		tok0->t_nargs=nargs;
 		CHECK_TOK(503);
-		after_proc=tok;
+		after_proc=tok;	// this must be RPAR token!
+		check_skip_token_err1(TOK_RPAR,"no right parenthesis",505);
+		stack_push("proc ) ",tok);
 		// MESG("err TOK_PROC: set after_proc [%s] ttype=%d",tok->tname,tok->ttype);
-		err_num=err_exec_function(tok0->tname,nargs,&bp);
+		FILEBUF *proc_buffer=NULL;
+		err_num=err_exec_function(tok0->tname,nargs,&proc_buffer);
 		if(err_num) {
 			// MESG("	err_num=%d",err_num);
 			return(err_num);
 		};
-		if(bp!=NULL) {
-			tok0->proc_buffer=bp;
-			bp->function_called=0;
+		if(proc_buffer!=NULL) {
+			tok0->proc_buffer=proc_buffer;
+			proc_buffer->function_called=0;
 			// MESG("	set function buffer");
 		};
 		CHECK_TOK(504);
 		tok=after_proc;
 		// MESG("	TOK_PROC: end function tnum=%d",tok->tnum);
-		stack_push("proc ) ",tok);
-		check_skip_token_err1(TOK_RPAR,"no right parenthesis",505);
+		// stack_push("proc ) ",tok);
 		// MESG("err TOK_PROC: end ttype=%d",tok->ttype);
 		RT_MESG;
 	};

@@ -504,7 +504,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  tok_struct *array_tok=NULL;
  int skip_token=0;
  proc_name[0]=0;
- MESG("parse_block1: [%s] check if parsed!",bf->b_fname);
+ // MESG("parse_block1: [%s] check if parsed!",bf->b_fname);
  // return if already parsed and not forced to parse
  if(bf->tok_table !=NULL && init==0) {
  	check_buffer = buffer_ori;
@@ -552,8 +552,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  while(getnc1(bf,&cc,&tok_type))
  {
 	if(change_script_state(tok_type,&script_active)) continue;
-
-	MESG("[%s] parse- cc=%d %c type=%3d [%10s] line=%d",bf->b_fname,cc,cc,tok_type,tname(tok_type),tok_line);
+	if(tok_type!=TOK_LETTER && cc!=10)
+	// MESG("[%s] parse- cc=%d %c type=%3d [%10s] line=%d",bf->b_fname,cc,cc,tok_type,tname(tok_type),tok_line);
 
 	if(err_num>0) {
 		check_buffer = buffer_ori;
@@ -588,10 +588,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			continue;
 		case TOK_LETTER: 
 			slen=getnword1(bf,cc,nword);
-			MESG("[%s] parse: TOK_LETTER 		[%s]",bf->b_fname,nword);
+			// MESG("[%s] parse: TOK_LETTER 		[%s]",bf->b_fname,nword);
 			if(previous_ttype==15) {
 				strcpy(proc_name,nword);
-				MESG("[%s]		set proc_name to [%s]",bf->b_fname,proc_name);
+				// MESG("[%s]		set proc_name to [%s]",bf->b_fname,proc_name);
 			};
 			break;
 		case TOK_NUM:
@@ -610,7 +610,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			break;
 		case TOK_RCURL:
 			{ 
-				MESG("[%s]	RCURL:",bf->b_fname);
+				// MESG("[%s]	RCURL:",bf->b_fname);
 				curl_level--;cc=1;
 				if(curl_level<0) {
 					err_num=102;err_str="curls dont match!";
@@ -897,7 +897,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 				tok_type=TOK_DIR_ELSE;
 				is_now_sep=0;
 			} else {
-				MESG("		add separator!");
+				// MESG("		add separator!");
 				ADD_TOKEN("separator");
 			};
 		};
@@ -961,7 +961,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	};
 	
 	if(tok_type==TOK_LETTER) {
-		MESG("[%s]	parser: TOK_LETTER: check element in bt [%s] store=%d",bf->b_fname,nword,is_storelines);
+		// MESG("[%s]	parser: TOK_LETTER: check element in bt [%s] store=%d",bf->b_fname,nword,is_storelines);
 		tok->tok_node  = find_btnode(bt_table,nword); // check main table
 
 #if	USE_TYPE_VARS
@@ -1153,12 +1153,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  free_list(bf->lex_parser,"lex_parser");
  bf->lex_parser=NULL;
  free_list(curl_stack,"cstack");
-
+ // show_token_table("After parse:",bf,bf->tok_table,bf->end_token - bf->tok_table+1);
 #if	DEBUG_SYNTAX
  stage_level=save_stage_level;
 #endif
-	if(bf->symbol_tree==NULL)MESG("[%s]: --- parse_block1: > end.",bf->b_fname);
-	else MESG("[%s]: parse_block1 > end. Number of tokens %d",bf->b_fname,bf->symbol_tree->items);
+	// if(bf->symbol_tree==NULL)MESG("[%s]: --- parse_block1: > end.",bf->b_fname);
+	// else MESG("[%s]: parse_block1 > end. Number of tokens %d",bf->b_fname,bf->symbol_tree->items);
  // MESG("parse_block1: [%s] >> end",bf->b_fname); 
  check_buffer = buffer_ori;
  return(TRUE); 

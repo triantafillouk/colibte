@@ -2116,7 +2116,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 		}
    };
 	check_line_mode(bf);
-	MESG_time("go update lines");
+	// MESG_time("go update lines");
 	update_lines(bf);
 	if(!(bf->b_flag & FSMMAP)) 
 		set_modified(bf);
