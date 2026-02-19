@@ -647,9 +647,15 @@ char *native_copy="pbcopy";
 #else 
 #if	WSL
 // The following is for wsl!
+#if	1
+char *native_copy="powershell.exe -noprofile -command \"chcp 65001 > \\$null;clip.exe\"";
+char *native_paste="powershell.exe -noprofile -command chcp 65001>\\$null; Get-Clipboard";
+// char *native_paste0="powershell.exe -noprofile -command Get-Clipboard";
+#else
 char *native_paste0="win32yank.exe -o --lf";
 char *native_paste="win32yank.exe -o --lf";
 char *native_copy="win32yank.exe -i";
+#endif
 #else
 char *native_copy="xclip -o";
 char *native_paste="xclip -i";

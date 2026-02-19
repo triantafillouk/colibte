@@ -24,12 +24,14 @@ xls=/mnt/c/Program\ Files/Microsoft\ Office/root/Office16/EXCEL.EXE
 xlsx=/mnt/c/Program\ Files/Microsoft\ Office/root/Office16/EXCEL.EXE
 # for browsers 'web:' at the begining denotes that program needs to 
 # prepend the file name with "file://"
-pdf=web:/mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe
-html=web:/mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe
-htm=web:/mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe
-php=web:/mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe
-svg=web:/mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe
-asp=web:/mnt/c/Program\ Files\ \(x86\)/Microsoft/Edge/Application/msedge.exe
+pdf=/mnt/c/Program\ Files\ \(x86\)/Microsoft/Edge/Application/msedge.exe
+#html=web:/mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe
+html=web:/mnt/c/Program\ Files\ \(x86\)/Microsoft/Edge/Application/msedge.exe
+htm=web:/mnt/c/Program\ Files\ \(x86\)/Microsoft/Edge/Application/msedge.exe
+#htm=web:/mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe
+php=/mnt/c/Program\ Files\ \(x86\)/Microsoft/Edge/Application/msedge.exe
+svg=griv
+asp=/mnt/c/Program\ Files\ \(x86\)/Microsoft/Edge/Application/msedge.exe
 tar=tar tvf,tar tvf 
 tgz=tar tvzf, tar tvzf
 tbz=tar tvjf
