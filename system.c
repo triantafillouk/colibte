@@ -648,9 +648,17 @@ char *native_copy="pbcopy";
 #if	WSL
 // The following is for wsl!
 #if	1
-char *native_copy="powershell.exe -noprofile -command \"chcp 65001 > \\$null;clip.exe\"";
-char *native_paste="powershell.exe -noprofile -command chcp 65001>\\$null; Get-Clipboard";
-// char *native_paste0="powershell.exe -noprofile -command Get-Clipboard";
+//char *native_copy="powershell.exe -noprofile -command 'chcp 65001 > $null;clip.exe'";
+//char *native_paste="powershell.exe -noprofile -command 'chcp 65001>$null; Get-Clipboard'";
+/*
+	chcp does not work ok in case of redirect the output of powershell to a file or pipe!!!
+	The best way to correctly use of native past is to set default codepage to UTF-8 in windows!
+	otherwise 
+	- a X11 server with xclip must be used also for wsl2
+	- use win32yank.exe as bellow
+*/
+char *native_copy="powershell.exe -noprofile -command 'clip.exe'";
+char *native_paste="powershell.exe -noprofile -command 'Get-Clipboard'";
 #else
 char *native_paste0="win32yank.exe -o --lf";
 char *native_paste="win32yank.exe -o --lf";
@@ -673,7 +681,7 @@ int check_native_copy()
 	if(status>=MAXFLEN) return 0;
 	status = system(exec_st);
 	// MESG("check_native_copy:[%s] -> %d",exec_st,status);
-	if(status == 0) {
+	if(status%256 == 0) {
 		clip_copy=native_paste;
 		clip_paste=native_copy;
 		ext_clipboard_command=1;
@@ -692,7 +700,10 @@ int init_system_clipboard()
 	// if(status>=MAXFLEN) return 0;
 	// MESG("init_system_clipboard:");
 #if	(WSL | DARWIN) & PCURSES
-	if(check_native_copy()) return 1;
+	if(check_native_copy()) {
+		MESG("using native copy!");
+		return 1;
+	};
 #endif
 	display_env = getenv("DISPLAY");
 	if(display_env == NULL) {
@@ -846,7 +857,7 @@ int insert_text_file_as_column(char *filnam)
 int insert_text_file_nl(char *filnam)
 {
 	FILEBUF *ori_buf = cbfp;
-
+	// MESG("insert_text_file_nl:");
 	
 
 	FILEBUF *tmp_bp = new_filebuf(filnam,0);
@@ -856,14 +867,15 @@ int insert_text_file_nl(char *filnam)
 	if(tmp_bp->maxlinelen==0) tmp_bp->maxlinelen=FSize(tmp_bp);
 
 	const num max_len = tmp_bp->maxlinelen;
-	// MESG("#insert_text_file_nl: position  --------------- max_len=%d",max_len);
+	MESG("#insert_text_file_nl: position  --------------- max_len=%d",max_len);
 
 	char *pad_space = (char *)malloc(max_len+3);
 	if(pad_space==NULL) { delete_filebuf(tmp_bp,1); return false;};
 	num line_start=0;
-
+	// MESG(" insert_text_file_nl:1");
 	select_filebuf(ori_buf);
 	char *ml_out;
+	// MESG(" insert_text_file_nl:1");
 	while(line_start<FSize(tmp_bp)) {
 		char *line_text=get_line_at(tmp_bp,line_start);
 		int col=0, in_offset=0;;
@@ -879,8 +891,8 @@ int insert_text_file_nl(char *filnam)
 			memcpy(ml_out,&uc,utf8charlen_nocheck(uc.uval[0]));
 			ml_out+=utf8charlen_nocheck(uc.uval[0]);
 		};
-
 		line_start = FNextLine(tmp_bp,line_start);
+		// MESG(" insert_text_file_nl:2 line_start=%ld",line_start);
 		if(FEof(cbfp)) {
 			// MESG("	eof insert now! [%s] ",pad_space);
 			memcpy(ml_out,cbfp->EolStr,cbfp->EolSize);
@@ -943,18 +955,18 @@ int ext_system_paste()
 	static char exec_st[MAXFLEN];
 	status=snprintf(exec_st,sizeof(exec_st),"%s > %s 2> /dev/null",clip_copy,filnam);
 	if(status>=MAXFLEN) return 0;
-
+	MESG("ext_clipoard_paste:[%s]",exec_st);
 	status = system(exec_st);
 #endif
 
-	if(status==0) {
+	if(status%256==0) {
 
 		if(cwp->selection==REGION_COLUMN) {	/* Column past  */
 			status=insert_text_file_as_column(filnam);
 		} else {	/* Normal paste  */
 			status=insert_text_file_nl(filnam);
 		};
-		unlink(filnam);
+		// unlink(filnam);
 		set_update(cwp,UPD_EDIT);
 		setmark(0);
 		return status;
