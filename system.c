@@ -648,8 +648,8 @@ char *native_copy="pbcopy";
 #if	WSL
 // The following is for wsl!
 #if	1
-//char *native_copy="powershell.exe -noprofile -command 'chcp 65001 > $null;clip.exe'";
-//char *native_paste="powershell.exe -noprofile -command 'chcp 65001>$null; Get-Clipboard'";
+char *native_copy="powershell.exe -noprofile -command 'chcp 65001 > $null;clip.exe'";
+char *native_paste="powershell.exe -noprofile -command 'chcp 65001 > $null;$OutputEncoding = [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false); Get-Clipboard'";
 /*
 	chcp does not work ok in case of redirect the output of powershell to a file or pipe!!!
 	The best way to correctly use of native past is to set default codepage to UTF-8 in windows!
@@ -657,8 +657,8 @@ char *native_copy="pbcopy";
 	- a X11 server with xclip must be used also for wsl2
 	- use win32yank.exe as bellow
 */
-char *native_copy="powershell.exe -noprofile -command 'clip.exe'";
-char *native_paste="powershell.exe -noprofile -command 'Get-Clipboard'";
+//char *native_copy="powershell.exe -noprofile -command 'clip.exe'";
+//char *native_paste="powershell.exe -noprofile -command 'Get-Clipboard'";
 #else
 char *native_paste0="win32yank.exe -o --lf";
 char *native_paste="win32yank.exe -o --lf";
