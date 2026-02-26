@@ -1474,11 +1474,13 @@ int text_mouse_key(int *c)
 
 void drv_win_move(WINDP *wp,int row,int col)
 {
+	// MESG("drv_win_move: [r=%d c=%d] cols=%d lcol=%ld",row,col,wp->w_ntcols,wp->w_lcol);
 	 wmove(stdscr,wp->gwp->t_ypos+row,wp->gwp->t_xpos+col);
 }
 
 void drv_move(int row, int col)
 {
+	// MESG("drv_move:[r=%d c=%d]",row,col);
 	wmove(stdscr,row,col);
 }
 
@@ -1605,7 +1607,7 @@ void hide_cursor(char *from)
 void show_cursor(char *from) 
 {
 	if(!entry_mode) {
-	// MESG("show_cursor:");
+	// MESG("show_cursor:[%s]",from);
 		if(
 #if	TNOTES
 			cbfp->b_flag==FSNOTES || cbfp->b_flag==FSNOTESN || 
@@ -2016,6 +2018,7 @@ void expose_window(WINDP *wp)
 void drv_clear_line(WINDP *wp,int row)
 {
 	return;
+#if	0
 	wmove(wp->gwp->draw,row,0);
 	int i;
 	for(i=0;i<wp->w_ntcols;i++) {
@@ -2026,6 +2029,7 @@ void drv_clear_line(WINDP *wp,int row)
 	// doupdate();
 	wmove(wp->gwp->draw,row,0);
 	// MESG("drv_clear_line: %2d",row);
+#endif
 }
 
 /* Put virtual screen text on physical */
@@ -2118,7 +2122,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 #else
 		memcpy(vstr,v1->uval,6);
 #endif
-
+		// MESG("put_wtext row=%d",row);
 		if(	get_utf_length((utfchar *)vstr)<0) 
 		{
 			wprintw(wp->gwp->draw,"%s",unknown1);
@@ -2278,6 +2282,7 @@ void drv_msg_line(char *arg)
 	if (discmd == FALSE || macro_exec) return;
 	curs_set(0);
 	wmove(mesg_window,0,0);	
+	// MESG("drv_msg_line:[%s]",arg);
 #if	1
 	if(app_error) 
 		wbkgd(mesg_window,color_pair(COLOR_FG,COLOR_SEARCH_BG));
@@ -2455,7 +2460,7 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
 	wmove(wp->gwp->draw,status_row,0);
 	maxlen=wp->w_ntcols-1;
  };
-
+  // MESG("put_string_statusline1 [%s]",show_string);
   utf_string_break(status_string,maxlen);
   wprintw(wp->gwp->draw,"%s",status_string);
   touchline(wp->gwp->draw,status_row,1);

@@ -75,24 +75,27 @@ int utf_num_chars(char *utf)
  	ch=utf[i];
 	trail=utf8_countBytes[ch]-1;
 	if(trail<0) {
-		utf_error=trail;
+		utf_error=200+trail;
 		return -1;
 	};
 	i++;
 	utflen++;
 	for(j=0;j<trail;j++,i++) {
 		if(i>=len) {
-			utf_error=i-j;
+			utf_error=400+i-j;
 			return -1;
 		};
 		if(utf[i]<128 || utf[i]>191) {
-			utf_error=i-j;
+			utf_error=500+i-j;
 			return -1;
 		};
 	};
  };
  return utflen;
 }
+
+#define	TEST3	1
+char * utf8_rtruncate(char *utf_string, int len);
 
 /* print full file name in limited space */
 char *get_pfname(char *dir_name,char *file_name,int len)
@@ -194,18 +197,18 @@ int utf_num_chars_tnl(char *utf,long *size)
  	ch=utf[i];
 	trail=utf8_countBytes[ch]-1;
 	if(trail<0) {
-		utf_error=trail;
+		utf_error=1000+trail;
 		return -1;
 	};
 	i++;
 	utflen++;
 	for(j=0;j<trail;j++,i++) {
 		if(i>=len) {
-			utf_error=i-j;
+			utf_error=1100+i-j;
 			return -1;
 		};
 		if(utf[i]<128 || utf[i]>191) {
-			utf_error=i-j;
+			utf_error=1500+i-j;
 			return -1;
 		};
 	};
@@ -321,7 +324,7 @@ int  SUtfCharAt(char *utfstr, int offset, utfchar *uc)
 {
  int i,ulen;
  int o=offset;
-	memset(uc->uval,0,12);
+	memset(uc->uval,0,16);
 	// ulen=utf8_countBytes[(int)utfstr[offset]];
 	ulen=SUtfCharLen(utfstr,offset,uc);
 	if(ulen>12) { error_line(" SUtfcharAt: [%s] o=%d ulen=%d",utfstr,o,ulen);ulen=12;};
@@ -333,7 +336,7 @@ int  SUtfCharAt(char *utfstr, int offset, utfchar *uc)
 void utf_string_break(char *utf_string, int column)
 {
 	 char *s=utf_string;
-	// MESG("utf_string_break: [%s] column=%d",utf_string,column);
+	 // MESG("utf_string_break: [%s] column=%d",utf_string,column);
 	 char *end_string = utf_string+strlen(utf_string);
 	 int i=0;
 
@@ -348,6 +351,7 @@ void utf_string_break(char *utf_string, int column)
 		i = SUtfCharAt(s,0,&uc);
 #else
 		SUtfCharAt(s,0,&uc);
+		// MESG("UtfStringBreak [%s] col=%d",utf_string,column);
 		i += get_utf_length(&uc);
 #endif
 		s += utf8_countBytes[(int)*s];
@@ -376,7 +380,7 @@ int utf8_str_left(char *st,int pos)
  int ch;
  int err=0;
  i=pos-1;
-
+ // MESG("utf8_str_left:[%s]",st);
  if(st[i]<128) return i;
  while((ch=st[i])<192) {
  	i--;
@@ -507,7 +511,8 @@ long utf8_to_unicode(unsigned char* const utf8_str)
 			//0x80..0xBF, we ignore. These are reserved for UTF-8 encoding.
 			// printf("error: reserved for UTF-8 encoding 0x%X\n",*utf8_currentCodeUnit);
 			// *size=0;
-			utf_error=1;
+			//MESG("utf_error: %X len=%d %s",*utf8_currentCodeUnit,strlen((char *)utf8_str),utf8_str);
+			utf_error=100;
 			return unic;	/* this is an error!  */
 		}
 		else if (*utf8_currentCodeUnit < 0xE0) {
@@ -595,7 +600,7 @@ long utf8_to_unicode(unsigned char* const utf8_str)
 		else {
 			//Invalid UTF-8 code unit, we ignore.
 			// printf("error 0x%X > 0xF8\n",*utf8_currentCodeUnit);
-			utf_error=1;
+			utf_error=1011;
 			// *size=0;
 		}
 	return 0;
@@ -621,7 +626,7 @@ long utf8_to_unicode(unsigned char* const utf8_str, int *size)
 			//0x80..0xBF, we ignore. These are reserved for UTF-8 encoding.
 			// printf("error: reserved for UTF-8 encoding 0x%X\n",*utf8_currentCodeUnit);
 			*size=0;
-			utf_error=1;
+			utf_error=102;
 			return unic;	/* this is an error!  */
 		}
 		else if (*utf8_currentCodeUnit < 0xE0) {
@@ -709,7 +714,7 @@ long utf8_to_unicode(unsigned char* const utf8_str, int *size)
 		else {
 			//Invalid UTF-8 code unit, we ignore.
 			// printf("error 0x%X > 0xF8\n",*utf8_currentCodeUnit);
-			utf_error=1;
+			utf_error=103;
 			*size=0;
 		}
 	return 0;

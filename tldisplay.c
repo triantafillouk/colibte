@@ -144,7 +144,7 @@ void vtinit(int argc, char **argp)
 void movecursor(int row, int col)
 {
  static int t=0;
- // MESG("movecursor:"); 
+ // MESG("movecursor: col=%d",col); 
    if(row<drv_numrow-1) {
 		if(cwp->w_ntcols>40) show_position_info(0);
 		else if(cwp->w_ntcols>25) show_position_info(1);
@@ -966,11 +966,9 @@ void update_cursor_position()
 	if(!entry_mode)
 	{
 		if(!in_menu) {
-#if	1
 			if(cwp->w_fp->b_flag == FSNOTES) movecursor(cwp->current_tag_line-cwp->top_tag_line+(cwp->w_fp->b_header!=NULL), WGetCol());
 			else if(cwp->w_fp->b_flag & FSNOTESN) movecursor(cwp->current_note_line-cwp->top_note_line+(cwp->w_fp->b_header!=NULL), WGetCol());
 			else 
-#endif
 			if(cwp->w_fp->b_flag & FSNLIST) {
 				// MESG("update_cursor_position: fsnlist");
 				movecursor(cwp->current_note_line-cwp->top_note_line+(cwp->w_fp->b_header!=NULL), 0);
@@ -979,7 +977,7 @@ void update_cursor_position()
 				// MESG("update_cursor_position: row=%d col=%d %d",cwp->currow,cwp->curcol,WGetCol());
 				movecursor(cwp->currow,cwp->curcol);
 			} else {
-				// MESG("update_cursor_position: regular");
+				// MESG("update_cursor_position: regular %d",WGetCol());
 				movecursor(cwp->currow+(cwp->w_fp->b_header!=NULL), WGetCol());
 			};
 			// MESG("update_cursor_position: go show_cusor");
@@ -1541,13 +1539,14 @@ void status_line(WINDP *wp)
 	cp=cp_data;
 	// MESG("status_line: fdname [%s] l=%d",fdname,strlen(fdname));
 	composite = g_utf8_normalize(fdname,-1,G_NORMALIZE_ALL_COMPOSE);
-	// MESG("           : composite [%s]",composite);
+	// MESG("          : composite [%s]",composite);
 	if(wp->w_ntcols>NUM_COLS_SHORT) {
+	// MESG("			: %s",bp->b_fname); 
 	full_name = get_pfname(composite,bp->b_fname,max_t-1);
-	// MESG("           : full_name [%s] l=%d max_t=%d",full_name,strlen(full_name),max_t);
+	// MESG("          : full_name [%s] l=%d max_t=%d",full_name,strlen(full_name),max_t);
 	strlcpy(cp,full_name,MAXLLEN);
 	} else {
-	
+	// MESG("			: b_fname [%s]",bp->b_fname);
 	strlcpy(cp,bp->b_fname,MAXLLEN);
 	};
 	// MESG("           : cp        [%s]",cp);
@@ -1578,7 +1577,7 @@ void status_line(WINDP *wp)
     }
 	*stp=0;
 
-// 	MESG("   status   : [%s] %d",status_string,max_t);
+	// MESG("   status   : [%s] %d",status_string,max_t);
 	put_string_statusline(wp,status_string,0);
 	wp->w_flag &= ~UPD_STATUS;
 	if(wp==cwp) titletext();
@@ -1928,7 +1927,7 @@ int get_utf_length(utfchar *utf_char_str)
 #endif 
  {
  if(utf_char_str->uval[0]<0x81) return 1;
-
+ // MESG("get_utf_length: [%s]",utf_char_str);
  int code_unit = utf8_to_unicode((unsigned char *)utf_char_str);
 
 #if	RED_BLACK

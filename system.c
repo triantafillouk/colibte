@@ -819,7 +819,10 @@ int insert_text_file_as_column(char *filnam)
 			utfchar uc;
 			in_offset=SUtfCharAt(line_text,in_offset,&uc);
 			if(uc.uval[0]==CHR_TAB) {col=next_tab(col);}
-			else col+=get_utf_length(&uc);
+			else {
+				// MESG("insert1");
+				col+=get_utf_length(&uc);
+			};
 			memcpy(ml_out,&uc,utf8charlen_nocheck(uc.uval[0]));
 			ml_out+=utf8charlen_nocheck(uc.uval[0]);
 		};
@@ -886,7 +889,10 @@ int insert_text_file_nl(char *filnam)
 			utfchar uc;
 			in_offset=SUtfCharAt(line_text,in_offset,&uc);
 			if(uc.uval[0]==CHR_TAB) {col=next_tab(col);}
-			else col+=get_utf_length(&uc);
+			else {
+				// MESG("insert2");
+				col+=get_utf_length(&uc);
+			};
 			// MESG("	memcpy");
 			memcpy(ml_out,&uc,utf8charlen_nocheck(uc.uval[0]));
 			ml_out+=utf8charlen_nocheck(uc.uval[0]);

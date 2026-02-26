@@ -117,7 +117,10 @@ void FindLineCol(TextPoint *tp)
 			utfchar uc;
 			o=FUtfCharAt_nocheck(fp,o,&uc);
 			if(uc.uval[0]==CHR_TAB) c=next_tab(c);
-			else c+=get_utf_length(&uc);
+			else {
+				// MESG("findlinecol:");
+				c+=get_utf_length(&uc);
+			};
 		};
 	};
 	line_len=o-start_of_line;

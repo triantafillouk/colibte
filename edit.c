@@ -947,6 +947,7 @@ int valid_offset(offs o_in_line,int column_goal)
 	if (uc.uval[0] == CHR_TAB) {
 		col=next_tab(col);
 	} else {
+		// MESG("valid_offset:");
 		col += get_utf_length(&uc);
 	};
 	if (col >= column_goal) {
@@ -1642,7 +1643,10 @@ int entab_line(num n)
 	position=newpos;
 	set_Offset(position);
 	if(c==9) cc=next_tab(cc);
-	else cc += get_utf_length(&uc);
+	else {
+		// MESG("---1");
+		cc += get_utf_length(&uc);
+	};
 	if(BolAt(position)) {ns=0;cc=0;};
   };
   if(cwp->selection) break; 

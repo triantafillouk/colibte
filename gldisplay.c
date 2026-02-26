@@ -179,7 +179,7 @@ int window_column_decrease(num n)
 void movecursor(int row, int col)
 {
 	show_position_info(0);
-	// MESG("movecursor: row=%d",row);
+	// MESG("movecursor: row=%d col=%d",row,col);
 	drv_move(row+(cwp->w_fp->b_header!=NULL),col);
 }
 
