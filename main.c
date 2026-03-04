@@ -321,6 +321,9 @@ void parse_command_line(int argc, char **argv)
 					break;
 				case 't':
 					show_tokens=1;
+				case 'f':
+					execmd=1;
+					exebnf=1;
 				case 'x':	/* execute file and quit */
 					execmd=1;
 				case 'X':	/* execute file as statrup */
