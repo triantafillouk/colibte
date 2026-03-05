@@ -1,11 +1,64 @@
 
 tok_struct* bnf_stack[100];
 tok_struct *bnf_start, *bnf_var1, *bnf_var2, *bnf_op;
+
 int	ind_var1=0;
 int ind_var2=0;
 int ind_op=0;
 int ind_var=0;	// current index
 double value=0;
+
+MVAR bnf_vars[100];
+MVAR *bnf_var=&bnf_vars[0];
+
+inline MVAR *get_left_slot(int ind);
+
+void bnf_factor_var()
+{
+	bnf_var->var_pointer=get_left_slot(tok->tind);
+	bnf_var->var_type=VTYPE_POINTER;
+	bnf_var++;
+	NTOKEN2;
+}
+
+void bnf_factor_num()
+{
+	bnf_var->dval = tok->dval;
+	bnf_var->var_type=VTYPE_NUM;
+	bnf_var++;
+	NTOKEN2;
+}
+
+void bnf_factor_quote()
+{
+	bnf_var->sval = tok->tname;
+	bnf_var->var_type=VTYPE_STRING;
+	bnf_var++;
+	NTOKEN2;
+}
+
+void bnf_factor_not()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	bnf_var->dval = bnf_var->dval==0 ? 1:0;
+	bnf_var++;NTOKEN2;
+	return;
+ };
+ if(bnf_var->var_type == VTYPE_POINTER) {
+	MVAR *var = bnf_var->var_pointer;
+	if(var->var_type == VTYPE_NUM) {
+ 		double val = var->dval ==0? 1:0;
+		bnf_var->var_type = VTYPE_NUM;
+		bnf_var->dval = val;
+		bnf_var++;NTOKEN2;
+		return;
+	};
+	// ARRAY op
+ };
+ // set error!!!!
+ bnf_var++;NTOKEN2;
+}
 
 void bnf_stack_init()
 {
@@ -23,12 +76,13 @@ double bnf_not()
 {
 	return 1.0;
 }
-
+#if	0
 double bnf_op1()
 {
 	return 1.0;
 
 }
+#endif
 
 double bnf_op2()
 {
