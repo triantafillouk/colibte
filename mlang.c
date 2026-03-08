@@ -209,7 +209,7 @@ void stack_push(char *title,tok_struct *tok)
  // if(no_push) { MESG("stack_push:%s skip %s",title,tok_info(tok));return;};
  if(tok!=NULL) {
 	if(tok->pushed>=0) {
-		// MESG("P[%10s already pushed at %3d %-15s|%s %p",check_buffer->b_fname,tok->pushed,title,tok_info(tok),tok);
+		MESG("P[%10s already pushed at %3d %-15s|%s %p",check_buffer->b_fname,tok->pushed,title,tok_info(tok),tok);
 	} else {
 		tok_struct *dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
@@ -218,6 +218,11 @@ void stack_push(char *title,tok_struct *tok)
 			return;
 		};
     	tok->pushed=check_buffer->tok_bnf_index;
+		if(tok->ttype==TOK_VAR||tok->ttype==TOK_NUM||tok->ttype==TOK_QUOTE) {
+			MESG("stack_push var: num=%d  %d %d",dest->tnum,tok->bnf_group,dest->bnf_group);
+			dest->bnf_group=tok->ttype;
+		};
+		
  		// MESG("P[%10s %3d %-15s|%s %p",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(tok),dest);
 		check_buffer->tok_bnf_index++;
    }
@@ -660,6 +665,7 @@ tok_struct *new_tok()
  tok->ttype=0;
  tok->tgroup=0;
  tok->pushed=-1;
+ tok->bnf_group=-1;
  tok->factor_function=factor_none;
  tok->directive=lexpression;
  tok->tok_node=NULL;
@@ -1628,7 +1634,7 @@ double factor_array1()
 	array_slot=&current_stable[tok->tind];
 	array_dat *adat = array_slot->adat;
 	lstoken=tok;
-	MESG("factor_array1:----------- vtype=%d",array_slot->var_type);
+	// MESG("factor_array1:----------- vtype=%d",array_slot->var_type);
 	NTOKEN2;
 	ind1 = (int)num_expression();
 
@@ -4014,6 +4020,9 @@ void MESG_TOK_INFO(char *title,tok_struct *tok)
 char * tok_info(tok_struct *tok)
 {
  static char stok[MAXLLEN];
+ char *bnf[2]={"","BNF"};
+ char *bnfg=bnf[(tok->bnf_group)>0];
+
 	if(tok==NULL) { MESG("tok_info: NULL token!");return "null token";};
 	// MESG("tok_info: ttype=%d",tok->ttype);
 
@@ -4027,25 +4036,25 @@ char * tok_info(tok_struct *tok)
 				rows=tok->tok_adat->rows;
 				cols=tok->tok_adat->cols;
 			};
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] rows=%d cols=%d",
-				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,rows,cols);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] rows=%d cols=%d %s",
+				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,rows,cols,bnfg);
 		} else 
-		if(tok->ttype==TOK_SHOW) { snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [:]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME);
+		if(tok->ttype==TOK_SHOW) { snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [:] %s",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,bnfg);
 		} else
 		if(tok->ttype==TOK_LCURL||tok->ttype==TOK_RCURL) {
 				// snprintf(stok,sizeof(stok),"%3d:%4d CURL",tok->tnum,tok->tline);
-				snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %s other is %d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum);
+				snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %s other is %d %s",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum,bnfg);
 		} else
 		if(tok->tgroup>0) {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] [%2d:%5s]!!",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup));
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] [%2d:%5s]!! %s",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup),bnfg);
 		} else 
 			if(tok->ttype==TOK_NUM) { 
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %5.1f",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %5.1f %s",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval,bnfg);
 		} else if(tok->ttype==TOK_QUOTE) {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\"",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\" %s",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,bnfg);
 		} else if(tok->ttype==TOK_VAR) {
 			// MESG("TOK_VAR:");
 			BTNODE *var_node = tok->tok_node;
@@ -4066,16 +4075,16 @@ char * tok_info(tok_struct *tok)
 			};
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
 
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] %8s %d size %d",
-				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,vtype_names[vtype] ,vtype,size);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] %8s %d size %d [%s %d]",
+				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,vtype_names[vtype] ,vtype,size,bnfg,tok->bnf_group);
 		} else {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] %s",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,bnfg);
 		};
 // 			
 	} else {
 			return "null tok name !!!!!!!!!!!!!!!!!!!!!!!!!!!";
-		     snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5.1f]",tok->tnum,tok->tline,tok->tind,tok->ttype,"null name",tok->dval);
+		     snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5.1f] %s",tok->tnum,tok->tline,tok->tind,tok->ttype,"null name",tok->dval,bnfg);
 	};
 	// MESG("tok_info: end");
 	return stok;

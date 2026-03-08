@@ -253,6 +253,7 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 	BTNODE *btn=add_to_symbol_tree(stree,name,TOK_VAR);
 	tok->tind=btn->node_index;
 	tok->ttype=btn->node_type;
+	tok->bnf_group=TOK_VAR;
 	ex_edenv=tok->ttype;
 	btn->node_vtype=VTYPE_NONE;
 	btn->node_name=strdup(name);
