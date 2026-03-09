@@ -220,8 +220,8 @@ void stack_push(char *title,tok_struct *tok)
 			return;
 		};
     	tok->pushed=check_buffer->tok_bnf_index;
-		if(tok->ttype==TOK_VAR||tok->ttype==TOK_NUM||tok->ttype==TOK_QUOTE) {
-			MESG("stack_push var: num=%d  %d %d",dest->tnum,tok->bnf_group,dest->bnf_group);
+		if(tok->ttype==TOK_VAR||tok->ttype==TOK_NUM||tok->ttype==TOK_QUOTE||tok->tgroup==TOK_TERM1||tok->tgroup==TOK_TERM2) {
+			// MESG("stack_push var: num=%d  %d %d",dest->tnum,tok->bnf_group,dest->bnf_group);
 			dest->bnf_group=tok->ttype;
 		};
 		

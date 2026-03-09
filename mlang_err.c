@@ -717,7 +717,7 @@ int err_factor()
 		RT_MESG1(480);
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
-		MESG("TOK_VAR: CHECK!!!! %d [%s] type %d ind=%d",tok0->tnum,tok0->tname,tok0->ttype,tok0->tind);
+		// MESG("TOK_VAR: CHECK!!!! %d [%s] type %d ind=%d",tok0->tnum,tok0->tname,tok0->ttype,tok0->tind);
 		// MESG("	TOK_VAR: var ind=%d type is %d",tok0->tind,current_stable[tok0->tind].var_type);
 		pre_symbol=0;
 		ex_nvars++;
@@ -889,7 +889,7 @@ int err_factor()
 				RT_MESG1(485);
 			} else { 
 				pnum--;
-				stack_push("4851",tok);
+				// stack_push("4851",tok);
 				NTOKEN_ERR(4851);
 			};
 			RT_MESG1(486);
