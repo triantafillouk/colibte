@@ -209,7 +209,9 @@ void stack_push(char *title,tok_struct *tok)
  // if(no_push) { MESG("stack_push:%s skip %s",title,tok_info(tok));return;};
  if(tok!=NULL) {
 	if(tok->pushed>=0) {
+		if(check_buffer)
 		MESG("P[%10s already pushed at %3d %-15s|%s %p",check_buffer->b_fname,tok->pushed,title,tok_info(tok),tok);
+		else MESG("P[ check buffer is NULL!!!!! %s",title);
 	} else {
 		tok_struct *dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
@@ -4022,7 +4024,7 @@ char * tok_info(tok_struct *tok)
  static char stok[MAXLLEN];
  char *bnf[2]={"","BNF"};
  char *bnfg=bnf[(tok->bnf_group)>0];
-
+	
 	if(tok==NULL) { MESG("tok_info: NULL token!");return "null token";};
 	// MESG("tok_info: ttype=%d",tok->ttype);
 

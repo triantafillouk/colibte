@@ -137,7 +137,6 @@ int check_skip_token1( int type)
  	if(tok->ttype==type) 
  	{ 
 		// MESG("skip_token1");
-		stack_push("check skip",tok);
 		NTOKEN2;
  		return(1);
  	} else {
@@ -1761,7 +1760,7 @@ int err_check_sentence1()
 		if(tok->ttype!=TOK_SEP&&tok->ttype!=TOK_RPAR) 	
 			err_num=err_lexpression();
 		// stack_push("dir return )",tok0);
-		//stack_push("dir return )",tok);
+		stack_push("dir return )",tok);
 		check_skip_token1(TOK_RPAR);
 		// MESG(" err TOK_DIR_RETURN: after lexpression: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype); 
 		RT_MESG1(666);
