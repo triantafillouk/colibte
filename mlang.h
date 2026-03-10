@@ -14,6 +14,7 @@
 #define	ARRAY_ALLOCATED		3
 
 typedef	alist * TLIST;
+typedef void (*VFunction)();
 typedef double (*FFunction)();
 typedef double (*TFunction)(double v1);
 typedef double (*EFunction)(double v1,double v2);
@@ -27,8 +28,11 @@ typedef struct tok_struct {
 	short tnum;	/* token number for debugging  */
 	short ttype;	/* token type */
 	short tgroup;	/* token group  */
+#if	TBNF
 	short bnf_group;
 	short pushed;
+	VFunction bnf_factor_function;
+#endif
 	// short tind1;	/* index1 for type elements  */
 	// short tind2;	/* index2 for type elements  */
 	char *tname;	// token name or string value

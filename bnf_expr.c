@@ -17,6 +17,7 @@ void bnf_factor_var()
 {
 	bnf_var->var_pointer=get_left_slot(tok->tind);
 	bnf_var->var_type=VTYPE_POINTER;
+	bnf_var->var_index=tok->tind;
 	bnf_var++;
 	NTOKEN2;
 }
@@ -60,6 +61,188 @@ void bnf_factor_not()
  bnf_var++;NTOKEN2;
 }
 
+void bnf_factor_add()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval += val;
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
+void bnf_factor_plus()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval += val;
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
+void bnf_factor_minus()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval -= val;
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
+void bnf_factor_mul()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval *= val;
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
+void bnf_factor_div()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval = bnf_var->dval/val;
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
+void bnf_factor_modulo()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval = ((int)(bnf_var->dval))%(int)val;
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
+void bnf_factor_power()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval = pow(bnf_var->dval,val);
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
+void bnf_factor_smaller()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval = bnf_var->dval < val;
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
+void bnf_factor_bigger()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval = bnf_var->dval > val;
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
+void bnf_factor_smallereq()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval = bnf_var->dval <= val;
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
+void bnf_factor_biggereq()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval = bnf_var->dval >= val;
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
+void bnf_factor_equal()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval = bnf_var->dval == val;
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
+void bnf_factor_notequal()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval = bnf_var->dval == val;
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
 void bnf_stack_init()
 {
 	// bnf_start= bnf_stack;
@@ -71,81 +254,57 @@ void bnf_stack_init()
 	value=0;
 }
 
-
-double bnf_not()
+void bnf_factor_none()
 {
-	return 1.0;
-}
-#if	0
-double bnf_op1()
-{
-	return 1.0;
-
-}
-#endif
-
-double bnf_op2()
-{
- double val2=bnf_stack[ind_var1--]->dval;
- double val1=bnf_stack[ind_var1--]->dval;
- 
- return val1+val2;
+	NTOKEN2;
 }
 
-double bnf_mul()
+void bnf_factor_comma()
 {
- double val2=bnf_stack[ind_var1--]->dval;
- double val1=bnf_stack[ind_var1]->dval;
- double val = val1*val2;
- bnf_stack[ind_var1]->dval = val;
- 
- return val;
+	NTOKEN2;
 }
 
-double bnf_plus()
+void bnf_factor_eof()
 {
- double val2=bnf_stack[ind_var1--]->dval;
- double val1=bnf_stack[ind_var1--]->dval;
- return val1+val2;
+	current_active_flag=0;
 }
 
-double bnf_assign()
+void bnf_factor_sep()
+{
+	NTOKEN2;
+	lstoken=NULL;
+	// initialize and/or check expression stack!
+}
+
+void bnf_factor_rcurl()
+{
+	NTOKEN2;
+	lstoken=NULL;
+	// return what ??
+}
+
+void bnf_factor_error()
+{
+}
+
+void bnf_factor_assign()
 {
  
-	return 1.0;
 }
+
+void bnf_factor_lpar()
+{
+ 
+}
+
 
 double bnf_expression()
 {
  double val=0;
  bnf_stack_init();
 
-	while(tok->ttype != TOK_DIR) {
-		switch(tok->ttype) {
-			case TOK_VAR:
-			case TOK_NUM:
-			case TOK_QUOTE:
-				bnf_stack[ind_var]=tok;
-				ind_var1=ind_var++;
-				break;
-			case TOK_OR:
-			case TOK_AND:
-				bnf_op2();
-				break;
-			case TOK_ASSIGN:
-				ind_op=ind_var;
-				bnf_assign();
-				break;
-			case TOK_PLUS:
-				ind_op=ind_var;
-				bnf_plus();
-				break;
-			case TOK_MUL:
-				ind_op=ind_var;
-				bnf_plus();
-				break;
-		};
-		NTOKEN2;
+	while(tok->bnf_group) {
+		tok->bnf_factor_function();	
 	}
  return val;
 }

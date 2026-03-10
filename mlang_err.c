@@ -672,7 +672,6 @@ int err_factor()
 				syntax_error(" wrong separator in table definition!",xpos);
 				RT_MESG1(xpos);
 			};
-			// tok->bnf_group=TOK_BOOL;
 			err_num=err_num_expression();
 			// MESG("	ex_value=%f err_num=%d",ex_value,err_num);
 			if(err_num) return err_num;
@@ -721,18 +720,24 @@ int err_factor()
 		// MESG("	TOK_VAR: var ind=%d type is %d",tok0->tind,current_stable[tok0->tind].var_type);
 		pre_symbol=0;
 		ex_nvars++;
+#if	TBNF
 		tok0->bnf_group=TOK_VAR;
+#endif
 		if(tok->ttype==TOK_INCREASE) {
 			tok->dval=1;
 			// tok->tgroup=TOK_TERM2;
+#if	TBNF
 			tok->bnf_group=TOK_TERM0;
+#endif
 			set_tok_function(tok,0);
 			stack_push("INC",tok);
 			NTOKEN_ERR(498);
 		} else
 		if(tok->ttype==TOK_DECREASE) {
 			// tok->tgroup=TOK_TERM2;
+#if	TBNF
 			tok->bnf_group=TOK_TERM0;
+#endif
 			tok->dval=-1;
 			set_tok_function(tok,0);
 			stack_push("DEC",tok);
@@ -751,7 +756,9 @@ int err_factor()
 		RT_MESG1(493);}
 	case TOK_ARRAY_L2:{
 		// MESG("TOK_ARRAY_L2:");
+#if	TBNF
 		tok0->bnf_group=TOK_TERM0;
+#endif
 		err_num=err_num_expression(); 
 		if(!check_skip_token_err1(TOK_RBRAKET,"array error",xpos)){
 			// MESG("	RBRAKET found!");
@@ -782,20 +789,26 @@ int err_factor()
 		pre_symbol=0;
 		ex_nvars++;
 		stack_push("499",tok);
+#if	TBNF
 		tok0->bnf_group=TOK_TERM0;
+#endif
 		NTOKEN_ERR(499);
 		};
 		if(tok->ttype==TOK_INCREASE) {
 			tok->dval=1;
 			// tok->tgroup=TOK_TERM2;
+#if	TBNF
 			tok->bnf_group=TOK_TERM0;
+#endif
 			set_tok_function(tok,0);
 			stack_push("4986",tok);
 			NTOKEN_ERR(4986);
 		} else
 		if(tok->ttype==TOK_DECREASE) {
 			// tok->tgroup=TOK_TERM2;
+#if	TBNF
 			tok->bnf_group=TOK_TERM0;
+#endif
 			tok->dval=-1;
 			set_tok_function(tok,0);
 			stack_push("4987",tok);
@@ -806,7 +819,9 @@ int err_factor()
 	// case TOK_INCREASE:
 	case TOK_ARRAY1:{
 		// MESG("	err use of tok_array1 [%s]",tok_info(tok0));
+#if	TBNF
 		tok0->bnf_group=TOK_TERM0;
+#endif
 		err_num=err_num_expression(); 
 		// MESG("	err tok_array1: after [%s]",tok_info(tok));
 		xpos=499;
@@ -819,14 +834,18 @@ int err_factor()
 			// MESG("	err TOK_INCREASE: %s",tok_info(tok));
 			tok->dval=1;
 			// tok->tgroup=TOK_TERM2;
+#if	TBNF
 			tok->bnf_group=TOK_TERM0;
+#endif
 			set_tok_function(tok,0);
 			stack_push("4988",tok);
 			NTOKEN_ERR(4988);
 		} else
 		if(tok->ttype==TOK_DECREASE) {
 			// tok->tgroup=TOK_TERM2;
+#if	TBNF
 			tok->bnf_group=TOK_TERM0;
+#endif
 			tok->dval=-1;
 			set_tok_function(tok,0);
 			stack_push("4988",tok);
@@ -841,7 +860,9 @@ int err_factor()
 		RT_MESG1(5931);
 #endif
 	case TOK_ARRAY2:{
+#if	TBNF
 		tok0->bnf_group=TOK_TERM0;
+#endif
 		// MESG("	err use of tok_array2 [%s]",tok_info(tok0));
 		err_num=err_num_expression(); 
 		// MESG("	err_array2:1 t=%d",tok->ttype);
@@ -906,7 +927,9 @@ int err_factor()
 		pre_symbol=0;
 		ex_nums++;
 		xpos=4871;
+#if	TBNF
 		tok0->bnf_group=TOK_TERM0;
+#endif
 		// MESG("tok_num: ");
 		// MESG("	next is: %s",tok_info(tok));
 		if(tok->ttype==TOK_INCREASE||tok->ttype==TOK_INCREASEBY ||tok->ttype==TOK_DECREASE||tok->ttype==TOK_DECREASEBY) {
@@ -919,7 +942,9 @@ int err_factor()
 		RT_MESG1(487);
 	case TOK_QUOTE:	 { // string 
 		xpos=488;
+#if	TBNF
 		tok0->bnf_group=TOK_TERM0;
+#endif
 		if(pre_symbol) { syntax_error("symbol before string",xpos);RT_MESG1(4881);};
 		// set_vtype(VTYPE_STRING);
 		ex_nquote++;
@@ -932,7 +957,9 @@ int err_factor()
 		};
 	case TOK_MINUS:
 		// MESG("tok_minus: %d",pre_symbol);
+#if	TBNF
 		tok0->bnf_group=TOK_TERM0;
+#endif
 		if(pre_symbol>1) {
 			xpos=490;
 			syntax_error("too many symbols(+) infront of factor",xpos);
@@ -942,8 +969,10 @@ int err_factor()
 		err_factor();
 		RT_MESG1(4911);
 	case TOK_PLUS:
-		MESG("tok_plus: %d",pre_symbol);
+		// MESG("tok_plus: %d",pre_symbol);
+#if	TBNF
 		tok0->bnf_group=TOK_TERM0;
+#endif
 		if(pre_symbol>1) {
 			xpos=490;
 			syntax_error("too many symbols(+) infront of factor",xpos);
@@ -954,7 +983,9 @@ int err_factor()
 		RT_MESG1(4911);
 	case TOK_NOT:
 		xpos=492;
+#if	TBNF
 		tok0->bnf_group=TOK_TERM0;
+#endif
 		if(pre_symbol) { syntax_error("symbol before not",xpos);RT_MESG;};
 		pre_symbol=0;
 		CHECK_TOK(xpos);
@@ -966,7 +997,9 @@ int err_factor()
 		xpos=494;
 		ex_nvars++;
 		var_node=tok0->tok_node;
+#if	TBNF
 		tok0->bnf_group=TOK_TERM0;
+#endif
 		ex_edenv=0;
 #if	1
 		// set_vtype(var_node->node_vtype);
@@ -980,19 +1013,25 @@ int err_factor()
 	case TOK_ENV:	// 1 editor env var
 		/* variable's name in tok0->tname */
 		var_node=tok0->tok_node;
+#if	TBNF
 		tok0->bnf_group=TOK_TERM0;
+#endif
 		pre_symbol=0;
 		ex_nvars++;
 		RT_MESG1(495);
 	case TOK_FUNC:	// 2 editor function 
 		/* variable's name in tok0->tname */
 		pre_symbol=0;
+#if	TBNF
 		tok0->bnf_group=TOK_TERM0;
+#endif
 		err_num=err_eval_fun1(tok0,lpar);
 		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)
 		int nargs=0;
+#if	TBNF
 		tok0->bnf_group=TOK_TERM0;
+#endif
 		tok_struct *after_proc;	// this is needed for recursive functions
 		xpos=501;
 		// MESG("err TOK_PROC:");
@@ -1148,7 +1187,9 @@ int err_factor()
 	case TOK_MULBY:
 	case TOK_DECREASEBY:
 		tok0->tname="assign";
+#if	TBNF
 		tok0->bnf_group=TOK_TERM0;
+#endif
 		RT_MESG1(527);
 #if	USE_TYPE_VARS
 	case TOK_ASSIGN_TYPE:{
@@ -1295,7 +1336,9 @@ int err_num_expression()
  while (tok->tgroup==TOK_TERM) {
    CHECK_TOK(563);
     tok_struct *tok0=tok;
+#if	TBNF
 	tok->bnf_group=TOK_TERM;
+#endif
     if(tok->ttype==TOK_PLUS) {	/* TOK_PLUS  */
 		// tok->term_function = term_plus;
 		set_term_function(tok,term_plus);
@@ -1359,7 +1402,9 @@ int err_lexpression()
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_or);
 			tok->tgroup=TOK_BOOL;
+#if	TBNF
 			tok->bnf_group=TOK_BOOL;
+#endif
 			NTOKEN_ERR(704);
 			err_num=err_lexpression();
 			// MESG_TOK_INFO("#2 err_lexpression",tok0);
@@ -1373,7 +1418,9 @@ int err_lexpression()
 			// tok->term_function = logical_xor;
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_xor);
+#if	TBNF
 			tok->bnf_group=TOK_TERM0;
+#endif
 			tok->tgroup=TOK_BOOL;
 			NTOKEN_ERR(709);
 			err_num=err_lexpression();
@@ -1389,7 +1436,9 @@ int err_lexpression()
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_nor);
 			tok->tgroup=TOK_BOOL;
+#if	TBNF
 			tok->bnf_group=TOK_BOOL;
+#endif
 			NTOKEN_ERR(7091);
 			err_num=err_lexpression();
 			// MESG_TOK_INFO("#2 err_lexpression",tok0);
@@ -1406,7 +1455,9 @@ int err_lexpression()
 		case TOK_SMALLEREQ:
 		case TOK_BIGGEREQ:
 			tok->tgroup=TOK_BOOL;
+#if	TBNF
 			tok->bnf_group=TOK_BOOL;
+#endif
 			NTOKEN_ERR(708);
 			err_num=err_cexpression();
 			stack_push("compare",tok0);
@@ -1417,7 +1468,9 @@ int err_lexpression()
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_and);
 			tok->tgroup=TOK_BOOL;
+#if	TBNF
 			tok->bnf_group=TOK_BOOL;
+#endif
 			NTOKEN_ERR(709);
 			err_num=err_cexpression();
 			// MESG_TOK_INFO("#2 err_lexpression",tok0);
@@ -1432,7 +1485,9 @@ int err_lexpression()
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_nand);
 			tok->tgroup=TOK_BOOL;
+#if	TBNF
 			tok->bnf_group=TOK_BOOL;
+#endif
 			NTOKEN_ERR(7092);
 			err_num=err_cexpression();
 			// MESG_TOK_INFO("#2 err_lexpression",tok0);
@@ -1445,7 +1500,9 @@ int err_lexpression()
 		case TOK_ASSIGN: {
 			// tok->term_function = assign_val;
 			set_term_function(tok,assign_val);
+#if	TBNF
 			tok->bnf_group=TOK_TERM0;
+#endif
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			NTOKEN_ERR(710);
 			err_num=err_assign_val();
@@ -1457,7 +1514,9 @@ int err_lexpression()
 			// tok->term_function = increase_by;
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,(TFunction)increase_by);
+#if	TBNF
 			tok->bnf_group=TOK_TERM0;
+#endif
 			tok->tname = "+=";
 			// tok0=tok;
 			NTOKEN_ERR(710);
@@ -1470,7 +1529,9 @@ int err_lexpression()
 			// tok->term_function = mul_by;
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,(TFunction)mul_by);
+#if	TBNF
 			tok->bnf_group=TOK_TERM0;
+#endif
 			tok->tname = "*=";
 			// tok0=tok;
 			NTOKEN_ERR(710);
@@ -1483,7 +1544,9 @@ int err_lexpression()
 			// tok->term_function = decrease_by;
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,(TFunction)decrease_by);
+#if	TBNF
 			tok->bnf_group=TOK_TERM0;
+#endif
 			tok->tname = "-=";
 			// tok0=tok;
 			NTOKEN_ERR(710);
@@ -1496,7 +1559,9 @@ int err_lexpression()
 			// tok->term_function = assign_env;
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,assign_env);
+#if	TBNF
 			tok->bnf_group=TOK_TERM0;
+#endif
 			NTOKEN_ERR(710);
 			err_num=err_assign_env();
 			// stack_push_replace("tok l",tok_l);
@@ -1506,7 +1571,9 @@ int err_lexpression()
 			// tok->term_function = assign_option;
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,assign_option);
+#if	TBNF
 			tok->bnf_group=TOK_TERM0;
+#endif
 			NTOKEN_ERR(710);
 			err_num=err_assign_env();
 			// stack_push_replace("tok l",tok_l);
@@ -1630,7 +1697,9 @@ int err_check_sentence1()
 		tok_struct *tok0=NULL;
 		if(tok->ttype==TOK_VAR) {
 			// MESG_TOK_INFO(" loop var",tok);
+#if	TBNF
 			tok->bnf_group=TOK_BOOL;
+#endif
 			stack_push("loop var",tok);
 			NTOKEN_ERR(6403);
 			if(tok->ttype!=TOK_ASSIGN) {
