@@ -2328,12 +2328,12 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_biggereq,	// TOK_BIGGEREQ	,	/* >=  */
 
 	bnf_factor_none,	// TOK_BOOL		,40
-	bnf_factor_none,	// TOK_AND			,	/* &  */
-	bnf_factor_none,	// TOK_OR			,	/* |  */
+	bnf_factor_and,	// TOK_AND			,	/* &  */
+	bnf_factor_or,	// TOK_OR			,	/* |  */
 	bnf_factor_not,		// TOK_NOT	/* !  */
-	bnf_factor_none,	// TOK_NAND		,	/* !&  */
-	bnf_factor_none,	// TOK_NOR			,	/* !|  */
-	bnf_factor_none,	// TOK_XOR			,	/* ^  */
+	bnf_factor_nand,	// TOK_NAND		,	/* !&  */
+	bnf_factor_nor,	// TOK_NOR			,	/* !|  */
+	bnf_factor_xor,	// TOK_XOR			,	/* ^  */
 	/* term operators  */
 	bnf_factor_plus,	// TOK_PLUS		,47
 	bnf_factor_minus,	// TOK_MINUS		,
@@ -2959,7 +2959,7 @@ double	value=lexpression();
 double lexpression()
 {
  TDS("lexpression");
- // MESG("# lexpression:0 start [%s]",tok_info(tok));
+ MESG("# lexpression:0 start [%s]",tok_info(tok));
  double value = cexpression();
  // MESG("  lexpression :1 		[%s] cexpression result = %f",tok_info(tok),value);
  if(tok->tgroup == TOK_TERM0){

@@ -647,9 +647,9 @@ char *native_copy="pbcopy";
 #else 
 #if	WSL
 // The following is for wsl!
-#if	1
-char *native_copy="powershell.exe -noprofile -command 'chcp 65001 > $null;clip.exe'";
-char *native_paste="powershell.exe -noprofile -command 'chcp 65001 > $null;$OutputEncoding = [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false); Get-Clipboard'";
+#if	0
+char *native_copy="pwsh.exe -noprofile -command 'chcp 65001 > $null;clip.exe'";
+char *native_paste="pwsh.exe -noprofile -command 'chcp 65001 > $null;$OutputEncoding = [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false); Get-Clipboard'";
 /*
 	chcp does not work ok in case of redirect the output of powershell to a file or pipe!!!
 	The best way to correctly use of native past is to set default codepage to UTF-8 in windows!

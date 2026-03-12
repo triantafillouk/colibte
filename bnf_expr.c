@@ -243,6 +243,76 @@ void bnf_factor_notequal()
  }; 
 }
 
+void bnf_factor_and()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval = (int)bnf_var->dval && (int)val;
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
+void bnf_factor_nand()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval = !((int)bnf_var->dval && (int)val);
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
+void bnf_factor_or()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval = (int)bnf_var->dval || (int)val;
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
+void bnf_factor_nor()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval = !((int)bnf_var->dval && (int)val);
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
+void bnf_factor_xor()
+{
+ bnf_var--;
+ if(bnf_var->var_type == VTYPE_NUM) {
+ 	double val=bnf_var->dval;
+	bnf_var--;
+	if(bnf_var->var_type == VTYPE_NUM) {
+		bnf_var->dval = (bnf_var->dval!=0 && val!=0) || ((bnf_var->dval==0 && val==0));
+		bnf_var++;NTOKEN2;
+		return;
+	};
+ }; 
+}
+
 void bnf_stack_init()
 {
 	// bnf_start= bnf_stack;
@@ -287,11 +357,34 @@ void bnf_factor_error()
 {
 }
 
-void bnf_factor_assign()
+void bnf_factor_assign_var()
 {
- 
+	bnf_var--;
+	MVAR *bval=bnf_var;
+	bnf_var--;
+	if(bnf_var->var_type != VTYPE_POINTER) {
+		// error
+		return;
+	};
+	MVAR *aval=bnf_var->var_pointer;
+	if(bval->var_type==VTYPE_POINTER) {
+		bval = bval->var_pointer;
+	};
+	aval->var_type = bval->var_type;
+	if(bval->var_type==VTYPE_NUM) { 
+		aval->dval = bval->dval;
+		NTOKEN2;
+		return;
+	};
+	if(bval->var_type==VTYPE_STRING) {
+		aval->sval = strdup(bval->sval);
+		NTOKEN2;
+		return;
+	};
+	// set for any different type!
 }
 
+// dummy one!
 void bnf_factor_lpar()
 {
  
