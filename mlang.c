@@ -355,6 +355,7 @@ curl_struct *new_curl(int level,int mline, struct _el *el)
 
 static inline double factor_none()
 {
+	MESG("factor_none:");
 	NTOKEN2;
 	return 0.0;	/* continue  */
 }
@@ -1920,8 +1921,8 @@ double factor_error()
 static inline double factor_lpar()
 {
  double value;
+ // MESG("factor_lpar");
  NTOKEN2;
- // set_vdval(0);
  value = lexpression();
  NTOKEN2;	/* skip corresponding right parenthesis!  */
  return value;
@@ -2269,8 +2270,9 @@ double factor_sep(){
 }
 
 double factor_comma(){
-	MESG("factor_comma:");
+	// MESG("factor_comma:");
 	NTOKEN2;
+	lstoken=NULL;
 	return 0.0;
 }
 
@@ -2959,7 +2961,7 @@ double	value=lexpression();
 double lexpression()
 {
  TDS("lexpression");
- MESG("# lexpression:0 start [%s]",tok_info(tok));
+ //MESG("# lexpression:0 start [%s]",tok_info(tok));
  double value = cexpression();
  // MESG("  lexpression :1 		[%s] cexpression result = %f",tok_info(tok),value);
  if(tok->tgroup == TOK_TERM0){

@@ -384,12 +384,45 @@ void bnf_factor_assign_var()
 	// set for any different type!
 }
 
+void bnf_factor_assign_option()
+{
+	
+}
+
+
 // dummy one!
 void bnf_factor_lpar()
 {
  
 }
 
+void bnf_block1(FILEBUF *bp)
+{
+
+}
+
+void bnf_block1_break(FILEBUF *bp)
+{
+
+}
+
+void bnf_dir_lcurl()
+{
+	NTOKEN2;
+	bnf_block1(exe_buffer);
+}
+
+void bnf_dir_lcurl_break()
+{
+	NTOKEN2;
+	bnf_block1_break(exe_buffer);
+}
+
+void bnf_dir_break()
+{
+	NTOKEN2;
+	current_active_flag=0;
+}
 
 double bnf_expression()
 {
@@ -401,4 +434,14 @@ double bnf_expression()
 	}
  return val;
 }
+
+void bnf_dir_return()
+{
+	NTOKEN2;
+	if(tok->ttype!=TOK_SEP && tok->ttype!=TOK_RPAR) { 
+		bnf_expression();
+	}
+	current_active_flag=0;	/* skip rest of function  */
+}
+
 
