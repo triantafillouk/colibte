@@ -384,11 +384,24 @@ void bnf_factor_assign_var()
 	// set for any different type!
 }
 
-void bnf_factor_assign_option()
+double bnf_factor_option()
 {
-	
-}
+ BTNODE *bte; 
+/* variable's name in tok0->tname */
+	bte=tok->tok_node;
+	// MESG("factor_option: set var_node [%s]",tok_info(tok));
+	var_node=bte;
+	NTOKEN2;
 
+	set_vtype(bte->node_vtype);
+	if(bte->node_vtype==VTYPE_STRING) { /* there is a valid string value */
+		clean_saved_string(strlen(bte->node_sval));
+		strcpy(saved_string,bte->node_sval);
+		return 0;
+	} else {
+		return(bte->node_dval);
+	};
+}
 
 // dummy one!
 void bnf_factor_lpar()

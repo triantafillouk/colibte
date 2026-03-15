@@ -1598,6 +1598,7 @@ double factor_array2()
 	return(value);
 }
 
+#if	TBNF
 double factor_option()
 {
  BTNODE *bte; 
@@ -1616,6 +1617,26 @@ double factor_option()
 		return(bte->node_dval);
 	};
 }
+#else
+double factor_option()
+{
+ BTNODE *bte; 
+/* variable's name in tok0->tname */
+	bte=tok->tok_node;
+	// MESG("factor_option: set var_node [%s]",tok_info(tok));
+	var_node=bte;
+	NTOKEN2;
+
+	set_vtype(bte->node_vtype);
+	if(bte->node_vtype==VTYPE_STRING) { /* there is a valid string value */
+		clean_saved_string(strlen(bte->node_sval));
+		strcpy(saved_string,bte->node_sval);
+		return 0;
+	} else {
+		return(bte->node_dval);
+	};
+}
+#endif
 
 double factor_array1()
 {

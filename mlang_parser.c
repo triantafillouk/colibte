@@ -259,7 +259,6 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 	ex_edenv=tok->ttype;
 	btn->node_vtype=VTYPE_NONE;
 	btn->node_name=strdup(name);
-	//tok->tok_node=btn;
 	// MESG("	set_var: new variable name=%s tind=%d ttype=%d",name,tok->tind,tok->ttype);
 }
 

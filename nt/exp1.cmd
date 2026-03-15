@@ -22,3 +22,8 @@ a & (b xor c):
 a nor b & c: 
 a nor (b & c): 
 (a nor b) & c: 
+if(b) { :
+	print("a=",a)
+} else { :
+	print("b")
+}
