@@ -224,7 +224,7 @@ void stack_push(char *title,tok_struct *tok)
 			// MESG("stack_push var: num=%d  %d %d",dest->tnum,tok->bnf_group,dest->bnf_group);
 			dest->bnf_group=tok->ttype;
 		};
-		
+		set_bnf_function(dest,0);	
  		// MESG("P[%10s %3d %-15s|%s %p",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(tok),dest);
 		check_buffer->tok_bnf_index++;
    }
@@ -355,7 +355,7 @@ curl_struct *new_curl(int level,int mline, struct _el *el)
 
 static inline double factor_none()
 {
-	MESG("factor_none:");
+	// MESG("factor_none:");
 	NTOKEN2;
 	return 0.0;	/* continue  */
 }
@@ -669,6 +669,8 @@ tok_struct *new_tok()
 #if	TBNF
  tok->pushed=-1;
  tok->bnf_group=-1;
+ tok->bnf_factor_function=bnf_factor_none;
+ tok->bnf_directive=bnf_expression;
 #endif
  tok->factor_function=factor_none;
  tok->directive=lexpression;
@@ -2373,11 +2375,11 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_none,	// TOK_BQUOTE
 	bnf_factor_none,	// TOK_DOLAR		,
 	bnf_factor_none,	// TOK_TILDA		,
-	(VFunction)update_val,		// TOK_INCREASE	,61
-	(VFunction)update_val,		// TOK_DECREASE	,62
-	bnf_factor_none,	// TOK_INCREASEBY 63
-	(VFunction)mul_by,			// TOK_MULBY
-	(VFunction)decrease_by,	// TOK_DECREASEBY
+	bnf_update_val,		// TOK_INCREASE	,61
+	bnf_update_val,		// TOK_DECREASE	,62
+	bnf_increase_by,	// TOK_INCREASEBY 63
+	bnf_mul_by,			// TOK_MULBY
+	bnf_decrease_by,	// TOK_DECREASEBY
 	bnf_factor_none,	// TOK_BSLASH		,
 
 	bnf_factor_none,	// TOK_NL				,
@@ -2507,14 +2509,44 @@ FFunction factor_funcs[] = {
 	factor_none		// TOK_OTHER,
 };
 
-void set_tok_function(tok_struct *tok, int type)
+void set_bnf_function(tok_struct *tok, int type)
 {
 	// MESG("set_tok_function: type=%d",type);
-	// MESG("set_tok_function: %s",tok_info(tok));
+	MESG("set_bnf_function: type=%d ttype=%d %s",type,tok->ttype,tok_info(tok));
 	if(tok==NULL) MESG("set_tok_function: NULL! token");
 	switch(type) {
 		case 0:
-			// MESG("	type 0");
+			MESG("	type 0");
+			if(tok->ttype==TOK_FUNC) {
+				// MESG("ttype is tok_func");
+				if(tok->tok_node==NULL) { set_error(tok,3003,"tok_node is null!");
+				return;};
+				int findex = tok->tok_node->node_index;
+				// MESG("	findex=%d",findex);
+				MESG(" F tok %2d: %s type [%d -s] set factor function %d",tok->tnum,tok->tname,tok->ttype,findex);
+				tok->factor_function = m_functions[findex].ffunction;
+			} else {
+	 			tok->factor_function = factor_funcs[tok->ttype];
+	 			tok->bnf_factor_function = factor_bnf_funcs[tok->ttype];
+				MESG(" f tok %2d: %s type [%d -s] set bnf function",tok->tnum,tok->tname,tok->ttype);
+			};
+			break;
+		case 1:
+			MESG("	1 set factor function to %d",tok->ttype);
+			// tok->cexpr_function = (EFunction)factor_funcs[tok->ttype];
+			tok->bnf_factor_function = factor_bnf_funcs[tok->ttype];
+			// MESG(" c tok %2d: %s type [%d %s] set cepr function",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype]);
+	};
+}
+
+void set_tok_function(tok_struct *tok, int type)
+{
+	// MESG("set_tok_function: type=%d",type);
+	MESG("set_tok_function: type=%d ttype=%d %s",type,tok->ttype,tok_info(tok));
+	if(tok==NULL) MESG("set_tok_function: NULL! token");
+	switch(type) {
+		case 0:
+			MESG("	type 0");
 			if(tok->ttype==TOK_FUNC) {
 				// MESG("ttype is tok_func");
 				if(tok->tok_node==NULL) { set_error(tok,3003,"tok_node is null!");
@@ -2525,21 +2557,29 @@ void set_tok_function(tok_struct *tok, int type)
 				tok->factor_function = m_functions[findex].ffunction;
 			} else {
 	 			tok->factor_function = factor_funcs[tok->ttype];
-				// MESG(" f tok %2d: %s type [%d -s] set factor function",tok->tnum,tok->tname,tok->ttype);
+	 			tok->bnf_factor_function = factor_bnf_funcs[tok->ttype];
+				MESG(" f tok %2d: %s type [%d -s] set factor function",tok->tnum,tok->tname,tok->ttype);
 			};
 			break;
 		case 1:
-			// MESG("	type 1");
+			MESG("	1 set factor function to %d",tok->ttype);
 			tok->cexpr_function = (EFunction)factor_funcs[tok->ttype];
+			tok->bnf_factor_function = factor_bnf_funcs[tok->ttype];
 			// MESG(" c tok %2d: %s type [%d %s] set cepr function",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype]);
-
 	};
 }
+
 
 void set_tok_directive(tok_struct *tok, FFunction directive)
 {
 	tok->directive = directive;
 	// MESG_TOK_INFO("# tok_directive",tok);
+}
+
+void set_bnf_directive(tok_struct *tok, VFunction directive)
+{
+	MESG("set_bnf_directive: %s",tok_info(tok));
+	tok->bnf_directive = directive;
 }
 
 void set_term_function(tok_struct *tok, TFunction term_function)
@@ -3893,6 +3933,14 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	if(execmd) val=exec_block1(bp);
 	else val=exec_block1_break(bp);
 	// MESG("	after exec_block1 !!!!!");
+#if	TBNF
+	if(exebnf) {
+		MESG("execute bnf block!");
+		tok=bp->tok_table_bnf;
+		bnf_block1(bp);
+		bnf_result();
+	};
+#endif
 	drv_stop_checking_break();
 
 	/* cleaning  */
