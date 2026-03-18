@@ -17,9 +17,9 @@ void bnf_expression();
 void prev_var(char *title)
 {
  bnf_var--;
- printf("	-var %3ld %s\n",bnf_var-bnf_vars,title);
+ MESG("	-var %3ld %s",bnf_var-bnf_vars,title);
  if(bnf_var < &bnf_vars[0]) {
-	printf("Negativ var!\n");
+	MESG("Negativ var!");
 	exit(1);
  };
 }
@@ -27,9 +27,9 @@ void prev_var(char *title)
 void next_var(char *title)
 {
  bnf_var++;
- printf("	+var %3ld %s\n",bnf_var-bnf_vars,title);
+ MESG("	+var %3ld %s",bnf_var-bnf_vars,title);
  if(bnf_var - &bnf_vars[0]>100) {
-	printf("MAX var exceeded!\n");
+	MESG("MAX var exceeded!");
 	exit(2);
  };
 }
