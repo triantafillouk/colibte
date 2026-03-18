@@ -229,12 +229,12 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 		// };
 		if(tok->ttype==TOK_RPAR||tok->ttype==TOK_SEP ||tok->ttype==TOK_EOF) {
 			// MESG("end function parameters");
-			if(tok->ttype==TOK_RPAR) stack_push("eval_function )",tok);
+			if(tok->ttype==TOK_RPAR) stack_push("eval_function )",tok,-TOK_RPAR);
 			break;
 		}
 		if(tok->ttype==TOK_COMMA) {
 			// MESG("	found comma! %s",tok_info(tok));
-			stack_push("eval_function ,",tok);
+			stack_push("eval_function ,",tok,0);
 			NTOKEN_ERR(403);
 		}
 		ia++;
@@ -251,7 +251,7 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 
 	if(tok->ttype==TOK_RPAR) {
 		// MESG("err_eval_fun1: skip RPAR!!");
-		if(lpar) stack_push("eval_func )",tok);
+		if(lpar) stack_push("eval_func )",tok,-TOK_RPAR);
 		NTOKEN_ERR(404);
 	};
 	tok0->number_of_args=ia;
@@ -271,10 +271,10 @@ int err_skip_type_args(tok_struct *tok0)
  // MESG("	items=%d",args0);
  if(tok->ttype==TOK_LBRAKET) {
  	// MESG("	skip index");
-	stack_push("type lbraket",tok);
+	stack_push("type lbraket",tok,-TOK_LBRAKET);
 	NTOKEN_ERR(661);
 	stat=err_cexpression();
-	stack_push("type_args sep",tok);
+	stack_push("type_args sep",tok,0);
 	NTOKEN_ERR(662);
  };
  if(tok->ttype==TOK_LPAR) {
@@ -293,7 +293,7 @@ int err_skip_type_args(tok_struct *tok0)
 		if(tok->ttype!=TOK_COMMA && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_SEP) { 
 			return 662;
 		};
-		stack_push("skip args sep",tok);
+		stack_push("skip args sep",tok,0);
 		NTOKEN_ERR(668);
 		stat=err_cexpression();
 		// MESG("	next token in loop is [%s] tnum=%d",tok->tname,tok->tnum);
@@ -302,7 +302,7 @@ int err_skip_type_args(tok_struct *tok0)
 			nargs=0;
 		};	
 	};
-	stack_push("skip_args )",tok);
+	stack_push("skip_args )",tok,0);
 	NTOKEN_ERR(670);
 	// MESG("err_skip_type_args: Data definition of [%s] at line %d rows=%d args=%d",tok0->tname,tok0->tline,rows+1,args0);
  };
@@ -349,7 +349,7 @@ int  err_push_args_1(int *nargs)
 		
 		break;
 	} else if (tok->ttype==TOK_COMMA) {
-		stack_push("arg ,",tok);
+		stack_push("arg ,",tok,0);
 		NTOKEN_ERR(416);
 		continue;
 	}
@@ -378,7 +378,7 @@ int err_assign_args1(int nargs)
  TDSERR("assign_args");
 
  SHOW_STAGE(420);
- stack_push("assign args",tok);
+ stack_push("assign args",tok,0); // ????
  NTOKEN_ERR(4201); /* skip name */
  // MESG("err_assign_args1: nargs=%d",nargs); 
  if(nargs!=0) {
@@ -386,7 +386,7 @@ int err_assign_args1(int nargs)
 	for(i=0;i<nargs;i++) {
 		xpos=422;
 		if(tok->ttype==TOK_RPAR) {
-			// stack_push("end of assign",tok);
+			// stack_push("end of assign",tok,TOK_RPAR);
 			break;	/* end of arguments!  */
 		}
 		xpos=423;	/* this should be a var token  */
@@ -394,11 +394,11 @@ int err_assign_args1(int nargs)
 		err_cexpression();
 		// MESG("err_assign: after lexpression: [%s] %d",tok->tname,tok->ttype);
 		if(tok->ttype==TOK_RPAR)  {
-			// stack_push("end of assign1",tok);
+			// stack_push("end of assign1",tok,TOK_RPAR);
 			break;
 		}
 		if(tok->ttype!=TOK_COMMA) { set_error(tok,xpos,"not separator between args"); RT_MESG1(426);};
-		stack_push("assign_args sep",tok);
+		stack_push("assign_args sep",tok,0);
 		NTOKEN_ERR(427);	/* skip separator  */
 	};
  } else { // we send no arguments!
@@ -413,7 +413,7 @@ int err_assign_args1(int nargs)
 			break;
 		};
 		xpos=431;
-		stack_push("skip sem par",tok);
+		stack_push("skip sem par",tok,0);
 		NTOKEN_ERR(432);	/* skip semicolon or end parenthesis */
 
 		if(tok->ttype==TOK_RPAR)  {
@@ -612,7 +612,7 @@ int err_factor()
  set_tok_function(tok,0);
  if(tok->ttype!=TOK_NOT) {
 	
- 	stack_push("factor",tok);
+ 	stack_push("factor",tok,tok->ttype);	// ????
  };
  int save_macro_exec;
  tok_struct *tok0; 
@@ -705,7 +705,7 @@ int err_factor()
 		};
 		tok0->tok_adat = new_array(rows,cols);
 		// MESG("	err: CREATED new array %d [%d %d]",tok0->tok_adat->anum,rows,cols);
-		stack_push("4789",tok);
+		stack_push("4789",tok,-tok->ttype);
 		NTOKEN_ERR(4789)
 		// MESG("	token after array: %s",tok_info(tok));
 		if(tok->ttype!=TOK_SEP && tok->ttype!=TOK_EOF && tok->ttype!=TOK_SHOW) {
@@ -726,34 +726,35 @@ int err_factor()
 		pre_symbol=0;
 		ex_nvars++;
 #if	TBNF
-		tok0->bnf_group=TOK_VAR;
+		// set_bnf_function1(tok0,TOK_VAR);
 #endif
 		if(tok->ttype==TOK_INCREASE) {
 			tok->dval=1;
 			// tok->tgroup=TOK_TERM2;
 #if	TBNF
-			tok->bnf_group=TOK_TERM0;
+			// set_bnf_function1(tok,TOK_TERM0);
 #endif
 			set_tok_function(tok,0);
-			stack_push("INC",tok);
+			stack_push("INC",tok,tok->ttype);
 			NTOKEN_ERR(498);
 		} else
 		if(tok->ttype==TOK_DECREASE) {
 			// tok->tgroup=TOK_TERM2;
 #if	TBNF
-			tok->bnf_group=TOK_TERM0;
+			// set_bnf_function1(tok,tok->ttype);
 #endif
 			tok->dval=-1;
 			set_tok_function(tok,0);
-			stack_push("DEC",tok);
+			stack_push("DEC",tok,tok->ttype);
 			NTOKEN_ERR(4981);
 		};
 #if	1
 		if(tok->ttype==TOK_TYPE_ELEMENT) {
 			// MESG("err tok_type_element: %s",tok->tname);
 			set_tok_function(tok,0);
+			// set_bnf_function1(tok,tok->ttype);
 			tok->dval=-1;
-			stack_push("type_element",tok);
+			stack_push("type_element",tok,tok->ttype);
 			NTOKEN_ERR(4982);
 		};
 #endif
@@ -762,7 +763,7 @@ int err_factor()
 	case TOK_ARRAY_L2:{
 		// MESG("TOK_ARRAY_L2:");
 #if	TBNF
-		tok0->bnf_group=TOK_TERM0;
+		// set_bnf_function1(tok,tok->ttype);
 #endif
 		err_num=err_num_expression(); 
 		if(!check_skip_token_err1(TOK_RBRAKET,"array error",xpos)){
@@ -770,21 +771,21 @@ int err_factor()
 		} else {
 			MESG("	No rbracket found!");
 		};
-		stack_push("tok_array_l2",tok);
+		stack_push("tok_array_l2",tok,tok->ttype);
 		NTOKEN_ERR(444);
 		if(tok->ttype==TOK_INCREASE) {
 			// MESG("	found TOK_INCREASE");
 			tok->dval=1;
 			set_tok_function(tok,0);
 			tok->tgroup=0;
-			stack_push("4984",tok);
+			stack_push("4984",tok,tok->ttype);
 			NTOKEN_ERR(4984);
 		} else
 		if(tok->ttype==TOK_DECREASE) {
 			tok->dval=-1;
 			set_tok_function(tok,0);
 			tok->tgroup=0;
-			stack_push("4985",tok);
+			stack_push("4985",tok,tok->ttype);
 			NTOKEN_ERR(4985);
 		};
 		RT_MESG1(4441);		
@@ -793,30 +794,24 @@ int err_factor()
 		// MESG("TOK_ARRAY_L1: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
 		pre_symbol=0;
 		ex_nvars++;
-		stack_push("499",tok);
-#if	TBNF
-		tok0->bnf_group=TOK_TERM0;
-#endif
+		stack_push("499",tok,tok->ttype);
 		NTOKEN_ERR(499);
 		};
 		if(tok->ttype==TOK_INCREASE) {
 			tok->dval=1;
 			// tok->tgroup=TOK_TERM2;
-#if	TBNF
-			tok->bnf_group=TOK_TERM0;
-#endif
 			set_tok_function(tok,0);
-			stack_push("4986",tok);
+			stack_push("4986",tok,tok->ttype);
 			NTOKEN_ERR(4986);
 		} else
 		if(tok->ttype==TOK_DECREASE) {
 			// tok->tgroup=TOK_TERM2;
 #if	TBNF
-			tok->bnf_group=TOK_TERM0;
+			tok->bnf_group=tok->ttype;
 #endif
 			tok->dval=-1;
 			set_tok_function(tok,0);
-			stack_push("4987",tok);
+			stack_push("4987",tok,tok->ttype);
 			NTOKEN_ERR(4987);
 		};
 		RT_MESG1(494);
@@ -825,7 +820,7 @@ int err_factor()
 	case TOK_ARRAY1:{
 		// MESG("	err use of tok_array1 [%s]",tok_info(tok0));
 #if	TBNF
-		tok0->bnf_group=TOK_TERM0;
+		tok0->bnf_group=tok0->ttype;
 #endif
 		err_num=err_num_expression(); 
 		// MESG("	err tok_array1: after [%s]",tok_info(tok));
@@ -839,21 +834,15 @@ int err_factor()
 			// MESG("	err TOK_INCREASE: %s",tok_info(tok));
 			tok->dval=1;
 			// tok->tgroup=TOK_TERM2;
-#if	TBNF
-			tok->bnf_group=TOK_TERM0;
-#endif
 			set_tok_function(tok,0);
-			stack_push("4988",tok);
+			stack_push("4988",tok,tok->ttype);
 			NTOKEN_ERR(4988);
 		} else
 		if(tok->ttype==TOK_DECREASE) {
 			// tok->tgroup=TOK_TERM2;
-#if	TBNF
-			tok->bnf_group=TOK_TERM0;
-#endif
 			tok->dval=-1;
 			set_tok_function(tok,0);
-			stack_push("4988",tok);
+			stack_push("4988",tok,tok->ttype);
 			NTOKEN_ERR(4989);
 		};
 
@@ -866,18 +855,18 @@ int err_factor()
 #endif
 	case TOK_ARRAY2:{
 #if	TBNF
-		tok0->bnf_group=TOK_TERM0;
+		tok0->bnf_group=tok0->ttype;
 #endif
 		// MESG("	err use of tok_array2 [%s]",tok_info(tok0));
 		err_num=err_num_expression(); 
 		// MESG("	err_array2:1 t=%d",tok->ttype);
-		stack_push("500",tok);
+		stack_push("500",tok,-tok->ttype);
 		NTOKEN_ERR(500);
 		// MESG("	err_array2:2 t=%d",tok->ttype);
 		// if(err_num) return(err_num);
 		err_num=err_num_expression(); 
 		// MESG("err_array2:3 t=%d",tok->ttype);
-		stack_push("5001",tok);
+		stack_push("5001",tok,-tok->ttype);
 		NTOKEN_ERR(5001);
 		// MESG("err_array2:4 t=%d",tok->ttype);
 		RT_MESG1(4932);
@@ -891,7 +880,7 @@ int err_factor()
 			{
 				if(tok->ttype==TOK_RPAR) {	/* null expression  */
 					pnum--;
-					stack_push("483",tok);
+					stack_push("483",tok,-tok->ttype);
 					NTOKEN_ERR(483);
 					RT_MESG;	/* return right after right parenthesis  */
 				};
@@ -923,7 +912,7 @@ int err_factor()
 		break;
 #if	0
 	case TOK_EQUAL:
-		tok0->bnf_group=TOK_TERM0;
+		tok0->bnf_group=tok0->ttype;
 		NTOKEN_ERR(444);
 		// err_cexpression();
 		RT_MESG1(444);;	
@@ -933,7 +922,7 @@ int err_factor()
 		ex_nums++;
 		xpos=4871;
 #if	TBNF
-		tok0->bnf_group=TOK_TERM0;
+		tok0->bnf_group=tok0->ttype;
 #endif
 		// MESG("tok_num: ");
 		// MESG("	next is: %s",tok_info(tok));
@@ -948,7 +937,7 @@ int err_factor()
 	case TOK_QUOTE:	 { // string 
 		xpos=488;
 #if	TBNF
-		tok0->bnf_group=TOK_TERM0;
+		tok0->bnf_group=tok0->ttype;
 #endif
 		if(pre_symbol) { syntax_error("symbol before string",xpos);RT_MESG1(4881);};
 		// set_vtype(VTYPE_STRING);
@@ -963,7 +952,7 @@ int err_factor()
 	case TOK_MINUS:
 		// MESG("tok_minus: %d",pre_symbol);
 #if	TBNF
-		tok0->bnf_group=TOK_TERM0;
+		tok0->bnf_group=tok0->ttype;
 #endif
 		if(pre_symbol>1) {
 			xpos=490;
@@ -976,7 +965,7 @@ int err_factor()
 	case TOK_PLUS:
 		// MESG("tok_plus: %d",pre_symbol);
 #if	TBNF
-		tok0->bnf_group=TOK_TERM0;
+		tok0->bnf_group=tok0->ttype;
 #endif
 		if(pre_symbol>1) {
 			xpos=490;
@@ -985,17 +974,15 @@ int err_factor()
 		};
 		CHECK_TOK(491);
 		err_factor();
+		// stack_push("NOT",tok0,tok0->ttype);
 		RT_MESG1(4911);
 	case TOK_NOT:
 		xpos=492;
-#if	TBNF
-		tok0->bnf_group=TOK_TERM0;
-#endif
 		if(pre_symbol) { syntax_error("symbol before not",xpos);RT_MESG;};
 		pre_symbol=0;
 		CHECK_TOK(xpos);
 		int stat=err_factor();
-		stack_push("NOT",tok0);
+		stack_push("NOT",tok0,tok0->ttype);
 		return(stat);
 	case TOK_OPTION:// 5 editor option
 		/* variable's name in tok0->tname */
@@ -1003,7 +990,7 @@ int err_factor()
 		ex_nvars++;
 		var_node=tok0->tok_node;
 #if	TBNF
-		tok0->bnf_group=TOK_TERM0;
+		// stack_push("TOK_OPTION",tok0,tok0->ttype);
 #endif
 		ex_edenv=0;
 #if	1
@@ -1019,7 +1006,7 @@ int err_factor()
 		/* variable's name in tok0->tname */
 		var_node=tok0->tok_node;
 #if	TBNF
-		tok0->bnf_group=TOK_TERM0;
+		tok0->bnf_group=tok0->ttype;
 #endif
 		pre_symbol=0;
 		ex_nvars++;
@@ -1028,14 +1015,14 @@ int err_factor()
 		/* variable's name in tok0->tname */
 		pre_symbol=0;
 #if	TBNF
-		tok0->bnf_group=TOK_TERM0;
+		tok0->bnf_group=tok0->ttype;
 #endif
 		err_num=err_eval_fun1(tok0,lpar);
 		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)
 		int nargs=0;
 #if	TBNF
-		tok0->bnf_group=TOK_TERM0;
+		tok0->bnf_group=tok0->ttype;
 #endif
 		tok_struct *after_proc;	// this is needed for recursive functions
 		xpos=501;
@@ -1052,7 +1039,7 @@ int err_factor()
 		CHECK_TOK(503);
 		after_proc=tok;	// this must be RPAR token!
 		check_skip_token_err1(TOK_RPAR,"no right parenthesis",505);
-		stack_push("proc ) ",tok0);
+		stack_push("proc ) ",tok0,-TOK_RPAR);
 		// MESG("err TOK_PROC: set after_proc [%s] ttype=%d",tok->tname,tok->ttype);
 		FILEBUF *proc_buffer=NULL;
 		err_num=err_exec_function(tok0->tname,nargs,&proc_buffer);
@@ -1068,7 +1055,7 @@ int err_factor()
 		CHECK_TOK(504);
 		tok=after_proc;
 		// MESG("	TOK_PROC: end function tnum=%d",tok->tnum);
-		// stack_push("proc ) ",tok);
+		// stack_push("proc ) ",tok,0);
 		// MESG("err TOK_PROC: end ttype=%d",tok->ttype);
 		RT_MESG;
 	};
@@ -1081,6 +1068,9 @@ int err_factor()
 		var_node=tok0->tok_node;
 		index = var_node->node_index;
 		// MESG("err: TOK_CMD");
+#if	TBNF
+		stack_push("NOT",tok0,-tok0->ttype);
+#endif
 		pre_symbol=0;
 		if(ftable[index].arg==0) check_par=0;else check_par=1;
 		if(check_par) 
@@ -1130,7 +1120,7 @@ int err_factor()
 				if(i<args-1) {	/* check for a comma  */
 					CHECK_TOK(5172);
 					if(tok->ttype==TOK_COMMA || check_end==0) {
-						stack_push("518",tok);
+						stack_push("518",tok,0);
 						NTOKEN_ERR(518);
 					} else {
 						CHECK_TOK(519);
@@ -1192,8 +1182,9 @@ int err_factor()
 	case TOK_MULBY:
 	case TOK_DECREASEBY:
 		tok0->tname="assign";
+		// set_bnf_function1(tok0,tok0->ttype);
 #if	TBNF
-		tok0->bnf_group=TOK_TERM0;
+		tok0->bnf_group=tok0->ttype;
 #endif
 		RT_MESG1(527);
 #if	USE_TYPE_VARS
@@ -1210,6 +1201,9 @@ int err_factor()
 #if	1
 	case TOK_TYPE_ELEMENT:
 		// MESG("TOK_TYPE_ELEMENT: [%s]",tok0->tname);
+#if	TBNF
+		tok0->bnf_group=tok0->ttype;
+#endif
 		tok0->tgroup=TOK_TERM2;
 		RT_MESG1(529);
 #endif
@@ -1234,7 +1228,7 @@ int err_num_term3(tok_struct *tok1)
  // tok_struct *tok0=tok;
  // MESG("-- term2 start: %s",tok_info(tok));
  err_num = err_factor();
- stack_push("term3",tok1);
+ stack_push("term3",tok1,tok1->ttype);
  if(err_num) RT_MESG1(err_num);
 
  if(tok->tgroup==TOK_TERM2) {
@@ -1249,7 +1243,7 @@ int err_num_term3(tok_struct *tok1)
 		err_num = err_num_term3(tok0);
 	} else {
 		NTOKEN_ERR(544);
-		stack_push("term3 function",tok1);
+		stack_push("term3 function",tok1,tok1->ttype);
 		err_num = err_num_term3(tok0);
 	};
 	// if(tok0->ttype==TOK_MOD) MESG("# term2 function after [%s]",tok_info(tok0));
@@ -1280,7 +1274,7 @@ int err_num_term2()
 	} else {
 		NTOKEN_ERR(544);
 		// MESG_TOK_INFO("-- push term2 function",tok0);
-		stack_push("num_term2",tok0);
+		stack_push("num_term2",tok0,tok0->ttype);
 		err_num = err_num_term2();
 	};
 	// if(tok0->ttype==TOK_MOD) MESG("# term2 function after [%s]",tok_info(tok0));
@@ -1312,7 +1306,7 @@ int err_num_term1()
 	err_num=err_num_term2();
 	// tok1 = tok;
 	// MESG_TOK_INFO("-- push term1 function",tok0);
-	stack_push("num_term1",tok0);
+	stack_push("num_term1",tok0,tok0->ttype);
 
 	if(err_num) RT_MESG1(5531);
 	CHECK_TOK(554);
@@ -1342,14 +1336,14 @@ int err_num_expression()
    CHECK_TOK(563);
     tok_struct *tok0=tok;
 #if	TBNF
-	tok->bnf_group=TOK_TERM;
+	// tok->bnf_group=tok->ttype;
 #endif
     if(tok->ttype==TOK_PLUS) {	/* TOK_PLUS  */
 		// tok->term_function = term_plus;
 		set_term_function(tok,term_plus);
 		NTOKEN_ERR(568);
 		err_num=err_num_term1();
-		stack_push("TOK_PLUS",tok0);
+		stack_push("TOK_PLUS",tok0,tok0->ttype);
 
 		if(err_num) return (err_num);
 		CHECK_TOK(569);
@@ -1369,12 +1363,12 @@ int err_num_expression()
 		NTOKEN_ERR(571);
 		if(expression_type==VTYPE_STRING) {	// operator on first chars of strings. numeric result
 			err_num=err_num_term1();
-			stack_push("TOK_MINUS string",tok0);
+			stack_push("TOK_MINUS string",tok0,tok0->ttype);
 			CHECK_TOK(573);
 			simple=0;
 		} else 	{
 			err_num=err_num_term1();
-			stack_push("TOK_MINUS num",tok0);
+			stack_push("TOK_MINUS num",tok0,tok0->ttype);
 			CHECK_TOK(574);
 		}
 	};
@@ -1408,12 +1402,12 @@ int err_lexpression()
 			set_term_function(tok,logical_or);
 			tok->tgroup=TOK_BOOL;
 #if	TBNF
-			tok->bnf_group=TOK_BOOL;
+			// tok->bnf_group=tok->ttype;
 #endif
 			NTOKEN_ERR(704);
 			err_num=err_lexpression();
 			// MESG_TOK_INFO("#2 err_lexpression",tok0);
-			stack_push("TOK_OR",tok0);
+			stack_push("TOK_OR",tok0,tok0->ttype);
 			if(err_num) return err_num;
 			CHECK_TOK(706);
 			simple=0;
@@ -1424,13 +1418,13 @@ int err_lexpression()
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,logical_xor);
 #if	TBNF
-			tok->bnf_group=TOK_TERM0;
+			// tok->bnf_group=tok->ttype;
 #endif
 			tok->tgroup=TOK_BOOL;
 			NTOKEN_ERR(709);
 			err_num=err_lexpression();
 			// MESG_TOK_INFO("#2 err_lexpression",tok0);
-			stack_push(" TOK_XOR",tok0);
+			stack_push(" TOK_XOR",tok0,tok0->ttype);
 			if(err_num) return err_num;
 			CHECK_TOK(712);
 			simple=0;
@@ -1442,12 +1436,12 @@ int err_lexpression()
 			set_term_function(tok,logical_nor);
 			tok->tgroup=TOK_BOOL;
 #if	TBNF
-			tok->bnf_group=TOK_BOOL;
+			// tok->bnf_group=tok->ttype;
 #endif
 			NTOKEN_ERR(7091);
 			err_num=err_lexpression();
 			// MESG_TOK_INFO("#2 err_lexpression",tok0);
-			stack_push("TOK_NOR",tok0);
+			stack_push("TOK_NOR",tok0,tok0->ttype);
 			if(err_num) return err_num;
 			CHECK_TOK(712);
 			simple=0;
@@ -1461,11 +1455,11 @@ int err_lexpression()
 		case TOK_BIGGEREQ:
 			tok->tgroup=TOK_BOOL;
 #if	TBNF
-			tok->bnf_group=TOK_BOOL;
+			tok->bnf_group=tok->ttype;
 #endif
 			NTOKEN_ERR(708);
 			err_num=err_cexpression();
-			stack_push("compare",tok0);
+			stack_push("compare",tok0,tok0->ttype);
 			simple=0;
 			continue;
 		case TOK_AND: {	
@@ -1474,12 +1468,12 @@ int err_lexpression()
 			set_term_function(tok,logical_and);
 			tok->tgroup=TOK_BOOL;
 #if	TBNF
-			tok->bnf_group=TOK_BOOL;
+			// tok->bnf_group=tok->ttype;
 #endif
 			NTOKEN_ERR(709);
 			err_num=err_cexpression();
 			// MESG_TOK_INFO("#2 err_lexpression",tok0);
-			stack_push("TOK_AND",tok0);
+			stack_push("TOK_AND",tok0,tok0->ttype);
 			if(err_num) return err_num;
 			CHECK_TOK(712);
 			simple=0;
@@ -1491,12 +1485,12 @@ int err_lexpression()
 			set_term_function(tok,logical_nand);
 			tok->tgroup=TOK_BOOL;
 #if	TBNF
-			tok->bnf_group=TOK_BOOL;
+			// tok->bnf_group=tok->ttype;
 #endif
 			NTOKEN_ERR(7092);
 			err_num=err_cexpression();
 			// MESG_TOK_INFO("#2 err_lexpression",tok0);
-			stack_push("TOK_NAND",tok0);
+			stack_push("TOK_NAND",tok0,tok0->ttype);
 			if(err_num) return err_num;
 			CHECK_TOK(712);
 			simple=0;
@@ -1506,13 +1500,13 @@ int err_lexpression()
 			// tok->term_function = assign_val;
 			set_term_function(tok,assign_val);
 #if	TBNF
-			tok->bnf_group=TOK_TERM0;
+			// tok->bnf_group=tok->ttype;
 #endif
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			NTOKEN_ERR(710);
 			err_num=err_assign_val();
 			// stack_push_replace("tok l",tok_l);
-			stack_push("TOK_ASSIGN 1",tok0);
+			stack_push("TOK_ASSIGN 1",tok0,tok0->ttype);
 			RT_MESG1(714);
 		};
 		case TOK_INCREASEBY: {
@@ -1520,14 +1514,14 @@ int err_lexpression()
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,(TFunction)increase_by);
 #if	TBNF
-			tok->bnf_group=TOK_TERM0;
+			// tok->bnf_group=tok->ttype;
 #endif
 			tok->tname = "+=";
 			// tok0=tok;
 			NTOKEN_ERR(710);
 			err_num=err_increase_by();
 			// stack_push_replace("tok l",tok_l);
-			stack_push("+=",tok0);
+			stack_push("+=",tok0,tok0->ttype);
 			RT_MESG1(714);
 		};
 		case TOK_MULBY: {
@@ -1535,14 +1529,14 @@ int err_lexpression()
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,(TFunction)mul_by);
 #if	TBNF
-			tok->bnf_group=TOK_TERM0;
+			// tok->bnf_group=tok->ttype;
 #endif
 			tok->tname = "*=";
 			// tok0=tok;
 			NTOKEN_ERR(710);
 			err_num=err_mul_by();
 			// stack_push_replace("tok l",tok_l);
-			stack_push("*=",tok0);
+			stack_push("*=",tok0,tok0->ttype);
 			RT_MESG1(714);
 		};
 		case TOK_DECREASEBY: {
@@ -1550,14 +1544,14 @@ int err_lexpression()
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,(TFunction)decrease_by);
 #if	TBNF
-			tok->bnf_group=TOK_TERM0;
+			// tok->bnf_group=tok->ttype;
 #endif
 			tok->tname = "-=";
 			// tok0=tok;
 			NTOKEN_ERR(710);
 			err_num=err_decrease_by();
 			// stack_push_replace("tok l",tok_l);
-			stack_push("-=",tok0);
+			stack_push("-=",tok0,tok0->ttype);
 			RT_MESG1(714);
 		};
 		case TOK_ASSIGNENV:
@@ -1565,24 +1559,23 @@ int err_lexpression()
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,assign_env);
 #if	TBNF
-			tok->bnf_group=TOK_TERM0;
+			// tok->bnf_group=tok->ttype;
 #endif
 			NTOKEN_ERR(710);
 			err_num=err_assign_env();
 			// stack_push_replace("tok l",tok_l);
-			stack_push("assign env",tok0);
+			stack_push("assign env",tok0,tok0->ttype);
 			RT_MESG1(7141);
 		case TOK_ASSIGNOPT:
 			// tok->term_function = assign_option;
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			set_term_function(tok,assign_option);
 #if	TBNF
-			tok->bnf_group=TOK_TERM0;
+			tok->bnf_group=tok->ttype;
 #endif
 			NTOKEN_ERR(710);
 			err_num=err_assign_env();
-			// stack_push_replace("tok l",tok_l);
-			stack_push("assign option",tok0);
+			stack_push("assign option",tok0,tok0->ttype);
 			RT_MESG1(7141);
 		default:
 			RT_MESG1(715);
@@ -1613,7 +1606,7 @@ int err_cexpression()
 	// MESG(" in cexpression compare: %s",tok_info(tok));
 	NTOKEN_ERR(615);
 	err_num=err_num_expression();
-	stack_push("compare",tok0);
+	stack_push("compare",tok0,tok0->ttype);
 	RT_MESG1(616);
 }
 
@@ -1627,12 +1620,12 @@ int err_check_sentence1()
 	case TOK_EOF:
 		MESG_TOK_INFO("# err_check_sentence",tok);
 		err_num=0;
-		stack_push("EOF",tok);
+		stack_push("EOF",tok,0);
 		RT_MESG1(625);
 
 	case TOK_RCURL:
 		MESG_TOK_INFO("# err_check_sentence",tok);
-		stack_push("sentence RCURL",tok);
+		stack_push("sentence RCURL",tok,-tok->ttype);
 		CHECK_TOK(626);
 		break;
  	case TOK_LCURL:
@@ -1645,7 +1638,7 @@ int err_check_sentence1()
 			set_tok_directive(tok,dir_lcurl_break);
 			set_bnf_directive(tok,bnf_dir_lcurl_break);
 		};
-		stack_push("sentence {",tok);
+		stack_push("sentence {",tok,-tok->ttype);
 		NTOKEN_ERR(627);
 		CHECK_TOK(628);
 		err_num=err_check_block1();
@@ -1657,7 +1650,7 @@ int err_check_sentence1()
 		tok_struct *tok0=tok;
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,tok_dir_if);
-		stack_push("DIR_IF",tok);
+		stack_push("DIR_IF",tok,-tok->ttype);
 		NTOKEN_ERR(631);	/* go to next token after if */
 		xpos=632;
 
@@ -1669,7 +1662,7 @@ int err_check_sentence1()
 			return err_num;
 		};
 		// MESG("err: TOK_DIR_IF! check rpar! of %d",tok->tnum);
-		stack_push("if )",tok);
+		stack_push("if )",tok,-tok->ttype);
 		check_skip_token_err1(TOK_RPAR,"tok_dir_if",xpos);
 
 		CHECK_TOK(634);
@@ -1686,7 +1679,7 @@ int err_check_sentence1()
 		if(tok->ttype==TOK_DIR_ELSE) {
 			// MESG("we have an else statement!");
 			tok0=tok;
-			stack_push("else",tok);
+			stack_push("else",tok,-tok->ttype);
 			NTOKEN2;
 			err_num=err_check_sentence1();	/* body of else  */
 			xpos=638;
@@ -1703,7 +1696,7 @@ int err_check_sentence1()
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,tok_dir_fori);
 		set_bnf_directive(tok,bnf_dir_fori);
-		stack_push("DIR_FORI",tok);
+		stack_push("DIR_FORI",tok,-tok->ttype);
 		NTOKEN_ERR(640);	/* go to next token after for */
 		tok_struct *tok0=NULL;
 		if(tok->ttype==TOK_VAR) {
@@ -1711,7 +1704,7 @@ int err_check_sentence1()
 #if	TBNF
 			tok->bnf_group=TOK_BOOL;
 #endif
-			stack_push("loop var",tok);
+			stack_push("loop var",tok,tok->ttype);
 			NTOKEN_ERR(6403);
 			if(tok->ttype!=TOK_ASSIGN) {
 				ERROR("6404:for i error");
@@ -1722,19 +1715,19 @@ int err_check_sentence1()
 		} else ERROR("6405:for i syntax error");
 		NTOKEN_ERR(64053);
 		err_num=err_num_expression();	/* initial   */
-		stack_push("for i assign",tok0);
+		stack_push("for i assign",tok0,tok0->ttype);
 		if(err_num) return(err_num);
 		CHECK_TOK(6406);
-		stack_push("fori sep 1",tok);
+		stack_push("fori sep 1",tok,0);
 		NTOKEN_ERR(6407);	/* skip separator! */
 		err_num=err_num_expression();
 		if(err_num) return(err_num);
-		stack_push("fori sep 2",tok);
+		stack_push("fori sep 2",tok,-tok->ttype);
 		NTOKEN_ERR(6408);
 		err_num=err_num_expression();
 		if(err_num) return(err_num);
 		CHECK_TOK(6409);
-		stack_push("fori )",tok);
+		stack_push("fori )",tok,-tok->ttype);
 		if(tok->ttype!=TOK_RPAR) ERROR("6409:for i: error ");
 		NTOKEN_ERR(64010);	/* skip right parenthesis  */
 		// set block start
@@ -1773,7 +1766,7 @@ int err_check_sentence1()
 #if	TBNF
 		set_bnf_directive(tok,bnf_dir_for);
 #endif
-		stack_push("dir for",tok);
+		stack_push("dir for",tok,-tok->ttype);
 		NTOKEN_ERR(641);	/* go to next token after for */
 
 		err_num=err_lexpression();	/* check initial  */
@@ -1785,7 +1778,7 @@ int err_check_sentence1()
 
 		err_num=err_lexpression();	/* check loop statement  */
 		CHECK_TOK(647);
-		stack_push("for )",tok);
+		stack_push("for )",tok,-tok->ttype);
 		if(!check_skip_token1(TOK_RPAR)) { set_error(tok,xpos,"RPAR"); RT_MESG1(6471);};
 
 		start_block=tok;
@@ -1806,16 +1799,16 @@ int err_check_sentence1()
 			// MESG("# err_check_sentence: %s",tok_info(tok));
 			set_tok_directive(tok,tok_dir_while);
 #if	TBNF
-			set_bnf_directive(tok,bnf_dir_while);
+			// set_bnf_directive(tok,bnf_dir_while);
 #endif
-			stack_push("while",tok);
+			stack_push("while",tok,-tok->ttype);
 			NTOKEN_ERR(654);	/* go to next toke after while */
 
 			// set check_list
 			check_element=tok;
 			err_num=err_check_sentence1();
 			CHECK_TOK(657);
-			stack_push("while )",tok);
+			stack_push("while )",tok,-tok->ttype);
 			check_skip_token_err1(TOK_RPAR,"tok_dir_while:",xpos);
 			CHECK_TOK(658);
 			start_block=tok;
@@ -1835,24 +1828,24 @@ int err_check_sentence1()
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,dir_break);
 #if	TBNF
-		set_bnf_directive(tok,bnf_dir_break);
+		// set_bnf_directive(tok,bnf_dir_break);
 #endif
-		stack_push("dir break",tok);
+		stack_push("dir break",tok,-tok->ttype);
 		NTOKEN_ERR(663);
 		RT_MESG;
 	case TOK_DIR_RETURN:
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,dir_return);
 #if	TBNF
-		set_bnf_directive(tok,bnf_dir_return);
+		// set_bnf_directive(tok,bnf_dir_return);
 #endif
 		// MESG(" err TOK_DIR_RetURN");
-		stack_push("dir return",tok);
+		stack_push("dir return",tok,-tok->ttype);
 		NTOKEN_ERR(664);
 		if(tok->ttype!=TOK_SEP&&tok->ttype!=TOK_RPAR) 	
 			err_num=err_lexpression();
 		// stack_push("dir return )",tok0);
-		stack_push("dir return )",tok);
+		stack_push("dir return )",tok,-tok->ttype);
 		check_skip_token1(TOK_RPAR);
 		// MESG(" err TOK_DIR_RETURN: after lexpression: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype); 
 		RT_MESG1(666);
@@ -1864,9 +1857,9 @@ int err_check_sentence1()
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,tok_dir_type);
 #if	TBNF
-		set_bnf_directive(tok,bnf_dir_type);
+		// set_bnf_directive(tok,bnf_dir_type);
 #endif
-		stack_push("dir type",tok);
+		stack_push("dir type",tok,-tok->ttype);
 		// MESG("--> err: TOK_DIR_TYPE: %s",tok->tname);
 		NTOKEN_ERR(671);	// this is the type name
 		xpos=632;
@@ -1893,28 +1886,28 @@ int err_check_block1()
 		case TOK_EOF: 
 			// MESG_TOK_INFO("# err_check_block1",tok);
 			// MESG(">>>>>>>>>>>>>>> end error_check!");
-			stack_push("EOF ",tok);
+			stack_push("EOF ",tok,-tok->ttype);
 			RT_MESG1(673);
 		case TOK_SEP:
 			// MESG_TOK_INFO("# err_check_block1",tok);
-			stack_push("--------------",tok);
+			stack_push("--------------",tok,-tok->ttype);
 			NTOKEN_ERR(6741);
 			continue;
 		case TOK_RPAR:	/* problem if removed  */
 			// MESG_TOK_INFO("# err_check_block1",tok);
-			stack_push("RPAR ",tok);
+			stack_push("RPAR ",tok,-tok->ttype);
 			NTOKEN_ERR(6741);
 			continue;
 		case TOK_COMMA:
 		case TOK_SHOW:
 			// MESG_TOK_INFO("# err_check_block1",tok);
-			stack_push("Show or comma",tok);
+			stack_push("Show or comma",tok,-tok->ttype);
 			tok->factor_function = factor_funcs[tok->ttype];
 			NTOKEN_ERR(674);
 			continue;
 		case TOK_RCURL:
 			// MESG_TOK_INFO("# err_check_block1",tok);
-			stack_push("RCURL }",tok);
+			stack_push("RCURL }",tok,-tok->ttype);
 			NTOKEN_ERR(675);
 			RT_MESG1(6751);
 		// default:

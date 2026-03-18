@@ -353,6 +353,12 @@ static inline void bnf_factor_none()
 	NTOKEN2;
 }
 
+void bnf_factor_dummy()
+{
+	MESG("bnf_factor_dummy!");
+	NTOKEN2;
+}
+
 void bnf_update_val()
 {
 	MESG("bnf_update_val:");
@@ -646,6 +652,7 @@ void bnf_factor_assign_var()
 	aval->var_type = bval->var_type;
 	if(bval->var_type==VTYPE_NUM) { 
 		aval->dval = bval->dval;
+		MESG("set var to %f",aval->dval);
 		NTOKEN2;
 		return;
 	};
@@ -655,6 +662,17 @@ void bnf_factor_assign_var()
 		return;
 	};
 	// set for any different type!
+}
+
+void bnf_assign_env()
+{
+	MESG("bnf_assign_env:");
+	NTOKEN2;
+}
+
+void bnf_assign_opt()
+{
+	MESG("bnf_assign_opt:");
 }
 
 double bnf_factor_option()
