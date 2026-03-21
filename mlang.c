@@ -207,6 +207,29 @@ char *vtype_names[] = {
 
 void set_bnf_function(tok_struct *tok, int type);
 
+void eval_curl_match(tok_struct *tok)
+{
+ static tok_struct *curl_stack[100];
+ static int left_curl_index=0;
+	
+ 	if(tok==NULL) {
+		left_curl_index=0;
+		return;
+	};
+	if(tok->ttype==TOK_LCURL) {// push left curl
+		curl_stack[left_curl_index] = tok;
+		left_curl_index++;
+		return;
+	};
+	if(tok->ttype==TOK_RCURL) { // pull left curl and set match_token
+		left_curl_index--;
+		tok_struct *left_curl_tok = curl_stack[left_curl_index];
+		tok->match_tok = left_curl_tok+1;
+		left_curl_tok->match_tok = tok+1; 
+		MESG("set curl match left=%d right=%d",left_curl_tok->tnum,tok->tnum);
+	};
+}
+
 void stack_push(char *title,tok_struct *tok,int exp_type)
 {
 #if	TBNF
@@ -225,7 +248,8 @@ void stack_push(char *title,tok_struct *tok,int exp_type)
     	tok->pushed=check_buffer->tok_bnf_index;
 
 		set_bnf_function1(dest,exp_type);
-
+		if(dest->ttype==TOK_LCURL||dest->ttype==TOK_RCURL) 
+			eval_curl_match(dest);
  		MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(dest));
 		check_buffer->tok_bnf_index++;
    }
