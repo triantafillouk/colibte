@@ -19,7 +19,7 @@ void bnf_expression();
 void prev_var(char *title)
 {
  bnf_var--;
- MESG("	-var %3ld %s",bnf_var-bnf_vars,title);
+ MESG("	-var %3ld -> %3ld %s",bnf_var-bnf_vars+1,bnf_var-bnf_vars,title);
  if(bnf_var < &bnf_vars[0]) {
 	MESG("Negativ var!");
 	exit(1);
@@ -29,7 +29,7 @@ void prev_var(char *title)
 void next_var(char *title)
 {
  bnf_var++;
- MESG("	+var %3ld %s",bnf_var-bnf_vars,title);
+ MESG("	+var %3ld -> %3ld %s",bnf_var-bnf_vars-1,bnf_var-bnf_vars,title);
  if(bnf_var - &bnf_vars[0]>100) {
 	MESG("MAX var exceeded!");
 	exit(2);
@@ -41,29 +41,29 @@ double bnf_result()
  int stack_num = bnf_var-bnf_vars;
  switch(bnf_var->var_type) {
  	case VTYPE_NUM:
-		MESG("bnf result: %3d NUMERIC val=%f",stack_num,bnf_var->dval);
+		MESG("bnf result: @%3d NUMERIC val=%f",stack_num,bnf_var->dval);
 		return(bnf_var->dval);
 		break;
 	case VTYPE_STRING:
-		MESG("bnf result: %3d STRING  val=[%s]",stack_num,bnf_var->sval);
+		MESG("bnf result: @%3d STRING  val=[%s]",stack_num,bnf_var->sval);
 		return 0.0;
 	case VTYPE_POINTER:
 	{ MVAR *var=bnf_var->var_pointer;
 		if(var->var_type==VTYPE_NUM) {
-			MESG("bnf result: %3d var NUMERIC val=%f",stack_num,var->dval);
+			MESG("bnf result: @%3d var NUMERIC val=%f",stack_num,var->dval);
 			return var->dval;
 		};
 		if(var->var_type==VTYPE_STRING) {
-			MESG("bnf result: %3d var STRING  val=[%s]",stack_num,var->sval);
+			MESG("bnf result: @%3d var STRING  val=[%s]",stack_num,var->sval);
 			return 0.0;
 		};
 		if(var->var_type==VTYPE_NONE) {
-			MESG("bnf result: %3d var value undefined",stack_num);
+			MESG("bnf result: @%3d var value undefined",stack_num);
 			return 0.0;
 		};
 	};break;
 	default:
-		MESG("bnf result: %3d  type %X",stack_num,bnf_var->var_type);
+		MESG("bnf result: @%3d  type %X",stack_num,bnf_var->var_type);
  };
  return 0.0;
 }
@@ -932,7 +932,7 @@ void bnf_factor_line_array()
 			int ind1=cols*j+i;
 			// MESG("factor_line_array: set [%d] ex_vtype=%d",ind1,get_vtype());
 			adat->mval[ind1].var_type=bnf_var->var_type;
-			if((bnf_var->var_type==VTYPE_NUM)) adat->mval[ind1].dval=bnf_var->dval;
+			if(bnf_var->var_type==VTYPE_NUM) adat->mval[ind1].dval=bnf_var->dval;
 			else if(vtype_is(VTYPE_STRING)) adat->mval[ind1].sval=strdup(bnf_var->sval);
 		};
 		i++;if(i>cols) cols=i;
@@ -963,7 +963,7 @@ void bnf_factor_assign_var()
 	MVAR *bval=bnf_var;
 	prev_var("assign var2");
 	if(bnf_var->var_type != VTYPE_POINTER) {
-		next_var("cannot assign to non var!");
+		// next_var("cannot assign to non var!");
 		current_active_flag=0;
 		NTOKEN2;
 		return;
@@ -977,18 +977,18 @@ void bnf_factor_assign_var()
 	if(bval->var_type==VTYPE_NUM) { 
 		aval->dval = bval->dval;
 		MESG("stack ind=%2d set var to %f",stack_index,aval->dval);
-		next_var("assign_var num");
+		// next_var("assign_var num");
 		NTOKEN2;
 		return;
 	};
 	if(bval->var_type==VTYPE_STRING) {
 		aval->sval = strdup(bval->sval);
-		next_var("assign_var string");
+		// next_var("assign_var string");
 		NTOKEN2;
 		return;
 	};
 	// set for any different type!
-	next_var("assign_var undefined");
+	// next_var("assign_var undefined");
 	NTOKEN2;
 }
 
