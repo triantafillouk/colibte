@@ -610,7 +610,7 @@ int err_factor()
  int lpar=0;
  // MESG("-- err_factor %s",tok_info(tok));
  set_tok_function(tok,0);
- if(tok->ttype!=TOK_NOT) {
+ if(tok->ttype!=TOK_NOT && tok->ttype!=TOK_LPAR) {
 	
  	stack_push("factor",tok,tok->ttype);	// ????
  };
@@ -1237,7 +1237,7 @@ int err_num_term3(tok_struct *tok1)
 	set_term_function(tok,(TFunction)factor_funcs[tok->ttype]);
 	tok_struct *tok0=tok;
 
-	if(tok1->ttype==TOK_MOD) {
+	if(tok1->ttype==TOK_MOD||tok1->ttype==TOK_POWER) {
 		NTOKEN_ERR(544);
 		// MESG("# term3 function [%s]",tok_info(tok0));
 		err_num = err_num_term3(tok0);
@@ -1268,7 +1268,7 @@ int err_num_term2()
 	set_term_function(tok,(TFunction)factor_funcs[tok->ttype]);
 	tok_struct *tok0=tok;
 
-	if(tok0->ttype==TOK_MOD) {
+	if(tok0->ttype==TOK_MOD||tok0->ttype==TOK_POWER) {
 		NTOKEN_ERR(544);
 		err_num = err_num_term3(tok0);
 	} else {

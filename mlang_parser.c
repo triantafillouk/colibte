@@ -1190,6 +1190,8 @@ void set_tok_table(FILEBUF *bf)
  bf->tok_bnf = bf->tok_table_bnf;
  
  MESG("-----> set tok_table_bnf: bf=[%s] at %p size %d",bf->b_fname,bf->tok_table_bnf,table_size);
+ eval_curl_match(NULL); // initialize curl stack
+
 #endif
  tok_table=(void *)malloc(sizeof(struct tok_struct)*table_size);
  bf->tok_table = (void *) tok_table;
