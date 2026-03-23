@@ -1,4 +1,8 @@
 
+char *ddot_string();
+void update_ddot_line(char *ddot_out);
+void skip_sentence1();
+
 tok_struct* bnf_stack[100];
 tok_struct *bnf_start, *bnf_var1, *bnf_var2, *bnf_op;
 
@@ -15,6 +19,72 @@ inline MVAR *get_left_slot(int ind);
 void bnf_expression();
 
 #define NTOKEN22	ntoken2()
+
+void bnf_refresh_ddot()
+{
+ MESG("refresh_ddot");
+ int stat=0;
+ TextPoint *tp = tok->ddot;
+ FILEBUF *buf = tp->fp;
+ // MESG("refresh_ddot: %d",get_vtype());
+
+	bnf_var--;
+	MVAR *var_show = bnf_var;
+	int var_index = var_show-bnf_vars;
+	int ori_type=var_show->var_type;
+	if(bnf_var->var_type==VTYPE_POINTER) {
+		var_show = bnf_var->var_pointer;
+ 	};
+
+ MESG("refresh_ddot: ind=%3ld ori=%d type=%d",var_index,ori_type,var_show->var_type);
+ if(execmd) {
+	 if(var_show->var_type==VTYPE_NUM) {
+		printf("%s	: %.3f\n",ddot_string(),var_show->dval);
+	 } else if(var_show->var_type==VTYPE_STRING) {
+		printf("%s	: %s\n",ddot_string(),var_show->sval);
+	 } else if(var_show->var_type==VTYPE_ARRAY || var_show->var_type==VTYPE_SARRAY ||var_show->var_type==VTYPE_AMIXED) {
+		// MESG("	show_array!");
+		print_array1("array: ",var_show->adat);
+	 	// print_array1(ddot_string(),var_show->adat);
+	 };
+	 // lstoken=NULL;
+	 NTOKEN2;
+	 return;
+ };
+
+ int precision=bt_dval("print_precision");
+ int show_hex=bt_dval("show_hex");
+ // char *ddot_out = (char *)malloc(128);
+ char ddot_out[128];
+
+ // MESG("	ddot_pos=%d end=%d todel=%d",ddot_position,line_end,line_end-ddot_position);
+ if(buf->b_state & FS_VIEW) {NTOKEN2;return;}; // no refresh in view mode
+
+ if(var_show->var_type==VTYPE_STRING) {	/* string value  */
+	stat=snprintf(ddot_out,sizeof(ddot_out)," \"%s\"",var_show->sval);
+ }  else if(var_show->var_type==VTYPE_NUM) {	/* numeric value  */
+	long int d = (long int)value;
+	if(d==value) {	/* an integer/double value!  */
+		if(show_hex) stat=snprintf(ddot_out,sizeof(ddot_out)," %5.0f | 0x%llX | 0o%llo",value,(unsigned long long)value,(unsigned long long)value);
+		else stat=snprintf(ddot_out,sizeof(ddot_out)," %5.*f",1,value);
+	} else {	/* a decimal value!  */
+		stat=snprintf(ddot_out,sizeof(ddot_out)," %5.*f",precision,value);
+	};
+
+ } else if(var_show->var_type==VTYPE_ARRAY || var_show->var_type==VTYPE_SARRAY || var_show->var_type==VTYPE_AMIXED) {
+	// MESG("refresh_ddot:1");
+	array_dat *adat = var_show->adat;
+	// MESG("refresh_ddot: array: type=%d name=(%s)",adat->atype,adat->array_name);
+
+ 	stat=snprintf(ddot_out,sizeof(ddot_out)," array %d:[%s] type [%s] , slot %ld type=%d rows %d,cols %d",adat->anum,
+		adat->array_name,vtype_names[adat->atype],lsslot-current_stable,adat->atype,adat->rows,adat->cols);
+	// print_array1(":",adat);
+ };
+ if(stat>MAXLLEN) MESG("truncated");
+
+ update_ddot_line(ddot_out);
+ NTOKEN2;
+}
 
 void prev_var(char *title)
 {
@@ -976,6 +1046,8 @@ void bnf_factor_assign_var()
 	aval->var_type = bval->var_type;
 	if(bval->var_type==VTYPE_NUM) { 
 		aval->dval = bval->dval;
+		bnf_var->var_type = aval->var_type;
+		bnf_var->dval = aval->dval;
 		MESG("stack ind=%2d set var to %f",stack_index,aval->dval);
 		next_var("assign_var num");
 		NTOKEN2;
@@ -1103,8 +1175,95 @@ void bnf_dir_break()
 
 void bnf_dir_fori()
 {
-	MESG("bnf_dir_fori: to be defined!");
+	MESG("bnf_dir_fori: var_stack_index=%d",bnf_var-bnf_vars);
+	tok_struct *start_block;	// element at block start
+	tok_struct *end_block=NULL;	/* at the block end  */
+	int old_active_flag=current_active_flag;
+	MVAR *index=NULL;
+	double dinit,dmax,dstep;
+	double *iterrator_val;
+
+	NTOKEN2;	/* go to next token after for */
+
+	index=&current_stable[tok->tind];
+	MESG("	fori start initialization!");
+	bnf_expression();
+	MESG("	fori: after index expression tok=%s",tok_info(tok));
+#if	0
+	if(index->var_type!=VTYPE_NUM) {err_num=224;ERROR("for i syntax error %d",err_num);};
+	set_vtype(index->var_type);
+
+	NTOKEN2; // next
+	NTOKEN2; // skip equal sign
+
+	dinit=num_expression();	/* initial   */
+	iterrator_val=&index->dval;
+	*iterrator_val=dinit;
+#else
+	bnf_var--;
+	if(bnf_var->var_type!=VTYPE_NUM) { 
+		MESG("	fori: error in fori index! var index=%ld var_type=%d",bnf_var-bnf_vars,bnf_var->var_type);
+		exit(1);
+	}
+	else iterrator_val = &bnf_var->dval;
+	dinit = bnf_var->dval;
+	// check if ok!
+	if(dinit != index->dval) { MESG("	fori: ERROR1 IN FORI index! %f %f",dinit ,&index->dval);};
+#endif
+	NTOKEN2;	/* skip separator! */
+
+	bnf_expression();
+	bnf_var--;
+	dmax = bnf_var->dval;
+	MESG("	fori max=%f",dmax);
 	NTOKEN2;
+
+	bnf_expression();
+	bnf_var--;
+	dstep = bnf_var->dval;
+
+	MESG("fori: from %f to %f step %f",dinit,dmax,dstep);
+	//if(tok->ttype!=TOK_RPAR) { err_num=226;ERROR("for i: error %d",err_num);};
+	NTOKEN2;	/* skip right parenthesis  */
+	// set block start
+	start_block=tok;	/* this is a block start or a simple sentence  */
+	
+	MESG("	fori start of block token [%s]",tok_info(tok));
+	// find token after the end of block
+	skip_sentence1();
+	end_block=tok;
+	MESG("	fori end if block token [%s]",tok_info(tok));
+
+	if(dinit==dmax) {
+		tok=end_block;
+		current_active_flag=old_active_flag;
+		return;
+	};
+	if(dstep>0 && dmax > *iterrator_val) {
+
+		for(;*iterrator_val < dmax; *iterrator_val +=dstep) {
+			tok=start_block;
+			tok->bnf_factor_function();
+			if(current_active_flag==0) {
+				if(is_break1) { tok=exe_buffer->end_token;return;};
+				break;
+			};
+		};
+	} else if(dstep<0 && dmax< *iterrator_val) {
+		for(; *iterrator_val > dmax; *iterrator_val +=dstep) {
+			tok=start_block;
+			tok->bnf_factor_function();
+			if(current_active_flag==0) {
+				if(is_break1) { tok=exe_buffer->end_token;return;};
+				break;
+			};
+		};
+	} else {
+		err_num=226;
+		ERROR("error: infinite fori loop %d",err_num);
+	};
+	tok=end_block;
+	current_active_flag=old_active_flag;
 }
 
 void bnf_dir_for()

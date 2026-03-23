@@ -2319,7 +2319,7 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_quote,	// TOK_QUOTE
 	bnf_factor_lpar,	// TOK_LPAR
 	bnf_factor_error,	// TOK_RPAR	
-	(VFunction)factor_refresh_ddot,	// TOK_SHOW
+	bnf_refresh_ddot,	// TOK_SHOW
 	bnf_factor_none,	// TOK_COMMENT	,
 	bnf_factor_var,	// TOK_VAR	level 0 variable
 	(VFunction)factor_option,	// TOK_OPTION	,	// editor option
@@ -2343,7 +2343,7 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_none,	// TOK_DIR_WHILE	,
 	bnf_factor_none,	// TOK_DIR_FOR		,
 	bnf_factor_comma,	// TOK_COMMA		,
-	bnf_factor_none,	// TOK_DIR_FORI	,
+	bnf_dir_fori,	// TOK_DIR_FORI	,
 
 	/* bool operators  */
 	bnf_factor_none,	// TOK_COMPARE		,33
@@ -4047,8 +4047,14 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 
 	drv_start_checking_break();
 	// MESG("	call exec_block1 ------");
+#if	TBNF
+	if(!exebnf) {
+#endif
 	if(execmd) val=exec_block1(bp);
 	else val=exec_block1_break(bp);
+#if TBNF
+	};
+#endif
 	// MESG("	after exec_block1 !!!!!");
 #if	TBNF
 	if(exebnf) {
@@ -4147,7 +4153,12 @@ int refresh_current_buffer(num nused)
  	msg_line("evaluating ...");
 	init_exec_flags();
 	tok=fp->tok_table;
+#if	TBNF
+	// check bnf flag!!
 	val=exec_block1_break(fp);
+#else
+	val=exec_block1_break(fp);
+#endif
 	drv_stop_checking_break();
 	if(err_num>0) {
 		macro_exec=0;
