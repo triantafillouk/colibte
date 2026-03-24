@@ -63,7 +63,8 @@ void bnf_refresh_ddot()
  FILEBUF *buf = tp->fp;
  // MESG("refresh_ddot: %d",get_vtype());
 
-	prev_var("ddot");
+	// prev_var("ddot");
+	bnf_var--;
 	MVAR *var_show = bnf_var;
 	// int var_index = var_show-bnf_vars;
 	// int ori_type=var_show->var_type;
@@ -211,22 +212,44 @@ void bnf_factor_not()
  next_var("not error");NTOKEN2;
 }
 
+void bnf_factor_nn_plus()
+{
+ bnf_var--;
+ double varb = bnf_var->dval;
+ bnf_var--;
+ bnf_var->dval+=varb;
+ bnf_var->var_type=VTYPE_NUM;
+ bnf_var++;
+ NTOKEN2;
+}
+
 void bnf_factor_plus()
 {
  // MESG("bnf_factor_plus : var ind=%d tok ind=%d var type=%d",bnf_var-&bnf_vars[0],tok->tnum,bnf_var->var_type);
  // prev_var("plus");
  bnf_var--;
  MVAR *varb = bnf_var;
- 	if(varb->var_type==VTYPE_POINTER) varb=varb->var_pointer;
-	prev_var("plus21");
+ int vb=0;
+ 	if(varb->var_type==VTYPE_POINTER) {
+		varb=varb->var_pointer;
+		vb=VTYPE_NUM;
+	};
+	// prev_var("plus21");
+	bnf_var--;
 	MVAR *vara = bnf_var;
-	if(vara->var_type==VTYPE_POINTER) vara=vara->var_pointer;
+	int va=-1;
+	if(vara->var_type==VTYPE_POINTER) {
+		vara=vara->var_pointer;
+		va=VTYPE_POINTER;
+	};
 	if(vara->var_type==VTYPE_NUM) {
 		if(varb->var_type==VTYPE_NUM) {
 			bnf_var->dval=vara->dval+varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
 			// bnf_result();
-			next_var("plus22");
+			// next_var("plus22");
+			bnf_var++;
+			if(va!=vb) tok->bnf_factor_function=bnf_factor_nn_plus;
 			NTOKEN2;
 			return;
 		};
@@ -258,22 +281,38 @@ void bnf_factor_minus()
 	NTOKEN2;
 }
 
+void bnf_factor_pp_num_mul()
+{
+ bnf_var--;
+ double varb = bnf_var->var_pointer->dval;
+ bnf_var--;
+ MVAR *vara = bnf_var->var_pointer;
+ bnf_var->dval=vara->dval * varb;
+ bnf_var->var_type=VTYPE_NUM;
+ bnf_var++;
+ NTOKEN2;
+}
+
 void bnf_factor_mul()
 {
 //  MESG("bnf_factor_mul : var ind=%d tok ind=%d var type=%d",bnf_var-&bnf_vars[0],tok->tnum,bnf_var->var_type);
  // prev_var("mul");
  bnf_var--;
  MVAR *varb = bnf_var;
- 	if(varb->var_type==VTYPE_POINTER) varb=varb->var_pointer;
+ int vb=0;
+ 	if(varb->var_type==VTYPE_POINTER){ varb=varb->var_pointer;vb=VTYPE_POINTER;};
 	prev_var("mul21");
 	MVAR *vara = bnf_var;
-	if(vara->var_type==VTYPE_POINTER) vara=vara->var_pointer;
+	int va=-1;
+	if(vara->var_type==VTYPE_POINTER) {vara=vara->var_pointer;va=VTYPE_POINTER;};
 	if(vara->var_type==VTYPE_NUM) {
 		if(varb->var_type==VTYPE_NUM) {
 			bnf_var->dval=vara->dval*varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
 			// bnf_result();
-			next_var("mul22");
+			// next_var("mul22");
+			bnf_var++;
+			if(va==vb) tok->bnf_factor_function=bnf_factor_pp_num_mul;
 			NTOKEN2;
 			return;
 		};
@@ -670,13 +709,28 @@ void bnf_update_val()
 	// set for any different type!
 }
 
+void bnf_increase_by_pp_num()
+{
+	bnf_var--;
+	double bval=bnf_var->var_pointer->dval;
+	bnf_var--;
+	MVAR *aval=bnf_var->var_pointer;
+	aval->dval += bval;
+	bnf_var->dval=aval->dval;
+	bnf_var->var_type=VTYPE_NUM;
+	bnf_var++;
+	NTOKEN2;
+}
+
 // aval+=bval
 void bnf_increase_by()
 {
 	MESG("bnf_factor_increase_by:");
-	prev_var("inc by");
+	// prev_var("inc by");
+	bnf_var--;
 	MVAR *bval=bnf_var;
-	prev_var("inc by2");
+	// prev_var("inc by2");
+	bnf_var--;
 #if	0
 	if(bnf_var->var_type != VTYPE_POINTER) {
 		next_var("incr by error1");
@@ -697,6 +751,7 @@ void bnf_increase_by()
 			bnf_var->dval = val;
 			// next_var("inc by num");
 			bnf_var++;
+			tok->bnf_factor_function=bnf_increase_by_pp_num;
 			NTOKEN2;
 			return;
 		};
@@ -1060,11 +1115,13 @@ void bnf_block1(FILEBUF *fp)
    {
 	// MESG("!__exec_block1 [%s]",tok_info(tok));
  	tok->bnf_factor_function();
+	// if(tok->ttype==TOK_RCURL) MESG("bnf_block inside rcurl!:");
 	// lstoken=NULL;MESG("exec_block1: reset lstoken");
 	// if(ex_var.var_type==VTYPE_NUM) ex_var.dval=val;
 	if(!current_active_flag) break;
    };
 	if(tok->ttype==TOK_RCURL) { 
+		MESG("bnf_block rcurl");
 		NTOKEN2;
 		// lstoken=NULL;
 		// return(ex_var.dval);
