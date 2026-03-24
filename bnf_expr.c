@@ -1200,7 +1200,7 @@ void bnf_dir_fori()
 	iterrator_val=&index->dval;
 	*iterrator_val=dinit;
 #else
-	bnf_var--;
+	// prev_var("get init val");
 	if(bnf_var->var_type!=VTYPE_NUM) { 
 		MESG("	fori: error in fori index! var index=%ld var_type=%d",bnf_var-bnf_vars,bnf_var->var_type);
 		exit(1);
@@ -1213,13 +1213,13 @@ void bnf_dir_fori()
 	NTOKEN2;	/* skip separator! */
 
 	bnf_expression();
-	bnf_var--;
+	prev_var("	get dmax val");
 	dmax = bnf_var->dval;
 	MESG("	fori max=%f",dmax);
 	NTOKEN2;
 
 	bnf_expression();
-	bnf_var--;
+	prev_var("	get step val");
 	dstep = bnf_var->dval;
 
 	MESG("fori: from %f to %f step %f",dinit,dmax,dstep);
@@ -1243,6 +1243,7 @@ void bnf_dir_fori()
 
 		for(;*iterrator_val < dmax; *iterrator_val +=dstep) {
 			tok=start_block;
+			MESG("		fori: %3d [%s]",*iterrator_val,tok_info(tok));
 			tok->bnf_factor_function();
 			if(current_active_flag==0) {
 				if(is_break1) { tok=exe_buffer->end_token;return;};

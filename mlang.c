@@ -2338,7 +2338,7 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_sep,		// TOK_SEP
 	bnf_factor_none,	// TOK_SPACE
 	bnf_factor_none,	// TOK_LETTER
-	bnf_factor_none,	// TOK_LCURL	,
+	bnf_dir_lcurl,	// TOK_LCURL	,
 	bnf_factor_rcurl,	// TOK_RCURL	,
 	bnf_factor_quote,	// TOK_QUOTE
 	bnf_factor_lpar,	// TOK_LPAR

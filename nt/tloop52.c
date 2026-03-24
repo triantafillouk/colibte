@@ -26,9 +26,7 @@ int main(int argc,char **argp)
 			l = i*j+32;
 			p = p+l+fact(10);
 		} 
-	
+		printf("loop:%d p=%.0f\n",i,p);	
 	}
-
-	printf("Test concluded in p=%f\n",p);
 	return 0;
 }
