@@ -226,7 +226,7 @@ void eval_curl_match(tok_struct *tok)
 		tok_struct *left_curl_tok = curl_stack[left_curl_index];
 		tok->match_tok = left_curl_tok+1;
 		left_curl_tok->match_tok = tok+1; 
-		MESG("set curl match left=%d right=%d",left_curl_tok->tnum,tok->tnum);
+		// MESG("set curl match left=%d right=%d",left_curl_tok->tnum,tok->tnum);
 	};
 }
 
@@ -2645,18 +2645,17 @@ void set_bnf_function1(tok_struct *tok, int type)
 	int exp_type = factor_bnf_type[type];
 	tok->bnf_group=exp_type;
 	tok->bnf_factor_function = factor_bnf_funcs[exp_type];
-	MESG("-- set_bnf_function1: ind=%2d exp type=%3d",tok->tind,exp_type);
+	// MESG("-- set_bnf_function1: ind=%2d exp type=%3d",tok->tind,exp_type);
  } else {
 	tok->bnf_group=0;
 	tok->bnf_factor_function = factor_bnf_funcs[-type];
-	MESG("-- set_bnf_function1: ind=%2d exp type=%3d",tok->tind,type);
+	// MESG("-- set_bnf_function1: ind=%2d exp type=%3d",tok->tind,type);
  };
 }
 
 void set_bnf_function(tok_struct *tok, int type)
 {
-	// MESG("set_tok_function: type=%d",type);
-	MESG("# set_bnf_function: type=%d ttype=%2d %s",type,tok->ttype,tok_info(tok));
+	// MESG("# set_bnf_function: type=%d ttype=%2d %s",type,tok->ttype,tok_info(tok));
 	if(tok==NULL) MESG("set_bnf_function: NULL! token");
 	switch(type) {
 		case 0:
@@ -2666,26 +2665,23 @@ void set_bnf_function(tok_struct *tok, int type)
 				return;};
 				int findex = tok->tok_node->node_index;
 				// MESG("	findex=%d",findex);
-				MESG(" Function tnum=%2d: tname=%s [ttype=%2d] set factor function %d",tok->tnum,tok->tname,tok->ttype,findex);
+				// MESG(" Function tnum=%2d: tname=%s [ttype=%2d] set factor function %d",tok->tnum,tok->tname,tok->ttype,findex);
 				tok->factor_function = m_functions[findex].ffunction;
 			} else {
 	 			tok->factor_function = factor_funcs[tok->ttype];
 	 			tok->bnf_factor_function = factor_bnf_funcs[tok->ttype];
-				MESG(" bnf function tnum=%2d: name=%s [ttype=%2d] set bnf function",tok->tnum,tok->tname,tok->ttype);
+				// MESG(" bnf function tnum=%2d: name=%s [ttype=%2d] set bnf function",tok->tnum,tok->tname,tok->ttype);
 			};
 			break;
 		case 1:
-			MESG("	1 set factor function to ttype=%2d",tok->ttype);
-			// tok->cexpr_function = (EFunction)factor_funcs[tok->ttype];
+			// MESG("	1 set factor function to ttype=%2d",tok->ttype);
 			tok->bnf_factor_function = factor_bnf_funcs[tok->ttype];
-			// MESG(" c tok %2d: %s type [ttype=%2d] set cepr function",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype]);
 	};
 }
 
 void set_tok_function(tok_struct *tok, int type)
 {
-	// MESG("set_tok_function: type=%d",type);
-	MESG("set_tok_function: type=%d ttype=%d %s",type,tok->ttype,tok_info(tok));
+	// MESG("set_tok_function: type=%d ttype=%d %s",type,tok->ttype,tok_info(tok));
 	if(tok==NULL) MESG("set_tok_function: NULL! token");
 	switch(type) {
 		case 0:
@@ -2694,17 +2690,15 @@ void set_tok_function(tok_struct *tok, int type)
 				if(tok->tok_node==NULL) { set_error(tok,3003,"tok_node is null!");
 				return;};
 				int findex = tok->tok_node->node_index;
-				// MESG("	findex=%d",findex);
 				// MESG(" F tok %2d: %s type [%d -s] set factor function %d",tok->tnum,tok->tname,tok->ttype,findex);
 				tok->factor_function = m_functions[findex].ffunction;
 			} else {
 	 			tok->factor_function = factor_funcs[tok->ttype];
-	 			// tok->bnf_factor_function = factor_bnf_funcs[tok->ttype];
-				MESG(" f tok %2d: %s type [%d -s] set factor function",tok->tnum,tok->tname,tok->ttype);
+				// MESG(" f tok %2d: %s type [%d -s] set factor function",tok->tnum,tok->tname,tok->ttype);
 			};
 			break;
 		case 1:
-			MESG("	1 set factor function to %d",tok->ttype);
+			// MESG("	1 set factor function to %d",tok->ttype);
 			tok->cexpr_function = (EFunction)factor_funcs[tok->ttype];
 			// tok->bnf_factor_function = factor_bnf_funcs[tok->ttype];
 			// MESG(" c tok %2d: %s type [%d %s] set cepr function",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype]);
@@ -2720,7 +2714,7 @@ void set_tok_directive(tok_struct *tok, FFunction directive)
 
 void set_bnf_directive(tok_struct *tok, VFunction directive)
 {
-	MESG("set_bnf_directive: %s",tok_info(tok));
+	// MESG("set_bnf_directive: %s",tok_info(tok));
 	tok->bnf_directive = directive;
 }
 

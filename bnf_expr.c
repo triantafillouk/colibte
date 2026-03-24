@@ -1121,7 +1121,7 @@ void bnf_block1(FILEBUF *fp)
 	if(!current_active_flag) break;
    };
 	if(tok->ttype==TOK_RCURL) { 
-		MESG("bnf_block rcurl");
+		// MESG("bnf_block rcurl");
 		NTOKEN2;
 		// lstoken=NULL;
 		// return(ex_var.dval);
