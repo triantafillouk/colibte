@@ -240,17 +240,18 @@ void stack_push(char *title,tok_struct *tok,int exp_type)
 		MESG("P[%10s already pushed at %3d %-15s|%s %p",check_buffer->b_fname,tok->pushed,title,tok_info(tok),tok);
 		else MESG("P[ check buffer is NULL!!!!! %s",title);
 	} else {
-		tok_struct *dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
-		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
 		if(tok->ttype==TOK_LPAR) { 
 			MESG("skip left paranthesis!");
+			return;
 		};
+		tok_struct *dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
+		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
     	tok->pushed=check_buffer->tok_bnf_index;
 
 		set_bnf_function1(dest,exp_type);
 		if(dest->ttype==TOK_LCURL||dest->ttype==TOK_RCURL) 
 			eval_curl_match(dest);
- 		MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(dest));
+ 		// MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(dest));
 		check_buffer->tok_bnf_index++;
    }
  } else {
@@ -2338,7 +2339,7 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_sep,		// TOK_SEP
 	bnf_factor_none,	// TOK_SPACE
 	bnf_factor_none,	// TOK_LETTER
-	bnf_dir_lcurl,	// TOK_LCURL	,
+	bnf_dir_lcurl,		// TOK_LCURL	,
 	bnf_factor_rcurl,	// TOK_RCURL	,
 	bnf_factor_quote,	// TOK_QUOTE
 	bnf_factor_lpar,	// TOK_LPAR
@@ -2441,7 +2442,7 @@ int factor_bnf_type[] = {
 	TOK_LETTER,	// TOK_LETTER
 	0,	// TOK_LCURL	,
 	0,	// TOK_RCURL	,
-	0,	// TOK_QUOTE
+	TOK_QUOTE,	// TOK_QUOTE
 	TOK_LPAR,	// TOK_LPAR
 	TOK_RPAR,	// TOK_RPAR	
 	0,	// TOK_SHOW
