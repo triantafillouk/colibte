@@ -256,13 +256,27 @@ void stack_push(char *title,tok_struct *tok,int exp_type)
 				if(p->bnf_group==TOK_NUM) {
 					// MESG("	set factor_num0!,increase_by0!");
 					p->bnf_factor_function=bnf_factor_num0;
+					dest->bnf_factor_function=bnf_increase_by0;
 				} else if(p->bnf_group==TOK_VAR) {
 					// MESG("	set factor_var0!,increase_by0!");
 					p->bnf_factor_function=bnf_factor_var0;
+					dest->bnf_factor_function=bnf_increase_by0;
 				};
-				dest->bnf_factor_function=bnf_increase_by0;
-				dest->bnf_group=exp_type;
 			};
+#if	1
+			if(exp_type==TOK_ASSIGN) {
+				if(p->bnf_group==TOK_NUM) {
+					// MESG("	%3d set factor_num0!,assign_var0!",check_buffer->tok_bnf_index);
+					p->bnf_factor_function=bnf_factor_num0;
+					dest->bnf_factor_function=bnf_factor_assign_var0;
+				} else if(p->bnf_group==TOK_VAR) {
+					// MESG("	%3d set factor_var0!,assign_var0!",check_buffer->tok_bnf_index);
+					p->bnf_factor_function=bnf_factor_var0;
+					dest->bnf_factor_function=bnf_factor_assign_var0;
+				};
+			};
+#endif
+			dest->bnf_group=exp_type;
 		};
 		if(dest->bnf_factor_function==NULL)
 #endif
