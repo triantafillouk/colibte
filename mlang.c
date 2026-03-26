@@ -205,8 +205,6 @@ char *vtype_names[] = {
 #include "bnf_expr.c"
 #endif
 
-void set_bnf_function(tok_struct *tok, int type);
-
 void eval_curl_match(tok_struct *tok)
 {
  static tok_struct *curl_stack[100];
@@ -235,6 +233,7 @@ void stack_push(char *title,tok_struct *tok,int exp_type)
 #if	TBNF
  // if(no_push) { MESG("stack_push:%s skip %s",title,tok_info(tok));return;};
  if(tok!=NULL) {
+ // MESG("stack_push! at %p",check_buffer->tok_table_bnf+check_buffer->tok_bnf_index);
 	if(tok->pushed>=0) {
 		if(check_buffer)
 		MESG("P[%10s already pushed at %3d %-15s|%s %p",check_buffer->b_fname,tok->pushed,title,tok_info(tok),tok);
@@ -247,10 +246,29 @@ void stack_push(char *title,tok_struct *tok,int exp_type)
 		tok_struct *dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
     	tok->pushed=check_buffer->tok_bnf_index;
-
-		set_bnf_function1(dest,exp_type);
-		if(dest->ttype==TOK_LCURL||dest->ttype==TOK_RCURL) 
-			eval_curl_match(dest);
+#if	1		
+		tok_struct *p=dest-1;// check_buffer->tok_table_bnf+(check_buffer->tok_bnf_index-1);
+		dest->bnf_factor_function=NULL;
+		if(p>check_buffer->tok_table_bnf){
+			// MESG("	p=%p",p);
+			if(exp_type==TOK_INCREASEBY) {
+				// MESG("TOK_INCREASE!");
+				if(p->bnf_group==TOK_NUM) {
+					// MESG("	set factor_num0!,increase_by0!");
+					p->bnf_factor_function=bnf_factor_num0;
+				} else if(p->bnf_group==TOK_VAR) {
+					// MESG("	set factor_var0!,increase_by0!");
+					p->bnf_factor_function=bnf_factor_var0;
+				};
+				dest->bnf_factor_function=bnf_increase_by0;
+				dest->bnf_group=exp_type;
+			};
+		};
+		if(dest->bnf_factor_function==NULL)
+#endif
+			set_bnf_function1(dest,exp_type);
+		
+		if(dest->ttype==TOK_LCURL||dest->ttype==TOK_RCURL) eval_curl_match(dest);
  		// MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(dest));
 		check_buffer->tok_bnf_index++;
    }
@@ -2653,6 +2671,7 @@ void set_bnf_function1(tok_struct *tok, int type)
  };
 }
 
+#if	NUSE
 void set_bnf_function(tok_struct *tok, int type)
 {
 	// MESG("# set_bnf_function: type=%d ttype=%2d %s",type,tok->ttype,tok_info(tok));
@@ -2678,6 +2697,7 @@ void set_bnf_function(tok_struct *tok, int type)
 			tok->bnf_factor_function = factor_bnf_funcs[tok->ttype];
 	};
 }
+#endif
 
 void set_tok_function(tok_struct *tok, int type)
 {

@@ -162,13 +162,29 @@ void bnf_factor_var()
 	NTOKEN2;
 }
 
+void bnf_factor_var0()
+{
+	// MESG("bnf_factor_var: put var %s at pos %ld",tok->tname,bnf_var-bnf_vars);
+	bnf_var->var_pointer=get_left_slot(tok->tind);
+	bnf_var->var_type=VTYPE_POINTER;
+	// bnf_result();
+	NTOKEN2;
+}
+
 void bnf_factor_num()
 {
 	bnf_var->dval = tok->dval;
 	bnf_var->var_type=VTYPE_NUM;
 	// MESG("bnf_factor_num: put numeric %f at pos %ld type=%d",bnf_var->dval,bnf_var-bnf_vars,bnf_var->var_type);
 	next_var("num");
-	// bnf_var++;
+	NTOKEN2;
+}
+
+void bnf_factor_num0()
+{
+	bnf_var->dval = tok->dval;
+	bnf_var->var_type=VTYPE_NUM;
+	// MESG("bnf_factor_num: put numeric %f at pos %ld type=%d",bnf_var->dval,bnf_var-bnf_vars,bnf_var->var_type);
 	NTOKEN2;
 }
 
@@ -725,6 +741,22 @@ void bnf_increase_by_pp_num()
 	NTOKEN2;
 }
 
+void bnf_increase_by_pp_num0()
+{
+	// prev_var("increase_pp_num");
+	// bnf_var--;
+	double bval=bnf_var->var_pointer->dval;
+	prev_var("increase_pp_num2");
+	// bnf_var--;
+	MVAR *aval=bnf_var->var_pointer;
+	aval->dval += bval;
+	bnf_var->dval=aval->dval;
+	bnf_var->var_type=VTYPE_NUM;
+	// next_var("increase_pp_num");
+	// bnf_var++;
+	NTOKEN2;
+}
+
 // aval+=bval
 void bnf_increase_by()
 {
@@ -755,6 +787,57 @@ void bnf_increase_by()
 			// next_var("inc by num");
 			// bnf_var++;
 			tok->bnf_factor_function=bnf_increase_by_pp_num;
+			NTOKEN2;
+			return;
+		};
+		if(aval->var_type==VTYPE_ARRAY) {
+			// copy array
+			array_add1(aval->adat,bval->dval);
+			// set the copied array to bnf_var position
+			// next_var("inc by array");
+			NTOKEN2;
+			return;
+		};
+	};
+	
+/*
+	if(bval->var_type==VTYPE_STRING) {
+		aval->sval = strdup(bval->sval);
+		NTOKEN2;
+		return;
+	};
+*/
+	set_error(tok,1024,"increase operation not supported!");
+	NTOKEN2;
+}
+
+void bnf_increase_by0()
+{
+	// MESG("bnf_factor_increase_by:");
+	// prev_var("inc by");
+	MVAR *bval=bnf_var;
+	prev_var("inc by2");
+#if	1
+	if(bnf_var->var_type != VTYPE_POINTER) {
+		next_var("incr by error1");
+		NTOKEN2;
+		return;
+	};
+#endif
+	MVAR *aval=bnf_var->var_pointer;
+	if(bval->var_type==VTYPE_POINTER) {
+		bval = bval->var_pointer;
+	};
+	//aval->var_type = bval->var_type;
+	if(bval->var_type==VTYPE_NUM) { 
+		if(aval->var_type==VTYPE_NUM) {
+			aval->dval += bval->dval;
+			double val = aval->dval;
+			bnf_var->var_type = VTYPE_NUM;
+			bnf_var->dval = val;
+			// next_var("inc by num");
+			// bnf_var++;
+			tok->bnf_factor_function=bnf_increase_by_pp_num0;
 			NTOKEN2;
 			return;
 		};
