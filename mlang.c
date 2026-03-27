@@ -246,7 +246,7 @@ void stack_push(char *title,tok_struct *tok,int exp_type)
 		tok_struct *dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
     	tok->pushed=check_buffer->tok_bnf_index;
-#if	1		
+#if	0		
 		tok_struct *p=dest-1;// check_buffer->tok_table_bnf+(check_buffer->tok_bnf_index-1);
 		dest->bnf_factor_function=NULL;
 		if(p>check_buffer->tok_table_bnf){

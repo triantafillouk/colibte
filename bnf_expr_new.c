@@ -694,9 +694,8 @@ void bnf_increase_by_pp_num()
 // aval+=bval
 void bnf_increase_by()
 {
-	MESG("bnf_factor_increase_by:");
+	// MESG("bnf_factor_increase_by:");
 	MVAR *bval=bnf_var;
-	int btype=bval->var_type;
 	prev_var("inc by");
 #if	0	// should be checked during prep!
 	if(bnf_var->var_type != VTYPE_POINTER) {
@@ -704,7 +703,6 @@ void bnf_increase_by()
 		return;
 	};
 #endif
-	int atype=bnf_var->var_type;
 	MVAR *aval=bnf_var->var_pointer;
 	if(bval->var_type==VTYPE_POINTER) {
 		bval = bval->var_pointer;
@@ -716,8 +714,7 @@ void bnf_increase_by()
 			double val = aval->dval;
 			bnf_var->var_type = VTYPE_NUM;
 			bnf_var->dval = val;
-			if(atype==btype && atype==VTYPE_POINTER)
-				tok->bnf_factor_function=bnf_increase_by_pp_num;
+			//tok->bnf_factor_function=bnf_increase_by_pp_num;
 			NTOKEN2;
 			return;
 		};
@@ -918,7 +915,7 @@ void bnf_factor_rcurl()
 {
  // MESG("bnf_factor_rcurl:");
  if(bnf_var>bnf_vars)
- 	prev_var("rcurl");
+ prev_var("rcurl");
  NTOKEN2;
 	// return what ??
 }
