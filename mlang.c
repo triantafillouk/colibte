@@ -1324,7 +1324,7 @@ double factor_line_array()
 inline MVAR *get_left_slot(int ind)
 {
 	// MESG("get_left_slot: ind=%d",ind);
-	return current_stable+ind;
+	return &current_stable[ind];
 }
 
 #if	USE_TYPE_VARS
@@ -4114,6 +4114,9 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		MESG("execute bnf block!");
 		tok=bp->tok_table_bnf;
 		bnf_block1(bp);
+		// MESG("end of program var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);
+		next_var("end");
+		// MESG("end of program var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);
 		bnf_result();
 	};
 #endif
@@ -4129,9 +4132,12 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		};
 		current_stable=old_symbol_table;
 	};
-
-	if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
-	if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
+	if(exebnf) {
+		if(bnf_var->var_type==VTYPE_NUM) msg_line("Result is [%f]",bnf_result());
+	} else {
+		if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
+		if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
+	};
  } else {
  	msg_line("parse error %d on %s ",err_num,bp->b_fname);
 	val=0;
