@@ -43,6 +43,7 @@ double compare_biggereq(double value);
 double compare_equal(double v1);
 void set_bnf_function1(tok_struct *tok, int type);
 void bnf_factor_dummy();
+void delete_symbol_table(MVAR *td, int size,int nargs);
 
 #if	SYNTAX_DEBUG
 
@@ -1115,6 +1116,7 @@ int check_init(FILEBUF *bf)
 
  tok=tok_table;
  // MESG("check_init:end [%s] %d",bf->b_fname,bf->b_type);
+ if(!exebnf)
  show_token_table("Token table ",bf,bf->tok_table,bf->end_token - bf->tok_table+1);
  if(bf->err>0) {
 	return bf->err;
@@ -2382,7 +2384,7 @@ VFunction factor_bnf_funcs[] = {
 	(VFunction)factor_option,	// TOK_OPTION	,	// editor option
 	(VFunction)factor_cmd,		// TOK_CMD		,	// editor commands
 	bnf_factor_none,	// TOK_FUNC	,	// function
-	(VFunction)factor_proc,	// TOK_PROC	,
+	bnf_factor_proc,	// TOK_PROC	,
 	(VFunction)factor_env,		// TOK_ENV		,	// editor environment function
 	bnf_factor_none,	// TOK_TERM0	term0 group
 	bnf_factor_none,	// TOK_TERM	,	// term operators (+,-)
