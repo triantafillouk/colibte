@@ -9,7 +9,7 @@ static MVAR *bnf_var=&bnf_vars[0];
 inline MVAR *get_left_slot(int ind);
 void bnf_expression();
 
-#if	0
+#if	1
 #if	1
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
@@ -118,14 +118,27 @@ void bnf_refresh_ddot()
  NTOKEN2;
 }
 
-double bnf_result()
+inline static double num_result()
+{
+  if(bnf_var->var_type==VTYPE_NUM) {
+	return(bnf_var->dval);
+  } else if(bnf_var->var_type==VTYPE_POINTER)	{ 
+  	MVAR *var=bnf_var->var_pointer;
+	if(var->var_type==VTYPE_NUM) {
+		return var->dval;
+	};
+  };
+ return 0.0;
+}
+
+
+inline static double show_result()
 {
  int stack_num = bnf_var-bnf_vars;
  switch(bnf_var->var_type) {
  	case VTYPE_NUM:
 		// MESG("bnf result: @%3d NUMERIC val=%f",stack_num,bnf_var->dval);
 		return(bnf_var->dval);
-		break;
 	case VTYPE_STRING:
 		MESG("bnf result: @%3d STRING  val=[%s]",stack_num,bnf_var->sval);
 		return 0.0;
@@ -156,7 +169,6 @@ void bnf_factor_var()
 	// MESG("bnf_factor_var: put var %s at pos %ld",tok->tname,bnf_var-bnf_vars);
 	bnf_var->var_pointer=get_left_slot(tok->tind);
 	bnf_var->var_type=VTYPE_POINTER;
-	// bnf_result();
 	NTOKEN2;
 }
 
@@ -210,7 +222,6 @@ static inline void  bnf_factor_pp_plus()
 	prev_var("plus21");
 	bnf_var->dval = bnf_var->var_pointer->dval + valb;
 	bnf_var->var_type=VTYPE_NUM;
-	// bnf_result();
 	NTOKEN2;
 }
 
@@ -220,7 +231,6 @@ static inline void  bnf_factor_nn_plus()
  double valb = bnf_var->dval;
 	prev_var("plus21");
 	bnf_var->dval += valb;
-	// bnf_result();
 	NTOKEN2;
 }
 
@@ -231,7 +241,6 @@ static inline void  bnf_factor_pn_plus()
 	prev_var("plus21");
 	bnf_var->dval = bnf_var->var_pointer->dval + valb;
 	bnf_var->var_type=VTYPE_NUM;
-	// bnf_result();
 	NTOKEN2;
 }
 
@@ -241,7 +250,6 @@ static inline void  bnf_factor_np_plus()
  double valb = bnf_var->var_pointer->dval;
 	prev_var("plus21");
 	bnf_var->dval += valb;
-	// bnf_result();
 	NTOKEN2;
 }
 
@@ -298,7 +306,6 @@ void bnf_factor_minus()
 		if(varb->var_type==VTYPE_NUM) {
 			bnf_var->dval=vara->dval-varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
-			// bnf_result();
 			NTOKEN2;
 			return;
 		};
@@ -350,7 +357,6 @@ void bnf_factor_mul()
 		if(varb->var_type==VTYPE_NUM) {
 			bnf_var->dval=vara->dval*varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
-			// bnf_result();
 			if(va==VTYPE_POINTER && vb==VTYPE_POINTER) 
 				tok->bnf_factor_function=bnf_factor_pp_num_mul;
 			if(va==VTYPE_NUM && vb==VTYPE_NUM) 
@@ -379,7 +385,6 @@ void bnf_factor_div()
 		if(varb->var_type==VTYPE_NUM) {
 			bnf_var->dval=vara->dval/varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
-			// bnf_result();
 			NTOKEN2;
 			return;
 		};
@@ -400,7 +405,6 @@ void bnf_factor_modulo()
 		if(varb->var_type==VTYPE_NUM) {
 			bnf_var->dval=(int)vara->dval%(int)varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
-			// bnf_result();
 			NTOKEN2;
 			return;
 		};
@@ -421,7 +425,6 @@ void bnf_factor_power()
 		if(varb->var_type==VTYPE_NUM) {
 			bnf_var->dval=pow(vara->dval,varb->dval);
 			bnf_var->var_type=VTYPE_NUM;
-			// bnf_result();
 			NTOKEN2;
 			return;
 		};
@@ -442,7 +445,6 @@ void bnf_factor_smaller()
 		if(varb->var_type==VTYPE_NUM) {
 			bnf_var->dval=vara->dval < varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
-			// bnf_result();
 			NTOKEN2;
 			return;
 		};
@@ -463,7 +465,6 @@ void bnf_factor_bigger()
 		if(varb->var_type==VTYPE_NUM) {
 			bnf_var->dval=vara->dval > varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
-			// bnf_result();
 			NTOKEN2;
 			return;
 		};
@@ -484,7 +485,6 @@ void bnf_factor_smallereq()
 		if(varb->var_type==VTYPE_NUM) {
 			bnf_var->dval=vara->dval <= varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
-			// bnf_result();
 			NTOKEN2;
 			return;
 		};
@@ -505,7 +505,6 @@ void bnf_factor_biggereq()
 		if(varb->var_type==VTYPE_NUM) {
 			bnf_var->dval=vara->dval >= varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
-			// bnf_result();
 			NTOKEN2;
 			return;
 		};
@@ -527,7 +526,6 @@ void bnf_factor_equal()
 		if(varb->var_type==VTYPE_NUM) {
 			bnf_var->dval=vara->dval == varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
-			// bnf_result();
 			NTOKEN2;
 			return;
 		};
@@ -548,7 +546,6 @@ void bnf_factor_notequal()
 		if(varb->var_type==VTYPE_NUM) {
 			bnf_var->dval=vara->dval != varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
-			// bnf_result();
 			NTOKEN2;
 			return;
 		};
@@ -1255,10 +1252,10 @@ void bnf_dir_fori()
 
 	bnf_expression();	/* initial   */
 	// MESG("	fori: after index expression tok=%s",tok_info(tok));
-	dinit = bnf_result();
+	dinit = num_result();
 	iterrator_val=&index->dval;
 	*iterrator_val=dinit;
-	dinit = bnf_var->dval;
+
 	prev_var("fori index");
 	// check if ok!
 	if(dinit != index->dval) { MESG("	fori: ERROR1 IN FORI index! %f %f",dinit ,&index->dval);};
@@ -1266,14 +1263,14 @@ void bnf_dir_fori()
 	NTOKEN2;	/* skip separator! */
 
 	bnf_expression();
-	dmax = bnf_var->dval;
+	dmax = num_result();
 	prev_var("	get dmax val");
 
 	// MESG("	fori max=%f",dmax);
 	NTOKEN2;
 
 	bnf_expression();
-	dstep = bnf_var->dval;
+	dstep = num_result();;
 	prev_var("	get step val");
 	// MESG("fori: from %f to %f step %f var_index=%ld",dinit,dmax,dstep,bnf_var-bnf_vars);
 	NTOKEN2;	/* skip right parenthesis  */
@@ -1347,7 +1344,6 @@ void bnf_expression()
 			tok->bnf_factor_function();	
 		};
 	};
-	// bnf_result();
 }
 
 void bnf_dir_return()
