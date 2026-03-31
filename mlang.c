@@ -44,6 +44,8 @@ double compare_equal(double v1);
 void set_bnf_function1(tok_struct *tok, int type);
 void bnf_factor_dummy();
 void delete_symbol_table(MVAR *td, int size,int nargs);
+MVAR *new_symbol_table(int const size);
+void init_vars(MVAR *head,int size);
 
 #if	SYNTAX_DEBUG
 
