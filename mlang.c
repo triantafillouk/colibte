@@ -269,11 +269,11 @@ void stack_push(char *title,tok_struct *tok,int exp_type)
 #if	1
 			if(exp_type==TOK_ASSIGN) {
 				if(p->bnf_group==TOK_NUM) {
-					// MESG("	%3d set factor_num0!,assign_var0!",check_buffer->tok_bnf_index);
+					MESG("	%3d set factor_num0!,assign_var0!",check_buffer->tok_bnf_index);
 					p->bnf_factor_function=bnf_factor_num0;
 					dest->bnf_factor_function=bnf_factor_assign_var0;
 				} else if(p->bnf_group==TOK_VAR) {
-					// MESG("	%3d set factor_var0!,assign_var0!",check_buffer->tok_bnf_index);
+					MESG("	%3d set factor_var0!,assign_var0!",check_buffer->tok_bnf_index);
 					p->bnf_factor_function=bnf_factor_var0;
 					dest->bnf_factor_function=bnf_factor_assign_var0;
 				};
@@ -286,6 +286,12 @@ void stack_push(char *title,tok_struct *tok,int exp_type)
 			set_bnf_function1(dest,exp_type);
 		
 		if(dest->ttype==TOK_LCURL||dest->ttype==TOK_RCURL) eval_curl_match(dest);
+		if(dest->ttype==TOK_RCURL) {
+			tok_struct *p=dest-1;
+			if(p->ttype==TOK_SHOW) dest->bnf_factor_function=bnf_factor_rcurl_no;
+			else
+			if(p->ttype!=TOK_SEP) dest->bnf_factor_function=bnf_factor_rcurl0;
+		};
  		// MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(dest));
 		check_buffer->tok_bnf_index++;
    }
@@ -2544,7 +2550,7 @@ int factor_bnf_type[] = {
 	TOK_DECREASE,		// TOK_DECREASE	,62
 	TOK_INCREASEBY,	// TOK_INCREASEBY 63
 	TOK_MULBY,			// TOK_MULBY
-	TOK_DECREASE,	// TOK_DECREASEBY
+	TOK_DECREASEBY,	// TOK_DECREASEBY
 	0,	// TOK_BSLASH		,
 
 	0,	// TOK_NL				,

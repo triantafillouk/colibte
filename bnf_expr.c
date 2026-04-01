@@ -9,7 +9,7 @@ static MVAR *bnf_var=&bnf_vars[0];
 inline MVAR *get_left_slot(int ind);
 void bnf_expression();
 
-#if	1
+#if	0
 #if	1
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
@@ -29,7 +29,7 @@ static inline void next_var(char *title)
 
 void prev_var(char *title)
 {
- MESG("	%3d -var %3ld -> %3ld %s",tok->tnum,bnf_var-bnf_vars,bnf_var-bnf_vars-1,title);
+ // MESG("	%3d -var %3ld -> %3ld %s",tok->tnum,bnf_var-bnf_vars,bnf_var-bnf_vars-1,title);
  if(bnf_var>bnf_vars) bnf_var--;
  else {
 	MESG("prev_var (%s) from 0 at [%s]",title,tok_info(tok));
@@ -44,7 +44,7 @@ void prev_var(char *title)
 
 void next_var(char *title)
 {
- MESG("	%3d +var %3ld -> %3ld %s",tok->tnum,bnf_var-bnf_vars,bnf_var-bnf_vars+1,title);
+ // MESG("	%3d +var %3ld -> %3ld %s",tok->tnum,bnf_var-bnf_vars,bnf_var-bnf_vars+1,title);
  bnf_var++;
  if(bnf_var - &bnf_vars[0]>100) {
 	MESG("MAX var exceeded!");
@@ -145,7 +145,7 @@ inline static double show_result()
 	case VTYPE_POINTER:
 	{ MVAR *var=bnf_var->var_pointer;
 		if(var->var_type==VTYPE_NUM) {
-			MESG("bnf result: @%3d var NUMERIC val=%f",stack_num,var->dval);
+			MESG("bnf1 result: @%3d var NUMERIC val=%f",stack_num,var->dval);
 			return var->dval;
 		};
 		if(var->var_type==VTYPE_STRING) {
@@ -166,7 +166,7 @@ inline static double show_result()
 void bnf_factor_var()
 {
 	next_var("var");
-	// MESG("bnf_factor_var: put var %s at pos %ld",tok->tname,bnf_var-bnf_vars);
+	// MESG("	var: put var %s at pos %ld",tok->tname,bnf_var-bnf_vars);
 	bnf_var->var_pointer=get_left_slot(tok->tind);
 	bnf_var->var_type=VTYPE_POINTER;
 	NTOKEN2;
@@ -259,7 +259,7 @@ void bnf_factor_plus()
 	prev_var("plus2");
  MVAR *vara = bnf_var;
 
-MESG("bnf_factor_plus : var ind=%d tok ind=%d vb=%d va=%d",bnf_var-&bnf_vars[0],tok->tnum,vara->var_type,varb->var_type);
+// MESG("bnf_factor_plus : var ind=%d tok ind=%d vb=%d va=%d",bnf_var-&bnf_vars[0],tok->tnum,vara->var_type,varb->var_type);
  if(varb->var_type==VTYPE_POINTER) {
  	if(varb->var_pointer->var_type==VTYPE_NUM) {
 		if(vara->var_type==VTYPE_POINTER) {
@@ -741,7 +741,7 @@ void bnf_increase_by_pn_num()
 // aval+=bval
 void bnf_increase_by()
 {
-	MESG("bnf_factor_increase_by:");
+	// MESG("bnf_factor_increase_by: [%s]",tok_info(tok));
 	MVAR *bvar=bnf_var;
 	int btype=bvar->var_type;
 	prev_var("inc by");
@@ -752,26 +752,28 @@ void bnf_increase_by()
 	};
 #endif
 	int atype=bnf_var->var_type;
-	MVAR *aval=bnf_var->var_pointer;
+	MVAR *avar=bnf_var->var_pointer;
 	if(bvar->var_type==VTYPE_POINTER) {
 		bvar = bvar->var_pointer;
 	};
 	if(bvar->var_type==VTYPE_NUM) { 
-		if(aval->var_type==VTYPE_NUM) {
-			aval->dval += bvar->dval;
-			double val = aval->dval;
+		if(avar->var_type==VTYPE_NUM) {
+			avar->dval += bvar->dval;
+			double val = avar->dval;
 			bnf_var->var_type = VTYPE_NUM;
 			bnf_var->dval = val;
+#if	1
 			if(atype==btype && atype==VTYPE_POINTER)
 				tok->bnf_factor_function=bnf_increase_by_pp_num;
 			if(atype==VTYPE_POINTER && btype==VTYPE_NUM)
 				tok->bnf_factor_function=bnf_increase_by_pn_num;
+#endif
 			NTOKEN2;
 			return;
 		};
-		if(aval->var_type==VTYPE_ARRAY) {
+		if(avar->var_type==VTYPE_ARRAY) {
 			// copy array
-			array_add1(aval->adat,bvar->dval);
+			array_add1(avar->adat,bvar->dval);
 			// set the copied array to bnf_var position
 			NTOKEN2;
 			return;
@@ -780,7 +782,7 @@ void bnf_increase_by()
 	
 /*
 	if(bvar->var_type==VTYPE_STRING) {
-		aval->sval = strdup(bvar->sval);
+		avar->sval = strdup(bvar->sval);
 		NTOKEN2;
 		return;
 	};
@@ -953,11 +955,14 @@ void bnf_factor_eof()
 
 void bnf_factor_sep()
 {
- // MESG("bnf_factor_sep:");
- if(bnf_var-bnf_vars>1) { 
+ if(bnf_var-bnf_vars>1) 
+ // if(tok->tnum>1)
+ { 
+	MESG("bnf_factor_sep: go prev [%s]",tok_info(tok));
 	 prev_var("sep");
 	 tok->bnf_factor_function=bnf_factor_sep1;
  } else {
+	MESG("bnf_factor_sep: NO!! prev [%s]",tok_info(tok));
  	tok->bnf_factor_function=bnf_factor_sep0;
  };
  NTOKEN2;
@@ -970,12 +975,16 @@ static inline void bnf_factor_rcurl0()
 	NTOKEN2;
 }
 
+static inline void bnf_factor_rcurl_no()
+{
+	NTOKEN2;
+}
+
+
 static inline void bnf_factor_rcurl()
 {
- if(bnf_var>bnf_vars) {
- 	prev_var("rcurl");
-	// tok->bnf_factor_function=bnf_factor_rcurl0;
- };
+ long ind=bnf_var-bnf_vars;
+ MESG("	rcurl: ind=%ld",ind);
  NTOKEN2;
 	// return what ??
 }
@@ -1059,7 +1068,7 @@ static inline void bnf_factor_assign_var_num()
 {
 	double bval=bnf_var->dval;
 	prev_var("assign var");
-
+	bnf_var->var_pointer->dval=bval;
 	bnf_var->dval=bval;
 	bnf_var->var_type=VTYPE_NUM;
 	NTOKEN2;
@@ -1069,7 +1078,7 @@ static inline void bnf_factor_assign_var_nump()
 {
 	double bval=bnf_var->var_pointer->dval;
 	prev_var("assign var");
-
+	bnf_var->var_pointer->dval=bval;
 	bnf_var->dval=bval;
 	bnf_var->var_type=VTYPE_NUM;
 	NTOKEN2;
@@ -1098,9 +1107,10 @@ void bnf_factor_assign_var()
 		aval->dval = bvar->dval;
 		bnf_var->var_type = aval->var_type;
 		bnf_var->dval = aval->dval;
-		// MESG("stack ind=%2d set var to %f",stack_index,aval->dval);
+		long ind=bnf_var-bnf_vars;
+		MESG("	assign ind=%2ld set var to %f tok [%s]",ind,aval->dval,tok_info(tok));
 		if(btype==VTYPE_POINTER) tok->bnf_factor_function=bnf_factor_assign_var_nump;
-		if(btype==VTYPE_POINTER) tok->bnf_factor_function=bnf_factor_assign_var_num;
+		if(btype==VTYPE_NUM) tok->bnf_factor_function=bnf_factor_assign_var_num;
 		NTOKEN2;
 		return;
 	};
@@ -1246,10 +1256,8 @@ void bnf_dir_fori()
 	NTOKEN2;	/* go to next token after for */
 
 	index=&current_stable[tok->tind];
-	// MESG("	fori start initialization! [%s]",tok_info(tok));
 
-	if(index->var_type!=VTYPE_NUM) {err_num=224;ERROR("for i syntax error %d",err_num);};
-
+	// MESG("	fori: tok [%s]",tok_info(tok));
 	bnf_expression();	/* initial   */
 	// MESG("	fori: after index expression tok=%s",tok_info(tok));
 	dinit = num_result();
@@ -1274,6 +1282,8 @@ void bnf_dir_fori()
 	prev_var("	get step val");
 	// MESG("fori: from %f to %f step %f var_index=%ld",dinit,dmax,dstep,bnf_var-bnf_vars);
 	NTOKEN2;	/* skip right parenthesis  */
+	//long ind=bnf_var-bnf_vars;
+	// MESG("	fori: before block execute ind=%ld tok=[%s]",ind,tok_info(tok));
 	// set block start
 	start_block=tok;	/* this is a block start or a simple sentence  */
 	
