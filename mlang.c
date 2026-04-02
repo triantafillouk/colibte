@@ -1,5 +1,5 @@
 /*
-	Curses,gtk editor,notes,directory browser
+	Curses,gtk editor,notes,directory bnfrowser
 	Copyright Kostas Triantafillou
 	GNU LESSER GENERAL PUBLIC LICENSE version 2 
 	(or at your option) any later version.
@@ -154,7 +154,17 @@ MVAR *exec_stack_max;
 
 int show_stage=0;
 int xpos=0;		/* stage position  */
-int current_active_flag=1;	/* on to execute procedure!  */
+static int current_active_flag=1;	/* on to execute procedure!  */
+
+void set_active_flag(int flag)
+{
+	current_active_flag=flag;
+}
+
+int get_active_flag()
+{
+	return current_active_flag;
+}
 
 int pnum=0;	/* parenthesis level */
 
@@ -739,7 +749,7 @@ tok_struct *new_tok()
  tok->pushed=-1;
  tok->bnf_group=-1;
  tok->bnf_factor_function=bnf_factor_dummy;
- tok->bnf_directive=bnf_expression;
+ //tok->bnf_directive=bnf_expression;
 #endif
  tok->factor_function=factor_none;
  tok->directive=lexpression;
@@ -2462,7 +2472,7 @@ VFunction factor_bnf_funcs[] = {
 	(VFunction)factor_array_l2,// TOK_ARRAY_L2
 	bnf_assign_env,	// TOK_ASSIGNENV	,
 	bnf_assign_opt,	// TOK_ASSIGNOPT	,
-	bnf_factor_none,	// TOK_END,
+	bnf_factor_end,	// TOK_END,
 	bnf_factor_none,	// TOK_DEFINE_TYPE,
 #if	USE_TYPE_VARS
 	(VFunction)factor_assign_type,	// TOK_ASSIGN_TYPE,
@@ -2754,12 +2764,6 @@ void set_tok_directive(tok_struct *tok, FFunction directive)
 {
 	tok->directive = directive;
 	// MESG_TOK_INFO("# tok_directive",tok);
-}
-
-void set_bnf_directive(tok_struct *tok, VFunction directive)
-{
-	// MESG("set_bnf_directive: %s",tok_info(tok));
-	tok->bnf_directive = directive;
 }
 
 void set_term_function(tok_struct *tok, TFunction term_function)
@@ -3622,10 +3626,11 @@ void skip_sentence1()
  TDS("skip_sentence1");
  // MESG("skip_sentence: ttype=%d",tok->ttype);
  if(tok->ttype==TOK_LCURL) {
-		tok=tok->match_tok; 
-		// NTOKEN2;
-		// MESG("skip_sentence1");
-		return; 
+	// MESG("skip_sentence rcurl [%s]",tok_info(tok));
+	tok=tok->match_tok; 
+		// tok is after the corresponding rcurl!
+	// MESG("skip_sentence end [%s]",tok_info(tok));
+	return; 
  };
 
  int plevel=0;

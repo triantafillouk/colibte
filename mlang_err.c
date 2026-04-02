@@ -190,7 +190,6 @@ void set_error(tok_struct *tok,int err,char *description)
  if(tok==NULL) return;
  tok->ttype=TOK_EOF;
  set_tok_directive(tok,factor_eof);
- set_bnf_directive(tok,bnf_factor_eof);
  tok->tgroup=TOK_END;
  tok->ttype=TOK_EOF;
 }
@@ -1632,10 +1631,8 @@ int err_check_sentence1()
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		if(execmd) {
 			set_tok_directive(tok,dir_lcurl);
-			set_bnf_directive(tok,bnf_dir_lcurl);
 		}else {
 			set_tok_directive(tok,dir_lcurl_break);
-			set_bnf_directive(tok,bnf_dir_lcurl_break);
 		};
 		stack_push("sentence {",tok,-tok->ttype);
 		NTOKEN_ERR(627);
@@ -1694,7 +1691,6 @@ int err_check_sentence1()
 		tok_struct *end_block;	/* at the block end  */
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,tok_dir_fori);
-		set_bnf_directive(tok,bnf_dir_fori);
 		stack_push("DIR_FORI",tok,-tok->ttype);
 		NTOKEN_ERR(640);	/* go to next token after for */
 		tok_struct *tok0=NULL;
@@ -1762,9 +1758,7 @@ int err_check_sentence1()
 		tok_struct *start_block;	// element at block start
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,tok_dir_for);
-#if	TBNF
-		set_bnf_directive(tok,bnf_dir_for);
-#endif
+
 		stack_push("dir for",tok,-tok->ttype);
 		NTOKEN_ERR(641);	/* go to next token after for */
 
@@ -1797,9 +1791,7 @@ int err_check_sentence1()
 			tok_struct *start_block;	// element at block start
 			// MESG("# err_check_sentence: %s",tok_info(tok));
 			set_tok_directive(tok,tok_dir_while);
-#if	TBNF
-			// set_bnf_directive(tok,bnf_dir_while);
-#endif
+
 			stack_push("while",tok,-tok->ttype);
 			NTOKEN_ERR(654);	/* go to next toke after while */
 
@@ -1826,18 +1818,14 @@ int err_check_sentence1()
 	case TOK_DIR_BREAK:
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,dir_break);
-#if	TBNF
-		// set_bnf_directive(tok,bnf_dir_break);
-#endif
+
 		stack_push("dir break",tok,-tok->ttype);
 		NTOKEN_ERR(663);
 		RT_MESG;
 	case TOK_DIR_RETURN:
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,dir_return);
-#if	TBNF
-		// set_bnf_directive(tok,bnf_dir_return);
-#endif
+
 		// MESG(" err TOK_DIR_RetURN");
 		stack_push("dir return",tok,-tok->ttype);
 		NTOKEN_ERR(664);
@@ -1855,9 +1843,7 @@ int err_check_sentence1()
 		{
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,tok_dir_type);
-#if	TBNF
-		// set_bnf_directive(tok,bnf_dir_type);
-#endif
+
 		stack_push("dir type",tok,-tok->ttype);
 		// MESG("--> err: TOK_DIR_TYPE: %s",tok->tname);
 		NTOKEN_ERR(671);	// this is the type name

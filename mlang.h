@@ -43,9 +43,6 @@ typedef struct tok_struct {
 		EFunction cexpr_function;
 	};
 	FFunction directive;
-#if	TBNF
-	VFunction bnf_directive;
-#endif
 	union {	
 		int	number_of_args;
 		struct MVAR *var_pointer;

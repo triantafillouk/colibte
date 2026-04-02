@@ -32,6 +32,9 @@ extern FILEBUF *cbfp;
 extern int record_session;
 #endif
 
+void set_active_flag(int flag);
+int get_active_flag();
+
 int vtype_is(int type);
 int custom_cell_width=0;
 
@@ -711,7 +714,6 @@ int exec_file(num n)
 }
 
 extern int show_stage;
-extern int current_active_flag;
 
 /* dofile:	execute a macro file */
 int dofile(char *fname)
@@ -745,13 +747,13 @@ int dofile(char *fname)
 		};
 	};
 	/* go execute it! */
-	int backup_caf=current_active_flag;
+	int backup_caf=get_active_flag();
 	double d = compute_block(bp,bp,1);
 	// MESG("dofile: after compute_block:");
 	if(err_num>0) return (FALSE);
 	init_error();
 	set_vdval(d);
-	current_active_flag=backup_caf;
+	set_active_flag(backup_caf);
 	/* if not displayed, remove the now unneeded macro buffer and exit */
 	if (bp->b_nwnd == 0) 
 		delete_filebuf(bp,1);
