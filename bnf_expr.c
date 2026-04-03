@@ -258,6 +258,8 @@ void bnf_factor_plus()
  MVAR *varb = bnf_var;
 	prev_var("plus2");
  MVAR *vara = bnf_var;
+ int typea=vara->var_type;
+ int typeb=varb->var_type;
 
 // MESG("bnf_factor_plus : var ind=%d tok ind=%d vb=%d va=%d",bnf_var-&bnf_vars[0],tok->tnum,vara->var_type,varb->var_type);
  if(varb->var_type==VTYPE_POINTER) {
@@ -277,8 +279,8 @@ void bnf_factor_plus()
 	}
  } else if(varb->var_type==VTYPE_NUM) {
  	if(vara->var_type==VTYPE_POINTER) {
-		if(vara->var_type==VTYPE_NUM) {
-			vara->dval = bnf_var->var_pointer->dval + varb->dval;
+		if(vara->var_pointer->var_type==VTYPE_NUM) {
+			bnf_var->dval = vara->var_pointer->dval + varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
 			tok->bnf_factor_function=bnf_factor_pn_plus;
 			NTOKEN2;return;
@@ -290,7 +292,7 @@ void bnf_factor_plus()
 	};
  };
  
- 	MESG("plus error!");
+ 	MESG("plus error! atype=%d btype=%d [%s]",typea,typeb,tok_info(tok));
 	NTOKEN2;
 }
 
@@ -675,26 +677,24 @@ void bnf_factor_dummy()
 	NTOKEN2;
 }
 
+// var++,var--
 void bnf_update_val()
 {
 	// MESG("bnf_update_val:");
-	MVAR *bval=bnf_var;
-		if(bval->var_type==VTYPE_POINTER) bval = bval->var_pointer;
-	prev_var("update2_val");
-	MVAR *aval=bnf_var;
+	MVAR *avar=bnf_var->var_pointer;
 
-	aval=bnf_var->var_pointer;
-
-	if(aval->var_type==VTYPE_NUM) { 
-		bnf_var->dval=aval->dval;
+	if(avar->var_type==VTYPE_NUM) { 
+		bnf_var->dval=avar->dval;
 		bnf_var->var_type=VTYPE_NUM;
-		aval->dval += tok->dval;
+		
+		avar->dval += tok->dval;
+
 		NTOKEN2;
 		return;
 	};
-	if(aval->var_type==VTYPE_ARRAY) {
-		array_add1(aval->adat,tok->dval);
-		bnf_var->adat=aval->adat;
+	if(avar->var_type==VTYPE_ARRAY) {
+		bnf_var->adat=dup_array_add1(avar->adat,0);
+		array_add1(avar->adat,tok->dval);
 		bnf_var->var_type=VTYPE_ARRAY;
 		NTOKEN2;
 		return;
