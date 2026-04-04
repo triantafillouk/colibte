@@ -298,9 +298,10 @@ void stack_push(char *title,tok_struct *tok,int exp_type)
 		if(dest->ttype==TOK_LCURL||dest->ttype==TOK_RCURL) eval_curl_match(dest);
 		if(dest->ttype==TOK_RCURL) {
 			tok_struct *p=dest-1;
-			if(p->ttype==TOK_SHOW) dest->bnf_factor_function=bnf_factor_rcurl_no;
+			if(p->ttype==TOK_SHOW || p->ttype==TOK_RCURL) dest->bnf_factor_function=bnf_factor_rcurl_no;
 			else
 			if(p->ttype!=TOK_SEP) dest->bnf_factor_function=bnf_factor_rcurl0;
+			else dest->bnf_factor_function=bnf_factor_rcurl;
 		};
  		// MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(dest));
 		check_buffer->tok_bnf_index++;
@@ -4027,7 +4028,8 @@ double exec_block1(FILEBUF *fp)
 	if(ex_var.var_type==VTYPE_NUM) ex_var.dval=val;
 	if(!current_active_flag) break;
    };
-	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
+	if(tok->ttype==TOK_RCURL) { 
+	NTOKEN2;lstoken=NULL;return(ex_var.dval);};
    // MESG("exec_block1: end!");
 	return(val);
 }

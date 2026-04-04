@@ -941,20 +941,22 @@ void bnf_factor_sep()
 
 static inline void bnf_factor_rcurl0()
 {
+	// MESG("	rcurl go prev!");
 	prev_var("rcurl");
 	NTOKEN2;
 }
 
 static inline void bnf_factor_rcurl_no()
 {
+	// MESG("	rcurl no move");
 	NTOKEN2;
 }
 
 
 static inline void bnf_factor_rcurl()
 {
- long ind=bnf_var-bnf_vars;
- MESG("	rcurl: ind=%ld",ind);
+ // long ind=bnf_var-bnf_vars;
+ // MESG("	rcurl: ind=%ld",ind);
  NTOKEN2;
 	// return what ??
 }
@@ -1131,6 +1133,18 @@ void bnf_factor_lpar()
 
 void bnf_block1(FILEBUF *fp)
 {
+#if	1
+	// MESG("-- block start! { [%s]",tok_info(tok));
+	do {
+		// MESG("	- [%s]",tok_info(tok));
+	 	tok->bnf_factor_function();
+		// if(tok->ttype==TOK_RCURL) MESG("bnf_block inside rcurl!:");
+		//if(!current_active_flag) break;
+	} while(tok->tgroup!=TOK_END);
+	tok->bnf_factor_function();
+	// int ind = bnf_var - bnf_vars;
+	// MESG("-- block end  ! } [%s] %d",tok_info(tok),ind);
+#else
    // MESG("# bnf_block:[%s]",tok_info(tok));
    while(tok->tgroup!=TOK_END) 
    {
@@ -1139,16 +1153,11 @@ void bnf_block1(FILEBUF *fp)
 	// if(tok->ttype==TOK_RCURL) MESG("bnf_block inside rcurl!:");
 	if(!current_active_flag) break;
    };
-#if	1
-	tok->bnf_factor_function();
-	NTOKEN2;
-#else
 	if(tok->ttype==TOK_RCURL) { 
 		// MESG("bnf_block rcurl");
-		tok->bnf_factor_function();
+		// tok->bnf_factor_function();
+		prev_var("end block");
 		NTOKEN2;
-	} else {
-		MESG("no rcurl!");
 	};
 #endif
 }
