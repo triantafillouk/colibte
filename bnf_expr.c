@@ -67,8 +67,8 @@ void bnf_refresh_ddot()
 	if(bnf_var->var_type==VTYPE_POINTER) {
 		var_show = bnf_var->var_pointer;
  	};
-
- // MESG("refresh_ddot: ind=%3ld ori=%d type=%d",var_index,ori_type,var_show->var_type);
+ int var_index = bnf_var - bnf_vars;
+ MESG("refresh_ddot: ind=%3ld type=%d",var_index,var_show->var_type);
  prev_var("ddot");
  if(execmd) {
 	 if(var_show->var_type==VTYPE_NUM) {
@@ -184,7 +184,7 @@ void bnf_factor_num()
 void bnf_factor_quote()
 {
 	next_var("num");
-	bnf_var->sval = tok->tname;
+	bnf_var->sval = strdup(tok->tname);
 	bnf_var->var_type=VTYPE_STRING;
 	// MESG("bnf_factor_quote: put quote %s at pos %ld type %d",bnf_var->sval,bnf_var-bnf_vars,bnf_var->var_type);
 	NTOKEN2;
@@ -261,22 +261,50 @@ void bnf_factor_plus()
  int typea=vara->var_type;
  int typeb=varb->var_type;
 
-// MESG("bnf_factor_plus : var ind=%d tok ind=%d vb=%d va=%d",bnf_var-&bnf_vars[0],tok->tnum,vara->var_type,varb->var_type);
+MESG("bnf_factor_plus : var ind=%d tok ind=%d va=%d vb=%d",bnf_var-&bnf_vars[0],tok->tnum,vara->var_type,varb->var_type);
  if(varb->var_type==VTYPE_POINTER) {
  	if(varb->var_pointer->var_type==VTYPE_NUM) {
 		if(vara->var_type==VTYPE_POINTER) {
 			if(vara->var_pointer->var_type==VTYPE_NUM) {
+				MESG("-plus vara num = %f",vara->var_pointer->dval);
 				bnf_var->dval=vara->var_pointer->dval + varb->var_pointer->dval;
 				bnf_var->var_type=VTYPE_NUM;
 				tok->bnf_factor_function=bnf_factor_pp_plus;
 				NTOKEN2;return;
+			} else if(vara->var_pointer->var_type==VTYPE_STRING) {
+				MESG("-plus vara pointer string is [%s] ....",vara->var_pointer->sval);
 			};
 		} else if (vara->var_type==VTYPE_NUM) {
 			bnf_var->dval += varb->var_pointer->dval;
 			tok->bnf_factor_function=bnf_factor_np_plus;
 			NTOKEN2;return;
+		} else if(vara->var_type==VTYPE_STRING) {
+			MESG("-plus vara string is [%s]",vara->sval);
+			char svalue[MAXLLEN];
+			if(varb->var_pointer->var_type==VTYPE_NUM) { // string + num
+				MESG("	varb pointer num = %f",varb->var_pointer->dval);
+				int stat = snprintf(svalue,sizeof(svalue),"%s%f",vara->sval,varb->var_pointer->dval);
+				if(stat>MAXLLEN) MESG("truncated 2");
+				free(vara->sval);
+				vara->sval=strdup(svalue);
+				MESG("var string + varb pointer num! [%s]",vara->sval);
+				// tok->bnf_factor_function=...;
+				NTOKEN2;
+				return;
+			} else if(varb->var_pointer->var_type==VTYPE_STRING) { // string + string
+				MESG("	varb pointer string = %s",varb->var_pointer->sval);
+				int stat = snprintf(svalue,sizeof(svalue),"%s%s",vara->sval,varb->var_pointer->sval);
+				if(stat>MAXLLEN) MESG("truncated 2");
+				free(vara->sval);
+				vara->sval=strdup(svalue);
+				// tok->bnf_factor_function=...;
+				NTOKEN2;
+				return;
+			};
 		}; 
-	}
+	} else if (varb->var_pointer->var_type==VTYPE_STRING) {
+		MESG("- plus varb pointer string %s",varb->var_pointer->sval);
+	};
  } else if(varb->var_type==VTYPE_NUM) {
  	if(vara->var_type==VTYPE_POINTER) {
 		if(vara->var_pointer->var_type==VTYPE_NUM) {
@@ -284,12 +312,33 @@ void bnf_factor_plus()
 			bnf_var->var_type=VTYPE_NUM;
 			tok->bnf_factor_function=bnf_factor_pn_plus;
 			NTOKEN2;return;
+		} else if(vara->var_pointer->var_type==VTYPE_STRING) {
+			char svalue[MAXLLEN];
+			int stat = snprintf(svalue,sizeof(svalue),"%s%f",vara->var_pointer->sval,varb->dval);
+			if(stat>MAXLLEN) MESG("truncated 2");
+			vara->sval=strdup(svalue);
+			vara->var_type=VTYPE_STRING;
+			// tok->bnf_factor_function=...;
+			NTOKEN2;return;
 		};
 	} else if (vara->var_type==VTYPE_NUM) {
  			bnf_var->dval += varb->dval;
 			tok->bnf_factor_function=bnf_factor_nn_plus;
 			NTOKEN2;return;
+	} else if(vara->var_type==VTYPE_STRING) {
+			char svalue[MAXLLEN];
+			int stat = snprintf(svalue,sizeof(svalue),"%s%f",vara->sval,varb->dval);
+			if(stat>MAXLLEN) MESG("truncated 2");
+			free(vara->sval);
+			vara->sval=strdup(svalue);
+			
+			// tok->bnf_factor_function=...;
+			NTOKEN2;
+			return;
 	};
+	MESG("plus varb=num!");
+ } else if(varb->var_type==VTYPE_STRING) {
+ 	MESG("plus varb=string!");
  };
  
  	MESG("plus error! atype=%d btype=%d [%s]",typea,typeb,tok_info(tok));
@@ -941,22 +990,22 @@ void bnf_factor_sep()
 
 static inline void bnf_factor_rcurl0()
 {
-	// MESG("	rcurl go prev!");
+	MESG("	rcurl go prev!");
 	prev_var("rcurl");
 	NTOKEN2;
 }
 
 static inline void bnf_factor_rcurl_no()
 {
-	// MESG("	rcurl no move");
+	MESG("	rcurl no move");
 	NTOKEN2;
 }
 
 
 static inline void bnf_factor_rcurl()
 {
- // long ind=bnf_var-bnf_vars;
- // MESG("	rcurl: ind=%ld",ind);
+ long ind=bnf_var-bnf_vars;
+ MESG("	rcurl: ind=%ld",ind);
  NTOKEN2;
 	// return what ??
 }
@@ -1138,8 +1187,7 @@ void bnf_block1(FILEBUF *fp)
 	do {
 		// MESG("	- [%s]",tok_info(tok));
 	 	tok->bnf_factor_function();
-		// if(tok->ttype==TOK_RCURL) MESG("bnf_block inside rcurl!:");
-		//if(!current_active_flag) break;
+		if(!current_active_flag) break;
 	} while(tok->tgroup!=TOK_END);
 	tok->bnf_factor_function();
 	// int ind = bnf_var - bnf_vars;
@@ -1164,20 +1212,30 @@ void bnf_block1(FILEBUF *fp)
 
 void bnf_block1_break(FILEBUF *fp)
 {
- INIT_STAGE;
  exe_buffer=fp;
    // MESG("exec_block1:[%s] err_num= %d %d tok=[%s]",fp->b_fname,err_num,current_active_flag,tok_info(tok));
    if(!current_active_flag) {
 		tok=fp->end_token;
 		// return(ex_var.dval);
    };
+#if	1
+	// MESG("-- block start! { [%s]",tok_info(tok));
+	do {
+		// MESG("	- [%s]",tok_info(tok));
+	 	tok->bnf_factor_function();
+		if(drv_check_break_key()) break;
+	} while(tok->tgroup!=TOK_END);
+	tok->bnf_factor_function();
+	// int ind = bnf_var - bnf_vars;
+	// MESG("-- block end  ! } [%s] %d",tok_info(tok),ind);
+#else
    while(tok->tgroup!=TOK_END) 
    {
 	// MESG_TOK_INFO("- exec_block1 [%s]",tok);
  	tok->bnf_factor_function();
 	// lstoken=NULL;MESG("exec_block1: reset lstoken");
 	// if(ex_var.var_type==VTYPE_NUM) ex_var.dval=val;
-	if(!current_active_flag) break;
+	// if(!current_active_flag) break;
 	if(drv_check_break_key()) break;
    };
 	if(tok->ttype==TOK_RCURL) { 
@@ -1185,6 +1243,7 @@ void bnf_block1_break(FILEBUF *fp)
 		// lstoken=NULL;
 		// return(ex_var.dval);
 	};
+#endif
 }
 
 void bnf_dir_lcurl()
