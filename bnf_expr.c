@@ -67,8 +67,8 @@ void bnf_refresh_ddot()
 	if(bnf_var->var_type==VTYPE_POINTER) {
 		var_show = bnf_var->var_pointer;
  	};
- int var_index = bnf_var - bnf_vars;
- MESG("refresh_ddot: ind=%3ld type=%d",var_index,var_show->var_type);
+ // int var_index = bnf_var - bnf_vars;
+ // MESG("refresh_ddot: ind=%3ld type=%d",var_index,var_show->var_type);
  prev_var("ddot");
  if(execmd) {
 	 if(var_show->var_type==VTYPE_NUM) {
@@ -253,6 +253,23 @@ static inline void  bnf_factor_np_plus()
 	NTOKEN2;
 }
 
+static void bnf_factor_spn_plus()
+{
+ double valb=bnf_var->var_pointer->dval;
+ prev_var("spn_plus");
+ char *svala=bnf_var->sval;
+ char svalue[MAXLLEN];
+	// MESG("	varb pointer num = %f",varb->var_pointer->dval);
+	int stat = snprintf(svalue,sizeof(svalue),"%s%f",svala,valb);
+	if(stat>MAXLLEN) MESG("truncated 2");
+	free(svala);
+	bnf_var->sval=strdup(svalue);
+	// MESG("var string + varb pointer num! [%s]",vara->sval);
+	// tok->bnf_factor_function=...;
+	NTOKEN2;
+	return;
+}
+
 void bnf_factor_plus()
 {
  MVAR *varb = bnf_var;
@@ -261,38 +278,38 @@ void bnf_factor_plus()
  int typea=vara->var_type;
  int typeb=varb->var_type;
 
-MESG("bnf_factor_plus : var ind=%d tok ind=%d va=%d vb=%d",bnf_var-&bnf_vars[0],tok->tnum,vara->var_type,varb->var_type);
+// MESG("bnf_factor_plus : var ind=%d tok ind=%d va=%d vb=%d",bnf_var-&bnf_vars[0],tok->tnum,vara->var_type,varb->var_type);
  if(varb->var_type==VTYPE_POINTER) {
  	if(varb->var_pointer->var_type==VTYPE_NUM) {
 		if(vara->var_type==VTYPE_POINTER) {
 			if(vara->var_pointer->var_type==VTYPE_NUM) {
-				MESG("-plus vara num = %f",vara->var_pointer->dval);
+				// MESG("-plus vara num = %f",vara->var_pointer->dval);
 				bnf_var->dval=vara->var_pointer->dval + varb->var_pointer->dval;
 				bnf_var->var_type=VTYPE_NUM;
 				tok->bnf_factor_function=bnf_factor_pp_plus;
 				NTOKEN2;return;
 			} else if(vara->var_pointer->var_type==VTYPE_STRING) {
-				MESG("-plus vara pointer string is [%s] ....",vara->var_pointer->sval);
+				// MESG("-plus vara pointer string is [%s] ....",vara->var_pointer->sval);
 			};
 		} else if (vara->var_type==VTYPE_NUM) {
 			bnf_var->dval += varb->var_pointer->dval;
 			tok->bnf_factor_function=bnf_factor_np_plus;
 			NTOKEN2;return;
 		} else if(vara->var_type==VTYPE_STRING) {
-			MESG("-plus vara string is [%s]",vara->sval);
+			// MESG("-plus vara string is [%s]",vara->sval);
 			char svalue[MAXLLEN];
 			if(varb->var_pointer->var_type==VTYPE_NUM) { // string + num
-				MESG("	varb pointer num = %f",varb->var_pointer->dval);
+				// MESG("	varb pointer num = %f",varb->var_pointer->dval);
 				int stat = snprintf(svalue,sizeof(svalue),"%s%f",vara->sval,varb->var_pointer->dval);
 				if(stat>MAXLLEN) MESG("truncated 2");
 				free(vara->sval);
 				vara->sval=strdup(svalue);
-				MESG("var string + varb pointer num! [%s]",vara->sval);
-				// tok->bnf_factor_function=...;
+				// MESG("var string + varb pointer num! [%s]",vara->sval);
+				tok->bnf_factor_function=bnf_factor_spn_plus;
 				NTOKEN2;
 				return;
 			} else if(varb->var_pointer->var_type==VTYPE_STRING) { // string + string
-				MESG("	varb pointer string = %s",varb->var_pointer->sval);
+				// MESG("	varb pointer string = %s",varb->var_pointer->sval);
 				int stat = snprintf(svalue,sizeof(svalue),"%s%s",vara->sval,varb->var_pointer->sval);
 				if(stat>MAXLLEN) MESG("truncated 2");
 				free(vara->sval);
@@ -336,7 +353,7 @@ MESG("bnf_factor_plus : var ind=%d tok ind=%d va=%d vb=%d",bnf_var-&bnf_vars[0],
 			NTOKEN2;
 			return;
 	};
-	MESG("plus varb=num!");
+	// MESG("plus varb=num!");
  } else if(varb->var_type==VTYPE_STRING) {
  	MESG("plus varb=string!");
  };
@@ -990,14 +1007,14 @@ void bnf_factor_sep()
 
 static inline void bnf_factor_rcurl0()
 {
-	MESG("	rcurl go prev!");
+	// MESG("	rcurl go prev!");
 	prev_var("rcurl");
 	NTOKEN2;
 }
 
 static inline void bnf_factor_rcurl_no()
 {
-	MESG("	rcurl no move");
+	// MESG("	rcurl no move");
 	NTOKEN2;
 }
 
@@ -1180,7 +1197,7 @@ void bnf_factor_lpar()
 	NTOKEN2; 
 }
 
-void bnf_block1(FILEBUF *fp)
+static void bnf_block1(FILEBUF *fp)
 {
 #if	1
 	// MESG("-- block start! { [%s]",tok_info(tok));
