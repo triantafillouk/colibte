@@ -137,7 +137,7 @@ inline static double show_result()
  int stack_num = bnf_var-bnf_vars;
  switch(bnf_var->var_type) {
  	case VTYPE_NUM:
-		// MESG("bnf result: @%3d NUMERIC val=%f",stack_num,bnf_var->dval);
+		MESG("bnf result: @%3d NUMERIC val=%f",stack_num,bnf_var->dval);
 		return(bnf_var->dval);
 	case VTYPE_STRING:
 		MESG("bnf result: @%3d STRING  val=[%s]",stack_num,bnf_var->sval);
@@ -278,7 +278,7 @@ void bnf_factor_plus()
  int typea=vara->var_type;
  int typeb=varb->var_type;
 
-// MESG("bnf_factor_plus : var ind=%d tok ind=%d va=%d vb=%d",bnf_var-&bnf_vars[0],tok->tnum,vara->var_type,varb->var_type);
+ // MESG("bnf_factor_plus : var ind=%d tok ind=%d va=%d vb=%d",bnf_var-&bnf_vars[0],tok->tnum,vara->var_type,varb->var_type);
  if(varb->var_type==VTYPE_POINTER) {
  	if(varb->var_pointer->var_type==VTYPE_NUM) {
 		if(vara->var_type==VTYPE_POINTER) {
@@ -382,17 +382,15 @@ void bnf_factor_minus()
 	NTOKEN2;
 }
 
-void bnf_factor_np_num_mul()
+static void bnf_factor_np_num_mul()
 {
- double valb = bnf_var->dval;
+ double valb = bnf_var->var_pointer->dval;
  prev_var("pp_mul2");
- MVAR *vara = bnf_var->var_pointer;
- bnf_var->dval=vara->dval * valb;
- bnf_var->var_type=VTYPE_NUM;
+ bnf_var->dval *= valb;
  NTOKEN2;
 }
 
-void bnf_factor_nn_num_mul()
+static void bnf_factor_nn_num_mul()
 {
  double valb = bnf_var->dval;
  prev_var("pp_mul2");
@@ -401,7 +399,7 @@ void bnf_factor_nn_num_mul()
  NTOKEN2;
 }
 
-void bnf_factor_pp_num_mul()
+static void bnf_factor_pp_num_mul()
 {
  double valb = bnf_var->var_pointer->dval;
  prev_var("pp_mul2");
@@ -744,7 +742,7 @@ void bnf_factor_dummy()
 }
 
 // var++,var--
-void bnf_update_val()
+static void bnf_update_val()
 {
 	// MESG("bnf_update_val:");
 	MVAR *avar=bnf_var->var_pointer;
@@ -770,7 +768,7 @@ void bnf_update_val()
 	// set for any different type!
 }
 
-void bnf_increase_by_pp_num()
+static void bnf_increase_by_pp_num()
 {
 	double bval=bnf_var->var_pointer->dval;
 	prev_var("increase_pp_num2");
@@ -779,7 +777,7 @@ void bnf_increase_by_pp_num()
 	NTOKEN2;
 }
 
-void bnf_increase_by_pn_num()
+static void bnf_increase_by_pn_num()
 {
 	double bval=bnf_var->dval;
 	prev_var("increase_pp_num2");
@@ -789,7 +787,7 @@ void bnf_increase_by_pn_num()
 }
 
 // aval+=bval
-void bnf_increase_by()
+static void bnf_increase_by()
 {
 	// MESG("bnf_factor_increase_by: [%s]",tok_info(tok));
 	MVAR *bvar=bnf_var;
@@ -1393,11 +1391,7 @@ void bnf_expression()
 	// MESG("	bnf_expression: ------ tok ind=%3d ttype=%d tgroup=%d bnf_group=%d",tok->tind,tok->ttype,tok->tgroup,tok->bnf_group);
 	while(tok->bnf_group>0) {
 		// MESG("	bnf_group=%d [%s]",tok->bnf_group,tok_info(tok));
-		if(tok->bnf_factor_function==NULL) {
-			MESG("bnf_factor_function is NULL!!");
-		} else {
-			tok->bnf_factor_function();	
-		};
+		tok->bnf_factor_function();	
 	};
 }
 
