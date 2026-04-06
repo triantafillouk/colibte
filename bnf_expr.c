@@ -10,7 +10,7 @@ inline MVAR *get_left_slot(int ind);
 void bnf_expression();
 
 #if	1
-#if	1
+#if	0
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
 
@@ -23,6 +23,7 @@ static inline void prev_var(char *title)
 static inline void next_var(char *title)
 {
 	bnf_var++;
+	if(bnf_var->var_type==VTYPE_STRING) free(bnf_var->sval);
 }
 #endif
 #else

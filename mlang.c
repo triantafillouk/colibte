@@ -216,6 +216,7 @@ char *vtype_names[] = {
 #include "mlang_functions.c"
 #if	TBNF
 #include "bnf_expr.c"
+#include "bnf_mlangf.c"
 #endif
 
 void eval_curl_match(tok_struct *tok)
