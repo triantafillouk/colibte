@@ -9,7 +9,7 @@ static MVAR *bnf_var=&bnf_vars[0];
 inline MVAR *get_left_slot(int ind);
 void bnf_expression();
 
-#if	0
+#if	1
 #if	0
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
@@ -1431,7 +1431,7 @@ void bnf_dir_type()
 
 MVAR * push_args_bnf(int nargs,int vars_num)
 {
- TDS("push_args");
+ MESG("push_args_bnf: nargs=%d vars_num=%d",nargs,vars_num);
 
  MVAR *va = new_symbol_table(nargs+vars_num);
  if(va==NULL) return NULL;
@@ -1439,7 +1439,7 @@ MVAR * push_args_bnf(int nargs,int vars_num)
  MVAR *va_i=va;
  for(;va_i<va+nargs;va_i++)
  {
-	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
+	MESG("	push_args_1: arg %d, tok=[%d %s] type=%d",(int)(va_i-va),tok->tnum,tok->tname,va_i->var_type);
 	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
 	// MESG(";		i=%d, var_type = %d",i,va_i->var_type);
 	bnf_expression();
@@ -1480,6 +1480,10 @@ MVAR * push_args_bnf(int nargs,int vars_num)
 void bnf_exec_function(FILEBUF *proc_buffer,int nargs)
 {
 	MVAR *old_symbol_table=current_stable;
+	MESG("bnf_exec_function:");
+	if(proc_buffer==NULL) MESG("	buffer is NULL!");
+	MESG("	proc_buffer [%s]",proc_buffer->b_fname);
+
 	current_stable = push_args_bnf(nargs,proc_buffer->symbol_tree->items);
 	tok_struct *after_proc=tok;
 	
@@ -1497,8 +1501,12 @@ void bnf_factor_proc()
 {
 	tok_struct *tok0=tok;
 	FILEBUF *cbuf=exe_buffer;
-	MESG("bnf_factor_proc:");
+	MESG("bnf_factor_proc: ttype=%d",tok0->ttype);
+	MESG("	tname [%s]",tok0->tname);
+	// MESG("bnf_factor_proc: current_buffer [%s]",cbuf->b_fname);
+	// MESG("	token buffer [%s]",tok0->proc_buffer->b_fname);
 	exe_buffer=tok0->proc_buffer;
+	MESG("	exe_buffer [%s]",exe_buffer->b_fname);
 #if	TPROFILE
 	tok0->proc_buffer->function_called++;
 #endif

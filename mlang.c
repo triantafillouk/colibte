@@ -242,7 +242,7 @@ void eval_curl_match(tok_struct *tok)
 	};
 }
 
-void stack_push(char *title,tok_struct *tok,int exp_type)
+tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 {
 #if	TBNF
  // if(no_push) { MESG("stack_push:%s skip %s",title,tok_info(tok));return;};
@@ -252,10 +252,11 @@ void stack_push(char *title,tok_struct *tok,int exp_type)
 		if(check_buffer)
 		MESG("P[%10s already pushed at %3d %-15s|%s %p",check_buffer->b_fname,tok->pushed,title,tok_info(tok),tok);
 		else MESG("P[ check buffer is NULL!!!!! %s",title);
+		return NULL;
 	} else {
 		if(tok->ttype==TOK_LPAR) { 
 			MESG("skip left paranthesis!");
-			return;
+			return NULL;
 		};
 		tok_struct *dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
@@ -310,9 +311,11 @@ void stack_push(char *title,tok_struct *tok,int exp_type)
 			dest->bnf_factor_function=(VFunction)bnf_functions[tok->tok_node->node_index].ffunction;
 		};
 		check_buffer->tok_bnf_index++;
-   }
+	   return dest;
+   };
  } else {
  	MESG("P [%s] null token!!!",title);
+	return NULL;
  }
 #endif
 }
@@ -1143,6 +1146,7 @@ int check_init(FILEBUF *bf)
  if(!exebnf)
  show_token_table("Token table ",bf,bf->tok_table,bf->end_token - bf->tok_table+1);
  if(bf->err>0) {
+ 	check_buffer = ori_buffer;
 	return bf->err;
  };
  bf->m_mode |= M_CHECKED;

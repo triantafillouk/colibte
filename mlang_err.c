@@ -538,11 +538,12 @@ int err_assign_env()
 int err_exec_function(char *name,int nargs,FILEBUF **bf)
 {
  TDSERR("exec_function");
+
 #if	DEBUG1
  int save_stage_level=stage_level;
 #endif
 	// tok_struct *tok_latest=NULL;
- 	// MESG("err_exec_funtion: << %s",name);
+ 	MESG("err_exec_funtion: << %s [%s]",name,tok_info(tok));
     FILEBUF *bp;		/* ptr to buffer to execute */
     char bufn[MAXFLEN+2];		/* name of buffer to execute */
 	int parsed;
@@ -607,14 +608,15 @@ int err_factor()
  static int pre_symbol=0;
  TDSERR("factor");
  int lpar=0;
+ int save_macro_exec;
+ tok_struct *tok0,*tok0_bnf; 
+
  // MESG("-- err_factor %s",tok_info(tok));
  set_tok_function(tok,0);
  if(tok->ttype!=TOK_NOT && tok->ttype!=TOK_LPAR) {
 	
- 	stack_push("factor",tok,tok->ttype);	// ????
+ 	tok0_bnf=stack_push("factor",tok,tok->ttype);	// ????
  };
- int save_macro_exec;
- tok_struct *tok0; 
 
  ex_edenv=0;
 
@@ -1018,6 +1020,9 @@ int err_factor()
 		err_num=err_eval_fun1(tok0,lpar);
 		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)
+		MESG("	err TOK_PROC");
+		MESG("	- tok0 [%s]",tok_info(tok0));
+		MESG("	- tok  [%s]",tok_info(tok));
 		int nargs=0;
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
@@ -1037,16 +1042,20 @@ int err_factor()
 		CHECK_TOK(503);
 		after_proc=tok;	// this must be RPAR token!
 		check_skip_token_err1(TOK_RPAR,"no right parenthesis",505);
-		stack_push("proc ) ",tok0,-TOK_RPAR);
+		stack_push("proc )",tok,-TOK_RPAR);
 		// MESG("err TOK_PROC: set after_proc [%s] ttype=%d",tok->tname,tok->ttype);
 		FILEBUF *proc_buffer=NULL;
 		err_num=err_exec_function(tok0->tname,nargs,&proc_buffer);
+
 		if(err_num) {
 			// MESG("	err_num=%d",err_num);
 			return(err_num);
 		};
 		if(proc_buffer!=NULL) {
 			tok0->proc_buffer=proc_buffer;
+#if	TBNF
+			tok0_bnf->proc_buffer=proc_buffer;
+#endif
 			proc_buffer->function_called=0;
 			// MESG("	set function buffer");
 		};
