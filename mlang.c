@@ -244,6 +244,7 @@ void eval_curl_match(tok_struct *tok)
 
 tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 {
+  MESG("--[%s] try push %d [%s] exp=%d [%s]",check_buffer->b_fname,tok->pushed,title,exp_type,tok_info(tok));
 #if	TBNF
  // if(no_push) { MESG("stack_push:%s skip %s",title,tok_info(tok));return;};
  if(tok!=NULL) {
@@ -252,7 +253,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		if(check_buffer)
 		MESG("P[%10s already pushed at %3d %-15s|%s %p",check_buffer->b_fname,tok->pushed,title,tok_info(tok),tok);
 		else MESG("P[ check buffer is NULL!!!!! %s",title);
-		return NULL;
+		return check_buffer->tok_table_bnf+tok->pushed;
 	} else {
 		if(tok->ttype==TOK_LPAR) { 
 			MESG("skip left paranthesis!");
@@ -261,6 +262,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		tok_struct *dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
     	tok->pushed=check_buffer->tok_bnf_index;
+		MESG("! set pushed! as %d [%s]",tok->pushed,tok_info(tok));
 #if	0		
 		tok_struct *p=dest-1;// check_buffer->tok_table_bnf+(check_buffer->tok_bnf_index-1);
 		dest->bnf_factor_function=NULL;
@@ -305,14 +307,14 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 			if(p->ttype!=TOK_SEP) dest->bnf_factor_function=bnf_factor_rcurl0;
 			else dest->bnf_factor_function=bnf_factor_rcurl;
 		};
- 		MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(dest));
+ 		// MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(dest));
 		if(dest->ttype==TOK_FUNC) {
 			MESG("set bnf function! index=%d for [%s]",tok->tok_node->node_index,tok_info(dest));
 			dest->bnf_factor_function=(VFunction)bnf_functions[tok->tok_node->node_index].ffunction;
 		};
 		check_buffer->tok_bnf_index++;
-	   return dest;
-   };
+		return dest;
+   }
  } else {
  	MESG("P [%s] null token!!!",title);
 	return NULL;
@@ -1146,7 +1148,6 @@ int check_init(FILEBUF *bf)
  if(!exebnf)
  show_token_table("Token table ",bf,bf->tok_table,bf->end_token - bf->tok_table+1);
  if(bf->err>0) {
- 	check_buffer = ori_buffer;
 	return bf->err;
  };
  bf->m_mode |= M_CHECKED;

@@ -315,7 +315,7 @@ int  err_push_args_1(int *nargs)
  TDSERR("push_args");
 
  SHOW_STAGE(410);
- // MESG("err_push_args:");
+ MESG("err_push_args: [%s]",tok_info(tok));
  if(tok->ttype!=TOK_RPAR) {
 	if(tok->ttype==TOK_SEP) {
 		*nargs=0;
@@ -331,7 +331,7 @@ int  err_push_args_1(int *nargs)
 		break;
 	};
 	err_num = err_lexpression();
-	// MESG("err after expression t_type=%d err=%d",tok->ttype,err_num);
+	MESG("	%2d	after expression [%s]",num_args,tok_info(tok));
 	if(err_num) { ERROR("error in push_args_1 from lexpression %d",err_num);return err_num;};
 	CHECK_TOK(413);
 	num_args++;
@@ -360,7 +360,7 @@ int  err_push_args_1(int *nargs)
 	}
  };
 	*nargs=num_args;
-	// MESG("err_push_args: args=%d err=%d",num_args,err_num);
+	MESG("err_push_args: end args=%d err=%d",num_args,err_num);
  	return(err_num);
  } else {	/* no arguments!  */
 	xpos=418;
@@ -542,7 +542,7 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
  int save_stage_level=stage_level;
 #endif
 	// tok_struct *tok_latest=NULL;
- 	MESG("err_exec_funtion: << %s [%s]",name,tok_info(tok));
+ 	MESG("err_exec_funtion: << %s",name);
     FILEBUF *bp;		/* ptr to buffer to execute */
     char bufn[MAXFLEN+2];		/* name of buffer to execute */
 	int parsed;
@@ -566,17 +566,21 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 		RT_MESG;
     };
 	*bf=bp;
-	MESG("err_exec_function: %s args=%d",bp->b_fname,nargs);
+	// tok_struct *tok1=tok;
+	// MESG("err_exec_function: %s args=%d",bp->b_fname,nargs);
 	parsed=parse_block1(bp,NULL,0);	/* do not init if already parsed!, returns 0 if parsed  */
-	MESG("err_exec_function: return from parse_block1");
+	// MESG("err_exec_function: return from parse_block1");
 	if(parsed==0) {	/* already parsed, no need to check again!  */
-		MESG("	already parsed!");
+		// MESG("	already parsed!");
 		// MESG("err_exec_function: already parsed! >>");
 		RT_MESG1(463);
 	};
+	// if(tok!=tok1) {
+		// MESG("tok changed from parse_block1!!!!!!!!!!!!!!");
+	// };
 	/* and now execute it as asked */
 	// MESG("err_exec_function: call check_init");
-	// tok_latest=tok;
+	tok_struct *tok_latest=tok;
 	if((check_init(bp))>0) {
 		ERROR("found syntax errors in function!");
 		RT_MESG1(464);
@@ -584,7 +588,7 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 #if	DEBUG1
 	stage_level=save_stage_level;
 #endif
-	// tok=tok_latest;
+	tok=tok_latest;
 
 	tok=bp->tok_table;
 	no_push=1;
@@ -607,15 +611,14 @@ int err_factor()
  static int pre_symbol=0;
  TDSERR("factor");
  int lpar=0;
- int save_macro_exec;
- tok_struct *tok0,*tok0_bnf; 
-
  // MESG("-- err_factor %s",tok_info(tok));
  set_tok_function(tok,0);
+ tok_struct *tok0_bnf=NULL;
  if(tok->ttype!=TOK_NOT && tok->ttype!=TOK_LPAR) {
-	
  	tok0_bnf=stack_push("factor",tok,tok->ttype);	// ????
  };
+ int save_macro_exec;
+ tok_struct *tok0; 
 
  ex_edenv=0;
 
@@ -1019,9 +1022,7 @@ int err_factor()
 		err_num=err_eval_fun1(tok0,lpar);
 		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)
-		MESG("	err TOK_PROC");
-		MESG("	- tok0 [%s]",tok_info(tok0));
-		MESG("	- tok  [%s]",tok_info(tok));
+		MESG("------ define TOK_PROC ------ [%s]",tok_info(tok));
 		int nargs=0;
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
@@ -1038,38 +1039,43 @@ int err_factor()
 		if(err_num) return(err_num);
 		// MESG("	err check: TOK_PROC: args=%d",nargs);
 		tok0->t_nargs=nargs;
+#if	TBNF
+		if(tok0_bnf!=NULL) {
+			tok0_bnf->t_nargs=nargs;
+			MESG("	proc function %s pushed ok!",tok0_bnf->tname);
+		} else {
+			err_num=502;
+			MESG("tok0_bnf is NULL!!");
+			RT_MESG1(502);
+		};
+#endif
 		CHECK_TOK(503);
 		after_proc=tok;	// this must be RPAR token!
-		if(tok->ttype != TOK_RPAR) {
-			xpos=5050;
-			set_error(tok,xpos,"proc with no right parenthesis");
-			RT_MESG1(505);
+		if(tok->ttype!=TOK_RPAR) {
+			xpos=503;
+			MESG("503 no right_parenthesis after proc");
+			RT_MESG1(503);
 		};
 		stack_push("proc ) ",tok,-TOK_RPAR);
 		NTOKEN2;
-		// MESG("err TOK_PROC: set after_proc [%s] ttype=%d",tok->tname,tok->ttype);
+		after_proc=tok;	// this must be RPAR token!
+		MESG("err TOK_PROC: set after_proc [%s] ttype=%d",tok->tname,tok->ttype);
 		FILEBUF *proc_buffer=NULL;
 		err_num=err_exec_function(tok0->tname,nargs,&proc_buffer);
-
+		MESG("		>>>>>>>>>> after exec_function!");
 		if(err_num) {
 			// MESG("	err_num=%d",err_num);
 			return(err_num);
 		};
 		if(proc_buffer!=NULL) {
-			
-			MESG("	function buffer found,! [%s]",proc_buffer->b_fname);
 			tok0->proc_buffer=proc_buffer;
-			MESG("	tok0    [%s]",tok_info(tok0));
-#if	TBNF
 			tok0_bnf->proc_buffer=proc_buffer;
-#endif
 			proc_buffer->function_called=0;
-			MESG("	tok_bnf [%s]",tok_info(tok0_bnf));
 			// MESG("	set function buffer");
 		};
 		CHECK_TOK(504);
 		tok=after_proc;
-		MESG("	TOK_PROC: end function tnum=%d",tok->tnum);
+		// MESG("	TOK_PROC: end function tnum=%d",tok->tnum);
 		// stack_push("proc ) ",tok,0);
 		// MESG("err TOK_PROC: end ttype=%d",tok->ttype);
 		RT_MESG;
@@ -1842,7 +1848,7 @@ int err_check_sentence1()
 	case TOK_DIR_RETURN:
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,dir_return);
-		// tok0=tok;
+
 		// MESG(" err TOK_DIR_RetURN");
 		stack_push("dir return",tok,-tok->ttype);
 		NTOKEN_ERR(664);
