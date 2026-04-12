@@ -305,7 +305,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 			if(p->ttype!=TOK_SEP) dest->bnf_factor_function=bnf_factor_rcurl0;
 			else dest->bnf_factor_function=bnf_factor_rcurl;
 		};
- 		// MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(dest));
+ 		MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(dest));
 		if(dest->ttype==TOK_FUNC) {
 			MESG("set bnf function! index=%d for [%s]",tok->tok_node->node_index,tok_info(dest));
 			dest->bnf_factor_function=(VFunction)bnf_functions[tok->tok_node->node_index].ffunction;

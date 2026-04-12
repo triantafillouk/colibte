@@ -9,7 +9,7 @@ static MVAR *bnf_var=&bnf_vars[0];
 inline MVAR *get_left_slot(int ind);
 void bnf_expression();
 
-#if	1
+#if	0
 #if	0
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++

@@ -538,7 +538,6 @@ int err_assign_env()
 int err_exec_function(char *name,int nargs,FILEBUF **bf)
 {
  TDSERR("exec_function");
-
 #if	DEBUG1
  int save_stage_level=stage_level;
 #endif
@@ -567,11 +566,11 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 		RT_MESG;
     };
 	*bf=bp;
-	// MESG("err_exec_function: %s args=%d",bp->b_fname,nargs);
+	MESG("err_exec_function: %s args=%d",bp->b_fname,nargs);
 	parsed=parse_block1(bp,NULL,0);	/* do not init if already parsed!, returns 0 if parsed  */
-	// MESG("err_exec_function: return from parse_block1");
+	MESG("err_exec_function: return from parse_block1");
 	if(parsed==0) {	/* already parsed, no need to check again!  */
-		// MESG("	already parsed!");
+		MESG("	already parsed!");
 		// MESG("err_exec_function: already parsed! >>");
 		RT_MESG1(463);
 	};
@@ -1041,8 +1040,13 @@ int err_factor()
 		tok0->t_nargs=nargs;
 		CHECK_TOK(503);
 		after_proc=tok;	// this must be RPAR token!
-		check_skip_token_err1(TOK_RPAR,"no right parenthesis",505);
-		stack_push("proc )",tok,-TOK_RPAR);
+		if(tok->ttype != TOK_RPAR) {
+			xpos=5050;
+			set_error(tok,xpos,"proc with no right parenthesis");
+			RT_MESG1(505);
+		};
+		stack_push("proc ) ",tok,-TOK_RPAR);
+		NTOKEN2;
 		// MESG("err TOK_PROC: set after_proc [%s] ttype=%d",tok->tname,tok->ttype);
 		FILEBUF *proc_buffer=NULL;
 		err_num=err_exec_function(tok0->tname,nargs,&proc_buffer);
@@ -1052,16 +1056,20 @@ int err_factor()
 			return(err_num);
 		};
 		if(proc_buffer!=NULL) {
+			
+			MESG("	function buffer found,! [%s]",proc_buffer->b_fname);
 			tok0->proc_buffer=proc_buffer;
+			MESG("	tok0    [%s]",tok_info(tok0));
 #if	TBNF
 			tok0_bnf->proc_buffer=proc_buffer;
 #endif
 			proc_buffer->function_called=0;
+			MESG("	tok_bnf [%s]",tok_info(tok0_bnf));
 			// MESG("	set function buffer");
 		};
 		CHECK_TOK(504);
 		tok=after_proc;
-		// MESG("	TOK_PROC: end function tnum=%d",tok->tnum);
+		MESG("	TOK_PROC: end function tnum=%d",tok->tnum);
 		// stack_push("proc ) ",tok,0);
 		// MESG("err TOK_PROC: end ttype=%d",tok->ttype);
 		RT_MESG;
@@ -1834,7 +1842,7 @@ int err_check_sentence1()
 	case TOK_DIR_RETURN:
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,dir_return);
-
+		// tok0=tok;
 		// MESG(" err TOK_DIR_RetURN");
 		stack_push("dir return",tok,-tok->ttype);
 		NTOKEN_ERR(664);
