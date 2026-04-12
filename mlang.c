@@ -263,43 +263,13 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
     	tok->pushed=check_buffer->tok_bnf_index;
 		MESG("! set pushed! as %d [%s]",tok->pushed,tok_info(tok));
-#if	0		
-		tok_struct *p=dest-1;// check_buffer->tok_table_bnf+(check_buffer->tok_bnf_index-1);
-		dest->bnf_factor_function=NULL;
-		if(p>check_buffer->tok_table_bnf){
-			// MESG("	p=%p",p);
-			if(exp_type==TOK_INCREASEBY) {
-				// MESG("TOK_INCREASE!");
-				if(p->bnf_group==TOK_NUM) {
-					// MESG("	set factor_num0!,increase_by0!");
-					p->bnf_factor_function=bnf_factor_num0;
-					dest->bnf_factor_function=bnf_increase_by0;
-				} else if(p->bnf_group==TOK_VAR) {
-					// MESG("	set factor_var0!,increase_by0!");
-					p->bnf_factor_function=bnf_factor_var0;
-					dest->bnf_factor_function=bnf_increase_by0;
-				};
-			};
-#if	1
-			if(exp_type==TOK_ASSIGN) {
-				if(p->bnf_group==TOK_NUM) {
-					MESG("	%3d set factor_num0!,assign_var0!",check_buffer->tok_bnf_index);
-					p->bnf_factor_function=bnf_factor_num0;
-					dest->bnf_factor_function=bnf_factor_assign_var0;
-				} else if(p->bnf_group==TOK_VAR) {
-					MESG("	%3d set factor_var0!,assign_var0!",check_buffer->tok_bnf_index);
-					p->bnf_factor_function=bnf_factor_var0;
-					dest->bnf_factor_function=bnf_factor_assign_var0;
-				};
-			};
-#endif
-			dest->bnf_group=exp_type;
+
+		// set_bnf_function1(dest,exp_type);
+		set_bnf_function1(dest,dest->ttype);
+		if(dest->ttype==TOK_LCURL||dest->ttype==TOK_RCURL) {
+			eval_curl_match(dest);
+			if(dest->ttype==TOK_LCURL) dest->bnf_factor_function = bnf_dir_lcurl;
 		};
-		if(dest->bnf_factor_function==NULL)
-#endif
-			set_bnf_function1(dest,exp_type);
-		
-		if(dest->ttype==TOK_LCURL||dest->ttype==TOK_RCURL) eval_curl_match(dest);
 		if(dest->ttype==TOK_RCURL) {
 			tok_struct *p=dest-1;
 			if(p->ttype==TOK_SHOW || p->ttype==TOK_RCURL) dest->bnf_factor_function=bnf_factor_rcurl_no;
@@ -2427,7 +2397,7 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_none,	// TOK_DIR_IF	,	// dir if
 	bnf_factor_none,	// TOK_DIR_ELSE	,	// dir else
 	bnf_factor_none,	// TOK_DIR_BREAK	,
-	bnf_factor_none,	// TOK_DIR_RETURN	,
+	bnf_dir_return,	// TOK_DIR_RETURN	,
 	bnf_factor_none,	// TOK_DIR_WHILE	,
 	bnf_factor_none,	// TOK_DIR_FOR		,
 	bnf_factor_comma,	// TOK_COMMA		,
@@ -2704,16 +2674,33 @@ FFunction factor_funcs[] = {
 
 void set_bnf_function1(tok_struct *tok, int type)
 {
+  if(type==0) {
+ 		tok->bnf_group=factor_bnf_type[type];
+		tok->bnf_factor_function = factor_bnf_funcs[type];
+		MESG("-- set_bnf_function1: ind=%2d type=%3d",tok->tind,type);
+  } else if (type>0) {
+  		int exp_type=factor_bnf_type[type];
+  		tok->bnf_group=exp_type;
+		tok->bnf_factor_function = factor_bnf_funcs[type];
+		MESG("-- set_bnf_function1: ind=%2d type=%3d",tok->tind,type);
+  } else {
+  		int exp_type=factor_bnf_type[-type];
+  		tok->bnf_group=exp_type;
+		tok->bnf_factor_function = factor_bnf_funcs[-type];
+		MESG("-- set_bnf_function1: ind=%2d -type=%3d",tok->tind,type);
+  };
+#if	0
  if(type>=0) {
 	int exp_type = factor_bnf_type[type];
 	tok->bnf_group=exp_type;
 	tok->bnf_factor_function = factor_bnf_funcs[exp_type];
-	// MESG("-- set_bnf_function1: ind=%2d exp type=%3d",tok->tind,exp_type);
+	MESG("-- set_bnf_function1: ind=%2d exp type=%3d",tok->tind,exp_type);
  } else {
 	tok->bnf_group=0;
 	tok->bnf_factor_function = factor_bnf_funcs[-type];
-	// MESG("-- set_bnf_function1: ind=%2d exp type=%3d",tok->tind,type);
+	MESG("-- set_bnf_function1: ind=%2d exp type=%3d",tok->tind,type);
  };
+#endif
 }
 
 #if	NUSE

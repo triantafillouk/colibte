@@ -9,7 +9,7 @@ static MVAR *bnf_var=&bnf_vars[0];
 inline MVAR *get_left_slot(int ind);
 void bnf_expression();
 
-#if	0
+#if	1
 #if	0
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
@@ -752,7 +752,7 @@ static inline void bnf_factor_none()
 
 void bnf_factor_dummy()
 {
-	MESG("bnf_factor_dummy!");
+	MESG("bnf_factor_dummy! [%s]",tok);
 	NTOKEN2;
 }
 
@@ -1279,10 +1279,10 @@ void bnf_block1_break(FILEBUF *fp)
 
 void bnf_dir_lcurl()
 {
-	// MESG("bnf_dir_lcurl:<<<");
+	MESG("bnf_dir_lcurl:<<<");
 	NTOKEN2;
 	bnf_block1(exe_buffer);
-	// MESG("end block! [%s]>>>",tok_info(tok));
+	MESG("end block! [%s]>>>",tok_info(tok));
 }
 
 void bnf_dir_lcurl_break()
@@ -1415,11 +1415,13 @@ void bnf_expression()
 
 void bnf_dir_return()
 {
-	// MESG("bnf_dir_return:");
+	MESG("bnf_dir_return: at [%s]",tok_info(tok));
 	NTOKEN2;
 	if(tok->ttype!=TOK_SEP && tok->ttype!=TOK_RPAR) { 
 		bnf_expression();
-	}
+	};
+	MESG("bnf_dir_return: end at [%s]",tok_info(tok));
+	printf("bnf_dir_return: %f\n",num_result());
 	current_active_flag=0;	/* skip rest of function  */
 }
 
@@ -1486,14 +1488,17 @@ void bnf_exec_function(FILEBUF *proc_buffer,int nargs)
 
 	current_stable = push_args_bnf(nargs,proc_buffer->symbol_tree->items);
 	tok_struct *after_proc=tok;
-	
+	FILEBUF *ori_buf=exe_buffer;
+	exe_buffer=proc_buffer;
 	tok=proc_buffer->tok_table;	/* start of function  */
 	MESG("bnf_exec_function:start [%s]",tok_info(tok));
 	skip_args1(nargs);
 	MESG("bnf_exec_function:[%s]",tok_info(tok));
-	tok->bnf_factor_function();
+	// tok->bnf_factor_function();
+	bnf_dir_lcurl();
 	delete_symbol_table(current_stable,proc_buffer->symbol_tree->items,nargs);
 	current_stable=old_symbol_table;
+	exe_buffer=ori_buf;
 	tok=after_proc;
 }
 
