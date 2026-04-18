@@ -746,13 +746,13 @@ void bnf_factor_xor()
 
 static inline void bnf_factor_none()
 {
-	MESG("bnf_factor_none!");
+	MESG("bnf_factor_none! [%s]",tok_info(tok));
 	NTOKEN2;
 }
 
 void bnf_factor_dummy()
 {
-	MESG("bnf_factor_dummy! [%s]",tok);
+	MESG("bnf_factor_dummy! [%s]",tok_info(tok));
 	NTOKEN2;
 }
 
@@ -1279,10 +1279,10 @@ void bnf_block1_break(FILEBUF *fp)
 
 void bnf_dir_lcurl()
 {
-	MESG("bnf_dir_lcurl:<<<");
+	// MESG("bnf_dir_lcurl:<<<");
 	NTOKEN2;
 	bnf_block1(exe_buffer);
-	MESG("end block! [%s]>>>",tok_info(tok));
+	// MESG("end block! [%s]>>>",tok_info(tok));
 }
 
 void bnf_dir_lcurl_break()

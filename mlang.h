@@ -31,6 +31,7 @@ typedef struct tok_struct {
 #if	TBNF
 	short bnf_group;
 	short pushed;
+	short function_index;
 	VFunction bnf_factor_function;
 #endif
 	// short tind1;	/* index1 for type elements  */

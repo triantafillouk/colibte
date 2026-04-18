@@ -264,8 +264,8 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
     	tok->pushed=check_buffer->tok_bnf_index;
 		MESG("! set pushed! as %d [%s]",tok->pushed,tok_info(tok));
 
-		// set_bnf_function1(dest,exp_type);
-		set_bnf_function1(dest,dest->ttype);
+		set_bnf_function1(dest,exp_type);
+
 		if(dest->ttype==TOK_LCURL||dest->ttype==TOK_RCURL) {
 			eval_curl_match(dest);
 			if(dest->ttype==TOK_LCURL) dest->bnf_factor_function = bnf_dir_lcurl;
@@ -279,7 +279,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		};
  		// MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(dest));
 		if(dest->ttype==TOK_FUNC) {
-			MESG("set bnf function! index=%d for [%s]",tok->tok_node->node_index,tok_info(dest));
+			MESG("	set bnf function! index=%d for [%s]",tok->tok_node->node_index,tok_info(dest));
 			dest->bnf_factor_function=(VFunction)bnf_functions[tok->tok_node->node_index].ffunction;
 		};
 		check_buffer->tok_bnf_index++;
@@ -1017,7 +1017,7 @@ int exec_named_function(char *name)
     FILEBUF *bp;		/* ptr to buffer to execute */
     char bufn[MAXFLEN+2];		/* name of buffer to execute */
 
-	// MESG("exec_named_function: %s",name);
+	MESG("exec_named_function: %s",name);
 	/* find out what buffer to execute */
 	strlcpy(bufn+1,name,MAXFLEN);
 
@@ -2498,7 +2498,7 @@ int factor_bnf_type[] = {
 	0,	// TOK_DIR_IF	,	// dir if
 	0,	// TOK_DIR_ELSE	,	// dir else
 	0,	// TOK_DIR_BREAK	,
-	0,	// TOK_DIR_RETURN	,
+	-TOK_DIR_RETURN,	// TOK_DIR_RETURN	,
 	0,	// TOK_DIR_WHILE	,
 	0,	// TOK_DIR_FOR		,
 	0,	// TOK_COMMA		,
@@ -2674,6 +2674,7 @@ FFunction factor_funcs[] = {
 
 void set_bnf_function1(tok_struct *tok, int type)
 {
+#if	0
   if(type==0) {
  		tok->bnf_group=factor_bnf_type[type];
 		tok->bnf_factor_function = factor_bnf_funcs[type];
@@ -2689,16 +2690,24 @@ void set_bnf_function1(tok_struct *tok, int type)
 		tok->bnf_factor_function = factor_bnf_funcs[-type];
 		MESG("-- set_bnf_function1: ind=%2d -type=%3d",tok->tind,type);
   };
-#if	0
- if(type>=0) {
+#else
+ if(type==0) {
 	int exp_type = factor_bnf_type[type];
 	tok->bnf_group=exp_type;
 	tok->bnf_factor_function = factor_bnf_funcs[exp_type];
-	MESG("-- set_bnf_function1: ind=%2d exp type=%3d",tok->tind,exp_type);
+	tok->function_index=exp_type;
+	MESG("-- set_bnf_function1 to none!!!: num=%2d exp type=%3d",tok->tnum,exp_type);
+ } else if(type>0) {
+	int exp_type = factor_bnf_type[type];
+	tok->bnf_group=exp_type;
+	tok->bnf_factor_function = factor_bnf_funcs[exp_type];
+	tok->function_index=exp_type;
+	MESG("-- set_bnf_function1: ind=%2d exp num=%3d",tok->tnum,exp_type);
  } else {
 	tok->bnf_group=0;
 	tok->bnf_factor_function = factor_bnf_funcs[-type];
-	MESG("-- set_bnf_function1: ind=%2d exp type=%3d",tok->tind,type);
+	tok->function_index=type;
+	MESG("-- set_bnf_function1: ind=%2d exp num=%3d",tok->tnum,type);
  };
 #endif
 }
@@ -4359,25 +4368,25 @@ char * tok_info(tok_struct *tok)
 				rows=tok->tok_adat->rows;
 				cols=tok->tok_adat->cols;
 			};
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] rows=%d cols=%d bnf=%2d",
-				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,rows,cols,tok->bnf_group);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] rows=%d cols=%d bnf=%2d fi=%d",
+				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,rows,cols,tok->bnf_group,tok->function_index);
 		} else 
-		if(tok->ttype==TOK_SHOW) { snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [:] bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->bnf_group);
+		if(tok->ttype==TOK_SHOW) { snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [:] bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->bnf_group,tok->function_index);
 		} else
 		if(tok->ttype==TOK_LCURL||tok->ttype==TOK_RCURL) {
 				// snprintf(stok,sizeof(stok),"%3d:%4d CURL",tok->tnum,tok->tline);
-				snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %s other is %d bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum,tok->bnf_group);
+				snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %s other is %d bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum,tok->bnf_group,tok->function_index);
 		} else
 		if(tok->tgroup>0) {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] [%2d:%5s]!! bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup),tok->bnf_group);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] [%2d:%5s]!! bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup),tok->bnf_group,tok->function_index);
 		} else 
 			if(tok->ttype==TOK_NUM) { 
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %5.1f bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval,tok->bnf_group);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %5.1f bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval,tok->bnf_group,tok->function_index);
 		} else if(tok->ttype==TOK_QUOTE) {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\" bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->bnf_group);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\" bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->bnf_group,tok->function_index);
 		} else if(tok->ttype==TOK_VAR) {
 			// MESG("TOK_VAR:");
 			BTNODE *var_node = tok->tok_node;
@@ -4398,16 +4407,16 @@ char * tok_info(tok_struct *tok)
 			};
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
 
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] %8s %d size %d [bnf=%2d]",
-				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,vtype_names[vtype] ,vtype,size,tok->bnf_group);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] %8s %d size %d [bnf=%2d] fi=%d",
+				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,vtype_names[vtype] ,vtype,size,tok->bnf_group,tok->function_index);
 		} else {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->bnf_group);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->bnf_group,tok->function_index);
 		};
 // 			
 	} else {
 			return "null tok name !!!!!!!!!!!!!!!!!!!!!!!!!!!";
-		     snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5.1f] bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,"null name",tok->dval,tok->bnf_group);
+		     snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5.1f] bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,"null name",tok->dval,tok->bnf_group,tok->function_index);
 	};
 	// MESG("tok_info: end");
 	return stok;
