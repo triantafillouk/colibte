@@ -513,7 +513,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	return (0);
  };
 
- // MESG("- Parse block [%s] type=%d <---------------------",bf->b_fname,bf->b_type);
+ MESG("- Parse_block1 [%s] type=%d <---------------------",bf->b_fname,bf->b_type);
  if(is_mlang(bf)) script_active=1;	/* initial script state  */
 
  if(init && bf->tok_table!=NULL) {
@@ -559,6 +559,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 
 	if(err_num>0) {
 		check_buffer = buffer_ori;
+		MESG("--> parse_block1: return in error %d",err_num);
 		return 0.0;
 	}
 	value=0;
@@ -602,6 +603,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			// MESG("parse: TOK_NUM: num=%d type=%d val=%f",tok->tnum,tok->ttype,value);
 			if(err_num>0) {
 				check_buffer = buffer_ori;
+				MESG("--> parse_block1: return in error %d",err_num);
 				return(0);
 			};
 			break;
@@ -617,6 +619,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 				if(curl_level<0) {
 					err_num=102;err_str="curls dont match!";
 					check_buffer = buffer_ori;
+					MESG("--> parse_block1: return in error %d",err_num);
 					return(0);
 				};
 				if(curl_level==store_level && is_storelines) {
@@ -848,6 +851,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			if(tok_line) err_line=tok_line;else err_line=last_correct_line;
 			err_str="character unrecognised";
 			check_buffer = buffer_ori;
+			MESG("--> parse_block1: return in error %d",err_num);
 			return(0);
 			};
 	};
@@ -1012,6 +1016,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 						// set_error(tok,111,"type_definition parse error");
 						MESG("	after setting 111 error");
 						check_buffer = buffer_ori;
+						MESG("--> parse_block1: return in error %d",err_num);
 						return 0;
 					} else {
 						// MESG("after check type type_init_definition! ttype=%d",tok->ttype);
@@ -1163,6 +1168,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	// else MESG("[%s]: parse_block1 > end. Number of tokens %d",bf->b_fname,bf->symbol_tree->items);
  // MESG("parse_block1: [%s] >> end",bf->b_fname); 
  check_buffer = buffer_ori;
+ MESG("--> parse_block1:[%s] end OK!",bf->b_fname);
  return(TRUE); 
 }
 
@@ -1176,13 +1182,14 @@ void set_tok_table(FILEBUF *bf)
  alist *lex_parser = bf->lex_parser;
  int isize=0;
  int table_size = lex_parser->size+1;
- // MESG("set_tok_table: [%s] create token table from token list size of %d!",bf->b_fname,lex_parser->size);
+ MESG("set_tok_table: [%s] create token table from token list size of %d!",bf->b_fname,lex_parser->size);
  if(bf->tok_table != NULL) {
  	free(bf->tok_table);
  };
 // 	MESG("1");
 #if	TBNF
  if(bf->tok_table_bnf != NULL) {
+	MESG("	-- [%s] recreate bnf token table!",bf->b_fname);
  	free(bf->tok_table_bnf);
  };
  bf->tok_table_bnf=(void *)malloc(sizeof(struct tok_struct)*table_size);

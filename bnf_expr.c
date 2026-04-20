@@ -1012,8 +1012,8 @@ void bnf_factor_comma()
 
 void bnf_factor_eof()
 {
-	int ind = bnf_var - bnf_vars;
- 	MESG("bnf_factor_EOF: var index = %d type=%d",ind,bnf_var->var_type);
+	// int ind = bnf_var - bnf_vars;
+ 	// MESG("bnf_factor_EOF: var index = %d type=%d",ind,bnf_var->var_type);
 	current_active_flag=0;
 }
 
@@ -1058,7 +1058,7 @@ static inline void bnf_factor_rcurl()
 
 void bnf_factor_error()
 {
- MESG("bnf_factor_error:");
+ 	MESG("bnf_factor_error: [%s]",tok_info(tok));
 	current_active_flag=0;
 	NTOKEN2;
 }
@@ -1235,15 +1235,16 @@ void bnf_factor_lpar()
 static void bnf_block1(FILEBUF *fp)
 {
 #if	1
-	// MESG("-- block start! { [%s]",tok_info(tok));
+	// MESG("-------- bnf_block1 start![%s] { [%s]",fp->b_fname,tok_info(tok));
+	// show_token_table("block  ",fp,fp->tok_table_bnf,fp->tok_bnf_index);
 	do {
 		// MESG("	- [%s]",tok_info(tok));
 	 	tok->bnf_factor_function();
 		if(!current_active_flag) break;
 	} while(tok->tgroup!=TOK_END);
 	tok->bnf_factor_function();
-	// int ind = bnf_var - bnf_vars;
-	// MESG("-- block end  ! } [%s] %d",tok_info(tok),ind);
+
+	// MESG("-- block end  ! } [%s]",tok_info(tok));
 #else
    // MESG("# bnf_block:[%s]",tok_info(tok));
    while(tok->tgroup!=TOK_END) 
@@ -1436,13 +1437,13 @@ void bnf_expression()
 
 void bnf_dir_return()
 {
-	MESG("bnf_dir_return: at [%s]",tok_info(tok));
+	// MESG("bnf_dir_return: at [%s]",tok_info(tok));
 	NTOKEN2;
 	if(tok->ttype!=TOK_SEP && tok->ttype!=TOK_RPAR) { 
 		bnf_expression();
 	};
-	MESG("bnf_dir_return: end at [%s]",tok_info(tok));
-	printf("bnf_dir_return: %f\n",num_result());
+	// MESG("bnf_dir_return: end at [%s]",tok_info(tok));
+	// printf("bnf_dir_return: %f\n",num_result());
 	current_active_flag=0;	/* skip rest of function  */
 }
 
@@ -1454,7 +1455,7 @@ void bnf_dir_type()
 
 MVAR * push_args_bnf(int nargs,int vars_num)
 {
- MESG("push_args_bnf: nargs=%d vars_num=%d",nargs,vars_num);
+ // MESG("push_args_bnf: nargs=%d vars_num=%d",nargs,vars_num);
 
  MVAR *va = new_symbol_table(nargs+vars_num);
  if(va==NULL) return NULL;
@@ -1462,7 +1463,7 @@ MVAR * push_args_bnf(int nargs,int vars_num)
  MVAR *va_i=va;
  for(;va_i<va+nargs;va_i++)
  {
-	MESG("	push_args_1: arg %d, tok=[%d %s] type=%d",(int)(va_i-va),tok->tnum,tok->tname,va_i->var_type);
+	// MESG("	push_args_1: arg %d, tok=[%d %s] type=%d",(int)(va_i-va),tok->tnum,tok->tname,va_i->var_type);
 	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
 	// MESG(";		i=%d, var_type = %d",i,va_i->var_type);
 	bnf_expression();
@@ -1503,23 +1504,25 @@ MVAR * push_args_bnf(int nargs,int vars_num)
 void bnf_exec_function(FILEBUF *proc_buffer,int nargs)
 {
 	MVAR *old_symbol_table=current_stable;
-	MESG("bnf_exec_function:");
+	// MESG("bnf_exec_function:");
 	if(proc_buffer==NULL) MESG("	buffer is NULL!");
-	MESG("	proc_buffer [%s]",proc_buffer->b_fname);
+	// MESG("	proc_buffer [%s]",proc_buffer->b_fname);
 
 	current_stable = push_args_bnf(nargs,proc_buffer->symbol_tree->items);
 	tok_struct *after_proc=tok;
-	FILEBUF *ori_buf=exe_buffer;
-	exe_buffer=proc_buffer;
-	tok=proc_buffer->tok_table;	/* start of function  */
-	MESG("bnf_exec_function:start [%s]",tok_info(tok));
+
+		// FILEBUF *ori_buf=exe_buffer;
+		// exe_buffer=proc_buffer;
+	
+	tok=proc_buffer->tok_table_bnf;	/* start of function  */
+	// MESG("bnf_exec_function:start [%s]",tok_info(tok));
 	skip_args1(nargs);
-	MESG("bnf_exec_function:[%s]",tok_info(tok));
+	// MESG("bnf_exec_function:[%s]",tok_info(tok));
 	// tok->bnf_factor_function();
 	bnf_dir_lcurl();
 	delete_symbol_table(current_stable,proc_buffer->symbol_tree->items,nargs);
 	current_stable=old_symbol_table;
-	exe_buffer=ori_buf;
+		// exe_buffer=ori_buf;
 	tok=after_proc;
 }
 
@@ -1527,12 +1530,12 @@ void bnf_factor_proc()
 {
 	tok_struct *tok0=tok;
 	FILEBUF *cbuf=exe_buffer;
-	MESG("bnf_factor_proc: ttype=%d",tok0->ttype);
-	MESG("	tname [%s]",tok0->tname);
+	// MESG("bnf_factor_proc: ttype=%d",tok0->ttype);
+	// MESG("	tname [%s]",tok0->tname);
 	// MESG("bnf_factor_proc: current_buffer [%s]",cbuf->b_fname);
 	// MESG("	token buffer [%s]",tok0->proc_buffer->b_fname);
 	exe_buffer=tok0->proc_buffer;
-	MESG("	exe_buffer [%s]",exe_buffer->b_fname);
+	// MESG("	exe_buffer [%s]",exe_buffer->b_fname);
 #if	TPROFILE
 	tok0->proc_buffer->function_called++;
 #endif

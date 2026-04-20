@@ -1055,8 +1055,7 @@ void show_token_table(char *title, FILEBUF *bf,tok_struct *token_start,int size)
 {
  int i=0;
  tok_struct *tokp=token_start;
- // tok_struct *tokp1=token_start;
- MESG("---- %s token table of %s size %d ----",title,bf->b_fname,size);
+ // MESG("---- %s token table of %s size %d ----",title,bf->b_fname,size);
  for(i=0;i<size;i++) {
 	// tokp=token_start+i;
  	// MESG("!T %3d %p %s",i,tokp,tok_info(tokp));
@@ -1075,7 +1074,8 @@ int check_init(FILEBUF *bf)
  check_buffer = bf;
  int err=0;
  INIT_STAGE;
- // MESG("---- check_init: [%s] %d",bf->b_fname,bf->b_type);
+ int checked = (bf->tok_table != NULL);
+ MESG("---- check_init: [%s] %d checked=%d",bf->b_fname,bf->b_type,checked);
 #if	0
  if(execmd) 
  {
@@ -4174,7 +4174,7 @@ int empty_tok_table(FILEBUF *fp)
 {
  tok_struct *table= fp->tok_table;
  tok_struct *tokdel;
- // MESG("empty_tok_table:");
+ MESG("empty_tok_table: of [%s]",fp->b_fname);
  if(table==NULL) {
  	// MESG("empty_tok_table: already clean!");
 	return(0);
@@ -4376,17 +4376,20 @@ char * tok_info(tok_struct *tok)
 		if(tok->ttype==TOK_LCURL||tok->ttype==TOK_RCURL) {
 				// snprintf(stok,sizeof(stok),"%3d:%4d CURL",tok->tnum,tok->tline);
 				snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %s other is %d bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum,tok->bnf_group,tok->function_index);
-		} else
-		if(tok->tgroup>0) {
+		} else	if(tok->tgroup>0) {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
 			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] [%2d:%5s]!! bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup),tok->bnf_group,tok->function_index);
-		} else 
-			if(tok->ttype==TOK_NUM) { 
+		} else	if(tok->ttype==TOK_NUM) { 
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
 			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %5.1f bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval,tok->bnf_group,tok->function_index);
 		} else if(tok->ttype==TOK_QUOTE) {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
 			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\" bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->bnf_group,tok->function_index);
+		} else if(tok->ttype==TOK_PROC) { 
+			if(tok->proc_buffer == NULL) 
+				snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\" NULL proc bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->bnf_group,tok->function_index);
+			else 
+				snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\" [%s] proc bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->proc_buffer->b_fname,tok->bnf_group,tok->function_index);
 		} else if(tok->ttype==TOK_VAR) {
 			// MESG("TOK_VAR:");
 			BTNODE *var_node = tok->tok_node;

@@ -10,7 +10,8 @@ fori(i=1;11;1)
 		l=i*j+32.1
 		p += l
 	}
-	p:
+	s="p = "+p
+	show_time(s,1);
 }
 tdif=show_time("End test",2)
 
