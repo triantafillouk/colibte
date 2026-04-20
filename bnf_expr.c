@@ -1444,7 +1444,7 @@ void bnf_dir_return()
 		bnf_expression();
 	};
 	// MESG("bnf_dir_return: end at [%s]",tok_info(tok));
-	// printf("bnf_dir_return: %f\n",num_result());
+	MESG("bnf_dir_return: %fn",num_result());
 	current_active_flag=0;	/* skip rest of function  */
 }
 
@@ -1554,9 +1554,40 @@ void bnf_factor_proc()
 	exe_buffer=cbuf;
 }
 
+#if	1
 void bnf_dir_if()
 {
 	tok_struct *tok0=tok;
+	// MESG("tok_dir_if: n=%d",tok->tnum);
+	NTOKEN2;	/* go to next token after if */
+
+	bnf_expression();
+	int ival = num_result();
+	MESG("tok_dir_if: res=%d after expression [%s]",ival,tok_info(tok));
+	if(ival) {
+		// MESG("err_if: ttype=%d tnum=%f",tok->ttype,tok->tnum);
+		// MESG("	execute if at %d",tok->tnum);
+		NTOKEN2;
+		MESG("	execute if at [%s]",tok_info(tok));
+		tok->bnf_factor_function();
+		if(tok->ttype==TOK_DIR_ELSE) {
+			tok=tok->next_tok;
+			// MESG("skip else up to %d",tok->tnum);
+		};
+		return;
+	} else {
+		tok=tok0->next_tok;
+		if(check_skip_token1(TOK_DIR_ELSE)) {
+			MESG("	execute else at [%s]",tok_info(tok));
+			NTOKEN2;
+			tok->bnf_factor_function();
+		};
+	}
+}
+#else
+void bnf_dir_if()
+{
+	// tok_struct *tok0=tok;
 	MESG("tok_dir_if: n=%d",tok->tnum);
 	NTOKEN2;	/* go to next token after if */
 
@@ -1584,7 +1615,7 @@ void bnf_dir_if()
 		};
 	}
 }
-
+#endif
 void bnf_dir_else()
 {
 	MESG("bnf_dir_else:");

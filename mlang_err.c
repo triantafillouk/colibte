@@ -1669,7 +1669,7 @@ int err_check_sentence1()
 		tok_struct *tok0=tok;
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,tok_dir_if);
-		stack_push("DIR_IF",tok,-tok->ttype);
+		tok_struct *if_token=stack_push("DIR_IF",tok,-tok->ttype);
 		NTOKEN_ERR(631);	/* go to next token after if */
 		xpos=632;
 
@@ -1691,6 +1691,8 @@ int err_check_sentence1()
 		// check_skip_token1(TOK_RPAR);	/* ???????????  */
 		// NTOKEN_ERR(635);	/* go after sentence  */
 		CHECK_TOK(635);
+		tok_struct *end_if_tok=stack_push("end of if",tok,-tok->ttype);
+		if_token->next_tok=end_if_tok;
 		tok0->next_tok=tok;
 		// MUST: No separator before else, handle this in parser !!!!! CHECK
 		// check for else statement!
@@ -1698,11 +1700,12 @@ int err_check_sentence1()
 		if(tok->ttype==TOK_DIR_ELSE) {
 			// MESG("we have an else statement!");
 			tok0=tok;
-			stack_push("else",tok,-tok->ttype);
+			// tok_struct *else_bnf_tok=stack_push("else",tok,-tok->ttype);
 			NTOKEN2;
 			err_num=err_check_sentence1();	/* body of else  */
 			xpos=638;
 			tok0->next_tok=tok;
+			end_if_tok->next_tok = stack_push("end of else",tok,-tok->ttype);
 		} else {
 			xpos=639;
 		};
