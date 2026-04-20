@@ -536,6 +536,7 @@ void bnf_factor_smaller()
 	if(vara->var_type==VTYPE_POINTER) vara=vara->var_pointer;
 	if(vara->var_type==VTYPE_NUM) {
 		if(varb->var_type==VTYPE_NUM) {
+			MESG("< numeric!");
 			bnf_var->dval=vara->dval < varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
 			NTOKEN2;
@@ -1552,4 +1553,42 @@ void bnf_factor_proc()
 
 	exe_buffer=cbuf;
 }
+
+void bnf_dir_if()
+{
+	tok_struct *tok0=tok;
+	MESG("tok_dir_if: n=%d",tok->tnum);
+	NTOKEN2;	/* go to next token after if */
+
+	bnf_expression();
+	int ival=num_result();
+	MESG("tok_dir_if: res=%d after expression [%s]",ival,tok_info(tok));
+	NTOKEN2;	/* skip right parenthesis  */
+	if(ival) {
+		// MESG("err_if: ttype=%d tnum=%f",tok->ttype,tok->tnum);
+		MESG("	execute if at %d",tok->tnum);
+		tok->bnf_factor_function();
+		// MESG("tok_dir_if: num=%d",tok->tnum);
+		if(tok->ttype==TOK_DIR_ELSE) {
+			// tok=tok->next_tok;
+			NTOKEN2;
+			skip_sentence1();
+			MESG("skip else up to %d",tok->tnum);
+		};
+		return ;
+	} else {
+		skip_sentence1();
+		MESG("	execute else starting at %d",tok->tnum);
+		if(check_skip_token1(TOK_DIR_ELSE)) {
+			tok->bnf_factor_function();
+		};
+	}
+}
+
+void bnf_dir_else()
+{
+	MESG("bnf_dir_else:");
+	NTOKEN2;
+}
+
 

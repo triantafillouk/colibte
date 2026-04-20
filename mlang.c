@@ -2394,9 +2394,9 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_num,		// TOK_NUM, numeric value
 
 	bnf_factor_none,	// TOK_DIR		,	// directive
-	bnf_factor_none,	// TOK_DIR_IF	,	// dir if
-	bnf_factor_none,	// TOK_DIR_ELSE	,	// dir else
-	bnf_factor_none,	// TOK_DIR_BREAK	,
+	bnf_dir_if,	// TOK_DIR_IF	,	// dir if
+	bnf_dir_else,	// TOK_DIR_ELSE	,	// dir else
+	bnf_dir_break,	// TOK_DIR_BREAK	,
 	bnf_dir_return,	// TOK_DIR_RETURN	,
 	bnf_factor_none,	// TOK_DIR_WHILE	,
 	bnf_factor_none,	// TOK_DIR_FOR		,
@@ -4388,8 +4388,10 @@ char * tok_info(tok_struct *tok)
 		} else if(tok->ttype==TOK_PROC) { 
 			if(tok->proc_buffer == NULL) 
 				snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\" NULL proc bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->bnf_group,tok->function_index);
-			else 
-				snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\" [%s] proc bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->proc_buffer->b_fname,tok->bnf_group,tok->function_index);
+			else {
+				int len=snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\" [%20s] proc bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->proc_buffer->b_fname,tok->bnf_group,tok->function_index);
+				if(len>=sizeof(stok))  MESG("	truncated");
+			};
 		} else if(tok->ttype==TOK_VAR) {
 			// MESG("TOK_VAR:");
 			BTNODE *var_node = tok->tok_node;
