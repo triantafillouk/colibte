@@ -24,6 +24,7 @@ static inline void next_var(char *title)
 {
 	bnf_var++;
 	if(bnf_var->var_type==VTYPE_STRING) {
+		MESG("next_var free [%s]",tok_info(tok));
 		if(bnf_var->var_alloced) free(bnf_var->sval);
 		bnf_var->var_alloced=0;
 		bnf_var->var_type=0;
@@ -638,19 +639,34 @@ void bnf_factor_power()
 	NTOKEN2;
 }
 
+void bnf_factor_smaller_pn()
+{
+ MVAR *varb = bnf_var;
+	prev_var("smaller");
+	bnf_var->dval = bnf_var->var_pointer->dval < varb->dval;
+	bnf_var->var_type=VTYPE_NUM;
+	NTOKEN2;
+}
+
 void bnf_factor_smaller()
 {
  // MESG("bnf_factor_smaller : var ind=%d tok ind=%d var type=%d",bnf_var-&bnf_vars[0],tok->tnum,bnf_var->var_type);
  MVAR *varb = bnf_var;
+ int varb_type=varb->var_type;
  	if(varb->var_type==VTYPE_POINTER) varb=varb->var_pointer;
 	prev_var("smaller");
 	MVAR *vara = bnf_var;
+	int vara_type=vara->var_type;
 	if(vara->var_type==VTYPE_POINTER) vara=vara->var_pointer;
 	if(vara->var_type==VTYPE_NUM) {
 		if(varb->var_type==VTYPE_NUM) {
 			// MESG("< numeric!");
 			bnf_var->dval=vara->dval < varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
+			if(vara_type==VTYPE_POINTER && varb_type==VTYPE_NUM) {
+				tok->bnf_factor_function=bnf_factor_smaller_pn;
+				MESG("set bnf_function to smaller_pn [%s]",tok_info(tok));
+			};
 			NTOKEN2;
 			return;
 		};
@@ -658,6 +674,7 @@ void bnf_factor_smaller()
  	MESG("smaller error!");
 	NTOKEN2;
 }
+
 
 void bnf_factor_bigger()
 {
