@@ -299,7 +299,7 @@ double bnf_show_time()
 	} else {
 		syntax_error("error in stime",312);
 	}
-	MESG("show_time: [%s]",va[0].sval);
+	// MESG("show_time: [%s]",va[0].sval);
 	prev_var("show_time");
 	return value;
 }

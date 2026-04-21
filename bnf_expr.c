@@ -71,7 +71,7 @@ void set_var_value()
  	bnf_var->var_type=bnf_var->var_pointer->var_type;
 	if(bnf_var->var_type==VTYPE_NUM) {
 		bnf_var->dval=bnf_var->var_pointer->dval;
-		MESG("	set_var_value num %f",bnf_var->dval);
+		// MESG("	set_var_value num %f",bnf_var->dval);
 	} else if(bnf_var->var_type==VTYPE_STRING) {
 		bnf_var->sval=strdup(bnf_var->var_pointer->sval);
 		bnf_var->var_alloced=1;
@@ -234,7 +234,7 @@ inline static double return_result()
 void bnf_factor_var()
 {
 	next_var("var");
-	MESG("	var: put var %s at pos %ld",tok->tname,bnf_var-bnf_vars);
+	// MESG("	var: put var %s at pos %ld",tok->tname,bnf_var-bnf_vars);
 	bnf_var->var_pointer=get_left_slot(tok->tind);
 	bnf_var->var_type=VTYPE_POINTER;
 	NTOKEN2;
@@ -245,7 +245,7 @@ void bnf_factor_num()
 	next_var("num");
 	bnf_var->dval = tok->dval;
 	bnf_var->var_type=VTYPE_NUM;
-	MESG("bnf_factor_num: put numeric %f at pos %ld type=%d",bnf_var->dval,bnf_var-bnf_vars,bnf_var->var_type);
+	// MESG("bnf_factor_num: put numeric %f at pos %ld type=%d",bnf_var->dval,bnf_var-bnf_vars,bnf_var->var_type);
 	NTOKEN2;
 }
 
@@ -255,7 +255,7 @@ void bnf_factor_quote()
 	bnf_var->sval = strdup(tok->tname);
 	bnf_var->var_type=VTYPE_STRING;
 	bnf_var->var_alloced=1;
-	MESG("bnf_factor_quote: put quote '%s' at pos %d type %d",bnf_var->sval,(int)(bnf_var-bnf_vars),bnf_var->var_type);
+	// MESG("bnf_factor_quote: put quote '%s' at pos %d type %d",bnf_var->sval,(int)(bnf_var-bnf_vars),bnf_var->var_type);
 	// show_result();
 	// MESG("end of factor_quote!");
 	NTOKEN2;
@@ -350,7 +350,7 @@ void bnf_factor_plus()
  int typea=vara->var_type;
  int typeb=varb->var_type;
 
- MESG("bnf_factor_plus [%2d]: var ind=%d  va=%d vb=%d",tok->tnum,(int)(bnf_var-bnf_vars),vara->var_type,varb->var_type);
+ // MESG("bnf_factor_plus [%2d]: var ind=%d  va=%d vb=%d",tok->tnum,(int)(bnf_var-bnf_vars),vara->var_type,varb->var_type);
  if(varb->var_type==VTYPE_POINTER) {
  	if(varb->var_pointer->var_type==VTYPE_NUM) {
 		if(vara->var_type==VTYPE_POINTER) {
@@ -358,37 +358,37 @@ void bnf_factor_plus()
 				// MESG("-plus vara num = %f",vara->var_pointer->dval);
 				bnf_var->dval=vara->var_pointer->dval + varb->var_pointer->dval;
 				bnf_var->var_type=VTYPE_NUM;
-				// tok->bnf_factor_function=bnf_factor_pp_plus;
-				// MESG("set factor_function to pp_plus [%s]",tok_info(tok));
+				tok->bnf_factor_function=bnf_factor_pp_plus;
+				MESG("set factor_function to pp_plus [%s]",tok_info(tok));
 				NTOKEN2;return;
 			} else if(vara->var_pointer->var_type==VTYPE_STRING) {
-				MESG("-plus vara pointer string is [%s] ....TBD",vara->var_pointer->sval);
+				// MESG("-plus vara pointer string is [%s] ....TBD",vara->var_pointer->sval);
 				NTOKEN2;return;
 			};
 		} else if (vara->var_type==VTYPE_NUM) {
 			bnf_var->dval += varb->var_pointer->dval;
-			// tok->bnf_factor_function=bnf_factor_np_plus;
-			// MESG("set factor_function to np_plus [%s]",tok_info(tok));
+			tok->bnf_factor_function=bnf_factor_np_plus;
+			MESG("set factor_function to np_plus [%s]",tok_info(tok));
 			NTOKEN2;return;
 		} else if(vara->var_type==VTYPE_STRING) {
 			// MESG("-plus vara string is [%s]",vara->sval);
 			char svalue[MAXLLEN];
 			if(varb->var_pointer->var_type==VTYPE_NUM) { // string + num
-				MESG("	varb pointer num = %f",varb->var_pointer->dval);
+				// MESG("	varb pointer num = %f",varb->var_pointer->dval);
 				int stat = snprintf(svalue,sizeof(svalue),"%s%f",vara->sval,varb->var_pointer->dval);
-				MESG("-plus string + var num = [%s]",svalue);
+				// MESG("-plus string + var num = [%s]",svalue);
 				if(stat>MAXLLEN) MESG("truncated 2");
 				if(vara->var_alloced) free(vara->sval);
 				vara->sval=strdup(svalue);
 				// MESG("var string + varb pointer num! [%s]",vara->sval);
-				// MESG("set factor_function to spn_plus [%s]",tok_info(tok));
-				// tok->bnf_factor_function=bnf_factor_spn_plus;
+				MESG("set factor_function to spn_plus [%s]",tok_info(tok));
+				tok->bnf_factor_function=bnf_factor_spn_plus;
 				NTOKEN2;return;
 			} else if(varb->var_pointer->var_type==VTYPE_STRING) { // string + string
 				// MESG("	varb pointer string = %s",varb->var_pointer->sval);
 				int stat = snprintf(svalue,sizeof(svalue),"%s%s",vara->sval,varb->var_pointer->sval);
 				if(stat>MAXLLEN) MESG("truncated 2");
-				MESG("-plus string + var string = [%s]",svalue);
+				// MESG("-plus string + var string = [%s]",svalue);
 				if(vara->var_alloced) free(vara->sval);
 				vara->sval=strdup(svalue);
 				NTOKEN2;return;
@@ -432,7 +432,7 @@ void bnf_factor_plus()
  } else if(varb->var_type==VTYPE_STRING) {
 	char svalue[MAXLLEN];
 	int stat;
- 	MESG("plus varb=string!");
+ 	// MESG("plus varb=string!");
 	if(typea==VTYPE_STRING) {
 		stat=snprintf(svalue,sizeof(svalue),"%s%s",vara->sval,varb->sval);
 		if(stat>MAXLLEN) MESG("truncated 2");
@@ -444,7 +444,7 @@ void bnf_factor_plus()
 	bnf_var->var_alloced=1;
 	if(varb->var_alloced) free(varb->sval);
 	varb->var_alloced=0;
-	MESG("string plus ind=%d [%s]",(int)(bnf_var-bnf_vars),bnf_var->sval);
+	// MESG("string plus ind=%d [%s]",(int)(bnf_var-bnf_vars),bnf_var->sval);
 	NTOKEN2;return;
  };
  
@@ -461,12 +461,12 @@ void bnf_factor_minus()
  int typea=vara->var_type;
  int typeb=varb->var_type;
 
- MESG("bnf_factor_plus [%2d]: var ind=%d  va=%d vb=%d",tok->tnum,(int)(bnf_var-bnf_vars),vara->var_type,varb->var_type);
+ // MESG("bnf_factor_minus [%2d]: var ind=%d  va=%d vb=%d",tok->tnum,(int)(bnf_var-bnf_vars),vara->var_type,varb->var_type);
  if(varb->var_type==VTYPE_POINTER) {
  	if(varb->var_pointer->var_type==VTYPE_NUM) {
 		if(vara->var_type==VTYPE_POINTER) {
 			if(vara->var_pointer->var_type==VTYPE_NUM) {
-				MESG("- minus vara nump = %f - %f",vara->var_pointer->dval,varb->var_pointer->dval);
+				// MESG("- minus vara nump = %f - %f",vara->var_pointer->dval,varb->var_pointer->dval);
 				bnf_var->dval=vara->var_pointer->dval - varb->var_pointer->dval;
 				bnf_var->var_type=VTYPE_NUM;
 				// tok->bnf_factor_function=bnf_factor_pp_plus;
@@ -474,7 +474,7 @@ void bnf_factor_minus()
 				NTOKEN2;return;
 			}
 		} else if (vara->var_type==VTYPE_NUM) {
-			MESG(" - minus var num = %f - %f",vara->dval,varb->var_pointer->dval);
+			// MESG(" - minus var num = %f - %f",vara->dval,varb->var_pointer->dval);
 			bnf_var->dval -= varb->var_pointer->dval;
 			// tok->bnf_factor_function=bnf_factor_np_plus;
 			// MESG("set factor_function to np_plus [%s]",tok_info(tok));
@@ -484,7 +484,7 @@ void bnf_factor_minus()
  } else if(varb->var_type==VTYPE_NUM) {
  	if(vara->var_type==VTYPE_POINTER) {
 		if(vara->var_pointer->var_type==VTYPE_NUM) {
-			MESG(" - minus var num = %f - %f",vara->var_pointer->dval,varb->dval);
+			// MESG(" - minus var num = %f - %f",vara->var_pointer->dval,varb->dval);
 			bnf_var->dval = vara->var_pointer->dval - varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
 			// tok->bnf_factor_function=bnf_factor_pn_plus;
@@ -492,7 +492,7 @@ void bnf_factor_minus()
 			NTOKEN2;return;
 		}
 	} else if (vara->var_type==VTYPE_NUM) {
-			MESG(" - minus var num = %f - %f",vara->dval,varb->dval);
+			// MESG(" - minus var num = %f - %f",vara->dval,varb->dval);
  			bnf_var->dval -= varb->dval;
 			// MESG("set factor_function (%f) to nn_plus [%s]",bnf_var->dval,tok_info(tok));
 			// tok->bnf_factor_function=bnf_factor_nn_plus;
@@ -630,7 +630,7 @@ void bnf_factor_power()
 
 void bnf_factor_smaller()
 {
- MESG("bnf_factor_smaller : var ind=%d tok ind=%d var type=%d",bnf_var-&bnf_vars[0],tok->tnum,bnf_var->var_type);
+ // MESG("bnf_factor_smaller : var ind=%d tok ind=%d var type=%d",bnf_var-&bnf_vars[0],tok->tnum,bnf_var->var_type);
  MVAR *varb = bnf_var;
  	if(varb->var_type==VTYPE_POINTER) varb=varb->var_pointer;
 	prev_var("smaller");
@@ -638,7 +638,7 @@ void bnf_factor_smaller()
 	if(vara->var_type==VTYPE_POINTER) vara=vara->var_pointer;
 	if(vara->var_type==VTYPE_NUM) {
 		if(varb->var_type==VTYPE_NUM) {
-			MESG("< numeric!");
+			// MESG("< numeric!");
 			bnf_var->dval=vara->dval < varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
 			NTOKEN2;
@@ -651,7 +651,7 @@ void bnf_factor_smaller()
 
 void bnf_factor_bigger()
 {
- MESG("bnf_factor_bigger : var ind=%d tok ind=%d var type=%d",bnf_var-&bnf_vars[0],tok->tnum,bnf_var->var_type);
+ // MESG("bnf_factor_bigger : var ind=%d tok ind=%d var type=%d",bnf_var-&bnf_vars[0],tok->tnum,bnf_var->var_type);
  MVAR *varb = bnf_var;
  	if(varb->var_type==VTYPE_POINTER) varb=varb->var_pointer;
 	prev_var("bigger");
@@ -1153,8 +1153,8 @@ static inline void bnf_factor_rcurl_no()
 
 static inline void bnf_factor_rcurl()
 {
- long ind=bnf_var-bnf_vars;
- MESG("	rcurl: ind=%ld",ind);
+ // long ind=bnf_var-bnf_vars;
+ // MESG("	rcurl: ind=%ld",ind);
  NTOKEN2;
 	// return what ??
 }
@@ -1258,7 +1258,7 @@ static inline void bnf_factor_assign_var_nump()
 
 void bnf_factor_assign_var()
 {
-	MESG("bnf_factor_assign_var: ind @ %d",(int)(bnf_var-bnf_vars));
+	// MESG("bnf_factor_assign_var: ind @ %d",(int)(bnf_var-bnf_vars));
 	MVAR *bvar=bnf_var;
 	int btype=bvar->var_type;
 	prev_var("assign var");
@@ -1349,7 +1349,7 @@ static void bnf_block1(FILEBUF *fp)
 		// MESG("	- [%s]",tok_info(tok));
 	 	tok->bnf_factor_function();
 		if(!current_active_flag) {
-			MESG("bnf_block1:[%s] stop: ind=%d type=%d [%s]",fp->b_fname,(int)(bnf_var-bnf_vars),bnf_var->var_type,tok_info(tok));
+			// MESG("bnf_block1:[%s] stop: ind=%d type=%d [%s]",fp->b_fname,(int)(bnf_var-bnf_vars),bnf_var->var_type,tok_info(tok));
 			return;
 		};
 	} while(tok->tgroup!=TOK_END);
@@ -1532,15 +1532,15 @@ void bnf_expression()
 
 void bnf_dir_return()
 {
-	MESG("bnf_dir_return: at [%s]",tok_info(tok));
+	// MESG("bnf_dir_return: at [%s]",tok_info(tok));
 	NTOKEN2;
 	if(tok->ttype!=TOK_SEP && tok->ttype!=TOK_RPAR) { 
-		MESG("bnf_dir_return: before expression ind=%d [%s]",(int)(bnf_var-bnf_vars),tok_info(tok));
+		// MESG("bnf_dir_return: before expression ind=%d [%s]",(int)(bnf_var-bnf_vars),tok_info(tok));
 		bnf_expression();
 		set_var_value();
 	};
-	MESG("bnf_dir_return: end at [%s]",tok_info(tok));
-	show_result();
+	// MESG("bnf_dir_return: end at [%s]",tok_info(tok));
+	// show_result();
 	current_active_flag=0;	/* skip rest of function  */
 }
 
@@ -1601,8 +1601,8 @@ MVAR * push_args_bnf(int nargs,int vars_num)
 void bnf_exec_function(FILEBUF *proc_buffer,int nargs)
 {
 	MVAR *old_symbol_table=current_stable;
-	if(proc_buffer==NULL) MESG("	buffer is NULL!");
-	else MESG("bnf_exec_function:[%s] args=%d",proc_buffer->b_fname,nargs);
+	// if(proc_buffer==NULL) MESG("	buffer is NULL!");
+	// else MESG("bnf_exec_function:[%s] args=%d",proc_buffer->b_fname,nargs);
 
 	current_stable = push_args_bnf(nargs,proc_buffer->symbol_tree->items);
 	tok_struct *after_proc=tok; 
@@ -1620,14 +1620,14 @@ void bnf_exec_function(FILEBUF *proc_buffer,int nargs)
 	current_stable=old_symbol_table;
 		// exe_buffer=ori_buf;
 	tok=after_proc;
-	MESG("	continue after function to [%s]",tok_info(after_proc));
+	// MESG("	continue after function to [%s]",tok_info(after_proc));
 }
 
 void bnf_factor_proc()
 {
 	tok_struct *tok0=tok;
 	FILEBUF *cbuf=exe_buffer;
-	MESG("bnf_factor_proc:[%s] << ind=%d",tok0->tname,(int)(bnf_var-bnf_vars));
+	// MESG("bnf_factor_proc:[%s] << ind=%d",tok0->tname,(int)(bnf_var-bnf_vars));
 	next_var("proc");		/* to save proc result  */
 	MVAR *result_var=bnf_var;
 	// MESG("	tname [%s]",tok0->tname);
@@ -1645,14 +1645,14 @@ void bnf_factor_proc()
 
 	bnf_exec_function(tok0->proc_buffer,tok0->t_nargs);
 
-	MESG("bnf_factor_proc:[%s] >> return ind=%d",tok0->tname,(int)(bnf_var-bnf_vars));
+	// MESG("bnf_factor_proc:[%s] >> return ind=%d",tok0->tname,(int)(bnf_var-bnf_vars));
 	if(bnf_var->var_type==VTYPE_NUM) {
 		result_var->dval=bnf_var->dval;
 		result_var->var_type=VTYPE_NUM;
 	} else if (bnf_var->var_type==VTYPE_STRING) {
 		result_var->sval=bnf_var->sval;
 		result_var->var_alloced=bnf_var->var_alloced;
-		result_var->var_type==VTYPE_STRING;
+		result_var->var_type=VTYPE_STRING;
 	} else MESG("	something else!");
 
 	bnf_var = result_var;
@@ -1671,22 +1671,22 @@ void bnf_dir_if()
 	bnf_expression();
 	int ival = num_result();
 	prev_var("if result");
-	MESG("tok_dir_if: res=%d after expression [%s]",ival,tok_info(tok));
+	// MESG("tok_dir_if: res=%d after expression [%s]",ival,tok_info(tok));
 	if(ival) {
 		// MESG("err_if: ttype=%d tnum=%f",tok->ttype,tok->tnum);
 		// MESG("	execute if at %d",tok->tnum);
 		NTOKEN2;
-		MESG("	execute if at [%s]",tok_info(tok));
+		// MESG("	execute if at [%s]",tok_info(tok));
 		tok->bnf_factor_function();
 		if(tok->ttype==TOK_DIR_ELSE) {
 			tok=tok->next_tok;
-			MESG("skip else up to %d",tok->tnum);
+			// MESG("skip else up to %d",tok->tnum);
 		};
 		return;
 	} else {
 		tok=tok0->next_tok;
 		if(check_skip_token1(TOK_DIR_ELSE)) {
-			MESG("	execute else at [%s]",tok_info(tok));
+			// MESG("	execute else at [%s]",tok_info(tok));
 			NTOKEN2;
 			tok->bnf_factor_function();
 		};
