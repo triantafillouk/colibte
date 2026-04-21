@@ -2377,7 +2377,7 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_rcurl,	// TOK_RCURL	,
 	bnf_factor_quote,	// TOK_QUOTE
 	bnf_factor_lpar,	// TOK_LPAR
-	bnf_factor_error,	// TOK_RPAR	
+	bnf_factor_rpar,	// TOK_RPAR	
 	bnf_refresh_ddot,	// TOK_SHOW
 	bnf_factor_none,	// TOK_COMMENT	,
 	bnf_factor_var,	// TOK_VAR	level 0 variable
