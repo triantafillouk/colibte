@@ -454,6 +454,7 @@ void bnf_factor_plus()
 
 void bnf_factor_minus()
 {
+ // MESG("bnf_factor_minus : var ind=%d tok ind=%d var type=%d",bnf_var-&bnf_vars[0],tok->tnum,bnf_var->var_type);
  MVAR *varb = bnf_var;
 	prev_var("plus2");
  MVAR *vara = bnf_var;
@@ -1271,9 +1272,8 @@ void bnf_factor_assign_var()
 		aval->dval = bvar->dval;
 		bnf_var->var_type = aval->var_type;
 		bnf_var->dval = aval->dval;
-		int ind=(int)(bnf_var-bnf_vars);
-		MESG("	assign ind=%d set var to %f tok [%s]",ind,aval->dval,tok_info(tok));
-#if	1
+		// long ind=bnf_var-bnf_vars;
+		// MESG("	assign ind=%2ld set var to %f tok [%s]",ind,aval->dval,tok_info(tok));
 		if(btype==VTYPE_POINTER) {
 			tok->bnf_factor_function=bnf_factor_assign_var_nump;
 			MESG("set factor_function to assign_var_nump [%s]",tok_info(tok));
@@ -1282,7 +1282,6 @@ void bnf_factor_assign_var()
 			tok->bnf_factor_function=bnf_factor_assign_var_num;
 			MESG("set factor_function to assign_var_num [%s]",tok_info(tok));
 		};
-#endif
 		NTOKEN2;
 		return;
 	};
@@ -1351,11 +1350,10 @@ static void bnf_block1(FILEBUF *fp)
 	 	tok->bnf_factor_function();
 		if(!current_active_flag) {
 			MESG("bnf_block1:[%s] stop: ind=%d type=%d [%s]",fp->b_fname,(int)(bnf_var-bnf_vars),bnf_var->var_type,tok_info(tok));
-			show_results();
-			break;
+			return;
 		};
 	} while(tok->tgroup!=TOK_END);
-	// tok->bnf_factor_function();
+	tok->bnf_factor_function();
 
 	// MESG("-- block end  ! } [%s]",tok_info(tok));
 }
