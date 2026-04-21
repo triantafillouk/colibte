@@ -1,8 +1,13 @@
 
 i=0
-l=0
-	fori(j=1;800001;1) { 
-		l = i*j+32
-		p = p+l+100 
-	}
-p:
+
+if(i==0) {
+	"is 0":
+	print("i is 0","1","3")
+} else {
+	"i is something else":
+	print("i is something else")
+}
+
+b="end0":
+

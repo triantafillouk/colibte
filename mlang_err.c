@@ -200,7 +200,7 @@ void syntax_error(char *description,int err)
  set_error(tok,err,description);
 }
 
-int	err_eval_fun1(tok_struct *tok0,int lpar)
+int	err_eval_fun1(tok_struct *tok0,tok_struct *tok_bnf,int lpar)
 {
 	TDSERR("eval_fun1");
 	int ia=0;
@@ -254,6 +254,7 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 		NTOKEN_ERR(404);
 	};
 	tok0->number_of_args=ia;
+	tok_bnf->number_of_args=ia;
 
 	entry_mode=f_entry;
 	// MESG("err_eval_fun1: END >> args=%d %d",ia0,ia);
@@ -331,7 +332,7 @@ int  err_push_args_1(int *nargs)
 		break;
 	};
 	err_num = err_lexpression();
-	MESG("	%2d	after expression [%s]",num_args,tok_info(tok));
+	// MESG("	%2d	after expression [%s]",num_args,tok_info(tok));
 	if(err_num) { ERROR("error in push_args_1 from lexpression %d",err_num);return err_num;};
 	CHECK_TOK(413);
 	num_args++;
@@ -1019,7 +1020,7 @@ int err_factor()
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
 #endif
-		err_num=err_eval_fun1(tok0,lpar);
+		err_num=err_eval_fun1(tok0,tok0_bnf,lpar);
 		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)
 		MESG("------ define TOK_PROC ------ [%s]",tok_info(tok));
@@ -1042,7 +1043,7 @@ int err_factor()
 #if	TBNF
 		if(tok0_bnf!=NULL) {
 			tok0_bnf->t_nargs=nargs;
-			MESG("	proc function %s pushed ok!",tok0_bnf->tname);
+			// MESG("	proc function %s pushed ok!",tok0_bnf->tname);
 		} else {
 			err_num=502;
 			MESG("tok0_bnf is NULL!!");

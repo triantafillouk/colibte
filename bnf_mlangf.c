@@ -245,18 +245,17 @@ double bnf_mid()
 
 double bnf_print()
 {
-	tok_struct *tok=current_token();
 	int args=tok->number_of_args;
-	// MESG("bnf_print: ex_vtype=%d tnum=%d args=%d",get_vtype(),tok->tnum,tok->number_of_args);
+	MESG("bnf_print: tnum=%d args=%d var index=%d",tok->tnum,tok->number_of_args,(int)(bnf_var-bnf_vars));
 	int i;
-	double value=0;
 	for(i=0;i<args;i++) {
-		ntoken();
-		tok=current_token();
-		// MESG("	eval arg %d tnum=%d ttype=%d",i,tok->tnum,tok->ttype);
-		value=expression("bnf_print");
-		// MESG("		val=%f s='%s'",value,get_sval());
-		switch(get_vtype()) {
+		// ntoken();
+		NTOKEN2;
+		// tok=current_token();
+		bnf_expression();
+		MESG("	bnf_print: after %d expression ind=%d [%s]",i,(int)(bnf_var-bnf_vars),tok_info(tok));
+		show_result();
+		switch(bnf_var->var_type) {
 			case VTYPE_ARRAY:
 			case VTYPE_SARRAY:
 			case VTYPE_AMIXED:
@@ -264,15 +263,16 @@ double bnf_print()
 				print_array1("",get_array("102"));break;
 			case VTYPE_NUM:{
 				char p_out[128];
-				long l0=value;
-				if(l0==value) snprintf(p_out,sizeof(p_out),"%ld",l0);
-				else snprintf(p_out,sizeof(p_out),"%f",value); 
+				long l0=bnf_var->dval;
+				if(l0==bnf_var->dval) snprintf(p_out,sizeof(p_out),"%ld",l0);
+				else snprintf(p_out,sizeof(p_out),"%f",bnf_var->dval); 
 				out_print(p_out,0);
 				// free(p_out);
 				break;
 			};
 			case VTYPE_STRING:{
-				out_print(get_sval(),0);
+				MESG("-- bnf_print: string result '%s'",bnf_var->sval);
+				out_print(bnf_var->sval,0);
 			};
 		};
 		// MESG("	if: after switch!");
@@ -286,7 +286,7 @@ double bnf_print()
 	// MESG("end of if_print: show current token!");
 	// MESG("end of bnf_print: num=%d",tok->tnum);
 	// MESG("bnf_print: >>");
-	return value;
+	return 1;
 }
 
 double bnf_show_time()

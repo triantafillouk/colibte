@@ -244,25 +244,25 @@ void eval_curl_match(tok_struct *tok)
 
 tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 {
-  MESG("--[%s] try push %d [%s] exp=%d [%s]",check_buffer->b_fname,tok->pushed,title,exp_type,tok_info(tok));
+  // MESG("--[%s] try push %d [%s] exp=%d [%s]",check_buffer->b_fname,tok->pushed,title,exp_type,tok_info(tok));
 #if	TBNF
  // if(no_push) { MESG("stack_push:%s skip %s",title,tok_info(tok));return;};
  if(tok!=NULL) {
  // MESG("stack_push! at %p",check_buffer->tok_table_bnf+check_buffer->tok_bnf_index);
 	if(tok->pushed>=0) {
 		if(check_buffer)
-		MESG("P[%10s already pushed at %3d %-15s|%s %p",check_buffer->b_fname,tok->pushed,title,tok_info(tok),tok);
-		else MESG("P[ check buffer is NULL!!!!! %s",title);
+		// MESG("P[%10s already pushed at %3d %-15s|%s %p",check_buffer->b_fname,tok->pushed,title,tok_info(tok),tok);
+		// else MESG("P[ check buffer is NULL!!!!! %s",title);
 		return check_buffer->tok_table_bnf+tok->pushed;
 	} else {
 		if(tok->ttype==TOK_LPAR) { 
-			MESG("skip left paranthesis!");
+			// MESG("skip left paranthesis!");
 			return NULL;
 		};
 		tok_struct *dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
     	tok->pushed=check_buffer->tok_bnf_index;
-		MESG("! set pushed! as %d [%s]",tok->pushed,tok_info(tok));
+		// MESG("! set pushed! as %d [%s]",tok->pushed,tok_info(tok));
 
 		set_bnf_function1(dest,exp_type);
 
@@ -290,6 +290,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 	return NULL;
  }
 #endif
+ return NULL;
 }
 
 void delete_type_tree(BTREE *type_tree)
@@ -2696,18 +2697,18 @@ void set_bnf_function1(tok_struct *tok, int type)
 	tok->bnf_group=exp_type;
 	tok->bnf_factor_function = factor_bnf_funcs[exp_type];
 	tok->function_index=exp_type;
-	MESG("-- set_bnf_function1 to none!!!: num=%2d exp type=%3d",tok->tnum,exp_type);
+	// MESG("-- set_bnf_function1 to none!!!: num=%2d exp type=%3d",tok->tnum,exp_type);
  } else if(type>0) {
 	int exp_type = factor_bnf_type[type];
 	tok->bnf_group=exp_type;
 	tok->bnf_factor_function = factor_bnf_funcs[exp_type];
 	tok->function_index=exp_type;
-	MESG("-- set_bnf_function1: ind=%2d exp num=%3d",tok->tnum,exp_type);
+	// MESG("-- set_bnf_function1: ind=%2d exp num=%3d",tok->tnum,exp_type);
  } else {
 	tok->bnf_group=0;
 	tok->bnf_factor_function = factor_bnf_funcs[-type];
 	tok->function_index=type;
-	MESG("-- set_bnf_function1: ind=%2d exp num=%3d",tok->tnum,type);
+	// MESG("-- set_bnf_function1: ind=%2d exp num=%3d",tok->tnum,type);
  };
 #endif
 }
@@ -4140,7 +4141,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		// MESG("end of program var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);
 		next_var("end");
 		// MESG("end of program var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);
-		show_result();
+		// show_results();
 	};
 #endif
 	drv_stop_checking_break();
