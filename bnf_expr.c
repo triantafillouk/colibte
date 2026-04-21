@@ -452,6 +452,16 @@ void bnf_factor_plus()
 	NTOKEN2;
 }
 
+static inline void  bnf_factor_pn_minus()
+{
+ // MESG("bnf_factor_pn_plus : var ind=%d tok ind=%d var type=%d",bnf_var-&bnf_vars[0],tok->tnum,bnf_var->var_type);
+ double valb = bnf_var->dval;
+	prev_var("minus21");
+	bnf_var->dval = bnf_var->var_pointer->dval - valb;
+	bnf_var->var_type=VTYPE_NUM;
+	NTOKEN2;
+}
+
 void bnf_factor_minus()
 {
  // MESG("bnf_factor_minus : var ind=%d tok ind=%d var type=%d",bnf_var-&bnf_vars[0],tok->tnum,bnf_var->var_type);
@@ -487,8 +497,8 @@ void bnf_factor_minus()
 			// MESG(" - minus var num = %f - %f",vara->var_pointer->dval,varb->dval);
 			bnf_var->dval = vara->var_pointer->dval - varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
-			// tok->bnf_factor_function=bnf_factor_pn_plus;
-			// MESG("set factor_function to pn_plus [%s]",tok_info(tok));
+			tok->bnf_factor_function=bnf_factor_pn_minus;
+			MESG("set factor_function to pn_minus [%s]",tok_info(tok));
 			NTOKEN2;return;
 		}
 	} else if (vara->var_type==VTYPE_NUM) {
