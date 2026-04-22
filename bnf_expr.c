@@ -8,6 +8,8 @@ static MVAR *bnf_var=&bnf_vars[0];
 
 inline MVAR *get_left_slot(int ind);
 void bnf_expression();
+int set_option_val(int vnum,char *svalue);
+int set_option_bnf(int vnum,int ival);
 
 #if	1
 #if	1
@@ -1396,15 +1398,32 @@ void bnf_factor_assign_var()
 	NTOKEN2;
 }
 
+void set_bnf_string(char *s)
+{
+	bnf_var->sval=strdup(s);
+	bnf_var->var_type=VTYPE_STRING;
+	bnf_var->var_alloced=1;
+}
+
+void set_bnf_num(double v)
+{
+	bnf_var->dval=v;
+	bnf_var->var_type=VTYPE_NUM;
+}
+
 void bnf_factor_env()
 {
 	BTNODE *bte;
-	MESG("bnf_factor_env");
+	// MESG("bnf_factor_env");
 	next_var("env");
 
 	bte=tok->tok_node;
-	var_node=bte;
+	// var_node=bte;
 	// MESG("factor_env: set var_node [%s]",tok_info(tok));
+	// MESG("	env node name [%s] vtype=%d index=%d",bte->node_name,bte->node_vtype,bte->node_index);
+#if	1
+	get_env(bte->node_index);
+#else
 	if(bte->node_vtype==VTYPE_STRING) {
 		bnf_var->sval = strdup(bte->node_sval);
 		bnf_var->var_alloced=1;
@@ -1413,6 +1432,7 @@ void bnf_factor_env()
 		bnf_var->dval = get_env(bte->node_index);
 		bnf_var->var_type=VTYPE_NUM;
 	};
+#endif
 	NTOKEN2;
 }
 
@@ -1448,6 +1468,7 @@ void bnf_assign_opt()
 		var_node->node_sval=strdup(var->sval);
 	} else {
 		// CHECK !!!!!!!!
+		
 		var_node->node_vtype=VTYPE_NUM;
 		var_node->node_dval=var->dval;
 	};
@@ -1465,6 +1486,7 @@ void bnf_factor_option()
 	var_node=bte;
 
 	set_vtype(bte->node_vtype);
+
 	if(bte->node_vtype==VTYPE_STRING) { /* there is a valid string value */
 		// clean_saved_string(strlen(bte->node_sval));
 		bnf_var->sval=strdup(bte->node_sval);

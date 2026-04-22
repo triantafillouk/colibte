@@ -1010,6 +1010,7 @@ int err_factor()
 		var_node=tok0->tok_node;
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
+		tok0_bnf->tok_node=var_node;
 #endif
 		pre_symbol=0;
 		ex_nvars++;

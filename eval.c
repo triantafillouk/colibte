@@ -34,6 +34,10 @@ extern int record_session;
 
 void set_active_flag(int flag);
 int get_active_flag();
+#if	TBNF
+void set_bnf_string(char *s);
+void set_bnf_num(double v);
+#endif
 
 int vtype_is(int type);
 int custom_cell_width=0;
@@ -241,7 +245,15 @@ double get_env(int vnum)
 	value=v1;
 	if(svalue[0]!=0) { 
 		set_sval(svalue);	
-	} else set_vdval(value);
+#if	TBNF
+		set_bnf_string(svalue);
+#endif
+	} else {
+		set_vdval(value);
+#if	TBNF
+		set_bnf_num(value);
+#endif
+	};
 	return(value);
 }
 
@@ -321,6 +333,7 @@ short int get_next_key(num mode)
  	return (*kbdsptr++);
  };
 }
+
 
 /* set option values */
 int set_option_val(int vnum,char *svalue)
@@ -450,6 +463,16 @@ int set_option_val(int vnum,char *svalue)
 	set_update(cwp,UPD_ALL);
 	return(1);
 }
+
+#if	TBNF
+int set_option_bnf(int vnum,int ival)
+{
+ char st[20];
+ sprintf(st,"%d",ival);
+ set_option_val(vnum,st);
+ return ival;
+}
+#endif
 
 /* set editor variables */
 void set_env(int vnum,char *svalue,double value)
