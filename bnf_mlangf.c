@@ -301,6 +301,12 @@ double bnf_show_time()
 	}
 	// MESG("show_time: [%s]",va[0].sval);
 	prev_var("show_time");
+	if(bnf_var->var_type==VTYPE_STRING && bnf_var->var_alloced==1) {
+		// MESG("show time, free sval!");
+		free(bnf_var->sval);
+	};
+	bnf_var->dval=value;
+	bnf_var->var_type=VTYPE_NUM;
 	return value;
 }
 

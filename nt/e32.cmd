@@ -14,5 +14,5 @@ fori(i=1;11;1)
 	show_time(s,1);
 }
 tdif=show_time("End test",2)
-
+tdif:
 p:

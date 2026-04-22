@@ -1396,36 +1396,86 @@ void bnf_factor_assign_var()
 	NTOKEN2;
 }
 
+void bnf_factor_env()
+{
+	BTNODE *bte;
+	MESG("bnf_factor_env");
+	next_var("env");
+
+	bte=tok->tok_node;
+	var_node=bte;
+	// MESG("factor_env: set var_node [%s]",tok_info(tok));
+	if(bte->node_vtype==VTYPE_STRING) {
+		bnf_var->sval = strdup(bte->node_sval);
+		bnf_var->var_alloced=1;
+		bnf_var->var_type=VTYPE_STRING;
+	} else {
+		bnf_var->dval = get_env(bte->node_index);
+		bnf_var->var_type=VTYPE_NUM;
+	};
+	NTOKEN2;
+}
+
 void bnf_assign_env()
 {
 	MESG("bnf_assign_env:");
+	int left_index;
+	// MESG("assign_env:");
+	left_index=var_node->node_index;
+	// MESG("assign_env: left_index=%d",left_index);
+	MVAR *var=bnf_var;
+	prev_var("assign_env");
+	if(var->var_type==VTYPE_POINTER) var=bnf_var->var_pointer;
+	if(var->var_type==VTYPE_NUM) set_env(left_index,"",var->dval);
+	else if(var->var_type==VTYPE_STRING) set_env(left_index,var->sval,0);
+	else MESG("bnf_assign_env type=%d not correct!",var->var_type);
+	var_node=NULL;
 	NTOKEN2;
 }
 
 void bnf_assign_opt()
 {
 	MESG("bnf_assign_opt:");
+	MVAR *var=bnf_var;
+	prev_var("assign var");
+
+	// MESG("assign_option:");
+	if(var_node->node_vtype==VTYPE_STRING) { free(var_node->node_sval);};
+
+	if(var->var_type==VTYPE_POINTER) var=bnf_var->var_pointer;
+	if(var->var_type==VTYPE_STRING){
+		var_node->node_vtype=VTYPE_STRING;
+		var_node->node_sval=strdup(var->sval);
+	} else {
+		// CHECK !!!!!!!!
+		var_node->node_vtype=VTYPE_NUM;
+		var_node->node_dval=var->dval;
+	};
 	NTOKEN2;
 }
 
-double bnf_factor_option()
+void bnf_factor_option()
 {
  BTNODE *bte; 
  MESG("bnf_factor_option:");
+ next_var("option");
 /* variable's name in tok0->tname */
 	bte=tok->tok_node;
 	// MESG("factor_option: set var_node [%s]",tok_info(tok));
 	var_node=bte;
-	NTOKEN2;
 
 	set_vtype(bte->node_vtype);
 	if(bte->node_vtype==VTYPE_STRING) { /* there is a valid string value */
-		clean_saved_string(strlen(bte->node_sval));
-		strcpy(saved_string,bte->node_sval);
-		return 0;
+		// clean_saved_string(strlen(bte->node_sval));
+		bnf_var->sval=strdup(bte->node_sval);
+		bnf_var->var_type=VTYPE_STRING;
+		bnf_var->var_alloced=1;
 	} else {
-		return(bte->node_dval);
+		bnf_var->dval=bte->node_dval;
+		bnf_var->var_type=VTYPE_NUM;
+		// return(bte->node_dval);
 	};
+	NTOKEN2;
 }
 
 // dummy one!

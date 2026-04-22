@@ -2381,11 +2381,11 @@ VFunction factor_bnf_funcs[] = {
 	bnf_refresh_ddot,	// TOK_SHOW
 	bnf_factor_none,	// TOK_COMMENT	,
 	bnf_factor_var,	// TOK_VAR	level 0 variable
-	(VFunction)factor_option,	// TOK_OPTION	,	// editor option
+	bnf_factor_option,	// TOK_OPTION	,	// editor option
 	(VFunction)factor_cmd,		// TOK_CMD		,	// editor commands
 	bnf_factor_none,	// TOK_FUNC	,	// function
 	bnf_factor_proc,	// TOK_PROC	,
-	(VFunction)factor_env,		// TOK_ENV		,	// editor environment function
+	bnf_factor_env,		// TOK_ENV		,	// editor environment function
 	bnf_factor_none,	// TOK_TERM0	term0 group
 	bnf_factor_none,	// TOK_TERM	,	// term operators (+,-)
 	bnf_factor_none,	// TOK_TERM1	,	// term1 operators (%,^)
