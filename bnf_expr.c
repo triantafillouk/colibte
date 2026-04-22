@@ -164,33 +164,32 @@ inline static double num_result()
 
 void show_result()
 {
- int stack_num = bnf_var-bnf_vars;
- MESG("# show_result: stack_num=%d type=%d\n",stack_num,bnf_var->var_type);
+ int stack_num = (int)(bnf_var-bnf_vars);
+ // MESG("# show_result: stack_num=%d type=%d\n",stack_num,bnf_var->var_type);
  switch(bnf_var->var_type) {
  	case VTYPE_NUM:
-		MESG("bnf result: @%3d NUMERIC val=%f",stack_num,bnf_var->dval);
+		MESG("##: @%3d NUMERIC val=%f",stack_num,bnf_var->dval);
 		return;
 	case VTYPE_STRING:
-		MESG("bnf result: string");
-		MESG("bnf result: @%3d STRING  val=[%s]",stack_num,bnf_var->sval);
+		MESG("##: @%3d STRING  val=[%s]",stack_num,bnf_var->sval);
 		return;
 	case VTYPE_POINTER:
 	{ MVAR *var=bnf_var->var_pointer;
 		if(var->var_type==VTYPE_NUM) {
-			MESG("bnf1 result: @%3d var NUMERIC val=%f",stack_num,var->dval);
+			MESG("##: @%3d var NUMERIC val=%f",stack_num,var->dval);
 			return;
 		};
 		if(var->var_type==VTYPE_STRING) {
-			MESG("bnf result: @%3d var STRING  val=[%s]",stack_num,var->sval);
+			MESG("##: @%3d var STRING  val=[%s]",stack_num,var->sval);
 			return;
 		};
 		if(var->var_type==VTYPE_NONE) {
-			MESG("bnf result: @%3d var value undefined",stack_num);
+			MESG("##: @%3d var other undefined",stack_num);
 			return;
 		};
 	};break;
 	default:
-		MESG("bnf result: @%3d  type %X",stack_num,bnf_var->var_type);
+		MESG("##: @%3d  type %X",stack_num,bnf_var->var_type);
  };
 }
 
@@ -411,9 +410,8 @@ void bnf_factor_plus()
 				long l0=varb->var_pointer->dval;
 				int stat; 
 				if(l0 == varb->var_pointer->dval) stat=snprintf(svalue,sizeof(svalue),"%s%ld",vara->sval,l0);
-				else stat=snprintf(svalue,sizeof(svalue),"%s%f",svalue,varb->var_pointer->dval);
+				else stat=snprintf(svalue,sizeof(svalue),"%s%f",vara->sval,varb->var_pointer->dval);
 
-				// MESG("-plus string + var num = [%s]",svalue);
 				if(stat>MAXLLEN) MESG("truncated 2");
 				if(vara->var_alloced) free(vara->sval);
 				vara->sval=strdup(svalue);
@@ -1700,6 +1698,10 @@ void bnf_expression()
 		// MESG("	bnf_group=%d [%s]",tok->bnf_group,tok_info(tok));
 		tok->bnf_factor_function();	
 	};
+#if	1
+	if(bnf_var->var_type==VTYPE_POINTER)
+		memmove(bnf_var,bnf_var->var_pointer,sizeof(struct MVAR));
+#endif
 }
 
 void bnf_dir_return()

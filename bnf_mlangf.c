@@ -251,7 +251,7 @@ double bnf_print()
 	for(i=0;i<args;i++) {
 		// ntoken();
 		NTOKEN2;
-		// tok=current_token();
+		
 		bnf_expression();
 		// MESG("	bnf_print: after %d expression ind=%d [%s]",i,(int)(bnf_var-bnf_vars),tok_info(tok));
 		// show_result();
@@ -275,6 +275,7 @@ double bnf_print()
 				out_print(bnf_var->sval,0);
 			};
 		};
+		prev_var();
 		// MESG("	if: after switch!");
 		// tok=current_token();
 		// MESG("	if: after switch tnum=%d ttype=%d",tok->tnum,tok->ttype);
@@ -579,60 +580,83 @@ double bnf_dbg_message()
 
 double bnf_sin()
 {
-	bnf_numeric_arg();
-	double value=sin(num_result());
-	MESG("bnf_sin: %f",value);
-	return value;
+	NTOKEN2;
+	bnf_expression();
+	bnf_var->dval=sin(bnf_var->dval);
+	NTOKEN2;
+	return bnf_var->dval;
 }
 
 double bnf_cos()
 {
-	bnf_function_args(1);
-	double value=cos(num_result());
-	return value;
+	NTOKEN2;
+	bnf_expression();
+	bnf_var->dval=cos(bnf_var->dval);
+	NTOKEN2;
+	return bnf_var->dval;
 }
 
 double bnf_tan()
 {
-	double value=tan(num_result());
-	return value;
+	NTOKEN2;
+	bnf_expression();
+	bnf_var->dval=tan(bnf_var->dval);
+	NTOKEN2;
+	return bnf_var->dval;
 }
 
 double bnf_log10()
 {
-	double value=log10(num_result());
-	return value;
+	NTOKEN2;
+	bnf_expression();
+	bnf_var->dval=log10(bnf_var->dval);
+	NTOKEN2;
+	return bnf_var->dval;
 }
 
 double bnf_atan()
 {
-	double value=atan(num_result());
-	return value;
+	NTOKEN2;
+	bnf_expression();
+	bnf_var->dval=atan(bnf_var->dval);
+	NTOKEN2;
+	return bnf_var->dval;
 }
 
 double bnf_log()
 {
-	double value=log(num_result());
-	return value;
+	NTOKEN2;
+	bnf_expression();
+	bnf_var->dval=log(bnf_var->dval);
+	NTOKEN2;
+	return bnf_var->dval;
 }
 
 double bnf_trunc()
 {
-	double value=trunc(num_result());
-	return value;
+	NTOKEN2;
+	bnf_expression();
+	bnf_var->dval=trunct(bnf_var->dval);
+	NTOKEN2;
+	return bnf_var->dval;
 }
 
 double bnf_round()
 {
-	double value=bnf_numeric_arg();
-	value=round(value);
-	return value;
+	NTOKEN2;
+	bnf_expression();
+	bnf_var->dval=round(bnf_var->dval);
+	NTOKEN2;
+	return bnf_var->dval;
 }
 
-double bnf_getpoint()
+double bnf_getpoint()	/* ???  */
 {
-	ntoken();
-	return 0.0;
+	NTOKEN2;
+	bnf_expression();
+	bnf_var->dval=tan(bnf_var->dval);
+	NTOKEN2;
+	return 0;
 }
 
 double bnf_time()	// ??
