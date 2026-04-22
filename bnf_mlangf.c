@@ -246,15 +246,15 @@ double bnf_mid()
 double bnf_print()
 {
 	int args=tok->number_of_args;
-	MESG("bnf_print: tnum=%d args=%d var index=%d",tok->tnum,tok->number_of_args,(int)(bnf_var-bnf_vars));
+	// MESG("bnf_print: tnum=%d args=%d var index=%d",tok->tnum,tok->number_of_args,(int)(bnf_var-bnf_vars));
 	int i;
 	for(i=0;i<args;i++) {
 		// ntoken();
 		NTOKEN2;
 		// tok=current_token();
 		bnf_expression();
-		MESG("	bnf_print: after %d expression ind=%d [%s]",i,(int)(bnf_var-bnf_vars),tok_info(tok));
-		show_result();
+		// MESG("	bnf_print: after %d expression ind=%d [%s]",i,(int)(bnf_var-bnf_vars),tok_info(tok));
+		// show_result();
 		switch(bnf_var->var_type) {
 			case VTYPE_ARRAY:
 			case VTYPE_SARRAY:
@@ -271,7 +271,7 @@ double bnf_print()
 				break;
 			};
 			case VTYPE_STRING:{
-				MESG("-- bnf_print: string result '%s'",bnf_var->sval);
+				// MESG("-- bnf_print: string result '%s'",bnf_var->sval);
 				out_print(bnf_var->sval,0);
 			};
 		};
