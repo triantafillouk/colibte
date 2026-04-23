@@ -31,16 +31,25 @@ void show_var_node(BTNODE *node);
 void bnf_function_args (int number_of_args)
 {
 	int i;
-	int f_entry;
-	// tok_struct *tok = current_token();
-	f_entry=entry_mode;
+	int f_entry=entry_mode;
 	entry_mode=KNORMAL;
 	// MESG("bnf_function_args: %d [%d %s]",number_of_args,tok->tnum,tok->tname);
-
+#if	1
+// 0->1
+// 1->2
+// 2->3
+// 3->4
+	NTOKEN2;
+	for(i=0;i<number_of_args;i++) {
+		bnf_expression();
+		NTOKEN2;
+	};
+#else
 	if(number_of_args) {
 		for(i=0;i< number_of_args;i++) { 
-			ntoken();
-			bnf_expression();set_var_value();
+			NTOKEN2;
+			bnf_expression();
+			// set_var_value();
 		};
 		ntoken();
 	} else {;
@@ -50,7 +59,7 @@ void bnf_function_args (int number_of_args)
 				ntoken();
 		};
 	};
-
+#endif
 	entry_mode=f_entry;
 // 	return va;
 }
@@ -275,7 +284,7 @@ double bnf_print()
 				out_print(bnf_var->sval,0);
 			};
 		};
-		prev_var();
+		prev_var("print");
 		// MESG("	if: after switch!");
 		// tok=current_token();
 		// MESG("	if: after switch tnum=%d ttype=%d",tok->tnum,tok->ttype);
@@ -636,7 +645,7 @@ double bnf_trunc()
 {
 	NTOKEN2;
 	bnf_expression();
-	bnf_var->dval=trunct(bnf_var->dval);
+	bnf_var->dval=trunc(bnf_var->dval);
 	NTOKEN2;
 	return bnf_var->dval;
 }

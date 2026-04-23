@@ -42,7 +42,7 @@ double compare_smallereq(double value);
 double compare_biggereq(double value);
 double compare_equal(double v1);
 void set_bnf_function1(tok_struct *tok, int type);
-void bnf_factor_dummy();
+static inline void bnf_factor_dummy();
 void delete_symbol_table(MVAR *td, int size,int nargs);
 MVAR *new_symbol_table(int const size);
 void init_vars(MVAR *head,int size);
@@ -731,7 +731,6 @@ tok_struct *new_tok()
  tok->pushed=-1;
  tok->bnf_group=-1;
  tok->bnf_factor_function=bnf_factor_dummy;
- //tok->bnf_directive=bnf_expression;
 #endif
  tok->factor_function=factor_none;
  tok->directive=lexpression;
@@ -4137,7 +4136,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	if(exebnf) {
 		MESG("execute bnf block!");
 		tok=bp->tok_table_bnf;
-		bnf_block1(bp);
+		bnf_block1();
 		// MESG("end of program var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);
 		next_var("end");
 		// MESG("end of program var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);
