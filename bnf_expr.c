@@ -1568,7 +1568,7 @@ inline static void bnf_dir_lcurl()
 inline static void bnf_dir_lcurl_break()
 {
 	NTOKEN2;
-	bnf_block1_break(exe_buffer);
+	bnf_block1_break();
 }
 
 void bnf_dir_break()

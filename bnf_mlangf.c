@@ -86,7 +86,7 @@ double bnf_numeric_arg ()
 	return num_result();
 }
 
-bnf_len()
+void bnf_len()
 {
 	bnf_function_args(1);
 
@@ -129,11 +129,12 @@ void bnf_cls()
 	MESG("<-[%s: %s ------------------------------------------------------------->",cbfp->b_fname,VERSION);
 }
 
-void bnf_index()	// ??
+void bnf_index()	// ?? TBD!!
 {
 	ntoken();
 	MESG("new index!");
-	bnf_var=VTYPE_TREE;
+	// bnf_var->dval=VTYPE_TREE;
+	bnf_var->var_type=VTYPE_TREE;
 }
 
 /* get array determinant */
@@ -236,8 +237,7 @@ void bnf_mid()	/* TBD  */
 			syntax_error("mid: wrong_type of args",100);
 			set_sval("");
 		};
-		set_vtype(VTYPE_STRING);
-	return 0;	
+		bnf_var->var_type=VTYPE_STRING;
 }
 
 
@@ -698,7 +698,7 @@ void bnf_mainargsize()	/* TBC  */
 
 void bnf_mainarg()	/* TBD  */
 {
-	if(!main_args) { ntoken();return 0;};
+	if(!main_args) { ntoken();};
 
 	bnf_function_args(1);
 	MVAR *va=bnf_var;
@@ -758,7 +758,6 @@ void bnf_test_loop()
 		p = p + l + 6;
 	};
 }
-
 
 v_function bnf_functions[] = {
 	{"len",1,bnf_len},        /* STRING LENGTH */

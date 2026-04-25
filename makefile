@@ -74,7 +74,8 @@ OSYSTEM=LINUX
 LIBLM=-lX11 -lm
 X11include=-I/opt/X11/include/
 X11lib0=-L/usr/X11R6/lib -lX11 -L/opt/X11/lib 
-CC=gcc -O3 -W -mtune=alderlake -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
+#CC=gcc -O3 -W -mtune=alderlake -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
+#CC=clang -O3 -W -mtune=alderlake -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
 #CC=zig cc -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
 endif
 
