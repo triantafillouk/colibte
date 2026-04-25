@@ -280,7 +280,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
  		// MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(dest));
 		if(dest->ttype==TOK_FUNC) {
 			MESG("	set bnf function! index=%d for [%s]",tok->tok_node->node_index,tok_info(dest));
-			dest->bnf_factor_function=(VFunction)bnf_functions[tok->tok_node->node_index].ffunction;
+			dest->bnf_factor_function=bnf_functions[tok->tok_node->node_index].vfunction;
 		};
 		check_buffer->tok_bnf_index++;
 		return dest;

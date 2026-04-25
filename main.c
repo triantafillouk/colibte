@@ -322,7 +322,6 @@ void parse_command_line(int argc, char **argv)
 				case 't':
 					show_tokens=1;
 				case 'f':
-					execmd=1;
 					exebnf=1;
 				case 'x':	/* execute file and quit */
 					execmd=1;

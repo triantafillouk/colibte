@@ -307,5 +307,5 @@ FUNCS	ftable[] = {
 #endif
 	{"next_utf8_error",0,next_utf8_error,""},
 	{"do_nothing",0,	do_nothing,"do nothing"},
-	{NULL,	0,		NULL}
+	{NULL,	0,		NULL,NULL}
 };

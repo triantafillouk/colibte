@@ -97,6 +97,12 @@ typedef struct m_function {
 	FFunction ffunction;
 } m_function;
 
+typedef struct v_function {
+	char *f_name;	/* function name  */
+	short f_args;	/* number of function arguments  */
+	VFunction vfunction;
+} v_function;
+
 typedef struct term_type {
 	char *term_name;
 	short term_type;
