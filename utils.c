@@ -93,18 +93,18 @@ void out_print(char *s,int nl);
  	/* init=2 returns diff from initialization */
 double  show_time(char *description,int init)
 { 
-	static int start_sec=0;
-	static int start_usec=0;
-	static int prev_sec=0;
-	static int prev_usec=0;
-  	int	usec1,sec1=0,diff_sec,diff_usec,diff_start_sec,diff_start_usec;
+	static long start_sec=0;
+	static long start_usec=0;
+	static long prev_sec=0;
+	static long prev_usec=0;
+  	long usec1,sec1=0,diff_sec,diff_usec,diff_start_sec,diff_start_usec;
 	double vtime;
 	struct timeval      timev;
 	char sout[512];
 	diff_sec=diff_usec=0;
 	gettimeofday(&timev, NULL);
-	sec1 = (int)timev.tv_sec;
-	usec1 = (int)timev.tv_usec;
+	sec1 = (long)timev.tv_sec;
+	usec1 = (long)timev.tv_usec;
 	if(init==0) {
 		start_sec=sec1;start_usec=usec1;prev_sec=0;prev_usec=0;
 		diff_start_sec=diff_start_usec=0;
@@ -132,8 +132,8 @@ double  show_time(char *description,int init)
 		if(init==0) snprintf(sout,sizeof(sout),"%c[%45s] %d,%06d  %d,%06d --------",c,description,0,0,0,0);
 		else        snprintf(sout,sizeof(sout),"%c[%45s] %d,%06d  %d,%06d",c,description,1,0,0,0);
 	} else 	{
-		if(init==0) snprintf(sout,sizeof(sout),"%c[%45s] %d,%06d  %d,%06d --------",c,description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
-		else        snprintf(sout,sizeof(sout),"%c[%45s] %d,%06d  %d,%06d",c,description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
+		if(init==0) snprintf(sout,sizeof(sout),"%c[%45s] %ld,%06ld  %ld,%06ld --------",c,description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
+		else        snprintf(sout,sizeof(sout),"%c[%45s] %ld,%06ld  %ld,%06ld",c,description,diff_start_sec,diff_start_usec,diff_sec,diff_usec);
 	// if(xwin && discmd) MESG("%s",sout);
 	// MESG("%s",sout);
 	};
@@ -143,9 +143,9 @@ double  show_time(char *description,int init)
 	prev_usec=usec1;
 	prev_sec=sec1;
 	if(init==1) {	
-		vtime=diff_sec+diff_usec*0.000001;
+		vtime=diff_sec+diff_usec*0.00001;
 	} else {
-		vtime=diff_start_sec+diff_start_usec*0.000001;
+		vtime=diff_start_sec+diff_start_usec*0.00001;
 	}
 	set_vdval(vtime);
 	if(show_no_time) return 1;

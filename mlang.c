@@ -31,7 +31,7 @@ FILEBUF *exe_buffer=NULL;
 FILEBUF *check_buffer=NULL;
 void show_vars(MVAR *va, int size,char *title);
 void set_term_function(tok_struct *tok, TFunction term_function);
-void  skip_args1(int nargs);
+inline static void  skip_args1(int nargs);
 int check_init(FILEBUF *bf);
 double exec_function(FILEBUF *bp,int nargs);
 MVAR * push_args_1(int nargs,int vars_num);
@@ -302,7 +302,7 @@ void delete_type_tree(BTREE *type_tree)
 
 array_dat *transpose(array_dat *array1);
 
-void init_vars(MVAR *head,int size)
+inline void init_vars(MVAR *head,int size)
 {
  // initialize as numeric
  // MESG("init_vars: %d",size);
@@ -3575,7 +3575,7 @@ double assign_val(double none)
 	};
 }
 
-void  skip_args1(int nargs)
+inline static void  skip_args1(int nargs)
 {
 #if    1
  if(nargs) tok +=1+2*nargs;
