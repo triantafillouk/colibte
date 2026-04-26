@@ -316,7 +316,7 @@ int  err_push_args_1(int *nargs)
  TDSERR("push_args");
 
  SHOW_STAGE(410);
- MESG("err_push_args: [%s]",tok_info(tok));
+ // MESG("err_push_args: [%s]",tok_info(tok));
  if(tok->ttype!=TOK_RPAR) {
 	if(tok->ttype==TOK_SEP) {
 		*nargs=0;
@@ -361,7 +361,7 @@ int  err_push_args_1(int *nargs)
 	}
  };
 	*nargs=num_args;
-	MESG("err_push_args: end args=%d err=%d",num_args,err_num);
+	// MESG("err_push_args: end args=%d err=%d",num_args,err_num);
  	return(err_num);
  } else {	/* no arguments!  */
 	xpos=418;
@@ -1890,7 +1890,7 @@ int err_check_block1()
  TDSERR("block");
    SHOW_STAGE(671);
 	
-   MESG("err_check_block1: [%s] <-- [%s]",check_buffer->b_fname,tok_info(tok));
+   // MESG("err_check_block1: [%s] <-- [%s]",check_buffer->b_fname,tok_info(tok));
    // MESG("   num: name          ttype tind");
    while(1) {
 	CHECK_TOK(672);
@@ -1929,7 +1929,7 @@ int err_check_block1()
 	};
 	// MESG("-- err_check_block: end of switch: at [%s]",tok_info(tok));
  	err_num=err_check_sentence1();
-	MESG("--- err_check_block: [%s] after sequence: [%s]",check_buffer->b_fname,tok_info(tok));
+	// MESG("--- err_check_block: [%s] after sequence: [%s]",check_buffer->b_fname,tok_info(tok));
 	if(err_num) return(err_num);
    };
  xpos=692;syntax_error("Null in block",xpos);

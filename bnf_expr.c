@@ -17,20 +17,28 @@ int set_option_bnf(int vnum,int ival);
 #define	next_var(x)	bnf_var++
 
 #else
-static inline void prev_var(char *title)
+inline static void prev_var(char *title)
 {
 	bnf_var--;
 }
 
-static inline void next_var(char *title)
+inline static void next_var(char *title)
 {
 	bnf_var++;
+#if	1
+	if(bnf_var - &bnf_vars[0]>100) {
+		MESG("MAX var exceeded!");
+		exit(2);
+	};
 	if(bnf_var->var_type==VTYPE_STRING) {
-		// MESG("next_var free [%s]",tok_info(tok));
-		if(bnf_var->var_alloced) free(bnf_var->sval);
+		if(bnf_var->var_alloced) {
+			MESG("next_var free [%s] -- [%s] alloced",tok_info(tok),bnf_var->sval);
+			free(bnf_var->sval);
+		};
 		bnf_var->var_alloced=0;
 		bnf_var->var_type=0;
 	};
+#endif
 }
 #endif
 #else
@@ -276,7 +284,7 @@ void bnf_factor_quote()
 
 void bnf_factor_not()
 {
- MESG("bnf_factor_not:");
+ // MESG("bnf_factor_not:");
  if(bnf_var->var_type == VTYPE_NUM) {
  	bnf_var->dval = bnf_var->dval==0 ? 1:0;
 	NTOKEN2;
@@ -359,7 +367,7 @@ inline static void  bnf_factor_np_minus()
 void set_bnf_function(tok_struct *tok, char *label, VFunction function)
 {
 	tok->bnf_factor_function=function;
-	MESG("- set bnf function: to %s [%s]",label,tok_info(tok));
+	// MESG("- set bnf function: to %s [%s]",label,tok_info(tok));
 }
 
 static void bnf_factor_spn_plus()
@@ -1722,7 +1730,7 @@ MVAR * push_args_bnf(int nargs,int vars_num)
  // MESG("push_args_bnf: nargs=%d vars_num=%d",nargs,vars_num);
 
  MVAR *va = new_symbol_table(nargs+vars_num);
- if(va==NULL) return NULL;
+ // if(va==NULL) return NULL;
 
  MVAR *va_i=va;
  for(;va_i<va+nargs;va_i++)
@@ -1731,25 +1739,9 @@ MVAR * push_args_bnf(int nargs,int vars_num)
 	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
 	// MESG(";		i=%d, var_type = %d",i,va_i->var_type);
 	bnf_expression();
-#if	1
+
 	memmove(va_i,bnf_var,sizeof(MVAR));
-#else
-	MVAR *varg=bnf_var;
-	// if(varg->var_type==VTYPE_POINTER) varg=varg->var_pointer;
-	// MESG("> %2d: type=%d",(int)(va_i-va),varg->var_type);
-	va_i->var_type=varg->var_type;
-	if(varg->var_type==VTYPE_NUM) {
-			// MESG("	arg:%d numeric %f",(int)(va_i-va),varg->dval);
-			va_i->dval=varg->dval;
-	} else
-	if(varg->var_type==VTYPE_STRING) {
-		// MESG("	arg:%d string [%s]",(int)(va_i-va),varg->sval);
-		va_i->sval=strdup(varg->sval);
-	} else {
-		MESG("	arg:%d something else! %d",(int)(va_i-va),varg->var_type);
-		// memcpy(va_i,varg,sizeof(MVAR));
-	}
-#endif
+
 	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
 	NTOKEN2; // skip separator or right parenthesis!
  };
@@ -1759,24 +1751,24 @@ MVAR * push_args_bnf(int nargs,int vars_num)
  return(va);
 }
 
-void bnf_exec_function(FILEBUF *proc_buffer,int nargs)
+inline void bnf_exec_function(FILEBUF *proc_buffer,int nargs)
 {
 	MVAR *old_symbol_table=current_stable;
+#if	0
 	if(proc_buffer==NULL) MESG("	buffer is NULL!");
-	// else MESG("## bnf_exec_function:[%s] args=%d",proc_buffer->b_fname,nargs);
-
+	else MESG("## bnf_exec_function:[%s] args=%d",proc_buffer->b_fname,nargs);
+#endif
 	current_stable = push_args_bnf(nargs,proc_buffer->symbol_tree->items);
 	tok_struct *after_proc=tok; 
 
-		// FILEBUF *ori_buf=exe_buffer;
-		// exe_buffer=proc_buffer;
-	
 	tok=proc_buffer->tok_table_bnf;	/* start of function  */
 	// MESG("bnf_exec_function:start [%s]",tok_info(tok));
+
 	skip_args1(nargs);
-	// MESG("bnf_exec_function:[%s]",tok_info(tok));
-	// tok->bnf_factor_function();
-	bnf_dir_lcurl();
+
+	// bnf_dir_lcurl();
+	NTOKEN2;
+	bnf_block1();
 	delete_symbol_table(current_stable,proc_buffer->symbol_tree->items,nargs);
 	current_stable=old_symbol_table;
 		// exe_buffer=ori_buf;
@@ -1805,19 +1797,9 @@ void bnf_factor_proc()
 	// MESG("factor_proc: tok  [%d %s] %d ",tok->tnum,tok->tname,tok->tind);
 
 	bnf_exec_function(tok0->proc_buffer,tok0->t_nargs);
-#if	1
+
 	memmove(result_var,bnf_var,sizeof(MVAR));
-#else
-	// MESG("bnf_factor_proc:[%s] >> return ind=%d",tok0->tname,(int)(bnf_var-bnf_vars));
-	if(bnf_var->var_type==VTYPE_NUM) {
-		result_var->dval=bnf_var->dval;
-		result_var->var_type=VTYPE_NUM;
-	} else if (bnf_var->var_type==VTYPE_STRING) {
-		result_var->sval=bnf_var->sval;
-		result_var->var_alloced=bnf_var->var_alloced;
-		result_var->var_type=VTYPE_STRING;
-	} else MESG("	something else!");
-#endif
+
 	bnf_var = result_var;
 	current_active_flag=1;	/* start checking again  */
 

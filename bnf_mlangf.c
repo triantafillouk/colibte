@@ -28,43 +28,20 @@ void get_lowercase_string(char *lower, char *string);
 int deq(double v1,double v2);
 void show_var_node(BTNODE *node);
 
-void bnf_function_args (int number_of_args)
+inline static void bnf_function_args (int number_of_args)
 {
 	int i;
 	int f_entry=entry_mode;
 	entry_mode=KNORMAL;
 	// MESG("bnf_function_args: %d [%d %s]",number_of_args,tok->tnum,tok->tname);
-#if	1
-// 0->1
-// 1->2
-// 2->3
-// 3->4
+
 	NTOKEN2;
 	for(i=0;i<number_of_args;i++) {
 		bnf_expression();
 		NTOKEN2;
 	};
-#else
-	if(number_of_args) {
-		for(i=0;i< number_of_args;i++) { 
-			NTOKEN2;
-			bnf_expression();
-			// set_var_value();
-		};
-		ntoken();
-	} else {;
-		if(check_token(TOK_LPAR)) {
-			// MESG("	bnf_function_args: TOK_LPAR");
-				ntoken();
-				ntoken();
-		};
-	};
-#endif
 	entry_mode=f_entry;
-// 	return va;
 }
-
-// MVAR va[3];
 
 void bnf_numeric_args (int number_of_args)
 {
@@ -184,14 +161,13 @@ void bnf_inverse()	/* TBD  */
 void bnf_transpose()	/* TBD  */
 {
 	bnf_function_args(1);
-	double value=0;
+
 	if(vtype_is(VTYPE_ARRAY)) {
 		array_dat *arr  = bnf_var->adat;
 		array_dat *tarray;
 		tarray = transpose(arr);
 		set_array(tarray);
 		ex_name="Tranpose";
-		value=1;
 	} else {
 		syntax_error("Not an array!",207);
 	};
@@ -339,10 +315,8 @@ void bnf_lower()	/* TBD  */
 void bnf_ascii()	/* TBD  */
 {
 	bnf_function_args(1);
-	MVAR *va=bnf_var;
-	double value=0;
-	if(va[0].var_type==VTYPE_STRING) {
-	 value=va[0].sval[0];
+	if(bnf_var->var_type==VTYPE_STRING) {
+	 	bnf_var->dval=bnf_var->sval[0];
 	} else {
 		syntax_error("s_acs: needs a string argument",100);
 	};
@@ -471,7 +445,7 @@ void bnf_wait()	/* TBC  */
 	MVAR *va=bnf_var;
 	if(va[0].var_type==VTYPE_STRING) msg_line("[%s] waiting.. ",va[0].sval);
 	else msg_line("<%f> wait for key",va[0].dval);
-	clean_saved_string(1);
+
 	char *slocal=get_sval();
 	if(execmd) {
 		slocal[0]=getc(stdin);
@@ -483,7 +457,7 @@ void bnf_wait()	/* TBC  */
 	};
 	entry_mode=f_entry;
 	slocal[1] = 0;
-	double value=slocal[0];
+	bnf_var->sval = strdup(slocal);
 	bnf_var->var_type=VTYPE_STRING;
 }
 
@@ -502,6 +476,7 @@ void bnf_input()	/* TBD  */
 	entry_mode=f_entry;
 }
 
+// prompt and get a numeric value
 void bnf_dinput()	/* TBD  */
 {
 	bnf_function_args(1);
@@ -509,7 +484,7 @@ void bnf_dinput()	/* TBD  */
 	clean_saved_string(80);
 	if(va[0].var_type!=VTYPE_STRING) getstring("DInput :",get_sval(),80,true);
 	getstring(va[0].sval,get_sval(),80,true);
-	double value=atof(get_sval());
+	bnf_var->dval=atof(get_sval());
 	clean_saved_string(0);
 	bnf_var->var_type=VTYPE_NUM;
 }
@@ -523,30 +498,27 @@ void bnf_init()	/* TBC  */
 
 void bnf_val()	/* TBC  */
 {
-	double value=0;
 	bnf_function_args(1);
 	MVAR *va=bnf_var;
-	if(va[0].var_type==VTYPE_STRING) 
-		value=atof(va[0].sval);
-	else syntax_error("val: wrong_type of args",100);
-	bnf_var->var_type=VTYPE_NUM;
-	bnf_var->dval=value;
+	if(va[0].var_type==VTYPE_STRING) {
+		bnf_var->var_type=VTYPE_NUM;
+		bnf_var->dval=atof(va[0].sval);
+	} else syntax_error("val: wrong_type of args",100);
 }
 
-void bnf_sqrt()	/* TBC  */
+void bnf_sqrt()	/* OK?  */
 {
-	double value=bnf_numeric_arg();
-	// MESG("sqrt(%f)",value);
-	bnf_var->dval=sqrt(value);
-	bnf_var->var_type=VTYPE_NUM;
+	NTOKEN2;
+	bnf_expression();
+	bnf_var->dval=sqrt(bnf_var->dval);
+	NTOKEN2;
 }
 
-void bnf_cbrt()	/* TBC  */
+void bnf_cbrt()	/* OK?  */
 {
-	double value=bnf_numeric_arg();
-	// MESG("cbrt(%f)",value);
-	bnf_var->dval=cbrt(value);
-	bnf_var->var_type=VTYPE_NUM;
+	NTOKEN2;
+	bnf_expression();
+	bnf_var->dval=cbrt(bnf_var->dval);
 	NTOKEN2;
 }
 
@@ -622,46 +594,48 @@ void bnf_round()	/* OK?  */
 	NTOKEN2;
 }
 
-void bnf_getpoint()	/* ???  */
+void bnf_getpoint()	/* dummy ?? only for plot!  */
 {
 	NTOKEN2;
-	bnf_expression();
-	bnf_var->dval=tan(bnf_var->dval);
-	NTOKEN2;
+	// bnf_expression();
+	// bnf_var->dval=tan(bnf_var->dval);
+	// NTOKEN2;
 }
 
 void bnf_time()	/* OK????  */
 {
+	MESG("-- bnf_time");
 	bnf_function_args(2);
 	MVAR *va=bnf_var-1;
-	double value=0;
+
 	if(va[0].var_type==VTYPE_STRING) {
-		set_sval(va[0].sval);
-		value=show_time(get_sval(),va[1].dval);
+		// set_sval(va[0].sval);
+		double dval=show_time(va[0].sval,va[1].dval);
+		if(va[0].var_alloced) free(va[0].sval);
+		va[0].dval=dval;
+		va[0].var_type=VTYPE_NUM;
 	} else {
 		syntax_error("error in stime",312);
 	}
 	prev_var("time");
-	bnf_var->var_type=VTYPE_NUM;
 }
 
 void bnf_deq()	/* OK?  */
 {
-	bnf_numeric_args(2);
+	bnf_function_args(2);
 	MVAR *va=bnf_var-1;
-	double value = deq(va[0].dval,va[1].dval);
-	va[0].dval=value;
+	va[0].dval = deq(va[0].dval,va[1].dval);
 	prev_var("deq");
-	NTOKEN2;
+	// NTOKEN2;
 }
 
 void bnf_atbof()	/* TBC  */
 {
+	ntoken();
 	next_var("atbof");
 
 	bnf_var->dval = FBof(cbfp);
 	bnf_var->var_type=VTYPE_NUM;
-	ntoken();
 }
 
 void bnf_ateof()	/* TBC  */
@@ -703,12 +677,13 @@ void bnf_mainarg()	/* TBD  */
 	bnf_function_args(1);
 	MVAR *va=bnf_var;
 	int ind;
-	double value=0;
+	// double value=0;
 	ind=(int)va[0].dval;
 	if(ind<main_args->cols) {
-		set_sval(main_args->sval[(int)va[0].dval]);
-		set_vtype(VTYPE_STRING);
-		value=atof(get_sval());
+		// set_sval(main_args->sval[(int)va[0].dval]);
+		bnf_var->sval=main_args->sval[(int)va[0].dval];
+		bnf_var->var_type=VTYPE_STRING;
+		// value=atof(get_sval());
 	} else {
 		set_vtype(VTYPE_NUM);
 	};

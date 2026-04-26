@@ -888,11 +888,9 @@ MVAR *new_symbol_table(int const size)
 
 	if(call_stack_used>call_stack_available) {
 		if(execmd) {
-			printf("new_symbol_table: overflow: available=%ld required=%ld\n",call_stack_available-call_stack,call_stack_used-call_stack);
-			// printf("execmd=%d\n",execmd);
+			fprintf(stderr,"new_symbol_table: overflow: available=%ld required=%ld\n",call_stack_available-call_stack,call_stack_used-call_stack);
 			exit(0);
 		} else {
-
 			msg_line("new_symbol_table: overflow: available=%d required=%d",call_stack_available-call_stack,call_stack_used-call_stack);
 		};
 		set_error(tok,101,"call_stack overflow");
@@ -2711,34 +2709,6 @@ void set_bnf_function1(tok_struct *tok, int type)
  };
 #endif
 }
-
-#if	NUSE
-void set_bnf_function(tok_struct *tok, int type)
-{
-	// MESG("# set_bnf_function: type=%d ttype=%2d %s",type,tok->ttype,tok_info(tok));
-	if(tok==NULL) MESG("set_bnf_function: NULL! token");
-	switch(type) {
-		case 0:
-			if(tok->ttype==TOK_FUNC) {
-				// MESG("ttype is tok_func");
-				if(tok->tok_node==NULL) { set_error(tok,3003,"tok_node is null!");
-				return;};
-				int findex = tok->tok_node->node_index;
-				// MESG("	findex=%d",findex);
-				// MESG(" Function tnum=%2d: tname=%s [ttype=%2d] set factor function %d",tok->tnum,tok->tname,tok->ttype,findex);
-				tok->factor_function = m_functions[findex].ffunction;
-			} else {
-	 			tok->factor_function = factor_funcs[tok->ttype];
-	 			tok->bnf_factor_function = factor_bnf_funcs[tok->ttype];
-				// MESG(" bnf function tnum=%2d: name=%s [ttype=%2d] set bnf function",tok->tnum,tok->tname,tok->ttype);
-			};
-			break;
-		case 1:
-			// MESG("	1 set factor function to ttype=%2d",tok->ttype);
-			tok->bnf_factor_function = factor_bnf_funcs[tok->ttype];
-	};
-}
-#endif
 
 void set_tok_function(tok_struct *tok, int type)
 {
