@@ -1493,7 +1493,7 @@ void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
  } else {
  	int a = current_scheme->color_style[fcolor].color_attr;
 #if	!SOLARIS
-	if(a & FONT_STYLE_ITALIC) attrib |= A_ITALIC;
+	// if(a & FONT_STYLE_ITALIC) attrib |= A_ITALIC;
 #endif
 	if(a & FONT_STYLE_BOLD) attrib |= A_BOLD;
 	if(a & FONT_STYLE_DIM) attrib |= A_DIM;

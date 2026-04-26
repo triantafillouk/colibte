@@ -143,9 +143,9 @@ double  show_time(char *description,int init)
 	prev_usec=usec1;
 	prev_sec=sec1;
 	if(init==1) {	
-		vtime=diff_sec+diff_usec*0.00001;
+		vtime=diff_sec+diff_usec*0.000001;
 	} else {
-		vtime=diff_start_sec+diff_start_usec*0.00001;
+		vtime=diff_start_sec+diff_start_usec*0.000001;
 	}
 	set_vdval(vtime);
 	if(show_no_time) return 1;

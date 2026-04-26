@@ -3,8 +3,10 @@ char *ddot_string();
 void update_ddot_line(char *ddot_out);
 void skip_sentence1();
 
-static MVAR bnf_vars[200];
+static MVAR bnf_vars[500];
 static MVAR *bnf_var=&bnf_vars[0];
+static long max_var=0;
+static long var_index=0;
 
 inline MVAR *get_left_slot(int ind);
 static double bnf_expression();
@@ -12,7 +14,7 @@ int set_option_val(int vnum,char *svalue);
 int set_option_bnf(int vnum,int ival);
 
 #if	1
-#if	1
+#if	0
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
 
@@ -20,13 +22,18 @@ int set_option_bnf(int vnum,int ival);
 inline static void prev_var(char *title)
 {
 	bnf_var--;
+#if	1
+	var_index--;
+#endif
 }
 
 inline static void next_var(char *title)
 {
 	bnf_var++;
 #if	1
-	if(bnf_var - &bnf_vars[0]>100) {
+	var_index++;
+	if(max_var<var_index) max_var=var_index;
+	if(bnf_var - &bnf_vars[0]>500) {
 		MESG("MAX var exceeded!");
 		exit(2);
 	};
@@ -430,7 +437,7 @@ void bnf_factor_plus()
 				// MESG("	varb pointer num = %f",varb->var_pointer->dval);
 				double l0 = trunc(varb->var_pointer->dval);
 				int stat; 
-				// MESG("-- add quote \"%s\", numeric var %f",vara->sval,varb->var_pointer->dval);
+
 				if(l0 == varb->var_pointer->dval) stat=snprintf(svalue,sizeof(svalue),"%s%.0f",vara->sval,l0);
 				else stat=snprintf(svalue,sizeof(svalue),"%s%f",vara->sval,varb->var_pointer->dval);
 
@@ -1809,7 +1816,7 @@ void bnf_factor_proc()
 	bnf_exec_function(tok0->proc_buffer,tok0->t_nargs);
 
 	memmove(result_var,bnf_var,sizeof(MVAR));
-
+	var_index -= (int)(bnf_var-result_var);
 	bnf_var = result_var;
 	current_active_flag=1;	/* start checking again  */
 
@@ -1853,3 +1860,7 @@ void bnf_dir_else()
 }
 
 
+void show_var_stats()
+{
+	fprintf(stderr,"MVAR index=%ld max=%ld\n",var_index,max_var);
+}

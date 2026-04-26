@@ -4126,6 +4126,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		current_stable=old_symbol_table;
 	};
 	if(exebnf) {
+		show_var_stats();
 		if(bnf_var->var_type==VTYPE_NUM) msg_line("Result is [%f]",num_result());
 	} else {
 		if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
