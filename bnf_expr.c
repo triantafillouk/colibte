@@ -14,7 +14,7 @@ int set_option_val(int vnum,char *svalue);
 int set_option_bnf(int vnum,int ival);
 
 #if	1
-#if	0
+#if	1
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
 
@@ -1640,12 +1640,12 @@ void bnf_dir_fori()
 	// MESG("	fori: before block execute ind=%ld tok=[%s]",ind,tok_info(tok));
 	// set block start
 	start_block=tok;	/* this is a block start or a simple sentence  */
-	
-	// MESG("	fori start of block token [%s]",tok_info(tok));
+	start_block++;	
+	// MESG("	fori start of block token [%s]",tok_info(start_block));
 	// find token after the end of block
 	skip_sentence1();
 	end_block=tok;
-	// MESG("	fori end if block token [%s]",tok_info(tok));
+	// MESG("	fori end of block token [%s]",tok_info(tok));
 
 	if(dinit==dmax) {
 		tok=end_block;
@@ -1657,8 +1657,7 @@ void bnf_dir_fori()
 		for(;*iterrator_val < dmax; *iterrator_val +=dstep) {
 			tok=start_block;
 			// MESG("		fori: iterrator_val=%3f [%s]",*iterrator_val,tok_info(tok));
-			tok->bnf_factor_function();
-
+			bnf_block1();
 			if(current_active_flag==0) {
 				MESG("end loop!:");
 				if(is_break1) { tok=exe_buffer->end_token;return;};
@@ -1668,7 +1667,7 @@ void bnf_dir_fori()
 	} else if(dstep<0 && dmax< *iterrator_val) {
 		for(; *iterrator_val > dmax; *iterrator_val +=dstep) {
 			tok=start_block;
-			tok->bnf_factor_function();
+			bnf_block1();
 			if(current_active_flag==0) {
 				if(is_break1) { tok=exe_buffer->end_token;return;};
 				break;
