@@ -3,9 +3,29 @@ char *ddot_string();
 void update_ddot_line(char *ddot_out);
 void skip_sentence1();
 
+#if	0
 static MVAR bnf_vars[500];
 static MVAR *bnf_var=&bnf_vars[0];
+
+void init_bnf_vars()
+{
+}
+#else
+static MVAR *bnf_vars;
+static MVAR *bnf_var;
+
+void init_bnf_vars()
+{
+	MESG("init_bnf_vars");
+	bnf_vars=(MVAR *)malloc(500*sizeof(MVAR));
+	bnf_var=bnf_vars;
+}
+
+#endif
+
+
 static long max_var=0;
+
 static long var_index=0;
 
 inline MVAR *get_left_slot(int ind);
