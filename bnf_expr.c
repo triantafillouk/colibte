@@ -3,30 +3,13 @@ char *ddot_string();
 void update_ddot_line(char *ddot_out);
 void skip_sentence1();
 
-#if	0
 static MVAR bnf_vars[500];
-static MVAR *bnf_var=&bnf_vars[0];
+static MVAR *bnf_var=bnf_vars;
 
-void init_bnf_vars()
-{
-}
-#else
-static MVAR *bnf_vars;
-static MVAR *bnf_var;
-
-void init_bnf_vars()
-{
-	MESG("init_bnf_vars");
-	bnf_vars=(MVAR *)malloc(500*sizeof(MVAR));
-	bnf_var=bnf_vars;
-}
-
-#endif
-
-
+#if	TPROFILE
 static long max_var=0;
-
 static long var_index=0;
+#endif
 
 inline MVAR *get_left_slot(int ind);
 static double bnf_expression();
@@ -42,7 +25,7 @@ int set_option_bnf(int vnum,int ival);
 inline static void prev_var(char *title)
 {
 	bnf_var--;
-#if	1
+#if	TPROFILE
 	var_index--;
 #endif
 }
@@ -50,7 +33,7 @@ inline static void prev_var(char *title)
 inline static void next_var(char *title)
 {
 	bnf_var++;
-#if	1
+#if	TPROFILE
 	var_index++;
 	if(max_var<var_index) max_var=var_index;
 	if(bnf_var - &bnf_vars[0]>500) {
@@ -138,8 +121,7 @@ void bnf_refresh_ddot()
 	if(bnf_var->var_type==VTYPE_POINTER) {
 		var_show = bnf_var->var_pointer;
  	};
- // int var_index = bnf_var - bnf_vars;
- // MESG("refresh_ddot: ind=%3ld type=%d",var_index,var_show->var_type);
+
  if(execmd) {
 	 if(var_show->var_type==VTYPE_NUM) {
 		printf("%s	: %.3f\n",ddot_string(),var_show->dval);
@@ -1654,7 +1636,6 @@ void bnf_dir_fori()
 	dstep = bnf_expression();
 	prev_var("	get step val");
 
-	// MESG("fori: from %f to %f step %f var_index=%ld",dinit,dmax,dstep,bnf_var-bnf_vars);
 	NTOKEN2;	/* skip right parenthesis  */
 	// ind=bnf_var-bnf_vars;
 	// MESG("	fori: before block execute ind=%ld tok=[%s]",ind,tok_info(tok));
@@ -1762,7 +1743,9 @@ inline static MVAR * push_args_bnf(int nargs,int vars_num)
  // if(va==NULL) return NULL;
 
  MVAR *va_i=va;
- for(;va_i<va+nargs;va_i++)
+
+ int i=0;
+ for(;i<nargs;i++,va_i++)
  {
 	// MESG("	push_args_1: arg %d, tok=[%d %s] type=%d",(int)(va_i-va),tok->tnum,tok->tname,va_i->var_type);
 	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
@@ -1774,15 +1757,17 @@ inline static MVAR * push_args_bnf(int nargs,int vars_num)
 	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
 	NTOKEN2; // skip separator or right parenthesis!
  };
-#if	1
-  while(va_i<va+vars_num+nargs) {
+#if	0	/* no need to initialize ??  */
+  // while(i<vars_num+nargs)
+  for(;i<vars_num+nargs;i++,va_i++)
+  // while(va_i<va+vars_num+nargs) 
+  {
  	va_i->var_type=VTYPE_NUM;
 	va_i->dval=0;
-	va_i++;  
+	// va_i++; i++;
   };
-#else
- init_vars(va_i,vars_num);
 #endif
+
  // MESG(">	push_args_1:end [%s]",tok_info(tok));
  return(va);
 }
@@ -1802,7 +1787,6 @@ inline static void bnf_exec_function(FILEBUF *proc_buffer,int nargs)
 
 	skip_args1(nargs);
 
-	// bnf_dir_lcurl();
 	NTOKEN2;
 	bnf_block1();
 	delete_symbol_table(current_stable,proc_buffer->symbol_tree->items,nargs);
@@ -1835,7 +1819,9 @@ void bnf_factor_proc()
 	bnf_exec_function(tok0->proc_buffer,tok0->t_nargs);
 
 	memmove(result_var,bnf_var,sizeof(MVAR));
+#if	TPROFILE
 	var_index -= (int)(bnf_var-result_var);
+#endif
 	bnf_var = result_var;
 	current_active_flag=1;	/* start checking again  */
 
@@ -1881,5 +1867,7 @@ void bnf_dir_else()
 
 void show_var_stats()
 {
+#if	TPROFILE
 	fprintf(stderr,"MVAR index=%ld max=%ld\n",var_index,max_var);
+#endif
 }

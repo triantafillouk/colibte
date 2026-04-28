@@ -50,7 +50,6 @@ struct array_dat *main_args=NULL;
 int dofile(char *fname);
 
 int new_in_key_list=0;
-void init_bnf_vars();
 
 void init_lists()
 {
@@ -324,7 +323,6 @@ void parse_command_line(int argc, char **argv)
 					show_tokens=1;
 				case 'f':
 					exebnf=1;
-					init_bnf_vars();
 				case 'x':	/* execute file and quit */
 					execmd=1;
 				case 'X':	/* execute file as statrup */

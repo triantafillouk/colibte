@@ -315,7 +315,6 @@ inline void init_vars(MVAR *head,int size)
 #else
  int i=0;
  for(;i<size;i++) {
-	// td[i].var_index=i;
  	head[i].var_type=VTYPE_NUM;
 	head[i].dval=0;
  };
@@ -925,8 +924,8 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 {
  // MESG("delete_symbol_table: nargs=%d size=%d",nargs,size);
  MVAR *sslot=td;
- // int i=0;
- for(;sslot < td+nargs;sslot++)
+ int i=0;
+ for(;i<nargs;i++,sslot++)
  {
 	// string arguments are dublicated, must be freed
  	if(sslot->var_type==VTYPE_STRING) {
@@ -936,8 +935,9 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 		};
 	};
  };
+
  // for(i=nargs;i<size;i++) 
- for(;sslot < td+size+nargs;sslot++) 
+ for(;i<size+nargs;i++,sslot++) 
  {
 	// MESG("dst vars %d",i);
 	if(sslot->var_type==VTYPE_STRING) {
@@ -946,7 +946,7 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 				free(sslot->sval);
 				sslot->sval=NULL;
 			};
-	};
+	} else
 	if(sslot->var_type==VTYPE_ARRAY) {
 		// MESG("delete_symbol_table:array %s",sslot->adat->array_name);
 		if(sslot->adat!=NULL) {
@@ -957,6 +957,7 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 		};
 	};
  };
+
  // MESG("delete_symbol_table from: %lld",call_stack_used-call_stack);
  call_stack_used -= size+nargs;
  // MESG("delete_symbol_table: call_stack=%lld upto %lld",call_stack_used-call_stack,call_stack_used-call_stack+nargs+size-1);
@@ -1232,7 +1233,7 @@ MVAR * push_args_1(int nargs,int vars_num)
 	NTOKEN2; // skip separator or right parenthesis!
  };
 
- init_vars(va_i,vars_num);
+ // init_vars(va_i,vars_num);	/* need to initialize ??  */
  // MESG(">	push_args_1:end [%s]",tok_info(tok));
  return(va);
 }
