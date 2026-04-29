@@ -38,7 +38,7 @@ inline static void bnf_function_args (int number_of_args)
 	NTOKEN2;
 	for(i=0;i<number_of_args;i++) {
 		bnf_expression();
-		show_result();
+		// show_result();
 		NTOKEN2;
 	};
 	entry_mode=f_entry;
@@ -175,24 +175,33 @@ void bnf_transpose()	/* TBD  */
 	// free(va);
 }
 
-void bnf_left()	/* TBD  */
+void bnf_left()	/* TBC  */
 {
 	bnf_function_args(2);
 	MVAR *va=bnf_var-1;
 	if(va[0].var_type==VTYPE_STRING && va[1].var_type==VTYPE_NUM ) {
-		va[0].sval[(int)va[1].dval]=0;
-		char *s=strdup(va[0].sval);
-		if(va[0].var_alloced) free(va[0].sval);
-		va[0].sval=s;
+		int r1=(int)va[1].dval;
+		if(r1<strlen(va[0].sval)) {
+			char *s=(char *)malloc(r1+1);
+			memcpy(s,va[0].sval,r1);s[r1]=0;
+			va[0].sval=s;
+			va[0].var_alloced=1;
+		} else {
+			// va[0].sval[(int)va[1].dval]=0;
+			// char *s=strdup(va[0].sval);
+			// if(va[0].var_alloced) free(va[0].sval);
+		};
 	} else {
 		va[0].sval="error string left!";
 		va[0].var_type=VTYPE_NUM;
 		va[0].var_alloced=0;
 	};
-	prev_var();
+	prev_var("left");
+	MESG("- left: next is [%s]",tok_info(tok));
+	// NTOKEN2;
 }
 
-void bnf_right()	/* TBD  */
+void bnf_right()	/* TBC  */
 {
 	bnf_function_args(2);
 	MVAR *va=bnf_var-1;
@@ -210,10 +219,12 @@ void bnf_right()	/* TBD  */
 		syntax_error("right: wrong type of args",206);
 		// set_sval("");
 	};
-	prev_var();
+	prev_var("right");
+	MESG("- right: next is [%s]",tok_info(tok));
+	// NTOKEN2;
 }
 
-void bnf_mid()	/* TBD  */
+void bnf_mid()	/* TBC  */
 {
 	bnf_function_args(3);
 	MVAR *va=bnf_var-2;
@@ -234,9 +245,10 @@ void bnf_mid()	/* TBD  */
 			syntax_error("mid: wrong_type of args",100);
 			set_sval("");
 		};
-		prev_var();
-		prev_var();
+		prev_var("mid1");
+		prev_var("mid2");
 		bnf_var->var_type=VTYPE_STRING;
+		MESG("- mid : next is [%s]",tok_info(tok));
 }
 
 
@@ -303,46 +315,65 @@ void bnf_show_time()
 }
 
 
-void bnf_upper()	/* TBD  */
+void bnf_upper()	/* TBC  */
 {
 	bnf_function_args(1);
 	MVAR *va=bnf_var;
-	if(va[0].var_type==VTYPE_STRING) {
-		clean_saved_string(strlen(va[0].sval));
-		get_uppercase_string(get_sval(),va[0].sval);
+	if(va->var_type==VTYPE_POINTER) va=va->var_pointer;
+	if(va->var_type==VTYPE_STRING) {
+		// clean_saved_string(strlen(va[0].sval));
+		char *s=(char *)malloc(strlen(va[0].sval+1));
+		get_uppercase_string(s,va[0].sval);
+		if(bnf_var->var_alloced) free(bnf_var->sval);
+		bnf_var->sval=s;
+		// MESG("upper: [%s]",va[0].sval);
+		// MESG("upper: [%s]",bnf_var->sval);
+		bnf_var->var_type=VTYPE_STRING;
 	} else {
 		syntax_error("upper: wrong_type of args",100);
-		set_sval("");	
+		// set_sval("");	
 	};
-	bnf_var->var_type=VTYPE_STRING;
+	MESG("- upper: next is [%s]",tok_info(tok));
 }
 
-void bnf_lower()	/* TBD  */
+void bnf_lower()	/* TBC  */
 {
 	bnf_function_args(1);
 	MVAR *va=bnf_var;
-	if(va[0].var_type==VTYPE_STRING) {
-		clean_saved_string(strlen(va[0].sval));
-		get_lowercase_string(get_sval(),va[0].sval);
+	if(va->var_type==VTYPE_POINTER) va=va->var_pointer;
+	if(va->var_type==VTYPE_STRING) {
+		// clean_saved_string(strlen(va[0].sval));
+		char *s=(char *)malloc(strlen(va[0].sval+1));
+		get_lowercase_string(s,va[0].sval);
+		if(bnf_var->var_alloced) free(bnf_var->sval);
+		bnf_var->sval=s;
+		// MESG("upper: [%s]",va[0].sval);
+		// MESG("upper: [%s]",bnf_var->sval);
+		bnf_var->var_type=VTYPE_STRING;
 	} else {
-		syntax_error("lower: needs a string argument",100);
-		set_sval("");
+		syntax_error("lower: wrong_type of args",100);
+		// set_sval("");	
 	};
-	bnf_var->var_type=VTYPE_STRING;
+	// MESG("- lower: next is [%s]",tok_info(tok));
 }
 
-void bnf_ascii()	/* TBD  */
+void bnf_ascii()	/* TBC  */
 {
 	bnf_function_args(1);
-	if(bnf_var->var_type==VTYPE_STRING) {
-	 	bnf_var->dval=bnf_var->sval[0];
+	MVAR *va=bnf_var;
+	if(bnf_var->var_type==VTYPE_POINTER) va=bnf_var->var_pointer;
+	if(va->var_type==VTYPE_STRING) {
+	 	int ascii=va->sval[0];
+		if(bnf_var->var_alloced) free(bnf_var->sval);
+		bnf_var->dval=ascii;
 	} else {
 		syntax_error("s_acs: needs a string argument",100);
 	};
 	bnf_var->var_type=VTYPE_NUM;
+	// MESG("- ascii: next is [%s]",tok_info(tok));
 }
 
-void bnf_chr()	/* TBD  */
+void bnf_chr()	/* TBC  */
 {
 	bnf_function_args(1);
 	MVAR *va=bnf_var;
@@ -355,18 +386,18 @@ void bnf_chr()	/* TBD  */
 	// free(va);
 }
 
-void bnf_getchar() // ??	/* TBD  */
+void bnf_getchar() /* TBC  */
 {
 	ntoken();
-	clean_saved_string(1);
-	char *slocal=get_sval();
+	next_var("getchar");
+	char *slocal=(char *)malloc(2);
 	if(execmd) {
-		slocal[0]=getchar();
+		slocal[0]=getchar();	/* get a utf8 char! TBD !! */
 	} else {
 		slocal[0] = getcmd();
 	};
 	slocal[1] = 0;
-
+	bnf_var->sval=slocal;bnf_var->var_alloced=1;
 	bnf_var->var_type=VTYPE_STRING;
 }
 
@@ -403,37 +434,39 @@ void bnf_abs()
 /* string of a value */
 void bnf_sindex()	/* TBC  */
 {
-	double value=0;
 	bnf_function_args(2);
-	MVAR *va=bnf_var-1;
-	if(va[0].var_type==VTYPE_STRING) {
-		value = sindex(va[0].sval, va[1].sval);
+	MVAR *vb=bnf_var;
+	if(vb->var_type==VTYPE_POINTER) vb=vb->var_pointer;
+	prev_var("sindex");
+	MVAR *va=bnf_var;
+	if(va->var_type==VTYPE_POINTER) va=va->var_pointer;
+	if(va->var_type==VTYPE_STRING && vb->var_type==VTYPE_STRING) {
+		bnf_var->dval = sindex(va->sval, vb->sval);
 		bnf_var->var_type=VTYPE_NUM;
 	} else {
 		syntax_error("s_index: wrong_type of args",100);
 	};
-	bnf_var->dval=value;
-	bnf_var->var_type=VTYPE_NUM;
 }
 
 /* string of a value */
-void bnf_string()	/* TBD  */
+void bnf_string()	/* TBC  */
 {
 	bnf_function_args(1);
 	MVAR *va=bnf_var;
 	if(va[0].var_type==VTYPE_NUM) {
 		// MESG("bnf_string: %f",va[0].dval);
-		clean_saved_string(20);
-		char *slocal=get_sval();
+		char *slocal=(char *)malloc(20);
 		snprintf(slocal,20,"%f",va[0].dval);
-		va[0].sval=slocal;
-		// MESG("bnf_string: [%s]",get_sval());
+		va->sval=slocal;
+		va->var_alloced=1;
+		// MESG("- bnf_string: next is [%s]",tok_info(tok));
+		// show_result();
 	} else {
 		syntax_error("string: wrong_type of args",100);
-		set_sval("");
-		va[0].sval="";
+		va->sval="";
+		va->var_alloced=0;
 	};
-	bnf_var->var_type=VTYPE_STRING;
+	va->var_type=VTYPE_STRING;
 }
 
 void bnf_message()	/* TBC  */
@@ -480,18 +513,20 @@ void bnf_wait()	/* TBC  */
 	bnf_var->var_type=VTYPE_STRING;
 }
 
-void bnf_input()	/* TBD  */
+void bnf_input()	/* TBC  */
 {
 	int f_entry=entry_mode;
 	bnf_function_args(1);
 	MVAR *va=bnf_var;
 	entry_mode=KENTRY;	/* get input from screen */
-	clean_saved_string(80);
-	char *slocal=get_sval();
-	if(va[0].var_type!=VTYPE_STRING) getstring("Input :",get_sval(),80,true);
-	else getstring(va[0].sval,get_sval(),80,true);
+	// clean_saved_string(80);
+	char *slocal=(char *)malloc(80);
+	if(va[0].var_type!=VTYPE_STRING) getstring("Input :",slocal,80,true);
+	else getstring(va->sval,slocal,80,true);
 	if(execmd) strtok(slocal, "\n");
 	bnf_var->var_type=VTYPE_STRING;
+	if(bnf_var->var_alloced) free(bnf_var->sval);
+	bnf_var->sval=slocal;bnf_var->var_alloced=1;
 	entry_mode=f_entry;
 }
 
@@ -521,7 +556,10 @@ void bnf_val()	/* TBC  */
 	MVAR *va=bnf_var;
 	if(va[0].var_type==VTYPE_STRING) {
 		bnf_var->var_type=VTYPE_NUM;
-		bnf_var->dval=atof(va[0].sval);
+		double val=atof(va[0].sval);
+		if(bnf_var->var_alloced) { free(bnf_var->sval);bnf_var->var_alloced=0;};
+		bnf_var->dval=val;
+		bnf_var->var_type=VTYPE_NUM;
 	} else syntax_error("val: wrong_type of args",100);
 }
 
@@ -541,7 +579,7 @@ void bnf_cbrt()	/* OK?  */
 	NTOKEN2;
 }
 
-void bnf_dbg_message()
+void bnf_dbg_message()	/* TBC  */
 {
 	bnf_function_args(1);
 	MVAR *va=bnf_var;

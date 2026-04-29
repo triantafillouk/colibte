@@ -17,7 +17,7 @@ int set_option_val(int vnum,char *svalue);
 int set_option_bnf(int vnum,int ival);
 
 #if	1
-#if	1
+#if	0
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
 
@@ -110,7 +110,7 @@ inline static void set_var_value()
 
 void bnf_refresh_ddot()
 {
- // MESG("refresh_ddot");
+ // MESG("refresh_ddot: var type=%d",bnf_var->var_type);
  int stat=0;
  double value=0;
  TextPoint *tp = tok->ddot;
@@ -262,6 +262,7 @@ void bnf_factor_var()
 	// MESG("	var: put var %s at pos %ld",tok->tname,bnf_var-bnf_vars);
 	bnf_var->var_pointer=get_left_slot(tok->tind);
 	bnf_var->var_type=VTYPE_POINTER;
+	bnf_var->var_alloced=0;
 	NTOKEN2;
 }
 
@@ -1055,7 +1056,7 @@ inline static void bnf_increase_by()
 	if(bvar->var_type==VTYPE_POINTER) {
 		bvar = bvar->var_pointer;
 	};
-	if(bvar->var_type==VTYPE_NUM) { 
+	if(bvar->var_type==VTYPE_NUM) {
 		if(avar->var_type==VTYPE_NUM) {
 			avar->dval += bvar->dval;
 			double val = avar->dval;
@@ -1085,13 +1086,19 @@ inline static void bnf_increase_by()
 		};
 	};
 	
-/*
-	if(bvar->var_type==VTYPE_STRING) {
-		avar->sval = strdup(bvar->sval);
+
+	if(bvar->var_type==VTYPE_STRING && avar->var_type==VTYPE_STRING) {
+		char *s=(char*)malloc(strlen(avar->sval)+strlen(bvar->sval)+1);
+		memcpy(s,avar->sval,strlen(avar->sval));
+		memcpy(s+strlen(avar->sval),bvar->sval,strlen(bvar->sval));
+		s[strlen(avar->sval)+strlen(bvar->sval)]=0;
+		bnf_var->sval=s; bnf_var->var_alloced=0;bnf_var->var_type=VTYPE_STRING;
+		if(avar->var_alloced) free(avar->sval);
+		avar->sval=s; avar->var_alloced=1;
 		NTOKEN2;
 		return;
 	};
-*/
+
 	set_error(tok,1024,"increase operation not supported!");
 	NTOKEN2;
 }
@@ -1415,9 +1422,11 @@ void bnf_factor_assign_var()
 		return;
 	};
 	if(bvar->var_type==VTYPE_STRING) {
-		if(aval->var_type==VTYPE_STRING) free(aval->sval);
+		if(aval->var_type==VTYPE_STRING) {
+			if(aval->var_alloced) free(aval->sval);
+		} else aval->var_type=VTYPE_STRING;
 		aval->sval = strdup(bvar->sval);
-		bnf_var->sval = aval->sval;
+		// bnf_var->sval = aval->sval;
 		NTOKEN2;
 		return;
 	};
