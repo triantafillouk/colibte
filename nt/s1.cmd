@@ -4,8 +4,8 @@ s="abcdefghijklmnopqrstuvwxyz"
 s:
  atan(1.2):
 
+right(s,3)		:
 left(s,10)		:
-right(s,3)	:
 mid(s,4,3)	:
 u=upper(s)		:
 l=lower(u)		:

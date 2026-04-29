@@ -1707,8 +1707,10 @@ inline static double bnf_expression()
 		tok->bnf_factor_function();	
 	};
 #if	1
-	if(bnf_var->var_type==VTYPE_POINTER)
+	if(bnf_var->var_type==VTYPE_POINTER) {
 		memmove(bnf_var,bnf_var->var_pointer,sizeof(struct MVAR));
+		if(bnf_var->var_type==VTYPE_STRING) bnf_var->var_alloced=0;
+	};
 	if(bnf_var->var_type==VTYPE_NUM) return bnf_var->dval;
 	else return 0;
 #endif

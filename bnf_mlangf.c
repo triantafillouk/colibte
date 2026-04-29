@@ -38,6 +38,7 @@ inline static void bnf_function_args (int number_of_args)
 	NTOKEN2;
 	for(i=0;i<number_of_args;i++) {
 		bnf_expression();
+		show_result();
 		NTOKEN2;
 	};
 	entry_mode=f_entry;
@@ -179,23 +180,37 @@ void bnf_left()	/* TBD  */
 	bnf_function_args(2);
 	MVAR *va=bnf_var-1;
 	if(va[0].var_type==VTYPE_STRING && va[1].var_type==VTYPE_NUM ) {
-		set_nsval(va[0].sval,(int)va[1].dval);
-	} else set_sval("");
+		va[0].sval[(int)va[1].dval]=0;
+		char *s=strdup(va[0].sval);
+		if(va[0].var_alloced) free(va[0].sval);
+		va[0].sval=s;
+	} else {
+		va[0].sval="error string left!";
+		va[0].var_type=VTYPE_NUM;
+		va[0].var_alloced=0;
+	};
+	prev_var();
 }
 
 void bnf_right()	/* TBD  */
 {
 	bnf_function_args(2);
 	MVAR *va=bnf_var-1;
+	// MESG("bnf_right: %d %d",va[0].var_type,va[1].var_type);
 	if(va[0].var_type==VTYPE_STRING && va[1].var_type==VTYPE_NUM ) {
 		unsigned long r1=(unsigned long)va[1].dval;
-		// MESG("right: r1=%d",r1);
+		// MESG("	right: [%s] r1=%d",va[0].sval,r1);
 		if(strlen(va[0].sval)<r1) r1=strlen(va[0].sval);
-		set_sval(va[0].sval+(strlen(va[0].sval)-r1));
+		char *s=strdup(va[0].sval+(strlen(va[0].sval)-r1));
+		if(va[0].var_alloced) free(va[0].sval);
+		va[0].sval=s;
+		va[0].var_alloced=1;
+		// set_sval(va[0].sval+(strlen(va[0].sval)-r1));
 	} else {
 		syntax_error("right: wrong type of args",206);
-		set_sval("");
+		// set_sval("");
 	};
+	prev_var();
 }
 
 void bnf_mid()	/* TBD  */
@@ -205,14 +220,22 @@ void bnf_mid()	/* TBD  */
 		if(va[0].var_type==VTYPE_STRING && va[1].var_type==VTYPE_NUM && va[2].var_type==VTYPE_NUM) 
 		{
 		if((unsigned long)va[1].dval>strlen(va[0].sval) || va[2].dval==0) {
-			set_sval("");
+			// set_sval("");
 		} else {
-			set_nsval(va[0].sval+(int)va[1].dval,(int)va[2].dval);
+			char *s=(char *)malloc((int)va[2].dval+1);
+			memcpy(s,va[0].sval+(int)va[1].dval,(int)va[2].dval);
+			s[(int)va[2].dval]=0;
+			// set_nsval(va[0].sval+(int)va[1].dval,(int)va[2].dval);
+			va[0].sval=s;
+			va[0].var_type=VTYPE_STRING;
+			va[0].var_alloced=1;
 		};
 		} else {
 			syntax_error("mid: wrong_type of args",100);
 			set_sval("");
 		};
+		prev_var();
+		prev_var();
 		bnf_var->var_type=VTYPE_STRING;
 }
 
@@ -249,16 +272,12 @@ void bnf_print()
 				out_print(bnf_var->sval,0);
 			};
 		};
-		prev_var("print");
-		// MESG("	if: after switch!");
-		// tok=current_token();
+		// prev_var("print");
 		// MESG("	if: after switch tnum=%d ttype=%d",tok->tnum,tok->ttype);
 	};
 	out_print("",1);
 	// MESG("bnf_print: skip function right parenthesis");
 	ntoken();
-	// tok=current_token();
-	// MESG("end of if_print: show current token!");
 	// MESG("end of bnf_print: num=%d",tok->tnum);
 	// MESG("bnf_print: >>");
 }
