@@ -918,7 +918,6 @@ MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
  return td;
 }
 
-
 /* free symbol table after execute */
 void delete_symbol_table(MVAR *td, int size,int nargs)
 {
@@ -937,7 +936,7 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
  };
 
  // for(i=nargs;i<size;i++) 
- for(;i<size+nargs;i++,sslot++) 
+ for(;i<size;i++,sslot++) 
  {
 	// MESG("dst vars %d",i);
 	if(sslot->var_type==VTYPE_STRING) {
@@ -959,14 +958,16 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
  };
 
  // MESG("delete_symbol_table from: %lld",call_stack_used-call_stack);
- call_stack_used -= size+nargs;
+ call_stack_used -= size;
  // MESG("delete_symbol_table: call_stack=%lld upto %lld",call_stack_used-call_stack,call_stack_used-call_stack+nargs+size-1);
  // MESG("                    at  : %lld",call_stack_used-call_stack);
 }
 
 void init_stack()
 {
+	// MESG("init_stack:");
 	delete_symbol_table(call_stack,call_stack_used-call_stack,0);
+	// MESG("init_stack:end ok!");
 }
 
 /* double equality */
@@ -1196,7 +1197,7 @@ MVAR * push_args_1(int nargs,int vars_num)
 {
  TDS("push_args");
 
- MVAR *va = new_symbol_table(nargs+vars_num);
+ MVAR *va = new_symbol_table(vars_num);
  if(va==NULL) return NULL;
 
  MVAR *va_i=va;

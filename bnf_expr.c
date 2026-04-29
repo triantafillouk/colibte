@@ -1739,8 +1739,9 @@ inline static MVAR * push_args_bnf(int nargs,int vars_num)
 {
  // MESG("push_args_bnf: nargs=%d vars_num=%d",nargs,vars_num);
 
- MVAR *va = new_symbol_table(nargs+vars_num);
- // if(va==NULL) return NULL;
+//  MVAR *va = new_symbol_table(nargs+vars_num);
+ MVAR *va = new_symbol_table(vars_num);
+ if(va==NULL) return NULL;
 
  MVAR *va_i=va;
 
@@ -1759,7 +1760,7 @@ inline static MVAR * push_args_bnf(int nargs,int vars_num)
  };
 #if	0	/* no need to initialize ??  */
   // while(i<vars_num+nargs)
-  for(;i<vars_num+nargs;i++,va_i++)
+  for(;i<vars_num;i++,va_i++)
   // while(va_i<va+vars_num+nargs) 
   {
  	va_i->var_type=VTYPE_NUM;
@@ -1771,6 +1772,7 @@ inline static MVAR * push_args_bnf(int nargs,int vars_num)
  // MESG(">	push_args_1:end [%s]",tok_info(tok));
  return(va);
 }
+
 
 inline static void bnf_exec_function(FILEBUF *proc_buffer,int nargs)
 {
@@ -1821,6 +1823,17 @@ void bnf_factor_proc()
 	memmove(result_var,bnf_var,sizeof(MVAR));
 #if	TPROFILE
 	var_index -= (int)(bnf_var-result_var);
+#endif
+#if	0
+//	clean used strings
+	MVAR *mv_i;
+	for(mv_i=result_var+1;mv_i<=bnf_var;mv_i++){
+		if(mv_i->var_type==VTYPE_STRING) {
+			if(mv_i->var_alloced) {
+				free(mv_i->sval);mv_i->var_alloced=0;
+			};
+		};
+	};
 #endif
 	bnf_var = result_var;
 	current_active_flag=1;	/* start checking again  */
