@@ -21,6 +21,8 @@ print("pressed "+c)
 k=str(123.43)	:
 v=s_val("343.22")	:
 tan(3.61):
+list_tokens()
+show_vars()
 
 
 

@@ -708,6 +708,7 @@ int err_factor()
 			free(tok0->tok_adat);
 		};
 		tok0->tok_adat = new_array(rows,cols);
+		tok0_bnf->tok_adat = tok0->tok_adat;
 		// MESG("	err: CREATED new array %d [%d %d]",tok0->tok_adat->anum,rows,cols);
 		stack_push("4789",tok,-tok->ttype);
 		NTOKEN_ERR(4789)

@@ -2428,7 +2428,7 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_mul,	// TOK_MUL			,
 	bnf_factor_div,	// TOK_DIV			,
 
-	(VFunction)factor_line_array,	// TOK_LBRAKET		,53
+	bnf_factor_line_array,	// TOK_LBRAKET		,53
 	bnf_factor_error,	// TOK_RBRAKET		,
 	bnf_factor_none,	// TOK_SQUOTE		,
 	(VFunction)factor_at,		// TOK_AT			,
@@ -2529,7 +2529,7 @@ int factor_bnf_type[] = {
 	TOK_MUL,	// TOK_MUL			,
 	TOK_DIV,	// TOK_DIV			,
 
-	0,	// TOK_LBRAKET		,53
+	TOK_LBRAKET,	// TOK_LBRAKET		,53
 	0,	// TOK_RBRAKET		,
 	TOK_SQUOTE,	// TOK_SQUOTE		,
 	0,		// TOK_AT			,
@@ -4107,6 +4107,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 #if	TBNF
 	if(exebnf) {
 		MESG("execute bnf block!");
+		exe_buffer=bp;
 		tok=bp->tok_table_bnf;
 		bnf_block1();
 		// MESG("end of program var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);

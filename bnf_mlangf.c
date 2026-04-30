@@ -135,13 +135,14 @@ void bnf_determinant()	/* TBD  */
 	bnf_var->dval=value;
 }
 
-void bnf_inverse()	/* TBD  */
+void bnf_inverse()	/* TBC  */
 {
 	double value=0;
 	bnf_function_args(1);
-
-	if(vtype_is(VTYPE_ARRAY)) {
-		array_dat *arr = bnf_var->adat;
+	MVAR *va = bnf_var;
+	if(va->var_type==VTYPE_POINTER) va=va->var_pointer;
+	if(va->var_type==VTYPE_ARRAY) {
+		array_dat *arr = va->adat;
 
 		if(arr->rows==arr->cols) {
 			value=determinant(arr);
@@ -151,7 +152,10 @@ void bnf_inverse()	/* TBD  */
 		if(value!=0) {
 			array_dat *inverse;
 			inverse=cofactor2(arr,value);
-			set_array(inverse);
+		// free array ??
+			bnf_var->adat = inverse;
+			bnf_var->var_type=va->var_type;
+			// set_array(inverse);
 			ex_name="Inverse";
 		};
 	} else {
@@ -159,15 +163,21 @@ void bnf_inverse()	/* TBD  */
 	}
 }
 
-void bnf_transpose()	/* TBD  */
+void bnf_transpose()	/* TBC  */
 {
 	bnf_function_args(1);
 
-	if(vtype_is(VTYPE_ARRAY)) {
-		array_dat *arr  = bnf_var->adat;
+	MVAR *va = bnf_var;
+	if(va->var_type==VTYPE_POINTER) va=va->var_pointer;
+
+	if(va->var_type==VTYPE_ARRAY) {
+		array_dat *arr  = va->adat;
 		array_dat *tarray;
 		tarray = transpose(arr);
-		set_array(tarray);
+		// free array ??
+		bnf_var->adat = tarray;
+		bnf_var->var_type=va->var_type;
+		// set_array(tarray);
 		ex_name="Tranpose";
 	} else {
 		syntax_error("Not an array!",207);
@@ -750,32 +760,36 @@ extern MVAR *current_stable;
 extern FILEBUF *exe_buffer;
 
 
-void bnf_show_vars()
+void bnf_show_vars()	/* ok?  */
 {
 	ntoken();
 
-	mesg_out("Ind Name       Type             Value      local vars",exe_buffer->symbol_tree->items);
+	mesg_out("Ind Name        Type             Value      local vars %d",exe_buffer->symbol_tree->items);
 	eval_btree(exe_buffer->symbol_tree->root,show_var_node);
 #if	USE_TYPE_VARS
 	if(global_types_tree->root) {
-	mesg_out("Ind Name       Type             Value      global vars/types",exe_buffer->symbol_tree->items);
+	mesg_out("Ind Name        Type             Value      global vars/types %d",exe_buffer->symbol_tree->items);
 		eval_btree(global_types_tree->root,show_var_node);
 	} else mesg_out("global_types_tree: empty!");
 #endif
 }
 
-void bnf_list_tokens()	/* TBD  */
+void bnf_list_tokens()	/* ok?  */
 {
  ntoken();
+ // MESG("bnf_list_tokens:");
+ if(exe_buffer==NULL) { MESG("	exec buffer is null!");return;};
 
- tok_struct *ltok=exe_buffer->tok_table;
- out_print("Num: line ind [type     name ] value ------- ",1);
+ tok_struct *ltok=exe_buffer->tok_table_bnf;
+
+ cbfp=exe_buffer;
+ out_print("Num: line ind[type   name] [value] ------------------------------- ",1);
  while(ltok->ttype!=TOK_EOF) {
  	out_print(tok_info(ltok),1);
 	// mesg_out("	show token info",1);
 	ltok++;
  };	
- out_print("|-------------------------------------------|",1);
+ out_print("|-----------------------------------------------------|",1);
 }
 
 void bnf_test_loop()
