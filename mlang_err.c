@@ -673,6 +673,7 @@ int err_factor()
 			};
 			if(tok->ttype==TOK_SEP || tok->ttype==TOK_COMMA) {
 				MESG("	tok_sep [%s]",tok->tname);
+				stack_push("lbra",tok,-tok->ttype);
 				NTOKEN2;
 				continue;
 			};
@@ -694,6 +695,7 @@ int err_factor()
 				// j++;
 				cdim++;if(cdim>rows) rows=cdim;
 				MESG("		new row2");
+				stack_push("lbra line",tok,-tok->ttype);
 				NTOKEN2;
 				continue;
 			};
