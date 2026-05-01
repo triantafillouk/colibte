@@ -259,10 +259,10 @@ inline static double return_result()
 void bnf_factor_var()
 {
 	next_var("var");
-	// MESG("	var: put var %s at pos %ld",tok->tname,bnf_var-bnf_vars);
+	MESG("	var: put var %s at pos %ld",tok->tname,bnf_var-bnf_vars);
 	bnf_var->var_pointer=get_left_slot(tok->tind);
 	bnf_var->var_type=VTYPE_POINTER;
-	bnf_var->var_alloced=0;
+	// bnf_var->var_alloced=0;
 	NTOKEN2;
 }
 
@@ -1979,4 +1979,95 @@ void bnf_factor_line_array()
 	bnf_var->var_type=adat->atype;
 	// set_array(adat);
 	NTOKEN2;
+}
+
+void bnf_factor_array2()
+{
+	int ind1=0;
+	int ind2=0;
+	double value=0;
+	next_var("array2");
+	MVAR *array_slot;
+	array_dat *adat;
+	tok_struct *tok0 = tok;
+	// MESG("factor_array2: %s",tok->tname);
+	array_slot=get_left_slot(tok->tind);
+	adat=array_slot->adat;
+	// lstoken=tok;
+	// MESG("factor_array2: type %d",adat->atype);
+	
+	if(adat==NULL) {
+#if	1
+		set_error(tok,209,"array indexes out of bound!");
+		return;
+#else
+		/* No data in the array, allocate new ones!  */
+		NTOKEN2;
+		ind1=(int)num_expression();
+		NTOKEN2;
+		ind2=(int)num_expression();
+		NTOKEN2;
+		adat = new_array(ind1+1,ind2+1);
+
+		array_slot->adat = adat;
+		tok0->adat = adat;
+		print_array1("new array created",adat);
+		dval2 = adat->dval2;
+
+		// MESG("new rows=%d cols=%d",adat->rows,adat->cols);
+// 		NTOKEN2;
+			// value=dval2[ind1][ind2];
+#endif
+	} else {
+		NTOKEN2;
+		ind1=(int)bnf_expression();
+		NTOKEN2;prev_var("ind1");
+		ind2=(int)bnf_expression();
+		NTOKEN2;prev_var("ind2");
+		MESG("	ind1=%d ind2=%d",ind1,ind2);
+		if((ind1 >= adat->rows) || (ind2 >= adat->cols)) {
+			// syntax_error("array indexes out of bound!",209);
+			set_error(tok0,209,"array indexes out of bound!");
+		} else {
+			if(adat->atype==VTYPE_ARRAY) {
+				MESG("	array type!");
+				double **dval2 = adat->dval2;
+				value=dval2[ind1][ind2];
+
+				ls_pdval=&dval2[ind1][ind2];
+				bnf_var->dval=value;
+				bnf_var->var_type=VTYPE_NUM;
+				MESG("		value %f",value);
+				return;
+			} else if(adat->atype==VTYPE_SARRAY) {
+				char **sval = adat->sval;
+				int ind=adat->cols*ind1+ind2;
+				clean_saved_string(strlen(adat->sval[ind]));	/* Check!! TODO  */
+				strcpy(saved_string,adat->sval[ind]);
+				// MESG("	show string value![%s]",saved_string);
+				ls_psval=&sval[ind];
+				value=0;
+				set_vtype(VTYPE_STRING);
+			} else if(adat->atype==VTYPE_AMIXED) {
+				// MESG("factor_array2: AMIXED v1=%d v2=%d",ind1,ind2);
+				int ind=adat->cols*ind1+ind2;
+				set_vtype(adat->mval[ind].var_type);
+				lmvar = &adat->mval[ind];
+				if(adat->mval[ind].var_type==VTYPE_NUM) {
+					value=array_slot->adat->mval[ind].dval;
+					// MESG("	num: val=%f",value);
+					ls_pdval=&array_slot->adat->mval[ind].dval;
+					return;
+				} else {
+					// MESG("	string: at %d",ind);
+					// MESG("	string: val=[%s]",adat->mval[ind].sval);
+					set_sval(adat->mval[ind].sval);
+					// MESG("	string: val=[%s]",adat->mval[ind].sval);
+					// value=0;
+					// return(0);
+				};
+			};
+		};
+	};
+	// MESG("end factor_array2: lsslot=%X",(void *)lsslot);
 }

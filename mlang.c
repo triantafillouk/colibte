@@ -2448,7 +2448,7 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_none,	// TOK_DIR_FOREACH		,
 	bnf_factor_none,	// TOK_DIR_TYPE,
 	(VFunction)factor_array1,	// TOK_ARRAY1
-	(VFunction)factor_array2,	// TOK_ARRAY2
+	bnf_factor_array2,	// TOK_ARRAY2
 	(VFunction)factor_array_l1,// TOK_ARRAY_L1
 	(VFunction)factor_array_l2,// TOK_ARRAY_L2
 	bnf_assign_env,	// TOK_ASSIGNENV	,
