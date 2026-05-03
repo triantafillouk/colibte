@@ -1750,12 +1750,13 @@ inline static double bnf_expression()
 
 void bnf_dir_return()
 {
-	// MESG("bnf_dir_return: at [%s]",tok_info(tok));
+	MESG("bnf_dir_return: at [%s]",tok_info(tok));
 	NTOKEN2;
-	// if(tok->ttype!=TOK_SEP && tok->ttype!=TOK_RPAR) 
-	// { 
+	MESG("		: at [%s]",tok_info(tok));
+	if(tok->ttype!=TOK_SEP && tok->ttype!=TOK_RPAR) 
+	{ 
 		bnf_expression();
-	// };
+	};
 	current_active_flag=0;	/* skip rest of function  */
 }
 
@@ -1887,16 +1888,19 @@ void bnf_dir_if()
 		NTOKEN2;
 		// MESG("	execute if at [%s]",tok_info(tok));
 		tok->bnf_factor_function();
+		NTOKEN2;
+		// MESG("	after if execution! %s",tok_info(tok));
 		if(tok->ttype==TOK_DIR_ELSE) {
 			tok=tok->next_tok;
-			// MESG("skip else up to %d",tok->tnum);
+			tok--;
+			// MESG("skip else up to %s",tok_info(tok));
 		};
 		return;
 	} else {
 		tok=tok0->next_tok;
 		if(check_skip_token1(TOK_DIR_ELSE)) {
 			// MESG("	execute else at [%s]",tok_info(tok));
-			NTOKEN2;
+			// NTOKEN2;
 			tok->bnf_factor_function();
 		};
 	}

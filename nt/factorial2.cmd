@@ -18,10 +18,10 @@ function fact(num , st)
  }
 }
 
-f=20
+f=20:
 n=fact(f,"test")
-
-n: 2432902008176640000.0
-print("fact("+f+") is "+n)
-return(n)
+print("----------------------")
+n:
+#print("fact("+f+") is "+n)
+#return(n)
 
