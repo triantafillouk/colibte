@@ -236,8 +236,8 @@ void eval_curl_match(tok_struct *tok)
 	if(tok->ttype==TOK_RCURL) { // pull left curl and set match_token
 		left_curl_index--;
 		tok_struct *left_curl_tok = curl_stack[left_curl_index];
-		tok->match_tok = left_curl_tok+1;
-		left_curl_tok->match_tok = tok+1; 
+		tok->match_tok = left_curl_tok;
+		left_curl_tok->match_tok = tok; 
 		// MESG("set curl match left=%d right=%d",left_curl_tok->tnum,tok->tnum);
 	};
 }

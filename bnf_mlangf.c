@@ -35,11 +35,10 @@ inline static void bnf_function_args (int number_of_args)
 	entry_mode=KNORMAL;
 	// MESG("bnf_function_args: %d [%d %s]",number_of_args,tok->tnum,tok->tname);
 
-	NTOKEN2;
 	for(i=0;i<number_of_args;i++) {
+		NTOKEN2;
 		bnf_expression();
 		// show_result();
-		NTOKEN2;
 	};
 	entry_mode=f_entry;
 }
@@ -52,7 +51,7 @@ void bnf_numeric_args (int number_of_args)
 		ntoken();
 		bnf_expression();set_var_value();
 	};
-	ntoken();
+// 	ntoken();
 }
 
 double bnf_numeric_arg ()
@@ -60,7 +59,7 @@ double bnf_numeric_arg ()
 	// MESG("bnf_numeric_arg:");
 	ntoken();
 	bnf_expression();set_var_value();
-	ntoken();
+	// ntoken();
 	return num_result();
 }
 
@@ -101,7 +100,7 @@ void bnf_array_rows()
 /* clear output buffer */
 void bnf_cls()
 {
-	ntoken();
+	// ntoken();
 	if(check_token(TOK_RPAR)) ntoken();
 	cls_fout("[out]");
 	MESG("<-[%s: %s ------------------------------------------------------------->",cbfp->b_fname,VERSION);
@@ -109,7 +108,7 @@ void bnf_cls()
 
 void bnf_index()	// ?? TBD!!
 {
-	ntoken();
+	// ntoken();
 	MESG("new index!");
 	// bnf_var->dval=VTYPE_TREE;
 	bnf_var->var_type=VTYPE_TREE;
@@ -299,7 +298,7 @@ void bnf_print()
 	};
 	out_print("",1);
 	// MESG("bnf_print: skip function right parenthesis");
-	ntoken();
+	// ntoken();
 	// MESG("end of bnf_print: num=%d",tok->tnum);
 	// MESG("bnf_print: >>");
 }
@@ -602,7 +601,7 @@ void bnf_sin()	/* OK?  */
 	NTOKEN2;
 	bnf_expression();
 	bnf_var->dval=sin(bnf_var->dval);
-	NTOKEN2;
+	// NTOKEN2;
 }
 
 void bnf_cos()	/* OK?  */
@@ -610,7 +609,7 @@ void bnf_cos()	/* OK?  */
 	NTOKEN2;
 	bnf_expression();
 	bnf_var->dval=cos(bnf_var->dval);
-	NTOKEN2;
+	// NTOKEN2;
 }
 
 void bnf_tan()	/* OK?  */
@@ -618,7 +617,7 @@ void bnf_tan()	/* OK?  */
 	NTOKEN2;
 	bnf_expression();
 	bnf_var->dval=tan(bnf_var->dval);
-	NTOKEN2;
+	// NTOKEN2;
 }
 
 void bnf_log10()	/* OK?  */
@@ -626,7 +625,7 @@ void bnf_log10()	/* OK?  */
 	NTOKEN2;
 	bnf_expression();
 	bnf_var->dval=log10(bnf_var->dval);
-	NTOKEN2;
+	// NTOKEN2;
 }
 
 void bnf_atan()	/* OK?  */
@@ -634,7 +633,7 @@ void bnf_atan()	/* OK?  */
 	NTOKEN2;
 	bnf_expression();
 	bnf_var->dval=atan(bnf_var->dval);
-	NTOKEN2;
+	// NTOKEN2;
 }
 
 void bnf_log()	/* OK?  */
@@ -642,7 +641,7 @@ void bnf_log()	/* OK?  */
 	NTOKEN2;
 	bnf_expression();
 	bnf_var->dval=log(bnf_var->dval);
-	NTOKEN2;
+	// NTOKEN2;
 }
 
 void bnf_trunc()	/* OK?  */
@@ -650,7 +649,7 @@ void bnf_trunc()	/* OK?  */
 	NTOKEN2;
 	bnf_expression();
 	bnf_var->dval=trunc(bnf_var->dval);
-	NTOKEN2;
+	// NTOKEN2;
 }
 
 void bnf_round()	/* OK?  */
@@ -658,7 +657,7 @@ void bnf_round()	/* OK?  */
 	NTOKEN2;
 	bnf_expression();
 	bnf_var->dval=round(bnf_var->dval);
-	NTOKEN2;
+	// NTOKEN2;
 }
 
 void bnf_getpoint()	/* dummy ?? only for plot!  */
@@ -698,7 +697,7 @@ void bnf_deq()	/* OK?  */
 
 void bnf_atbof()	/* TBC  */
 {
-	ntoken();
+	// ntoken();
 	next_var("atbof");
 
 	bnf_var->dval = FBof(cbfp);

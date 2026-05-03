@@ -7,3 +7,4 @@ fori(i=1;5;1)
 }
 
 a:
+print("a=",a)
