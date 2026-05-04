@@ -10,8 +10,11 @@ function sc(ind)
 
 "start of test!":
  scale1=[14000-2, 4+3.1;  3000, 20*3+1;  3000, 35;  5000, 37;  100000, 20]
-"pos1":
+"Show the array":
  scale1:
+
+ print("----------")
+
  a=scale1[1][1]:
  a:
 "end of test!":

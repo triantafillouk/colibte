@@ -891,88 +891,71 @@ inline static void bnf_factor_notequal()
 
 inline static void bnf_factor_and()
 {
- if(bnf_var->var_type == VTYPE_NUM) {
- 	double val=bnf_var->dval;
-	prev_var("and2");
-	if(bnf_var->var_type == VTYPE_NUM) {
-		bnf_var->dval = (int)bnf_var->dval && (int)val;
-		// NTOKEN2;
-		return;
-	};
-	if(bnf_var->var_type == VTYPE_POINTER) {
-		double vala = bnf_var->var_pointer->dval && val;
-		bnf_var->var_type = VTYPE_NUM;
-		bnf_var->dval = vala;
-		// NTOKEN2;
+ MVAR *bvar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+ if(bvar->var_type == VTYPE_NUM) {
+ 	int val=bvar->dval>0;
+	prev_var("xor2");
+
+	MVAR *avar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+	if(avar->var_type == VTYPE_NUM) {
+		bnf_var->dval = (avar->dval>0) && val;
+		bnf_var->var_type=VTYPE_NUM;
 		return;
 	};
  };
  MESG("and error");
- // NTOKEN2;
 }
 
 inline static void bnf_factor_nand()
 {
- if(bnf_var->var_type == VTYPE_NUM) {
- 	double val=bnf_var->dval;
-	prev_var("nand");
-	if(bnf_var->var_type == VTYPE_NUM) {
-		bnf_var->dval = !((int)bnf_var->dval && (int)val);
-		return;
-	};
-	if(bnf_var->var_type == VTYPE_POINTER) {
-		double vala = !(bnf_var->var_pointer->dval && val);
-		bnf_var->var_type = VTYPE_NUM;
-		bnf_var->dval = vala;
+ MVAR *bvar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+ if(bvar->var_type == VTYPE_NUM) {
+ 	int val=bvar->dval>0;
+	prev_var("xor2");
+
+	MVAR *avar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+	if(avar->var_type == VTYPE_NUM) {
+		bnf_var->dval = !((avar->dval>0) && val);
+		bnf_var->var_type=VTYPE_NUM;
 		return;
 	};
  };
- MESG("nand error");
- // NTOKEN2;
+ MESG("and error");
 }
 
 inline static void bnf_factor_or()
 {
- if(bnf_var->var_type == VTYPE_NUM) {
- 	double val=bnf_var->dval;
-	prev_var("or2");
-	if(bnf_var->var_type == VTYPE_NUM) {
-		bnf_var->dval = (int)bnf_var->dval || (int)val;
-		// NTOKEN2;
-		return;
-	};
-	if(bnf_var->var_type == VTYPE_POINTER) {
-		double vala = (int)bnf_var->var_pointer->dval || (int)val;
-		bnf_var->var_type = VTYPE_NUM;
-		bnf_var->dval = vala;
+ MVAR *bvar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+ if(bvar->var_type == VTYPE_NUM) {
+ 	int val=bvar->dval>0;
+	prev_var("xor2");
+
+	MVAR *avar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+	if(avar->var_type == VTYPE_NUM) {
+		bnf_var->dval = (avar->dval>0) || val;
+		bnf_var->var_type=VTYPE_NUM;
 		// NTOKEN2;
 		return;
 	};
  };
  MESG("or error");
- // NTOKEN2;
 }
 
 inline static void bnf_factor_nor()
 {
- if(bnf_var->var_type == VTYPE_NUM) {
- 	double val=bnf_var->dval;
-	prev_var("nor");
-	if(bnf_var->var_type == VTYPE_NUM) {
-		bnf_var->dval = !((int)bnf_var->dval || (int)val);
-		// NTOKEN2;
-		return;
-	};
-	if(bnf_var->var_type == VTYPE_POINTER) {
-		double vala = !((int)bnf_var->var_pointer->dval || (int)val);
-		bnf_var->var_type = VTYPE_NUM;
-		bnf_var->dval = vala;
-		// NTOKEN2;
+ MVAR *bvar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+ if(bvar->var_type == VTYPE_NUM) {
+ 	int val=bvar->dval>0;
+	prev_var("xor2");
+
+	MVAR *avar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+	if(avar->var_type == VTYPE_NUM) {
+		bnf_var->dval = !((avar->dval>0) || val);
+		bnf_var->var_type=VTYPE_NUM;
 		return;
 	};
  };
  MESG("nor error");
- // NTOKEN2;
 }
 
 inline static void bnf_factor_xor()
@@ -981,28 +964,13 @@ inline static void bnf_factor_xor()
  if(bvar->var_type == VTYPE_NUM) {
  	int val=bvar->dval>0;
 	prev_var("xor2");
-#if	1
+
 	MVAR *avar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
 	if(avar->var_type == VTYPE_NUM) {
 		bnf_var->dval = (avar->dval>0) ^ val;
 		bnf_var->var_type=VTYPE_NUM;
-		// NTOKEN2;
 		return;
 	};
-#else
-	if(bnf_var->var_type == VTYPE_NUM) {
-		bnf_var->dval = (bnf_var->dval>0) ^ val;
-		// NTOKEN2;
-		return;
-	};
-	if(bnf_var->var_type == VTYPE_POINTER) {
-		double vala = (bnf_var->var_pointer->dval!=0  && val!=0) || ((bnf_var->var_pointer->dval==0 && val==0));
-		bnf_var->var_type = VTYPE_NUM;
-		bnf_var->dval = vala;
-		// NTOKEN2;
-		return;
-	};
-#endif
  };
  MESG("xor error");
  // NTOKEN2;
@@ -1586,9 +1554,10 @@ static void bnf_block1()
 {
 	// MESG("-------- bnf_block1 start![%s] { [%s]",fp->b_fname,tok_info(tok));
 	// show_token_table("block  ",fp,fp->tok_table_bnf,fp->tok_bnf_index);
+	// MESG("-- block1: start at [%s]",tok_info(tok));
 	do {
-		tok_struct *tok0=tok;
-	 	tok0->bnf_factor_function();
+		// tok_struct *tok0=tok;
+	 	tok->bnf_factor_function();
 		NTOKEN2;
 		if(!current_active_flag) {
 			// MESG("bnf_block1:[%s] stop: ind=%d type=%d [%s]",fp->b_fname,(int)(bnf_var-bnf_vars),bnf_var->var_type,tok_info(tok));
@@ -1900,18 +1869,18 @@ void bnf_dir_if()
 	// MESG("tok_dir_if: res=%d after expression [%s]",ival,tok_info(tok));
 	if(ival) {
 		// MESG("	true: start of [%s]",tok_info(tok));
-		// MESG("	execute if at %d",tok->tnum);
 		NTOKEN2;
 		// MESG("	true:2 start of [%s]",tok_info(tok));
-		bnf_expression();
-		// NTOKEN2;
+		if(tok->ttype==TOK_LCURL) { NTOKEN2;bnf_block1();}
+		else bnf_expression();
+		NTOKEN2;
 		// MESG("	true:3 after if execution! %s",tok_info(tok));
 		if(tok->ttype==TOK_DIR_ELSE) {
 			tok=tok->next_tok;
 			tok--;
 			// MESG("skip else up to %s",tok_info(tok));
 		};
-		MESG("## tok_dir_if: true: end [%s]",tok_info(tok));
+		// MESG("## tok_dir_if: true: end [%s]",tok_info(tok));
 		return;
 	} else {
 		tok=tok0->next_tok;
@@ -1919,10 +1888,10 @@ void bnf_dir_if()
 		if(check_skip_token1(TOK_DIR_ELSE)) {
 			// MESG("	execute else at [%s]",tok_info(tok));
 			// NTOKEN2;
-			bnf_expression();
+			if(tok->ttype==TOK_LCURL) { NTOKEN2;bnf_block1();}
+			else bnf_expression();
 		};
-		// MESG("	false: end at [%s]",tok_info(tok));
-		MESG("## tok_dir_if: else: end [%s]",tok_info(tok));
+		// MESG("## tok_dir_if: else: end [%s]",tok_info(tok));
 	}
 }
 
