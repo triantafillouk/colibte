@@ -921,7 +921,7 @@ MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
 /* free symbol table after execute */
 void delete_symbol_table(MVAR *td, int size,int nargs)
 {
- MESG("delete_symbol_table: << nargs=%d size=%d",nargs,size);
+ // MESG("delete_symbol_table: << nargs=%d size=%d",nargs,size);
  MVAR *sslot=td;
  int i=0;
  for(;i<nargs;i++,sslot++)
@@ -958,7 +958,7 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 	};
  };
 
- MESG("delete_symbol_table from: >> %lld",call_stack_used-call_stack);
+ // MESG("delete_symbol_table from: >> %lld",call_stack_used-call_stack);
  call_stack_used -= size;
  // MESG("delete_symbol_table: call_stack=%lld upto %lld",call_stack_used-call_stack,call_stack_used-call_stack+nargs+size-1);
  // MESG("                    at  : %lld",call_stack_used-call_stack);

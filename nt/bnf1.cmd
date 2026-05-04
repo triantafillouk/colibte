@@ -3,7 +3,9 @@ function d2(d1)
 	return (2*d1)
 }
 
-b=d2(5)
+cls
+
+b=d2(5):
 b:  10.0
 
 

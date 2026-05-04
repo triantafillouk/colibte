@@ -3,7 +3,7 @@ cls
 aa=1
 k="kk": "kk"
 
-a=[1 k 2.33]
+a=[1, k, 2.33]
 #a[0]:
 print(a)
 s=a[1]
