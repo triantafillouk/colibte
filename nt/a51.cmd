@@ -1,5 +1,7 @@
+## e4, a51, a52
+
 cls
-k=4
+k=5
 
 if(k==4) print("OK!") 
 else print("error")

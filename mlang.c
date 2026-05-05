@@ -4131,7 +4131,9 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	};
 	if(exebnf) {
 		show_var_stats();
-		if(bnf_var->var_type==VTYPE_NUM) msg_line("Result is [%f]",num_result());
+		MVAR *result = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+		if(result->var_type==VTYPE_NUM) msg_line("Result is [%f]",num_result());
+		if(result->var_type==VTYPE_STRING) msg_line("Result is [%s]",string_result());
 	} else {
 		if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
 		if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);

@@ -116,11 +116,7 @@ void bnf_refresh_ddot()
  TextPoint *tp = tok->ddot;
  FILEBUF *buf = tp->fp;
 
-	MVAR *var_show = bnf_var;
-
-	if(bnf_var->var_type==VTYPE_POINTER) {
-		var_show = bnf_var->var_pointer;
- 	};
+ MVAR *var_show = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
 
  if(execmd) {
 	 if(var_show->var_type==VTYPE_NUM) {
@@ -177,15 +173,20 @@ void bnf_refresh_ddot()
 inline static double num_result()
 {
   // MESG("num_result: %s",tok_info(tok));
-  if(bnf_var->var_type==VTYPE_NUM) {
-	return(bnf_var->dval);
-  } else if(bnf_var->var_type==VTYPE_POINTER)	{ 
-  	MVAR *var=bnf_var->var_pointer;
-	if(var->var_type==VTYPE_NUM) {
-		return var->dval;
-	};
+  MVAR *num_var = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer:bnf_var;
+  if(num_var->var_type==VTYPE_NUM) {
+ 	return num_var->dval;
   };
- return 0.0;
+  return 0.0;
+}
+
+inline static char * string_result()
+{
+ MVAR *s_var = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer:bnf_var;
+ if(s_var->var_type==VTYPE_STRING) {
+ 	return s_var->sval;
+ };
+ return "";
 }
 
 void show_result()
@@ -1871,9 +1872,11 @@ void bnf_dir_if()
 		// MESG("	true: start of [%s]",tok_info(tok));
 		NTOKEN2;
 		// MESG("	true:2 start of [%s]",tok_info(tok));
-		if(tok->ttype==TOK_LCURL) { NTOKEN2;bnf_block1();}
-		else bnf_expression();
-		NTOKEN2;
+		if(tok->ttype==TOK_LCURL) { NTOKEN2;bnf_block1();NTOKEN2;}
+		else { bnf_expression();
+			// NTOKEN2;
+		};
+		// NTOKEN2;
 		// MESG("	true:3 after if execution! %s",tok_info(tok));
 		if(tok->ttype==TOK_DIR_ELSE) {
 			tok=tok->next_tok;
