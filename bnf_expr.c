@@ -385,7 +385,7 @@ void bnf_factor_plus()
 	prev_var("plus");
  MVAR *vara = bnf_var;
  int typea=vara->var_type;
- int typeb=varb->var_type;
+ // int typeb=varb->var_type;
 
  // MESG("bnf_factor_plus [%2d]: var ind=%d  va=%d vb=%d",tok->tnum,(int)(bnf_var-bnf_vars),vara->var_type,varb->var_type);
  if(varb->var_type==VTYPE_POINTER) {

@@ -226,15 +226,18 @@ void eval_curl_match(tok_struct *tok)
 	
  	if(tok==NULL) {
 		left_curl_index=0;
+		// MESG("initialize left_curl_index");
 		return;
 	};
 	if(tok->ttype==TOK_LCURL) {// push left curl
 		curl_stack[left_curl_index] = tok;
+		// MESG("set left_curl_index left: %d [%s]",left_curl_index,tok_info(tok));
 		left_curl_index++;
 		return;
 	};
 	if(tok->ttype==TOK_RCURL) { // pull left curl and set match_token
 		left_curl_index--;
+		// MESG("set left_curl_inde right: %d [%s]",left_curl_index,tok_info(tok));
 		tok_struct *left_curl_tok = curl_stack[left_curl_index];
 		tok->match_tok = left_curl_tok;
 		left_curl_tok->match_tok = tok; 
@@ -1077,6 +1080,7 @@ int check_init(FILEBUF *bf)
  INIT_STAGE;
  int checked = (bf->tok_table != NULL);
  MESG("---- check_init: [%s] %d checked=%d",bf->b_fname,bf->b_type,checked);
+ // eval_curl_match(NULL);
 #if	0
  if(execmd) 
  {
@@ -4056,6 +4060,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  MVAR *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
 	MESG("# [%-15s %s ---------------------------------------------",bp->b_fname,VERSION);
+	eval_curl_match(NULL);
  if(show_tokens) {
 	parse_buffer_show_tokens(1);
 	return(0);	

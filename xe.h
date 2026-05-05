@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.7T864 (5/5/2026)"
+#define VERSION 	 "#01.7T865 (5/5/2026)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -490,7 +490,9 @@ typedef struct MLQUOTES {
 #define VTYPE_PROC		16	/* proc pointer  */
 #define VTYPE_OPTION	17	/* editor option   */
 #define VTYPE_FUNCTION	18	/* editor function  */
-#define VTYPE_OTHER		19
+#define VTYPE_NUMP		19	/* numeric pointer in array  */
+#define VTYPE_STRINGP	20	/* string pointer in array  */
+#define VTYPE_OTHER		21
 
 /* textpoint */
 #define  FULLDEFINED	0
