@@ -1711,6 +1711,7 @@ int err_check_sentence1()
 			xpos=638;
 			tok0->next_tok=tok;
 			end_if_tok->next_tok = stack_push("end of else",tok,-tok->ttype);
+			end_if_tok->next_tok--;
 		} else {
 			xpos=639;
 		};

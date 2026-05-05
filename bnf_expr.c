@@ -1880,7 +1880,7 @@ void bnf_dir_if()
 		// MESG("	true:3 after if execution! %s",tok_info(tok));
 		if(tok->ttype==TOK_DIR_ELSE) {
 			tok=tok->next_tok;
-			tok--;
+			// tok--;
 			// MESG("skip else up to %s",tok_info(tok));
 		};
 		// MESG("## tok_dir_if: true: end [%s]",tok_info(tok));
@@ -1891,8 +1891,14 @@ void bnf_dir_if()
 		if(check_skip_token1(TOK_DIR_ELSE)) {
 			// MESG("	execute else at [%s]",tok_info(tok));
 			// NTOKEN2;
-			if(tok->ttype==TOK_LCURL) { NTOKEN2;bnf_block1();}
-			else bnf_expression();
+			if(tok->ttype==TOK_LCURL) { 
+				NTOKEN2;
+				bnf_block1();
+				// MESG("## tok_dir_if: else: end block [%s]",tok_info(tok));
+			} else {
+				bnf_expression();
+				// MESG("## tok_dir_if: else: end expression [%s]",tok_info(tok));
+			};
 		};
 		// MESG("## tok_dir_if: else: end [%s]",tok_info(tok));
 	}
