@@ -1840,7 +1840,7 @@ double factor_array_l1()
 	NTOKEN2;
 	lsslot=array_slot;
 	// MESG("        : >>>> end");
-	// MESG("	factor_array1:ind1=%d lsslot ind=%d type=%d rows=%d cols=%d [%s]!",ind1,lsslot->var_index,lsslot->var_type,lsslot->adat->rows,lsslot->adat->cols,array_slot->psval[0]);
+	// MESG("	factor_array_l1:ind1=%d lsslot ind=%d type=%d rows=%d cols=%d [%s]!",ind1,lsslot->var_index,lsslot->var_type,lsslot->adat->rows,lsslot->adat->cols,array_slot->psval[0]);
 	return(value);
 }
 
@@ -1900,7 +1900,7 @@ double factor_array_l2()
 	NTOKEN2;
 	lsslot=array_slot;
 	// MESG("        : >>>> end");
-	// MESG("	factor_array1:ind1=%d lsslot ind=%d type=%d rows=%d cols=%d!",ind1,lsslot->var_index,lsslot->var_type,lsslot->adat->rows,lsslot->adat->cols);
+	// MESG("	factor_array_l2:ind1=%d lsslot ind=%d type=%d rows=%d cols=%d!",ind1,lsslot->var_index,lsslot->var_type,lsslot->adat->rows,lsslot->adat->cols);
 	return(value);
 }
 
@@ -2452,10 +2452,10 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_none,	// TOK_DIR_CONTINUE	,
 	bnf_factor_none,	// TOK_DIR_FOREACH		,
 	bnf_factor_none,	// TOK_DIR_TYPE,
-	(VFunction)factor_array1,	// TOK_ARRAY1
+	bnf_factor_array1,	// TOK_ARRAY1
 	bnf_factor_array2,	// TOK_ARRAY2
-	(VFunction)factor_array_l1,// TOK_ARRAY_L1
-	(VFunction)factor_array_l2,// TOK_ARRAY_L2
+	bnf_factor_array_l1,// TOK_ARRAY_L1
+	bnf_factor_array_l2,// TOK_ARRAY_L2
 	bnf_assign_env,	// TOK_ASSIGNENV	,
 	bnf_assign_opt,	// TOK_ASSIGNOPT	,
 	bnf_factor_end,	// TOK_END,
