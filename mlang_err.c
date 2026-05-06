@@ -15,6 +15,7 @@ int err_check_sentence1();
 int err_assign_val();
 int err_assign_env();
 
+int assign_type_to=0;
 
 void mesg_out(const char *fmt, ...)
 {
@@ -824,7 +825,7 @@ int err_factor()
 
 	// case TOK_INCREASE:
 	case TOK_ARRAY1:{
-		// MESG("	err use of tok_array1 [%s]",tok_info(tok0));
+		MESG("	err use of tok_array1 [%s]",tok_info(tok0));
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
 #endif
@@ -853,7 +854,10 @@ int err_factor()
 			stack_push("4988",tok,tok->ttype);
 			NTOKEN_ERR(4989);
 		};
-
+		if(tok->ttype==TOK_ASSIGN) {
+			tok0_bnf->ttype=TOK_ASSIGN_ARRAY1;
+			assign_type_to=TOK_ASSIGN_ARRAY1;
+		};
 		RT_MESG1(4931);
 		};
 #if	0
@@ -877,6 +881,8 @@ int err_factor()
 		stack_push("5001",tok,-tok->ttype);
 		NTOKEN_ERR(5001);
 		// MESG("err_array2:4 t=%d",tok->ttype);
+		tok0_bnf->ttype=TOK_ASSIGN_ARRAY2;
+		assign_type_to=TOK_ASSIGN_ARRAY2;
 		RT_MESG1(4932);
 		};
 	case TOK_LPAR:
@@ -1534,7 +1540,15 @@ int err_lexpression()
 			NTOKEN_ERR(710);
 			err_num=err_assign_val();
 			// stack_push_replace("tok l",tok_l);
-			stack_push("TOK_ASSIGN 1",tok0,tok0->ttype);
+			
+			tok_struct *tok0_bnf=stack_push("TOK_ASSIGN 1",tok0,tok0->ttype);
+			if(assign_type_to) {
+				if(assign_type_to==TOK_ASSIGN_ARRAY2) 
+					tok0_bnf->bnf_factor_function=bnf_assign_array2;
+				if(assign_type_to==TOK_ASSIGN_ARRAY1) 
+					tok0_bnf->bnf_factor_function=bnf_assign_array1;
+				assign_type_to=0;
+			};
 			RT_MESG1(714);
 		};
 		case TOK_INCREASEBY: {
