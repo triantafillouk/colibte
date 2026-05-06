@@ -282,7 +282,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		};
  		// MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(dest));
 		if(dest->ttype==TOK_FUNC) {
-			MESG("	set bnf function! index=%d for [%s]",tok->tok_node->node_index,tok_info(dest));
+			// MESG("	set bnf function! index=%d for [%s]",tok->tok_node->node_index,tok_info(dest));
 			dest->bnf_factor_function=bnf_functions[tok->tok_node->node_index].vfunction;
 		};
 		check_buffer->tok_bnf_index++;
@@ -2615,12 +2615,12 @@ FFunction factor_funcs[] = {
 	/* bool operators  */
 	factor_none,	// TOK_COMPARE		,33
 
-	compare_notequal,	// TOK_NOTEQUAL	,
-	compare_smaller,	// TOK_SMALLER		,	/* <  */
-	compare_bigger,	// TOK_BIGGER		,	/* >  */
-	compare_equal,	// TOK_EQUAL		,	/* ==  */
-	compare_smallereq,	// TOK_SMALLEREQ	,	/* <=  */
-	compare_biggereq,	// TOK_BIGGEREQ	,	/* >=  */
+	(FFunction) compare_notequal,	// TOK_NOTEQUAL	,
+	(FFunction) compare_smaller,	// TOK_SMALLER		,	/* <  */
+	(FFunction) compare_bigger,	// TOK_BIGGER		,	/* >  */
+	(FFunction) compare_equal,	// TOK_EQUAL		,	/* ==  */
+	(FFunction) compare_smallereq,	// TOK_SMALLEREQ	,	/* <=  */
+	(FFunction) compare_biggereq,	// TOK_BIGGEREQ	,	/* >=  */
 
 	factor_none,	// TOK_BOOL		,40
 	factor_none,	// TOK_AND			,	/* &  */

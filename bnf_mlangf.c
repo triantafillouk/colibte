@@ -278,7 +278,8 @@ void bnf_print()
 			case VTYPE_SARRAY:
 			case VTYPE_AMIXED:
 				if(i>0) out_print("",1);
-				print_array1("",get_array("102"));break;
+				// print_array1("",get_array("102"));break;
+				print_array1("",bnf_var->adat);break;
 			case VTYPE_NUM:{
 				char p_out[128];
 				long l0=bnf_var->dval;

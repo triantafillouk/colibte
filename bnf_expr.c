@@ -1276,7 +1276,7 @@ void bnf_factor_assign_var()
 	// show_result();
 	int btype=bvar->var_type;
 	prev_var("assign var");
-	// MESG("bnf_factor_assign_var: atype=%d btype %d",bnf_var->var_type,btype);
+	MESG("bnf_factor_assign_var: atype=%d btype %d",bnf_var->var_type,btype);
 
 	MVAR *aval=bnf_var->var_pointer;
 
@@ -1316,7 +1316,7 @@ void bnf_factor_assign_var()
 	
 	// set for any different type!
 #if	1
-	// MESG("	copy data");
+	MESG("	-- assign_var: copy data");
 	memcpy(aval,bvar,sizeof(MVAR));
 #else
 	// MESG("	set array");
@@ -1803,7 +1803,7 @@ void bnf_factor_line_array()
 	int i=0,j=0;
 	int cdim=0;
 	int rows=0,cols=0;
-	// MESG("bnf_factor_line_array:");
+	MESG("bnf_factor_line_array:");
 	array_dat *adat=tok->tok_adat;
 	cdim=1;
 	next_var("line_array");
@@ -1862,9 +1862,10 @@ void bnf_factor_line_array()
 	};
 	// MESG("bnf_factor_line_array: end");
 	adat->astat=ARRAY_LOCAL;
-	print_array1("",adat);
+	// print_array1("end of array definition",adat);
 	bnf_var->adat=adat;
 	bnf_var->var_type=adat->atype;
+	MESG("-> array definition: @%d  end [%s]",(int)(bnf_var-bnf_vars),tok_info(tok));
 	// set_array(adat);
 	// NTOKEN2;
 }
@@ -1879,12 +1880,12 @@ void bnf_factor_array1()
 	array_slot=&current_stable[tok->tind];
 	array_dat *adat = array_slot->adat;
 	lstoken=tok;
-	// MESG("factor_array1:----------- vtype=%d",array_slot->var_type);
+	MESG("factor_array1:----------- vtype=%d",array_slot->var_type);
 	NTOKEN2;
 	ind1 = (int)bnf_expression();
-
+	MESG("	array index: %d [%s]",ind1,tok_info(tok));
 	if(adat==NULL) {	/* this must not happen!!!  */
-		// MESG("array adat is NULL allocate new one !!!!!!!!!!!!");
+		MESG("array adat is NULL allocate new one %d x 1 !!!!!!!!!!!!",ind1);
 		ex_nums=1;
 		adat=new_array(ind1+1,1);
 		array_slot->adat=adat;
@@ -1893,16 +1894,16 @@ void bnf_factor_array1()
 	};
 
 	if(tok->ttype==TOK_RBRAKET) { 
-		NTOKEN2;
-		// MESG("ends with rbracket!!");
+		// NTOKEN2;
+		MESG("ends with rbracket!!");
 	};
-	// MESG("factor_array1:ind=%d ind1=%d type=%d",array_slot->var_index,ind1,array_slot->var_type);
+	MESG("factor_array1:ind=%d ind1=%d type=%d",array_slot->var_index,ind1,array_slot->var_type);
 
-		// MESG("	2 vtype=%d %d",array_slot->var_type,VTYPE_ARRAY);
+		MESG("	2 vtype=%d %d",array_slot->var_type,VTYPE_ARRAY);
 		if(array_slot->var_type==VTYPE_ARRAY) {
 		if(array_slot->adat->rows<ind1 && array_slot->adat->cols<ind1) {
 			double *dval_old = array_slot->adat->dval;
-			// MESG("+++ reallocate ind1=%d x %d %X",ind1,sizeof(double),dval_old);
+			MESG("+++ reallocate ind1=%d x %d %X",ind1,sizeof(double),dval_old);
 			if(array_slot->adat->cols > array_slot->adat->rows) 
 				array_slot->adat->cols=ind1;
 			else
@@ -1916,15 +1917,17 @@ void bnf_factor_array1()
 				return;
 			};
 			array_slot->adat->dval = dval_new; 
-			// MESG("	array reallocated:%X",array_slot->adat->dval);
+			MESG("	array reallocated:%X",array_slot->adat->dval);
 		} else { 
 			dval = array_slot->adat->dval;
 	
 			value=dval[ind1];
-			// MESG("	pdval value [%d]=%f",ind1,value);
+			MESG("	pdval value [%d]=%f",ind1,value);
 			ls_pdval=&dval[ind1];
-			// MESG("	array_slot %d: pdal=%f",array_slot->var_index, *array_slot->pdval);
-			set_vtype(VTYPE_NUM);
+			bnf_var->dval=value;
+			bnf_var->var_type=VTYPE_NUM;
+			MESG("	array_slot %d: ",array_slot->var_index);
+			// set_vtype(VTYPE_NUM);
 		};
 		};
 
@@ -1956,7 +1959,7 @@ void bnf_factor_array1()
 		};
 
 	lsslot=array_slot;
-	// MESG("        : >>>> end");
+	MESG("        : >>>> end");
 	// MESG("	factor_array1:ind1=%d lsslot ind=%d type=%d rows=%d cols=%d [%s]!",ind1,lsslot->var_index,lsslot->var_type,lsslot->adat->rows,lsslot->adat->cols,array_slot->psval[0]);
 	// return(value);
 }
@@ -2053,8 +2056,10 @@ void bnf_factor_array2()
 
 void bnf_factor_array_l1()
 {
+	next_var("array_l1");
 	int ind1;
 	double value=0;
+
 	MVAR *array_slot;
 	array_slot=&current_stable[tok->tind];
 	array_dat *adat = array_slot->adat;

@@ -209,7 +209,7 @@ int	err_eval_fun1(tok_struct *tok0,tok_struct *tok_bnf,int lpar)
 	BTNODE 	*var_node = tok0->tok_node;
 	int fnum = var_node->node_index;
 	ia0=m_functions[fnum].f_args;
-	MESG("err_eval_fun1:lpar=%d <<  f_args=%d",lpar,ia0);
+	// MESG("err_eval_fun1:lpar=%d <<  f_args=%d",lpar,ia0);
 	// MESG("err_eval_fun1: [%s] args=%d tnum=%d ttype=%d",m_functions[fnum].f_name,ia,tok->tnum,tok->ttype);
 
 	f_entry=entry_mode;
@@ -832,7 +832,9 @@ int err_factor()
 		// MESG("	err tok_array1: after [%s]",tok_info(tok));
 		xpos=499;
 		if(!check_skip_token_err1(TOK_RBRAKET,"array error",xpos)){
-			// MESG("	RBRAKET found!");
+			tok_struct *braket=tok-1;
+			// MESG("	RBRAKET found! [%s]",tok_info(braket));
+			stack_push("RB",braket,-braket->ttype);
 		} else {
 			MESG("	No rbracket found!");
 		};

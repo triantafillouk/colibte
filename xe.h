@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.7T865 (5/5/2026)"
+#define VERSION 	 "#01.7T867 (6/5/2026)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -319,6 +319,7 @@ typedef struct  VIDEO {
 typedef struct MVAR {
 	short	var_type;
 	short	var_alloced;
+	short	var_index;
 	union {
 		// long int ival;
 		double dval;
