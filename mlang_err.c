@@ -766,13 +766,14 @@ int err_factor()
 			NTOKEN_ERR(4982);
 		};
 #endif
+		if(tok->ttype==TOK_ASSIGN) {
+			MESG("set normal assign [%s]",tok_info(tok));
+			assign_type_to=0;
+		};
 		// MESG("	TOK_VAR: return [%s]",tok_info(tok));
 		RT_MESG1(493);}
 	case TOK_ARRAY_L2:{
-		// MESG("TOK_ARRAY_L2:");
-#if	TBNF
-		// set_bnf_function1(tok,tok->ttype);
-#endif
+		MESG("TOK_ARRAY_L2: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
 		err_num=err_num_expression(); 
 		if(!check_skip_token_err1(TOK_RBRAKET,"array error",xpos)){
 			// MESG("	RBRAKET found!");
@@ -826,7 +827,7 @@ int err_factor()
 
 	// case TOK_INCREASE:
 	case TOK_ARRAY1:{
-		MESG("	err use of tok_array1 [%s]",tok_info(tok0));
+		MESG("	TOK_ARRAY1: [%s]",tok_info(tok0));
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
 #endif
@@ -839,7 +840,7 @@ int err_factor()
 			stack_push("RB",braket,-braket->ttype);
 			tok0_bnf->ttype=TOK_ARRAY_L1;
 			tok0_bnf->bnf_factor_function=bnf_factor_array_l1;
-			assign_type_to=TOK_ASSIGN_ARRAY1;
+			if(tok->ttype==TOK_ASSIGN)	assign_type_to=TOK_ASSIGN_ARRAY1;
 		} else {
 			MESG("	No rbracket found!");
 		};
@@ -871,10 +872,10 @@ int err_factor()
 		RT_MESG1(5931);
 #endif
 	case TOK_ARRAY2:{
+		MESG("	TOK_ARRAY2 [%s]",tok_info(tok0));
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
 #endif
-		// MESG("	err use of tok_array2 [%s]",tok_info(tok0));
 		err_num=err_num_expression(); 
 		// MESG("	err_array2:1 t=%d",tok->ttype);
 		stack_push("500",tok,-tok->ttype);
@@ -886,8 +887,16 @@ int err_factor()
 		stack_push("5001",tok,-tok->ttype);
 		NTOKEN_ERR(5001);
 		// MESG("err_array2:4 t=%d",tok->ttype);
+#if	0
 		tok0_bnf->ttype=TOK_ASSIGN_ARRAY2;
-		assign_type_to=TOK_ASSIGN_ARRAY2;
+		if(tok->ttype==TOK_ASSIGN)
+			assign_type_to=TOK_ASSIGN_ARRAY2;
+#else
+		if(tok->ttype==TOK_ASSIGN) {
+			tok0_bnf->bnf_factor_function=bnf_factor_array_l2_tba;
+			assign_type_to=TOK_ASSIGN_ARRAY2;
+		};
+#endif
 		RT_MESG1(4932);
 		};
 	case TOK_LPAR:
@@ -1549,12 +1558,11 @@ int err_lexpression()
 			tok_struct *tok0_bnf_assign=stack_push("TOK_ASSIGN 1",tok0,tok0->ttype);
 			if(assign_type_to) {
 				if(assign_type_to==TOK_ASSIGN_ARRAY2) {
+					tok0_bnf_assign->ttype=TOK_ASSIGN_ARRAY2;
 					tok0_bnf_assign->bnf_factor_function=bnf_assign_array2;
 				} if(assign_type_to==TOK_ASSIGN_ARRAY1) {
 					tok0_bnf_assign->ttype=TOK_ASSIGN_ARRAY1;
 					tok0_bnf_assign->bnf_factor_function=bnf_assign_array1;
-					// tok_bnf->bnf_factor_function=bnf_assign_array1;
-					// tok0_bnf->bnf_factor_function=bnf_factor_array_l1;
 				};
 				assign_type_to=0;
 			};

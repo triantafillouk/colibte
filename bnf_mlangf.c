@@ -294,7 +294,7 @@ void bnf_print()
 				out_print(bnf_var->sval,0);
 			};
 		};
-		// prev_var("print");
+		prev_var("print");
 		// MESG("	if: after switch tnum=%d ttype=%d",tok->tnum,tok->ttype);
 	};
 	out_print("",1);
@@ -618,6 +618,7 @@ void bnf_tan()	/* OK?  */
 	NTOKEN2;
 	bnf_expression();
 	bnf_var->dval=tan(bnf_var->dval);
+// 	prev_var("tan");
 	// NTOKEN2;
 }
 

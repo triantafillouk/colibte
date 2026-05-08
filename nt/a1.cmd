@@ -1,5 +1,5 @@
 cls
-max1=20000000
+max1=100000000
 print("Initializing arrays with ",max1," elements")
 print("")
 show_time("start allocate/define array a",0)

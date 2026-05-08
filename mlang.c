@@ -251,7 +251,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 #if	TBNF
  // if(no_push) { MESG("stack_push:%s skip %s",title,tok_info(tok));return;};
  if(tok!=NULL) {
- // MESG("stack_push! at %p",check_buffer->tok_table_bnf+check_buffer->tok_bnf_index);
+ 	// MESG("stack_push! at %p",check_buffer->tok_table_bnf+check_buffer->tok_bnf_index);
 	if(tok->pushed>=0) {
 		if(check_buffer)
 		// MESG("P[%10s already pushed at %3d %-15s|%s %p",check_buffer->b_fname,tok->pushed,title,tok_info(tok),tok);
@@ -280,7 +280,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 			if(p->ttype!=TOK_SEP) dest->bnf_factor_function=bnf_factor_rcurl0;
 			else dest->bnf_factor_function=bnf_factor_rcurl;
 		};
- 		// MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(dest));
+ 		MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(dest));
 		if(dest->ttype==TOK_FUNC) {
 			// MESG("	set bnf function! index=%d for [%s]",tok->tok_node->node_index,tok_info(dest));
 			dest->bnf_factor_function=bnf_functions[tok->tok_node->node_index].vfunction;
@@ -2452,7 +2452,7 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_none,	// TOK_DIR_CONTINUE	,
 	bnf_factor_none,	// TOK_DIR_FOREACH		,
 	bnf_factor_none,	// TOK_DIR_TYPE,
-	bnf_factor_array1,	// TOK_ARRAY1
+	bnf_factor_array_l1_tba,	// TOK_ARRAY1
 	bnf_factor_array2,	// TOK_ARRAY2
 	bnf_factor_array_l1,// TOK_ARRAY_L1
 	bnf_factor_array_l2,// TOK_ARRAY_L2
@@ -4144,10 +4144,12 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		show_var_stats();
 		MVAR *result = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
 		if(result->var_type==VTYPE_NUM) msg_line("Result is [%f]",num_result());
-		if(result->var_type==VTYPE_STRING) msg_line("Result is [%s]",string_result());
+		else if(result->var_type==VTYPE_STRING) msg_line("Result is [%s]",string_result());
+		else msg_line("Result is type %d",bnf_var->var_type);
 	} else {
 		if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
-		if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
+		else if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
+		else msg_line("Result is type %d",get_vtype());
 	};
  } else {
  	msg_line("parse error %d on %s ",err_num,bp->b_fname);
