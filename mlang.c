@@ -924,7 +924,7 @@ MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
 /* free symbol table after execute */
 void delete_symbol_table(MVAR *td, int size,int nargs)
 {
- // MESG("delete_symbol_table: << nargs=%d size=%d",nargs,size);
+ MESG("delete_symbol_table: << nargs=%d size=%d",nargs,size);
  MVAR *sslot=td;
  int i=0;
  for(;i<nargs;i++,sslot++)
@@ -953,8 +953,12 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 	if(sslot->var_type==VTYPE_ARRAY) {
 		// MESG("delete_symbol_table:array %s",sslot->adat->array_name);
 		if(sslot->adat!=NULL) {
-			free_array_dat(sslot->adat);
-			free(sslot->adat);
+			if(sslot->adat->astat==ARRAY_ALLOCATED
+				||sslot->adat->astat==ARRAY_LOCAL
+			){
+				free_array_dat(sslot->adat);
+				free(sslot->adat);
+			};
 			sslot->var_type=VTYPE_NUM;
 			sslot->dval=0;
 		};
@@ -2403,8 +2407,8 @@ VFunction factor_bnf_funcs[] = {
 	bnf_dir_else,	// TOK_DIR_ELSE	,	// dir else
 	bnf_dir_break,	// TOK_DIR_BREAK	,
 	bnf_dir_return,	// TOK_DIR_RETURN	,
-	bnf_factor_none,	// TOK_DIR_WHILE	,
-	bnf_factor_none,	// TOK_DIR_FOR		,
+	bnf_dir_while,	// TOK_DIR_WHILE	,
+	bnf_dir_for,	// TOK_DIR_FOR		,
 	bnf_factor_comma,	// TOK_COMMA		,
 	bnf_dir_fori,	// TOK_DIR_FORI	,
 
@@ -2504,7 +2508,7 @@ int factor_bnf_type[] = {
 	0,	// TOK_DIR		,	// directive
 	0,	// TOK_DIR_IF	,	// dir if
 	0,	// TOK_DIR_ELSE	,	// dir else
-	0,	// TOK_DIR_BREAK	,
+	-TOK_DIR_BREAK,	// TOK_DIR_BREAK	,
 	-TOK_DIR_RETURN,	// TOK_DIR_RETURN	,
 	0,	// TOK_DIR_WHILE	,
 	0,	// TOK_DIR_FOR		,
@@ -4118,34 +4122,38 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	// MESG("	after exec_block1 !!!!!");
 #if	TBNF
 	if(exebnf) {
-		MESG("execute bnf block!");
+		MESG("## execute bnf block! --------------------");
 		exe_buffer=bp;
 		tok=bp->tok_table_bnf;
 		bnf_block1();
-		// MESG("end of program var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);
+		MESG("end of program var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);
 		next_var("end");
-		// MESG("end of program var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);
+		MESG("end of program var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);
 		// show_results();
 	};
 #endif
 	drv_stop_checking_break();
 
 	/* cleaning  */
-	// MESG("cleaning:");
+	MESG("cleaning:");
 	if(start) {
-		if(local_symbols)
+		if(local_symbols){
+		MESG("	cleaning local symbols");
 		if(bp->symbol_tree){
 			delete_symbol_table(local_symbols,bp->symbol_tree->items,0);
 			bp->symbol_tree=NULL;
+		};
 		};
 		current_stable=old_symbol_table;
 	};
 	if(exebnf) {
 		show_var_stats();
+		MESG("show result!");
 		MVAR *result = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
 		if(result->var_type==VTYPE_NUM) msg_line("Result is [%f]",num_result());
 		else if(result->var_type==VTYPE_STRING) msg_line("Result is [%s]",string_result());
 		else msg_line("Result is type %d",bnf_var->var_type);
+		MESG("	result var@=%d",(int)(bnf_var-bnf_vars));
 	} else {
 		if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
 		else if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);

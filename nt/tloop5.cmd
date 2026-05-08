@@ -1,4 +1,6 @@
+
 initialize
+# CHECK!!!!!
 cls
 
 i=p=0
@@ -20,7 +22,7 @@ while (i<10)
 		print(" for loop "+j)
 		l = i*j + 32
 		p = p+l
-		if(j>1) break;
+		if(j>1) break
 	};
 	print("iloop:"+i+" p="+p)
 #	show_time("loop "+i,1)

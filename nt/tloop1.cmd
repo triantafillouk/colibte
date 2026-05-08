@@ -13,12 +13,12 @@ while (i<10)
 	{ 
 		l = i*j + 32
 		p = p+l
-		if(j>10000) break;
+		if(j>10000) { break }
 	}
 #	print("loop:"+i+" p="+p)
 	show_time("loop "+i+" p="+p,1)
 	i=i+1
-	if(i>3) break;
+	if(i>3) { break }
 }
 _time	: [Wed Oct  1 23:28:47 2014]
 

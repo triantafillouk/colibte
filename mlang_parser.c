@@ -579,7 +579,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			last_correct_line=tok_line;
 			// skip_line1(bf,cc);
 			if(!(next_token_type(bf)==TOK_RCURL)) 
-			if(is_now_sep || after_rpar || is_now_curl) continue;
+			if(is_now_sep /* || after_rpar */ || is_now_curl) continue;
 			is_now_sep=1;
 			tok_type=TOK_SEP;
 			// ADD_TOKEN("separator");
@@ -642,6 +642,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 				} else {
 					int tt=1;
 					// MESG("	TOK_RCURL sep=%d",is_now_sep);
+#if	1
 					while(1){	/* remove all separators,white space after rcurl  */
 						tt=next_token_type(bf);
 						if(tt!=TOK_SEP && tt!=TOK_NL && tt!=TOK_SPACE) {
@@ -650,6 +651,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 						getnc1(bf,&cc,&tok_type);
 						if(tok_type==TOK_NL) tok_line++;
 					};
+#endif
 					tok_type=TOK_RCURL;
 				};
 			};
@@ -858,6 +860,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 
 	if(tok_type==TOK_NL) {
 		// start_of_line = 1;
+		tok_type=TOK_SEP;
+		ADD_TOKEN("nl");
 		continue;
 	};
 	// MESG("	- token type=[%d %s] previous token is [%d %s] nword=[%s],store=%d",tok_type,tname(tok_type),previous_ttype,tname(previous_ttype),nword,is_storelines);

@@ -644,7 +644,7 @@ int err_factor()
  // MESG("now     : tok  %s",tok_info(tok));
  switch(tok0->ttype) {
 	/*  the following ends factor  */
-#if	1
+#if	0
  	case TOK_SEP:
 		xpos=476;
 		// syntax_error("separator in factor!",xpos);
@@ -1259,7 +1259,7 @@ int err_factor()
 		xpos=527;
 		MESG(" default: error_factor0: %s tind=%d ttype=%d TOK_VAR=%d",tok_info(tok0),tok0->tind,tok0->ttype,TOK_VAR);
 		MESG(" default: error_factor : %s",tok_info(tok));
-		set_error(tok,3000+tok->ttype,"factor :wrong character found:");
+		set_error(tok,3000+tok0->ttype,"factor :wrong character found:");
 		RT_MESG1(5271);
  }
  xpos=529;
@@ -1828,10 +1828,12 @@ int err_check_sentence1()
 		NTOKEN_ERR(641);	/* go to next token after for */
 
 		err_num=err_lexpression();	/* check initial  */
+		stack_push("sep",tok,0);
 		NTOKEN_ERR(643);	/* skip separator! */
-		
+			
 		// set check_list
 		err_num=err_lexpression();
+		stack_push("sep",tok,0);
 		NTOKEN_ERR(645);
 
 		err_num=err_lexpression();	/* check loop statement  */
@@ -1902,6 +1904,7 @@ int err_check_sentence1()
 		// MESG(" err TOK_DIR_RETURN: after lexpression: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype); 
 		RT_MESG1(666);
 	case TOK_SEP:
+		stack_push("sep ",tok,-tok->ttype);
 		MESG_TOK_INFO("# err_check_sentence",tok);
 		RT_MESG;
 	case TOK_DIR_TYPE:

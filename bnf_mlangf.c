@@ -132,6 +132,7 @@ void bnf_determinant()	/* TBD  */
 	};
 	bnf_var->var_type=VTYPE_NUM;
 	bnf_var->dval=value;
+	MESG("	determinant: %f var@=%d",value,(int)(bnf_var-bnf_vars));
 }
 
 void bnf_inverse()	/* TBC  */
