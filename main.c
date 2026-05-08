@@ -110,7 +110,7 @@ int main(int argc, char **argv)
 	else if(lc_lang[0]==0) lc_lang=getenv("LANG");
 	errno=0;
 	set_start_dir(NULL);
-	// printf("size=%ld\n",sizeof(struct tok_struct));exit(0);
+	// printf("size=%ld\n",sizeof(struct MVAR));exit(0);
 	// check_config_dir();
 	init_hash();
 	discmd = FALSE;

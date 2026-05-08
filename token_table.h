@@ -81,8 +81,8 @@ TOK_TAB token_table[]= {
 	{TOK_DIR_TYPE		,"type",0},
 	{TOK_ARRAY1			,"array1",0},	// 71
 	{TOK_ARRAY2			,"array2",0},
-	{TOK_ARRAY_L1		,"array_l1",0},
-	{TOK_ARRAY_L2		,"array_l2",0},
+	{TOK_ARRAY_L1		,"AL1",0},
+	{TOK_ARRAY_L2		,"AL2",0},
 	{TOK_ASSIGNENV		,"setenv",TOK_TERM0},
 	{TOK_ASSIGNOPT		,"setoption",TOK_TERM0},
 	{TOK_END			,"END",0},

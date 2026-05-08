@@ -616,6 +616,7 @@ int err_factor()
  // MESG("-- err_factor %s",tok_info(tok));
  set_tok_function(tok,0);
  tok_struct *tok0_bnf=NULL;
+ // tok_struct *tok0_bnf_assign=NULL;
  if(tok->ttype!=TOK_NOT && tok->ttype!=TOK_LPAR) {
  	tok0_bnf=stack_push("factor",tok,tok->ttype);	// ????
  };
@@ -798,7 +799,7 @@ int err_factor()
 		RT_MESG1(4441);		
 	};
 	case TOK_ARRAY_L1:{	// 0 variable
-		// MESG("TOK_ARRAY_L1: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
+		MESG("TOK_ARRAY_L1: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
 		pre_symbol=0;
 		ex_nvars++;
 		stack_push("499",tok,tok->ttype);
@@ -836,6 +837,9 @@ int err_factor()
 			tok_struct *braket=tok-1;
 			// MESG("	RBRAKET found! [%s]",tok_info(braket));
 			stack_push("RB",braket,-braket->ttype);
+			tok0_bnf->ttype=TOK_ARRAY_L1;
+			tok0_bnf->bnf_factor_function=bnf_factor_array_l1;
+			assign_type_to=TOK_ASSIGN_ARRAY1;
 		} else {
 			MESG("	No rbracket found!");
 		};
@@ -855,7 +859,8 @@ int err_factor()
 			NTOKEN_ERR(4989);
 		};
 		if(tok->ttype==TOK_ASSIGN) {
-			tok0_bnf->ttype=TOK_ASSIGN_ARRAY1;
+			// tok0_bnf->ttype=TOK_ASSIGN_ARRAY1;
+			tok0_bnf->bnf_factor_function=bnf_factor_array_l1_tba;
 			assign_type_to=TOK_ASSIGN_ARRAY1;
 		};
 		RT_MESG1(4931);
@@ -1541,12 +1546,16 @@ int err_lexpression()
 			err_num=err_assign_val();
 			// stack_push_replace("tok l",tok_l);
 			
-			tok_struct *tok0_bnf=stack_push("TOK_ASSIGN 1",tok0,tok0->ttype);
+			tok_struct *tok0_bnf_assign=stack_push("TOK_ASSIGN 1",tok0,tok0->ttype);
 			if(assign_type_to) {
-				if(assign_type_to==TOK_ASSIGN_ARRAY2) 
-					tok0_bnf->bnf_factor_function=bnf_assign_array2;
-				if(assign_type_to==TOK_ASSIGN_ARRAY1) 
-					tok0_bnf->bnf_factor_function=bnf_assign_array1;
+				if(assign_type_to==TOK_ASSIGN_ARRAY2) {
+					tok0_bnf_assign->bnf_factor_function=bnf_assign_array2;
+				} if(assign_type_to==TOK_ASSIGN_ARRAY1) {
+					tok0_bnf_assign->ttype=TOK_ASSIGN_ARRAY1;
+					tok0_bnf_assign->bnf_factor_function=bnf_assign_array1;
+					// tok_bnf->bnf_factor_function=bnf_assign_array1;
+					// tok0_bnf->bnf_factor_function=bnf_factor_array_l1;
+				};
 				assign_type_to=0;
 			};
 			RT_MESG1(714);

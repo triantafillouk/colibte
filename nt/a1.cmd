@@ -5,7 +5,7 @@ print("")
 show_time("start allocate/define array a",0)
 # defining the max index of the array at the beggining is faster!
 # Loop to check allocation one item per time
-print("starting loop")
+# print("starting loop")
 fori(i=0;max1;1)
 {
 	a[i]=1.1+i
