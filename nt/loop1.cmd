@@ -7,7 +7,7 @@ fori(i=0;max;1)
 	l1++
 }
 
-fori(i=0;max;1) l1++
+fori(i=0;max;1) { l1++ }
 
 l1:
 i=0
@@ -21,6 +21,6 @@ for(i=0;i<max;i++)
 {
 	l1++
 }
-for(i=0;i<max;i++) l1++
+for(i=0;i<max;i++) { l1++ }
 
 l1:

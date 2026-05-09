@@ -265,8 +265,9 @@ void bnf_mid()	/* TBC  */
 void bnf_print()
 {
 	int args=tok->number_of_args;
-	// MESG("bnf_print: tnum=%d args=%d var index=%d",tok->tnum,tok->number_of_args,(int)(bnf_var-bnf_vars));
+	// MESG("bnf_print: tnum=%d args=%d var index=%d",tok->tnum,tok->number_of_args,VARIND);
 	int i;
+	next_var("print0");
 	for(i=0;i<args;i++) {
 		// ntoken();
 		NTOKEN2;
@@ -295,14 +296,12 @@ void bnf_print()
 				out_print(bnf_var->sval,0);
 			};
 		};
-		prev_var("print");
+		prev_var("print el");
 		// MESG("	if: after switch tnum=%d ttype=%d",tok->tnum,tok->ttype);
 	};
+
 	out_print("",1);
-	// MESG("bnf_print: skip function right parenthesis");
-	// ntoken();
-	// MESG("end of bnf_print: num=%d",tok->tnum);
-	// MESG("bnf_print: >>");
+	// MESG("bnf_print: >> end var@=%d",VARIND);
 }
 
 void bnf_show_time()

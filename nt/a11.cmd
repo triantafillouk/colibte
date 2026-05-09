@@ -1,5 +1,5 @@
 cls
-max1=20
+max1=50
 print("Initializing arrays with ",max1," elements")
 print("")
 # defining the max index of the array at the beggining is faster!
