@@ -4126,7 +4126,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		exe_buffer=bp;
 		tok=bp->tok_table_bnf;
 		bnf_block1();
-		MESG("end of program var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);
+		// MESG("end of program var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);
 		next_var("end");
 		MESG("end of program var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);
 		// show_results();
@@ -4135,10 +4135,10 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	drv_stop_checking_break();
 
 	/* cleaning  */
-	MESG("cleaning:");
+	// MESG("cleaning:");
 	if(start) {
 		if(local_symbols){
-		MESG("	cleaning local symbols");
+		// MESG("	cleaning local symbols");
 		if(bp->symbol_tree){
 			delete_symbol_table(local_symbols,bp->symbol_tree->items,0);
 			bp->symbol_tree=NULL;
@@ -4148,7 +4148,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	};
 	if(exebnf) {
 		show_var_stats();
-		MESG("show result!");
+		// MESG("show result!");
 		MVAR *result = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
 		if(result->var_type==VTYPE_NUM) msg_line("Result is [%f]",num_result());
 		else if(result->var_type==VTYPE_STRING) msg_line("Result is [%s]",string_result());

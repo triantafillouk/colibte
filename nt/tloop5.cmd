@@ -17,14 +17,14 @@ i=0
 while (i<10)
 {
 	print("	i loop "+i)
-	for (j=1;j<3;j=j+1)
+	for (j=1;j<5;j=j+1)
 	{ 
-		print(" for loop "+j)
+		print(" j for loop "+j)
 		l = i*j + 32
 		p = p+l
-		if(j>1) break
-	};
-	print("iloop:"+i+" p="+p)
+		if(j>2) break 
+	}
+	print("	iloop:"+i+" p="+p)
 #	show_time("loop "+i,1)
 	i=i+1
 	if(i>3) break

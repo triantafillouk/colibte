@@ -1138,6 +1138,7 @@ inline static void bnf_factor_end()
 inline static void bnf_factor_sep1()
 {
 	// MESG(";bnf_factor_sep1");
+	if(bnf_var>bnf_vars)
 	prev_var("sep1");
 }
 
@@ -1695,7 +1696,7 @@ void bnf_dir_while()	/* TBC  */
 	do {
 		// set tlist to tok pointer
 		tok=check_element;
-		MESG("# while var@=%d [%s]",VARIND,tok_info(tok));
+		// MESG("# while var@=%d [%s]",VARIND,tok_info(tok));
 		double check=bnf_expression();prev_var("exr");
 		if(check) {
 			// on the block start
@@ -1716,9 +1717,9 @@ void bnf_dir_while()	/* TBC  */
 	current_active_flag=old_active_flag;
 }
 
-inline static void bnf_statement()
+inline static void bnf_statement(char *from)
 {
-	// MESG("#	bnf_statement: var@=%d [%s]",VARIND,tok_info(tok));
+	MESG("#	bnf_statement:[%s] var@=%d [%s]",from,VARIND,tok_info(tok));
 	if(tok->ttype==TOK_LCURL) bnf_dir_lcurl();
 	else {
 	while(tok->ttype != TOK_SEP && tok->ttype != TOK_RCURL && tok->ttype != TOK_DIR_ELSE) {
@@ -1878,18 +1879,18 @@ void bnf_factor_proc()
 void bnf_dir_if()
 {
 	tok_struct *tok0=tok;
-	// MESG("tok_dir_if: n=%d",tok->tnum);
+	// MESG("## tok_dir_if:< var@=%d [%s]",VARIND,tok_info(tok));
 	NTOKEN2;	/* go to next token after if */
 
 	int ival = bnf_expression();
 	prev_var("if result");
-	// MESG("tok_dir_if: res=%d after expression var@=%d [%s]",ival,VARIND,tok_info(tok));
+	// MESG("   tok_dir_if: res=%d after expression var@=%d [%s]",ival,VARIND,tok_info(tok));
 	if(ival) {
 		// MESG("	true: start of [%s]",tok_info(tok));
 		NTOKEN2;
-		// MESG("##	if true: var@=%d start of [%s]",VARIND,tok_info(tok));
+		// MESG("		if true: var@=%d start of [%s]",VARIND,tok_info(tok));
 
-		bnf_statement();
+		bnf_statement("if true");
 
 		// MESG("		true:3 after if execution! %s",tok_info(tok));
 		NTOKEN2;
@@ -1901,13 +1902,17 @@ void bnf_dir_if()
 		return;
 	} else {
 		tok=tok0->next_tok;
-		// MESG("##	false: var@=%d start of [%s]",VARIND,tok_info(tok));
+		// MESG("		false: var@=%d start of [%s]",VARIND,tok_info(tok));
 		if(check_skip_token1(TOK_DIR_ELSE)) {
 			// MESG("	execute else at [%s]",tok_info(tok));
-			bnf_statement();
+			bnf_statement("if else");
+		} else { 
+			tok--;
+			if(tok->ttype!=TOK_RCURL) 
+				tok--; 
 		};
-		// MESG("## 	tok_dir_if: else: end [%s]",tok_info(tok));
 	}
+	MESG("	 	tok_dir_if: ival=%d > end [%s]",ival,tok_info(tok));
 }
 
 void bnf_dir_else()

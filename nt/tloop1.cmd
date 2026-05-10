@@ -1,5 +1,5 @@
 # check loops with break 
-# not working !!!!!!
+# ok for bnf not for normal !!!!!!
 cls
 
 print(_time)	: [Wed Oct  1 23:28:47 2014]
@@ -9,16 +9,17 @@ l=p=i=0
 
 while (i<10)
 {
-	for (j=1;j<800000;j=j+1)
+	for (j=1;j<10;j=j+1)
 	{ 
 		l = i*j + 32
 		p = p+l
-		if(j>10000) { break }
+		if(j>5) break 
+		print("--")
 	}
 #	print("loop:"+i+" p="+p)
 	show_time("loop "+i+" p="+p,1)
 	i=i+1
-	if(i>3) { break }
+	if(i>3) { print("break2");break }
 }
 _time	: [Wed Oct  1 23:28:47 2014]
 

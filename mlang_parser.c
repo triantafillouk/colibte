@@ -579,7 +579,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			last_correct_line=tok_line;
 			// skip_line1(bf,cc);
 			if(!(next_token_type(bf)==TOK_RCURL)) 
-			if(is_now_sep /* || after_rpar */ || is_now_curl) continue;
+			if(is_now_sep || after_rpar  || is_now_curl ) continue;
 			is_now_sep=1;
 			tok_type=TOK_SEP;
 			// ADD_TOKEN("separator");

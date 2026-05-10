@@ -1730,7 +1730,10 @@ int err_check_sentence1()
 		// NTOKEN_ERR(635);	/* go after sentence  */
 		CHECK_TOK(635);
 		tok_struct *end_if_tok=stack_push("end of if",tok,-tok->ttype);
+		// end_if_tok--;
 		if_token->next_tok=end_if_tok;
+		MESG("err tok_dir_if: end next_token [%s]",tok_info(end_if_tok));
+
 		tok0->next_tok=tok;
 		// MUST: No separator before else, handle this in parser !!!!! CHECK
 		// check for else statement!
@@ -1886,7 +1889,7 @@ int err_check_sentence1()
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 		set_tok_directive(tok,dir_break);
 
-		stack_push("dir break",tok,-tok->ttype);
+		stack_push("dir_break",tok,-tok->ttype);
 		NTOKEN_ERR(663);
 		RT_MESG;
 	case TOK_DIR_RETURN:
@@ -1894,12 +1897,12 @@ int err_check_sentence1()
 		set_tok_directive(tok,dir_return);
 
 		// MESG(" err TOK_DIR_RetURN");
-		stack_push("dir return",tok,-tok->ttype);
+		stack_push("dir_return",tok,-tok->ttype);
 		NTOKEN_ERR(664);
 		if(tok->ttype!=TOK_SEP&&tok->ttype!=TOK_RPAR) 	
 			err_num=err_lexpression();
 		// stack_push("dir return )",tok0);
-		stack_push("dir return )",tok,-tok->ttype);
+		stack_push("dir_return )",tok,-tok->ttype);
 		check_skip_token1(TOK_RPAR);
 		// MESG(" err TOK_DIR_RETURN: after lexpression: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype); 
 		RT_MESG1(666);
