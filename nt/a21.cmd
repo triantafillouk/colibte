@@ -1,3 +1,6 @@
+# simple double numeric array ops
+# ok with bnf, uncorrect with normal
+
 cls
 
 a=[	1, 2, 3
