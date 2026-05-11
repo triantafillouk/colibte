@@ -6,7 +6,7 @@ print("Executing file ",_file_name," in ",_start_dir)
 show_time("Start fori test loop 1",0)
 
 fori(i=1;11;1){ 
-	fori(j=1;11;1) {p += i*j+32.1 ;}
+	fori(j=1;50000;1) { p += i*j+32.1 }
 	p:
 	# show_time("loop:"+i+" p="+p,1);
 }

@@ -8,7 +8,7 @@ show_time("Start fori test loop 1",0)
 fori(i=1;11;1){ 
 	fori(j=1;8001;1) { 
 		p += i*j+32.1 
-		print("this is loop time:"+_time):
+		#print("this is loop time:"+_time):
 	}
 }
 _time	: 

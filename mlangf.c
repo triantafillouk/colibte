@@ -772,6 +772,12 @@ double uf_list_tokens()
  return 0;
 }
 
+double uf_var_index()
+{
+ MESG("var_index:");
+ return 0;
+}
+
 double uf_test_loop()
 {
 	long int lmax= (long int) get_numeric_arg();

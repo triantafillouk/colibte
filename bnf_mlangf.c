@@ -207,8 +207,6 @@ void bnf_left()	/* TBC  */
 		va[0].var_alloced=0;
 	};
 	prev_var("left");
-	MESG("- left: next is [%s]",tok_info(tok));
-	// NTOKEN2;
 }
 
 void bnf_right()	/* TBC  */
@@ -230,7 +228,7 @@ void bnf_right()	/* TBC  */
 		// set_sval("");
 	};
 	prev_var("right");
-	MESG("- right: next is [%s]",tok_info(tok));
+	// MESG("- right: next is [%s]",tok_info(tok));
 	// NTOKEN2;
 }
 
@@ -258,7 +256,7 @@ void bnf_mid()	/* TBC  */
 		prev_var("mid1");
 		prev_var("mid2");
 		bnf_var->var_type=VTYPE_STRING;
-		MESG("- mid : next is [%s]",tok_info(tok));
+		// MESG("- mid : next is [%s]",tok_info(tok));
 }
 
 
@@ -306,6 +304,7 @@ void bnf_print()
 
 void bnf_show_time()
 {
+	// MESG("	show_time: start var@=%d",VARIND);
 	bnf_function_args(2);
 	MVAR *va=bnf_var-1;
 	double value=0;
@@ -314,14 +313,15 @@ void bnf_show_time()
 	} else {
 		syntax_error("error in stime",312);
 	}
-	// MESG("show_time: [%s]",va[0].sval);
 	prev_var("show_time");
+	// MESG("	show_time: end var@=%d [%s]",VARIND,va[0].sval);
 	if(bnf_var->var_type==VTYPE_STRING && bnf_var->var_alloced==1) {
 		// MESG("show time, free sval!");
 		free(bnf_var->sval);
 	};
 	bnf_var->dval=value;
 	bnf_var->var_type=VTYPE_NUM;
+	// MESG("	show_time: end var@=%d",VARIND);
 }
 
 
@@ -343,7 +343,7 @@ void bnf_upper()	/* TBC  */
 		syntax_error("upper: wrong_type of args",100);
 		// set_sval("");	
 	};
-	MESG("- upper: next is [%s]",tok_info(tok));
+	// MESG("- upper: next is [%s]",tok_info(tok));
 }
 
 void bnf_lower()	/* TBC  */
@@ -672,7 +672,7 @@ void bnf_getpoint()	/* dummy ?? only for plot!  */
 
 void bnf_time()	/* OK????  */
 {
-	MESG("-- bnf_time");
+	// MESG("-- bnf_time");
 	bnf_function_args(2);
 	MVAR *va=bnf_var-1;
 
@@ -793,6 +793,11 @@ void bnf_list_tokens()	/* ok?  */
  out_print("|-----------------------------------------------------|",1);
 }
 
+void bnf_var_index()
+{
+	MESG("var_index: var@=%d",VARIND);
+}
+
 void bnf_test_loop()
 {
 	long int lmax= (long int) bnf_numeric_arg();
@@ -858,6 +863,7 @@ v_function bnf_functions[] = {
 	{"index",0,bnf_index},	/* new index  */
 	{"show_vars",0,bnf_show_vars},	/* show local vars  */
 	{"list_tokens",0,bnf_list_tokens},	/* list_tokens  */
+	{"var_index",0,bnf_var_index},	/* show stack var index  */
 	{"test_loop",1,bnf_test_loop},	/* test computational loop  */
 	{NULL,0,NULL}
 };

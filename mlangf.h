@@ -54,3 +54,4 @@ double uf_index();
 double uf_show_vars();
 double uf_list_tokens();
 double uf_test_loop();
+double uf_var_index();

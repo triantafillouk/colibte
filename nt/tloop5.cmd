@@ -16,10 +16,10 @@ print("k loop "+k)
 i=0
 while (i<10)
 {
-	print("	i loop "+i)
+	#print("	i loop "+i)
 	for (j=1;j<5;j=j+1)
 	{ 
-		print(" j for loop "+j)
+		# print(" j for loop "+j)
 		l = i*j + 32
 		p = p+l
 		if(j>2) break 
@@ -33,7 +33,7 @@ while (i<10)
 }
 _time	: [Thu Sep 25 16:59:11 2014]
 
-message("i<"+i+" and j< "+j+" sets p="+p)
+message("End result: i<"+i+" and j< "+j+" sets p="+p)
 print(_time)	: [Thu Sep 25 16:59:11 2014]
 tdif=show_time("End test",2)
 print("Test concluded in "+tdif+" seconds")

@@ -644,7 +644,7 @@ int err_factor()
  // MESG("now     : tok  %s",tok_info(tok));
  switch(tok0->ttype) {
 	/*  the following ends factor  */
-#if	0
+#if	1
  	case TOK_SEP:
 		xpos=476;
 		// syntax_error("separator in factor!",xpos);
