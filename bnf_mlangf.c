@@ -1,6 +1,6 @@
 
 extern array_dat *main_args;
-extern char *ex_name;
+// extern char *ex_name;
 extern FILEBUF *cbfp;
 extern BTREE *global_types_tree;
 extern char *vtype_names[];
@@ -156,7 +156,7 @@ void bnf_inverse()	/* TBC  */
 			bnf_var->adat = inverse;
 			bnf_var->var_type=va->var_type;
 			// set_array(inverse);
-			ex_name="Inverse";
+			array_dat->array_name="Inverse";
 		};
 	} else {
 		syntax_error("Not an array!",206);
@@ -178,7 +178,7 @@ void bnf_transpose()	/* TBC  */
 		bnf_var->adat = tarray;
 		bnf_var->var_type=va->var_type;
 		// set_array(tarray);
-		ex_name="Tranpose";
+		tarray->array_name="Tranpose";
 	} else {
 		syntax_error("Not an array!",207);
 	};
@@ -271,19 +271,22 @@ void bnf_print()
 		NTOKEN2;
 		
 		bnf_expression();
+		MVAR *avar=(bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
 		// MESG("	bnf_print: after %d expression ind=%d [%s]",i,(int)(bnf_var-bnf_vars),tok_info(tok));
 		// show_result();
-		switch(bnf_var->var_type) {
+		switch(avar->var_type) {
 			case VTYPE_ARRAY:
 			case VTYPE_SARRAY:
 			case VTYPE_AMIXED:
 				if(i>0) out_print("",1);
-				// print_array1("",get_array("102"));break;
-				print_array1("",bnf_var->adat);break;
+				tok_struct *ptok=tok-1;
+				// MESG("-- print array: var@=%d [%s]",VARIND,tok_info(ptok));
+				avar->adat->array_name=ptok->tname;
+				print_array1("",avar->adat);break;
 			case VTYPE_NUM:{
 				char p_out[128];
-				long l0=bnf_var->dval;
-				if(l0==bnf_var->dval) snprintf(p_out,sizeof(p_out),"%ld",l0);
+				long l0=avar->dval;
+				if(l0==avar->dval) snprintf(p_out,sizeof(p_out),"%ld",l0);
 				else snprintf(p_out,sizeof(p_out),"%f",bnf_var->dval); 
 				out_print(p_out,0);
 				// free(p_out);
@@ -291,7 +294,7 @@ void bnf_print()
 			};
 			case VTYPE_STRING:{
 				// MESG("-- bnf_print: string result '%s'",bnf_var->sval);
-				out_print(bnf_var->sval,0);
+				out_print(avar->sval,0);
 			};
 		};
 		prev_var("print el");
