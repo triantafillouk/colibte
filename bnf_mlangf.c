@@ -156,7 +156,7 @@ void bnf_inverse()	/* TBC  */
 			bnf_var->adat = inverse;
 			bnf_var->var_type=va->var_type;
 			// set_array(inverse);
-			array_dat->array_name="Inverse";
+			inverse->array_name="Inverse";
 		};
 	} else {
 		syntax_error("Not an array!",206);
