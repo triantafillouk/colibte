@@ -1,4 +1,4 @@
-
+# types TBD
 type human (name:"Name" age:55)
 # a=human
 # a.age++ : 

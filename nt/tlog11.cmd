@@ -1,4 +1,5 @@
 # logical test, result should be 1
+# check result TBC
 cls
 a3=1
 a4=1

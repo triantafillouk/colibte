@@ -1,6 +1,6 @@
-# string operations
+# multiply should work in bnf TBD
 cls
-a=["test " "test2 ";11 "tt2"]
+a=["test ", "test2 ";11, "tt2"]
 a:
 a[1][0]:
 a[1][0]*=10

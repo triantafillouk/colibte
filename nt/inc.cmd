@@ -1,3 +1,4 @@
+# this should give an error! TBD
 cls
 a="kk"	: 
 a+=1	: 

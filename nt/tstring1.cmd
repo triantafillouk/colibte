@@ -1,4 +1,5 @@
 # string compare
+# bnf not working TBD
 a=c=c1="fly1"	: 
 b="fly2"		: 
 

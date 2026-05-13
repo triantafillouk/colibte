@@ -1,4 +1,5 @@
 # test loop with fori
+# not working TBD
 
 cls
 p=0, l=0; 

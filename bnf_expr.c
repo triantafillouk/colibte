@@ -1406,7 +1406,7 @@ static void bnf_block1()
 		};
 	} while(tok->tgroup!=TOK_END);
 	
-	MESG("-- block end  ! [%s]",tok_info(tok));
+	// MESG("-- block end  ! [%s]",tok_info(tok));
 	tok->bnf_factor_function();
 }
 
@@ -1549,7 +1549,7 @@ void bnf_dir_for()
 	tok_struct *end_block=NULL;	/* at the block end  */
 	int old_active_flag=current_active_flag;
 
-	MESG("-- dir_for:start var@=%d active = %d [%s]",VARIND,current_active_flag,tok_info(tok));	
+	// MESG("-- dir_for:start var@=%d active = %d [%s]",VARIND,current_active_flag,tok_info(tok));	
 	NTOKEN2;	/* go to next token after for */
 
 	bnf_expression();	/* initial   */
@@ -1604,7 +1604,7 @@ void bnf_dir_for()
 	if(is_break1) { tok=exe_buffer->end_token;return;};
 	tok=end_block;
 	current_active_flag=old_active_flag;
-	MESG("-- dir_for:end var@=%d active = %d",VARIND,current_active_flag);	
+	// MESG("-- dir_for:end var@=%d active = %d",VARIND,current_active_flag);	
 }
 
 void bnf_dir_while()	/* TBC  */
@@ -1638,7 +1638,7 @@ void bnf_dir_while()	/* TBC  */
 		// set tlist to tok pointer
 		tok=check_element;
 		double check=bnf_expression();prev_var("exr");
-		MESG("# while var@=%d check=%f [%s]",VARIND,check,tok_info(tok));
+		// MESG("# while var@=%d check=%f [%s]",VARIND,check,tok_info(tok));
 		if(check) {
 			// on the block start
 			tok=start_block;

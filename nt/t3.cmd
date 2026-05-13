@@ -1,5 +1,6 @@
+# string array TBD
 cls
-a=["b1" "b2" "b3"]
+a=["b1", "b2", "b3"]
 a[1]:
 a[2]:
 p=a[0]

@@ -1,5 +1,5 @@
 # test loop with fori
-
+# check bnf_factor_sep1 CHECK
 cls
 
 p=0; l=0; 

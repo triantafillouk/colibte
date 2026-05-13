@@ -1,4 +1,4 @@
-# type var in function
+# type var in function TBD
 
 type human = [name::"Name",age::20]
 
