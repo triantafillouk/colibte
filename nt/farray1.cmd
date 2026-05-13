@@ -1,4 +1,4 @@
-
+# arrays as function args!!!!! (not working ok with bnf!)
 cls
 
 function test_array(a ,l)
@@ -22,7 +22,7 @@ function test_string(s)
 	return(s)
 }
 
-a1 = [1.22 2.44 3.11]
+a1 = [1.22, 2.44, 3.11]
 a1[1] : 2.440000
 print(a1)	
 #a1[1000]=5.3

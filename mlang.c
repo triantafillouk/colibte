@@ -4126,9 +4126,9 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		exe_buffer=bp;
 		tok=bp->tok_table_bnf;
 		bnf_block1();
-		// MESG("end of program var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);
+		MESG("end of program1 var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);
 		next_var("end");
-		MESG("end of program var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);
+		MESG("end of program2 var stack at %ld type %d",bnf_var-bnf_vars,bnf_var->var_type);
 		// show_results();
 	};
 #endif

@@ -3,7 +3,7 @@ char *ddot_string();
 void update_ddot_line(char *ddot_out);
 void skip_sentence1();
 
-static MVAR bnf_vars[150];
+static MVAR bnf_vars[500];
 static MVAR *bnf_var=bnf_vars;
 
 #if	TPROFILE
@@ -19,7 +19,7 @@ int set_option_bnf(int vnum,int ival);
 #define VARIND (int)(bnf_var-bnf_vars)
 
 #if	1
-#if	1
+#if	0
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
 
@@ -29,6 +29,7 @@ inline static void prev_var(char *title)
 	bnf_var--;
 #if	TPROFILE
 	var_index--;
+	if(VARIND<0) { MESG("min var exceeded!!!"); exit(3);};
 #endif
 }
 
@@ -38,7 +39,7 @@ inline static void next_var(char *title)
 #if	TPROFILE
 	var_index++;
 	if(max_var<var_index) max_var=var_index;
-	if(bnf_var - &bnf_vars[0]>500) {
+	if(VARIND > 500) {
 		MESG("MAX var exceeded!");
 		exit(2);
 	};
@@ -659,6 +660,7 @@ inline static void bnf_factor_div()
 		if(varb->var_type==VTYPE_NUM) {
 			bnf_var->dval=vara->dval/varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
+			if(varb->dval==0) set_error(tok,1031,"div with zero!");
 			return;
 		};
 	};
@@ -1138,7 +1140,7 @@ inline static void bnf_factor_end()
 inline static void bnf_factor_sep1()
 {
 	if(bnf_var>bnf_vars) {
-		MESG(";bnf_factor_sep1 ---  var@=%d [%s]",VARIND,tok_info(tok));
+		// MESG(";bnf_factor_sep1 ---  var@=%d [%s]",VARIND,tok_info(tok));
 		prev_var("sep1");
 	} else {
 		MESG(";bnf_factor_sep1 skip var@=%d [%s]",VARIND,tok_info(tok));
@@ -1394,16 +1396,18 @@ static void bnf_block1()
 	// show_token_table("block  ",fp,fp->tok_table_bnf,fp->tok_bnf_index);
 	// MESG("-- block1: start at [%s]",tok_info(tok));
 	do {
-		// tok_struct *tok0=tok;
+		// MESG("-- tok %d type %d",tok->tnum,tok->ttype);
 	 	tok->bnf_factor_function();
+		// MESG("		-- tok %d type %d",tok->tnum,tok->ttype);
 		NTOKEN2;
 		if(!current_active_flag) {
 			// MESG("bnf_block1:[%s] stop: ind=%d type=%d [%s]",fp->b_fname,(int)(bnf_var-bnf_vars),bnf_var->var_type,tok_info(tok));
 			return;
 		};
 	} while(tok->tgroup!=TOK_END);
+	
+	MESG("-- block end  ! [%s]",tok_info(tok));
 	tok->bnf_factor_function();
-	// MESG("-- block end  ! } [%s]",tok_info(tok));
 }
 
 void bnf_block1_break(/*FILEBUF *fp*/)

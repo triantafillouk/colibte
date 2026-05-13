@@ -24,12 +24,12 @@ function fact(num , st)
  }
 }
 
-f=3:
+f=3: 
 n=test(f,"test")
 
 #n=fact(f,"test")
 
-n: 2432902008176640000.0
+n: 
 print("fact("+f+") is "+n)
 return(n)
 
