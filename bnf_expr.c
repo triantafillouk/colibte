@@ -3,8 +3,10 @@ char *ddot_string();
 void update_ddot_line(char *ddot_out);
 void skip_sentence1();
 
-static MVAR bnf_vars[500];
+#define	MAX_VARS	500
+static MVAR bnf_vars[MAX_VARS];
 static MVAR *bnf_var=bnf_vars;
+
 
 #if	TPROFILE
 static long max_var=0;
@@ -19,7 +21,7 @@ int set_option_bnf(int vnum,int ival);
 #define VARIND (int)(bnf_var-bnf_vars)
 
 #if	1
-#if	0
+#if	1
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
 
@@ -29,7 +31,7 @@ inline static void prev_var(char *title)
 	bnf_var--;
 #if	TPROFILE
 	var_index--;
-	if(VARIND<0) { MESG("min var exceeded!!!"); exit(3);};
+	if(VARIND<0) { MESG("min var exceeded!!! var@=%d [%s]",VARIND,tok_info(tok)); exit(3);};
 #endif
 }
 
@@ -39,8 +41,8 @@ inline static void next_var(char *title)
 #if	TPROFILE
 	var_index++;
 	if(max_var<var_index) max_var=var_index;
-	if(VARIND > 500) {
-		MESG("MAX var exceeded!");
+	if(VARIND > MAX_VARS) {
+		MESG("MAX var@=%d exceeded! [%s]",VARIND,tok_info(tok));
 		exit(2);
 	};
 	if(bnf_var->var_type==VTYPE_STRING) {
@@ -58,31 +60,29 @@ inline static void next_var(char *title)
 
 void prev_var(char *title)
 {
- MESG(" - var %d %s",(int)(bnf_var-bnf_vars),title);
+ MESG(" - var %d -> %d %s [%s]",VARIND,VARIND-1,title,tok_info(tok));
  // MESG("	%3d -var %3ld -> %3ld %s",tok->tnum,(long)(bnf_var-bnf_vars),(long)(bnf_var-bnf_vars-1),title);
  if(bnf_var>bnf_vars) bnf_var--;
  else {
 	MESG("prev_var (%s) from 0 at [%s]",title,tok_info(tok));
+	exit(3);
  };
 #if	1
- if(bnf_var < &bnf_vars[0]) {
-	// MESG("Negativ var!");
-	exit(1);
- };
+	if(VARIND<0) { MESG("min var exceeded!!! var@=%d [%s]",VARIND,tok_info(tok)); exit(3);};
 #endif
 }
 
 void next_var(char *title)
 {
- MESG(" + var %d %s",(int)(bnf_var-bnf_vars),title);
+ MESG(" + var %d -> %d %s [%s]",VARIND,VARIND+1,title,tok_info(tok));
  // MESG("	%3d +var %3ld -> %3ld %s",tok->tnum,(long)(bnf_var-bnf_vars),(long)(bnf_var-bnf_vars+1),title);
  bnf_var++;
 	if(bnf_var->var_type==VTYPE_STRING) {
 		if(bnf_var->var_alloced) free(bnf_var->sval);
 		bnf_var->var_alloced=0;
 	};
- if(bnf_var - &bnf_vars[0]>100) {
-	MESG("MAX var exceeded!");
+ if(VARIND>MAX_VARS) {
+	MESG("MAX var@=%d exceeded! [%s]",VARIND,tok_info(tok));
 	exit(2);
  };
 }
@@ -1181,8 +1181,9 @@ inline static void bnf_factor_sep()
 
 inline static void bnf_factor_rcurl0()
 {
-	// MESG("	rcurl go prev!");
-	prev_var("rcurl0");
+	// MESG("	var@=%d rcurl go prev! [%s]",VARIND,tok_info(tok));
+	if(VARIND>1)	
+		prev_var("rcurl0");
 }
 
 inline static void bnf_factor_rcurl_no()
@@ -1193,8 +1194,7 @@ inline static void bnf_factor_rcurl_no()
 
 inline static void bnf_factor_rcurl()
 {
- // long ind=bnf_var-bnf_vars;
- // MESG("	rcurl: ind=%ld",ind);
+ // MESG("	rcurl: ind=%ld",VARIND);
 }
 
 void bnf_factor_error()
@@ -1395,6 +1395,7 @@ static void bnf_block1()
 	// MESG("-------- bnf_block1 start![%s] { [%s]",fp->b_fname,tok_info(tok));
 	// show_token_table("block  ",fp,fp->tok_table_bnf,fp->tok_bnf_index);
 	// MESG("-- block1: start at [%s]",tok_info(tok));
+	// int block_startvar_pos=VARIND;
 	do {
 		// MESG("-- tok %d type %d",tok->tnum,tok->ttype);
 	 	tok->bnf_factor_function();
@@ -1402,12 +1403,14 @@ static void bnf_block1()
 		NTOKEN2;
 		if(!current_active_flag) {
 			// MESG("bnf_block1:[%s] stop: ind=%d type=%d [%s]",fp->b_fname,(int)(bnf_var-bnf_vars),bnf_var->var_type,tok_info(tok));
+			// if(VARIND!=block_startvar_pos) MESG("	block break: var@=%d startvar=%d [%s]",VARIND,block_startvar_pos,tok_info(tok));
 			return;
 		};
 	} while(tok->tgroup!=TOK_END);
 	
 	// MESG("-- block end  ! [%s]",tok_info(tok));
 	tok->bnf_factor_function();
+	// if(VARIND!=block_startvar_pos) MESG("	block end : var@=%d startvar=%d [%s]",VARIND,block_startvar_pos,tok_info(tok));
 }
 
 void bnf_block1_break(/*FILEBUF *fp*/)
@@ -1446,7 +1449,7 @@ inline static void bnf_dir_lcurl_break()
 
 void bnf_dir_break()
 {
-	MESG("bnf_dir_break:!!!!!!!!!!!!!!!!!!!!!!!!!");
+	// MESG("bnf_dir_break:!!!!!!!!!!!!!!!!!!!!!!!!!");
 	// NTOKEN2;
 	current_active_flag=0;
 }
@@ -1584,10 +1587,11 @@ void bnf_dir_for()
 		if(val) {
 			tok=start_block;
 			// MESG("	for: start of loop: var@=%d",VARIND);
-			bnf_block1();tok--;
-			// prev_var("block");
+			MESG("	for: start block: var@=%d [%s]",VARIND,tok_info(tok));
+			bnf_block1();
 			if(current_active_flag==0) {
-				// MESG("	current_active_flag is zero!!!!");
+				tok--;
+				MESG("	for: break: var@=%d [%s]",VARIND,tok_info(tok));
 				break;
 			};
 			tok=loop_element;	/*   */
@@ -1598,6 +1602,7 @@ void bnf_dir_for()
 		} else {
 			break;
 		};
+		MESG("	for: end: var@=%d [%s]",VARIND,tok_info(tok));
 //		MESG("before next loop: val=%f",val);		
 	};
 	current_active_flag=aflag;
@@ -1819,7 +1824,7 @@ void bnf_factor_proc()
 void bnf_dir_if()
 {
 	tok_struct *tok0=tok;
-	// MESG("## tok_dir_if:< var@=%d [%s]",VARIND,tok_info(tok));
+	// MESG("## tok_dir_if: var@=%d [%s]",VARIND,tok_info(tok));
 	NTOKEN2;	/* go to next token after if */
 
 	int ival = bnf_expression();

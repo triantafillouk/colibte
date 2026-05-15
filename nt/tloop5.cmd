@@ -19,10 +19,10 @@ while (i<10)
 	#print("	i loop "+i)
 	for (j=1;j<5;j=j+1)
 	{ 
-		# print(" j for loop "+j)
-		l = i*j + 32
-		p = p+l
-		if(j>2) break 
+		print(" j for loop "+j)		
+		p = p+sin(i*j + 32)
+		if(j>2) break
+		# l=0 
 	}
 	print("	iloop:"+i+" p="+p)
 #	show_time("loop "+i,1)

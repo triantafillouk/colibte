@@ -293,14 +293,12 @@ void bnf_print()
 			};
 			case VTYPE_STRING:{
 				// MESG("-- bnf_print: string result '%s'",bnf_var->sval);
-				out_print(avar->sval,0);
+				out_print(avar->sval,1);
 			};
 		};
 		prev_var("print el");
 		// MESG("	if: after switch tnum=%d ttype=%d",tok->tnum,tok->ttype);
 	};
-
-	out_print("",1);
 	// MESG("bnf_print: >> end var@=%d",VARIND);
 }
 
