@@ -182,7 +182,7 @@ BTNODE *find_bt_element(char *name)
 /* This is editors environment get function */
 double get_env(int vnum)
 {
-	char *getkill();
+	// char *getkill();
 	static double value=0;
 	char svalue[MAXLLEN];
 	long v1=0;

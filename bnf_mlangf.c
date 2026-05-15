@@ -271,7 +271,7 @@ void bnf_print()
 		
 		bnf_expression();
 		MVAR *avar=(bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
-		// MESG("	bnf_print: after %d expression ind=%d [%s]",i,(int)(bnf_var-bnf_vars),tok_info(tok));
+		// MESG("	bnf_print: after %d expression var@=%d type=%d [%s]",i,VARIND,bnf_var->var_type,tok_info(tok));
 		// show_result();
 		switch(avar->var_type) {
 			case VTYPE_ARRAY:
@@ -292,13 +292,14 @@ void bnf_print()
 				break;
 			};
 			case VTYPE_STRING:{
-				// MESG("-- bnf_print: string result '%s'",bnf_var->sval);
-				out_print(avar->sval,1);
+				// MESG("-- bnf_print: string '%s'",bnf_var->sval);
+				out_print(avar->sval,0);
 			};
 		};
 		prev_var("print el");
 		// MESG("	if: after switch tnum=%d ttype=%d",tok->tnum,tok->ttype);
 	};
+	out_print("",1);
 	// MESG("bnf_print: >> end var@=%d",VARIND);
 }
 

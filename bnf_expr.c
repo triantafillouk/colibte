@@ -1182,7 +1182,7 @@ inline static void bnf_factor_sep()
 inline static void bnf_factor_rcurl0()
 {
 	// MESG("	var@=%d rcurl go prev! [%s]",VARIND,tok_info(tok));
-	if(VARIND>1)	
+	// if(VARIND>1)	
 		prev_var("rcurl0");
 }
 
@@ -1283,6 +1283,7 @@ void bnf_factor_assign_var()
 
 void set_bnf_string(char *s)
 {
+	// MESG("set_bnf_string: [%s]",s);
 	bnf_var->sval=strdup(s);
 	bnf_var->var_type=VTYPE_STRING;
 	bnf_var->var_alloced=1;
@@ -1290,6 +1291,7 @@ void set_bnf_string(char *s)
 
 void set_bnf_num(double v)
 {
+	// MESG("set_bnf_num: [%f]",v);
 	bnf_var->dval=v;
 	bnf_var->var_type=VTYPE_NUM;
 }
@@ -1587,22 +1589,23 @@ void bnf_dir_for()
 		if(val) {
 			tok=start_block;
 			// MESG("	for: start of loop: var@=%d",VARIND);
-			MESG("	for: start block: var@=%d [%s]",VARIND,tok_info(tok));
+			// MESG("	for: start block: var@=%d [%s]",VARIND,tok_info(tok));
 			bnf_block1();
 			if(current_active_flag==0) {
 				tok--;
-				MESG("	for: break: var@=%d [%s]",VARIND,tok_info(tok));
+				// MESG("	for: break: var@=%d [%s]",VARIND,tok_info(tok));
 				break;
 			};
 			tok=loop_element;	/*   */
 			val=bnf_expression();	/* exec for loop  */
 			// MESG("	loop var@=%d result %f",VARIND,val);
+			if(VARIND)
 			prev_var("loop");
 			// MESG("	for: end of loop: var@=%d",VARIND);
 		} else {
 			break;
 		};
-		MESG("	for: end: var@=%d [%s]",VARIND,tok_info(tok));
+		// MESG("	for: end: var@=%d [%s]",VARIND,tok_info(tok));
 //		MESG("before next loop: val=%f",val);		
 	};
 	current_active_flag=aflag;
