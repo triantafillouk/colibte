@@ -193,6 +193,7 @@ void set_error(tok_struct *tok,int err,char *description)
  set_tok_directive(tok,factor_eof);
  tok->tgroup=TOK_END;
  tok->ttype=TOK_EOF;
+ current_active_flag=0;
 }
 
 void syntax_error(char *description,int err)

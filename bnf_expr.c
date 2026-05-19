@@ -1289,7 +1289,9 @@ void bnf_factor_assign_var()
 	};
 	
 	// set for any different type!
-	if(bvar->var_type==VTYPE_ARRAY) {
+	if(bvar->var_type==VTYPE_ARRAY
+		||bvar->var_type==VTYPE_AMIXED
+		||bvar->var_type==VTYPE_SARRAY) {
 		// MESG("assign var array!");
 		avar->var_type=bvar->var_type;
 		avar->adat=bvar->adat;
