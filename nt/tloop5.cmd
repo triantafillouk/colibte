@@ -1,4 +1,4 @@
-# not working correclty in bnf TBD
+# 
 initialize
 # CHECK!!!!!
 cls

@@ -1,4 +1,4 @@
-# string operations on string arrays
+# string operations on string arrays TBD for bnf
 a=["a1" "a2"]
 a: array 0:[a] type [SARRAY] , slot 0 type=3 rows 1,cols 2
 a[0]+="test1"

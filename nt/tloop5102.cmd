@@ -1,5 +1,4 @@
 # test loop with fori
-# slower ??
 
 cls
 p=0, l=0; 

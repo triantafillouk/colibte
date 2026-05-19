@@ -1,3 +1,4 @@
+# normal not correct, num * array not working in bnf at line 24 TBD
 cls
 c=[	1.1, 	3.2, 	3
 	4, 		5 ,		6

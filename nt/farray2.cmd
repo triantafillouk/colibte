@@ -1,4 +1,4 @@
-# arrays as function args!!!!! (not working ok with bnf! TBD)
+# arrays as function args!!!!! ( ok with bnf not ok in normal!!)
 cls
 
 function test_array(a ,l)

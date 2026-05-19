@@ -17,6 +17,7 @@ function sc(ind)
 
  a=scale1[1][1]:
  a:
+sc(3):
 "end of test!":
 
 

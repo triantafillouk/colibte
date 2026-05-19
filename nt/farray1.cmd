@@ -1,4 +1,5 @@
-# arrays as function args!!!!! (not working ok with bnf! TBD)
+# arrays as function args!!!!! (correct element additions in bnf not ok in normal!)
+# last print not ok in bnf TBD
 cls
 
 function test_array(a ,l)

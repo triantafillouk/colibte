@@ -1,4 +1,4 @@
-# multiply should work in bnf TBD
+# numeric element multiplication of MIXED array should work in bnf TBD
 cls
 a=["test ", "test2 ";11, "tt2"]
 a:

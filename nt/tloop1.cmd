@@ -1,5 +1,5 @@
 # check loops with break 
-# ok for bnf not for normal !!!!!!
+# ok 
 cls
 
 print(_time)	: [Wed Oct  1 23:28:47 2014]
@@ -14,7 +14,7 @@ while (i<10)
 		l = i*j + 32
 		p = p+l
 		if(j>5) break 
-		print("--")
+		print("-- j=",j)
 	}
 #	print("loop:"+i+" p="+p)
 	show_time("loop "+i+" p="+p,1)

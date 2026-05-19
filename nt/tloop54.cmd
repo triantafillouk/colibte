@@ -1,5 +1,5 @@
 # test loop with fori
-# slower ??
+# 
 
 cls
 

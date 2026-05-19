@@ -1,4 +1,4 @@
-# some boolean ops
+# some boolean ops , different results bnf vs normal
 a=3:   3.0
 c=55:   0.0
 d=1:   1.0

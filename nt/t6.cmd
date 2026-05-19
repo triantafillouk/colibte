@@ -1,4 +1,4 @@
-# TBD
+# mixed array definition not working in bnf TBD
 cls
 print("This is a test defining a mixed array!")
 

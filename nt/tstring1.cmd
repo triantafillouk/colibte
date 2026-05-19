@@ -1,5 +1,5 @@
 # string compare
-# bnf not working TBD
+# bnf not working, equal,compare strings TBD
 a=c=c1="fly1"	: 
 b="fly2"		: 
 

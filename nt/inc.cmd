@@ -1,4 +1,4 @@
-# this should give an error! TBD
+# this should give an error! ok in bnf
 cls
 a="kk"	: 
 a+=1	: 

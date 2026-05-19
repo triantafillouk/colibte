@@ -1,6 +1,7 @@
-# string + array element TBD
+# string + array element, minus before number TBD
 cls
-c=[1.1, 3.2, 33 ; -4.4+3, +5, 6, 7, 8.1, 9]
+c=[1.1, 3.2, 33 ; 4.4+3, -5, 6, 7, 8.1, 9]
+c:
  "test "+c[0][1]	:
 c:
 
