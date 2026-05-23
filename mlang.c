@@ -2476,6 +2476,10 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_none,	// TOK_DECBEFORE
 	bnf_assign_array1,	// TOK_ASSIGN_ARRAY1
 	bnf_assign_array2,	// TOK_ASSIGN_ARRAY2
+	bnf_update_array1,	// TOK_INCREASE_ARRAY1,
+	bnf_update_array2,	// TOK_INCREASE_ARRAY2,
+	bnf_update_array1,	// TOK_DECREASE_ARRAY1,
+	bnf_update_array2,	// TOK_DECREASE_ARRAY2,
 	bnf_factor_none		// TOK_OTHER,
 };
 
@@ -2579,6 +2583,10 @@ int factor_bnf_type[] = {
 	0,	// TOK_DECBEFORE
 	TOK_ASSIGN_ARRAY1,
 	TOK_ASSIGN_ARRAY2,
+	TOK_INCREASE_ARRAY1,
+	TOK_INCREASE_ARRAY2,
+	TOK_DECREASE_ARRAY1,
+	TOK_DECREASE_ARRAY2,
 	0		// TOK_OTHER,
 };
 
@@ -2684,6 +2692,10 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_DECBEFORE
 	factor_none,
 	factor_none,
+	factor_none,	// TOK_INCREASE_ARRAY1,
+	factor_none,	// TOK_INCREASE_ARRAY2,
+	factor_none,	// TOK_DECREASE_ARRAY1,
+	factor_none,	// TOK_DECREASE_ARRAY2,
 	factor_none		// TOK_OTHER,
 };
 

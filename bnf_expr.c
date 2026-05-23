@@ -950,7 +950,9 @@ inline static void bnf_factor_dummy()
 // var++,var--
 inline static void bnf_update_val()
 {
-	// MESG("bnf_update_val:");
+	MESG("bnf_update_val:");
+	int avar_type=bnf_var->var_type;
+	if(avar_type==VTYPE_POINTER) {
 	MVAR *avar=bnf_var->var_pointer;
 
 	if(avar->var_type==VTYPE_NUM) { 
@@ -966,8 +968,63 @@ inline static void bnf_update_val()
 		bnf_var->var_type=VTYPE_ARRAY;
 		return;
 	};
+	MESG("update value type %d not supported",avar->var_type);
+	};
+	MESG("update value type %d",avar_type);
 	set_error(tok,1026,"cannot update non numeric value!");
 	// set for any different type!
+}
+
+inline static void bnf_update_array1()
+{
+	MESG("bnf_update_array1 [%s]",tok_info(tok));
+	array_dat *adat = bnf_var->adat;
+	int ind1=bnf_var->index1;
+	if(adat->atype==VTYPE_ARRAY) {
+		// Check if bvar is VTYPE_NUM!!
+		double *dval = adat->dval;
+		dval[ind1] += tok->dval;
+		bnf_var->dval=dval[ind1];
+		bnf_var->var_type=VTYPE_NUM;
+		return;
+	};
+	if(adat->atype==VTYPE_AMIXED) {
+		if(adat->mval[ind1].var_type==VTYPE_NUM) {
+			adat->mval[ind1].dval += tok->dval;
+			bnf_var->dval=adat->mval[ind1].dval;
+			bnf_var->var_type=VTYPE_NUM;
+			return;
+		}
+	};
+	set_error(tok,413,"update operation not supported ");
+}
+
+inline static void bnf_update_array2()
+{
+	MESG("bnf_update_array2 [%s]",tok_info(tok));
+	array_dat *adat = bnf_var->adat;
+	int ind1=bnf_var->index1;
+
+	if(adat->atype==VTYPE_ARRAY) {
+		MESG("	update ARRAY element");
+		double *dval = adat->dval;
+		dval[ind1] += tok->dval;
+		bnf_var->dval=dval[ind1];
+		bnf_var->var_type=VTYPE_NUM;
+		return;
+	};
+	if(adat->atype==VTYPE_AMIXED) {
+		MESG("	update MIXED element");
+		if(adat->mval[ind1].var_type==VTYPE_NUM) {
+			adat->mval[ind1].dval += tok->dval;
+			bnf_var->var_type=VTYPE_NUM;
+			bnf_var->dval=adat->mval[ind1].dval;
+			return;
+		};
+	};
+	// MESG("in mixed array[%d] mul type %d by %f not supported",ind1,dest_type,bvar->var_type);
+	set_error(tok,1226,"bnf_update_array2 not supported");
+
 }
 
 inline static void bnf_increase_by_pp_num()
@@ -1042,7 +1099,7 @@ inline static void bnf_increase_by()
 		sarray_add1(avar->adat,bnf_var->sval);
 		return;
 	};
-	set_error(tok,1024,"increase operation not supported!");
+	set_error(tok,1024,"increase_by operation not supported!");
 }
 
 
