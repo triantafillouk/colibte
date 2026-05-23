@@ -1,4 +1,4 @@
-# abort function not working bnf,normal ! TBD
+# abort function ok at 887
 show_time("test",0)
 abort()
 show_time("test1",1)

@@ -1462,6 +1462,9 @@ int abort_cmd(num n)
 	clear_message_line();
 	set_update(cwp,UPD_STATUS);
 	drv_flush();
+	} else {
+		MESG("abort program!");
+		exit(1);
 	};
     return(false);
 }

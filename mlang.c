@@ -2390,7 +2390,7 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_none,	// TOK_COMMENT	,
 	bnf_factor_var,	// TOK_VAR	level 0 variable
 	bnf_factor_option,	// TOK_OPTION	,	// editor option
-	(VFunction)factor_cmd,		// TOK_CMD		,	// editor commands
+	bnf_factor_cmd,		// TOK_CMD		,	// editor commands
 	bnf_factor_none,	// TOK_FUNC	,	// function
 	bnf_factor_proc,	// TOK_PROC	,
 	bnf_factor_env,		// TOK_ENV		,	// editor environment function
@@ -2493,7 +2493,7 @@ int factor_bnf_type[] = {
 	0,	// TOK_COMMENT	,
 	TOK_VAR,	// TOK_VAR	level 0 variable
 	TOK_OPTION,	// TOK_OPTION	,	// editor option
-	0,		// TOK_CMD		,	// editor commands
+	TOK_CMD,		// TOK_CMD		,	// editor commands
 	TOK_FUNC,	// TOK_FUNC	,	// function
 	TOK_PROC,	// TOK_PROC	,
 	TOK_ENV,		// TOK_ENV		,	// editor environment function

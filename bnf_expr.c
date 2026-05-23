@@ -2,6 +2,7 @@
 char *ddot_string();
 void update_ddot_line(char *ddot_out);
 void skip_sentence1();
+void show_error(char *from,char *name);
 
 #define	MAX_VARS	500
 static MVAR bnf_vars[MAX_VARS];
@@ -2672,4 +2673,78 @@ void bnf_factor_array_l2()
 	NTOKEN2;
 	// MESG("        : >>>> end");
 	// MESG("	factor_array_l2:ind1=%d lsslot ind=%d type=%d rows=%d cols=%d!",ind1,lsslot->index1,lsslot->var_type,lsslot->adat->rows,lsslot->adat->cols);
+}
+
+void bnf_factor_cmd()
+{
+	int function_index;
+	int check_par=0;
+	int save_macro_exec;
+	double value=1;
+	FUNCS *ed_command;
+
+	// MESG(";factor_cmd: ttype=%d command=%d",tok->ttype,tok->tok_node->node_index);
+	function_index = tok->tok_node->node_index;
+	ed_command = ftable+function_index;
+
+	NTOKEN2;
+	save_macro_exec=macro_exec;
+	macro_exec=MACRO_MODE2;
+	// MESG(";ed_command: [%s] args=%d",ed_command->n_name,ed_command->arg);
+	if(ed_command->arg) {
+		check_par=1;	/* we need parenthesis if arguments.  */
+
+		value=bnf_expression();
+		prev_var("cmd");
+		// MESG(";	ed_command: value=%f %f ex_vtype=%d s=[%s] arg=%d",value,get_val(),get_vtype(),get_sval(),ed_command->arg);
+		set_dval(value);
+		switch(ed_command->arg) {
+			case 1:{ /* one argument */
+				// MESG("	one argument type=%d",get_vtype());
+				if(bnf_var->var_type==VTYPE_STRING) { value=1;};
+				break;
+			};
+			case 2:	/* two arguments  */
+			{
+				NTOKEN2;
+#if	0
+				value=bnd_expression();
+				// MESG(";	ed_command:arg2 value=%f ex_var.var_type=%d s=[%s]",value,ex_var.var_type,get_sval());
+#endif
+				// MESG(";ed_command: second token! type=%d ",tok->ttype);
+				break;
+			};
+		};
+
+	};
+
+	macro_exec = MACRO_MODE2;
+
+	// err_num=0;
+	err_line=tok->tline;
+	err_str=NULL;
+	// MESG(";factor_cmd: execute function! current token is [%s] tnum=%d value=%d",tok->tname,tok->tnum,(int)value);
+	value=ed_command->n_func((int)value);
+
+	set_vdval(value);
+	bnf_var->dval=value;
+	bnf_var->var_type=VTYPE_NUM;
+	// value=get_val();
+	// MESG("TOC_CMD: result %f",get_val());
+	macro_exec = save_macro_exec;
+
+	if(check_par) { 
+		if(check_rparenthesis()) {
+			NTOKEN2;
+			// MESG("right parenthesis skipped!");
+		};
+	};
+
+	if(err_num>0) {
+		// ERROR("error %d after function [%s] at line %d: %s",err_num,ftable[function_index].n_name,err_line,err_str);
+		set_error(tok,105,"factor_cmd");
+		show_error("Factor","factor_cmd");
+	};
+
+	// MESG(";factor_cmd:end value=%f status=%d err=%d",value,status,err_num);
 }
