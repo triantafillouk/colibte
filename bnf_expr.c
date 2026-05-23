@@ -2029,6 +2029,15 @@ void bnf_assign_array1()
 	};
 	if(adat->atype==VTYPE_SARRAY) {
 		MESG("assign for sarray element TBD");
+		free(adat->sval[ind1]);
+		adat->sval[ind1]=strdup(bvar->sval);
+		bnf_var->sval = adat->sval[ind1];
+		bnf_var->var_type=VTYPE_STRING;
+		bnf_var->var_alloced=0;
+		if(bvar->var_alloced) { 
+			free(bvar->sval);bvar->var_alloced=0;
+		};
+		return;
 	};
 }
 
@@ -2079,13 +2088,31 @@ void bnf_increaseby_array1()
 	if(adat->atype==VTYPE_SARRAY) {
 		MESG("array element if SARRAY");
 		if(bvar->var_type==VTYPE_NUM) {
-			MESG("	catanate num value TBD");
-			/* TBD  */
+			MESG("	catanate num value ");
+			char svalue[MAXLLEN];
+			unsigned long stat;
+			double l0 = trunc(bvar->dval);
+			char *svala = adat->sval[ind1];
+
+			if(l0 == bvar->dval) stat=snprintf(svalue,sizeof(svalue),"%s%.0f",svala,l0);
+			else stat=snprintf(svalue,sizeof(svalue),"%s%f",svala,bvar->dval);
+
+			if(stat>MAXLLEN) MESG("truncated 2");
+			// if(vara->var_alloced) 
+				free(svala);
+			adat->sval[ind1]=strdup(svalue);
+			bnf_var->sval=adat->sval[ind1];
+			bnf_var->var_alloced=0;
+			bnf_var->var_type==VTYPE_STRING;
+			return;
 		} else if(bvar->var_type==VTYPE_STRING) {
-			MESG("	catanate string");
+			MESG("	catanate string element %d",ind1);
 			int newsize=strlen(adat->sval[ind1])+strlen(bvar->sval)+1;
 			char *result=malloc(newsize);
-			sprintf(result,"%s%s",adat->mval[ind1].sval,bvar->sval);
+
+			sprintf(result,"%s%s",adat->sval[ind1],bvar->sval);
+			
+			MESG("	free element %d",ind1);
 			free(adat->sval[ind1]);
 			adat->sval[ind1]=result;
 			bnf_var->sval=result;

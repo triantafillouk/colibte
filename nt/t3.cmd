@@ -1,4 +1,4 @@
-# string array TBD
+# string array bnf fixed in 887
 cls
 a=["b1", "b2", "b3"]
 a[1]:
