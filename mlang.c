@@ -265,8 +265,8 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		tok_struct *dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
     	tok->pushed=check_buffer->tok_bnf_index;
-		// MESG("! set pushed! as %d [%s]",tok->pushed,tok_info(tok));
-
+		// MESG("! set pushed! as %d [%s] exp_type=%d",tok->pushed,tok_info(tok),exp_type);
+		// dest->ttype=exp_type;
 		set_bnf_function1(dest,exp_type);
 
 		if(dest->ttype==TOK_LCURL||dest->ttype==TOK_RCURL) {
@@ -2480,6 +2480,7 @@ VFunction factor_bnf_funcs[] = {
 	bnf_update_array2,	// TOK_INCREASE_ARRAY2,
 	bnf_update_array1,	// TOK_DECREASE_ARRAY1,
 	bnf_update_array2,	// TOK_DECREASE_ARRAY2,
+	bnf_factor_negate,	// TOK_NEGATE,
 	bnf_factor_none		// TOK_OTHER,
 };
 
@@ -2587,6 +2588,7 @@ int factor_bnf_type[] = {
 	TOK_INCREASE_ARRAY2,
 	TOK_DECREASE_ARRAY1,
 	TOK_DECREASE_ARRAY2,
+	TOK_NEGATE,
 	0		// TOK_OTHER,
 };
 
@@ -2696,6 +2698,7 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_INCREASE_ARRAY2,
 	factor_none,	// TOK_DECREASE_ARRAY1,
 	factor_none,	// TOK_DECREASE_ARRAY2,
+	factor_none,	// TOK_NEGATE,
 	factor_none		// TOK_OTHER,
 };
 
@@ -2709,6 +2712,7 @@ void set_bnf_function1(tok_struct *tok, int type)
   } else if (type>0) {
   		int exp_type=factor_bnf_type[type];
   		tok->bnf_group=exp_type;
+		tok->ttype=type;
 		tok->bnf_factor_function = factor_bnf_funcs[type];
 		MESG("-- set_bnf_function1: ind=%2d type=%3d",tok->tind,type);
   } else {
@@ -2729,6 +2733,7 @@ void set_bnf_function1(tok_struct *tok, int type)
 	tok->bnf_group=exp_type;
 	tok->bnf_factor_function = factor_bnf_funcs[exp_type];
 	tok->function_index=exp_type;
+	tok->ttype=type;
 	// MESG("-- set_bnf_function1: ind=%2d exp num=%3d",tok->tnum,exp_type);
  } else {
 	tok->bnf_group=0;

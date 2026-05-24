@@ -2153,6 +2153,28 @@ void bnf_increaseby_array1()
 			bnf_var->var_alloced=0;
 			bnf_var->var_type=VTYPE_STRING;
 			return;
+		} else if(bvar->var_type==VTYPE_STRING && adat->mval[ind1].var_type==VTYPE_NUM){
+			char sval[MAXLLEN];
+			int stat=snprintf(sval,MAXLLEN,"%f%s",adat->mval[ind1].dval,bvar->sval);
+			if(stat>=sizeof(sval)) MESG("result truncated!");
+			adat->mval[ind1].sval=strdup(sval);
+			adat->mval[ind1].var_type=VTYPE_STRING;adat->mval[ind1].var_alloced=1;
+			bnf_var->sval=adat->mval[ind1].sval;
+			bnf_var->var_type=VTYPE_STRING;
+			bnf_var->var_alloced=0;
+			if(bvar->var_alloced) free(bvar->sval);
+			return;
+		} else if(bvar->var_type==VTYPE_NUM && adat->mval[ind1].var_type==VTYPE_STRING){
+			char sval[MAXLLEN];
+			int stat=snprintf(sval,MAXLLEN,"%s%f",adat->mval[ind1].sval,bvar->dval);
+			if(stat>=sizeof(sval)) MESG("result truncated!");
+			if(adat->mval[ind1].var_alloced) free(adat->mval[ind1].sval);
+			adat->mval[ind1].sval=strdup(sval);
+			adat->mval[ind1].var_alloced=1;
+			bnf_var->sval=adat->mval[ind1].sval;
+			bnf_var->var_type=VTYPE_STRING;
+			bnf_var->var_alloced=0;
+			return;
 		};
 	};
 
@@ -2174,7 +2196,7 @@ void bnf_increaseby_array1()
 			adat->sval[ind1]=strdup(svalue);
 			bnf_var->sval=adat->sval[ind1];
 			bnf_var->var_alloced=0;
-			bnf_var->var_type==VTYPE_STRING;
+			bnf_var->var_type=VTYPE_STRING;
 			return;
 		} else if(bvar->var_type==VTYPE_STRING) {
 			MESG("	catanate string element %d",ind1);
@@ -2546,7 +2568,7 @@ void bnf_factor_array_l1()
 			return;
 		}
 		if(array_slot->var_type==VTYPE_SARRAY) {
-			char **sval = array_slot->adat->sval;
+			// char **sval = array_slot->adat->sval;
 			bnf_var->sval = array_slot->adat->sval[ind1];
 			MESG("-- var@=%d element %d of string array! [%s]",VARIND,ind1,bnf_var->sval);
 			bnf_var->var_type=VTYPE_STRING;

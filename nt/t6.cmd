@@ -1,4 +1,4 @@
-# mixed array definition not working in bnf TBD
+# mixed array definition on 890 ok but differs, bnf allows num+string TBC
 cls
 print("This is a test defining a mixed array!")
 

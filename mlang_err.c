@@ -618,7 +618,7 @@ int err_factor()
  set_tok_function(tok,0);
  tok_struct *tok0_bnf=NULL;
  // tok_struct *tok0_bnf_assign=NULL;
- if(tok->ttype!=TOK_NOT && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_MINUS) {
+ if(tok->ttype!=TOK_NOT && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_MINUS && tok->ttype!=TOK_PLUS) {
  	tok0_bnf=stack_push("factor",tok,tok->ttype);	// ????
  };
  int save_macro_exec;
@@ -629,7 +629,7 @@ int err_factor()
  SHOW_STAGE(470);
  tok0=tok;
  switch(tok0->ttype) {
- 	// case TOK_PLUS:
+ 	case TOK_PLUS:
 	case TOK_MINUS:
 		pre_symbol++;
  };
@@ -1004,8 +1004,9 @@ int err_factor()
 		CHECK_TOK(491);
 		if(pre_symbol) {
 			err_factor();
-			tok0_bnf=stack_push("minus",tok0,tok0->ttype);
-			tok0_bnf->bnf_factor_function=bnf_factor_negate;
+			MESG("	minus set to negate");
+			tok0_bnf=stack_push("negate",tok0,TOK_NEGATE);
+			// tok0_bnf->bnf_factor_function=bnf_factor_negate;
 		} else {
 			tok0_bnf=stack_push("minus",tok0,tok0->ttype);
 			err_factor();
@@ -1022,7 +1023,16 @@ int err_factor()
 			RT_MESG1(490);
 		};
 		CHECK_TOK(491);
-		err_factor();
+		if(pre_symbol) {
+			err_factor();
+			MESG("	plus should be skiped!");
+			// tok0_bnf=stack_push("negate",tok0,0);
+			// tok0_bnf->bnf_factor_function=bnf_factor_negate;
+		} else {
+			tok0_bnf=stack_push("plus",tok0,tok0->ttype);
+			err_factor();
+		};
+
 		// stack_push("NOT",tok0,tok0->ttype);
 		RT_MESG1(4911);
 	case TOK_NOT:
