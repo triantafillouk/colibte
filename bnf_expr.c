@@ -672,7 +672,34 @@ inline static void bnf_factor_mul()
 			MESG("	array multiply by num!");
 			return;
 		} else
-		MESG("	array mul num! TBD!");
+		if(varb->var_type==VTYPE_ARRAY) {
+			array_dat *array1=vara->adat;
+			array_dat *array2=varb->adat;
+
+			if(array1->rows==1 && array2->cols==1) {
+				if(array1->cols== array2->rows) {
+					int i;
+					double v1=0;
+					for(i=0;i<array1->cols;i++){
+						v1 += array1->dval[i]*array2->dval[i];
+					};
+					bnf_var->var_type=VTYPE_NUM;
+					bnf_var->dval=v1;
+					return;
+				};
+				syntax_error("array multiply error",213);
+				return;
+			} else {
+				array_dat *result_array;
+				result_array=array_mul2(array1,array2);
+				bnf_var->var_type=VTYPE_ARRAY;
+				bnf_var->adat=result_array;
+				if(array1->astat==ARRAY_ALLOCATED) {	/* free this one!! ?? */ };
+				return;
+			};
+			syntax_error("array multiply error",214);
+			return ;
+		};
 	};
  	MESG("num error! [%s]",tok_info(tok));
 	set_error(tok,1029,"mul error");

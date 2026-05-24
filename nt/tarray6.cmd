@@ -1,4 +1,4 @@
-# array decreaseby not working in bnf TBD
+# array decrease, decreaseby ok in 890
 cls()
 a=[1, 2, 3, 3.33]
 print("decrease by 1 array")
