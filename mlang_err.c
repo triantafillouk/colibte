@@ -618,7 +618,7 @@ int err_factor()
  set_tok_function(tok,0);
  tok_struct *tok0_bnf=NULL;
  // tok_struct *tok0_bnf_assign=NULL;
- if(tok->ttype!=TOK_NOT && tok->ttype!=TOK_LPAR) {
+ if(tok->ttype!=TOK_NOT && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_MINUS) {
  	tok0_bnf=stack_push("factor",tok,tok->ttype);	// ????
  };
  int save_macro_exec;
@@ -1002,7 +1002,14 @@ int err_factor()
 			RT_MESG1(490);
 		};
 		CHECK_TOK(491);
-		err_factor();
+		if(pre_symbol) {
+			err_factor();
+			tok0_bnf=stack_push("minus",tok0,tok0->ttype);
+			tok0_bnf->bnf_factor_function=bnf_factor_negate;
+		} else {
+			tok0_bnf=stack_push("minus",tok0,tok0->ttype);
+			err_factor();
+		};
 		RT_MESG1(4911);
 	case TOK_PLUS:
 		// MESG("tok_plus: %d",pre_symbol);

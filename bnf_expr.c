@@ -304,6 +304,19 @@ void bnf_factor_not()
  set_error(tok,1027,"factor not error!");
 }
 
+void bnf_factor_negate()
+{
+
+  MVAR *num_var = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer:bnf_var;
+ // MESG("bnf_factor_negate:");
+ if(num_var->var_type == VTYPE_NUM) {
+ 	bnf_var->dval = -num_var->dval;
+	bnf_var->var_type=VTYPE_NUM;
+	return;
+ };
+ set_error(tok,1027,"factor not error!");
+}
+
 inline static void  bnf_factor_pp_plus()
 {
  // MESG("bnf_factor_pp_plus : var ind=%d tok ind=%d var type=%d",bnf_var-&bnf_vars[0],tok->tnum,bnf_var->var_type);
@@ -384,12 +397,13 @@ static void bnf_factor_spn_plus()
 
 void bnf_factor_plus()
 {
- // MESG(";bnf_factor_plus: var@=%d [%s]",VARIND,tok_info(tok));
+ MESG(";bnf_factor_plus: var@=%d [%s]",VARIND,tok_info(tok));
  MVAR *varb = bnf_var;
 	prev_var("plus");
  MVAR *vara = bnf_var;
  int typea=vara->var_type;
  // int typeb=varb->var_type;
+ MESG("	typea=%d typeb=%d",vara->var_type,varb->var_type);
  if(typea==VTYPE_POINTER) {
  	typea=vara->var_pointer->var_type;
  	// MESG("bnf_factor_plus [%2d]: var@=%d  va pointer=%d vb=%d",tok->tnum,VARIND,typea,varb->var_type);
@@ -547,7 +561,7 @@ inline static void  bnf_factor_pn_minus()
 
 void bnf_factor_minus()
 {
- // MESG("bnf_factor_minus : var ind=%d tok ind=%d var type=%d",bnf_var-&bnf_vars[0],tok->tnum,bnf_var->var_type);
+ MESG(";bnf_factor_minus: var@=%d tok ind=%d var type=%d",VARIND,tok->tnum,bnf_var->var_type);
  MVAR *varb = bnf_var;
  prev_var("minus");
  MVAR *vara = bnf_var;
