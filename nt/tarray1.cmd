@@ -1,4 +1,4 @@
-# array multiplication not correct! TBD
+# bnf array multiplication ok from 893
 cls
 test=1
 if(test==1){

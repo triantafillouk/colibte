@@ -665,10 +665,11 @@ inline static void bnf_factor_mul()
 	};
 	if(vara->var_type==VTYPE_ARRAY) {
 		if(varb->var_type==VTYPE_NUM) {
-			array_dat *loc_array = vara->adat;
-			if(loc_array->astat==ARRAY_LOCAL) loc_array=dup_array_mul1(loc_array,varb->dval);
-			else array_mul1(loc_array,varb->dval);
-			vara->adat = loc_array;
+			array_dat *array1 = vara->adat;
+			array_dat *result_array =dup_array_mul1(array1,varb->dval);
+			bnf_var->adat=result_array;
+			bnf_var->var_type=VTYPE_ARRAY;
+			bnf_var->var_alloced=1;
 			MESG("	array multiply by num!");
 			return;
 		} else
