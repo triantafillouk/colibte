@@ -964,7 +964,7 @@ inline static void bnf_factor_dummy()
 // var++,var--
 inline static void bnf_update_val()
 {
-	MESG("bnf_update_val:");
+	// MESG("bnf_update_val:");
 	int avar_type=bnf_var->var_type;
 	if(avar_type==VTYPE_POINTER) {
 	MVAR *avar=bnf_var->var_pointer;
@@ -977,16 +977,16 @@ inline static void bnf_update_val()
 		return;
 	};
 	if(avar->var_type==VTYPE_ARRAY) {
-		bnf_var->adat=dup_array_add1(avar->adat,0);
+		// bnf_var->adat=dup_array_add1(avar->adat,tok->dval);
 		array_add1(avar->adat,tok->dval);
 		bnf_var->var_type=VTYPE_ARRAY;
+		bnf_var->adat = avar->adat;
+		bnf_var->var_alloced=0;
 		return;
 	};
-	MESG("update value type %d not supported",avar->var_type);
 	};
-	MESG("update value type %d",avar_type);
+	MESG("update value type %d not supported",avar_type);
 	set_error(tok,1026,"cannot update non numeric value!");
-	// set for any different type!
 }
 
 inline static void bnf_update_array1()
