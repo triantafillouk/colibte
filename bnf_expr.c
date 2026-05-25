@@ -798,6 +798,12 @@ inline static void bnf_factor_smaller()
 			return;
 		};
 	};
+	if(vara->var_type==VTYPE_STRING && varb->var_type==VTYPE_STRING) {
+		int lresult=scmp(vara->sval,varb->sval);
+		bnf_var->dval= (lresult < 0 ? 1.0: 0.0);
+		bnf_var->var_type=VTYPE_NUM;
+		return;
+	};
 	set_error(tok,1033,"smaller error");
  	// MESG("smaller error!");
 }
@@ -818,6 +824,12 @@ inline static void bnf_factor_bigger()
 			return;
 		};
 	};
+	if(vara->var_type==VTYPE_STRING && varb->var_type==VTYPE_STRING) {
+		int lresult=scmp(vara->sval,varb->sval);
+		bnf_var->dval= (lresult > 0 ? 1.0: 0.0);
+		bnf_var->var_type=VTYPE_NUM;
+		return;
+	};
 	set_error(tok,1034,"bigger error!");
 }
 
@@ -836,6 +848,12 @@ inline static void bnf_factor_smallereq()
 			return;
 		};
 	};
+	if(vara->var_type==VTYPE_STRING && varb->var_type==VTYPE_STRING) {
+		int lresult=scmp(vara->sval,varb->sval);
+		bnf_var->dval= (lresult <= 0 ? 1.0: 0.0);
+		bnf_var->var_type=VTYPE_NUM;
+		return;
+	};
  	set_error(tok,1035,"<= error!");
 }
 
@@ -853,6 +871,12 @@ inline static void bnf_factor_biggereq()
 			bnf_var->var_type=VTYPE_NUM;
 			return;
 		};
+	};
+	if(vara->var_type==VTYPE_STRING && varb->var_type==VTYPE_STRING) {
+		int lresult=scmp(vara->sval,varb->sval);
+		bnf_var->dval= (lresult >= 0 ? 1.0: 0.0);
+		bnf_var->var_type=VTYPE_NUM;
+		return;
 	};
  	set_error(tok,1036,"biggereq error!");
 }
@@ -873,6 +897,12 @@ inline static void bnf_factor_equal()
 			return;
 		};
 	};
+	if(vara->var_type==VTYPE_STRING && varb->var_type==VTYPE_STRING) {
+		int lresult=scmp(vara->sval,varb->sval);
+		bnf_var->dval= (lresult == 0 ? 1.0: 0.0);
+		bnf_var->var_type=VTYPE_NUM;
+		return;
+	};
  	set_error(tok,1037,"equal error!");
 }
 
@@ -890,6 +920,12 @@ inline static void bnf_factor_notequal()
 			bnf_var->var_type=VTYPE_NUM;
 			return;
 		};
+	};
+	if(vara->var_type==VTYPE_STRING && varb->var_type==VTYPE_STRING) {
+		int lresult=scmp(vara->sval,varb->sval);
+		bnf_var->dval= (lresult != 0 ? 1.0: 0.0);
+		bnf_var->var_type=VTYPE_NUM;
+		return;
 	};
  	set_error(tok,1038,"notequal error!");
 }
