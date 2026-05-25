@@ -169,7 +169,7 @@ void bnf_transpose()	/* TBC  */
 	MVAR *va = bnf_var;
 	if(va->var_type==VTYPE_POINTER) va=va->var_pointer;
 
-	if(va->var_type==VTYPE_ARRAY) {
+	if(va->var_type==VTYPE_ARRAY || va->var_type==VTYPE_AMIXED) {
 		array_dat *arr  = va->adat;
 		array_dat *tarray;
 		tarray = transpose(arr);
