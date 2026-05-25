@@ -1,4 +1,4 @@
-# test call macro file, return 1 if ok
+# test call macro file, return 1 if ok not ok in normal and bnf TBD
 # 0 if any error
 
 print("go and exec_file: ....")

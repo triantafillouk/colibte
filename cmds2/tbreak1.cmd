@@ -1,4 +1,5 @@
 # checks break inside a block
+# normal not ok! TBC
 
 cls()
 for(j=0;j<10;j=j+1)

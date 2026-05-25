@@ -1,11 +1,11 @@
 # test arrays
 cls
 initialize()
-a = [ 1.1 1.2]
+a = [ 1.1, 1.2]
 1+3: 
 a:
-b = [ 1 2
-	  3 4 5]
+b = [ 1, 2
+	  3, 4, 5]
 b:
 print("finished")
 b[1][2]:

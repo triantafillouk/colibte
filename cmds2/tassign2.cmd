@@ -1,4 +1,4 @@
-# test functions, assign function, quit function
+# test functions, assign function, quit function assign_function not working TBD
 p=2	:   2.0
 a=3
 d=log(10)	: 2.302585

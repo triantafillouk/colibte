@@ -1,7 +1,7 @@
-# test arrays
+# test arrays TBD
 cls
 k=1.22
-a = [k 1 2 3]
+a = [k, 1, 2, 3]
 a:
 a+1:
 a+=1
