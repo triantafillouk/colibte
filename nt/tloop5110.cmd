@@ -1,5 +1,5 @@
 # test loop with fori
-# not working TBD (segfault)
+# fori expression loop TBC 
 
 cls
 p=0, l=0; 

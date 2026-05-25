@@ -399,17 +399,86 @@ void bnf_factor_plus()
 {
  // MESG(";bnf_factor_plus: var@=%d [%s]",VARIND,tok_info(tok));
  MVAR *varb = bnf_var;
-	prev_var("plus");
+ int varb_type_is_pointer=0;
+ if(varb->var_type==VTYPE_POINTER) { varb=bnf_var->var_pointer;varb_type_is_pointer=1;};
+ prev_var("plus");
  MVAR *vara = bnf_var;
- int typea=vara->var_type;
+ int vara_type_is_pointer=0;
+ if(vara->var_type==VTYPE_POINTER) { vara=bnf_var->var_pointer;vara_type_is_pointer=1;};
 
- // MESG("	typea=%d typeb=%d",vara->var_type,varb->var_type);
- if(typea==VTYPE_POINTER) {
- 	typea=vara->var_pointer->var_type;
- 	// MESG("bnf_factor_plus [%2d]: var@=%d  va pointer=%d vb=%d",tok->tnum,VARIND,typea,varb->var_type);
- } else {
- 	// MESG("bnf_factor_plus [%2d]: var@=%d  va=%d vb=%d",tok->tnum,VARIND,typea,varb->var_type);
- }
+ if(varb->var_type==VTYPE_NUM) {
+ 	if(vara->var_type==VTYPE_NUM) {
+		bnf_var->dval=vara->dval + varb->dval;
+		bnf_var->var_type=VTYPE_NUM;
+ 		if(vara_type_is_pointer && varb_type_is_pointer) 
+			set_bnf_function(tok,"pp_plus",bnf_factor_pp_plus);
+ 		if(!vara_type_is_pointer && varb_type_is_pointer) 
+			set_bnf_function(tok,"np_plus",bnf_factor_np_plus);
+		if(!vara_type_is_pointer && varb_type_is_pointer)
+			set_bnf_function(tok,"nn_plus",bnf_factor_nn_plus);
+		return;
+	} else if(vara->var_type==VTYPE_STRING) {	// string+num
+		char svalue[MAXLLEN];
+		double l0 = trunc(varb->dval);
+		int stat; 
+
+		if(l0 == varb->dval) stat=snprintf(svalue,sizeof(svalue),"%s%.0f",vara->sval,l0);
+		else stat=snprintf(svalue,sizeof(svalue),"%s%f",vara->sval,varb->dval);
+
+		if(stat>MAXLLEN) MESG("truncated 2");
+		if(!vara_type_is_pointer && vara->var_alloced==1) free(vara->sval);
+		bnf_var->sval=strdup(svalue);
+		bnf_var->var_type=VTYPE_STRING;
+		bnf_var->var_alloced=1;
+		if(vara_type_is_pointer && !varb_type_is_pointer)
+			set_bnf_function(tok,"spn_plus",bnf_factor_spn_plus);
+		return;
+	} else if(vara->var_type==VTYPE_ARRAY) {
+			array_dat *adat=dup_array_add1(vara->adat,varb->dval);
+			vara->adat=adat;
+			vara->var_type=VTYPE_ARRAY;
+			vara->var_alloced=1;
+			return;
+	} else if(vara->var_type==VTYPE_SARRAY) {
+		// TBD
+	};	
+ } else if(varb->var_type==VTYPE_STRING) {
+ 	if(vara->var_type==VTYPE_STRING) {
+		char svalue[MAXLLEN];
+		unsigned long stat;
+		stat = snprintf(svalue,sizeof(svalue),"%s%s",vara->sval,varb->sval);
+		if(stat>=sizeof(svalue)) MESG("truncated s+s");
+		if(!vara_type_is_pointer && vara->var_alloced) free(vara->sval);
+		bnf_var->sval=strdup(svalue);
+		bnf_var->var_alloced=1;
+ 		return;
+	} else if(vara->var_type==VTYPE_NUM) {
+		char svalue[MAXLLEN];
+		unsigned long stat;
+		double l0 = trunc(vara->dval);
+		if(l0 == vara->dval) stat=snprintf(svalue,sizeof(svalue),"%.0f%s",l0,varb->sval);
+		else stat=snprintf(svalue,sizeof(svalue),"%f%s",vara->dval,varb->sval);
+
+		if(stat>=sizeof(svalue)) MESG("truncated s+s");
+		vara->sval=strdup(svalue);
+		vara->var_alloced=1;
+		vara->var_type=VTYPE_STRING;
+		return;
+	} else if(vara->var_type==VTYPE_SARRAY) {
+		// TDB
+		// sarray_add1(avar->adat,bvar->sval);
+	}
+ 
+ } else if(varb->var_type==VTYPE_ARRAY) {
+ 	if(vara->var_type==VTYPE_NUM) {
+		array_dat *adat=dup_array_add1(varb->adat,vara->dval);
+		vara->adat=adat;
+		vara->var_type=VTYPE_ARRAY;
+		vara->var_alloced=1;
+		return;
+	};
+ };
+#if	0
  if(varb->var_type==VTYPE_POINTER) {
  	if(varb->var_pointer->var_type==VTYPE_NUM) {
 		if(vara->var_type==VTYPE_POINTER) {
@@ -485,7 +554,10 @@ void bnf_factor_plus()
 			// MESG("- plus varb pointer string %s",varb->var_pointer->sval);
 		};
 		return;
+	} else if(varb->var_pointer->var_type==VTYPE_ARRAY) {
+		
 	};
+
  } else if(varb->var_type==VTYPE_NUM) {
  	if(vara->var_type==VTYPE_POINTER) {
 		if(vara->var_pointer->var_type==VTYPE_NUM) {
@@ -546,6 +618,7 @@ void bnf_factor_plus()
 	// MESG("string plus ind=%d [%s]",(int)(bnf_var-bnf_vars),bnf_var->sval);
 	return;
  };
+#endif
  	set_error(tok,1028,"plus error");
  	// MESG("plus error! atype=%d btype=%d [%s]",typea,typeb,tok_info(tok));
 }
