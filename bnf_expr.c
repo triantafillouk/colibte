@@ -610,6 +610,7 @@ void bnf_factor_minus()
 	// MESG("plus varb=num!");
  } 
  	MESG("minus error! atype=%d btype=%d [%s]",typea,typeb,tok_info(tok));
+	set_error(tok,1029,"minus error");
 }
 
 inline static void bnf_factor_np_num_mul()
@@ -877,7 +878,7 @@ inline static void bnf_factor_equal()
 
 inline static void bnf_factor_notequal()
 {
- MESG("bnf_factor_notequal : var ind=%d tok ind=%d var type=%d",bnf_var-&bnf_vars[0],tok->tnum,bnf_var->var_type);
+ // MESG("bnf_factor_notequal : var ind=%d tok ind=%d var type=%d",bnf_var-&bnf_vars[0],tok->tnum,bnf_var->var_type);
  MVAR *varb = bnf_var;
  	if(varb->var_type==VTYPE_POINTER) varb=varb->var_pointer;
 	prev_var("notequal");
