@@ -1,6 +1,5 @@
 
 extern array_dat *main_args;
-// extern char *ex_name;
 extern FILEBUF *cbfp;
 extern BTREE *global_types_tree;
 extern char *vtype_names[];
@@ -115,7 +114,7 @@ void bnf_index()	// ?? TBD!!
 }
 
 /* get array determinant */
-void bnf_determinant()	/* TBD  */
+void bnf_determinant()	/* TBC  */
 {
 	double value=0;
 	bnf_function_args(1);
@@ -132,7 +131,7 @@ void bnf_determinant()	/* TBD  */
 	};
 	bnf_var->var_type=VTYPE_NUM;
 	bnf_var->dval=value;
-	MESG("	determinant: %f var@=%d",value,(int)(bnf_var-bnf_vars));
+	// MESG("	determinant: %f var@=%d",value,(int)(bnf_var-bnf_vars));
 }
 
 void bnf_inverse()	/* TBC  */
@@ -271,7 +270,7 @@ void bnf_print()
 		
 		bnf_expression();
 		MVAR *avar=(bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
-		MESG("	bnf_print: after %d expression var@=%d type=%d [%s]",i,VARIND,bnf_var->var_type,tok_info(tok));
+		// MESG("	bnf_print: after %d expression var@=%d type=%d [%s]",i,VARIND,bnf_var->var_type,tok_info(tok));
 		// show_result();
 		switch(avar->var_type) {
 			case VTYPE_ARRAY:
@@ -543,7 +542,7 @@ void bnf_input()	/* TBC  */
 }
 
 // prompt and get a numeric value
-void bnf_dinput()	/* TBD  */
+void bnf_dinput()	/* TBC  */
 {
 	bnf_function_args(1);
 	MVAR *va=bnf_var;
@@ -727,7 +726,7 @@ void bnf_mainargsize()	/* TBC  */
 	bnf_var->dval = main_args->cols;
 }
 
-void bnf_mainarg()	/* TBD  */
+void bnf_mainarg()	/* TBC  */
 {
 	if(!main_args) { ntoken();};
 

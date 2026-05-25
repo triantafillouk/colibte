@@ -397,13 +397,13 @@ static void bnf_factor_spn_plus()
 
 void bnf_factor_plus()
 {
- MESG(";bnf_factor_plus: var@=%d [%s]",VARIND,tok_info(tok));
+ // MESG(";bnf_factor_plus: var@=%d [%s]",VARIND,tok_info(tok));
  MVAR *varb = bnf_var;
 	prev_var("plus");
  MVAR *vara = bnf_var;
  int typea=vara->var_type;
- // int typeb=varb->var_type;
- MESG("	typea=%d typeb=%d",vara->var_type,varb->var_type);
+
+ // MESG("	typea=%d typeb=%d",vara->var_type,varb->var_type);
  if(typea==VTYPE_POINTER) {
  	typea=vara->var_pointer->var_type;
  	// MESG("bnf_factor_plus [%2d]: var@=%d  va pointer=%d vb=%d",tok->tnum,VARIND,typea,varb->var_type);
@@ -561,7 +561,7 @@ inline static void  bnf_factor_pn_minus()
 
 void bnf_factor_minus()
 {
- MESG(";bnf_factor_minus: var@=%d tok ind=%d var type=%d",VARIND,tok->tnum,bnf_var->var_type);
+ // MESG(";bnf_factor_minus: var@=%d tok ind=%d var type=%d",VARIND,tok->tnum,bnf_var->var_type);
  MVAR *varb = bnf_var;
  prev_var("minus");
  MVAR *vara = bnf_var;
@@ -1649,11 +1649,13 @@ void bnf_dir_fori()
 	// MESG("	fori: before block execute ind=%ld tok=[%s]",ind,tok_info(tok));
 	// set block start
 	start_block=tok;	/* this is a block start or a simple sentence  */
-	start_block++;	
+	int is_curl=tok->ttype==TOK_LCURL;
+	if(is_curl) start_block++;	
 	// MESG("	fori start of block token [%s]",tok_info(start_block));
 	// find token after the end of block
 	skip_sentence1();
 	end_block=tok;
+	if(!is_curl) end_block-=2;
 	// MESG("	fori end of block token [%s]",tok_info(tok));
 
 	if(dinit==dmax) {
@@ -1661,13 +1663,19 @@ void bnf_dir_fori()
 		current_active_flag=old_active_flag;
 		return;
 	};
-	if(dstep>0 && dmax > *iterrator_val) {
 
+	// MESG("# fori: start var@=%d, start_block=[%s]",VARIND,tok_info(start_block));
+	int start_var=VARIND;
+	if(is_curl) {
+
+	if(dstep>0 && dmax > *iterrator_val) {
 		for(;*iterrator_val < dmax; *iterrator_val +=dstep) {
 			tok=start_block;
 			// MESG("# fori: iterrator_val=%3f var@=%d, [%s]",*iterrator_val,VARIND,tok_info(tok));
+			bnf_var=bnf_vars+start_var;
 			bnf_block1();
-			// MESG("	fori:2 iterrator_val=%3f var@=%d, [%s]",*iterrator_val,VARIND,tok_info(tok));
+			
+			// MESG("	fori:2 iterrator_val=%3f start var=%d var@=%d, [%s]",*iterrator_val,start_var,VARIND,tok_info(tok));
 			if(current_active_flag==0) {
 				// MESG("end loop!:");
 				if(is_break1) { tok=exe_buffer->end_token;return;};
@@ -1687,9 +1695,29 @@ void bnf_dir_fori()
 		err_num=226;
 		ERROR("error: infinite fori loop %d",err_num);
 	};
+
+	} else {
+		if(dstep>0 && dmax > *iterrator_val) {
+			for(;*iterrator_val < dmax; *iterrator_val +=dstep) {
+				tok=start_block;
+				// MESG("# fori: iterrator_val=%3f var@=%d, [%s]",*iterrator_val,VARIND,tok_info(tok));
+				bnf_var=bnf_vars+start_var;
+				bnf_expression();
+				// if(VARIND>start_var) 	prev_var("fori");
+				// MESG("	fori:2 iterrator_val=%3f var@=%d, [%s]",*iterrator_val,VARIND,tok_info(tok));
+			};
+		} else if(dstep<0 && dmax< *iterrator_val) {
+			for(; *iterrator_val > dmax; *iterrator_val +=dstep) {
+				tok=start_block;
+				bnf_expression();prev_var("fori");
+			};
+		} else {
+			err_num=226;
+			ERROR("error: infinite fori loop %d",err_num);
+		};
+	};
 	tok=end_block;
-	// ind=bnf_var-bnf_vars;
-	// MESG("	fori: at end of block ind=%ld tok=[%s]",ind,tok_info(tok));
+	// MESG("	fori:end iterrator_val=%3f var@=%d, [%s]",*iterrator_val,VARIND,tok_info(tok));
 
 	current_active_flag=old_active_flag;
 }
