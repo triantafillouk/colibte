@@ -1,4 +1,4 @@
-# test input not ok in both! TBD
+# test input ok in both! TBC
 
 a=0
 b=50

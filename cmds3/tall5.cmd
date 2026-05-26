@@ -1,4 +1,4 @@
-# string minus string TBD in bnf
+# ok, TBC from 899
 cls
 # examples
 # variables, strings and conditional expressions

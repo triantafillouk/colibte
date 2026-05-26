@@ -186,6 +186,7 @@ int shell_cmd(num nused)
 {
     int    s;	/* return status from CLI */
     char	tline[MAXLLEN]; 	/* command line send to shell */
+	MESG(">	shell_cmd:");
 	tline[0]=0;
     if ((s=nextarg("!", tline, MAXLLEN,true)) != TRUE) return(s);
 	s=exec_shell(tline);

@@ -4233,7 +4233,7 @@ int refresh_current_buffer(num nused)
  INIT_STAGE;
 
  /* clear parse list  */
- // MESG("refresh_current_buffer: call empty_tok_table: [%s]",fp->b_fname);
+ MESG("refresh_current_buffer: call empty_tok_table: [%s]",fp->b_fname);
  empty_tok_table(fp);
  clean_saved_string(0);
  fp->err=-1;
@@ -4293,7 +4293,7 @@ int parse_check_current_buffer(num n)
  err_num=0;
  err_line=0;
  show_stage=1;
- // MESG("parse_check_current_buffer: %d",is_mlang(fp));
+ MESG("parse_check_current_buffer: %d",is_mlang(fp));
  if(!is_mlang(fp)) return 0;
 
  /* clear parse list  */
@@ -4529,7 +4529,7 @@ int show_parse_buffer(num n)
  tok_struct *tok_table,*tok_ind;
  fp=cbfp;
 
- // MESG("show_parse_buffer:");
+ MESG("show_parse_buffer:");
  if(!is_mlang(fp)) return 0;
 
  err_num=0;
@@ -4679,7 +4679,8 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 	} else {
 		/* slval has already the next argument */
 		// MESG("nextarg: slval=%s",get_sval());	
-		strlcpy(buffer,get_sval(),size);
+		if(exebnf) strlcpy(buffer,bnf_var->sval,size);
+		else strlcpy(buffer,get_sval(),size);
 	};
 	return(TRUE);
 }
