@@ -1502,7 +1502,7 @@ double factor_assign_type()
 		// MESG("	end: size2=%d [%s]",size2,tok_info(tok));
 	};
 
-	array_dat *adat=alloc_array();
+	array_dat *adat=alloc_array_header();
 	adat->rows=size2;
 	adat->cols=columns;
 	adat->atype=VTYPE_AMIXED;
@@ -1593,11 +1593,12 @@ double factor_array2()
 	// MESG("factor_array2: %s",tok->tname);
 	array_slot=get_left_slot(tok->tind);
 	adat=array_slot->adat;
+	char *array_name=tok->tname;
 	lstoken=tok;
 	// MESG("factor_array2: type %d",adat->atype);
 	
 	if(adat==NULL) {
-#if	1
+#if	0
 		set_error(tok,209,"array indexes out of bound!");
 		return(0);
 #else
@@ -1607,29 +1608,34 @@ double factor_array2()
 		NTOKEN2;
 		ind2=(int)num_expression();
 		NTOKEN2;
-		adat = new_array(ind1+1,ind2+1);
-
+		adat = new_array(ind1+1,ind2+1,VTYPE_ARRAY);
+		allocate_array(adat);
+		adat->atype=VTYPE_ARRAY;
+		adat->array_name = array_name;
 		array_slot->adat = adat;
-		tok0->adat = adat;
+		MESG("created a 2 dim array!");
+		MESG("	array name=%s",array_name);
 		print_array1("new array created",adat);
-		dval2 = adat->dval2;
 
 		// MESG("new rows=%d cols=%d",adat->rows,adat->cols);
-// 		NTOKEN2;
+		NTOKEN2;
 			// value=dval2[ind1][ind2];
 #endif
-	} else {
+	} else
+	{
 		NTOKEN2;
 		ind1=(int)num_expression();
 		NTOKEN2;
 		ind2=(int)num_expression();
 		NTOKEN2;
+	};
 
 		if((ind1 >= adat->rows) || (ind2 >= adat->cols)) {
 			// syntax_error("array indexes out of bound!",209);
 			set_error(tok0,209,"array indexes out of bound!");
 		} else {
 			if(adat->atype==VTYPE_ARRAY) {
+				MESG("- 2 dim num array!");
 				double **dval2 = adat->dval2;
 				set_vtype(VTYPE_NUM);
 				value=dval2[ind1][ind2];
@@ -1665,7 +1671,7 @@ double factor_array2()
 				};
 			};
 		};
-	};
+
 	// MESG("end factor_array2: lsslot=%X",(void *)lsslot);
 	return(value);
 }
@@ -1726,7 +1732,7 @@ double factor_array1()
 	if(adat==NULL) {	/* this must not happen!!!  */
 		// MESG("array adat is NULL allocate new one !!!!!!!!!!!!");
 		ex_nums=1;
-		adat=new_array(ind1+1,1);
+		adat=new_array(ind1+1,1,VTYPE_ARRAY);
 		array_slot->adat=adat;
 		array_slot->var_type=VTYPE_ARRAY;
 		allocate_array(array_slot->adat);	/*   */
@@ -2239,13 +2245,13 @@ static double term1_mul(double v1)
 			return 1;
 		};
 		if(vtype_is(VTYPE_ARRAY)) {
-			array_dat *new_array = get_array("11");
-			if(loc_array->rows==1 && new_array->cols==1) {
-				if(loc_array->cols== new_array->rows) {
+			array_dat *array1 = get_array("11");
+			if(loc_array->rows==1 && array1->cols==1) {
+				if(loc_array->cols== array1->rows) {
 					int i;
 					v1=0;
 					for(i=0;i<loc_array->cols;i++){
-						v1 += loc_array->dval[i]*new_array->dval[i];
+						v1 += loc_array->dval[i]*array1->dval[i];
 					};
 					set_vtype(VTYPE_NUM);
 					// free old ex_array ???
@@ -2845,13 +2851,13 @@ double term_plus(double value)
 		return 0;
 	};
 	if(vtype2==VTYPE_ARRAY) { // num + array
-		array_dat *new_array = get_array("18");
+		array_dat *array1 = get_array("18");
 		// MESG("term_plus: numeric + array");
-		if(new_array->astat==ARRAY_LOCAL) {
-			set_array(dup_array_add1(new_array,value));
+		if(array1->astat==ARRAY_LOCAL) {
+			set_array(dup_array_add1(array1,value));
 			ex_name="New array,add to numeric";
 		} else {
-			array_add1(new_array,value);
+			array_add1(array1,value);
 			ex_name=tok->tname;
 		};
 		set_vtype(VTYPE_ARRAY);
@@ -2910,10 +2916,10 @@ double term_plus(double value)
 				if(vtype2==VTYPE_NUM) { // add numeric to array
 					MESG("	array + numeric");
 					if(loc_array->astat==ARRAY_LOCAL) {
-						array_dat *new_array;
-						new_array=dup_array_add1(loc_array,d1);
-						set_array(new_array);
-						print_array1("after a+num",new_array);
+						array_dat *array1;
+						array1=dup_array_add1(loc_array,d1);
+						set_array(array1);
+						print_array1("after a+num",array1);
 					} else {
 						array_add1(loc_array,d1);
 					};
@@ -2951,10 +2957,10 @@ double term_plus(double value)
 				if(vtype2==VTYPE_NUM) { // add numeric to array
 					MESG("	mixed array + numeric");
 					if(loc_array->astat==ARRAY_LOCAL) {
-						array_dat *new_array;
-						new_array=dup_array_add1(loc_array,d1);
-						set_array(new_array);
-						print_array1("after a+num",new_array);
+						array_dat *array1;
+						array1=dup_array_add1(loc_array,d1);
+						set_array(array1);
+						print_array1("after a+num",array1);
 					} else {
 						array_add1(loc_array,d1);
 					};
@@ -3003,12 +3009,12 @@ double term_minus(double value)
 		return value-d1;
 	};
 	if(vtype_is(VTYPE_ARRAY)) {
-		array_dat *new_array=get_array("22");
-		if(new_array->astat==ARRAY_LOCAL) {
-			set_array(dup_array_sub1(new_array,value));
+		array_dat *array1=get_array("22");
+		if(array1->astat==ARRAY_LOCAL) {
+			set_array(dup_array_sub1(array1,value));
 			ex_name="New array,subtract from numeric";
 		} else {
-			array_sub1(new_array,value);
+			array_sub1(array1,value);
 			ex_name="Subtract from numeric";
 		};
 		set_vtype(VTYPE_ARRAY);
@@ -3583,14 +3589,14 @@ double assign_val(double none)
 	} else {
 		// MESG("	same type!");
 		if(vtype_is(VTYPE_ARRAY) || vtype_is(VTYPE_SARRAY)) {
-			array_dat *new_array = get_array("32");
-			if(new_array->anum != sslot->adat->anum) {
+			array_dat *array1 = get_array("32");
+			if(array1->anum != sslot->adat->anum) {
  				if(sslot->adat->dval) free_array("assign",sslot->adat);
 				if(sslot->adat->sval) {
 					// MESG("free string array!");
 				};
-				sslot->adat=new_array;
-				if(new_array->astat==ARRAY_ALLOCATED) new_array->astat=ARRAY_LOCAL;	/* make it local to variable  */
+				sslot->adat=array1;
+				if(array1->astat==ARRAY_ALLOCATED) array1->astat=ARRAY_LOCAL;	/* make it local to variable  */
 			};
 			return(v1);
 		};
@@ -4167,9 +4173,9 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		show_var_stats();
 		// MESG("show result!");
 		MVAR *result = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
-		if(result->var_type==VTYPE_NUM) msg_line("Result is [%f]",num_result());
-		else if(result->var_type==VTYPE_STRING) msg_line("Result is [%s]",string_result());
-		else msg_line("Result is type %d",bnf_var->var_type);
+		if(result->var_type==VTYPE_NUM) msg_line("Result at var@=%d [%f]",VARIND,num_result());
+		else if(result->var_type==VTYPE_STRING) msg_line("Result at var@=%d [%s]",VARIND,string_result());
+		else msg_line("Result at var@=%d is type %d",VARIND,bnf_var->var_type);
 		MESG("	result var@=%d",(int)(bnf_var-bnf_vars));
 	} else {
 		if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());

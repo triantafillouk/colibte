@@ -69,11 +69,11 @@ typedef struct array_dat {
 		BTREE *var_tree;
 	};
 	union {
-		void *dat;
-		double *dval;
-		double **dval2;
-		char **sval;
-		struct MVAR *mval;
+		void *dat;		// onother array ??
+		double *dval;	// one dim num array
+		double **dval2;	// two dim num array
+		char **sval;	// ?? dim string array
+		struct MVAR *mval;	// ?? dim mixed array
 	};
 } array_dat;
 

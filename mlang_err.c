@@ -664,6 +664,7 @@ int err_factor()
 		cdim=1;
 		ex_nvars=0;ex_nquote=0;ex_nums=0;	/* initialize table counters  */
 		ex_array=NULL;
+		int ctype=VTYPE_ARRAY;
 		while(cdim>0){
 		while(1) {
 			// MESG("	err: lbra: type=%d [%s] %f",tok->ttype,tok->tname,tok->dval);
@@ -710,7 +711,11 @@ int err_factor()
 			// MESG("err_lb: free array!");
 			free(tok0->tok_adat);
 		};
-		tok0->tok_adat = new_array(rows,cols);
+		if(ex_nvars) ctype=VTYPE_AMIXED;
+		else if(ex_nquote>0 && ex_nums>0) ctype=VTYPE_AMIXED;
+		else if(ex_nquote) ctype=VTYPE_SARRAY;
+		
+		tok0->tok_adat = new_array(rows,cols,ctype);
 		tok0_bnf->tok_adat = tok0->tok_adat;
 		// MESG("	err: CREATED new array %d [%d %d]",tok0->tok_adat->anum,rows,cols);
 		stack_push("4789",tok,-tok->ttype);

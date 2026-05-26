@@ -6,10 +6,10 @@ extern char *vtype_names[];
 
 void mesg_out(const char *fmt, ...);
 void init_stack();
-tok_struct *current_token();
-void set_vtype(int type);
-int vtype_is(int type);
-int get_vtype();
+// tok_struct *current_token();
+// void set_vtype(int type);
+// int vtype_is(int type);
+// int get_vtype();
 void set_array(array_dat *a);
 array_dat *get_array(char *);
 void set_nsval(char *,int);
@@ -80,26 +80,35 @@ void bnf_array_cols()
 {
 	bnf_function_args(1);
 	MVAR *va=bnf_var;
-	if(va->var_type==VTYPE_ARRAY||va->var_type==VTYPE_SARRAY) {
-		va->dval=va->adat->cols;
-	} va->dval=0;
-	va->var_type = VTYPE_NUM;
+	// MESG("array_cols: va type=%d",va->var_type);
+	if(va->var_type==VTYPE_POINTER) va=bnf_var->var_pointer;
+	// MESG("array [%s] c=%d r=%d",va->adat->array_name,va->adat->cols,va->adat->rows);
+	if(va->var_type==VTYPE_ARRAY||va->var_type==VTYPE_SARRAY||va->var_type==VTYPE_AMIXED) {
+		bnf_var->dval=va->adat->cols;
+	} else bnf_var->dval=0;
+	// MESG("	var@=%d  %d",VARIND,(int)bnf_var->dval);
+	bnf_var->var_type = VTYPE_NUM;
 }
 
 void bnf_array_rows()
 {
 	bnf_function_args(1);
 	MVAR *va=bnf_var;
-	if(va->var_type==VTYPE_ARRAY||va->var_type==VTYPE_SARRAY) {
-		va->dval = va->adat->rows;
-	} else va->dval=0;
-	va->var_type=VTYPE_NUM;
+	// MESG("array_rows: va type=%d",va->var_type);
+	if(va->var_type==VTYPE_POINTER) va=bnf_var->var_pointer;
+	// MESG("array [%s] c=%d r=%d",va->adat->array_name,va->adat->cols,va->adat->rows);
+	if(va->var_type==VTYPE_ARRAY||va->var_type==VTYPE_SARRAY||va->var_type==VTYPE_AMIXED) {
+		// MESG("	set rows to %d",va->adat->rows);
+		bnf_var->dval = va->adat->rows;
+	} else bnf_var->dval=0;
+	// MESG("	var@=%d  %d",VARIND,(int)bnf_var->dval);
+	bnf_var->var_type=VTYPE_NUM;
 }
 
 /* clear output buffer */
 void bnf_cls()
 {
-	// ntoken();
+	/* clear screen with ncursor TBD  */
 	if(check_token(TOK_RPAR)) ntoken();
 	cls_fout("[out]");
 	MESG("<-[%s: %s ------------------------------------------------------------->",cbfp->b_fname,VERSION);
@@ -107,7 +116,6 @@ void bnf_cls()
 
 void bnf_index()	// ?? TBD!!
 {
-	// ntoken();
 	MESG("new index!");
 	// bnf_var->dval=VTYPE_TREE;
 	bnf_var->var_type=VTYPE_TREE;
@@ -261,7 +269,7 @@ void bnf_mid()	/* TBC  */
 void bnf_print()
 {
 	int args=tok->number_of_args;
-	// MESG("bnf_print: tnum=%d args=%d var index=%d",tok->tnum,tok->number_of_args,VARIND);
+	// MESG("bnf_print: tnum=%d args=%d var@=%d",tok->tnum,tok->number_of_args,VARIND);
 	int i;
 	next_var("print0");
 	for(i=0;i<args;i++) {
@@ -299,7 +307,7 @@ void bnf_print()
 		// MESG("	if: after switch tnum=%d ttype=%d",tok->tnum,tok->ttype);
 	};
 	out_print("",1);
-	next_var("pend");
+	// next_var("pend");
 	// MESG("bnf_print: >> end var@=%d",VARIND);
 }
 
@@ -388,13 +396,13 @@ void bnf_chr()	/* TBC  */
 {
 	bnf_function_args(1);
 	MVAR *va=bnf_var;
-	clean_saved_string(1);
-	char *slocal=get_sval();
-	slocal[0] = (int)va[0].dval;
-	slocal[1] = 0;
 
+	char s[2];
+	s[0] = (int)va[0].dval;
+	s[1] = 0;
+	bnf_var->sval=strdup(s);
 	bnf_var->var_type=VTYPE_STRING;
-	// free(va);
+	bnf_var->var_alloced=1;
 }
 
 void bnf_getchar() /* TBC  */
@@ -504,12 +512,12 @@ void bnf_wait()	/* TBC  */
 {
 	int f_entry=entry_mode;
 	entry_mode=KENTRY;
-	bnf_function_args(1);
+	bnf_function_args(1);	/* get prompt  */
 	MVAR *va=bnf_var;
 	if(va[0].var_type==VTYPE_STRING) msg_line("[%s] waiting.. ",va[0].sval);
 	else msg_line("<%f> wait for key",va[0].dval);
 
-	char *slocal=get_sval();
+	char slocal[2];
 	if(execmd) {
 		slocal[0]=getc(stdin);
 	} else {
@@ -527,10 +535,10 @@ void bnf_wait()	/* TBC  */
 void bnf_input()	/* TBC  */
 {
 	int f_entry=entry_mode;
-	bnf_function_args(1);
+	bnf_function_args(1);	/* get the prompt!  */
 	MVAR *va=bnf_var;
 	entry_mode=KENTRY;	/* get input from screen */
-	// clean_saved_string(80);
+
 	char *slocal=(char *)malloc(80);
 	if(va[0].var_type!=VTYPE_STRING) getstring("Input :",slocal,80,true);
 	else getstring(va->sval,slocal,80,true);
@@ -546,11 +554,10 @@ void bnf_dinput()	/* TBC  */
 {
 	bnf_function_args(1);
 	MVAR *va=bnf_var;
-	clean_saved_string(80);
-	if(va[0].var_type!=VTYPE_STRING) getstring("DInput :",get_sval(),80,true);
-	getstring(va[0].sval,get_sval(),80,true);
-	bnf_var->dval=atof(get_sval());
-	clean_saved_string(0);
+	char sval[80];
+	if(va[0].var_type!=VTYPE_STRING) getstring("DInput :",sval,80,true);
+	getstring(va[0].sval,sval,80,true);
+	bnf_var->dval=atof(sval);
 	bnf_var->var_type=VTYPE_NUM;
 }
 
@@ -733,15 +740,14 @@ void bnf_mainarg()	/* TBC  */
 	bnf_function_args(1);
 	MVAR *va=bnf_var;
 	int ind;
-	// double value=0;
+
 	ind=(int)va[0].dval;
 	if(ind<main_args->cols) {
-		// set_sval(main_args->sval[(int)va[0].dval]);
 		bnf_var->sval=main_args->sval[(int)va[0].dval];
 		bnf_var->var_type=VTYPE_STRING;
-		// value=atof(get_sval());
+		bnf_var->var_alloced=0;
 	} else {
-		set_vtype(VTYPE_NUM);
+		bnf_var->var_type=VTYPE_NUM;
 	};
 }
 
@@ -853,5 +859,6 @@ v_function bnf_functions[] = {
 	{"list_tokens",0,bnf_list_tokens},	/* list_tokens  */
 	{"var_index",0,bnf_var_index},	/* show stack var index  */
 	{"test_loop",1,bnf_test_loop},	/* test computational loop  */
+	// {"array_fixed_to_num",1,bnf_array_fixed_to_num},
 	{NULL,0,NULL}
 };

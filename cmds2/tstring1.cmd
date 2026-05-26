@@ -1,4 +1,4 @@
-# check string operations chr segfaults in bnf TBD
+# check string operations bnf ok TBC
 cls
 bs="butterfly"
 

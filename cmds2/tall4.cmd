@@ -1,5 +1,5 @@
 # test all language structures
-# TBD check result normal may be wrong!
+# TBC check result normal may be wrong!
 cls
 
 ok=1

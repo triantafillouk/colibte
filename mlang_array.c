@@ -13,22 +13,23 @@ array_dat * transpose2(array_dat *a,array_dat *b,double det);
 array_dat * cofactor(array_dat *numa,double det);
 array_dat *cofactor2inverse(array_dat *faca, double det);
 void print_array1(char *title,array_dat *adat);
-struct array_dat *new_array(int rows,int cols);
+struct array_dat *new_array(int rows,int cols,int array_type);
 struct array_dat *new_array_similar(array_dat *a);
 void allocate_array(struct array_dat *adat);
 extern char *vtype_names[];
 
-void init_array(struct array_dat *array, int rows,int cols)
+void init_array_header(struct array_dat *array, int rows,int cols,int ctype)
 {
+#if	0
 	int ctype=VTYPE_ARRAY;	/* default is numeric!!  */
-	// MESG("init_array: ex_nvars=%d ex_nquote=%d",ex_nvars,ex_nquote);
+	// MESG("init_array_header: ex_nvars=%d ex_nquote=%d",ex_nvars,ex_nquote);
 	if(ex_nvars) ctype=VTYPE_AMIXED;
 	else if(ex_nquote>0 && ex_nums>0) ctype=VTYPE_AMIXED;
 	else if(ex_nquote) ctype=VTYPE_SARRAY;
 	else ctype=VTYPE_ARRAY;
-
 	// MESG("init_array: ex_nums=%d ex_nquote=%d ex_nvars=%d ->ctype=%d",ex_nums,ex_nquote,ex_nvars,ctype);
-	MESG("init_array: rows=%d cols=%d",rows,cols);
+#endif
+	MESG("init_array_header: rows=%d cols=%d array_type=%d",rows,cols,ctype);
 	array->rows=rows;
 	array->cols=cols;
 	array->atype=ctype;
@@ -37,7 +38,7 @@ void init_array(struct array_dat *array, int rows,int cols)
 	set_vtype(ctype);
 	/* init again after use the ex values!  */
 	ex_nums=0;ex_nquote=0;ex_nvars=0;
-	MESG("init_array: type=%d rows=%d cols=%d",array->atype,array->rows,array->cols);
+	MESG("init_array_header: type=%d rows=%d cols=%d",array->atype,array->rows,array->cols);
 }
 
 /* List array is one dimensional string array  */
@@ -46,7 +47,7 @@ struct array_dat * new_list_array(int cols)
 	struct array_dat *sarray;
 	ex_nquote=1;
 	// MESG("new_list_array: cols=%d",cols);
-	sarray = new_array(1,cols);
+	sarray = new_array(1,cols,VTYPE_SARRAY);
 	return sarray;
 }
 
@@ -148,10 +149,10 @@ void allocate_array(struct array_dat *adat)
 }
 
 // allocate array header
-struct array_dat *alloc_array()
+struct array_dat *alloc_array_header()
 {
  static int array_num=0;
- // MESG("alloc_array:");
+ // MESG("alloc_array_header:");
  array_dat *na=(array_dat *)malloc(sizeof(struct array_dat));
  na->anum = array_num++;
  na->var_tree=NULL;
@@ -163,7 +164,7 @@ struct array_dat *new_array_similar(array_dat *a)
 {
  array_dat *na;
  // MESG("new_array_similar:");
- na=alloc_array();
+ na=alloc_array_header();
  na->rows=a->rows;
  na->cols=a->cols;
  na->atype=a->atype;
@@ -173,12 +174,13 @@ struct array_dat *new_array_similar(array_dat *a)
  return(na); 
 }
 
-struct array_dat *new_array(int rows,int cols)
+struct array_dat *new_array(int rows,int cols,int array_type)
 {
 	struct array_dat *array;
-	array=alloc_array();
-	MESG("new_array: rows=%d cols=%d",rows,cols);
-	init_array(array,rows,cols);
+	array=alloc_array_header();
+	MESG("new_array: rows=%d cols=%d type=%d",rows,cols,array_type);
+
+	init_array_header(array,rows,cols,array_type);
 	// MESG("new_array:%d rows=%d cols=%d",array->anum,rows,cols);
 	return(array);
 }
@@ -307,7 +309,7 @@ array_dat * array_mul2(array_dat *aa,array_dat *ba)
    int result_rows=aa->rows;
    int i,j,k;
    MESG("array_mul2: a (%d %d) b (%d %d)",aa->rows,aa->cols,ba->rows,ba->cols);
-	na=new_array(result_rows,result_cols);
+	na=new_array(result_rows,result_cols,VTYPE_ARRAY);
 	na->atype=aa->atype;
 	allocate_array(na);
 	if(aa->atype==VTYPE_ARRAY) {
@@ -637,7 +639,8 @@ double determinant(array_dat *aa)
     }
   else
     {
-	ba=new_array(k,k);allocate_array(ba);
+	ba=new_array(k,k,VTYPE_ARRAY);
+	allocate_array(ba);
   	b=ba->dval2;
     det=0;
 
@@ -670,11 +673,11 @@ array_dat * cofactor2(array_dat *numa,double det)
  num=numa->dval2;
  ex_nums=1;	/* this is a numerical array!  */
  // MESG("coactor2:");
-  faca=new_array(dim,dim);allocate_array(faca);
+  faca=new_array(dim,dim,VTYPE_ARRAY);allocate_array(faca);
   fac=faca->dval2;
 
  if(dim>2) {
-  ba=new_array(dim-1,dim-1);allocate_array(ba);
+  ba=new_array(dim-1,dim-1,VTYPE_ARRAY);allocate_array(ba);
   b=ba->dval2;
  for (q=0;q<dim;q++)
  {
@@ -747,11 +750,11 @@ array_dat * cofactor(array_dat *numa,double det)
  num=numa->dval2;
  ex_nums=1;	/* a numerical array!  */
  // MESG("coactor:");
-  faca=new_array(dim,dim);allocate_array(faca);
+  faca=new_array(dim,dim,VTYPE_ARRAY);allocate_array(faca);
   fac=faca->dval2;
 
  if(dim>2) {
-  ba=new_array(dim-1,dim-1);allocate_array(ba);
+  ba=new_array(dim-1,dim-1,VTYPE_ARRAY);allocate_array(ba);
   b=ba->dval2;
  for (q=0;q<dim;q++)
  {
@@ -822,7 +825,7 @@ array_dat *transpose2(array_dat *numa,array_dat *faca, double det)
   fac=faca->dval2;
   ex_nums=1;	/* a numerical array  */
   // MESG("transpose2:");
-  inversea=new_array(dim,dim); allocate_array(inversea);
+  inversea=new_array(dim,dim,VTYPE_ARRAY); allocate_array(inversea);
   inverse = inversea->dval2;
 
 //  d=determinant(numa);
@@ -842,7 +845,7 @@ array_dat *transpose(array_dat *array1)
   array_dat *tarray;
   ex_nums=1;	/* a numerical array  */
   // MESG("transpose:");
-  tarray=new_array(array1->cols,array1->rows);
+  tarray=new_array(array1->cols,array1->rows,VTYPE_ARRAY);
   allocate_array(tarray);
   if(array1->rows==1 || array1->cols==1) {
 	int dim=1;
@@ -870,7 +873,7 @@ array_dat *cofactor2inverse(array_dat *faca, double det)
   fac=faca->dval2;
   ex_nums=1;	/* a numerical array  */
   // MESG("cofactor2inverse:");
-  inversea=new_array(dim,dim); allocate_array(inversea);
+  inversea=new_array(dim,dim,VTYPE_ARRAY); allocate_array(inversea);
   inverse = inversea->dval2;
 
   /* use the adjoint of coofactor and divide with determinant!  */

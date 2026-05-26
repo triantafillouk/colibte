@@ -65,5 +65,6 @@ m_function m_functions[] = {
 	{"list_tokens",0,uf_list_tokens},	/* list_tokens  */
 	{"var_index",0,uf_var_index},
 	{"test_loop",1,uf_test_loop},	/* test computational loop  */
+	// {"array_fixed_to_num",1,uf_array_fixed_to_num},
 	{NULL,0,NULL}
 };

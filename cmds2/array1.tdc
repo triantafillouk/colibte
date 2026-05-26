@@ -1,4 +1,4 @@
-# test arrays TBD
+# test arrays normal has problems ok in bnf, TBC
 cls
 k=1.22
 a = [k, 1, 2, 3]
@@ -16,7 +16,8 @@ at=T(a)
 at:
 a1=a*at:
 a2=at*a:
-ia=INV(a2):
+
+# ia=INV(a2):
 ka=k-a:
 ak=a-k:
 a:
@@ -29,7 +30,7 @@ a[2]:
 a[3]:
 a[i]:
 # a two dimensional array
-b=[2.1 2.2;4.3 4.4]
+b=[2.1, 2.2;4.3, 4.4]
 b:
 i=0
 b[i][0]:

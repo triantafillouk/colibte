@@ -1,4 +1,4 @@
-# aray a+b	bnf TBD
+# aray a+b	bnf ok TBC
 cls
 a=[1, 2]:array 3, slot 0 rows 1,cols 2
 print(a):array 0, slot 0 rows 1,cols 2
