@@ -11,7 +11,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.7T901 (27/5/2026)"
+#define VERSION 	 "#01.7T902 (27/5/2026)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -95,7 +95,6 @@
 #include <locale.h>
 #include <stdint.h>
 
-	/* from mc  */
 #if defined _POSIX_VERSION || (defined HAVE_LIMITS_H && !defined __GNUC__)
 # include <limits.h>
 #endif

@@ -1137,7 +1137,7 @@ int err_factor()
 		index = var_node->node_index;
 		// MESG("err: TOK_CMD");
 #if	TBNF
-		stack_push("NOT",tok0,-tok0->ttype);
+		stack_push("TOK_CMD",tok0,-tok0->ttype);
 #endif
 		pre_symbol=0;
 		if(ftable[index].arg==0) check_par=0;else check_par=1;
@@ -1208,6 +1208,7 @@ int err_factor()
 					};
 				};
 			};
+
 			if(i!=(args-1) && check_end) {
 				xpos=521; 
 				syntax_error("wrong number of arguments",xpos);
@@ -1224,6 +1225,11 @@ int err_factor()
 		macro_exec = save_macro_exec;
 		if(check_par){ 
 		// MESG(" ---- skip tok_rpar");
+#if	TBNF
+			if(tok->ttype==TOK_RPAR) {
+				stack_push("cmd rpar",tok,-tok->ttype);
+			};
+#endif
 		if(!check_skip_token_err1(TOK_RPAR,"editor command",xpos)) 
 		{
 			pnum--;
