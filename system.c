@@ -186,7 +186,7 @@ int shell_cmd(num nused)
 {
     int    s;	/* return status from CLI */
     char	tline[MAXLLEN]; 	/* command line send to shell */
-	MESG(">	shell_cmd:");
+	// MESG(">	shell_cmd:");
 	tline[0]=0;
     if ((s=nextarg("!", tline, MAXLLEN,true)) != TRUE) return(s);
 	s=exec_shell(tline);
@@ -197,12 +197,11 @@ char *get_line_at(FILEBUF *fb,offs offset);
 
 int exec_shell(char *tline)
 {
-//     int    s;	/* return status from CLI */
 	FILEBUF *bp,*bperr;
 	FILEBUF	*old_buffer=cbfp;
 	static char bname[] = "[command]";
 	static char ename[] = "[error]";
-
+	// MESG("exec_shell: cbfp = \"%s\"",cbfp->b_fname);
 	static char filnam[MAXFLEN];	//  = "/tmp/command";
 	static char filerr[MAXFLEN];
 	int status=0;
@@ -231,7 +230,7 @@ int exec_shell(char *tline)
 	if(status) {
 		sync();
 	
-		/* create and clear the command buffer */
+		// MESG("create and clear the command buffer \"%s\"",bname);
 	    if ((bp=new_filebuf(bname, 0)) != FALSE) {
 			EmptyText(bp);
 			if(bp->b_nwnd==0) {
@@ -255,15 +254,19 @@ int exec_shell(char *tline)
 			return(FALSE);
 		};
 	
+		// MESG("	select error buffer :%s",bperr->b_fname);
 		select_filebuf(bperr);
 		goto_eof(1);
+
 		ifile(bperr,filerr,0);
 		bperr->b_state &= ~FS_CHG;
 		set_Offset(0);
 		strlcpy(bp->b_dname,exec_dir,sizeof(bp->b_dname));
 		strlcpy(bperr->b_dname,exec_dir,sizeof(bp->b_dname));
+
 		select_filebuf(bp);
 		goto_eof(1);
+		// MESG("		goto end and insert %s",filnam);
 		ifile(bp,filnam,0);
 		bp->b_state &= ~FS_CHG;
 		set_Offset(0);
@@ -274,14 +277,17 @@ int exec_shell(char *tline)
 		// MESG("exec: err_lines=%ld out_lines=%ld",bperr->lines,bp->lines);
 
 		if(bp->lines<2) {
-			select_filebuf(old_buffer);
-			if(cbfp->b_flag & (FSNLIST)) dir_reload(1);
+			// MESG("select %s",old_buffer->b_fname);
+			if(exebnf||execmd) cbfp=old_buffer;
+			else {select_filebuf(old_buffer);
+				if(cbfp->b_flag & (FSNLIST)) dir_reload(1);
+			};
 		};
 		
-		if(bperr->lines<2)	msg_line("ok!");
+		if(bperr->lines<2)	msg_line("ok no errors!");
 		else if(bperr->lines==2) {
 			char *err_line1 = get_line_at(bperr,0);
-			// MESG("err: %s",err_line1);
+			MESG("err: %s",err_line1);
 			msg_line(err_line1);
 		} else msg_line("ok");
 		return(TRUE);

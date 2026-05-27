@@ -2932,27 +2932,26 @@ void bnf_factor_cmd()
 	double value=1;
 	FUNCS *ed_command;
 
-	MESG(";factor_cmd: ttype=%d command=%d",tok->ttype,tok->tok_node->node_index);
+	MESG(";factor_cmd: editor command: ttype=%d command=%d",tok->ttype,tok->tok_node->node_index);
 	function_index = tok->tok_node->node_index;
 	ed_command = ftable+function_index;
 
 	NTOKEN2;
 	save_macro_exec=macro_exec;
 	macro_exec=MACRO_MODE2;
-	MESG(";ed_command: [%s] args=%d",ed_command->n_name,ed_command->arg);
+	// MESG(";ed_command: [%s] args=%d",ed_command->n_name,ed_command->arg);
 	if(ed_command->arg) {
 		check_par=1;	/* we need parenthesis if arguments.  */
 
 		value=bnf_expression();
 		int type1=bnf_var->var_type;
-		MESG("; ed_command1 var@=%d value=%f type=%d",VARIND,value,bnf_var->var_type);
+		// MESG("; ed_command1 var@=%d value=%f type=%d",VARIND,value,bnf_var->var_type);
 		// prev_var("cmd");
 		// MESG("; ed_command2 var@=%d value=%f type=%d",VARIND,value,bnf_var->var_type);
 		// MESG(";	ed_command: value=%f %f ex_vtype=%d s=[%s] arg=%d",value,get_val(),get_vtype(),get_sval(),ed_command->arg);
-		// set_dval(value);
 		switch(ed_command->arg) {
 			case 1:{ /* one argument */
-				MESG("	one argument type=%d",type1);
+				// MESG("	one argument type=%d",type1);
 				if(type1==VTYPE_STRING) { value=1;};
 				break;
 			};
@@ -2975,20 +2974,16 @@ void bnf_factor_cmd()
 	// err_num=0;
 	err_line=tok->tline;
 	err_str=NULL;
-	MESG(";factor_cmd: execute function! current token is [%s] tnum=%d value=%d",tok->tname,tok->tnum,(int)value);
+	// MESG(";factor_cmd: execute function! current token is [%s] tnum=%d value=%d",tok->tname,tok->tnum,(int)value);
 	value=ed_command->n_func((int)value);
 
-	// set_vdval(value);
 	bnf_var->dval=value;
 	bnf_var->var_type=VTYPE_NUM;
-	// value=get_val();
-	// MESG("TOC_CMD: result %f",get_val());
 	macro_exec = save_macro_exec;
 
 	if(check_par) { 
 		if(check_rparenthesis()) {
-			NTOKEN2;
-			// MESG("right parenthesis skipped!");
+			NTOKEN2;	// MESG("right parenthesis skipped!");
 		};
 	};
 

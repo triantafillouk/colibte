@@ -4197,7 +4197,7 @@ int empty_tok_table(FILEBUF *fp)
  tok_struct *tokdel;
  MESG("empty_tok_table: of [%s]",fp->b_fname);
  if(table==NULL) {
- 	// MESG("empty_tok_table: already clean!");
+ 	MESG("empty_tok_table: already clean!");
 	return(0);
  };
  tokdel=table;

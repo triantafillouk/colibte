@@ -1988,7 +1988,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
    int status=0;
    int file;
    int temp_used=0;
-
+	// MESG("ifile0 \"%s\"",bf->b_fname);
 	bf->line_from=0;
 	if( bf->b_flag & FSDIRED ) {
 		int i;
@@ -4008,6 +4008,7 @@ void  EmptyText(FILEBUF *bp)
 	bp->b_tag_list=NULL;
 #endif
 	bp->b_header=NULL;
+	// MESG("end of EmptyText of \"%s\"",bp->b_fname);
 }
 
 // get size bytes in buf at o offset till eol
