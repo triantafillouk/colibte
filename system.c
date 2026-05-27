@@ -60,7 +60,9 @@ int sysexec(char *st)
 		if(status!=0) {
 			msg_line("command [%s] exit status %d",st,status);
 			events_flush();
-		} else msg_line("ok!");
+		} else {
+			if(!(execmd||exebnf)) msg_line("ok!");
+		};
 		return(TRUE);
 	} else {
 		char *st1=st;
@@ -195,6 +197,19 @@ int shell_cmd(num nused)
 
 char *get_line_at(FILEBUF *fb,offs offset);
 
+offs  FUtfCharAt_nocheck(FILEBUF *bf, offs offset, utfchar *uc);
+
+void print_buffer(FILEBUF *fp)
+{
+	textpoint_set(fp->tp_current,0);
+	offs o=0;
+	utfchar uc;
+	while(!FEofAt(fp,o)) {
+		o=FUtfCharAt_nocheck(fp,o,&uc);
+		printf("%s",uc.uval);
+	};
+}
+
 int exec_shell(char *tline)
 {
 	FILEBUF *bp,*bperr;
@@ -268,6 +283,7 @@ int exec_shell(char *tline)
 		goto_eof(1);
 		// MESG("		goto end and insert %s",filnam);
 		ifile(bp,filnam,0);
+		if(exebnf||execmd) print_buffer(bp);
 		bp->b_state &= ~FS_CHG;
 		set_Offset(0);
 		set_hmark(1,"shell_cmd");
@@ -284,12 +300,14 @@ int exec_shell(char *tline)
 			};
 		};
 		
-		if(bperr->lines<2)	msg_line("ok no errors!");
-		else if(bperr->lines==2) {
-			char *err_line1 = get_line_at(bperr,0);
-			MESG("err: %s",err_line1);
-			msg_line(err_line1);
-		} else msg_line("ok");
+		if(!(exebnf||execmd)){
+			if(bperr->lines<2)	msg_line("ok no errors!");
+			else if(bperr->lines==2) {
+				char *err_line1 = get_line_at(bperr,0);
+				MESG("err: %s",err_line1);
+				msg_line(err_line1);
+			} else msg_line("ok");
+		};
 		return(TRUE);
 	} else {
 		set_update(cwp,UPD_MOVE);
