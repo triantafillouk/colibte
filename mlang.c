@@ -258,8 +258,8 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		// else MESG("P[ check buffer is NULL!!!!! %s",title);
 		return check_buffer->tok_table_bnf+tok->pushed;
 	} else {
-		if(tok->ttype==TOK_LPAR) { 
-			// MESG("skip left paranthesis!");
+		if(tok->ttype==TOK_LPAR && exp_type>0) { 
+			MESG("skip left paranthesis!");
 			return NULL;
 		};
 		tok_struct *dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
@@ -1487,7 +1487,7 @@ double factor_assign_type()
 	int columns = var_tree->items;
 	MVAR *svar = btree_to_mvar(var_tree);
 	int size2=1;
-	MESG("factor_assign_type: [%s]",tok_info(tok));
+	MESG("factor_assign_type: [%s] items=%d",tok_info(tok),columns);
 	// if(lsslot) MESG("	lsslot ind=%d type=%d",lsslot->var_index,lsslot->var_type);
 	// MESG("factor_assign_type: -- var_slot ind=%d vtype=%d",var_slot->var_index,var_slot->var_type);
 	// MESG(" factor_assign_type: $$$$$ name=[%s] type %d vtype=%d line=%d size=%d",tok->tname,tok->ttype,var_slot->var_type,tok->tline,size);
@@ -2471,7 +2471,7 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_end,	// TOK_END,
 	bnf_factor_none,	// TOK_DEFINE_TYPE,
 #if	USE_TYPE_VARS
-	(VFunction)factor_assign_type,	// TOK_ASSIGN_TYPE,
+	bnf_assign_type,	// TOK_ASSIGN_TYPE,
 	(VFunction)factor_type_element,	// TOK_TYPE_ELEMENT
 #else
 	bnf_factor_none,	// TOK_ASSIGN_TYPE,

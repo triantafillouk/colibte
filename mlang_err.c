@@ -1263,8 +1263,9 @@ int err_factor()
 		RT_MESG1(527);
 #if	USE_TYPE_VARS
 	case TOK_ASSIGN_TYPE:{
-		MESG("TOK_ASSIGN_TYPE: tok0 [%s] tnum=%d ttype=%d",tok0->tname,tok0->tnum,tok0->ttype);
-		// MESG("	tok [%s] tnum %d ttype %d",tok->tname,tok->tnum,tok->ttype);
+		MESG("TOK_ASSIGN_TYPE: tok0 [%s]",tok_info(tok));
+		MESG("		tok [%s]",tok_info(tok));
+		if(tok->ttype==TOK_LPAR) stack_push("assign type",tok,-tok->ttype);
 		if(err_skip_type_args(tok0)) {
 			set_error(tok0,2000,"TOK_ASSIGN_TYPE: error in argument list");
 		};

@@ -2644,8 +2644,6 @@ void bnf_factor_array2()
 				};
 			};
 		};
-
-	// MESG("end factor_array2: lsslot=%X",(void *)lsslot);
 }
 
 void bnf_factor_array_l1()
@@ -2797,9 +2795,6 @@ void bnf_factor_array_l1_tba()
 			bnf_var->index1 = ind1;
 			bnf_var->var_type=VTYPE_ARRAYEL1;
 		};
-
-	// lsslot=array_slot;
-	// MESG("        : >>>> end");
 }
 
 void bnf_factor_array_l2_tba()
@@ -2994,4 +2989,97 @@ void bnf_factor_cmd()
 	};
 
 	// MESG(";factor_cmd:end value=%f status=%d err=%d",value,status,err_num);
+}
+
+MVAR *btree_to_mvar(BTREE *bt);
+
+void bnf_assign_type()
+{
+	double value=0;
+	tok_struct *tok0 = tok;
+	BTREE *var_tree = tok->tok_node->node_dat;
+	lsslot=&current_stable[tok->tind];
+	MVAR *var_slot=lsslot;
+	int columns = var_tree->items;
+	MVAR *svar = btree_to_mvar(var_tree);
+	int size2=1;
+	MESG("# bnf_assign_type: [%s]",tok_info(tok));
+	MESG("bnf_assign_type: var@=%d [%s] columns=%d",VARIND,tok_info(tok),columns);
+	// if(lsslot) MESG("	lsslot ind=%d type=%d",lsslot->var_index,lsslot->var_type);
+	MESG("factor_assign_type: -- var_slot ind=%d vtype=%d",var_slot->index1,var_slot->var_type);
+	// MESG(" factor_assign_type: $$$$$ name=[%s] type %d vtype=%d line=%d size=%d",tok->tname,tok->ttype,var_slot->var_type,tok->tline,size);
+	NTOKEN2;
+	if(tok->ttype==TOK_SEP) {
+		MESG("	skip, type definition exist already!");
+		return;
+	};
+
+	next_var("assign_type");
+
+	if(check_token(TOK_LBRAKET)) {
+		MESG("	assign type lbraket, double array!");
+		NTOKEN2;
+		size2 = (int)bnf_expression();prev_var("at");
+		NTOKEN2;
+		// MESG("	end: size2=%d [%s]",size2,tok_info(tok));
+	};
+
+	array_dat *adat=alloc_array_header();
+	adat->rows=size2;
+	adat->cols=columns;
+	adat->atype=VTYPE_AMIXED;
+	if(size2==1) adat->mval=svar;
+	else {
+		int asize=adat->rows*adat->cols;
+		adat->mval=(struct MVAR *)malloc(sizeof(struct MVAR)*asize);
+		// MESG("	allocate %d elements in mval",asize);
+	};
+	adat->astat=ARRAY_ALLOCATED;
+	adat->array_name=strdup(tok0->tname);
+	adat->var_tree = var_tree;
+	MESG("		>> rows %d columns %d [%s]",size2,columns,tok_info(tok));
+
+	
+	if(check_token(TOK_LPAR)) {
+		MESG("	assign type with parenthessis!");
+		int i;
+		int row=0;
+		NTOKEN2;
+
+		for(row=0;row<size2;row++) {
+		MVAR *row_var=&adat->mval[row*columns];
+		for(i=0;i<columns;i++) {
+			value=bnf_expression();
+			MESG("	row %2d col %2d type=%d",row,i);
+
+			if(bnf_var->var_type!=svar[i].var_type) {
+				set_error(tok,1022,"type mismatch!");
+				return;
+			};
+			row_var[i].var_type=bnf_var->var_type;
+			if(bnf_var->var_type==VTYPE_STRING) {
+				MESG("	%2d: type=%d val=[%s]",i,bnf_var->var_type,bnf_var->sval);
+				row_var[i].sval=strdup(bnf_var->sval);
+				row_var[i].var_alloced=1;
+			} else {
+				MESG("	%2d: type=%d val=%f %f",i,bnf_var->var_type,bnf_var->dval,value);
+				row_var[i].dval=bnf_var->dval;
+			};
+			prev_var("at3");
+			// MESG("next toke type is %s",tok_info(tok));
+			NTOKEN2;	// skip end parenthesis or separator
+		};
+		};
+	};
+
+	if(var_slot) {
+		// MESG("	add var_type to array!");
+		var_slot->var_type=VTYPE_AMIXED;
+		var_slot->adat = adat;
+	};
+	bnf_var->adat=adat;
+	bnf_var->var_type=VTYPE_AMIXED;
+	bnf_var->var_alloced=0;
+	print_array1("type array",adat);
+	return;
 }
