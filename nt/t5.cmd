@@ -11,12 +11,12 @@ a: array 1:[human1] type [AMIXED] , slot 0 type=14 rows 1,cols 6
 # a = human1 ("Kostas","Tr",55,20,100)
 # a[0]: 
 #max=1
-c = human1[2]("name1","tr1",33,34,35,36; "name2","tr2",43,44,45,46)
-c:
+#c = human1[2]("name1","tr1",33,34,35,36; "name2","tr2",43,44,45,46)
+#c:
 # fori(i=0;max;1){
 	print(i,":===================")
-	a.name: "kostas maria"
 	a.age:  33.0
+	a.name: "kostas maria"
 	a.age=77:  77.0
 	a.age+=2:  77.0
 	a.age:  79.0

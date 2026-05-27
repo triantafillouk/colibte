@@ -734,7 +734,7 @@ int err_factor()
 		RT_MESG1(480);
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
-		// MESG("	TOK_VAR: var ind=%d type is %d",tok0->tind,current_stable[tok0->tind].var_type);
+		MESG("	TOK_VAR: var ind=%d type is %d [%s]",tok0->tind,current_stable[tok0->tind].var_type,tok_info(tok0));
 		pre_symbol=0;
 		ex_nvars++;
 #if	TBNF
@@ -761,7 +761,7 @@ int err_factor()
 			NTOKEN_ERR(4981);
 		};
 		if(tok->ttype==TOK_TYPE_ELEMENT) {
-			// MESG("err tok_type_element: %s",tok->tname);
+			MESG("err tok_type_element: %s",tok->tname);
 			set_tok_function(tok,0);
 			// set_bnf_function1(tok,tok->ttype);
 			tok->dval=-1;
@@ -802,9 +802,10 @@ int err_factor()
 		RT_MESG1(4441);		
 	};
 	case TOK_ARRAY_L1:{	// 0 variable
-		// MESG("TOK_ARRAY_L1: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
+		MESG("TOK_ARRAY_L1: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
 		pre_symbol=0;
 		ex_nvars++;
+		MESG("		push [%s]",tok_info(tok));
 		stack_push("499",tok,tok->ttype);
 		NTOKEN_ERR(499);
 		};

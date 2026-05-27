@@ -2472,7 +2472,7 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_none,	// TOK_DEFINE_TYPE,
 #if	USE_TYPE_VARS
 	bnf_assign_type,	// TOK_ASSIGN_TYPE,
-	(VFunction)factor_type_element,	// TOK_TYPE_ELEMENT
+	bnf_type_element,	// TOK_TYPE_ELEMENT
 #else
 	bnf_factor_none,	// TOK_ASSIGN_TYPE,
 	bnf_factor_none,	// TOK_TYPE_ELEMENT

@@ -3083,3 +3083,50 @@ void bnf_assign_type()
 	print_array1("type array",adat);
 	return;
 }
+
+void bnf_type_element()
+{
+ double value=0;
+ // lsslot=&current_stable[tok->tind];
+ // array_dat *adat = lsslot->adat;
+ MVAR *vara=(bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+ 
+ array_dat *adat = vara->adat;
+ MESG("bnf_type_element: var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+ // MESG("	factor_type_element: lsslot %d [%s] array name=[%s] vtype=%d (%s)",lsslot->index1,lstoken->tname,adat->array_name,lsslot->var_type,vtype_names[lsslot->var_type]);
+ // MESG("	type_element [%s]",tok->tname);
+ if(adat->var_tree) {
+ 	int ind;
+ 	// MESG("	var tree name [%s]",adat->var_tree->tree_name);
+	if(tok->dval<0) {
+		BTNODE *el_node = find_btnode(adat->var_tree,tok->tname);
+		if(el_node) {
+			ind = (int)(el_node->node_index);
+			tok->dval=ind;
+		} else {
+			set_error(tok,501,"element not found!");
+			return;
+		};
+	} else {
+		ind=(int)tok->dval;
+		// MESG(" ind from cache %d",ind);
+	};
+
+	// MESG("	ind = %d",ind);
+	if(adat->mval[ind].var_type==VTYPE_NUM) {
+		value=adat->mval[ind].dval;
+		set_vdval(value);
+		// MESG("	return type dval %f",value);
+	} else {
+		set_vtype(VTYPE_STRING);
+		set_sval(adat->mval[ind].sval);
+		// MESG("	return type sval [%s]",adat->mval[ind].sval);
+	};
+
+ } else {
+ 	set_error(tok,502,"no tree in type element!");
+	return;
+ };
+ 
+ // NTOKEN2;
+}
