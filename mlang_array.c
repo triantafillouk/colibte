@@ -902,8 +902,13 @@ void print_array1(char *title,array_dat *adat)
 		out_print("Null array!",1);
 		return;
 	};
-	if(adat->var_tree) snprintf(so,sizeof(so),"# %s Array %s,%d:(%s) rows=%d cols=%d astat=%d with var_tree",title,ex_name,adat->anum,vtype_names[adat->atype],adat->rows,adat->cols,adat->astat);
-	else snprintf(so,sizeof(so),"# %s Array %s,%d:(%s) rows=%d cols=%d astat=%d",title,adat->array_name,adat->anum,vtype_names[adat->atype],adat->rows,adat->cols,adat->astat);
+	if(adat->var_tree && ! exebnf) {
+		snprintf(so,sizeof(so),"# %s Array %s,%d:(%s) rows=%d cols=%d astat=%d with var_tree",
+			title,ex_name,adat->anum,vtype_names[adat->atype],adat->rows,adat->cols,adat->astat);
+	} else {
+		snprintf(so,sizeof(so),"# %s Array %s,%d:(%s) rows=%d cols=%d astat=%d",
+			title,adat->array_name,adat->anum,vtype_names[adat->atype],adat->rows,adat->cols,adat->astat);
+	};
 	out_print(so,1);
 	strcpy(so,"");
 	if(adat->astat!=ARRAY_UNALLOCATED) {

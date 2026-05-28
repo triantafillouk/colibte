@@ -34,6 +34,7 @@ a: array 1:[human1] type [AMIXED] , slot 0 type=14 rows 1,cols 6
 k=20
 #b = human1[k*(k+2)]
 c = human1[2]("name1","tr1",33,34,35,36; "name2","tr2",43,44,45,46)
+c:
 print("---1")
 c[1][1]: "tr2"
 print("---2")
