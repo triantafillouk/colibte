@@ -1,4 +1,4 @@
-# types TBD
+# types ok from 906, TBC
 type  human1 = [name::"Name" surname::"Surname" age::0 bdate::0 salary::1 age2::1]
 #print(human2)
 #list1 = list ()

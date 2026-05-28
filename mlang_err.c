@@ -786,17 +786,35 @@ int err_factor()
 		};
 		MESG("	tok_array_l2: after rbraket [%s]",tok_info(tok));
 		tok_struct *dest=stack_push("tok_array_l2",tok,tok->ttype);
-#if	1		
 		if(tok->ttype==TOK_TYPE_ELEMENT) {
 			tok->dval=-1;
-			MESG("	TOK_TYPE_ELEMENT before [%s]",tok_info(tok));
-			MESG("	tok0_bnf [%s]",tok_info(tok0_bnf));
 			tok0_bnf->bnf_factor_function=bnf_type_l2_result;
-			tok0_bnf->tname="TAL2";			
+			tok0_bnf->tname="TL2";			
+			MESG("	tok0_bnf [%s]",tok_info(tok0_bnf));
+
+			MESG("	TOK_TYPE_ELEMENT before [%s]",tok_info(tok));
 			NTOKEN2;
+			MESG("	TOK_TYPE_ELEMENT after [%s]",tok_info(tok));
+
+			if(tok->ttype==TOK_INCREASE) {
+				MESG("	found TOK_INCREASE after type array_l2");
+				tok->dval=1;
+				set_tok_function(tok,0);
+				tok->tgroup=0;
+				stack_push("INC_AT2",tok,TOK_INCREASE);
+				NTOKEN_ERR(4984);
+			} else
+			if(tok->ttype==TOK_DECREASE) {
+				MESG("	found TOK_DECREASE after type array_l2");
+				tok->dval=-1;
+				set_tok_function(tok,0);
+				tok->tgroup=0;
+				stack_push("DEC_AT2",tok,TOK_DECREASE);
+				NTOKEN_ERR(4985);\
+			};
+
 			RT_MESG1(495);
 		} else 
-#endif
 		{
 		NTOKEN_ERR(444);
 		if(tok->ttype==TOK_INCREASE) {

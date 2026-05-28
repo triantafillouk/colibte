@@ -2,7 +2,7 @@
 
 type human = [name::"Name",age::20]
 
-a=human
+a=human("name1",100)
 
 function pass1(r1,k)
 {
@@ -13,6 +13,8 @@ function pass1(r1,k)
  
 p=2
 pass1(a,p)
+a.age:
+a.name:
 
 print("a.age=",a.age)
 print("a.name=",a.name)
