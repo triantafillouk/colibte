@@ -1511,7 +1511,7 @@ void bnf_factor_assign_var()
 		avar->adat=bvar->adat;
 		avar->var_alloced=bvar->var_alloced;
 		bvar->var_alloced=0;
-		print_array1("after array assign",avar->adat);
+		// print_array1("after array assign",avar->adat);
 		return;
 	};
 	set_error(tok,102,"assign operation not supported yet");
@@ -3183,7 +3183,7 @@ void bnf_assign_type()
 	bnf_var->adat=adat;
 	bnf_var->var_type=VTYPE_AMIXED;
 	bnf_var->var_alloced=0;
-	print_array1("type array",adat);
+	// print_array1("type array",adat);
 	MESG("	bnf_assign_type: end var@=%d: rows=%d cols=%d",VARIND,bnf_var->adat->rows,bnf_var->adat->cols);
 	MESG("	bnf_assign_type: end [%s]",tok_info(tok));
 
@@ -3430,20 +3430,20 @@ void bnf_type_l2_result()
 	array_dat *adat = array_slot->adat;
 	MESG("	get the row");
 	NTOKEN2;
-	int row=bnf_expression();prev_var("type_l2");
+	int row=bnf_expression()*adat->cols;prev_var("type_l2");
 	MESG("	row=%d [%s]",row,tok_info(tok));
 	NTOKEN2;
 	MESG("	get the index type [%s]",tok_info(tok));
 	// MESG("	type=%d",array_slot->var_type);
 	// MESG("	factor_arrayl1:< ----------- vtype=%d  [%s]",array_slot->var_type,tok_info(tok));
 	// NTOKEN2;
-	// tok->dval=-1;
+	tok->dval=-1;
 	int ind1 = get_type_index(adat,tok);
 	MESG("	ind1=%d",ind1);
 	if(ind1 >= 0) {
-		bnf_var->var_pointer = &adat->mval[ind1];
+		bnf_var->var_pointer = &adat->mval[row+ind1];
 		bnf_var->var_type=VTYPE_POINTER;
-		bnf_var->index1=ind1;
+		bnf_var->index1=row+ind1;
 		return;
 	};
 

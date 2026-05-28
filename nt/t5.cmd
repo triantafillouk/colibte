@@ -40,9 +40,9 @@ c[1][1]: "tr2"
 print("---2")
 c[1].name: "name1"
 print("---3")
-c[1].surname="new"
+c[1].surname="new"+" surname"
 print("---4")
-#c[1].surname:
+c[1].surname:
 print("end")
 # print(a[22].name)
 # show_vars()
