@@ -1450,17 +1450,17 @@ inline static void bnf_factor_assign_var_nump()
 void bnf_factor_assign_var()
 {
 	MVAR *bvar=bnf_var;
-	// show_result();
 	int btype=bvar->var_type;
-	
+	char *var_name = tok->tname;
+
+	// MESG("bnf_factor_assign_var: name=%s [%s]",var_name,tok_info(tok));
 	prev_var("assign var");
 	if(bnf_var->var_type!=VTYPE_POINTER) { set_error(tok,505,"cannot assign to non var!");exit(5);};
 	MVAR *avar=bnf_var->var_pointer;
 	int atype=bnf_var->var_type;
 	if(atype!=VTYPE_POINTER) MESG("assign_var: error not a variable!!!!");
 	
-	// int atype=bnf_var->var_pointer->var_type;
-	MESG("bnf_factor_assign_var: vara@=%d atype=%d btype %d",VARIND,atype,btype);
+	// MESG("bnf_factor_assign_var: vara@=%d atype=%d btype %d",VARIND,atype,btype);
 
 	MVAR *aval=bnf_var->var_pointer;
 
@@ -1468,7 +1468,7 @@ void bnf_factor_assign_var()
 		// MESG("bvar is pointer");
 		bvar = bvar->var_pointer;
 	};
-	MESG("	bvar=%d",bvar->var_type);
+	// MESG("	bvar=%d",bvar->var_type);
 	aval->var_type = bvar->var_type;
 
 	if(bvar->var_type==VTYPE_NUM) { 
@@ -1502,7 +1502,7 @@ void bnf_factor_assign_var()
 	if(bvar->var_type==VTYPE_ARRAY
 		||bvar->var_type==VTYPE_AMIXED
 		||bvar->var_type==VTYPE_SARRAY) {
-		MESG("assign var array!");
+		// MESG("assign var array! to name '%s'",var_name);
 #if	0
 		if(btype!=VTYPE_POINTER) { // set the array name!
 			bvar->adat->array_name = strdup(tok->tname);
@@ -1512,6 +1512,7 @@ void bnf_factor_assign_var()
 		avar->adat=bvar->adat;
 		avar->var_alloced=bvar->var_alloced;
 		bvar->var_alloced=0;
+		bvar->adat->array_name=var_name;
 		// print_array1("after array assign",avar->adat);
 		return;
 	};
@@ -1559,9 +1560,8 @@ void bnf_factor_env()
 
 void bnf_assign_env()
 {
-	MESG("bnf_assign_env:");
+	// MESG("bnf_assign_env:");
 	int left_index;
-	// MESG("assign_env:");
 	left_index=var_node->node_index;
 	// MESG("assign_env: left_index=%d",left_index);
 	MVAR *var=bnf_var;
@@ -1575,7 +1575,7 @@ void bnf_assign_env()
 
 void bnf_assign_opt()
 {
-	MESG("bnf_assign_opt:");
+	// MESG("bnf_assign_opt:");
 	MVAR *var=bnf_var;
 	prev_var("assign var");
 
@@ -1637,9 +1637,6 @@ void bnf_factor_rpar()
 static void bnf_block1()
 {
 	// MESG("-------- bnf_block1 start![%s] { [%s]",fp->b_fname,tok_info(tok));
-	// show_token_table("block  ",fp,fp->tok_table_bnf,fp->tok_bnf_index);
-	// MESG("-- block1: start at [%s]",tok_info(tok));
-	// int block_startvar_pos=VARIND;
 	do {
 		// MESG("--- block var@=%d [%s]",VARIND,tok_info(tok));
 	 	tok->bnf_factor_function();
@@ -1659,18 +1656,11 @@ static void bnf_block1()
 
 void bnf_block1_break(/*FILEBUF *fp*/)
 {
-#if	0
- exe_buffer=fp;
-   // MESG("exec_block1:[%s] err_num= %d %d tok=[%s]",fp->b_fname,err_num,current_active_flag,tok_info(tok));
-   if(!current_active_flag) {
-		tok=fp->end_token;
-		// return(ex_var.dval);
-   };
-#endif
 	// MESG("-- block start! { [%s]",tok_info(tok));
 	do {
 		// MESG("	- [%s]",tok_info(tok));
 	 	tok->bnf_factor_function();
+		NTOKEN2;
 		if(drv_check_break_key()) break;
 	} while(tok->tgroup!=TOK_END);
 	tok->bnf_factor_function();
@@ -2559,7 +2549,7 @@ void bnf_factor_array2()
 	// MESG("factor_array2: %s tind=%d [%s]",tok->tname,tok->tind,tok_info(tok));
 	array_slot=get_left_slot(tok->tind);
 	adat=array_slot->adat;
-	
+	char *array_name=tok->tname;
 	if(adat==NULL) {
 #if	0
 		set_error(tok,209,"array indexes out of bound!");
@@ -2577,7 +2567,8 @@ void bnf_factor_array2()
 		adat = new_array(ind1+1,ind2+1,VTYPE_ARRAY);
 		allocate_array(adat);
 		array_slot->adat = adat;
-		adat->array_name=tok0->tname;
+		// adat->array_name=tok0->tname;
+		adat->array_name=array_name;
 
 		// MESG("created a 2 dim array!");
 		// MESG("	array name=%s",adat->array_name);

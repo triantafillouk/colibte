@@ -772,6 +772,8 @@ int err_factor()
 		if(tok->ttype==TOK_ASSIGN) {
 			// MESG("set normal assign [%s]",tok_info(tok));
 			assign_type_to=0;
+			tok->tname = tok0->tname;
+			MESG("	var_name_to_assign: %s [%s]",tok0->tname,tok_info(tok));
 		};
 		// MESG("	TOK_VAR: return [%s]",tok_info(tok));
 		RT_MESG1(493);}

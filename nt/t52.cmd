@@ -1,4 +1,4 @@
-# types TBD
+# types ok from 908 TBC
 type  human1 = [name::"Name" surname::"Surname" age::0 bdate::0 salary::1 age2::1]
 k=1
 

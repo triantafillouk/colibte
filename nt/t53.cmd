@@ -1,4 +1,4 @@
-# types TBD
+# types ok from 908
 type human = [name::"Name" age::55]
 # a=human
 # a.age++ : 
