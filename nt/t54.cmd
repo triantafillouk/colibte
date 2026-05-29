@@ -2,19 +2,23 @@
 
 type human = [name::"Name",age::20]
 
-a=human("name1",100)
+a=human("No name",100)
 
 function pass1(r1,k)
 {
-	print("age:",r1.age)
+	print("pass1: before changing age:",r1.age)
+	r1.name="kostas"
 	r1.age =30*k
-	r1.name="kt"
+	r1.age:
 }
  
+print("Start test")
+
+
+a:
 p=2
 pass1(a,p)
-a.age:
-a.name:
+a:
 
 print("a.age=",a.age)
 print("a.name=",a.name)

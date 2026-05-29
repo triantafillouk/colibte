@@ -785,7 +785,7 @@ int err_factor()
 			MESG("	No rbracket found!");
 		};
 		MESG("	tok_array_l2: after rbraket [%s]",tok_info(tok));
-		tok_struct *dest=stack_push("tok_array_l2",tok,tok->ttype);
+		stack_push("tok_array_l2",tok,tok->ttype);
 		if(tok->ttype==TOK_TYPE_ELEMENT) {
 			tok->dval=-1;
 			tok0_bnf->bnf_factor_function=bnf_type_l2_result;
