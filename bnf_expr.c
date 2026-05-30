@@ -1961,7 +1961,7 @@ inline static double bnf_expression()
 
 void bnf_dir_return()
 {
-	// MESG("bnf_dir_return: var@=%d [%s]",VARIND,tok_info(tok));
+	MESG("bnf_dir_return: var@=%d [%s]",VARIND,tok_info(tok));
 	NTOKEN2;
 	// MESG("	return : start at [%s]",tok_info(tok));
 	if(tok->ttype!=TOK_SEP && tok->ttype!=TOK_RPAR) 
@@ -1970,7 +1970,7 @@ void bnf_dir_return()
 		// prev_var("");
 		// show_result();
 	};
-	// MESG("	return : end var@=%d  [%s]",VARIND,tok_info(tok));
+	MESG("	dir_return : end var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	current_active_flag=0;	/* skip rest of function  */
 }
 
@@ -3031,14 +3031,14 @@ void bnf_factor_cmd()
 	err_str=NULL;
 	MESG(";factor_cmd: before ed_command: var@=%d type=%d",VARIND,bnf_var->var_type);
 	value=ed_command->n_func((int)value);
-	bnf_var->dval=value;
-	bnf_var->var_type=VTYPE_NUM;
+	// bnf_var->dval=value;
+	// bnf_var->var_type=VTYPE_NUM;
 	macro_exec = save_macro_exec;
 	MESG("after ed_command: var@=%d type=%d",VARIND,bnf_var->var_type);
 	if(bnf_var->var_type==VTYPE_NUM) {
 		MESG("exec result=%f",bnf_var->dval);
 	};
-	prev_var("");
+	// prev_var("");	/*   */
 	MESG("after ed_command: var@=%d type=%d",VARIND,bnf_var->var_type);
 	if(bnf_var->var_type==VTYPE_NUM) {
 		MESG("exec result=%f",bnf_var->dval);
