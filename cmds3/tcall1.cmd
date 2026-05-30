@@ -6,3 +6,5 @@ b=exec_file("tcall2.cmd")	: 2.100000
 b: 2.100000
 if(b==2.1) print("test ok!")
 else print("test not ok!")
+;
+b:

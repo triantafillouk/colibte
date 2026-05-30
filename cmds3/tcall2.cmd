@@ -2,6 +2,6 @@
 a="butterfly1"
 
 print("--- tcall2.cmd ---,a="+a)
-a: <0.00000>[butterfly1]
+a: 
 return 2.1
 

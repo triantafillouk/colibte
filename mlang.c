@@ -4161,7 +4161,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	// MESG("cleaning:");
 	if(start) {
 		if(local_symbols){
-		// MESG("	cleaning local symbols");
+		MESG("	cleaning local symbols of [%s]",bp->b_fname);
 		if(bp->symbol_tree){
 			delete_symbol_table(local_symbols,bp->symbol_tree->items,0);
 			bp->symbol_tree=NULL;
@@ -4171,7 +4171,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	};
 	if(exebnf) {
 		show_var_stats();
-		// MESG("show result!");
+		MESG("show result executing buffer [%s]!",bp->b_fname);
 		MVAR *result = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
 		if(result->var_type==VTYPE_NUM) msg_line("Result at var@=%d [%f]",VARIND,num_result());
 		else if(result->var_type==VTYPE_STRING) msg_line("Result at var@=%d [%s]",VARIND,string_result());
