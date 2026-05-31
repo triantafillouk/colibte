@@ -2998,7 +2998,6 @@ void bnf_factor_cmd()
 
 	NTOKEN2;
 	save_macro_exec=macro_exec;
-	macro_exec=MACRO_MODE2;
 	next_var("cmd");
 	// MESG(";ed_command: [%s] args=%d",ed_command->n_name,ed_command->arg);
 	if(ed_command->arg) {
@@ -3030,7 +3029,7 @@ void bnf_factor_cmd()
 
 	};
 
-	macro_exec = MACRO_MODE2;
+	macro_exec = save_macro_exec;
 
 	// err_num=0;
 	err_line=tok->tline;

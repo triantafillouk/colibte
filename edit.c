@@ -2087,7 +2087,7 @@ int trim_line(num n)
 	if(oldcur>ptr)	textpoint_set(cwp->tp_current,oldcur-trimmed_at_start);
 	else textpoint_set(cwp->tp_current,ptr);
 
-	if(!macro_exec)
+	if(macro_exec==FALSE)
 		msg_line("Line trimed by %d + %d chars!",trimmed_at_start,trimmed_at_end);
 	return(TRUE);
 }

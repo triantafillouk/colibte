@@ -1227,6 +1227,8 @@ int recreate_notes_db(num init_db)
 	int start_notes=0;
 	start_notes = sindex(notes_files[0],"/Notes")+6;
 	char notes_name[MAXFLEN];
+	int save_macro_exec=macro_exec;
+	macro_exec=0;
 	init_note_keys();
 	for(i=0 ;notes_files[i]!=NULL;i++){
 		struct stat st;
@@ -1330,6 +1332,7 @@ int recreate_notes_db(num init_db)
 	};
 	set_bt_num_val("notes_recreate",0);
 	free_sarray(notes_files);
+	macro_exec=save_macro_exec;
 	// select_filebuf(current_buffer);
 	msg_line("# recreated_notes_db: new %d, dirs %d, skipped %d failed %d same %d failed parse %d",notes_new,dirs,notes_skipped,notes_failstat,notes_same,notes_failparse);
 	return true;

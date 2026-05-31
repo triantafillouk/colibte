@@ -1061,7 +1061,7 @@ FILEBUF * new_filebuf(char *bname,int bflag)
 int empty_filebuf(FILEBUF *bp)
 {
 	if(!strcmp(bp->b_fname,"[dofile]")) return(TRUE);
-	if(!macro_exec){
+	if(macro_exec==FALSE){
         if ((bp->b_flag&FSINVS) == 0            /* Not internal file.  */
         && (bp->b_state & FS_CHG) != 0              /* Something changed    */
         && (confirm("Clear text", "discard all changes?",1)) != TRUE
