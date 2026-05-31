@@ -7,6 +7,7 @@
 
 	xe.h main include file for colibri editor editor
 */
+
 /* Flags and structures of xe editor */
 
 /*	Program Identification..... */
