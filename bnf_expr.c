@@ -22,7 +22,7 @@ int get_type_index(array_dat *adat, tok_struct *tok);
 
 #define VARIND (int)(bnf_var-bnf_vars)
 
-#if	0
+#if	1
 #if	1
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
@@ -634,7 +634,7 @@ inline static void bnf_factor_mul()
 	MVAR *vara = bnf_var;
 	int va=vara->var_type;
 	if(vara->var_type==VTYPE_POINTER) {vara=vara->var_pointer;va=VTYPE_POINTER;};
-	MESG(";factor_mul: atype=%d btype=%d",vara->var_type,varb->var_type);
+	// MESG(";factor_mul: atype=%d btype=%d",vara->var_type,varb->var_type);
 	if(vara->var_type==VTYPE_NUM) {
 		if(varb->var_type==VTYPE_NUM) {
 			bnf_var->dval=vara->dval*varb->dval;
@@ -1270,7 +1270,7 @@ inline static void bnf_decrease_by()
 // aval*=bval
 inline static void bnf_mul_by()
 {
-	MESG("bnf_factor_mul_by: [%s]",tok_info(tok));
+	// MESG("bnf_factor_mul_by: [%s]",tok_info(tok));
 	MVAR *bval=bnf_var;
 
 	prev_var("mul by");
@@ -1315,7 +1315,7 @@ inline static void bnf_mul_by()
 #endif
 	};
 
-	MESG("	err 1023: aval type=%d",aval->var_type);
+	// MESG("	err 1023: aval type=%d",aval->var_type);
 	set_error(tok,1023,"multiply operation not supported!");
 }
 
@@ -1961,7 +1961,7 @@ inline static double bnf_expression()
 
 void bnf_dir_return()
 {
-	MESG("bnf_dir_return: var@=%d [%s]",VARIND,tok_info(tok));
+	// MESG("bnf_dir_return: var@=%d [%s]",VARIND,tok_info(tok));
 	NTOKEN2;
 	// MESG("	return : start at [%s]",tok_info(tok));
 	if(tok->ttype!=TOK_SEP && tok->ttype!=TOK_RPAR) 
@@ -1970,7 +1970,7 @@ void bnf_dir_return()
 		// prev_var("");
 		// show_result();
 	};
-	MESG("	dir_return : end var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+	// MESG("	dir_return : end var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	current_active_flag=0;	/* skip rest of function  */
 }
 
@@ -2106,7 +2106,7 @@ void bnf_dir_if()
 			// if(tok->ttype!=TOK_RCURL) tok--; 
 		};
 	}
-	MESG(";	 	tok_dir_if:end var@=%d  ival=%d > end [%s]",VARIND,ival,tok_info(tok));
+	// MESG(";	 	tok_dir_if:end var@=%d  ival=%d > end [%s]",VARIND,ival,tok_info(tok));
 }
 
 void bnf_dir_else()
