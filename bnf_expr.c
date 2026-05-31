@@ -22,7 +22,7 @@ int get_type_index(array_dat *adat, tok_struct *tok);
 
 #define VARIND (int)(bnf_var-bnf_vars)
 
-#if	1
+#if	0
 #if	1
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
@@ -1357,6 +1357,7 @@ inline static void bnf_factor_sep0()
 
 inline static void bnf_factor_end()
 {
+	MESG(">bnf_factor_end: var@=%d",VARIND);
 	current_active_flag=0;
 }
 
@@ -1383,8 +1384,7 @@ inline static void bnf_factor_comma()
 
 inline static void bnf_factor_eof()
 {
-	// int ind = bnf_var - bnf_vars;
- 	// MESG("bnf_factor_EOF: var index = %d type=%d",ind,bnf_var->var_type);
+ 	MESG("bnf_factor_EOF: var@=%d type=%d",VARIND,bnf_var->var_type);
 	current_active_flag=0;
 }
 
@@ -2053,7 +2053,7 @@ void bnf_factor_proc()
 
 	memmove(result_var,bnf_var,sizeof(MVAR));
 #if	TPROFILE
-	var_index -= (int)(bnf_var-result_var);
+	var_index -= (int)(bnf_var-result_var-1);
 #endif
 #if	0
 //	clean used strings
@@ -2119,7 +2119,7 @@ void bnf_dir_else()
 void show_var_stats()
 {
 #if	TPROFILE
-	fprintf(stderr,"MVAR index=%ld max=%ld\n",var_index,max_var);
+	fprintf(stderr,"MVAR index=%ld var@=%d max=%ld\n",var_index,VARIND,max_var);
 #endif
 }
 
@@ -2994,6 +2994,7 @@ void bnf_factor_cmd()
 	NTOKEN2;
 	save_macro_exec=macro_exec;
 	macro_exec=MACRO_MODE2;
+	next_var("cmd");
 	// MESG(";ed_command: [%s] args=%d",ed_command->n_name,ed_command->arg);
 	if(ed_command->arg) {
 		check_par=1;	/* we need parenthesis if arguments.  */
@@ -3014,7 +3015,7 @@ void bnf_factor_cmd()
 			{
 				NTOKEN2;
 #if	0
-				value=bnd_expression();
+				value=bnf_expression();
 				// MESG(";	ed_command:arg2 value=%f ex_var.var_type=%d s=[%s]",value,ex_var.var_type,get_sval());
 #endif
 				// MESG(";ed_command: second token! type=%d ",tok->ttype);
@@ -3031,14 +3032,9 @@ void bnf_factor_cmd()
 	err_str=NULL;
 	MESG(";factor_cmd: before ed_command: var@=%d type=%d",VARIND,bnf_var->var_type);
 	value=ed_command->n_func((int)value);
-	// bnf_var->dval=value;
-	// bnf_var->var_type=VTYPE_NUM;
+	bnf_var->dval=value;
+	bnf_var->var_type=VTYPE_NUM;
 	macro_exec = save_macro_exec;
-	MESG("after ed_command: var@=%d type=%d",VARIND,bnf_var->var_type);
-	if(bnf_var->var_type==VTYPE_NUM) {
-		MESG("exec result=%f",bnf_var->dval);
-	};
-	// prev_var("");	/*   */
 	MESG("after ed_command: var@=%d type=%d",VARIND,bnf_var->var_type);
 	if(bnf_var->var_type==VTYPE_NUM) {
 		MESG("exec result=%f",bnf_var->dval);
@@ -3046,7 +3042,7 @@ void bnf_factor_cmd()
 
 	if(check_par) { 
 		if(check_rparenthesis()) {
-			NTOKEN2;	// MESG("right parenthesis skipped!");
+			//NTOKEN2;	// MESG("right parenthesis skipped!");
 		};
 	};
 

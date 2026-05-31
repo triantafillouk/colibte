@@ -1,3 +1,3 @@
 # bnf TBD
-result=recreate_notes_db("test")
+result=recreate_notes_db(1)
 print(result)

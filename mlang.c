@@ -4151,9 +4151,9 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		bnf_block1();
 		MESG("end of program1 var@=%d type %d",VARIND,bnf_var->var_type);
 		if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
-		next_var("end");
-		MESG("end of program2 var@=%d type %d",VARIND,bnf_var->var_type);
-		if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
+		// next_var("end");
+		// MESG("end of program2 var@=%d type %d",VARIND,bnf_var->var_type);
+		// if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
 		// show_results();
 	};
 #endif

@@ -1196,7 +1196,7 @@ int recreate_notes_db(num init_db)
  char tmp_file[256];
  char **notes_files;
  // FILEBUF *current_buffer=cbfp;
-	// MESG("--- recreate_notes_db: ---- n=%d",n);
+	MESG("--- recreate_notes_db: ---- init_db=%d",init_db);
 	set_bt_num_val("notes_recreate",1);
 	// create notes db
 	if(init_db==INIT_DB){
