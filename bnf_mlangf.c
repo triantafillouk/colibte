@@ -108,13 +108,13 @@ void bnf_array_rows()
 /* clear output buffer */
 void bnf_cls()
 {
-	/* clear screen with ncursor TBD  */
+	/* clear screen with ncursor TODO  */
 	if(check_token(TOK_RPAR)) ntoken();
 	cls_fout("[out]");
 	MESG("<-[%s: %s ------------------------------------------------------------->",cbfp->b_fname,VERSION);
 }
 
-void bnf_index()	// ?? TBD!!
+void bnf_index()	// ?? TODO!!
 {
 	MESG("new index!");
 	// bnf_var->dval=VTYPE_TREE;
@@ -411,7 +411,7 @@ void bnf_getchar() /* TBC  */
 	next_var("getchar");
 	char *slocal=(char *)malloc(2);
 	if(execmd) {
-		slocal[0]=getchar();	/* get a utf8 char! TBD !! */
+		slocal[0]=getchar();	/* get a utf8 char! TODO !! */
 	} else {
 		slocal[0] = getcmd();
 	};

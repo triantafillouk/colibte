@@ -2006,7 +2006,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	};
 	return(false);
    } ;
-   if(!CheckMode(st.st_mode)) {
+  if(!CheckMode(st.st_mode)) {
 		SYS_ERROR("[%s] not a regular file!");
 		msg_line("[%s] not a regular file!");
 	   	return(false);
@@ -2016,6 +2016,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
   	status=init_ftype(bf,name,&temp_used,0); // if not insert then get file type
 	if(status!=TRUE) return FALSE;
   };
+
    errno=0;
    /* clear the 'temporarily read-only' bit */
    bf->b_state &= ~FS_VIEW;

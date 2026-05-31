@@ -183,12 +183,13 @@ int activate_file(FILEBUF *bp)
 	// MESG("activate_file:[%s] b_type=%d b_flag=%X mll=%ld ",bp->b_fname,bp->b_type,bp->b_flag,bp->maxlinelen);
 	if ((bp->b_state & FS_ACTIVE) ==0)
 	{	
-		// MESG("activatee_file: is not active, activate it!");
+		// MESG("activate_file: is not active, activate it!");
 		/* read it in and activate it */
 		if(bp->b_fname[0]!=CHR_LBRA || !strncmp(bp->b_fname,"[D",2))
 		{
 			file_read(bp,bp->b_fname);
 		};
+
 		if(!strncmp(bp->b_fname,"[new ",4)) {
 			file_read(bp,bp->b_fname);
 		};
@@ -201,9 +202,10 @@ int activate_file(FILEBUF *bp)
 		textpoint_set(bp->tp_current,0);
 		// bp->save_ppline=0;
 		bp->b_state |= FS_ACTIVE;
-		// MESG("activate_file:[%s] b_type=%d b_flag=%X mll=%ld ",bp->b_fname,bp->b_type,bp->b_flag,bp->maxlinelen);
+		// MESG("activate_file:1[%s] b_type=%d b_flag=%X mll=%ld ",bp->b_fname,bp->b_type,bp->b_flag,bp->maxlinelen);
 
 		if(bp->b_fname[0]!=CHR_LBRA){
+			// MESG("	go add_to_recent_list");
 			add_to_recent_list(get_buf_full_name(bp));
 		};
 	};
@@ -1096,6 +1098,7 @@ FILEBUF *cls_fout(char *bname)
 char *get_buf_full_name(FILEBUF *fp)
 {
  static char full_name[MAXFLEN];
+ // MESG("get_full_name:");
  set_full_name(full_name,fp->b_dname,fp->b_fname,MAXFLEN);
  return(full_name);
 }
@@ -1526,12 +1529,14 @@ int file_read(FILEBUF *bp, char *fname)
 
  /* clear the buffer */
  if(empty_filebuf(bp)!=TRUE) return FALSE;
+
  if(fname!=bp->b_fname) strlcpy(bp->b_fname, fname,MAXFLEN);
  if(! ifile(bp,fname,0) && fname[0]!=CHR_LBRA) {
  	discmd=display_messages;
 // 	msg_line("No lines for file %s",fname);
 	return(FALSE);
  };
+
  bp->b_flag &= ~FSINVS;
  bp->b_state &= ~FS_CHG;
 
@@ -1542,6 +1547,7 @@ int file_read(FILEBUF *bp, char *fname)
 	if(stat<MAXFLEN) unlink(scratch_file);
  };
  set_update(cwp,UPD_FULL);
+
  if(get_default_view_mode()) {
  	bp->b_state |= FS_VIEW;
  	// MESG("set as view only");
@@ -1752,6 +1758,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
  int htype=0;	/* highlight type  */
  char	oext[MAXLLEN], cmd[MAXLLEN];
  *temp_used=0;
+
  // MESG("init_ftype:[%s] b_type=%d view_mode=0x%X b_mode=%X" ,fname,bp->b_type,bp->view_mode,bp->b_mode);
 #if	CRYPT
 	s=resetkey(bp);
@@ -1806,6 +1813,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 	if(bp->b_mode!=VMHEX) {
 		bp->bom_type = bom_type(bp->file_id);
 	};
+
 #if	CRYPT
 	if ((bp->bom_type == FTYPE_ENCRYPTED) 
 		/* and if only text, tdc,cmd and notes are to be encrypted!  */
@@ -1815,14 +1823,13 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 		|| file_type_is("MD",bp->b_type) 
 		|| (bp->b_type >= NOTE_TYPE))
 		 ) {	
-			// MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
+			MESG("	file %s is encrypted!  %X %X",bp->b_fname,bp->b_type,NOTE_TYPE);
 			bp->b_mode |= EMCRYPT;
 #if	TNOTES
 			if(bt_dval("notes_recreate") || from_note) 
 			{
 #if	1
 				int key_type = bt_dval("notes_key");
-
 				if(get_notes_key(key_type))
 				strlcpy(bp->b_key,get_notes_key(key_type),sizeof(bp->b_key));
 				else return false;
@@ -2011,6 +2018,7 @@ int add_to_recent_list(char *full_file_name)
 {
 	int found=0;
 	char *new_str;
+	if(exebnf||execmd) return 0;
 	// MESG("add_to_recent_list: [%s]",full_file_name);
 	if(full_file_name[0]==CHR_LBRA) return 0;
 	if(recent_file_list==NULL) return 0;

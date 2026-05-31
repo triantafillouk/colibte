@@ -1009,10 +1009,10 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
  char st2[MAXLLEN];	// this is the real string
  int saved_kbdmode=kbdmode;
  
- // MESG("win_getstring:");
+ MESG("win_getstring:");
  // MESG("win_getstring: prompt %s maxlen=%d execmd=%d",prompt,maxlen,execmd);
  if(maxlen>MAXLLEN-1) maxlen=MAXLLEN-1;
- if(execmd) {
+ if(execmd||exebnf) {
 	// MESG("	print the prompt!");
 	printf("%s",prompt);
 	if(fgets(st1,maxlen,stdin)==NULL) return false;

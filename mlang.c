@@ -4668,17 +4668,22 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 /* size of the buffer */
 {
 	/* if we are interactive, go get it! */
-	// MESG("nextarg:");
-	if (macro_exec == FALSE) {
+	MESG("nextarg: macro_exec=%d var@=%d",macro_exec,VARIND);
+	if (macro_exec == FALSE || macro_exec==2) {
 		// MESG("getstring: %s",prompt);
 		if(getstring(prompt, buffer, size,show)!=FALSE) {
 			// MESG("nextarg: buffer=[%s]",buffer);
+			if(exebnf) {
+				bnf_var->dval=atof(buffer);
+				bnf_var->var_type=VTYPE_NUM;
+			} else
 			set_dval(atof(buffer));
 		} else {
 			set_update(cwp,UPD_MOVE);
 			return(FALSE);
 		};
 	} else {
+		// MESG("	get the next argument! exebnf=%d execmd=%d",exebnf,execmd);
 		/* slval has already the next argument */
 		// MESG("nextarg: slval=%s",get_sval());	
 		if(exebnf) strlcpy(buffer,bnf_var->sval,size);

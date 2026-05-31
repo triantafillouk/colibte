@@ -758,6 +758,7 @@ int string_is_empty(char *str)
 // Parse note and create db fields
 int parse_note(FILEBUF *fp)
 {
+ // MESG(">parse_node:0");
  notes_struct *note=fp->b_note;
  offs ptr=0;
  int errors=0;
@@ -768,13 +769,14 @@ int parse_note(FILEBUF *fp)
 	if(note==NULL) note=fp->b_note=init_note();
 	// MESG("!parse_note: --- b_type=%X dir=[%s] name=[%s] tags=[%s] lines=%d",fp->b_type,fp->b_dname,fp->b_fname,note->n_tags,fp->lines);
 	if(fp->lines<2) {
-		error_line("### parse error, too few lines (%d)!!",fp->lines);
+		error_line("### parse error in [%s] too few lines (%d)!!",fp->b_fname,fp->lines);
 		return false;
 	};
 	if(FSize(fp)<10) {
-		error_line("### parse error size < 10",FSize(fp));
+		error_line("### parse error in [%s] size < 10",fp->b_fname,FSize(fp));
 		return false;
 	};
+
 	if(fp->b_type & NOTE_CAL_TYPE) {
 		// MESG("	--- NOTE_CAL_TYPE:fname=[%s]",fp->b_fname);
 		strlcpy(note->n_name,fp->b_fname,sizeof(note->n_name));
@@ -869,7 +871,7 @@ int parse_note(FILEBUF *fp)
 #endif
 			// MESG("	todo set n_cat=%s n_name=%s",note->n_cat,note->n_name);
 		} else { 
-			MESG("not a note,calendar,todo!");
+			MESG("[%s] not a note,calendar,todo!",fp->b_fname);
 		};
 	if(ptr==0) {
 		errors++;
@@ -889,7 +891,7 @@ int parse_note(FILEBUF *fp)
 		if(snprintf(note->n_cat,sizeof(note->n_cat),"%s",start_cat_name)>=sizeof(note->n_cat)) MESG("note category truncated");
 		if(snprintf(note->n_name,sizeof(note->n_name),"%s",fp->b_fname)>=sizeof(note->n_name)) MESG("note name truncated");
 		if(strlen(note->n_cat)==0) {
-			MESG("### parse error, category is empty!");
+			MESG("### parse error in [%s], category is empty!",fp->b_fname);
 			return false;
 		};
 		// MESG("	- parse_note:4 cat=%s name=%s errors=%d",note->n_cat,note->n_name,errors);
@@ -914,7 +916,7 @@ int parse_note(FILEBUF *fp)
 		if(ptr==0 ) {
 			strcpy(note->n_title,"No title");
 			if((strlen(note->n_tags)==0)) {
-				MESG("### parse error, No title!");
+				MESG("### parse error in [%s], No title!",fp->b_fname);
 				return false;
 			};
 		};
@@ -978,7 +980,7 @@ int parse_note(FILEBUF *fp)
 	};
 	// MESG("	errors %d name=[%s]",errors,note->n_name);
 	if(errors>3 || string_is_empty(note->n_name)) {
-		MESG("### parse error errors=%d name=[%s]",errors,note->n_name);
+		MESG("### parse error in [%s] errors=%d name=[%s]",fp->b_fname,errors,note->n_name);
 		return false;
 	};
 	return true;
@@ -1186,6 +1188,7 @@ int init_notes_db(num n)
 
 #define	INIT_DB		1
 #define	RESET_KEY	2
+void prev_var_ext(char *from);
 
 // reconstruct notes database from file contents.
 int recreate_notes_db(num init_db)
@@ -1196,9 +1199,11 @@ int recreate_notes_db(num init_db)
  char tmp_file[256];
  char **notes_files;
  // FILEBUF *current_buffer=cbfp;
+
 	MESG("--- recreate_notes_db: ---- init_db=%d",init_db);
 	set_bt_num_val("notes_recreate",1);
 	// create notes db
+	if(exebnf) prev_var_ext("recreate_notes_db");
 	if(init_db==INIT_DB){
 		MESG("recreate_note_db: Initialize database!");
 		if(!init_notes_db(1)) return false;
@@ -1225,7 +1230,7 @@ int recreate_notes_db(num init_db)
 	init_note_keys();
 	for(i=0 ;notes_files[i]!=NULL;i++){
 		struct stat st;
-		// MESG("---- insert %d: [%s]",i,notes_files[i]);
+		MESG("---- insert %d: [%s]",i,notes_files[i]);
 		if(!stat(notes_files[i],&st))
 		{
 			int flen=strlen(notes_files[i]);
@@ -1255,7 +1260,7 @@ int recreate_notes_db(num init_db)
 				};
 
 
-				// MESG("  #%3d: go parse %s",i,notes_files[i]);
+				// MESG("  #%3d: go parse %s init=%ld",i,notes_files[i],init_db);
 				bp=new_filebuf(notes_files[i],0);
 
 				if(init_db == RESET_KEY) {
@@ -1291,10 +1296,11 @@ int recreate_notes_db(num init_db)
 					continue;
 #endif
 				};
-
+		
 				bp->b_note = s_note;
+				// MESG("	activate file [%s][%s]",bp->b_dname,bp->b_fname);
 				activate_file(bp);
-
+				// MESG("	file_activated!");
 				if(!parse_note(bp)) {
 					msg_line(" file [%s] Not a note file !!!!!!!!!!!!",notes_files[i]);
 					delete_filebuf(bp,1);
@@ -1303,7 +1309,7 @@ int recreate_notes_db(num init_db)
 					notes_failparse++;
 					continue;					
 				};
-				MESG("  %3d: add - n=[%s] title=[%s] cat=[%s] tags=[%s] cr=[%s]",i,s_note->n_name,s_note->n_title,s_note->n_cat,s_note->n_tags,bp->b_key);
+				// MESG("  %3d: add - n=[%s] title=[%s] cat=[%s] tags=[%s] cr=[%s]",i,s_note->n_name,s_note->n_title,s_note->n_cat,s_note->n_tags,bp->b_key);
 				s_note->timestamp = st.st_mtime;
 				status=save_to_db(s_note);
 				notes_new++;

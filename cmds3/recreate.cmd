@@ -1,3 +1,3 @@
-# bnf TBD
-result=recreate_notes_db(1)
+# bnf ok, the argument states if will initialize the database TBC
+result=recreate_notes_db(0)
 print(result)

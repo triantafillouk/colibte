@@ -90,6 +90,11 @@ void next_var(char *title)
 }
 #endif
 
+void prev_var_ext(char *from)
+{
+	prev_var(from);
+}
+
 
 inline static void set_var_value()
 {
@@ -475,7 +480,7 @@ void bnf_factor_plus()
 		bnf_var->var_type=VTYPE_STRING;
 		return;
 	} else if(vara->var_type==VTYPE_SARRAY) {
-		// TDB
+		// TBD
 		// sarray_add1(avar->adat,bvar->sval);
 	}
  
@@ -3031,7 +3036,7 @@ void bnf_factor_cmd()
 	err_line=tok->tline;
 	err_str=NULL;
 	MESG(";factor_cmd: before ed_command: var@=%d type=%d",VARIND,bnf_var->var_type);
-	value=ed_command->n_func((int)value);
+	value=ed_command->n_func((num)value);
 	bnf_var->dval=value;
 	bnf_var->var_type=VTYPE_NUM;
 	macro_exec = save_macro_exec;

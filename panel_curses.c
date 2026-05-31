@@ -1066,6 +1066,7 @@ void drv_post_init()
 
 int getstring(char *prompt, char *st1,int maxlen,int disinp)
 {
+ // MESG("	win_getstring");
  return win_getstring(mesg_window,prompt, st1,maxlen,disinp);
 }
 
