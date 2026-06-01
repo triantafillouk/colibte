@@ -40,6 +40,7 @@ int	macro_exec	= FALSE;		/* command line execution flag	*/
 int	discmd	= TRUE;			/* display command flag		*/
 int execmd	= FALSE;	/* exec the file  */
 int exebnf  = FALSE;	/* exec with bnf notation activep  */
+int usebnf  = FALSE;
 int show_tokens = FALSE;
 int show_bnf_tokens = FALSE;
 int show_no_time = FALSE;
@@ -62,6 +63,7 @@ extern int entry_mode;
 extern int xwin;
 extern int execmd;
 extern int exebnf;
+extern int usebnf;
 extern int show_tokens;
 extern int show_bnf_tokens;
 extern int show_no_time;

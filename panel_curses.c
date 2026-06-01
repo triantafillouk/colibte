@@ -1489,10 +1489,12 @@ void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
 {
  int fcolor=afcol % 0x100;
  int attrib=0;
+ MESG("drv_wcolor: fcolor=%d",fcolor);
  if(afcol & FONT_STYLE_UNDERLINE) {
  	attrib |=A_UNDERLINE;
  } else {
  	int a = current_scheme->color_style[fcolor].color_attr;
+	MESG("	a=%d",a);
 #if	!SOLARIS
 	// if(a & FONT_STYLE_ITALIC) attrib |= A_ITALIC;
 #endif
@@ -2308,9 +2310,10 @@ int dspv(WINDOW *disp_window,int x,int y,char *st)
  // int len;
  int x_pos,y_pos;
  // len=0;
- // MESG("dspv: x=%d y=%d [%s]",x,y,st);
+ MESG("dspv: x=%d y=%d [%s]",x,y,st);
  hide_cursor("dpsv");
  wmove(disp_window,y,x);
+ MESG("dspv:1");
 
  while((c=*st++)!=0) {
  	if(c<32) {
@@ -2322,6 +2325,7 @@ int dspv(WINDOW *disp_window,int x,int y,char *st)
 	waddch(disp_window,c);
 	drv_wcolor(disp_window,COLOR_FG,COLOR_BG);
  };
+ MESG("dspv:1");
  getyx(disp_window,y_pos,x_pos);
  wclrtoeol(disp_window);
  wnoutrefresh(disp_window);

@@ -2015,7 +2015,7 @@ void main_loop()
 	};
 #else
 #if	GTK4
-	MESG("start application!");
+	// MESG("start application!");
 	GtkApplication *app;
 	int status;
 

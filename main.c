@@ -319,8 +319,12 @@ void parse_command_line(int argc, char **argv)
 						allocate_array(main_args);
 						a_arg=0;
 					break;
+				case 'F':
+					usebnf=1;
+					break;
 				case 't':
 					show_tokens=1;
+					break;
 				case 'f':
 					exebnf=1;
 				case 'x':	/* execute file and quit */

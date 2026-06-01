@@ -1009,7 +1009,7 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
  char st2[MAXLLEN];	// this is the real string
  int saved_kbdmode=kbdmode;
  
- MESG("win_getstring:");
+ MESG("win_getstring: %d %d",execmd,exebnf);
  // MESG("win_getstring: prompt %s maxlen=%d execmd=%d",prompt,maxlen,execmd);
  if(maxlen>MAXLLEN-1) maxlen=MAXLLEN-1;
  if(execmd||exebnf) {
@@ -1032,6 +1032,7 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
  msg_line("");
  
  strlcpy(st2,st1,MAXLLEN);
+ printf("1\n");
 
  /* get current position prompt_len,ys */
 #if	PCURSES
@@ -1041,18 +1042,21 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
 #endif
  cursor_x = dspv(disp_window,0,ys,prompt);
  prompt_len=cursor_x;
+ printf("2\n");
  /* display start string */
  ce=0;
  ce1=0;
 
  strlcpy(st,st1,511);
  cursor_x += dspv(disp_window,cursor_x,ys,st);
+ printf("3\n");
 
  ce=strlen(st2);
  ce1=ce;
 
  quotef=FALSE;	/* we start with no escape for special chars  */
  kbdmode=0;
+ printf("4\n");
  for(;;) {
    e_pos = cursor_x;
    show_cursor_dl(cursor_x);
@@ -1361,7 +1365,7 @@ void main_loop()
 	app_error=0;
 
 	c = getcmd();
-	MESG_time_start("# main_loop go execute -------key %s",xe_key_name(c));
+	// MESG_time_start("# main_loop go execute -------key %s",xe_key_name(c));
 	/* execute the keyboard sequence */
 	// msg_line(time2a());
 	main_execute(c);

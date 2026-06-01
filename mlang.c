@@ -1251,6 +1251,13 @@ MVAR * push_args_1(int nargs,int vars_num)
 
 double exec_function(FILEBUF *proc_buffer,int nargs)
 {
+#if	TBNF
+	if(usebnf) {
+		bnf_exec_function(proc_buffer,nargs);
+		if(bnf_var->var_type==VTYPE_NUM) return bnf_var->dval;
+		return 1;
+	};
+#endif
 	MVAR *old_symbol_table=current_stable;
 	current_stable = push_args_1(nargs,proc_buffer->symbol_tree->items);
 	tok_struct *after_proc=tok;
@@ -4135,7 +4142,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	drv_start_checking_break();
 	// MESG("	call exec_block1 ------");
 #if	TBNF
-	if(!exebnf) {
+	if(!exebnf && !usebnf) {
 #endif
 	if(execmd) val=exec_block1(bp);
 	else val=exec_block1_break(bp);
@@ -4144,7 +4151,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 #endif
 	// MESG("	after exec_block1 !!!!!");
 #if	TBNF
-	if(exebnf) {
+	if(exebnf || usebnf) {
 		MESG("## execute bnf block! --------------------");
 		exe_buffer=bp;
 		tok=bp->tok_table_bnf;
@@ -4171,7 +4178,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		};
 		current_stable=old_symbol_table;
 	};
-	if(exebnf) {
+	if(exebnf || usebnf) {
 		show_var_stats();
 		MESG("show result executing buffer [%s]!",bp->b_fname);
 		MVAR *result = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
@@ -4237,6 +4244,9 @@ int refresh_current_buffer(num nused)
  /* clear parse list  */
  MESG("refresh_current_buffer: call empty_tok_table: [%s]",fp->b_fname);
  empty_tok_table(fp);
+#if	TBNF
+ if(!usebnf)
+#endif
  clean_saved_string(0);
  fp->err=-1;
  // MESG("refresh_current_buffer:1 [%s] %d",fp->b_fname,fp->b_type);
@@ -4259,8 +4269,13 @@ int refresh_current_buffer(num nused)
 	init_exec_flags();
 	tok=fp->tok_table;
 #if	TBNF
-	// check bnf flag!!
-	val=exec_block1_break(fp);
+	if(usebnf) {
+		bnf_block1_break();
+		if(bnf_var->var_type==VTYPE_NUM) val=bnf_var->dval;
+		else val=1;
+	} else {
+		val=exec_block1_break(fp);
+	};
 #else
 	val=exec_block1_break(fp);
 #endif
@@ -4271,6 +4286,13 @@ int refresh_current_buffer(num nused)
 		// msg_line("Error %d [%s] at line %d",err_num,err_str,err_line);
 		// mesg_out("Error %d [%s] at line %d",err_num,err_str,err_line);
 	} else {
+#if	TBNF
+		if(usebnf) {
+			if(bnf_var->var_type==VTYPE_NUM) msg_line("Result is [%f]",val);
+			else if(bnf_var->var_type==VTYPE_NUM) msg_line("Result is \"%s\"",bnf_var->sval);
+			else msg_line("done!");
+		};
+#endif
 		if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
 		else if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
 		else if(get_sval()) msg_line("Result is [%s %f]",get_sval(),val);
