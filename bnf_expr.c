@@ -2992,13 +2992,14 @@ void bnf_factor_cmd()
 	double value=1;
 	FUNCS *ed_command;
 
-	// MESG(";factor_cmd: editor command: ttype=%d command=%d",tok->ttype,tok->tok_node->node_index);
 	function_index = tok->tok_node->node_index;
+	MESG(";factor_cmd: editor command: ttype=%d command=%d %s",tok->ttype,function_index,ftable[function_index].n_name);
 	ed_command = ftable+function_index;
 
 	NTOKEN2;
 	save_macro_exec=macro_exec;
 	next_var("cmd");
+	macro_exec=MACRO_MODE2;
 	// MESG(";ed_command: [%s] args=%d",ed_command->n_name,ed_command->arg);
 	if(ed_command->arg) {
 		check_par=1;	/* we need parenthesis if arguments.  */
@@ -3029,7 +3030,7 @@ void bnf_factor_cmd()
 
 	};
 
-	macro_exec = save_macro_exec;
+	macro_exec = MACRO_MODE2;
 
 	// err_num=0;
 	err_line=tok->tline;

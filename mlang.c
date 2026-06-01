@@ -4690,7 +4690,7 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 /* size of the buffer */
 {
 	/* if we are interactive, go get it! */
-	// MESG("nextarg: macro_exec=%d var@=%d",macro_exec,VARIND);
+	MESG("nextarg: macro_exec=%d var@=%d",macro_exec,VARIND);
 	if (macro_exec == FALSE) {
 		// MESG("getstring: %s",prompt);
 		if(getstring(prompt, buffer, size,show)!=FALSE) {
@@ -4708,7 +4708,7 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 		// MESG("	get the next argument! exebnf=%d execmd=%d",exebnf,execmd);
 		/* slval has already the next argument */
 		// MESG("nextarg: slval=%s",get_sval());	
-		if(exebnf) strlcpy(buffer,bnf_var->sval,size);
+		if(exebnf||usebnf) strlcpy(buffer,bnf_var->sval,size);
 		else strlcpy(buffer,get_sval(),size);
 	};
 	return(TRUE);
