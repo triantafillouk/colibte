@@ -3037,10 +3037,8 @@ void bnf_factor_cmd()
 	err_str=NULL;
 	MESG(";factor_cmd: before ed_command: var@=%d type=%d",VARIND,bnf_var->var_type);
 	value=ed_command->n_func((num)value);
-	bnf_var->dval=value;
-	bnf_var->var_type=VTYPE_NUM;
 	macro_exec = save_macro_exec;
-	MESG("after ed_command: var@=%d type=%d",VARIND,bnf_var->var_type);
+	MESG("after ed_command: var@=%d type=%d value=%d",VARIND,bnf_var->var_type,value);
 	if(bnf_var->var_type==VTYPE_NUM) {
 		MESG("exec result=%f",bnf_var->dval);
 	};
