@@ -68,6 +68,8 @@ extern alist *shell_list;
 extern alist *pat_list;
 extern alist *macro_list;
 
+void prev_var_ext(char *from);
+
 inline int normalize(int c);
 
 void set_list_type(int type)
@@ -382,7 +384,9 @@ int assign_sub(num n)
 	// MESG("assign_sub:");
 	if((s = nextarg("Assign: subroutine name :", funname, 32,true))!=TRUE) return(s);
 //	show_token(cbfp->parser,"assign_sub: after nextarg!");
-	prev_var_ext("assign_sub");
+#if	TBNF
+	if(usebnf) prev_var_ext("assign_sub");
+#endif
 	kfunc = execsub;
 	msg_line("Press the key to assign!");
 	c = getckey();

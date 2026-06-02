@@ -37,6 +37,7 @@ int get_active_flag();
 #if	TBNF
 void set_bnf_string(char *s);
 void set_bnf_num(double v);
+MVAR *get_bnf_var();
 #endif
 
 int vtype_is(int type);
@@ -1284,10 +1285,17 @@ int refresh_current_line(num nused)
 		set_update(cwp,UPD_EDIT);
 		return (FALSE);
  	} else {
- 		if(vtype_is(VTYPE_STRING)) msg_line("res=[%s]",value,get_sval());
-		else {
-			msg_line("res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
-		}
+		if(usebnf) {
+			MVAR *result=get_bnf_var();
+			if(result->var_type==VTYPE_STRING) msg_line("bnf res=[%s]",result->sval);
+			else if (result->var_type==VTYPE_NUM) msg_line("bnf res=[%f]",result->dval);
+			else msg_line("bnf result type %d",result->var_type);
+		} else {
+	 		if(vtype_is(VTYPE_STRING)) msg_line("res=[%s]",value,get_sval());
+			else {
+				msg_line("res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
+			}
+		};
  	};
 	if(is_ddot){
 		el=FLineEnd(cbfp,sl);

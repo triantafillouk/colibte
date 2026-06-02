@@ -265,7 +265,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		tok_struct *dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
     	tok->pushed=check_buffer->tok_bnf_index;
-		MESG("! set pushed! as %d [%s] exp_type=%d",tok->pushed,tok_info(tok),exp_type);
+		// MESG("! set pushed! as %d [%s] exp_type=%d",tok->pushed,tok_info(tok),exp_type);
 		// dest->ttype=exp_type;
 		set_bnf_function1(dest,exp_type);
 
@@ -4162,6 +4162,8 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		exe_buffer=bp;
 		tok=bp->tok_table_bnf;
 		bnf_block1();
+		next_var("res1");
+		set_result();
 		MESG("end of program1 var@=%d type %d",VARIND,bnf_var->var_type);
 		if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
 		// next_var("end");
@@ -4186,6 +4188,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	};
 	if(exebnf || usebnf) {
 		show_var_stats();
+		// next_var("result");
 		MESG("show result executing buffer [%s]!",bp->b_fname);
 		MVAR *result = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
 		if(result->var_type==VTYPE_NUM) msg_line("Result at var@=%d [%f]",VARIND,num_result());
@@ -4193,9 +4196,9 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		else msg_line("Result at var@=%d is type %d",VARIND,bnf_var->var_type);
 		MESG("	result var@=%d",(int)(bnf_var-bnf_vars));
 	} else {
-		if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
-		else if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
-		else msg_line("Result is type %d",get_vtype());
+		if(vtype_is(VTYPE_STRING)) msg_line("Result n is \"%s\"",get_sval());
+		else if(vtype_is(VTYPE_NUM)) msg_line("Result n is [%f]",val);
+		else msg_line("Result n is type %d",get_vtype());
 	};
  } else {
  	msg_line("parse error %d on %s ",err_num,bp->b_fname);
@@ -4296,14 +4299,16 @@ int refresh_current_buffer(num nused)
 	} else {
 #if	TBNF
 		if(usebnf) {
-			if(bnf_var->var_type==VTYPE_NUM) msg_line("Result is [%f]",val);
-			else if(bnf_var->var_type==VTYPE_NUM) msg_line("Result is \"%s\"",bnf_var->sval);
+			set_result();
+			if(bnf_var->var_type==VTYPE_NUM) msg_line("Result bnf is [%f]",val);
+			else if(bnf_var->var_type==VTYPE_NUM) msg_line("Result bnf is \"%s\"",bnf_var->sval);
 			else msg_line("done!");
-		};
+		} else {
 #endif
-		if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
-		else if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
-		else if(get_sval()) msg_line("Result is [%s %f]",get_sval(),val);
+			if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
+			else if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
+			else if(get_sval()) msg_line("Result is [%s %f]",get_sval(),val);
+		};
 	};
  } else {
  	msg_line("parse error %d line %d [%s]",err_num,err_line+1,err_str);
@@ -4698,7 +4703,7 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 /* size of the buffer */
 {
 	/* if we are interactive, go get it! */
-	MESG("nextarg: macro_exec=%d var@=%d",macro_exec,VARIND);
+	// MESG("nextarg: macro_exec=%d var@=%d",macro_exec,VARIND);
 	if (macro_exec == FALSE) {
 		// MESG("getstring: %s",prompt);
 		if(getstring(prompt, buffer, size,show)!=FALSE) {

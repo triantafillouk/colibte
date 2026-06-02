@@ -22,7 +22,7 @@ int get_type_index(array_dat *adat, tok_struct *tok);
 
 #define VARIND (int)(bnf_var-bnf_vars)
 
-#if	0
+#if	1
 #if	1
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
@@ -282,7 +282,7 @@ void bnf_factor_var()
 	bnf_var->var_pointer=get_left_slot(tok->tind);
 	bnf_var->var_type=VTYPE_POINTER;
 	bnf_var->var_alloced=0;
-	MESG("## factor_var: put var %s tind=%d %p at var@=%d",tok->tname,tok->tind,bnf_var->var_pointer,VARIND);
+	// MESG("## factor_var: put var %s tind=%d %p at var@=%d",tok->tname,tok->tind,bnf_var->var_pointer,VARIND);
 }
 
 void bnf_factor_num()
@@ -1402,10 +1402,10 @@ inline static void bnf_factor_sep()
 {
  if(bnf_var-bnf_vars>1) 
  { 
-	MESG("bnf_factor_sep: < var@=%d set prev_var [%s]",VARIND,tok_info(tok));
+	// MESG("bnf_factor_sep: < var@=%d set prev_var [%s]",VARIND,tok_info(tok));
 	prev_var("sep");
 	set_bnf_function(tok,"sep->sep1",bnf_factor_sep1);
-	MESG("bnf_factor_sep: >, var@=%d",VARIND);
+	// MESG("bnf_factor_sep: >, var@=%d",VARIND);
  } else {
 	set_bnf_function(tok,"sep->sep0",bnf_factor_sep0);
  };
@@ -1951,6 +1951,15 @@ inline static void bnf_statement(char *from)
 	// MESG("	bnf_statement: end var@=%d [%s]",VARIND,tok_info(tok));
 }
 
+inline static void set_result()
+{
+	if(bnf_var->var_type==VTYPE_POINTER) {
+		memmove(bnf_var,bnf_var->var_pointer,sizeof(struct MVAR));
+		// if(bnf_var->var_type==VTYPE_STRING) 
+			bnf_var->var_alloced=0;
+	};
+}
+
 inline static double bnf_expression()
 {
 	// MESG("	bnf_expression: ------ tok ind=%3d ttype=%d tgroup=%d bnf_group=%d",tok->tind,tok->ttype,tok->tgroup,tok->bnf_group);
@@ -1960,10 +1969,7 @@ inline static double bnf_expression()
 		NTOKEN2;
 	};
 #if	1
-	if(bnf_var->var_type==VTYPE_POINTER) {
-		memmove(bnf_var,bnf_var->var_pointer,sizeof(struct MVAR));
-		if(bnf_var->var_type==VTYPE_STRING) bnf_var->var_alloced=0;
-	};
+	set_result();
 	if(bnf_var->var_type==VTYPE_NUM) return bnf_var->dval;
 	else return 0;
 #endif
@@ -1982,6 +1988,11 @@ void bnf_dir_return()
 	};
 	// MESG("	dir_return : end var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	current_active_flag=0;	/* skip rest of function  */
+}
+
+MVAR *get_bnf_var()
+{
+	return bnf_var;
 }
 
 void bnf_dir_type()
@@ -2129,7 +2140,8 @@ void bnf_dir_else()
 void show_var_stats()
 {
 #if	TPROFILE
-	fprintf(stderr,"MVAR index=%ld var@=%d max=%ld\n",var_index,VARIND,max_var);
+// 	fprintf(stderr,"MVAR index=%ld var@=%d max=%ld\n",var_index,VARIND,max_var);
+	MESG("MVAR index=%ld var@=%d max=%ld",var_index,VARIND,max_var);
 #endif
 }
 
@@ -2998,7 +3010,7 @@ void bnf_factor_cmd()
 	FUNCS *ed_command;
 
 	function_index = tok->tok_node->node_index;
-	MESG(";factor_cmd: editor command: ttype=%d command=%d %s",tok->ttype,function_index,ftable[function_index].n_name);
+	// MESG(";factor_cmd: editor command: ttype=%d command=%d %s",tok->ttype,function_index,ftable[function_index].n_name);
 	ed_command = ftable+function_index;
 
 	NTOKEN2;
@@ -3040,12 +3052,12 @@ void bnf_factor_cmd()
 	// err_num=0;
 	err_line=tok->tline;
 	err_str=NULL;
-	MESG(";<factor_cmd: before ed_command: var@=%d type=%d",VARIND,bnf_var->var_type);
+	// MESG(";<factor_cmd: before ed_command: var@=%d type=%d",VARIND,bnf_var->var_type);
 	value=ed_command->n_func((num)value);
 	macro_exec = save_macro_exec;
-	MESG(";>factor_cmd: after ed_command: var@=%d type=%d value=%d",VARIND,bnf_var->var_type,value);
+	// MESG(";>factor_cmd: after ed_command: var@=%d type=%d value=%d",VARIND,bnf_var->var_type,value);
 	if(bnf_var->var_type==VTYPE_NUM) {
-		MESG("exec result=%f",bnf_var->dval);
+		// MESG("exec result=%f",bnf_var->dval);
 	};
 
 	if(check_par) { 
