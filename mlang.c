@@ -265,7 +265,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		tok_struct *dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
     	tok->pushed=check_buffer->tok_bnf_index;
-		// MESG("! set pushed! as %d [%s] exp_type=%d",tok->pushed,tok_info(tok),exp_type);
+		MESG("! set pushed! as %d [%s] exp_type=%d",tok->pushed,tok_info(tok),exp_type);
 		// dest->ttype=exp_type;
 		set_bnf_function1(dest,exp_type);
 
@@ -4028,7 +4028,10 @@ double exec_block1(FILEBUF *fp)
  INIT_STAGE;
  exe_buffer=fp;
  double val=0;
-   // MESG("exec_block1:[%s] err_num= %d %d tok=[%s]",fp->b_fname,err_num,current_active_flag,tok_info(tok));
+#if TBNF
+	if(usebnf) exit(0);
+#endif 
+  // MESG("exec_block1:[%s] err_num= %d %d tok=[%s]",fp->b_fname,err_num,current_active_flag,tok_info(tok));
    if(!current_active_flag) {
 		tok=fp->end_token;
 		return(ex_var.dval);
@@ -4059,7 +4062,9 @@ double exec_block1(FILEBUF *fp)
 
 double exec_block1_break(FILEBUF *fp)
 {
- // double val=0;
+#if TBNF
+	if(usebnf) exit(0);
+#endif 
  INIT_STAGE;
  exe_buffer=fp;
  double val=0;
@@ -4099,6 +4104,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  MVAR *local_symbols;
  MVAR *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
+	MESG("# compute_block1: [%s] use [%s] start=%d",bp->b_fname,use_fp->b_fname,start);
 	MESG("# [%-15s %s ---------------------------------------------",bp->b_fname,VERSION);
 	eval_curl_match(NULL);
  if(show_tokens) {
@@ -4265,15 +4271,17 @@ int refresh_current_buffer(num nused)
 		return(0);
 	};
 	// MESG("refresh_current_buffer: after check_init");
- 	msg_line("evaluating ...");
+ 	msg_line("evaluating %s",fp->b_fname);
 	init_exec_flags();
-	tok=fp->tok_table;
+	exe_buffer=fp;
 #if	TBNF
 	if(usebnf) {
+		tok=fp->tok_table_bnf;
 		bnf_block1_break();
 		if(bnf_var->var_type==VTYPE_NUM) val=bnf_var->dval;
 		else val=1;
 	} else {
+		tok=fp->tok_table;
 		val=exec_block1_break(fp);
 	};
 #else

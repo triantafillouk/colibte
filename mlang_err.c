@@ -1263,7 +1263,7 @@ int err_factor()
 				} else {
 					CHECK_TOK(520);
 					if(tok->ttype==TOK_RPAR) {
-						MESG_TOK_INFO("# check RPAR:2",tok);
+						// MESG_TOK_INFO("# check RPAR:2",tok);
 						break;
 					};
 				};
@@ -2076,7 +2076,7 @@ int err_check_block1()
  TDSERR("block");
    SHOW_STAGE(671);
 	
-   // MESG("err_check_block1: [%s] <-- [%s]",check_buffer->b_fname,tok_info(tok));
+   MESG("err_check_block1: [%s] <-- [%s]",check_buffer->b_fname,tok_info(tok));
    // MESG("   num: name          ttype tind");
    while(1) {
 	CHECK_TOK(672);

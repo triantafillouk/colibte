@@ -382,6 +382,7 @@ int assign_sub(num n)
 	// MESG("assign_sub:");
 	if((s = nextarg("Assign: subroutine name :", funname, 32,true))!=TRUE) return(s);
 //	show_token(cbfp->parser,"assign_sub: after nextarg!");
+	prev_var_ext("assign_sub");
 	kfunc = execsub;
 	msg_line("Press the key to assign!");
 	c = getckey();

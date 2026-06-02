@@ -1489,12 +1489,12 @@ void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
 {
  int fcolor=afcol % 0x100;
  int attrib=0;
- MESG("drv_wcolor: fcolor=%d",fcolor);
+ // MESG("drv_wcolor: fcolor=%d",fcolor);
  if(afcol & FONT_STYLE_UNDERLINE) {
  	attrib |=A_UNDERLINE;
  } else {
  	int a = current_scheme->color_style[fcolor].color_attr;
-	MESG("	a=%d",a);
+	// MESG("	a=%d",a);
 #if	!SOLARIS
 	// if(a & FONT_STYLE_ITALIC) attrib |= A_ITALIC;
 #endif
