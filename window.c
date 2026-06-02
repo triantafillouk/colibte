@@ -438,12 +438,15 @@ int buffer_in_view(num n)
  WINDP *view_window;
  char bname[MAXFLEN];
  int s1;
+ MESG("buffer_in_view:");
  if(!drv_initialized) return false;
  if((s1 = nextarg("buffer name: ",bname,MAXFLEN,true)) !=TRUE) return FALSE;
  view_buffer=get_filebuf(bname,NULL,0);
  if(view_buffer) {
  	view_window=find_buffer_window(view_buffer);
-	if(view_window) return true;
+	if(view_window) {
+		return true;
+	};
  };
  return false;
 }

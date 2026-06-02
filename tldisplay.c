@@ -1032,7 +1032,6 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
  msg_line("");
  
  strlcpy(st2,st1,MAXLLEN);
- printf("1\n");
 
  /* get current position prompt_len,ys */
 #if	PCURSES
@@ -1042,21 +1041,20 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
 #endif
  cursor_x = dspv(disp_window,0,ys,prompt);
  prompt_len=cursor_x;
- printf("2\n");
+ 
  /* display start string */
  ce=0;
  ce1=0;
 
  strlcpy(st,st1,511);
  cursor_x += dspv(disp_window,cursor_x,ys,st);
- printf("3\n");
 
  ce=strlen(st2);
  ce1=ce;
 
  quotef=FALSE;	/* we start with no escape for special chars  */
  kbdmode=0;
- printf("4\n");
+ 
  for(;;) {
    e_pos = cursor_x;
    show_cursor_dl(cursor_x);

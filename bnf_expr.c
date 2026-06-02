@@ -2030,7 +2030,7 @@ inline static MVAR * push_args_bnf(int nargs,int vars_num)
 inline static void bnf_exec_function(FILEBUF *proc_buffer,int nargs)
 {
 	MVAR *old_symbol_table=current_stable;
-	// MESG("## bnf_exec_function:[%s] var@=%d args=%d",proc_buffer->b_fname,VARIND,nargs);
+	MESG("## bnf_exec_function:[%s] var@=%d args=%d",proc_buffer->b_fname,VARIND,nargs);
 
 	current_stable = push_args_bnf(nargs,proc_buffer->symbol_tree->items);
 	tok_struct *after_proc=tok; 
@@ -3010,7 +3010,7 @@ void bnf_factor_cmd()
 	FUNCS *ed_command;
 
 	function_index = tok->tok_node->node_index;
-	// MESG(";factor_cmd: editor command: ttype=%d command=%d %s",tok->ttype,function_index,ftable[function_index].n_name);
+	MESG(";factor_cmd: editor command: ttype=%d command=%d %s",tok->ttype,function_index,ftable[function_index].n_name);
 	ed_command = ftable+function_index;
 
 	NTOKEN2;
@@ -3053,13 +3053,17 @@ void bnf_factor_cmd()
 	err_line=tok->tline;
 	err_str=NULL;
 	// MESG(";<factor_cmd: before ed_command: var@=%d type=%d",VARIND,bnf_var->var_type);
-	value=ed_command->n_func((num)value);
+	value=(double)ed_command->n_func((num)value);
 	macro_exec = save_macro_exec;
-	// MESG(";>factor_cmd: after ed_command: var@=%d type=%d value=%d",VARIND,bnf_var->var_type,value);
+#if	1
+	bnf_var->var_type=VTYPE_NUM;
+	bnf_var->dval=value;
+#else
 	if(bnf_var->var_type==VTYPE_NUM) {
 		// MESG("exec result=%f",bnf_var->dval);
 	};
-
+#endif
+	MESG(";>factor_cmd: after ed_command: var@=%d type=%d value=%f",VARIND,bnf_var->var_type,value);
 	if(check_par) { 
 		if(check_rparenthesis()) {
 			//NTOKEN2;	// MESG("right parenthesis skipped!");
