@@ -339,9 +339,9 @@ int goto_line(num n)
 {
 	char arg[MAXSLEN];
 	arg[0]=0;
-	MESG("goto_line:");
+	// MESG("goto_line:");
 	if ((nextarg("Go to line : ", arg, MAXSLEN,true)) != TRUE) 	return(FALSE);
-	MESG("goto_line: macro_exec=%d != %d",macro_exec!=MACRO_MODE2);
+	// MESG("goto_line: macro_exec=%d != %d",macro_exec!=MACRO_MODE2);
 	if(macro_exec!=MACRO_MODE2) n = get_val();
 	if(cbfp->b_flag & FSNLIST) {
 		cwp->current_note_line=n;

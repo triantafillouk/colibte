@@ -1025,7 +1025,7 @@ int exec_named_function(char *name)
     FILEBUF *bp;		/* ptr to buffer to execute */
     char bufn[MAXFLEN+2];		/* name of buffer to execute */
 
-	MESG("exec_named_function: %s",name);
+	// MESG("exec_named_function: %s",name);
 	/* find out what buffer to execute */
 	strlcpy(bufn+1,name,MAXFLEN);
 

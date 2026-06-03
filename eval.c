@@ -698,7 +698,7 @@ int macro_line(num nused)
 
 int execsub(num n)
 {
-	MESG("execsub: %d %s",n,subname);
+	// MESG("execsub: %d %s",n,subname);
 	return(exec_named_function(subname));
 }
 
