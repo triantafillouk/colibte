@@ -92,6 +92,7 @@ void next_var(char *title)
 
 void prev_var_ext(char *from)
 {
+	// MESG("prev_var_ext:");
 	prev_var(from);
 }
 
@@ -120,14 +121,14 @@ inline static void set_var_value()
 
 void bnf_refresh_ddot()
 {
- MESG("refresh_ddot: var@=%d type=%d",VARIND,bnf_var->var_type);
+ // MESG("refresh_ddot: var@=%d type=%d",VARIND,bnf_var->var_type);
  int stat=0;
  double value=0;
  TextPoint *tp = tok->ddot;
  FILEBUF *buf = tp->fp;
 
  MVAR *var_show = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
- MESG("var_show: type=%d",var_show->var_type);
+ // MESG("var_show: type=%d",var_show->var_type);
 
  if(execmd) {
 	 if(var_show->var_type==VTYPE_NUM) {
@@ -179,7 +180,7 @@ void bnf_refresh_ddot()
 	// print_array1(":",adat);
  };
  if(stat>MAXLLEN) MESG("truncated");
- MESG("	ddot_out: [%s]",ddot_out);
+ // MESG("	ddot_out: [%s]",ddot_out);
  update_ddot_line(ddot_out);
  // NTOKEN2;
 }
@@ -2030,7 +2031,7 @@ inline static MVAR * push_args_bnf(int nargs,int vars_num)
 inline static void bnf_exec_function(FILEBUF *proc_buffer,int nargs)
 {
 	MVAR *old_symbol_table=current_stable;
-	MESG("## bnf_exec_function:[%s] var@=%d args=%d",proc_buffer->b_fname,VARIND,nargs);
+	// MESG("## bnf_exec_function:[%s] var@=%d args=%d",proc_buffer->b_fname,VARIND,nargs);
 
 	current_stable = push_args_bnf(nargs,proc_buffer->symbol_tree->items);
 	tok_struct *after_proc=tok; 

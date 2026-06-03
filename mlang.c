@@ -1250,13 +1250,13 @@ MVAR * push_args_1(int nargs,int vars_num)
 
 double exec_function(FILEBUF *proc_buffer,int nargs)
 {
-	MESG("exec_function: [%s]",proc_buffer->b_fname);
+	// MESG("exec_function: [%s]",proc_buffer->b_fname);
 #if	TBNF
 	if(usebnf) {
 		bnf_exec_function(proc_buffer,nargs);
-		MESG("after bnf_exec_function: var@=%d type=%d",VARIND,bnf_var->var_type);
+		// MESG("after bnf_exec_function: var@=%d type=%d",VARIND,bnf_var->var_type);
 		if(bnf_var->var_type==VTYPE_NUM) {
-			MESG("	numeric val=%f",bnf_var->dval);
+			// MESG("	numeric val=%f",bnf_var->dval);
 			return bnf_var->dval;
 		};
 		return 1;
@@ -2092,7 +2092,7 @@ double factor_proc()
 {
 	tok_struct *tok0=tok;
 	FILEBUF *cbuf=exe_buffer;
-	MESG("factor_proc:");
+	// MESG("factor_proc:");
 	exe_buffer=tok0->proc_buffer;
 #if	TPROFILE
 	tok0->proc_buffer->function_called++;
