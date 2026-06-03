@@ -47,7 +47,7 @@ void bnf_numeric_args (int number_of_args)
 	int i;
 	// MESG("bnf_numeric_args: %d",number_of_args);
 	for(i=0;i< number_of_args;i++ ) { 
-		ntoken();
+		NTOKEN2;
 		bnf_expression();set_var_value();
 	};
 // 	ntoken();
@@ -58,7 +58,6 @@ double bnf_numeric_arg ()
 	// MESG("bnf_numeric_arg:");
 	ntoken();
 	bnf_expression();set_var_value();
-	// ntoken();
 	return num_result();
 }
 

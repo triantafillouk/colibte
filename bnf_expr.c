@@ -96,27 +96,12 @@ void prev_var_ext(char *from)
 	prev_var(from);
 }
 
-
 inline static void set_var_value()
 {
-#if	1
-	if(bnf_var->var_type==VTYPE_POINTER)
+	if(bnf_var->var_type==VTYPE_POINTER){
 		memmove(bnf_var,bnf_var->var_pointer,sizeof(struct MVAR));
-#else
- if(bnf_var->var_type==VTYPE_POINTER) {
- 	bnf_var->var_type=bnf_var->var_pointer->var_type;
-	if(bnf_var->var_type==VTYPE_NUM) {
-		bnf_var->dval=bnf_var->var_pointer->dval;
-		// MESG("	set_var_value num %f",bnf_var->dval);
-	} else if(bnf_var->var_type==VTYPE_STRING) {
-		bnf_var->sval=strdup(bnf_var->var_pointer->sval);
-		bnf_var->var_alloced=1;
-	} else if (bnf_var->var_type==VTYPE_ARRAY) {
-		bnf_var->adat=bnf_var->var_pointer->adat;
 		bnf_var->var_alloced=0;
 	};
- };
-#endif
 }
 
 void bnf_refresh_ddot()
@@ -243,41 +228,7 @@ void show_results()
  };
 }
 
-#if	NUSE
-inline static double return_result()
-{
- int stack_num = bnf_var-bnf_vars;
- printf("return_result: stack_num=%d type=%d\n",stack_num,bnf_var->var_type);
- switch(bnf_var->var_type) {
- 	case VTYPE_NUM:
-		MESG("bnf result: @%3d NUMERIC val=%f",stack_num,bnf_var->dval);
-		return(bnf_var->dval);
-	case VTYPE_STRING:
-		MESG("bnf result: @%3d STRING  val=[%s]",stack_num,bnf_var->sval);
-		return 0.0;
-	case VTYPE_POINTER:
-	{ MVAR *var=bnf_var->var_pointer;
-		if(var->var_type==VTYPE_NUM) {
-			MESG("bnf1 result: @%3d var NUMERIC val=%f",stack_num,var->dval);
-			return var->dval;
-		};
-		if(var->var_type==VTYPE_STRING) {
-			MESG("bnf result: @%3d var STRING  val=[%s]",stack_num,var->sval);
-			return 0.0;
-		};
-		if(var->var_type==VTYPE_NONE) {
-			MESG("bnf result: @%3d var value undefined",stack_num);
-			return 0.0;
-		};
-	};break;
-	default:
-		MESG("bnf result: @%3d  type %X",stack_num,bnf_var->var_type);
- };
- return 0.0;
-}
-#endif
-
-void bnf_factor_var()
+inline static void bnf_factor_var()
 {
 	next_var("var");
 	bnf_var->var_pointer=get_left_slot(tok->tind);
@@ -286,7 +237,7 @@ void bnf_factor_var()
 	// MESG("## factor_var: put var %s tind=%d %p at var@=%d",tok->tname,tok->tind,bnf_var->var_pointer,VARIND);
 }
 
-void bnf_factor_num()
+inline static void bnf_factor_num()
 {
 	next_var("num");
 	bnf_var->dval = tok->dval;
@@ -294,7 +245,7 @@ void bnf_factor_num()
 	// MESG("bnf_factor_num: put numeric %f at pos %ld type=%d",bnf_var->dval,bnf_var-bnf_vars,bnf_var->var_type);
 }
 
-void bnf_factor_quote()
+inline static void bnf_factor_quote()
 {
 	next_var("quote");
 	bnf_var->var_type=VTYPE_STRING;
@@ -1464,7 +1415,7 @@ void bnf_factor_assign_var()
 	int btype=bvar->var_type;
 	char *var_name = tok->tname;
 
-	// MESG("bnf_factor_assign_var: name=%s [%s]",var_name,tok_info(tok));
+	// MESG("bnf_factor_assign_var: name=%s bvar@=%d [%s]",var_name,VARIND,tok_info(tok));
 	prev_var("assign var");
 	if(bnf_var->var_type!=VTYPE_POINTER) { set_error(tok,505,"cannot assign to non var!");exit(5);};
 	MVAR *avar=bnf_var->var_pointer;
@@ -1486,8 +1437,7 @@ void bnf_factor_assign_var()
 		aval->dval = bvar->dval;
 		bnf_var->var_type = aval->var_type;
 		bnf_var->dval = aval->dval;
-		// long ind=bnf_var-bnf_vars;
-		// MESG("	assign %p ind=%2ld set var to %f tok [%s]",aval,ind,aval->dval,tok_info(tok));
+		// MESG("	assign set aval to %f tok [%s]",aval,aval->dval,tok_info(tok));
 		if(btype==VTYPE_POINTER) {
 			// tok->bnf_factor_function=bnf_factor_assign_var_nump;
 			// MESG("set factor_function to assign_var_nump [%s]",tok_info(tok));
@@ -1642,7 +1592,7 @@ void bnf_factor_lpar()
 
 void bnf_factor_rpar()
 {
-	MESG("bnf_factor_rpar: var@=%d tok=%d",VARIND,tok->tnum);
+	// MESG("bnf_factor_rpar: var@=%d tok=%d",VARIND,tok->tnum);
 }
 
 static void bnf_block1()
@@ -3011,7 +2961,7 @@ void bnf_factor_cmd()
 	FUNCS *ed_command;
 
 	function_index = tok->tok_node->node_index;
-	MESG(";factor_cmd: editor command: ttype=%d command=%d %s",tok->ttype,function_index,ftable[function_index].n_name);
+	// MESG(";factor_cmd: editor command: command=%d %s [%s]",function_index,ftable[function_index].n_name,tok_info(tok));
 	ed_command = ftable+function_index;
 
 	NTOKEN2;
@@ -3057,6 +3007,7 @@ void bnf_factor_cmd()
 	value=(double)ed_command->n_func((num)value);
 	macro_exec = save_macro_exec;
 #if	1
+	prev_var("");
 	bnf_var->var_type=VTYPE_NUM;
 	bnf_var->dval=value;
 #else
@@ -3064,7 +3015,7 @@ void bnf_factor_cmd()
 		// MESG("exec result=%f",bnf_var->dval);
 	};
 #endif
-	MESG(";>factor_cmd: after ed_command: var@=%d type=%d value=%f",VARIND,bnf_var->var_type,value);
+	// MESG(";>factor_cmd: after ed_command: var@=%d type=%d value=%f",VARIND,bnf_var->var_type,value);
 	if(check_par) { 
 		if(check_rparenthesis()) {
 			//NTOKEN2;	// MESG("right parenthesis skipped!");

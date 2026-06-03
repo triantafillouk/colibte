@@ -734,29 +734,21 @@ int err_factor()
 		RT_MESG1(480);
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
+#if	0
 		if(current_stable)
 		MESG("	TOK_VAR: var ind=%d type is %d [%s]",tok0->tind,
 			current_stable[tok0->tind].var_type,tok_info(tok0));
+#endif
 		pre_symbol=0;
 		ex_nvars++;
-#if	TBNF
-		// set_bnf_function1(tok0,TOK_VAR);
-#endif
+
 		if(tok->ttype==TOK_INCREASE) {
 			tok->dval=1;
-			// tok->tgroup=TOK_TERM2;
-#if	TBNF
-			// set_bnf_function1(tok,TOK_TERM0);
-#endif
 			set_tok_function(tok,0);
 			stack_push("INC",tok,tok->ttype);
 			NTOKEN_ERR(498);
 		} else
 		if(tok->ttype==TOK_DECREASE) {
-			// tok->tgroup=TOK_TERM2;
-#if	TBNF
-			// set_bnf_function1(tok,tok->ttype);
-#endif
 			tok->dval=-1;
 			set_tok_function(tok,0);
 			stack_push("DEC",tok,tok->ttype);
@@ -794,8 +786,6 @@ int err_factor()
 			tok->dval=-1;
 			tok0_bnf->bnf_factor_function=bnf_type_l2_result;
 			tok0_bnf->tname="TL2";			
-			// MESG("	tok0_bnf [%s]",tok_info(tok0_bnf));
-
 			// MESG("	TOK_TYPE_ELEMENT before [%s]",tok_info(tok));
 			NTOKEN2;
 			// MESG("	TOK_TYPE_ELEMENT after [%s]",tok_info(tok));
@@ -840,11 +830,10 @@ int err_factor()
 		};
 		RT_MESG1(4441);		
 	};
-	case TOK_ARRAY_L1:	// 0 variable
+	case TOK_ARRAY_L1:	
 		// MESG("TOK_ARRAY_L1: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
 		pre_symbol=0;
 		ex_nvars++;
-		// MESG("		push [%s]",tok_info(tok));
 		tok_struct *dest=stack_push("499",tok,tok->ttype);
 		NTOKEN_ERR(499);
 		if(dest->ttype==TOK_TYPE_ELEMENT) {
@@ -2076,8 +2065,7 @@ int err_check_block1()
  TDSERR("block");
    SHOW_STAGE(671);
 	
-   MESG("err_check_block1: [%s] <-- [%s]",check_buffer->b_fname,tok_info(tok));
-   // MESG("   num: name          ttype tind");
+   // MESG("err_check_block1: [%s] <-- [%s]",check_buffer->b_fname,tok_info(tok));
    while(1) {
 	CHECK_TOK(672);
 	// MESG(" - %3d: %-15s %3d %3d",tok->tnum,tok->tname,tok->ttype,tok->tind);

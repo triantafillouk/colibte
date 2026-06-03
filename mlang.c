@@ -1062,15 +1062,12 @@ void show_token_table(char *title, FILEBUF *bf,tok_struct *token_start,int size)
 {
  int i=0;
  tok_struct *tokp=token_start;
- // MESG("---- %s token table of %s size %d ----",title,bf->b_fname,size);
+ MESG("!---------- %s token table of %s size %d -------------",title,bf->b_fname,size);
  for(i=0;i<size;i++) {
-	// tokp=token_start+i;
- 	// MESG("!T %3d %p %s",i,tokp,tok_info(tokp));
 	MESG("!T %3d %s",i,tok_info(tokp));
 	tokp++;
-	// tokp1++;
  };
- MESG("------------------------------------------");
+ MESG("------------------------------------------------------");
 }
 
 /* Check for any errors and initialize parsed list  */
