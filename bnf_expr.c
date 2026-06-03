@@ -2980,8 +2980,9 @@ void bnf_factor_cmd()
 		// MESG(";	ed_command: value=%f %f ex_vtype=%d s=[%s] arg=%d",value,get_val(),get_vtype(),get_sval(),ed_command->arg);
 		switch(ed_command->arg) {
 			case 1:{ /* one argument */
-				// MESG("	one argument type=%d",type1);
+				// MESG("	one argument type=%d %f",type1,value);
 				if(type1==VTYPE_STRING) { value=1;};
+				// else if(type1==VTYPE_NUM) value=bnf_var->dval;
 				break;
 			};
 			case 2:	/* two arguments  */

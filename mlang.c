@@ -4722,7 +4722,10 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 		// MESG("	get the next argument! exebnf=%d execmd=%d",exebnf,execmd);
 		/* slval has already the next argument */
 		// MESG("nextarg: slval=%s",get_sval());	
-		if(exebnf||usebnf) strlcpy(buffer,bnf_var->sval,size);
+		// MESG("nextarg:2 var_type=%d",bnf_var->var_type);
+		if(exebnf||usebnf) {
+			if(bnf_var->var_type==VTYPE_STRING) strlcpy(buffer,bnf_var->sval,size);
+		}
 		else strlcpy(buffer,get_sval(),size);
 	};
 	return(TRUE);
