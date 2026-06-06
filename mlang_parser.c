@@ -550,7 +550,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 #endif
  skip_tag_header(bf);
 
- // MESG("--- Start parsing block loop <--------------------");
+ MESG("--- [%s] Start parsing block loop <-------------------------------",bf->b_fname);
+
  while(getnc1(bf,&cc,&tok_type))
  {
 	if(change_script_state(tok_type,&script_active)) continue;
@@ -1125,7 +1126,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
   
- 	// MESG("parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
+  MESG("parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
  	/* add eof token!  */
 	if(tok_type!=TOK_SEP) 
 	{	
@@ -1141,7 +1142,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			tok->tname="end sep";
 		};
 	};
-	// MESG("parse_block1: set end token");
+	MESG("parse_block1: set end token");
 	bf->end_token=tok;	/* save end token  */
 	// ADD_TOKEN("end token");
 	tok->ttype=TOK_EOF;
@@ -1190,7 +1191,6 @@ void set_tok_table(FILEBUF *bf)
  if(bf->tok_table != NULL) {
  	free(bf->tok_table);
  };
-// 	MESG("1");
 #if	TBNF
  if(bf->tok_table_bnf != NULL) {
 	MESG("	-- [%s] recreate bnf token table!",bf->b_fname);
@@ -1214,7 +1214,7 @@ void set_tok_table(FILEBUF *bf)
  while(tlist->current)
  {
 	tok=(tok_struct *)tlist->current->data;
-	
+	// MESG("- add tok %s",tok->tname);
 	memcpy((void *)tok_to,(void *)tok,sizeof(tok_struct));
 	if(tok->ttype==TOK_LCURL || tok->ttype==TOK_RCURL) {
 		tok_to->match_tok = tok_table + tok_to->tcurl->num+1;

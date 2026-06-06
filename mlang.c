@@ -4159,7 +4159,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	// MESG("	after exec_block1 !!!!!");
 #if	TBNF
 	if(exebnf || usebnf) {
-		MESG("## execute bnf block! --------------------");
+		MESG("## execute bnf program block! --------------------");
 		exe_buffer=bp;
 		tok=bp->tok_table_bnf;
 		bnf_block1();
@@ -4195,7 +4195,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		if(result->var_type==VTYPE_NUM) msg_line("Result at var@=%d [%f]",VARIND,num_result());
 		else if(result->var_type==VTYPE_STRING) msg_line("Result at var@=%d [%s]",VARIND,string_result());
 		else msg_line("Result at var@=%d is type %d",VARIND,bnf_var->var_type);
-		MESG("	result var@=%d",(int)(bnf_var-bnf_vars));
+		MESG("	result var@=%d",VARIND);
 	} else {
 		if(vtype_is(VTYPE_STRING)) msg_line("Result n is \"%s\"",get_sval());
 		else if(vtype_is(VTYPE_NUM)) msg_line("Result n is [%f]",val);
