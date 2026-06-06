@@ -443,10 +443,9 @@ void bnf_seed()
 
 void bnf_abs()
 {
-	double value=bnf_var->dval;// numeric_arg();
-	value= fabs(value);
-	bnf_var->dval=value;
-	bnf_var->var_type=VTYPE_NUM;
+	NTOKEN2;
+	bnf_expression();
+	bnf_var->dval=fabs(bnf_var->dval);
 }
 
 /* string of a value */
@@ -756,8 +755,6 @@ extern FILEBUF *exe_buffer;
 
 void bnf_show_vars()	/* ok?  */
 {
-	ntoken();
-
 	mesg_out("Ind Name        Type             Value      local vars %d",exe_buffer->symbol_tree->items);
 	eval_btree(exe_buffer->symbol_tree->root,show_var_node);
 #if	USE_TYPE_VARS

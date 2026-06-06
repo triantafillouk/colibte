@@ -1,3 +1,6 @@
 a=10
+fori(i=1;10;1){
 a++:
-a:
+b=abs(sin(a))
+}
+show_vars()

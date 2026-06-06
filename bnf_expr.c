@@ -1352,7 +1352,7 @@ inline static void bnf_factor_eof()
 
 inline static void bnf_factor_sep()
 {
- if(bnf_var-bnf_vars>1) 
+ if(bnf_var-bnf_vars>0) 
  { 
 	// MESG("bnf_factor_sep: < var@=%d set prev_var [%s]",VARIND,tok_info(tok));
 	prev_var("sep");
