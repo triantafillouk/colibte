@@ -4,6 +4,7 @@ print("Initializing arrays with ",max1," elements")
 print("")
 # defining the max index of the array at the beggining is faster!
 # Loop to check allocation one item per time
+
 show_time("start allocate/define array a",0)
 fori(i=0;max1;1)
 {

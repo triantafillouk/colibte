@@ -1,5 +1,5 @@
 cls
-max1=100000000
+max1=3000000
 print("Initializing arrays with ",max1," elements")
 print("")
 show_time("start allocate/define array a",0)
@@ -10,18 +10,21 @@ fori(i=0;max1;1)
 {
 	a[i]=1.1+i
 }
-show_time("array a allocated/defined!",1)
-
+print("a[100]=",a[100])
+t=show_time("array a allocated/defined!",1)
+print("time1=",t)
 print("defining the max element of the array at the begining is faster!")
 show_time("start allocate array b",0)
 b[max1]=0
-show_time("array b allocated, start defining!",1)
+t=show_time("array b allocated, start defining!",1)
 # Loop to check allocation one item per time
 fori(i=0;max1;1)
 {
 	b[i]=1.1+i
 }
-show_time("array b allocated and defined!",1)
+t+=show_time("array b allocated and defined!",1)
+print("b[100]=",b[100])
+print("time2=",t)
 
 
 
