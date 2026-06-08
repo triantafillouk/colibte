@@ -115,12 +115,14 @@ void allocate_array(struct array_dat *adat)
 	}; 
  } else {
 	int dim=1;
-	int i;
+	// int i;
 
  	if(adat->dval != NULL) free(adat->dval);
-	if(adat->rows > 1) dim=adat->rows; else dim=adat->cols;
- 	adat->dval=(double *)malloc(sizeof(double)*dim);
-	for(i=0;i<dim;i++) adat->dval[i]=0;
+	// if(adat->rows > 1) dim=adat->rows; else dim=adat->cols;
+	dim = (adat->rows > 1) ? adat->rows: adat->cols;
+ 	adat->dval=calloc(sizeof(double),dim);
+	MESG("	- allocated size=%d dval=%p",dim*sizeof(double),adat->dval);
+	// for(i=0;i<dim;i++) adat->dval[i]=0;
  };
 
 	};

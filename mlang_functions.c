@@ -1,7 +1,7 @@
 /* editor functions */
 #include "mlangf.h"
 
-inline void ntoken()
+void ntoken()
 {
 	tok++;
 }

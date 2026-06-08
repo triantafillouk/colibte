@@ -2667,7 +2667,7 @@ void bnf_factor_array_l1()
 {
 	MESG("# -- bnf_factor_array_l1: prev@=%d type=%d",VARIND,bnf_var->var_type);
 	// if(bnf_var->var_type==VTYPE_STRING) MESG("	prev var string [%s]",bnf_var->sval);
-	next_var("arrayl1");
+	// next_var("arrayl1");
 	// MESG("bnf_factor_array_l1: var@=%d [%s]",VARIND,tok_info(tok));
 	int ind1;
 	double value=0;
@@ -2681,7 +2681,7 @@ void bnf_factor_array_l1()
 	// MESG("	array adat cols=%d rows=%d",adat->cols,adat->rows);
 	NTOKEN2;
 	ind1 = (int)bnf_expression();
-	prev_var("ae:");
+	// prev_var("ae:");
 	// MESG("	after expression: array index=%d var@=%d [%s]",ind1,VARIND,tok_info(tok));
 	if(adat==NULL) {	/* this happens if array is not defined yet!!!  */
 		// MESG("	array adat is NULL allocate new one %d x 1 !!!!!!!!!!!!",ind1);
@@ -2695,9 +2695,11 @@ void bnf_factor_array_l1()
 
 		// MESG("	2 vtype=%d %d",array_slot->var_type,VTYPE_ARRAY);
 		if(array_slot->var_type==VTYPE_ARRAY) {
-		if(array_slot->adat->rows<ind1 && array_slot->adat->cols<ind1) {
+	
+		int dim = (adat->rows > 1) ? adat->rows: adat->cols;
+		if(dim<=ind1) {
 			double *dval_old = array_slot->adat->dval;
-			MESG("+++ reallocate ind1=%d x %d %X",ind1,sizeof(double),dval_old);
+			MESG("+++ reallocate in factor_array_l1: ind1=%d x %d %X",ind1,sizeof(double),dval_old);
 			if(array_slot->adat->cols > array_slot->adat->rows) 
 				array_slot->adat->cols=ind1;
 			else
@@ -2709,8 +2711,9 @@ void bnf_factor_array_l1()
 				// ERROR("	array cannot allocate dval at %d",err_line);
 				set_break();
 				return;
+			} else {
+				array_slot->adat->dval = dval_new; 
 			};
-			array_slot->adat->dval = dval_new; 
 			// MESG("	array reallocated:%X",array_slot->adat->dval);
 		}; 
 			// MESG("	result array[%d] into var@=%d",ind1,VARIND);
@@ -2827,28 +2830,32 @@ void bnf_factor_array_l1_tba_array()
 {
 	array_dat *adat = (current_stable+tok->tind)->adat;
 	// next_var("arrayl1");
-	// MESG("## bnf_factor_array_l1_tba: var@=%d [%s]",VARIND,tok_info(tok));
 	NTOKEN2;
 	int ind1 = (int)bnf_expression();
 	// prev_var("ae:");
-
+	// if(ind1<10) MESG("## bnf_factor_array_l1_tba: var@=%d [%s]",VARIND,tok_info(tok));
+#if	0
+	if(adat->dval==NULL) {
+		MESG("dval is NULL!!!!");exit(20);
+	};
+#endif
+	int dim = (adat->rows > 1) ? adat->rows: adat->cols;
 	// MESG("	array_slot vtype=%d %d",array_slot->var_type,VTYPE_ARRAY);
-	if(adat->rows<ind1 && adat->cols<ind1) {
-		// MESG("	array index outside limits!");
-		// MESG("+++ reallocate ind1=%d x %d %X",ind1,sizeof(double),dval_old);
-		if(adat->cols > adat->rows) adat->cols=ind1;
-		else adat->rows=ind1;
+	if(dim<=ind1) {
+		if(ind1<10)	MESG("+++ reallocate size=%d dval=%p",(ind1+1)*sizeof(double),adat->dval);
 
-		double *dval_old = adat->dval;
-		double *dval_new = (double *)realloc((void *)(dval_old),(ind1+1)*sizeof(double));
+		double *dval_new = realloc(adat->dval,(ind1+1)*sizeof(double));
 		if(dval_new==NULL) {
 			err_num=214;
 			err_line=tok->tline;
 			ERROR("	array cannot allocate dval at %d",err_line);
 			set_break();
 			return;
+		} else {
+			adat->dval = dval_new; 
+			if(adat->cols > adat->rows) adat->cols=ind1;
+			else adat->rows=ind1;
 		};
-		adat->dval = dval_new; 
 		// MESG("	array reallocated:%X",array_slot->adat->dval);
 	};
 	bnf_var->index1=ind1;
@@ -2903,37 +2910,7 @@ void bnf_factor_array_l1_tba()
 	// MESG("		factor_arrayl1:ind=%d ind1=%d type=%d",array_slot->index1,ind1,array_slot->var_type);
 
 		MESG("	array_slot vtype=%d %d",array_slot->var_type,VTYPE_ARRAY);
-#if	0
-		if(array_slot->var_type==VTYPE_ARRAY) {
-		// MESG("	array_slot numeric!");
-		if(array_slot->adat->rows<ind1 && array_slot->adat->cols<ind1) {
-			// MESG("	array index outside limits!");
-			double *dval_old = array_slot->adat->dval;
-			MESG("+++ reallocate ind1=%d x %d %X",ind1,sizeof(double),dval_old);
-			if(array_slot->adat->cols > array_slot->adat->rows) 
-				array_slot->adat->cols=ind1;
-			else
-				array_slot->adat->rows=ind1;
-			double *dval_new = (double *)realloc((void *)(dval_old),(ind1+1)*sizeof(double));
-			if(dval_new==NULL) {
-				err_num=214;
-				err_line=tok->tline;
-				ERROR("	array cannot allocate dval at %d",err_line);
-				set_break();
-				return;
-			};
-			array_slot->adat->dval = dval_new; 
-			// MESG("	array reallocated:%X",array_slot->adat->dval);
-		} else { 
-			// MESG("	array index in limits!");
-		};
-			bnf_var->index1=ind1;
-			bnf_var->adat = array_slot->adat;
-			bnf_var->var_type=VTYPE_ARRAYEL1;
-			// MESG("	set array element var@=%d",VARIND);
-			return;
-		};
-#endif
+
 		if(array_slot->var_type==VTYPE_AMIXED) {
 			lmvar = &array_slot->adat->mval[ind1];
 			bnf_var->adat = array_slot->adat;
@@ -2982,25 +2959,25 @@ void bnf_factor_array_l2_tba()
 
 		// MESG("	2 vtype=%d %d",array_slot->var_type,VTYPE_ARRAY);
 		if(array_slot->var_type==VTYPE_ARRAY) {
-		if(array_slot->adat->rows<ind1 && array_slot->adat->cols<ind1) {
-			double *dval_old = array_slot->adat->dval;
-			// MESG("+++ reallocate ind1=%d x %d %X",ind1,sizeof(double),dval_old);
-			if(array_slot->adat->cols > array_slot->adat->rows) 
-				array_slot->adat->cols=ind1;
+		if(adat->rows<ind1 && adat->cols<ind1) {
+			MESG("+++ reallocate ind1=%d x %d %X",ind1,sizeof(double),adat->dval);
+			if(adat->cols > adat->rows) 
+				adat->cols=ind1;
 			else
-				array_slot->adat->rows=ind1;
-			double *dval_new = (double *)realloc((void *)(dval_old),(ind1+1)*sizeof(double));
+				adat->rows=ind1;
+			double *dval_new = realloc(adat->dval,(ind1+1)*sizeof(double));
 			if(dval_new==NULL) {
 				err_num=214;
 				err_line=tok->tline;
 				// ERROR("	array cannot allocate dval at %d",err_line);
 				set_break();
 				return;
+			} else {
+				adat->dval = dval_new; 
 			};
-			array_slot->adat->dval = dval_new; 
 			// MESG("	array reallocated:%X",array_slot->adat->dval);
 		} else { 
-			// dval = array_slot->adat->dval;
+			// dval = adat->dval;
 			// value=dval[ind1];
 			// ls_pdval=&dval[ind1];
 			// MESG("	array_slot %d: ",array_slot->index1);
