@@ -10,4 +10,6 @@ function fact(num)
  }
 }
 
-fact(120): 
+fact(120):
+
+return fact(120)

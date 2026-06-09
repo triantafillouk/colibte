@@ -1,4 +1,4 @@
-# a array not with values in normal mode
+# a array not with values in normal mode SELECTBNF
 cls
 max1=30000000
 print("Initializing arrays with ",max1," elements")

@@ -2090,6 +2090,13 @@ int err_check_block1()
 			stack_push("Show or comma",tok,-tok->ttype);
 			tok->factor_function = factor_funcs[tok->ttype];
 			NTOKEN_ERR(674);
+#if	1
+			if(tok->ttype==TOK_SEP) {
+				tok_struct *dest=stack_push("sep after ddot",tok,-tok->ttype);
+				dest->bnf_factor_function=bnf_factor_sep0;
+				NTOKEN_ERR(674);
+			};
+#endif
 			continue;
 		case TOK_RCURL:
 			stack_push("RCURL ",tok,-tok->ttype);

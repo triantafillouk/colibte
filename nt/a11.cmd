@@ -1,3 +1,4 @@
+# in normal mode last value not correct SELECTBNF
 cls
 max1=50
 print("Initializing arrays with ",max1," elements")

@@ -7,6 +7,7 @@ function test(num,st)
 {
  num:
  st:
+ return (st)
 }
 
 function fact(num , st)

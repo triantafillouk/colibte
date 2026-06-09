@@ -1426,7 +1426,10 @@ void bnf_factor_assign_var()
 
 	// MESG("bnf_factor_assign_var: name=%s bvar@=%d [%s]",var_name,VARIND,tok_info(tok));
 	prev_var("assign var");
-	if(bnf_var->var_type!=VTYPE_POINTER) { set_error(tok,505,"cannot assign to non var!");exit(5);};
+	if(bnf_var->var_type!=VTYPE_POINTER) { 
+		MESG("assign_var: var@=%d [%s]",VARIND,tok_info(tok));
+		set_error(tok,505,"cannot assign to non var!");exit(5);
+    };
 	MVAR *avar=bnf_var->var_pointer;
 	int atype=bnf_var->var_type;
 	if(atype!=VTYPE_POINTER) MESG("assign_var: error not a variable!!!!");
@@ -1960,8 +1963,12 @@ void bnf_dir_return()
 	if(tok->ttype!=TOK_SEP && tok->ttype!=TOK_RPAR) 
 	{ 
 		bnf_expression();
-		// prev_var("");
+		// MESG("## ---- dir_return: var@=%d type=%d",VARIND,bnf_var->var_type);
 		// show_result();
+		MVAR *bvar=bnf_var;
+		prev_var("return");
+		memcpy(bnf_var,bvar,sizeof(MVAR));
+		bvar->var_alloced=0;
 	};
 	// MESG("	dir_return : end var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	current_active_flag=0;	/* skip rest of function  */
@@ -2214,7 +2221,7 @@ void bnf_assign_array1_arrayp()
 	MVAR *bvar = bnf_var->var_pointer;
 	prev_var("assign_array1_arrayp:");
 	int ind1 = bnf_var->index1;
-	// MESG("	set array[%d] avar@=%d type=%d index1=%d",ind1,VARIND,bnf_var->var_type,bnf_var->index1);
+	MESG("	set array[%d] avar@=%d type=%d index1=%d",ind1,VARIND,bnf_var->var_type,bnf_var->index1);
 	array_dat *adat = bnf_var->adat;
 	double *dval = adat->dval;
 	dval[ind1]=bvar->dval;
@@ -2684,7 +2691,7 @@ void bnf_factor_array_l1()
 	// prev_var("ae:");
 	// MESG("	after expression: array index=%d var@=%d [%s]",ind1,VARIND,tok_info(tok));
 	if(adat==NULL) {	/* this happens if array is not defined yet!!!  */
-		// MESG("	array adat is NULL allocate new one %d x 1 !!!!!!!!!!!!",ind1);
+		MESG("	bnf_factor_array_l1 adat is NULL allocate new one %d x 1 !!!!!!!!!!!!",ind1);
 		ex_nums=1;
 		adat=new_array(ind1+1,1,VTYPE_ARRAY);
 		array_slot->adat=adat;
@@ -2748,7 +2755,7 @@ void bnf_factor_array_l1()
 
 void bnf_type_l1()
 {
-	// MESG("# -- bnf_factor_array_l1: prev@=%d type=%d",VARIND,bnf_var->var_type);
+	MESG("# -- bnf_type_l1: prev@=%d type=%d",VARIND,bnf_var->var_type);
 	// if(bnf_var->var_type==VTYPE_STRING) MESG("	prev var string [%s]",bnf_var->sval);
 	next_var("arrayl1");
 	// MESG("bnf_factor_array_l1: var@=%d [%s]",VARIND,tok_info(tok));
@@ -2767,7 +2774,7 @@ void bnf_type_l1()
 	prev_var("ae:");
 	// MESG("	after expression: array index=%d var@=%d [%s]",ind1,VARIND,tok_info(tok));
 	if(adat==NULL) {	/* this happens if array is not defined yet!!!  */
-		// MESG("	array adat is NULL allocate new one %d x 1 !!!!!!!!!!!!",ind1);
+		MESG("	bnf_type_l1 array adat is NULL allocate new one %d x 1 !!!!!!!!!!!!",ind1);
 		ex_nums=1;
 		adat=new_array(ind1+1,1,VTYPE_ARRAY);
 		array_slot->adat=adat;
@@ -2778,28 +2785,27 @@ void bnf_type_l1()
 
 		// MESG("	2 vtype=%d %d",array_slot->var_type,VTYPE_ARRAY);
 		if(array_slot->var_type==VTYPE_ARRAY) {
-		if(array_slot->adat->rows<ind1 && array_slot->adat->cols<ind1) {
-			double *dval_old = array_slot->adat->dval;
-			MESG("+++ reallocate ind1=%d x %d %X",ind1,sizeof(double),dval_old);
-			if(array_slot->adat->cols > array_slot->adat->rows) 
-				array_slot->adat->cols=ind1;
-			else
-				array_slot->adat->rows=ind1;
-			double *dval_new = (double *)realloc((void *)(dval_old),(ind1+1)*sizeof(double));
+		int dim = (adat->rows>1) ? adat->rows: adat->cols;
+		if(dim < ind1 ) {
+			MESG("+++ reallocate bnf_type_l1 ind1=%d x %d %p",ind1,sizeof(double),adat->dval);
+			if(adat->cols > adat->rows) adat->cols=ind1;
+			else adat->rows=ind1;
+			double *dval_new = (double *)realloc(adat->dval,(ind1+1)*sizeof(double));
 			if(dval_new==NULL) {
 				err_num=214;
 				err_line=tok->tline;
 				// ERROR("	array cannot allocate dval at %d",err_line);
 				set_break();
 				return;
-			};
-			array_slot->adat->dval = dval_new; 
+			} else {
+				adat->dval = dval_new; 
+			}
 			// MESG("	array reallocated:%X",array_slot->adat->dval);
 		}; 
 			// MESG("	result array[%d] into var@=%d",ind1,VARIND);
-			dval = array_slot->adat->dval;
+			dval = adat->dval;
 			value=dval[ind1];
-			
+			// set_result
 			bnf_var->index1=ind1;
 			bnf_var->dval = value;
 			bnf_var->var_type=VTYPE_NUM;
@@ -2834,15 +2840,11 @@ void bnf_factor_array_l1_tba_array()
 	int ind1 = (int)bnf_expression();
 	// prev_var("ae:");
 	// if(ind1<10) MESG("## bnf_factor_array_l1_tba: var@=%d [%s]",VARIND,tok_info(tok));
-#if	0
-	if(adat->dval==NULL) {
-		MESG("dval is NULL!!!!");exit(20);
-	};
-#endif
+
 	int dim = (adat->rows > 1) ? adat->rows: adat->cols;
 	// MESG("	array_slot vtype=%d %d",array_slot->var_type,VTYPE_ARRAY);
 	if(dim<=ind1) {
-		if(ind1<10)	MESG("+++ reallocate size=%d dval=%p",(ind1+1)*sizeof(double),adat->dval);
+		if(ind1<10)	MESG("+++ reallocate array_l1_tba_array size=%d dval=%p",(ind1+1)*sizeof(double),adat->dval);
 
 		double *dval_new = realloc(adat->dval,(ind1+1)*sizeof(double));
 		if(dval_new==NULL) {
@@ -2873,12 +2875,12 @@ void bnf_factor_array_l1_tba()
 
 		array_dat *adat = array_slot->adat;
 		if(adat==NULL) {	/* this happens if array is not defined yet!!!  */
-			MESG("	array adat is NULL create and allocate a  new one %d x 1 !!!!!!!!!!!!",2);
+			MESG("	array adat is NULL create and allocate a  new one %d x 1 !!!!!!!!!!!!",1);
 			ex_nums=1;
-			adat=new_array(2,1,VTYPE_ARRAY);
+			adat=new_array(1,1,VTYPE_ARRAY);
+			allocate_array(adat);
 			array_slot->adat=adat;
 			array_slot->var_type=VTYPE_ARRAY;
-			allocate_array(array_slot->adat);	/*   */
 		};
 
 		tok->bnf_factor_function=bnf_factor_array_l1_tba_array;
@@ -2960,7 +2962,7 @@ void bnf_factor_array_l2_tba()
 		// MESG("	2 vtype=%d %d",array_slot->var_type,VTYPE_ARRAY);
 		if(array_slot->var_type==VTYPE_ARRAY) {
 		if(adat->rows<ind1 && adat->cols<ind1) {
-			MESG("+++ reallocate ind1=%d x %d %X",ind1,sizeof(double),adat->dval);
+			MESG("+++ reallocate array_l2_tba ind1=%d x %d %X",ind1,sizeof(double),adat->dval);
 			if(adat->cols > adat->rows) 
 				adat->cols=ind1;
 			else
@@ -3000,7 +3002,7 @@ void bnf_factor_array_l2()
 
 	array_slot=&current_stable[tok->tind];
 	array_dat *adat = array_slot->adat;
-	if(adat==NULL) { set_error(tok,505,"var not defined as array");return;};
+	if(adat==NULL) { set_error(tok,506,"var not defined as array");return;};
 
 	// if(adat->var_tree) MESG("	we have a typed array!");
 	// else MESG("	untyped array!");

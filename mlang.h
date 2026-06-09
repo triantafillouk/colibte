@@ -63,10 +63,11 @@ typedef struct array_dat {
 	short anum;
 	int rows;
 	int cols;
-	short astat;	/* array allocation status  */
+	unsigned short astat:4;	/* array allocation status  */
+	unsigned short rowcol:2; // rows or column dim
 	char *array_name;
 	union {
-		BTREE *var_tree;
+		BTREE *var_tree;	/* typed var symbol tree  */
 	};
 	union {
 		void *dat;		// onother array ??

@@ -4164,6 +4164,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		tok=bp->tok_table_bnf;
 		bnf_block1();
 		next_var("res1");
+		// next_var("res2");
 		set_result();
 		MESG("end of program1 var@=%d type %d",VARIND,bnf_var->var_type);
 		if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);

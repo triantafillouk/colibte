@@ -1,4 +1,4 @@
-# ok but different result at the end CHECK
+# ok but different result at the end TBC
 cls
 a=[1.2, 2.3, 4.5, 5.5, 6.6, 7.7]:
 print("show 1")

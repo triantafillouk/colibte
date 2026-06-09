@@ -1,5 +1,5 @@
 # simple double numeric array ops
-# ok with bnf, uncorrect with normal
+# ok with bnf, uncorrect with normal SELECTBNF
 
 cls
 

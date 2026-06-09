@@ -1,4 +1,4 @@
-# some boolean ops , different results bnf vs normal
+# some boolean ops , different results bnf vs normal, both correct??
 a=3:   3.0
 c=2:   2.0
 # bnf return true for the following (like there were parenthesis in place!)
