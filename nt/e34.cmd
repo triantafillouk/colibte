@@ -1,4 +1,4 @@
-# test loop with proc inside
+# test loop with proc inside, different final result
 cls
 function fact(num)
 {

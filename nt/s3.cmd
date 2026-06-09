@@ -1,4 +1,5 @@
 # numeric element multiplication of MIXED array bnf fixed at v886
+# but string mul by num is not working
 cls
 a=["test ", "test2 ";11, "tt2"]
 a:

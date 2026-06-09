@@ -1,4 +1,4 @@
-# types ok from 906, TBC
+# types ok from 906, increase result not ok TBD
 type  human1 = [name::"Name" surname::"Surname" age::0 bdate::0 salary::1 age2::1]
 #print(human2)
 #list1 = list ()

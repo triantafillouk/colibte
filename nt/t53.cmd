@@ -1,4 +1,4 @@
-# types ok from 908
+# types ok from 908, normal not ok!
 type human = [name::"Name" age::55]
 # a=human
 # a.age++ : 

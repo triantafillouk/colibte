@@ -4191,16 +4191,30 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	if(exebnf || usebnf) {
 		show_var_stats();
 		// next_var("result");
+		// prev_var("r");
 		MESG("show result executing buffer [%s]!",bp->b_fname);
+
 		MVAR *result = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
-		if(result->var_type==VTYPE_NUM) msg_line("Result at var@=%d [%f]",VARIND,num_result());
-		else if(result->var_type==VTYPE_STRING) msg_line("Result at var@=%d [%s]",VARIND,string_result());
-		else msg_line("Result at var@=%d is type %d",VARIND,bnf_var->var_type);
+		if(show_no_time) {
+			if(result->var_type==VTYPE_NUM) msg_line("Result is [%f]",num_result());
+			else if(result->var_type==VTYPE_STRING) msg_line("Result is \"%s\"",string_result());
+			else msg_line("Result is type %d",bnf_var->var_type);
+		} else {
+			if(result->var_type==VTYPE_NUM) msg_line("Result at var@=%d [%f]",VARIND,num_result());
+			else if(result->var_type==VTYPE_STRING) msg_line("Result at var@=%d [%s]",VARIND,string_result());
+			else msg_line("Result at var@=%d is type %d",VARIND,bnf_var->var_type);
+		};
 		MESG("	result var@=%d",VARIND);
 	} else {
-		if(vtype_is(VTYPE_STRING)) msg_line("Result n is \"%s\"",get_sval());
-		else if(vtype_is(VTYPE_NUM)) msg_line("Result n is [%f]",val);
-		else msg_line("Result n is type %d",get_vtype());
+		if(show_no_time) {
+			if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
+			else if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
+			else msg_line("Result is type %d",get_vtype());
+		} else {
+			if(vtype_is(VTYPE_STRING)) msg_line("Result n is \"%s\"",get_sval());
+			else if(vtype_is(VTYPE_NUM)) msg_line("Result n is [%f]",val);
+			else msg_line("Result n is type %d",get_vtype());
+		};
 	};
  } else {
  	msg_line("parse error %d on %s ",err_num,bp->b_fname);

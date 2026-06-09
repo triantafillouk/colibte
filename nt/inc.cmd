@@ -1,4 +1,4 @@
-# this should give an error! ok in bnf
+# increase string by number, this should give an error! ok in bnf
 cls
 a="kk"	: 
 a+=1	: 

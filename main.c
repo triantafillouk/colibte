@@ -303,6 +303,7 @@ void parse_command_line(int argc, char **argv)
 #endif
 				case 'd':
 					show_no_time=1;
+					break;
 				case 'D':
 					set_debug(1);
 					break;

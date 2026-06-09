@@ -1,4 +1,4 @@
-# string operations on string arrays
+# string operations on string arrays, string array ops not ok in bnf TBD
 a=["a1", "a2"]
 a[0]:
 a[1]:

@@ -1,4 +1,4 @@
-
+# different final result, but it does not matter TBC
 function show_out()
 {
  if(!in_view("[out]")) {
