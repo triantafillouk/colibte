@@ -1,4 +1,4 @@
-# different final result TBC
+# different final result, correct in bnf
 
 b=0
 a=1

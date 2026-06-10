@@ -1,4 +1,4 @@
-# final result different 924 ok, 925 not
+# ok from 927
 a=1
 b=0
 # test

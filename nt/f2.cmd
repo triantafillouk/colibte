@@ -1,4 +1,4 @@
-# test loop with proc inside different final result TBC
+# test loop with proc inside different ok from 927
 cls
 
 i=2

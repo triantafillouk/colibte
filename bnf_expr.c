@@ -1955,22 +1955,31 @@ inline static double bnf_expression()
 #endif
 }
 
-void bnf_dir_return()
+inline static void bnf_dir_return_value()
+{
+	NTOKEN2;
+	bnf_expression();
+	current_active_flag=0;	/* skip rest of function  */
+}
+
+inline static void bnf_dir_return_novalue()
+{
+	NTOKEN2;
+	current_active_flag=0;	/* skip rest of function  */
+}
+
+inline static void bnf_dir_return()
 {
 	// MESG("bnf_dir_return: var@=%d [%s]",VARIND,tok_info(tok));
 	NTOKEN2;
 	// MESG("	return : start at [%s]",tok_info(tok));
-	if(tok->ttype!=TOK_SEP && tok->ttype!=TOK_RPAR) 
+	if(tok->ttype!=TOK_SEP && tok->ttype!=TOK_RPAR && tok->ttype!=TOK_RCURL) 
 	{ 
+		MESG("## ---- dir_return: evaluate return value, var@=%d type=%d",VARIND,bnf_var->var_type);
 		bnf_expression();
-		// MESG("## ---- dir_return: var@=%d type=%d",VARIND,bnf_var->var_type);
 		// show_result();
-		MVAR *bvar=bnf_var;
-		prev_var("return");
-		memcpy(bnf_var,bvar,sizeof(MVAR));
-		bvar->var_alloced=0;
 	};
-	// MESG("	dir_return : end var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+	MESG("			dir_return : end var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	current_active_flag=0;	/* skip rest of function  */
 }
 

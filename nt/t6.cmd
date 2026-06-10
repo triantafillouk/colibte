@@ -1,4 +1,4 @@
-# mixed array definition on 890 ok but differs, bnf allows num+string TBC
+# mixed array definition on 890 ok but differs, bnf num+string is correct!
 cls
 print("This is a test defining a mixed array!")
 

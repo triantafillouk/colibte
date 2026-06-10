@@ -1827,7 +1827,7 @@ int err_check_sentence1()
 		}else {
 			set_tok_directive(tok,dir_lcurl_break);
 		};
-		stack_push("sentence {",tok,-tok->ttype);
+		stack_push("sentence LCURL",tok,-tok->ttype);
 		NTOKEN_ERR(627);
 		CHECK_TOK(628);
 		err_num=err_check_block1();
@@ -2029,11 +2029,14 @@ int err_check_sentence1()
 		set_tok_directive(tok,dir_return);
 
 		// MESG(" err TOK_DIR_RetURN");
-		stack_push("dir_return",tok,-tok->ttype);
+		tok_struct *dest=stack_push("dir_return",tok,-tok->ttype);
 		NTOKEN_ERR(664);
-		if(tok->ttype!=TOK_SEP&&tok->ttype!=TOK_RPAR) 	
+		if(tok->ttype!=TOK_SEP&&tok->ttype!=TOK_RPAR&&tok->ttype!=TOK_RCURL) {	
 			err_num=err_lexpression();
-		// stack_push("dir return )",tok0);
+			dest->bnf_factor_function = bnf_dir_return_value;
+		} else {
+			dest->bnf_factor_function = bnf_dir_return_novalue;
+		};
 		stack_push("dir_return )",tok,-tok->ttype);
 		check_skip_token1(TOK_RPAR);
 		// MESG(" err TOK_DIR_RETURN: after lexpression: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype); 

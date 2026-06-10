@@ -1,4 +1,4 @@
-# different final results TBC
+# ok from 927
 # test
 if (1==2) {
 	a=3

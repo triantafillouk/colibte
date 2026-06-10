@@ -1,4 +1,4 @@
-# final result if different!
+# final result same from 927
 cls
 a="lkasjdlaskj";b=a+2:
 len(a):

@@ -1,5 +1,5 @@
 # a recursive function that adds 3 arguments with a quirk
-# final result different TBC
+# ok from 927
 function add3(a,b,c)
 {
  print("-args:a="+a+" b="+b+" c="+c)

@@ -270,6 +270,8 @@ void bnf_print()
 	int args=tok->number_of_args;
 	// MESG("bnf_print: tnum=%d args=%d var@=%d",tok->tnum,tok->number_of_args,VARIND);
 	int i;
+	char total_printed[MAXLLEN];
+	total_printed[0]=0;
 	next_var("print0");
 	for(i=0;i<args;i++) {
 		// ntoken();
@@ -294,12 +296,14 @@ void bnf_print()
 				if(l0==avar->dval) snprintf(p_out,sizeof(p_out),"%ld",l0);
 				else snprintf(p_out,sizeof(p_out),"%f",bnf_var->dval); 
 				out_print(p_out,0);
+				strncat(total_printed,p_out,MAXLLEN-1);
 				// free(p_out);
 				break;
 			};
 			case VTYPE_STRING:{
 				// MESG("-- bnf_print: string '%s'",bnf_var->sval);
 				out_print(avar->sval,0);
+				strncat(total_printed,avar->sval,MAXLLEN-1);
 			};
 		};
 		prev_var("print el");
@@ -307,7 +311,11 @@ void bnf_print()
 	};
 	out_print("",1);
 	// next_var("pend");
-	// MESG("bnf_print: >> end var@=%d",VARIND);
+	bnf_var->var_type=VTYPE_STRING;
+	bnf_var->sval=strdup(total_printed);
+	bnf_var->var_alloced=1;
+	MESG("	total_printed = [%s]",total_printed);
+	MESG("bnf_print: >> end var@=%d type=%d [%s]",VARIND,bnf_var->var_type,bnf_var->sval);
 }
 
 void bnf_show_time()
@@ -445,7 +453,9 @@ void bnf_abs()
 {
 	NTOKEN2;
 	bnf_expression();
+	MESG("- <bnf_abs: %f",bnf_var->dval);
 	bnf_var->dval=fabs(bnf_var->dval);
+	MESG("  >bnf_abs: %f",bnf_var->dval);
 }
 
 /* string of a value */
@@ -596,8 +606,11 @@ void bnf_cbrt()	/* OK?  */
 void bnf_dbg_message()	/* TBC  */
 {
 	bnf_function_args(1);
-	MVAR *va=bnf_var;
-	if(va[0].var_type==VTYPE_STRING) MESG(":%s",va[0].sval);
+	// MVAR *va=bnf_var;
+	if(bnf_var->var_type==VTYPE_STRING) {
+		fprintf(stderr,":%s\n",bnf_var->sval);
+		// MESG("dbg_message:var@=%d [%s]",VARIND,bnf_var->sval);
+	};
 }
 
 void bnf_sin()	/* OK?  */
