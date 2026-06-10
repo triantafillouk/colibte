@@ -3324,7 +3324,7 @@ void bnf_increaseby_type_el1()
 		bnf_var->var_type=bvar->var_type;
 		if(bvar->var_type==VTYPE_NUM) {
 			adat->mval[ind1].dval+=bvar->dval;
-			bnf_var->dval=bvar->dval;
+			bnf_var->dval=adat->mval[ind1].dval-bvar->dval;
 			return;
 		} else {
 			adat->mval[ind1].sval=bvar->sval;
@@ -3349,7 +3349,7 @@ void bnf_decreaseby_type_el1()
 		bnf_var->var_type=bvar->var_type;
 		if(bvar->var_type==VTYPE_NUM) {
 			adat->mval[ind1].dval-=bvar->dval;
-			bnf_var->dval=bvar->dval;
+			bnf_var->dval=adat->mval[ind1].dval+bvar->dval;
 			return;
 		} else {
 			adat->mval[ind1].sval=bvar->sval;
