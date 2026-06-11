@@ -618,7 +618,7 @@ inline static void bnf_factor_mul()
 			bnf_var->adat=result_array;
 			bnf_var->var_type=VTYPE_ARRAY;
 			bnf_var->var_alloced=1;
-			MESG("	array multiply by num!");
+			// MESG("	array multiply by num!");
 			return;
 		};
 		if(varb->var_type==VTYPE_AMIXED) {
@@ -627,7 +627,7 @@ inline static void bnf_factor_mul()
 			bnf_var->adat=result_array;
 			bnf_var->var_type=VTYPE_AMIXED;
 			bnf_var->var_alloced=1;
-			MESG("	array multiply by num!");
+			// MESG("	array multiply by num!");
 			return;
 		};
 	};
@@ -638,7 +638,7 @@ inline static void bnf_factor_mul()
 			bnf_var->adat=result_array;
 			bnf_var->var_type=VTYPE_ARRAY;
 			bnf_var->var_alloced=1;
-			MESG("	array multiply by num!");
+			// MESG("	array multiply by num!");
 			return;
 		} else
 		if(varb->var_type==VTYPE_ARRAY) {
@@ -677,11 +677,11 @@ inline static void bnf_factor_mul()
 			bnf_var->adat=result_array;
 			bnf_var->var_type=VTYPE_AMIXED;
 			bnf_var->var_alloced=1;
-			MESG("	array multiply by num!");
+			// MESG("	array multiply by num!");
 			return;
 		};
 		if(varb->var_type==VTYPE_AMIXED) {
-			MESG("mul array [%d %d]x[%d %d]",vara->adat->cols,vara->adat->rows,varb->adat->cols,varb->adat->rows);
+			// MESG("mul array [%d %d]x[%d %d]",vara->adat->cols,vara->adat->rows,varb->adat->cols,varb->adat->rows);
 			array_dat *result_array = array_mul2(vara->adat,varb->adat);
 			bnf_var->adat=result_array;
 			bnf_var->var_type=VTYPE_AMIXED;
@@ -1059,7 +1059,7 @@ inline static void bnf_update_val()
 
 inline static void bnf_update_array1()
 {
-	MESG("bnf_update_array1 [%s]",tok_info(tok));
+	// MESG("bnf_update_array1 [%s]",tok_info(tok));
 	array_dat *adat = bnf_var->adat;
 	int ind1=bnf_var->index1;
 	if(adat->atype==VTYPE_ARRAY) {
@@ -1085,12 +1085,12 @@ inline static void bnf_update_array1()
 
 inline static void bnf_update_array2()
 {
-	MESG("bnf_update_array2 [%s]",tok_info(tok));
+	// MESG("bnf_update_array2 [%s]",tok_info(tok));
 	array_dat *adat = bnf_var->adat;
 	int ind1=bnf_var->index1;
 
 	if(adat->atype==VTYPE_ARRAY) {
-		MESG("	update ARRAY element");
+		// MESG("	update ARRAY element");
 		double *dval = adat->dval;
 		dval[ind1] += tok->dval;
 		bnf_var->dval=dval[ind1];
@@ -1098,7 +1098,7 @@ inline static void bnf_update_array2()
 		return;
 	};
 	if(adat->atype==VTYPE_AMIXED) {
-		MESG("	update MIXED element");
+		// MESG("	update MIXED element");
 		if(adat->mval[ind1].var_type==VTYPE_NUM) {
 			adat->mval[ind1].dval += tok->dval;
 			bnf_var->var_type=VTYPE_NUM;
@@ -1187,7 +1187,8 @@ inline static void bnf_increase_by()
 	};
 
 	if(bvar->var_type==VTYPE_STRING && avar->var_type==VTYPE_SARRAY) {
-		sarray_add1(avar->adat,bnf_var->sval);
+		// MESG("	add a string to a string array!");
+		sarray_add1(avar->adat,bvar->sval);
 		return;
 	};
 	set_error(tok,1024,"increase_by operation not supported!");
@@ -1197,7 +1198,7 @@ inline static void bnf_increase_by()
 // aval-=bval
 inline static void bnf_decrease_by()
 {
-	MESG("bnf_factor_decrease_by:");
+	// MESG("bnf_factor_decrease_by:");
 
 	MVAR *bval=bnf_var;
 	prev_var("decrease by");
@@ -2294,7 +2295,7 @@ void bnf_assign_array1()
 void bnf_increaseby_array1()
 {
 	// MESG("increase_by_array1");
-	// MESG(":increaseby_array1: bvar type=%d",bnf_var->var_type);
+	MESG(":increaseby_array1: bvar type=%d",bnf_var->var_type);
 	MVAR *bvar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer : bnf_var;
 	prev_var("increaseby_array1:");
 	int ind1 = bnf_var->index1;

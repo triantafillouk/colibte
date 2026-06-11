@@ -1,4 +1,4 @@
-# string operations on string arrays, string array ops not ok in bnf TBD
+# string operations on string arrays, ok in bnf from 931
 a=["a1", "a2"]
 a[0]: 
 a[1]: 
@@ -7,6 +7,7 @@ a[0]+="test1"
 a[0]: 
 a[1]: 
 a+=" test2"
+a:
 a[0]: 
 a[1]: 
 a[1]: 
