@@ -1,4 +1,4 @@
-# bnf 923 ok, 924 not ok! TBD
+# bnf 923 ok, 924 not ok!, 930 ok bnf final result is correct!
 f1=2
 
 function sv(b,a,c)

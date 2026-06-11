@@ -1606,10 +1606,6 @@ double factor_array2()
 	// MESG("factor_array2: type %d",adat->atype);
 	
 	if(adat==NULL) {
-#if	0
-		set_error(tok,209,"array indexes out of bound!");
-		return(0);
-#else
 		/* No data in the array, allocate new ones!  */
 		NTOKEN2;
 		ind1=(int)num_expression();
@@ -1621,14 +1617,13 @@ double factor_array2()
 		adat->atype=VTYPE_ARRAY;
 		adat->array_name = array_name;
 		array_slot->adat = adat;
-		MESG("created a 2 dim array!");
-		MESG("	array name=%s",array_name);
+		// MESG("created a 2 dim array!");
+		// MESG("	array name=%s",array_name);
 		print_array1("new array created",adat);
 
 		// MESG("new rows=%d cols=%d",adat->rows,adat->cols);
 		NTOKEN2;
 			// value=dval2[ind1][ind2];
-#endif
 	} else
 	{
 		NTOKEN2;
@@ -1643,7 +1638,7 @@ double factor_array2()
 			set_error(tok0,209,"array indexes out of bound!");
 		} else {
 			if(adat->atype==VTYPE_ARRAY) {
-				MESG("- 2 dim num array!");
+				// MESG("- 2 dim num array!");
 				double **dval2 = adat->dval2;
 				set_vtype(VTYPE_NUM);
 				value=dval2[ind1][ind2];

@@ -357,8 +357,6 @@ static void bnf_factor_spn_plus()
 	return;
 }
 
-#if	0
-#else
 void bnf_factor_plus()
 {
  // MESG(";bnf_factor_plus: var@=%d [%s]",VARIND,tok_info(tok));
@@ -473,7 +471,6 @@ void bnf_factor_plus()
 
  	set_error(tok,1028,"plus error");
 }
-#endif
 
 inline static void  bnf_factor_pn_minus()
 {
@@ -1068,15 +1065,17 @@ inline static void bnf_update_array1()
 	if(adat->atype==VTYPE_ARRAY) {
 		// Check if bvar is VTYPE_NUM!!
 		double *dval = adat->dval;
+		double old_val = dval[ind1];
 		dval[ind1] += tok->dval;
-		bnf_var->dval=dval[ind1];
+		bnf_var->dval=old_val;
 		bnf_var->var_type=VTYPE_NUM;
 		return;
 	};
 	if(adat->atype==VTYPE_AMIXED) {
 		if(adat->mval[ind1].var_type==VTYPE_NUM) {
+			double old_val=adat->mval[ind1].dval;
 			adat->mval[ind1].dval += tok->dval;
-			bnf_var->dval=adat->mval[ind1].dval;
+			bnf_var->dval=old_val;
 			bnf_var->var_type=VTYPE_NUM;
 			return;
 		}
