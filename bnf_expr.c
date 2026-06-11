@@ -1729,6 +1729,7 @@ void bnf_dir_fori()
 	// find token after the end of block
 	skip_sentence1();
 	end_block=tok;
+	// MESG("	fori initial end of block token [%s]",tok_info(tok));
 	if(!is_curl) end_block-=2;
 	// MESG("	fori end of block token [%s]",tok_info(tok));
 
@@ -1777,13 +1778,15 @@ void bnf_dir_fori()
 				// MESG("# fori: iterrator_val=%3f var@=%d, [%s]",*iterrator_val,VARIND,tok_info(tok));
 				bnf_var=bnf_vars+start_var;
 				bnf_expression();
-				// if(VARIND>start_var) 	prev_var("fori");
+				// prev_var("fori");
 				// MESG("	fori:2 iterrator_val=%3f var@=%d, [%s]",*iterrator_val,VARIND,tok_info(tok));
 			};
 		} else if(dstep<0 && dmax< *iterrator_val) {
 			for(; *iterrator_val > dmax; *iterrator_val +=dstep) {
+				bnf_var=bnf_vars+start_var;
 				tok=start_block;
-				bnf_expression();prev_var("fori");
+				bnf_expression();
+				// prev_var("fori");
 			};
 		} else {
 			err_num=226;
@@ -1822,10 +1825,13 @@ void bnf_dir_for()
 
 	NTOKEN2;	/* skip right parenthesis  */
 	// set block start
-	start_block=tok+1;
+	start_block=tok;
+	int is_curl=tok->ttype==TOK_LCURL;
+	if(is_curl) start_block++;	
 	// MESG("	for loop: start of block [%s]",tok_info(tok));
 	skip_sentence1();
 	end_block=tok;
+	if(!is_curl) end_block-=2;
 	// MESG("	for loop: end of block [%s]",tok_info(tok));
 	int aflag=current_active_flag;
 	while(current_active_flag)
@@ -1835,12 +1841,12 @@ void bnf_dir_for()
 		tok=check_element;
 		val=bnf_expression();
 		prev_var("check");
-		// MESG("	for check result: %f",val);
+		// MESG("	dir_for: check result: %f",val);
 		if(val) {
 			tok=start_block;
-			// MESG("	for: start of loop: var@=%d",VARIND);
-			// MESG("	for: start block: var@=%d [%s]",VARIND,tok_info(tok));
-			bnf_block1();
+			// MESG("	for: start of loop: var@=%d [%s]",VARIND,tok_info(tok));
+			if(is_curl) bnf_block1();
+			else { bnf_expression();prev_var("fori");};
 			if(current_active_flag==0) {
 				tok--;
 				// MESG("	for: break: var@=%d [%s]",VARIND,tok_info(tok));
