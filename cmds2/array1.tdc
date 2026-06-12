@@ -1,28 +1,31 @@
 # test arrays normal has problems ok in bnf, TBC
 cls
-k=1.22
+k=1.22:
 a = [k, 1, 2, 3]
 a:
-a+1:
-a+=1
-a:
-2*a:
-a*2:
-a+1:
-a+a:
-a-a:
+i5=I(5):
+j34=J(3,4):
 
 at=T(a)
 at:
 a1=a*at:
 a2=at*a:
-
-# ia=INV(a2):
+to_num_array(a2)
+d2=DET(a2):
+a2[0][0]=3
+a2[1][0]=45
+print(a2)
+d2=DET(a2):
+# return
+ia=INV(a2):
+ia:
+return
 ka=k-a:
 ak=a-k:
 a:
 ka:
 ak:
+#return
 i=0
 a[0]:
 a[1]:

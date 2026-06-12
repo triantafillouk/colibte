@@ -928,10 +928,12 @@ void out_print(char *s,int nl)
 	if(!discmd) return ;
 #else
 	if(!discmd) {
+#if	0
 		if(debug_flag()) {
 			if(nl) fprintf(stderr,"%s\n",s);
 			else fprintf(stderr,"%s",s);
 		};
+#endif
 		if(nl) fprintf(stdout,"%s\n",s);
 		else fprintf(stdout,"%s",s);
 		return;

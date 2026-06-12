@@ -29,7 +29,7 @@ void init_array_header(struct array_dat *array, int rows,int cols,int ctype)
 	else ctype=VTYPE_ARRAY;
 	// MESG("init_array: ex_nums=%d ex_nquote=%d ex_nvars=%d ->ctype=%d",ex_nums,ex_nquote,ex_nvars,ctype);
 #endif
-	MESG("init_array_header: rows=%d cols=%d array_type=%d",rows,cols,ctype);
+	// MESG("init_array_header: rows=%d cols=%d array_type=%d",rows,cols,ctype);
 	array->rows=rows;
 	array->cols=cols;
 	array->atype=ctype;
@@ -38,7 +38,7 @@ void init_array_header(struct array_dat *array, int rows,int cols,int ctype)
 	set_vtype(ctype);
 	/* init again after use the ex values!  */
 	ex_nums=0;ex_nquote=0;ex_nvars=0;
-	MESG("init_array_header: type=%d rows=%d cols=%d",array->atype,array->rows,array->cols);
+	// MESG("init_array_header: type=%d rows=%d cols=%d",array->atype,array->rows,array->cols);
 }
 
 /* List array is one dimensional string array  */
@@ -74,10 +74,14 @@ void free_array_dat(struct array_dat *adat)
 	adat->dval=NULL;
  } else {
  	int j;
- 	for(j=0;j<adat->rows;j++) {
-		free(adat->dval2[j]);
+	if(adat->atype==VTYPE_ARRAY) {
+	 	for(j=0;j<adat->rows;j++) {
+			free(adat->dval2[j]);
+		};
+		free(adat->dval2);
+	} else { 
+		free(adat->mval);
 	};
-	free(adat->dval2);
  };
  adat->astat=ARRAY_UNALLOCATED;
  return;
@@ -93,7 +97,7 @@ void free_array(char *spos,struct array_dat *adat)
 void allocate_array(struct array_dat *adat)
 {
  int i;
- MESG("allocate_array: rows=%d cols=%d astat=%d type=%d",adat->rows,adat->cols,adat->astat,adat->atype);
+ // MESG("allocate_array: rows=%d cols=%d astat=%d type=%d",adat->rows,adat->cols,adat->astat,adat->atype);
  
  if(adat->astat==ARRAY_UNALLOCATED || adat->atype==VTYPE_AMIXED) {	/* new/renew  */
  	if(adat->atype==VTYPE_ARRAY) {	/* allocate num array  */
@@ -121,7 +125,11 @@ void allocate_array(struct array_dat *adat)
 	// if(adat->rows > 1) dim=adat->rows; else dim=adat->cols;
 	dim = (adat->rows > 1) ? adat->rows: adat->cols;
  	adat->dval=calloc(sizeof(double),dim);
-	MESG("	- allocated size=%d dval=%p",dim*sizeof(double),adat->dval);
+	if(adat->dval==NULL) {
+		set_error(tok,4021,"cannot allocate array");
+		return;
+	};
+	// MESG("	- allocated size=%d dval=%p",dim*sizeof(double),adat->dval);
 	// for(i=0;i<dim;i++) adat->dval[i]=0;
  };
 
@@ -180,7 +188,7 @@ struct array_dat *new_array(int rows,int cols,int array_type)
 {
 	struct array_dat *array;
 	array=alloc_array_header();
-	MESG("new_array: rows=%d cols=%d type=%d",rows,cols,array_type);
+	// MESG("new_array: rows=%d cols=%d type=%d",rows,cols,array_type);
 
 	init_array_header(array,rows,cols,array_type);
 	// MESG("new_array:%d rows=%d cols=%d",array->anum,rows,cols);
@@ -191,8 +199,10 @@ array_dat * dup_array_add1(array_dat *a,double plus)
 {
  array_dat *na;	/* new array  */
  // MESG("dup_array_add1:");
- na=new_array_similar(a);
- 	if(na->atype==VTYPE_ARRAY) {	/* allocate num array  */
+ // na=new_array_similar(a);
+ na=new_array(a->rows,a->cols,VTYPE_ARRAY);
+ allocate_array(na);
+ 	if(a->atype==VTYPE_ARRAY) {	
 		int i,j,dim=1;
 		if(na->rows>1 && na->cols>1) {
 			for(j=0;j<na->rows;j++) for(i=0;i<na->cols;i++) 
@@ -202,6 +212,27 @@ array_dat * dup_array_add1(array_dat *a,double plus)
 			for(i=0;i<dim;i++) na->dval[i]= a->dval[i]+plus;
 		};
 	};
+
+ 	if(a->atype==VTYPE_AMIXED) {	
+		int i,j,dim=1;
+		int k=0;
+		if(na->rows>1 && na->cols>1) {
+			for(j=0;j<na->rows;j++) for(i=0;i<na->cols;i++) {
+				if(a->mval[k].var_type==VTYPE_NUM) 
+					na->dval2[j][i]=a->mval[k].dval+plus;
+				k++;
+			};
+		} else {
+			if(na->rows > 1) dim=na->rows; else dim=na->cols;
+			for(i=0;i<dim;i++) {
+				if(a->mval[k].var_type==VTYPE_NUM) 
+					na->dval[i]=a->mval[k].dval+plus;
+				k++;
+			};
+		};
+	};
+
+
  na->astat=ARRAY_ALLOCATED;
  return(na);
 }
@@ -229,7 +260,7 @@ array_dat * dup_array_sub1(array_dat *a,double plus)
 array_dat * dup_array_mul1(array_dat *a,double num)
 {
  array_dat *na;	/* new array  */
- MESG("dup_array_mul1:");
+ // MESG("dup_array_mul1:");
  na=new_array_similar(a);
  	if(na->atype==VTYPE_ARRAY) {	/* allocate num array  */
 		int i,j,dim=1;
@@ -310,7 +341,7 @@ array_dat * array_mul2(array_dat *aa,array_dat *ba)
    int result_cols=ba->cols;
    int result_rows=aa->rows;
    int i,j,k;
-   MESG("array_mul2: a (%d %d) b (%d %d)",aa->rows,aa->cols,ba->rows,ba->cols);
+   // MESG("array_mul2: a (%d %d) b (%d %d)",aa->rows,aa->cols,ba->rows,ba->cols);
 	na=new_array(result_rows,result_cols,VTYPE_ARRAY);
 	na->atype=aa->atype;
 	allocate_array(na);
@@ -350,10 +381,10 @@ array_dat * array_mul2(array_dat *aa,array_dat *ba)
 		};		
 		if(aa->atype==VTYPE_AMIXED) {	/* TBC ?????  */
 			// double **n=na->dval2;
-			if(aa->cols==1||ba->cols==1) {
+			if(aa->cols==1) {
 				for(i=0;i<aa->rows;i++) {
 					// check if both are numeric values !!
-					na->mval[i].dval=aa->mval[i].dval * ba->mval[i].dval; 
+					na->mval[i+i*aa->rows].dval=aa->mval[i].dval * ba->mval[i].dval; 
 				}
 			} else if(ba->cols==1) {
 				// double *a;
@@ -447,6 +478,65 @@ array_dat * array_sub2(array_dat *aa,array_dat *ba)
  	err_num=255;
 	err_str="To substract arrays they must have the same dimensions";
 	return(NULL);
+ };
+}
+
+// substruct an array from another, the result is on the first one
+// the second can be amixed type
+void array_sub(array_dat *aa,array_dat *ba)
+{
+ if(aa->rows==ba->rows && aa->cols==ba->cols){
+	int i,j;
+	if(aa->cols==1 || aa->rows==1) {
+		// MESG("array_sub: rows=%d cols=%d ba type=%d",aa->cols,aa->rows,ba->atype);
+		if(ba->atype==VTYPE_AMIXED) { 
+			for(i=0;i < aa->cols*aa->rows;i++) {
+				aa->dval[i]-=ba->mval[i].dval;
+				// MESG("	%2d: %f",aa->dval[i]);
+			};
+		} else
+			for(i=0;i < aa->cols*aa->rows;i++) aa->dval[i]-=ba->dval[i];
+	} else {
+		double **a=aa->dval2;
+		double **b=ba->dval2;
+		for(j=0;j<aa->rows;j++) for(i=0;i<aa->cols;i++){
+			a[j][i]-=b[j][i];
+		};
+	}
+	return;
+ } else {
+ 	err_num=255;
+	err_str="To add arrays they must have the same dimensions";
+	return;
+ };
+}
+
+// add an array to another, the result is on the first one
+// the second can be amixed type
+void array_add(array_dat *aa,array_dat *ba)
+{
+ if(aa->rows==ba->rows && aa->cols==ba->cols){
+	int i,j;
+	if(aa->cols==1 || aa->rows==1) {
+		if(ba->atype==VTYPE_AMIXED) { 
+			for(i=0;i < aa->cols*aa->rows;i++) {
+				aa->dval[i]+=ba->mval[i].dval;
+				// MESG("	%2d: %f",aa->dval[i]);
+			};
+		} else
+		for(i=0;i < aa->cols*aa->rows;i++) aa->dval[i]-=ba->dval[i];
+	} else {
+		double **a=aa->dval2;
+		double **b=ba->dval2;
+		for(j=0;j<aa->rows;j++) for(i=0;i<aa->cols;i++){
+			a[j][i]-=b[j][i];
+		};
+	};
+	return;
+ } else {
+ 	err_num=255;
+	err_str="To substract arrays they must have the same dimensions";
+	return;
  };
 }
 
@@ -634,7 +724,11 @@ double determinant(array_dat *aa)
   k=aa->rows-1;
   ex_nvars=0;
   ex_nums=1;	/* this is a numerical array!  */
-  // MESG("determinant:");
+  if(aa->atype!=VTYPE_ARRAY) { 
+	ERROR("determinant on non array type is %d",aa->atype); 
+ 	return(0);
+  }; 
+  // MESG("determinant: type = %d rows=%d cols=%d",aa->atype,aa->rows,aa->cols);
   if (k==1)
     {
 	det=a[0][0]*a[1][1]-a[0][1]*a[1][0];
@@ -847,6 +941,31 @@ array_dat *transpose(array_dat *array1)
   array_dat *tarray;
   ex_nums=1;	/* a numerical array  */
   // MESG("transpose:");
+  if(array1->cols==1 || array1->rows==1) {
+  	tarray = new_array_similar(array1);
+	tarray->cols = array1->rows;
+	tarray->rows = array1->cols;
+	allocate_array(tarray);
+	int dim=(tarray->cols>tarray->rows) ? tarray->cols:tarray->rows;
+	if(array1->atype==VTYPE_ARRAY) {
+		int i=0;
+		for(i=0;i<dim;i++) tarray->dval[i]=array1->dval[i];
+	};
+	if(array1->atype==VTYPE_AMIXED) {
+		int i=0;
+		for(i=0;i<dim;i++) {
+			if(array1->mval[i].var_type==VTYPE_NUM) {
+				tarray->mval[i].dval=array1->mval[i].dval;
+			} else {
+				tarray->mval[i].sval=strdup(array1->mval[i].sval);
+				tarray->mval[i].var_alloced=1;
+			};
+			tarray->mval[i].var_type=array1->mval[i].var_type;
+		};
+	};
+  	return(tarray);
+  };
+
   tarray=new_array(array1->cols,array1->rows,VTYPE_ARRAY);
   allocate_array(tarray);
   if(array1->rows==1 || array1->cols==1) {

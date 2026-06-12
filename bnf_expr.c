@@ -491,8 +491,7 @@ void bnf_factor_minus()
  MVAR *vara = bnf_var;
  int vara_type_is_pointer=0;
  if(vara->var_type==VTYPE_POINTER) { vara=bnf_var->var_pointer;vara_type_is_pointer=1;};
- // MESG(";factor_minus: atype=%d btype=%d [%s]",vara->var_type,varb->var_type,tok_info(tok));
-
+ MESG(";factor_minus: atype=%d btype=%d [%s]",vara->var_type,varb->var_type,tok_info(tok));
  if(varb->var_type==VTYPE_NUM) {
  	if(vara->var_type==VTYPE_NUM) {
 		bnf_var->dval=vara->dval - varb->dval;
@@ -523,10 +522,15 @@ void bnf_factor_minus()
 	};	
  } else if(varb->var_type==VTYPE_ARRAY) {
  	if(vara->var_type==VTYPE_NUM) {
-		array_dat *adat=dup_array_add1(varb->adat,-vara->dval);
-		vara->adat=adat;
-		vara->var_type=VTYPE_ARRAY;
-		vara->var_alloced=1;
+		MESG("scalar - minus an array!");
+		array_dat *new = new_array(varb->adat->rows,varb->adat->cols,VTYPE_ARRAY);
+		allocate_array(new);
+		array_add1(new,vara->dval);
+		array_sub(new,varb->adat);
+
+		bnf_var->adat=new;
+		bnf_var->var_type=VTYPE_ARRAY;
+		bnf_var->var_alloced=1;
 		return;
 	};
 	if(vara->var_type==VTYPE_ARRAY||vara->var_type==VTYPE_AMIXED) {
@@ -536,10 +540,15 @@ void bnf_factor_minus()
 	};
  } else if(varb->var_type==VTYPE_AMIXED) {
  	if(vara->var_type==VTYPE_NUM) {
-		array_dat *adat=dup_array_add1(varb->adat,-vara->dval);
-		vara->adat=adat;
-		vara->var_type=VTYPE_AMIXED;
-		vara->var_alloced=1;
+		// MESG("scalar - minus a mixed array!");
+		array_dat *new = new_array(varb->adat->rows,varb->adat->cols,VTYPE_ARRAY);
+		allocate_array(new);
+		array_add1(new,vara->dval);
+		array_sub(new,varb->adat);
+
+		bnf_var->adat=new;
+		bnf_var->var_type=VTYPE_ARRAY;
+		bnf_var->var_alloced=1;
 		return;
 	};
 	if(vara->var_type==VTYPE_ARRAY||vara->var_type==VTYPE_AMIXED) {
@@ -1005,7 +1014,7 @@ inline static void bnf_factor_xor()
 
 inline static void bnf_factor_none()
 {
-	MESG("bnf_factor_none! [%s]",tok_info(tok));
+	// MESG("bnf_factor_none! [%s]",tok_info(tok));
 }
 
 inline static void bnf_factor_dummy()

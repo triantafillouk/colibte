@@ -791,3 +791,18 @@ double uf_test_loop()
 	};
 	return p;
 }
+
+double uf_new_array_J()
+{
+ return 0;
+}
+
+double uf_new_array_I()
+{
+	return 0;
+}
+
+double uf_to_num_array()
+{
+	return 2;
+}

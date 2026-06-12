@@ -134,7 +134,8 @@ void bnf_determinant()	/* TBC  */
 			syntax_error("wrong dimensions for determinant",203);
 		};
 	} else {
-		syntax_error("Not an array!",204);
+		MESG("bnf_determinant: var_type=%d",bnf_var->var_type);
+		syntax_error("Variable Not a numeric array!",204);
 	};
 	bnf_var->var_type=VTYPE_NUM;
 	bnf_var->dval=value;
@@ -146,12 +147,14 @@ void bnf_inverse()	/* TBC  */
 	double value=0;
 	bnf_function_args(1);
 	MVAR *va = bnf_var;
+	// MESG("bnf_inverse: var@=%d type %d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	if(va->var_type==VTYPE_POINTER) va=va->var_pointer;
-	if(va->var_type==VTYPE_ARRAY) {
+	if(va->var_type==VTYPE_ARRAY||va->var_type==VTYPE_AMIXED) {
 		array_dat *arr = va->adat;
 
 		if(arr->rows==arr->cols) {
 			value=determinant(arr);
+			// MESG("	bnf_inverse: determinant = %f",value);
 		} else {
 			syntax_error("wrong dimensions for determinant",205);
 		};
@@ -314,8 +317,8 @@ void bnf_print()
 	bnf_var->var_type=VTYPE_STRING;
 	bnf_var->sval=strdup(total_printed);
 	bnf_var->var_alloced=1;
-	MESG("	total_printed = [%s]",total_printed);
-	MESG("bnf_print: >> end var@=%d type=%d [%s]",VARIND,bnf_var->var_type,bnf_var->sval);
+	// MESG("	total_printed = [%s]",total_printed);
+	// MESG("bnf_print: >> end var@=%d type=%d [%s]",VARIND,bnf_var->var_type,bnf_var->sval);
 }
 
 void bnf_show_time()
@@ -814,6 +817,88 @@ void bnf_test_loop()
 	};
 }
 
+void bnf_new_array_I()
+{
+	NTOKEN2;
+	bnf_expression();
+	// MESG("bnf_new_array_I: var@=%d type=%d",VARIND,bnf_var->var_type);
+	int dim=0;
+	if(bnf_var->var_type==VTYPE_NUM) dim=bnf_var->dval;
+	else {
+		if(bnf_var->var_type==VTYPE_POINTER) {
+			if(bnf_var->var_pointer->var_type==VTYPE_NUM) {
+				dim=bnf_var->var_pointer->dval;
+			}
+		};
+	};
+	if(dim>0) {
+		// MESG("bnf_new_array: new I array dim=%d",dim);
+		array_dat *aI = new_array(dim,dim,VTYPE_ARRAY);
+		allocate_array(aI);
+		int i;
+		for(i=0;i<dim;i++) aI->dval2[i][i]=1;
+		bnf_var->var_type=VTYPE_ARRAY;
+		bnf_var->var_alloced=1;
+		bnf_var->adat=aI;
+		MESG("	ok!");
+		return;
+	};
+	set_error(tok,4002,"error in bnf_new_array_I argument");
+}
+
+
+void bnf_new_array_J()
+{
+	bnf_function_args(2);
+	int cols=bnf_var->dval;
+	prev_var("J");
+	int rows=bnf_var->dval;
+	// MESG("bnf_new_array_J rows=%d cols=%d",rows,cols);
+	array_dat *aJ = new_array(rows,cols,VTYPE_ARRAY);
+	allocate_array(aJ);
+	int i,j;
+	for(i=0;i<rows;i++) for(j=0;j<cols;j++) {
+		aJ->dval2[i][j]=1;
+	};
+	bnf_var->var_type=VTYPE_ARRAY;
+	bnf_var->adat=aJ;
+	bnf_var->var_alloced=1;
+}
+
+
+void bnf_to_num_array()
+{
+	NTOKEN2;
+	// MESG("bnf_to_num_array: var@=%d [%s]",VARIND,tok_info(tok));
+	tok->bnf_factor_function();NTOKEN2;
+	// MESG("bnf_to_num_array: var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+		
+	if(bnf_var->var_type==VTYPE_POINTER) {
+		if(bnf_var->var_pointer->var_type==VTYPE_AMIXED) {
+			array_dat *a_old=bnf_var->var_pointer->adat;
+			array_dat *a_new=new_array(a_old->rows,a_old->cols,VTYPE_ARRAY);
+			allocate_array(a_new);
+			int i,j,k=0;
+			for(i=0;i<a_old->rows;i++) for(j=0;j<a_old->cols;j++) {
+				if(a_old->mval[k].var_type==VTYPE_NUM) 
+					a_new->dval2[i][j]=a_old->mval[k].dval;
+				else a_new->dval2[i][j]=0;
+				k++;
+			};
+			bnf_var->var_pointer->var_type=VTYPE_ARRAY;
+			bnf_var->var_pointer->adat = a_new;
+			// MESG("	free old array!");
+			free_array_dat(a_old);
+			// MESG("free ok!");
+			return;
+		} else
+		if(bnf_var->var_pointer->var_type==VTYPE_ARRAY) {
+			return;	/* Just return  */
+		};
+	};
+	set_error(tok,4001,"cannot convert to numeric array");
+}
+
 v_function bnf_functions[] = {
 	{"len",1,bnf_len},        /* STRING LENGTH */
 	{"upper",1,bnf_upper},        /* UPPERCASE STRING */
@@ -868,6 +953,9 @@ v_function bnf_functions[] = {
 	{"list_tokens",0,bnf_list_tokens},	/* list_tokens  */
 	{"var_index",0,bnf_var_index},	/* show stack var index  */
 	{"test_loop",1,bnf_test_loop},	/* test computational loop  */
+	{"to_num_array",1,bnf_to_num_array},	/* convert to numeric array  */
+	{"J",2,bnf_new_array_J},	/* new all 1 array  */
+	{"I",1,bnf_new_array_I},	/* new identity array  */
 	// {"array_fixed_to_num",1,bnf_array_fixed_to_num},
 	{NULL,0,NULL}
 };

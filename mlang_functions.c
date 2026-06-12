@@ -65,6 +65,10 @@ m_function m_functions[] = {
 	{"list_tokens",0,uf_list_tokens},	/* list_tokens  */
 	{"var_index",0,uf_var_index},
 	{"test_loop",1,uf_test_loop},	/* test computational loop  */
+	{"to_num_array",1,uf_to_num_array},	/* convert to numeric array  */
+	{"J",2,uf_new_array_J},	/* new all 1 array  */
+	{"I",1,uf_new_array_I},	/* new identity array  */
+
 	// {"array_fixed_to_num",1,uf_array_fixed_to_num},
 	{NULL,0,NULL}
 };
