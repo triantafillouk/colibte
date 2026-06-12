@@ -2,7 +2,7 @@
 initialize
 # CHECK!!!!!
 cls
-
+print("--- tloop5.cmd")
 i=p=0
 
 print(_time)	: [Thu Sep 25 16:59:11 2014]

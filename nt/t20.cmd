@@ -1,4 +1,5 @@
 # ok from 927
+print("--- t20.cmd")
 i=1
 # if test
 if (1==i)	{a=1;b=2} else 

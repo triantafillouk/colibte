@@ -1,5 +1,5 @@
 # test string functions
-
+print("--- s4.cmd")
 s2="abc":
 s1="cba":
 

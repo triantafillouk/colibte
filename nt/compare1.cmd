@@ -1,3 +1,5 @@
+print("--- compare1.cmd")
+
 a=1:
 b=3:
 c=d=1   : 

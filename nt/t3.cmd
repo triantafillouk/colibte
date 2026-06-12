@@ -1,5 +1,6 @@
 # string array bnf fixed in 887
 cls
+print("--- t3.cmd")
 a=["b1", "b2", "b3"]
 a[1]:
 a[2]:

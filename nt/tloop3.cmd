@@ -1,7 +1,7 @@
 # speed test 2 with double fori loops
 
 cls
-
+print("--- tloop3.cmd")
 print(_time)	: "Sat Oct 18 05:35:09 2014"
 show_time("Start test 2 fori",0)
 

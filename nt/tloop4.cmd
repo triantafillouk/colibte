@@ -1,7 +1,7 @@
 # speed test 3 with a function inside the loop
 
 cls
-
+print("--- tloop4.cmd")
 print(_time)	: "Thu Aug 13 14:18:00 2015"
 show_time("Loop test while/for sin 3",0)
 

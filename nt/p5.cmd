@@ -1,4 +1,4 @@
-
+print("--- p5.cmd")
 function print_name(name,flag)
 {
  if(flag) {

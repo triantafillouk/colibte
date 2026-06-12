@@ -1,6 +1,7 @@
 ## e4, a51, a52
 
 cls
+print("--- a51.cmd")
 k=4
 
 if(k==4) print("OK!") 

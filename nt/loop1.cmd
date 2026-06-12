@@ -1,5 +1,6 @@
 # check loops
 cls
+print("--- loop1.cmd")
 max=100
 l1=0
 fori(i=0;max;1)

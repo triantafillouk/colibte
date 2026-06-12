@@ -1,5 +1,6 @@
 # test loop with proc inside
 cls
+print("--- f1.cmd")
 function fact(num)
 {
  if(num<1) 

@@ -1,4 +1,5 @@
 # ok from 927
+print("--- t21.cmd")
 a=1
 b=0
 # test

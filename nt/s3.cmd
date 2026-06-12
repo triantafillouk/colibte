@@ -1,6 +1,7 @@
 # numeric element multiplication of MIXED array bnf fixed at v886
 # but string mul by num is not working
 cls
+print("--- s3.cmd")
 a=["test ", "test2 ";11, "tt2"]
 a:
 #a*=2

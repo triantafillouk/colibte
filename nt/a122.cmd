@@ -1,5 +1,6 @@
 # simple array ops
 # ok in bnf not correct in normal
+print("--- a122.cmd")
 
 b=[1, 2, 3.1]:
 b+=1

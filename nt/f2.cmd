@@ -1,6 +1,6 @@
 # test loop with proc inside different ok from 927
 cls
-
+print("--- f2.cmd")
 i=2
 
 if(i==3) {

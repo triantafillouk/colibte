@@ -1,4 +1,5 @@
 # test loop with fori
+print("--- e5.cmd")
 
 p=0, l=0; 
 

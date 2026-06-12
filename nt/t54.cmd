@@ -1,5 +1,5 @@
 # type var in function ok from 908
-
+print("--- t54.cmd")
 type human = [name::"Name",age::20]
 
 a=human("No name",100)

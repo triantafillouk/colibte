@@ -1,4 +1,5 @@
 # string operations on string arrays, ok in bnf from 931
+print("--- s2.cmd")
 a=["a1", "a2"]
 a[0]: 
 a[1]: 

@@ -1,5 +1,6 @@
 # test mixed dynamic array!
 cls
+print("--- a9.cmd")
 aa=1
 k="kk": "kk"
 

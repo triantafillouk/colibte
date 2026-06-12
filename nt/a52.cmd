@@ -1,4 +1,6 @@
 cls
+print("--- a52.cmd")
+
 k=4
 
 if(k==4) { print("OK!") }

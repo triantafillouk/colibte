@@ -1,5 +1,6 @@
 # bnf array multiplication ok from 893
 cls
+print("--- tarray1.cmd")
 test=1
 if(test==1){
 c=[1, 2

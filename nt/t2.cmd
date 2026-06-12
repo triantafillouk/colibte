@@ -1,5 +1,6 @@
 # ok from 927
 # test
+print("--- t2.cmd")
 if (1==2) {
 	a=3
 	b=2

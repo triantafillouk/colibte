@@ -1,4 +1,5 @@
 
+print("--- array9.cmd")
 function sc(ind)
 {
  scale=[14000, 4; 3000, 20; 3000, 35; 5000, 37; 100000, 20]

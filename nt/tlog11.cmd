@@ -1,6 +1,7 @@
 # logical test, result should be 1
 # check result TBC
 cls
+print("--- tlog11.cmd")
 a3=1
 a4=1
 

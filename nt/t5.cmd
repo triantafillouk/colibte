@@ -1,4 +1,5 @@
 # types ok from 906, increase result same as the previous one, ok 928
+print("--- t5.cmd")
 type  human1 = [name::"Name" surname::"Surname" age::0 bdate::0 salary::1 age2::1]
 #print(human2)
 #list1 = list ()

@@ -1,5 +1,6 @@
 # array ops, not correct in normal mode
 cls
+print("--- farray4.cmd")
 b=3
 a1 = [1.22, 2.44, 3.11]
 a1[1] = a1[2]+3 : 6.110000

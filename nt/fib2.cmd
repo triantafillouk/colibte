@@ -1,5 +1,6 @@
 # fibonachi numbers 
 # fast fibonachi
+print("--- fib2.cmd")
 
 function fib2_inner(a,b ,n)
 {

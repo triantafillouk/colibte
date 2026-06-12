@@ -1,5 +1,6 @@
 # ok in 929 (problem in fori,for fixed)
 cls
+print("--- tarray2.cmd")
 c=[1.1, 3.2, 3; 4, 5, 6; 7, 8.1, 9]
 
 c[0][2]	:     3

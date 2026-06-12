@@ -1,4 +1,4 @@
-
+print("--- tproc2.cmd")
 function test_print()
 {
  i=1

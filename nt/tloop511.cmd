@@ -2,7 +2,7 @@
 # slower ??
 
 cls
-
+print("--- tloop511.cmd")
 p=0; l=0; 
 print(_time)	: "Thu May 23 11:38:23 2019"
 show_time("Start fori test loop 1",0)

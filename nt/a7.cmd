@@ -1,4 +1,5 @@
 cls
+print("--- a7.cmd")
 k=10
 l=11
 for(i=1;i<10;i++){

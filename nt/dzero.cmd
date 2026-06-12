@@ -1,5 +1,6 @@
 
 cls
+print("--- dzero.cmd")
 i=5
 while(i>=0){
  n=10/i

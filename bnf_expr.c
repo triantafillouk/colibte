@@ -491,7 +491,7 @@ void bnf_factor_minus()
  MVAR *vara = bnf_var;
  int vara_type_is_pointer=0;
  if(vara->var_type==VTYPE_POINTER) { vara=bnf_var->var_pointer;vara_type_is_pointer=1;};
- MESG(";factor_minus: atype=%d btype=%d [%s]",vara->var_type,varb->var_type,tok_info(tok));
+ // MESG(";factor_minus: atype=%d btype=%d [%s]",vara->var_type,varb->var_type,tok_info(tok));
  if(varb->var_type==VTYPE_NUM) {
  	if(vara->var_type==VTYPE_NUM) {
 		bnf_var->dval=vara->dval - varb->dval;
@@ -522,7 +522,7 @@ void bnf_factor_minus()
 	};	
  } else if(varb->var_type==VTYPE_ARRAY) {
  	if(vara->var_type==VTYPE_NUM) {
-		MESG("scalar - minus an array!");
+		// MESG("scalar - minus an array!");
 		array_dat *new = new_array(varb->adat->rows,varb->adat->cols,VTYPE_ARRAY);
 		allocate_array(new);
 		array_add1(new,vara->dval);
@@ -1816,7 +1816,7 @@ void bnf_dir_for()
 	tok_struct *end_block=NULL;	/* at the block end  */
 	int old_active_flag=current_active_flag;
 
-	// MESG("-- dir_for:start var@=%d active = %d [%s]",VARIND,current_active_flag,tok_info(tok));	
+	MESG("-- dir_for:start var@=%d active = %d [%s]",VARIND,current_active_flag,tok_info(tok));	
 	NTOKEN2;	/* go to next token after for */
 
 	bnf_expression();	/* initial   */
@@ -1829,7 +1829,7 @@ void bnf_dir_for()
 	skip_sentence1();	/* skip check element  */
 	// set loop_list
 	loop_element=tok;
-	// MESG("	for loop element  [%s]",tok_info(loop_element));
+	MESG("			for loop element  [%s]",tok_info(loop_element));
 	skip_sentence1();	/* skip loop element  */
 
 	NTOKEN2;	/* skip right parenthesis  */
@@ -1837,11 +1837,11 @@ void bnf_dir_for()
 	start_block=tok;
 	int is_curl=tok->ttype==TOK_LCURL;
 	if(is_curl) start_block++;	
-	// MESG("	for loop: start of block [%s]",tok_info(tok));
+	MESG("		for loop: start of block [%s]",tok_info(tok));
 	skip_sentence1();
 	end_block=tok;
 	if(!is_curl) end_block-=2;
-	// MESG("	for loop: end of block [%s]",tok_info(tok));
+	MESG("		for loop: var@=%d is_curl=%d end of block is [%s]",VARIND,is_curl,tok_info(tok));
 	int aflag=current_active_flag;
 	while(current_active_flag)
 	{
@@ -1850,12 +1850,14 @@ void bnf_dir_for()
 		tok=check_element;
 		val=bnf_expression();
 		prev_var("check");
-		// MESG("	dir_for: check result: %f",val);
+		// MESG("			- dir_for: var@=%d check result: %f",VARIND,val);
 		if(val) {
 			tok=start_block;
+			int ind=VARIND;
 			// MESG("	for: start of loop: var@=%d [%s]",VARIND,tok_info(tok));
-			if(is_curl) bnf_block1();
-			else { bnf_expression();prev_var("fori");};
+			if(is_curl) { bnf_block1();} 
+			else { bnf_expression();prev_var("for");};
+			// bnf_var=bnf_vars+ind;
 			if(current_active_flag==0) {
 				tok--;
 				// MESG("	for: break: var@=%d [%s]",VARIND,tok_info(tok));
@@ -1864,7 +1866,7 @@ void bnf_dir_for()
 			tok=loop_element;	/*   */
 			val=bnf_expression();	/* exec for loop  */
 			// MESG("	loop var@=%d result %f",VARIND,val);
-			if(VARIND)
+			// if(VARIND)
 			prev_var("loop");
 			// MESG("	for: end of loop: var@=%d",VARIND);
 		} else {
@@ -1887,22 +1889,22 @@ void bnf_dir_while()	/* TBC  */
 	tok_struct *start_block;	// element at block start
 	tok_struct *end_block=NULL;	/* at the block end  */
 	int old_active_flag=current_active_flag;
-	// MESG("tok_dir_while:");
+	MESG("tok_dir_while:");
 	NTOKEN2;	/* go to next token after while */
 
 	check_element=tok;	/* this is the check element!  */
 	// MESG("	check element at [%s]",tok_info(tok));
 	skip_sentence1();	/* for now skip it  */
-
+	MESG("	tok_dir_while: var@=%d [%s]",tok_info(tok));
 	NTOKEN2;	/* skip right parenthesis  */
 
 	// this is the start of a simple sentence or a curl
-	// MESG("	start of block at [%s]",tok_info(tok));
+	MESG("	while start of block at [%s]",tok_info(tok));
 	start_block=tok+1;
 
 	// find token after the end of block
 	skip_sentence1();
-	// MESG("	end of block at [%s]",tok_info(tok));
+	MESG("	end of block at [%s]",tok_info(tok));
 	end_block=tok;
 
 	// set tok pointer here
@@ -1911,12 +1913,13 @@ void bnf_dir_while()	/* TBC  */
 		// set tlist to tok pointer
 		tok=check_element;
 		double check=bnf_expression();prev_var("exr");
-		// MESG("# while var@=%d check=%f [%s]",VARIND,check,tok_info(tok));
+		MESG("# while var@=%d check=%f [%s]",VARIND,check,tok_info(tok));
 		if(check) {
 			// on the block start
 			tok=start_block;
-			// MESG("	while start loop var@=%d [%s]",VARIND,tok_info(tok));
+			MESG("		while start loop var@=%d [%s]",VARIND,tok_info(tok));
 			bnf_block1();
+			MESG("		while end loop var@=%d [%d]",VARIND,tok_info(tok));
 			if(current_active_flag==0) {	/* only after break  */
 				if(is_break1) { tok=exe_buffer->end_token;return;};
 				break;

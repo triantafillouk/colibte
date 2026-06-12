@@ -1,5 +1,6 @@
 # test loop with proc inside, ok from 927
 cls
+print("--- e34.cmd")
 function fact(num)
 {
  if(num<1) 

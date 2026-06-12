@@ -1,5 +1,5 @@
 cls
-
+print("--- for1.cmd")
 for(i=0;i<10;i+=1)
 {
 	print(" f:"+i)

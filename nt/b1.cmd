@@ -1,3 +1,4 @@
+print("--- b1.cmd")
 print("XOR ----")
 1 xor 1	:
 1 xor 0	:

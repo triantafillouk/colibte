@@ -1,5 +1,6 @@
 # final result same from 927
 cls
+print("--- a8.cmd")
 a="lkasjdlaskj";b=a+2:
 len(a):
 a:

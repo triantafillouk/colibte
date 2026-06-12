@@ -1,7 +1,7 @@
 # test loop with fori
 # check bnf_factor_sep1 CHECK
 cls
-
+print("--- tloop500.cmd")
 p=0; l=0; 
 print(_time)	:
 show_time("Start fori test loop 1",0)

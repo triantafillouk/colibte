@@ -1,4 +1,5 @@
 # bnf 923 ok, 924 not ok!, 930 ok bnf final result is correct!
+print("--- svars.cmd")
 f1=2
 
 function sv(b,a,c)

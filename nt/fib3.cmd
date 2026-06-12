@@ -1,4 +1,4 @@
-
+print("--- fib3.cmd")
 function ai1(n){
     counter = 1;
     sum = 1;

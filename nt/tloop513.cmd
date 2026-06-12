@@ -1,7 +1,7 @@
 # test loop with fori
 
 cls
-
+print("--- tloop513.cmd")
 p=0; l=0; 
 print(_time)	:
 show_time("Start fori test loop 1",0)

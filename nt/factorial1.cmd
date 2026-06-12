@@ -1,4 +1,5 @@
 cls
+print("--- factorial1.cmd")
 function fact(num)
 {
  if(num<1) 

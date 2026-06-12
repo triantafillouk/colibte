@@ -1,5 +1,5 @@
 # test string functions
-
+print("--- s1.cmd")
 s="abcdefghijklmnopqrstuvwxyz"
 s:
  atan(1.2):

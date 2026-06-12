@@ -1,4 +1,5 @@
 # types ok from 908, normal not ok!
+print("--- t53.cmd")
 type human = [name::"Name" age::55]
 # a=human
 # a.age++ : 

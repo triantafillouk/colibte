@@ -1,5 +1,5 @@
 # check recursive functions 2
-
+print("--- factorial20.cmd")
 num=1
 var1=10
 

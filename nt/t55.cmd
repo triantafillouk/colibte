@@ -1,5 +1,5 @@
 # type speed test
-
+print("--- t55.cmd")
 type human = [name::"Name",age::20]
 
 a=human("No name",100)

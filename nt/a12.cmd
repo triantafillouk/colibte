@@ -1,4 +1,6 @@
 cls
+print("---- a12.cmd")
+
 function fact(num)
 {
  if(num<1) 

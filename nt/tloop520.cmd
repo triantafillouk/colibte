@@ -1,5 +1,7 @@
 # test loop with proc inside
 cls
+print("--- tloop520.cmd")
+
 function fact(num)
 {
  if(num<1) 

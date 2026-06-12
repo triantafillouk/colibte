@@ -1,5 +1,6 @@
 # in normal mode last value not correct SELECTBNF
 cls
+print("--- a11.cmd")
 max1=50
 print("Initializing arrays with ",max1," elements")
 print("")

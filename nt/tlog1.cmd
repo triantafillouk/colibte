@@ -1,5 +1,6 @@
 # logical test, result should be 1
 cls
+print("--- tlog1.cmd")
 a1=0
 a2=1
 a3=1

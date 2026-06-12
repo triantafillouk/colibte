@@ -1,5 +1,7 @@
 # test
 cls
+print("--- e2.cmd")
+
 sin(0.45)
 show_time("test bnf",0);
 b=!5:

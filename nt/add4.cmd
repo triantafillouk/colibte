@@ -1,5 +1,7 @@
 # a recursive function that adds 3 arguments with a quirk
 # ok from 927
+print("--- add4.cmd")
+
 function add3(a,b,c)
 {
  print("-args:a="+a+" b="+b+" c="+c)

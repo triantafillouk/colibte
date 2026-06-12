@@ -1,3 +1,5 @@
+print("--- bnf1.cmd")
+
 function d2(d1)
 {
 	return (2*d1)

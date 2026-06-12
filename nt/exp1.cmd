@@ -1,5 +1,5 @@
 # logical expression 
-
+print("--- exp1.cmd")
 
 a=0: 
 b=5: 

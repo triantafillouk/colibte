@@ -1,5 +1,6 @@
 # string compare
 # bnf ok!
+print("--- tstring1.cmd")
 a=c=c1="fly1"	: 
 b="fly2"		: 
 

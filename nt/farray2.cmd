@@ -1,6 +1,6 @@
 # arrays as function args!!!!! ( ok with bnf not ok in normal!!)
 cls
-
+print("--- farray2.cmd")
 function test_array(a ,l)
 {
 	b=a*1

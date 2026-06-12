@@ -1,5 +1,6 @@
 # a array not with values in normal mode SELECTBNF
 cls
+print("---- a1.cmd");
 max1=30000000
 print("Initializing arrays with ",max1," elements")
 print("")

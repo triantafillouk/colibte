@@ -1,5 +1,6 @@
 # mixed array definition on 890 ok but differs, bnf num+string is correct!
 cls
+print("--- t6.cmd")
 print("This is a test defining a mixed array!")
 
 #k="test"

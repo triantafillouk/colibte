@@ -1,7 +1,7 @@
 # check loops with break 
 
 cls
-
+print("--- tloop12.cmd")
 print(_time)	: [Wed Oct  1 23:28:47 2014]
 show_time("Start test loop break",0)
 

@@ -1,5 +1,6 @@
 # normal not correct, bnf ok from 892
 cls
+print("--- tarray3.cmd")
 c=[	1.1, 	3.2, 	3
 	4, 		5 ,		6
 	7	,	8.1,		9]

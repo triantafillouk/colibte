@@ -1,4 +1,6 @@
 # ok from 927
+print("--- a3.cmd")
+
 a=3.3
 fori(i=1;5;1)
 {

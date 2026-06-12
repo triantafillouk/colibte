@@ -1,4 +1,5 @@
 # types ok from 908 TBC
+print("--- t52.cmd")
 type  human1 = [name::"Name" surname::"Surname" age::0 bdate::0 salary::1 age2::1]
 k=1
 

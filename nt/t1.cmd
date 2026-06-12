@@ -1,4 +1,5 @@
 # abort function ok at 887
+print("--- t1.cmd")
 show_time("test",0)
 abort()
 show_time("test1",1)
