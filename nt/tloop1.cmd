@@ -1,4 +1,4 @@
-# check loops with break 
+# check loops with break ok in bnf, ? in normal
 # ok 
 cls
 print("--- tloop1.cmd")

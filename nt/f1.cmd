@@ -1,4 +1,5 @@
 # test loop with proc inside
+# correct final result in bnf
 cls
 print("--- f1.cmd")
 function fact(num)

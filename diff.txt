@@ -1,0 +1,41 @@
+
+# different final result, but it does not matter TBC
+==== nt/e1.cmd
+3c3
+< Result is [0.000000]
+---
+> Result is [1.000000]
+
+
+# should return "test"
+==== nt/factorial20.cmd
+7c7
+< Result is "test"
+---
+> Result is "fact(3) is test"
+
+
+# bnf segfauults sometimes
+==== nt/fib3.cmd
+1c1
+< --- fib3.cmd
+---
+> 
+
+
+# TBC
+==== nt/s3.cmd
+9c9
+< a[1][1]	: tt2tt2
+---
+> a[1][1]	: tt2
+
+
+
+# problem in first line! TBD
+==== nt/tproc2.cmd
+1c1
+< --- tproc2.cmd
+---
+> 
+

@@ -1,3 +1,4 @@
+# ok in bnf
 print("--- p5.cmd")
 function print_name(name,flag)
 {

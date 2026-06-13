@@ -25,12 +25,12 @@ function fact(num , st)
  }
 }
 
-f=3: 
+f=3:   3.0
 n=test(f,"test")
 
 #n=fact(f,"test")
 
-n: 
+n: "test"
 print("fact("+f+") is "+n)
 return(n)
 

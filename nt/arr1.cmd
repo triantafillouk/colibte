@@ -1,4 +1,4 @@
-
+# bnf returns the string result of print command
 cls
 print("--- arr1.cmd")
 

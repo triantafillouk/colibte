@@ -1,4 +1,4 @@
-# 
+# bnf ok normal not ok! 
 initialize
 # CHECK!!!!!
 cls
