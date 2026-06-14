@@ -254,7 +254,7 @@ int	err_eval_fun1(tok_struct *tok0,tok_struct *tok_bnf,int lpar)
 		// MESG("err_eval_fun1: skip RPAR!!");
 		if(lpar) stack_push("eval_func )",tok,-TOK_RPAR);
 		NTOKEN_ERR(404);
-		MESG("	eval_func1: after rpar: [%s]",tok_info(tok));
+		// MESG("	eval_func1: after rpar: [%s]",tok_info(tok));
 		// if(tok->ttype==TOK_SEP) stack_push("function end",tok,0);
 	};
 	tok0->number_of_args=ia;

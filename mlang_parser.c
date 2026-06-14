@@ -696,9 +696,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			// MESG("end of array definition tnum=%d ",tok->tnum);
 			cc=1;
 			if(next_token_type(bf)==TOK_LBRAKET) {
-				MESG("[%s]	next is LBRAKET",bf->b_fname);
+				// MESG("[%s]	next is LBRAKET",bf->b_fname);
 				// array_tok=tok;
-				if(array_tok)		// ??????????????????? CHECK!!!!!
+				if(array_tok)		// ??????????????????? TBC CHECK!!!!!
 					array_tok->ttype=TOK_ARRAY2;
 				else tok_type=TOK_ARRAY2;
 				// tok_type=TOK_ARRAY2;

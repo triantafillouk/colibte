@@ -53,7 +53,6 @@ nt/farray2.cmd
 nt/farray3.cmd
 nt/farray4.cmd
 nt/fib.cmd
-nt/fib2.c
 nt/fib2.cmd
 nt/fib3.cmd
 nt/for1.cmd
@@ -94,8 +93,6 @@ nt/tarray3.cmd
 nt/tarray4.cmd
 nt/tarray5.cmd
 nt/tarray6.cmd
-nt/time1,outf
-nt/time1,outx
 nt/time1.cmd
 nt/tlog1.cmd
 nt/tlog11.cmd

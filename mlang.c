@@ -3553,7 +3553,7 @@ double assign_val(double none)
 				if(sslot->var_type==VTYPE_AMIXED) {
 					// MESG("	AMIXED !");
 					// MESG("	AMIXED we are here! %f",*ls_pdval);
-					if(stype!=lmvar->var_type) MESG("	different subtype!!!");
+					// if(stype!=lmvar->var_type) MESG("	different subtype!!!");
 					if(lmvar->var_type==VTYPE_STRING) free(lmvar->sval);
 					lmvar->var_type=get_vtype();
 					if(vtype_is(VTYPE_STRING)) {
@@ -4187,28 +4187,27 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		show_var_stats();
 		// next_var("result");
 		// prev_var("r");
-		MESG("show result executing buffer [%s]!",bp->b_fname);
+		// MESG("show result executing buffer [%s]!",bp->b_fname);
 
 		MVAR *result = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
 		if(show_no_time) {
-			if(result->var_type==VTYPE_NUM) msg_line("Result is [%f]",num_result());
-			else if(result->var_type==VTYPE_STRING) msg_line("Result is \"%s\"",string_result());
-			else msg_line("Result is type %d",bnf_var->var_type);
+			if(result->var_type==VTYPE_NUM) msg_line("[%s] Result (%f)",bp->b_fname,num_result());
+			else if(result->var_type==VTYPE_STRING) msg_line("[%s] Result  \"%s\"",bp->b_fname,string_result());
+			else msg_line("[%s] Result type %d",bp->b_fname,bnf_var->var_type);
 		} else {
-			if(result->var_type==VTYPE_NUM) msg_line("Result at var@=%d [%f]",VARIND,num_result());
-			else if(result->var_type==VTYPE_STRING) msg_line("Result at var@=%d [%s]",VARIND,string_result());
-			else msg_line("Result at var@=%d is type %d",VARIND,bnf_var->var_type);
+			if(result->var_type==VTYPE_NUM) msg_line("[%s] Result at var@=%d (%f)",bp->b_fname,VARIND,num_result());
+			else if(result->var_type==VTYPE_STRING) msg_line("[%s] Result at var@=%d \"%s]\"",bp->b_fname,VARIND,string_result());
+			else msg_line("[%s] Result at var@=%d type %d",bp->b_fname,VARIND,bnf_var->var_type);
 		};
-		MESG("	result var@=%d",VARIND);
 	} else {
 		if(show_no_time) {
-			if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
-			else if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
-			else msg_line("Result is type %d",get_vtype());
+			if(vtype_is(VTYPE_NUM)) msg_line("[%s] Result  (%f)",bp->b_fname,val);
+			else if(vtype_is(VTYPE_STRING)) msg_line("[%s] Result  \"%s\"",bp->b_fname,get_sval());
+			else msg_line("[%s] Result type %d",bp->b_fname,get_vtype());
 		} else {
-			if(vtype_is(VTYPE_STRING)) msg_line("Result n is \"%s\"",get_sval());
-			else if(vtype_is(VTYPE_NUM)) msg_line("Result n is [%f]",val);
-			else msg_line("Result n is type %d",get_vtype());
+			if(vtype_is(VTYPE_STRING)) msg_line("[%s] Result n is \"%s\"",bp->b_fname,get_sval());
+			else if(vtype_is(VTYPE_NUM)) msg_line("[%s] Result n is (%f)",bp->b_fname,val);
+			else msg_line("[%s] Result n type %d",bp->b_fname,get_vtype());
 		};
 	};
  } else {

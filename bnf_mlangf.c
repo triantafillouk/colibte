@@ -456,9 +456,9 @@ void bnf_abs()
 {
 	NTOKEN2;
 	bnf_expression();
-	MESG("- <bnf_abs: %f",bnf_var->dval);
+	// MESG("- <bnf_abs: %f",bnf_var->dval);
 	bnf_var->dval=fabs(bnf_var->dval);
-	MESG("  >bnf_abs: %f",bnf_var->dval);
+	// MESG("  >bnf_abs: %f",bnf_var->dval);
 }
 
 /* string of a value */
