@@ -3517,7 +3517,7 @@ double assign_val(double none)
 		return(v1);
 	};
 
-	int stype=sslot->var_type;;
+	// int stype=sslot->var_type;;
 	// MESG("assign_val: check diffs! %d %d %d",get_vtype(),stype,sslot->var_type);
 	if(!vtype_is(sslot->var_type)){
 		// MESG("assign_val: different vtype %d != sslot_vtype %d",get_vtype(),sslot->var_type);
