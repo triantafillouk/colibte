@@ -4101,7 +4101,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  MVAR *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
 	MESG("# compute_block1: [%s] use [%s] start=%d",bp->b_fname,use_fp->b_fname,start);
-	MESG("# [%-15s %s ---------------------------------------------",bp->b_fname,VERSION);
+	MESG("# [%-15s %d %s ---------------------------------------------",bp->b_fname,usebnf,VERSION);
 	eval_curl_match(NULL);
  if(show_tokens) {
 	parse_buffer_show_tokens(1);
@@ -4161,7 +4161,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		next_var("res1");
 		// next_var("res2");
 		set_result();
-		MESG("end of program1 var@=%d type %d",VARIND,bnf_var->var_type);
+		// MESG("end of program1 var@=%d type %d",VARIND,bnf_var->var_type);
 		if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
 		// next_var("end");
 		// MESG("end of program2 var@=%d type %d",VARIND,bnf_var->var_type);
@@ -4175,7 +4175,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	// MESG("cleaning:");
 	if(start) {
 		if(local_symbols){
-		MESG("	cleaning local symbols of [%s]",bp->b_fname);
+		// MESG("	cleaning local symbols of [%s]",bp->b_fname);
 		if(bp->symbol_tree){
 			delete_symbol_table(local_symbols,bp->symbol_tree->items,0);
 			bp->symbol_tree=NULL;
@@ -4191,13 +4191,13 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 
 		MVAR *result = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
 		if(show_no_time) {
-			if(result->var_type==VTYPE_NUM) msg_line("[%s] Result (%f)",bp->b_fname,num_result());
-			else if(result->var_type==VTYPE_STRING) msg_line("[%s] Result  \"%s\"",bp->b_fname,string_result());
-			else msg_line("[%s] Result type %d",bp->b_fname,bnf_var->var_type);
+			if(result->var_type==VTYPE_NUM) msg_line("[%15s] Result (%f)",bp->b_fname,num_result());
+			else if(result->var_type==VTYPE_STRING) msg_line("[%15s] Result  \"%s\"",bp->b_fname,string_result());
+			else msg_line("[%15s] Result type %d",bp->b_fname,bnf_var->var_type);
 		} else {
-			if(result->var_type==VTYPE_NUM) msg_line("[%s] Result at var@=%d (%f)",bp->b_fname,VARIND,num_result());
-			else if(result->var_type==VTYPE_STRING) msg_line("[%s] Result at var@=%d \"%s]\"",bp->b_fname,VARIND,string_result());
-			else msg_line("[%s] Result at var@=%d type %d",bp->b_fname,VARIND,bnf_var->var_type);
+			if(result->var_type==VTYPE_NUM) msg_line("[%15s] Result at var@=%d (%f)",bp->b_fname,VARIND,num_result());
+			else if(result->var_type==VTYPE_STRING) msg_line("[%15s] Result at var@=%d \"%s]\"",bp->b_fname,VARIND,string_result());
+			else msg_line("[%15s] Result at var@=%d type %d",bp->b_fname,VARIND,bnf_var->var_type);
 		};
 	} else {
 		if(show_no_time) {

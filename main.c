@@ -120,14 +120,18 @@ int main(int argc, char **argv)
 
 	load_config();
 	parse_command_line(argc,argv);
-	initialize_call_stack((int)bt_dval("call_stack_size"));
-	if(firstbp==NULL && !execmd) {
-		// scratch_files[0] = load_scratch_files();
-		firstbp=get_scratch_file();
+	if(firstbp==NULL && execmd && startfile==NULL) {
+		fprintf(stderr,"No file to execute!\n");
+		exit(1);
 	};
-#if	TNOTES
-	init_note_keys();
-#endif
+		initialize_call_stack((int)bt_dval("call_stack_size"));
+		if(firstbp==NULL && !execmd) {
+			// scratch_files[0] = load_scratch_files();
+			firstbp=get_scratch_file();
+		};
+	#if	TNOTES
+		init_note_keys();
+	#endif
 	if(!execmd) {
 		// MESG("init_system_clipboard");
 		init_system_clipboard();
@@ -321,7 +325,7 @@ void parse_command_line(int argc, char **argv)
 						a_arg=0;
 					break;
 				case 'F':
-					usebnf=1;
+					usebnf=0;
 					break;
 				case 't':
 					show_tokens=1;

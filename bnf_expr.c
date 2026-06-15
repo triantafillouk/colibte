@@ -1632,23 +1632,6 @@ void bnf_factor_rpar()
 static void bnf_block1()
 {
 	// MESG("-------- bnf_block1 start![%s] { [%s]",fp->b_fname,tok_info(tok));
-#if	0
-	do {
-		// MESG("--- block var@=%d [%s]",VARIND,tok_info(tok));
-	 	tok->bnf_factor_function();
-		// MESG("		-- tok %d type %d",tok->tnum,tok->ttype);
-		NTOKEN2;
-		if(!current_active_flag) {
-			// MESG("bnf_block1:[%s] stop: ind=%d type=%d [%s]",fp->b_fname,VARIND,bnf_var->var_type,tok_info(tok));
-			// if(VARIND!=block_startvar_pos) MESG("	block break: var@=%d startvar=%d [%s]",VARIND,block_startvar_pos,tok_info(tok));
-			return;
-		};
-	} while(tok->tgroup!=TOK_END);
-	
-	// MESG("-- block end  ! [%s]",tok_info(tok));
-	if(tok->ttype!=TOK_END) tok->bnf_factor_function();
-	// if(VARIND!=block_startvar_pos) MESG("	block end : var@=%d startvar=%d [%s]",VARIND,block_startvar_pos,tok_info(tok));
-#else
 	while(tok->tgroup!=TOK_END) {
 		// MESG("--- block var@=%d [%s]",VARIND,tok_info(tok));
 	 	tok->bnf_factor_function();
@@ -1664,21 +1647,25 @@ static void bnf_block1()
 	// MESG("-- block end  ! [%s]",tok_info(tok));
 	// if(tok->ttype!=TOK_END) 
 	tok->bnf_factor_function();
-
-#endif
 }
 
 void bnf_block1_break(/*FILEBUF *fp*/)
 {
-	// MESG("-- block start! { [%s]",tok_info(tok));
-	do {
-		// MESG("	- [%s]",tok_info(tok));
+	while(tok->tgroup!=TOK_END) {
+		// MESG("--- block var@=%d [%s]",VARIND,tok_info(tok));
 	 	tok->bnf_factor_function();
+		// MESG("		-- tok %d type %d",tok->tnum,tok->ttype);
 		NTOKEN2;
-		if(drv_check_break_key()) break;
-	} while(tok->tgroup!=TOK_END);
+		if(drv_check_break_key()) {
+			// MESG("bnf_block1:[%s] stop: ind=%d type=%d [%s]",fp->b_fname,VARIND,bnf_var->var_type,tok_info(tok));
+			// if(VARIND!=block_startvar_pos) MESG("	block break: var@=%d startvar=%d [%s]",VARIND,block_startvar_pos,tok_info(tok));
+			return;
+		};
+	} 
+	
+	// MESG("-- block end  ! [%s]",tok_info(tok));
 	tok->bnf_factor_function();
-	// MESG("-- block end  ! } [%s] %d",tok_info(tok),ind);
+
 }
 
 inline static void bnf_dir_lcurl()
