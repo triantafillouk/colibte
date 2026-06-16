@@ -1188,8 +1188,9 @@ int init_notes_db(num n)
 
 #define	INIT_DB		1
 #define	RESET_KEY	2
+#if	TBNF
 void prev_var_ext(char *from);
-
+#endif
 // reconstruct notes database from file contents.
 int recreate_notes_db(num init_db)
 {
@@ -1203,7 +1204,9 @@ int recreate_notes_db(num init_db)
 	MESG("--- recreate_notes_db: ---- init_db=%d",init_db);
 	set_bt_num_val("notes_recreate",1);
 	// create notes db
+#if	TBNF
 	if(exebnf) prev_var_ext("recreate_notes_db");
+#endif
 	if(init_db==INIT_DB){
 		MESG("recreate_note_db: Initialize database!");
 		if(!init_notes_db(1)) return false;

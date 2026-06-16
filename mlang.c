@@ -48,12 +48,18 @@ double compare_smallereq(double value);
 double compare_biggereq(double value);
 double compare_equal(double v1);
 void set_bnf_function1(tok_struct *tok, int type);
+#if	TBNF
 static inline void bnf_factor_dummy();
+#endif
 void delete_symbol_table(MVAR *td, int size,int nargs);
 MVAR *new_symbol_table(int const size);
 void init_vars(MVAR *head,int size);
 void set_tok_function(tok_struct *tok, int type);
 void set_tok_directive(tok_struct *tok, FFunction directive);
+MVAR *btree_to_mvar(BTREE *bt);
+void skip_sentence1();
+inline MVAR *get_left_slot(int ind);
+void show_error(char *from,char *name);
 
 #if	SYNTAX_DEBUG
 
@@ -493,9 +499,15 @@ void init_hash()
 	insert_bt_element(bt_table,ftable[i].n_name,TOK_CMD,i);
   };
 	/* editor function */
+#if	TBNF
   for(i=0; bnf_functions[i].f_name != NULL;i++){ 
 	insert_bt_element(bt_table,bnf_functions[i].f_name,TOK_FUNC,i);
   };
+#else
+  for(i=0; m_functions[i].f_name != NULL;i++){ 
+	insert_bt_element(bt_table,m_functions[i].f_name,TOK_FUNC,i);
+  };
+#endif
 
 /* env variable */
   for(i=0;fvars[i]!=NULL;i++)
@@ -717,6 +729,7 @@ void show_error(char *from,char *name)
 void show_token_table(char *title, FILEBUF *bf,tok_struct *token_start,int size)
 {
  int i=0;
+
  tok_struct *tokp=token_start;
  MESG("!---------- %s token table of %s size %d -------------",title,bf->b_fname,size);
  for(i=0;i<size;i++) {
@@ -735,7 +748,7 @@ int check_init(FILEBUF *bf)
  int err=0;
  INIT_STAGE;
  int checked = (bf->tok_table != NULL);
- MESG("---- check_init: [%s] %d checked=%d",bf->b_fname,bf->b_type,checked);
+ MESG("---- check_init: [%s] %d checked=%d %d",bf->b_fname,bf->b_type,checked,bf->err);
  // eval_curl_match(NULL);
 #if	0
  if(execmd) 
@@ -746,14 +759,14 @@ int check_init(FILEBUF *bf)
 #endif
  if(tok_table==NULL) 
  {
- 	// MESG("create token table [%s]",bf->b_fname);
+ 	MESG("create token table [%s] err=%d",bf->b_fname,bf->err);
 	parse_block1(bf,NULL,1);
-	// MESG("block parsed err = %d",err_num);
+	MESG("block parsed err = %d",err_num);
 	if(err_num>0) {
 		msg_line("found parsed errors: err_num=%d %s",err_num,err_str);
 		check_buffer = ori_buffer;
 		return(err_num);
-	}
+	};
 	tok_table=bf->tok_table;
 	if(tok_table==NULL)	{
 		ERROR("cannot parse file");
@@ -761,7 +774,7 @@ int check_init(FILEBUF *bf)
 		return(201);
 	}
  };
-
+ MESG("check_init:2 err=%d %d",bf->err,bf->tok_table==NULL);
  if(bf->err<1) 
  {
 	tok=bf->tok_table;
@@ -775,8 +788,10 @@ int check_init(FILEBUF *bf)
  };
 
  tok=tok_table;
- // MESG("check_init:end [%s] %d",bf->b_fname,bf->b_type);
+ MESG("check_init:end [%s] %d",bf->b_fname,bf->b_type);
+#if	TBNF
  if(!exebnf)
+#endif
  show_token_table("Token table ",bf,bf->tok_table,bf->end_token - bf->tok_table+1);
  if(bf->err>0) {
 	return bf->err;
@@ -936,6 +951,7 @@ char *str_cat(char *sval, char *add)
 
 void set_bnf_function1(tok_struct *tok, int type)
 {
+#if	TBNF
  if(type==0) {
 	int exp_type = factor_bnf_type[type];
 	tok->bnf_group=exp_type;
@@ -955,6 +971,7 @@ void set_bnf_function1(tok_struct *tok, int type)
 	tok->function_index=type;
 	// MESG("-- set_bnf_function1: ind=%2d exp num=%3d",tok->tnum,type);
  };
+#endif
 }
 
 #include "mlang_parser.c"
@@ -1147,7 +1164,7 @@ double exec_block1(FILEBUF *fp)
 #if TBNF
 	if(usebnf) exit(0);
 #endif 
-  MESG("exec_block1:[%s] err_num= %d %d tok=[%s]",fp->b_fname,err_num,current_active_flag,tok_info(tok));
+  // MESG("exec_block1:[%s] err_num= %d %d tok=[%s]",fp->b_fname,err_num,current_active_flag,tok_info(tok));
    if(!current_active_flag) {
 		tok=fp->end_token;
 		return(ex_var.dval);
@@ -1221,7 +1238,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  MVAR *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
 	MESG("# compute_block1: [%s] use [%s] start=%d",bp->b_fname,use_fp->b_fname,start);
-	MESG("# [%-15s %d %s ---------------------------------------------",bp->b_fname,usebnf,VERSION);
+	MESG("# [%-15s %d %s --------------------------------------------- %d",bp->b_fname,usebnf,VERSION,bp->err);
 	eval_curl_match(NULL);
  if(show_tokens) {
 	parse_buffer_show_tokens(1);
@@ -1241,14 +1258,14 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	if(err_num) { execmd=0;return(0);};
 	MESG("	comput_block: start=%d",start);
 	if(start || current_stable==NULL) {
-		// MESG("new current_stable with %d items",use_fp->symbol_tree->items);
+		MESG("new current_stable with %d items",use_fp->symbol_tree->items);
 		local_symbols=new_symbol_table(use_fp->symbol_tree->items);
 	} else {
-		// MESG("use current_stable new items = %d",use_fp->symbol_tree->items);
+		MESG("use current_stable new items = %d",use_fp->symbol_tree->items);
 		local_symbols=realloc_symbol_table(current_stable,use_fp->symbol_tree->items,old_items);
 	}
 	current_stable=local_symbols;
-
+ MESG("compute_block:2");
  if(bp->m_mode<2)	/* if not already checked!  */
  {
 	err_num=check_init(bp);
@@ -1305,6 +1322,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		};
 		current_stable=old_symbol_table;
 	};
+#if	TBNF
 	if(exebnf || usebnf) {
 		show_var_stats();
 		// next_var("result");
@@ -1321,7 +1339,9 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 			else if(result->var_type==VTYPE_STRING) msg_line("[%15s] Result at var@=%d \"%s]\"",bp->b_fname,VARIND,string_result());
 			else msg_line("[%15s] Result at var@=%d type %d",bp->b_fname,VARIND,bnf_var->var_type);
 		};
-	} else {
+	} else
+#endif 
+	{
 		if(show_no_time) {
 			if(vtype_is(VTYPE_NUM)) msg_line("[%s] Result  (%f)",bp->b_fname,val);
 			else if(vtype_is(VTYPE_STRING)) msg_line("[%s] Result  \"%s\"",bp->b_fname,get_sval());
@@ -1439,8 +1459,9 @@ int refresh_current_buffer(num nused)
 			if(bnf_var->var_type==VTYPE_NUM) msg_line("Result bnf is [%f]",val);
 			else if(bnf_var->var_type==VTYPE_NUM) msg_line("Result bnf is \"%s\"",bnf_var->sval);
 			else msg_line("done!");
-		} else {
+		} else 
 #endif
+		{
 			if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
 			else if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
 			else if(get_sval()) msg_line("Result is [%s %f]",get_sval(),val);
@@ -1625,7 +1646,7 @@ char * tok_info(tok_struct *tok)
 {
  static char stok[MAXLLEN];
 	if(tok==NULL) { MESG("tok_info: NULL token!");return "null token";};
-	// MESG("tok_info: ttype=%d",tok->ttype);
+	MESG("tok_info: ttype=%d",tok->ttype);
 
 	if(tok->tname!=NULL){
 		// MESG("tok_info: %d %s %d",tok->tind,tok->tname,tok->tline);
@@ -1766,7 +1787,7 @@ void init_exec_flags()
  set_vdval(0.0);
  ex_nvars=0;ex_nquote=0;ex_nums=0;	/* initialize table counters  */
 #endif
- // MESG("init_exec_flags:end");
+ MESG("init_exec_flags:end");
 }
 
 
@@ -1801,13 +1822,17 @@ int exec_named_function(char *name)
 	};
 	double value;
 #if	TNORMAL
-	if(exebnf) value=exec_function(bp,0);
+#if	TBNF
+	if(!exebnf) value=exec_function(bp,0);
 	else {
 		bnf_exec_function(bp,0);
 		if(bnf_var->var_type==VTYPE_NUM) 
 			value=bnf_var->dval;
 		else value=0;
 	};
+#else
+	value=exec_function(bp,0);
+#endif
 #else
 		bnf_exec_function(bp,0);
 		if(bnf_var->var_type==VTYPE_NUM) 
@@ -1820,8 +1845,10 @@ int exec_named_function(char *name)
 double expression(char *from)
 {
 #if	TNORMAL
+#if	TBNF
 	if(exebnf||usebnf) return bnf_expression();
 	else 
+#endif
 	return lexpression();
 #else
 	return bnf_expression();
@@ -1927,11 +1954,18 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 		// MESG("getstring: %s",prompt);
 		if(getstring(prompt, buffer, size,show)!=FALSE) {
 			// MESG("nextarg: buffer=[%s]",buffer);
+#if	TBNF
 			if(exebnf) {
 				bnf_var->dval=atof(buffer);
 				bnf_var->var_type=VTYPE_NUM;
-			} else
+			}
+#if	TNORMAL 
+			else
+#endif
+#endif
+#if	TNORMAL
 			set_dval(atof(buffer));
+#endif
 		} else {
 			set_update(cwp,UPD_MOVE);
 			return(FALSE);
@@ -1941,10 +1975,12 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 		/* slval has already the next argument */
 		// MESG("nextarg: slval=%s",get_sval());	
 		// MESG("nextarg:2 var_type=%d",bnf_var->var_type);
+#if	TBNF
 		if(exebnf||usebnf) {
 			if(bnf_var->var_type==VTYPE_STRING) strlcpy(buffer,bnf_var->sval,size);
-		}
-		else strlcpy(buffer,get_sval(),size);
+		} else
+#endif
+		strlcpy(buffer,get_sval(),size);
 	};
 	return(TRUE);
 }

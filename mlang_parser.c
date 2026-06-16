@@ -1220,7 +1220,7 @@ void set_tok_table(FILEBUF *bf)
  while(tlist->current)
  {
 	tok=(tok_struct *)tlist->current->data;
-	// MESG("- add tok %s",tok->tname);
+	MESG("- add tok %s",tok->tname);
 	memcpy((void *)tok_to,(void *)tok,sizeof(tok_struct));
 	if(tok->ttype==TOK_LCURL || tok->ttype==TOK_RCURL) {
 		tok_to->match_tok = tok_table + tok_to->tcurl->num+1;
