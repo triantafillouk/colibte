@@ -1182,7 +1182,9 @@ double exec_block1(FILEBUF *fp)
 #if	0
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
 #endif
+#if	TNORMAL
  	val=tok->directive();
+#endif
 	// lstoken=NULL;MESG("exec_block1: reset lstoken");
 	if(ex_var.var_type==VTYPE_NUM) ex_var.dval=val;
 	if(!current_active_flag) break;
@@ -1218,7 +1220,9 @@ double exec_block1_break(FILEBUF *fp)
 #if	0
 	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
 #endif
+#if	TNORMAL
  	val=tok->directive();
+#endif
 	if(ex_var.var_type==1) ex_var.dval=val;
 
 	if(!current_active_flag) break;

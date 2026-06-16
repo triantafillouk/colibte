@@ -38,12 +38,14 @@ typedef struct tok_struct {
 	// short tind2;	/* index2 for type elements  */
 	char *tname;	// token name or string value
 	double dval;	// double value
+#if	TNORMAL
 	union {
 		FFunction factor_function;
 		TFunction term_function;
 		EFunction cexpr_function;
 	};
 	FFunction directive;
+#endif
 	union {	
 		int	number_of_args;
 		struct MVAR *var_pointer;
