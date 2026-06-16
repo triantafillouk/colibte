@@ -1738,12 +1738,14 @@ int show_parse_buffer(num n)
 char * key_str1()
 {
  char *s;
- // MESG("key_str1: tnum=%d ttype=%d",tok->tnum,tok->ttype);
+ // MESG("key_str1: var@=%d [%s]",VARIND,tok_info(tok));
 #if	TNORMAL
  num_expression();
  s = get_sval();
 #else	/* bnf!  */
-	if(bnf_var->var_type==VTYPE_NUM) s=bnf_var->sval;
+	bnf_expression();
+	// MESG("	key_str1: var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+	if(bnf_var->var_type==VTYPE_STRING) s=bnf_var->sval;
 	else s="";
 #endif
  // MESG("key_str1: ex_vtype=%d ex_value=%f [%s]",get_vtype(),ex_value,get_sval());
@@ -1822,7 +1824,7 @@ double expression(char *from)
 	else 
 	return lexpression();
 #else
-	bnf_expression();
+	return bnf_expression();
 #endif
 }
 

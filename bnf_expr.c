@@ -2701,7 +2701,7 @@ void bnf_factor_array2()
 				// MESG("		value %f",value);
 				return;
 			} else if(adat->atype==VTYPE_SARRAY) {
-				char **sval = adat->sval;
+				// char **sval = adat->sval;
 				int ind=adat->cols*ind1+ind2;
 #if	1
 				bnf_var->sval=adat->sval[ind];
