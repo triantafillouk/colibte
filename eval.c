@@ -746,7 +746,7 @@ int dofile(char *fname)
 	int status;	/* results of various calls */
 	char bname[MAXFLEN];
 	snprintf(bname,sizeof(bname),"[%s]",fname);
-	// MESG("# dofile:fname=[%s]",fname);
+	MESG("# dofile:fname=[%s]",fname);
 	show_stage=0;
 	set_screen_update(false);
 	if((bp=get_filebuf(bname,NULL,0))==NULL) { // file not in memory, load it!
@@ -773,7 +773,7 @@ int dofile(char *fname)
 	/* go execute it! */
 	int backup_caf=get_active_flag();
 	double d = compute_block(bp,bp,1);
-	// MESG("dofile: after compute_block:");
+	MESG("dofile: after compute_block:");
 	if(err_num>0) return (FALSE);
 	init_error();
 	set_vdval(d);

@@ -12,7 +12,7 @@ void init_stack();
 // int get_vtype();
 void set_array(array_dat *a);
 array_dat *get_array(char *);
-void set_nsval(char *,int);
+// void set_nsval(char *,int);
 char * tok_info(tok_struct *tok);
 
 void ntoken();

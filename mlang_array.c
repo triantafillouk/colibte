@@ -41,6 +41,23 @@ void init_array_header(struct array_dat *array, int rows,int cols,int ctype)
 	// MESG("init_array_header: type=%d rows=%d cols=%d",array->atype,array->rows,array->cols);
 }
 
+array_dat *get_array(char *pos)
+{
+	// MESG("get_array: %s",pos);
+	if(ex_var.adat==NULL) MESG("ex_var.adat at %s is NULL!",pos);
+	// else MESG("get_array:[%s] num=%d type=%d tok [%s]  ind=%d num=%d type=%d atype=%d",
+		// pos,ex_var.adat->anum,ex_var.var_type,tok->tname,tok->tind,tok->tnum,tok->ttype,ex_var.adat->atype);
+	// if(ex_var.var_type==1) return NULL;
+	return ex_var.adat;
+}
+
+void set_array(array_dat *a)
+{
+	// MESG("set_array:num=%d type %d allocated=%d name=%s",a->anum,a->atype,a->astat,a->array_name);
+	ex_var.adat=a;
+	ex_var.var_type=a->atype;
+}
+
 /* List array is one dimensional string array  */
 struct array_dat * new_list_array(int cols)
 {

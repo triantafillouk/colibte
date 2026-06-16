@@ -324,14 +324,18 @@ void parse_command_line(int argc, char **argv)
 						allocate_array(main_args);
 						a_arg=0;
 					break;
+#if	TBNF
 				case 'F':
-					usebnf=0;
+					usebnf=1;
 					break;
+#endif
 				case 't':
 					show_tokens=1;
 					break;
+#if	TBNF
 				case 'f':
 					exebnf=1;
+#endif
 				case 'x':	/* execute file and quit */
 					execmd=1;
 				case 'X':	/* execute file as statrup */

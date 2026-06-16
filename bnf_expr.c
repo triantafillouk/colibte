@@ -1995,6 +1995,7 @@ inline static void bnf_expression0()
 	};
 }
 
+
 inline static double bnf_expression()
 {
 	// MESG("	bnf_expression: ------ tok ind=%3d ttype=%d tgroup=%d bnf_group=%d",tok->tind,tok->ttype,tok->tgroup,tok->bnf_group);
@@ -2068,9 +2069,7 @@ inline static MVAR * push_args_bnf(int nargs,int vars_num)
 	memmove(va_i,bnf_var,sizeof(MVAR));
 	prev_var("push arg");
 	// MESG("			after2  var@=%d var_type=%d [%s]",VARIND,va_i->var_type,tok_info(tok));
-	// MESG("	push_args_1: arg %d, tok=[%d %s] value=%f type=%d",i,tok->tnum,tok->tname,value,va_i->var_type);
  };
- // MESG(">	push_args_1:end [%s]",tok_info(tok));
  return(va);
 }
 
@@ -2704,12 +2703,18 @@ void bnf_factor_array2()
 			} else if(adat->atype==VTYPE_SARRAY) {
 				char **sval = adat->sval;
 				int ind=adat->cols*ind1+ind2;
+#if	1
+				bnf_var->sval=adat->sval[ind];
+				bnf_var->var_type=VTYPE_STRING;
+				bnf_var->var_alloced=0;
+#else
 				clean_saved_string(strlen(adat->sval[ind]));	/* Check!! TODO  */
 				strcpy(saved_string,adat->sval[ind]);
 				// MESG("	show string value![%s]",saved_string);
 				ls_psval=&sval[ind];
 				value=0;
 				set_vtype(VTYPE_STRING);
+#endif
 			} else if(adat->atype==VTYPE_AMIXED) {
 				// MESG("factor_array2: AMIXED v1=%d v2=%d",ind1,ind2);
 				int ind=adat->cols*ind1+ind2;
@@ -3552,3 +3557,233 @@ void bnf_type_element_l2_tba()
 	};
 	// MESG("error in bnf_type_element_l2_tba");
 }
+
+inline static void bnf_factor_at()
+{
+	int bval=macro_exec;
+	macro_exec=MACRO_TRUE;
+	set_vtype(VTYPE_NUM);
+	bnf_var->dval=sysexec((char *)tok->tname);
+	bnf_var->var_type=VTYPE_NUM;
+	NTOKEN2;
+	macro_exec=bval;
+}
+
+#if	TBNF
+VFunction factor_bnf_funcs[] = {
+	bnf_factor_none,	// TOK_NONE
+	bnf_factor_sep,		// TOK_SEP
+	bnf_factor_none,	// TOK_SPACE
+	bnf_factor_none,	// TOK_LETTER
+	bnf_dir_lcurl,		// TOK_LCURL	,
+	bnf_factor_rcurl,	// TOK_RCURL	,
+	bnf_factor_quote,	// TOK_QUOTE
+	bnf_factor_lpar,	// TOK_LPAR
+	bnf_factor_rpar,	// TOK_RPAR	
+	bnf_refresh_ddot,	// TOK_SHOW
+	bnf_factor_none,	// TOK_COMMENT	,
+	bnf_factor_var,	// TOK_VAR	level 0 variable
+	bnf_factor_option,	// TOK_OPTION	,	// editor option
+	bnf_factor_cmd,		// TOK_CMD		,	// editor commands
+	bnf_factor_none,	// TOK_FUNC	,	// function
+	bnf_factor_proc,	// TOK_PROC	,
+	bnf_factor_env,		// TOK_ENV		,	// editor environment function
+	bnf_factor_none,	// TOK_TERM0	term0 group
+	bnf_factor_none,	// TOK_TERM	,	// term operators (+,-)
+	bnf_factor_none,	// TOK_TERM1	,	// term1 operators (%,^)
+	bnf_factor_none,	// TOK_TERM2	,	// term2 operators (*,/)
+	bnf_factor_assign_var,	// TOK_ASSIGN	,	// assignament
+	bnf_factor_eof,		// TOK_EOF		,	// end of file token
+	bnf_factor_num,		// TOK_NUM, numeric value
+
+	bnf_factor_none,	// TOK_DIR		,	// directive
+	bnf_dir_if,	// TOK_DIR_IF	,	// dir if
+	bnf_dir_else,	// TOK_DIR_ELSE	,	// dir else
+	bnf_dir_break,	// TOK_DIR_BREAK	,
+	bnf_dir_return,	// TOK_DIR_RETURN	,
+	bnf_dir_while,	// TOK_DIR_WHILE	,
+	bnf_dir_for,	// TOK_DIR_FOR		,
+	bnf_factor_comma,	// TOK_COMMA		,
+	bnf_dir_fori,	// TOK_DIR_FORI	,
+
+	/* bool operators  */
+	bnf_factor_none,	// TOK_COMPARE		,33
+
+	bnf_factor_notequal,	// TOK_NOTEQUAL	,
+	bnf_factor_smaller,	// TOK_SMALLER		,	/* <  */
+	bnf_factor_bigger,	// TOK_BIGGER		,	/* >  */
+	bnf_factor_equal,	// TOK_EQUAL		,	/* ==  */
+	bnf_factor_smallereq,	// TOK_SMALLEREQ	,	/* <=  */
+	bnf_factor_biggereq,	// TOK_BIGGEREQ	,	/* >=  */
+
+	bnf_factor_none,	// TOK_BOOL		,40
+	bnf_factor_and,	// TOK_AND			,	/* &  */
+	bnf_factor_or,	// TOK_OR			,	/* |  */
+	bnf_factor_not,		// TOK_NOT	/* !  */
+	bnf_factor_nand,	// TOK_NAND		,	/* !&  */
+	bnf_factor_nor,	// TOK_NOR			,	/* !|  */
+	bnf_factor_xor,	// TOK_XOR			,	/* ^  */
+	/* term operators  */
+	bnf_factor_plus,	// TOK_PLUS		,47
+	bnf_factor_minus,	// TOK_MINUS		,
+	bnf_factor_power,	// TOK_POWER		,	/* ** */
+	bnf_factor_modulo,	// TOK_MOD			,	/* %  */
+	bnf_factor_mul,	// TOK_MUL			,
+	bnf_factor_div,	// TOK_DIV			,
+
+	bnf_factor_line_array,	// TOK_LBRAKET		,53
+	bnf_factor_error,	// TOK_RBRAKET		,
+	bnf_factor_none,	// TOK_SQUOTE		,
+	bnf_factor_at,		// TOK_AT			,
+	bnf_factor_none,	// TOK_RANGE		,
+	bnf_factor_none,	// TOK_BQUOTE
+	bnf_factor_none,	// TOK_DOLAR		,
+	bnf_factor_none,	// TOK_TILDA		,
+	bnf_update_val,		// TOK_INCREASE	,61
+	bnf_update_val,		// TOK_DECREASE	,62
+	bnf_increase_by,	// TOK_INCREASEBY 63
+	bnf_mul_by,			// TOK_MULBY
+	bnf_decrease_by,	// TOK_DECREASEBY
+	bnf_factor_none,	// TOK_BSLASH		,
+
+	bnf_factor_none,	// TOK_NL				,
+	bnf_factor_none,	// TOK_DIR_CONTINUE	,
+	bnf_factor_none,	// TOK_DIR_FOREACH		,
+	bnf_factor_none,	// TOK_DIR_TYPE,
+	bnf_factor_array_l1_tba,	// TOK_ARRAY1
+	bnf_factor_array2,	// TOK_ARRAY2
+	bnf_factor_array_l1,// TOK_ARRAY_L1
+	bnf_factor_array_l2,// TOK_ARRAY_L2
+	bnf_assign_env,	// TOK_ASSIGNENV	,
+	bnf_assign_opt,	// TOK_ASSIGNOPT	,
+	bnf_factor_end,	// TOK_END,
+	bnf_factor_none,	// TOK_DEFINE_TYPE,
+#if	USE_TYPE_VARS
+	bnf_assign_type,	// TOK_ASSIGN_TYPE,
+	bnf_type_element,	// TOK_TYPE_ELEMENT
+#else
+	bnf_factor_none,	// TOK_ASSIGN_TYPE,
+	bnf_factor_none,	// TOK_TYPE_ELEMENT
+#endif
+	bnf_factor_none,	// TOK_DOT,
+	bnf_factor_none,	// TOK_INCBEFORE
+	bnf_factor_none,	// TOK_DECBEFORE
+	bnf_assign_array1,	// TOK_ASSIGN_ARRAY1
+	bnf_assign_array2,	// TOK_ASSIGN_ARRAY2
+	bnf_update_array1,	// TOK_INCREASE_ARRAY1,
+	bnf_update_array2,	// TOK_INCREASE_ARRAY2,
+	bnf_update_array1,	// TOK_DECREASE_ARRAY1,
+	bnf_update_array2,	// TOK_DECREASE_ARRAY2,
+	bnf_factor_negate,	// TOK_NEGATE,
+	bnf_factor_none		// TOK_OTHER,
+};
+
+int factor_bnf_type[] = {
+	0,	// TOK_NONE
+	0,		// TOK_SEP
+	0,	// TOK_SPACE
+	TOK_LETTER,	// TOK_LETTER
+	0,	// TOK_LCURL	,
+	0,	// TOK_RCURL	,
+	TOK_QUOTE,	// TOK_QUOTE
+	TOK_LPAR,	// TOK_LPAR
+	TOK_RPAR,	// TOK_RPAR	
+	0,	// TOK_SHOW
+	0,	// TOK_COMMENT	,
+	TOK_VAR,	// TOK_VAR	level 0 variable
+	TOK_OPTION,	// TOK_OPTION	,	// editor option
+	TOK_CMD,		// TOK_CMD		,	// editor commands
+	TOK_FUNC,	// TOK_FUNC	,	// function
+	TOK_PROC,	// TOK_PROC	,
+	TOK_ENV,		// TOK_ENV		,	// editor environment function
+	TOK_TERM0,	// TOK_TERM0	term0 group
+	TOK_TERM,	// TOK_TERM	,	// term operators (+,-)
+	TOK_TERM1,	// TOK_TERM1	,	// term1 operators (%,^)
+	TOK_TERM2,	// TOK_TERM2	,	// term2 operators (*,/)
+	TOK_ASSIGN,		// TOK_ASSIGN	,	// assignment
+	0,		// TOK_EOF		,	// end of file token
+	TOK_NUM,		// TOK_NUM, numeric value
+
+	0,	// TOK_DIR		,	// directive
+	0,	// TOK_DIR_IF	,	// dir if
+	0,	// TOK_DIR_ELSE	,	// dir else
+	-TOK_DIR_BREAK,	// TOK_DIR_BREAK	,
+	-TOK_DIR_RETURN,	// TOK_DIR_RETURN	,
+	0,	// TOK_DIR_WHILE	,
+	0,	// TOK_DIR_FOR		,
+	0,	// TOK_COMMA		,
+	0,	// TOK_DIR_FORI	,
+
+	/* bool operators  */
+	TOK_COMPARE,	// TOK_COMPARE		,33
+
+	TOK_NOTEQUAL,	// TOK_NOTEQUAL	,
+	TOK_SMALLER,	// TOK_SMALLER		,	/* <  */
+	TOK_BIGGER,	// TOK_BIGGER		,	/* >  */
+	TOK_EQUAL,	// TOK_EQUAL		,	/* ==  */
+	TOK_SMALLEREQ,	// TOK_SMALLEREQ	,	/* <=  */
+	TOK_BIGGEREQ,	// TOK_BIGGEREQ	,	/* >=  */
+
+	TOK_BOOL,	// TOK_BOOL		,40
+	TOK_AND,	// TOK_AND			,	/* &  */
+	TOK_OR,	// TOK_OR			,	/* |  */
+	TOK_NOT,		// TOK_NOT	/* !  */
+	TOK_NAND,	// TOK_NAND		,	/* !&  */
+	TOK_NOR,	// TOK_NOR			,	/* !|  */
+	TOK_XOR,	// TOK_XOR			,	/* ^  */
+	/* term operators  */
+	TOK_PLUS,	// TOK_PLUS		,47
+	TOK_MINUS,	// TOK_MINUS		,
+	TOK_POWER,	// TOK_POWER		,	/* ** */
+	TOK_MOD,	// TOK_MOD			,	/* %  */
+	TOK_MUL,	// TOK_MUL			,
+	TOK_DIV,	// TOK_DIV			,
+
+	TOK_LBRAKET,	// TOK_LBRAKET		,53
+	0,	// TOK_RBRAKET		,
+	TOK_SQUOTE,	// TOK_SQUOTE		,
+	0,		// TOK_AT			,
+	0,	// TOK_RANGE		,
+	0,	// TOK_BQUOTE
+	0,	// TOK_DOLAR		,
+	0,	// TOK_TILDA		,
+	TOK_INCREASE,		// TOK_INCREASE	,61
+	TOK_DECREASE,		// TOK_DECREASE	,62
+	TOK_INCREASEBY,	// TOK_INCREASEBY 63
+	TOK_MULBY,			// TOK_MULBY
+	TOK_DECREASEBY,	// TOK_DECREASEBY
+	0,	// TOK_BSLASH		,
+
+	0,	// TOK_NL				,
+	0,	// TOK_DIR_CONTINUE	,
+	0,	// TOK_DIR_FOREACH		,
+	0,	// TOK_DIR_TYPE,
+	TOK_ARRAY1,	// TOK_ARRAY1
+	TOK_ARRAY2,	// TOK_ARRAY2
+	TOK_ARRAY_L1,// TOK_ARRAY_L1
+	TOK_ARRAY_L2,// TOK_ARRAY_L2
+	TOK_ASSIGNENV,	// TOK_ASSIGNENV	,
+	TOK_ASSIGNOPT,	// TOK_ASSIGNOPT	,
+	0,	// TOK_END,
+	0,	// TOK_DEFINE_TYPE,
+#if	USE_TYPE_VARS
+	TOK_ASSIGN_TYPE,	// TOK_ASSIGN_TYPE,
+	TOK_TYPE_ELEMENT,	// TOK_TYPE_ELEMENT
+#else
+	0,	// TOK_ASSIGN_TYPE,
+	0,	// TOK_TYPE_ELEMENT
+#endif
+	0,	// TOK_DOT,
+	0,	// TOK_INCBEFORE
+	0,	// TOK_DECBEFORE
+	TOK_ASSIGN_ARRAY1,
+	TOK_ASSIGN_ARRAY2,
+	TOK_INCREASE_ARRAY1,
+	TOK_INCREASE_ARRAY2,
+	TOK_DECREASE_ARRAY1,
+	TOK_DECREASE_ARRAY2,
+	TOK_NEGATE,
+	0		// TOK_OTHER,
+};
+
+#endif

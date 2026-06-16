@@ -16,7 +16,9 @@ int vtype_is(int type);
 int get_vtype();
 void set_array(array_dat *a);
 array_dat *get_array(char *);
+#if	TNORMAL
 void set_nsval(char *,int);
+#endif
 char * tok_info(tok_struct *tok);
 
 void ntoken();
@@ -31,7 +33,7 @@ void get_lowercase_string(char *lower, char *string);
 int deq(double v1,double v2);
 
 MVAR va[3];
-
+#if	TNORMAL
 void get_function_args (int number_of_args)
 {
 	int i;
@@ -81,9 +83,9 @@ void get_function_args (int number_of_args)
 	entry_mode=f_entry;
 // 	return va;
 }
+#endif
 
-// MVAR va[3];
-
+#if	TNORMAL
 void get_numeric_args (int number_of_args)
 {
 	int i;
@@ -106,7 +108,9 @@ double get_numeric_arg ()
 	ntoken();
 	return value;
 }
+#endif
 
+#if	TNORMAL
 double uf_len()
 {
 	get_function_args(1);
@@ -720,6 +724,7 @@ double uf_mainarg()
 	};
 	return value;
 }
+#endif
 
 extern MVAR *current_stable;
 extern FILEBUF *exe_buffer;
@@ -756,6 +761,7 @@ double uf_show_vars()
 	return 0;
 }
 
+#if	TNORMAL
 double uf_list_tokens()
 {
  ntoken();
@@ -806,3 +812,5 @@ double uf_to_num_array()
 {
 	return 2;
 }
+#endif
+

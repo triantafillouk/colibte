@@ -1,16 +1,9 @@
 /* editor functions */
+#if	TNORMAL
 #include "mlangf.h"
+#endif
 
-void ntoken()
-{
-	tok++;
-}
-
-int tok_type()
-{
-	return tok->ttype;
-}
-
+#if	TNORMAL
 m_function m_functions[] = {
 	{"len",1,uf_len},        /* STRING LENGTH */
 	{"upper",1,uf_upper},        /* UPPERCASE STRING */
@@ -72,3 +65,4 @@ m_function m_functions[] = {
 	// {"array_fixed_to_num",1,uf_array_fixed_to_num},
 	{NULL,0,NULL}
 };
+#endif
