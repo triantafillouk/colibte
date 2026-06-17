@@ -203,10 +203,10 @@ void syntax_error(char *description,int err)
  if(err_num>0) return;	/* error already set  */
  set_error(tok,err,description);
 }
+
 #if	TBNF
 int	err_eval_fun1(tok_struct *tok0,tok_struct *tok_bnf,int lpar)
-#endif
-#if	TNORMAL
+#else
 int	err_eval_fun1(tok_struct *tok0,int lpar)
 #endif
 {
@@ -1184,8 +1184,7 @@ int err_factor()
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
 		err_num=err_eval_fun1(tok0,tok0_bnf,lpar);
-#endif
-#if	TNORMAL
+#else
 		err_num=err_eval_fun1(tok0,lpar);
 #endif
 		RT_MESG1(497);
@@ -1912,7 +1911,7 @@ int err_check_sentence1()
  TDSERR("sentence");
  SHOW_STAGE(621);
  
- MESG("err_check_sentence: ttype=%d",tok->ttype);
+ // MESG("err_check_sentence: ttype=%d",tok->ttype);
  switch(tok->ttype) {
 	case TOK_EOF:
 		MESG_TOK_INFO("# err_check_sentence",tok);
@@ -1923,7 +1922,7 @@ int err_check_sentence1()
 		RT_MESG1(625);
 
 	case TOK_RCURL:
-		MESG_TOK_INFO("# err_check_sentence",tok);
+		// MESG_TOK_INFO("# err_check_sentence",tok);
 #if	TBNF
 		stack_push("sentence RCURL",tok,-tok->ttype);
 #endif

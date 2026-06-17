@@ -98,7 +98,6 @@ void clean_saved_string(int new_size);
 int deq(double v1,double v2);
 char *str_mul(char *sval, double v1);
 char *str_cat(char *sval, char *add);
-void refresh_ddot_1(double value);
 double factor_refresh_ddot();
 
 double assign_val(double none);
@@ -792,7 +791,9 @@ int check_init(FILEBUF *bf)
 #if	TBNF
  if(!exebnf)
 #endif
+#if	TNORMAL
  show_token_table("Token table ",bf,bf->tok_table,bf->end_token - bf->tok_table+1);
+#endif
  if(bf->err>0) {
 	return bf->err;
  };
@@ -1087,73 +1088,6 @@ void update_ddot_line(char *ddot_out)
  // sfb(old_fp);
 }
 
-void refresh_ddot_1(double value)
-{
- TDS("refresh_ddot_1");
- int stat=0;
- TextPoint *tp = tok->ddot;
- FILEBUF *buf = tp->fp;
- // MESG("refresh_ddot: %d",get_vtype());
-
- if(execmd) {
-	 if(vtype_is(VTYPE_NUM)) {
-		printf("%s	: %.3f\n",ddot_string(),value);
-	 } else if(vtype_is(VTYPE_STRING)) {
-		printf("%s	: %s\n",ddot_string(),get_sval());
-	 } else if(vtype_is(VTYPE_ARRAY)||vtype_is(VTYPE_SARRAY)||vtype_is(VTYPE_AMIXED)) {
-		// MESG("	show_array!");
-		print_array1("array: ",get_array("36"));
-	 	// print_array1(ddot_string(),get_array("36"));
-	 };
-	 lstoken=NULL;
-	 NTOKEN2;
-	 return;
- };
-
- int precision=bt_dval("print_precision");
- int show_hex=bt_dval("show_hex");
- // char *ddot_out = (char *)malloc(128);
- char ddot_out[128];
-
- // MESG("	ddot_pos=%d end=%d todel=%d",ddot_position,line_end,line_end-ddot_position);
- if(buf->b_state & FS_VIEW) {NTOKEN2;return;}; // no refresh in view mode
-
- if(vtype_is(VTYPE_STRING)) {	/* string value  */
-	stat=snprintf(ddot_out,sizeof(ddot_out)," \"%s\"",get_sval());
- }  else if(vtype_is(VTYPE_NUM)) {	/* numeric value  */
-	long int d = (long int)value;
-	if(d==value) {	/* an integer/double value!  */
-		if(show_hex) stat=snprintf(ddot_out,sizeof(ddot_out)," %5.0f | 0x%llX | 0o%llo",value,(unsigned long long)value,(unsigned long long)value);
-		else stat=snprintf(ddot_out,sizeof(ddot_out)," %5.*f",1,value);
-	} else {	/* a decimal value!  */
-		stat=snprintf(ddot_out,sizeof(ddot_out)," %5.*f",precision,value);
-	};
-
- } else if(vtype_is(VTYPE_ARRAY) || vtype_is(VTYPE_SARRAY) || vtype_is(VTYPE_AMIXED)) {
-	// MESG("refresh_ddot:1");
-	array_dat *adat = get_array("37");
-	// MESG("refresh_ddot: array: type=%d name=(%s)",adat->atype,adat->array_name);
-
- 	stat=snprintf(ddot_out,sizeof(ddot_out)," array %d:[%s] type [%s] , slot %ld type=%d rows %d,cols %d",adat->anum,
-		adat->array_name,vtype_names[adat->atype],lsslot-current_stable,adat->atype,adat->rows,adat->cols);
-	// print_array1(":",adat);
- };
- if(stat>MAXLLEN) MESG("truncated");
-
- update_ddot_line(ddot_out);
- NTOKEN2;
-}
-
-double factor_refresh_ddot()
-{
- double value = get_val();
- // MESG("TOK_SHOW factor_refresh_ddot");
- // MESG("	val=%f",value);
- refresh_ddot_1(value);
- return value;
-}
-
-
 
 /* exec multiple sentences at the same level */
 double exec_block1(FILEBUF *fp)
@@ -1258,18 +1192,18 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		old_items=use_fp->symbol_tree->items;
 	};
 	parse_block1(bp,use_fp->symbol_tree,start);
-	MESG("parse_block: ended! err=%d start=%d items=%d",err_num,start,use_fp->symbol_tree->items);
+	// MESG("parse_block: ended! err=%d start=%d items=%d",err_num,start,use_fp->symbol_tree->items);
 	if(err_num) { execmd=0;return(0);};
-	MESG("	comput_block: start=%d",start);
+	// MESG("	comput_block: start=%d",start);
 	if(start || current_stable==NULL) {
-		MESG("new current_stable with %d items",use_fp->symbol_tree->items);
+		// MESG("new current_stable with %d items",use_fp->symbol_tree->items);
 		local_symbols=new_symbol_table(use_fp->symbol_tree->items);
 	} else {
-		MESG("use current_stable new items = %d",use_fp->symbol_tree->items);
+		// MESG("use current_stable new items = %d",use_fp->symbol_tree->items);
 		local_symbols=realloc_symbol_table(current_stable,use_fp->symbol_tree->items,old_items);
 	}
 	current_stable=local_symbols;
- MESG("compute_block:2");
+ // MESG("compute_block:2");
  if(bp->m_mode<2)	/* if not already checked!  */
  {
 	err_num=check_init(bp);
@@ -1279,13 +1213,12 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		show_error("Check init",bp->b_fname);
 		return(0);
 	};
-#if	TNORMAL
 	init_exec_flags();
-#endif
 	tok=bp->tok_table;
 
 	drv_start_checking_break();
-	MESG("	call exec_block1 ------");
+	// MESG("	call exec_block1 ------");
+#if	TNORMAL
 #if	TBNF
 	if(!exebnf && !usebnf) {
 #endif
@@ -1294,14 +1227,17 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 #if TBNF
 	};
 #endif
+#endif
 	// MESG("	after exec_block1 !!!!!");
 #if	TBNF
+#if	TNORMAL
 	if(exebnf || usebnf) {
+#endif
 		MESG("## execute bnf program block! --------------------");
 		exe_buffer=bp;
 		tok=bp->tok_table_bnf;
 		bnf_block1();
-		next_var("res1");
+		// next_var("res1");
 		// next_var("res2");
 		set_result();
 		// MESG("end of program1 var@=%d type %d",VARIND,bnf_var->var_type);
@@ -1310,7 +1246,9 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		// MESG("end of program2 var@=%d type %d",VARIND,bnf_var->var_type);
 		// if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
 		// show_results();
+#if	TNORMAL
 	};
+#endif
 #endif
 	drv_stop_checking_break();
 
@@ -1327,7 +1265,9 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		current_stable=old_symbol_table;
 	};
 #if	TBNF
+#if	TNORMAL
 	if(exebnf || usebnf) {
+#endif
 		show_var_stats();
 		// next_var("result");
 		// prev_var("r");
@@ -1343,8 +1283,11 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 			else if(result->var_type==VTYPE_STRING) msg_line("[%15s] Result at var@=%d \"%s]\"",bp->b_fname,VARIND,string_result());
 			else msg_line("[%15s] Result at var@=%d type %d",bp->b_fname,VARIND,bnf_var->var_type);
 		};
+#if	TNORMAL
 	} else
-#endif 
+#endif
+#endif
+#if	TNORMAL 
 	{
 		if(show_no_time) {
 			if(vtype_is(VTYPE_NUM)) msg_line("[%s] Result  (%f)",bp->b_fname,val);
@@ -1356,6 +1299,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 			else msg_line("[%s] Result n type %d",bp->b_fname,get_vtype());
 		};
 	};
+#endif
  } else {
  	msg_line("parse error %d on %s ",err_num,bp->b_fname);
 	val=0;
@@ -1369,9 +1313,9 @@ int empty_tok_table(FILEBUF *fp)
 {
  tok_struct *table= fp->tok_table;
  tok_struct *tokdel;
- MESG("empty_tok_table: of [%s]",fp->b_fname);
+ // MESG("empty_tok_table: of [%s]",fp->b_fname);
  if(table==NULL) {
- 	MESG("empty_tok_table: already clean!");
+ 	// MESG("empty_tok_table: already clean!");
 	return(0);
  };
  tokdel=table;
@@ -1437,16 +1381,19 @@ int refresh_current_buffer(num nused)
 	init_exec_flags();
 #endif
 	exe_buffer=fp;
+	tok=fp->tok_table;
 #if	TBNF
+#if	TNORMAL
 	if(usebnf) {
-		tok=fp->tok_table_bnf;
+#endif
 		bnf_block1_break();
 		if(bnf_var->var_type==VTYPE_NUM) val=bnf_var->dval;
 		else val=1;
+#if	TNORMAL
 	} else {
-		tok=fp->tok_table;
 		val=exec_block1_break(fp);
 	};
+#endif
 #else
 	val=exec_block1_break(fp);
 #endif
@@ -1458,13 +1405,18 @@ int refresh_current_buffer(num nused)
 		// mesg_out("Error %d [%s] at line %d",err_num,err_str,err_line);
 	} else {
 #if	TBNF
+#if	TNORMAL
 		if(usebnf) {
+#endif
 			set_result();
 			if(bnf_var->var_type==VTYPE_NUM) msg_line("Result bnf is [%f]",val);
 			else if(bnf_var->var_type==VTYPE_NUM) msg_line("Result bnf is \"%s\"",bnf_var->sval);
 			else msg_line("done!");
-		} else 
+#if	TNORMAL
+		} else
+#endif 
 #endif
+
 		{
 			if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
 			else if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
@@ -1871,6 +1823,30 @@ inline double get_val()
 
 char *get_sval()
 {
+#if	TBNF
+#if	TNORMAL
+	if(usebnf) {
+#endif
+	if(bnf_var->var_type==VTYPE_STRING) return bnf_var->sval;
+	else if(bnf_var->var_type==VTYPE_NUM) {
+		char *s=malloc(16);
+		snprintf(saved_string,16,"%f",bnf_var->dval);
+		bnf_var->sval=s;
+		bnf_var->var_type=VTYPE_STRING;
+		bnf_var->var_alloced=1;
+		return s;
+	} else return "";
+#if	TNORMAL
+	} else {
+	if(saved_string==NULL) {
+		saved_string=(char *)malloc(16);
+		snprintf(saved_string,16,"%f",get_val());
+		// MESG("get_sval: new saved_string! [%s]",saved_string);
+	};
+	return(saved_string);
+	};
+#endif
+#else
 // 	MESG("get_sval: tnum=%d type=%d %f ex_value=%f",tok->tnum,tok->ttype,tok->dval,ex_value);
 	if(saved_string==NULL) {
 		saved_string=(char *)malloc(16);
@@ -1878,24 +1854,43 @@ char *get_sval()
 		// MESG("get_sval: new saved_string! [%s]",saved_string);
 	};
 	return(saved_string);
+#endif
 }
 
 inline int get_vtype()
 {
-#if	0
-	if(ex_var.var_type>=VTYPE_OTHER || ex_var.var_type<0) {
-		MESG("get_vtype: error %d",ex_var.var_type);
-		ex_var.var_type=VTYPE_NONE;
-		return VTYPE_NONE;
+#if	TBNF
+#if	TNORMAL
+	if(usebnf) {
+		return bnf_var->var_type;
+	} else {
+		return ex_var.var_type;
 	};
+#else
+		return bnf_var->var_type;
 #endif
+#else
 	return ex_var.var_type;
+#endif
 }
 
 inline int vtype_is(int type)
 {
 	// MESG("vtype_is: type=%d ex type=%d",type,ex_var.var_type);
 	return type==ex_var.var_type;
+#if	TBNF
+#if	TNORMAL
+	if(usebnf) {
+		return bnf_var->var_type==type;
+	} else {
+		return type==ex_var.var_type;
+	};
+#else
+		return bnf_var->var_type==type;
+#endif
+#else
+	return type==ex_var.var_type;
+#endif
 }
 
 inline void set_vtype(int type)
@@ -1919,10 +1914,23 @@ void set_nsval(char *s,int max)
 void set_sval(char *s)
 {
 #if	TNORMAL
+#if	TBNF
+	if(usebnf) {
+		if(bnf_var->var_type==VTYPE_STRING && bnf_var->var_alloced)
+			free(bnf_var->sval);
+		bnf_var->sval=s;
+		bnf_var->var_type=VTYPE_STRING;
+		bnf_var->var_alloced=0;
+	} else {
+		clean_saved_string(0);
+		saved_string=strdup(s);
+		ex_var.var_type=VTYPE_STRING;
+	};
+#else
  clean_saved_string(0);
  saved_string=strdup(s);
- // MESG("set_sval:");
  ex_var.var_type=VTYPE_STRING;
+#endif
 #else
 	if(bnf_var->var_type==VTYPE_STRING && bnf_var->var_alloced)
 		free(bnf_var->sval);
@@ -1933,15 +1941,38 @@ void set_sval(char *s)
 }
 
 inline void set_vdval(double value){
-	// MESG("set_vdval: %f",value);
+#if	TNORMAL
+#if	TBNF
+	if(usebnf) {
+		bnf_var->dval=value;
+		bnf_var->var_type=VTYPE_NUM;
+	} else {
+		ex_var.var_type=VTYPE_NUM;
+		ex_var.dval=value;
+	};
+#else
 	ex_var.var_type=VTYPE_NUM;
 	ex_var.dval=value;
+#endif
+#else
+	bnf_var->dval=value;
+	bnf_var->var_type=VTYPE_NUM;
+#endif
 }
 
 inline void set_dval(double value)
 {
-	// MESG("set_dval: %f",value);
+#if	TNORMAL
+#if	TBNF
+	if(usebnf) {
+		bnf_var->dval=value;
+	} else 	ex_var.dval=value;
+#else
 	ex_var.dval=value;
+#endif
+#else
+		bnf_var->dval=value;
+#endif
 }
 
 #include "mlang_err.c"

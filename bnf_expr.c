@@ -24,6 +24,10 @@ int get_type_index(array_dat *adat, tok_struct *tok);
 
 #define VARIND (int)(bnf_var-bnf_vars)
 
+int varind(){
+	return VARIND;
+}
+
 #if	1
 #if	1
 #define	prev_var(x)	bnf_var--
@@ -106,14 +110,14 @@ inline static void set_var_value()
 
 void bnf_refresh_ddot()
 {
- // MESG("refresh_ddot: var@=%d type=%d",VARIND,bnf_var->var_type);
+ // MESG("bnf_refresh_ddot: var@=%d type=%d",VARIND,bnf_var->var_type);
  int stat=0;
  double value=0;
  TextPoint *tp = tok->ddot;
  FILEBUF *buf = tp->fp;
 
  MVAR *var_show = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
- // MESG("var_show: type=%d",var_show->var_type);
+ // MESG("bnf_refresh_ddot: var_show@=%d: type=%d",VARIND,var_show->var_type);
 
  if(execmd) {
 	 if(var_show->var_type==VTYPE_NUM) {
@@ -135,7 +139,6 @@ void bnf_refresh_ddot()
  int show_hex=bt_dval("show_hex");
  char ddot_out[128];
 
- // MESG("	ddot_pos=%d end=%d todel=%d",ddot_position,line_end,line_end-ddot_position);
  if(buf->b_state & FS_VIEW) {
  	// NTOKEN2;
 	return;
@@ -144,12 +147,16 @@ void bnf_refresh_ddot()
  
  if(var_show->var_type==VTYPE_STRING) {	/* string value  */
 	stat=snprintf(ddot_out,sizeof(ddot_out)," \"%s\"",var_show->sval);
+	// MESG("	ddot result is string [%s]",ddot_out);
  }  else if(var_show->var_type==VTYPE_NUM) {	/* numeric value  */
 	value=var_show->dval;
+	// MESG("	ddot result is num %f",value);
 	long int d = (long int)var_show->dval;
 	if(d==value) {	/* an integer/double value!  */
 		if(show_hex) stat=snprintf(ddot_out,sizeof(ddot_out)," %5.0f | 0x%llX | 0o%llo",value,(unsigned long long)value,(unsigned long long)value);
 		else stat=snprintf(ddot_out,sizeof(ddot_out)," %5.*f",1,value);
+		bnf_var->dval=d;
+		bnf_var->var_type=VTYPE_NUM;
 	} else {	/* a decimal value!  */
 		stat=snprintf(ddot_out,sizeof(ddot_out)," %5.*f",precision,value);
 	};
@@ -1631,12 +1638,11 @@ void bnf_factor_rpar()
 
 static void bnf_block1()
 {
-	// MESG("-------- bnf_block1 start![%s] { [%s]",fp->b_fname,tok_info(tok));
+	// MESG("bnf_block1 start! group=%d [%s]",tok->tgroup,tok_info(tok));
 	while(tok->tgroup!=TOK_END) {
-		// MESG("--- block var@=%d [%s]",VARIND,tok_info(tok));
 	 	tok->bnf_factor_function();
-		// MESG("		-- tok %d type %d",tok->tnum,tok->ttype);
 		NTOKEN2;
+		// MESG("	  var@=%d group=%d [%s]",VARIND,tok->tgroup,tok_info(tok));
 		if(!current_active_flag) {
 			// MESG("bnf_block1:[%s] stop: ind=%d type=%d [%s]",fp->b_fname,VARIND,bnf_var->var_type,tok_info(tok));
 			// if(VARIND!=block_startvar_pos) MESG("	block break: var@=%d startvar=%d [%s]",VARIND,block_startvar_pos,tok_info(tok));
@@ -2231,7 +2237,6 @@ void bnf_factor_line_array()
 		};
 		if(adat->atype==VTYPE_SARRAY) {
 			int ind1=cols*j+i;
-			// MESG("	add row %d col=%d -> %d [%s]",j,i,ind1,get_sval());
 			adat->sval[ind1]=strdup(bnf_var->sval);
 		};
 		if(adat->atype==VTYPE_AMIXED) {
@@ -3132,7 +3137,6 @@ void bnf_factor_cmd()
 		// MESG("; ed_command1 var@=%d value=%f type=%d",VARIND,value,bnf_var->var_type);
 		// prev_var("cmd");
 		// MESG("; ed_command2 var@=%d value=%f type=%d",VARIND,value,bnf_var->var_type);
-		// MESG(";	ed_command: value=%f %f ex_vtype=%d s=[%s] arg=%d",value,get_val(),get_vtype(),get_sval(),ed_command->arg);
 		switch(ed_command->arg) {
 			case 1:{ /* one argument */
 				// MESG("	one argument type=%d %f",type1,value);
@@ -3145,7 +3149,6 @@ void bnf_factor_cmd()
 				NTOKEN2;
 #if	0
 				value=bnf_expression();
-				// MESG(";	ed_command:arg2 value=%f ex_var.var_type=%d s=[%s]",value,ex_var.var_type,get_sval());
 #endif
 				// MESG(";ed_command: second token! type=%d ",tok->ttype);
 				break;

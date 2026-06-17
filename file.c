@@ -1254,8 +1254,9 @@ int open_file(num n)
 	fname[0]=0;
 	if(macro_exec){
 		// MESG("	open_file_named");
-		err=open_file_named(get_sval());
-		err=goto_file(get_sval());
+		char *file_name = get_sval();
+		err=open_file_named(file_name);
+		err=goto_file(file_name);
 		// igotolinecol(line,1,-1);
 		return(err);
 	}

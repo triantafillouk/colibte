@@ -52,6 +52,73 @@ double factor_option()
 #endif
 
 
+void refresh_ddot_1(double value)
+{
+ TDS("refresh_ddot_1");
+ int stat=0;
+ TextPoint *tp = tok->ddot;
+ FILEBUF *buf = tp->fp;
+ // MESG("refresh_ddot: %d",get_vtype());
+
+ if(execmd) {
+	 if(vtype_is(VTYPE_NUM)) {
+		printf("%s	: %.3f\n",ddot_string(),value);
+	 } else if(vtype_is(VTYPE_STRING)) {
+		printf("%s	: %s\n",ddot_string(),get_sval());
+	 } else if(vtype_is(VTYPE_ARRAY)||vtype_is(VTYPE_SARRAY)||vtype_is(VTYPE_AMIXED)) {
+		// MESG("	show_array!");
+		print_array1("array: ",get_array("36"));
+	 	// print_array1(ddot_string(),get_array("36"));
+	 };
+	 lstoken=NULL;
+	 NTOKEN2;
+	 return;
+ };
+
+ int precision=bt_dval("print_precision");
+ int show_hex=bt_dval("show_hex");
+ // char *ddot_out = (char *)malloc(128);
+ char ddot_out[128];
+
+ // MESG("	ddot_pos=%d end=%d todel=%d",ddot_position,line_end,line_end-ddot_position);
+ if(buf->b_state & FS_VIEW) {NTOKEN2;return;}; // no refresh in view mode
+
+ if(vtype_is(VTYPE_STRING)) {	/* string value  */
+	stat=snprintf(ddot_out,sizeof(ddot_out)," \"%s\"",get_sval());
+ }  else if(vtype_is(VTYPE_NUM)) {	/* numeric value  */
+	long int d = (long int)value;
+	if(d==value) {	/* an integer/double value!  */
+		if(show_hex) stat=snprintf(ddot_out,sizeof(ddot_out)," %5.0f | 0x%llX | 0o%llo",value,(unsigned long long)value,(unsigned long long)value);
+		else stat=snprintf(ddot_out,sizeof(ddot_out)," %5.*f",1,value);
+	} else {	/* a decimal value!  */
+		stat=snprintf(ddot_out,sizeof(ddot_out)," %5.*f",precision,value);
+	};
+
+ } else if(vtype_is(VTYPE_ARRAY) || vtype_is(VTYPE_SARRAY) || vtype_is(VTYPE_AMIXED)) {
+	// MESG("refresh_ddot:1");
+	array_dat *adat = get_array("37");
+	// MESG("refresh_ddot: array: type=%d name=(%s)",adat->atype,adat->array_name);
+
+ 	stat=snprintf(ddot_out,sizeof(ddot_out)," array %d:[%s] type [%s] , slot %ld type=%d rows %d,cols %d",adat->anum,
+		adat->array_name,vtype_names[adat->atype],lsslot-current_stable,adat->atype,adat->rows,adat->cols);
+	// print_array1(":",adat);
+ };
+ if(stat>MAXLLEN) MESG("truncated");
+
+ update_ddot_line(ddot_out);
+ NTOKEN2;
+}
+
+double factor_refresh_ddot()
+{
+ double value = get_val();
+ // MESG("TOK_SHOW factor_refresh_ddot");
+ // MESG("	val=%f",value);
+ refresh_ddot_1(value);
+ return value;
+}
+
+
 
 void init_ex_var()
 {

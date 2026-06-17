@@ -38,6 +38,7 @@ int get_active_flag();
 void set_bnf_string(char *s);
 void set_bnf_num(double v);
 MVAR *get_bnf_var();
+int varind();
 #endif
 
 int vtype_is(int type);
@@ -246,14 +247,8 @@ double get_env(int vnum)
 	value=v1;
 	if(svalue[0]!=0) { 
 		set_sval(svalue);	
-#if	TBNF
-		set_bnf_string(svalue);
-#endif
 	} else {
 		set_vdval(value);
-#if	TBNF
-		set_bnf_num(value);
-#endif
 	};
 	return(value);
 }
@@ -643,7 +638,7 @@ double compute_string(char *s,char *new_string)
 	EmptyText(fp);
  	init_error();
 	insert_string(fp,s,strlen(s));
-	// MESG("compute_string [%s]",s);
+	MESG("compute_string [%s]",s);
 	fp->b_type=1;
 	value=compute_block(fp,cbfp,0);
 	// MESG("compute_string new_string=[%s]",new_string);
@@ -1229,6 +1224,7 @@ int create_function_buffer(FILEBUF *pbuf,char *function_name,offs start_function
 	return(1);
 }
 
+
 /* 
  refresh line at current cursor position of current window
  (cbfp is cwp->w_fp)
@@ -1249,7 +1245,6 @@ int refresh_current_line(num nused)
  // if special file type return
  if(cbfp->b_flag & (FSNLIST|FSDIRED|FSNOTES|FSNOTESN)) return 0;
 	macro_exec=1;
- // MESG("refresh_current_line:");
 	tpo=tp_offset(cwp->tp_current);
 	
 	sl=FLineBegin(cbfp,tpo);
@@ -1263,6 +1258,8 @@ int refresh_current_line(num nused)
 			is_ddot=!(cbfp->b_state & FS_VIEW);
 			ddot_pos=i-sl+1;break;};
 	};
+
+ 	MESG("refresh_current_line: is_ddot=%d ddot_pos=%d",is_ddot,ddot_pos);
 	
 	// goto the begining of the line
 	set_Offset(sl+ddot_pos);
@@ -1272,9 +1269,9 @@ int refresh_current_line(num nused)
 	set_Offset(sl);
 	if(is_ddot) DeleteBlock(cbfp,0,ddot_pos);	/* clear the line!  */
 	set_Offset(sl);
-	// MESG("refresh_current_line:[%s] %d",text_line,ddot_pos);
+	MESG("refresh_current_line:[%s] %d",text_line,ddot_pos);
 	value = compute_string(text_line,text_line);
-
+	MESG("	after compute_string var@=%d value=%f [%s]",varind(),value,text_line);
 	if(is_ddot) {
 		insert_string(cbfp,text_line,strlen(text_line));
 	};
@@ -1285,24 +1282,36 @@ int refresh_current_line(num nused)
 		set_update(cwp,UPD_EDIT);
 		return (FALSE);
  	} else {
+#if	TNORMAL
 #if	TBNF
 		if(usebnf) {
 			MVAR *result=get_bnf_var();
-			if(result->var_type==VTYPE_STRING) msg_line("bnf res=[%s]",result->sval);
-			else if (result->var_type==VTYPE_NUM) msg_line("bnf res=[%f]",result->dval);
-			else msg_line("bnf result type %d",result->var_type);
-		}
-#if	TNORMAL 
-		else
-#endif 
-#endif
-#if	TNORMAL
-		{
+			
+			if(result->var_type==VTYPE_STRING) msg_line("res=[%s]",result->sval);
+			else if (result->var_type==VTYPE_NUM) {
+				value=result->dval;
+				msg_line("b res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
+			} else msg_line("result is of type %d",result->var_type);
+		} else {
 	 		if(vtype_is(VTYPE_STRING)) msg_line("res=[%s]",value,get_sval());
 			else {
-				msg_line("res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
+				msg_line("n res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
 			}
-		};
+		}
+#else
+ 		if(vtype_is(VTYPE_STRING)) msg_line("res=[%s]",value,get_sval());
+		else {
+			msg_line("n res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
+		}
+#endif
+#else
+			MVAR *result=get_bnf_var();
+			
+			if(result->var_type==VTYPE_STRING) msg_line("res=[%s]",result->sval);
+			else if (result->var_type==VTYPE_NUM) {
+				value=result->dval;
+				msg_line("b1 res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
+			} else msg_line("result is of type %d",result->var_type);
 #endif
  	};
 	if(is_ddot){
