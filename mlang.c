@@ -60,6 +60,8 @@ MVAR *btree_to_mvar(BTREE *bt);
 void skip_sentence1();
 inline MVAR *get_left_slot(int ind);
 void show_error(char *from,char *name);
+char *ddot_string();
+void update_ddot_line(char *ddot_out);
 
 #if	SYNTAX_DEBUG
 
@@ -747,7 +749,7 @@ int check_init(FILEBUF *bf)
  int err=0;
  INIT_STAGE;
  int checked = (bf->tok_table != NULL);
- MESG("---- check_init: [%s] %d checked=%d %d",bf->b_fname,bf->b_type,checked,bf->err);
+ MESG("---- check_init: [%s] %d checked=%d err=%d",bf->b_fname,bf->b_type,checked,bf->err);
  // eval_curl_match(NULL);
 #if	0
  if(execmd) 
@@ -772,7 +774,7 @@ int check_init(FILEBUF *bf)
 		check_buffer = ori_buffer;
 		return(201);
 	}
- };
+ } else MESG("	already checked!");
  MESG("check_init:2 err=%d %d",bf->err,bf->tok_table==NULL);
  if(bf->err<1) 
  {
@@ -1236,7 +1238,8 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		MESG("## execute bnf program block! --------------------");
 		exe_buffer=bp;
 		tok=bp->tok_table_bnf;
-		bnf_block1();
+		if(execmd) bnf_block1();
+		else bnf_block1_break();
 		// next_var("res1");
 		// next_var("res2");
 		set_result();
@@ -1313,9 +1316,9 @@ int empty_tok_table(FILEBUF *fp)
 {
  tok_struct *table= fp->tok_table;
  tok_struct *tokdel;
- // MESG("empty_tok_table: of [%s]",fp->b_fname);
+ MESG("empty_tok_table: of [%s]",fp->b_fname);
  if(table==NULL) {
- 	// MESG("empty_tok_table: already clean!");
+ 	MESG("empty_tok_table: already clean!");
 	return(0);
  };
  tokdel=table;
@@ -1326,7 +1329,7 @@ int empty_tok_table(FILEBUF *fp)
 	};
  };
  if(fp->tok_table) {
-	 // MESG("free the table");
+	 MESG("free the table");
 	free(fp->tok_table);
 	// MESG("empty_tok_table: set NULL!");
 	fp->tok_table=NULL;
@@ -1360,14 +1363,18 @@ int refresh_current_buffer(num nused)
  clean_saved_string(0);
 #endif
  fp->err=-1;
- // MESG("refresh_current_buffer:1 [%s] %d",fp->b_fname,fp->b_type);
+ MESG("refresh_current_buffer:1 [%s] %d",fp->b_fname,fp->b_type);
+ MESG("		checked1=%d",fp->tok_table!=NULL);
  parse_block1(fp,fp->symbol_tree,1);
 
+ MESG("		checked2=%d",fp->tok_table!=NULL);
  if(err_num<1){	/* if no errors  */
 	current_stable=new_symbol_table(fp->symbol_tree->items);
 
  	msg_line("checking ...");
 	drv_start_checking_break();
+	MESG("		checked3=%d",fp->tok_table!=NULL);
+
 	if(check_init(fp)>0) {
 		drv_stop_checking_break();
 		show_error("refresh buffer",fp->b_fname);
@@ -1377,10 +1384,9 @@ int refresh_current_buffer(num nused)
 	};
 	// MESG("refresh_current_buffer: after check_init");
  	msg_line("evaluating %s",fp->b_fname);
-#if	TNORMAL
 	init_exec_flags();
-#endif
 	exe_buffer=fp;
+	MESG("		checked4=%d",fp->tok_table!=NULL);
 	tok=fp->tok_table;
 #if	TBNF
 #if	TNORMAL
@@ -1602,7 +1608,7 @@ char * tok_info(tok_struct *tok)
 {
  static char stok[MAXLLEN];
 	if(tok==NULL) { MESG("tok_info: NULL token!");return "null token";};
-	MESG("tok_info: ttype=%d",tok->ttype);
+	// MESG("tok_info: ttype=%d",tok->ttype);
 
 	if(tok->tname!=NULL){
 		// MESG("tok_info: %d %s %d",tok->tind,tok->tname,tok->tline);

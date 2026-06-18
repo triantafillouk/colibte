@@ -40,11 +40,7 @@ int	macro_exec	= FALSE;		/* command line execution flag	*/
 int	discmd	= TRUE;			/* display command flag		*/
 int execmd	= FALSE;	/* exec the file  */
 int exebnf  = FALSE;	/* exec with bnf notation activep  */
-#if	TNORMAL
 int usebnf  = FALSE;
-#else
-int usebnf = TRUE;
-#endif
 int show_tokens = FALSE;
 int show_bnf_tokens = FALSE;
 int show_no_time = FALSE;

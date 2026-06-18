@@ -1271,7 +1271,9 @@ int refresh_current_line(num nused)
 	set_Offset(sl);
 	MESG("refresh_current_line:[%s] %d",text_line,ddot_pos);
 	value = compute_string(text_line,text_line);
+#if	TBNF
 	MESG("	after compute_string var@=%d value=%f [%s]",varind(),value,text_line);
+#endif
 	if(is_ddot) {
 		insert_string(cbfp,text_line,strlen(text_line));
 	};

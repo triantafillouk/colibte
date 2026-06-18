@@ -67,9 +67,9 @@ extern alist *var_list;
 extern alist *shell_list;
 extern alist *pat_list;
 extern alist *macro_list;
-
+#if	TBNF
 void prev_var_ext(char *from);
-
+#endif
 inline int normalize(int c);
 
 void set_list_type(int type)

@@ -61,7 +61,7 @@ int sysexec(char *st)
 			msg_line("command [%s] exit status %d",st,status);
 			events_flush();
 		} else {
-			if(!(execmd||exebnf)) msg_line("ok!");
+			if(!(exebnf)) msg_line("ok!");
 		};
 		return(TRUE);
 	} else {
@@ -283,7 +283,7 @@ int exec_shell(char *tline)
 		goto_eof(1);
 		// MESG("		goto end and insert %s",filnam);
 		ifile(bp,filnam,0);
-		if(exebnf||execmd) print_buffer(bp);
+		if(execmd) print_buffer(bp);
 		bp->b_state &= ~FS_CHG;
 		set_Offset(0);
 		set_hmark(1,"shell_cmd");
@@ -294,13 +294,13 @@ int exec_shell(char *tline)
 
 		if(bp->lines<2) {
 			// MESG("select %s",old_buffer->b_fname);
-			if(exebnf||execmd) cbfp=old_buffer;
+			if(execmd) cbfp=old_buffer;
 			else {select_filebuf(old_buffer);
 				if(cbfp->b_flag & (FSNLIST)) dir_reload(1);
 			};
 		};
 		
-		if(!(exebnf||execmd)){
+		if(!(execmd)){
 			if(bperr->lines<2)	msg_line("ok no errors!");
 			else if(bperr->lines==2) {
 				char *err_line1 = get_line_at(bperr,0);

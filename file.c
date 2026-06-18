@@ -2019,7 +2019,7 @@ int add_to_recent_list(char *full_file_name)
 {
 	int found=0;
 	char *new_str;
-	if(exebnf||execmd) return 0;
+	if(execmd) return 0;
 	// MESG("add_to_recent_list: [%s]",full_file_name);
 	if(full_file_name[0]==CHR_LBRA) return 0;
 	if(recent_file_list==NULL) return 0;

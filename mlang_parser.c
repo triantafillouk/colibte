@@ -488,7 +488,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  int is_now_sep=0;
  int is_now_curl=0;
  int par_level=0;
- int after_rpar=0;
+ // int after_rpar=0;
  TLIST curl_stack; // curl stack
  int store_level=0;
 #if	DEBUG_SYNTAX
@@ -872,7 +872,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 		continue;
 	};
 	// MESG("	- token type=[%d %s] previous token is [%d %s] nword=[%s],store=%d",tok_type,tname(tok_type),previous_ttype,tname(previous_ttype),nword,is_storelines);
-	if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
+	// if(tok_type==TOK_RPAR || !strcmp(nword,"else")) after_rpar=1;else after_rpar=0;
 	if(!is_storelines) {
 	if(!(is_now_sep && (tok_type==TOK_LCURL||tok_type==TOK_RCURL) )){
 		// MESG("check for else! is_now_sep=%d tok_type=%d",is_now_sep,tok_type);
