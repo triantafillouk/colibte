@@ -169,7 +169,7 @@ void error_skip_token(int index,char *description)
 
 void set_error(tok_struct *tok,int err,char *description)
 {
- set_break();
+ set_break(description);
 
  if(tok==NULL) {
  	fprintf(stderr,"error: tok is NULL, %d %s\n",err,description);

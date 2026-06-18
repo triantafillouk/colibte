@@ -1009,6 +1009,7 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
  char st2[MAXLLEN];	// this is the real string
  int saved_kbdmode=kbdmode;
  
+ // MESG("win_getstring: %d %d",execmd,exebnf);
  // MESG("win_getstring: prompt %s maxlen=%d execmd=%d",prompt,maxlen,execmd);
  if(maxlen>MAXLLEN-1) maxlen=MAXLLEN-1;
  if(execmd) {

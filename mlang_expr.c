@@ -855,7 +855,7 @@ double factor_array1()
 				err_num=214;
 				err_line=tok->tline;
 				// ERROR("	array cannot allocate dval at %d",err_line);
-				set_break();
+				set_break("cannot allocate dval");
 				return 0;
 			};
 			array_slot->adat->dval = dval_new; 
@@ -1194,7 +1194,7 @@ static double term2_power(double v1)
 			ex_name="array power numeric";
 		} else {
 			syntax_error("wrong power on table",2101);
-			set_break();
+			set_break("wrong power on table");
 		};
 		return(1);
 	} else {
@@ -1222,7 +1222,7 @@ double v2;
 			ex_name="array modulo numeric";
 		} else {
 			syntax_error("wrong modulo on table",2102);
-			set_break();
+			set_break("wrong modulo on table");
 		};
 		return(1);
 	} else {
@@ -1233,7 +1233,7 @@ double v2;
 	} else {
 		/* RT error  */
 		syntax_error("wrong modulo value value=0",2103);
-		set_break();
+		set_break("wrong modulo value");
 	};
 	}
 	RTRN(v1);
@@ -1283,7 +1283,7 @@ static double term1_mul(double v1)
 		};
 		if(vtype_is(VTYPE_STRING)) {
 			syntax_error("cannot multiply str * str!",2102);
-			set_break();
+			set_break("cannot multiply str * str");
 			return(0);
 		};
 	};
@@ -1332,7 +1332,7 @@ static double term1_mul(double v1)
 		};
 	};
 	syntax_error("wrong multiply type",2101);
-	set_break();
+	set_break("wrong multiply type");
 	return(1);
 }
 
@@ -1402,7 +1402,7 @@ static double term1_div(double v1)
 		};
 	};
 	set_error(tok,216,"division op not supported");
-	set_break();
+	set_break("divition op not supported");
 	RTRN(v1);
 }
 
@@ -1441,7 +1441,7 @@ double factor_error()
 {
 	syntax_error("factor_error",2081);
 	NTOKEN2;
-	set_break();
+	set_break("factor error");
 	return 0.0;
 }
 

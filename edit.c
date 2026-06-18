@@ -2273,7 +2273,7 @@ int copy_region(num n)
  else
 	snprintf(s,sizeof(s),"[%lld bytes copied]",MainClipBoard->width);
  msg_line(s);
- set_break();
+ set_break("copy region");
  return TRUE;
 }
 

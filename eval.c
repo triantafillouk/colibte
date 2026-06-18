@@ -638,7 +638,7 @@ double compute_string(char *s,char *new_string)
 	EmptyText(fp);
  	init_error();
 	insert_string(fp,s,strlen(s));
-	MESG("compute_string [%s]",s);
+	// MESG("compute_string [%s]",s);
 	fp->b_type=1;
 	value=compute_block(fp,cbfp,0);
 	// MESG("compute_string new_string=[%s]",new_string);
@@ -1259,7 +1259,7 @@ int refresh_current_line(num nused)
 			ddot_pos=i-sl+1;break;};
 	};
 
- 	MESG("refresh_current_line: is_ddot=%d ddot_pos=%d",is_ddot,ddot_pos);
+ 	// MESG("refresh_current_line: is_ddot=%d ddot_pos=%d",is_ddot,ddot_pos);
 	
 	// goto the begining of the line
 	set_Offset(sl+ddot_pos);
@@ -1269,10 +1269,10 @@ int refresh_current_line(num nused)
 	set_Offset(sl);
 	if(is_ddot) DeleteBlock(cbfp,0,ddot_pos);	/* clear the line!  */
 	set_Offset(sl);
-	MESG("refresh_current_line:[%s] %d",text_line,ddot_pos);
+	// MESG("refresh_current_line:[%s] %d",text_line,ddot_pos);
 	value = compute_string(text_line,text_line);
 #if	TBNF
-	MESG("	after compute_string var@=%d value=%f [%s]",varind(),value,text_line);
+	// MESG("	after compute_string var@=%d value=%f [%s]",varind(),value,text_line);
 #endif
 	if(is_ddot) {
 		insert_string(cbfp,text_line,strlen(text_line));

@@ -775,7 +775,7 @@ int check_init(FILEBUF *bf)
 		return(201);
 	}
  } else MESG("	already checked!");
- MESG("check_init:2 err=%d %d",bf->err,bf->tok_table==NULL);
+ // MESG("check_init:2 err=%d %d",bf->err,bf->tok_table==NULL);
  if(bf->err<1) 
  {
 	tok=bf->tok_table;
@@ -789,7 +789,7 @@ int check_init(FILEBUF *bf)
  };
 
  tok=tok_table;
- MESG("check_init:end [%s] %d",bf->b_fname,bf->b_type);
+ // MESG("check_init:end [%s] %d",bf->b_fname,bf->b_type);
 #if	TBNF
  if(!exebnf)
 #endif
@@ -912,21 +912,15 @@ MVAR *btree_to_mvar(BTREE *bt)
 }
 
 
-
-
-
 /* user interupt on, set also break flag  */
-void set_break()
+void set_break(char *from)
 {
-	// MESG("set_break:");
+	MESG("set_break: from %s",from);
 	is_break1=1;
 	// tok->tgroup=TOK_EOF;
 	// tok->ttype=TOK_EOF;
 	current_active_flag=0;
 }
-
-
-
 
 char *str_mul(char *sval, double v1)
 {
@@ -1216,7 +1210,6 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		return(0);
 	};
 	init_exec_flags();
-	tok=bp->tok_table;
 
 	drv_start_checking_break();
 	// MESG("	call exec_block1 ------");
@@ -1224,6 +1217,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 #if	TBNF
 	if(!exebnf && !usebnf) {
 #endif
+	tok=bp->tok_table;
 	if(execmd) val=exec_block1(bp);
 	else val=exec_block1_break(bp);
 #if TBNF
@@ -1316,9 +1310,9 @@ int empty_tok_table(FILEBUF *fp)
 {
  tok_struct *table= fp->tok_table;
  tok_struct *tokdel;
- MESG("empty_tok_table: of [%s]",fp->b_fname);
+ // MESG("empty_tok_table: of [%s]",fp->b_fname);
  if(table==NULL) {
- 	MESG("empty_tok_table: already clean!");
+ 	// MESG("empty_tok_table: already clean!");
 	return(0);
  };
  tokdel=table;
@@ -1329,7 +1323,7 @@ int empty_tok_table(FILEBUF *fp)
 	};
  };
  if(fp->tok_table) {
-	 MESG("free the table");
+	 // MESG("free the table");
 	free(fp->tok_table);
 	// MESG("empty_tok_table: set NULL!");
 	fp->tok_table=NULL;
@@ -1363,18 +1357,14 @@ int refresh_current_buffer(num nused)
  clean_saved_string(0);
 #endif
  fp->err=-1;
- MESG("refresh_current_buffer:1 [%s] %d",fp->b_fname,fp->b_type);
- MESG("		checked1=%d",fp->tok_table!=NULL);
+ // MESG("refresh_current_buffer:1 [%s] %d",fp->b_fname,fp->b_type);
  parse_block1(fp,fp->symbol_tree,1);
 
- MESG("		checked2=%d",fp->tok_table!=NULL);
  if(err_num<1){	/* if no errors  */
 	current_stable=new_symbol_table(fp->symbol_tree->items);
 
  	msg_line("checking ...");
 	drv_start_checking_break();
-	MESG("		checked3=%d",fp->tok_table!=NULL);
-
 	if(check_init(fp)>0) {
 		drv_stop_checking_break();
 		show_error("refresh buffer",fp->b_fname);
@@ -1386,21 +1376,23 @@ int refresh_current_buffer(num nused)
  	msg_line("evaluating %s",fp->b_fname);
 	init_exec_flags();
 	exe_buffer=fp;
-	MESG("		checked4=%d",fp->tok_table!=NULL);
-	tok=fp->tok_table;
+
 #if	TBNF
 #if	TNORMAL
 	if(usebnf) {
 #endif
+		tok=fp->tok_table_bnf;
 		bnf_block1_break();
 		if(bnf_var->var_type==VTYPE_NUM) val=bnf_var->dval;
 		else val=1;
 #if	TNORMAL
 	} else {
+		tok=fp->tok_table;
 		val=exec_block1_break(fp);
 	};
 #endif
 #else
+	tok=fp->tok_table;
 	val=exec_block1_break(fp);
 #endif
 	drv_stop_checking_break();
@@ -1749,7 +1741,7 @@ void init_exec_flags()
  set_vdval(0.0);
  ex_nvars=0;ex_nquote=0;ex_nums=0;	/* initialize table counters  */
 #endif
- MESG("init_exec_flags:end");
+ MESG("init_exec_flags:ok!");
 }
 
 
@@ -1760,6 +1752,7 @@ int exec_named_function(char *name)
     char bufn[MAXFLEN+2];		/* name of buffer to execute */
 
 	// MESG("exec_named_function: %s",name);
+	msg_line("exec_name_function: %s",name);
 	/* find out what buffer to execute */
 	strlcpy(bufn+1,name,MAXFLEN);
 
@@ -1783,6 +1776,7 @@ int exec_named_function(char *name)
 		return(0);
 	};
 	double value;
+	// MESG("exec_named_function: active_flag=%d",current_active_flag);
 #if	TNORMAL
 #if	TBNF
 	if(!exebnf) value=exec_function(bp,0);
@@ -1801,6 +1795,10 @@ int exec_named_function(char *name)
 			value=bnf_var->dval;
 		else value=0;
 #endif
+#if	TBNF
+	MESG("end of exec_named_function var@=%d value=%f",VARIND,value);
+#endif
+
 	return((int)value);
 }
 
@@ -1883,7 +1881,6 @@ inline int get_vtype()
 inline int vtype_is(int type)
 {
 	// MESG("vtype_is: type=%d ex type=%d",type,ex_var.var_type);
-	return type==ex_var.var_type;
 #if	TBNF
 #if	TNORMAL
 	if(usebnf) {

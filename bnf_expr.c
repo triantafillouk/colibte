@@ -139,6 +139,7 @@ void bnf_refresh_ddot()
  int show_hex=bt_dval("show_hex");
  char ddot_out[128];
 
+ // MESG("	ddot_pos=%d end=%d todel=%d",ddot_position,line_end,line_end-ddot_position);
  if(buf->b_state & FS_VIEW) {
  	// NTOKEN2;
 	return;
@@ -477,7 +478,7 @@ void bnf_factor_plus()
 		return;
 	};
  };
-
+	// MESG("factor_plus: vara=%d varb=%d",vara->var_type,varb->var_type);
  	set_error(tok,1028,"plus error");
 }
 
@@ -492,7 +493,7 @@ inline static void  bnf_factor_pn_minus()
 
 void bnf_factor_minus()
 {
- // MESG(";bnf_factor_plus: var@=%d [%s]",VARIND,tok_info(tok));
+ // MESG(";bnf_factor_minus: var@=%d [%s]",VARIND,tok_info(tok));
  MVAR *varb = bnf_var;
  int varb_type_is_pointer=0;
  if(varb->var_type==VTYPE_POINTER) { varb=bnf_var->var_pointer;varb_type_is_pointer=1;};
@@ -1640,9 +1641,11 @@ static void bnf_block1()
 {
 	// MESG("bnf_block1 start! group=%d [%s]",tok->tgroup,tok_info(tok));
 	while(tok->tgroup!=TOK_END) {
+		// MESG("--- block var@=%d [%s]",VARIND,tok_info(tok));
 	 	tok->bnf_factor_function();
+		// MESG("		-- tok %d type %d act=%d",tok->tnum,tok->ttype,current_active_flag);
 		NTOKEN2;
-		// MESG("	  var@=%d group=%d [%s]",VARIND,tok->tgroup,tok_info(tok));
+		// MESG("	  var@=%d group=%d [%s] act=%d",VARIND,tok->tgroup,tok_info(tok),current_active_flag);
 		if(!current_active_flag) {
 			// MESG("bnf_block1:[%s] stop: ind=%d type=%d [%s]",fp->b_fname,VARIND,bnf_var->var_type,tok_info(tok));
 			// if(VARIND!=block_startvar_pos) MESG("	block break: var@=%d startvar=%d [%s]",VARIND,block_startvar_pos,tok_info(tok));
@@ -2094,11 +2097,13 @@ inline static void bnf_exec_function(FILEBUF *proc_buffer,int nargs)
 	skip_args1(nargs);
 
 	NTOKEN2;
+	// MESG("-bnf_exec_function: at start of block: [%s] active=%d",tok_info(tok),current_active_flag);
+	// current_active_flag=1;
 	bnf_block1();
 	// show_result();
 	delete_symbol_table(current_stable,proc_buffer->symbol_tree->items,nargs);
 	current_stable=old_symbol_table;
-		// exe_buffer=ori_buf;
+
 	tok=after_proc;
 	// MESG("	continue after function to [%s]",tok_info(tok));
 }
@@ -2237,6 +2242,7 @@ void bnf_factor_line_array()
 		};
 		if(adat->atype==VTYPE_SARRAY) {
 			int ind1=cols*j+i;
+			// MESG("	add row %d col=%d -> %d [%s]",j,i,ind1,get_sval());
 			adat->sval[ind1]=strdup(bnf_var->sval);
 		};
 		if(adat->atype==VTYPE_AMIXED) {
@@ -2787,7 +2793,7 @@ void bnf_factor_array_l1()
 				err_num=214;
 				err_line=tok->tline;
 				// ERROR("	array cannot allocate dval at %d",err_line);
-				set_break();
+				set_break("cannot allocate dval");
 				return;
 			} else {
 				array_slot->adat->dval = dval_new; 
@@ -2865,7 +2871,7 @@ void bnf_type_l1()
 				err_num=214;
 				err_line=tok->tline;
 				// ERROR("	array cannot allocate dval at %d",err_line);
-				set_break();
+				set_break("cannot allocate dval");
 				return;
 			} else {
 				adat->dval = dval_new; 
@@ -2921,7 +2927,7 @@ void bnf_factor_array_l1_tba_array()
 			err_num=214;
 			err_line=tok->tline;
 			ERROR("	array cannot allocate dval at %d",err_line);
-			set_break();
+			set_break("cannot allocate dval");
 			return;
 		} else {
 			adat->dval = dval_new; 
@@ -3041,7 +3047,7 @@ void bnf_factor_array_l2_tba()
 				err_num=214;
 				err_line=tok->tline;
 				// ERROR("	array cannot allocate dval at %d",err_line);
-				set_break();
+				set_break("can not allocate dval");
 				return;
 			} else {
 				adat->dval = dval_new; 
@@ -3137,6 +3143,7 @@ void bnf_factor_cmd()
 		// MESG("; ed_command1 var@=%d value=%f type=%d",VARIND,value,bnf_var->var_type);
 		// prev_var("cmd");
 		// MESG("; ed_command2 var@=%d value=%f type=%d",VARIND,value,bnf_var->var_type);
+		// MESG(";	ed_command: value=%f %f ex_vtype=%d s=[%s] arg=%d",value,get_val(),get_vtype(),get_sval(),ed_command->arg);
 		switch(ed_command->arg) {
 			case 1:{ /* one argument */
 				// MESG("	one argument type=%d %f",type1,value);
@@ -3149,6 +3156,7 @@ void bnf_factor_cmd()
 				NTOKEN2;
 #if	0
 				value=bnf_expression();
+				// MESG(";	ed_command:arg2 value=%f ex_var.var_type=%d s=[%s]",value,ex_var.var_type,get_sval());
 #endif
 				// MESG(";ed_command: second token! type=%d ",tok->ttype);
 				break;

@@ -681,7 +681,7 @@ int drv_check_break_key()
 	key=key_buf[key_index];
 	count=0;
 	if(key==3) {
-		set_break();
+		set_break("drv_check_break_key");
 		return 1;
 	};
  };
