@@ -324,7 +324,7 @@ void parse_command_line(int argc, char **argv)
 						allocate_array(main_args);
 						a_arg=0;
 					break;
-#if	TBNF
+#if	TBNF & TNORMAL
 				case 'F':
 					usebnf=1;
 					break;
@@ -335,6 +335,7 @@ void parse_command_line(int argc, char **argv)
 #if	TBNF
 				case 'f':
 					exebnf=1;
+					usebnf=1;
 #endif
 				case 'x':	/* execute file and quit */
 					execmd=1;

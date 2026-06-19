@@ -1284,9 +1284,10 @@ int refresh_current_line(num nused)
 		set_update(cwp,UPD_EDIT);
 		return (FALSE);
  	} else {
-#if	TNORMAL
-#if	TBNF
+#if	TBNFNORMAL
 		if(usebnf) {
+#endif
+#if	TBNF
 			MVAR *result=get_bnf_var();
 			
 			if(result->var_type==VTYPE_STRING) msg_line("res=[%s]",result->sval);
@@ -1294,26 +1295,18 @@ int refresh_current_line(num nused)
 				value=result->dval;
 				msg_line("b res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
 			} else msg_line("result is of type %d",result->var_type);
+#endif
+#if	TBNFNORMAL
 		} else {
+#endif
+#if	TNORMAL
 	 		if(vtype_is(VTYPE_STRING)) msg_line("res=[%s]",value,get_sval());
 			else {
 				msg_line("n res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
 			}
-		}
-#else
- 		if(vtype_is(VTYPE_STRING)) msg_line("res=[%s]",value,get_sval());
-		else {
-			msg_line("n res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
-		}
 #endif
-#else
-			MVAR *result=get_bnf_var();
-			
-			if(result->var_type==VTYPE_STRING) msg_line("res=[%s]",result->sval);
-			else if (result->var_type==VTYPE_NUM) {
-				value=result->dval;
-				msg_line("b1 res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
-			} else msg_line("result is of type %d",result->var_type);
+#if	TBNFNORMAL
+		}
 #endif
  	};
 	if(is_ddot){

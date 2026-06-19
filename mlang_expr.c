@@ -8,48 +8,94 @@
 	Normal factor ops
 */
 
-
 double factor_option();
 
-#if	TBNF
-double factor_option()
+/* exec multiple sentences at the same level */
+double exec_block1(FILEBUF *fp)
 {
- BTNODE *bte; 
-/* variable's name in tok0->tname */
-	bte=tok->tok_node;
-	// MESG("factor_option: set var_node [%s]",tok_info(tok));
-	var_node=bte;
-	NTOKEN2;
-
-	set_vtype(bte->node_vtype);
-	if(bte->node_vtype==VTYPE_STRING) { /* there is a valid string value */
-		clean_saved_string(strlen(bte->node_sval));
-		strcpy(saved_string,bte->node_sval);
-		return 0;
-	} else {
-		return(bte->node_dval);
+ INIT_STAGE;
+ exe_buffer=fp;
+ double val=0;
+  // MESG("exec_block1:[%s] err_num= %d %d tok=[%s]",fp->b_fname,err_num,current_active_flag,tok_info(tok));
+   if(!current_active_flag) {
+		tok=fp->end_token;
+		return(ex_var.dval);
+   };
+   while(tok->tgroup!=TOK_END) 
+   {
+	// MESG_TOK_INFO("- exec_block1 [%s]",tok);
+#if	1
+	if(tok->ttype==TOK_SEP){ 
+		NTOKEN2;
+		lstoken=NULL;
+		continue;
 	};
-}
-#else
-double factor_option()
-{
- BTNODE *bte; 
-/* variable's name in tok0->tname */
-	bte=tok->tok_node;
-	// MESG("factor_option: set var_node [%s]",tok_info(tok));
-	var_node=bte;
-	NTOKEN2;
-
-	set_vtype(bte->node_vtype);
-	if(bte->node_vtype==VTYPE_STRING) { /* there is a valid string value */
-		clean_saved_string(strlen(bte->node_sval));
-		strcpy(saved_string,bte->node_sval);
-		return 0;
-	} else {
-		return(bte->node_dval);
-	};
-}
 #endif
+#if	0
+	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
+#endif
+ 	val=tok->directive();
+	// lstoken=NULL;MESG("exec_block1: reset lstoken");
+	if(ex_var.var_type==VTYPE_NUM) ex_var.dval=val;
+	if(!current_active_flag) break;
+   };
+	if(tok->ttype==TOK_RCURL) { 
+	NTOKEN2;lstoken=NULL;return(ex_var.dval);};
+   // MESG("exec_block1: end!");
+	return(val);
+}
+
+double exec_block1_break(FILEBUF *fp)
+{
+ INIT_STAGE;
+ exe_buffer=fp;
+ double val=0;
+	// MESG("#exec_block_break:%d ttype=%d [%s]",tok->tnum,tok->ttype,tok_info(tok));
+   if(!current_active_flag|| err_num>0) {
+		tok=fp->end_token;
+		return(ex_var.dval);
+   };
+   while(tok->tgroup!=TOK_END) 
+   {
+	// MESG(";exec_block:%d ttype=%d",tok->tnum,tok->ttype);
+#if	1
+	if(tok->ttype==TOK_SEP){ NTOKEN2;
+		lstoken=NULL;
+		continue;
+	};
+#endif
+#if	0
+	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
+#endif
+ 	val=tok->directive();
+	if(ex_var.var_type==1) ex_var.dval=val;
+
+	if(!current_active_flag) break;
+	if(drv_check_break_key()) break;
+	// MESG(" [%s]",tok_info(tok));
+   };
+	if(tok->ttype==TOK_RCURL) { NTOKEN2;lstoken=NULL;return(ex_var.dval);};
+	return(val);
+}
+
+double factor_option()
+{
+ BTNODE *bte; 
+/* variable's name in tok0->tname */
+	bte=tok->tok_node;
+	// MESG("factor_option: set var_node [%s]",tok_info(tok));
+	var_node=bte;
+	NTOKEN2;
+
+	set_vtype(bte->node_vtype);
+	if(bte->node_vtype==VTYPE_STRING) { /* there is a valid string value */
+		clean_saved_string(strlen(bte->node_sval));
+		strcpy(saved_string,bte->node_sval);
+		return 0;
+	} else {
+		return(bte->node_dval);
+	};
+}
 
 
 void refresh_ddot_1(double value)
@@ -2256,17 +2302,6 @@ void set_term_function(tok_struct *tok, TFunction term_function)
 double exec_function(FILEBUF *proc_buffer,int nargs)
 {
 	// MESG("exec_function: [%s]",proc_buffer->b_fname);
-#if	TBNF
-	if(usebnf) {
-		bnf_exec_function(proc_buffer,nargs);
-		// MESG("after bnf_exec_function: var@=%d type=%d",VARIND,bnf_var->var_type);
-		if(bnf_var->var_type==VTYPE_NUM) {
-			// MESG("	numeric val=%f",bnf_var->dval);
-			return bnf_var->dval;
-		};
-		return 1;
-	};
-#endif
 	MVAR *old_symbol_table=current_stable;
 	current_stable = push_args_1(nargs,proc_buffer->symbol_tree->items);
 	tok_struct *after_proc=tok;

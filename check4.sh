@@ -1,2 +1,2 @@
 
-for i in `cat nt2.lst`;do ./cte  -$1 $i |grep Result;done 2>&1|tee check4$1.out
+for i in `cat nt2.lst`;do echo $i; ./cte945f -d -$1 $i ;done 2>&1|tee check4_945_$1.out
