@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.7T945 (19/6/2026)"
+#define VERSION 	 "#01.7T946 (20/6/2026)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -29,7 +29,7 @@
 #define	TARROWS		1	/* Use arrow menus in panel curses  */
 #define	USE_UTF8	1	/* Use utf8 characters  */
 #define	TBNF		1	/* convert to bnf notation test  */
-#define TNORMAL		1	/* normal ops included  */
+#define TNORMAL		0	/* normal ops included  */
 #if	TBNF & TNORMAL
 #define	TBNFNORMAL		1
 #else
