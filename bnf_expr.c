@@ -343,7 +343,7 @@ inline static void  bnf_factor_np_minus()
 void set_bnf_function(tok_struct *tok, char *label, VFunction function)
 {
 	tok->bnf_factor_function=function;
-	MESG("- set bnf function: to %s [%s]",label,tok_info(tok));
+	MESG("- set bnf function: to %s var@=%d [%s]",label,VARIND,tok_info(tok));
 }
 
 static void bnf_factor_spn_plus()
@@ -1386,16 +1386,21 @@ inline static void bnf_factor_eof()
 {
  	MESG("bnf_factor_EOF: var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	current_active_flag=0;
+	next_var("eof");
 }
 
 
 inline static void bnf_factor_sep()
 {
+ 
  if(bnf_var>bnf_vars) 
- { 
+ {
+	tok_struct *ntoken=tok+1;
+	if(ntoken->ttype!=TOK_EOF) { 
 	// MESG("bnf_factor_sep: < var@=%d set prev_var [%s]",VARIND,tok_info(tok));
 	prev_var("sep");
 	set_bnf_function(tok,"sep->sep1",bnf_factor_sep1);
+	} 
 	// MESG("bnf_factor_sep: >, var@=%d",VARIND);
  } else {
 	set_bnf_function(tok,"sep->sep0",bnf_factor_sep0);
@@ -1423,7 +1428,7 @@ inline static void bnf_factor_rcurl()
 
 void bnf_factor_error()
 {
- 	MESG("bnf_factor_error: [%s]",tok_info(tok));
+ 	MESG("bnf_factor_error: var@=%d  [%s]",VARIND,tok_info(tok));
 	current_active_flag=0;
 }
 

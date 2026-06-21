@@ -1,3 +1,5 @@
+# bnf1.cmd
+
 print("--- bnf1.cmd")
 
 function d2(d1)
