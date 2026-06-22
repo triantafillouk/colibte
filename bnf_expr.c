@@ -110,7 +110,7 @@ inline static void set_var_value()
 
 void bnf_refresh_ddot()
 {
- // MESG("bnf_refresh_ddot: var@=%d type=%d",VARIND,bnf_var->var_type);
+ // MESG("bnf_refresh_ddot: var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
  int stat=0;
  double value=0;
  TextPoint *tp = tok->ddot;
@@ -130,10 +130,26 @@ void bnf_refresh_ddot()
 		print_array1("array: ",var_show->adat);
 	 	// print_array1(ddot_string(),var_show->adat);
 	 };
-	 // if(tok->ttype != TOK_END) 
-	 	prev_var("ddot");
+	 tok_struct *ntoken=tok+1;
+	 if(ntoken->ttype != TOK_EOF 
+	 ) {
+		if(ntoken->ttype==TOK_SEP) {
+			ntoken++;
+			if(ntoken->ttype!=TOK_EOF 
+				// && ntoken->ttype!=TOK_RCURL
+			) {
+			 	prev_var("ddot");
+				// MESG("	prev_var ddot ntoken=[%s]",tok_info(ntoken));
+			}
+		} else {
+			prev_var("ddot2");
+			// MESG("	prev_var ddot2 ntoken=[%s]",tok_info(ntoken));
+		};
+		// MESG("	ddot prev_var ntoken=[%s]",tok_info(ntoken));
+	};//  else MESG("ntoken is  TOK_END, var@=%d",VARIND);
 	 return;
  };
+
 
  int precision=bt_dval("print_precision");
  int show_hex=bt_dval("show_hex");
@@ -343,7 +359,7 @@ inline static void  bnf_factor_np_minus()
 void set_bnf_function(tok_struct *tok, char *label, VFunction function)
 {
 	tok->bnf_factor_function=function;
-	MESG("- set bnf function: to %s var@=%d [%s]",label,VARIND,tok_info(tok));
+	MESG("- set bnf function: to %s [%s]",label,tok_info(tok));
 }
 
 static void bnf_factor_spn_plus()
@@ -1374,7 +1390,7 @@ inline static void bnf_factor_comma()
 {
  // MESG("bnf_factor_comma:");
  if(bnf_var>bnf_vars) { 
- 	MESG(";bnf_factor_comma ---  var@=%d [%s]",VARIND,tok_info(tok));
+ 	// MESG(";bnf_factor_comma ---  var@=%d [%s]",VARIND,tok_info(tok));
 	prev_var("comma");
 	set_bnf_function(tok,"comma->sep1",bnf_factor_sep1);
  } else {
@@ -1384,23 +1400,22 @@ inline static void bnf_factor_comma()
 
 inline static void bnf_factor_eof()
 {
- 	MESG("bnf_factor_EOF: var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+	if(VARIND==0) next_var("eof");
+ 	// MESG("bnf_factor_EOF: var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	current_active_flag=0;
-	next_var("eof");
 }
 
 
 inline static void bnf_factor_sep()
 {
- 
  if(bnf_var>bnf_vars) 
- {
+ { 
 	tok_struct *ntoken=tok+1;
 	if(ntoken->ttype!=TOK_EOF) { 
 	// MESG("bnf_factor_sep: < var@=%d set prev_var [%s]",VARIND,tok_info(tok));
-	prev_var("sep");
-	set_bnf_function(tok,"sep->sep1",bnf_factor_sep1);
-	} 
+		prev_var("sep");
+		set_bnf_function(tok,"sep->sep1",bnf_factor_sep1);
+	} else set_bnf_function(tok,"sep->sep0",bnf_factor_sep0);
 	// MESG("bnf_factor_sep: >, var@=%d",VARIND);
  } else {
 	set_bnf_function(tok,"sep->sep0",bnf_factor_sep0);
@@ -1428,7 +1443,7 @@ inline static void bnf_factor_rcurl()
 
 void bnf_factor_error()
 {
- 	MESG("bnf_factor_error: var@=%d  [%s]",VARIND,tok_info(tok));
+ 	MESG("bnf_factor_error: [%s]",tok_info(tok));
 	current_active_flag=0;
 }
 
@@ -1463,11 +1478,12 @@ void bnf_factor_assign_var()
 	prev_var("assign var");
 	if(bnf_var->var_type!=VTYPE_POINTER) { 
 		MESG("assign_var: var@=%d [%s]",VARIND,tok_info(tok));
-		set_error(tok,505,"cannot assign to non var!");exit(5);
+		set_error(tok,505,"cannot assign to non var!");
+		return;
     };
 	MVAR *avar=bnf_var->var_pointer;
-	int atype=bnf_var->var_type;
-	if(atype!=VTYPE_POINTER) MESG("assign_var: error not a variable!!!!");
+	// int atype=bnf_var->var_type;
+	// if(atype!=VTYPE_POINTER) MESG("assign_var: error not a variable!!!!");
 	
 	// MESG("bnf_factor_assign_var: vara@=%d atype=%d btype %d",VARIND,atype,btype);
 

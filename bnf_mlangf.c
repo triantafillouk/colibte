@@ -292,7 +292,9 @@ void bnf_print()
 				tok_struct *ptok=tok-1;
 				// MESG("-- print array: var@=%d [%s]",VARIND,tok_info(ptok));
 				avar->adat->array_name=ptok->tname;
-				print_array1("",avar->adat);break;
+				print_array1("",avar->adat);
+				snprintf(total_printed,MAXLLEN,"array [%s]",avar->adat->array_name);
+				break;
 			case VTYPE_NUM:{
 				char p_out[128];
 				long l0=avar->dval;
@@ -313,12 +315,12 @@ void bnf_print()
 		// MESG("	if: after switch tnum=%d ttype=%d",tok->tnum,tok->ttype);
 	};
 	out_print("",1);
-	// next_var("pend");
+	// prev_var("pend");
+	// out_print(total_printed,1);
 	bnf_var->var_type=VTYPE_STRING;
 	bnf_var->sval=strdup(total_printed);
 	bnf_var->var_alloced=1;
-	// MESG("	total_printed = [%s]",total_printed);
-	// MESG("bnf_print: >> end var@=%d type=%d [%s]",VARIND,bnf_var->var_type,bnf_var->sval);
+	// printf("	>>print [%s] @var=%d [%s]\n",bnf_var->sval,VARIND,tok_info(tok));
 }
 
 void bnf_show_time()
