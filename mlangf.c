@@ -812,5 +812,10 @@ double uf_to_num_array()
 {
 	return 2;
 }
+
+double uf_dofile()
+{
+	return 0;
+}
 #endif
 

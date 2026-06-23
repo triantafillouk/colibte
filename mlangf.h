@@ -58,3 +58,4 @@ double uf_var_index();
 double uf_new_array_I();
 double uf_new_array_J();
 double uf_to_num_array();
+double uf_dofile();

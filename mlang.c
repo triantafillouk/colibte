@@ -1092,8 +1092,9 @@ void update_ddot_line(char *ddot_out)
 /* execute a block from a file  */
 double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 {
+#if	TNORMAL
  double val=0;
- // int extra=0;
+#endif
  MVAR *local_symbols;
  MVAR *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
@@ -1167,8 +1168,8 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		// MESG("end of program1 var@=%d type %d",VARIND,bnf_var->var_type);
 		if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
 		// next_var("end");
-		// MESG("end of program2 var@=%d type %d",VARIND,bnf_var->var_type);
-		// if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
+		MESG("end of program2 var@=%d type %d",VARIND,bnf_var->var_type);
+		if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
 		// show_results();
 #endif
 #if	TBNFNORMAL
@@ -1180,7 +1181,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	// MESG("cleaning:");
 	if(start) {
 		if(local_symbols){
-		// MESG("	cleaning local symbols of [%s]",bp->b_fname);
+		MESG("	cleaning local symbols of [%s]",bp->b_fname);
 		if(bp->symbol_tree){
 			delete_symbol_table(local_symbols,bp->symbol_tree->items,0);
 			bp->symbol_tree=NULL;
@@ -1226,11 +1227,13 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 #endif
  } else {
  	msg_line("parse error %d on %s ",err_num,bp->b_fname);
+#if	TNORMAL
 	val=0;
+#endif
  };
  tok=old_tok;
- // MESG("compute_block return %f",val);
- return(val); 
+ // MESG("compute_block return %f %f",val,num_result());
+ return(num_result()); 
 }
 
 int empty_tok_table(FILEBUF *fp)

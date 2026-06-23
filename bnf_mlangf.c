@@ -900,6 +900,41 @@ void bnf_to_num_array()
 	};
 	set_error(tok,4001,"cannot convert to numeric array");
 }
+int dofile(char *fname);
+
+void bnf_dofile()	
+{
+	char *fname;	/* name of file to execute */
+	char *fspec=NULL;		/* full file spec */
+	MESG("bnf_dofile:");
+	bnf_function_args(1);
+	MVAR *va=bnf_var;
+	if(va->var_type==VTYPE_POINTER) va=va->var_pointer;
+	if(va->var_type!=VTYPE_STRING) {
+		set_error(tok,4004,"dofile: argument not a file name!");
+		return;
+	};
+	fname = va->sval;
+
+	/* look up the path for the file */
+	if(fname[0]!='/' && fname[0]!=CHR_LBRA) fspec = find_file("cmds",fname,1,0);
+	else fspec=fname;
+	if(fspec==NULL) fspec=fname;	/* if not found try relative to current dir!  */
+	/* if it isn't around */
+	if (fspec == NULL)	{
+
+		if(get_filebuf(fname,NULL,0)!=NULL) fspec=fname;
+		else {
+			set_error(tok,4005,"dofile: file not found!");
+			return ;
+		};
+	};
+	// MESG("dofile: [%s]",fspec);
+
+	int stat=dofile(fspec);
+	double value=num_result();
+	MESG("bnf_dofile: stat=%d var@=%d val=%f",stat,varind(),value);
+}
 
 v_function bnf_functions[] = {
 	{"len",1,bnf_len},        /* STRING LENGTH */
@@ -958,6 +993,7 @@ v_function bnf_functions[] = {
 	{"to_num_array",1,bnf_to_num_array},	/* convert to numeric array  */
 	{"J",2,bnf_new_array_J},	/* new all 1 array  */
 	{"I",1,bnf_new_array_I},	/* new identity array  */
+	{"do_file",1,bnf_dofile},	/* execute a file  */
 	// {"array_fixed_to_num",1,bnf_array_fixed_to_num},
 	{NULL,0,NULL}
 };

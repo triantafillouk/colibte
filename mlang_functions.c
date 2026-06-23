@@ -61,7 +61,7 @@ m_function m_functions[] = {
 	{"to_num_array",1,uf_to_num_array},	/* convert to numeric array  */
 	{"J",2,uf_new_array_J},	/* new all 1 array  */
 	{"I",1,uf_new_array_I},	/* new identity array  */
-
+	{"do_file",-1,uf_dofile},	/* execute a file  */
 	// {"array_fixed_to_num",1,uf_array_fixed_to_num},
 	{NULL,0,NULL}
 };

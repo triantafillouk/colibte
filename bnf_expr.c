@@ -193,11 +193,12 @@ void bnf_refresh_ddot()
  // NTOKEN2;
 }
 
-inline static double num_result()
+double num_result()
 {
   // MESG("num_result: %s",tok_info(tok));
   MVAR *num_var = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer:bnf_var;
   if(num_var->var_type==VTYPE_NUM) {
+	MESG("	num_result: var@=%d %f",VARIND,num_var->dval);
  	return num_var->dval;
   };
   return 0.0;
@@ -3188,17 +3189,16 @@ void bnf_factor_cmd()
 	err_line=tok->tline;
 	err_str=NULL;
 	// MESG(";<factor_cmd: before ed_command: var@=%d type=%d",VARIND,bnf_var->var_type);
-	value=(double)ed_command->n_func((num)value);
+	int stat=ed_command->n_func((num)value);
 	macro_exec = save_macro_exec;
-#if	1
+
+	// double pvalue=num_result();
+	// MESG("	after cmd: var@=%d",VARIND);
+	if(bnf_var->var_type==VTYPE_NUM) MESG("	numeric val=%f %f",bnf_var->dval,value);
 	prev_var("");
 	bnf_var->var_type=VTYPE_NUM;
-	bnf_var->dval=value;
-#else
-	if(bnf_var->var_type==VTYPE_NUM) {
-		// MESG("exec result=%f",bnf_var->dval);
-	};
-#endif
+	bnf_var->dval=stat;
+
 	// MESG(";>factor_cmd: after ed_command: var@=%d type=%d value=%f",VARIND,bnf_var->var_type,value);
 	if(check_par) { 
 		if(check_rparenthesis()) {

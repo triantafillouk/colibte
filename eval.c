@@ -697,6 +697,8 @@ int execsub(num n)
 	return(exec_named_function(subname));
 }
 
+double num_result();
+
 /* find and execute a macro file */
 int exec_file(num n)	
 {
@@ -725,11 +727,11 @@ int exec_file(num n)
 	while (n-- > 0) 
 	{
 		status=dofile(fspec);
-		MESG("exec_file: return status = %d val=%f",status,get_val());
+		MESG("exec_file: return status = %d var@=%d val=%f",status,varind(),get_val());
 		
 		if (status != TRUE) return(status);
 	};
-	return(TRUE);	/* ERROR when it returns CHECK!! FIXIT!!!!  */
+	return(TRUE);	/* status return! */
 }
 
 extern int show_stage;
@@ -768,7 +770,7 @@ int dofile(char *fname)
 	/* go execute it! */
 	int backup_caf=get_active_flag();
 	double d = compute_block(bp,bp,1);
-	MESG("dofile: after compute_block:");
+	MESG("dofile: after compute_block: var@=%d",varind());
 	if(err_num>0) return (FALSE);
 	init_error();
 	set_vdval(d);
