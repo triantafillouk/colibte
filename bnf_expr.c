@@ -1786,6 +1786,9 @@ void bnf_dir_fori()
 		for(;*iterrator_val < dmax; *iterrator_val +=dstep) {
 			tok=start_block;
 			// MESG("# fori: iterrator_val=%3f var@=%d, [%s]",*iterrator_val,VARIND,tok_info(tok));
+#if	TPROFILE
+			var_index -= (VARIND-start_var);
+#endif
 			bnf_var=bnf_vars+start_var;
 			bnf_block1();
 			
@@ -1799,6 +1802,10 @@ void bnf_dir_fori()
 	} else if(dstep<0 && dmax< *iterrator_val) {
 		for(; *iterrator_val > dmax; *iterrator_val +=dstep) {
 			tok=start_block;
+#if	TPROFILE
+			var_index -= (VARIND-start_var);
+#endif
+			bnf_var=bnf_vars+start_var;
 			bnf_block1();
 			if(current_active_flag==0) {
 				if(is_break1) { tok=exe_buffer->end_token;return;};
@@ -1815,25 +1822,20 @@ void bnf_dir_fori()
 			for(;*iterrator_val < dmax; *iterrator_val +=dstep) {
 				tok=start_block;
 				// MESG("# fori: iterrator_val=%3f var@=%d, [%s]",*iterrator_val,VARIND,tok_info(tok));
-				bnf_var=bnf_vars+start_var;
-#if	1
-				bnf_expression0();
-#else
-				bnf_expression();
+#if	TPROFILE
+			var_index -= (VARIND-start_var);
 #endif
-				// prev_var("fori");
-				// MESG("	fori:2 iterrator_val=%3f var@=%d, [%s]",*iterrator_val,VARIND,tok_info(tok));
+				bnf_var=bnf_vars+start_var;
+				bnf_expression0();
 			};
 		} else if(dstep<0 && dmax< *iterrator_val) {
 			for(; *iterrator_val > dmax; *iterrator_val +=dstep) {
+#if	TPROFILE
+			var_index -= (VARIND-start_var);
+#endif
 				bnf_var=bnf_vars+start_var;
 				tok=start_block;
-#if	1
 				bnf_expression0();
-#else
-				bnf_expression();
-#endif
-				// prev_var("fori");
 			};
 		} else {
 			err_num=226;
@@ -1856,11 +1858,7 @@ void bnf_dir_for()
 
 	// MESG("-- dir_for:start var@=%d active = %d [%s]",VARIND,current_active_flag,tok_info(tok));	
 	NTOKEN2;	/* go to next token after for */
-#if	1
 	bnf_expression0();
-#else
-	bnf_expression();	/* initial   */
-#endif
 	prev_var("for init");
 	// MESG("	for: after init expression: [%s]",tok_info(tok));
 	NTOKEN2;	/* skip separator! */
@@ -1905,7 +1903,6 @@ void bnf_dir_for()
 #endif
 				prev_var("for");
 			};
-			// bnf_var=bnf_vars+ind;
 			if(current_active_flag==0) {
 				tok--;
 				// MESG("	for: break: var@=%d [%s]",VARIND,tok_info(tok));
@@ -2150,10 +2147,9 @@ void bnf_factor_proc()
 	// MESG("factor_proc: tok  [%d %s] %d ",tok->tnum,tok->tname,tok->tind);
 
 	bnf_exec_function(tok0->proc_buffer,tok0->t_nargs);
-
 	memmove(result_var,bnf_var,sizeof(MVAR));
 #if	TPROFILE
-	var_index -= (int)(bnf_var-result_var-1);
+	var_index -= (int)(bnf_var-result_var);
 #endif
 #if	0
 //	clean used strings
@@ -2219,8 +2215,8 @@ void bnf_dir_else()
 void show_var_stats()
 {
 #if	TPROFILE
-// 	fprintf(stderr,"MVAR index=%ld var@=%d max=%ld\n",var_index,VARIND,max_var);
-	MESG("MVAR index=%ld var@=%d max=%ld",var_index,VARIND,max_var);
+	fprintf(stderr,"MVAR index=%ld var@=%d max=%ld\n",var_index,VARIND,max_var);
+	// MESG("MVAR index=%ld var@=%d max=%ld",var_index,VARIND,max_var);
 #endif
 }
 
