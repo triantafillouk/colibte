@@ -1417,13 +1417,21 @@ int parse_buffer_show_tokens(num n)
  // clear out buffer
  cls_fout("[out]");
  err_num=check_init(fp);
+#if	TBNF
+ tok_ind=fp->tok_table_bnf;
+#else
  tok_ind=fp->tok_table;
+#endif
  // MESG("Print token table to out buffer");
  if(tok_ind==NULL) {
 	msg_line("parsing buffer produced no table!");
 	return(0);
  };
- out_print("|-------- Token list -----------------------------------",1);
+#if	TBNF
+ out_print("|-------- Token list bnf -----------------------------------",1);
+#else
+ out_print("|-------- Token list ---------------------------------------",1);
+#endif
  // if(tok_ind==NULL) return 0;
  while(1)
  {
@@ -1499,10 +1507,9 @@ char * tok_info(tok_struct *tok)
 			};
 		} else if(tok->ttype==TOK_VAR) {
 			// MESG("TOK_VAR:");
-			BTNODE *var_node = tok->tok_node;
-			int size=0;
 			int vtype=0;
 #if	0
+			BTNODE *var_node = tok->tok_node;
 			char *var_name="unknown";
 			if(var_node!=NULL) {
 				vtype=var_node->node_vtype;
@@ -1511,14 +1518,22 @@ char * tok_info(tok_struct *tok)
 #endif
 			// MESG("TOK_VAR: vtype=%d",vtype);
 			// MESG("tok_info var! ind=[%d] group=%d vtype=%d",tok->tind,tok->tgroup,vtype);
+			MVAR *var=NULL;
+			if(current_stable) 
+				var = &current_stable[tok->tind];
+			if(var!=NULL) vtype=var->var_type;
+#if	0
+			int size=0;
 			if(vtype==VTYPE_TREE) {
 				BTREE *type_tree=(BTREE *)var_node->node_dat;
 				size = type_tree->items;
 			};
-			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-
 			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] %8s %d size %d [bnf=%2d] fi=%d",
 				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,vtype_names[vtype] ,vtype,size,tok->bnf_group,tok->function_index);
+#else
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] %8s %d [bnf=%2d] fi=%d",
+				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,vtype_names[vtype] ,vtype,tok->bnf_group,tok->function_index);
+#endif
 		} else {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
 			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->bnf_group,tok->function_index);
