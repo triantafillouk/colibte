@@ -18,7 +18,7 @@ GVERS := $(shell git log -1 --pretty=tformat:%h,%s)
 ctxe : XLIB=1
 ctxe : _X11_=1
 ctxe : PCURSES=0 
-cteg2 : XPLOT=1
+ctg2 : XPLOT=1
 ctxe: TNOTES=1
 ctxe: USE_GLIB=0
 ctxe : SQLITE3=`pkg-config sqlite3 --libs`

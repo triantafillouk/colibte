@@ -1233,7 +1233,11 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  };
  tok=old_tok;
  // MESG("compute_block return %f %f",val,num_result());
+#if	TBNF
  return(num_result()); 
+#else
+ return(val);
+#endif
 }
 
 int empty_tok_table(FILEBUF *fp)

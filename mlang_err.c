@@ -2018,7 +2018,9 @@ int err_check_sentence1()
 		stack_push("DIR_FORI",tok,-tok->ttype);
 #endif
 		NTOKEN_ERR(640);	/* go to next token after for */
+#if	TBNF
 		tok_struct *tok0=NULL;
+#endif
 		if(tok->ttype==TOK_VAR) {
 			// MESG_TOK_INFO(" loop var",tok);
 #if	TBNF
@@ -2029,7 +2031,9 @@ int err_check_sentence1()
 			if(tok->ttype!=TOK_ASSIGN) {
 				ERROR("6404:for i error");
 			} else {
+#if	TBNF
 				tok0=tok;
+#endif
 				// MESG_TOK_INFO(" equal to",tok);
 			};
 		} else ERROR("6405:for i syntax error");
@@ -2174,7 +2178,7 @@ int err_check_sentence1()
 #endif
 		NTOKEN_ERR(663);
 		RT_MESG;
-	case TOK_DIR_RETURN:
+	case TOK_DIR_RETURN:{
 		// MESG("# err_check_sentence: %s",tok_info(tok));
 #if	TNORMAL
 		set_tok_directive(tok,dir_return);
@@ -2200,7 +2204,7 @@ int err_check_sentence1()
 #endif
 		check_skip_token1(TOK_RPAR);
 		// MESG(" err TOK_DIR_RETURN: after lexpression: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype); 
-		RT_MESG1(666);
+		};RT_MESG1(666);
 	case TOK_SEP:
 #if	TBNF
 		stack_push("sep ",tok,-tok->ttype);

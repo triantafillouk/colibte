@@ -727,8 +727,9 @@ int exec_file(num n)
 	while (n-- > 0) 
 	{
 		status=dofile(fspec);
+#if	TBNF
 		MESG("exec_file: return status = %d var@=%d val=%f",status,varind(),get_val());
-		
+#endif
 		if (status != TRUE) return(status);
 	};
 	return(TRUE);	/* status return! */
@@ -770,7 +771,9 @@ int dofile(char *fname)
 	/* go execute it! */
 	int backup_caf=get_active_flag();
 	double d = compute_block(bp,bp,1);
+#if	TBNF
 	MESG("dofile: after compute_block: var@=%d",varind());
+#endif
 	if(err_num>0) return (FALSE);
 	init_error();
 	set_vdval(d);
