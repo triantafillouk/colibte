@@ -46,7 +46,7 @@ void list_buffers(char *position)
 	MESG("list_buffers: %s",position);
 	// get first scratch buffer
 	lbegin(file_list);
-	while((bp = (FILEBUF *)lget(file_list))!=NULL){
+	while((bp = lget(file_list))!=NULL){
 		MESG(" [%s] - buffer:[%d] [%s] %lX",position,bp->b_index,bp->b_fname,(long)bp);
 	};
 }

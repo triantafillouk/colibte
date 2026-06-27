@@ -1171,12 +1171,21 @@ int err_factor()
 	case TOK_ENV:	// 1 editor env var
 		/* variable's name in tok0->tname */
 		var_node=tok0->tok_node;
+		// MESG("+ TOK_ENV tok0=[%s]",tok_info(tok0));
+		// MESG("           tok=[%s]",tok_info(tok));
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
 		tok0_bnf->tok_node=var_node;
 #endif
 		pre_symbol=0;
 		ex_nvars++;
+		if(tok->ttype==TOK_ASSIGNENV) {
+			// MESG("set normal assign [%s]",tok_info(tok));
+			assign_type_to=0;
+			tok->tname = tok0->tname;
+			tok->dval=var_node->node_index;
+			// MESG("	env_name_to_assign: %s ind=%d [%s]",tok0->tname,var_node->node_index,tok_info(tok));
+		};
 		RT_MESG1(495);
 	case TOK_FUNC:	// 2 editor function 
 		/* variable's name in tok0->tname */

@@ -184,13 +184,13 @@ BTNODE *find_bt_element(char *name)
 /* This is editors environment get function */
 double get_env(int vnum)
 {
-	// char *getkill();
 	static double value=0;
 	char svalue[MAXLLEN];
 	long v1=0;
 	svalue[0]=0;
 
 	/* fetch the appropriate value */
+	// MESG("get_env: %d",vnum);
 	if(cbfp == NULL) return(0.0);
 	switch (vnum) {
 		case EVCFNAME:	
@@ -219,17 +219,23 @@ double get_env(int vnum)
 			break;
 		case EVCWROW:	v1 = getwline();break;
 		case EVWCOLS:	
-			v1 = cwp->w_ntcols;
+			if(cwp) v1 = cwp->w_ntcols;
 			break;
-		case EVWROWS:	v1 = cwp->w_ntrows;break;
+		case EVWROWS:	
+			if(cwp) v1 = cwp->w_ntrows;
+			break;
 		case EVFOUND:	v1 = found;break;
 		case EVNWORD:	
 			strlcpy(svalue,getnword(),MAXLLEN);
 			break;
 		case EVDEBUG:	v1=debug_flag(); return(v1); break;
 
-		case EVFCOLOR:	v1=cwp->w_fcolor;break;
-		case EVBCOLOR:	v1=cwp->w_bcolor;break;
+		case EVFCOLOR:	
+			if(cwp) v1=cwp->w_fcolor;
+			break;
+		case EVBCOLOR:	
+			if(cwp) v1=cwp->w_bcolor;
+			break;
 
 		case EVCASE:	v1=gmode_exact_case;break;
 		case EVOVER:	v1=gmode_over;break;
@@ -245,6 +251,7 @@ double get_env(int vnum)
 			return value;
 	};
 	value=v1;
+	// MESG("	svalue=[%s] value=%f",svalue,value);
 	if(svalue[0]!=0) { 
 		set_sval(svalue);	
 	} else {
@@ -482,7 +489,7 @@ void set_env(int vnum,char *svalue,double value)
 		case EVCFNAME:	// set current file name
 				strlcpy(cbfp->b_fname, svalue,MAXFLEN);
 				/* update mode lines */
-				set_update(cwp,UPD_STATUS);
+				if(cwp) set_update(cwp,UPD_STATUS);
 				break;
 		case EVCURCHAR:	// replace current character
 				forw_delete(1);	/* delete 1 char */
@@ -498,13 +505,14 @@ void set_env(int vnum,char *svalue,double value)
 		case EVREPLACE:	strlcpy(replace_pattern, svalue,MAXLLEN);
 				break;
 		case EVCURCOL:
+			if(cwp){
 				textpoint_set_lc(cwp->tp_current,
-					tp_line(cwp->tp_current),v1);
-				break;
+				tp_line(cwp->tp_current),v1);
+			};break;
 		case EVCURLINE:	goto_line(v1);
 				break;
 		case EVCURPOS: 
-				textpoint_set(cwp->w_fp->tp_current,v1);
+				if(cwp) textpoint_set(cwp->w_fp->tp_current,v1);
 				break;
 		// _base_name is read only
 		// _lastkey is read only ??
@@ -512,13 +520,13 @@ void set_env(int vnum,char *svalue,double value)
 				break;
 		case EVTEXT:	set_linetext(svalue);break;
 		case EVCWROW:	
-			igotolinecol(v1+tp_line(cwp->tp_hline),1,0);
+			if(cwp) igotolinecol(v1+tp_line(cwp->tp_hline),1,0);
 				break;
 		case EVWCOLS: 
-				vresize_wind(-cwp->w_ntcols+(int)v1);
+			if(cwp) vresize_wind(-cwp->w_ntcols+(int)v1);
 				break;
 		case EVWROWS: 
-				hresize_wind(-cwp->w_ntrows+(int)v1);
+			if(cwp)	hresize_wind(-cwp->w_ntrows+(int)v1);
 				break;
 		// _found is read only
 		// _next_word is read only
@@ -527,20 +535,22 @@ void set_env(int vnum,char *svalue,double value)
 				return;
 				break;
 		case EVFCOLOR: 
-			cwp->w_fcolor=value;
-			set_update(cwp,UPD_WINDOW);
-			break;
+			if(cwp){
+				cwp->w_fcolor=value;
+				set_update(cwp,UPD_WINDOW);
+			} ;break;
 		case EVBCOLOR: 
-			cwp->w_bcolor=value;
-			set_update(cwp,UPD_WINDOW);
-			break;
+			if(cwp){
+				cwp->w_bcolor=value;
+				if(cwp) set_update(cwp,UPD_WINDOW);
+			} break;
 		case EVCASE: 
 			gmode_exact_case=value;
-			set_update(cwp,UPD_STATUS);
+			if(cwp) set_update(cwp,UPD_STATUS);
 			break;
 		case EVOVER: 
 			gmode_over=value;
-			set_update(cwp,UPD_STATUS);
+			if(cwp) set_update(cwp,UPD_STATUS);
 			break;
 		case EVREGEXP:
 			gmode_reg_exp=value;	// ?????

@@ -513,7 +513,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	return (0);
  };
 
- MESG("- Parse_block1 [%s] type=%d <---------------------",bf->b_fname,bf->b_type);
+ MESG("<-- Parse_block1 [%s] type=%d ---------------------",bf->b_fname,bf->b_type);
  if(is_mlang(bf)) script_active=1;	/* initial script state  */
 
  if(init && bf->tok_table!=NULL) {
@@ -550,7 +550,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 #endif
  skip_tag_header(bf);
 
- MESG("--- [%s] Start parsing block loop <-------------------------------",bf->b_fname);
+ MESG("	--- [%s] Start parsing block loop -------------------------------",bf->b_fname);
 
  while(getnc1(bf,&cc,&tok_type))
  {
@@ -1132,7 +1132,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
   
-  MESG("parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
+  MESG("	parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
  	/* add eof token!  */
 	if(tok_type!=TOK_SEP) 
 	{	
@@ -1148,7 +1148,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			tok->tname="end sep";
 		};
 	};
-	MESG("parse_block1: set end token");
+	// MESG("parse_block1: set end token");
 	bf->end_token=tok;	/* save end token  */
 	// ADD_TOKEN("end token");
 	tok->ttype=TOK_EOF;
@@ -1193,7 +1193,7 @@ void set_tok_table(FILEBUF *bf)
  alist *lex_parser = bf->lex_parser;
  int isize=0;
  int table_size = lex_parser->size+1;
- MESG("set_tok_table: [%s] create token table from token list size of %d!",bf->b_fname,lex_parser->size);
+ MESG("	- set_tok_table: [%s] create token table from token list size of %d!",bf->b_fname,lex_parser->size);
  if(bf->tok_table != NULL) {
  	free(bf->tok_table);
  };
@@ -1206,7 +1206,7 @@ void set_tok_table(FILEBUF *bf)
  bf->tok_bnf_index=0;
  bf->tok_bnf = bf->tok_table_bnf;
  
- MESG("-----> set tok_table_bnf: bf=[%s] at %p size %d",bf->b_fname,bf->tok_table_bnf,table_size);
+ MESG("	-- set tok_table_bnf: bf=[%s] at %p size %d",bf->b_fname,bf->tok_table_bnf,table_size);
  //eval_curl_match(NULL); // initialize curl stack
 
 #endif

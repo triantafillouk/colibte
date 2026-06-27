@@ -1169,7 +1169,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
 		// next_var("end");
 		MESG("end of program2 var@=%d type %d",VARIND,bnf_var->var_type);
-		if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
+		// if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
 		// show_results();
 #endif
 #if	TBNFNORMAL
@@ -1181,7 +1181,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	// MESG("cleaning:");
 	if(start) {
 		if(local_symbols){
-		MESG("	cleaning local symbols of [%s]",bp->b_fname);
+		// MESG("	cleaning local symbols of [%s]",bp->b_fname);
 		if(bp->symbol_tree){
 			delete_symbol_table(local_symbols,bp->symbol_tree->items,0);
 			bp->symbol_tree=NULL;

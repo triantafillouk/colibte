@@ -198,7 +198,7 @@ double num_result()
   // MESG("num_result: %s",tok_info(tok));
   MVAR *num_var = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer:bnf_var;
   if(num_var->var_type==VTYPE_NUM) {
-	MESG("	num_result: var@=%d %f",VARIND,num_var->dval);
+	// MESG("	num_result: var@=%d %f",VARIND,num_var->dval);
  	return num_var->dval;
   };
   return 0.0;
@@ -1568,6 +1568,7 @@ void bnf_factor_env()
 	bte=tok->tok_node;
 	// var_node=bte;
 	// MESG("factor_env: set var_node [%s]",tok_info(tok));
+	// MESG("	bte node index=%d",bte->node_index);
 	// MESG("	env node name [%s] vtype=%d index=%d",bte->node_name,bte->node_vtype,bte->node_index);
 #if	1
 	get_env(bte->node_index);
@@ -1587,15 +1588,27 @@ void bnf_assign_env()
 {
 	// MESG("bnf_assign_env:");
 	int left_index;
-	left_index=var_node->node_index;
+	left_index=tok->dval;
 	// MESG("assign_env: left_index=%d",left_index);
 	MVAR *var=bnf_var;
 	prev_var("assign_env");
 	if(var->var_type==VTYPE_POINTER) var=bnf_var->var_pointer;
-	if(var->var_type==VTYPE_NUM) set_env(left_index,"",var->dval);
-	else if(var->var_type==VTYPE_STRING) set_env(left_index,var->sval,0);
-	else MESG("bnf_assign_env type=%d not correct!",var->var_type);
-	var_node=NULL;
+	// MESG("assign_env: type=%d ind=%d",bnf_var->var_type,left_index);
+	if(var->var_type==VTYPE_NUM) {
+		set_env(left_index,"",var->dval);
+		bnf_var->dval=var->dval;
+		bnf_var->var_type=VTYPE_NUM;
+	} else if(var->var_type==VTYPE_STRING) {
+		set_env(left_index,var->sval,0);
+		bnf_var->sval=var->sval;
+		bnf_var->var_type=VTYPE_STRING;
+		bnf_var->var_alloced=var->var_alloced;
+		var->var_alloced=0;
+	} else {
+		MESG("bnf_assign_env error type=%d not correct!",var->var_type);
+		bnf_var->dval=0;
+		bnf_var->var_type=VTYPE_NUM;
+	};
 }
 
 void bnf_assign_opt()
