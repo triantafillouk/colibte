@@ -1452,19 +1452,29 @@ void bnf_factor_error()
 inline static void bnf_factor_assign_var_num()
 {
 	double bval=bnf_var->dval;
+#if	1
+	MVAR *avar=get_left_slot(tok->tind);
+	avar->dval=bval;
+#else
 	prev_var("assign_var_num");
 	bnf_var->var_pointer->dval=bval;
 	// MESG("assign_var numeric %f",bval);
 	// bnf_var->dval=bval;
 	// bnf_var->var_type=VTYPE_NUM;
+#endif
 }
 
 inline static void bnf_factor_assign_var_nump()
 {
 	double bval=bnf_var->var_pointer->dval;
+#if	1
+	MVAR *avar=get_left_slot(tok->tind);
+	avar->dval=bval;
+#else
 	prev_var("assign_var_nump");
 	// MESG("assign_var to var %f",bval);
 	bnf_var->var_pointer->dval=bval;
+#endif
 	bnf_var->dval=bval;
 	bnf_var->var_type=VTYPE_NUM;
 }
@@ -1474,21 +1484,91 @@ void bnf_factor_assign_var()
 	MVAR *bvar=bnf_var;
 	int btype=bvar->var_type;
 	char *var_name = tok->tname;
-
-	// MESG("bnf_factor_assign_var: name=%s bvar@=%d [%s]",var_name,VARIND,tok_info(tok));
-	prev_var("assign var");
-	if(bnf_var->var_type!=VTYPE_POINTER) { 
-		MESG("assign_var: var@=%d [%s]",VARIND,tok_info(tok));
-		set_error(tok,505,"cannot assign to non var!");
-		return;
-    };
-	MVAR *avar=bnf_var->var_pointer;
+	// MESG("bnf_factor_assign_var: %d",tok->tind);
+	// MESG("	bvar value=%f",bvar->dval);
+	MVAR *aval=get_left_slot(tok->tind);
+	// MESG("assign var %s at slot %d",tok->tname,tok->tind);
 	// int atype=bnf_var->var_type;
 	// if(atype!=VTYPE_POINTER) MESG("assign_var: error not a variable!!!!");
 	
 	// MESG("bnf_factor_assign_var: vara@=%d atype=%d btype %d",VARIND,atype,btype);
 
+
+	if(btype==VTYPE_POINTER) {
+		// MESG("bvar is pointer");
+		bvar = bvar->var_pointer;
+	};
+	// MESG("	bvar=%d",bvar->var_type);
+	aval->var_type = bvar->var_type;
+	// MESG("	aval:");
+	if(bvar->var_type==VTYPE_NUM) { 
+		aval->dval = bvar->dval;
+		// MESG("	bval=%f",bvar->dval);
+		bnf_var->var_type = aval->var_type;
+		bnf_var->dval = aval->dval;
+		// MESG("	assign set aval to %f tok [%s]",aval->dval,tok_info(tok));
+		if(btype==VTYPE_POINTER) {
+			// tok->bnf_factor_function=bnf_factor_assign_var_nump;
+			// MESG("set factor_function to assign_var_nump [%s]",tok_info(tok));
+			set_bnf_function(tok,"assign_var_nump",bnf_factor_assign_var_nump);
+		};
+		if(btype==VTYPE_NUM) {
+			// tok->bnf_factor_function=bnf_factor_assign_var_num;
+			// MESG("set factor_function to assign_var_num [%s]",tok_info(tok));
+			set_bnf_function(tok,"assign_var_num",bnf_factor_assign_var_num);
+		};
+		return;
+	};
+	if(bvar->var_type==VTYPE_STRING) {
+		if(aval->var_type==VTYPE_STRING) {
+			if(aval->var_alloced) free(aval->sval);
+		} else aval->var_type=VTYPE_STRING;
+		aval->sval = strdup(bvar->sval);
+		// bnf_var->sval = aval->sval;
+		return;
+	};
+	
+	// set for any different type!
+	if(bvar->var_type==VTYPE_ARRAY
+		||bvar->var_type==VTYPE_AMIXED
+		||bvar->var_type==VTYPE_SARRAY) {
+		// MESG("assign var array! to name '%s'",var_name);
+#if	0
+		if(btype!=VTYPE_POINTER) { // set the array name!
+			bvar->adat->array_name = strdup(tok->tname);
+		};
+#endif
+		bnf_var->var_type=bvar->var_type;
+		bnf_var->adat=bvar->adat;
+		bnf_var->var_alloced=bvar->var_alloced;
+		bvar->var_alloced=0;
+		bvar->adat->array_name=var_name;
+		// print_array1("after array assign",bnf_var->adat);
+		return;
+	};
+	set_error(tok,102,"assign operation not supported yet");
+}
+
+void bnf_factor_assign_iterator()
+{
+	MVAR *bvar=bnf_var;
+	int btype=bvar->var_type;
+	char *var_name = tok->tname;
+
+	// MESG("bnf_factor_assign_var: name=%s bvar@=%d [%s]",var_name,VARIND,tok_info(tok));
+	prev_var("assign var");
+	if(bnf_var->var_type!=VTYPE_POINTER) { 
+		// MESG("assign_var: var@=%d [%s]",VARIND,tok_info(tok));
+		set_error(tok,505,"cannot assign to non var!");
+		return;
+    };
+	MVAR *avar=bnf_var->var_pointer;
 	MVAR *aval=bnf_var->var_pointer;
+	// int atype=bnf_var->var_type;
+	// if(atype!=VTYPE_POINTER) MESG("assign_var: error not a variable!!!!");
+	
+	// MESG("bnf_factor_assign_var: vara@=%d atype=%d btype %d",VARIND,atype,btype);
+
 
 	if(btype==VTYPE_POINTER) {
 		// MESG("bvar is pointer");
@@ -1533,12 +1613,12 @@ void bnf_factor_assign_var()
 			bvar->adat->array_name = strdup(tok->tname);
 		};
 #endif
-		avar->var_type=bvar->var_type;
-		avar->adat=bvar->adat;
-		avar->var_alloced=bvar->var_alloced;
+		bnf_var->var_type=bvar->var_type;
+		bnf_var->adat=bvar->adat;
+		bnf_var->var_alloced=bvar->var_alloced;
 		bvar->var_alloced=0;
 		bvar->adat->array_name=var_name;
-		// print_array1("after array assign",avar->adat);
+		// print_array1("after array assign",bnf_var->adat);
 		return;
 	};
 	set_error(tok,102,"assign operation not supported yet");

@@ -637,6 +637,7 @@ int err_factor()
  tok_struct *tok0_bnf=NULL;
 
  if(tok->ttype!=TOK_NOT && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_MINUS && tok->ttype!=TOK_PLUS) {
+	if(tok->ttype!=TOK_VAR)
  	tok0_bnf=stack_push("factor",tok,tok->ttype);	// ????
  };
 #endif
@@ -658,6 +659,10 @@ int err_factor()
  	// MESG("unknown token type %d line %d %d",tok0->ttype,tok0->tline,last_correct_line);
 	err_num=4730;
 	return(err_num);
+ };
+
+ if(tok0->ttype==TOK_VAR && tok->ttype != TOK_ASSIGN) {
+ 	tok0_bnf=stack_push("factor",tok0,tok0->ttype);
  };
  // set_tok_function(tok0,0);
  // MESG("switch  : tok0 %s",tok_info(tok0));
@@ -798,6 +803,7 @@ int err_factor()
 			// MESG("set normal assign [%s]",tok_info(tok));
 			assign_type_to=0;
 			tok->tname = tok0->tname;
+			tok->tind = tok0->tind;
 			// MESG("	var_name_to_assign: %s [%s]",tok0->tname,tok_info(tok));
 		};
 		// MESG("	TOK_VAR: return [%s]",tok_info(tok));
@@ -2029,12 +2035,14 @@ int err_check_sentence1()
 		NTOKEN_ERR(640);	/* go to next token after for */
 #if	TBNF
 		tok_struct *tok0=NULL;
+		tok_struct *tok_var=tok;
+		tok_struct *tok0_bnf=NULL;
 #endif
 		if(tok->ttype==TOK_VAR) {
 			// MESG_TOK_INFO(" loop var",tok);
 #if	TBNF
 			tok->bnf_group=TOK_BOOL;
-			stack_push("loop var",tok,tok->ttype);
+			tok0_bnf=stack_push("loop var",tok,tok->ttype);
 #endif
 			NTOKEN_ERR(6403);
 			if(tok->ttype!=TOK_ASSIGN) {
@@ -2049,7 +2057,10 @@ int err_check_sentence1()
 		NTOKEN_ERR(64053);
 		err_num=err_num_expression();	/* initial   */
 #if	TBNF
-		stack_push("for i assign",tok0,tok0->ttype);
+		tok0_bnf=stack_push("for i assign",tok0,tok0->ttype);
+		tok0_bnf->tname = tok_var->tname;
+		tok0_bnf->tind = tok_var->tind;
+		tok0_bnf->bnf_factor_function=bnf_factor_assign_iterator;
 #endif
 		if(err_num) return(err_num);
 		CHECK_TOK(6406);
