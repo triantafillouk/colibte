@@ -661,7 +661,7 @@ int err_factor()
 	return(err_num);
  };
 
- if(tok0->ttype==TOK_VAR && tok->ttype != TOK_ASSIGN) {
+ if(tok0->ttype==TOK_VAR && tok->ttype != TOK_ASSIGN && tok->ttype!=TOK_INCREASEBY) {
  	tok0_bnf=stack_push("factor",tok0,tok0->ttype);
  };
  // set_tok_function(tok0,0);
@@ -800,6 +800,13 @@ int err_factor()
 			NTOKEN_ERR(4982);
 		};
 		if(tok->ttype==TOK_ASSIGN) {
+			// MESG("set normal assign [%s]",tok_info(tok));
+			assign_type_to=0;
+			tok->tname = tok0->tname;
+			tok->tind = tok0->tind;
+			// MESG("	var_name_to_assign: %s [%s]",tok0->tname,tok_info(tok));
+		};
+		if(tok->ttype==TOK_INCREASEBY) {
 			// MESG("set normal assign [%s]",tok_info(tok));
 			assign_type_to=0;
 			tok->tname = tok0->tname;
@@ -1763,7 +1770,7 @@ int err_lexpression()
 #if	TNORMAL
 			set_term_function(tok,(TFunction)increase_by);
 #endif
-			tok->tname = "+=";
+			// tok->tname = "+=";
 			// tok0=tok;
 			NTOKEN_ERR(710);
 			err_num=err_increase_by();

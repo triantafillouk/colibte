@@ -1179,21 +1179,26 @@ inline static void bnf_increase_by()
 {
 	// MESG("bnf_factor_increase_by: [%s]",tok_info(tok));
 	MVAR *bvar=bnf_var;
-	int btype=bvar->var_type;
+	// int btype=bvar->var_type;
+	if(bvar->var_type==VTYPE_POINTER) {
+		bvar = bvar->var_pointer;
+	};
+
+#if	1
+	MVAR *avar=get_left_slot(tok->tind);
+#else
 	prev_var("inc by");
 
 	int atype=bnf_var->var_type;
 	MVAR *avar=bnf_var->var_pointer;
-	if(bvar->var_type==VTYPE_POINTER) {
-		bvar = bvar->var_pointer;
-	};
+#endif
 	if(bvar->var_type==VTYPE_NUM) {
 		if(avar->var_type==VTYPE_NUM) {
 			avar->dval += bvar->dval;
 			double val = avar->dval;
 			bnf_var->var_type = VTYPE_NUM;
 			bnf_var->dval = val;
-#if	1
+#if	0
 			if(atype==btype && atype==VTYPE_POINTER) {
 				set_bnf_function(tok,"increase_by_pp_num",bnf_increase_by_pp_num);
 			};
