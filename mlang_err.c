@@ -637,7 +637,9 @@ int err_factor()
  tok_struct *tok0_bnf=NULL;
 
  if(tok->ttype!=TOK_NOT && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_MINUS && tok->ttype!=TOK_PLUS) {
+#if	TNOASGN
 	if(tok->ttype!=TOK_VAR)
+#endif
  	tok0_bnf=stack_push("factor",tok,tok->ttype);	// ????
  };
 #endif
@@ -660,10 +662,11 @@ int err_factor()
 	err_num=4730;
 	return(err_num);
  };
-
- if(tok0->ttype==TOK_VAR && tok->ttype != TOK_ASSIGN && tok->ttype!=TOK_INCREASEBY) {
+#if	TNOASG
+ if(tok0->ttype==TOK_VAR && (tok->ttype != TOK_ASSIGN || tok->ttype!=TOK_INCREASEBY)) {
  	tok0_bnf=stack_push("factor",tok0,tok0->ttype);
  };
+#endif
  // set_tok_function(tok0,0);
  // MESG("switch  : tok0 %s",tok_info(tok0));
  // MESG("now     : tok  %s",tok_info(tok));
@@ -2067,7 +2070,9 @@ int err_check_sentence1()
 		tok0_bnf=stack_push("for i assign",tok0,tok0->ttype);
 		tok0_bnf->tname = tok_var->tname;
 		tok0_bnf->tind = tok_var->tind;
+#if	TNOASGN
 		tok0_bnf->bnf_factor_function=bnf_factor_assign_iterator;
+#endif
 #endif
 		if(err_num) return(err_num);
 		CHECK_TOK(6406);

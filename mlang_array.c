@@ -559,7 +559,7 @@ void array_add(array_dat *aa,array_dat *ba)
 
 void array_add1(array_dat *na,double plus)
 {
- MESG("array_add1: type=%d stat=%d %d",na->atype,na->astat,ARRAY_ALLOCATED);
+ // MESG("array_add1: type=%d stat=%d %d",na->atype,na->astat,ARRAY_ALLOCATED);
  if(na->astat==ARRAY_UNALLOCATED) {
  	err_num=256;
  	err_str="error: cannot add to non defined array!";

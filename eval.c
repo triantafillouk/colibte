@@ -521,13 +521,13 @@ void set_env(int vnum,char *svalue,double value)
 		case EVTEXT:	set_linetext(svalue);break;
 		case EVCWROW:	
 			if(cwp) igotolinecol(v1+tp_line(cwp->tp_hline),1,0);
-				break;
+			break;
 		case EVWCOLS: 
 			if(cwp) vresize_wind(-cwp->w_ntcols+(int)v1);
-				break;
+			break;
 		case EVWROWS: 
 			if(cwp)	hresize_wind(-cwp->w_ntrows+(int)v1);
-				break;
+			break;
 		// _found is read only
 		// _next_word is read only
 		case EVDEBUG: 
