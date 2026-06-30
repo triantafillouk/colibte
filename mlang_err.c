@@ -662,8 +662,8 @@ int err_factor()
 	err_num=4730;
 	return(err_num);
  };
-#if	TNOASG
- if(tok0->ttype==TOK_VAR && (tok->ttype != TOK_ASSIGN || tok->ttype!=TOK_INCREASEBY)) {
+#if	TNOASGN
+ if(tok0->ttype==TOK_VAR && (tok->ttype != TOK_ASSIGN && tok->ttype!=TOK_INCREASEBY)) {
  	tok0_bnf=stack_push("factor",tok0,tok0->ttype);
  };
 #endif
@@ -2035,7 +2035,7 @@ int err_check_sentence1()
 		{
 		tok_struct *start_block;	// element at block start
 		tok_struct *end_block;	/* at the block end  */
-		// MESG("# err_check_sentence: %s",tok_info(tok));
+		MESG("# err_check_sentence: fori %s",tok_info(tok));
 #if	TNORMAL
 		set_tok_directive(tok,tok_dir_fori);
 #endif
@@ -2049,8 +2049,8 @@ int err_check_sentence1()
 		tok_struct *tok0_bnf=NULL;
 #endif
 		if(tok->ttype==TOK_VAR) {
-			// MESG_TOK_INFO(" loop var",tok);
-#if	TBNF
+			MESG_TOK_INFO(" loop var",tok);
+#if	TBNF & !TNOASG
 			tok->bnf_group=TOK_BOOL;
 			tok0_bnf=stack_push("loop var",tok,tok->ttype);
 #endif
@@ -2064,14 +2064,15 @@ int err_check_sentence1()
 				// MESG_TOK_INFO(" equal to",tok);
 			};
 		} else ERROR("6405:for i syntax error");
-		NTOKEN_ERR(64053);
+		NTOKEN_ERR(6053);
 		err_num=err_num_expression();	/* initial   */
 #if	TBNF
 		tok0_bnf=stack_push("for i assign",tok0,tok0->ttype);
 		tok0_bnf->tname = tok_var->tname;
 		tok0_bnf->tind = tok_var->tind;
 #if	TNOASGN
-		tok0_bnf->bnf_factor_function=bnf_factor_assign_iterator;
+		// tok0_bnf->bnf_factor_function=bnf_factor_assign_iterator;
+		tok0_bnf->bnf_factor_function=bnf_factor_assign_var;
 #endif
 #endif
 		if(err_num) return(err_num);

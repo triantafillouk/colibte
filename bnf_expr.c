@@ -80,8 +80,10 @@ void prev_var(char *title)
 
 void next_var(char *title)
 {
- MESG(" + var %d -> %d %s [%s]",VARIND,VARIND+1,title,tok_info(tok));
  bnf_var++;
+ if(bnf_var->var_type==VTYPE_NUM) MESG(" + var %d -> %d (%f) %s [%s]",VARIND-1,VARIND,bnf_var->dval,title,tok_info(tok));
+ else  MESG(" + var %d -> %d (t=%d) %s [%s]",VARIND,VARIND+1,bnf_var->var_type,title,tok_info(tok));
+
 	if(bnf_var->var_type==VTYPE_STRING) {
 		if(bnf_var->var_alloced) free(bnf_var->sval);
 		bnf_var->var_alloced=0;
@@ -1157,6 +1159,21 @@ inline static void bnf_update_array2()
 
 }
 
+#if	TNOASGN
+inline static void bnf_increase_by_pp_num()
+{
+	double bval=bnf_var->var_pointer->dval;
+	MVAR *avar=get_left_slot(tok->tind);
+	avar->dval += bval;
+}
+
+inline static void bnf_increase_by_pn_num()
+{
+	double bval=bnf_var->dval;
+	MVAR *avar=get_left_slot(tok->tind);
+	avar->dval += bval;
+}
+#else
 inline static void bnf_increase_by_pp_num()
 {
 	double bval=bnf_var->var_pointer->dval;
@@ -1172,6 +1189,7 @@ inline static void bnf_increase_by_pn_num()
 	MVAR *avar=bnf_var->var_pointer;
 	avar->dval += bval;
 }
+#endif
 
 // aval+=bval
 #if	TNOASGN
@@ -1179,31 +1197,25 @@ inline static void bnf_increase_by()
 {
 	// MESG("bnf_factor_increase_by: [%s]",tok_info(tok));
 	MVAR *bvar=bnf_var;
-	// int btype=bvar->var_type;
+	int btype=bvar->var_type;
 	if(bvar->var_type==VTYPE_POINTER) {
 		bvar = bvar->var_pointer;
 	};
 
-#if	1
 	MVAR *avar=get_left_slot(tok->tind);
 	// MESG("	increase_by: atype=%d",avar->var_type);
-#else
-	prev_var("inc by");
 
-	int atype=bnf_var->var_type;
-	MVAR *avar=bnf_var->var_pointer;
-#endif
 	if(bvar->var_type==VTYPE_NUM) {
 		if(avar->var_type==VTYPE_NUM) {
 			avar->dval += bvar->dval;
 			double val = avar->dval;
 			bnf_var->var_type = VTYPE_NUM;
 			bnf_var->dval = val;
-#if	0
-			if(atype==btype && atype==VTYPE_POINTER) {
+#if	1
+			if(btype == VTYPE_POINTER) {
 				set_bnf_function(tok,"increase_by_pp_num",bnf_increase_by_pp_num);
 			};
-			if(atype==VTYPE_POINTER && btype==VTYPE_NUM) {
+			if(btype == VTYPE_NUM) {
 				set_bnf_function(tok,"increase_by_pn_num",bnf_increase_by_pn_num);
 			};
 #endif
@@ -1315,7 +1327,6 @@ inline static void bnf_increase_by()
 	};
 	set_error(tok,1024,"increase_by operation not supported!");
 }
-
 #endif
 
 // aval-=bval
@@ -1716,6 +1727,7 @@ void bnf_factor_assign_var()
 
 #endif
 
+#if	NUSE
 void bnf_factor_assign_iterator()
 {
 	MVAR *bvar=bnf_var;
@@ -1785,6 +1797,7 @@ void bnf_factor_assign_iterator()
 	};
 	set_error(tok,102,"assign operation not supported yet");
 }
+#endif
 
 void set_bnf_string(char *s)
 {
@@ -1985,22 +1998,26 @@ void bnf_dir_fori()
 	double dinit,dmax,dstep;
 	double *iterrator_val;
 
-	// MESG("	fori: ---  ind=%d tok=[%s]"VARIND,tok_info(tok));
+	// MESG("	fori: ---  ind=%d tok=[%s]",VARIND,tok_info(tok));
 	NTOKEN2;	/* go to next token after for */
-
+#if	!TNOASGN
 	index=&current_stable[tok->tind];
-
+#endif
 	// MESG("	fori: tok [%s]",tok_info(tok));
 	// MESG("	fori: after index expression tok=%s",tok_info(tok));
 	dinit = bnf_expression();
+#if	TNOASGN
+	tok_struct *tok_assign_var=tok-1;
+	// MESG("fori: after init expression [%s]",tok_info(tok_assign_var));
+	index=&current_stable[tok_assign_var->tind];
+#endif
 	prev_var("fori index");
-
 	iterrator_val=&index->dval;
 	*iterrator_val=dinit;
 
 	// check if ok!
 	// if(dinit != index->dval) { MESG("	fori: ERROR1 IN FORI index! %f %f",dinit ,&index->dval);};
-	// MESG("	fori init iterrator to %f",dinit);
+	// MESG("	fori init iterrator set to %f",dinit);
 	NTOKEN2;	/* skip separator! */
 
 	dmax = bnf_expression();
