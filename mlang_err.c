@@ -664,6 +664,7 @@ int err_factor()
  };
 #if	TNOASGN
  if(tok0->ttype==TOK_VAR && (tok->ttype != TOK_ASSIGN && tok->ttype!=TOK_INCREASEBY)) {
+	MESG("stack push [%s]",tok_info(tok0));
  	tok0_bnf=stack_push("factor",tok0,tok0->ttype);
  };
 #endif
@@ -835,7 +836,7 @@ int err_factor()
 		// MESG("	TOK_VAR: return [%s]",tok_info(tok));
 		RT_MESG1(493);}
 	case TOK_ARRAY_L2:{
-		// MESG("TOK_ARRAY_L2: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
+		MESG("TOK_ARRAY_L2: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
 		err_num=err_num_expression(); 
 		if(tok->ttype==TOK_RBRAKET) {
 			stack_push("array_l2",tok,tok->ttype);
@@ -843,8 +844,8 @@ int err_factor()
 		} else {
 			MESG("	No rbracket found!");
 		};
-		// MESG("	tok_array_l2: after rbraket [%s]",tok_info(tok));
-		stack_push("tok_array_l2",tok,tok->ttype);
+		MESG("	tok_array_l2: after rbraket [%s]",tok_info(tok));
+		tok_struct *tok0_array=stack_push("tok_array_l2",tok,tok->ttype);
 		if(tok->ttype==TOK_TYPE_ELEMENT) {
 			tok->dval=-1;
 #if	TBNF
@@ -856,13 +857,20 @@ int err_factor()
 			// MESG("	TOK_TYPE_ELEMENT after [%s]",tok_info(tok));
 
 			if(tok->ttype==TOK_INCREASE) {
-				// MESG("	found TOK_INCREASE after type array_l2");
+				MESG("	found TOK_INCREASE after type array_l2");
 				tok->dval=1;
 #if	TNORMAL
 				set_tok_function(tok,0);
 #endif
+
 				tok->tgroup=0;
+#if	TNOASGN
+				tok0_bnf->dval=1;
+				tok0_bnf->tname="TL2u";
+				tok0_bnf->bnf_factor_function=bnf_type_l2_result_update;
+#else
 				stack_push("INC_AT2",tok,TOK_INCREASE);
+#endif
 				NTOKEN_ERR(4984);
 			} else
 			if(tok->ttype==TOK_DECREASE) {
@@ -953,7 +961,7 @@ int err_factor()
 
 	// case TOK_INCREASE:
 	case TOK_ARRAY1:{
-		// MESG("	TOK_ARRAY1: tok0=[%s]",tok_info(tok0));
+		MESG("	TOK_ARRAY1: tok0=[%s]",tok_info(tok0));
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
 #endif
@@ -1013,7 +1021,7 @@ int err_factor()
 		RT_MESG1(5931);
 #endif
 	case TOK_ARRAY2:{
-		// MESG("	TOK_ARRAY2 tok0=[%s]",tok_info(tok0));
+		MESG("	TOK_ARRAY2 tok0=[%s]",tok_info(tok0));
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
 #endif
@@ -1025,7 +1033,7 @@ int err_factor()
 		// MESG("	err_array2:2 [%s]",tok_info(tok));
 		if(tok->ttype==TOK_TYPE_ELEMENT) {
 			tok->dval=-1;
-			// MESG("	TOK_TYPE_ELEMENT before [%s]",tok_info(tok));
+			MESG("	TOK_TYPE_ELEMENT before [%s]",tok_info(tok));
 #if	TBNF
 			tok0_bnf->bnf_factor_function=bnf_type_l2_result;
 #endif
@@ -1035,9 +1043,9 @@ int err_factor()
 		// MESG("err_array2:3 t=%d",tok->ttype);
 		stack_push("5001",tok,-tok->ttype);
 		NTOKEN_ERR(5001);	// skip RB
-		// MESG("err_array2:4 t=%d",tok->ttype);
+		MESG("err_array2:4 t=%d",tok->ttype);
 		if(tok->ttype==TOK_INCREASE) {
-			// MESG("		TOK_INCREASE set bnf_factor_array_l1_tba");
+			MESG("		TOK_INCREASE set bnf_factor_array_l1_tba");
 #if	TBNF
 			tok0_bnf->bnf_factor_function=bnf_factor_array_l1_tba;
 			assign_type_to=TOK_INCREASE_ARRAY2;
