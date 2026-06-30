@@ -780,7 +780,15 @@ int err_factor()
 #if	TNORMAL
 			set_tok_function(tok,0);
 #endif
+#if	TBNF
+#if	TNOASGN
+			tok0_bnf->ttype=tok->ttype;
+			tok0_bnf->bnf_factor_function=bnf_update_val;
+			tok0_bnf->dval=1;
+#else
 			stack_push("INC",tok,tok->ttype);
+#endif
+#endif
 			NTOKEN_ERR(498);
 		} else
 		if(tok->ttype==TOK_DECREASE) {
@@ -788,7 +796,15 @@ int err_factor()
 #if	TNORMAL
 			set_tok_function(tok,0);
 #endif
+#if	TBNF
+#if	TNOASGN
+			tok0_bnf->ttype=tok->ttype;
+			tok0_bnf->bnf_factor_function=bnf_update_val;
+			tok0_bnf->dval=-1;
+#else
 			stack_push("DEC",tok,tok->ttype);
+#endif
+#endif
 			NTOKEN_ERR(4981);
 		};
 		if(tok->ttype==TOK_TYPE_ELEMENT) {
