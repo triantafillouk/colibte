@@ -895,7 +895,13 @@ int err_factor()
 			set_tok_function(tok,0);
 #endif
 			tok->tgroup=0;
+#if	TNOASNG
+				tok0_bnf->dval=1;
+				tok0_bnf->tname="TL2i";
+				tok0_bnf->bnf_factor_function=bnf_type_l2_result_update;
+#else
 			stack_push("INC_AL2",tok,TOK_INCREASE_ARRAY2);
+#endif
 			NTOKEN_ERR(4984);
 		} else
 		if(tok->ttype==TOK_DECREASE) {
@@ -905,7 +911,13 @@ int err_factor()
 			set_tok_function(tok,0);
 #endif
 			tok->tgroup=0;
+#if	TNOASGN
+				tok0_bnf->dval=-1;
+				tok0_bnf->tname="TL2d";
+				tok0_bnf->bnf_factor_function=bnf_type_l2_result_update;
+#else
 			stack_push("DEC_AL2",tok,TOK_DECREASE_ARRAY2);
+#endif
 			NTOKEN_ERR(4985);
 		};
 		};
@@ -1026,11 +1038,11 @@ int err_factor()
 		tok0->bnf_group=tok0->ttype;
 #endif
 		err_num=err_num_expression(); 
-		// MESG("	err_array2:1 [%s]",tok_info(tok));
-		stack_push("500",tok,-tok->ttype);
+		MESG("	err_array2:1 [%s]",tok_info(tok));
+		stack_push("500",tok,-tok->ttype);// RB
 		
 		NTOKEN_ERR(500);
-		// MESG("	err_array2:2 [%s]",tok_info(tok));
+		MESG("	err_array2:2 [%s]",tok_info(tok));
 		if(tok->ttype==TOK_TYPE_ELEMENT) {
 			tok->dval=-1;
 			MESG("	TOK_TYPE_ELEMENT before [%s]",tok_info(tok));
@@ -1040,21 +1052,29 @@ int err_factor()
 			RT_MESG1(501);
 		};
 		err_num=err_num_expression(); 
-		// MESG("err_array2:3 t=%d",tok->ttype);
-		stack_push("5001",tok,-tok->ttype);
+		MESG("err_array2:3 t=%d [%s]",tok->ttype,tok_info(tok));
+		stack_push("5001",tok,-tok->ttype); //RB
 		NTOKEN_ERR(5001);	// skip RB
 		MESG("err_array2:4 t=%d",tok->ttype);
 		if(tok->ttype==TOK_INCREASE) {
-			MESG("		TOK_INCREASE set bnf_factor_array_l1_tba");
+			MESG("		TOK_INCREASE set bnf_factor_array_l2_tba");
 #if	TBNF
-			tok0_bnf->bnf_factor_function=bnf_factor_array_l1_tba;
-			assign_type_to=TOK_INCREASE_ARRAY2;
+#if	TNOASGN
+			MESG("		TOK_INCREASE noasgn, [%s]",tok_info(tok0_bnf));
+			tok0_bnf->bnf_factor_function=bnf_factor_array_l2_tba;
+			tok0_bnf->tname="L2inc";
+ 			assign_type_to=0;
+			NTOKEN_ERR(5002);
+#else
+			tok0_bnf->bnf_factor_function=bnf_factor_array_l2_tba;
+ 			assign_type_to=TOK_INCREASE_ARRAY2;
+#endif
 #endif
 		};
 		if(tok->ttype==TOK_DECREASE) {
 			// MESG("		TOK_DECREASE set bnf_factor_array_l1_tba");
 #if	TBNF
-			tok0_bnf->bnf_factor_function=bnf_factor_array_l1_tba;
+			tok0_bnf->bnf_factor_function=bnf_factor_array_l2_tba_upd;
 			assign_type_to=TOK_DECREASE_ARRAY2;
 #endif
 		};
@@ -2074,7 +2094,7 @@ int err_check_sentence1()
 #endif
 		if(tok->ttype==TOK_VAR) {
 			MESG_TOK_INFO(" loop var",tok);
-#if	TBNF & !TNOASG
+#if	TBNF & !TNOASGN
 			tok->bnf_group=TOK_BOOL;
 			tok0_bnf=stack_push("loop var",tok,tok->ttype);
 #endif

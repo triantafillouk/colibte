@@ -3410,6 +3410,72 @@ void bnf_factor_array_l2_tba()
 		bnf_var->var_type=VTYPE_ARRAYEL2;			
 }
 
+void bnf_factor_array_l2_tba_upd()
+{
+	// tok_struct *tok0=tok;
+	MESG("bnf_factor_array_l2_tba_upd:[%s]",tok_info(tok));
+	next_var("arrayl2");
+	// MESG("	array_l1 var@=%d",VARIND);
+	int ind1,ind2;
+	MVAR *array_slot;
+	// MESG("	token var index tind=%d",tok->tind);
+	array_slot=&current_stable[tok->tind];
+	array_dat *adat = array_slot->adat;
+
+	// MESG("	array type=%d cols=%d rows=%d",adat->atype,adat->cols,adat->rows);
+	// MESG("	factor_array_l2_tba:< ----------- vtype=%d  [%s]",array_slot->var_type,tok_info(tok));
+	NTOKEN2;
+	ind1 = (int)bnf_expression();
+	prev_var("ae:");
+	NTOKEN2;
+	ind2 = (int)bnf_expression();
+	prev_var("ae:");
+	// NTOKEN2;
+	if(adat==NULL) {	/* this happens if array is not defined yet!!!  */
+		// MESG("	array adat is NULL allocate new one %d x 1 !!!!!!!!!!!!",ind1);
+		ex_nums=1;
+		adat=new_array(ind1+1,ind2+1,VTYPE_ARRAY);
+		array_slot->adat=adat;
+		array_slot->var_type=VTYPE_ARRAY;
+		allocate_array(array_slot->adat);	/*   */
+	};
+
+	// MESG("	factor_arrayl1:ind=%d ind1=%d type=%d",array_slot->index1,ind1,array_slot->var_type);
+
+		// MESG("	2 vtype=%d %d",array_slot->var_type,VTYPE_ARRAY);
+		if(array_slot->var_type==VTYPE_ARRAY) {
+		if(adat->rows<ind1 && adat->cols<ind1) {
+			// MESG("+++ reallocate array_l2_tba ind1=%d x %d %X",ind1,sizeof(double),adat->dval);
+			if(adat->cols > adat->rows) 
+				adat->cols=ind1;
+			else
+				adat->rows=ind1;
+			double *dval_new = realloc(adat->dval,(ind1+1)*sizeof(double));
+			if(dval_new==NULL) {
+				err_num=214;
+				err_line=tok->tline;
+				// ERROR("	array cannot allocate dval at %d",err_line);
+				set_break("can not allocate dval");
+				return;
+			} else {
+				adat->dval = dval_new; 
+			};
+			// MESG("	array reallocated:%X",array_slot->adat->dval);
+		} else { 
+			// dval = adat->dval;
+			// value=dval[ind1];
+			// ls_pdval=&dval[ind1];
+			// MESG("	array_slot %d: ",array_slot->index1);
+		};
+
+		};
+
+		bnf_var->index1=ind1*array_slot->adat->cols+ind2;
+		// MESG("	index1=%d",bnf_var->index1);
+		bnf_var->adat = array_slot->adat;
+		bnf_var->var_type=VTYPE_ARRAYEL2;			
+}
+
 void bnf_factor_array_l2()
 {
 	int ind1;
