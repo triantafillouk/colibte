@@ -1087,6 +1087,35 @@ void update_ddot_line(char *ddot_out)
  // sfb(old_fp);
 }
 
+#if	TBNF
+void msg_result(char *name,int show_no_time)
+{
+	// set_result();
+	MVAR *result = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+	if(show_no_time) {
+		if(result->var_type==VTYPE_NUM) msg_line("%s Result @%d (%f)",name,VARIND,num_result());
+		else if(result->var_type==VTYPE_STRING) msg_line("%s Result @%d \"%s\"",name,VARIND,string_result());
+		else msg_line("%s Result @%d type %d",name,VARIND,result->var_type);
+	} else {
+		if(result->var_type==VTYPE_NUM) msg_line("%s Result @%d (%f)",name,VARIND,num_result());
+		else if(result->var_type==VTYPE_STRING) msg_line("%s Result @%d \"%s\"",name,VARIND,string_result());
+		else msg_line("%s Result @%d type %d",name,VARIND,result->var_type);
+	};
+}
+#else
+void msg_result(char *name, int show_no_time)
+{
+	if(show_no_time) {
+		if(vtype_is(VTYPE_NUM)) msg_line("%s Result  (%f)",name,get_val());
+		else if(vtype_is(VTYPE_STRING)) msg_line("%s Result  \"%s\"",name,get_sval());
+		else msg_line("%s Result type %d",name,get_vtype());
+	} else {
+		if(vtype_is(VTYPE_STRING)) msg_line("%s Result n is \"%s\"",name,get_sval());
+		else if(vtype_is(VTYPE_NUM)) msg_line("%s Result n is (%f)",name,get_val());
+		else msg_line("%s Result n type %d",name,get_vtype());
+	};
+}
+#endif
 
 
 /* execute a block from a file  */
@@ -1197,7 +1226,9 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		// next_var("result");
 		// prev_var("r");
 		// MESG("show result executing buffer [%s]!",bp->b_fname);
-
+#if	1
+		msg_result(bp->b_fname,show_no_time);
+#else
 		MVAR *result = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
 		if(show_no_time) {
 			if(result->var_type==VTYPE_NUM) msg_line("[%15s] Result @var=%d (%f)",bp->b_fname,VARIND,num_result());
@@ -1209,11 +1240,15 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 			else msg_line("[%15s] Result @var=%d type %d",bp->b_fname,VARIND,result->var_type);
 		};
 #endif
+#endif
 #if	TBNFNORMAL
 	} else
 #endif
 #if	TNORMAL 
 	{
+#if	1
+		msg_result(bp->b_fname,show_no_time);
+#else
 		if(show_no_time) {
 			if(vtype_is(VTYPE_NUM)) msg_line("[%s] Result  (%f)",bp->b_fname,val);
 			else if(vtype_is(VTYPE_STRING)) msg_line("[%s] Result  \"%s\"",bp->b_fname,get_sval());
@@ -1223,6 +1258,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 			else if(vtype_is(VTYPE_NUM)) msg_line("[%s] Result n is (%f)",bp->b_fname,val);
 			else msg_line("[%s] Result n type %d",bp->b_fname,get_vtype());
 		};
+#endif
 	};
 #endif
  } else {
@@ -1264,12 +1300,18 @@ int empty_tok_table(FILEBUF *fp)
  };
  fp->err=0;
  fp->m_mode=0;
+#if	TBNF
+// Initialize var stack
+ bnf_var=bnf_vars;
+#endif
  return(1);
 }
 
 int refresh_current_buffer(num nused)
 {
+#if	TNORMAL
  double val=0;
+#endif
  FILEBUF *fp=cbfp;
  exe_buffer=cbfp;
  num curline = tp_line(cwp->tp_current);
@@ -1284,6 +1326,7 @@ int refresh_current_buffer(num nused)
  /* clear parse list  */
  MESG("refresh_current_buffer: call empty_tok_table: [%s]",fp->b_fname);
  empty_tok_table(fp);
+
 #if	TBNFNORMAL
  if(!usebnf)
 #endif
@@ -1317,8 +1360,6 @@ int refresh_current_buffer(num nused)
 #if	TBNF
 		tok=fp->tok_table_bnf;
 		bnf_block1_break();
-		if(bnf_var->var_type==VTYPE_NUM) val=bnf_var->dval;
-		else val=1;
 #endif
 #if	TBNFNORMAL
 	} else {
@@ -1338,28 +1379,8 @@ int refresh_current_buffer(num nused)
 		// msg_line("Error %d [%s] at line %d",err_num,err_str,err_line);
 		// mesg_out("Error %d [%s] at line %d",err_num,err_str,err_line);
 	} else {
-#if	TBNFNORMAL
 		MESG("refresh_current_buffer: set result!");
-		if(usebnf) {
-#endif
-#if	TBNF
-			set_result();
-			if(bnf_var->var_type==VTYPE_NUM) msg_line("Result bnf is [%f]",val);
-			else if(bnf_var->var_type==VTYPE_NUM) msg_line("Result bnf is \"%s\"",bnf_var->sval);
-			else msg_line("done!");
-#endif
-#if	TBNFNORMAL
-		} else
-		{
-#endif 
-#if	TNORMAL
-			if(vtype_is(VTYPE_STRING)) msg_line("Result is \"%s\"",get_sval());
-			else if(vtype_is(VTYPE_NUM)) msg_line("Result is [%f]",val);
-			else if(get_sval()) msg_line("Result is [%s %f]",get_sval(),val);
-#endif
-#if	TBNFNORMAL
-		};
-#endif
+		msg_result("",0);
 	};
  } else {
  	msg_line("parse error %d line %d [%s]",err_num,err_line+1,err_str);

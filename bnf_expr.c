@@ -28,7 +28,7 @@ int varind(){
 	return VARIND;
 }
 
-#if	1
+#if	0
 #if	1
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
@@ -109,28 +109,8 @@ inline static void set_var_value()
 	};
 }
 
-void bnf_refresh_ddot()
+inline static void	update_ddot_var_position()
 {
- // MESG("bnf_refresh_ddot: var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
- int stat=0;
- double value=0;
- TextPoint *tp = tok->ddot;
- FILEBUF *buf = tp->fp;
-
- MVAR *var_show = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
- // MESG("bnf_refresh_ddot: var_show@=%d: type=%d",VARIND,var_show->var_type);
-
- if(execmd) {
-	 if(var_show->var_type==VTYPE_NUM) {
-		printf("%s	: %.3f\n",ddot_string(),var_show->dval);
-		// MESG("%s	: %.3f\n",ddot_string(),var_show->dval);
-	 } else if(var_show->var_type==VTYPE_STRING) {
-		printf("%s	: %s\n",ddot_string(),var_show->sval);
-	 } else if(var_show->var_type==VTYPE_ARRAY || var_show->var_type==VTYPE_SARRAY ||var_show->var_type==VTYPE_AMIXED) {
-		// MESG("	show_array!");
-		print_array1("array: ",var_show->adat);
-	 	// print_array1(ddot_string(),var_show->adat);
-	 };
 	 tok_struct *ntoken=tok+1;
 	 if(ntoken->ttype != TOK_EOF 
 	 ) {
@@ -148,7 +128,32 @@ void bnf_refresh_ddot()
 		};
 		// MESG("	ddot prev_var ntoken=[%s]",tok_info(ntoken));
 	};//  else MESG("ntoken is  TOK_END, var@=%d",VARIND);
-	 return;
+};
+
+void bnf_refresh_ddot()
+{
+ // MESG("bnf_refresh_ddot: var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+ int stat=0;
+ double value=0;
+ TextPoint *tp = tok->ddot;
+ FILEBUF *buf = tp->fp;
+
+ MVAR *var_show = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+ // MESG("bnf_refresh_ddot: var_show@=%d: type=%d",VARIND,var_show->var_type);
+
+ if(execmd) {
+	if(var_show->var_type==VTYPE_NUM) {
+		printf("%s	: %.3f\n",ddot_string(),var_show->dval);
+		// MESG("%s	: %.3f\n",ddot_string(),var_show->dval);
+	} else if(var_show->var_type==VTYPE_STRING) {
+		printf("%s	: %s\n",ddot_string(),var_show->sval);
+	} else if(var_show->var_type==VTYPE_ARRAY || var_show->var_type==VTYPE_SARRAY ||var_show->var_type==VTYPE_AMIXED) {
+		// MESG("	show_array!");
+		print_array1("array: ",var_show->adat);
+		// print_array1(ddot_string(),var_show->adat);
+	};
+	update_ddot_var_position();
+	return;
  };
 
 
@@ -188,8 +193,10 @@ void bnf_refresh_ddot()
 		adat->array_name,vtype_names[adat->atype],lsslot-current_stable,adat->atype,adat->rows,adat->cols);
 	// print_array1(":",adat);
  };
+
  if(stat>MAXLLEN) MESG("truncated");
  // MESG("	ddot_out: [%s]",ddot_out);
+ update_ddot_var_position();
  update_ddot_line(ddot_out);
  // NTOKEN2;
 }
@@ -213,6 +220,7 @@ inline static char * string_result()
  };
  return "";
 }
+
 
 void show_result()
 {
