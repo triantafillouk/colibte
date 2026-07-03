@@ -774,7 +774,9 @@ int check_init(FILEBUF *bf)
 		check_buffer = ori_buffer;
 		return(201);
 	}
- } else MESG("	already checked!");
+ } else {
+ 	// MESG("	already checked!");
+ };
  // MESG("check_init:2 err=%d %d",bf->err,bf->tok_table==NULL);
  if(bf->err<1) 
  {
@@ -807,7 +809,7 @@ int check_init(FILEBUF *bf)
  if(usebnf)
 #endif
 #if	TBNF
- show_token_table("BNF ",bf,bf->tok_table_bnf,bf->tok_bnf_index);
+ // show_token_table("BNF ",bf,bf->tok_table_bnf,bf->tok_bnf_index);
  if(bnf_debug() && check_buffer==NULL) exit(0);
 #endif
  return(0);
@@ -1195,8 +1197,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		// next_var("res2");
 		set_result();
 		// MESG("end of program1 var@=%d type %d",VARIND,bnf_var->var_type);
-		if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
-		// next_var("end");
+		// if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
 		MESG("end of program2 var@=%d type %d",VARIND,bnf_var->var_type);
 		// if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
 		// show_results();
@@ -1727,7 +1728,7 @@ void init_exec_flags()
  set_vdval(0.0);
  ex_nvars=0;ex_nquote=0;ex_nums=0;	/* initialize table counters  */
 #endif
- MESG("init_exec_flags:ok!");
+ // MESG("init_exec_flags:ok!");
 }
 
 

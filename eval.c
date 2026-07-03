@@ -782,7 +782,7 @@ int dofile(char *fname)
 	int backup_caf=get_active_flag();
 	double d = compute_block(bp,bp,1);
 #if	TBNF
-	MESG("dofile: after compute_block: var@=%d",varind());
+	// MESG("dofile: after compute_block: var@=%d",varind());
 #endif
 	if(err_num>0) return (FALSE);
 	init_error();
@@ -1212,7 +1212,7 @@ int create_function_buffer(FILEBUF *pbuf,char *function_name,offs start_function
  char bname[MAXFLEN];
  char *function_block;
  int function_size=0;
-	MESG("create_function_buffer: [%s]",function_name);
+	// MESG("create_function_buffer: [%s]",function_name);
 	bname[0] = CHR_LBRA;
 	strlcpy(bname+1,function_name,250);
 	insert_bt_element(bt_table,bname+1,TOK_PROC,0);	/* insert in main table  */

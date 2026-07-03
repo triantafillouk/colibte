@@ -550,7 +550,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 #endif
  skip_tag_header(bf);
 
- MESG("	--- [%s] Start parsing block loop -------------------------------",bf->b_fname);
+ // MESG("	--- [%s] Start parsing block loop -------------------------------",bf->b_fname);
 
  while(getnc1(bf,&cc,&tok_type))
  {
@@ -1179,7 +1179,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	// else MESG("[%s]: parse_block1 > end. Number of tokens %d",bf->b_fname,bf->symbol_tree->items);
  // MESG("parse_block1: [%s] >> end",bf->b_fname); 
  check_buffer = buffer_ori;
- MESG("--> parse_block1:[%s] end OK!",bf->b_fname);
+ // MESG("--> parse_block1:[%s] end OK!",bf->b_fname);
  return(TRUE); 
 }
 
@@ -1193,20 +1193,20 @@ void set_tok_table(FILEBUF *bf)
  alist *lex_parser = bf->lex_parser;
  int isize=0;
  int table_size = lex_parser->size+1;
- MESG("	- set_tok_table: [%s] create token table from token list size of %d!",bf->b_fname,lex_parser->size);
+ // MESG("	- set_tok_table: [%s] create token table from token list size of %d!",bf->b_fname,lex_parser->size);
  if(bf->tok_table != NULL) {
  	free(bf->tok_table);
  };
 #if	TBNF
  if(bf->tok_table_bnf != NULL) {
-	MESG("	-- [%s] recreate bnf token table!",bf->b_fname);
+	// MESG("	-- [%s] recreate bnf token table!",bf->b_fname);
  	free(bf->tok_table_bnf);
  };
  bf->tok_table_bnf=(void *)malloc(sizeof(struct tok_struct)*table_size);
  bf->tok_bnf_index=0;
  bf->tok_bnf = bf->tok_table_bnf;
  
- MESG("	-- set tok_table_bnf: bf=[%s] at %p size %d",bf->b_fname,bf->tok_table_bnf,table_size);
+ // MESG("	-- set tok_table_bnf: bf=[%s] at %p size %d",bf->b_fname,bf->tok_table_bnf,table_size);
  //eval_curl_match(NULL); // initialize curl stack
 
 #endif

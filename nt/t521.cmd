@@ -10,4 +10,5 @@ c[1].surname:
 # s1:
 c[1].surname="new surname"
 c[1].surname:
+c[0].surname:
 # show_vars()
