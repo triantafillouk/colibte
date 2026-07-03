@@ -205,7 +205,10 @@ double get_env(int vnum)
 		case EVCURCHAR:	v1=Char();	break;
 		case EVSEARCH:	strlcpy(svalue,search_pattern,MAXLLEN);break;
 		case EVREPLACE:	strlcpy(svalue,replace_pattern,MAXLLEN);break;
-		case EVCTIME:	strlcpy(svalue,time2a(),MAXLLEN);break;
+		case EVCTIME:	
+			if(show_no_time) strlcpy(svalue,"Now",MAXLLEN);
+			else strlcpy(svalue,time2a(),MAXLLEN);
+			break;
 		case EVMATCH:	strlcpy(svalue,patmatch,MAXLLEN);
 		case EVCURCOL:	v1 = FColumn(cbfp,Offset()); break;
 		case EVCURLINE: v1 = getcline();break;
@@ -588,6 +591,7 @@ int sindex(char *source, char *pattern)	/* find pattern within source */
 char *date_string(num n)
 {
  static char date_str[128];
+
  int res=0;
 	time_t	tclock;
 	struct tm *tim;

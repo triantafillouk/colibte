@@ -3659,7 +3659,9 @@ void bnf_factor_array_l2_update()
 	// tok_struct *tok0=tok;
 	MESG("bnf_factor_array_l2_update:[%s]",tok_info(tok));
 	MESG("	ind=%d val=%f",tok->tind,tok->dval);
+#if	TNOASGN
 	double update_value=tok->dval;
+#endif
 	// MESG("	array_l1 var@=%d",VARIND);
 	int ind1,ind2;
 	MVAR *array_slot;

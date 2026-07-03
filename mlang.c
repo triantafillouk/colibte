@@ -1227,39 +1227,14 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		// next_var("result");
 		// prev_var("r");
 		// MESG("show result executing buffer [%s]!",bp->b_fname);
-#if	1
 		msg_result(bp->b_fname,show_no_time);
-#else
-		MVAR *result = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
-		if(show_no_time) {
-			if(result->var_type==VTYPE_NUM) msg_line("[%15s] Result @var=%d (%f)",bp->b_fname,VARIND,num_result());
-			else if(result->var_type==VTYPE_STRING) msg_line("[%15s] Result @var=%d \"%s\"",bp->b_fname,VARIND,string_result());
-			else msg_line("[%15s] Result @var=%d type %d",bp->b_fname,VARIND,result->var_type);
-		} else {
-			if(result->var_type==VTYPE_NUM) msg_line("[%15s] Result at var@=%d (%f)",bp->b_fname,VARIND,num_result());
-			else if(result->var_type==VTYPE_STRING) msg_line("[%15s] Result @var=%d \"%s\"",bp->b_fname,VARIND,string_result());
-			else msg_line("[%15s] Result @var=%d type %d",bp->b_fname,VARIND,result->var_type);
-		};
-#endif
 #endif
 #if	TBNFNORMAL
 	} else
 #endif
 #if	TNORMAL 
 	{
-#if	1
 		msg_result(bp->b_fname,show_no_time);
-#else
-		if(show_no_time) {
-			if(vtype_is(VTYPE_NUM)) msg_line("[%s] Result  (%f)",bp->b_fname,val);
-			else if(vtype_is(VTYPE_STRING)) msg_line("[%s] Result  \"%s\"",bp->b_fname,get_sval());
-			else msg_line("[%s] Result type %d",bp->b_fname,get_vtype());
-		} else {
-			if(vtype_is(VTYPE_STRING)) msg_line("[%s] Result n is \"%s\"",bp->b_fname,get_sval());
-			else if(vtype_is(VTYPE_NUM)) msg_line("[%s] Result n is (%f)",bp->b_fname,val);
-			else msg_line("[%s] Result n type %d",bp->b_fname,get_vtype());
-		};
-#endif
 	};
 #endif
  } else {
@@ -1270,6 +1245,10 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  };
  tok=old_tok;
  // MESG("compute_block return %f %f",val,num_result());
+#if	TBNFNORMAL
+ if(usebnf) return(num_result()); 
+ else return(val);
+#endif
 #if	TBNF
  return(num_result()); 
 #else
@@ -1311,7 +1290,7 @@ int empty_tok_table(FILEBUF *fp)
 int refresh_current_buffer(num nused)
 {
 #if	TNORMAL
- double val=0;
+ // double val=0;
 #endif
  FILEBUF *fp=cbfp;
  exe_buffer=cbfp;
@@ -1367,7 +1346,7 @@ int refresh_current_buffer(num nused)
 #endif
 #if	TNORMAL
 		tok=fp->tok_table;
-		val=exec_block1_break(fp);
+		exec_block1_break(fp);
 #endif
 #if	TBNFNORMAL
 	};
