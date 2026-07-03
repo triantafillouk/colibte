@@ -9,7 +9,7 @@ function pass1(r1,k)
 {
 	print("pass1: before changing age:",r1.age)
 	r1.name="kostas"
-	r1.age =30*k
+	r1.age =30*k:
 	r1.age:
 	c=human("pass1",r1.age*2)
 	c:

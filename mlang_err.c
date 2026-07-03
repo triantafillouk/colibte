@@ -666,6 +666,7 @@ int err_factor()
  if(tok0->ttype==TOK_VAR && (tok->ttype != TOK_ASSIGN && tok->ttype!=TOK_INCREASEBY)) {
 	// MESG("stack push [%s]",tok_info(tok0));
  	tok0_bnf=stack_push("factor",tok0,tok0->ttype);
+	
  };
 #endif
  // set_tok_function(tok0,0);
@@ -820,11 +821,11 @@ int err_factor()
 			NTOKEN_ERR(4982);
 		};
 		if(tok->ttype==TOK_ASSIGN) {
-			// MESG("set normal assign [%s]",tok_info(tok));
+			MESG("set normal assign [%s]",tok_info(tok));
 			assign_type_to=0;
 			tok->tname = tok0->tname;
 			tok->tind = tok0->tind;
-			// MESG("	var_name_to_assign: %s [%s]",tok0->tname,tok_info(tok));
+			MESG("	var_name_to_assign: %s [%s]",tok0->tname,tok_info(tok));
 		};
 		if(tok->ttype==TOK_INCREASEBY) {
 			// MESG("set normal assign [%s]",tok_info(tok));
@@ -943,7 +944,7 @@ int err_factor()
 		RT_MESG1(4441);		
 	};
 	case TOK_ARRAY_L1:	
-		// MESG("TOK_ARRAY_L1: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
+		MESG("TOK_ARRAY_L1: [%s] type %d ind=%d",tok0->tname,tok0->ttype,tok0->tind);
 		pre_symbol=0;
 		ex_nvars++;
 #if	TBNF
@@ -955,11 +956,13 @@ int err_factor()
 			// MESG("	TOK_TYPE_ELEMENT before [%s]",tok_info(tok));
 			if(tok->ttype==TOK_ASSIGN || tok->ttype==TOK_INCREASEBY || tok->ttype==TOK_MULBY || tok->ttype==TOK_DECREASEBY) {
 				// MESG("	assign type_element1");
-				tok0_bnf->bnf_factor_function=bnf_type_element_l1_tba;
 #if	TNOASGN
 				// MESG("	ASSIGN original function!");
+				// tok0_bnf->bnf_factor_function=bnf_type_element_l1_tba;
+				tok0_bnf->bnf_factor_function=bnf_type_l1_result;
 				assign_type_to=TOK_TYPE_ELEMENT;
 #else
+				tok0_bnf->bnf_factor_function=bnf_type_element_l1_tba;
 				assign_type_to=TOK_ASSIGN_TYPE;
 #endif
 			} else {;
@@ -1847,6 +1850,12 @@ int err_lexpression()
 					tok0_bnf_assign->bnf_factor_function=bnf_assign_element;
 					// MESG(";3 for [%s] set assign to bnf_assign_element",tok_info(tok0_bnf_assign));
 				};
+#if	TNOASGN
+				if(assign_type_to==0) {
+					tok0_bnf_assign->tname="VAR2=";
+					tok0_bnf_assign->bnf_factor_function=bnf_assign_element_to;
+				};
+#endif
 				assign_type_to=0;
 			};
 #endif
@@ -1880,10 +1889,10 @@ int err_lexpression()
 					dest->bnf_factor_function=bnf_increaseby_element;
 					MESG("; for [%s] increaseby_element",tok_info(dest));
 				};
-#if	0
+#if	1
 				 if(assign_type_to==TOK_TYPE_ELEMENT) {
 					dest->tname="EL+=";
-					dest->bnf_factor_function=bnf_increaseby_type_el1;
+					dest->bnf_factor_function=bnf_increaseby_element;
 					MESG("; for [%s] set assign to type %d,bnf_increaseby_array1",tok_info(dest));
 				};
 #endif
@@ -1952,7 +1961,7 @@ int err_lexpression()
 					// MESG("; for [%s] set assign to type %d,bnf_decreaseby_array1",tok_info(dest));
 				};
 				 if(assign_type_to==TOK_TYPE_ELEMENT) {
-					dest->tname="A1-=";
+					dest->tname="EL1-=";
 					dest->bnf_factor_function=bnf_decreaseby_element;
 					// MESG("; for [%s] set assign to type %d,bnf_increaseby_array1",tok_info(dest));
 				};

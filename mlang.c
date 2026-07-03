@@ -809,7 +809,7 @@ int check_init(FILEBUF *bf)
  if(usebnf)
 #endif
 #if	TBNF
- // show_token_table("BNF ",bf,bf->tok_table_bnf,bf->tok_bnf_index);
+ show_token_table("BNF ",bf,bf->tok_table_bnf,bf->tok_bnf_index);
  if(bnf_debug() && check_buffer==NULL) exit(0);
 #endif
  return(0);

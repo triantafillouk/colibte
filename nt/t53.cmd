@@ -10,7 +10,7 @@ b = human[2]("kostas",55
 b: 
 # b[0].name:
 # b[1].name:
-b[1].age-=10:
+b[1].age*=10:
 # "after addition":
 b[1].age: 
 b[0].age:
