@@ -1356,7 +1356,7 @@ inline static void bnf_increase_by()
 #else
 inline static void bnf_increase_by()
 {
-	MESG("bnf_factor_increase_by: [%s]",tok_info(tok));
+	// MESG("bnf_factor_increase_by: [%s]",tok_info(tok));
 	MVAR *bvar=bnf_var;
 	int btype=bvar->var_type;
 	prev_var("inc by");

@@ -1,3 +1,3 @@
 
-for i in `cat nt2.lst`;do echo $i; ./cte967x -d -x $i ;done  |tee check4_967_x.out
+for i in `cat nt2.lst`;do echo $i; ./cte -d -x $i ;done  |tee check4_968_f.out
 
