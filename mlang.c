@@ -1095,8 +1095,8 @@ void msg_result(char *name,int show_no_time)
 	// set_result();
 	MVAR *result = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
 	if(show_no_time) {
-		if(result->var_type==VTYPE_NUM) msg_line("%s Result @%d (%f)",name,VARIND,num_result());
-		else if(result->var_type==VTYPE_STRING) msg_line("%s Result @%d \"%s\"",name,VARIND,string_result());
+		if(result->var_type==VTYPE_NUM) msg_line("%s Result (%f)",name,num_result());
+		else if(result->var_type==VTYPE_STRING) msg_line("%s Result \"%s\"",name,string_result());
 		else msg_line("%s Result @%d type %d",name,VARIND,result->var_type);
 	} else {
 		if(result->var_type==VTYPE_NUM) msg_line("%s Result @%d (%f)",name,VARIND,num_result());
@@ -1108,8 +1108,8 @@ void msg_result(char *name,int show_no_time)
 void msg_result(char *name, int show_no_time)
 {
 	if(show_no_time) {
-		if(vtype_is(VTYPE_NUM)) msg_line("%s Result  (%f)",name,get_val());
-		else if(vtype_is(VTYPE_STRING)) msg_line("%s Result  \"%s\"",name,get_sval());
+		if(vtype_is(VTYPE_NUM)) msg_line("%s Result (%f)",name,get_val());
+		else if(vtype_is(VTYPE_STRING)) msg_line("%s Result \"%s\"",name,get_sval());
 		else msg_line("%s Result type %d",name,get_vtype());
 	} else {
 		if(vtype_is(VTYPE_STRING)) msg_line("%s Result n is \"%s\"",name,get_sval());

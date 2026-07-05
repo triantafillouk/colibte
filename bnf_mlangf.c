@@ -773,6 +773,7 @@ extern FILEBUF *exe_buffer;
 
 void bnf_show_vars()	/* ok?  */
 {
+	MESG("bnf_show_vars:");
 	mesg_out("Ind Name       Type             Value      local vars %d",exe_buffer->symbol_tree->items);
 	eval_btree(exe_buffer->symbol_tree->root,show_var_node);
 #if	USE_TYPE_VARS
