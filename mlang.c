@@ -32,6 +32,9 @@ FILEBUF *check_buffer=NULL;
 void show_vars(MVAR *va, int size,char *title);
 void set_term_function(tok_struct *tok, TFunction term_function);
 inline static void  skip_args1(int nargs);
+inline static MVAR *get_left_slot(int ind);
+inline static int check_token(int type);
+
 #if	TNORMAL
 static inline double num_expression();
 static inline double num_term1();
@@ -595,7 +598,7 @@ MVAR *new_symbol_table(int const size)
 		} else {
 			msg_line("new_symbol_table: overflow: available=%d required=%d",call_stack_available-call_stack,call_stack_used-call_stack);
 		};
-		set_error(tok,101,"call_stack overflow");
+		set_error(tok,301,"call_stack overflow");
 		return NULL;
 	};
  }
@@ -869,7 +872,14 @@ int check_skip_token_err(int type,char *mesg,int err)
   return(err_num);
 }
 
-int check_token(int type)
+#if	TNORMAL
+int is_token(int type)
+{
+ return(tok->ttype == type);
+}
+#endif
+
+inline static int check_token(int type)
 {
  TDS("check_token");
 
@@ -879,7 +889,7 @@ int check_token(int type)
 
 
 
-inline MVAR *get_left_slot(int ind)
+inline static MVAR *get_left_slot(int ind)
 {
 	// MESG("get_left_slot: ind=%d",ind);
 	return &current_stable[ind];
@@ -987,7 +997,7 @@ void set_tok_function(tok_struct *tok, int type)
 		case 0:
 			if(tok->ttype==TOK_FUNC) {
 				// MESG("ttype is tok_func");
-				if(tok->tok_node==NULL) { set_error(tok,3003,"tok_node is null!");
+				if(tok->tok_node==NULL) { set_error(tok,303,"tok_node is null!");
 				return;};
 				int findex = tok->tok_node->node_index;
 				// MESG(" F tok %2d: %s type [%d -s] set factor function %d",tok->tnum,tok->tname,tok->ttype,findex);
@@ -1130,7 +1140,8 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  MVAR *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
 	MESG("# compute_block1: [%s] use [%s] start=%d",bp->b_fname,use_fp->b_fname,start);
-	MESG("# [%-15s %d %s --------------------------------------------- %d",bp->b_fname,usebnf,VERSION,bp->err);
+	if(show_no_time) MESG("# [%-15s %d %s --------------------------------------------- %d",bp->b_fname,usebnf,"Version",bp->err);
+	else MESG("# [%-15s %d %s --------------------------------------------- %d",bp->b_fname,usebnf,VERSION,bp->err);
 	eval_curl_match(NULL);
  if(show_tokens) {
 	parse_buffer_show_tokens(1);

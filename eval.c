@@ -247,7 +247,8 @@ double get_env(int vnum)
 			v1=tabsize;
 			break;
 		case EVVERSION:
-			strlcpy(svalue,VERSION,MAXLLEN);
+			if(show_no_time) strlcpy(svalue,"version ..",MAXLLEN);
+			else strlcpy(svalue,VERSION,MAXLLEN);
 			break;
 		default:
 			ERROR("GET_ENV: Not a valid function err=503");

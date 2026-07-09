@@ -154,7 +154,7 @@ int check_skip_token_err1(int type,char *mesg,int err)
 		NTOKEN2;
  		return(0);
  	} else {
-		syntax_error(mesg,err);
+		syntax_error(err,mesg);
 	};
 
   return(err_num);
@@ -177,17 +177,17 @@ void set_error(tok_struct *tok,int err,char *description)
 	err_str=description;
 	return;
  };
- err_line=tok->tline;
+ err_line=tok->tline+1;
  err_num=err;
  // MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
  err_str=strdup(description);
 #if	1
  if(execmd) {
-	if(tok->tname==NULL) fprintf(stderr,"Error:%d tnum=%d ttype=%d %s line %d\n",err,tok->tnum,tok->ttype,err_str,err_line);
- 	else fprintf(stderr,"Error:%d [%s] tnum=%d ttype=%d %s line %d\n",err,(char *)tok->tname,tok->tnum,tok->ttype,err_str,err_line);
+	if(tok->tname==NULL) fprintf(stderr,"[%s] Error:%d tnum=%d ttype=%d %s line %d\n",exe_buffer->b_fname,err,tok->tnum,tok->ttype,err_str,err_line);
+ 	else fprintf(stderr,"[%s] Error:%d [%s] tnum=%d ttype=%d %s line %d\n",exe_buffer->b_fname,err,(char *)tok->tname,tok->tnum,tok->ttype,err_str,err_line);
  };
 #endif
- tok=cbfp->end_token;
+ tok=exe_buffer->end_token;
  if(tok==NULL) return;
  tok->ttype=TOK_EOF;
 #if	TNORMAL
@@ -198,7 +198,7 @@ void set_error(tok_struct *tok,int err,char *description)
  current_active_flag=0;
 }
 
-void syntax_error(char *description,int err)
+void syntax_error(int err,char *description)
 {
  if(err_num>0) return;	/* error already set  */
  set_error(tok,err,description);
@@ -257,7 +257,7 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 	// Check for correct number of args, this sould not happen!
 	if(ia0>=0 && ia0!=ia) {
 		MESG("Error in number of args: %d != %d",ia0,ia);
-		syntax_error("function arguments error",4031);
+		syntax_error(4031,"function arguments error");
 		return(err_num);
 	};
 	// MESG("	err_eval_fun_1: 1");
@@ -456,7 +456,7 @@ int err_assign_val()
 	// MESG("err_assign_val");
 	if(!simple){
 		xpos=440;
-		syntax_error("bogus assignement!!!!",xpos);
+		syntax_error(xpos,"bogus assignement!!!!");
 		RT_MESG1(440);
 	};
 	err_num=err_lexpression();
@@ -471,7 +471,7 @@ int err_increase_by()
  // MESG("# increase_by: %s",tok_info(tok));
 	if(!simple){
 		xpos=443;
-		syntax_error("bogus assignement!!!!",xpos);
+		syntax_error(xpos,"bogus assignement!!!!");
 		RT_MESG1(443);
 	};
 	err_num=err_lexpression();
@@ -487,7 +487,7 @@ int err_mul_by()
 
 	if(!simple){
 		xpos=443;
-		syntax_error("bogus assignement!!!!",xpos);
+		syntax_error(xpos,"bogus assignement!!!!");
 		RT_MESG1(443);
 	};
 	err_num=err_num_expression();
@@ -503,7 +503,7 @@ int err_decrease_by()
 
 	if(!simple){
 		xpos=443;
-		syntax_error("bogus assignement!!!!",xpos);
+		syntax_error(xpos,"bogus assignement!!!!");
 		RT_MESG1(443);
 	};
 	err_num=err_num_expression();
@@ -547,7 +547,7 @@ int err_assign_env()
  SHOW_STAGE(450);
 	if(!simple){
 		xpos=451;
-		syntax_error("bogus assignement!!!!",xpos);
+		syntax_error(xpos,"bogus assignement!!!!");
 		RT_MESG1(451);
 	};xpos=452;
 	err_num=err_cexpression();
@@ -580,7 +580,7 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
     if ((bp=get_filebuf(bufn,NULL,0)) == NULL) 
 	{
 		xpos=463;ERROR("No function named %s",bufn);
-		syntax_error("function not found",xpos);
+		syntax_error(xpos,"function not found");
 		RT_MESG;
     };
 	*bf=bp;
@@ -674,7 +674,7 @@ int err_factor()
 	/*  the following ends factor  */
  	case TOK_SEP:
 		xpos=476;
-		// syntax_error("separator in factor!",xpos);
+		// syntax_error(xpos,"separator in factor!");
 		RT_MESG1(xpos);
 	case TOK_COMMA:
 	case TOK_SHOW:
@@ -699,7 +699,7 @@ int err_factor()
 			// MESG("	err: lbra: type=%d [%s] %f",tok->ttype,tok->tname,tok->dval);
 			if(tok->ttype==TOK_EOF||tok->ttype==TOK_SHOW) {
 				xpos=4777;
-				syntax_error(" FAC1_err: No closing braket",xpos);
+				syntax_error(xpos," FAC1_err: No closing braket");
 				RT_MESG1(xpos);
 			};
 			if(tok->ttype==TOK_SEP || tok->ttype==TOK_COMMA) {
@@ -710,7 +710,7 @@ int err_factor()
 			};
 			if(tok->ttype!=TOK_NUM && tok->ttype!=TOK_VAR && tok->ttype!=TOK_MINUS && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_PLUS && tok->ttype!=TOK_QUOTE) {
 				xpos=4778;
-				syntax_error(" wrong separator in table definition!",xpos);
+				syntax_error(xpos," wrong separator in table definition!");
 				RT_MESG1(xpos);
 			};
 			err_num=err_num_expression();
@@ -761,7 +761,7 @@ int err_factor()
 	case TOK_RPAR:
 		xpos=479;
 		pnum--;
-		// syntax_error("wrong argument number",xpos);
+		// syntax_error(xpos,"wrong argument number");
 		RT_MESG1(480);
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
@@ -1142,16 +1142,11 @@ int err_factor()
 				MESG("	(((((( err_tok_lpar: we have a left braket, continue!");
 				RT_MESG;
 			};
-#if	0
-			if(tok->ttype ==TOK_LPAR) {
-				NTOKEN_ERR(1841);
-				RT_MESG;
-			};
-#endif
+
 			if(tok->ttype !=TOK_RPAR) {
 				xpos=4850;
 				set_error(tok0,xpos,"FAC1_err: No closing parenthesis");
-				// syntax_error(" FAC1_err: No closing parenthesis",xpos);
+				// syntax_error(xpos," FAC1_err: No closing parenthesis");
 				RT_MESG1(485);
 			} else { 
 				pnum--;
@@ -1189,7 +1184,7 @@ int err_factor()
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
 #endif
-		if(pre_symbol) { syntax_error("symbol before string",xpos);RT_MESG1(4881);};
+		if(pre_symbol) { syntax_error(xpos,"symbol before string");RT_MESG1(4881);};
 		ex_nquote++;
 		RT_MESG1(4882);
 	 	};
@@ -1204,7 +1199,7 @@ int err_factor()
 #endif
 		if(pre_symbol>1) {
 			xpos=490;
-			syntax_error("too many symbols(+) infront of factor",xpos);
+			syntax_error(xpos,"too many symbols(+) infront of factor");
 			RT_MESG1(490);
 		};
 		CHECK_TOK(491);
@@ -1228,7 +1223,7 @@ int err_factor()
 #endif
 		if(pre_symbol>1) {
 			xpos=490;
-			syntax_error("too many symbols(+) infront of factor",xpos);
+			syntax_error(xpos,"too many symbols(+) infront of factor");
 			RT_MESG1(490);
 		};
 		CHECK_TOK(491);
@@ -1245,7 +1240,7 @@ int err_factor()
 		RT_MESG1(4911);
 	case TOK_NOT:
 		xpos=492;
-		if(pre_symbol) { syntax_error("symbol before not",xpos);RT_MESG;};
+		if(pre_symbol) { syntax_error(xpos,"symbol before not");RT_MESG;};
 		pre_symbol=0;
 		CHECK_TOK(xpos);
 		int stat=err_factor();
@@ -1395,21 +1390,15 @@ int err_factor()
 				if(err_num) return err_num;
 				CHECK_TOK(517);
 				// MESG("arg %d tok=[%s %d]",i,tok->tname,tok->ttype);
-#if	1
+
 				if(!check_end) {
 					if(tok->ttype==TOK_RPAR || tok->ttype==TOK_SEP) {
 						// MESG_TOK_INFO("# check RPAR:1",tok);
 						break;
 					} else {
-						syntax_error("argument not correct!",xpos);
+						syntax_error(xpos,"argument not correct!");
 					};
 				}
-#else
-				if(!check_end && tok->ttype==TOK_RPAR) {
-					CHECK_TOK(5171);
-					break;
-				};
-#endif
 				if(i<args-1) {	/* check for a comma  */
 					CHECK_TOK(5172);
 					if(tok->ttype==TOK_COMMA || check_end==0) {
@@ -1421,7 +1410,7 @@ int err_factor()
 							CHECK_TOK(5191);
 							break;
 						};
-						syntax_error("argument error,comma expected",xpos);
+						syntax_error(xpos,"argument error,comma expected");
 						macro_exec=save_macro_exec;
 						RT_MESG1(5192);
 					};
@@ -1436,7 +1425,7 @@ int err_factor()
 
 			if(i!=(args-1) && check_end) {
 				xpos=521; 
-				syntax_error("wrong number of arguments",xpos);
+				syntax_error(xpos,"wrong number of arguments");
 				macro_exec=save_macro_exec;
 				RT_MESG1(5211);
 			};
@@ -1460,17 +1449,13 @@ int err_factor()
 			pnum--;
 		} else {
 			xpos=523;
-			syntax_error("right parenthesis not found",xpos);
+			syntax_error(xpos,"right parenthesis not found");
 			RT_MESG1(5231);
 		};
 		};
 		RT_MESG1(524);
 	};
 	case TOK_DIR_ELSE:
-#if	0
-		xpos=526;
-		set_error(tok,xpos,"else without if error");
-#endif
 		RT_MESG1(5261);
 	case TOK_RBRAKET:
 		// MESG("tok_rbtacket");
@@ -1498,7 +1483,6 @@ int err_factor()
 		RT_MESG1(528);
 		};
 #endif
-#if	1
 	case TOK_TYPE_ELEMENT:
 		MESG("TOK_TYPE_ELEMENT: [%s]",tok0->tname);
 #if	TBNF
@@ -1507,7 +1491,6 @@ int err_factor()
 #endif
 		tok0->tgroup=TOK_TERM2;
 		RT_MESG1(529);
-#endif
 	default:
 		xpos=527;
 		MESG(" default: error_factor0: %s tind=%d ttype=%d TOK_VAR=%d",tok_info(tok0),tok0->tind,tok0->ttype,TOK_VAR);
@@ -1857,12 +1840,6 @@ int err_lexpression()
 #endif
 					// MESG(";3 for [%s] set assign to bnf_assign_element",tok_info(tok0_bnf_assign));
 				};
-#if	TNOASGN0
-				if(assign_type_to==0) {
-					tok0_bnf_assign->tname="VAR2=";
-					tok0_bnf_assign->bnf_factor_function=bnf_assign_element_to;
-				};
-#endif
 				assign_type_to=0;
 			};
 #endif
@@ -1894,13 +1871,11 @@ int err_lexpression()
 					dest->bnf_factor_function=bnf_increaseby_element;
 					MESG("; for [%s] increaseby_element",tok_info(dest));
 				};
-#if	1
 				 if(assign_type_to==TOK_TYPE_ELEMENT) {
 					dest->tname="EL+=";
 					dest->bnf_factor_function=bnf_increaseby_element;
 					MESG("; for [%s] set assign to type %d,bnf_increaseby_array1",tok_info(dest));
 				};
-#endif
 				assign_type_to=0;
 			} 
 #endif
@@ -2206,28 +2181,15 @@ int err_check_sentence1()
 		// set block start
 		start_block=tok;
 		CHECK_TOK(64011);
-#if	1
+
 		skip_sentence1();
 		end_block=tok;
-#else
-		if(tok->ttype==TOK_LCURL) {
-			end_block=tok->match_tok; 
-			end_block++;
-			is_block=1;
-		} else {
-			skip_sentence1();
-			end_block=tok;
-		};
-#endif
+
 		tok=start_block;
 		err_num=err_check_sentence1();
 		CHECK_TOK(64015);
-#if	1
+
 		tok=end_block;
-#else
-		if(is_block) tok=end_block;
-		else skip_sentence1();
-#endif
 		CHECK_TOK(64020);
 		}; 
 		break;
@@ -2413,7 +2375,6 @@ int err_check_block1()
 			tok->factor_function = factor_funcs[tok->ttype];
 #endif
 			NTOKEN_ERR(674);
-#if	1
 			if(tok->ttype==TOK_SEP) {
 #if	TBNF
 				tok_struct *dest=stack_push("sep after ddot",tok,-tok->ttype);
@@ -2421,7 +2382,6 @@ int err_check_block1()
 #endif
 				NTOKEN_ERR(674);
 			};
-#endif
 			continue;
 		case TOK_RCURL:
 #if	TBNF
@@ -2438,7 +2398,7 @@ int err_check_block1()
 	// MESG("--- err_check_block: [%s] after sequence: [%s]",check_buffer->b_fname,tok_info(tok));
 	if(err_num) return(err_num);
    };
- xpos=692;syntax_error("Null in block",xpos);
+ xpos=692;syntax_error(xpos,"Null in block");
  RT_MESG1(6921);
 }
 

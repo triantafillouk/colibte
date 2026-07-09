@@ -1374,7 +1374,8 @@ void main_loop()
 int show_version(num n)
 {
  // MESG("show_version:");
- msg_line("This is %s version %s !",APPLICATION_NAME,VERSION);
+ if(show_no_time) msg_line("This is %s version %s !",APPLICATION_NAME,"version");
+ else msg_line("This is %s version %s !",APPLICATION_NAME,VERSION);
  return(FALSE);
 }
 

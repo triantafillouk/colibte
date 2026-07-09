@@ -20,9 +20,8 @@ array_dat *get_array(char *);
 void set_nsval(char *,int);
 #endif
 char * tok_info(tok_struct *tok);
-
+int is_token(int type);
 void ntoken();
-int check_token(int type);
 double determinant(array_dat *aa);
 array_dat * cofactor2(array_dat *numa,double det);
 array_dat *transpose(array_dat *array1);
@@ -73,7 +72,7 @@ void get_function_args (int number_of_args)
 #endif
 		ntoken();
 	} else {;
-		if(check_token(TOK_LPAR)) {
+		if(is_token(TOK_LPAR)) {
 			// MESG("	get_function_args: TOK_LPAR");
 				ntoken();
 				ntoken();
@@ -171,10 +170,10 @@ double uf_determinant()
 		if(arr->rows==arr->cols) value=determinant(arr);
 		else {
 			// MESG("wrong dimensions!");
-			syntax_error("wrong dimensions for determinant",203);
+			syntax_error(1203,"wrong dimensions for determinant");
 		};
 	} else {
-		syntax_error("Not an array!",204);
+		syntax_error(1204,"Not an array!");
 	};
 	set_vtype(VTYPE_NUM);
 	// free(va);
@@ -192,7 +191,7 @@ double uf_inverse()
 		if(arr->rows==arr->cols) {
 			value=determinant(arr);
 		} else {
-			syntax_error("wrong dimensions for determinant",205);
+			syntax_error(1205,"wrong dimensions for determinant");
 		};
 		if(value!=0) {
 			array_dat *inverse;
@@ -201,7 +200,7 @@ double uf_inverse()
 			ex_name="Inverse";
 		};
 	} else {
-		syntax_error("Not an array!",206);
+		syntax_error(1206,"Not an array!");
 	}
 	return value;
 }
@@ -218,7 +217,7 @@ double uf_transpose()
 		ex_name="Tranpose";
 		value=1;
 	} else {
-		syntax_error("Not an array!",207);
+		syntax_error(1207,"Not an array!");
 	};
 	// free(va);
 	return value;
@@ -244,7 +243,7 @@ double uf_right()
 		if(strlen(va[0].sval)<r1) r1=strlen(va[0].sval);
 		set_sval(va[0].sval+(strlen(va[0].sval)-r1));
 	} else {
-		syntax_error("right: wrong type of args",206);
+		syntax_error(1208,"right: wrong type of args");
 		set_sval("");
 	};
 
@@ -264,7 +263,7 @@ double uf_mid()
 			set_nsval(va[0].sval+(int)va[1].dval,(int)va[2].dval);
 		};
 		} else {
-			syntax_error("mid: wrong_type of args",100);
+			syntax_error(1209,"mid: wrong_type of args");
 			set_sval("");
 		};
 		set_vtype(VTYPE_STRING);
@@ -326,7 +325,7 @@ double uf_show_time()
 		set_sval(va[0].sval);
 		value=show_time(get_sval(),va[1].dval);
 	} else {
-		syntax_error("error in stime",312);
+		syntax_error(1210,"error in stime");
 	}
 
 	return value;
@@ -340,7 +339,7 @@ double uf_upper()
 		clean_saved_string(strlen(va[0].sval));
 		get_uppercase_string(get_sval(),va[0].sval);
 	} else {
-		syntax_error("upper: wrong_type of args",100);
+		syntax_error(1211,"upper: wrong_type of args");
 		set_sval("");	
 	};
 	set_vtype(VTYPE_STRING);
@@ -354,7 +353,7 @@ double uf_lower()
 		clean_saved_string(strlen(va[0].sval));
 		get_lowercase_string(get_sval(),va[0].sval);
 	} else {
-		syntax_error("lower: needs a string argument",100);
+		syntax_error(1212,"lower: needs a string argument");
 		set_sval("");
 	};
 	set_vtype(VTYPE_STRING);
@@ -368,7 +367,7 @@ double uf_ascii()
 	if(va[0].var_type==VTYPE_STRING) {
 	 value=va[0].sval[0];
 	} else {
-		syntax_error("s_acs: needs a string argument",100);
+		syntax_error(1213,"s_acs: needs a string argument");
 	};
 	set_vtype(VTYPE_NUM);
 	// free(va);
@@ -441,7 +440,7 @@ double uf_sindex()
 	if(va[0].var_type==VTYPE_STRING) {
 		value = sindex(va[0].sval, va[1].sval);
 	} else {
-		syntax_error("s_index: wrong_type of args",100);
+		syntax_error(1214,"s_index: wrong_type of args");
 	};
 	set_vtype(VTYPE_NUM);
 
@@ -460,7 +459,7 @@ double uf_string()
 		snprintf(slocal,20,"%f",va[0].dval);
 		// MESG("uf_string: [%s]",get_sval());
 	} else {
-		syntax_error("string: wrong_type of args",100);
+		syntax_error(1215,"string: wrong_type of args");
 		set_sval("");
 	};
 	set_vtype(VTYPE_STRING);
@@ -555,7 +554,7 @@ double uf_val()
 	get_function_args(1);
 	if(va[0].var_type==VTYPE_STRING) 
 		value=atof(va[0].sval);
-	else syntax_error("val: wrong_type of args",100);
+	else syntax_error(1216,"val: wrong_type of args");
 	set_vtype(VTYPE_NUM);
 	return value;
 }
@@ -655,7 +654,7 @@ double uf_time()
 		set_sval(va[0].sval);
 		value=show_time(get_sval(),va[1].dval);
 	} else {
-		syntax_error("error in stime",312);
+		syntax_error(1217,"error in stime");
 	}
 
 	set_vtype(VTYPE_NUM);

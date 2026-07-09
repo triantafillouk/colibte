@@ -659,7 +659,7 @@ double factor_variable()
 #endif
 		default:
 		// error !!
-		syntax_error("no data in the array!!",2081);
+		syntax_error(2081,"no data in the array!!");
 		NTOKEN2;
 		RTRN(lsslot->dval);
 	};
@@ -1239,7 +1239,7 @@ static double term2_power(double v1)
 			// set_vtype(VTYPE_ARRAY);
 			ex_name="array power numeric";
 		} else {
-			syntax_error("wrong power on table",2101);
+			syntax_error(2101,"wrong power on table");
 			set_break("wrong power on table");
 		};
 		return(1);
@@ -1267,7 +1267,7 @@ double v2;
 			// set_vtype(VTYPE_ARRAY);
 			ex_name="array modulo numeric";
 		} else {
-			syntax_error("wrong modulo on table",2102);
+			syntax_error(2102,"wrong modulo on table");
 			set_break("wrong modulo on table");
 		};
 		return(1);
@@ -1278,7 +1278,7 @@ double v2;
 		set_vtype(VTYPE_NUM);
 	} else {
 		/* RT error  */
-		syntax_error("wrong modulo value value=0",2103);
+		syntax_error(2103,"wrong modulo value value=0");
 		set_break("wrong modulo value");
 	};
 	}
@@ -1328,7 +1328,7 @@ static double term1_mul(double v1)
 			return v2;
 		};
 		if(vtype_is(VTYPE_STRING)) {
-			syntax_error("cannot multiply str * str!",2102);
+			syntax_error(2104,"cannot multiply str * str!");
 			set_break("cannot multiply str * str");
 			return(0);
 		};
@@ -1360,7 +1360,7 @@ static double term1_mul(double v1)
 					ex_name="array * array";
 					RTRN(v1);
 				};
-				syntax_error("array multiply error",213);
+				syntax_error(2113,"array multiply error");
 				set_vtype(VTYPE_NUM);
 				RTRN(v1);
 			} else {
@@ -1377,7 +1377,7 @@ static double term1_mul(double v1)
 			return v1;
 		};
 	};
-	syntax_error("wrong multiply type",2101);
+	syntax_error(2114,"wrong multiply type");
 	set_break("wrong multiply type");
 	return(1);
 }
@@ -1392,7 +1392,7 @@ static double term1_div_num(double v1)
 		return v1;
 	};
 	/* RT error  */
-		syntax_error("Division by zero",212);
+		syntax_error(2115,"Division by zero");
 		v1 = 9999999999.9;
 		RTRN(v1);
 }
@@ -1414,7 +1414,7 @@ static double term1_div(double v1)
 					return v1;
 					};
 					/* RT error  */
-					syntax_error("Division by zero",212);
+					syntax_error(2116,"Division by zero");
 					v1 = 9999999999.9;
 					RTRN(v1);
 				case VTYPE_ARRAY:	// numeric * array
@@ -1429,7 +1429,7 @@ static double term1_div(double v1)
 		v2 = num_term2();
 		if(v2==0) {
 			/* RT error  */
-			syntax_error("Division by zero",215);
+			syntax_error(2117,"Division by zero");
 			v1 = 9999999999.9;
 			RTRN(v1);
 		};
@@ -1485,7 +1485,7 @@ double factor_eof(){
 
 double factor_error()
 {
-	syntax_error("factor_error",2081);
+	syntax_error(2118,"factor_error");
 	NTOKEN2;
 	set_break("factor error");
 	return 0.0;
@@ -1934,7 +1934,7 @@ double compare_smaller(double v1)
 		tok0->term_function = num_smaller;
 		return v1 < v2 ? 1.0: 0.0;
  };
-	syntax_error("comparison error",223);
+	syntax_error(2119,"comparison error");
 	MESG("comparison error type1=%d type2=%d",vtype1,vtype2);
 	set_vdval(0);
 	return 0;
@@ -1961,7 +1961,7 @@ double compare_notequal(double v1)
 		tok0->term_function = num_notequal;
 		return v1 != v2 ? 1.0: 0.0;
  };
-	syntax_error("comparison error",223);
+	syntax_error(2120,"comparison error");
 	MESG("comparison error type1=%d type2=%d",vtype1,vtype2);
 	set_vdval(0);
 	return 0;
@@ -1989,7 +1989,7 @@ double compare_bigger(double v1)
 		tok0->term_function = num_bigger;
 		return v1 > v2 ? 1.0: 0.0;
  };
-	syntax_error("comparison error",223);
+	syntax_error(2122,"comparison error");
 	MESG("comparison error type1=%d type2=%d",vtype1,vtype2);
 	set_vdval(0);
 	return 0;
@@ -2016,7 +2016,7 @@ double compare_equal(double v1)
 		tok0->term_function = num_equal;
 		return v1 == v2 ? 1.0: 0.0;
  };
-	syntax_error("comparison error",223);
+	syntax_error(2123,"comparison error");
 	MESG("comparison error type1=%d type2=%d",vtype1,vtype2);
 	set_vdval(0);
 	return 0;
@@ -2043,7 +2043,7 @@ double compare_smallereq(double v1)
 		tok0->term_function = num_smallereq;
 		return v1 <= v2 ? 1.0: 0.0;
  };
-	syntax_error("comparison error",223);
+	syntax_error(2124,"comparison error");
 	MESG("comparison error type1=%d type2=%d",vtype1,vtype2);
 	set_vdval(0);
 	return 0;
@@ -2070,7 +2070,7 @@ double compare_biggereq(double v1)
 		tok0->term_function = num_biggereq;
 		return v1 >= v2 ? 1.0: 0.0;
  };
-	syntax_error("comparison error",223);
+	syntax_error(2125,"comparison error");
 	MESG("comparison error type1=%d type2=%d",vtype1,vtype2);
 	set_vdval(0);
 	return 0;

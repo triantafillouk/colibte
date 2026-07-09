@@ -110,7 +110,8 @@ void bnf_cls()
 	/* clear screen with ncursor TODO  */
 	if(check_token(TOK_RPAR)) ntoken();
 	cls_fout("[out]");
-	MESG("<-[%s: %s ------------------------------------------------------------->",cbfp->b_fname,VERSION);
+	if(show_no_time) MESG("<-[%s: %s ------------------------------------------------------------->",cbfp->b_fname,"version..");
+	else MESG("<-[%s: %s ------------------------------------------------------------->",cbfp->b_fname,VERSION);
 }
 
 void bnf_index()	// ?? TODO!!
@@ -131,11 +132,11 @@ void bnf_determinant()	/* TBC  */
 		if(arr->rows==arr->cols) value=determinant(arr);
 		else {
 			// MESG("wrong dimensions!");
-			syntax_error("wrong dimensions for determinant",203);
+			syntax_error(1203,"wrong dimensions for determinant");
 		};
 	} else {
 		MESG("bnf_determinant: var_type=%d",bnf_var->var_type);
-		syntax_error("Variable Not a numeric array!",204);
+		syntax_error(1204,"Variable Not a numeric array!");
 	};
 	bnf_var->var_type=VTYPE_NUM;
 	bnf_var->dval=value;
@@ -156,7 +157,7 @@ void bnf_inverse()	/* TBC  */
 			value=determinant(arr);
 			// MESG("	bnf_inverse: determinant = %f",value);
 		} else {
-			syntax_error("wrong dimensions for determinant",205);
+			syntax_error(1205,"wrong dimensions for determinant");
 		};
 		if(value!=0) {
 			array_dat *inverse;
@@ -168,7 +169,7 @@ void bnf_inverse()	/* TBC  */
 			inverse->array_name="Inverse";
 		};
 	} else {
-		syntax_error("Not an array!",206);
+		syntax_error(1206,"Not an array!");
 	}
 }
 
@@ -189,7 +190,7 @@ void bnf_transpose()	/* TBC  */
 		// set_array(tarray);
 		tarray->array_name="Tranpose";
 	} else {
-		syntax_error("Not an array!",207);
+		syntax_error(1207,"Not an array!");
 	};
 	// free(va);
 }
@@ -233,7 +234,7 @@ void bnf_right()	/* TBC  */
 		va[0].var_alloced=1;
 		// set_sval(va[0].sval+(strlen(va[0].sval)-r1));
 	} else {
-		syntax_error("right: wrong type of args",206);
+		syntax_error(1208,"right: wrong type of args");
 		// set_sval("");
 	};
 	prev_var("right");
@@ -258,7 +259,7 @@ void bnf_mid()	/* TBC  */
 			va[0].var_alloced=1;
 		};
 		} else {
-			syntax_error("mid: wrong_type of args",100);
+			syntax_error(1209,"mid: wrong_type of args");
 			set_sval("");
 		};
 		prev_var("mid1");
@@ -332,7 +333,7 @@ void bnf_show_time()
 	if(va[0].var_type==VTYPE_STRING) {
 		value=show_time(va[0].sval,va[1].dval);
 	} else {
-		syntax_error("error in stime",312);
+		syntax_error(1210,"error in stime");
 	}
 	prev_var("show_time");
 	// MESG("	show_time: end var@=%d [%s]",VARIND,va[0].sval);
@@ -361,7 +362,7 @@ void bnf_upper()	/* TBC  */
 		// MESG("upper: [%s]",bnf_var->sval);
 		bnf_var->var_type=VTYPE_STRING;
 	} else {
-		syntax_error("upper: wrong_type of args",100);
+		syntax_error(1212,"upper: wrong_type of args");
 		// set_sval("");	
 	};
 	// MESG("- upper: next is [%s]",tok_info(tok));
@@ -382,7 +383,7 @@ void bnf_lower()	/* TBC  */
 		// MESG("upper: [%s]",bnf_var->sval);
 		bnf_var->var_type=VTYPE_STRING;
 	} else {
-		syntax_error("lower: wrong_type of args",100);
+		syntax_error(1213,"lower: wrong_type of args");
 		// set_sval("");	
 	};
 	// MESG("- lower: next is [%s]",tok_info(tok));
@@ -398,7 +399,7 @@ void bnf_ascii()	/* TBC  */
 		if(bnf_var->var_alloced) free(bnf_var->sval);
 		bnf_var->dval=ascii;
 	} else {
-		syntax_error("s_acs: needs a string argument",100);
+		syntax_error(1214,"s_acs: needs a string argument");
 	};
 	bnf_var->var_type=VTYPE_NUM;
 	// MESG("- ascii: next is [%s]",tok_info(tok));
@@ -476,7 +477,7 @@ void bnf_sindex()	/* TBC  */
 		bnf_var->dval = sindex(va->sval, vb->sval);
 		bnf_var->var_type=VTYPE_NUM;
 	} else {
-		syntax_error("s_index: wrong_type of args",100);
+		syntax_error(1215,"s_index: wrong_type of args");
 	};
 }
 
@@ -494,7 +495,7 @@ void bnf_string()	/* TBC  */
 		// MESG("- bnf_string: next is [%s]",tok_info(tok));
 		// show_result();
 	} else {
-		syntax_error("string: wrong_type of args",100);
+		syntax_error(1216,"string: wrong_type of args");
 		va->sval="";
 		va->var_alloced=0;
 	};
@@ -591,7 +592,7 @@ void bnf_val()	/* TBC  */
 		if(bnf_var->var_alloced) { free(bnf_var->sval);bnf_var->var_alloced=0;};
 		bnf_var->dval=val;
 		bnf_var->var_type=VTYPE_NUM;
-	} else syntax_error("val: wrong_type of args",100);
+	} else syntax_error(1217,"val: wrong_type of args");
 }
 
 void bnf_sqrt()	/* OK?  */
@@ -695,7 +696,7 @@ void bnf_time()	/* OK????  */
 		va[0].dval=dval;
 		va[0].var_type=VTYPE_NUM;
 	} else {
-		syntax_error("error in stime",312);
+		syntax_error(1218,"error in stime");
 	}
 	prev_var("time");
 }
