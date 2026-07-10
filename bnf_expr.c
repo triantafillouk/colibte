@@ -434,9 +434,9 @@ inline static void bnf_factor_plus()
 		return;
 	} else if(vara->var_type==VTYPE_ARRAY) {
 			array_dat *adat=dup_array_add1(vara->adat,varb->dval);
-			vara->adat=adat;
-			vara->var_type=VTYPE_ARRAY;
-			vara->var_alloced=1;
+			bnf_var->adat=adat;
+			bnf_var->var_type=VTYPE_ARRAY;
+			bnf_var->var_alloced=1;
 			return;
 	} else if(vara->var_type==VTYPE_SARRAY) {
 		// TBD
