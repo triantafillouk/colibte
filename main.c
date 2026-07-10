@@ -102,6 +102,21 @@ FILEBUF *get_scratch_file()
 	return(cbfp);
 }
 
+// Custom signal handler
+void handle_signal(int sig) {
+    if (sig == SIGTERM || sig == SIGINT ) {
+	drv_close();
+	fprintf(stderr,"stoped with signal %d\n",sig);	
+    exit(0);
+	};
+}
+
+void handle_signals()
+{
+   if (signal(SIGTERM, handle_signal) == SIG_ERR) {
+        perror("Error setting SIGTERM handler");
+    }
+}
 
 int main(int argc, char **argv)
 {
@@ -109,6 +124,7 @@ int main(int argc, char **argv)
 	if(lc_lang==NULL) lc_lang=getenv("LANG");
 	else if(lc_lang[0]==0) lc_lang=getenv("LANG");
 	errno=0;
+	handle_signals();
 	set_start_dir(NULL);
 	// printf("size=%ld\n",sizeof(struct tok_struct));exit(0);
 	// check_config_dir();
