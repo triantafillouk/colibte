@@ -1250,10 +1250,10 @@ int open_file(num n)
  int err=0;
  int stat=0;
  int line=0;
- // MESG("open_file: %d [%s]",n,get_sval());
+ 
 	fname[0]=0;
 	if(macro_exec){
-		// MESG("	open_file_named");
+		// MESG("open_file: %d [%s]",n,get_sval());
 		char *file_name = get_sval();
 		err=open_file_named(file_name);
 		err=goto_file(file_name);
@@ -1298,7 +1298,8 @@ int open_file(num n)
 		set_update(cwp,UPD_WINDOW);
 		return(FALSE);
 	};
-	// MESG("open_file: fname=[%s] tname=[%s]",fname,tname);
+	// MESG("open_file: fname=[%s] tname=[%s] dname=%s",fname,tname,cbfp->b_dname);
+	
 	set_bfname(fname,tname);
 	if(fname[0]==0) strlcpy(fname,tname,MAXFLEN);
 	if(fname[0]==0) return(FALSE);
@@ -1598,9 +1599,11 @@ void set_bfname(char *full_name, char *fname)
 			if(cbfp) set_full_name(full_name,cbfp->b_dname,fname,MAXFLEN);
 			else set_full_name(full_name,getcwd(dir_name,MAXFLEN),fname,MAXFLEN);
 		} else {
-			set_full_name(full_name,get_start_dir(),fname,MAXFLEN);
+			if(cbfp) set_full_name(full_name,cbfp->b_dname,fname,MAXFLEN);
+			else set_full_name(full_name,get_start_dir(),fname,MAXFLEN);
 		};
 	};
+	
 }
 
 
