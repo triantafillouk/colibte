@@ -21,7 +21,7 @@ a: array 1:[human1] type [AMIXED] , slot 0 type=14 rows 1,cols 6
 	a.name: "kostas maria"
 	a.age=77:  77.0
 	a.age:  79.0
-	a.age+=2:  77.0
+	a.age*=2:  77.0
 	a.age:  79.0
 	a.age-=2:  49.0
 	a.age:  77.0

@@ -490,7 +490,7 @@ int err_mul_by()
 		syntax_error(xpos,"bogus assignement!!!!");
 		RT_MESG1(443);
 	};
-	err_num=err_num_expression();
+	err_num=err_lexpression();
 
 	RT_MESG1(443);
 }
@@ -1172,7 +1172,7 @@ int err_factor()
 #endif
 		// MESG("tok_num: ");
 		// MESG("	next is: %s",tok_info(tok));
-		if(tok->ttype==TOK_INCREASE||tok->ttype==TOK_INCREASEBY ||tok->ttype==TOK_DECREASE||tok->ttype==TOK_DECREASEBY) {
+		if(tok->ttype==TOK_INCREASE||(tok->ttype>=TOK_INCREASEBY&&tok->ttype<=TOK_DECREASEBY)) {
 			tok--;
 			set_error(tok0,xpos,"cannot change constant value!");
 			RT_MESG1(xpos);
@@ -1869,12 +1869,12 @@ int err_lexpression()
 					// tok->ttype=TOK_ASSIGN_ARRAY1;
 					dest->tname="EL1+=";
 					dest->bnf_factor_function=bnf_increaseby_element;
-					MESG("; for [%s] increaseby_element",tok_info(dest));
+					// MESG("; for [%s] increaseby_element",tok_info(dest));
 				};
 				 if(assign_type_to==TOK_TYPE_ELEMENT) {
 					dest->tname="EL+=";
 					dest->bnf_factor_function=bnf_increaseby_element;
-					MESG("; for [%s] set assign to type %d,bnf_increaseby_array1",tok_info(dest));
+					// MESG("; for [%s] set assign to type %d,bnf_increaseby_array1",tok_info(dest));
 				};
 				assign_type_to=0;
 			} 
@@ -1900,14 +1900,19 @@ int err_lexpression()
 					dest->tname="A2*=";
 					dest->bnf_factor_function=bnf_mulby_array2;
 					// MESG("; for [%s] set assign to type %d,bnf_mulby_array2",tok_info(dest));
-				} if(assign_type_to==TOK_ASSIGN_ARRAY1) {
+				}; if(assign_type_to==TOK_ASSIGN_ARRAY1) {
 					dest->tname="A1*=";
 					dest->bnf_factor_function=bnf_mulby_array1;
 					// MESG("; for [%s] set assign to type %d,bnf_mulby_array1",tok_info(dest));
 				};
-				 if(assign_type_to==TOK_TYPE_ELEMENT) {
+
+				 if(assign_type_to==TOK_ASSIGN_TYPE) {
 					// tok->ttype=TOK_ASSIGN_ARRAY1;
-					
+					dest->tname="EL1*=";
+					dest->bnf_factor_function=bnf_mulby_element;
+					// MESG("; for [%s] mulby_element",tok_info(dest));
+				};
+				 if(assign_type_to==TOK_TYPE_ELEMENT) {
 					dest->tname="EL*=";
 					dest->bnf_factor_function=bnf_mulby_element;
 					// MESG("; for [%s] set assign to type %d,bnf_increaseby_array1",tok_info(dest));
