@@ -6,6 +6,8 @@
 
  	An interpreter,embeded calculator by K.Triantafillou (2011,2020),
 */
+#define TOKENN		0
+inline void ntoken();
 
 #include	<math.h>
 #include	<stdlib.h>
@@ -16,13 +18,17 @@
 #include	"func.h"
 #include	"token_table.h"
 
+
 #define	SYNTAX_DEBUG	0
-#if	1
-// #define NTOKEN2 ntoken2()
-#define NTOKEN2 tok++
+
+#if	TOKENN
+#define	NTOKEN2 tok=tok->next_token
+// #define	NTOKEN2	ntoken()
 #else
-#define	NTOKEN2	ntoken2()
+#define NTOKEN2 tok++
+// #define	NTOKEN2	ntoken()
 #endif
+
 #define FACTOR_FUNCTION tok->factor_function()
 void mesg_out(const char *fmt, ...);
 extern FILEBUF *cbfp;
@@ -51,6 +57,8 @@ double compare_smallereq(double value);
 double compare_biggereq(double value);
 double compare_equal(double v1);
 void set_bnf_function1(tok_struct *tok, int type);
+// inline static void ntoken2();
+
 #if	TBNF
 static inline void bnf_factor_dummy();
 #endif
@@ -143,6 +151,7 @@ char *ex_name=NULL;	/* variable name of the previous array  */
 int err_num=0;
 static int err_line=0;
 int last_correct_line=0;
+
 static tok_struct *tok=NULL;	/* current token!!  */
 
 char *err_str;
@@ -425,14 +434,22 @@ tok_struct *new_tok()
 #endif
  tok->tok_node=NULL;
  // MESG("new_tok:");
+#if	TOKENN
+ tok->next_token=NULL;
+#endif
  return(tok);
 }
 
 #define	TNAME	tname(tok->ttype)
 
-void ntoken()
+inline void ntoken()
 {
+#if	TOKENN
+	// MESG("- %s",tok->tname);
+	tok=tok->next_token;
+#else
 	tok++;
+#endif
 }
 
 int tok_type()
@@ -743,6 +760,22 @@ void show_token_table(char *title, FILEBUF *bf,tok_struct *token_start,int size)
  MESG("------------------------------------------------------");
 }
 
+#if	TOKENN
+void create_token_pointers(FILEBUF *bf)
+{
+ tok_struct *tokp=bf->tok_table_bnf;
+ int table_size=bf->tok_bnf_index;
+ MESG("create_token_pointers:[%s] size=%d",bf->b_fname,table_size);
+ int i=0;
+ for(i=0;i<table_size;i++) {
+	// MESG("tp %3d %s",i,tokp->tname);
+ 	tokp->next_token = tokp+1;
+	tokp++;
+ };
+ // tokp->next_tok=NULL;
+}
+#endif
+
 /* Check for any errors and initialize parsed list  */
 int check_init(FILEBUF *bf)
 {
@@ -812,6 +845,9 @@ int check_init(FILEBUF *bf)
  if(usebnf)
 #endif
 #if	TBNF
+#if	TOKENN
+ create_token_pointers(bf);
+#endif
  show_token_table("BNF ",bf,bf->tok_table_bnf,bf->tok_bnf_index);
  if(bnf_debug() && check_buffer==NULL) exit(0);
 #endif
@@ -930,7 +966,7 @@ MVAR *btree_to_mvar(BTREE *bt)
 /* user interupt on, set also break flag  */
 void set_break(char *from)
 {
-	MESG("set_break: from %s",from);
+	// MESG("set_break: from %s",from);
 	is_break1=1;
 	// tok->tgroup=TOK_EOF;
 	// tok->ttype=TOK_EOF;
@@ -1351,6 +1387,7 @@ int refresh_current_buffer(num nused)
 #if	TBNF
 		tok=fp->tok_table_bnf;
 		bnf_block1_break();
+		MESG("== end program!");
 #endif
 #if	TBNFNORMAL
 	} else {

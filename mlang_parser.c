@@ -264,7 +264,7 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 
 void set_dot_var(FILEBUF *bf,tok_struct *tok)
 {
-	char nword[256];
+	char nword[256];	/* TBC maximum variable name  */
 	
 	// MESG("set_dot_var:");
 	// MESG("set_dot_var: name %s",tok->tname);

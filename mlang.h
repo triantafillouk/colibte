@@ -57,6 +57,9 @@ typedef struct tok_struct {
 		struct FILEBUF *proc_buffer;
 		struct BTNODE *tok_node;
 	};
+#if	TOKENN
+	struct tok_struct *next_token;
+#endif
 } tok_struct;
 
 

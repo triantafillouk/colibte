@@ -579,7 +579,7 @@ void bnf_init()	/* TBC  */
 {
 	MESG("initialize: bnf_init");
 	init_stack();
-	ntoken();
+	NTOKEN2;
 }
 
 void bnf_val()	/* TBC  */
@@ -711,7 +711,6 @@ void bnf_deq()	/* OK?  */
 
 void bnf_atbof()	/* TBC  */
 {
-	// ntoken();
 	next_var("atbof");
 
 	bnf_var->dval = FBof(cbfp);
@@ -720,7 +719,7 @@ void bnf_atbof()	/* TBC  */
 
 void bnf_ateof()	/* TBC  */
 {
-	ntoken();
+	NTOKEN2;
 	next_var("ateof");
 	bnf_var->var_type=VTYPE_NUM;
 	bnf_var->dval = FEof(cbfp);
@@ -728,7 +727,7 @@ void bnf_ateof()	/* TBC  */
 
 void bnf_atbol()	/* OK?  */
 {
-	ntoken();
+	NTOKEN2;
 	next_var("atbol");
 	bnf_var->var_type=VTYPE_NUM;
 	bnf_var->dval = FBolAt(cbfp,Offset());
@@ -736,7 +735,7 @@ void bnf_atbol()	/* OK?  */
 
 void bnf_ateol()	/* OK?  */
 {
-	ntoken();
+	NTOKEN2;
 	next_var("ateol");
 	bnf_var->var_type=VTYPE_NUM;
 	bnf_var->dval=FEolAt(cbfp,Offset());
@@ -744,7 +743,7 @@ void bnf_ateol()	/* OK?  */
 
 void bnf_mainargsize()	/* TBC  */
 {
-	ntoken();
+	NTOKEN2;
 	next_var("mainargsize");
 	bnf_var->var_type=VTYPE_NUM;
 	bnf_var->dval = main_args->cols;
@@ -752,7 +751,7 @@ void bnf_mainargsize()	/* TBC  */
 
 void bnf_mainarg()	/* TBC  */
 {
-	if(!main_args) { ntoken();};
+	if(!main_args) { NTOKEN2;};
 
 	bnf_function_args(1);
 	MVAR *va=bnf_var;
@@ -787,7 +786,7 @@ void bnf_show_vars()	/* ok?  */
 
 void bnf_list_tokens()	/* ok?  */
 {
- ntoken();
+ NTOKEN2;
  // MESG("bnf_list_tokens:");
  if(exe_buffer==NULL) { MESG("	exec buffer is null!");return;};
 

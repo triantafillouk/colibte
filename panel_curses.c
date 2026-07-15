@@ -1166,7 +1166,8 @@ int drv_check_break_key()
  // if(checking_break_key) {
  count++;
  // MESG("drv_check_break_key: %d",count);
- if(count>10000000) {
+ if(count>10000) {
+	// fprintf(stderr,"break_key:\n");
  	int key=getch();
 	count=0;
 	if(key==3) { set_break("drv_check_break_key");return 1;}

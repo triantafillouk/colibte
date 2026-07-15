@@ -642,9 +642,7 @@ inline static void bnf_factor_pp_num_mul()
 {
  double valb = bnf_var->var_pointer->dval;
  prev_var("pp_mul");
- // bnf_var->var_pointer->dval *= valb;
- double vala = bnf_var->var_pointer->dval;
- bnf_var->dval=vala * valb;
+ bnf_var->dval = bnf_var->var_pointer->dval * valb;
  bnf_var->var_type=VTYPE_NUM;
  // MESG("bnf_factor_pp_num_mul: %f",bnf_var->dval);
 }
@@ -2140,9 +2138,13 @@ inline static void bnf_block1()
 		// MESG("		-- tok %d type %d act=%d",tok->tnum,tok->ttype,current_active_flag);
 		NTOKEN2;
 		// MESG("	  var@=%d group=%d [%s] act=%d",VARIND,tok->tgroup,tok_info(tok),current_active_flag);
-		if(!current_active_flag) {
+		if(!current_active_flag) 
+		// if(drv_check_break_key())
+		{
 			// MESG("bnf_block1:[%s] stop: ind=%d type=%d [%s]",fp->b_fname,VARIND,bnf_var->var_type,tok_info(tok));
 			// if(VARIND!=block_startvar_pos) MESG("	block break: var@=%d startvar=%d [%s]",VARIND,block_startvar_pos,tok_info(tok));
+			// MESG("bnf_block1:[%s] stop: ind=%d type=%d [%s]",exe_buffer->b_fname,VARIND,bnf_var->var_type,tok_info(tok));
+			//tok=exe_buffer->end_token;
 			return;
 		};
 	} 
@@ -2154,13 +2156,14 @@ inline static void bnf_block1()
 
 inline static void bnf_block1_break(/*FILEBUF *fp*/)
 {
+	// MESG("bnf_block1_break start! group=%d [%s]",tok->tgroup,tok_info(tok));
 	while(tok->tgroup!=TOK_END) {
 		// MESG("--- block var@=%d [%s]",VARIND,tok_info(tok));
 	 	tok->bnf_factor_function();
 		// MESG("		-- tok %d type %d",tok->tnum,tok->ttype);
 		NTOKEN2;
 		if(drv_check_break_key()) {
-			// MESG("bnf_block1:[%s] stop: ind=%d type=%d [%s]",fp->b_fname,VARIND,bnf_var->var_type,tok_info(tok));
+			// MESG("bnf_block1_break:[%s] stop: ind=%d type=%d [%s]",exe_buffer->b_fname,VARIND,bnf_var->var_type,tok_info(tok));
 			// if(VARIND!=block_startvar_pos) MESG("	block break: var@=%d startvar=%d [%s]",VARIND,block_startvar_pos,tok_info(tok));
 			return;
 		};
@@ -2266,12 +2269,17 @@ inline static void bnf_dir_fori()
 			var_index -= (VARIND-start_var);
 #endif
 			bnf_var=bnf_vars+start_var;
-			bnf_block1();
+			if(execmd) bnf_block1();
+			else bnf_block1_break();
 			
 			// MESG("	fori:2 iterrator_val=%3f start var=%d var@=%d, [%s]",*iterrator_val,start_var,VARIND,tok_info(tok));
 			if(current_active_flag==0) {
 				// MESG("end loop!:");
-				if(is_break1) { tok=exe_buffer->end_token;return;};
+				if(is_break1) { 
+					tok=exe_buffer->end_token-1;
+					// MESG("is break , return");
+					return;
+				};
 				break;
 			};
 		};
@@ -2282,7 +2290,9 @@ inline static void bnf_dir_fori()
 			var_index -= (VARIND-start_var);
 #endif
 			bnf_var=bnf_vars+start_var;
-			bnf_block1();
+			if(execmd) bnf_block1();
+			else bnf_block1_break();
+
 			if(current_active_flag==0) {
 				if(is_break1) { tok=exe_buffer->end_token;return;};
 				break;
@@ -2370,8 +2380,10 @@ inline static void bnf_dir_for()
 			tok=start_block;
 			// int ind=VARIND;
 			// MESG("	for: start of loop: var@=%d [%s]",VARIND,tok_info(tok));
-			if(is_curl) { bnf_block1();} 
-			else { 
+			if(is_curl) { 
+				if(execmd) bnf_block1();
+				else bnf_block1_break();
+			} else { 
 #if	0
 				bnf_statement0();
 #else
@@ -2397,7 +2409,7 @@ inline static void bnf_dir_for()
 //		MESG("before next loop: val=%f",val);		
 	};
 	current_active_flag=aflag;
-	if(is_break1) { tok=exe_buffer->end_token;return;};
+	if(is_break1) { tok=exe_buffer->end_token-1;return;};
 	tok=end_block;
 	current_active_flag=old_active_flag;
 	// MESG("-- dir_for:end var@=%d active = %d",VARIND,current_active_flag);	
@@ -2439,7 +2451,8 @@ inline static void bnf_dir_while()	/* TBC  */
 			// on the block start
 			tok=start_block;
 			// MESG("		while start loop var@=%d [%s]",VARIND,tok_info(tok));
-			bnf_block1();
+			if(execmd) bnf_block1();
+			else bnf_block1_break();
 			// MESG("		while end loop var@=%d [%d]",VARIND,tok_info(tok));
 			if(current_active_flag==0) {	/* only after break  */
 				if(is_break1) { tok=exe_buffer->end_token;return;};
@@ -2459,6 +2472,7 @@ inline static void bnf_statement0()
 {
 	while(tok->ttype != TOK_SEP && tok->ttype != TOK_RCURL && tok->ttype != TOK_DIR_ELSE) {
 		tok->bnf_factor_function();	
+		// MESG("	bnf_statement0: loop var@=%d [%s]",VARIND,tok_info(tok));
 		NTOKEN2;
 	};
 	tok--;
@@ -2472,6 +2486,7 @@ inline static void bnf_statement(char *from)
 	else {
 		while(tok->ttype != TOK_SEP && tok->ttype != TOK_RCURL && tok->ttype != TOK_DIR_ELSE) {
 			tok->bnf_factor_function();	
+			// MESG("	bnf_statement: loop var@=%d [%s]",VARIND,tok_info(tok));
 			NTOKEN2;
 		};
 		tok--;
@@ -2494,6 +2509,7 @@ inline static void bnf_expression0()
 	while(tok->bnf_group>0) {
 		// MESG("	bnf_group=%d [%s]",tok->bnf_group,tok_info(tok));
 		tok->bnf_factor_function();	
+		// MESG("bnf_expression0:");
 		NTOKEN2;
 	};
 }
@@ -2505,6 +2521,7 @@ inline static double bnf_expression()
 	while(tok->bnf_group>0) {
 		// MESG("	bnf_group=%d [%s]",tok->bnf_group,tok_info(tok));
 		tok->bnf_factor_function();	
+		// MESG("bnf_expression:");
 		NTOKEN2;
 	};
 #if	1
@@ -2593,7 +2610,8 @@ inline static void bnf_exec_function(FILEBUF *proc_buffer,int nargs)
 	NTOKEN2;
 	// MESG("-bnf_exec_function: at start of block: [%s] active=%d",tok_info(tok),current_active_flag);
 	// current_active_flag=1;
-	bnf_block1();
+			if(execmd) bnf_block1();
+			else bnf_block1_break();
 	// show_result();
 	delete_symbol_table(current_stable,proc_buffer->symbol_tree->items,nargs);
 	current_stable=old_symbol_table;

@@ -745,6 +745,7 @@ void show_var_node(BTNODE *node)
 		mesg_out("%03d %-10s %2d(%12s)",node->node_index,node->node_name,var->var_type,vtype_names[var->var_type]);
 }
 
+#if	TNORMAL
 double uf_show_vars()
 {
 	ntoken();
@@ -759,6 +760,7 @@ double uf_show_vars()
 #endif
 	return 0;
 }
+#endif
 
 #if	TNORMAL
 double uf_list_tokens()
