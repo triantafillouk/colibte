@@ -138,7 +138,7 @@ int check_skip_token1( int type)
  	if(tok->ttype==type) 
  	{ 
 		// MESG("skip_token1");
-		NTOKEN2;
+		NTOKEN_ERR(110);
  		return(1);
  	} else {
 		return(0);
@@ -151,7 +151,7 @@ int check_skip_token_err1(int type,char *mesg,int err)
  	if(tok->ttype==type) 
  	{
 		// MESG_TOK_INFO(" check_skip_token",tok);
-		NTOKEN2;
+		NTOKEN_ERR(100);
  		return(0);
  	} else {
 		syntax_error(err,mesg);
@@ -164,7 +164,7 @@ int check_skip_token_err1(int type,char *mesg,int err)
 void error_skip_token(int index,char *description)
 {
 	set_error(tok,index, "input error!!!");
-	NTOKEN2;
+	NTOKEN_ERR(101);
 }
 
 void set_error(tok_struct *tok,int err,char *description)
@@ -705,7 +705,7 @@ int err_factor()
 			if(tok->ttype==TOK_SEP || tok->ttype==TOK_COMMA) {
 				// MESG("	tok_sep [%s]",tok->tname);
 				stack_push("lbra",tok,-tok->ttype);
-				NTOKEN2;
+				NTOKEN_ERR(103);
 				continue;
 			};
 			if(tok->ttype!=TOK_NUM && tok->ttype!=TOK_VAR && tok->ttype!=TOK_MINUS && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_PLUS && tok->ttype!=TOK_QUOTE) {
@@ -727,7 +727,7 @@ int err_factor()
 				cdim++;if(cdim>rows) rows=cdim;
 				// MESG("		new row2");
 				stack_push("lbra line",tok,-tok->ttype);
-				NTOKEN2;
+				NTOKEN_ERR(104);
 				continue;
 			};
 			// MESG("ttype=%d %s",tok->ttype,tname(tok->ttype));
@@ -844,7 +844,7 @@ int err_factor()
 		err_num=err_num_expression(); 
 		if(tok->ttype==TOK_RBRAKET) {
 			stack_push("array_l2 b1",tok,tok->ttype);
-			NTOKEN2;
+			NTOKEN_ERR(105);
 		} else {
 			MESG("	No rbracket found!");
 		};
@@ -857,7 +857,7 @@ int err_factor()
 			tok0_bnf->tname="TL2 a";
 #endif
 			// MESG("	TOK_TYPE_ELEMENT before [%s]",tok_info(tok));
-			NTOKEN2;
+			NTOKEN_ERR(106);
 			// MESG("	TOK_TYPE_ELEMENT after [%s]",tok_info(tok));
 
 			if(tok->ttype==TOK_INCREASE) {
@@ -1322,7 +1322,7 @@ int err_factor()
 			RT_MESG1(503);
 		};
 		stack_push("proc ) ",tok,-TOK_RPAR);
-		NTOKEN2;
+		NTOKEN_ERR(107);
 		after_proc=tok;	// this must be RPAR token!
 		// MESG("err TOK_PROC: set after_proc [%s] ttype=%d",tok->tname,tok->ttype);
 		FILEBUF *proc_buffer=NULL;
@@ -1543,13 +1543,14 @@ int err_num_term3(tok_struct *tok1)
 int err_num_term2()
 {
  TDSERR("num_term2");
-
+ MESG("err_num_term2:0 [%s]",tok_info(tok));
  SHOW_STAGE(541);
  err_num = err_factor();
  if(err_num) RT_MESG1(err_num);
-
+ MESG("err_num_term2:1 [%s]",tok_info(tok));
  if(tok->tgroup==TOK_TERM2) {
  	CHECK_TOK(543);
+	MESG("err_num_term2:2 [%s]",tok_info(tok));
 	// tok->term_function = factor_funcs[tok->ttype];
 #if	TNORMAL
 	set_term_function(tok,(TFunction)factor_funcs[tok->ttype]);
@@ -1557,18 +1558,21 @@ int err_num_term2()
 	tok_struct *tok0=tok;
 
 	if(tok0->ttype==TOK_MOD||tok0->ttype==TOK_POWER) {
+		MESG("err_num_term2:3 [%s]",tok_info(tok));
 		NTOKEN_ERR(544);
 		err_num = err_num_term3(tok0);
 	} else {
+		MESG("err_num_term2:4 [%s]",tok_info(tok));
 		NTOKEN_ERR(544);
 		// MESG_TOK_INFO("-- push term2 function",tok0);
 		stack_push("num_term2",tok0,tok0->ttype);
 		err_num = err_num_term2();
 	};
+	MESG("err_num_term2:5 [%s]",tok_info(tok));
 	// if(tok0->ttype==TOK_MOD) MESG("# term2 function after [%s]",tok_info(tok0));
 	RT_MESG1(545);
  } else {
- 	// MESG(" term2 end %s",tok_info(tok));
+ 	MESG(" term2 end %s",tok_info(tok));
  };
  RT_MESG1(548);
 }
@@ -2106,7 +2110,7 @@ int err_check_sentence1()
 		if(tok->ttype==TOK_DIR_ELSE) {
 			// MESG("we have an else statement!");
 			tok0=tok;
-			NTOKEN2;
+			NTOKEN_ERR(108);
 			err_num=err_check_sentence1();	/* body of else  */
 			xpos=638;
 			tok0->next_tok=tok;

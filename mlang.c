@@ -6,7 +6,7 @@
 
  	An interpreter,embeded calculator by K.Triantafillou (2011,2020),
 */
-#define TOKENN		0
+#define TOKENN		1
 inline void ntoken();
 
 #include	<math.h>
