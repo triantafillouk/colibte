@@ -170,6 +170,7 @@ void error_skip_token(int index,char *description)
 void set_error(tok_struct *tok,int err,char *description)
 {
  set_break(description);
+ FILEBUF *error_buffer = (exe_buffer==NULL) ? cbfp: exe_buffer;
 
  if(tok==NULL) {
  	fprintf(stderr,"error: tok is NULL, %d %s\n",err,description);
@@ -179,15 +180,15 @@ void set_error(tok_struct *tok,int err,char *description)
  };
  err_line=tok->tline+1;
  err_num=err;
- // MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
+ MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
  err_str=strdup(description);
 #if	1
  if(execmd) {
-	if(tok->tname==NULL) fprintf(stderr,"[%s] Error:%d tnum=%d ttype=%d %s line %d\n",exe_buffer->b_fname,err,tok->tnum,tok->ttype,err_str,err_line);
- 	else fprintf(stderr,"[%s] Error:%d [%s] tnum=%d ttype=%d %s line %d\n",exe_buffer->b_fname,err,(char *)tok->tname,tok->tnum,tok->ttype,err_str,err_line);
+	if(tok->tname==NULL) fprintf(stderr,"[%s] Error:%d tnum=%d ttype=%d %s line %d\n",error_buffer->b_fname,err,tok->tnum,tok->ttype,err_str,err_line);
+ 	else fprintf(stderr,"[%s] Error:%d [%s] tnum=%d ttype=%d %s line %d\n",error_buffer->b_fname,err,(char *)tok->tname,tok->tnum,tok->ttype,err_str,err_line);
  };
 #endif
- tok=exe_buffer->end_token;
+ tok=error_buffer->end_token;
  if(tok==NULL) return;
  tok->ttype=TOK_EOF;
 #if	TNORMAL
@@ -836,6 +837,9 @@ int err_factor()
 			tok->tind = var_index;
 			// MESG("	var_name_to_assign: %s [%s]",tok0->tname,tok_info(tok));
 		};
+		if(tok->ttype==TOK_LPAR) {
+			set_error(tok0,492,"var not a function!");
+		};
 		// MESG("	TOK_VAR: return [%s]",tok_info(tok));
 		RT_MESG1(493);}
 	case TOK_ARRAY_L2:{
@@ -1145,7 +1149,7 @@ int err_factor()
 
 			if(tok->ttype !=TOK_RPAR) {
 				xpos=4850;
-				set_error(tok0,xpos,"FAC1_err: No closing parenthesis");
+				set_error(tok,xpos,"FAC1_err: No closing parenthesis");
 				// syntax_error(xpos," FAC1_err: No closing parenthesis");
 				RT_MESG1(485);
 			} else { 
@@ -1543,14 +1547,12 @@ int err_num_term3(tok_struct *tok1)
 int err_num_term2()
 {
  TDSERR("num_term2");
- MESG("err_num_term2:0 [%s]",tok_info(tok));
+ // MESG("err_num_term2:0 [%s]",tok_info(tok));
  SHOW_STAGE(541);
  err_num = err_factor();
  if(err_num) RT_MESG1(err_num);
- MESG("err_num_term2:1 [%s]",tok_info(tok));
  if(tok->tgroup==TOK_TERM2) {
  	CHECK_TOK(543);
-	MESG("err_num_term2:2 [%s]",tok_info(tok));
 	// tok->term_function = factor_funcs[tok->ttype];
 #if	TNORMAL
 	set_term_function(tok,(TFunction)factor_funcs[tok->ttype]);
@@ -1558,21 +1560,18 @@ int err_num_term2()
 	tok_struct *tok0=tok;
 
 	if(tok0->ttype==TOK_MOD||tok0->ttype==TOK_POWER) {
-		MESG("err_num_term2:3 [%s]",tok_info(tok));
 		NTOKEN_ERR(544);
 		err_num = err_num_term3(tok0);
 	} else {
-		MESG("err_num_term2:4 [%s]",tok_info(tok));
 		NTOKEN_ERR(544);
 		// MESG_TOK_INFO("-- push term2 function",tok0);
 		stack_push("num_term2",tok0,tok0->ttype);
 		err_num = err_num_term2();
 	};
-	MESG("err_num_term2:5 [%s]",tok_info(tok));
 	// if(tok0->ttype==TOK_MOD) MESG("# term2 function after [%s]",tok_info(tok0));
 	RT_MESG1(545);
  } else {
- 	MESG(" term2 end %s",tok_info(tok));
+ 	// MESG(" term2 end %s",tok_info(tok));
  };
  RT_MESG1(548);
 }

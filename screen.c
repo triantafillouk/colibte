@@ -57,13 +57,12 @@ int	noupdate=1;		/* no need to update the screen , no display started */
 
 utfchar double_hline = { "═" };
 utfchar single_hline = { "↪" };
-utfchar next_l = { " " };
 // utfchar next_l = { "↘" };
 // utfchar first_l = { "►" };
-utfchar first_l = { "." };
 
-//num cline_end=0;
-//num cstart_offset;
+utfchar first_l = { " " };
+utfchar next_l = { "." };
+
 
 #if	NUSE
 int addutfvchar(char *str, vchar *vc, int pos, FILEBUF *w_fp)
