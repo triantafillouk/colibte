@@ -30,7 +30,10 @@ typedef struct tok_struct {
 	short tgroup;	/* token group  */
 #if	TBNF
 	short bnf_group;
-	short pushed;
+	union {
+		short pushed;
+		short statement_group;
+	};
 	short function_index;
 	VFunction bnf_factor_function;
 #endif

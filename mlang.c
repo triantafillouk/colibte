@@ -6,7 +6,6 @@
 
  	An interpreter,embeded calculator by K.Triantafillou (2011,2020),
 */
-#define TOKENN		0
 inline void ntoken();
 
 #include	<math.h>
@@ -776,6 +775,20 @@ void create_token_pointers(FILEBUF *bf)
 }
 #endif
 
+void create_statement_group(FILEBUF *bf)
+{
+ tok_struct *tokp=bf->tok_table_bnf;
+ int table_size=bf->tok_bnf_index;
+ // MESG("create_token_pointers:[%s] size=%d",bf->b_fname,table_size);
+ int i=0;
+ for(i=0;i<table_size;i++) {
+	// MESG("tp %3d %s",i,tokp->tname);
+ 	tokp->statement_group = tokp->ttype != TOK_SEP && tokp->ttype != TOK_RCURL && tokp->ttype != TOK_DIR_ELSE;
+	tokp++;
+ };
+ // tokp->next_tok=NULL;
+}
+
 /* Check for any errors and initialize parsed list  */
 int check_init(FILEBUF *bf)
 {
@@ -848,6 +861,7 @@ int check_init(FILEBUF *bf)
 #if	TOKENN
  create_token_pointers(bf);
 #endif
+ create_statement_group(bf);
  show_token_table("BNF ",bf,bf->tok_table_bnf,bf->tok_bnf_index);
  if(bnf_debug() && check_buffer==NULL) exit(0);
 #endif

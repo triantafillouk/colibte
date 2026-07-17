@@ -2470,7 +2470,9 @@ inline static void bnf_dir_while()	/* TBC  */
 
 inline static void bnf_statement0()
 {
-	while(tok->ttype != TOK_SEP && tok->ttype != TOK_RCURL && tok->ttype != TOK_DIR_ELSE) {
+	// while(tok->ttype != TOK_SEP && tok->ttype != TOK_RCURL && tok->ttype != TOK_DIR_ELSE) 
+	while(tok->statement_group)
+	{
 		tok->bnf_factor_function();	
 		// MESG("	bnf_statement0: loop var@=%d [%s]",VARIND,tok_info(tok));
 		NTOKEN2;
@@ -2484,7 +2486,9 @@ inline static void bnf_statement(char *from)
 	// if(tok->ttype==TOK_DIR_BREAK) { tok->bnf_factor_function(); return;};
 	if(tok->ttype==TOK_LCURL) bnf_dir_lcurl();
 	else {
-		while(tok->ttype != TOK_SEP && tok->ttype != TOK_RCURL && tok->ttype != TOK_DIR_ELSE) {
+		// while(tok->ttype != TOK_SEP && tok->ttype != TOK_RCURL && tok->ttype != TOK_DIR_ELSE) 
+		while(tok->statement_group)
+		{
 			tok->bnf_factor_function();	
 			// MESG("	bnf_statement: loop var@=%d [%s]",VARIND,tok_info(tok));
 			NTOKEN2;

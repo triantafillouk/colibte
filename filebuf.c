@@ -278,12 +278,20 @@ int show_info(num n)
 	char *xv="u";
 #else 
 #if	TBNF
+#if	TOKENN
+	char *xv="t";
+#else
 	char *xv="f";
+#endif
 #else
 	char *xv="n";
 #endif
 #endif
-	SMESG("%s version %s %s",PROGNAME,xv,VERSION);
+#if	TOKENN
+	SMESG("%s Version %s %s",PROGNAME,xv,VERSION);
+#else
+	SMESG("%s Version %s %s",PROGNAME,xv,VERSION);
+#endif
 #ifdef	GVERS
 	SMESG("git:%s",GVERS);
 #endif
