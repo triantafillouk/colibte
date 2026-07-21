@@ -597,9 +597,8 @@ void drv_size()
 
 void set_mouse_on()
 {
-#if	!SOLARIS
+ if(!mcurflag) return;
  mousemask(ALL_MOUSE_EVENTS|REPORT_MOUSE_POSITION,NULL);
-#endif
  printf("\033[?1003h");	/* makes terminal report mouse mouvement  */
  if(extended_mouse) {
  	printf("\033[?1006h");	/* makes terminal extended report mouse mouvement  */
@@ -609,27 +608,21 @@ void set_mouse_on()
 
 void enable_key_mouse()
 {
+ if(!mcurflag) return;
  mouse_active=1;
-#if	SOLARIS
-	return;
-#else
-	set_mouse_on();
-#endif
+ set_mouse_on();
 }
 
 void disable_key_mouse()
 {
  mouse_active=0;
-#if	SOLARIS
-	return;
-#else
+ // fprintf(stderr,"set_mouse_off:\n");
  mousemask(0,NULL);
  printf("\033[?1003l");	/* makes terminal stop reporting mouse mouvement  */
  if(extended_mouse) {
  	printf("\033[?1006l");	/* makes terminal stop reporting mouse mouvement  */
  };
  fflush(stdout);
-#endif
 }
 
 int toggle_mouse(num n)
@@ -670,7 +663,6 @@ void drv_open()
  noecho();
  raw();
  nonl();
-
  if(mcurflag){
 // keypad(stdscr,1);	/* no need for the moment, need a lot of changes!  */
 	set_mouse_on();
@@ -1097,8 +1089,10 @@ void drv_close()
 /* Flush/resync */
 void drv_flush()
 {
+ if(mcurflag){
 	set_mouse_on();
-	refresh();
+ };
+ refresh();
 }
 
 void drv_win_flush(WINDP *wp)
