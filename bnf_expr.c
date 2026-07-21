@@ -3049,28 +3049,28 @@ inline static void bnf_assign_array2()
 
 inline static void bnf_increaseby_array2()
 {
-	// MESG(":increaseby_array2: bvar type=%d",bnf_var->var_type);
+	MESG(":increaseby_array2: bvar type=%d",bnf_var->var_type);
 	MVAR *bvar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer : bnf_var;
 	prev_var("increaseby_array2:");
 	array_dat *adat = bnf_var->adat;
-	int ind1=bnf_var->index1;
+	int index1=bnf_var->index1;
 
 	// MESG("	set array[%d] avar@=%d type=%d ind1=%d ind2=%d",ind1,VARIND,bnf_var->var_type,ind1,ind2);
-	// double **dval = adat->dval2;
-	// dval[ind1][ind2]+=bvar->dval;
-	// bnf_var->dval=dval[ind1][ind2];
 	if(adat->atype==VTYPE_ARRAY) {
-		double *dval = adat->dval;
-		dval[ind1] *=bvar->dval;
-		// bnf_var->dval=dval[ind1];
-		// adat->mval[bnf_var->index1] *= bvar->dval;
+		int ind1 = index1%adat->cols;
+		int ind2 = index1%adat->rows;
+		// MESG("	adat cols=%d rows=%d ind=%d ind1=%d ind2=%d",adat->cols,adat->rows,index1,ind1,ind2);
+		double **dval2 = adat->dval2;
 
-		bnf_var->dval=dval[ind1];
+		dval2[ind1][ind2] +=bvar->dval;
+		bnf_var->dval=dval2[ind1][ind2];
 		bnf_var->var_type=VTYPE_NUM;
+
 		return;
 	};
 	int dest_type=0;
 	if(adat->atype==VTYPE_AMIXED) {
+		int ind1 = index1;
 		// MESG("array type is MIXED");
 		dest_type=adat->mval[ind1].var_type;
 		if(dest_type==VTYPE_NUM) {
@@ -3080,6 +3080,7 @@ inline static void bnf_increaseby_array2()
 			return;
 		};
 		if(dest_type==VTYPE_STRING) {
+			int ind1 = index1%adat->cols;
 			char *tmp_s = malloc(strlen(adat->mval[ind1].sval)+strlen(bvar->sval)+1);
 			sprintf(tmp_s,"%s%s",adat->mval[ind1].sval,bvar->sval);
 			if(adat->mval[ind1].var_alloced) free(adat->mval[ind1].sval);
@@ -3095,7 +3096,7 @@ inline static void bnf_increaseby_array2()
 	if(adat->atype==VTYPE_SARRAY) {
 	
 	};
-	MESG("in array[%d] increase type %d by %f not supported",ind1,dest_type,bvar->var_type);
+	MESG("in array[%d] increase type %d by %f not supported",index1,dest_type,bvar->var_type);
 	set_error(tok,1127,"bnf_increaseby_array2");
 
 }
@@ -3106,18 +3107,36 @@ inline static void bnf_decreaseby_array2()
 	MVAR *bvar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer : bnf_var;
 	prev_var("decreaseby_array2:");
 	array_dat *adat = bnf_var->adat;
-	int ind1=bnf_var->index1;
+	int index1=bnf_var->index1;
 
 	// int ind1 = bnf_var->index1 / adat->rows;
 	// int ind2 = bnf_var->index1 % adat->rows;
 	// MESG("	set array[%d] avar@=%d type=%d ind1=%d ind2=%d",ind1,VARIND,bnf_var->var_type,ind1,ind2);
 	if(adat->atype==VTYPE_ARRAY) {
-	double *dval = adat->dval;
-	dval[ind1] -= bvar->dval;
-	bnf_var->dval = dval[ind1];
-	bnf_var->var_type=VTYPE_NUM;
-	return;
+		int ind1 = index1%adat->cols;
+		int ind2 = index1%adat->rows;
+		MESG("	adat cols=%d rows=%d ind=%d ind1=%d ind2=%d",adat->cols,adat->rows,index1,ind1,ind2);
+		double **dval2 = adat->dval2;
+
+		dval2[ind1][ind2] -=bvar->dval;
+		bnf_var->dval=dval2[ind1][ind2];
+		bnf_var->var_type=VTYPE_NUM;
+
+		return;
 	};
+
+	int dest_type=0;
+	if(adat->atype==VTYPE_AMIXED) {
+		// MESG("array type is MIXED");
+		dest_type=adat->mval[index1].var_type;
+		if(dest_type==VTYPE_NUM) {
+			adat->mval[index1].dval -= bvar->dval;
+			bnf_var->var_type=VTYPE_NUM;
+			bnf_var->dval=adat->mval[index1].dval;
+			return;
+		};
+	};
+
 	set_error(tok,1128,"bnf_decreaseby_array2");
 }
 
@@ -3128,38 +3147,41 @@ inline static void bnf_mulby_array2()
 	prev_var("mulby_array2:");
 	// MESG("	avar type=%d",bnf_var->var_type);
 	array_dat *adat=bnf_var->adat;
-	int ind1=bnf_var->index1;
+	int index1=bnf_var->index1;
 
-#if	1
 	if(adat->atype==VTYPE_ARRAY) {
-		double *dval = adat->dval;
-		dval[ind1] *=bvar->dval;
-		bnf_var->dval=dval[ind1];
+		int ind1 = index1%adat->cols;
+		int ind2 = index1%adat->rows;
+		double **dval2 = adat->dval2;
+
+		dval2[ind1][ind2] *=bvar->dval;
+		bnf_var->dval=dval2[ind1][ind2];
 		bnf_var->var_type=VTYPE_NUM;
-		// adat->mval[bnf_var->index1] *= bvar->dval;
-		// bnf_var->var_type=VTYPE_NUM;
+
 		return;
 	};
-#endif
+
 	int dest_type=0;
 	if(adat->atype==VTYPE_AMIXED) {
 		// MESG("array type is MIXED");
-		dest_type=adat->mval[ind1].var_type;
+		dest_type=adat->mval[index1].var_type;
 		if(dest_type==VTYPE_NUM) {
-			adat->mval[ind1].dval *= bvar->dval;
+			adat->mval[index1].dval *= bvar->dval;
 			bnf_var->var_type=VTYPE_NUM;
-			bnf_var->dval=adat->mval[ind1].dval;
+			bnf_var->dval=adat->mval[index1].dval;
 			return;
 		};
+#if	1
 		if(dest_type==VTYPE_STRING) {
-			char *tmp_s = str_mul(adat->mval[ind1].sval,bvar->dval);
+			char *tmp_s = str_mul(adat->mval[index1].sval,bvar->dval);
 			bnf_var->sval = tmp_s;
 			bnf_var->var_type=VTYPE_STRING;
 			bnf_var->var_alloced=0;
 			return;
 		};
+#endif
 	};
-	// MESG("in mixed array[%d] mul type %d by %f not supported",ind1,dest_type,bvar->var_type);
+	MESG("in mixed array[%d] mul type %d by %f not supported",index1,dest_type,bvar->var_type);
 	set_error(tok,1128,"bnf_mulby_array2");
 }
 
@@ -3995,6 +4017,135 @@ inline static void bnf_factor_at()
 	// NTOKEN2;
 	macro_exec=bval;
 }
+
+#if	TNOASGN
+void bnf_factor_array_l2_update()
+{
+	// tok_struct *tok0=tok;
+	MESG("bnf_factor_array_l2_update:[%s]",tok_info(tok));
+	MESG("	ind=%d val=%f",tok->tind,tok->dval);
+	double update_value=tok->dval;
+	// MESG("	array_l1 var@=%d",VARIND);
+	int ind1,ind2;
+	MVAR *array_slot;
+	// MESG("	token var index tind=%d",tok->tind);
+	array_slot=&current_stable[tok->tind];
+	array_dat *adat = array_slot->adat;
+
+	NTOKEN2;
+	MESG("	at first index token [%s]",tok_info(tok));
+	ind1 = (int)bnf_expression();
+	prev_var("l2_tba_upd_ae1:");
+	NTOKEN2;
+	MESG("	at second index token [%s]",tok_info(tok));
+	ind2 = (int)bnf_expression();
+	MESG("	update: ind1=%d ind2=%d [%s]",ind1,ind2,tok_info(tok));
+	// prev_var("l2_tba_upd_ae2:");
+
+	if(adat==NULL) {	/* this happens if array is not defined yet!!!  */
+		// MESG("	array adat is NULL allocate new one %d x 1 !!!!!!!!!!!!",ind1);
+		ex_nums=1;
+		adat=new_array(ind1+1,ind2+1,VTYPE_ARRAY);
+		array_slot->adat=adat;
+		array_slot->var_type=VTYPE_ARRAY;
+		allocate_array(array_slot->adat);	/*   */
+	};
+
+	MESG("		:ind=%d ind1=%d type=%d",array_slot->index1,ind1,array_slot->var_type);
+
+		// MESG("	2 vtype=%d %d",array_slot->var_type,VTYPE_ARRAY);
+		if(array_slot->var_type==VTYPE_ARRAY) {
+		if(adat->rows<ind1 && adat->cols<ind1) {
+			// MESG("+++ reallocate array_l2_tba ind1=%d x %d %X",ind1,sizeof(double),adat->dval);
+			if(adat->cols > adat->rows) 
+				adat->cols=ind1;
+			else
+				adat->rows=ind1;
+			double *dval_new = realloc(adat->dval,(ind1+1)*sizeof(double));
+			if(dval_new==NULL) {
+				err_num=214;
+				err_line=tok->tline;
+				// ERROR("	array cannot allocate dval at %d",err_line);
+				set_break("can not allocate dval");
+				return;
+			} else {
+				adat->dval = dval_new; 
+			};
+			// MESG("	array reallocated:%X",array_slot->adat->dval);
+		} else { 
+			// dval = adat->dval;
+			// value=dval[ind1];
+			// ls_pdval=&dval[ind1];
+			// MESG("	array_slot %d: ",array_slot->index1);
+		};
+
+		};
+		// next_var("arrayl2");
+#if	TNOASGN
+		// int index1=ind1*array_slot->adat->cols+ind2;
+		if(array_slot->var_type==VTYPE_ARRAY) {
+			MESG("	update array [%d][%d] val  by %f",ind1,ind2,update_value);
+			bnf_var->dval=adat->dval2[ind1][ind2];
+			bnf_var->var_type=VTYPE_NUM;
+			adat->dval2[ind1][ind2]+=update_value;
+			return;
+		};
+		if(array_slot->var_type==VTYPE_AMIXED) {
+			int index1=ind1*array_slot->adat->cols+ind2;
+			MVAR *var_el = &adat->mval[index1];
+			if(var_el->var_type==VTYPE_NUM) {
+				bnf_var->dval=var_el->dval;
+				bnf_var->var_type=VTYPE_NUM;
+				var_el->dval += update_value;
+			};
+		};
+#else
+		bnf_var->index1=ind1*array_slot->adat->cols+ind2;
+		// MESG("	index1=%d",bnf_var->index1);
+		bnf_var->adat = array_slot->adat;
+		bnf_var->var_type=VTYPE_ARRAYEL2;
+#endif
+}
+
+void bnf_type_l2_result_update()
+{
+	// MESG("## bnf_type_l2_result_update:");
+	next_var("arrayl2");
+	// MESG("## bnf_type_l2_result_update: ind=%d %f var@=%d [%s]",tok->tind,tok->dval,VARIND,tok_info(tok));
+	int update_val=tok->dval;
+
+	MVAR *array_slot;
+	// MESG("	token var index tind=%d",tok->tind);
+	array_slot=&current_stable[tok->tind];
+	array_dat *adat = array_slot->adat;
+	// MESG("	get the row");
+	NTOKEN2;
+	int row=bnf_expression()*adat->cols;prev_var("type_l2");
+	// MESG("	row=%d [%s]",row,tok_info(tok));
+	NTOKEN2;
+	// MESG("	get the index type [%s]",tok_info(tok));
+	// MESG("	type=%d",array_slot->var_type);
+	// MESG("	factor_arrayl1:< ----------- vtype=%d  [%s]",array_slot->var_type,tok_info(tok));
+	// NTOKEN2;
+	tok->dval=-1;
+	int ind1 = get_type_index(adat,tok);
+	// MESG("	type_index=%d of %s",ind1,adat->array_name);
+	if(ind1 >= 0) {
+		bnf_var->var_pointer = &adat->mval[row+ind1];
+		bnf_var->var_type=VTYPE_POINTER;
+		bnf_var->index1=row+ind1;
+
+		MVAR *avar=bnf_var->var_pointer;
+		if(avar->var_type==VTYPE_NUM) {
+			// MESG("	update %f by %d",avar->dval,update_val);
+			avar->dval+=update_val;
+		};
+		return;
+	};
+
+	MESG("error in bnf_type_l2_result_update");
+}
+#endif
 
 #if	TBNF
 VFunction factor_bnf_funcs[] = {
