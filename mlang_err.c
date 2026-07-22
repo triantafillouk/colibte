@@ -180,7 +180,7 @@ void set_error(tok_struct *tok,int err,char *description)
  };
  err_line=tok->tline+1;
  err_num=err;
- MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
+ // MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
  err_str=strdup(description);
 #if	1
  if(execmd) {

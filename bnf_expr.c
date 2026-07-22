@@ -190,8 +190,8 @@ inline static void bnf_refresh_ddot()
 	array_dat *adat = var_show->adat;
 	// MESG("refresh_ddot: array: type=%d name=(%s)",adat->atype,adat->array_name);
 
- 	stat=snprintf(ddot_out,sizeof(ddot_out)," array %d:[%s] type [%s] , slot %ld type=%d rows %d,cols %d",adat->anum,
-		adat->array_name,vtype_names[adat->atype],lsslot-current_stable,adat->atype,adat->rows,adat->cols);
+ 	stat=snprintf(ddot_out,sizeof(ddot_out)," array %d:[%s] type [%d:%s] rows %d,cols %d",adat->anum,
+		adat->array_name,adat->atype,vtype_names[adat->atype],adat->rows,adat->cols);
 	// print_array1(":",adat);
  };
 
@@ -725,6 +725,11 @@ inline static void bnf_factor_mul()
 			} else {
 				array_dat *result_array;
 				result_array=array_mul2(array1,array2);
+				// MESG("	after array_mul2:0 %d",err_num);
+				if(err_num) {
+					// syntax_error(1109,err_str);
+					return;
+				};
 				bnf_var->var_type=VTYPE_ARRAY;
 				bnf_var->adat=result_array;
 				if(array1->astat==ARRAY_ALLOCATED) {	/* free this one!! ?? */ };
@@ -747,6 +752,11 @@ inline static void bnf_factor_mul()
 		if(varb->var_type==VTYPE_AMIXED) {
 			// MESG("mul array [%d %d]x[%d %d]",vara->adat->cols,vara->adat->rows,varb->adat->cols,varb->adat->rows);
 			array_dat *result_array = array_mul2(vara->adat,varb->adat);
+			// MESG("	after array_mul2:1 %d",err_num);
+				if(err_num) {
+					// syntax_error(1110,err_str);
+					return;
+				};
 			bnf_var->adat=result_array;
 			bnf_var->var_type=VTYPE_AMIXED;
 			bnf_var->var_alloced=1;
