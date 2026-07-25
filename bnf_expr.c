@@ -1159,10 +1159,11 @@ inline static void bnf_update_val()
 #else
 inline static void bnf_update_val()
 {
-	// MESG("bnf_update_val: [%s]",tok_info(tok));
+	MESG("bnf_update_val: [%s]",tok_info(tok));
 	int avar_type=bnf_var->var_type;
+	MVAR *avar=bnf_var;
 	if(avar_type==VTYPE_POINTER) {
-	MVAR *avar=bnf_var->var_pointer;
+	avar=bnf_var->var_pointer;
 	avar_type=avar->var_type;
 	// MESG("			: type = %d",avar->var_type);
 	if(avar->var_type==VTYPE_NUM) { 
@@ -1196,8 +1197,22 @@ inline static void bnf_update_val()
 	};
 
 		MESG("update value type %d not supported1",avar_type);
-	} else 
-	MESG("update value type %d not supported2",avar_type);
+	} else {
+		if(bnf_var->var_type==VTYPE_ARRAYEL2) {
+			MESG("ind=%d",bnf_var->index1);
+			if(avar->adat->atype==VTYPE_ARRAY) {
+				array_dat *adat=bnf_var->adat;
+				int col=bnf_var->index1 % avar->adat->cols;
+				int row=bnf_var->index1 / avar->adat->cols;
+				MESG("update array element row=%d col=%d by %f",row,col,tok->dval);
+				bnf_var->var_type=VTYPE_NUM;
+				bnf_var->dval = adat->dval2[row][col];
+				adat->dval2[row][col]+=tok->dval;
+				return;
+			};
+		}; 
+		MESG("update value type %d not supported2 ind=%d",avar_type,tok->tind);
+	};
 	syntax_error(1143,"cannot update non numeric value!");
 }
 #endif
@@ -3465,7 +3480,7 @@ inline static void bnf_factor_array_l1_tba()
 inline static void bnf_factor_array_l2_tba()
 {
 	// tok_struct *tok0=tok;
-	// MESG("bnf_factor_array_l2_tba:[%s]",tok_info(tok));
+	MESG("bnf_factor_array_l2_tba:[%s]",tok_info(tok));
 	next_var("arrayl2");
 	// MESG("	array_l1 var@=%d",VARIND);
 	int ind1,ind2;
@@ -3492,11 +3507,11 @@ inline static void bnf_factor_array_l2_tba()
 		allocate_array(array_slot->adat);	/*   */
 	};
 
-	// MESG("	factor_arrayl1:ind=%d ind1=%d type=%d",array_slot->index1,ind1,array_slot->var_type);
+	MESG("	factor_arrayl2_tba:ind1=%d ind2=%d type=%d",ind1,ind2,array_slot->var_type);
 
 		// MESG("	2 vtype=%d %d",array_slot->var_type,VTYPE_ARRAY);
 		if(array_slot->var_type==VTYPE_ARRAY) {
-		if(adat->rows<ind1 && adat->cols<ind1) {
+		if(adat->cols<ind1 && adat->rows<ind2) {
 			// MESG("+++ reallocate array_l2_tba ind1=%d x %d %X",ind1,sizeof(double),adat->dval);
 			if(adat->cols > adat->rows) 
 				adat->cols=ind1;
