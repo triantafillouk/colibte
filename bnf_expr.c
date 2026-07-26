@@ -1159,7 +1159,7 @@ inline static void bnf_update_val()
 #else
 inline static void bnf_update_val()
 {
-	MESG("bnf_update_val: [%s]",tok_info(tok));
+	// MESG("bnf_update_val: [%s]",tok_info(tok));
 	int avar_type=bnf_var->var_type;
 	MVAR *avar=bnf_var;
 	if(avar_type==VTYPE_POINTER) {
@@ -1196,23 +1196,35 @@ inline static void bnf_update_val()
 		return;
 	};
 
-		MESG("update value type %d not supported1",avar_type);
+		// MESG("update value type %d not supported1",avar_type);
 	} else {
 		if(bnf_var->var_type==VTYPE_ARRAYEL2) {
-			MESG("ind=%d",bnf_var->index1);
+			// MESG("ind=%d",bnf_var->index1);
 			if(avar->adat->atype==VTYPE_ARRAY) {
 				array_dat *adat=bnf_var->adat;
 				int col=bnf_var->index1 % avar->adat->cols;
 				int row=bnf_var->index1 / avar->adat->cols;
-				MESG("update array element row=%d col=%d by %f",row,col,tok->dval);
+				// MESG("update array element row=%d col=%d by %f",row,col,tok->dval);
 				bnf_var->var_type=VTYPE_NUM;
 				bnf_var->dval = adat->dval2[row][col];
 				adat->dval2[row][col]+=tok->dval;
 				return;
 			};
+			if(avar->adat->atype==VTYPE_AMIXED) {
+				array_dat *adat=bnf_var->adat;
+				// int col=bnf_var->index1 % avar->adat->cols;
+				// int row=bnf_var->index1 / avar->adat->cols;
+				if(adat->mval[bnf_var->index1].var_type==VTYPE_NUM) {
+				// MESG("update amixed element row=%d col=%d by %f",row,col,tok->dval);
+				bnf_var->var_type=VTYPE_NUM;
+				bnf_var->dval = adat->mval[bnf_var->index1].dval;
+				adat->mval[bnf_var->index1].dval +=tok->dval;
+				return;
+				};
+			};
 		}; 
-		MESG("update value type %d not supported2 ind=%d",avar_type,tok->tind);
 	};
+	MESG("update value type %d not supported2 ind=%d",avar_type,tok->tind);
 	syntax_error(1143,"cannot update non numeric value!");
 }
 #endif
@@ -3074,7 +3086,7 @@ inline static void bnf_assign_array2()
 
 inline static void bnf_increaseby_array2()
 {
-	MESG(":increaseby_array2: bvar type=%d",bnf_var->var_type);
+	// MESG(":increaseby_array2: bvar type=%d",bnf_var->var_type);
 	MVAR *bvar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer : bnf_var;
 	prev_var("increaseby_array2:");
 	array_dat *adat = bnf_var->adat;
@@ -3479,8 +3491,7 @@ inline static void bnf_factor_array_l1_tba()
 
 inline static void bnf_factor_array_l2_tba()
 {
-	// tok_struct *tok0=tok;
-	MESG("bnf_factor_array_l2_tba:[%s]",tok_info(tok));
+	// MESG("bnf_factor_array_l2_tba:[%s]",tok_info(tok));
 	next_var("arrayl2");
 	// MESG("	array_l1 var@=%d",VARIND);
 	int ind1,ind2;
@@ -3507,7 +3518,7 @@ inline static void bnf_factor_array_l2_tba()
 		allocate_array(array_slot->adat);	/*   */
 	};
 
-	MESG("	factor_arrayl2_tba:ind1=%d ind2=%d type=%d",ind1,ind2,array_slot->var_type);
+	// MESG("	factor_arrayl2_tba:ind1=%d ind2=%d type=%d",ind1,ind2,array_slot->var_type);
 
 		// MESG("	2 vtype=%d %d",array_slot->var_type,VTYPE_ARRAY);
 		if(array_slot->var_type==VTYPE_ARRAY) {
@@ -3555,10 +3566,6 @@ inline static void bnf_factor_array_l2()
 	array_dat *adat = array_slot->adat;
 	if(adat==NULL) { set_error(tok,506,"var not defined as array");return;};
 
-	// if(adat->var_tree) MESG("	we have a typed array!");
-	// else MESG("	untyped array!");
-
-	// MESG("	adat num=%d",adat->anum);
 	lstoken=tok;
 	NTOKEN2;
 	value=bnf_expression();
