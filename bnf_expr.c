@@ -29,7 +29,7 @@ int varind(){
 }
 
 #if	1
-#if	1
+#if	!TPROFILE
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
 
@@ -64,7 +64,7 @@ inline static void next_var(char *title)
 #endif
 }
 #endif
-#else
+#else	// variable show debug
 
 void prev_var(char *title)
 {
@@ -1229,6 +1229,7 @@ inline static void bnf_update_val()
 }
 #endif
 
+#if	1
 inline static void bnf_update_array1()
 {
 	// MESG("bnf_update_array1 [%s]",tok_info(tok));
@@ -1254,7 +1255,9 @@ inline static void bnf_update_array1()
 	};
 	syntax_error(1145,"update operation not supported ");
 }
+#endif
 
+#if	NUSE
 inline static void bnf_update_array2()
 {
 	// MESG("bnf_update_array2 [%s]",tok_info(tok));
@@ -1282,6 +1285,7 @@ inline static void bnf_update_array2()
 	set_error(tok,1226,"bnf_update_array2 not supported");
 
 }
+#endif 
 
 #if	TNOASGN
 inline static void bnf_increase_by_pp_num()
@@ -1491,6 +1495,7 @@ inline static void bnf_increase_by()
 }
 #endif
 
+#if	NUSE
 inline static void bnf_increase_by0()
 {
 	MESG("bnf_factor_increase_by0: [%s]",tok_info(tok));
@@ -1510,10 +1515,10 @@ inline static void bnf_increase_by0()
 			bnf_var->var_type = VTYPE_NUM;
 			bnf_var->dval = val;
 #if	1
-			if(atype==btype && atype==VTYPE_POINTER) {
+			if(btype==VTYPE_POINTER) {
 				set_bnf_function(tok,"increase_by_pp_num",bnf_increase_by_pp_num);
 			};
-			if(atype==VTYPE_POINTER && btype==VTYPE_NUM) {
+			if(btype==VTYPE_NUM) {
 				set_bnf_function(tok,"increase_by_pn_num",bnf_increase_by_pn_num);
 			};
 #endif
@@ -1556,7 +1561,7 @@ inline static void bnf_increase_by0()
 	};
 	set_error(tok,1024,"increase_by operation not supported!");
 }
-
+#endif
 // aval-=bval
 
 #if	TNOASGN
@@ -4280,10 +4285,10 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_none,	// TOK_DECBEFORE
 	bnf_assign_array1,	// TOK_ASSIGN_ARRAY1
 	bnf_assign_array2,	// TOK_ASSIGN_ARRAY2
-	bnf_update_array1,	// TOK_INCREASE_ARRAY1,
-	bnf_update_array2,	// TOK_INCREASE_ARRAY2,
-	bnf_update_array1,	// TOK_DECREASE_ARRAY1,
-	bnf_update_array2,	// TOK_DECREASE_ARRAY2,
+	bnf_update_val,		// TOK_INCREASE_ARRAY1,
+	bnf_update_val,		// TOK_INCREASE_ARRAY2,
+	bnf_update_val,		// TOK_DECREASE_ARRAY1,
+	bnf_update_val,		// TOK_DECREASE_ARRAY2,
 	bnf_factor_negate,	// TOK_NEGATE,
 	bnf_factor_none		// TOK_OTHER,
 };
