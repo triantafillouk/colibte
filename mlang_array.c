@@ -672,7 +672,7 @@ void array_mul1(array_dat *na,double num)
  	ERROR("error: cannot mul to unallocated array! astat=%d type=%d",na->astat,na->atype);
 	return;
  };
- 	if(na->atype==VTYPE_ARRAY) {	/* allocate num array  */
+ 	if(na->atype==VTYPE_ARRAY) {
 		int i,j,dim=1;
 		if(na->rows>1 && na->cols>1) {
 			for(j=0;j<na->rows;j++) for(i=0;i<na->cols;i++) 
@@ -680,6 +680,18 @@ void array_mul1(array_dat *na,double num)
 		} else {
 			if(na->rows > 1) dim=na->rows; else dim=na->cols;
 			for(i=0;i<dim;i++)  na->dval[i] *= num;
+		};
+		return;
+	};
+	
+ 	if(na->atype==VTYPE_AMIXED) {
+		int dim=na->rows*na->cols;
+		MESG("array_mul1: amixed dim=%d",dim);
+		int i;
+		MVAR *mval=na->mval;
+		for(i=0;i<dim;i++) {
+			if(mval[i].var_type==VTYPE_NUM)
+				mval[i].dval *=num;
 		};
 	};
 }

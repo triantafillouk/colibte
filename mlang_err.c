@@ -954,7 +954,7 @@ int err_factor()
 #if	TBNF
 		if(dest->ttype==TOK_TYPE_ELEMENT) {
 			// MESG("	TOK_TYPE_ELEMENT before [%s]",tok_info(tok));
-			if(tok->ttype==TOK_ASSIGN || tok->ttype==TOK_INCREASEBY || tok->ttype==TOK_MULBY || tok->ttype==TOK_DECREASEBY) {
+			if(tok->ttype==TOK_ASSIGN || tok->ttype==TOK_INCREASEBY || tok->ttype==TOK_MULBY || tok->ttype==TOK_DIVBY || tok->ttype==TOK_DECREASEBY) {
 				// MESG("	assign type_element1");
 #if	TNOASGN0
 				// MESG("	ASSIGN original function!");
@@ -1046,7 +1046,7 @@ int err_factor()
 			NTOKEN_ERR(4989);
 		};
 #if	TBNF
-		if(tok->ttype==TOK_ASSIGN || tok->ttype==TOK_INCREASEBY || tok->ttype==TOK_MULBY || tok->ttype==TOK_DECREASEBY) {
+		if(tok->ttype==TOK_ASSIGN || tok->ttype==TOK_INCREASEBY || tok->ttype==TOK_MULBY || tok->ttype==TOK_DIVBY || tok->ttype==TOK_DECREASEBY) {
 			tok0_bnf->bnf_factor_function=bnf_factor_array_l1_tba;
 			// MESG("; for [%s] set  bnf_factor_array_l1_tba",tok_info(tok0));
 			assign_type_to=TOK_ASSIGN_ARRAY1;
@@ -1472,6 +1472,7 @@ int err_factor()
 		// MESG("TOK_ASSIGN");
 	case TOK_INCREASEBY:
 	case TOK_MULBY:
+	case TOK_DIVBY:
 	case TOK_DECREASEBY:
 		tok0->tname="assign";
 		// set_bnf_function1(tok0,tok0->ttype);
@@ -1922,6 +1923,46 @@ int err_lexpression()
 				 if(assign_type_to==TOK_TYPE_ELEMENT) {
 					dest->tname="EL*=";
 					dest->bnf_factor_function=bnf_mulby_element;
+					// MESG("; for [%s] set assign to type %d,bnf_increaseby_array1",tok_info(dest));
+				};
+				assign_type_to=0;
+			};
+#endif
+			RT_MESG1(714);
+		};
+		case TOK_DIVBY: {
+			// tok->term_function = mul_by;
+			// MESG_TOK_INFO("# err_lexpression",tok);
+#if	TNORMAL
+			set_term_function(tok,(TFunction)div_by);
+#endif
+			tok->tname = "*=";
+			// tok0=tok;
+			NTOKEN_ERR(710);
+			err_num=err_mul_by();
+#if	TBNF
+			tok_struct *dest=stack_push("*=",tok0,tok0->ttype);
+			// MESG("	TOK_DIVBY: assign_type_to=%d",assign_type_to,tok_info(dest));
+			if(assign_type_to) {
+				if(assign_type_to==TOK_ASSIGN_ARRAY2) {
+					dest->tname="A2/=";
+					dest->bnf_factor_function=bnf_divby_array2;
+					// MESG("; for [%s] set assign to type %d,bnf_mulby_array2",tok_info(dest));
+				}; if(assign_type_to==TOK_ASSIGN_ARRAY1) {
+					dest->tname="A1/=";
+					dest->bnf_factor_function=bnf_divby_array1;
+					// MESG("; for [%s] set assign to type %d,bnf_mulby_array1",tok_info(dest));
+				};
+
+				 if(assign_type_to==TOK_ASSIGN_TYPE) {
+					// tok->ttype=TOK_ASSIGN_ARRAY1;
+					dest->tname="EL1/=";
+					dest->bnf_factor_function=bnf_divby_element;
+					// MESG("; for [%s] mulby_element",tok_info(dest));
+				};
+				 if(assign_type_to==TOK_TYPE_ELEMENT) {
+					dest->tname="EL/=";
+					dest->bnf_factor_function=bnf_divby_element;
 					// MESG("; for [%s] set assign to type %d,bnf_increaseby_array1",tok_info(dest));
 				};
 				assign_type_to=0;

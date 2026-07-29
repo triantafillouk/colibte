@@ -11,7 +11,7 @@ a=[	v, 2, 3
 # print("original array",a)
 print("original a[0][0]=",a[0][0])
 print("original a[1][0]=",a[1][0])
-a++
+a/=2
 print("after array increase a[1][0]=",a[1][0])
 a[1][0]++
 print("after element increase a[1][0]=",a[1][0])

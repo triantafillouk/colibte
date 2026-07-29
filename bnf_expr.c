@@ -1700,8 +1700,7 @@ inline static void bnf_mul_by()
 
 			return;
 		};
-		if(avar->var_type==VTYPE_ARRAY) {
-			// copy array
+		if(avar->var_type==VTYPE_ARRAY || avar->var_type==VTYPE_AMIXED) {
 			array_mul1(avar->adat,bval->dval);
 			// set the copied array to bnf_var position
 			bnf_var->var_type=VTYPE_ARRAY;
@@ -1718,13 +1717,6 @@ inline static void bnf_mul_by()
 			bnf_var->var_alloced=0;
 			bnf_var->var_type=VTYPE_STRING;
 		};
-#if	0
-		if(avar->var_type==VTYPE_AMIXED) {
-			MESG("	mul AMIXED by num??");
-			array_mul1(avar->adat,bval->dval);
-			return;
-		};
-#endif
 	};
 
 	// MESG("	err 1023: aval type=%d",avar->var_type);
@@ -1748,18 +1740,16 @@ inline static void bnf_div_by()
 			avar->dval /= bvar->dval;
 			return;
 		};
-		if(avar->var_type==VTYPE_ARRAY) {
+		if(avar->var_type==VTYPE_ARRAY||avar->var_type==VTYPE_AMIXED) {
 			array_mul1(avar->adat,(1/bvar->dval));
+
+			bnf_var->var_type=VTYPE_ARRAY;
+			bnf_var->adat=avar->adat;
+			bnf_var->var_alloced=0;
 			return;
 		};
 	};
 	
-/*
-	if(bval->var_type==VTYPE_STRING) {
-		avar->sval = strdup(bvar->sval);
-		return;
-	};
-*/
 	set_error(tok,1025,"divide operation not supported!");
 }
 
@@ -3074,6 +3064,37 @@ inline static void bnf_mulby_array1()
 	set_error(tok,404,"operation mulby not supported ");
 }
 
+inline static void bnf_divby_array1()
+{
+	// MESG(":divby_array1: bvar type=%d",bnf_var->var_type);
+	MVAR *bvar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer : bnf_var;
+	prev_var("divby_array1:");
+	if(bvar->dval==0) { set_error(tok,1172,"divide by zero!");return;};
+	int ind1 = bnf_var->index1;
+	// MESG("	set array[%d] avar@=%d type=%d index1=%d",ind1,VARIND,bnf_var->var_type,bnf_var->index1);
+	array_dat *adat = bnf_var->adat;
+	if(adat->atype==VTYPE_ARRAY) {
+		// Check if bvar is VTYPE_NUM!!
+		double *dval = adat->dval;
+		dval[ind1]/=bvar->dval;
+		bnf_var->dval=bvar->dval;
+		bnf_var->var_type=VTYPE_NUM;
+		return;
+	};
+
+	if(adat->atype==VTYPE_AMIXED) {
+		// adat->mval[ind1].var_type=bvar->var_type;
+		// bnf_var->var_type=bvar->var_type;
+		if(bvar->var_type==VTYPE_NUM && adat->mval[ind1].var_type==VTYPE_NUM) {
+			adat->mval[ind1].dval/=bvar->dval;
+			bnf_var->dval=adat->mval[ind1].dval;
+			bnf_var->var_type=VTYPE_NUM;
+			return;
+		}
+	};
+	set_error(tok,405,"operation divby not supported ");
+}
+
 inline static void bnf_assign_array2()
 {
 	// MESG(":assign_array2: bvar type=%d",bnf_var->var_type);
@@ -3225,6 +3246,43 @@ inline static void bnf_mulby_array2()
 	};
 	MESG("in mixed array[%d] mul type %d by %f not supported",index1,dest_type,bvar->var_type);
 	set_error(tok,1128,"bnf_mulby_array2");
+}
+
+inline static void bnf_divby_array2()
+{
+	// MESG(":mulby_array2:  bvar type=%d [%s]",bnf_var->var_type,tok_info(tok));
+	MVAR *bvar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer : bnf_var;
+	prev_var("divby_array2:");
+	if(bvar->dval==0) { set_error(tok,1171,"divide by zeror!");return;};
+	// MESG("	avar type=%d",bnf_var->var_type);
+	array_dat *adat=bnf_var->adat;
+	int index1=bnf_var->index1;
+
+	if(adat->atype==VTYPE_ARRAY) {
+		int ind1 = index1%adat->cols;
+		int ind2 = index1%adat->rows;
+		double **dval2 = adat->dval2;
+
+		dval2[ind1][ind2] /=bvar->dval;
+		bnf_var->dval=dval2[ind1][ind2];
+		bnf_var->var_type=VTYPE_NUM;
+
+		return;
+	};
+
+	int dest_type=0;
+	if(adat->atype==VTYPE_AMIXED) {
+		// MESG("array type is MIXED");
+		dest_type=adat->mval[index1].var_type;
+		if(dest_type==VTYPE_NUM) {
+			adat->mval[index1].dval /= bvar->dval;
+			bnf_var->var_type=VTYPE_NUM;
+			bnf_var->dval=adat->mval[index1].dval;
+			return;
+		};
+	};
+	MESG("in mixed array[%d] div type %d by %f not supported",index1,dest_type,bvar->var_type);
+	set_error(tok,1128,"bnf_divby_array2");
 }
 
 inline static void bnf_factor_array2()
@@ -4001,6 +4059,24 @@ inline static void bnf_mulby_element()
 	bnf_var->var_type=VTYPE_NUM;
 }
 
+inline static void bnf_divby_element()
+{
+	// MESG("bnf_decreaseby_element: var@=%d t=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+	MVAR *varb=(bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+	// if(varb->var_type==VTYPE_NUM) MESG("varb = %f",bnf_var->dval);
+	prev_var("divby_element");
+	if(varb->dval==0) { set_error(tok,1170,"divide by zeror!");return;};
+	MVAR *vara=bnf_var;
+	// MESG("	EL-= vara type=%d ind=%d",vara->var_type,vara->index1);
+	// if(vara->var_type==VTYPE_NUM) MESG("vara = %f",vara->dval);
+
+	int index1=vara->index1;
+	array_dat *adat=bnf_var->adat;
+	adat->mval[index1].dval /= varb->dval;
+	bnf_var->dval=adat->mval[index1].dval;
+	bnf_var->var_type=VTYPE_NUM;
+}
+
 inline static void bnf_type_l2_result()
 {
 	next_var("arrayl2 result");
@@ -4290,6 +4366,7 @@ VFunction factor_bnf_funcs[] = {
 	bnf_update_val,		// TOK_DECREASE_ARRAY1,
 	bnf_update_val,		// TOK_DECREASE_ARRAY2,
 	bnf_factor_negate,	// TOK_NEGATE,
+	bnf_div_by,			// TOK_DIVBY,
 	bnf_factor_none		// TOK_OTHER,
 };
 
@@ -4398,6 +4475,7 @@ int factor_bnf_type[] = {
 	TOK_DECREASE_ARRAY1,
 	TOK_DECREASE_ARRAY2,
 	TOK_NEGATE,
+	TOK_DIVBY,		// TOK_DIVBY
 	0		// TOK_OTHER,
 };
 

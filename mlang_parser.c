@@ -821,6 +821,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			};
 			break;
 		case TOK_DIV:
+			if(next_token_type(bf)==TOK_ASSIGN) {
+				getnc1(bf,&cc,&tok_type);
+				tok_type=TOK_DIVBY;
+				break;
+			};
 			break;
 		case TOK_ASSIGN:
 			// MESG("TOK_ASSIGN:");
