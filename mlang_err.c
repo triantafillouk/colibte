@@ -1936,12 +1936,12 @@ int err_lexpression()
 #if	TNORMAL
 			set_term_function(tok,(TFunction)div_by);
 #endif
-			tok->tname = "*=";
+			tok->tname = "/=";
 			// tok0=tok;
 			NTOKEN_ERR(710);
 			err_num=err_mul_by();
 #if	TBNF
-			tok_struct *dest=stack_push("*=",tok0,tok0->ttype);
+			tok_struct *dest=stack_push("/=",tok0,tok0->ttype);
 			// MESG("	TOK_DIVBY: assign_type_to=%d",assign_type_to,tok_info(dest));
 			if(assign_type_to) {
 				if(assign_type_to==TOK_ASSIGN_ARRAY2) {

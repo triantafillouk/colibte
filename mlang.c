@@ -1,10 +1,10 @@
 /*
-	Curses,gtk editor,notes,directory bnfrowser
+	Curses,gtk editor,notes,directory browser
 	Copyright Kostas Triantafillou
 	GNU LESSER GENERAL PUBLIC LICENSE version 2 
 	(or at your option) any later version.
 
- 	An interpreter,embeded calculator by K.Triantafillou (2011,2020),
+ 	An interpreter,embeded calculator by K.Triantafillou (2011,2026),
 */
 inline void ntoken();
 
@@ -47,28 +47,19 @@ static inline double num_term2();
 double cexpression();
 #endif
 int check_init(FILEBUF *bf);
-double exec_function(FILEBUF *bp,int nargs);
-MVAR * push_args_1(int nargs,int vars_num);
-double compare_notequal(double value);
-double compare_smaller(double value);
-double compare_bigger(double value);
-double compare_smallereq(double value);
-double compare_biggereq(double value);
-double compare_equal(double v1);
-void set_bnf_function1(tok_struct *tok, int type);
+
 // inline static void ntoken2();
+void set_tok_function(tok_struct *tok, int type);
 
 #if	TBNF
 static inline void bnf_factor_dummy();
+void set_bnf_function1(tok_struct *tok, int type);
 #endif
 void delete_symbol_table(MVAR *td, int size,int nargs);
 MVAR *new_symbol_table(int const size);
 void init_vars(MVAR *head,int size);
-void set_tok_function(tok_struct *tok, int type);
-void set_tok_directive(tok_struct *tok, FFunction directive);
 MVAR *btree_to_mvar(BTREE *bt);
 void skip_sentence1();
-inline MVAR *get_left_slot(int ind);
 void show_error(char *from,char *name);
 char *ddot_string();
 void update_ddot_line(char *ddot_out);
@@ -441,7 +432,7 @@ tok_struct *new_tok()
 
 #define	TNAME	tname(tok->ttype)
 
-inline void ntoken()
+void ntoken()
 {
 #if	TOKENN
 	// MESG("- %s",tok->tname);
@@ -775,6 +766,7 @@ void create_token_pointers(FILEBUF *bf)
 }
 #endif
 
+#if	TBNF
 void create_statement_group(FILEBUF *bf)
 {
  tok_struct *tokp=bf->tok_table_bnf;
@@ -788,6 +780,7 @@ void create_statement_group(FILEBUF *bf)
  };
  // tokp->next_tok=NULL;
 }
+#endif
 
 /* Check for any errors and initialize parsed list  */
 int check_init(FILEBUF *bf)
@@ -936,16 +929,11 @@ inline static int check_token(int type)
  return(tok->ttype == type);
 }
 
-
-
-
 inline static MVAR *get_left_slot(int ind)
 {
 	// MESG("get_left_slot: ind=%d",ind);
 	return &current_stable[ind];
 }
-
-
 
 void eval_btree1(BTNODE *node,void do_func(BTNODE *n,void *p),void *p);
 
@@ -1086,7 +1074,9 @@ void skip_sentence1()
 	switch(tok->ttype) {
 		case TOK_DIR_ELSE:	/* this one starts a new sentence!!  */
 		case TOK_SEP:
+#if	TNORMAL
 			set_tok_function(tok,1);
+#endif
 			NTOKEN2;
 			return;
 		case TOK_LPAR:
