@@ -140,7 +140,7 @@ inline static void bnf_refresh_ddot()
  FILEBUF *buf = tp->fp;
 
  MVAR *var_show = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
- // MESG("bnf_refresh_ddot: var_show@=%d: type=%d",VARIND,var_show->var_type);
+ // MESG("bnf_refresh_ddot: var_show@=%d: type=%d [%s]",VARIND,var_show->var_type,tok_info(tok));
 
  if(execmd) {
 	if(var_show->var_type==VTYPE_NUM) {
@@ -1887,7 +1887,7 @@ inline static void bnf_factor_assign_var_nump()
 
 void bnf_factor_assign_var()
 {
-	// MESG("bnf_factor_assign_var:na %d",tok->tind);
+	MESG("bnf_factor_assign_var:na %d",tok->tind);
 	MVAR *bvar=bnf_var;
 	int btype=bvar->var_type;
 	char *var_name = tok->tname;
@@ -1932,11 +1932,11 @@ void bnf_factor_assign_var()
 			if(avar->var_alloced) free(avar->sval);
 		} else avar->var_type=VTYPE_STRING;
 
-		avar->sval=bvar->sval;
-		avar->var_alloced=0;
+		avar->sval=strdup(bvar->sval);
+		avar->var_alloced=1;
 
-		bnf_var->sval=strdup(avar->sval);
-		bnf_var->var_alloced=1;
+		bnf_var->sval=avar->sval;
+		bnf_var->var_alloced=0;
 		bnf_var->var_type=VTYPE_STRING;
 		return;
 	};

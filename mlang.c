@@ -1144,6 +1144,7 @@ void msg_result(char *name,int show_no_time)
 {
 	// set_result();
 	MVAR *result = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+	// MESG("msg_result: @=%d t=%d %s",VARIND,result->var_type,result->sval);
 	if(show_no_time) {
 		if(result->var_type==VTYPE_NUM) msg_line("%s Result (%f)",name,num_result());
 		else if(result->var_type==VTYPE_STRING) msg_line("%s Result \"%s\"",name,string_result());
@@ -1252,6 +1253,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		MESG("end of program2 var@=%d type %d",VARIND,bnf_var->var_type);
 		// if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
 		// show_results();
+		msg_result(bp->b_fname,show_no_time);
 #endif
 #if	TBNFNORMAL
 	};
@@ -1278,7 +1280,6 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		// next_var("result");
 		// prev_var("r");
 		// MESG("show result executing buffer [%s]!",bp->b_fname);
-		msg_result(bp->b_fname,show_no_time);
 #endif
 #if	TBNFNORMAL
 	} else
