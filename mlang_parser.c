@@ -1248,7 +1248,7 @@ void set_tok_table(FILEBUF *bf)
 		tok_to->match_tok = tok_table + tok_to->tcurl->num+1;
 	};
 	tlist->current=tlist->current->next;
-	MESG(";TT[%s] %3d: t=[%s]",bf->b_fname,isize,tok_info(tok_to));
+	// MESG(";TT[%s]:[%s]",bf->b_fname,tok_info(tok_to));
 	isize++;
 	tok_to++;
  };

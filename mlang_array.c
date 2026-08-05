@@ -225,6 +225,7 @@ array_dat * dup_array_add1(array_dat *a,double plus)
 			if(na->rows > 1) dim=na->rows; else dim=na->cols;
 			for(i=0;i<dim;i++) na->dval[i]= a->dval[i]+plus;
 		};
+		 na->astat=ARRAY_ALLOCATED;
 	};
 
  	if(a->atype==VTYPE_AMIXED) {	
@@ -244,10 +245,10 @@ array_dat * dup_array_add1(array_dat *a,double plus)
 				k++;
 			};
 		};
+		na->astat=ARRAY_ALLOCATED;
 	};
 
 
- na->astat=ARRAY_ALLOCATED;
  return(na);
 }
 
@@ -347,6 +348,17 @@ array_dat * dup_array_power(array_dat *a,double num)
  return(na);
 }
 
+array_dat *dup_sarray(array_dat *a)
+{
+	array_dat *new_sarray = new_array_similar(a);
+	// copy array string values;
+	int size=a->cols*a->rows;
+	int i=0;
+	for(i=0;i<size;i++) {
+		new_sarray->sval[i]=strdup(a->sval[i]);
+	};
+	return new_sarray;
+}
 
 array_dat * array_mul2(array_dat *aa,array_dat *ba)
 {
@@ -586,6 +598,7 @@ void array_add1(array_dat *na,double plus)
 	};
 }
 
+
 void sarray_add1(array_dat *na,char *s)
 {
  if(na->astat==ARRAY_UNALLOCATED) {
@@ -607,6 +620,19 @@ void sarray_add1(array_dat *na,char *s)
 		na->sval[i]=stmp;
 	};
  }
+
+ if(na->atype==VTYPE_AMIXED) 
+ {
+ 	// MESG("String [%s] add to string array!",s);
+	int i;
+	for(i=0;i<na->rows*na->cols;i++) {
+		if(na->mval[i].var_type==VTYPE_STRING) {
+			na->mval[i].sval = realloc(na->mval[i].sval,strlen(na->mval[i].sval)+strlen(s)+1);
+			strcat(na->mval[i].sval,s);
+		};
+	};
+ }
+
 }
 
 void sarray_mul1(array_dat *sarray, double factor)

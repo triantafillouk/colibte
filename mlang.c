@@ -744,7 +744,7 @@ void show_token_table(char *title, FILEBUF *bf,tok_struct *token_start,int size)
  tok_struct *tokp=token_start;
  MESG("!---------- %s token table of %s size %d -------------",title,bf->b_fname,size);
  for(i=0;i<size;i++) {
-	MESG("!T %3d %s",i,tok_info(tokp));
+	MESG("!T %s",tok_info(tokp));
 	tokp++;
  };
  MESG("------------------------------------------------------");
