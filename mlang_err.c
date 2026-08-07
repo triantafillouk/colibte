@@ -630,7 +630,7 @@ int err_factor()
  static int pre_symbol=0;
  TDSERR("factor");
  int lpar=0;
- // MESG("-- err_factor %s",tok_info(tok));
+ MESG("-- err_factor %s",tok_info(tok));
 #if	TNORMAL
  set_tok_function(tok,0);
 #endif
@@ -1486,6 +1486,7 @@ int err_factor()
 		// set_bnf_function1(tok0,tok0->ttype);
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
+		MESG("	-- set bnf_group to %d",tok0->ttype);
 #endif
 		RT_MESG1(527);
 #if	USE_TYPE_VARS
@@ -1904,8 +1905,6 @@ int err_lexpression()
 #if	TNORMAL
 			set_term_function(tok,(TFunction)mul_by);
 #endif
-			tok->tname = "*=";
-			// tok0=tok;
 			NTOKEN_ERR(710);
 			err_num=err_mul_by();
 #if	TBNF
@@ -1931,7 +1930,7 @@ int err_lexpression()
 				 if(assign_type_to==TOK_TYPE_ELEMENT) {
 					dest->tname="EL*=";
 					dest->bnf_factor_function=bnf_mulby_element;
-					// MESG("; for [%s] set assign to type %d,bnf_increaseby_array1",tok_info(dest));
+					// MESG("; for [%s] set assign to type %d,bnf_inmulby_array1",tok_info(dest));
 				};
 				assign_type_to=0;
 			};
@@ -1944,12 +1943,10 @@ int err_lexpression()
 #if	TNORMAL
 			set_term_function(tok,(TFunction)div_by);
 #endif
-			tok->tname = "/=";
-			// tok0=tok;
-			NTOKEN_ERR(710);
+			NTOKEN_ERR(711);
 			err_num=err_mul_by();
 #if	TBNF
-			tok_struct *dest=stack_push("/=",tok0,tok0->ttype);
+			tok_struct *dest=stack_push("/==",tok0,tok0->ttype);
 			// MESG("	TOK_DIVBY: assign_type_to=%d",assign_type_to,tok_info(dest));
 			if(assign_type_to) {
 				if(assign_type_to==TOK_ASSIGN_ARRAY2) {
@@ -1971,7 +1968,7 @@ int err_lexpression()
 				 if(assign_type_to==TOK_TYPE_ELEMENT) {
 					dest->tname="EL/=";
 					dest->bnf_factor_function=bnf_divby_element;
-					// MESG("; for [%s] set assign to type %d,bnf_increaseby_array1",tok_info(dest));
+					// MESG("; for [%s] set assign to type %d,bnf_indivby_array1",tok_info(dest));
 				};
 				assign_type_to=0;
 			};
@@ -2008,7 +2005,7 @@ int err_lexpression()
 				 if(assign_type_to==TOK_TYPE_ELEMENT) {
 					dest->tname="EL1-=";
 					dest->bnf_factor_function=bnf_decreaseby_element;
-					// MESG("; for [%s] set assign to type %d,bnf_increaseby_array1",tok_info(dest));
+					// MESG("; for [%s] set assign to type %d,bnf_decreaseby_array1",tok_info(dest));
 				};
 				assign_type_to=0;
 			};
@@ -2417,7 +2414,7 @@ int err_check_block1()
 		case TOK_SEP:
 			// MESG_TOK_INFO("# err_check_block1",tok);
 #if	TBNF
-			stack_push("--------------",tok,-tok->ttype);
+			stack_push(";separator",tok,-tok->ttype);
 #endif
 			NTOKEN_ERR(6741);
 			continue;
@@ -2432,7 +2429,7 @@ int err_check_block1()
 		case TOK_SHOW:
 			// MESG_TOK_INFO("# err_check_block1",tok);
 #if	TBNF
-			stack_push("Show or comma",tok,-tok->ttype);
+			stack_push("Show/comma",tok,-tok->ttype);
 #endif
 #if	TNORMAL
 			tok->factor_function = factor_funcs[tok->ttype];

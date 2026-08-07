@@ -1511,75 +1511,8 @@ inline static void bnf_increase_by()
 }
 #endif
 
-#if	NUSE
-inline static void bnf_increase_by0()
-{
-	// MESG("bnf_factor_increase_by0: [%s]",tok_info(tok));
-	MVAR *bvar=bnf_var;
-	int btype=bvar->var_type;
-	prev_var("inc by");
 
-	int atype=bnf_var->var_type;
-	MVAR *avar=bnf_var->var_pointer;
-	if(bvar->var_type==VTYPE_POINTER) {
-		bvar = bvar->var_pointer;
-	};
-	if(bvar->var_type==VTYPE_NUM) {
-		if(avar->var_type==VTYPE_NUM) {
-			avar->dval += bvar->dval;
-			double val = avar->dval;
-			bnf_var->var_type = VTYPE_NUM;
-			bnf_var->dval = val;
-#if	1
-			if(btype==VTYPE_POINTER) {
-				set_bnf_function(tok,"increase_by_pp_num",bnf_increase_by_pp_num);
-			};
-			if(btype==VTYPE_NUM) {
-				set_bnf_function(tok,"increase_by_pn_num",bnf_increase_by_pn_num);
-			};
-#endif
-			return;
-		};
-		if(avar->var_type==VTYPE_STRING) {
-			/* TBD  */
-		};
-		if(avar->var_type==VTYPE_ARRAY) {
-			// copy array
-			array_add1(avar->adat,bvar->dval);
-			// set the copied array to bnf_var position
-			return;
-		};
-		if(avar->var_type==VTYPE_AMIXED) {
-			// copy array
-			array_add1(avar->adat,bvar->dval);
-			// set the copied array to bnf_var position
-			return;
-		};
-
-	};
-	
-
-	if(bvar->var_type==VTYPE_STRING && avar->var_type==VTYPE_STRING) {
-		char *s=(char*)malloc(strlen(avar->sval)+strlen(bvar->sval)+1);
-		memcpy(s,avar->sval,strlen(avar->sval));
-		memcpy(s+strlen(avar->sval),bvar->sval,strlen(bvar->sval));
-		s[strlen(avar->sval)+strlen(bvar->sval)]=0;
-		bnf_var->sval=s; bnf_var->var_alloced=0;bnf_var->var_type=VTYPE_STRING;
-		if(avar->var_alloced) free(avar->sval);
-		avar->sval=s; avar->var_alloced=1;
-		return;
-	};
-
-	if(bvar->var_type==VTYPE_STRING && avar->var_type==VTYPE_SARRAY) {
-		// MESG("	add a string to a string array!");
-		sarray_add1(avar->adat,bvar->sval);
-		return;
-	};
-	set_error(tok,1024,"increase_by operation not supported!");
-}
-#endif
 // aval-=bval
-
 #if	TNOASGN
 inline static void bnf_decrease_by()
 {
