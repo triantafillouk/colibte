@@ -465,11 +465,11 @@ int err_assign_val()
 	RT_MESG1(442);
 }
 
-int err_increase_by()
+int err_increaseby()
 {
- TDSERR("increase_by");
+ TDSERR("increaseby");
  SHOW_STAGE(443);
- // MESG("# increase_by: %s",tok_info(tok));
+ // MESG("# increaseby: %s",tok_info(tok));
 	if(!simple){
 		xpos=443;
 		syntax_error(xpos,"bogus assignement!!!!");
@@ -480,11 +480,11 @@ int err_increase_by()
 	RT_MESG1(443);
 }
 
-int err_mul_by()
+int err_mulby()
 {
- TDSERR("mul_by");
+ TDSERR("mulby");
  SHOW_STAGE(443);
- // MESG("# mul_by	: %s",tok_info(tok));
+ // MESG("# mulby	: %s",tok_info(tok));
 
 	if(!simple){
 		xpos=443;
@@ -496,11 +496,11 @@ int err_mul_by()
 	RT_MESG1(443);
 }
 
-int err_decrease_by()
+int err_decreaseby()
 {
- TDSERR("decrease_by");
+ TDSERR("decreaseby");
  SHOW_STAGE(443);
- // MESG_TOK_INFO("decrease_by",tok);
+ // MESG_TOK_INFO("decreaseby",tok);
 
 	if(!simple){
 		xpos=443;
@@ -664,7 +664,8 @@ int err_factor()
 	return(err_num);
  };
 #if	TNOASGN
- if(tok0->ttype==TOK_VAR && (tok->ttype != TOK_ASSIGN && tok->ttype!=TOK_INCREASEBY && tok->ttype!=TOK_DECREASEBY)) {
+ if(tok0->ttype==TOK_VAR && (tok->ttype != TOK_ASSIGN && tok->ttype!=TOK_INCREASEBY && tok->ttype!=TOK_DECREASEBY\
+ 	&& tok->ttype!=TOK_MULBY && tok->ttype!=TOK_DIVBY)) {
 	// MESG("stack push [%s]",tok_info(tok0));
  	tok0_bnf=stack_push("factor",tok0,tok0->ttype);
 	
@@ -837,6 +838,20 @@ int err_factor()
 			// MESG("	var_name_to_assign: %s [%s]",tok0->tname,tok_info(tok));
 		};
 		if(tok->ttype==TOK_DECREASEBY) {
+			// MESG("set normal assign [%s]",tok_info(tok));
+			assign_type_to=0;
+			tok->tname = tok0->tname;
+			tok->tind = var_index;
+			// MESG("	var_name_to_assign: %s [%s]",tok0->tname,tok_info(tok));
+		};
+		if(tok->ttype==TOK_MULBY) {
+			// MESG("set normal assign [%s]",tok_info(tok));
+			assign_type_to=0;
+			tok->tname = tok0->tname;
+			tok->tind = var_index;
+			// MESG("	var_name_to_assign: %s [%s]",tok0->tname,tok_info(tok));
+		};
+		if(tok->ttype==TOK_DIVBY) {
 			// MESG("set normal assign [%s]",tok_info(tok));
 			assign_type_to=0;
 			tok->tname = tok0->tname;
@@ -1129,7 +1144,7 @@ int err_factor()
 #endif
 		};
 #if	TBNF
-		if(tok->ttype==TOK_ASSIGN||(tok->ttype>=TOK_INCREASEBY&&tok->ttype<=TOK_DECREASEBY)) {
+		if(tok->ttype==TOK_ASSIGN||(tok->ttype>=TOK_INCREASEBY&&tok->ttype<=TOK_DECREASEBY)||tok->ttype==TOK_DIVBY) {
 			tok0_bnf->bnf_factor_function=bnf_factor_array_l2_tba;
 			tok0_bnf->tname="AL2_TBA";
 			assign_type_to=TOK_ASSIGN_ARRAY2;
@@ -1864,12 +1879,12 @@ int err_lexpression()
 		};
 		case TOK_INCREASEBY: {
 #if	TNORMAL
-			set_term_function(tok,(TFunction)increase_by);
+			set_term_function(tok,(TFunction)increaseby);
 #endif
 			// tok->tname = "+=";
 			// tok0=tok;
 			NTOKEN_ERR(710);
-			err_num=err_increase_by();
+			err_num=err_increaseby();
 #if	TBNF
 			tok_struct *dest=stack_push(tok0->tname,tok0,tok0->ttype);
 			if(assign_type_to) {
@@ -1900,13 +1915,13 @@ int err_lexpression()
 			RT_MESG1(714);
 		};
 		case TOK_MULBY: {
-			// tok->term_function = mul_by;
+			// tok->term_function = mulby;
 			// MESG_TOK_INFO("# err_lexpression",tok);
 #if	TNORMAL
-			set_term_function(tok,(TFunction)mul_by);
+			set_term_function(tok,(TFunction)mulby);
 #endif
 			NTOKEN_ERR(710);
-			err_num=err_mul_by();
+			err_num=err_mulby();
 #if	TBNF
 			tok_struct *dest=stack_push("*=",tok0,tok0->ttype);
 			// MESG("	TOK_MULBY: assign_type_to=%d",assign_type_to,tok_info(dest));
@@ -1938,23 +1953,23 @@ int err_lexpression()
 			RT_MESG1(714);
 		};
 		case TOK_DIVBY: {
-			// tok->term_function = mul_by;
+			// tok->term_function = mulby;
 			// MESG_TOK_INFO("# err_lexpression",tok);
 #if	TNORMAL
-			set_term_function(tok,(TFunction)div_by);
+			set_term_function(tok,(TFunction)divby);
 #endif
 			NTOKEN_ERR(711);
-			err_num=err_mul_by();
+			err_num=err_mulby();
 #if	TBNF
-			tok_struct *dest=stack_push("/==",tok0,tok0->ttype);
+			tok_struct *dest=stack_push(tok0->tname,tok0,tok0->ttype);
 			// MESG("	TOK_DIVBY: assign_type_to=%d",assign_type_to,tok_info(dest));
 			if(assign_type_to) {
 				if(assign_type_to==TOK_ASSIGN_ARRAY2) {
-					dest->tname="A2/=";
+					// dest->tname="A2/=";
 					dest->bnf_factor_function=bnf_divby_array2;
 					// MESG("; for [%s] set assign to type %d,bnf_mulby_array2",tok_info(dest));
 				}; if(assign_type_to==TOK_ASSIGN_ARRAY1) {
-					dest->tname="A1/=";
+					// dest->tname="A1/=";
 					dest->bnf_factor_function=bnf_divby_array1;
 					// MESG("; for [%s] set assign to type %d,bnf_mulby_array1",tok_info(dest));
 				};
@@ -1977,12 +1992,12 @@ int err_lexpression()
 		};
 		case TOK_DECREASEBY: {
 #if	TNORMAL
-			set_term_function(tok,(TFunction)decrease_by);
+			set_term_function(tok,(TFunction)decreaseby);
 #endif
 			// tok->tname = "-=";
 			// tok0=tok;
 			NTOKEN_ERR(710);
-			err_num=err_decrease_by();
+			err_num=err_decreaseby();
 #if	TBNF
 			tok_struct *dest=stack_push(tok0->tname,tok0,tok0->ttype);
 			if(assign_type_to) {

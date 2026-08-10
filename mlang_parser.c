@@ -833,6 +833,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 				getnc1(bf,&cc,&tok_type);
 				tok_type=TOK_DIVBY;
 				break;
+			} else
+			if(next_token_type(bf)==TOK_ASSIGN) {
+				getnc1(bf,&cc,&tok_type);
+				tok_type=TOK_DIVBY;
+				break;
 			};
 			break;
 		case TOK_ASSIGN:
