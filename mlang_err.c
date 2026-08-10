@@ -864,7 +864,7 @@ int err_factor()
 		// MESG("	TOK_VAR: return [%s]",tok_info(tok));
 		RT_MESG1(493);}
 	case TOK_ARRAY_L2:{
-		// MESG("TOK_ARRAY_L2: [%s] type %d ind=%d [%s]",tok0->tname,tok0->ttype,tok0->tind,tok_info(tok));
+		MESG("TOK_ARRAY_L2: [%s] type %d ind=%d [%s]",tok0->tname,tok0->ttype,tok0->tind,tok_info(tok));
 		
 		err_num=err_num_expression(); 
 		if(tok->ttype==TOK_RBRAKET) {
@@ -897,6 +897,7 @@ int err_factor()
 				tok0_bnf->dval=1;
 				tok0_bnf->tname="TL2inc";
 				tok0_bnf->bnf_factor_function=bnf_type_l2_result_update;
+				// assign_type_to=TOK_TYPE_ELEMENT;
 #else
 				stack_push("INC_AT2",tok,TOK_INCREASE);
 #endif
@@ -923,6 +924,10 @@ int err_factor()
 			if(tok->ttype==TOK_ASSIGN) {
 				// MESG("	ASSIGN to AL2!");
 				// MESG("	ASSIGN original function!");
+				assign_type_to=TOK_TYPE_ELEMENT;
+			} else 
+			if(tok->ttype==TOK_INCREASEBY) {
+				tok0_bnf->tname="TINC_t2";
 				assign_type_to=TOK_TYPE_ELEMENT;
 			};
 #endif
@@ -1878,6 +1883,7 @@ int err_lexpression()
 			RT_MESG1(714);
 		};
 		case TOK_INCREASEBY: {
+			MESG("! TOK_INCREASEBY: asg_type=%d tok=[%s]",assign_type_to,tok_info(tok));
 #if	TNORMAL
 			set_term_function(tok,(TFunction)increaseby);
 #endif
@@ -1905,7 +1911,11 @@ int err_lexpression()
 				};
 				 if(assign_type_to==TOK_TYPE_ELEMENT) {
 					dest->tname="EL+=";
-					dest->bnf_factor_function=bnf_increaseby_element;
+#if	TNOASGN
+ 					dest->bnf_factor_function=bnf_increaseby_element0;
+#else
+ 					dest->bnf_factor_function=bnf_increaseby_element;
+#endif
 					// MESG("; for [%s] set assign to type %d,bnf_increaseby_array1",tok_info(dest));
 				};
 				assign_type_to=0;

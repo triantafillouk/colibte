@@ -4131,7 +4131,7 @@ inline static void bnf_assign_element()
 
 inline static void bnf_increaseby_element()
 {
-	// MESG("bnf_increaseby_element: var@=%d t=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+	MESG("bnf_increaseby_element: var@=%d t=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	MVAR *varb=(bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
 	// if(varb->var_type==VTYPE_NUM) MESG("varb = %f",bnf_var->dval);
 	prev_var("increasby_element");
@@ -4144,6 +4144,62 @@ inline static void bnf_increaseby_element()
 	array_dat *adat=bnf_var->adat;
 	adat->mval[index1].dval += varb->dval;
 	bnf_var->dval=adat->mval[index1].dval;
+	bnf_var->var_type=VTYPE_NUM;
+}
+
+inline static void bnf_increaseby_element0()
+{
+	// MESG("bnf_increaseby_element0: var@=%d t=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+	MVAR *varb=(bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+	// MESG("	varb dval=%f",varb->dval);
+	prev_var("increasby_element");
+	// MESG("	avar type=%d",bnf_var->var_type);
+	MVAR *vara=bnf_var->var_pointer;
+
+	vara->dval += varb->dval;
+	bnf_var->dval=vara->dval;
+	bnf_var->var_type=VTYPE_NUM;
+}
+
+inline static void bnf_deccreaseby_element0()
+{
+	// MESG("bnf_decreaseby_element0: var@=%d t=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+	MVAR *varb=(bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+	// MESG("	varb dval=%f",varb->dval);
+	prev_var("increasby_element");
+	// MESG("	avar type=%d",bnf_var->var_type);
+	MVAR *vara=bnf_var->var_pointer;
+
+	vara->dval -= varb->dval;
+	bnf_var->dval=vara->dval;
+	bnf_var->var_type=VTYPE_NUM;
+}
+
+inline static void bnf_mulby_element0()
+{
+	// MESG("bnf_mulby_element0: var@=%d t=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+	MVAR *varb=(bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+	// MESG("	varb dval=%f",varb->dval);
+	prev_var("mulby_element");
+	// MESG("	avar type=%d",bnf_var->var_type);
+	MVAR *vara=bnf_var->var_pointer;
+
+	vara->dval *= varb->dval;
+	bnf_var->dval=vara->dval;
+	bnf_var->var_type=VTYPE_NUM;
+}
+
+inline static void bnf_divby_element0()
+{
+	// MESG("bnf_mulby_element0: var@=%d t=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+	MVAR *varb=(bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+	// MESG("	varb dval=%f",varb->dval);
+	prev_var("divby_element");
+	// MESG("	avar type=%d",bnf_var->var_type);
+	MVAR *vara=bnf_var->var_pointer;
+
+	vara->dval /= varb->dval;
+	bnf_var->dval=vara->dval;
 	bnf_var->var_type=VTYPE_NUM;
 }
 
