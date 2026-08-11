@@ -386,7 +386,7 @@ inline static void  bnf_factor_np_minus()
 void set_bnf_function(tok_struct *tok, char *label, VFunction function)
 {
 	tok->bnf_factor_function=function;
-	MESG("- set bnf function: to %s [%s]",label,tok_info(tok));
+	// MESG("- set bnf function: to %s [%s]",label,tok_info(tok));
 }
 
 inline static void bnf_factor_spn_plus()

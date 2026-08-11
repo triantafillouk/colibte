@@ -630,7 +630,7 @@ int err_factor()
  static int pre_symbol=0;
  TDSERR("factor");
  int lpar=0;
- MESG("-- err_factor %s",tok_info(tok));
+ // MESG("-- err_factor %s",tok_info(tok));
 #if	TNORMAL
  set_tok_function(tok,0);
 #endif
@@ -864,7 +864,7 @@ int err_factor()
 		// MESG("	TOK_VAR: return [%s]",tok_info(tok));
 		RT_MESG1(493);}
 	case TOK_ARRAY_L2:{
-		MESG("TOK_ARRAY_L2: [%s] type %d ind=%d [%s]",tok0->tname,tok0->ttype,tok0->tind,tok_info(tok));
+		// MESG("TOK_ARRAY_L2: [%s] type %d ind=%d [%s]",tok0->tname,tok0->ttype,tok0->tind,tok_info(tok));
 		
 		err_num=err_num_expression(); 
 		if(tok->ttype==TOK_RBRAKET) {
@@ -1883,7 +1883,7 @@ int err_lexpression()
 			RT_MESG1(714);
 		};
 		case TOK_INCREASEBY: {
-			MESG("! TOK_INCREASEBY: asg_type=%d tok=[%s]",assign_type_to,tok_info(tok));
+			// MESG("! TOK_INCREASEBY: asg_type=%d tok=[%s]",assign_type_to,tok_info(tok));
 #if	TNORMAL
 			set_term_function(tok,(TFunction)increaseby);
 #endif

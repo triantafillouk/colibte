@@ -282,7 +282,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		tok_struct *dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
     	tok->pushed=check_buffer->tok_bnf_index;
-		MESG("! push %10s as %d [%s] exp_type=%d",title,tok->pushed,tok_info(tok),exp_type);
+		// MESG("! push %10s as %d [%s] exp_type=%d",title,tok->pushed,tok_info(tok),exp_type);
 		// dest->ttype=exp_type;
 		set_bnf_function1(dest,exp_type);
 
