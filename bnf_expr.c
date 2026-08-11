@@ -3208,11 +3208,11 @@ inline static void bnf_assign_array2()
 		return;
 	};
 
-	int ind1 = bnf_var->index1 / adat->rows;
-	int ind2 = bnf_var->index1 % adat->rows;
-	// MESG("	set array[%d] avar@=%d type=%d ind1=%d ind2=%d",ind1,VARIND,bnf_var->var_type,ind1,ind2);
+	int row = bnf_var->index1 / adat->cols;
+	int col = bnf_var->index1 % adat->cols;
+	// MESG("	set array[%d] avar@=%d type=%d row=%d col=%d",row,VARIND,bnf_var->var_type,row,col);
 	double **dval = adat->dval2;
-	dval[ind1][ind2]=bvar->dval;
+	dval[row][col]=bvar->dval;
 	bnf_var->dval=bvar->dval;
 	bnf_var->var_type=VTYPE_NUM;
 }
@@ -3225,15 +3225,13 @@ inline static void bnf_increaseby_array2()
 	array_dat *adat = bnf_var->adat;
 	int index1=bnf_var->index1;
 
-	// MESG("	set array[%d] avar@=%d type=%d ind1=%d ind2=%d",ind1,VARIND,bnf_var->var_type,ind1,ind2);
 	if(adat->atype==VTYPE_ARRAY) {
-		int ind1 = index1%adat->cols;
-		int ind2 = index1%adat->rows;
-		// MESG("	adat cols=%d rows=%d ind=%d ind1=%d ind2=%d",adat->cols,adat->rows,index1,ind1,ind2);
+		int row = index1/adat->cols;
+		int col = index1%adat->cols;
 		double **dval2 = adat->dval2;
-
-		dval2[ind1][ind2] +=bvar->dval;
-		bnf_var->dval=dval2[ind1][ind2];
+		MESG("	mulby element row=%d col=%d",row,col);
+		dval2[row][col] +=bvar->dval;
+		bnf_var->dval=dval2[row][col];
 		bnf_var->var_type=VTYPE_NUM;
 
 		return;
@@ -3292,15 +3290,12 @@ inline static void bnf_decreaseby_array2()
 	// int ind2 = bnf_var->index1 % adat->rows;
 	// MESG("	set array[%d] avar@=%d type=%d ind1=%d ind2=%d",ind1,VARIND,bnf_var->var_type,ind1,ind2);
 	if(adat->atype==VTYPE_ARRAY) {
-		int ind1 = index1%adat->cols;
-		int ind2 = index1%adat->rows;
-		// MESG("	adat cols=%d rows=%d ind=%d ind1=%d ind2=%d",adat->cols,adat->rows,index1,ind1,ind2);
+		int row = index1/adat->cols;
+		int col = index1%adat->cols;
 		double **dval2 = adat->dval2;
-
-		dval2[ind1][ind2] -=bvar->dval;
-		bnf_var->dval=dval2[ind1][ind2];
+		dval2[row][col] -=bvar->dval;
+		bnf_var->dval=dval2[row][col];
 		bnf_var->var_type=VTYPE_NUM;
-
 		return;
 	};
 
@@ -3321,7 +3316,7 @@ inline static void bnf_decreaseby_array2()
 
 inline static void bnf_mulby_array2()
 {
-	// MESG(":mulby_array2:  bvar type=%d [%s]",bnf_var->var_type,tok_info(tok));
+	MESG(":mulby_array2:  bvar type=%d [%s]",bnf_var->var_type,tok_info(tok));
 	MVAR *bvar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer : bnf_var;
 	prev_var("mulby_array2:");
 	// MESG("	avar type=%d",bnf_var->var_type);
@@ -3329,14 +3324,13 @@ inline static void bnf_mulby_array2()
 	int index1=bnf_var->index1;
 
 	if(adat->atype==VTYPE_ARRAY) {
-		int ind1 = index1%adat->cols;
-		int ind2 = index1%adat->rows;
+		int row = index1/adat->cols;
+		int col = index1%adat->cols;
 		double **dval2 = adat->dval2;
-
-		dval2[ind1][ind2] *=bvar->dval;
-		bnf_var->dval=dval2[ind1][ind2];
+		MESG("	mulby element row=%d col=%d",row,col);
+		dval2[row][col] *=bvar->dval;
+		bnf_var->dval=dval2[row][col];
 		bnf_var->var_type=VTYPE_NUM;
-
 		return;
 	};
 
@@ -3375,12 +3369,12 @@ inline static void bnf_divby_array2()
 	int index1=bnf_var->index1;
 
 	if(adat->atype==VTYPE_ARRAY) {
-		int ind1 = index1%adat->cols;
-		int ind2 = index1%adat->rows;
+		int row = index1/adat->cols;
+		int col = index1%adat->cols;
 		double **dval2 = adat->dval2;
-
-		dval2[ind1][ind2] /=bvar->dval;
-		bnf_var->dval=dval2[ind1][ind2];
+		// MESG("	divby element row=%d col=%d",row,col);
+		dval2[row][col] /=bvar->dval;
+		bnf_var->dval=dval2[row][col];
 		bnf_var->var_type=VTYPE_NUM;
 
 		return;

@@ -1,11 +1,11 @@
-# simple double MIXED array ops
+# simple double numeric array ops
 # ok with bnf, uncorrect with normal SELECTBNF
 
 cls
 print("--- a210.cmd")
 v=1.5
-a=[	v, 2, 3
-	v+v, 5, 6
+a=[	1.5, 2, 3
+	1.5+1.5, 5, 6
 	7, 8, 9]
 
 print("original array",a)
