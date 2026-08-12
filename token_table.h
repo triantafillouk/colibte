@@ -73,6 +73,7 @@ TOK_TAB token_table[]= {
 	{TOK_DECREASE		," DEC ",TOK_TERM2},
 	{TOK_INCREASEBY		," += ",TOK_TERM0},
 	{TOK_MULBY			," *= ",TOK_TERM0},
+	{TOK_DIVBY,	 		" /= ",TOK_TERM0},
 	{TOK_DECREASEBY		," -= ",TOK_TERM0},	// 65
 	{TOK_BSLASH			,"[\\]",0},
 	{TOK_NL				," NL ",0},
@@ -99,6 +100,5 @@ TOK_TAB token_table[]= {
 	{TOK_DECREASE_ARRAY1	,"A1-",0},
 	{TOK_DECREASE_ARRAY2	,"A2-",0},
 	{TOK_NEGATE,	"Neg",0},
-	{TOK_DIVBY,			" /= ",TOK_TERM0},
 	{TOK_OTHER			,"OTHER",0}
 };

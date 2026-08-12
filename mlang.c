@@ -35,7 +35,9 @@ extern FILEBUF *cbfp;
 FILEBUF *exe_buffer=NULL;
 FILEBUF *check_buffer=NULL;
 void show_vars(MVAR *va, int size,char *title);
+#if	TNORMAL
 void set_term_function(tok_struct *tok, TFunction term_function);
+#endif
 inline static void  skip_args1(int nargs);
 inline static MVAR *get_left_slot(int ind);
 inline static int check_token(int type);
@@ -108,6 +110,7 @@ double assign_env(double none);
 void init_error();
 void get_lowercase_string(char *lower, char *string);
 void get_uppercase_string(char *lower, char *string);
+
 double exec_block1_break(FILEBUF *fp);
 char * tok_info(tok_struct *tok);
 void MESG_TOK_INFO(char *title,tok_struct *tok);
@@ -238,7 +241,8 @@ char *vtype_names[] = {
 
 void eval_curl_match(tok_struct *tok)
 {
- static tok_struct *curl_stack[100];
+#define MAX_CURLS 100
+ static tok_struct *curl_stack[MAX_CURLS];
  static int left_curl_index=0;
 	
  	if(tok==NULL) {
@@ -249,7 +253,8 @@ void eval_curl_match(tok_struct *tok)
 	if(tok->ttype==TOK_LCURL) {// push left curl
 		curl_stack[left_curl_index] = tok;
 		// MESG("set left_curl_index left: %d [%s]",left_curl_index,tok_info(tok));
-		left_curl_index++;
+		if(left_curl_index<MAX_CURLS)	left_curl_index++;
+		else set_error(tok,404,"MAX_CURLS limit exceeded!");
 		return;
 	};
 	if(tok->ttype==TOK_RCURL) { // pull left curl and set match_token

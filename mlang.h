@@ -14,10 +14,14 @@
 #define	ARRAY_ALLOCATED		3
 
 typedef	alist * TLIST;
+#if	TBNF
 typedef void (*VFunction)();
+#endif
+#if	TNORMAL
 typedef double (*FFunction)();
 typedef double (*TFunction)(double v1);
 typedef double (*EFunction)(double v1,double v2);
+#endif
 
 typedef struct tok_struct {
 	union {
@@ -98,19 +102,22 @@ typedef struct key_type {
 } key_type;
 
 // #define SEP_FUNCTIONS	1
-
+#if	TNORMAL
 /*	list of recognized user type functions	*/
 typedef struct m_function {
 	char *f_name;	/* function name  */
 	short f_args;	/* number of function arguments  */
 	FFunction ffunction;
 } m_function;
+#endif
 
+#if	TBNF
 typedef struct v_function {
 	char *f_name;	/* function name  */
 	short f_args;	/* number of function arguments  */
 	VFunction vfunction;
 } v_function;
+#endif
 
 typedef struct term_type {
 	char *term_name;
@@ -123,20 +130,23 @@ double assign(int is_edenv);
 int parse_block1(FILEBUF *bf,BTREE *stree,int start);
 void assign_args1( MVAR *va,MVAR *current_stable,int nargs);
 double factor_1();
+#if	TNORMAL
 double term1_1();
 double term2_1();
-double expression_1();
 double lterm1_1();
+double expression_1();
 double lexpression_1();
 double assign1(int is_edenv);
 double command1();
-double exec_block1(FILEBUF *fp);
 double exec_sentence1();
-int check_next_token(int ind);
+tok_struct *gettok1();
+double exec_block1(FILEBUF *fp);
+// int check_next_token(int ind);
+#endif
+
 int check_skip_token(int type);
 int check_skip_token_err(int type,char *mesg,int err);
 int check_next_token_type(int type);
-tok_struct *gettok1();
 void syntax_error(int err,char *description);
 void set_error(tok_struct *tok,int index,char *description);
 int plot_on();
@@ -215,6 +225,7 @@ enum {
 	TOK_DECREASE	,
 	TOK_INCREASEBY	,
 	TOK_MULBY		,
+	TOK_DIVBY,
 	TOK_DECREASEBY	,	// 65
 	TOK_BSLASH		,
 	TOK_NL				,
@@ -243,7 +254,6 @@ enum {
 	TOK_DECREASE_ARRAY1,
 	TOK_DECREASE_ARRAY2,
 	TOK_NEGATE,
-	TOK_DIVBY,
 	TOK_OTHER			// 81
 };
 

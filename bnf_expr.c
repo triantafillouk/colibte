@@ -4125,7 +4125,7 @@ inline static void bnf_assign_element()
 
 inline static void bnf_increaseby_element()
 {
-	MESG("bnf_increaseby_element: var@=%d t=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+	// MESG("bnf_increaseby_element: var@=%d t=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	MVAR *varb=(bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
 	// if(varb->var_type==VTYPE_NUM) MESG("varb = %f",bnf_var->dval);
 	prev_var("increasby_element");
@@ -4252,7 +4252,7 @@ inline static void bnf_divby_element()
 inline static void bnf_type_l2_result()
 {
 	next_var("arrayl2 result");	// new place on var stack
-	MESG("## bnf_type_l2_result: ind=%d var@=%d [%s]",tok->tind,VARIND,tok_info(tok));
+	// MESG("## bnf_type_l2_result: ind=%d var@=%d [%s]",tok->tind,VARIND,tok_info(tok));
 
 	MVAR *array_slot;
 	// MESG("	token var index tind=%d",tok->tind);
@@ -4392,7 +4392,7 @@ void bnf_type_l2_result_update()
 {
 	// MESG("## bnf_type_l2_result_update:");
 	next_var("arrayl2");
-	MESG("## bnf_type_l2_result_update: ind=%d %f var@=%d [%s]",tok->tind,tok->dval,VARIND,tok_info(tok));
+	// MESG("## bnf_type_l2_result_update: ind=%d %f var@=%d [%s]",tok->tind,tok->dval,VARIND,tok_info(tok));
 	int update_val=tok->dval;
 
 	MVAR *array_slot;
@@ -4401,13 +4401,12 @@ void bnf_type_l2_result_update()
 	array_dat *adat = array_slot->adat;
 	// MESG("	get the row");
 	NTOKEN2;
-	int row=bnf_expression()*adat->cols;prev_var("type_l2");
+	int row=bnf_expression()*adat->cols;prev_var("type_l2"); // points to row start index
 	// MESG("	row=%d [%s]",row,tok_info(tok));
 	NTOKEN2;
 	// MESG("	get the index type [%s]",tok_info(tok));
 	// MESG("	type=%d",array_slot->var_type);
 	// MESG("	factor_arrayl1:< ----------- vtype=%d  [%s]",array_slot->var_type,tok_info(tok));
-	// NTOKEN2;
 	tok->dval=-1;
 	int ind1 = get_type_index(adat,tok);
 	// MESG("	type_index=%d of %s",ind1,adat->array_name);
@@ -4506,6 +4505,7 @@ VFunction factor_bnf_funcs[] = {
 	bnf_update_val,		// TOK_DECREASE	,62
 	bnf_increaseby,	// TOK_INCREASEBY 63
 	bnf_mulby,			// TOK_MULBY
+	bnf_divby,			// TOK_DIVBY,
 	bnf_decreaseby,	// TOK_DECREASEBY
 	bnf_factor_none,	// TOK_BSLASH		,
 
@@ -4538,7 +4538,6 @@ VFunction factor_bnf_funcs[] = {
 	bnf_update_val,		// TOK_DECREASE_ARRAY1,
 	bnf_update_val,		// TOK_DECREASE_ARRAY2,
 	bnf_factor_negate,	// TOK_NEGATE,
-	bnf_divby,			// TOK_DIVBY,
 	bnf_factor_none		// TOK_OTHER,
 };
 
@@ -4567,7 +4566,6 @@ int factor_bnf_type[] = {
 	TOK_ASSIGN,		// TOK_ASSIGN	,	// assignment
 	0,		// TOK_EOF		,	// end of file token
 	TOK_NUM,		// TOK_NUM, numeric value
-
 	0,	// TOK_DIR		,	// directive
 	0,	// TOK_DIR_IF	,	// dir if
 	0,	// TOK_DIR_ELSE	,	// dir else
@@ -4577,17 +4575,15 @@ int factor_bnf_type[] = {
 	0,	// TOK_DIR_FOR		,
 	0,	// TOK_COMMA		,
 	0,	// TOK_DIR_FORI	,
-
 	/* bool operators  */
 	TOK_COMPARE,	// TOK_COMPARE		,33
-
 	TOK_NOTEQUAL,	// TOK_NOTEQUAL	,
 	TOK_SMALLER,	// TOK_SMALLER		,	/* <  */
 	TOK_BIGGER,	// TOK_BIGGER		,	/* >  */
 	TOK_EQUAL,	// TOK_EQUAL		,	/* ==  */
 	TOK_SMALLEREQ,	// TOK_SMALLEREQ	,	/* <=  */
 	TOK_BIGGEREQ,	// TOK_BIGGEREQ	,	/* >=  */
-
+	/* Bool operators  */
 	TOK_BOOL,	// TOK_BOOL		,40
 	TOK_AND,	// TOK_AND			,	/* &  */
 	TOK_OR,	// TOK_OR			,	/* |  */
@@ -4602,7 +4598,6 @@ int factor_bnf_type[] = {
 	TOK_MOD,	// TOK_MOD			,	/* %  */
 	TOK_MUL,	// TOK_MUL			,
 	TOK_DIV,	// TOK_DIV			,
-
 	TOK_LBRAKET,	// TOK_LBRAKET		,53
 	0,	// TOK_RBRAKET		,
 	TOK_SQUOTE,	// TOK_SQUOTE		,
@@ -4615,9 +4610,9 @@ int factor_bnf_type[] = {
 	TOK_DECREASE,		// TOK_DECREASE	,62
 	TOK_INCREASEBY,	// TOK_INCREASEBY 63
 	TOK_MULBY,			// TOK_MULBY
+	TOK_DIVBY,		// TOK_DIVBY
 	TOK_DECREASEBY,	// TOK_DECREASEBY
 	0,	// TOK_BSLASH		,
-
 	0,	// TOK_NL				,
 	0,	// TOK_DIR_CONTINUE	,
 	0,	// TOK_DIR_FOREACH		,
@@ -4630,13 +4625,8 @@ int factor_bnf_type[] = {
 	TOK_ASSIGNOPT,	// TOK_ASSIGNOPT	,
 	0,	// TOK_END,
 	0,	// TOK_DEFINE_TYPE,
-#if	USE_TYPE_VARS
 	TOK_ASSIGN_TYPE,	// TOK_ASSIGN_TYPE,
 	TOK_TYPE_ELEMENT,	// TOK_TYPE_ELEMENT
-#else
-	0,	// TOK_ASSIGN_TYPE,
-	0,	// TOK_TYPE_ELEMENT
-#endif
 	0,	// TOK_DOT,
 	0,	// TOK_INCBEFORE
 	0,	// TOK_DECBEFORE
@@ -4647,7 +4637,6 @@ int factor_bnf_type[] = {
 	TOK_DECREASE_ARRAY1,
 	TOK_DECREASE_ARRAY2,
 	TOK_NEGATE,
-	TOK_DIVBY,		// TOK_DIVBY
 	0		// TOK_OTHER,
 };
 

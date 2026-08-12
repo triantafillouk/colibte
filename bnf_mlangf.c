@@ -278,7 +278,6 @@ void bnf_print()
 	total_printed[0]=0;
 	next_var("print0");
 	for(i=0;i<args;i++) {
-		// ntoken();
 		NTOKEN2;
 		
 		bnf_expression();
