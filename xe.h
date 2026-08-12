@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.7T980  (21/7/2026)"
+#define VERSION 	 "#01.8  (12/8/2026)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -28,7 +28,7 @@
 #endif
 #define	TARROWS		1	/* Use arrow menus in panel curses  */
 #define	USE_UTF8	1	/* Use utf8 characters  */
-#define	TNOASGN		0	/* remove var from assignment in bnf  */
+#define	TNOASGN		1	/* remove var from assignment in bnf  */
 #define	TBNF		1	/* convert to bnf notation test  */
 #define TNORMAL		0	/* normal ops included  */
 #if	TBNF & TNORMAL
@@ -468,6 +468,8 @@ typedef struct MLQUOTES {
 #define H_QUOTE12	2048
 #define H_LINESEP	4096
 #define H_UTFERR	8192	/* Utf8 error  */
+#define	H_REGEX1	16384
+#define	H_REGEX2	32768
 
 #define H_WORD1		10	/* found word type1  */
 #define	H_WORD2		11	/* found word type2  */

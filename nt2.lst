@@ -5,6 +5,7 @@ nt/a121.cmd
 nt/a122.cmd
 nt/a2.cmd
 nt/a21.cmd
+nt/a210.cmd
 nt/a3.cmd
 nt/a4.cmd
 nt/a5.cmd
@@ -67,6 +68,9 @@ nt/p2.cmd
 nt/p4.cmd
 nt/p5.cmd
 nt/s2.cmd
+nt/s21.cmd
+nt/s22.cmd
+nt/s23.cmd
 nt/s3.cmd
 nt/s4.cmd
 nt/show_args.cmd

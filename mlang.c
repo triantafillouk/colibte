@@ -1,10 +1,10 @@
 /*
-	Curses,gtk editor,notes,directory bnfrowser
+	Curses,gtk editor,notes,directory browser
 	Copyright Kostas Triantafillou
 	GNU LESSER GENERAL PUBLIC LICENSE version 2 
 	(or at your option) any later version.
 
- 	An interpreter,embeded calculator by K.Triantafillou (2011,2020),
+ 	An interpreter,embeded calculator by K.Triantafillou (2011,2026),
 */
 inline void ntoken();
 
@@ -35,7 +35,9 @@ extern FILEBUF *cbfp;
 FILEBUF *exe_buffer=NULL;
 FILEBUF *check_buffer=NULL;
 void show_vars(MVAR *va, int size,char *title);
+#if	TNORMAL
 void set_term_function(tok_struct *tok, TFunction term_function);
+#endif
 inline static void  skip_args1(int nargs);
 inline static MVAR *get_left_slot(int ind);
 inline static int check_token(int type);
@@ -47,28 +49,19 @@ static inline double num_term2();
 double cexpression();
 #endif
 int check_init(FILEBUF *bf);
-double exec_function(FILEBUF *bp,int nargs);
-MVAR * push_args_1(int nargs,int vars_num);
-double compare_notequal(double value);
-double compare_smaller(double value);
-double compare_bigger(double value);
-double compare_smallereq(double value);
-double compare_biggereq(double value);
-double compare_equal(double v1);
-void set_bnf_function1(tok_struct *tok, int type);
+
 // inline static void ntoken2();
+void set_tok_function(tok_struct *tok, int type);
 
 #if	TBNF
 static inline void bnf_factor_dummy();
+void set_bnf_function1(tok_struct *tok, int type);
 #endif
 void delete_symbol_table(MVAR *td, int size,int nargs);
 MVAR *new_symbol_table(int const size);
 void init_vars(MVAR *head,int size);
-void set_tok_function(tok_struct *tok, int type);
-void set_tok_directive(tok_struct *tok, FFunction directive);
 MVAR *btree_to_mvar(BTREE *bt);
 void skip_sentence1();
-inline MVAR *get_left_slot(int ind);
 void show_error(char *from,char *name);
 char *ddot_string();
 void update_ddot_line(char *ddot_out);
@@ -117,6 +110,7 @@ double assign_env(double none);
 void init_error();
 void get_lowercase_string(char *lower, char *string);
 void get_uppercase_string(char *lower, char *string);
+
 double exec_block1_break(FILEBUF *fp);
 char * tok_info(tok_struct *tok);
 void MESG_TOK_INFO(char *title,tok_struct *tok);
@@ -247,7 +241,8 @@ char *vtype_names[] = {
 
 void eval_curl_match(tok_struct *tok)
 {
- static tok_struct *curl_stack[100];
+#define MAX_CURLS 100
+ static tok_struct *curl_stack[MAX_CURLS];
  static int left_curl_index=0;
 	
  	if(tok==NULL) {
@@ -258,7 +253,8 @@ void eval_curl_match(tok_struct *tok)
 	if(tok->ttype==TOK_LCURL) {// push left curl
 		curl_stack[left_curl_index] = tok;
 		// MESG("set left_curl_index left: %d [%s]",left_curl_index,tok_info(tok));
-		left_curl_index++;
+		if(left_curl_index<MAX_CURLS)	left_curl_index++;
+		else set_error(tok,404,"MAX_CURLS limit exceeded!");
 		return;
 	};
 	if(tok->ttype==TOK_RCURL) { // pull left curl and set match_token
@@ -291,7 +287,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		tok_struct *dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
     	tok->pushed=check_buffer->tok_bnf_index;
-		// MESG("! set pushed! as %d [%s] exp_type=%d",tok->pushed,tok_info(tok),exp_type);
+		// MESG("! push %10s as %d [%s] exp_type=%d",title,tok->pushed,tok_info(tok),exp_type);
 		// dest->ttype=exp_type;
 		set_bnf_function1(dest,exp_type);
 
@@ -441,7 +437,7 @@ tok_struct *new_tok()
 
 #define	TNAME	tname(tok->ttype)
 
-inline void ntoken()
+void ntoken()
 {
 #if	TOKENN
 	// MESG("- %s",tok->tname);
@@ -753,7 +749,7 @@ void show_token_table(char *title, FILEBUF *bf,tok_struct *token_start,int size)
  tok_struct *tokp=token_start;
  MESG("!---------- %s token table of %s size %d -------------",title,bf->b_fname,size);
  for(i=0;i<size;i++) {
-	MESG("!T %3d %s",i,tok_info(tokp));
+	MESG("!T %s",tok_info(tokp));
 	tokp++;
  };
  MESG("------------------------------------------------------");
@@ -775,6 +771,7 @@ void create_token_pointers(FILEBUF *bf)
 }
 #endif
 
+#if	TBNF
 void create_statement_group(FILEBUF *bf)
 {
  tok_struct *tokp=bf->tok_table_bnf;
@@ -788,6 +785,7 @@ void create_statement_group(FILEBUF *bf)
  };
  // tokp->next_tok=NULL;
 }
+#endif
 
 /* Check for any errors and initialize parsed list  */
 int check_init(FILEBUF *bf)
@@ -936,16 +934,11 @@ inline static int check_token(int type)
  return(tok->ttype == type);
 }
 
-
-
-
 inline static MVAR *get_left_slot(int ind)
 {
 	// MESG("get_left_slot: ind=%d",ind);
 	return &current_stable[ind];
 }
-
-
 
 void eval_btree1(BTNODE *node,void do_func(BTNODE *n,void *p),void *p);
 
@@ -1086,7 +1079,9 @@ void skip_sentence1()
 	switch(tok->ttype) {
 		case TOK_DIR_ELSE:	/* this one starts a new sentence!!  */
 		case TOK_SEP:
+#if	TNORMAL
 			set_tok_function(tok,1);
+#endif
 			NTOKEN2;
 			return;
 		case TOK_LPAR:
@@ -1154,6 +1149,7 @@ void msg_result(char *name,int show_no_time)
 {
 	// set_result();
 	MVAR *result = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
+	// MESG("msg_result: @=%d t=%d %s",VARIND,result->var_type,result->sval);
 	if(show_no_time) {
 		if(result->var_type==VTYPE_NUM) msg_line("%s Result (%f)",name,num_result());
 		else if(result->var_type==VTYPE_STRING) msg_line("%s Result \"%s\"",name,string_result());
@@ -1262,6 +1258,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		MESG("end of program2 var@=%d type %d",VARIND,bnf_var->var_type);
 		// if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
 		// show_results();
+		msg_result(bp->b_fname,show_no_time);
 #endif
 #if	TBNFNORMAL
 	};
@@ -1288,7 +1285,6 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		// next_var("result");
 		// prev_var("r");
 		// MESG("show result executing buffer [%s]!",bp->b_fname);
-		msg_result(bp->b_fname,show_no_time);
 #endif
 #if	TBNFNORMAL
 	} else

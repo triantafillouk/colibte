@@ -1,5 +1,5 @@
 /*
-	Curses,gtk editor,notes,directory bnfrowser
+	Curses,gtk editor,notes,directory browser
 	Copyright Kostas Triantafillou
 	GNU LESSER GENERAL PUBLIC LICENSE version 2 
 	(or at your option) any later version.
@@ -9,6 +9,15 @@
 */
 
 double factor_option();
+double exec_function(FILEBUF *bp,int nargs);
+MVAR * push_args_1(int nargs,int vars_num);
+double compare_notequal(double value);
+double compare_smaller(double value);
+double compare_bigger(double value);
+double compare_smallereq(double value);
+double compare_biggereq(double value);
+double compare_equal(double v1);
+void set_tok_directive(tok_struct *tok, FFunction directive);
 
 /* exec multiple sentences at the same level */
 double exec_block1(FILEBUF *fp)
@@ -423,7 +432,7 @@ double mul_by()
 		sslot->dval *= v1;
 		return(sslot->dval);
 	};
-	if(sslot->var_type==VTYPE_ARRAY) {
+	if(sslot->var_type==VTYPE_ARRAY || sslot->var_type==VTYPE_AMIXED) {
 		if(ori_type!=TOK_VAR) {
 			v0=*ls_pdval;
 			*ls_pdval = v0*v1;
@@ -455,35 +464,58 @@ double mul_by()
 		return(0);
 	};
 
-	if(sslot->var_type==VTYPE_AMIXED) {
-		if(vtype_is(VTYPE_NUM)) {
-			// MESG("	VTYPE_NUM sslot vtype=%d %d",VTYPE_AMIXED,VTYPE_NUM);
-			// MESG("	lmvar type=%d",lmvar->var_type);
-
-			if(ori_type!=TOK_VAR) {
-				if(lmvar->var_type==VTYPE_STRING) {
-					char *tmp_s= str_mul(lmvar->sval,v1);
-					// MESG("mul_by: mixed string1 %s",tmp_s);
-					lmvar->sval = tmp_s;
-				} else {
-					lmvar->dval *= v1;
-				};
-			return(v1);
-		};	
-		if(vtype_is(VTYPE_STRING)) {
-			char *tmp_s= str_mul(lmvar->sval,v1);
-			// MESG("mul_by: mixed string2 %s",tmp_s);
-			lmvar->sval = tmp_s;
-			// MESG("	result [%s]",lmvar->sval);
-			return v1;
-		};
-	 };
-	};
 	MESG("error token [%s] ind=%d line=%d type=%d",ltok->tname,ltok->tind,ltok->tline,ltok->ttype);
 	set_error(ltok,1023,"multiply operation not supported!");
 	return(-1);
 }
 
+double div_by_num()
+{
+	MVAR *sslot=lsslot;
+	sslot->dval /= num_expression();
+	return(sslot->dval);
+}
+
+double div_by()
+{
+	double v1,v0;
+	MESG("div_by:");
+	MVAR *sslot=lsslot;
+	tok_struct *ptok=tok;
+	// TDS("div_by");
+	int ori_type=lstoken->ttype;
+	MESG("ori_type=%d",ori_type);
+	tok_struct *ltok = tok;
+#if	0
+	if(ori_type!=TOK_VAR) {
+		set_error(lstoken,1022,"mul by constant not supported!");
+		return(0);
+	};
+#endif
+	v1=num_expression();
+	MESG("bvar sslot var_type=%d",sslot->var_type);
+	if(sslot->var_type==VTYPE_NUM) {
+		if(ori_type==VTYPE_NUM)	
+			set_term_function(ptok,(TFunction)div_by_num);
+		sslot->dval /= v1;
+		return(sslot->dval);
+	};
+	if(sslot->var_type==VTYPE_ARRAY || sslot->var_type==VTYPE_AMIXED ) {
+		if(ori_type!=TOK_VAR) {
+			v0=*ls_pdval;
+			*ls_pdval = v0/v1;
+			return(v0/v1);
+		} else {
+			array_mul1(sslot->adat,1/v1);
+			set_array(sslot->adat);
+			return(1/v1);
+		};
+	};
+
+	MESG("error token [%s] ind=%d line=%d type=%d",ltok->tname,ltok->tind,ltok->tline,ltok->ttype);
+	set_error(ltok,1023,"divide operation not supported!");
+	return(-1);
+}
 
 
 
@@ -2704,5 +2736,6 @@ FFunction factor_funcs[] = {
 	factor_none,	// TOK_DECREASE_ARRAY1,
 	factor_none,	// TOK_DECREASE_ARRAY2,
 	factor_none,	// TOK_NEGATE,
+	div_by,			// TOK_DIVBY,
 	factor_none		// TOK_OTHER,
 };

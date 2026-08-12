@@ -71,17 +71,14 @@ struct array_dat * new_list_array(int cols)
 void free_array_dat(struct array_dat *adat)
 {
  if(adat==NULL) {
-	err_num=251;
- 	err_str="free_array_dat: array is already NULL!!";
+ 	set_error(tok,251,"free_array_dat: array is already NULL!!");
 	return;
  };
  if(adat->astat==ARRAY_UNALLOCATED) { 
- 	err_num=252;
-	err_str="free_array_dat: astat is already zero !!!!!!!";
+ 	set_error(tok,252,"free_array_dat: astat is already zero !!!!!!!");
  };
  if(adat->rows==0 || adat->cols==0) {
- 	err_num=253;
-	err_str="error array with zero dims";
+ 	set_error(tok,253,"error array with zero dims");
  	ERROR("error array with zero dims %d %d",adat->rows,adat->cols);
 	return;
  };
@@ -228,6 +225,7 @@ array_dat * dup_array_add1(array_dat *a,double plus)
 			if(na->rows > 1) dim=na->rows; else dim=na->cols;
 			for(i=0;i<dim;i++) na->dval[i]= a->dval[i]+plus;
 		};
+		 na->astat=ARRAY_ALLOCATED;
 	};
 
  	if(a->atype==VTYPE_AMIXED) {	
@@ -247,10 +245,10 @@ array_dat * dup_array_add1(array_dat *a,double plus)
 				k++;
 			};
 		};
+		na->astat=ARRAY_ALLOCATED;
 	};
 
 
- na->astat=ARRAY_ALLOCATED;
  return(na);
 }
 
@@ -350,6 +348,17 @@ array_dat * dup_array_power(array_dat *a,double num)
  return(na);
 }
 
+array_dat *dup_sarray(array_dat *a)
+{
+	array_dat *new_sarray = new_array_similar(a);
+	// copy array string values;
+	int size=a->cols*a->rows;
+	int i=0;
+	for(i=0;i<size;i++) {
+		new_sarray->sval[i]=strdup(a->sval[i]);
+	};
+	return new_sarray;
+}
 
 array_dat * array_mul2(array_dat *aa,array_dat *ba)
 {
@@ -436,8 +445,7 @@ array_dat * array_mul2(array_dat *aa,array_dat *ba)
 		};
 	} else {
 		/* this is an error!!  */
-	 	err_num=261;
-		err_str="To multiply arrays, number of columns of the first must be equal to the number of rows of the second!!";
+		set_error(tok,261,"To multiply arrays, number of columns of the first must be equal to the number of rows of the second!!");
 		return(aa);
 	} 
 	return na;
@@ -465,8 +473,7 @@ array_dat * array_add2(array_dat *aa,array_dat *ba)
 	na->astat=ARRAY_ALLOCATED;
 	return(na);
  } else {
- 	err_num=254;
-	err_str="To add arrays they must have the same dimensions";
+ 	set_error(tok,254,"To add arrays they must have the same dimensions");
 	return(NULL);
  };
 }
@@ -492,8 +499,7 @@ array_dat * array_sub2(array_dat *aa,array_dat *ba)
 	na->astat=ARRAY_ALLOCATED;
 	return(na);
  } else {
- 	err_num=255;
-	err_str="To substract arrays they must have the same dimensions";
+ 	set_error(tok,255,"To substract arrays they must have the same dimensions");
 	return(NULL);
  };
 }
@@ -522,8 +528,7 @@ void array_sub(array_dat *aa,array_dat *ba)
 	}
 	return;
  } else {
- 	err_num=255;
-	err_str="To add arrays they must have the same dimensions";
+ 	set_error(tok,255,"To add arrays they must have the same dimensions");
 	return;
  };
 }
@@ -551,8 +556,7 @@ void array_add(array_dat *aa,array_dat *ba)
 	};
 	return;
  } else {
- 	err_num=255;
-	err_str="To substract arrays they must have the same dimensions";
+ 	set_error(tok,255,"To substract arrays they must have the same dimensions");
 	return;
  };
 }
@@ -561,8 +565,7 @@ void array_add1(array_dat *na,double plus)
 {
  // MESG("array_add1: type=%d stat=%d %d",na->atype,na->astat,ARRAY_ALLOCATED);
  if(na->astat==ARRAY_UNALLOCATED) {
- 	err_num=256;
- 	err_str="error: cannot add to non defined array!";
+ 	set_error(tok,256,"error: cannot add to non defined array!");
 	return;
  };
  	if(na->atype==VTYPE_ARRAY) {
@@ -595,11 +598,11 @@ void array_add1(array_dat *na,double plus)
 	};
 }
 
+
 void sarray_add1(array_dat *na,char *s)
 {
  if(na->astat==ARRAY_UNALLOCATED) {
- 	err_num=256;
- 	err_str="error: cannot add to non defined array!";
+ 	set_error(tok,256,"error: cannot add to non defined array!");
 	return;
  };
 
@@ -617,6 +620,19 @@ void sarray_add1(array_dat *na,char *s)
 		na->sval[i]=stmp;
 	};
  }
+
+ if(na->atype==VTYPE_AMIXED) 
+ {
+ 	// MESG("String [%s] add to string array!",s);
+	int i;
+	for(i=0;i<na->rows*na->cols;i++) {
+		if(na->mval[i].var_type==VTYPE_STRING) {
+			na->mval[i].sval = realloc(na->mval[i].sval,strlen(na->mval[i].sval)+strlen(s)+1);
+			strcat(na->mval[i].sval,s);
+		};
+	};
+ }
+
 }
 
 void sarray_mul1(array_dat *sarray, double factor)
@@ -639,8 +655,7 @@ void sarray_mul1(array_dat *sarray, double factor)
 void array_sub1(array_dat *na,double plus)
 {
  if(na->astat==ARRAY_UNALLOCATED) {
- 	err_num=257;
-	err_str="error: cannot sub to non defined array!";
+ 	set_error(tok,257,"cannot sub to non defined array!");
 	return;
  };
  	if(na->atype==VTYPE_ARRAY) {	/* allocate num array  */
@@ -673,13 +688,17 @@ void array_sub1(array_dat *na,double plus)
 
 void array_mul1(array_dat *na,double num)
 {
- if(na==NULL) { err_num=258;ERROR("array_mul1: NULL array!");return;};
+ if(na==NULL) { 
+ 	set_error(tok,258,"array_mul1: NULL array!");
+	ERROR("array_mul1: NULL array!");
+	return;
+ };
  if(na->astat==ARRAY_UNALLOCATED) {
- 	err_num=259;
+ 	set_error(tok,259,"cannot mul to unallocated array!");
  	ERROR("error: cannot mul to unallocated array! astat=%d type=%d",na->astat,na->atype);
 	return;
  };
- 	if(na->atype==VTYPE_ARRAY) {	/* allocate num array  */
+ 	if(na->atype==VTYPE_ARRAY) {
 		int i,j,dim=1;
 		if(na->rows>1 && na->cols>1) {
 			for(j=0;j<na->rows;j++) for(i=0;i<na->cols;i++) 
@@ -688,14 +707,28 @@ void array_mul1(array_dat *na,double num)
 			if(na->rows > 1) dim=na->rows; else dim=na->cols;
 			for(i=0;i<dim;i++)  na->dval[i] *= num;
 		};
+		return;
+	};
+	
+ 	if(na->atype==VTYPE_AMIXED) {
+		int dim=na->rows*na->cols;
+		MESG("array_mul1: amixed dim=%d",dim);
+		int i;
+		MVAR *mval=na->mval;
+		for(i=0;i<dim;i++) {
+			if(mval[i].var_type==VTYPE_NUM)
+				mval[i].dval *=num;
+		};
 	};
 }
 
 void array_mod1(array_dat *na,double num)
 {
- if(na==NULL) { err_num=258;ERROR("array_mod1: NULL array!");return;};
+ if(na==NULL) { 
+ 	set_error(tok,258,"array_mod1: NULL array!");return;
+ };
  if(na->astat==ARRAY_UNALLOCATED) {
- 	err_num=259;
+ 	set_error(tok,259,"array unallocated");
  	ERROR("error: cannot mod to non defined array! astat=%d",na->astat);
 	return;
  };
@@ -713,9 +746,9 @@ void array_mod1(array_dat *na,double num)
 
 void array_power(array_dat *na,double num)
 {
- if(na==NULL) { err_num=258;ERROR("array_power: NULL array!");return;};
+ if(na==NULL) { set_error(tok,258,"array_power: NULL array!");return;};
  if(na->astat==ARRAY_UNALLOCATED) {
- 	err_num=259;
+ 	set_error(tok,259,"power to an undefined array");
  	ERROR("error: cannot power to non defined array! astat=%d",na->astat);
 	return;
  };
@@ -1034,14 +1067,12 @@ void print_array1(char *title,array_dat *adat)
 	so[0]=0;
 	// MESG("print_array1: --------------- title \"%s\"",title);
 	if(adat==NULL) {
-		err_num=260;
-		err_str="%s: NULL array!!!!!!!!!!!!!!!!!!";
-		ERROR("%s: NULL array!!!!!!!!!!!!!!!!!!",title);
-		out_print("Null array!",1);
+		set_error(tok,260,"NULL array!");
+		ERROR("%s: NULL array ",title);
 		return;
 	};
 	char *vt;
-	vt = (adat->var_tree==NULL) ? "no var tree":"with var_tree";
+	vt = (adat->var_tree==NULL) ? "":"typed array";
 	snprintf(so,sizeof(so),"# %s Array %s,%d:(%s) rows=%d cols=%d astat=%d %s",
 		title,adat->array_name,adat->anum,vtype_names[adat->atype],adat->rows,adat->cols,adat->astat,vt);
 	out_print(so,1);

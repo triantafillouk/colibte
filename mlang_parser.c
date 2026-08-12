@@ -51,6 +51,14 @@ tok_struct *add_token(FILEBUF *bf,int tok_type,int cc,char *label,char *from,int
 	return tok;
 }
 
+#define SHOW_TOKEN(from) show_token0(bf,tok,from,cc,tok_line,tok_type);
+
+void show_token0(FILEBUF *bf,tok_struct *tok,char *from,int cc,int tok_line,int tok_type)
+{
+	// MESG(";[%s] %10s [%s]",bf->b_fname,from,tok_info(tok));
+	// MESG(";[%s]  [%s] l=%3d n=%3d: cc=%d type=[%s] name=[%s]",
+		// bf->b_fname,from,tok_line,tok->tnum,cc,tname(tok_type),tok->tname);
+}
 /* skip one line or till next separator */
 void skip_line1(FILEBUF *bf,int cc)
 {
@@ -821,6 +829,16 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			};
 			break;
 		case TOK_DIV:
+			if(next_token_type(bf)==TOK_ASSIGN) {
+				getnc1(bf,&cc,&tok_type);
+				tok_type=TOK_DIVBY;
+				break;
+			} else
+			if(next_token_type(bf)==TOK_ASSIGN) {
+				getnc1(bf,&cc,&tok_type);
+				tok_type=TOK_DIVBY;
+				break;
+			};
 			break;
 		case TOK_ASSIGN:
 			// MESG("TOK_ASSIGN:");
@@ -869,6 +887,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 		// start_of_line = 1;
 		tok_type=TOK_SEP;
 		ADD_TOKEN("nl");
+		SHOW_TOKEN("nl");
 		continue;
 	};
 	// MESG("	- token type=[%d %s] previous token is [%d %s] nword=[%s],store=%d",tok_type,tname(tok_type),previous_ttype,tname(previous_ttype),nword,is_storelines);
@@ -886,6 +905,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 					ADD_TOKEN("token dot!"); 
 					set_dot_var(bf,tok);
 					previous_ttype=tok->ttype;
+					SHOW_TOKEN("token dot!");
 					// MESG("	-- token [%s] %d ttype=%d ind=%d",tok->tname,tok->tnum,tok->ttype,tok->tind);
 					continue;
 				} else {
@@ -903,9 +923,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 						} else {
 							// MESG("	found directiv [%s] ind=%d vtype=%d",node->node_name,node->node_index,node->node_vtype);
 							ADD_TOKEN("other directive!");
+							SHOW_TOKEN("other");
 						};
 					} else {
 						ADD_TOKEN("letter");
+						SHOW_TOKEN("letter");
 					};
 				}
 			};
@@ -916,6 +938,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			} else {
 				// MESG("		add separator!");
 				ADD_TOKEN("separator");
+				SHOW_TOKEN("separator");
 			};
 		};
 	};
@@ -1066,6 +1089,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 							NTOKEN2;
 							ADD_TOKEN("dot");
 							set_dot_var(bf,tok);
+							SHOW_TOKEN("dot");
 							// continue;
 						};
 					} else {
@@ -1140,12 +1164,14 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			ADD_TOKEN("0");
 			tok->ttype=TOK_SEP;
 			tok->tname="end 0";
+			SHOW_TOKEN("0");
 		} else {
 			ADD_TOKEN("end sep");
 			tok->ttype=TOK_SEP;
 			tok->tind=0;
 			tok->tline=tok_line;
 			tok->tname="end sep";
+			SHOW_TOKEN("end sep");
 		};
 	};
 	// MESG("parse_block1: set end token");
@@ -1156,6 +1182,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	tok->tline=tok_line;
 	tok->tname="eof";
 	tok->tgroup=TOK_END;
+	SHOW_TOKEN("END");
 	if(curl_level!=0 && err_num<1) set_error(tok,106,"parse error: invalid number of curls");
 
 	if(par_level!=0 && err_num<1) { 
@@ -1226,7 +1253,7 @@ void set_tok_table(FILEBUF *bf)
 		tok_to->match_tok = tok_table + tok_to->tcurl->num+1;
 	};
 	tlist->current=tlist->current->next;
-	// MESG(";TT[%s] %3d: t=[%s] %p",bf->b_fname,isize,tok_info(tok_to),tok_to);
+	// MESG(";TT[%s]:[%s]",bf->b_fname,tok_info(tok_to));
 	isize++;
 	tok_to++;
  };
