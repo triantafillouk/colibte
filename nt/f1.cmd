@@ -1,5 +1,7 @@
 # test loop with proc inside
+# correct final result in bnf
 cls
+print("--- f1.cmd")
 function fact(num)
 {
  if(num<1) 
@@ -13,7 +15,8 @@ function fact(num)
 }
 
 i=1
-a=fact(i+2)
-print("fact("+i+") is "+a)
+a=fact(i+2)	:   6.0
+fact(3)	:   6.0
+print("fact(",i+2,") is ",a)
 
 

@@ -1,4 +1,5 @@
 # fibonachi numbers
+print("--- fib.cmd")
 
 function fib(n)
 {

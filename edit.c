@@ -339,7 +339,9 @@ int goto_line(num n)
 {
 	char arg[MAXSLEN];
 	arg[0]=0;
+	// MESG("goto_line:");
 	if ((nextarg("Go to line : ", arg, MAXSLEN,true)) != TRUE) 	return(FALSE);
+	// MESG("goto_line: macro_exec=%d != %d",macro_exec!=MACRO_MODE2);
 	if(macro_exec!=MACRO_MODE2) n = get_val();
 	if(cbfp->b_flag & FSNLIST) {
 		cwp->current_note_line=n;
@@ -947,6 +949,7 @@ int valid_offset(offs o_in_line,int column_goal)
 	if (uc.uval[0] == CHR_TAB) {
 		col=next_tab(col);
 	} else {
+		// MESG("valid_offset:");
 		col += get_utf_length(&uc);
 	};
 	if (col >= column_goal) {
@@ -1461,6 +1464,9 @@ int abort_cmd(num n)
 	clear_message_line();
 	set_update(cwp,UPD_STATUS);
 	drv_flush();
+	} else {
+		MESG("abort program!");
+		exit(1);
 	};
     return(false);
 }
@@ -1642,7 +1648,10 @@ int entab_line(num n)
 	position=newpos;
 	set_Offset(position);
 	if(c==9) cc=next_tab(cc);
-	else cc += get_utf_length(&uc);
+	else {
+		// MESG("---1");
+		cc += get_utf_length(&uc);
+	};
 	if(BolAt(position)) {ns=0;cc=0;};
   };
   if(cwp->selection) break; 
@@ -2080,7 +2089,7 @@ int trim_line(num n)
 	if(oldcur>ptr)	textpoint_set(cwp->tp_current,oldcur-trimmed_at_start);
 	else textpoint_set(cwp->tp_current,ptr);
 
-	if(!macro_exec)
+	if(macro_exec==FALSE)
 		msg_line("Line trimed by %d + %d chars!",trimmed_at_start,trimmed_at_end);
 	return(TRUE);
 }
@@ -2264,7 +2273,7 @@ int copy_region(num n)
  else
 	snprintf(s,sizeof(s),"[%lld bytes copied]",MainClipBoard->width);
  msg_line(s);
- set_break();
+ set_break("copy region");
  return TRUE;
 }
 

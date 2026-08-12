@@ -1,5 +1,6 @@
-
+# mixed array definition on 890 ok but differs, bnf num+string is correct!
 cls
+print("--- t6.cmd")
 print("This is a test defining a mixed array!")
 
 #k="test"
@@ -13,3 +14,9 @@ a[3]:
 a[4]:
 a[1]="k1"
 a[1]+a[2]:
+for(i=1;i<3;i++)
+{
+ print("loop ",i)
+ a[0]=3:
+ a[0]+="test":
+}

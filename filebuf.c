@@ -274,7 +274,24 @@ int show_info(num n)
  int stat;
 	SMESG("%s",date_string(1));
 	SMESG("--- Application info ----------------------------------------");
-	SMESG("%s version %s",PROGNAME,VERSION);
+#if	TBNFNORMAL
+	char *xv="u";
+#else 
+#if	TBNF
+#if	TOKENN
+	char *xv="t";
+#else
+	char *xv="f";
+#endif
+#else
+	char *xv="n";
+#endif
+#endif
+#if	TOKENN
+	SMESG("%s Version %s %s",PROGNAME,xv,VERSION);
+#else
+	SMESG("%s Version %s %s",PROGNAME,xv,VERSION);
+#endif
 #ifdef	GVERS
 	SMESG("git:%s",GVERS);
 #endif
@@ -489,6 +506,7 @@ int FUtfCharLen(FILEBUF *fp,offs o)
 		ch=FCharAt(fp,o);
 		if(ch<0xC0) {
 			if(ch>128) {
+				// MESG("FUtfCharLen: clen_error->1");
 				clen_error=1;	/* this is not a valid start for utf  */
 				return 1;
 			};
@@ -498,7 +516,10 @@ int FUtfCharLen(FILEBUF *fp,offs o)
 //			MESG("1: ch=%X %d",ch,ch);
 			if(o+1<FSize(fp)){
 				ch1=FCharAt(fp,o+1);
-				if(ch1<128 || ch1>0xBF) { clen_error=2;return 1;};	/* not a middle utf char  */
+				if(ch1<128 || ch1>0xBF) { 
+					// MESG("FUtfCharLen: clen_error->2");
+					clen_error=2;return 1;
+				};	/* not a middle utf char  */
 				clen=2;
 //#if	DARWIN || PCURSES
 				if((ch==0xCC||ch==0xCD) && !utf8_error() /* && drv_type<3 */ ) 
@@ -509,15 +530,22 @@ int FUtfCharLen(FILEBUF *fp,offs o)
 				};
 //#endif
 			} else {
+				MESG("FUtfCharLen: clen_error->3");
 				clen_error=3;	/* incomplete, eof  */
 				return clen;
 			};
 		}
 		else if(ch<0xF0) {
 			ch1=FCharAt(fp,o+1);
-			if(ch1<128 || ch1>0xBF) { clen_error=4;return 1;};	/* not a middle utf char  */
+			if(ch1<128 || ch1>0xBF) { 
+				// MESG("FUtfCharLen: clen_error->4");
+				clen_error=4;return 1;
+			};	/* not a middle utf char  */
 			ch1=FCharAt(fp,o+2);
-			if(ch1<128 || ch1>0xBF) { clen_error=5;return 1;};	/* not a middle utf char  */
+			if(ch1<128 || ch1>0xBF) { 
+				// MESG("FUtfCharLen: clen_error->5");
+				clen_error=5;return 1;
+			};	/* not a middle utf char  */
 			// if(ch==0xEF && ch1==0xB8) fp->utf_accent=1;
 			clen=3;
 		} else if(ch<0xF8) {
@@ -557,6 +585,7 @@ offs check_next_char(FILEBUF *fp,offs o,int *col)
 	if (c == CHR_TAB) {
 		*col=next_tab(*col);
 	} else {
+		// MESG("check_next_char");
 		*col += get_utf_length(&uc);
 	};
 	return o;
@@ -602,8 +631,9 @@ int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
  offs o=*dbo;
  offs file_size=FSize(fp);
  if(col_offs>file_size) col_offs=file_size;
+ // MESG("DiffColumn: lang=%d err=%d",fp->b_lang,utf8_error());
  if(fp->b_lang==0 && !utf8_error()){
-//  MESG("diffcol: from %ld to %ld",o,col_offs);
+  // MESG("diffcol: from %ld to %ld",o,col_offs);
   while (o < col_offs) {
 	int c;
 	utfchar uc;
@@ -612,8 +642,10 @@ int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from)
 	if (c == CHR_TAB) {
 		col=next_tab(col);
 	} else {
+		// MESG("DiffColumn");
 		col += get_utf_length(&uc);
 		if(clen_error) {
+			MESG("clen_error=%d",clen_error);
 			set_utf8_error(1);
 			c=DiffColumn(fp,dbo,col_offs,"inside");
 			set_utf8_error(0);
@@ -937,7 +969,10 @@ void  FindOffset(TextPoint *tp)
 		break;
 	};
 	if(uc.uval[0]=='\t') c=next_tab(c);
-	else c+=get_utf_length(&uc);
+	else {
+		// MESG("FindOffset:o=%ld",o);
+		c+=get_utf_length(&uc);
+	};
    };   
 
    tp->col=c;
@@ -1085,6 +1120,7 @@ int clipboard_copy(ClipBoard *clip)
 				if(uc.uval[0]=='\t') {
 					c=next_tab(c);
 	      		} else {
+					// MESG("clipboard_copy");
 		  			c += get_utf_length(&uc);
 		  		};
 	    	};
@@ -1105,6 +1141,7 @@ int clipboard_copy(ClipBoard *clip)
 		  	c=c1;
 		  	continue;
 	       } else {;
+		    // MESG("clipboard_copy2");
 		    int len=get_utf_length(&uc);
 			int i1;
 		       c+=len;
@@ -1287,6 +1324,7 @@ offs MoveToColumn(int go_col)
 	if (c == CHR_TAB) {
 		col=next_tab(col);
 	} else {
+		// MESG("MoveToColumn");
 		col += get_utf_length(&uc);
 	};
 	if(col > go_col) break;
@@ -1392,10 +1430,12 @@ offs  FUtfCharAt(FILEBUF *bf, offs offset, utfchar *uc)
  int i,ulen;
  offs o=offset;
 	ulen=FUtfCharLen(bf,o);
-	memset(uc->uval,0,8);
+	memset(uc->uval,0,16);
 	for(i=0;i<ulen;i++){
 			uc->uval[i]=FCharAt(bf,o+i);
 	};
+	// MESG("FUtfCharAt:%ld [%s]",offset,(char *)uc);
+	// MESG("FUtfCharAt:%ld [%s] clen_error=%d utf8_error=%d",offset,(char *)uc,clen_error,utf8_error());
 	return o+ulen;
 }
 
@@ -1408,10 +1448,12 @@ offs  FUtfCharAt_nocheck(FILEBUF *bf, offs offset, utfchar *uc)
 	if(utf8_error() || bf->b_lang>0 || clen_error) ulen=1;
 	else ulen = utf8charlen_nocheck(ch);
 
-	memset(uc->uval,0,8);
+	memset(uc->uval,0,16);
 	for(i=0;i<ulen;i++){
 			uc->uval[i]=FCharAt_NoCheck(bf,o+i);
 	};
+	// MESG("FUtfCharAt_nocheck:%ld [%s] clen_error=%d utf8_error=%d",offset,(char *)uc,clen_error,utf8_error());
+
 	return o+ulen;
 }
 
@@ -1517,7 +1559,7 @@ long int utf_value()
 long int unicode_point()
 {
  unsigned char char_string[8];
-
+ 
  if(utf8_error()) { 
 	return Char();
  };
@@ -1527,7 +1569,7 @@ long int unicode_point()
   int i;
   long int uchar=0;
   int ulen=FUtfCharLen(cbfp,o);
-
+  // MESG("unicode_point: o=%ld ulen=%d",o,ulen);
   for(i=0;i<ulen;i++){
   	char_string[i] = CharAt(o+i);
   };
@@ -1559,6 +1601,7 @@ long int utf_value_len(int *len)
   	uchar += uc.uval[i];
 	if(i<ulen-1) uchar <<=8;
   };
+  // MESG("utf_value_len");
   *len = get_utf_length(&uc);
   return(uchar);
  };
@@ -1582,7 +1625,10 @@ num physical_column(num vcol)
 			physical_column = vcol - cwp->w_lcol+VMCOLS;
 		} else {
 			if(cwp->w_infocol>0) physical_column = vcol - cwp->w_lcol + cwp->w_infocol;		
-			else physical_column = vcol - cwp->w_lcol;
+			else {
+				// MESG("physical_column: vcol=%ld lcol=%ld",vcol,cwp->w_lcol);
+				physical_column = vcol - cwp->w_lcol;
+			}
 		}
 #endif
 	}
@@ -1591,15 +1637,19 @@ num physical_column(num vcol)
 
 num WGetCol()
 {
- // MESG("WGetCol:");
-// num col1;
+ // MESG("WGetCol: f=%X FNOTESN=%X",cwp->w_fp->b_flag,FSNOTESN);
  num col2;
 //	col1 = tp_col(cwp->tp_current) - cwp->w_lcol;
 #if	0
  col2=tp_col(cwp->tp_current);
 #else
- if(cwp->w_fp->b_flag & FSNOTESN) col2=NOTES_COLUMN+2;
-	else col2 = physical_column(FColumn(cbfp,cwp->tp_current->offset));
+ if(cwp->w_fp->b_flag & FSNOTESN) {
+ 	col2=NOTES_COLUMN+2;
+	// else col2 = physical_column(FColumn(cbfp,cwp->tp_current->offset));
+	} else {
+		// MESG("WGetCol: o=%ld",tp_offset(cwp->tp_current));
+		col2 = physical_column(FColumn(cbfp,tp_offset(cwp->tp_current)));
+	};
  // MESG("wg: (%ld - %d+%d) col2=%ld",tp_col(cwp->tp_current),cwp->w_lcol,cwp->w_infocol,col2);
 #endif
  return col2;
@@ -1648,14 +1698,18 @@ num FColumn(FILEBUF *fp,offs o)
  offs	dbo;
  // MESG("FColumn: o=%ld",o);
  dbo=FLineBegin(fp,o);
+ set_utf8_error(0);
  if(fp->view_mode & VMHEX) col = (o-dbo)%0x10;
- else 
+ else
 #if	0
  	col=DiffColumns(fp,dbo,o,"FColumn:OK:BEG!");
 #else
+	{
+ 	// MESG("FColumn: dbo=%ld o=%ld",dbo,o);
 	col=DiffColumn(fp,&dbo,o,"FColumn");
+	};
 #endif
-// MESG("FColumn:%d %ld",col,tp_col(cwp->tp_current));
+ // MESG("FColumn:%d %ld",col,tp_col(cwp->tp_current));
  return (col);
 }
 
@@ -1704,6 +1758,7 @@ void    DeleteChar()
  utfchar uc;
  int len;
 	FUtfCharAt(cbfp,FOffset(cbfp),&uc);
+	// MESG("DeleteChar:");
 	len=get_utf_length(&uc);
 	DeleteBlock(cbfp,0,len);
 	set_modified(cbfp);
@@ -1950,7 +2005,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
    int status=0;
    int file;
    int temp_used=0;
-
+	// MESG("ifile0 \"%s\"",bf->b_fname);
 	bf->line_from=0;
 	if( bf->b_flag & FSDIRED ) {
 		int i;
@@ -1962,10 +2017,13 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	// MESG_time_start("ifile0: %s",bf->b_fname);
    if(status==-1 && errno==ENOENT)
    {
-	if(name[0]!=CHR_LBRA)	msg_line("New file \"%s\"",name);
+	if(name[0]!=CHR_LBRA) {
+		if(execmd) fprintf(stderr,"File %s not found\n",name);
+		else		msg_line("New file \"%s\"",name);
+	};
 	return(false);
    } ;
-   if(!CheckMode(st.st_mode)) {
+  if(!CheckMode(st.st_mode)) {
 		SYS_ERROR("[%s] not a regular file!");
 		msg_line("[%s] not a regular file!");
 	   	return(false);
@@ -1975,6 +2033,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
   	status=init_ftype(bf,name,&temp_used,0); // if not insert then get file type
 	if(status!=TRUE) return FALSE;
   };
+
    errno=0;
    /* clear the 'temporarily read-only' bit */
    bf->b_state &= ~FS_VIEW;
@@ -2113,7 +2172,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 		}
    };
 	check_line_mode(bf);
-	MESG_time("go update lines");
+	// MESG_time("go update lines");
 	update_lines(bf);
 	if(!(bf->b_flag & FSMMAP)) 
 		set_modified(bf);
@@ -3813,7 +3872,10 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
 			return ptr;
 		};
 		if(uc.uval[0]==CHR_TAB) col=next_tab(col);
-		else col+=get_utf_length(&uc);
+		else {
+			// MESG("FCheckNextLine1");
+			col+=get_utf_length(&uc);
+		};
 	}
  } else{
  	char c0=fp->EolStr[0];
@@ -3826,7 +3888,10 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
 			return ptr;
 		};
 		if(uc.uval[0]==CHR_TAB) col=next_tab(col);
-		else col+=get_utf_length(&uc);
+		else {
+			// MESG("FCheckNextLine2");
+			col+=get_utf_length(&uc);
+		};
 	};
 	// MESG("eof?");
  };
@@ -3961,6 +4026,7 @@ void  EmptyText(FILEBUF *bp)
 	bp->b_tag_list=NULL;
 #endif
 	bp->b_header=NULL;
+	// MESG("end of EmptyText of \"%s\"",bp->b_fname);
 }
 
 // get size bytes in buf at o offset till eol

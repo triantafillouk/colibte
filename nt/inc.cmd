@@ -1,4 +1,8 @@
+# increase string by number, this should give an error! ok in bnf
 cls
-a="kk"
-a=2
+print("--- inc.cmd")
+a="kk"	: 
+a+=1	: 
+a=2		: 
+a+=1
 print(a)

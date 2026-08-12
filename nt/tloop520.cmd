@@ -1,13 +1,14 @@
 # test loop with proc inside
 cls
+print("--- tloop520.cmd")
+
 function fact(num)
 {
  if(num<1) 
  {
  	return(1)
  } else {
-	f=num*fact(num-1)
-	return(f)
+	return(num*fact(num-1))
  }
 }
 
@@ -28,14 +29,13 @@ fact(3):     6
 
 tadd(1,2):
 
-p=0; l=0; 
+p=0; 
 print(_time)	: "Mon Dec 28 12:53:58 2015"
 show_time("Loop with proc 51",0)
 
 fori(i=1;11;1){ 
 	fori(j=1;800001;1) { 
-		l = i*j+32
-		p += i*j+32+fact(10)
+		p +=  i*j+32+fact(30)
 	} 
 	show_time("loop:"+i+" p="+p,1);
 }

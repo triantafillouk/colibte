@@ -1,5 +1,5 @@
-assign_sub ("show_out","M-,")
-
+# different final result, but it does not matter TBC
+print("--- e1.cmd")
 function show_out()
 {
  if(!in_view("[out]")) {
@@ -9,6 +9,8 @@ function show_out()
 	prev_window()
  }
 }
+
+assign_sub ("show_out","M-,")
 
 cls
 

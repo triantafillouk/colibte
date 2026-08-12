@@ -67,7 +67,9 @@ extern alist *var_list;
 extern alist *shell_list;
 extern alist *pat_list;
 extern alist *macro_list;
-
+#if	TBNF
+void prev_var_ext(char *from);
+#endif
 inline int normalize(int c);
 
 void set_list_type(int type)
@@ -381,13 +383,18 @@ int assign_sub(num n)
 	funname[0]=0;
 	// MESG("assign_sub:");
 	if((s = nextarg("Assign: subroutine name :", funname, 32,true))!=TRUE) return(s);
-//	show_token(cbfp->parser,"assign_sub: after nextarg!");
+	// MESG("	after nextarg [%s] ",funname);
+#if	TBNFNORMAL
+	if(usebnf) 
+#endif
+#if	TBNF
+		prev_var_ext("assign_sub");
+#endif
 	kfunc = execsub;
 	msg_line("Press the key to assign!");
 	c = getckey();
-	// show_token(cbfp->parser,"assign_sub: after getkey!");
-
-	// msg_line(xe_key_name(c));
+	// MESG("	key is c=%d",c);
+	msg_line(xe_key_name(c));
 	return(set_key_function(kfunc,c,funname));
 }
 
@@ -923,13 +930,14 @@ void out_print(char *s,int nl)
 	if(!discmd) return ;
 #else
 	if(!discmd) {
+#if	0
 		if(debug_flag()) {
 			if(nl) fprintf(stderr,"%s\n",s);
 			else fprintf(stderr,"%s",s);
-		} else {
-			if(nl) fprintf(stdout,"%s\n",s);
-			else fprintf(stdout,"%s",s);
-		}
+		};
+#endif
+		if(nl) fprintf(stdout,"%s\n",s);
+		else fprintf(stdout,"%s",s);
 		return;
 	};
 #endif

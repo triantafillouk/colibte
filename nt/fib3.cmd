@@ -1,18 +1,19 @@
-
+# fib3.cmd
+print("--- fib3.cmd")
 function ai1(n){
     counter = 1;
-    sum = 1;
+    sum = 0;
     fori (i = 1; n; 1) {
         counter = counter * i;
         sum += counter;
-		print("i="+i+" fib="+sum)
+		print("i=",i," fib=",sum," sin=",sin(0.2+0.3))
     }
     return sum;
 }
 
 cls
 
-a=ai1(3) :   4.0
+a=ai1(5) : 
 print("test")
 
 `

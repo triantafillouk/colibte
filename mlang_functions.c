@@ -1,16 +1,9 @@
 /* editor functions */
+#if	TNORMAL
 #include "mlangf.h"
+#endif
 
-void ntoken()
-{
-	tok++;
-}
-
-int tok_type()
-{
-	return tok->ttype;
-}
-
+#if	TNORMAL
 m_function m_functions[] = {
 	{"len",1,uf_len},        /* STRING LENGTH */
 	{"upper",1,uf_upper},        /* UPPERCASE STRING */
@@ -63,6 +56,13 @@ m_function m_functions[] = {
 	{"index",0,uf_index},	/* new index  */
 	{"show_vars",0,uf_show_vars},	/* show local vars  */
 	{"list_tokens",0,uf_list_tokens},	/* list_tokens  */
+	{"var_index",0,uf_var_index},
 	{"test_loop",1,uf_test_loop},	/* test computational loop  */
+	{"to_num_array",1,uf_to_num_array},	/* convert to numeric array  */
+	{"J",2,uf_new_array_J},	/* new all 1 array  */
+	{"I",1,uf_new_array_I},	/* new identity array  */
+	{"do_file",-1,uf_dofile},	/* execute a file  */
+	// {"array_fixed_to_num",1,uf_array_fixed_to_num},
 	{NULL,0,NULL}
 };
+#endif

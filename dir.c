@@ -1351,8 +1351,11 @@ int dir_view(num n)
 void init_extensions()
 {
  char *fname;
-
- if((fname = find_file("",APPLICATION_EXTENSIONS,1,0))==NULL) return;
+ 
+ if((fname = find_file("",APPLICATION_EXTENSIONS,1,0))==NULL) {
+	fprintf(stderr,"could not find extensions file [%s]\n",APPLICATION_EXTENSIONS);
+ 	return;
+ }
 
  read_pairs(fname,'=',&f_extension,&f_extcmd);
  // MESG("init_extentions: file=[%s]",fname);
@@ -1377,7 +1380,10 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 	int sstat=0;
 	int internal_view=0;
 	int web_view=0;
+	// int x11_view=0;
+	int len0=0;
 	int err=0;
+#if	0
 	if((s=getenv("DISPLAY"))!=NULL) {
 	  if(s[0]==0) {
 		inview=1;
@@ -1392,6 +1398,7 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 		view_file(fname_ns);
 		return TRUE;
 	};
+#endif
  	s1=file_type(fname,&is_compressed,exts);	/* get extension and compression type  */
 //	Find if an external viewer is needed
 	s1=sarray_index(f_extension,exts);
@@ -1472,8 +1479,22 @@ int exec_ext(char *fname,char *fname_ns,int f_vx)
 
 // execute the command with the file name as argument
 	cmd_ext=strdup(cmd);
-	web_view=sindex(cmd_ext,":");	// we need to prepend 'file://'
-
+	
+	len0=sindex(cmd_ext,":");	// we need to prepend 'file://'
+	// MESG("exec_ext: cmd_ext=[%s],len0=%d",cmd_ext,len0);
+	if(len0>0) {
+		char pre_extention[10];
+		memcpy(pre_extention,cmd_ext,3);
+		pre_extention[3]=0;
+		// MESG("preextention: [%s]",pre_extention);
+		if(!strcmp(pre_extention,"web")) web_view=len0;
+		if(!strcmp(pre_extention,"x11")) {
+			if((s=getenv("DISPLAY"))==NULL) {
+				view_file(fname_ns);
+				return TRUE;
+			};
+		};		
+	};
 	if(!strncmp("/mnt/",cmd_ext+web_view,5)) {
 		char ms_fname[MAXLLEN];
 		sstat=snprintf(ms_fname,sizeof(ms_fname),"%s/%s",tmp_name,fname_ns);

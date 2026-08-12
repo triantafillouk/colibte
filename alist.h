@@ -127,17 +127,18 @@ void show_string_list(alist *list,char *title);
 typedef struct BTNODE {
 	struct BTNODE *left;
 	struct BTNODE *right;
+	char *node_name;
 #if	RB_BALANCE
 	struct BTNODE *up;	/* for rb trees  */
 	int color;	/* for rb trees  */
 #endif
-	short node_type;
-	short node_index;
-	short node_vtype;
 #if	AVL_BALANCE
 	short balance;	/* for avl trees  */
 #endif
-	char *node_name;
+	short node_type;
+
+	short node_vtype;
+	short node_index;
 	union {
 		double node_dval;
 		char *node_sval;

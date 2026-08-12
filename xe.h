@@ -7,12 +7,12 @@
 
 	xe.h main include file for colibri editor editor
 */
+
 /* Flags and structures of xe editor */
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.7T53 (8/1/2026)"
-
+#define VERSION 	 "#01.8  (12/8/2026)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -28,10 +28,17 @@
 #endif
 #define	TARROWS		1	/* Use arrow menus in panel curses  */
 #define	USE_UTF8	1	/* Use utf8 characters  */
+#define	TNOASGN		1	/* remove var from assignment in bnf  */
 #define	TBNF		1	/* convert to bnf notation test  */
-#define	TPROFILE	0	/* profile flag  */
-#define	USE_CALL_STACK	0
+#define TNORMAL		0	/* normal ops included  */
+#if	TBNF & TNORMAL
+#define	TBNFNORMAL		1
+#else
+#define	TBNFNORMAL		0
+#endif
+#define	TPROFILE		0	/* profile flag  */
 #define	USE_TYPE_VARS	1
+#define TOKENN		0
 
 #define WRAPD	0	/* wrap debug  */
 #define	FAST_GTK_SCREEN	0
@@ -96,7 +103,6 @@
 #include <locale.h>
 #include <stdint.h>
 
-	/* from mc  */
 #if defined _POSIX_VERSION || (defined HAVE_LIMITS_H && !defined __GNUC__)
 # include <limits.h>
 #endif
@@ -318,9 +324,10 @@ typedef struct  VIDEO {
 #define HEX_LINE_LEN	16
 
 typedef struct MVAR {
-	// short	var_index;
-	int	var_type;
-	// char *var_name;
+	short	var_type;
+	short	var_alloced;
+	int		index1;
+	// short	index2;
 	union {
 		// long int ival;
 		double dval;
@@ -360,8 +367,8 @@ typedef struct	GWINDP {
 	PANEL *panel;
 	WINDOW *vline;
 	PANEL *vline_panel;
-	int back_xpos;
-	int back_ypos;
+	// int back_xpos;
+	// int back_ypos;
 	int back_rows;
 	int back_cols;
 	int h_flags;	/* horizon update flags  */
@@ -380,8 +387,8 @@ typedef struct	GWINDP {
 	GC top_gc,botom_gc;
 	GC sgc,sgm;
 	Drawable status;
-	int back_xpos;
-	int back_ypos;
+	// int back_xpos;
+	// int back_ypos;
 	int back_height;
 	int back_width;
 	int h_flags;	/* horizon update flags  */
@@ -461,6 +468,8 @@ typedef struct MLQUOTES {
 #define H_QUOTE12	2048
 #define H_LINESEP	4096
 #define H_UTFERR	8192	/* Utf8 error  */
+#define	H_REGEX1	16384
+#define	H_REGEX2	32768
 
 #define H_WORD1		10	/* found word type1  */
 #define	H_WORD2		11	/* found word type2  */
@@ -492,7 +501,9 @@ typedef struct MLQUOTES {
 #define VTYPE_PROC		16	/* proc pointer  */
 #define VTYPE_OPTION	17	/* editor option   */
 #define VTYPE_FUNCTION	18	/* editor function  */
-#define VTYPE_OTHER		19
+#define VTYPE_NUMP		19	/* numeric pointer in array  */
+#define VTYPE_STRINGP	20	/* string pointer in array  */
+#define VTYPE_OTHER		21
 
 /* textpoint */
 #define  FULLDEFINED	0
@@ -713,7 +724,7 @@ typedef struct  FILEBUF {
 	BTREE *symbol_tree;	/* local symbol table  */
 	struct alist *type_list;	/* type table list  */
 
-	MVAR *symbol_table;	/* instance of variables data  */
+	//MVAR *symbol_table;	/* instance of variables data  */
 //	Notes structures
 #if	TNOTES
 	notes_struct *b_note;
@@ -726,6 +737,7 @@ typedef struct  FILEBUF {
 #endif
 	struct	alist *dir_list_stack;
 	num maxlinelen;
+	struct alist *lex_parser;
 }  FILEBUF;
 
 #if	TNOTES

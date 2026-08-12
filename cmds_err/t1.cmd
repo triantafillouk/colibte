@@ -12,5 +12,5 @@ a="["+b+"--- lkasjdlkas dlkasj loop ["+(33+i)+"]"
 }
  print a
  t=input("loop "+l+" : ")
-
+ t:
 }

@@ -1,5 +1,8 @@
+# string + array element, bnf ok from 892
 cls
-c=[1.1 3.2 33 ;-4.4+3, +5 6, 7 8.1, 9]
+print("--- tarray5.cmd")
+c=[1.1, 3.2, 33 ; 4.4+3, -5, 6, 7, 8.1, 9]
+c:
  "test "+c[0][1]	:
 c:
 

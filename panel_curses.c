@@ -284,8 +284,8 @@ GWINDP * drv_new_twinp()
  gwp->panel=NULL;
  gwp->vline=NULL;		// right vertical line window
  gwp->vline_panel=NULL;	// right vertical line panel
- gwp->back_xpos=0;
- gwp->back_ypos=0;
+ // gwp->back_xpos=0;
+ // gwp->back_ypos=0;
  gwp->back_rows=0;
  gwp->back_cols=0;
  gwp->h_flags=0;
@@ -553,8 +553,8 @@ void drv_set_wvs(WINDP *wp)
 
 	create_rline(wp);
 //	backup also dimensions
-	wp->gwp->back_xpos=wp->gwp->t_xpos;
-	wp->gwp->back_ypos=wp->gwp->t_ypos;
+	// wp->gwp->back_xpos=wp->gwp->t_xpos;
+	// wp->gwp->back_ypos=wp->gwp->t_ypos;
 	wp->gwp->back_rows=wp->w_ntrows;
 	wp->gwp->back_cols=wp->w_ntcols;
 	wp->gwp->h_flags=0;
@@ -597,9 +597,8 @@ void drv_size()
 
 void set_mouse_on()
 {
-#if	!SOLARIS
+ if(!mcurflag) return;
  mousemask(ALL_MOUSE_EVENTS|REPORT_MOUSE_POSITION,NULL);
-#endif
  printf("\033[?1003h");	/* makes terminal report mouse mouvement  */
  if(extended_mouse) {
  	printf("\033[?1006h");	/* makes terminal extended report mouse mouvement  */
@@ -609,27 +608,21 @@ void set_mouse_on()
 
 void enable_key_mouse()
 {
+ if(!mcurflag) return;
  mouse_active=1;
-#if	SOLARIS
-	return;
-#else
-	set_mouse_on();
-#endif
+ set_mouse_on();
 }
 
 void disable_key_mouse()
 {
  mouse_active=0;
-#if	SOLARIS
-	return;
-#else
+ // fprintf(stderr,"set_mouse_off:\n");
  mousemask(0,NULL);
  printf("\033[?1003l");	/* makes terminal stop reporting mouse mouvement  */
  if(extended_mouse) {
  	printf("\033[?1006l");	/* makes terminal stop reporting mouse mouvement  */
  };
  fflush(stdout);
-#endif
 }
 
 int toggle_mouse(num n)
@@ -670,7 +663,6 @@ void drv_open()
  noecho();
  raw();
  nonl();
-
  if(mcurflag){
 // keypad(stdscr,1);	/* no need for the moment, need a lot of changes!  */
 	set_mouse_on();
@@ -1066,6 +1058,7 @@ void drv_post_init()
 
 int getstring(char *prompt, char *st1,int maxlen,int disinp)
 {
+ // MESG("	win_getstring");
  return win_getstring(mesg_window,prompt, st1,maxlen,disinp);
 }
 
@@ -1096,8 +1089,10 @@ void drv_close()
 /* Flush/resync */
 void drv_flush()
 {
+ if(mcurflag){
 	set_mouse_on();
-	refresh();
+ };
+ refresh();
 }
 
 void drv_win_flush(WINDP *wp)
@@ -1165,10 +1160,11 @@ int drv_check_break_key()
  // if(checking_break_key) {
  count++;
  // MESG("drv_check_break_key: %d",count);
- if(count>10000000) {
+ if(count>10000) {
+	// fprintf(stderr,"break_key:\n");
  	int key=getch();
 	count=0;
-	if(key==3) { set_break();return 1;}
+	if(key==3) { set_break("drv_check_break_key");return 1;}
  };
  // };
  return 0;
@@ -1474,11 +1470,13 @@ int text_mouse_key(int *c)
 
 void drv_win_move(WINDP *wp,int row,int col)
 {
+	// MESG("drv_win_move: [r=%d c=%d] cols=%d lcol=%ld",row,col,wp->w_ntcols,wp->w_lcol);
 	 wmove(stdscr,wp->gwp->t_ypos+row,wp->gwp->t_xpos+col);
 }
 
 void drv_move(int row, int col)
 {
+	// MESG("drv_move:[r=%d c=%d]",row,col);
 	wmove(stdscr,row,col);
 }
 
@@ -1486,12 +1484,14 @@ void drv_wcolor(WINDOW *wnd, int afcol, int abcol)
 {
  int fcolor=afcol % 0x100;
  int attrib=0;
+ // MESG("drv_wcolor: fcolor=%d",fcolor);
  if(afcol & FONT_STYLE_UNDERLINE) {
  	attrib |=A_UNDERLINE;
  } else {
  	int a = current_scheme->color_style[fcolor].color_attr;
+	// MESG("	a=%d",a);
 #if	!SOLARIS
-	if(a & FONT_STYLE_ITALIC) attrib |= A_ITALIC;
+	// if(a & FONT_STYLE_ITALIC) attrib |= A_ITALIC;
 #endif
 	if(a & FONT_STYLE_BOLD) attrib |= A_BOLD;
 	if(a & FONT_STYLE_DIM) attrib |= A_DIM;
@@ -1605,7 +1605,7 @@ void hide_cursor(char *from)
 void show_cursor(char *from) 
 {
 	if(!entry_mode) {
-	// MESG("show_cursor:");
+	// MESG("show_cursor:[%s]",from);
 		if(
 #if	TNOTES
 			cbfp->b_flag==FSNOTES || cbfp->b_flag==FSNOTESN || 
@@ -2016,6 +2016,7 @@ void expose_window(WINDP *wp)
 void drv_clear_line(WINDP *wp,int row)
 {
 	return;
+#if	0
 	wmove(wp->gwp->draw,row,0);
 	int i;
 	for(i=0;i<wp->w_ntcols;i++) {
@@ -2026,6 +2027,7 @@ void drv_clear_line(WINDP *wp,int row)
 	// doupdate();
 	wmove(wp->gwp->draw,row,0);
 	// MESG("drv_clear_line: %2d",row);
+#endif
 }
 
 /* Put virtual screen text on physical */
@@ -2118,7 +2120,7 @@ void put_wtext(WINDP *wp ,int row,int maxcol)
 #else
 		memcpy(vstr,v1->uval,6);
 #endif
-
+		// MESG("put_wtext row=%d",row);
 		if(	get_utf_length((utfchar *)vstr)<0) 
 		{
 			wprintw(wp->gwp->draw,"%s",unknown1);
@@ -2278,6 +2280,7 @@ void drv_msg_line(char *arg)
 	if (discmd == FALSE || macro_exec) return;
 	curs_set(0);
 	wmove(mesg_window,0,0);	
+	// MESG("drv_msg_line:[%s]",arg);
 #if	1
 	if(app_error) 
 		wbkgd(mesg_window,color_pair(COLOR_FG,COLOR_SEARCH_BG));
@@ -2305,6 +2308,7 @@ int dspv(WINDOW *disp_window,int x,int y,char *st)
  // MESG("dspv: x=%d y=%d [%s]",x,y,st);
  hide_cursor("dpsv");
  wmove(disp_window,y,x);
+ // MESG("dspv:1");
 
  while((c=*st++)!=0) {
  	if(c<32) {
@@ -2316,6 +2320,7 @@ int dspv(WINDOW *disp_window,int x,int y,char *st)
 	waddch(disp_window,c);
 	drv_wcolor(disp_window,COLOR_FG,COLOR_BG);
  };
+ // MESG("dspv:1");
  getyx(disp_window,y_pos,x_pos);
  wclrtoeol(disp_window);
  wnoutrefresh(disp_window);
@@ -2455,7 +2460,7 @@ void put_string_statusline(WINDP *wp,char *show_string,int position)
 	wmove(wp->gwp->draw,status_row,0);
 	maxlen=wp->w_ntcols-1;
  };
-
+  // MESG("put_string_statusline1 [%s]",show_string);
   utf_string_break(status_string,maxlen);
   wprintw(wp->gwp->draw,"%s",status_string);
   touchline(wp->gwp->draw,status_row,1);

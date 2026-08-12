@@ -57,13 +57,12 @@ int	noupdate=1;		/* no need to update the screen , no display started */
 
 utfchar double_hline = { "═" };
 utfchar single_hline = { "↪" };
-utfchar next_l = { " " };
 // utfchar next_l = { "↘" };
 // utfchar first_l = { "►" };
-utfchar first_l = { "." };
 
-//num cline_end=0;
-//num cstart_offset;
+utfchar first_l = { " " };
+utfchar next_l = { "." };
+
 
 #if	NUSE
 int addutfvchar(char *str, vchar *vc, int pos, FILEBUF *w_fp)
@@ -664,6 +663,7 @@ num utf_FLineLen(FILEBUF *fp, offs ptr);
 
 void  vput_normalize(WINDP *wp, utfchar uc)
 {
+// MESG("vput_normalize:");
 int display_size=get_utf_length(&uc);
 
 #if USE_GLIB	// Convert to composed character if possible to view it!
@@ -768,6 +768,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		c=uc.uval[0];
 		if(c>127) {
 			int size;
+			// MESG("vt_str 1");
 			size=get_utf_length(&uc);
 			col += size-1;
 			c='C';
@@ -789,6 +790,7 @@ void vt_str(WINDP *wp,char *str,int row,int index,int start_col,int max_size,int
 		c=uc.uval[0];
 		if(c>127) {
 			int size;
+			// MESG("vt_str 2");
 			size=get_utf_length(&uc);
 			col += size-1;
 			c='m';
@@ -940,6 +942,7 @@ int color_mask_create(WINDP *wp,offs start,int llen,char *vtlm,int vtla)
 				c=uc.uval[0];
 				if(c>127) {
 					int size;
+					// MESG("color_mask_create");
 					size=get_utf_length(&uc);
 					col += size-1;
 					c='C';
@@ -1161,6 +1164,7 @@ offs vtline(WINDP *wp, offs tp_offs)
 			
 			if(c>127) {
 				int size;
+				// MESG("vtline");
 				size=get_utf_length(&uc);
 				col += size-1;
 				c='m';
@@ -1871,7 +1875,7 @@ int  show_position_info(num short_version)
 	int sstat=0;
 	if(cwp==NULL) return false;
 	FILEBUF *fp = cwp->w_fp;
-	// MESG("show_position_info:");
+	// MESG("show_position_info: %X FSNOTES=%X",fp->b_flag,FSNOTES);
 	if(fp->b_flag>=FSNOTES) {
 	  if(fp->b_flag & FSDIRED) 
 	  {
@@ -1929,7 +1933,7 @@ int  show_position_info(num short_version)
 	};
 	};
 	if(sstat){
-
+	// MESG("show_position_info:[%s] %d",str,short_version);
 	if(short_version==1) put_string_statusline(cwp, str, 2);
 	else put_string_statusline(cwp, str, 1);
 	};

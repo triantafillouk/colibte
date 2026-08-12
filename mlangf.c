@@ -16,11 +16,12 @@ int vtype_is(int type);
 int get_vtype();
 void set_array(array_dat *a);
 array_dat *get_array(char *);
+#if	TNORMAL
 void set_nsval(char *,int);
+#endif
 char * tok_info(tok_struct *tok);
-
+int is_token(int type);
 void ntoken();
-int check_token(int type);
 double determinant(array_dat *aa);
 array_dat * cofactor2(array_dat *numa,double det);
 array_dat *transpose(array_dat *array1);
@@ -31,7 +32,7 @@ void get_lowercase_string(char *lower, char *string);
 int deq(double v1,double v2);
 
 MVAR va[3];
-
+#if	TNORMAL
 void get_function_args (int number_of_args)
 {
 	int i;
@@ -71,7 +72,7 @@ void get_function_args (int number_of_args)
 #endif
 		ntoken();
 	} else {;
-		if(check_token(TOK_LPAR)) {
+		if(is_token(TOK_LPAR)) {
 			// MESG("	get_function_args: TOK_LPAR");
 				ntoken();
 				ntoken();
@@ -81,9 +82,9 @@ void get_function_args (int number_of_args)
 	entry_mode=f_entry;
 // 	return va;
 }
+#endif
 
-// MVAR va[3];
-
+#if	TNORMAL
 void get_numeric_args (int number_of_args)
 {
 	int i;
@@ -106,7 +107,9 @@ double get_numeric_arg ()
 	ntoken();
 	return value;
 }
+#endif
 
+#if	TNORMAL
 double uf_len()
 {
 	get_function_args(1);
@@ -167,10 +170,10 @@ double uf_determinant()
 		if(arr->rows==arr->cols) value=determinant(arr);
 		else {
 			// MESG("wrong dimensions!");
-			syntax_error("wrong dimensions for determinant",203);
+			syntax_error(1203,"wrong dimensions for determinant");
 		};
 	} else {
-		syntax_error("Not an array!",204);
+		syntax_error(1204,"Not an array!");
 	};
 	set_vtype(VTYPE_NUM);
 	// free(va);
@@ -188,7 +191,7 @@ double uf_inverse()
 		if(arr->rows==arr->cols) {
 			value=determinant(arr);
 		} else {
-			syntax_error("wrong dimensions for determinant",205);
+			syntax_error(1205,"wrong dimensions for determinant");
 		};
 		if(value!=0) {
 			array_dat *inverse;
@@ -197,7 +200,7 @@ double uf_inverse()
 			ex_name="Inverse";
 		};
 	} else {
-		syntax_error("Not an array!",206);
+		syntax_error(1206,"Not an array!");
 	}
 	return value;
 }
@@ -214,7 +217,7 @@ double uf_transpose()
 		ex_name="Tranpose";
 		value=1;
 	} else {
-		syntax_error("Not an array!",207);
+		syntax_error(1207,"Not an array!");
 	};
 	// free(va);
 	return value;
@@ -240,7 +243,7 @@ double uf_right()
 		if(strlen(va[0].sval)<r1) r1=strlen(va[0].sval);
 		set_sval(va[0].sval+(strlen(va[0].sval)-r1));
 	} else {
-		syntax_error("right: wrong type of args",206);
+		syntax_error(1208,"right: wrong type of args");
 		set_sval("");
 	};
 
@@ -260,7 +263,7 @@ double uf_mid()
 			set_nsval(va[0].sval+(int)va[1].dval,(int)va[2].dval);
 		};
 		} else {
-			syntax_error("mid: wrong_type of args",100);
+			syntax_error(1209,"mid: wrong_type of args");
 			set_sval("");
 		};
 		set_vtype(VTYPE_STRING);
@@ -322,7 +325,7 @@ double uf_show_time()
 		set_sval(va[0].sval);
 		value=show_time(get_sval(),va[1].dval);
 	} else {
-		syntax_error("error in stime",312);
+		syntax_error(1210,"error in stime");
 	}
 
 	return value;
@@ -336,7 +339,7 @@ double uf_upper()
 		clean_saved_string(strlen(va[0].sval));
 		get_uppercase_string(get_sval(),va[0].sval);
 	} else {
-		syntax_error("upper: wrong_type of args",100);
+		syntax_error(1211,"upper: wrong_type of args");
 		set_sval("");	
 	};
 	set_vtype(VTYPE_STRING);
@@ -350,7 +353,7 @@ double uf_lower()
 		clean_saved_string(strlen(va[0].sval));
 		get_lowercase_string(get_sval(),va[0].sval);
 	} else {
-		syntax_error("lower: needs a string argument",100);
+		syntax_error(1212,"lower: needs a string argument");
 		set_sval("");
 	};
 	set_vtype(VTYPE_STRING);
@@ -364,7 +367,7 @@ double uf_ascii()
 	if(va[0].var_type==VTYPE_STRING) {
 	 value=va[0].sval[0];
 	} else {
-		syntax_error("s_acs: needs a string argument",100);
+		syntax_error(1213,"s_acs: needs a string argument");
 	};
 	set_vtype(VTYPE_NUM);
 	// free(va);
@@ -437,7 +440,7 @@ double uf_sindex()
 	if(va[0].var_type==VTYPE_STRING) {
 		value = sindex(va[0].sval, va[1].sval);
 	} else {
-		syntax_error("s_index: wrong_type of args",100);
+		syntax_error(1214,"s_index: wrong_type of args");
 	};
 	set_vtype(VTYPE_NUM);
 
@@ -456,7 +459,7 @@ double uf_string()
 		snprintf(slocal,20,"%f",va[0].dval);
 		// MESG("uf_string: [%s]",get_sval());
 	} else {
-		syntax_error("string: wrong_type of args",100);
+		syntax_error(1215,"string: wrong_type of args");
 		set_sval("");
 	};
 	set_vtype(VTYPE_STRING);
@@ -551,7 +554,7 @@ double uf_val()
 	get_function_args(1);
 	if(va[0].var_type==VTYPE_STRING) 
 		value=atof(va[0].sval);
-	else syntax_error("val: wrong_type of args",100);
+	else syntax_error(1216,"val: wrong_type of args");
 	set_vtype(VTYPE_NUM);
 	return value;
 }
@@ -651,7 +654,7 @@ double uf_time()
 		set_sval(va[0].sval);
 		value=show_time(get_sval(),va[1].dval);
 	} else {
-		syntax_error("error in stime",312);
+		syntax_error(1217,"error in stime");
 	}
 
 	set_vtype(VTYPE_NUM);
@@ -720,6 +723,7 @@ double uf_mainarg()
 	};
 	return value;
 }
+#endif
 
 extern MVAR *current_stable;
 extern FILEBUF *exe_buffer;
@@ -741,21 +745,24 @@ void show_var_node(BTNODE *node)
 		mesg_out("%03d %-10s %2d(%12s)",node->node_index,node->node_name,var->var_type,vtype_names[var->var_type]);
 }
 
+#if	TNORMAL
 double uf_show_vars()
 {
 	ntoken();
 
-	mesg_out("Ind Name       Type             Value      local vars",exe_buffer->symbol_tree->items);
+	mesg_out("Ind Name       Type             Value      local vars %d",exe_buffer->symbol_tree->items);
 	eval_btree(exe_buffer->symbol_tree->root,show_var_node);
 #if	USE_TYPE_VARS
 	if(global_types_tree->root) {
-	mesg_out("Ind Name       Type             Value      global vars/types",exe_buffer->symbol_tree->items);
+	mesg_out("Ind Name       Type             Value      global vars/types %d",exe_buffer->symbol_tree->items);
 		eval_btree(global_types_tree->root,show_var_node);
 	} else mesg_out("global_types_tree: empty!");
 #endif
 	return 0;
 }
+#endif
 
+#if	TNORMAL
 double uf_list_tokens()
 {
  ntoken();
@@ -767,8 +774,14 @@ double uf_list_tokens()
 	// mesg_out("	show token info",1);
 	ltok++;
  };	
- out_print("|-------------------------------------------|",1);
+ out_print("|-----------------------------------------------------|",1);
 
+ return 0;
+}
+
+double uf_var_index()
+{
+ MESG("var_index:");
  return 0;
 }
 
@@ -785,3 +798,25 @@ double uf_test_loop()
 	};
 	return p;
 }
+
+double uf_new_array_J()
+{
+ return 0;
+}
+
+double uf_new_array_I()
+{
+	return 0;
+}
+
+double uf_to_num_array()
+{
+	return 2;
+}
+
+double uf_dofile()
+{
+	return 0;
+}
+#endif
+

@@ -102,6 +102,21 @@ FILEBUF *get_scratch_file()
 	return(cbfp);
 }
 
+// Custom signal handler
+void handle_signal(int sig) {
+    if (sig == SIGTERM || sig == SIGINT ) {
+	drv_close();
+	fprintf(stderr,"stoped with signal %d\n",sig);	
+    exit(0);
+	};
+}
+
+void handle_signals()
+{
+   if (signal(SIGTERM, handle_signal) == SIG_ERR) {
+        perror("Error setting SIGTERM handler");
+    }
+}
 
 int main(int argc, char **argv)
 {
@@ -109,8 +124,9 @@ int main(int argc, char **argv)
 	if(lc_lang==NULL) lc_lang=getenv("LANG");
 	else if(lc_lang[0]==0) lc_lang=getenv("LANG");
 	errno=0;
+	handle_signals();
 	set_start_dir(NULL);
-
+	// printf("size=%ld\n",sizeof(struct tok_struct));exit(0);
 	// check_config_dir();
 	init_hash();
 	discmd = FALSE;
@@ -120,14 +136,18 @@ int main(int argc, char **argv)
 
 	load_config();
 	parse_command_line(argc,argv);
-	initialize_call_stack((int)bt_dval("call_stack_size"));
-	if(firstbp==NULL && !execmd) {
-		// scratch_files[0] = load_scratch_files();
-		firstbp=get_scratch_file();
+	if(firstbp==NULL && execmd && startfile==NULL) {
+		fprintf(stderr,"No file to execute!\n");
+		exit(1);
 	};
-#if	TNOTES
-	init_note_keys();
-#endif
+		initialize_call_stack((int)bt_dval("call_stack_size"));
+		if(firstbp==NULL && !execmd) {
+			// scratch_files[0] = load_scratch_files();
+			firstbp=get_scratch_file();
+		};
+	#if	TNOTES
+		init_note_keys();
+	#endif
 	if(!execmd) {
 		// MESG("init_system_clipboard");
 		init_system_clipboard();
@@ -146,7 +166,7 @@ int main(int argc, char **argv)
 		/* initialize the editor */
 		// MESG("init_names");
 		init_names();
-		// MESG("init_exensions");
+		MESG("init_extensions");
 		init_extensions();	// file extensions
 		if(startfile==NULL) {
 			startfile=find_file("",APPLICATION_RC,1,0);
@@ -303,6 +323,7 @@ void parse_command_line(int argc, char **argv)
 #endif
 				case 'd':
 					show_no_time=1;
+					break;
 				case 'D':
 					set_debug(1);
 					break;
@@ -319,8 +340,19 @@ void parse_command_line(int argc, char **argv)
 						allocate_array(main_args);
 						a_arg=0;
 					break;
+#if	TBNF & TNORMAL
+				case 'F':
+					usebnf=1;
+					break;
+#endif
 				case 't':
 					show_tokens=1;
+					break;
+#if	TBNF
+				case 'f':
+					exebnf=1;
+					usebnf=1;
+#endif
 				case 'x':	/* execute file and quit */
 					execmd=1;
 				case 'X':	/* execute file as statrup */

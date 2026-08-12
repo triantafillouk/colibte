@@ -1,4 +1,5 @@
 
+print("--- tproc2.cmd")
 function test_print()
 {
  i=1
@@ -10,3 +11,4 @@ cls
 test_print()
 
 print("test ended!")
+# problem in first line! TBD

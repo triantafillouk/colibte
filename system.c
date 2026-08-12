@@ -60,7 +60,9 @@ int sysexec(char *st)
 		if(status!=0) {
 			msg_line("command [%s] exit status %d",st,status);
 			events_flush();
-		} else msg_line("ok!");
+		} else {
+			if(!(exebnf)) msg_line("ok!");
+		};
 		return(TRUE);
 	} else {
 		char *st1=st;
@@ -186,6 +188,7 @@ int shell_cmd(num nused)
 {
     int    s;	/* return status from CLI */
     char	tline[MAXLLEN]; 	/* command line send to shell */
+	// MESG(">	shell_cmd:");
 	tline[0]=0;
     if ((s=nextarg("!", tline, MAXLLEN,true)) != TRUE) return(s);
 	s=exec_shell(tline);
@@ -194,14 +197,26 @@ int shell_cmd(num nused)
 
 char *get_line_at(FILEBUF *fb,offs offset);
 
+offs  FUtfCharAt_nocheck(FILEBUF *bf, offs offset, utfchar *uc);
+
+void print_buffer(FILEBUF *fp)
+{
+	textpoint_set(fp->tp_current,0);
+	offs o=0;
+	utfchar uc;
+	while(!FEofAt(fp,o)) {
+		o=FUtfCharAt_nocheck(fp,o,&uc);
+		printf("%s",uc.uval);
+	};
+}
+
 int exec_shell(char *tline)
 {
-//     int    s;	/* return status from CLI */
 	FILEBUF *bp,*bperr;
 	FILEBUF	*old_buffer=cbfp;
 	static char bname[] = "[command]";
 	static char ename[] = "[error]";
-
+	// MESG("exec_shell: cbfp = \"%s\"",cbfp->b_fname);
 	static char filnam[MAXFLEN];	//  = "/tmp/command";
 	static char filerr[MAXFLEN];
 	int status=0;
@@ -230,7 +245,7 @@ int exec_shell(char *tline)
 	if(status) {
 		sync();
 	
-		/* create and clear the command buffer */
+		// MESG("create and clear the command buffer \"%s\"",bname);
 	    if ((bp=new_filebuf(bname, 0)) != FALSE) {
 			EmptyText(bp);
 			if(bp->b_nwnd==0) {
@@ -254,16 +269,21 @@ int exec_shell(char *tline)
 			return(FALSE);
 		};
 	
+		// MESG("	select error buffer :%s",bperr->b_fname);
 		select_filebuf(bperr);
 		goto_eof(1);
+
 		ifile(bperr,filerr,0);
 		bperr->b_state &= ~FS_CHG;
 		set_Offset(0);
 		strlcpy(bp->b_dname,exec_dir,sizeof(bp->b_dname));
 		strlcpy(bperr->b_dname,exec_dir,sizeof(bp->b_dname));
+
 		select_filebuf(bp);
 		goto_eof(1);
+		// MESG("		goto end and insert %s",filnam);
 		ifile(bp,filnam,0);
+		if(execmd) print_buffer(bp);
 		bp->b_state &= ~FS_CHG;
 		set_Offset(0);
 		set_hmark(1,"shell_cmd");
@@ -273,16 +293,21 @@ int exec_shell(char *tline)
 		// MESG("exec: err_lines=%ld out_lines=%ld",bperr->lines,bp->lines);
 
 		if(bp->lines<2) {
-			select_filebuf(old_buffer);
-			if(cbfp->b_flag & (FSNLIST)) dir_reload(1);
+			// MESG("select %s",old_buffer->b_fname);
+			if(execmd) cbfp=old_buffer;
+			else {select_filebuf(old_buffer);
+				if(cbfp->b_flag & (FSNLIST)) dir_reload(1);
+			};
 		};
 		
-		if(bperr->lines<2)	msg_line("ok!");
-		else if(bperr->lines==2) {
-			char *err_line1 = get_line_at(bperr,0);
-			// MESG("err: %s",err_line1);
-			msg_line(err_line1);
-		} else msg_line("ok");
+		if(!(execmd)){
+			if(bperr->lines<2)	msg_line("ok no errors!");
+			else if(bperr->lines==2) {
+				char *err_line1 = get_line_at(bperr,0);
+				MESG("err: %s",err_line1);
+				msg_line(err_line1);
+			} else msg_line("ok");
+		};
 		return(TRUE);
 	} else {
 		set_update(cwp,UPD_MOVE);
@@ -647,9 +672,23 @@ char *native_copy="pbcopy";
 #else 
 #if	WSL
 // The following is for wsl!
+#if	0
+char *native_copy="pwsh.exe -noprofile -command 'chcp 65001 > $null;clip.exe'";
+char *native_paste="pwsh.exe -noprofile -command 'chcp 65001 > $null;$OutputEncoding = [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false); Get-Clipboard'";
+/*
+	chcp does not work ok in case of redirect the output of powershell to a file or pipe!!!
+	The best way to correctly use of native past is to set default codepage to UTF-8 in windows!
+	otherwise 
+	- a X11 server with xclip must be used also for wsl2
+	- use win32yank.exe as bellow
+*/
+//char *native_copy="powershell.exe -noprofile -command 'clip.exe'";
+//char *native_paste="powershell.exe -noprofile -command 'Get-Clipboard'";
+#else
 char *native_paste0="win32yank.exe -o --lf";
 char *native_paste="win32yank.exe -o --lf";
 char *native_copy="win32yank.exe -i";
+#endif
 #else
 char *native_copy="xclip -o";
 char *native_paste="xclip -i";
@@ -667,7 +706,7 @@ int check_native_copy()
 	if(status>=MAXFLEN) return 0;
 	status = system(exec_st);
 	// MESG("check_native_copy:[%s] -> %d",exec_st,status);
-	if(status == 0) {
+	if(status%256 == 0) {
 		clip_copy=native_paste;
 		clip_paste=native_copy;
 		ext_clipboard_command=1;
@@ -686,7 +725,10 @@ int init_system_clipboard()
 	// if(status>=MAXFLEN) return 0;
 	// MESG("init_system_clipboard:");
 #if	(WSL | DARWIN) & PCURSES
-	if(check_native_copy()) return 1;
+	if(check_native_copy()) {
+		MESG("using native copy!");
+		return 1;
+	};
 #endif
 	display_env = getenv("DISPLAY");
 	if(display_env == NULL) {
@@ -802,7 +844,10 @@ int insert_text_file_as_column(char *filnam)
 			utfchar uc;
 			in_offset=SUtfCharAt(line_text,in_offset,&uc);
 			if(uc.uval[0]==CHR_TAB) {col=next_tab(col);}
-			else col+=get_utf_length(&uc);
+			else {
+				// MESG("insert1");
+				col+=get_utf_length(&uc);
+			};
 			memcpy(ml_out,&uc,utf8charlen_nocheck(uc.uval[0]));
 			ml_out+=utf8charlen_nocheck(uc.uval[0]);
 		};
@@ -840,7 +885,7 @@ int insert_text_file_as_column(char *filnam)
 int insert_text_file_nl(char *filnam)
 {
 	FILEBUF *ori_buf = cbfp;
-
+	// MESG("insert_text_file_nl:");
 	
 
 	FILEBUF *tmp_bp = new_filebuf(filnam,0);
@@ -850,14 +895,15 @@ int insert_text_file_nl(char *filnam)
 	if(tmp_bp->maxlinelen==0) tmp_bp->maxlinelen=FSize(tmp_bp);
 
 	const num max_len = tmp_bp->maxlinelen;
-	// MESG("#insert_text_file_nl: position  --------------- max_len=%d",max_len);
+	MESG("#insert_text_file_nl: position  --------------- max_len=%d",max_len);
 
 	char *pad_space = (char *)malloc(max_len+3);
 	if(pad_space==NULL) { delete_filebuf(tmp_bp,1); return false;};
 	num line_start=0;
-
+	// MESG(" insert_text_file_nl:1");
 	select_filebuf(ori_buf);
 	char *ml_out;
+	// MESG(" insert_text_file_nl:1");
 	while(line_start<FSize(tmp_bp)) {
 		char *line_text=get_line_at(tmp_bp,line_start);
 		int col=0, in_offset=0;;
@@ -868,13 +914,16 @@ int insert_text_file_nl(char *filnam)
 			utfchar uc;
 			in_offset=SUtfCharAt(line_text,in_offset,&uc);
 			if(uc.uval[0]==CHR_TAB) {col=next_tab(col);}
-			else col+=get_utf_length(&uc);
+			else {
+				// MESG("insert2");
+				col+=get_utf_length(&uc);
+			};
 			// MESG("	memcpy");
 			memcpy(ml_out,&uc,utf8charlen_nocheck(uc.uval[0]));
 			ml_out+=utf8charlen_nocheck(uc.uval[0]);
 		};
-
 		line_start = FNextLine(tmp_bp,line_start);
+		// MESG(" insert_text_file_nl:2 line_start=%ld",line_start);
 		if(FEof(cbfp)) {
 			// MESG("	eof insert now! [%s] ",pad_space);
 			memcpy(ml_out,cbfp->EolStr,cbfp->EolSize);
@@ -937,18 +986,18 @@ int ext_system_paste()
 	static char exec_st[MAXFLEN];
 	status=snprintf(exec_st,sizeof(exec_st),"%s > %s 2> /dev/null",clip_copy,filnam);
 	if(status>=MAXFLEN) return 0;
-
+	MESG("ext_clipoard_paste:[%s]",exec_st);
 	status = system(exec_st);
 #endif
 
-	if(status==0) {
+	if(status%256==0) {
 
 		if(cwp->selection==REGION_COLUMN) {	/* Column past  */
 			status=insert_text_file_as_column(filnam);
 		} else {	/* Normal paste  */
 			status=insert_text_file_nl(filnam);
 		};
-		unlink(filnam);
+		// unlink(filnam);
 		set_update(cwp,UPD_EDIT);
 		setmark(0);
 		return status;

@@ -32,6 +32,15 @@ extern FILEBUF *cbfp;
 extern int record_session;
 #endif
 
+void set_active_flag(int flag);
+int get_active_flag();
+#if	TBNF
+void set_bnf_string(char *s);
+void set_bnf_num(double v);
+MVAR *get_bnf_var();
+int varind();
+#endif
+
 int vtype_is(int type);
 int custom_cell_width=0;
 
@@ -126,7 +135,7 @@ extern char patmatch[];
 
 extern int found;
 
-double exec_function(FILEBUF *vp,VAR *vargs,int nargs);
+double exec_function(FILEBUF *vp,int nargs);
 void show_points(FILEBUF *bf,FILE *fp);
 int check_init(FILEBUF *bf);
 void set_record_string1(char *st2);
@@ -175,13 +184,13 @@ BTNODE *find_bt_element(char *name)
 /* This is editors environment get function */
 double get_env(int vnum)
 {
-	char *getkill();
 	static double value=0;
 	char svalue[MAXLLEN];
 	long v1=0;
 	svalue[0]=0;
 
 	/* fetch the appropriate value */
+	// MESG("get_env: %d",vnum);
 	if(cbfp == NULL) return(0.0);
 	switch (vnum) {
 		case EVCFNAME:	
@@ -196,7 +205,10 @@ double get_env(int vnum)
 		case EVCURCHAR:	v1=Char();	break;
 		case EVSEARCH:	strlcpy(svalue,search_pattern,MAXLLEN);break;
 		case EVREPLACE:	strlcpy(svalue,replace_pattern,MAXLLEN);break;
-		case EVCTIME:	strlcpy(svalue,time2a(),MAXLLEN);break;
+		case EVCTIME:	
+			if(show_no_time) strlcpy(svalue,"Now",MAXLLEN);
+			else strlcpy(svalue,time2a(),MAXLLEN);
+			break;
 		case EVMATCH:	strlcpy(svalue,patmatch,MAXLLEN);
 		case EVCURCOL:	v1 = FColumn(cbfp,Offset()); break;
 		case EVCURLINE: v1 = getcline();break;
@@ -210,17 +222,23 @@ double get_env(int vnum)
 			break;
 		case EVCWROW:	v1 = getwline();break;
 		case EVWCOLS:	
-			v1 = cwp->w_ntcols;
+			if(cwp) v1 = cwp->w_ntcols;
 			break;
-		case EVWROWS:	v1 = cwp->w_ntrows;break;
+		case EVWROWS:	
+			if(cwp) v1 = cwp->w_ntrows;
+			break;
 		case EVFOUND:	v1 = found;break;
 		case EVNWORD:	
 			strlcpy(svalue,getnword(),MAXLLEN);
 			break;
 		case EVDEBUG:	v1=debug_flag(); return(v1); break;
 
-		case EVFCOLOR:	v1=cwp->w_fcolor;break;
-		case EVBCOLOR:	v1=cwp->w_bcolor;break;
+		case EVFCOLOR:	
+			if(cwp) v1=cwp->w_fcolor;
+			break;
+		case EVBCOLOR:	
+			if(cwp) v1=cwp->w_bcolor;
+			break;
 
 		case EVCASE:	v1=gmode_exact_case;break;
 		case EVOVER:	v1=gmode_over;break;
@@ -229,16 +247,20 @@ double get_env(int vnum)
 			v1=tabsize;
 			break;
 		case EVVERSION:
-			strlcpy(svalue,VERSION,MAXLLEN);
+			if(show_no_time) strlcpy(svalue,"version ..",MAXLLEN);
+			else strlcpy(svalue,VERSION,MAXLLEN);
 			break;
 		default:
 			ERROR("GET_ENV: Not a valid function err=503");
 			return value;
 	};
 	value=v1;
+	// MESG("	svalue=[%s] value=%f",svalue,value);
 	if(svalue[0]!=0) { 
 		set_sval(svalue);	
-	} else set_vdval(value);
+	} else {
+		set_vdval(value);
+	};
 	return(value);
 }
 
@@ -318,6 +340,7 @@ short int get_next_key(num mode)
  	return (*kbdsptr++);
  };
 }
+
 
 /* set option values */
 int set_option_val(int vnum,char *svalue)
@@ -448,6 +471,16 @@ int set_option_val(int vnum,char *svalue)
 	return(1);
 }
 
+#if	TBNF
+int set_option_bnf(int vnum,int ival)
+{
+ char st[20];
+ sprintf(st,"%d",ival);
+ set_option_val(vnum,st);
+ return ival;
+}
+#endif
+
 /* set editor variables */
 void set_env(int vnum,char *svalue,double value)
 {
@@ -460,7 +493,7 @@ void set_env(int vnum,char *svalue,double value)
 		case EVCFNAME:	// set current file name
 				strlcpy(cbfp->b_fname, svalue,MAXFLEN);
 				/* update mode lines */
-				set_update(cwp,UPD_STATUS);
+				if(cwp) set_update(cwp,UPD_STATUS);
 				break;
 		case EVCURCHAR:	// replace current character
 				forw_delete(1);	/* delete 1 char */
@@ -476,13 +509,14 @@ void set_env(int vnum,char *svalue,double value)
 		case EVREPLACE:	strlcpy(replace_pattern, svalue,MAXLLEN);
 				break;
 		case EVCURCOL:
+			if(cwp){
 				textpoint_set_lc(cwp->tp_current,
-					tp_line(cwp->tp_current),v1);
-				break;
+				tp_line(cwp->tp_current),v1);
+			};break;
 		case EVCURLINE:	goto_line(v1);
 				break;
 		case EVCURPOS: 
-				textpoint_set(cwp->w_fp->tp_current,v1);
+				if(cwp) textpoint_set(cwp->w_fp->tp_current,v1);
 				break;
 		// _base_name is read only
 		// _lastkey is read only ??
@@ -490,14 +524,14 @@ void set_env(int vnum,char *svalue,double value)
 				break;
 		case EVTEXT:	set_linetext(svalue);break;
 		case EVCWROW:	
-			igotolinecol(v1+tp_line(cwp->tp_hline),1,0);
-				break;
+			if(cwp) igotolinecol(v1+tp_line(cwp->tp_hline),1,0);
+			break;
 		case EVWCOLS: 
-				vresize_wind(-cwp->w_ntcols+(int)v1);
-				break;
+			if(cwp) vresize_wind(-cwp->w_ntcols+(int)v1);
+			break;
 		case EVWROWS: 
-				hresize_wind(-cwp->w_ntrows+(int)v1);
-				break;
+			if(cwp)	hresize_wind(-cwp->w_ntrows+(int)v1);
+			break;
 		// _found is read only
 		// _next_word is read only
 		case EVDEBUG: 
@@ -505,20 +539,22 @@ void set_env(int vnum,char *svalue,double value)
 				return;
 				break;
 		case EVFCOLOR: 
-			cwp->w_fcolor=value;
-			set_update(cwp,UPD_WINDOW);
-			break;
+			if(cwp){
+				cwp->w_fcolor=value;
+				set_update(cwp,UPD_WINDOW);
+			} ;break;
 		case EVBCOLOR: 
-			cwp->w_bcolor=value;
-			set_update(cwp,UPD_WINDOW);
-			break;
+			if(cwp){
+				cwp->w_bcolor=value;
+				if(cwp) set_update(cwp,UPD_WINDOW);
+			} break;
 		case EVCASE: 
 			gmode_exact_case=value;
-			set_update(cwp,UPD_STATUS);
+			if(cwp) set_update(cwp,UPD_STATUS);
 			break;
 		case EVOVER: 
 			gmode_over=value;
-			set_update(cwp,UPD_STATUS);
+			if(cwp) set_update(cwp,UPD_STATUS);
 			break;
 		case EVREGEXP:
 			gmode_reg_exp=value;	// ?????
@@ -556,6 +592,7 @@ int sindex(char *source, char *pattern)	/* find pattern within source */
 char *date_string(num n)
 {
  static char date_str[128];
+
  int res=0;
 	time_t	tclock;
 	struct tm *tim;
@@ -669,45 +706,13 @@ int macro_line(num nused)
 }
 
 
-int exec_named_function(char *name)
-{
-    FILEBUF *bp;		/* ptr to buffer to execute */
-    char bufn[MAXFLEN+2];		/* name of buffer to execute */
-	int ival;
-	// MESG("exec_named_function: %s",name);
-	/* find out what buffer to execute */
-	strlcpy(bufn+1,name,MAXFLEN);
-
-	/* construct the buffer name */
-	bufn[0] = CHR_LBRA;
-	strlcat(bufn, "]",MAXFLEN);
-	// MESG("exec_named_function: name=%s bufn=%s",name,bufn);	
-	/* find the pointer to that buffer */
-    if ((bp=get_filebuf(bufn,NULL,FSINVS)) == NULL) 
-	{
-		msg_line("No function named %s",bufn);
-		return(FALSE);
-    };
-	bp->b_type=1;	/* set file type to cmd  */
-	init_exec_flags();
-	/* parse the block if not already parsed  */
-	if(bp->m_mode != M_PARSED)
-	parse_block1(bp,NULL,0);	/* do not init if already parsed!  */
-
-	if((err_num=check_init(bp))>0) {
-		return(0);
-	};
-
-	ival = (int)exec_function(bp,NULL,0);
-
-	return(ival);
-}
-
 int execsub(num n)
 {
-//	MESG("execsub: %d %s",n,subname);
+	// MESG("execsub: %d %s",n,subname);
 	return(exec_named_function(subname));
 }
+
+double num_result();
 
 /* find and execute a macro file */
 int exec_file(num n)	
@@ -719,7 +724,7 @@ int exec_file(num n)
 	set_list_type(LDIR);
 	fname[0]=0;
 	status = nextarg("Macro file to execute: ", fname, MAXFLEN -1,true);
-
+	
 	if (status != TRUE)	{
 		return(status);
 	}
@@ -737,15 +742,15 @@ int exec_file(num n)
 	while (n-- > 0) 
 	{
 		status=dofile(fspec);
-		MESG("exec_file: return status = %d val=%f",status,get_val());
-		
+#if	TBNF
+		MESG("exec_file: return status = %d var@=%d val=%f",status,varind(),get_val());
+#endif
 		if (status != TRUE) return(status);
 	};
-	return(TRUE);	/* ERROR when it returns CHECK!! FIXIT!!!!  */
+	return(TRUE);	/* status return! */
 }
 
 extern int show_stage;
-extern int current_active_flag;
 
 /* dofile:	execute a macro file */
 int dofile(char *fname)
@@ -754,7 +759,7 @@ int dofile(char *fname)
 	int status;	/* results of various calls */
 	char bname[MAXFLEN];
 	snprintf(bname,sizeof(bname),"[%s]",fname);
-	// MESG("# dofile:fname=[%s]",fname);
+	MESG("# dofile:fname=[%s]",fname);
 	show_stage=0;
 	set_screen_update(false);
 	if((bp=get_filebuf(bname,NULL,0))==NULL) { // file not in memory, load it!
@@ -779,13 +784,15 @@ int dofile(char *fname)
 		};
 	};
 	/* go execute it! */
-	int backup_caf=current_active_flag;
+	int backup_caf=get_active_flag();
 	double d = compute_block(bp,bp,1);
-	// MESG("dofile: after compute_block:");
+#if	TBNF
+	// MESG("dofile: after compute_block: var@=%d",varind());
+#endif
 	if(err_num>0) return (FALSE);
 	init_error();
 	set_vdval(d);
-	current_active_flag=backup_caf;
+	set_active_flag(backup_caf);
 	/* if not displayed, remove the now unneeded macro buffer and exit */
 	if (bp->b_nwnd == 0) 
 		delete_filebuf(bp,1);
@@ -1210,11 +1217,12 @@ int create_function_buffer(FILEBUF *pbuf,char *function_name,offs start_function
  char bname[MAXFLEN];
  char *function_block;
  int function_size=0;
-	// MESG("create_function_buffer:");
+	// MESG("create_function_buffer: [%s]",function_name);
 	bname[0] = CHR_LBRA;
 	strlcpy(bname+1,function_name,250);
 	insert_bt_element(bt_table,bname+1,TOK_PROC,0);	/* insert in main table  */
 	strlcat(bname, "]",MAXFLEN);
+
 	if ((macrobuf = new_filebuf(bname, FSINVS)) == NULL) {
 		SYS_ERROR("Can not create function buffer");
 		return(0);
@@ -1231,9 +1239,11 @@ int create_function_buffer(FILEBUF *pbuf,char *function_name,offs start_function
 
 	// set buffer type to cmd
 	macrobuf->b_type=1;
+
 	// MESG("created sub file [%s] type %d",pbuf->b_fname,pbuf->b_type);
 	return(1);
 }
+
 
 /* 
  refresh line at current cursor position of current window
@@ -1255,7 +1265,6 @@ int refresh_current_line(num nused)
  // if special file type return
  if(cbfp->b_flag & (FSNLIST|FSDIRED|FSNOTES|FSNOTESN)) return 0;
 	macro_exec=1;
- // MESG("refresh_current_line:");
 	tpo=tp_offset(cwp->tp_current);
 	
 	sl=FLineBegin(cbfp,tpo);
@@ -1269,6 +1278,8 @@ int refresh_current_line(num nused)
 			is_ddot=!(cbfp->b_state & FS_VIEW);
 			ddot_pos=i-sl+1;break;};
 	};
+
+ 	// MESG("refresh_current_line: is_ddot=%d ddot_pos=%d",is_ddot,ddot_pos);
 	
 	// goto the begining of the line
 	set_Offset(sl+ddot_pos);
@@ -1280,7 +1291,9 @@ int refresh_current_line(num nused)
 	set_Offset(sl);
 	// MESG("refresh_current_line:[%s] %d",text_line,ddot_pos);
 	value = compute_string(text_line,text_line);
-
+#if	TBNF
+	// MESG("	after compute_string var@=%d value=%f [%s]",varind(),value,text_line);
+#endif
 	if(is_ddot) {
 		insert_string(cbfp,text_line,strlen(text_line));
 	};
@@ -1291,10 +1304,30 @@ int refresh_current_line(num nused)
 		set_update(cwp,UPD_EDIT);
 		return (FALSE);
  	} else {
- 		if(vtype_is(VTYPE_STRING)) msg_line("res=[%s]",value,get_sval());
-		else {
-			msg_line("res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
+#if	TBNFNORMAL
+		if(usebnf) {
+#endif
+#if	TBNF
+			MVAR *result=get_bnf_var();
+			
+			if(result->var_type==VTYPE_STRING) msg_line("res=[%s]",result->sval);
+			else if (result->var_type==VTYPE_NUM) {
+				value=result->dval;
+				msg_line("b res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
+			} else msg_line("result is of type %d",result->var_type);
+#endif
+#if	TBNFNORMAL
+		} else {
+#endif
+#if	TNORMAL
+	 		if(vtype_is(VTYPE_STRING)) msg_line("res=[%s]",value,get_sval());
+			else {
+				msg_line("n res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
+			}
+#endif
+#if	TBNFNORMAL
 		}
+#endif
  	};
 	if(is_ddot){
 		el=FLineEnd(cbfp,sl);

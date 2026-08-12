@@ -360,7 +360,7 @@ char *get_start_dir();
 char *get_pfname(char *dir_name,char *file_name,int len);
 
 // mlang.c
-void set_break();
+void set_break(char *from);
 
 // eval.c
 FILEBUF * cls_fout(char *bname);

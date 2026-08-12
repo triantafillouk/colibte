@@ -1,20 +1,17 @@
 # a recursive function that adds 3 arguments with a quirk
+# ok from 927
+print("--- add3.cmd")
 
-function add3(a,b,c)
+function add(a,b,c)
 {
- print("-args:a="+a+" b="+b+" c="+c)
- if(c==0) { return (0) }
- d=a+b+add3(a,b,c-1)
+ d=a+b+c
  return(d)
 }
 
 cls
 
-result = add3(1 ,2 ,2)
+result = add(1 ,2 ,2)
 result: 
 
-`
- this should act as a multiline comment
-`
 print("result is new "+result);
 

@@ -1,4 +1,4 @@
-# check division by zero
+# check division by zero TBC
 # check string/numeric variables mix
 
 a = "kk"	: "kk"

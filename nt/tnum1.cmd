@@ -1,5 +1,5 @@
 # test numeric operations
-
+print("--- tnum1.cmd")
 (a+1)	:   1.0
 2**3:   8.0
 2**3%2		:   0.0

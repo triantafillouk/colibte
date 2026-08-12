@@ -1,5 +1,7 @@
+# string array bnf fixed in 887
 cls
-a=["b1" "b2" "b3"]
+print("--- t3.cmd")
+a=["b1", "b2", "b3"]
 a[1]:
 a[2]:
 p=a[0]

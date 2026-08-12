@@ -1,3 +1,6 @@
+# types ok from 906, increase result same as the previous one, ok 928
+# normal not ok!
+print("--- t5.cmd")
 type  human1 = [name::"Name" surname::"Surname" age::0 bdate::0 salary::1 age2::1]
 #print(human2)
 #list1 = list ()
@@ -10,12 +13,15 @@ a: array 1:[human1] type [AMIXED] , slot 0 type=14 rows 1,cols 6
 # a = human1 ("Kostas","Tr",55,20,100)
 # a[0]: 
 #max=1
+#c = human1[2]("name1","tr1",33,34,35,36; "name2","tr2",43,44,45,46)
+#c:
 # fori(i=0;max;1){
 	print(i,":===================")
-	a.name: "kostas maria"
 	a.age:  33.0
+	a.name: "kostas maria"
 	a.age=77:  77.0
-	a.age+=2:  77.0
+	a.age:  79.0
+	a.age*=2:  77.0
 	a.age:  79.0
 	a.age-=2:  49.0
 	a.age:  77.0
@@ -30,14 +36,15 @@ a: array 1:[human1] type [AMIXED] , slot 0 type=14 rows 1,cols 6
 k=20
 #b = human1[k*(k+2)]
 c = human1[2]("name1","tr1",33,34,35,36; "name2","tr2",43,44,45,46)
+c:
 print("---1")
 c[1][1]: "tr2"
 print("---2")
 c[1].name: "name1"
 print("---3")
-c[1].surname="new"
+c[1].surname="new"+" surname"
 print("---4")
-#c[1].surname:
+c[1].surname:
 print("end")
 # print(a[22].name)
 # show_vars()

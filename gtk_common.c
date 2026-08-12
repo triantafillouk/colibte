@@ -550,7 +550,7 @@ int drv_check_break_key()
 	count=0;
 
 	if(key==3) {
-		set_break();
+		set_break("drv_check_break_key");
 		return 1;
 	};
  };
@@ -2015,7 +2015,7 @@ void main_loop()
 	};
 #else
 #if	GTK4
-	MESG("start application!");
+	// MESG("start application!");
 	GtkApplication *app;
 	int status;
 

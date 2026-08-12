@@ -1,4 +1,5 @@
 cls
+print("--- factorial1.cmd")
 function fact(num)
 {
  if(num<1) 
@@ -10,4 +11,6 @@ function fact(num)
  }
 }
 
-fact(4):     6
+fact(120):
+
+return fact(120)

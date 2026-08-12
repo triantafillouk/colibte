@@ -1,5 +1,5 @@
 cls
-
+print("--- tproc3.cmd")
 # function without arguments!!!
 
 function pwa()

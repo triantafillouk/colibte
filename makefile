@@ -18,7 +18,7 @@ GVERS := $(shell git log -1 --pretty=tformat:%h,%s)
 ctxe : XLIB=1
 ctxe : _X11_=1
 ctxe : PCURSES=0 
-cteg2 : XPLOT=1
+ctg2 : XPLOT=1
 ctxe: TNOTES=1
 ctxe: USE_GLIB=0
 ctxe : SQLITE3=`pkg-config sqlite3 --libs`
@@ -60,8 +60,8 @@ X11lib0= -lX11 -L/opt/X11/lib
 EXTFILE=.$(APP_NAME)_ext_mac
 WSL:=0
 LIBLM=
-CC=zig cc -DGVERS='"$(GVERS)"'
-#CC=clang -DGVERS='"$(GVERS)"'
+#CC=zig cc -DGVERS='"$(GVERS)"'
+CC=clang -DGVERS='"$(GVERS)"'
 #CC=gcc-mp-14 -DGVERS='"$(GVERS)"'
 #sudo codesign --force --sign - /usr/local/bin/e
 endif
@@ -74,7 +74,8 @@ OSYSTEM=LINUX
 LIBLM=-lX11 -lm
 X11include=-I/opt/X11/include/
 X11lib0=-L/usr/X11R6/lib -lX11 -L/opt/X11/lib 
-CC=gcc -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
+CC=gcc -O3  -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
+#CC=clang -O3  -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
 #CC=zig cc -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
 endif
 
@@ -231,7 +232,7 @@ eval.o: xe.h eval.c eval.h alist.h
 
 config_init.o: config_init.c
 
-mlang.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang_functions.c mlang.h alist.h xe.h func.h token_table.h bnf_expr.c
+mlang.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang_functions.c mlang.h alist.h xe.h func.h token_table.h bnf_expr.c bnf_mlangf.c mlang_expr.c
 
 mlang_ce.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang_functions.c mlang.h alist.h xe.h func.h token_table.h
 	${CC} mlang.c $(FLAGS1)  -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o mlang_ce.o

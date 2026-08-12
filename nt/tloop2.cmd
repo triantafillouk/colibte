@@ -1,7 +1,7 @@
 #check double loop, speed test 1
 
 cls
-
+print("--- tloop2.cmd")
 print(_time)	: [Fri Oct  3 15:47:31 2014]
 show_time("Loop test while/for 1",0)
 

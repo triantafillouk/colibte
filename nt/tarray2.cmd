@@ -1,18 +1,21 @@
+# ok in 929 (problem in fori,for fixed)
 cls
-c=[1.1 3.2 3; 4 5 6; 7 8.1 9]
+print("--- tarray2.cmd")
+c=[1.1, 3.2, 3; 4, 5, 6; 7, 8.1, 9]
 
 c[0][2]	:     3
 c[0][1]=1.234
 
-d=[ 1.1 2.4 3 4 5 6 7 8 9 10]
+d=[ 1.1, 2.4, 3, 4, 5, 6, 7, 8, 9, 10]
 d[0]	: 1.100000
 DET(c)	: -4.356000
 
-for(j=0;j<3;j=j+1) print("row:"+j+","+c[j][0]+","+c[j][1]+","+c[j][2])
+for(j=0;j<3;j=j+1) print("row:["+j+"]:"+c[j][0]+","+c[j][1]+","+c[j][2])
+# fori(j=0;3;1) print("row:"+j+","+c[j][0]+","+c[j][1]+","+c[j][2])
 c[0][1]	: 1.234000
 
-show_vars()
-list_tokens()
+#show_vars()
+#list_tokens()
 
 10:
 

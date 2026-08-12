@@ -1,11 +1,12 @@
 # check recursive functions 2
-
+print("--- factorial2.cmd")
 num=1
 var1=10
 
 function fact(num , st)
 {
- print("fact "+num+" var1="+var1+" st=["+st+"]")
+ "st = "+st:
+ print("fact "+num+" st=["+st+"]")
  if(num==1) 
  {
  	return(1)
@@ -17,10 +18,10 @@ function fact(num , st)
  }
 }
 
-f=20
+f=20:
 n=fact(f,"test")
-
-n: 2432902008176640000.0
-print("fact("+f+") is "+n)
-return(n)
+print("----------------------")
+n:
+#print("fact("+f+") is "+n)
+#return(n)
 

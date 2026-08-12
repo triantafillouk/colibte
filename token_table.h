@@ -38,6 +38,7 @@ TOK_TAB token_table[]= {
 	{TOK_DIR_FOR		,"for",0},	// 30
 	{TOK_COMMA			," , ",0},	// 31
 	{TOK_DIR_FORI		,"fori",0},	// 32
+	/* compare operators  */
 	{TOK_COMPARE		,"cmp",0},	// 33
 	{TOK_NOTEQUAL		," != ",TOK_COMPARE},	// 34
 	{TOK_SMALLER		," < ",TOK_COMPARE},	/* <  */
@@ -45,6 +46,7 @@ TOK_TAB token_table[]= {
 	{TOK_EQUAL			," == ",TOK_COMPARE},	/* ==  */
 	{TOK_SMALLEREQ		," <= ",TOK_COMPARE},	/* <=  */
 	{TOK_BIGGEREQ		," >= ",TOK_COMPARE},	/* >=  */
+	/* Bool operators  */
 	{TOK_BOOL			,"bool",TOK_BOOL},	// 40
 	{TOK_AND			,"AND",TOK_TERM0},	/* &  */
 	{TOK_OR				," OR ",TOK_BOOL},	/* |  */
@@ -52,6 +54,7 @@ TOK_TAB token_table[]= {
 	{TOK_NAND			," NAND ",TOK_TERM0},	/* !&  */
 	{TOK_NOR			," NOR ",TOK_BOOL},	/* !|  */
 	{TOK_XOR			," XOR ",TOK_BOOL},	/* ^  */
+	/* term operators  */
 	{TOK_PLUS			," + ",TOK_TERM},	// 47
 	{TOK_MINUS			," - ",TOK_TERM},	// 48
 	{TOK_POWER			," ** ",TOK_TERM2},	// 49
@@ -70,6 +73,7 @@ TOK_TAB token_table[]= {
 	{TOK_DECREASE		," DEC ",TOK_TERM2},
 	{TOK_INCREASEBY		," += ",TOK_TERM0},
 	{TOK_MULBY			," *= ",TOK_TERM0},
+	{TOK_DIVBY,	 		" /= ",TOK_TERM0},
 	{TOK_DECREASEBY		," -= ",TOK_TERM0},	// 65
 	{TOK_BSLASH			,"[\\]",0},
 	{TOK_NL				," NL ",0},
@@ -78,8 +82,8 @@ TOK_TAB token_table[]= {
 	{TOK_DIR_TYPE		,"type",0},
 	{TOK_ARRAY1			,"array1",0},	// 71
 	{TOK_ARRAY2			,"array2",0},
-	{TOK_ARRAY_L1		,"array_l1",0},
-	{TOK_ARRAY_L2		,"array_l2",0},
+	{TOK_ARRAY_L1		,"AL1",0},
+	{TOK_ARRAY_L2		,"AL2",0},
 	{TOK_ASSIGNENV		,"setenv",TOK_TERM0},
 	{TOK_ASSIGNOPT		,"setoption",TOK_TERM0},
 	{TOK_END			,"END",0},
@@ -87,5 +91,14 @@ TOK_TAB token_table[]= {
 	{TOK_ASSIGN_TYPE	,"=type",TOK_TERM0},
 	{TOK_TYPE_ELEMENT	,"TYPE_EL",TOK_TERM2},
 	{TOK_DOT			," . ",0},
+	{TOK_INCBEFORE		,"++ ",0},
+	{TOK_DECBEFORE      ,"-- ",0},
+	{TOK_ASSIGN_ARRAY1	,"A1=",0},
+	{TOK_ASSIGN_ARRAY2	,"A2=",0},
+	{TOK_INCREASE_ARRAY1	,"A1+",0},
+	{TOK_INCREASE_ARRAY2	,"A2+",0},
+	{TOK_DECREASE_ARRAY1	,"A1-",0},
+	{TOK_DECREASE_ARRAY2	,"A2-",0},
+	{TOK_NEGATE,	"Neg",0},
 	{TOK_OTHER			,"OTHER",0}
 };

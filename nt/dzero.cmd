@@ -1,6 +1,7 @@
-
+# bnf returns 0, this is the correct value after the dzero error!
 cls
-i=5
+print("--- dzero.cmd")
+i=15
 while(i>=0){
  n=10/i
  print("i="+i+" n="+n)
