@@ -656,6 +656,154 @@ inline static void bnf_factor_pp_num_mul()
  // MESG("bnf_factor_pp_num_mul: %f",bnf_var->dval);
 }
 
+#if	TOPNUM
+inline static void bnf_num_mul()
+{
+ double valb = tok->dval;
+ MESG("bnf_num_mul: var@=%d dval=%f [%s]",VARIND,tok->dval,tok_info(tok));
+ MESG("	vara type=%d",bnf_var->var_type);
+ if(bnf_var->var_type==VTYPE_POINTER) {
+ 	MESG("	pointer!");
+ 	bnf_var->dval = bnf_var->var_pointer->dval * valb;
+	bnf_var->var_type=VTYPE_NUM;
+ } else {
+ 	MESG("	num!");
+ 	bnf_var->dval *= valb;
+	bnf_var->var_type=VTYPE_NUM;
+ };
+ // next_var("aa");
+}
+
+inline static void bnf_var_mul_num()
+{
+ MVAR *varb = get_left_slot(tok->tind);
+	bnf_var->dval *= varb->dval;
+	// bnf_var->var_type=VTYPE_NUM;
+}
+
+inline static void bnf_var_mul_nump()
+{
+ MVAR *varb = get_left_slot(tok->tind);
+ bnf_var->dval=bnf_var->var_pointer->dval*varb->dval;
+ bnf_var->var_type=VTYPE_NUM;
+}
+
+inline static void bnf_var_mul()
+{
+ MESG("bnf_var_mul: tind=%d [%s]",tok->tind,tok_info(tok));
+ MVAR *varb = get_left_slot(tok->tind);
+	MESG("	> dval=%f",varb->dval);
+	MVAR *vara = bnf_var;
+	int va=vara->var_type;
+	if(vara->var_type==VTYPE_POINTER) {vara=vara->var_pointer;};
+	// MESG(";factor_mul: atype=%d btype=%d",vara->var_type,varb->var_type);
+	if(vara->var_type==VTYPE_NUM) {
+		if(varb->var_type==VTYPE_NUM) {
+			MESG("	new val=%f",bnf_var->dval);
+			if(va==VTYPE_NUM) {
+				bnf_var->dval*=varb->dval;
+				set_bnf_function(tok,"var_mul_num",bnf_var_mul_num);
+			};
+			if(va==VTYPE_POINTER) {
+				bnf_var->dval=bnf_var->var_pointer->dval*varb->dval;
+				bnf_var->var_type=VTYPE_NUM;
+				set_bnf_function(tok,"var_mul_num",bnf_var_mul_nump);
+			};
+			return;
+		};
+		if(varb->var_type==VTYPE_ARRAY) {
+			array_dat *array1 = varb->adat;
+			array_dat *result_array =dup_array_mul1(array1,vara->dval);
+			bnf_var->adat=result_array;
+			bnf_var->var_type=VTYPE_ARRAY;
+			bnf_var->var_alloced=1;
+			// MESG("	array multiply by num!");
+			return;
+		};
+		if(varb->var_type==VTYPE_AMIXED) {
+			array_dat *array2 = varb->adat;
+			array_dat *result_array =dup_array_mul1(array2,vara->dval);
+			bnf_var->adat=result_array;
+			bnf_var->var_type=VTYPE_AMIXED;
+			bnf_var->var_alloced=1;
+			// MESG("	array multiply by num!");
+			return;
+		};
+	};
+	if(vara->var_type==VTYPE_ARRAY) {
+		if(varb->var_type==VTYPE_NUM) {
+			array_dat *array1 = vara->adat;
+			array_dat *result_array =dup_array_mul1(array1,varb->dval);
+			bnf_var->adat=result_array;
+			bnf_var->var_type=VTYPE_ARRAY;
+			bnf_var->var_alloced=1;
+			// MESG("	array multiply by num!");
+			return;
+		} else
+		if(varb->var_type==VTYPE_ARRAY) {
+			array_dat *array1=vara->adat;
+			array_dat *array2=varb->adat;
+
+			if(array1->rows==1 && array2->cols==1) {
+				if(array1->cols== array2->rows) {
+					int i;
+					double v1=0;
+					for(i=0;i<array1->cols;i++){
+						v1 += array1->dval[i]*array2->dval[i];
+					};
+					bnf_var->var_type=VTYPE_NUM;
+					bnf_var->dval=v1;
+					return;
+				};
+				syntax_error(1108,"array multiply error");
+				return;
+			} else {
+				array_dat *result_array;
+				result_array=array_mul2(array1,array2);
+				// MESG("	after array_mul2:0 %d",err_num);
+				if(err_num) {
+					// syntax_error(1109,err_str);
+					return;
+				};
+				bnf_var->var_type=VTYPE_ARRAY;
+				bnf_var->adat=result_array;
+				if(array1->astat==ARRAY_ALLOCATED) {	/* free this one!! ?? */ };
+				return;
+			};
+			syntax_error(1109,"array multiply error");
+			return ;
+		};
+	};
+	if(vara->var_type==VTYPE_AMIXED) {
+		if(varb->var_type==VTYPE_NUM) {
+			array_dat *array1 = vara->adat;
+			array_dat *result_array =dup_array_mul1(array1,varb->dval);
+			bnf_var->adat=result_array;
+			bnf_var->var_type=VTYPE_AMIXED;
+			bnf_var->var_alloced=1;
+			// MESG("	array multiply by num!");
+			return;
+		};
+		if(varb->var_type==VTYPE_AMIXED) {
+			// MESG("mul array [%d %d]x[%d %d]",vara->adat->cols,vara->adat->rows,varb->adat->cols,varb->adat->rows);
+			array_dat *result_array = array_mul2(vara->adat,varb->adat);
+			// MESG("	after array_mul2:1 %d",err_num);
+				if(err_num) {
+					// syntax_error(1110,err_str);
+					return;
+				};
+			bnf_var->adat=result_array;
+			bnf_var->var_type=VTYPE_AMIXED;
+			bnf_var->var_alloced=1;
+			return;
+		};
+
+	}
+	syntax_error(1110,"multipy error");
+ 
+};
+#endif
+
 inline static void bnf_factor_mul()
 {
  // MESG("bnf_factor_mul : var ind=%d tok ind=%d var type=%d",VARIND,tok->tnum,bnf_var->var_type);
@@ -663,6 +811,7 @@ inline static void bnf_factor_mul()
  int vb=varb->var_type;
  	if(varb->var_type==VTYPE_POINTER){ varb=varb->var_pointer;vb=VTYPE_POINTER;};
 	prev_var("mul");
+
 	MVAR *vara = bnf_var;
 	int va=vara->var_type;
 	if(vara->var_type==VTYPE_POINTER) {vara=vara->var_pointer;va=VTYPE_POINTER;};

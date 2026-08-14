@@ -625,17 +625,31 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 }
 
 
+int skip_next=0;
+
 int err_factor()
 {
  static int pre_symbol=0;
  TDSERR("factor");
  int lpar=0;
- // MESG("-- err_factor %s",tok_info(tok));
+ MESG("-- err_factor skip=%d %s",skip_next,tok_info(tok));
 #if	TNORMAL
  set_tok_function(tok,0);
 #endif
 #if	TBNF
- tok_struct *tok0_bnf=NULL;
+tok_struct *tok0_bnf=NULL;
+#if	TOPNUM
+ if(tok->ttype==TOK_NUM && skip_next==1) { 
+ 	NTOKEN_ERR(222);
+	skip_next=0;
+	RT_MESG1(222);
+ };
+ if(tok->ttype==TOK_VAR && skip_next==1) {
+ 	NTOKEN_ERR(223);
+	skip_next=0;
+	RT_MESG1(222);
+ };
+#endif
 
  if(tok->ttype!=TOK_NOT && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_MINUS && tok->ttype!=TOK_PLUS) {
 #if	TNOASGN
@@ -1215,6 +1229,11 @@ int err_factor()
 		};
 		tok0->tname="numeric";
 		RT_MESG1(487);
+#if	TOPNUM
+	case TOK_MUL:
+		MESG("TOK_MUL: skip_next=%d [%s]",skip_next,tok_info(tok));
+		RT_MESG1(488);
+#endif
 	case TOK_QUOTE:	 { // string 
 		xpos=488;
 #if	TBNF
@@ -1581,7 +1600,7 @@ int err_num_term3(tok_struct *tok1)
 int err_num_term2()
 {
  TDSERR("num_term2");
- // MESG("err_num_term2:0 [%s]",tok_info(tok));
+ MESG("		err_num_term2:0 [%s]",tok_info(tok));
  SHOW_STAGE(541);
  err_num = err_factor();
  if(err_num) RT_MESG1(err_num);
@@ -1618,23 +1637,45 @@ int err_num_term1()
  SHOW_STAGE(551);
  err_num=err_num_term2();
  if(err_num) RT_MESG1(err_num);
- // MESG("term1: initial token %s",tok_info(tok));
+ MESG("term1: initial token %s",tok_info(tok));
  CHECK_TOK(552);
  tok_struct *tok0=NULL;
  while (tok->tgroup==TOK_TERM1) {
  	// tok1=tok;
  	// tok->term_function = factor_funcs[tok->ttype];
 	tok0=tok;
+	
 #if	TNORMAL
 	set_term_function(tok,(TFunction)factor_funcs[tok->ttype]);
 #endif
 	CHECK_TOK(553);
 	NTOKEN_ERR(5531);
+	MESG("	term1: midle [%s]",tok_info(tok));
+	tok_struct *op2 = tok;
+#if	TOPNUM
+	if(tok0->ttype==TOK_MUL && (op2->ttype==TOK_NUM || op2->ttype==TOK_VAR)){
+		MESG("	set skip_next!");
+		skip_next=1;
+	};
+#endif
 	err_num=err_num_term2();
 	// tok1 = tok;
-	// MESG_TOK_INFO("-- push term1 function",tok0);
-	stack_push("num_term1",tok0,tok0->ttype);
-
+	// MESG("-- push term1 function skip=%d [%s]",skip_next,tok_info(tok0));
+	tok_struct *bnf_term1 = stack_push("num_term1",tok0,tok0->ttype);
+#if	TOPNUM
+	if(op2->ttype==TOK_NUM){
+		MESG("	term1: set num value to %f",op2->dval);
+		bnf_term1->dval = op2->dval;
+		bnf_term1->bnf_factor_function=bnf_num_mul;
+		bnf_term1->tname="num";
+	};
+	if(op2->ttype==TOK_VAR){
+		MESG("	term1: set var index to %d",op2->tind);
+		bnf_term1->tind = op2->tind;
+		bnf_term1->bnf_factor_function=bnf_var_mul;
+		bnf_term1->tname=op2->tname;
+	};
+#endif
 	if(err_num) RT_MESG1(5531);
 	CHECK_TOK(554);
  };
