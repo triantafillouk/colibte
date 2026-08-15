@@ -411,7 +411,7 @@ tok_struct *new_tok()
 {
  tok_struct *tok;
  tok=(struct tok_struct *) malloc(sizeof(struct tok_struct));
- tok->tind=0;
+ tok->tind=-1;
  tok->tline=0;
  tok->tnum=0;
  tok->tname="empty";

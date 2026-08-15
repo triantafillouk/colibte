@@ -16,6 +16,7 @@ int err_assign_val();
 int err_assign_env();
 
 int assign_type_to=0;
+tok_struct *prev_token=NULL;
 
 void mesg_out(const char *fmt, ...)
 {
@@ -110,7 +111,7 @@ char * tok_info2(tok_struct *tok)
 
 #if	1
 #define	CHECK_TOK(pos) { xpos=pos ;}
-#define	NTOKEN_ERR(xxx)	{ tok++;show_type=';';CHECK_TOK(xxx);}
+#define	NTOKEN_ERR(xxx)	{ prev_token=tok;tok++;show_type=';';CHECK_TOK(xxx);}
 #else
 
 #define	CHECK_TOK(pos) { xpos=pos;\
@@ -639,13 +640,8 @@ int err_factor()
 #if	TBNF
 tok_struct *tok0_bnf=NULL;
 #if	TOPNUM
- if(tok->ttype==TOK_NUM && skip_next==1) { 
+ if((tok->ttype==TOK_NUM||tok->ttype==TOK_VAR) && skip_next==1) { 
  	NTOKEN_ERR(222);
-	skip_next=0;
-	RT_MESG1(222);
- };
- if(tok->ttype==TOK_VAR && skip_next==1) {
- 	NTOKEN_ERR(223);
 	skip_next=0;
 	RT_MESG1(222);
  };
@@ -833,7 +829,7 @@ tok_struct *tok0_bnf=NULL;
 			NTOKEN_ERR(4982);
 		};
 		if(tok->ttype==TOK_ASSIGN) {
-			// MESG("set normal assign [%s]",tok_info(tok));
+			MESG("set normal assign prok=[%s]",tok_info(prev_token));
 #if	TNOASGN
 			if(bnf_tok!=NULL) bnf_tok->bnf_factor_function=bnf_factor_assign_var_f;
 #endif
@@ -1637,24 +1633,22 @@ int err_num_term1()
  SHOW_STAGE(551);
  err_num=err_num_term2();
  if(err_num) RT_MESG1(err_num);
- MESG("term1: initial token %s",tok_info(tok));
- CHECK_TOK(552);
+ // MESG("term1: initial token %s",tok_info(tok));
+
  tok_struct *tok0=NULL;
+
  while (tok->tgroup==TOK_TERM1) {
- 	// tok1=tok;
- 	// tok->term_function = factor_funcs[tok->ttype];
 	tok0=tok;
-	
+	// MESG("	term1: tok0=[%s]",tok_info(tok0));
 #if	TNORMAL
 	set_term_function(tok,(TFunction)factor_funcs[tok->ttype]);
 #endif
-	CHECK_TOK(553);
 	NTOKEN_ERR(5531);
-	MESG("	term1: midle [%s]",tok_info(tok));
+	// MESG("	term1: midle [%s]",tok_info(tok));
 	tok_struct *op2 = tok;
 #if	TOPNUM
-	if(tok0->ttype==TOK_MUL && (op2->ttype==TOK_NUM || op2->ttype==TOK_VAR)){
-		MESG("	set skip_next!");
+	if((tok0->ttype==TOK_MUL || tok0->ttype==TOK_DIV) && (op2->ttype==TOK_NUM || op2->ttype==TOK_VAR)){
+		// MESG("	set skip_next!");
 		skip_next=1;
 	};
 #endif
@@ -1664,16 +1658,27 @@ int err_num_term1()
 	tok_struct *bnf_term1 = stack_push("num_term1",tok0,tok0->ttype);
 #if	TOPNUM
 	if(op2->ttype==TOK_NUM){
-		MESG("	term1: set num value to %f",op2->dval);
+		// MESG("	term1: set num value to %f",op2->dval);
 		bnf_term1->dval = op2->dval;
-		bnf_term1->bnf_factor_function=bnf_num_mul;
 		bnf_term1->tname="num";
+		// MESG("	term1: set function of [%s]",tok_info(bnf_term1));
+		if(bnf_term1->ttype==TOK_MUL) {
+			// MESG("	term1: set mul function!");
+			bnf_term1->bnf_factor_function=bnf_num_mul;
+		};
+		if(bnf_term1->ttype==TOK_DIV) {
+			// MESG("	term1: set div function!");
+			bnf_term1->bnf_factor_function=bnf_num_div;
+		};
 	};
 	if(op2->ttype==TOK_VAR){
-		MESG("	term1: set var index to %d",op2->tind);
+		// MESG("	term1: set var index to %d",op2->tind);
 		bnf_term1->tind = op2->tind;
-		bnf_term1->bnf_factor_function=bnf_var_mul;
 		bnf_term1->tname=op2->tname;
+
+		if(bnf_term1->ttype==TOK_MUL) bnf_term1->bnf_factor_function=bnf_var_mul;
+		if(bnf_term1->ttype==TOK_DIV) bnf_term1->bnf_factor_function=bnf_var_div;
+		// MESG("	term1: op [%s]",tok_info(bnf_term1));
 	};
 #endif
 	if(err_num) RT_MESG1(5531);
@@ -1686,60 +1691,41 @@ int err_num_term1()
 int err_num_expression()
 {
  TDSERR("num_expression");
- int expression_type=VTYPE_NUM;
-
- // init_expression_stack();
 
  xpos=561;
  SHOW_STAGE(561);
  // MESG("# start expression!");
+ // tok_struct *op2=tok;
  err_num = err_num_term1();
  if(err_num) return(err_num);
-
- expression_type=get_vtype();	// set local value
-
+ 
  while (tok->tgroup==TOK_TERM) {
-   CHECK_TOK(563);
     tok_struct *tok0=tok;
 #if	TBNF
 	// tok->bnf_group=tok->ttype;
 #endif
     if(tok->ttype==TOK_PLUS) {	/* TOK_PLUS  */
-		// tok->term_function = term_plus;
 #if	TNORMAL
 		set_term_function(tok,term_plus);
 #endif
 		NTOKEN_ERR(568);
+		// MESG("	num_expression: middle1  [%s]",tok_info(tok));
 		err_num=err_num_term1();
+		// MESG("	num_expression: middle2  [%s]",tok_info(tok));
+		// MESG("	push TOK_PLUS [%s]",tok_info(tok0));
 		stack_push("TOK_PLUS",tok0,tok0->ttype);
 
 		if(err_num) return (err_num);
-		CHECK_TOK(569);
 		simple=0;
 		/* check validity of operation combinations   */
-		if(expression_type==VTYPE_STRING) { /* catanate string */
-			if(get_vtype()) {
-			} else {
-				expression_type=get_vtype();
-			}
-		} else {
-		}
 	} else
 	if(tok->ttype==TOK_MINUS) {	/* TOK_MINUS  */
 #if	TNORMAL
 		set_term_function(tok,term_minus);
 #endif
 		NTOKEN_ERR(571);
-		if(expression_type==VTYPE_STRING) {	// operator on first chars of strings. numeric result
-			err_num=err_num_term1();
-			stack_push("TOK_MINUS string",tok0,tok0->ttype);
-			CHECK_TOK(573);
-			simple=0;
-		} else 	{
-			err_num=err_num_term1();
-			stack_push("TOK_MINUS num",tok0,tok0->ttype);
-			CHECK_TOK(574);
-		}
+		err_num=err_num_term1();
+		stack_push("TOK_MINUS",tok0,tok0->ttype);
 	};
  };
  // MESG_TOK_INFO("! end expression",tok);
@@ -1881,10 +1867,13 @@ int err_lexpression()
 			set_term_function(tok,assign_val);
 #endif
 			// MESG_TOK_INFO("# err_lexpression",tok);
+			MESG("	normal TOK_ASSIGN prev_token=[%s]",tok_info(prev_token));
+			if(prev_token->ttype==TOK_QUOTE) { set_error(tok,xpos,"NOASIGN");RT_MESG1(709);};
 			NTOKEN_ERR(710);
 			err_num=err_assign_val();
 #if	TBNF
 			tok_struct *tok0_bnf_assign=stack_push("TOK_ASSIGN 1",tok0,tok0->ttype);
+			
 			// MESG("TOK_ASSIGN: type=%d ind=%d",assign_type_to,tok0_bnf_assign->tind);
 			if(assign_type_to) {
 				if(assign_type_to==TOK_ASSIGN_ARRAY2) {
