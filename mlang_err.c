@@ -633,7 +633,7 @@ int err_factor()
  static int pre_symbol=0;
  TDSERR("factor");
  int lpar=0;
- MESG("-- err_factor skip=%d %s",skip_next,tok_info(tok));
+ // MESG("-- err_factor skip=%d %s",skip_next,tok_info(tok));
 #if	TNORMAL
  set_tok_function(tok,0);
 #endif
@@ -829,7 +829,7 @@ tok_struct *tok0_bnf=NULL;
 			NTOKEN_ERR(4982);
 		};
 		if(tok->ttype==TOK_ASSIGN) {
-			MESG("set normal assign prok=[%s]",tok_info(prev_token));
+			// MESG("set normal assign prok=[%s]",tok_info(prev_token));
 #if	TNOASGN
 			if(bnf_tok!=NULL) bnf_tok->bnf_factor_function=bnf_factor_assign_var_f;
 #endif
@@ -1227,7 +1227,7 @@ tok_struct *tok0_bnf=NULL;
 		RT_MESG1(487);
 #if	TOPNUM
 	case TOK_MUL:
-		MESG("TOK_MUL: skip_next=%d [%s]",skip_next,tok_info(tok));
+		// MESG("TOK_MUL: skip_next=%d [%s]",skip_next,tok_info(tok));
 		RT_MESG1(488);
 #endif
 	case TOK_QUOTE:	 { // string 
@@ -1596,7 +1596,7 @@ int err_num_term3(tok_struct *tok1)
 int err_num_term2()
 {
  TDSERR("num_term2");
- MESG("		err_num_term2:0 [%s]",tok_info(tok));
+ // MESG("		err_num_term2:0 [%s]",tok_info(tok));
  SHOW_STAGE(541);
  err_num = err_factor();
  if(err_num) RT_MESG1(err_num);
@@ -1867,7 +1867,7 @@ int err_lexpression()
 			set_term_function(tok,assign_val);
 #endif
 			// MESG_TOK_INFO("# err_lexpression",tok);
-			MESG("	normal TOK_ASSIGN prev_token=[%s]",tok_info(prev_token));
+			// MESG("	normal TOK_ASSIGN prev_token=[%s]",tok_info(prev_token));
 			if(prev_token->ttype==TOK_QUOTE) { set_error(tok,xpos,"NOASIGN");RT_MESG1(709);};
 			NTOKEN_ERR(710);
 			err_num=err_assign_val();
