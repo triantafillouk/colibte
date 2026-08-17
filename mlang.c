@@ -267,10 +267,69 @@ void eval_curl_match(tok_struct *tok)
 	};
 }
 
+int combine_tokens(tok_struct *prev_token,tok_struct *op2)
+{
+ int combined=0;
+ int ttype=op2->ttype;
+ if(prev_token->ttype==TOK_NUM) {
+	// MESG("	term1: set num value to %f",op2->dval);
+	// MESG("	term1: set function of [%s]",tok_info(bnf_term1));
+	if(ttype==TOK_MUL||ttype==TOK_DIV||ttype==TOK_PLUS||ttype==TOK_MINUS) {
+		// MESG("	term1: set mul function!");
+		prev_token->ttype = op2->ttype;
+		prev_token->tname="num";
+		prev_token->bnf_group = op2->ttype;
+		prev_token->tgroup = 19;
+		prev_token->function_index = op2->ttype;
+		switch(ttype){
+			case TOK_MUL:
+				prev_token->bnf_factor_function=bnf_num_mul;
+				combined=1;break;
+			case TOK_DIV:
+				prev_token->bnf_factor_function=bnf_num_div;
+				combined=1;break;
+			case TOK_PLUS:
+				prev_token->bnf_factor_function=bnf_num_plus;
+				combined=1;break;
+			case TOK_MINUS:
+				prev_token->bnf_factor_function=bnf_num_minus;
+				combined=1;break;
+		};
+	};
+ };
+ if(prev_token->ttype==TOK_VAR) {
+	if(ttype==TOK_MUL||ttype==TOK_DIV||ttype==TOK_PLUS||ttype==TOK_MINUS) {
+			prev_token->ttype = op2->ttype;
+			prev_token->bnf_group = op2->ttype;
+			prev_token->tgroup = 19;
+			prev_token->function_index = op2->ttype;
+			switch(ttype) {
+				case TOK_MUL:
+					prev_token->bnf_factor_function=bnf_var_mul;
+					combined=1;break;
+				case TOK_DIV:
+					prev_token->bnf_factor_function=bnf_var_div;
+					combined=1;break;
+				case TOK_PLUS:
+					prev_token->bnf_factor_function=bnf_var_plus;
+					combined=1;break;
+				case TOK_MINUS:
+					prev_token->bnf_factor_function=bnf_var_minus;
+					combined=1;break;
+			};
+		};
+ };
+ 
+ return combined;
+}
+
 tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 {
   // MESG("--[%s] try push %d [%s] exp=%d [%s]",check_buffer->b_fname,tok->pushed,title,exp_type,tok_info(tok));
 #if	TBNF
+#if	TOPNUM2
+	static tok_struct *prev_token=NULL;
+#endif
  // if(no_push) { MESG("stack_push:%s skip %s",title,tok_info(tok));return;};
  if(tok!=NULL) {
  	// MESG("stack_push! at %p",check_buffer->tok_table_bnf+check_buffer->tok_bnf_index);
@@ -284,7 +343,14 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 			MESG("skip left paranthesis!");
 			return NULL;
 		};
-		tok_struct *dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
+		tok_struct *dest;
+#if	TOPNUM2
+		if(prev_token!=NULL) 
+		if(prev_token->ttype==TOK_NUM||prev_token->ttype==TOK_VAR) {
+			if(combine_tokens(prev_token,tok)) return prev_token;
+		};
+#endif
+		dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
     	tok->pushed=check_buffer->tok_bnf_index;
 		// MESG("! push %10s as %d [%s] exp_type=%d",title,tok->pushed,tok_info(tok),exp_type);
@@ -307,6 +373,9 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 			dest->bnf_factor_function=bnf_functions[tok->tok_node->node_index].vfunction;
 		};
 		check_buffer->tok_bnf_index++;
+#if	TOPNUM2
+		prev_token = dest;
+#endif
 		return dest;
    }
  } else {

@@ -1645,8 +1645,8 @@ int err_num_term1()
 #endif
 	NTOKEN_ERR(5531);
 	// MESG("	term1: midle [%s]",tok_info(tok));
-	tok_struct *op2 = tok;
 #if	TOPNUM
+	tok_struct *op2 = tok;
 	if((tok0->ttype==TOK_MUL || tok0->ttype==TOK_DIV) && (op2->ttype==TOK_NUM || op2->ttype==TOK_VAR)){
 		// MESG("	set skip_next!");
 		skip_next=1;
