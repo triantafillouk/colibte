@@ -1655,8 +1655,8 @@ int err_num_term1()
 	err_num=err_num_term2();
 	// tok1 = tok;
 	// MESG("-- push term1 function skip=%d [%s]",skip_next,tok_info(tok0));
-	tok_struct *bnf_term1 = stack_push("num_term1",tok0,tok0->ttype);
 #if	TOPNUM
+	tok_struct *bnf_term1 = stack_push("num_term1",tok0,tok0->ttype);
 	if(op2->ttype==TOK_NUM){
 		// MESG("	term1: set num value to %f",op2->dval);
 		bnf_term1->dval = op2->dval;
@@ -1680,6 +1680,8 @@ int err_num_term1()
 		if(bnf_term1->ttype==TOK_DIV) bnf_term1->bnf_factor_function=bnf_var_div;
 		// MESG("	term1: op [%s]",tok_info(bnf_term1));
 	};
+#else
+	stack_push("num_term1",tok0,tok0->ttype);
 #endif
 	if(err_num) RT_MESG1(5531);
 	CHECK_TOK(554);

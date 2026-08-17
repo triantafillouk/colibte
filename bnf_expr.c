@@ -5185,6 +5185,7 @@ VFunction factor_bnf_funcs[] = {
 	bnf_update_val,		// TOK_DECREASE_ARRAY1,
 	bnf_update_val,		// TOK_DECREASE_ARRAY2,
 	bnf_factor_negate,	// TOK_NEGATE,
+	bnf_factor_none,	// TOK_OPNUM,
 	bnf_factor_none		// TOK_OTHER,
 };
 
@@ -5284,6 +5285,7 @@ int factor_bnf_type[] = {
 	TOK_DECREASE_ARRAY1,
 	TOK_DECREASE_ARRAY2,
 	TOK_NEGATE,
+	TOK_OPNUM,
 	0		// TOK_OTHER,
 };
 

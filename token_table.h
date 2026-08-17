@@ -100,5 +100,6 @@ TOK_TAB token_table[]= {
 	{TOK_DECREASE_ARRAY1	,"A1-",0},
 	{TOK_DECREASE_ARRAY2	,"A2-",0},
 	{TOK_NEGATE,	"Neg",0},
+	{TOK_OPNUM,		"OPNUM",TOK_TERM},
 	{TOK_OTHER			,"OTHER",0}
 };

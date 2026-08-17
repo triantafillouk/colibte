@@ -279,7 +279,7 @@ int combine_tokens(tok_struct *prev_token,tok_struct *op2)
 		prev_token->ttype = op2->ttype;
 		prev_token->tname="num";
 		prev_token->bnf_group = op2->ttype;
-		prev_token->tgroup = 19;
+		prev_token->tgroup = TOK_OPNUM;
 		prev_token->function_index = op2->ttype;
 		switch(ttype){
 			case TOK_MUL:
@@ -1614,6 +1614,9 @@ char * tok_info(tok_struct *tok)
 			};
 			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] rows=%d cols=%d bnf=%2d fi=%d",
 				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,rows,cols,tok->bnf_group,tok->function_index);
+		}  else	if(tok->tgroup==TOK_OPNUM) { 
+			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
+			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %5.1f bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval,tok->bnf_group,tok->function_index);
 		} else 
 		if(tok->ttype==TOK_SHOW) { snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [:] bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->bnf_group,tok->function_index);
 		} else
@@ -1629,7 +1632,9 @@ char * tok_info(tok_struct *tok)
 		} else if(tok->ttype==TOK_QUOTE) {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
 			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\" bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->bnf_group,tok->function_index);
-		} else if(tok->ttype==TOK_PROC) { 
+		}		
+		
+		else if(tok->ttype==TOK_PROC) { 
 			if(tok->proc_buffer == NULL) 
 				snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\" NULL proc bnf=%2d fi=%d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->bnf_group,tok->function_index);
 			else {

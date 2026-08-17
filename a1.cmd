@@ -1,9 +1,10 @@
 
+cls
 a=1
-fori(i=0;100;1){
-	a=i
-	a*=2: 198.0
+max=100000000
+fori(i=0;max;1){
+	a=i+2.2
+	a*=2
 }
 
-b="b1"
-b*=5: ,err mulby operation not supported!
+print("max=",max," a=",a)
