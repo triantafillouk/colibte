@@ -804,8 +804,7 @@ inline static void bnf_var_div_nump()
 inline static void bnf_var_nn_plus()
 {
  MVAR *varb = get_left_slot(tok->tind);
- bnf_var->dval=bnf_var->var_pointer->dval+varb->dval;
- bnf_var->var_type=VTYPE_NUM;
+ bnf_var->dval+=varb->dval;
 }
 
 inline static void bnf_var_mul()
@@ -924,8 +923,8 @@ inline static void bnf_var_mul()
 inline static void bnf_var_pn_plus()
 {
  MVAR *varb = get_left_slot(tok->tind);
- bnf_var->dval+=varb->dval;
- // bnf_var->var_type=VTYPE_NUM;
+ bnf_var->dval=bnf_var->var_pointer->dval+varb->dval;
+ bnf_var->var_type=VTYPE_NUM;
 }
 
 inline static void bnf_var_nn_minus()
@@ -955,13 +954,13 @@ inline static void bnf_var_plus()
  	if(vara->var_type==VTYPE_NUM) {
 		bnf_var->dval=vara->dval + varb->dval;
 		bnf_var->var_type=VTYPE_NUM;
-#if	0
+#if	1
 		if(!vara_type_is_pointer)
 			set_bnf_function(tok,"nn_plus",bnf_var_nn_plus);
 		if(vara_type_is_pointer)
 			set_bnf_function(tok,"pn_plus",bnf_var_pn_plus);
-		return;
 #endif
+		return;
 	} else if(vara->var_type==VTYPE_STRING) {	// string+num
 		char svalue[MAXLLEN];
 		double l0 = trunc(varb->dval);
