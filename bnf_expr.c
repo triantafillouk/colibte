@@ -268,6 +268,7 @@ inline static void bnf_factor_var()
 	next_var("var");
 	bnf_var->var_pointer=get_left_slot(tok->tind);
 	bnf_var->var_type=VTYPE_POINTER;
+
 	// bnf_var->var_alloced=0;
 	// MESG(";- factor_var: put var %s tind=%d at var@=%d [%s]",tok->tname,tok->tind,VARIND,tok_info(tok));
 }
@@ -673,6 +674,21 @@ inline static void bnf_num_plus()
 	// MESG("	var@ %d val=%f",VARIND,bnf_var->dval);
 	return;
  };
+ if(vara->var_type==VTYPE_STRING) {
+		char svalue[MAXLLEN];
+		double l0 = trunc(valb);
+		int stat; 
+
+		if(l0 == valb) stat=snprintf(svalue,sizeof(svalue),"%s%.0f",vara->sval,l0);
+		else stat=snprintf(svalue,sizeof(svalue),"%s%f",vara->sval,valb);
+
+		if(stat>MAXLLEN) MESG("truncated 2");
+		// if(vara->var_alloced==1) free(vara->sval);
+		bnf_var->sval=strdup(svalue);
+		bnf_var->var_type=VTYPE_STRING;
+		bnf_var->var_alloced=1;
+ 	return;
+ };
  if(vara->var_type==VTYPE_ARRAY || vara->var_type==VTYPE_AMIXED){
 	array_dat *array1 = vara->adat;
 	array_dat *result_array =dup_array_add1(array1,valb);
@@ -682,7 +698,8 @@ inline static void bnf_num_plus()
 	// MESG("	array div by num!");
 	return;
  };
- syntax_error(1122,"addition not supported");
+ MESG("Addition error va type=%d bnf_var type %d [%s]",vara->var_type,bnf_var->var_type,tok_info(tok));
+ syntax_error(11220,"addition not supported");
 }
 
 inline static void bnf_num_minus()
@@ -710,7 +727,9 @@ inline static void bnf_num_minus()
 	// MESG("	array div by num!");
 	return;
  };
- syntax_error(1122,"addition not supported");
+
+ MESG("num_minus: var@=%d a type=%d [%s]",VARIND,vara->var_type,tok_info(tok));
+ syntax_error(11221,"minus not supported");
 }
 
 
@@ -739,7 +758,7 @@ inline static void bnf_num_mul()
 	// MESG("	array div by num!");
 	return;
  };
- syntax_error(1122,"multipy not supported");
+ syntax_error(1123,"multipy not supported");
 }
 
 inline static void bnf_num_div()
@@ -766,7 +785,7 @@ inline static void bnf_num_div()
 	// MESG("	array div by num!");
 	return;
  };
- syntax_error(1121,"divide not supported");
+ syntax_error(11210,"divide not supported");
 }
 
 inline static void bnf_var_mul_num()
@@ -942,7 +961,7 @@ inline static void bnf_var_pn_minus()
 
 inline static void bnf_var_plus()
 {
- // MESG(";bnf_factor_plus: var@=%d [%s]",VARIND,tok_info(tok));
+ // MESG(";bnf_var_plus: var@=%d [%s]",VARIND,tok_info(tok));
  MVAR *varb = get_left_slot(tok->tind);
 
  MVAR *vara = bnf_var;
@@ -1061,18 +1080,18 @@ inline static void bnf_var_plus()
 	};
  };
 	// MESG("factor_plus: vara=%d varb=%d",vara->var_type,varb->var_type);
- 	syntax_error(1105,"plus error");
+ 	syntax_error(1105,"var_plus error");
 }
 
 inline static void bnf_var_minus()
 {
- // MESG(";bnf_factor_minus: var@=%d [%s]",VARIND,tok_info(tok));
+ // MESG(";bnf_var_minus: var@=%d [%s]",VARIND,tok_info(tok));
  MVAR *varb = get_left_slot(tok->tind);
- prev_var("minus");
  MVAR *vara = bnf_var;
+
  int vara_type_is_pointer=0;
  if(vara->var_type==VTYPE_POINTER) { vara=bnf_var->var_pointer;vara_type_is_pointer=1;};
- // MESG(";factor_minus: atype=%d btype=%d [%s]",vara->var_type,varb->var_type,tok_info(tok));
+ // MESG(";factor_minus: atype=%d btype=%d bind=%d [%s]",vara->var_type,varb->var_type,tok->tind,tok_info(tok));
  if(varb->var_type==VTYPE_NUM) {
  	if(vara->var_type==VTYPE_NUM) {
 		bnf_var->dval=vara->dval - varb->dval;
@@ -1145,7 +1164,8 @@ inline static void bnf_var_minus()
 		return;
 	};
  };
- 	syntax_error(1107,"minus error");
+	MESG("Substruction error a type=%d,b type=%d [%s]",vara->var_type,varb->var_type,tok_info(tok));
+ 	syntax_error(1107,"substruction error");
 }
 
 inline static void bnf_var_div()
@@ -1560,7 +1580,7 @@ inline static void bnf_factor_bigger()
 		bnf_var->var_type=VTYPE_NUM;
 		return;
 	};
-	syntax_error(1121,"bigger error!");
+	syntax_error(11211,"bigger error!");
 }
 
 inline static void bnf_factor_smallereq()
@@ -1584,7 +1604,7 @@ inline static void bnf_factor_smallereq()
 		bnf_var->var_type=VTYPE_NUM;
 		return;
 	};
- 	syntax_error(1123,"<= error!");
+ 	syntax_error(1124,"<= error!");
 }
 
 inline static void bnf_factor_biggereq()

@@ -630,8 +630,8 @@ int skip_next=0;
 
 int err_factor()
 {
- static int pre_symbol=0;
  TDSERR("factor");
+ static int pre_symbol=0;
  int lpar=0;
  // MESG("-- err_factor skip=%d %s",skip_next,tok_info(tok));
 #if	TNORMAL
@@ -665,6 +665,7 @@ tok_struct *tok0_bnf=NULL;
  	case TOK_PLUS:
 	case TOK_MINUS:
 		pre_symbol++;
+	// MESG("err_factor: pre_symbol=%d [%s",pre_symbol,tok_info(tok0));
  };
  NTOKEN_ERR(473);
  // MESG("	>> : next tok (%s)",tok_info(tok));
@@ -1210,6 +1211,7 @@ tok_struct *tok0_bnf=NULL;
 		RT_MESG1(444);;	
 #endif
 	case TOK_NUM:
+ 		// MESG("err_factor: NUM set pre_symbol to 0 [%s]",tok_info(tok0));
 		pre_symbol=0;
 		ex_nums++;
 		xpos=4871;
@@ -1258,17 +1260,19 @@ tok_struct *tok0_bnf=NULL;
 			err_factor();
 			// MESG("	minus set to negate");
 #if	TBNF
+			// MESG("push negate!!!!!");
 			tok0_bnf=stack_push("negate",tok0,TOK_NEGATE);
 #endif
 		} else {
 #if	TBNF
+			// MESG("push minus!!!!!");
 			tok0_bnf=stack_push("minus",tok0,tok0->ttype);
 #endif
 			err_factor();
 		};
 		RT_MESG1(4911);
 	case TOK_PLUS:
-		// MESG("tok_plus: %d",pre_symbol);
+		MESG("tok_plus: %d",pre_symbol);
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
 #endif

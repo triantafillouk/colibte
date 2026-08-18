@@ -267,10 +267,12 @@ void eval_curl_match(tok_struct *tok)
 	};
 }
 
+
 int combine_tokens(tok_struct *prev_token,tok_struct *op2)
 {
  int combined=0;
  int ttype=op2->ttype;
+
  if(prev_token->ttype==TOK_NUM) {
 	// MESG("	term1: set num value to %f",op2->dval);
 	// MESG("	term1: set function of [%s]",tok_info(bnf_term1));
@@ -347,7 +349,16 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 #if	TOPNUM2
 		if(prev_token!=NULL) 
 		if(prev_token->ttype==TOK_NUM||prev_token->ttype==TOK_VAR) {
-			if(combine_tokens(prev_token,tok)) return prev_token;
+			// MESG("	push: check combine: exp_type=%d",exp_type);
+			if(exp_type!=TOK_NEGATE) {
+				if(combine_tokens(prev_token,tok)) return prev_token;
+			} else {
+				// MESG("Negate: type1=%d type2=%d",prev_token->ttype,tok->ttype);
+				if(prev_token->ttype==TOK_NUM) {
+					prev_token->dval = - prev_token->dval;
+					return prev_token;
+				};
+			};
 		};
 #endif
 		dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
