@@ -160,8 +160,8 @@ void efree(void *p,char *des)
 
 void  FError(const char *s)
 {
-	msg_line("File: [%s] %s errno=%d",cbfp->b_fname,s,errno);
-	SYS_ERROR("File: [%s] %s errno=%d",cbfp->b_fname,s,errno);
+	msg_line("File: [%s][%s] %s errno=%d",cbfp->b_dname,cbfp->b_fname,s,errno);
+	// SYS_ERROR("File: [%s] %s errno=%d",cbfp->b_fname,s,errno);
 }
 
 
@@ -2005,8 +2005,10 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
    int status=0;
    int file;
    int temp_used=0;
-	// MESG("ifile0 \"%s\"",bf->b_fname);
+   chdir(bf->b_dname);
+	// MESG("ifile0:1 ir_flag=%d b_flag=%d \"%s\" ",ir_flag,bf->b_flag,name);
 	bf->line_from=0;
+
 	if( bf->b_flag & FSDIRED ) {
 		int i;
 		i=insert_dir(bf,0);
@@ -2014,7 +2016,8 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 		return(i);
 	};
    status=stat(name,&st);
-	// MESG_time_start("ifile0: %s",bf->b_fname);
+	// MESG("ifile0:2 status=%d",status);
+	// MESG_time_start("ifile0: status=%d %s",status,bf->b_fname);
    if(status==-1 && errno==ENOENT)
    {
 	if(name[0]!=CHR_LBRA) {
@@ -2061,7 +2064,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 			 bf->b_state |= FS_VIEW;
 		};
    };
-
+	// bf->b_flag &= ~FSMMAP;
 	// if(bf->b_flag & FSMMAP) MESG("ifile0: memory mapped file %s!",bf->b_fname);
 	if(bf->bom_type != 0) {	/* no mmap */
 		bf->b_flag &= ~FSMMAP;
@@ -2078,6 +2081,21 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 
 	// re-stat the file in case it was created
 	status=fstat(file,&st);
+#if	0
+	MESG("ifile0:5	status=%d mode: %X",status,st.st_mode); 
+		MESG("	S_IRWXU=%X",st.st_mode & S_IRWXU);
+		MESG("	S_IRUSR=%X",st.st_mode & S_IRUSR);
+		MESG("	S_IWUSR=%X",st.st_mode & S_IWUSR);
+		MESG("	S_IRWXG=%X",st.st_mode & S_IRWXG);
+		MESG("	S_IRGRP=%X",st.st_mode & S_IRGRP);
+		MESG("	S_IXGRP=%X",st.st_mode & S_IXGRP);
+		MESG("	S_IRWXO=%X",st.st_mode & S_IRWXO);
+		MESG("	S_IROTH=%X",st.st_mode & S_IROTH);
+		MESG("	S_IWOTH=%X",st.st_mode & S_IWOTH);
+		MESG("	S_IXOTH=%X",st.st_mode & S_IXOTH);
+		MESG("	S_ISUID=%X",st.st_mode & S_ISUID);
+		MESG("	S_ISGID=%X",st.st_mode & S_ISGID);
+#endif
 	if(status==0) {
 		bf->FileMode=st.st_mode;
 	} else {
@@ -2153,14 +2171,16 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
 	    if(to_read>0)
 		{
 		 	bf->buffer=(char*)mmap(0,to_read,
-					PROT_READ
-	//				|(PROT_WRITE)
-				    ,MAP_SHARED
+					PROT_WRITE
+					// PROT_NONE
+				    ,MAP_PRIVATE
 	#if	LINUX
 					|MAP_NONBLOCK
 	#endif
-					|MAP_NORESERVE,file,0);
+					// |MAP_NORESERVE
+					,file,0);
 		 if(bf->buffer==(char*)MAP_FAILED) {
+			// MESG("ifile0: MAP_FAILED!");
 		    FError(name);
 		    EmptyText(bf);
 			close(file);
