@@ -492,6 +492,7 @@ int load_keys()
 
 	free_sarray(a_as);
  };
+ fclose(f1);
 
  return 1;
 }

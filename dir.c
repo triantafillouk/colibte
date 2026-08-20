@@ -18,6 +18,9 @@
 #define FTYPE_LINK		1
 #define FTYPE_DIR		2
 #define FTYPE_DIRLINK	3
+#define	FTYPE_CFILE		4
+#define	FTYPE_SOCKET	5
+#define	FTYPE_FIFO		6
 
 #define	FILE_VIEW	0
 #define	FILE_EXEC	1
@@ -2122,7 +2125,27 @@ int dir_getfile(char *fname,int flag)
  if(is_link)
  {
 	if(S_ISDIR(t.st_mode)) return FTYPE_DIRLINK;
-	else return FTYPE_NORMAL;
+	else {
+#if	0
+		 switch (t.st_mode & S_IFMT) {
+           case S_IFBLK:  MESG("block device     %X",t.st_mode & S_IFMT);            break;
+           case S_IFCHR:  MESG("character device %X",t.st_mode & S_IFMT);        break;
+           case S_IFDIR:  MESG("directory        %X",t.st_mode & S_IFMT);               break;
+           case S_IFIFO:  MESG("FIFO/pipe        %X",t.st_mode & S_IFMT);               break;
+           case S_IFLNK:  MESG("symlink          %X",t.st_mode & S_IFMT);                 break;
+           case S_IFREG:  MESG("regular file     %X",t.st_mode & S_IFMT);            break;
+           case S_IFSOCK: MESG("socket           %X",t.st_mode & S_IFMT);                  break;
+           default:       MESG("unknown?         %X",t.st_mode & S_IFMT);                break;
+           }
+#endif
+		// MESG("	is_link: %X %X %X",t.st_mode & S_IFMT,S_IFCHR,S_IFLNK);
+		// MESG("	fname=[%s] f1=[%s]",fname,linked_name);
+		if((t.st_mode & S_IFMT) & S_IFCHR) return FTYPE_CFILE;
+		if((t.st_mode & S_IFMT) & S_IFLNK) return FTYPE_LINK;
+		if((t.st_mode & S_IFMT) & S_IFREG) return FTYPE_NORMAL;
+		
+		return FTYPE_NORMAL;
+	}
  };
  
  return(ftype); 
