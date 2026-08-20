@@ -2005,6 +2005,7 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
    int status=0;
    int file;
    int temp_used=0;
+	// MESG("ifile0:");
    chdir(bf->b_dname);
 	// MESG("ifile0:1 ir_flag=%d b_flag=%d \"%s\" ",ir_flag,bf->b_flag,name);
 	bf->line_from=0;

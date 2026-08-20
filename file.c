@@ -1528,14 +1528,14 @@ int file_read(FILEBUF *bp, char *fname)
  discmd=0;
  // MESG("file_read: fname=[%s] view_mode=%d",fname,bp->view_mode);
  if(fname[0]!=CHR_LBRA) if(!execmd && discmd) msg_line(" reading file:[%s]",fname);
-
  /* clear the buffer */
  if(empty_filebuf(bp)!=TRUE) return FALSE;
 
  if(fname!=bp->b_fname) strlcpy(bp->b_fname, fname,MAXFLEN);
+ 
  if(! ifile(bp,fname,0) && fname[0]!=CHR_LBRA) {
  	discmd=display_messages;
-// 	msg_line("No lines for file %s",fname);
+	msg_line("No lines for file %s",fname);
 	return(FALSE);
  };
 

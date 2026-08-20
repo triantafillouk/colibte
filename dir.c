@@ -476,14 +476,26 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
 
  // Find how many files in the dir
  while((df1=readdir(d1))!=NULL) num_of_files++;
+ // MESG("scandir2: num=%d",num_of_files);
  namelist = (struct kdirent **)malloc(((num_of_files+1)*sizeof(struct kdirent *)));
  // MESG("number_of_files %ld size %d",num_of_files,((num_of_files+1)*sizeof(struct kdirent *)));
  rewinddir(d1);
  // show_time("scan_dir: start",0);
- for(i=0;;i++) {
+ for(i=0;i<num_of_files;i++) {
  	df1=readdir(d1);
 
-	if(df1==NULL) { closedir(d1);break;};
+	if(df1==NULL) { 
+		if(i==0) { // could not rewind the dir!!
+			closedir(d1);
+			d1=opendir(dirname);
+			df1=readdir(d1);
+		};
+		if(df1==NULL) {
+			num_of_files=i;
+			closedir(d1);
+			break;
+		};
+	};
 	// MESG(" - %3d: %5d l=%d t=%d %d %d [%s]",i,df1->d_ino,df1->d_reclen,df1->d_type,sizeof(struct stat),sizeof(struct kdirent),df1->d_name);
 	// MESG(" - %3d: %5d l=%d t=%d 0x%X 0x%X [%s]",i,df1->d_ino,df1->d_reclen,df1->d_type,DT_DIR << 12,S_IFDIR,df1->d_name);
 	int len=strlen(df1->d_name)+1;
@@ -2417,8 +2429,10 @@ if((entry->st_mode & S_IXUSR \
 // insert file list in an editor window
 int insert_dir(FILEBUF *buf_dir,int retain)
 {
+ // MESG("insert_dir:");
  FILEBUF *oldbuf=current_file_buffer();
  int i;
+ // MESG("buf_dir [%s] old [%s]",buf_dir->b_fname,oldbuf->b_fname);
  struct kdirent *ff;
  struct kdirent **namelist=NULL;
  char *d1;
@@ -2429,11 +2443,9 @@ int insert_dir(FILEBUF *buf_dir,int retain)
 
  set_current_file_buffer(buf_dir);
  d1 = buf_dir->b_dname;
- // MESG("insert_dir:[%s]",d1);
  alist *dir_list_str=new_list(0,"dir_as_list");
  if(buf_dir->cdir == NULL) { error_line("cdif is null");return 0;};
  buf_dir->cdir->dir_name = strdup(buf_dir->b_dname);
-
 
  EmptyText(buf_dir);
  set_hmark(1,"insert_dir");
