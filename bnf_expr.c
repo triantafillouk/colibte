@@ -3424,24 +3424,28 @@ inline static void bnf_exec_function(FILEBUF *proc_buffer,int nargs)
 {
 	MVAR *old_symbol_table=current_stable;
 	// MESG("## bnf_exec_function:[%s] var@=%d args=%d",proc_buffer->b_fname,VARIND,nargs);
-
+	// int i0=VARIND;
 	current_stable = push_args_bnf(nargs,proc_buffer->symbol_tree->items);
 	tok_struct *after_proc=tok; 
 
 	tok=proc_buffer->tok_table_bnf;	/* start of function  */
 	// MESG("bnf_exec_function:start [%s]",tok_info(tok));
-
 	skip_args1(nargs);
-
+	// if(i0!=VARIND) MESG("	bnf_function:1 var @%d %d",i0,VARIND);
+#if	TNORMAL
 	NTOKEN2;
+#endif
 	// MESG("-bnf_exec_function: at start of block: [%s] active=%d",tok_info(tok),current_active_flag);
 	// current_active_flag=1;
-			if(execmd) bnf_block1();
-			else bnf_block1_break();
+			// if(execmd) 
+				bnf_block1();
+			// else 
+				// bnf_block1_break();
 	// show_result();
 	delete_symbol_table(current_stable,proc_buffer->symbol_tree->items,nargs);
 	current_stable=old_symbol_table;
 
+	// if(i0!=VARIND) MESG("	bnf_function:2 var @%d %d",i0,VARIND);
 	tok=after_proc;
 	// MESG("	continue after function to [%s]",tok_info(tok));
 }
@@ -3466,8 +3470,13 @@ inline static void bnf_factor_proc()
 	// MESG("factor_proc: tok0 [%d %s] args=%d",tok0->tnum,tok0->tname,tok0->tind);
 	// MESG("factor_proc: tok  [%d %s] %d ",tok->tnum,tok->tname,tok->tind);
 
-	bnf_exec_function(tok0->proc_buffer,tok0->t_nargs);
-	memmove(result_var,bnf_var,sizeof(MVAR));
+	bnf_exec_function(tok->proc_buffer,tok->t_nargs);
+#if	1
+	// if(bnf_var==result_var) 
+		// MESG("## factor_proc: res@ %d %d [%s]",(int)(result_var-bnf_vars),VARIND,tok_info(tok));
+	// else
+		memmove(result_var,bnf_var,sizeof(MVAR));
+#endif
 #if	TPROFILE
 	var_index -= (int)(bnf_var-result_var);
 #endif

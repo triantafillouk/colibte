@@ -462,21 +462,11 @@ curl_struct *new_curl(int level,int mline, struct _el *el)
 
 inline static void  skip_args1(int nargs)
 {
-#if    1
+#if    TNORMAL
  if(nargs) tok +=1+2*nargs;
  else tok+=2;
 #else
- // static int skips[]={2,3,5,7,9,11};
- // tok += skips[nargs];
- // MESG("skip_args1: va!=symbols! ++++++++++");
- NTOKEN2; /* skip name */
-	int i;
-	for(i=0;i<nargs;i++) {
-		NTOKEN2;	/* arg */
-		if(tok->ttype==TOK_RPAR) break;
-		NTOKEN2;	/* skip separator  */
-	};
- NTOKEN2;	/* skip right parenthesis  */
+ tok +=2+2*nargs;
 #endif
 }
 
@@ -679,9 +669,10 @@ MVAR *new_symbol_table(int const size)
  // int size_call_stack_used = call_stack_used - call_stack;
  // MESG("		new_symbol_table: at %lld",td-call_stack);
  call_stack_used += size;
+#if	0
  if(max_call_stack_end<call_stack_used) {
  	max_call_stack_end=call_stack_used;
-
+#endif
 	if(call_stack_used>call_stack_available) {
 		if(execmd) {
 			fprintf(stderr,"new_symbol_table: overflow: available=%ld required=%ld\n",call_stack_available-call_stack,call_stack_used-call_stack);
@@ -692,8 +683,9 @@ MVAR *new_symbol_table(int const size)
 		set_error(tok,301,"call_stack overflow");
 		return NULL;
 	};
+#if	0
  }
-
+#endif
  // MESG("Initialize new_symbol_table: size %d",size);
  init_vars(td,size);
  return td;
@@ -767,7 +759,7 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 
 void init_stack()
 {
-	// MESG("init_stack:");
+	MESG("init_stack:");
 	delete_symbol_table(call_stack,call_stack_used-call_stack,0);
 	// MESG("init_stack:end ok!");
 }
@@ -1286,10 +1278,10 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	if(err_num) { execmd=0;return(0);};
 	// MESG("	comput_block: start=%d",start);
 	if(start || current_stable==NULL) {
-		// MESG("new current_stable with %d items",use_fp->symbol_tree->items);
+		MESG("new current_stable with %d items",use_fp->symbol_tree->items);
 		local_symbols=new_symbol_table(use_fp->symbol_tree->items);
 	} else {
-		// MESG("use current_stable new items = %d",use_fp->symbol_tree->items);
+		MESG("use current_stable new items = %d",use_fp->symbol_tree->items);
 		local_symbols=realloc_symbol_table(current_stable,use_fp->symbol_tree->items,old_items);
 	}
 	current_stable=local_symbols;
