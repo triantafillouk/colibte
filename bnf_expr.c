@@ -3395,7 +3395,7 @@ void bnf_dir_type()
 	MESG("bnf_dir_type TBD");
 }
 
-inline static MVAR * push_args_bnf(int nargs,int vars_num)
+inline static MVAR * push_args_bnf(int const nargs,int const vars_num)
 {
  // MESG("# push_args_bnf: nargs=%d vars_num=%d",nargs,vars_num);
 
@@ -3404,8 +3404,7 @@ inline static MVAR * push_args_bnf(int nargs,int vars_num)
 
  MVAR *va_i=va;
 
- int i=0;
- for(;i<nargs;i++,va_i++)
+ for(;va_i<va+nargs;va_i++)
  {
 	NTOKEN2;	/* skip proc name of separator  */
 	// MESG("	[%2d] before var@=%d [%s]",i,VARIND,tok_info(tok));
@@ -3420,7 +3419,7 @@ inline static MVAR * push_args_bnf(int nargs,int vars_num)
 }
 
 
-inline static void bnf_exec_function(FILEBUF *proc_buffer,int nargs)
+inline static void bnf_exec_function(FILEBUF *proc_buffer,int const nargs)
 {
 	MVAR *old_symbol_table=current_stable;
 	// MESG("## bnf_exec_function:[%s] var@=%d args=%d",proc_buffer->b_fname,VARIND,nargs);
@@ -3472,7 +3471,7 @@ inline static void bnf_factor_proc()
 
 	bnf_exec_function(tok->proc_buffer,tok->t_nargs);
 #if	1
-	// if(bnf_var==result_var) 
+	// if(bnf_var!=result_var) 
 		// MESG("## factor_proc: res@ %d %d [%s]",(int)(result_var-bnf_vars),VARIND,tok_info(tok));
 	// else
 		memmove(result_var,bnf_var,sizeof(MVAR));

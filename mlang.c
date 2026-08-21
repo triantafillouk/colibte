@@ -406,7 +406,7 @@ void delete_type_tree(BTREE *type_tree)
 
 array_dat *transpose(array_dat *array1);
 
-inline void init_vars(MVAR *head,int size)
+inline void init_vars(MVAR *head,int const size)
 {
  // initialize as numeric
  // MESG("init_vars: %d",size);
@@ -460,7 +460,7 @@ curl_struct *new_curl(int level,int mline, struct _el *el)
  return(lcurl);
 }
 
-inline static void  skip_args1(int nargs)
+inline static void  skip_args1(int const nargs)
 {
 #if    TNORMAL
  if(nargs) tok +=1+2*nargs;
@@ -691,7 +691,7 @@ MVAR *new_symbol_table(int const size)
  return td;
 }
 
-MVAR *realloc_symbol_table(MVAR *td,int size,int old_size)
+MVAR *realloc_symbol_table(MVAR *td,int const size,int const old_size)
 {
   MESG("realloc_symbol_table: ---------------");
   call_stack_used += size-old_size;
@@ -712,8 +712,8 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 {
  // MESG("delete_symbol_table: << nargs=%d size=%d",nargs,size);
  MVAR *sslot=td;
- int i=0;
- for(;i<nargs;i++,sslot++)
+
+ for(;sslot<td+nargs;sslot++)
  {
 	// string arguments are dublicated, must be freed
  	if(sslot->var_type==VTYPE_STRING) {
@@ -725,8 +725,7 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 	};
  };
 
- // for(i=nargs;i<size;i++) 
- for(;i<size;i++,sslot++) 
+ for(;sslot<td+size;sslot++)
  {
 	// MESG("dst vars %d",i);
 	if(sslot->var_type==VTYPE_STRING) {
