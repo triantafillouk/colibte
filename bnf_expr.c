@@ -675,7 +675,7 @@ inline static void bnf_num_plus()
 {
  double valb = tok->dval;
  MVAR *vara = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
- MESG("	bnf_num_plus: vara t=%d bnf_var t=%d [%s]",vara->var_type, bnf_var->var_type,tok_info(tok));
+ // MESG("	bnf_num_plus: vara t=%d bnf_var t=%d [%s]",vara->var_type, bnf_var->var_type,tok_info(tok));
 
  if(vara->var_type==VTYPE_NUM) {
 
