@@ -9,7 +9,7 @@ function fact(num)
  } else {
 	# n1=num-1
 	# f=num*fact(n1)
-	return(num*fact(num-1))
+	return(fact(num-1)*num)
 	# return(f)
  }
 }

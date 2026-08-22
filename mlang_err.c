@@ -1921,7 +1921,7 @@ int err_lexpression()
 		case TOK_INCREASEBY: {
 			// MESG("! TOK_INCREASEBY: asg_type=%d tok=[%s]",assign_type_to,tok_info(tok));
 #if	TNORMAL
-			set_term_function(tok,(TFunction)increaseby);
+			set_term_function(tok,(TFunction)increase_by);
 #endif
 			// tok->tname = "+=";
 			// tok0=tok;
@@ -1964,7 +1964,7 @@ int err_lexpression()
 			// tok->term_function = mulby;
 			// MESG_TOK_INFO("# err_lexpression",tok);
 #if	TNORMAL
-			set_term_function(tok,(TFunction)mulby);
+			set_term_function(tok,(TFunction)mul_by);
 #endif
 			NTOKEN_ERR(710);
 			err_num=err_mulby();
@@ -2002,7 +2002,7 @@ int err_lexpression()
 			// tok->term_function = mulby;
 			// MESG_TOK_INFO("# err_lexpression",tok);
 #if	TNORMAL
-			set_term_function(tok,(TFunction)divby);
+			set_term_function(tok,(TFunction)div_by);
 #endif
 			NTOKEN_ERR(711);
 			err_num=err_mulby();
@@ -2038,7 +2038,7 @@ int err_lexpression()
 		};
 		case TOK_DECREASEBY: {
 #if	TNORMAL
-			set_term_function(tok,(TFunction)decreaseby);
+			set_term_function(tok,(TFunction)decrease_by);
 #endif
 			// tok->tname = "-=";
 			// tok0=tok;
