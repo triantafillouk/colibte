@@ -1871,7 +1871,7 @@ void highlight_jscript(int c)
 		if(hquotem==0) { 
 			hstate=HS_PREVSLASH;
 			// hquotem=H_REGEX1;
-			hquotem=H_QUOTE11;
+			// hquotem=H_QUOTE11;
 		};
 		break;
 	case '\\':{
