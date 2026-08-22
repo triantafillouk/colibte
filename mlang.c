@@ -266,7 +266,7 @@ void eval_curl_match(tok_struct *tok)
 	};
 }
 
-
+#if	TBNF
 int combine_tokens(tok_struct *prev_token,tok_struct *op2)
 {
  int combined=0;
@@ -279,11 +279,14 @@ int combine_tokens(tok_struct *prev_token,tok_struct *op2)
 		// MESG("	term1: set mul function!");
 		prev_token->ttype = op2->ttype;
 		prev_token->tname="num";
+#if	TBNF
 		prev_token->bnf_group = op2->ttype;
+#endif
 		prev_token->tgroup = TOK_OPNUM;
 #if	TFINDEX
 		prev_token->function_index = op2->ttype;
 #endif
+#if	TNOASGN
 		switch(ttype){
 			case TOK_MUL:
 				prev_token->bnf_factor_function=bnf_num_mul;
@@ -298,16 +301,20 @@ int combine_tokens(tok_struct *prev_token,tok_struct *op2)
 				prev_token->bnf_factor_function=bnf_num_minus;
 				combined=1;break;
 		};
+#endif
 	};
  };
  if(prev_token->ttype==TOK_VAR) {
 	if(ttype==TOK_MUL||ttype==TOK_DIV||ttype==TOK_PLUS||ttype==TOK_MINUS) {
 			prev_token->ttype = op2->ttype;
+#if	TBNF
 			prev_token->bnf_group = op2->ttype;
+#endif
 			prev_token->tgroup = 19;
 #if	TFINDEX
 			prev_token->function_index = op2->ttype;
 #endif
+#if	TNOASGN
 			switch(ttype) {
 				case TOK_MUL:
 					prev_token->bnf_factor_function=bnf_var_mul;
@@ -322,11 +329,13 @@ int combine_tokens(tok_struct *prev_token,tok_struct *op2)
 					prev_token->bnf_factor_function=bnf_var_minus;
 					combined=1;break;
 			};
+#endif
 		};
  };
  
  return combined;
 }
+#endif
 
 tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 {
@@ -495,7 +504,9 @@ tok_struct *new_tok()
  tok->tgroup=0;
 #if	TBNF
  tok->pushed=-1;
+#if	TBNF
  tok->bnf_group=-1;
+#endif
  tok->bnf_factor_function=bnf_factor_dummy;
 #endif
 #if	TNORMAL
@@ -1085,7 +1096,9 @@ void set_bnf_function1(tok_struct *tok, int type)
 #if	TBNF
  if(type==0) {
 	int exp_type = factor_bnf_type[type];
+#if	TBNF
 	tok->bnf_group=exp_type;
+#endif
 	tok->bnf_factor_function = factor_bnf_funcs[exp_type];
 #if	TFINDEX
 	tok->function_index=exp_type;
@@ -1093,7 +1106,9 @@ void set_bnf_function1(tok_struct *tok, int type)
 	// MESG("-- set_bnf_function1 to none!!!: num=%2d exp type=%3d",tok->tnum,exp_type);
  } else if(type>0) {
 	int exp_type = factor_bnf_type[type];
+#if	TBNF
 	tok->bnf_group=exp_type;
+#endif
 	tok->bnf_factor_function = factor_bnf_funcs[exp_type];
 #if	TFINDEX
 	tok->function_index=exp_type;
@@ -1101,7 +1116,9 @@ void set_bnf_function1(tok_struct *tok, int type)
 	tok->ttype=type;
 	// MESG("-- set_bnf_function1: ind=%2d exp num=%3d",tok->tnum,exp_type);
  } else {
+#if	TBNF
 	tok->bnf_group=0;
+#endif
 	tok->bnf_factor_function = factor_bnf_funcs[-type];
 #if	TFINDEX
 	tok->function_index=type;
@@ -1135,7 +1152,9 @@ void set_tok_function(tok_struct *tok, int type)
 		case 1:
 			// MESG("	1 set factor function to %d",tok->ttype);
 			tok->cexpr_function = (EFunction)factor_funcs[tok->ttype];
+#if	TBNF
 			// tok->bnf_factor_function = factor_bnf_funcs[tok->ttype];
+#endif
 			// MESG(" c tok %2d: %s type [%d %s] set cepr function",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype]);
 	};
 #endif

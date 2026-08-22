@@ -814,7 +814,9 @@ tok_struct *tok0_bnf=NULL;
 #endif
 			NTOKEN_ERR(4981);
 		};
+#if	TNOASGN
 		tok_struct *bnf_tok=NULL;
+#endif
 		if(tok->ttype==TOK_TYPE_ELEMENT) {
 			// MESG("err tok_type_element: %s",tok->tname);
 #if	TNORMAL

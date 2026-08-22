@@ -20,6 +20,7 @@ inline static void bnf_factor_np_num_mul();
 inline static void bnf_factor_pn_num_mul();
 inline static void bnf_factor_nn_num_mul();
 inline static void bnf_factor_pp_num_mul();
+#if	TNOASGN
 inline static void bnf_nump_plus();
 inline static void bnf_numn_plus();
 inline static void bnf_num_plus();
@@ -40,6 +41,13 @@ inline static void bnf_var_pn_minus();
 inline static void bnf_var_plus();
 inline static void bnf_var_minus();
 inline static void bnf_var_div();
+inline static void bnf_divby_pp_num();
+inline static void bnf_divby_pn_num();
+inline static void bnf_factor_array_l2_update();
+inline static void bnf_type_l2_result_update();
+
+#endif
+
 inline static void bnf_factor_mul();
 inline static void bnf_factor_div();
 inline static void bnf_factor_modulo();
@@ -72,8 +80,7 @@ inline static void bnf_decreaseby();
 inline static void bnf_mulby_pp_num();
 inline static void bnf_mulby_pn_num();
 inline static void bnf_mulby();
-inline static void bnf_divby_pp_num();
-inline static void bnf_divby_pn_num();
+
 inline static void bnf_divby();
 inline static void bnf_factor_sep0();
 inline static void bnf_factor_end();
@@ -143,8 +150,6 @@ inline static void bnf_mulby_element();
 inline static void bnf_divby_element();
 inline static void bnf_type_l2_result();
 inline static void bnf_factor_at();
-inline static void bnf_factor_array_l2_update();
-inline static void bnf_type_l2_result_update();
 
 #if	TBNF
 VFunction factor_bnf_funcs[] = {
