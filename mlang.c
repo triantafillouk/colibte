@@ -17,7 +17,6 @@ inline void ntoken();
 #include	"func.h"
 #include	"token_table.h"
 
-
 #define	SYNTAX_DEBUG	0
 
 #if	TOKENN

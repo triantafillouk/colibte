@@ -1,3 +1,6 @@
+/* bnf expression functions */
+
+#include "bnf_functions.h"
 
 char *ddot_string();
 void update_ddot_line(char *ddot_out);
@@ -2613,7 +2616,7 @@ inline static void bnf_factor_rcurl()
  // MESG("	rcurl: ind=%ld",VARIND);
 }
 
-void bnf_factor_error()
+inline static void bnf_factor_error()
 {
  	MESG("bnf_factor_error: [%s]",tok_info(tok));
 	current_active_flag=0;
@@ -2654,12 +2657,14 @@ inline static void bnf_factor_assign_var_nump()
 	// bnf_var->var_type=VTYPE_NUM;
 }
 
+#if	NUSE
 void bnf_factor_assign_none()
 {
 	set_error(tok,102,"assign NONE error");
 }
+#endif
 
-void bnf_factor_assign_var()
+inline static void bnf_factor_assign_var()
 {
 	// MESG("bnf_factor_assign_var:1 %s %d",tok->tname,tok->tind);
 	MVAR *bvar=bnf_var;
@@ -2742,7 +2747,7 @@ void bnf_factor_assign_var()
 	set_error(tok,102,"assign operation not supported yet");
 }
 
-void bnf_factor_assign_var_f()
+inline static void bnf_factor_assign_var_f()
 {
 	MESG("bnf_factor_assign_var:f %d",tok->tind);
 	MVAR *bvar=bnf_var;
@@ -3015,7 +3020,7 @@ inline static void bnf_dir_lcurl_break()
 	bnf_block1_break();
 }
 
-void bnf_dir_break()
+inline static void bnf_dir_break()
 {
 	// MESG("bnf_dir_break:!!!!!!!!!!!!!!!!!!!!!!!!!");
 	current_active_flag=0;
@@ -5020,7 +5025,7 @@ inline static void bnf_factor_at()
 }
 
 #if	TNOASGN
-void bnf_factor_array_l2_update()
+inline static void bnf_factor_array_l2_update()
 {
 	MESG("bnf_factor_array_l2_update:[%s]",tok_info(tok));
 	// MESG("	ind=%d val=%f",tok->tind,tok->dval);
@@ -5101,7 +5106,7 @@ void bnf_factor_array_l2_update()
 #endif
 
 #if	TNOASGN
-void bnf_type_l2_result_update()
+inline static void bnf_type_l2_result_update()
 {
 	// MESG("## bnf_type_l2_result_update:");
 	next_var("arrayl2");
@@ -5140,7 +5145,7 @@ void bnf_type_l2_result_update()
 }
 #endif
 
-#if	TBNF
+#if	0
 VFunction factor_bnf_funcs[] = {
 	bnf_factor_none,	// TOK_NONE
 	bnf_factor_sep,		// TOK_SEP
