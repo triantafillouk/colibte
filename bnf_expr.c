@@ -515,7 +515,7 @@ inline static void bnf_factor_plus()
 		bnf_var->var_alloced=1;
 		return;
 	};
-	if(vara->var_type==VTYPE_ARRAY||vara->var_type==VTYPE_AMIXED) {
+	if(vara->var_type==VTYPE_ARRAY) {
 		bnf_var->adat =array_add2(vara->adat,varb->adat);
 		bnf_var->var_type=vara->var_type;
 		bnf_var->var_alloced=1;
@@ -526,12 +526,6 @@ inline static void bnf_factor_plus()
 		array_dat *adat=dup_array_add1(varb->adat,vara->dval);
 		bnf_var->adat=adat;
 		bnf_var->var_type=VTYPE_AMIXED;
-		bnf_var->var_alloced=1;
-		return;
-	};
-	if(vara->var_type==VTYPE_ARRAY||vara->var_type==VTYPE_AMIXED) {
-		bnf_var->adat =array_add2(vara->adat,varb->adat);
-		bnf_var->var_type=vara->var_type;
 		bnf_var->var_alloced=1;
 		return;
 	};
@@ -936,6 +930,9 @@ inline static void bnf_var_mul()
 				return;
 			} else {
 				array_dat *result_array;
+				// MESG("multiply arrays:");
+				// print_array1("array1",array1);
+				// print_array1("array2",array2);
 				result_array=array_mul2(array1,array2);
 				// MESG("	after array_mul2:0 %d",err_num);
 				if(err_num) {
@@ -978,6 +975,7 @@ inline static void bnf_var_mul()
 	}
 	syntax_error(11101,"multipy error");
 }
+
 inline static void bnf_var_pn_plus()
 {
  MVAR *varb = get_left_slot(tok->tind);
@@ -1097,7 +1095,7 @@ inline static void bnf_var_plus()
 		bnf_var->var_alloced=1;
 		return;
 	};
-	if(vara->var_type==VTYPE_ARRAY||vara->var_type==VTYPE_AMIXED) {
+	if(vara->var_type==VTYPE_ARRAY) {
 		bnf_var->adat =array_add2(vara->adat,varb->adat);
 		bnf_var->var_type=vara->var_type;
 		bnf_var->var_alloced=1;
@@ -1108,12 +1106,6 @@ inline static void bnf_var_plus()
 		array_dat *adat=dup_array_add1(varb->adat,vara->dval);
 		bnf_var->adat=adat;
 		bnf_var->var_type=VTYPE_AMIXED;
-		bnf_var->var_alloced=1;
-		return;
-	};
-	if(vara->var_type==VTYPE_ARRAY||vara->var_type==VTYPE_AMIXED) {
-		bnf_var->adat =array_add2(vara->adat,varb->adat);
-		bnf_var->var_type=vara->var_type;
 		bnf_var->var_alloced=1;
 		return;
 	};
@@ -1169,7 +1161,8 @@ inline static void bnf_var_minus()
 		bnf_var->var_alloced=1;
 		return;
 	};
-	if(vara->var_type==VTYPE_ARRAY||vara->var_type==VTYPE_AMIXED) {
+	if(vara->var_type==VTYPE_ARRAY) 
+	{
 		bnf_var->adat =array_sub2(vara->adat,varb->adat);
 		bnf_var->var_type=vara->var_type;
 		return;
@@ -1187,11 +1180,6 @@ inline static void bnf_var_minus()
 		bnf_var->var_alloced=1;
 		return;
 	};
-	if(vara->var_type==VTYPE_ARRAY||vara->var_type==VTYPE_AMIXED) {
-		bnf_var->adat =array_sub2(vara->adat,varb->adat);
-		bnf_var->var_type=vara->var_type;
-		return;
-	};
  } else if(varb->var_type==VTYPE_STRING) {
  	if(vara->var_type==VTYPE_STRING) {
 		int a1,b1;
@@ -1207,9 +1195,11 @@ inline static void bnf_var_minus()
  	syntax_error(1107,"substruction error");
 }
 
+void bnf_inverse();
+
 inline static void bnf_var_div()
 {
- // MESG("bnf_var_div: tind=%d [%s]",tok->tind,tok_info(tok));
+ MESG("bnf_var_div: tind=%d [%s]",tok->tind,tok_info(tok));
  MVAR *varb = get_left_slot(tok->tind);
 	// MESG("	> dval=%f",varb->dval);
 	MVAR *vara = bnf_var;
@@ -1231,24 +1221,7 @@ inline static void bnf_var_div()
 			};
 			return;
 		};
-		if(varb->var_type==VTYPE_ARRAY) {
-			array_dat *array1 = varb->adat;
-			array_dat *result_array =dup_array_mul1(array1,vara->dval);
-			bnf_var->adat=result_array;
-			bnf_var->var_type=VTYPE_ARRAY;
-			bnf_var->var_alloced=1;
-			// MESG("	array multiply by num!");
-			return;
-		};
-		if(varb->var_type==VTYPE_AMIXED) {
-			array_dat *array2 = varb->adat;
-			array_dat *result_array =dup_array_mul1(array2,vara->dval);
-			bnf_var->adat=result_array;
-			bnf_var->var_type=VTYPE_AMIXED;
-			bnf_var->var_alloced=1;
-			// MESG("	array multiply by num!");
-			return;
-		};
+		// if(varb->var_type==VTYPE_ARRAY) 	/* divide num by array not supported  */
 	};
 	if(vara->var_type==VTYPE_ARRAY) {
 		if(varb->var_type==VTYPE_NUM) {
@@ -1261,38 +1234,28 @@ inline static void bnf_var_div()
 			return;
 		} else
 		if(varb->var_type==VTYPE_ARRAY) {
-			array_dat *array1=vara->adat;
-			array_dat *array2=varb->adat;
-
-			if(array1->rows==1 && array2->cols==1) {
-				if(array1->cols== array2->rows) {
-					int i;
-					double v1=0;
-					for(i=0;i<array1->cols;i++){
-						v1 += array1->dval[i]*array2->dval[i];
-					};
-					bnf_var->var_type=VTYPE_NUM;
-					bnf_var->dval=v1;
-					return;
-				};
-				syntax_error(1108,"array multiply error");
-				return;
-			} else {
-				array_dat *result_array;
-				result_array=array_mul2(array1,array2);
-				// MESG("	after array_mul2:0 %d",err_num);
-				if(err_num) {
-					// syntax_error(1109,err_str);
-					return;
-				};
-				bnf_var->var_type=VTYPE_ARRAY;
-				bnf_var->adat=result_array;
-				if(array1->astat==ARRAY_ALLOCATED) {	/* free this one!! ?? */ };
-				return;
-			};
-			syntax_error(1109,"array multiply error");
-			return ;
+			// MESG("Divide array by array!");
+			// double det = determinant(varb->adat);
+			next_var("inv");
+			bnf_var->adat=varb->adat;
+			bnf_var->var_type=VTYPE_ARRAY;
+			bnf_var->var_alloced=0;
+			bnf_inverse();	// find the inverse of the array!
+			print_array1("array a",vara->adat);
+			// array_mul1(bnf_var->adat,1/det);
+			array_dat *inverse = bnf_var->adat;
+			print_array1("inverse in bnf_var:",inverse);
+			array_dat * result_array = array_mul2(vara->adat,inverse);
+			free_array_dat(bnf_var->adat);
+			prev_var("a");
+			bnf_var->adat = result_array;
+			bnf_var->var_type=VTYPE_ARRAY;
+			bnf_var->var_alloced=1;
+			// MESG("	array multiply by num!");
+			return;
 		};
+			syntax_error(1109,"array divide error");
+			return ;
 	};
 	if(vara->var_type==VTYPE_AMIXED) {
 		if(varb->var_type==VTYPE_NUM) {
@@ -1304,23 +1267,8 @@ inline static void bnf_var_div()
 			// MESG("	array multiply by num!");
 			return;
 		};
-		if(varb->var_type==VTYPE_AMIXED) {
-			// MESG("mul array [%d %d]x[%d %d]",vara->adat->cols,vara->adat->rows,varb->adat->cols,varb->adat->rows);
-			array_dat *result_array = array_mul2(vara->adat,varb->adat);
-			// MESG("	after array_mul2:1 %d",err_num);
-				if(err_num) {
-					// syntax_error(11102,err_str);
-					return;
-				};
-			bnf_var->adat=result_array;
-			bnf_var->var_type=VTYPE_AMIXED;
-			bnf_var->var_alloced=1;
-			return;
-		};
-
 	}
-	syntax_error(11103,"multipy error");
- 
+	syntax_error(11103,"divide  error");
 }
 
 #endif

@@ -6,12 +6,15 @@
 
 	interpreter array operations support
 */
+#define TCOFACT	1
 
 double determinant(array_dat *a);
+#if	TCOFACT
 array_dat * cofactor2(array_dat *a,double det);
+array_dat *cofactor2inverse(array_dat *faca, double det);
+#endif
 array_dat * transpose2(array_dat *a,array_dat *b,double det);
 array_dat * cofactor(array_dat *numa,double det);
-array_dat *cofactor2inverse(array_dat *faca, double det);
 void print_array1(char *title,array_dat *adat);
 struct array_dat *new_array(int rows,int cols,int array_type);
 struct array_dat *new_array_similar(array_dat *a);
@@ -451,6 +454,7 @@ array_dat * array_mul2(array_dat *aa,array_dat *ba)
 	return na;
 }
 
+// Only for VTYPE_ARRAY both of them!
 array_dat * array_add2(array_dat *aa,array_dat *ba)
 {
  array_dat *na;	/* new array  */
@@ -478,6 +482,7 @@ array_dat * array_add2(array_dat *aa,array_dat *ba)
  };
 }
 
+// Only for VTYPE_ARRAY both of them!
 array_dat * array_sub2(array_dat *aa,array_dat *ba)
 {
  array_dat *na;	/* new array  */
@@ -804,11 +809,11 @@ double determinant(array_dat *aa)
 	 	det=det + s*a[0][c] * determinant(ba);
 		s=s*(-1);
 	 };
-
+	 free_array_dat(ba);
     };
     return (det);
 }
-
+#if	TCOFACT
 array_dat * cofactor2(array_dat *numa,double det)
 {
  double **b,**fac,**num;
@@ -885,6 +890,7 @@ array_dat * cofactor2(array_dat *numa,double det)
 //  print_array1("Inverse",inverse);
   return(inverse);
 }
+#endif
 
 array_dat * cofactor(array_dat *numa,double det)
 {
@@ -1035,6 +1041,7 @@ array_dat *transpose(array_dat *array1)
  return(tarray);
 }
 
+#if	TCOFACT
 array_dat *cofactor2inverse(array_dat *faca, double det)
 {
   int i,j;
@@ -1057,6 +1064,7 @@ array_dat *cofactor2inverse(array_dat *faca, double det)
     }
  return(inversea);
 }
+#endif
 
 /* print array  */
 void print_array1(char *title,array_dat *adat)

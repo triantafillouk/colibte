@@ -1287,8 +1287,8 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  MVAR *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
 	MESG("# compute_block1: [%s] use [%s] start=%d",bp->b_fname,use_fp->b_fname,start);
-	if(show_no_time) MESG("# [%-15s %d %s --------------------------------------------- %d",bp->b_fname,usebnf,"Version",bp->err);
-	else MESG("# [%-15s %d %s --------------------------------------------- %d",bp->b_fname,usebnf,VERSION,bp->err);
+	if(show_no_time) MESG("# [%-15s  %s --------------------------------------------- %d",bp->b_fname,"Version",bp->err);
+	else MESG("# [%-15s  %s --------------------------------------------- %d",bp->b_fname,VERSION,bp->err);
 	eval_curl_match(NULL);
  if(show_tokens) {
 	parse_buffer_show_tokens(1);
@@ -1498,7 +1498,7 @@ int refresh_current_buffer(num nused)
 #if	TBNF
 		tok=fp->tok_table_bnf;
 		bnf_block1_break();
-		MESG("== end program!");
+		// MESG("== end program!");
 #endif
 #if	TBNFNORMAL
 	} else {
@@ -2023,9 +2023,10 @@ int exec_named_function(char *name)
 	return((int)value);
 }
 
+
 double expression(char *from)
 {
-	MESG("expression from: %s",from);
+	// MESG("expression from: %s",from);
 #if	TBNFNORMAL
 	if(usebnf) 
 #endif
