@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.8T17 (22/8/2026)"
+#define VERSION 	 "#01.8T18 (22/8/2026)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -33,7 +33,7 @@
 #define	TNOASGN		1	/* remove var from assignment in bnf  */
 #define	TBNF		1	/* convert to bnf notation test  */
 #define	TFINDEX		0	/* use function index  */
-#define TNORMAL		1	/* normal ops included  */
+#define TNORMAL		0	/* normal ops included  */
 #if	TBNF & TNORMAL
 #define	TBNFNORMAL		1
 #else
@@ -327,8 +327,14 @@ typedef struct  VIDEO {
 #define HEX_LINE_LEN	16
 
 typedef struct MVAR {
-	short	var_type;
-	short	var_alloced;
+#if	1
+	unsigned short var_type;
+	unsigned short var_alloced;
+#else
+	unsigned int var_type:8;
+	int	var_alloced:1;
+	int size:22;
+#endif
 	int		index1;
 	// short	index2;
 	union {

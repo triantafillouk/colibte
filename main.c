@@ -127,6 +127,7 @@ int main(int argc, char **argv)
 	handle_signals();
 	set_start_dir(NULL);
 	// printf("size=%ld\n",sizeof(struct tok_struct));exit(0);
+	// printf("size=%ld\n",sizeof(struct MVAR));exit(0);
 	// check_config_dir();
 	init_hash();
 	discmd = FALSE;
