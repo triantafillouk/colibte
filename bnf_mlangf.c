@@ -624,8 +624,9 @@ void bnf_dbg_message()	/* TBC  */
 
 void bnf_sin()	/* OK?  */
 {
-	NTOKEN2;
-	bnf_expression();
+	// NTOKEN2;
+	// bnf_expression();
+	MESG("!X: bnf_sin: [%s]",tok);
 	bnf_var->dval=sin(bnf_var->dval);
 }
 

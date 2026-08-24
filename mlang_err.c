@@ -207,7 +207,11 @@ void syntax_error(int err,char *description)
 }
 
 #if	TBNF
+int	err_eval_fun1(tok_struct *tok0,int lpar)
+#if	TFUNC
+#else
 int	err_eval_fun1(tok_struct *tok0,tok_struct *tok_bnf,int lpar)
+#endif
 #else
 int	err_eval_fun1(tok_struct *tok0,int lpar)
 #endif
@@ -218,14 +222,14 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 	int f_entry;
 	BTNODE 	*var_node = tok0->tok_node;
 	int fnum = var_node->node_index;
-	// MESG("err_eval_fun1: fnum=%d tok0=[%s]",fnum,tok_info(tok0));
+	MESG("err_eval_fun1: fnum=%d tok0=[%s]",fnum,tok_info(tok0));
 #if	TBNF
 	ia0=bnf_functions[fnum].f_args;
 #else
 	ia0=m_functions[fnum].f_args;
 	// MESG("err_eval_fun1: fnum=%d [%s] args=%d",fnum,m_functions[fnum].f_name,ia);
 #endif
-	// MESG("err_eval_fun1:lpar=%d <<  f_args=%d",lpar,ia0);
+	MESG("err_eval_fun1:lpar=%d <<  f_args=%d",lpar,ia0);
 	// MESG("err_eval_fun1: [%s] args=%d tnum=%d ttype=%d",m_functions[fnum].f_name,ia,tok->tnum,tok->ttype);
 
 	f_entry=entry_mode;
@@ -243,7 +247,9 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 		// };
 		if(tok->ttype==TOK_RPAR||tok->ttype==TOK_SEP ||tok->ttype==TOK_EOF) {
 			// MESG("end function parameters");
+#if	!TFUNC
 			if(tok->ttype==TOK_RPAR) stack_push("eval_function )",tok,-TOK_RPAR);
+#endif
 			break;
 		}
 		if(tok->ttype==TOK_COMMA) {
@@ -255,7 +261,7 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 		// MESG("	ia=%d [%s]",ia,tok_info(tok));
 		err_num=err_lexpression();
 	};
-	// MESG("	ia=%d ia0=%d",ia,ia0);
+	MESG("		ia=%d ia0=%d",ia,ia0);
 	// Check for correct number of args, this sould not happen!
 	if(ia0>=0 && ia0!=ia) {
 		MESG("Error in number of args: %d != %d",ia0,ia);
@@ -264,9 +270,11 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 	};
 	// MESG("	err_eval_fun_1: 1");
 	if(tok->ttype==TOK_RPAR) {
-		// MESG("err_eval_fun1: skip RPAR!!");
 #if	TBNF
+#if	!TFUNC
+		MESG("err_eval_fun1: push RPAR!!");
 		if(lpar) stack_push("eval_func )",tok,-TOK_RPAR);
+#endif
 #endif
 		NTOKEN_ERR(404);
 		// MESG("	eval_func1: after rpar: [%s]",tok_info(tok));
@@ -276,10 +284,12 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 
 	tok0->number_of_args=ia;
 #if	TBNF
+#if	!TFUNC
 	tok_bnf->number_of_args=ia;
 #endif
+#endif
 	entry_mode=f_entry;
-	// MESG("err_eval_fun1: END >> args=%d %d",ia0,ia);
+	MESG("err_eval_fun1: END >> args=%d %d",ia0,ia);
 	RT_MESG1(408);
 }
 
@@ -650,6 +660,9 @@ tok_struct *tok0_bnf=NULL;
  if(tok->ttype!=TOK_NOT && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_MINUS && tok->ttype!=TOK_PLUS) {
 #if	TNOASGN
 	if(tok->ttype!=TOK_VAR)
+#if	TFUNC
+	if(tok->ttype!=TOK_FUNC)
+#endif
 #endif
  	tok0_bnf=stack_push("factor",tok,tok->ttype);	// ????
  };
@@ -1334,14 +1347,20 @@ tok_struct *tok0_bnf=NULL;
 		};
 		RT_MESG1(495);
 	case TOK_FUNC:	// 2 editor function 
-		/* variable's name in tok0->tname */
+		/* function name in tok0->tname */
+		MESG("TOK_FUNC: %s",tok0->tname);
 		pre_symbol=0;
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
+#if	TFUNC
+		err_num=err_eval_fun1(tok0,lpar);
+#else
 		err_num=err_eval_fun1(tok0,tok0_bnf,lpar);
+#endif
 #else
 		err_num=err_eval_fun1(tok0,lpar);
 #endif
+		stack_push("eval_func",tok0,TOK_FUNC);
 		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)
 		// MESG("------ define TOK_PROC ------ [%s]",tok_info(tok));
