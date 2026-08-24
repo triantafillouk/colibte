@@ -150,7 +150,7 @@ void bnf_inverse()	/* TBC  */
 	MVAR *va = bnf_var;
 	// MESG("bnf_inverse: var@=%d type %d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	if(va->var_type==VTYPE_POINTER) va=va->var_pointer;
-	if(va->var_type==VTYPE_ARRAY||va->var_type==VTYPE_AMIXED) {
+	if(va->var_type==VTYPE_ARRAY) {
 		array_dat *arr = va->adat;
 
 		if(arr->rows==arr->cols) {
@@ -158,6 +158,7 @@ void bnf_inverse()	/* TBC  */
 			// MESG("	bnf_inverse: determinant = %f",value);
 		} else {
 			syntax_error(1205,"wrong dimensions for determinant");
+			return;
 		};
 		if(value!=0) {
 			array_dat *inverse;
@@ -167,10 +168,13 @@ void bnf_inverse()	/* TBC  */
 			bnf_var->var_type=va->var_type;
 			// set_array(inverse);
 			inverse->array_name="Inverse";
+			return;
+		} else {
+			syntax_error(1206,"Determinant is zero!");
+			return;
 		};
-	} else {
-		syntax_error(1206,"Not an array!");
-	}
+	};
+	syntax_error(1206,"inverse a non array!");
 }
 
 void bnf_transpose()	/* TBC  */
