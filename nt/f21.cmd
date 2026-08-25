@@ -1,14 +1,8 @@
 # test loop with proc inside different ok from 927
 cls
-print("--- f2.cmd")
-i=2
-
-if(i==3) {
-	f=1
-} else {
-	f=3
-}
-
+print("--- f21.cmd")
+i=1
+f=2
 print("if test("+i+") is "+f," !")
 
 
