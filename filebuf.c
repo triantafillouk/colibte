@@ -2006,7 +2006,13 @@ int ifile0(FILEBUF *bf,char *name,int ir_flag)
    int file;
    int temp_used=0;
 	// MESG("ifile0:");
-   chdir(bf->b_dname);
+#if	0
+   if(chdir(bf->b_dname)) {
+		SYS_ERROR("Cannot change to dir [%s]",bf->b_dname);
+		msg_line("Cannot change to dir [%s]",bf->b_dname);
+   		return(false);
+   };
+#endif
 	// MESG("ifile0:1 ir_flag=%d b_flag=%d \"%s\" ",ir_flag,bf->b_flag,name);
 	bf->line_from=0;
 

@@ -376,7 +376,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
     	tok->pushed=check_buffer->tok_bnf_index;
-		MESG("! push %10s as %d [%s] exp_type=%d",title,tok->pushed,tok_info(tok),exp_type);
+		// MESG("! push %10s as %d [%s] exp_type=%d",title,tok->pushed,tok_info(tok),exp_type);
 		set_bnf_function1(dest,exp_type);
 
 		if(dest->ttype==TOK_LCURL||dest->ttype==TOK_RCURL) {
@@ -395,6 +395,8 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		};
  		// MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(dest));
 		if(dest->ttype==TOK_FUNC) {
+			// MESG("	args=%d",tok->number_of_args);
+			// MESG("	node index=%d",tok->tok_node->node_index);
 			// MESG("	set bnf function! index=%d for [%s]",tok->tok_node->node_index,tok_info(dest));
 			dest->bnf_factor_function=bnf_functions[tok->tok_node->node_index].vfunction;
 		};
@@ -831,6 +833,7 @@ void show_error(char *from,char *name)
 
 void show_token_table(char *title, FILEBUF *bf,tok_struct *token_start,int size)
 {
+ if(show_tokens==0) return;
  int i=0;
 
  tok_struct *tokp=token_start;
@@ -1290,11 +1293,12 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	if(show_no_time) MESG("# [%-15s  %s --------------------------------------------- %d",bp->b_fname,"Version",bp->err);
 	else MESG("# [%-15s  %s --------------------------------------------- %d",bp->b_fname,VERSION,bp->err);
 	eval_curl_match(NULL);
+#if	0
  if(show_tokens) {
 	parse_buffer_show_tokens(1);
 	return(0);	
  };
-
+#endif
  if(use_fp->symbol_tree==NULL) {
 	// MESG("create new symbol_tree for use_fp!");
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);
@@ -1308,14 +1312,14 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	if(err_num) { execmd=0;return(0);};
 	// MESG("	comput_block: start=%d",start);
 	if(start || current_stable==NULL) {
-		MESG("new current_stable with %d items",use_fp->symbol_tree->items);
+		// MESG("new current_stable with %d items",use_fp->symbol_tree->items);
 		local_symbols=new_symbol_table(use_fp->symbol_tree->items);
 	} else {
-		MESG("use current_stable new items = %d",use_fp->symbol_tree->items);
+		// MESG("use current_stable new items = %d",use_fp->symbol_tree->items);
 		local_symbols=realloc_symbol_table(current_stable,use_fp->symbol_tree->items,old_items);
 	}
 	current_stable=local_symbols;
- // MESG("compute_block:2");
+ // MESG("compute_block:2 m_mode=%d",bp->m_mode);
  if(bp->m_mode<2)	/* if not already checked!  */
  {
 	err_num=check_init(bp);
@@ -1346,7 +1350,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	if(usebnf) {
 #endif
 #if	TBNF
-		MESG("## execute bnf program block! --------------------");
+		// MESG("## execute bnf program block! --------------------");
 		exe_buffer=bp;
 		tok=bp->tok_table_bnf;
 		if(execmd) bnf_block1();
@@ -1354,9 +1358,8 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		// next_var("res1");
 		// next_var("res2");
 		set_result();
-		// MESG("end of program1 var@=%d type %d",VARIND,bnf_var->var_type);
 		// if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
-		MESG("end of program2 var@=%d type %d",VARIND,bnf_var->var_type);
+		MESG("	end of program var@=%d type %d",VARIND,bnf_var->var_type);
 		// if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
 		// show_results();
 		msg_result(bp->b_fname,show_no_time);
@@ -1962,8 +1965,6 @@ void init_exec_flags()
 #endif
  // MESG("init_exec_flags:ok!");
 }
-
-
 
 int exec_named_function(char *name)
 {

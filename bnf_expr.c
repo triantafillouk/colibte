@@ -23,6 +23,7 @@ static double bnf_expression();
 int set_option_val(int vnum,char *svalue);
 int set_option_bnf(int vnum,int ival);
 inline static int get_type_index(array_dat *adat, tok_struct *tok);
+inline static void set_result();
 
 #define VARIND (int)(bnf_var-bnf_vars)
 
@@ -271,7 +272,8 @@ inline static void bnf_factor_var()
 	next_var("var");
 	bnf_var->var_pointer=get_left_slot(tok->tind);
 	bnf_var->var_type=VTYPE_POINTER;
-
+	set_result();
+	// MESG("bnf_factor_var: [%s]",tok_info(tok));
 	// bnf_var->var_alloced=0;
 	// MESG(";- factor_var: put var %s tind=%d at var@=%d [%s]",tok->tname,tok->tind,VARIND,tok_info(tok));
 }
