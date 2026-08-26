@@ -564,7 +564,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  {
 	if(change_script_state(tok_type,&script_active)) continue;
 	if(tok_type!=TOK_LETTER && cc!=10)
-	MESG("[%s] parse- cc=%d %c type=%3d [%10s] line=%d",bf->b_fname,cc,cc,tok_type,tname(tok_type),tok_line);
+	// MESG("[%s] parse- cc=%d %c type=%3d [%10s] line=%d",bf->b_fname,cc,cc,tok_type,tname(tok_type),tok_line);
 
 	if(err_num>0) {
 		check_buffer = buffer_ori;
@@ -732,7 +732,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			break;
 		case TOK_QUOTE: // string start
 			slen=getnstr1(bf,cc,nword);
-			MESG("	TOK_QUOTE [%s]",nword);
+			// MESG("	TOK_QUOTE [%s]",nword);
 			break;
 		case TOK_SHOW:
 			if(next_token_type(bf)==TOK_SHOW) {
@@ -1002,7 +1002,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	};
 	
 	if(tok_type==TOK_LETTER) {
-		MESG("[%s]	parser: TOK_LETTER: check element in bt [%s] store=%d",bf->b_fname,nword,is_storelines);
+		// MESG("[%s]	parser: TOK_LETTER: check element in bt [%s] store=%d",bf->b_fname,nword,is_storelines);
 		tok->tok_node  = find_btnode(bt_table,nword); // check main table
 
 #if	USE_TYPE_VARS

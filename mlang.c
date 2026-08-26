@@ -232,7 +232,11 @@ char *vtype_names[] = {
 #endif
 #if	TBNF
 #include "bnf_expr.c"
+#if	TFUNC
 #include "bnf_mlangf.c"
+#else
+#include "bnf_mlang_f.c"
+#endif
 #endif
 #if	TNORMAL
 #include	"mlang_expr.c"
@@ -376,7 +380,8 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
     	tok->pushed=check_buffer->tok_bnf_index;
-		MESG("! pushed %10s as %d [%s] exp_type=%d",title,tok->pushed,tok_info(tok),exp_type);
+		
+		// MESG("! pushed %10s as %d [%s] exp_type=%d",title,tok->pushed,tok_info(tok),exp_type);
 		set_bnf_function1(dest,exp_type);
 
 		if(dest->ttype==TOK_LCURL||dest->ttype==TOK_RCURL) {
@@ -395,7 +400,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		};
  		// MESG("P[%10s %3d %-15s|%s",check_buffer->b_fname,check_buffer->tok_bnf_index,title,tok_info(dest));
 		if(dest->ttype==TOK_FUNC) {
-			MESG(" push func args=%d",tok->t_nargs);
+			// MESG(" push func args=%d",tok->t_nargs);
 			// MESG("	node index=%d",tok->tok_node->node_index);
 			// MESG("	set bnf function! index=%d for [%s]",tok->tok_node->node_index,tok_info(dest));
 			dest->bnf_factor_function=bnf_functions[tok->tok_node->node_index].vfunction;

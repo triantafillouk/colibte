@@ -4245,7 +4245,7 @@ inline static void bnf_factor_cmd()
 	bnf_var->var_type=VTYPE_NUM;
 	bnf_var->dval=stat;
 
-	// MESG(";>factor_cmd: after ed_command: var@=%d type=%d value=%f",VARIND,bnf_var->var_type,value);
+	MESG(";>factor_cmd: after ed_command: var@=%d type=%d value=%f",VARIND,bnf_var->var_type,value);
 #if	0
 	if(check_par) { 
 		if(check_rparenthesis()) {
@@ -4259,7 +4259,7 @@ inline static void bnf_factor_cmd()
 		show_error("Factor","factor_cmd");
 	};
 
-	// MESG(";factor_cmd:end value=%f status=%d err=%d",value,status,err_num);
+	MESG(";factor_cmd:end @%d value=%f stat=%d err=%d",VARIND,stat,err_num);
 }
 
 MVAR *btree_to_mvar(BTREE *bt);

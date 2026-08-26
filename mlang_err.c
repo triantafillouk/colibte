@@ -222,16 +222,14 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 	int f_entry;
 	BTNODE 	*var_node = tok0->tok_node;
 	int fnum = var_node->node_index;	// function index
-	MESG("## err_eval_fun1: fnum=%d tok0=[%s]",fnum,tok_info(tok0));
-	// MESG("err_eval_fun1: fnum=%d lpar=%d tok=[%s] ",fnum,lpar,tok_info(tok));
+	// MESG("## err_eval_fun1: fnum=%d tok0=[%s]",fnum,tok_info(tok0));
 #if	TBNF
 	ia0=bnf_functions[fnum].f_args;
 #else
 	ia0=m_functions[fnum].f_args;
 	// MESG("err_eval_fun1: fnum=%d [%s] args=%d",fnum,m_functions[fnum].f_name,ia);
 #endif
-	MESG("err_eval_fun1:lpar=%d <<  f_args=%d",lpar,ia0);
-	// MESG("err_eval_fun1: [%s] args=%d tnum=%d ttype=%d",m_functions[fnum].f_name,ia,tok->tnum,tok->ttype);
+	// MESG("err_eval_fun1:lpar=%d <<  f_args=%d",lpar,ia0);
 
 	f_entry=entry_mode;
 	entry_mode=KNORMAL;
@@ -241,7 +239,7 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 	// MESG("	tok [%s]",tok_info(tok));
 	while(1){
 		// if(tok->ttype==TOK_LPAR) {plevel++; NTOKEN_ERR(402); continue;};
-		MESG("	arg tnum=%d ttype=%d ia=%d",tok->tnum,tok->ttype,ia);
+		// MESG("	arg tnum=%d ttype=%d ia=%d",tok->tnum,tok->ttype,ia);
 		// if(tok->ttype==TOK_RPAR) {
 			// if(plevel>0) { plevel--;NTOKEN_ERR(402); continue;};
 		// };
@@ -254,8 +252,12 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 		}
 		if(tok->ttype==TOK_COMMA) {
 			// MESG("	found comma! %s",tok_info(tok));
+#if	TFUNC
 			tok_struct *tok_comma=stack_push("eval_function ,",tok,0);
 			tok_comma->bnf_factor_function=bnf_factor_sep0;
+#else
+			stack_push("eval_function ,",tok,0);
+#endif
 			NTOKEN_ERR(403);
 		}
 		ia++;
@@ -285,15 +287,19 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 
 	// MESG("	: before push function tok=[%s]",tok_info(tok));
 #if	TBNF
+#if	TFUNC
 	tok0->t_nargs =ia;
 	stack_push("eval_func",tok0,TOK_FUNC);
-#if	TFUNC
 #else
+	tok0->number_of_args =ia;
 	tok_bnf->number_of_args=ia;
 #endif
 #endif
+#if	TNORMAL
+	tok0->number_of_args =ia;
+#endif
 	entry_mode=f_entry;
-	MESG("err_eval_fun1: END >> args=%d %d",ia0,ia);
+	// MESG("err_eval_fun1: END >> args=%d %d",ia0,ia);
 	RT_MESG1(408);
 }
 
@@ -664,9 +670,9 @@ tok_struct *tok0_bnf=NULL;
  if(tok->ttype!=TOK_NOT && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_MINUS && tok->ttype!=TOK_PLUS) {
 #if	TNOASGN
 	if(tok->ttype!=TOK_VAR)
+#endif
 #if	TFUNC
 	if(tok->ttype!=TOK_FUNC)
-#endif
 #endif
  	tok0_bnf=stack_push("factor",tok,tok->ttype);	// ????
  };
@@ -1352,7 +1358,7 @@ tok_struct *tok0_bnf=NULL;
 		RT_MESG1(495);
 	case TOK_FUNC:	// 2 editor function 
 		/* function name in tok0->tname */
-		MESG("TOK_FUNC: %s tok=[%s]",tok0->tname,tok_info(tok));
+		// MESG("TOK_FUNC: %s tok=[%s]",tok0->tname,tok_info(tok));
 		pre_symbol=0;
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
@@ -1366,9 +1372,6 @@ tok_struct *tok0_bnf=NULL;
 		err_num=err_eval_fun1(tok0,lpar);
 #endif
 		// MESG("	end of TOK_FUNC [%s]",tok_info(tok));
-#if	!TFUNC
-		NTOKEN_ERR(497);
-#endif
 		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)
 		// MESG("------ define TOK_PROC ------ [%s]",tok_info(tok));
@@ -2239,9 +2242,12 @@ int err_check_sentence1()
 		// NTOKEN_ERR(635);	/* go after sentence  */
 		CHECK_TOK(635);
 #if	TBNF
+#if	!TFUNC
 		tok_struct *end_if_tok=stack_push("end of if",tok,-tok->ttype);
 		if_token->next_tok=end_if_tok;
 #endif
+#endif
+
 		// MESG("err tok_dir_if: end next_token [%s]",tok_info(end_if_tok));
 
 		tok0->next_tok=tok;
@@ -2250,16 +2256,32 @@ int err_check_sentence1()
 		
 		if(tok->ttype==TOK_DIR_ELSE) {
 			// MESG("we have an else statement!");
+#if	TBNF
+#if	TFUNC
+		tok_struct *end_if_tok=stack_push("end of if",tok,-tok->ttype);
+		if_token->next_tok=end_if_tok;
+#endif
+#endif
 			tok0=tok;
 			NTOKEN_ERR(108);
 			err_num=err_check_sentence1();	/* body of else  */
 			xpos=638;
 			tok0->next_tok=tok;
 #if	TBNF
+#if	TFUNC
+			tok_struct *ifnext = new_tok();
+			end_if_tok->next_tok=stack_push("end_of_else",ifnext,TOK_SEP);
+#else
 			end_if_tok->next_tok = stack_push("end of else",tok,-tok->ttype);
+#endif
 			end_if_tok->next_tok--;
 #endif
 		} else {
+#if	TFUNC
+			tok_struct *ifnext = new_tok();
+			tok_struct *end_if_tok=stack_push("end_of_else",ifnext,TOK_SEP);
+			if_token->next_tok=end_if_tok;
+#endif
 			xpos=639;
 		};
 		RT_MESG1(xpos);
@@ -2524,7 +2546,7 @@ int err_check_block1()
 			stack_push("Show/comma",tok,-tok->ttype);
 #endif
 #if	TNORMAL
-	*		tok->factor_function = factor_funcs[tok->ttype];
+			tok->factor_function = factor_funcs[tok->ttype];
 #endif
 			NTOKEN_ERR(674);
 			if(tok->ttype==TOK_SEP) {

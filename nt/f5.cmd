@@ -1,4 +1,4 @@
-# check function optimization
+# f5.cmd
 
 cls
 print("# ---- f5.cmd ----")
