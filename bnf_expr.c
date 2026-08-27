@@ -270,11 +270,9 @@ void show_results()
 inline static void bnf_factor_var()
 {
 	next_var("var");
-	bnf_var->var_pointer=get_left_slot(tok->tind);
-	bnf_var->var_type=VTYPE_POINTER;
-	set_result();
-	// MESG("bnf_factor_var: [%s]",tok_info(tok));
-	// bnf_var->var_alloced=0;
+	MVAR *var=get_left_slot(tok->tind);
+	memcpy(bnf_var,var,sizeof(struct MVAR));
+	bnf_var->var_alloced=0;
 	// MESG(";- factor_var: put var %s tind=%d at var@=%d [%s]",tok->tname,tok->tind,VARIND,tok_info(tok));
 }
 
@@ -2655,7 +2653,7 @@ inline static void bnf_block1()
 {
 	// MESG("bnf_block1 start! group=%d [%s]",tok->tgroup,tok_info(tok));
 	while(tok->tgroup!=TOK_END) {
-		// MESG("--- block var@=%d [%s]",VARIND,tok_info(tok));
+		// MESG("!B v@=%d [%s]",VARIND,tok_info(tok));	/*   */
 	 	tok->bnf_factor_function();
 		// MESG("		-- tok %d type %d act=%d",tok->tnum,tok->ttype,current_active_flag);
 		NTOKEN2;
@@ -2712,7 +2710,7 @@ inline static void bnf_dir_lcurl_break()
 
 inline static void bnf_dir_break()
 {
-	// MESG("bnf_dir_break:!!!!!!!!!!!!!!!!!!!!!!!!!");
+	MESG("bnf_dir_break:!!!!!!!!!!!!!!!!!!!!!!!!!");
 	current_active_flag=0;
 }
 
@@ -3059,8 +3057,10 @@ inline static double bnf_expression()
 
 inline static void bnf_dir_return_value()
 {
+	// MESG("return_value:0 @v=%d [%s]",VARIND,tok_info(tok));
 	NTOKEN2;
 	bnf_expression();
+	// MESG("return_value:1 @v=%d [%s]",VARIND,tok_info(tok));
 	current_active_flag=0;	/* skip rest of function  */
 }
 
@@ -3152,7 +3152,7 @@ inline static void bnf_factor_proc()
 {
 	tok_struct *tok0=tok;
 	FILEBUF *cbuf=exe_buffer;
-	// MESG("bnf_factor_proc:[%s] << ind=%d",tok0->tname,VARIND);
+	// MESG("bnf_factor_proc:[%s] << v@=%d",tok0->tname,VARIND);
 	next_var("proc");		/* to save proc result  */
 	MVAR *result_var=bnf_var;
 	// MESG("	tname [%s]",tok0->tname);
@@ -3169,11 +3169,11 @@ inline static void bnf_factor_proc()
 	// MESG("factor_proc: tok  [%d %s] %d ",tok->tnum,tok->tname,tok->tind);
 
 	bnf_exec_function(tok->proc_buffer,tok->t_nargs);
-#if	1
-	// if(bnf_var!=result_var) 
+#if	01
+	// if(bnf_var!=result_var) {
 		// MESG("## factor_proc: res@ %d %d [%s]",(int)(result_var-bnf_vars),VARIND,tok_info(tok));
-	// else
 		memmove(result_var,bnf_var,sizeof(MVAR));
+	// };
 #endif
 #if	TPROFILE
 	var_index -= (int)(bnf_var-result_var);
@@ -4660,7 +4660,7 @@ inline static void bnf_divby_element()
 inline static void bnf_type_l2_result()
 {
 	next_var("arrayl2 result");	// new place on var stack
-	// MESG("## bnf_type_l2_result: ind=%d var@=%d [%s]",tok->tind,VARIND,tok_info(tok));
+	MESG("## bnf_type_l2_result: ind=%d var@=%d [%s]",tok->tind,VARIND,tok_info(tok));
 
 	MVAR *array_slot;
 	// MESG("	token var index tind=%d",tok->tind);
@@ -4695,6 +4695,7 @@ inline static void bnf_type_l2_result()
 		// if(ovar->var_type==VTYPE_STRING) MESG("		old value [%s]",ovar->sval);
 		// bnf_var->index1=row_start+ind1;
 		bnf_var->index1=-1;
+		// set_result();
 		// MESG("	element var@=%d element index=%d",VARIND,bnf_var->index1);
 		return;
 	};
