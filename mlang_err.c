@@ -1324,7 +1324,8 @@ tok_struct *tok0_bnf=NULL;
 		pre_symbol=0;
 		CHECK_TOK(xpos);
 		int stat=err_factor();
-		stack_push("NOT",tok0,tok0->ttype);
+		tok_struct *not=stack_push("NOT",tok0,tok0->ttype);
+		not->bnf_factor_function=bnf_factor_not;
 		return(stat);
 	case TOK_OPTION:// 5 editor option
 		/* variable's name in tok0->tname */
