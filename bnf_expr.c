@@ -4259,6 +4259,7 @@ inline static void bnf_factor_cmd()
 
 		value=bnf_expression();
 		int type1=bnf_var->var_type;
+		// prev_var("cmd arg1");
 		// MESG("; ed_command1 var@=%d value=%f type=%d",VARIND,value,bnf_var->var_type);
 		// prev_var("cmd");
 		// MESG("; ed_command2 var@=%d value=%f type=%d",VARIND,value,bnf_var->var_type);
@@ -4296,11 +4297,12 @@ inline static void bnf_factor_cmd()
 	// double pvalue=num_result();
 	// MESG("	after cmd: var@=%d",VARIND);
 	if(bnf_var->var_type==VTYPE_NUM) MESG("	numeric val=%f %f",bnf_var->dval,value);
-	prev_var("");
+	if(ed_command->arg>0)prev_var("");
+	if(ed_command->arg>1) prev_var("");
 	bnf_var->var_type=VTYPE_NUM;
 	bnf_var->dval=stat;
 
-	MESG(";>factor_cmd: after ed_command: var@=%d type=%d value=%f",VARIND,bnf_var->var_type,value);
+	// MESG(";>factor_cmd: after ed_command: var@=%d type=%d value=%f",VARIND,bnf_var->var_type,value);
 #if	0
 	if(check_par) { 
 		if(check_rparenthesis()) {
@@ -4314,7 +4316,7 @@ inline static void bnf_factor_cmd()
 		show_error("Factor","factor_cmd");
 	};
 
-	MESG(";factor_cmd:end @%d value=%f stat=%d err=%d",VARIND,stat,err_num);
+	// MESG(";factor_cmd:end @%d value=%f stat=%d err=%d",VARIND,stat,err_num);
 }
 
 MVAR *btree_to_mvar(BTREE *bt);

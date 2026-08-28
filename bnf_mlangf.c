@@ -332,7 +332,7 @@ void bnf_print()
 	bnf_var->var_type=VTYPE_STRING;
 	bnf_var->sval=strdup(total_printed);
 	bnf_var->var_alloced=1;
-	// MESG("	>> end var@=%d [%s]",VARIND,bnf_var->sval);
+	// MESG("	>> print end var@=%d [%s]",VARIND,bnf_var->sval);
 	// printf("	>>print [%s] @var=%d [%s]\n",bnf_var->sval,VARIND,tok_info(tok));
 }
 

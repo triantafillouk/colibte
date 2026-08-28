@@ -2553,9 +2553,10 @@ int err_check_block1()
 			continue;
 		case TOK_COMMA:
 #if	TFUNC
+			{
 			tok_struct *comma = stack_push("comma",tok,tok->ttype);
 			comma->bnf_group=1;
-			break;
+			};break;
 #endif
 		case TOK_SHOW:
 			// MESG_TOK_INFO("# err_check_block1",tok);

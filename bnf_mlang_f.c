@@ -276,7 +276,7 @@ void bnf_mid()	/* TBC  */
 void bnf_print()
 {
 	int args=tok->number_of_args;
-	// MESG("bnf_print: tnum=%d args=%d var@=%d",tok->tnum,tok->number_of_args,VARIND);
+	MESG("bnf_print: tnum=%d args=%d var@=%d",tok->tnum,tok->number_of_args,VARIND);
 	int i;
 	char total_printed[MAXLLEN];
 	total_printed[0]=0;
@@ -324,6 +324,7 @@ void bnf_print()
 	bnf_var->var_type=VTYPE_STRING;
 	bnf_var->sval=strdup(total_printed);
 	bnf_var->var_alloced=1;
+	MESG("	>> end var@=%d [%s]",VARIND,bnf_var->sval);
 	// printf("	>>print [%s] @var=%d [%s]\n",bnf_var->sval,VARIND,tok_info(tok));
 }
 

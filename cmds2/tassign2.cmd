@@ -4,8 +4,10 @@
 p=2	: 
 a=3
 d=log(10)	: 
-
-b=assign_function("both_down","^N") ; l1=3; l2=4
+print("after log")
+b=assign_function("both_down","^N") 
+l1=3; l2=4
+print("after assign_function")
 a=log10(12)	: 
 c=atan(13)	: 
 b	: 
@@ -16,7 +18,7 @@ l1	:
 l2	: 
 print(p)
 p	: 
-
+show_keys()
 print((p=2))	: 
 print(c)
 
