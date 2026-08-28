@@ -6,7 +6,9 @@ char *ddot_string();
 void update_ddot_line(char *ddot_out);
 void skip_sentence1();
 void show_error(char *from,char *name);
+#if	0
 inline static void bnf_statement0();
+#endif
 inline static void bnf_expression0();
 
 #define	MAX_VARS	500
@@ -2712,7 +2714,7 @@ inline static void bnf_dir_lcurl_break()
 
 inline static void bnf_dir_break()
 {
-	MESG("bnf_dir_break:!!!!!!!!!!!!!!!!!!!!!!!!!");
+	// MESG("bnf_dir_break:!!!!!!!!!!!!!!!!!!!!!!!!!");
 	current_active_flag=0;
 }
 
@@ -2999,6 +3001,7 @@ inline static void bnf_dir_while()	/* TBC  */
 	current_active_flag=old_active_flag;
 }
 
+#if	NUSE
 inline static void bnf_statement0()
 {
 	// while(tok->ttype != TOK_SEP && tok->ttype != TOK_RCURL && tok->ttype != TOK_DIR_ELSE) 
@@ -3010,8 +3013,9 @@ inline static void bnf_statement0()
 	};
 	tok--;
 }
+#endif
 
-inline static void bnf_statement(char *from)
+inline static void bnf_statement(/*char *from*/)
 {
 	// MESG("#	bnf_statement:[%s] var@=%d [%s]",from,VARIND,tok_info(tok));
 	// if(tok->ttype==TOK_DIR_BREAK) { tok->bnf_factor_function(); return;};
@@ -3221,7 +3225,7 @@ inline static void bnf_dir_if_then()
 		// MESG("	then true: start of [%s]",tok_info(tok));
 		// NTOKEN2;
 		// MESG("		if true: var@=%d start of [%s]",VARIND,tok_info(tok));
-		bnf_statement("if true");
+		bnf_statement(/*"if true"*/);
 
 		// MESG("		true:3 after if execution! %s",tok_info(tok));
 		NTOKEN2;
@@ -3236,7 +3240,7 @@ inline static void bnf_dir_if_then()
 		// MESG("	then false: var@=%d start of [%s]",VARIND,tok_info(tok));
 		if(check_skip_token1(TOK_DIR_ELSE)) {
 			// MESG("	execute else at [%s]",tok_info(tok));
-			bnf_statement("if else");
+			bnf_statement(/*"if else"*/);
 		} else { 
 			tok--;
 			// if(tok->ttype!=TOK_RCURL) tok--; 
@@ -3258,7 +3262,7 @@ inline static void bnf_dir_if()
 		// MESG("	true: start of [%s]",tok_info(tok));
 		NTOKEN2;
 		// MESG("		if true: var@=%d start of [%s]",VARIND,tok_info(tok));
-		bnf_statement("if true");
+		bnf_statement(/*"if true"*/);
 
 		// MESG("		true:3 after if execution! %s",tok_info(tok));
 		NTOKEN2;
@@ -3273,7 +3277,7 @@ inline static void bnf_dir_if()
 		// MESG("		false: var@=%d start of [%s]",VARIND,tok_info(tok));
 		if(check_skip_token1(TOK_DIR_ELSE)) {
 			// MESG("	execute else at [%s]",tok_info(tok));
-			bnf_statement("if else");
+			bnf_statement(/*"if else"*/);
 		} else { 
 			tok--;
 			// if(tok->ttype!=TOK_RCURL) tok--; 
@@ -4711,7 +4715,7 @@ inline static void bnf_divby_element()
 inline static void bnf_type_l2_result()
 {
 	next_var("arrayl2 result");	// new place on var stack
-	MESG("## bnf_type_l2_result: ind=%d var@=%d [%s]",tok->tind,VARIND,tok_info(tok));
+	// MESG("## bnf_type_l2_result: ind=%d var@=%d [%s]",tok->tind,VARIND,tok_info(tok));
 
 	MVAR *array_slot;
 	// MESG("	token var index tind=%d",tok->tind);

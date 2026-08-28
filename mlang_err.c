@@ -2431,11 +2431,7 @@ int err_check_sentence1()
 			set_tok_directive(tok,tok_dir_while);
 #endif
 #if	TBNF
-#if	TFUNC0
-			tok_struct *while1=tok;
-#else
 			stack_push("while",tok,-tok->ttype);
-#endif
 #endif
 			// MESG("	DIR_WHILE: [%s]",tok_info(tok));
 			NTOKEN_ERR(654);	/* go to next toke after while */
@@ -2447,12 +2443,7 @@ int err_check_sentence1()
 			// MESG("	DIR_WHILE: end [%s]",tok_info(tok));
 			CHECK_TOK(657);
 #if	TBNF
-#if	TFUNC0
-			tok_struct *while_token=stack_push("do",while1,-while1->ttype);
-			while_token->bnf_factor_function=bnf_dir_while1;
-#else
 			stack_push("while )",tok,-tok->ttype);
-#endif
 #endif
 			check_skip_token_err1(TOK_RPAR,"tok_dir_while:",xpos);
 			CHECK_TOK(658);
@@ -2562,7 +2553,7 @@ int err_check_block1()
 			continue;
 		case TOK_COMMA:
 #if	TFUNC
-			tok_struct *comma = stack_push("Show/comma",tok,tok->ttype);
+			tok_struct *comma = stack_push("comma",tok,tok->ttype);
 			comma->bnf_group=1;
 			break;
 #endif
