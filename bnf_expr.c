@@ -296,9 +296,9 @@ inline static void bnf_factor_quote()
 inline static void bnf_factor_not()
 {
 
+  // MESG("bnf_factor_not: v@=%d t=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
   MVAR *num_var = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer:bnf_var;
- // MESG("bnf_factor_not:");
- if(num_var->var_type == VTYPE_NUM) {
+  if(num_var->var_type == VTYPE_NUM) {
  	bnf_var->dval = num_var->dval==0 ? 1:0;
 	bnf_var->var_type=VTYPE_NUM;
 	return;
@@ -2250,7 +2250,9 @@ inline static void bnf_factor_sep1()
 inline static void bnf_factor_comma()
 {
  // MESG("bnf_factor_comma:");
- if(bnf_var>bnf_vars) { 
+ // if(bnf_var>bnf_vars) 
+ if(0)
+ { 
  	// MESG(";bnf_factor_comma ---  var@=%d [%s]",VARIND,tok_info(tok));
 	prev_var("comma");
 	set_bnf_function(tok,"comma->sep1",bnf_factor_sep1);
@@ -2670,7 +2672,7 @@ inline static void bnf_block1()
 	} 
 	
 	// MESG("-- block end  ! [%s]",tok_info(tok));
-	// if(tok->ttype!=TOK_END) 
+	if(tok->ttype!=TOK_END) 
 	tok->bnf_factor_function();
 }
 
@@ -2942,18 +2944,22 @@ inline static void bnf_dir_while()	/* TBC  */
 	tok_struct *start_block;	// element at block start
 	tok_struct *end_block=NULL;	/* at the block end  */
 	int old_active_flag=current_active_flag;
+	// int loop_num=0;
 	// MESG("tok_dir_while:");
 	NTOKEN2;	/* go to next token after while */
 
 	check_element=tok;	/* this is the check element!  */
 	// MESG("	check element at [%s]",tok_info(tok));
 	skip_sentence1();	/* for now skip it  */
-	// MESG("	tok_dir_while: var@=%d [%s]",tok_info(tok));
+	// MESG("	tok_dir_while: should be parenthesis! [%s]",tok_info(tok));
 	NTOKEN2;	/* skip right parenthesis  */
 
 	// this is the start of a simple sentence or a curl
 	// MESG("	while start of block at [%s]",tok_info(tok));
-	start_block=tok+1;
+	start_block=tok;
+	int is_curl=0;
+	if(tok->ttype==TOK_LCURL) { start_block++;is_curl=1;};
+	// MESG("	while start of block at [%s]",tok_info(start_block));
 
 	// find token after the end of block
 	skip_sentence1();
@@ -2962,18 +2968,23 @@ inline static void bnf_dir_while()	/* TBC  */
 
 	// set tok pointer here
 	drv_start_checking_break();
+	// MESG("	while: before starting loop: a=%d",current_active_flag);
 	do {
 		// set tlist to tok pointer
+		// if(loop_num++ > 12) break;
 		tok=check_element;
+		// MESG("	evaluate check element at [%s]",tok_info(tok));
 		double check=bnf_expression();prev_var("exr");
-		// MESG("# while var@=%d check=%f [%s]",VARIND,check,tok_info(tok));
+		// MESG("	var@=%d check=%f [%s]",VARIND,check,tok_info(tok));
 		if(check) {
 			// on the block start
 			tok=start_block;
-			// MESG("		while start loop var@=%d [%s]",VARIND,tok_info(tok));
-			if(execmd) bnf_block1();
-			else bnf_block1_break();
-			// MESG("		while end loop var@=%d [%d]",VARIND,tok_info(tok));
+			// MESG("		while start_block at var@=%d a=%d [%s]",VARIND,current_active_flag,tok_info(tok));
+			if(is_curl) {
+				if(execmd) bnf_block1();
+				else bnf_block1_break();
+			} else bnf_expression0();
+			// MESG("		while end loop var@=%d a=%d[%s]",VARIND,current_active_flag,tok_info(tok));
 			if(current_active_flag==0) {	/* only after break  */
 				if(is_break1) { tok=exe_buffer->end_token;return;};
 				break;
@@ -3195,6 +3206,45 @@ inline static void bnf_factor_proc()
 	exe_buffer=cbuf;
 }
 
+
+#if	TFUNC
+inline static void bnf_dir_if_then()
+{
+	tok_struct *tok0=tok;
+	// MESG("## tok_dir_then: var@=%d [%s]",VARIND,tok_info(tok));
+	NTOKEN2;	/* go to next token after if */
+
+	int ival = bnf_var->dval;
+	prev_var("if result");
+	// MESG("   tok_then: ival=%d after expression var@=%d [%s]",ival,VARIND,tok_info(tok));
+	if(ival) {
+		// MESG("	then true: start of [%s]",tok_info(tok));
+		// NTOKEN2;
+		// MESG("		if true: var@=%d start of [%s]",VARIND,tok_info(tok));
+		bnf_statement("if true");
+
+		// MESG("		true:3 after if execution! %s",tok_info(tok));
+		NTOKEN2;
+		if(tok->ttype==TOK_DIR_ELSE) {
+			tok=tok->next_tok;
+			// MESG("skip else up to %s",tok_info(tok));
+		} else tok--;
+		// MESG("## 	tok_dir_if: true: end [%s]",tok_info(tok));
+		return;
+	} else {
+		tok=tok0->next_tok;
+		// MESG("	then false: var@=%d start of [%s]",VARIND,tok_info(tok));
+		if(check_skip_token1(TOK_DIR_ELSE)) {
+			// MESG("	execute else at [%s]",tok_info(tok));
+			bnf_statement("if else");
+		} else { 
+			tok--;
+			// if(tok->ttype!=TOK_RCURL) tok--; 
+		};
+	}
+	// MESG(";	 	tok_dir_if:end var@=%d  ival=%d > end [%s]",VARIND,ival,tok_info(tok));
+}
+#else
 inline static void bnf_dir_if()
 {
 	tok_struct *tok0=tok;
@@ -3231,6 +3281,7 @@ inline static void bnf_dir_if()
 	}
 	// MESG(";	 	tok_dir_if:end var@=%d  ival=%d > end [%s]",VARIND,ival,tok_info(tok));
 }
+#endif
 
 inline static void bnf_dir_else()
 {

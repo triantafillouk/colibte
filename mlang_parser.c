@@ -47,7 +47,7 @@ tok_struct *add_token(FILEBUF *bf,int tok_type,int cc,char *label,char *from,int
 	tok=new_tok();
 	add_element_to_list((void *)tok,bf->lex_parser);
 	tok->tnum=bf->lex_parser->size-1;
-	// MESG(";[%s] add [%s] %3d %3d: cc=%d type=[%s] name=[%s] tok=%p",bf->b_fname,from,line,tok->tnum,cc,tname(tok_type),label,tok);
+	// MESG("!A[%s] add [%s] %3d %3d: cc=%d type=[%s] name=[%s] tok=%p",bf->b_fname,from,line,tok->tnum,cc,tname(tok_type),label,tok);
 	return tok;
 }
 
@@ -563,7 +563,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  while(getnc1(bf,&cc,&tok_type))
  {
 	if(change_script_state(tok_type,&script_active)) continue;
-	if(tok_type!=TOK_LETTER && cc!=10)
+	// if(tok_type!=TOK_LETTER && cc!=10)
 	// MESG("[%s] parse- cc=%d %c type=%3d [%10s] line=%d",bf->b_fname,cc,cc,tok_type,tname(tok_type),tok_line);
 
 	if(err_num>0) {
@@ -1177,7 +1177,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	};
 	// MESG("parse_block1: set end token");
 	bf->end_token=tok;	/* save end token  */
-	// ADD_TOKEN("end token");
+	ADD_TOKEN("end token");
 	tok->ttype=TOK_EOF;
 	tok->tind=0;
 	tok->tline=tok_line;

@@ -299,7 +299,7 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 	tok0->number_of_args =ia;
 #endif
 	entry_mode=f_entry;
-	// MESG("err_eval_fun1: END >> args=%d %d",ia0,ia);
+	// MESG("err_eval_fun1: END >> args=%d %d [%s]",ia0,ia,tok_info(tok));
 	RT_MESG1(408);
 }
 
@@ -1320,10 +1320,12 @@ tok_struct *tok0_bnf=NULL;
 		RT_MESG1(4911);
 	case TOK_NOT:
 		xpos=492;
+		// MESG("TOK_NOT: pre=%d [%s]",pre_symbol,tok_info(tok));
 		if(pre_symbol) { syntax_error(xpos,"symbol before not");RT_MESG;};
-		pre_symbol=0;
+		// pre_symbol=0;
 		CHECK_TOK(xpos);
 		int stat=err_factor();
+		// MESG("TOK_NOT: after factor [%s]",tok_info(tok));
 		stack_push("NOT",tok0,tok0->ttype);
 		return(stat);
 	case TOK_OPTION:// 5 editor option
@@ -2216,7 +2218,12 @@ int err_check_sentence1()
 		set_tok_directive(tok,tok_dir_if);
 #endif
 #if	TBNF
+#if	!TFUNC
 		tok_struct *if_token=stack_push("DIR_IF",tok,-tok->ttype);
+#else
+		tok_struct *if1=tok;
+		if1->tname="then";
+#endif
 #endif
 		NTOKEN_ERR(631);	/* go to next token after if */
 		xpos=632;
@@ -2230,7 +2237,12 @@ int err_check_sentence1()
 		};
 		// MESG("err: TOK_DIR_IF! check rpar! of %d",tok->tnum);
 #if	TBNF
+#if	TFUNC
+		tok_struct *if_token=stack_push("THEN",if1,-if1->ttype);
+		if_token->bnf_factor_function=bnf_dir_if_then;
+#else
 		stack_push("if )",tok,-tok->ttype);
+#endif
 #endif
 		check_skip_token_err1(TOK_RPAR,"tok_dir_if",xpos);
 
@@ -2412,34 +2424,43 @@ int err_check_sentence1()
 		break;
 	case TOK_DIR_WHILE:
 		{
-			tok_struct *check_element; // check element pointer
-			tok_struct *start_block;	// element at block start
+			// tok_struct *check_element; /* check element pointer */
+			// tok_struct *start_block;	/* element at block start */
 			// MESG("# err_check_sentence: %s",tok_info(tok));
 #if	TNORMAL
 			set_tok_directive(tok,tok_dir_while);
 #endif
 #if	TBNF
+#if	TFUNC0
+			tok_struct *while1=tok;
+#else
 			stack_push("while",tok,-tok->ttype);
 #endif
+#endif
+			// MESG("	DIR_WHILE: [%s]",tok_info(tok));
 			NTOKEN_ERR(654);	/* go to next toke after while */
+			// MESG("	DIR_WHILE:next [%s]",tok_info(tok));
 
 			// set check_list
-			check_element=tok;
+			// check_element=tok;
 			err_num=err_check_sentence1();
+			// MESG("	DIR_WHILE: end [%s]",tok_info(tok));
 			CHECK_TOK(657);
 #if	TBNF
+#if	TFUNC0
+			tok_struct *while_token=stack_push("do",while1,-while1->ttype);
+			while_token->bnf_factor_function=bnf_dir_while1;
+#else
 			stack_push("while )",tok,-tok->ttype);
+#endif
 #endif
 			check_skip_token_err1(TOK_RPAR,"tok_dir_while:",xpos);
 			CHECK_TOK(658);
-			start_block=tok;
-	
+			// start_block=tok;
+			
+			// MESG("	while start_block [%s]",tok_info(tok));
 			// set check while body
-			tok=check_element;
-			err_num=err_lexpression();
-
-			CHECK_TOK(661);
-			tok=start_block;
+			// tok=start_block;
 			err_num=err_check_sentence1();
 			CHECK_TOK(662);
 		}
@@ -2540,6 +2561,11 @@ int err_check_block1()
 			NTOKEN_ERR(6741);
 			continue;
 		case TOK_COMMA:
+#if	TFUNC
+			tok_struct *comma = stack_push("Show/comma",tok,tok->ttype);
+			comma->bnf_group=1;
+			break;
+#endif
 		case TOK_SHOW:
 			// MESG_TOK_INFO("# err_check_block1",tok);
 #if	TBNF

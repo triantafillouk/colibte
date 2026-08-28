@@ -10,5 +10,7 @@ b[0]=b[1+1]+3.33:
 b[0]: 
 b[2]+=44: 
 b[2]: 
-
+len(b):
+array_rows(b):
+array_cols(b):
 

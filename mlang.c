@@ -381,7 +381,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
     	tok->pushed=check_buffer->tok_bnf_index;
 		
-		// MESG("! pushed %10s as %d [%s] exp_type=%d",title,tok->pushed,tok_info(tok),exp_type);
+		// MESG("!Push %10s as %d [%s] exp_type=%d",title,tok->pushed,tok_info(tok),exp_type);
 		set_bnf_function1(dest,exp_type);
 
 		if(dest->ttype==TOK_LCURL||dest->ttype==TOK_RCURL) {
@@ -873,9 +873,22 @@ void create_statement_group(FILEBUF *bf)
  int table_size=bf->tok_bnf_index;
  // MESG("create_token_pointers:[%s] size=%d",bf->b_fname,table_size);
  int i=0;
+ int in_brackets=0;
+ int in_call=0;
  for(i=0;i<table_size;i++) {
 	// MESG("tp %3d %s",i,tokp->tname);
  	tokp->statement_group = tokp->ttype != TOK_SEP && tokp->ttype != TOK_RCURL && tokp->ttype != TOK_DIR_ELSE;
+#if	TFUNC
+	if(tokp->ttype==TOK_LBRAKET) in_brackets=1;
+	if(tokp->ttype==TOK_RBRAKET) in_brackets=0;
+	if(tokp->ttype==TOK_PROC) in_call=1;
+	if(tokp->ttype==TOK_CMD) in_call=1;
+	if(tokp->ttype==TOK_LPAR) in_call=1;
+	if(tokp->ttype==TOK_COMMA) {
+		// tokp->statement_group=1;
+		if(!in_brackets && !in_call) tokp->bnf_group=1;
+	}
+#endif
 	tokp++;
  };
  // tokp->next_tok=NULL;
@@ -1184,7 +1197,7 @@ void skip_sentence1()
  int plevel=0;
  for(;tok->ttype!=TOK_EOF;NTOKEN2)
  {
- 	// MESG("	skip [%s]",tok_info(tok));
+ 	// MESG("	l=%d skip [%s]",plevel,tok_info(tok));
 	switch(tok->ttype) {
 		case TOK_DIR_ELSE:	/* this one starts a new sentence!!  */
 		case TOK_SEP:
@@ -1203,7 +1216,9 @@ void skip_sentence1()
 			};
 			break;
 		case TOK_CMD:
+#if	!TFUNC
 		case TOK_FUNC:
+#endif
 		case TOK_DIR_IF:
 		case TOK_DIR_FORI:
 		case TOK_DIR_FOR:
@@ -1718,6 +1733,7 @@ char * tok_info(tok_struct *tok)
 		};
 // 			
 	} else {
+			MESG("	null!!! tnum=%d",tok->tnum);
 			return "null tok name !!!!!!!!!!!!!!!!!!!!!!!!!!!";
 		     snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5.1f] bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,"null name",tok->dval,tok->bnf_group);
 	};

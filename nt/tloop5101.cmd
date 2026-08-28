@@ -2,7 +2,7 @@
 
 cls
 print("--- tloop5101.cmd")
-p=0, l=0; 
+p=0; l=0; 
 print("Executing file ",_file_name," in ",_start_dir)
 show_time("Start fori test loop 1",0)
 

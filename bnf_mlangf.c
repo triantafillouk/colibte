@@ -682,8 +682,9 @@ void bnf_time()	/* OK????  */
 
 void bnf_deq()	/* OK?  */
 {
-	// bnf_function_args(2);
 	MVAR *va=bnf_var-1;
+	// MESG("bnf_deq: v@=%d %f %f",VARIND,va[0].dval,va[1].dval);
+	
 	va[0].dval = deq(va[0].dval,va[1].dval);
 	prev_var("deq");
 }

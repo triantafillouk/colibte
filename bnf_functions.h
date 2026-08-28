@@ -112,7 +112,11 @@ inline static void bnf_dir_return_value();
 inline static void bnf_dir_return_novalue();
 inline static void bnf_dir_return();
 inline static void bnf_factor_proc();
+#if	TFUNC
+inline static void bnf_dir_if_then();
+#else
 inline static void bnf_dir_if();
+#endif
 inline static void bnf_dir_else();
 inline static void bnf_factor_line_array();
 inline static void bnf_assign_array1_array();
@@ -183,7 +187,11 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_num,		// TOK_NUM, numeric value
 
 	bnf_factor_none,	// TOK_DIR		,	// directive
+#if	TFUNC
+	bnf_dir_if_then,	// TOK_DIR_IF	,	// dir if
+#else
 	bnf_dir_if,	// TOK_DIR_IF	,	// dir if
+#endif
 	bnf_dir_else,	// TOK_DIR_ELSE	,	// dir else
 	bnf_dir_break,	// TOK_DIR_BREAK	,
 	bnf_dir_return,	// TOK_DIR_RETURN	,
@@ -298,7 +306,7 @@ int factor_bnf_type[] = {
 	-TOK_DIR_RETURN,	// TOK_DIR_RETURN	,
 	0,	// TOK_DIR_WHILE	,
 	0,	// TOK_DIR_FOR		,
-	0,	// TOK_COMMA		,
+	-TOK_COMMA,	// TOK_COMMA		,
 	0,	// TOK_DIR_FORI	,
 	/* bool operators  */
 	TOK_COMPARE,	// TOK_COMPARE		,33
