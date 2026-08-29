@@ -659,18 +659,9 @@ int err_factor()
 #endif
 #if	TBNF
 tok_struct *tok0_bnf=NULL;
-#if	TOPNUM
- if((tok->ttype==TOK_NUM||tok->ttype==TOK_VAR) && skip_next==1) { 
- 	NTOKEN_ERR(222);
-	skip_next=0;
-	RT_MESG1(222);
- };
-#endif
 
  if(tok->ttype!=TOK_NOT && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_MINUS && tok->ttype!=TOK_PLUS) {
-#if	TNOASGN
 	if(tok->ttype!=TOK_VAR)
-#endif
 #if	TFUNC
 	if(tok->ttype!=TOK_FUNC)
 #endif
@@ -697,14 +688,12 @@ tok_struct *tok0_bnf=NULL;
 	err_num=4730;
 	return(err_num);
  };
-#if	TNOASGN
  if(tok0->ttype==TOK_VAR && (tok->ttype != TOK_ASSIGN && tok->ttype!=TOK_INCREASEBY && tok->ttype!=TOK_DECREASEBY\
  	&& tok->ttype!=TOK_MULBY && tok->ttype!=TOK_DIVBY)) {
 	// MESG("stack push [%s]",tok_info(tok0));
  	tok0_bnf=stack_push("factor",tok0,tok0->ttype);
 	
  };
-#endif
  // MESG("> factor  : tok0 %s",tok_info(tok0));
  switch(tok0->ttype) {
 	/*  the following ends factor  */
@@ -811,13 +800,9 @@ tok_struct *tok0_bnf=NULL;
 			set_tok_function(tok,0);
 #endif
 #if	TBNF
-#if	TNOASGN
 			tok0_bnf->ttype=tok->ttype;
 			tok0_bnf->bnf_factor_function=bnf_update_val;
 			tok0_bnf->dval=1;
-#else
-			stack_push("INC",tok,tok->ttype);
-#endif
 #endif
 			NTOKEN_ERR(498);
 		} else
@@ -827,17 +812,13 @@ tok_struct *tok0_bnf=NULL;
 			set_tok_function(tok,0);
 #endif
 #if	TBNF
-#if	TNOASGN
 			tok0_bnf->ttype=tok->ttype;
 			tok0_bnf->bnf_factor_function=bnf_update_val;
 			tok0_bnf->dval=-1;
-#else
-			stack_push("DEC",tok,tok->ttype);
-#endif
 #endif
 			NTOKEN_ERR(4981);
 		};
-#if	TNOASGN
+#if	TBNF
 		tok_struct *bnf_tok=NULL;
 #endif
 		if(tok->ttype==TOK_TYPE_ELEMENT) {
@@ -845,7 +826,7 @@ tok_struct *tok0_bnf=NULL;
 #if	TNORMAL
 			set_tok_function(tok,0);
 #endif
-#if	TNOASGN
+#if	TBNF
 			var_index=-1;
 #endif
 			// set_bnf_function1(tok,tok->ttype);
@@ -856,7 +837,7 @@ tok_struct *tok0_bnf=NULL;
 		};
 		if(tok->ttype==TOK_ASSIGN) {
 			// MESG("set normal assign prok=[%s]",tok_info(prev_token));
-#if	TNOASGN
+#if	TBNF
 			if(bnf_tok!=NULL) bnf_tok->bnf_factor_function=bnf_factor_assign_var_f;
 #endif
 
@@ -929,13 +910,11 @@ tok_struct *tok0_bnf=NULL;
 #endif
 
 				tok->tgroup=0;
-#if	TNOASGN
+#if	TBNF
 				tok0_bnf->dval=1;
 				tok0_bnf->tname="TL2inc";
 				tok0_bnf->bnf_factor_function=bnf_type_l2_result_update;
 				// assign_type_to=TOK_TYPE_ELEMENT;
-#else
-				stack_push("INC_AT2",tok,TOK_INCREASE);
 #endif
 				NTOKEN_ERR(4984);
 			} else
@@ -946,16 +925,14 @@ tok_struct *tok0_bnf=NULL;
 				set_tok_function(tok,0);
 #endif
 				tok->tgroup=0;
-#if	TNOASGN
+#if	TBNF
 				tok0_bnf->dval=-1;
 				tok0_bnf->tname="TL2dec";
 				tok0_bnf->bnf_factor_function=bnf_type_l2_result_update;
-#else
-				stack_push("DEC_AT2",tok,TOK_DECREASE);
 #endif
 				NTOKEN_ERR(4985);\
 			}
-#if	TNOASGN
+#if	TBNF
 			else 
 			if(tok->ttype==TOK_ASSIGN) {
 				// MESG("	ASSIGN to AL2!");
@@ -978,12 +955,10 @@ tok_struct *tok0_bnf=NULL;
 			set_tok_function(tok,0);
 #endif
 			tok->tgroup=0;
-#if	TNOASGN
+#if	TBNF
 				tok0_bnf->dval=1;
 				tok0_bnf->tname="TL2i";
 				tok0_bnf->bnf_factor_function=bnf_type_l2_result_update;
-#else
-			stack_push("INC_AL2",tok,TOK_INCREASE_ARRAY2);
 #endif
 			NTOKEN_ERR(4984);
 		} else
@@ -994,11 +969,7 @@ tok_struct *tok0_bnf=NULL;
 			set_tok_function(tok,0);
 #endif
 			tok->tgroup=0;
-#if	TNOASGN0
-				tok0_bnf->dval=-1;
-				tok0_bnf->tname="TL2d";
-				tok0_bnf->bnf_factor_function=bnf_type_l2_result_update;
-#else
+#if	TBNF
 			stack_push("DEC_AL2",tok,TOK_DECREASE_ARRAY2);
 #endif
 			NTOKEN_ERR(4985);
@@ -1020,15 +991,8 @@ tok_struct *tok0_bnf=NULL;
 			// MESG("	TOK_TYPE_ELEMENT before [%s]",tok_info(tok));
 			if(tok->ttype==TOK_ASSIGN || tok->ttype==TOK_INCREASEBY || tok->ttype==TOK_MULBY || tok->ttype==TOK_DIVBY || tok->ttype==TOK_DECREASEBY) {
 				// MESG("	assign type_element1");
-#if	TNOASGN0
-				// MESG("	ASSIGN original function!");
-				// tok0_bnf->bnf_factor_function=bnf_type_element_l1_tba;
-				tok0_bnf->bnf_factor_function=bnf_type_l1_result;
-				assign_type_to=TOK_TYPE_ELEMENT;
-#else
 				tok0_bnf->bnf_factor_function=bnf_type_element_l1_tba;
 				assign_type_to=TOK_ASSIGN_TYPE;
-#endif
 			} else {;
 				tok0_bnf->bnf_factor_function=bnf_type_l1_result;
 			};
@@ -1151,37 +1115,21 @@ tok_struct *tok0_bnf=NULL;
 		if(tok->ttype==TOK_INCREASE) {
 			// MESG("		TOK_INCREASE set bnf_factor_array_l2_update");
 #if	TBNF
-#if	TNOASGN
 			// MESG("		TOK_INCREASE noasgn, [%s]",tok_info(tok0_bnf));
 			tok0_bnf->bnf_factor_function=bnf_factor_array_l2_update;
 			tok0_bnf->tname="L2inc";
 			tok0_bnf->dval=1;
  			assign_type_to=0;
 			NTOKEN_ERR(5002);
-#else
-			tok0_bnf->bnf_factor_function=bnf_factor_array_l2_tba;
-			tok0_bnf->tname="l2inc";
-			tok->dval=1;
- 			assign_type_to=TOK_INCREASE_ARRAY2;
-#endif
 #endif
 		};
 		if(tok->ttype==TOK_DECREASE) {
 			// MESG("		TOK_DECREASE set bnf_factor_array_l1_tba");
 #if	TBNF
-#if	TNOASGN0
-			// MESG("		TOK_DECREASE noasgn, [%s]",tok_info(tok0_bnf));
-			tok0_bnf->bnf_factor_function=bnf_factor_array_l2_update;
-			tok0_bnf->tname="L2dec";
-			tok0_bnf->dval=-1;
- 			assign_type_to=0;
-			NTOKEN_ERR(5003);
-#else
 			tok0_bnf->bnf_factor_function=bnf_factor_array_l2_tba;
 			tok0_bnf->tname="l2dec";
 			tok->dval=-1;
 			assign_type_to=TOK_DECREASE_ARRAY2;
-#endif
 #endif
 		};
 #if	TBNF
@@ -1252,11 +1200,6 @@ tok_struct *tok0_bnf=NULL;
 		};
 		tok0->tname="numeric";
 		RT_MESG1(487);
-#if	TOPNUM
-	case TOK_MUL:
-		// MESG("TOK_MUL: skip_next=%d [%s]",skip_next,tok_info(tok));
-		RT_MESG1(488);
-#endif
 	case TOK_QUOTE:	 { // string 
 		xpos=488;
 #if	TBNF
@@ -1683,44 +1626,10 @@ int err_num_term1()
 #endif
 	NTOKEN_ERR(5531);
 	// MESG("	term1: midle [%s]",tok_info(tok));
-#if	TOPNUM
-	tok_struct *op2 = tok;
-	if((tok0->ttype==TOK_MUL || tok0->ttype==TOK_DIV) && (op2->ttype==TOK_NUM || op2->ttype==TOK_VAR)){
-		// MESG("	set skip_next!");
-		skip_next=1;
-	};
-#endif
 	err_num=err_num_term2();
 	// tok1 = tok;
 	// MESG("-- push term1 function skip=%d [%s]",skip_next,tok_info(tok0));
-#if	TOPNUM
-	tok_struct *bnf_term1 = stack_push("num_term1",tok0,tok0->ttype);
-	if(op2->ttype==TOK_NUM){
-		// MESG("	term1: set num value to %f",op2->dval);
-		bnf_term1->dval = op2->dval;
-		bnf_term1->tname="num";
-		// MESG("	term1: set function of [%s]",tok_info(bnf_term1));
-		if(bnf_term1->ttype==TOK_MUL) {
-			// MESG("	term1: set mul function!");
-			bnf_term1->bnf_factor_function=bnf_num_mul;
-		};
-		if(bnf_term1->ttype==TOK_DIV) {
-			// MESG("	term1: set div function!");
-			bnf_term1->bnf_factor_function=bnf_num_div;
-		};
-	};
-	if(op2->ttype==TOK_VAR){
-		// MESG("	term1: set var index to %d",op2->tind);
-		bnf_term1->tind = op2->tind;
-		bnf_term1->tname=op2->tname;
-
-		if(bnf_term1->ttype==TOK_MUL) bnf_term1->bnf_factor_function=bnf_var_mul;
-		if(bnf_term1->ttype==TOK_DIV) bnf_term1->bnf_factor_function=bnf_var_div;
-		// MESG("	term1: op [%s]",tok_info(bnf_term1));
-	};
-#else
 	stack_push("num_term1",tok0,tok0->ttype);
-#endif
 	if(err_num) RT_MESG1(5531);
 	CHECK_TOK(554);
  };
@@ -1936,7 +1845,6 @@ int err_lexpression()
 				if(assign_type_to==TOK_TYPE_ELEMENT) {
 					tok0_bnf_assign->tname="EL=";
 					tok0_bnf_assign->ttype=TOK_ASSIGN_ARRAY2;
-#if	TNOASGN
 					// MESG("	assign noasgn: ind=%d",tok0_bnf_assign->tind);
 					if(tok0_bnf_assign->tind<0) 
 						tok0_bnf_assign->bnf_factor_function=bnf_assign_element;
@@ -1944,9 +1852,6 @@ int err_lexpression()
 						tok0_bnf_assign->bnf_factor_function=bnf_assign_element;
 						tok0_bnf_assign->tname="var=";
 					}
-#else
-					tok0_bnf_assign->bnf_factor_function=bnf_assign_element;
-#endif
 					// MESG(";3 for [%s] set assign to bnf_assign_element",tok_info(tok0_bnf_assign));
 				};
 				assign_type_to=0;
@@ -1983,11 +1888,7 @@ int err_lexpression()
 				};
 				 if(assign_type_to==TOK_TYPE_ELEMENT) {
 					dest->tname="EL+=";
-#if	TNOASGN
  					dest->bnf_factor_function=bnf_increaseby_element0;
-#else
- 					dest->bnf_factor_function=bnf_increaseby_element;
-#endif
 					// MESG("; for [%s] set assign to type %d,bnf_increaseby_array1",tok_info(dest));
 				};
 				assign_type_to=0;
@@ -2317,10 +2218,6 @@ int err_check_sentence1()
 #endif
 		if(tok->ttype==TOK_VAR) {
 			// MESG_TOK_INFO(" loop var",tok);
-#if	TBNF & !TNOASGN
-			tok->bnf_group=TOK_BOOL;
-			tok0_bnf=stack_push("loop var",tok,tok->ttype);
-#endif
 			NTOKEN_ERR(6403);
 			if(tok->ttype!=TOK_ASSIGN) {
 				ERROR("6404:for i error");
@@ -2337,12 +2234,8 @@ int err_check_sentence1()
 		tok0_bnf=stack_push("for i assign",tok0,tok0->ttype);
 		tok0_bnf->tname = tok_var->tname;
 		tok0_bnf->tind = tok_var->tind;
-#if	TNOASGN
 		// tok0_bnf->bnf_factor_function=bnf_factor_assign_iterator;
 		tok0_bnf->bnf_factor_function=bnf_factor_assign_var;
-#else
-		tok0_bnf->bnf_factor_function=bnf_factor_assign_var_f;
-#endif
 #endif
 		if(err_num) return(err_num);
 		CHECK_TOK(6406);

@@ -20,7 +20,7 @@ inline static void bnf_factor_np_num_mul();
 inline static void bnf_factor_pn_num_mul();
 inline static void bnf_factor_nn_num_mul();
 inline static void bnf_factor_pp_num_mul();
-#if	TNOASGN
+
 inline static void bnf_nump_plus();
 inline static void bnf_numn_plus();
 inline static void bnf_num_plus();
@@ -45,8 +45,6 @@ inline static void bnf_divby_pp_num();
 inline static void bnf_divby_pn_num();
 inline static void bnf_factor_array_l2_update();
 inline static void bnf_type_l2_result_update();
-
-#endif
 
 inline static void bnf_factor_mul();
 inline static void bnf_factor_div();
@@ -178,11 +176,7 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_none,	// TOK_TERM	,	// term operators (+,-)
 	bnf_factor_none,	// TOK_TERM1	,	// term1 operators (%,^)
 	bnf_factor_none,	// TOK_TERM2	,	// term2 operators (*,/)
-#if	TNOASGN
 	bnf_factor_assign_var,	// TOK_ASSIGN	,	// assignament
-#else
-	bnf_factor_assign_var_f,	// TOK_ASSIGN	,	// assignament
-#endif
 	bnf_factor_eof,		// TOK_EOF		,	// end of file token
 	bnf_factor_num,		// TOK_NUM, numeric value
 

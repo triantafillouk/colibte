@@ -384,9 +384,6 @@ int assign_sub(num n)
 	// MESG("assign_sub:");
 	if((s = nextarg("Assign: subroutine name :", funname, 32,true))!=TRUE) return(s);
 	// MESG("	after nextarg [%s] ",funname);
-#if	TBNFNORMAL
-	if(usebnf) 
-#endif
 #if	TBNF
 		prev_var_ext("assign_sub");
 #endif

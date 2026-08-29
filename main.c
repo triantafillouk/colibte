@@ -341,11 +341,6 @@ void parse_command_line(int argc, char **argv)
 						allocate_array(main_args);
 						a_arg=0;
 					break;
-#if	TBNFNORMAL
-				case 'F':
-					usebnf=1;
-					break;
-#endif
 				case 't':
 					show_tokens=1;
 					break;

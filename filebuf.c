@@ -274,9 +274,6 @@ int show_info(num n)
  int stat;
 	SMESG("%s",date_string(1));
 	SMESG("--- Application info ----------------------------------------");
-#if	TBNFNORMAL
-	char *xv="u";
-#else 
 #if	TBNF
 #if	TOKENN
 	char *xv="t";
@@ -286,7 +283,7 @@ int show_info(num n)
 #else
 	char *xv="n";
 #endif
-#endif
+
 #if	TOKENN
 	SMESG("%s Version %s %s",PROGNAME,xv,VERSION);
 #else
