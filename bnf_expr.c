@@ -6,9 +6,6 @@ char *ddot_string();
 void update_ddot_line(char *ddot_out);
 void skip_sentence1();
 void show_error(char *from,char *name);
-#if	0
-inline static void bnf_statement0();
-#endif
 inline static void bnf_expression0();
 
 #define	MAX_VARS	500
@@ -1623,14 +1620,14 @@ inline static void bnf_increaseby()
 			double val = avar->dval;
 			bnf_var->var_type = VTYPE_NUM;
 			bnf_var->dval = val;
-#if	1
+
 			if(btype == VTYPE_POINTER) {
 				set_bnf_function(tok,"increaseby_pp_num",bnf_increaseby_pp_num);
 			};
 			if(btype == VTYPE_NUM) {
 				set_bnf_function(tok,"increaseby_pn_num",bnf_increaseby_pn_num);
 			};
-#endif
+
 			return;
 		};
 		if(avar->var_type==VTYPE_STRING) {
@@ -1701,14 +1698,14 @@ inline static void bnf_decreaseby()
 			double val = avar->dval;
 			bnf_var->var_type = VTYPE_NUM;
 			bnf_var->dval = val;
-#if	1
+
 			if(btype == VTYPE_POINTER) {
 				set_bnf_function(tok,"decreaseby_pp_num",bnf_decreaseby_pp_num);
 			};
 			if(btype == VTYPE_NUM) {
 				set_bnf_function(tok,"decreaseby_pn_num",bnf_decreaseby_pn_num);
 			};
-#endif
+
 			return;
 		};
 
@@ -1769,14 +1766,14 @@ inline static void bnf_mulby()
 			avar->dval *= bvar->dval;
 			bnf_var->var_type = VTYPE_NUM;
 			bnf_var->dval = avar->dval;
-#if	1
+
 			if(btype == VTYPE_POINTER) {
 				set_bnf_function(tok,"mulby_pp_num",bnf_mulby_pp_num);
 			};
 			if(btype == VTYPE_NUM) {
 				set_bnf_function(tok,"mulby_pn_num",bnf_mulby_pn_num);
 			};
-#endif
+
 			return;
 		};
 
@@ -1839,14 +1836,14 @@ inline static void bnf_divby()
 			double val = avar->dval;
 			bnf_var->var_type = VTYPE_NUM;
 			bnf_var->dval = val;
-#if	1
+
 			if(btype == VTYPE_POINTER) {
 				set_bnf_function(tok,"divby_pp_num",bnf_divby_pp_num);
 			};
 			if(btype == VTYPE_NUM) {
 				set_bnf_function(tok,"divby_pn_num",bnf_divby_pn_num);
 			};
-#endif
+
 			return;
 		};
 
@@ -2252,7 +2249,7 @@ inline static void bnf_factor_option()
 	// MESG("factor_option: set var_node [%s]",tok_info(tok));
 	var_node=bte;
 
-	set_vtype(bte->node_vtype);
+	// set_vtype(bte->node_vtype);
 
 	if(bte->node_vtype==VTYPE_STRING) { /* there is a valid string value */
 		// clean_saved_string(strlen(bte->node_sval));
@@ -2620,20 +2617,6 @@ inline static void bnf_dir_while()	/* TBC  */
 	tok=end_block;	/* to the end of executable block  */
 	current_active_flag=old_active_flag;
 }
-
-#if	NUSE
-inline static void bnf_statement0()
-{
-	// while(tok->ttype != TOK_SEP && tok->ttype != TOK_RCURL && tok->ttype != TOK_DIR_ELSE) 
-	while(tok->statement_group)
-	{
-		tok->bnf_factor_function();	
-		// MESG("	bnf_statement0: loop var@=%d [%s]",VARIND,tok_info(tok));
-		NTOKEN2;
-	};
-	tok--;
-}
-#endif
 
 inline static void bnf_statement(/*char *from*/)
 {
@@ -3847,9 +3830,9 @@ inline static void bnf_factor_array_l2()
 		set_vdval(value);
 		// MESG("	return type dval %f",value);
 	} else {
-		set_vtype(VTYPE_STRING);
+		// set_vtype(VTYPE_STRING);
 		set_sval(adat->mval[ind1].sval);
-		ls_psval = &adat->mval[ind1].sval;
+		// ls_psval = &adat->mval[ind1].sval;
 		// MESG("	return type sval [%s]",adat->mval[ind1].sval);
 	};
 	NTOKEN2;
@@ -4383,7 +4366,7 @@ inline static void bnf_factor_at()
 {
 	int bval=macro_exec;
 	macro_exec=MACRO_TRUE;
-	set_vtype(VTYPE_NUM);
+	// set_vtype(VTYPE_NUM);
 	bnf_var->dval=sysexec((char *)tok->tname);
 	bnf_var->var_type=VTYPE_NUM;
 	// NTOKEN2;

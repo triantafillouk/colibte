@@ -8,6 +8,8 @@
 	Normal factor ops
 */
 
+#define FACTOR_FUNCTION tok->factor_function()
+
 double factor_option();
 double exec_function(FILEBUF *bp,int nargs);
 MVAR * push_args_1(int nargs,int vars_num);

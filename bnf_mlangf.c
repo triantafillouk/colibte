@@ -6,10 +6,6 @@ extern char *vtype_names[];
 
 void mesg_out(const char *fmt, ...);
 void init_stack();
-// tok_struct *current_token();
-// void set_vtype(int type);
-// int vtype_is(int type);
-// int get_vtype();
 void set_array(array_dat *a);
 array_dat *get_array(char *);
 // void set_nsval(char *,int);
@@ -26,42 +22,6 @@ void get_uppercase_string(char *upper, char *string);
 void get_lowercase_string(char *lower, char *string);
 int deq(double v1,double v2);
 void show_var_node(BTNODE *node);
-
-#if	NUSE
-inline static void bnf_function_args (int number_of_args)
-{
-	int i;
-	int f_entry=entry_mode;
-	entry_mode=KNORMAL;
-	// MESG("bnf_function_args: %d [%d %s]",number_of_args,tok->tnum,tok->tname);
-
-	for(i=0;i<number_of_args;i++) {
-		NTOKEN2;
-		bnf_expression();
-		// show_result();
-	};
-	entry_mode=f_entry;
-}
-
-void bnf_numeric_args (int number_of_args)
-{
-	int i;
-	// MESG("bnf_numeric_args: %d",number_of_args);
-	for(i=0;i< number_of_args;i++ ) { 
-		NTOKEN2;
-		bnf_expression();set_var_value();
-	};
-// 	ntoken();
-}
-
-double bnf_numeric_arg ()
-{
-	// MESG("bnf_numeric_arg:");
-	ntoken();
-	bnf_expression();set_var_value();
-	return num_result();
-}
-#endif
 
 void bnf_len()
 {
@@ -110,13 +70,6 @@ void bnf_cls()
 	cls_fout("[out]");
 	if(show_no_time) MESG("<-[%s: %s ------------------------------------------------------------->",cbfp->b_fname,"version..");
 	else MESG("<-[%s: %s ------------------------------------------------------------->",cbfp->b_fname,VERSION);
-}
-
-void bnf_index()	// ?? TODO!!
-{
-	MESG("new index!");
-	// bnf_var->dval=VTYPE_TREE;
-	bnf_var->var_type=VTYPE_TREE;
 }
 
 /* get array determinant */
@@ -953,7 +906,6 @@ v_function bnf_functions[] = {
 	{"array_cols",1,bnf_array_cols},	/* columns of an an array  */
 	{"array_rows",1,bnf_array_rows},	/* rows of an an array  */
 	{"dbg_message",1,bnf_dbg_message},	/* show debug message  */
-	{"index",0,bnf_index},	/* new index  */
 	{"show_vars",0,bnf_show_vars},	/* show local vars  */
 	{"list_tokens",0,bnf_list_tokens},	/* list_tokens  */
 	{"var_index",0,bnf_var_index},	/* show stack var index  */

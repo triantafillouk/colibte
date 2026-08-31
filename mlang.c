@@ -27,7 +27,6 @@ inline void ntoken();
 // #define	NTOKEN2	ntoken()
 #endif
 
-#define FACTOR_FUNCTION tok->factor_function()
 void mesg_out(const char *fmt, ...);
 extern FILEBUF *cbfp;
 // extern array_dat *main_args;
@@ -40,17 +39,21 @@ void set_term_function(tok_struct *tok, TFunction term_function);
 inline static void  skip_args1(int nargs);
 inline static MVAR *get_left_slot(int ind);
 inline static int check_token(int type);
+void show_var_node(BTNODE *node);
+void eval_btree1(BTNODE *node,void do_func(BTNODE *n,void *p),void *p);
 
 #if	TNORMAL
 static inline double num_expression();
 static inline double num_term1();
 static inline double num_term2();
 double cexpression();
+void set_tok_function(tok_struct *tok, int type);
+void set_vtype(int type);
 #endif
+
 int check_init(FILEBUF *bf);
 
 // inline static void ntoken2();
-void set_tok_function(tok_struct *tok, int type);
 
 #if	TBNF
 static inline void bnf_factor_dummy();
@@ -114,7 +117,6 @@ double exec_block1_break(FILEBUF *fp);
 char * tok_info(tok_struct *tok);
 void MESG_TOK_INFO(char *title,tok_struct *tok);
 
-void set_vtype(int type);
 int vtype_is(int type);
 int get_vtype();
 #if	TBNF
@@ -151,7 +153,9 @@ BTNODE *var_node=NULL;
 
 tok_struct *lstoken=NULL;
 MVAR *lsslot=NULL;
+#if	TNORMAL
 char **ls_psval=NULL;
+#endif
 double *ls_pdval=NULL;
 MVAR *lmvar=NULL;
 int firt_var=1;
@@ -229,7 +233,10 @@ char *vtype_names[] = {
 /* Function definitions */
 #if	TNORMAL
 #include "mlang_functions.c"
+#include "mlangf.c"
+#include "mlang_expr.c"
 #endif
+
 #if	TBNF
 #include "bnf_expr.c"
 #if	TFUNC
@@ -238,9 +245,22 @@ char *vtype_names[] = {
 #include "bnf_mlang_f.c"
 #endif
 #endif
-#if	TNORMAL
-#include	"mlang_expr.c"
-#endif
+
+void show_var_node(BTNODE *node)
+{
+	MVAR *var = current_stable;
+	var = &current_stable[node->node_index];
+	// mesg_out("type %d",var->var_type);
+	// mesg_out("type name %s",vtype_names[var->var_type]);
+	if(var->var_type==VTYPE_NUM) 
+		mesg_out("%03d %-10s %2d(%12s) %f",
+			node->node_index,node->node_name,var->var_type,vtype_names[var->var_type],var->dval);
+	else if(var->var_type==VTYPE_STRING)
+		mesg_out("%03d %-10s %2d(%12s) \"%s\"",
+			node->node_index,node->node_name,var->var_type,vtype_names[var->var_type],var->sval);
+	else
+		mesg_out("%03d %-10s %2d(%12s)",node->node_index,node->node_name,var->var_type,vtype_names[var->var_type]);
+}
 
 void eval_curl_match(tok_struct *tok)
 {
@@ -283,9 +303,7 @@ int combine_tokens(tok_struct *prev_token,tok_struct *op2)
 		// MESG("	term1: set mul function!");
 		prev_token->ttype = op2->ttype;
 		prev_token->tname="num";
-#if	TBNF
 		prev_token->bnf_group = op2->ttype;
-#endif
 		prev_token->tgroup = TOK_OPNUM;
 #if	TFINDEX
 		prev_token->function_index = op2->ttype;
@@ -309,9 +327,7 @@ int combine_tokens(tok_struct *prev_token,tok_struct *op2)
  if(prev_token->ttype==TOK_VAR) {
 	if(ttype==TOK_MUL||ttype==TOK_DIV||ttype==TOK_PLUS||ttype==TOK_MINUS) {
 			prev_token->ttype = op2->ttype;
-#if	TBNF
 			prev_token->bnf_group = op2->ttype;
-#endif
 			prev_token->tgroup = 19;
 #if	TFINDEX
 			prev_token->function_index = op2->ttype;
@@ -418,25 +434,15 @@ void delete_type_tree(BTREE *type_tree)
 	free(type_tree);
 }
 
-array_dat *transpose(array_dat *array1);
-
 inline void init_vars(MVAR *head,int const size)
 {
  // initialize as numeric
  // MESG("init_vars: %d",size);
-#if	1
  MVAR *tdp,*tdp_end=head+size;
  for(tdp=head;tdp<tdp_end;tdp++) {
  	tdp->var_type=VTYPE_NUM;
 	tdp->dval=0;
  };
-#else
- int i=0;
- for(;i<size;i++) {
- 	head[i].var_type=VTYPE_NUM;
-	head[i].dval=0;
- };
-#endif
 }
 
 void initialize_call_stack(int initial_size)
@@ -483,12 +489,6 @@ inline static void  skip_args1(int const nargs)
  tok +=2+2*nargs;
 #endif
 }
-
-
-
-
-void sarray_mul1(array_dat *sarray, double factor);
-
 
 tok_struct *new_tok()
 {
@@ -899,17 +899,10 @@ int check_init(FILEBUF *bf)
  INIT_STAGE;
  int checked = (bf->tok_table != NULL);
  MESG("---- check_init: [%s] %d checked=%d err=%d",bf->b_fname,bf->b_type,checked,bf->err);
- // eval_curl_match(NULL);
-#if	0
- if(execmd) 
- {
- 	fprintf(stderr,"exec [%s] ----------------\n",bf->b_fname);
- 	fprintf(stdout,"exec [%s] ----------------\n",bf->b_fname);
- };
-#endif
+
  if(tok_table==NULL) 
  {
- 	MESG("create token table [%s] err=%d",bf->b_fname,bf->err);
+ 	// MESG("create token table [%s] err=%d",bf->b_fname,bf->err);
 	parse_block1(bf,NULL,1);
 	// MESG("block parsed err = %d",err_num);
 	if(err_num>0) {
@@ -1036,7 +1029,6 @@ inline static MVAR *get_left_slot(int const ind)
 	return &current_stable[ind];
 }
 
-void eval_btree1(BTNODE *node,void do_func(BTNODE *n,void *p),void *p);
 
 void node_to_mvar(BTNODE *node,void *p)
 {
@@ -1099,15 +1091,12 @@ char *str_cat(char *sval, char *add)
  return sval;
 }
 
-
+#if	TBNF
 void set_bnf_function1(tok_struct *tok, int type)
 {
-#if	TBNF
  if(type==0) {
 	int exp_type = factor_bnf_type[type];
-#if	TBNF
 	tok->bnf_group=exp_type;
-#endif
 	tok->bnf_factor_function = factor_bnf_funcs[exp_type];
 #if	TFINDEX
 	tok->function_index=exp_type;
@@ -1115,9 +1104,7 @@ void set_bnf_function1(tok_struct *tok, int type)
 	// MESG("-- set_bnf_function1 to none!!!: num=%2d exp type=%3d",tok->tnum,exp_type);
  } else if(type>0) {
 	int exp_type = factor_bnf_type[type];
-#if	TBNF
 	tok->bnf_group=exp_type;
-#endif
 	tok->bnf_factor_function = factor_bnf_funcs[exp_type];
 #if	TFINDEX
 	tok->function_index=exp_type;
@@ -1125,23 +1112,21 @@ void set_bnf_function1(tok_struct *tok, int type)
 	tok->ttype=type;
 	// MESG("-- set_bnf_function1: ind=%2d exp num=%3d",tok->tnum,exp_type);
  } else {
-#if	TBNF
 	tok->bnf_group=0;
-#endif
 	tok->bnf_factor_function = factor_bnf_funcs[-type];
 #if	TFINDEX
 	tok->function_index=type;
 #endif
 	// MESG("-- set_bnf_function1: ind=%2d exp num=%3d",tok->tnum,type);
  };
-#endif
 }
+#endif
 
 #include "mlang_parser.c"
 
+#if	TNORMAL
 void set_tok_function(tok_struct *tok, int type)
 {
-#if	TNORMAL
 	// MESG("set_tok_function: type=%d ttype=%d %s",type,tok->ttype,tok_info(tok));
 	if(tok==NULL) MESG("set_tok_function: NULL! token");
 	switch(type) {
@@ -1161,13 +1146,10 @@ void set_tok_function(tok_struct *tok, int type)
 		case 1:
 			// MESG("	1 set factor function to %d",tok->ttype);
 			tok->cexpr_function = (EFunction)factor_funcs[tok->ttype];
-#if	TBNF
-			// tok->bnf_factor_function = factor_bnf_funcs[tok->ttype];
-#endif
 			// MESG(" c tok %2d: %s type [%d %s] set cepr function",tok->tnum,tok->tname,tok->ttype,tok_name[tok->ttype]);
 	};
-#endif
 }
+#endif
 
 // skip next sentence in a list
 void skip_sentence1()
@@ -2056,11 +2038,13 @@ inline int vtype_is(int type)
 #endif
 }
 
+#if	TNORMAL
 inline void set_vtype(int type)
 {
 	// MESG("set_vtype: %X",type);
 	ex_var.var_type=type;
 }
+#endif
 
 #if	TNORMAL
 void set_nsval(char *s,int max)

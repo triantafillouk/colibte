@@ -1,6 +1,6 @@
-#include "xe.h"
-#include "mlang.h"
-#include "display_driver.h"
+// #include "xe.h"
+// #include "mlang.h"
+// #include "display_driver.h"
 
 extern array_dat *main_args;
 extern char *ex_name;
@@ -30,6 +30,7 @@ void print_array1(char *title,array_dat *adat);
 void get_uppercase_string(char *upper, char *string);
 void get_lowercase_string(char *lower, char *string);
 int deq(double v1,double v2);
+void events_flush();
 
 MVAR va[3];
 #if	TNORMAL
@@ -148,14 +149,6 @@ double uf_cls()
 	ntoken();
 	cls_fout("[out]");
 	// MESG("<-%s: %s ------------------------------------------------------------->",cbfp->b_fname,VERSION);
-	return 0;
-}
-
-double uf_index()
-{
-	ntoken();
-	MESG("new index!");
-	set_vtype(VTYPE_TREE);
 	return 0;
 }
 
@@ -728,22 +721,6 @@ double uf_mainarg()
 extern MVAR *current_stable;
 extern FILEBUF *exe_buffer;
 
-
-void show_var_node(BTNODE *node)
-{
-	MVAR *var = current_stable;
-	var = &current_stable[node->node_index];
-	// mesg_out("type %d",var->var_type);
-	// mesg_out("type name %s",vtype_names[var->var_type]);
-	if(var->var_type==VTYPE_NUM) 
-		mesg_out("%03d %-10s %2d(%12s) %f",
-			node->node_index,node->node_name,var->var_type,vtype_names[var->var_type],var->dval);
-	else if(var->var_type==VTYPE_STRING)
-		mesg_out("%03d %-10s %2d(%12s) \"%s\"",
-			node->node_index,node->node_name,var->var_type,vtype_names[var->var_type],var->sval);
-	else
-		mesg_out("%03d %-10s %2d(%12s)",node->node_index,node->node_name,var->var_type,vtype_names[var->var_type]);
-}
 
 #if	TNORMAL
 double uf_show_vars()

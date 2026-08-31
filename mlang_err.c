@@ -688,12 +688,14 @@ tok_struct *tok0_bnf=NULL;
 	err_num=4730;
 	return(err_num);
  };
+#if	TBNF
  if(tok0->ttype==TOK_VAR && (tok->ttype != TOK_ASSIGN && tok->ttype!=TOK_INCREASEBY && tok->ttype!=TOK_DECREASEBY\
  	&& tok->ttype!=TOK_MULBY && tok->ttype!=TOK_DIVBY)) {
 	// MESG("stack push [%s]",tok_info(tok0));
  	tok0_bnf=stack_push("factor",tok0,tok0->ttype);
 	
  };
+#endif
  // MESG("> factor  : tok0 %s",tok_info(tok0));
  switch(tok0->ttype) {
 	/*  the following ends factor  */
@@ -891,7 +893,9 @@ tok_struct *tok0_bnf=NULL;
 			MESG("	No rbracket found!");
 		};
 		// MESG("	tok_array_l2: after rbraket [%s]",tok_info(tok));
+#if	TBNF
 		stack_push("tok_array_l2 2",tok,tok->ttype);
+#endif
 		if(tok->ttype==TOK_TYPE_ELEMENT) {
 			tok->dval=-1;
 #if	TBNF
@@ -1053,7 +1057,9 @@ tok_struct *tok0_bnf=NULL;
 #if	TBNF
 			tok0_bnf->bnf_factor_function=bnf_factor_array_l1_tba;
 #endif
+#if	TNORMAL
 			set_tok_function(tok,0);
+#endif
 #if	TBNF
 			tok_struct *ts=stack_push("4988",tok,tok->ttype);
 			ts->bnf_factor_function=bnf_update_array1;
@@ -1066,7 +1072,9 @@ tok_struct *tok0_bnf=NULL;
 #if	TBNF
 			tok0_bnf->bnf_factor_function=bnf_factor_array_l1_tba;
 #endif
+#if	TNORMAL
 			set_tok_function(tok,0);
+#endif
 #if	TBNF
 			tok_struct *ts=stack_push("4988",tok,tok->ttype);
 			ts->bnf_factor_function=bnf_update_array1;

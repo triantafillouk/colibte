@@ -38,7 +38,9 @@ void init_array_header(struct array_dat *array, int rows,int cols,int ctype)
 	array->atype=ctype;
 	array->astat=ARRAY_UNALLOCATED;
 	array->dat=NULL;
+#if	TNORMAL
 	set_vtype(ctype);
+#endif
 	/* init again after use the ex values!  */
 	ex_nums=0;ex_nquote=0;ex_nvars=0;
 	// MESG("init_array_header: type=%d rows=%d cols=%d",array->atype,array->rows,array->cols);
