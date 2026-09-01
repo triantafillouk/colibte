@@ -1094,20 +1094,23 @@ char *str_cat(char *sval, char *add)
 #if	TBNF
 void set_bnf_function1(tok_struct *tok, int type)
 {
+ // MESG("	set_bnf_function: type=%d [%s]",type,tok_info(tok));
  if(type==0) {
 	int exp_type = factor_bnf_type[type];
 	tok->bnf_group=exp_type;
-	tok->bnf_factor_function = factor_bnf_funcs[exp_type];
+	int ind_type = (exp_type>0) ? exp_type: -exp_type;
+	tok->bnf_factor_function = factor_bnf_funcs[ind_type];
 #if	TFINDEX
-	tok->function_index=exp_type;
+	tok->function_index=ind_type;
 #endif
 	// MESG("-- set_bnf_function1 to none!!!: num=%2d exp type=%3d",tok->tnum,exp_type);
  } else if(type>0) {
 	int exp_type = factor_bnf_type[type];
 	tok->bnf_group=exp_type;
-	tok->bnf_factor_function = factor_bnf_funcs[exp_type];
+	int ind_type = (exp_type>0) ? exp_type: -exp_type;
+	tok->bnf_factor_function = factor_bnf_funcs[ind_type];
 #if	TFINDEX
-	tok->function_index=exp_type;
+	tok->function_index=ind_type;
 #endif
 	tok->ttype=type;
 	// MESG("-- set_bnf_function1: ind=%2d exp num=%3d",tok->tnum,exp_type);
@@ -1115,7 +1118,7 @@ void set_bnf_function1(tok_struct *tok, int type)
 	tok->bnf_group=0;
 	tok->bnf_factor_function = factor_bnf_funcs[-type];
 #if	TFINDEX
-	tok->function_index=type;
+	tok->function_index=-type;
 #endif
 	// MESG("-- set_bnf_function1: ind=%2d exp num=%3d",tok->tnum,type);
  };

@@ -255,6 +255,7 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 #if	TFUNC
 			tok_struct *tok_comma=stack_push("eval_function ,",tok,0);
 			tok_comma->bnf_factor_function=bnf_factor_sep0;
+			tok_comma->tname=",0";
 #else
 			stack_push("eval_function ,",tok,0);
 #endif
@@ -2455,7 +2456,10 @@ int err_check_block1()
 		case TOK_COMMA:
 #if	TFUNC
 			{
+			// MESG("- Push TOK_COMMA");
 			tok_struct *comma = stack_push("comma",tok,tok->ttype);
+			// comma->tname=",1";
+			// comma->bnf_factor_function=bnf_factor_sep0;
 			comma->bnf_group=1;
 			};break;
 #endif

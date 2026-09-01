@@ -1886,8 +1886,8 @@ inline static void bnf_factor_sep1()
 		MESG(";bnf_factor_sep1 error! skip var@=%d [%s]",VARIND,tok_info(tok));
 	};
 #else
-	prev_var("sep1");
 	// MESG("	sep1: var@ %d [%s]",VARIND,tok_info(tok));
+	prev_var("sep1");
 #endif
 }
 
@@ -1916,6 +1916,7 @@ inline static void bnf_factor_eof()
 
 inline static void bnf_factor_sep()
 {
+ // MESG("bnf_factor_sep: [%s]",tok_info(tok));
  if(bnf_var>bnf_vars) 
  { 
 	tok_struct *ntoken=tok+1;
