@@ -897,8 +897,8 @@ int check_init(FILEBUF *bf)
  check_buffer = bf;
  int err=0;
  INIT_STAGE;
- int checked = (bf->tok_table != NULL);
- MESG("---- check_init: [%s] %d checked=%d err=%d",bf->b_fname,bf->b_type,checked,bf->err);
+ // int checked = (bf->tok_table != NULL);
+ // MESG("---- check_init: [%s] %d checked=%d err=%d",bf->b_fname,bf->b_type,checked,bf->err);
 
  if(tok_table==NULL) 
  {
@@ -1282,9 +1282,11 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  MVAR *local_symbols;
  MVAR *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
-	MESG("# compute_block1: [%s] use [%s] start=%d",bp->b_fname,use_fp->b_fname,start);
-	if(show_no_time) MESG("# [%-15s  %s --------------------------------------------- %d",bp->b_fname,"Version",bp->err);
-	else MESG("# [%-15s  %s --------------------------------------------- %d",bp->b_fname,VERSION,bp->err);
+	// MESG("# compute_block1: [%s] use [%s] start=%d",bp->b_fname,use_fp->b_fname,start);
+	if(show_no_time) 
+		MESG("# [%-15s use %s %s ---------------------------------",bp->b_fname,use_fp->b_fname,"Version");
+	else 
+		MESG("# [%-15s use %s %s ---------------------------------",bp->b_fname,use_fp->b_fname,VERSION);
 	eval_curl_match(NULL);
 #if	0
  if(show_tokens) {

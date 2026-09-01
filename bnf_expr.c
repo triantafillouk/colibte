@@ -3383,7 +3383,7 @@ inline static void bnf_decreaseby_array2()
 
 inline static void bnf_mulby_array2()
 {
-	MESG(":mulby_array2:  bvar type=%d [%s]",bnf_var->var_type,tok_info(tok));
+	// MESG(":mulby_array2:  bvar type=%d [%s]",bnf_var->var_type,tok_info(tok));
 	MVAR *bvar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer : bnf_var;
 	prev_var("mulby_array2:");
 	// MESG("	avar type=%d",bnf_var->var_type);
@@ -3394,7 +3394,7 @@ inline static void bnf_mulby_array2()
 		int row = index1/adat->cols;
 		int col = index1%adat->cols;
 		double **dval2 = adat->dval2;
-		MESG("	mulby element row=%d col=%d",row,col);
+		// MESG("	mulby element row=%d col=%d",row,col);
 		dval2[row][col] *=bvar->dval;
 		bnf_var->dval=dval2[row][col];
 		bnf_var->var_type=VTYPE_NUM;
@@ -3637,11 +3637,9 @@ inline static void bnf_factor_array_l1()
 inline static void bnf_factor_array_l1_tba_array()
 {
 	array_dat *adat = (current_stable+tok->tind)->adat;
-	// next_var("arrayl1");
-	// MESG("bnf_factor_array_l1_tba_array:");
+	// MESG("bnf_factor_array_l1_tba_array: v@=%d",VARIND);
 	NTOKEN2;
 	int ind1 = (int)bnf_expression();
-	// prev_var("l1_tba_ae:");
 	// if(ind1<10) MESG("## bnf_factor_array_l1_tba: var@=%d [%s]",VARIND,tok_info(tok));
 
 	int dim = (adat->rows > 1) ? adat->rows: adat->cols;
@@ -3690,7 +3688,7 @@ inline static void bnf_factor_array_l1_tba()
 		return bnf_factor_array_l1_tba_array();
 	}
 
-	next_var("arrayl1");
+	// next_var("arrayl1");
 	// MESG("## bnf_factor_array_l1_tba: var@=%d [%s]",VARIND,tok_info(tok));
 
 	int ind1;
@@ -3700,7 +3698,7 @@ inline static void bnf_factor_array_l1_tba()
 	// MESG("	factor_arrayl1:< ----------- vtype=%d  [%s]",array_slot->var_type,tok_info(tok));
 	NTOKEN2;
 	ind1 = (int)bnf_expression();
-	prev_var("l1_tba_ae:");
+	// prev_var("l1_tba_ae:");
 	// MESG("	after expression: array ind=%d var@=%d [%s]",ind1,VARIND,tok_info(tok));
 #if	0
 	if(adat==NULL) {	/* this happens if array is not defined yet!!!  */
@@ -3732,7 +3730,7 @@ inline static void bnf_factor_array_l1_tba()
 inline static void bnf_factor_array_l2_tba()
 {
 	// MESG("bnf_factor_array_l2_tba:[%s]",tok_info(tok));
-	next_var("arrayl2");
+	// next_var("arrayl2");
 	// MESG("	array_l1 var@=%d",VARIND);
 	int ind1,ind2;
 	MVAR *array_slot;
@@ -3744,7 +3742,7 @@ inline static void bnf_factor_array_l2_tba()
 	// MESG("	factor_array_l2_tba:< ----------- vtype=%d  [%s]",array_slot->var_type,tok_info(tok));
 	NTOKEN2;
 	ind1 = (int)bnf_expression();
-	prev_var("l2_tba_ae1");
+	// prev_var("l2_tba_ae1");
 	NTOKEN2;
 	ind2 = (int)bnf_expression();
 	prev_var("l2_tba_ae2");
@@ -3800,7 +3798,7 @@ inline static void bnf_factor_array_l2()
 	int ind1;
 	double value=0;
 	MVAR *array_slot;
-	MESG("bnf_factor_array_l2: var@=%d [%s]",VARIND,tok_info(tok));
+	// MESG("bnf_factor_array_l2: var@=%d [%s]",VARIND,tok_info(tok));
 
 	array_slot=&current_stable[tok->tind];
 	array_dat *adat = array_slot->adat;
@@ -3943,14 +3941,13 @@ inline static void bnf_assign_type()
 		return;
 	};
 
-	next_var("assign_type");
-
 	if(check_token(TOK_LBRAKET)) {
 		// MESG("	assign type lbraket, double array!");
 		NTOKEN2;
-		size2 = (int)bnf_expression();prev_var("at");
+		size2 = (int)bnf_expression();
+		// prev_var("at");
 		NTOKEN2;
-	};
+	} else next_var("assign_type");
 
 	array_dat *adat=alloc_array_header();
 	adat->rows=size2;
@@ -4318,7 +4315,7 @@ inline static void bnf_divby_element()
 
 inline static void bnf_type_l2_result()
 {
-	next_var("arrayl2 result");	// new place on var stack
+	// next_var("arrayl2 result");	/* new place on var stack */
 	// MESG("## bnf_type_l2_result: ind=%d var@=%d [%s]",tok->tind,VARIND,tok_info(tok));
 
 	MVAR *array_slot;
@@ -4338,7 +4335,7 @@ inline static void bnf_type_l2_result()
 	int row_start=bnf_expression();
 	// MESG("	row is %d",row_start);
 	row_start *=adat->cols;
-	prev_var("type_l2");
+	// prev_var("type_l2");
 	// MESG("	row_start=%d [%s]",row_start,tok_info(tok));
 	NTOKEN2;	/* skip rbraket  */
 	// MESG("	get the index type [%s]",tok_info(tok));
@@ -4456,8 +4453,8 @@ inline static void bnf_factor_array_l2_update()
 inline static void bnf_type_l2_result_update()
 {
 	// MESG("## bnf_type_l2_result_update:");
-	next_var("arrayl2");
-	// MESG("## bnf_type_l2_result_update: ind=%d %f var@=%d [%s]",tok->tind,tok->dval,VARIND,tok_info(tok));
+	// next_var("arrayl2");
+	MESG("## bnf_type_l2_result_update: ind=%d %f var@=%d [%s]",tok->tind,tok->dval,VARIND,tok_info(tok));
 	int update_val=tok->dval;
 
 	MVAR *array_slot;
@@ -4466,7 +4463,8 @@ inline static void bnf_type_l2_result_update()
 	array_dat *adat = array_slot->adat;
 	// MESG("	get the row");
 	NTOKEN2;
-	int row=bnf_expression()*adat->cols;prev_var("type_l2"); // points to row start index
+	int row=bnf_expression()*adat->cols;
+	// prev_var("type_l2"); /* points to row start index */
 	// MESG("	row=%d [%s]",row,tok_info(tok));
 	NTOKEN2;
 	// MESG("	get the index type [%s]",tok_info(tok));

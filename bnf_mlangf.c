@@ -828,7 +828,7 @@ void bnf_dofile()
 {
 	char *fname;	/* name of file to execute */
 	char *fspec=NULL;		/* full file spec */
-	MESG("bnf_dofile:");
+	// MESG("bnf_dofile:");
 	MVAR *va=bnf_var;
 	// if(va->var_type==VTYPE_POINTER) va=va->var_pointer;
 	if(va->var_type!=VTYPE_STRING) {
@@ -854,7 +854,7 @@ void bnf_dofile()
 
 	int stat=dofile(fspec);
 	double value=num_result();
-	MESG("bnf_dofile: stat=%d var@=%d val=%f",stat,varind(),value);
+	MESG("	bnf_dofile: end: stat=%d var@=%d val=%f",stat,varind(),value);
 }
 
 v_function bnf_functions[] = {

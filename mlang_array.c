@@ -719,7 +719,7 @@ void array_mul1(array_dat *na,double num)
 	
  	if(na->atype==VTYPE_AMIXED) {
 		int dim=na->rows*na->cols;
-		MESG("array_mul1: amixed dim=%d",dim);
+		// MESG("array_mul1: amixed dim=%d",dim);
 		int i;
 		MVAR *mval=na->mval;
 		for(i=0;i<dim;i++) {

@@ -1160,7 +1160,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
   
-  MESG("	parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
+  // MESG("	parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
  	/* add eof token!  */
 	if(tok_type!=TOK_SEP) 
 	{	
