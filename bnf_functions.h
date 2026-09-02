@@ -268,6 +268,107 @@ VFunction factor_bnf_funcs[] = {
 	bnf_factor_none		// TOK_OTHER,
 };
 
+#if	1
+int factor_bnf_type[] = {
+	0,	// TOK_NONE
+	0,		// TOK_SEP
+	0,	// TOK_SPACE
+	TOK_OPNUM,	// TOK_LETTER
+	0,	// TOK_LCURL	,
+	TOK_END,	// TOK_RCURL	,
+	TOK_OPNUM,	// TOK_QUOTE
+	TOK_OPNUM,	// TOK_LPAR
+	TOK_OPNUM,	// TOK_RPAR	
+	0,	// TOK_SHOW
+	0,	// TOK_COMMENT	,
+	TOK_OPNUM,	// TOK_OPNUM	level 0 variable
+	TOK_OPNUM,	// TOK_OPTION	,	// editor option
+	TOK_OPNUM,		// TOK_CMD		,	// editor commands
+	TOK_OPNUM,	// TOK_FUNC	,	// function
+	TOK_OPNUM,	// TOK_PROC	,
+	TOK_OPNUM,		// TOK_ENV		,	// editor environment function
+	TOK_OPNUM,	// TOK_TERM0	term0 group
+	TOK_OPNUM,	// TOK_TERM	,	// term operators (+,-)
+	TOK_OPNUM,	// TOK_TERM1	,	// term1 operators (%,^)
+	TOK_OPNUM,	// TOK_TERM2	,	// term2 operators (*,/)
+	TOK_OPNUM,		// TOK_ASSIGN	,	// assignment
+	TOK_END,		// TOK_EOF		,	// end of file token
+	TOK_OPNUM,		// TOK_NUM, numeric value
+	0,	// TOK_DIR		,	// directive
+	0,	// TOK_DIR_IF	,	// dir if
+	0,	// TOK_DIR_ELSE	,	// dir else
+	0,	// TOK_DIR_BREAK	,
+	0,	// TOK_DIR_RETURN	,
+	0,	// TOK_DIR_WHILE	,
+	0,	// TOK_DIR_FOR		,
+	0,	// TOK_COMMA		,
+	0,	// TOK_DIR_FORI	,
+	/* bool operators  */
+	TOK_OPNUM,	// TOK_COMPARE		,33
+	TOK_OPNUM,	// TOK_NOTEQUAL	,
+	TOK_OPNUM,	// TOK_SMALLER		,	/* <  */
+	TOK_OPNUM,	// TOK_BIGGER		,	/* >  */
+	TOK_OPNUM,	// TOK_EQUAL		,	/* ==  */
+	TOK_OPNUM,	// TOK_SMALLEREQ	,	/* <=  */
+	TOK_OPNUM,	// TOK_BIGGEREQ	,	/* >=  */
+	/* Bool operators  */
+	TOK_OPNUM,	// TOK_BOOL		,40
+	TOK_OPNUM,	// TOK_AND			,	/* &  */
+	TOK_OPNUM,	// TOK_OR			,	/* |  */
+	TOK_OPNUM,		// TOK_NOT	/* !  */
+	TOK_OPNUM,	// TOK_NAND		,	/* !&  */
+	TOK_OPNUM,	// TOK_NOR			,	/* !|  */
+	TOK_OPNUM,	// TOK_XOR			,	/* ^  */
+	/* term operators  */
+	TOK_OPNUM,	// TOK_PLUS		,47
+	TOK_OPNUM,	// TOK_MINUS		,
+	TOK_OPNUM,	// TOK_POWER		,	/* ** */
+	TOK_OPNUM,	// TOK_MOD			,	/* %  */
+	TOK_OPNUM,	// TOK_MUL			,
+	TOK_OPNUM,	// TOK_DIV			,
+	TOK_OPNUM,	// TOK_LBRAKET		,53
+	0,	// TOK_RBRAKET		,
+	TOK_OPNUM,	// TOK_SQUOTE		,
+	0,		// TOK_AT			,
+	0,	// TOK_RANGE		,
+	0,	// TOK_BQUOTE
+	0,	// TOK_DOLAR		,
+	0,	// TOK_TILDA		,
+	TOK_OPNUM,		// TOK_INCREASE	,61
+	TOK_OPNUM,		// TOK_DECREASE	,62
+	TOK_OPNUM,	// TOK_INCREASEBY 63
+	TOK_OPNUM,			// TOK_MULBY
+	TOK_OPNUM,		// TOK_DIVBY
+	TOK_OPNUM,	// TOK_DECREASEBY
+	0,	// TOK_BSLASH		,
+	0,	// TOK_NL				,
+	0,	// TOK_DIR_CONTINUE	,
+	0,	// TOK_DIR_FOREACH		,
+	0,	// TOK_DIR_TYPE,
+	TOK_OPNUM,	// TOK_ARRAY1
+	TOK_OPNUM,	// TOK_ARRAY2
+	TOK_OPNUM,// TOK_ARRAY_L1
+	TOK_OPNUM,// TOK_ARRAY_L2
+	TOK_OPNUM,	// TOK_ASSIGNENV	,
+	TOK_OPNUM,	// TOK_ASSIGNOPT	,
+	TOK_END,	// TOK_END,
+	0,	// TOK_DEFINE_TYPE,
+	TOK_OPNUM,	// TOK_ASSIGN_TYPE,
+	TOK_OPNUM,	// TOK_TYPE_ELEMENT
+	0,	// TOK_DOT,
+	0,	// TOK_INCBEFORE
+	0,	// TOK_DECBEFORE
+	TOK_OPNUM,
+	TOK_OPNUM,
+	TOK_OPNUM,
+	TOK_OPNUM,
+	TOK_OPNUM,
+	TOK_OPNUM,
+	TOK_OPNUM,
+	TOK_OPNUM,
+	0		// TOK_OTHER,
+};
+#else
 int factor_bnf_type[] = {
 	0,	// TOK_NONE
 	0,		// TOK_SEP
@@ -367,5 +468,4 @@ int factor_bnf_type[] = {
 	TOK_OPNUM,
 	0		// TOK_OTHER,
 };
-
 #endif

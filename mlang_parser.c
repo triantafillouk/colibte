@@ -47,7 +47,7 @@ tok_struct *add_token(FILEBUF *bf,int tok_type,int cc,char *label,char *from,int
 	tok=new_tok();
 	add_element_to_list((void *)tok,bf->lex_parser);
 	tok->tnum=bf->lex_parser->size-1;
-	// MESG("!A[%s] add [%s] %3d %3d: cc=%d type=[%s] name=[%s] tok=%p",bf->b_fname,from,line,tok->tnum,cc,tname(tok_type),label,tok);
+	// MESG("!A[%s] add [%s] %3d %3d: cc=%d type=[%s] name=[%s]",bf->b_fname,from,line,tok->tnum,cc,tname(tok_type),label);
 	return tok;
 }
 

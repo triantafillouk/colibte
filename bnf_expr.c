@@ -308,7 +308,7 @@ inline static void bnf_factor_not()
 inline static void bnf_factor_negate()
 {
   MVAR *num_var = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer:bnf_var;
- // MESG("bnf_factor_negate:");
+  // MESG("bnf_factor_negate: v@=%d t=%d",VARIND,num_var->var_type);
  if(num_var->var_type == VTYPE_NUM) {
  	bnf_var->dval = -num_var->dval;
 	bnf_var->var_type=VTYPE_NUM;
@@ -316,6 +316,7 @@ inline static void bnf_factor_negate()
  };
  syntax_error(1103,"factor not error!");
 }
+
 
 inline static void  bnf_factor_pp_plus()
 {
@@ -1154,7 +1155,7 @@ inline static void bnf_factor_mul()
 
 inline static void bnf_factor_div()
 {
- MESG("bnf_factor_div : var@=%d ind=%d [%s]",VARIND,tok->tind,tok_info(tok));
+ // MESG("bnf_factor_div : var@=%d ind=%d [%s]",VARIND,tok->tind,tok_info(tok));
  MVAR *varb = bnf_var;
  	if(varb->var_type==VTYPE_POINTER) varb=varb->var_pointer;
 	prev_var("div21");
@@ -2267,7 +2268,7 @@ inline static void bnf_factor_option()
 // dummy one!
 inline static void bnf_factor_lpar()
 {
-	MESG("bnf_factor_lpar: bnf_group=%d",tok->bnf_group);
+	MESG("bnf_factor_lpar: [%s]",tok_info(tok));
 }
 
 inline static void bnf_factor_rpar()
@@ -2277,8 +2278,8 @@ inline static void bnf_factor_rpar()
 
 inline static void bnf_block1()
 {
-	// MESG("bnf_block1 start! group=%d [%s]",tok->tgroup,tok_info(tok));
-	while(tok->tgroup!=TOK_END) {
+	// MESG("# bnf_block1 start! group=%d [%s]",tok->tgroup,tok_info(tok));
+	while(tok->bnf_group!=TOK_END) {
 		// MESG("!B v@=%d [%s]",VARIND,tok_info(tok));	/*   */
 	 	tok->bnf_factor_function();
 		// MESG("		-- tok %d type %d act=%d",tok->tnum,tok->ttype,current_active_flag);
@@ -2303,7 +2304,7 @@ inline static void bnf_block1()
 inline static void bnf_block1_break(/*FILEBUF *fp*/)
 {
 	// MESG("bnf_block1_break start! group=%d [%s]",tok->tgroup,tok_info(tok));
-	while(tok->tgroup!=TOK_END) {
+	while(tok->bnf_group!=TOK_END) {
 		// MESG("--- block var@=%d [%s]",VARIND,tok_info(tok));
 	 	tok->bnf_factor_function();
 		// MESG("		-- tok %d type %d",tok->tnum,tok->ttype);
@@ -2621,7 +2622,7 @@ inline static void bnf_dir_while()	/* TBC  */
 
 inline static void bnf_statement(/*char *from*/)
 {
-	// MESG("#	bnf_statement:[%s] var@=%d [%s]",from,VARIND,tok_info(tok));
+	// MESG("#	bnf_statement: var@=%d [%s]",VARIND,tok_info(tok));
 	// if(tok->ttype==TOK_DIR_BREAK) { tok->bnf_factor_function(); return;};
 	if(tok->ttype==TOK_LCURL) bnf_dir_lcurl();
 	else {
@@ -2648,20 +2649,22 @@ inline static void set_result()
 
 inline static void bnf_expression0()
 {
-	// MESG("	bnf_expression: ------ tok ind=%3d ttype=%d tgroup=%d bnf_group=%d",tok->tind,tok->ttype,tok->tgroup,tok->bnf_group);
-	while(tok->bnf_group>0) {
+	// MESG("	bnf_expression0: ------ [%s]",tok_info(tok));
+	while(tok->bnf_group==TOK_OPNUM) {
+		// MESG("	bnf_expression0: ------ v@=%d [%s]",VARIND,tok_info(tok));
 		// MESG("	bnf_group=%d [%s]",tok->bnf_group,tok_info(tok));
 		tok->bnf_factor_function();	
 		// MESG("bnf_expression0:");
 		NTOKEN2;
 	};
+	// MESG("		end bnf_expression0 v@=%d [%s]",VARIND,tok_info(tok));
 }
 
 
 inline static double bnf_expression()
 {
-	// MESG("	bnf_expression: ------ tok ind=%3d ttype=%d tgroup=%d bnf_group=%d",tok->tind,tok->ttype,tok->tgroup,tok->bnf_group);
-	while(tok->bnf_group>0) {
+	while(tok->bnf_group==TOK_OPNUM) {
+		// MESG("	bnf_expression: ------ v@=%d [%s]",VARIND,tok_info(tok));
 		// MESG("	bnf_group=%d [%s]",tok->bnf_group,tok_info(tok));
 		tok->bnf_factor_function();	
 		// MESG("bnf_expression:");
@@ -2672,6 +2675,7 @@ inline static double bnf_expression()
 	if(bnf_var->var_type==VTYPE_NUM) return bnf_var->dval;
 	else return 0;
 #endif
+	// MESG("		end bnf_expression v@=%d [%s]",VARIND,tok_info(tok));
 }
 
 inline static void bnf_dir_return_value()

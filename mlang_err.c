@@ -1019,7 +1019,7 @@ tok_struct *tok0_bnf=NULL;
 		if(tok->ttype==TOK_DECREASE) {
 			// tok->tgroup=TOK_TERM2;
 #if	TBNF
-			tok->bnf_group=tok->ttype;
+			// tok->bnf_group=tok->ttype;
 #endif
 			tok->dval=-1;
 #if	TNORMAL
@@ -1035,7 +1035,7 @@ tok_struct *tok0_bnf=NULL;
 	case TOK_ARRAY1:{
 		// MESG("	TOK_ARRAY1: tok0=[%s]",tok_info(tok0));
 #if	TBNF
-		tok0->bnf_group=tok0->ttype;
+		// tok0->bnf_group=tok0->ttype;
 #endif
 		err_num=err_num_expression(); 
 		// MESG("	err tok_array1: after [%s]",tok_info(tok));
@@ -1099,7 +1099,7 @@ tok_struct *tok0_bnf=NULL;
 	case TOK_ARRAY2:{
 		// MESG("# TOK_ARRAY2: tok0=[%s]",tok_info(tok0));
 #if	TBNF
-		tok0->bnf_group=tok0->ttype;
+		// tok0->bnf_group=tok0->ttype;
 #endif
 		err_num=err_num_expression(); 
 		// MESG("	err_array2:1 [%s]",tok_info(tok));
@@ -1187,7 +1187,7 @@ tok_struct *tok0_bnf=NULL;
 		break;
 #if	0
 	case TOK_EQUAL:
-		tok0->bnf_group=tok0->ttype;
+		// tok0->bnf_group=tok0->ttype;
 		NTOKEN_ERR(444);
 		// err_cexpression();
 		RT_MESG1(444);;	
@@ -1198,7 +1198,7 @@ tok_struct *tok0_bnf=NULL;
 		ex_nums++;
 		xpos=4871;
 #if	TBNF
-		tok0->bnf_group=tok0->ttype;
+		// tok0->bnf_group=tok0->ttype;
 #endif
 		// MESG("tok_num: ");
 		// MESG("	next is: %s",tok_info(tok));
@@ -1212,7 +1212,7 @@ tok_struct *tok0_bnf=NULL;
 	case TOK_QUOTE:	 { // string 
 		xpos=488;
 #if	TBNF
-		tok0->bnf_group=tok0->ttype;
+		// tok0->bnf_group=tok0->ttype;
 #endif
 		if(pre_symbol) { syntax_error(xpos,"symbol before string");RT_MESG1(4881);};
 		ex_nquote++;
@@ -1225,7 +1225,7 @@ tok_struct *tok0_bnf=NULL;
 	case TOK_MINUS:
 		// MESG("tok_minus: %d",pre_symbol);
 #if	TBNF
-		tok0->bnf_group=tok0->ttype;
+		// tok0->bnf_group=tok0->ttype;
 #endif
 		if(pre_symbol>1) {
 			xpos=490;
@@ -1234,11 +1234,16 @@ tok_struct *tok0_bnf=NULL;
 		};
 		CHECK_TOK(491);
 		if(pre_symbol) {
+			pre_symbol=0;
+			// MESG("	- [%s]",tok_info(tok));
 			err_factor();
 			// MESG("	minus set to negate");
 #if	TBNF
-			// MESG("push negate!!!!!");
+			// MESG("push negate!!!!! [%s]",tok_info(tok0));
+			tok0->ttype=TOK_NEGATE;
 			tok0_bnf=stack_push("negate",tok0,TOK_NEGATE);
+			tok0_bnf->tname="NEG";
+			// tok0_bnf->bnf_factor_function=bnf_factor_negate;
 #endif
 		} else {
 #if	TBNF
@@ -1251,7 +1256,7 @@ tok_struct *tok0_bnf=NULL;
 	case TOK_PLUS:
 		MESG("tok_plus: %d",pre_symbol);
 #if	TBNF
-		tok0->bnf_group=tok0->ttype;
+		// tok0->bnf_group=tok0->ttype;
 #endif
 		if(pre_symbol>1) {
 			xpos=490;
@@ -1297,7 +1302,7 @@ tok_struct *tok0_bnf=NULL;
 		// MESG("+ TOK_ENV tok0=[%s]",tok_info(tok0));
 		// MESG("           tok=[%s]",tok_info(tok));
 #if	TBNF
-		tok0->bnf_group=tok0->ttype;
+		// tok0->bnf_group=tok0->ttype;
 		tok0_bnf->tok_node=var_node;
 #endif
 		pre_symbol=0;
@@ -1315,7 +1320,7 @@ tok_struct *tok0_bnf=NULL;
 		// MESG("TOK_FUNC: %s tok=[%s]",tok0->tname,tok_info(tok));
 		pre_symbol=0;
 #if	TBNF
-		tok0->bnf_group=tok0->ttype;
+		// tok0->bnf_group=tok0->ttype;
 #if	TFUNC
 		// NTOKEN_ERR(497);
 		err_num=err_eval_fun1(tok0,lpar);
@@ -1331,7 +1336,7 @@ tok_struct *tok0_bnf=NULL;
 		// MESG("------ define TOK_PROC ------ [%s]",tok_info(tok));
 		int nargs=0;
 #if	TBNF
-		tok0->bnf_group=tok0->ttype;
+		// tok0->bnf_group=tok0->ttype;
 #endif
 		tok_struct *after_proc;	// this is needed for recursive functions
 		xpos=501;
@@ -1510,7 +1515,7 @@ tok_struct *tok0_bnf=NULL;
 		tok0->tname="assign";
 		// set_bnf_function1(tok0,tok0->ttype);
 #if	TBNF
-		tok0->bnf_group=tok0->ttype;
+		// tok0->bnf_group=tok0->ttype;
 		MESG("	-- set bnf_group to %d",tok0->ttype);
 #endif
 		RT_MESG1(527);
@@ -1530,7 +1535,7 @@ tok_struct *tok0_bnf=NULL;
 		// MESG("TOK_TYPE_ELEMENT: [%s]",tok0->tname);
 #if	TBNF
 		tok0_bnf->dval=-1;
-		tok0->bnf_group=tok0->ttype;
+		// tok0->bnf_group=tok0->ttype;
 #endif
 		tok0->tgroup=TOK_TERM2;
 		RT_MESG1(529);
@@ -1776,7 +1781,7 @@ int err_lexpression()
 		case TOK_BIGGEREQ:
 			tok->tgroup=TOK_BOOL;
 #if	TBNF
-			tok->bnf_group=tok->ttype;
+			// tok->bnf_group=tok->ttype;
 #endif
 			NTOKEN_ERR(708);
 			err_num=err_cexpression();
@@ -2040,7 +2045,7 @@ int err_lexpression()
 			set_term_function(tok,assign_option);
 #endif
 #if	TBNF
-			tok->bnf_group=tok->ttype;
+			// tok->bnf_group=tok->ttype;
 #endif
 			NTOKEN_ERR(710);
 			err_num=err_assign_env();
@@ -2166,6 +2171,7 @@ int err_check_sentence1()
 #if	TBNF
 #if	!TFUNC
 		tok_struct *end_if_tok=stack_push("end of if",tok,-tok->ttype);
+		end_if_tok->tname="end of if";
 		if_token->next_tok=end_if_tok;
 #endif
 #endif
@@ -2193,6 +2199,7 @@ int err_check_sentence1()
 #if	TFUNC
 			tok_struct *ifnext = new_tok();
 			end_if_tok->next_tok=stack_push("end_of_else",ifnext,TOK_SEP);
+			end_if_tok->next_tok->tname="after else";
 #else
 			end_if_tok->next_tok = stack_push("end of else",tok,-tok->ttype);
 #endif
@@ -2201,8 +2208,9 @@ int err_check_sentence1()
 		} else {
 #if	TFUNC
 			tok_struct *ifnext = new_tok();
-			tok_struct *end_if_tok=stack_push("end_of_else",ifnext,TOK_SEP);
+			tok_struct *end_if_tok=stack_push("end_of_if",ifnext,TOK_SEP);
 			if_token->next_tok=end_if_tok;
+			end_if_tok->tname="after if";
 #endif
 			xpos=639;
 		};
@@ -2459,8 +2467,8 @@ int err_check_block1()
 			// MESG("- Push TOK_COMMA");
 			tok_struct *comma = stack_push("comma",tok,tok->ttype);
 			// comma->tname=",1";
-			// comma->bnf_factor_function=bnf_factor_sep0;
-			comma->bnf_group=1;
+			comma->bnf_factor_function=bnf_factor_sep0;
+			// comma->bnf_group=1;
 			};break;
 #endif
 		case TOK_SHOW:
