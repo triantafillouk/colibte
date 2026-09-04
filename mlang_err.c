@@ -197,6 +197,7 @@ void set_error(tok_struct *tok,int err,char *description)
 #endif
  tok->tgroup=TOK_END;
  tok->ttype=TOK_EOF;
+ tok->bnf_group=TOK_END;
  current_active_flag=0;
 }
 
@@ -2218,6 +2219,7 @@ int err_check_sentence1()
 #endif
 #if	TBNF
 		stack_push("DIR_FORI",tok,-tok->ttype);
+		// MESG("TOK_DIR_FORI: [%s]",tok_info(tok));
 #endif
 		NTOKEN_ERR(640);	/* go to next token after for */
 #if	TBNF
@@ -2245,6 +2247,7 @@ int err_check_sentence1()
 		tok0_bnf->tind = tok_var->tind;
 		// tok0_bnf->bnf_factor_function=bnf_factor_assign_iterator;
 		tok0_bnf->bnf_factor_function=bnf_factor_assign_var;
+		// MESG("for i assign: [%s]",tok_info(tok0));
 #endif
 		if(err_num) return(err_num);
 		CHECK_TOK(6406);
@@ -2482,7 +2485,7 @@ int err_check_block1()
 			continue;
 		case TOK_RCURL:
 #if	TBNF
-			stack_push("RCURL ",tok,-tok->ttype);
+			stack_push("RCURL",tok,-tok->ttype);
 #endif
 			// MESG("err_check_block1: [%s] --> [%s]", check_buffer->b_fname,tok_info(tok));
 			NTOKEN_ERR(675);

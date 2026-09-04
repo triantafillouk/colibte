@@ -989,7 +989,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 		struct curl_struct *tcl;
 			tcl=new_curl(curl_level,tok_line,bf->lex_parser->last);
 			tcl->num=tok->tnum;
-			tok->tname=" LCURL";
+			tok->tname="LCURL";
 			lpush(tcl,curl_stack);
 			tok->tcurl=tcl;
 	} else
@@ -998,7 +998,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			tcr=new_curl(curl_level,tok_line,bf->lex_parser->last);
 			tcl=(curl_struct *)lpop(curl_stack);
 			tok->tcurl=tcr;
-			tok->tname=" RCURL";
+			tok->tname="RCURL";
 			tcr->num=tcl->num;
 			tcl->num=tok->tnum;
 			tok->tgroup=TOK_END;
