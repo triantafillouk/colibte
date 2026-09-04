@@ -2649,7 +2649,7 @@ inline static void set_result()
 inline static void bnf_expression0()
 {
 	// MESG("	bnf_expression: ------ tok ind=%3d ttype=%d tgroup=%d bnf_group=%d",tok->tind,tok->ttype,tok->tgroup,tok->bnf_group);
-	while(tok->bnf_group>0) {
+	while(tok->bnf_group==1) {
 		// MESG("	bnf_group=%d [%s]",tok->bnf_group,tok_info(tok));
 		tok->bnf_factor_function();	
 		// MESG("bnf_expression0:");
@@ -2661,7 +2661,7 @@ inline static void bnf_expression0()
 inline static double bnf_expression()
 {
 	// MESG("	bnf_expression: ------ tok ind=%3d ttype=%d tgroup=%d bnf_group=%d",tok->tind,tok->ttype,tok->tgroup,tok->bnf_group);
-	while(tok->bnf_group>0) {
+	while(tok->bnf_group==1) {
 		// MESG("	bnf_group=%d [%s]",tok->bnf_group,tok_info(tok));
 		tok->bnf_factor_function();	
 		// MESG("bnf_expression:");

@@ -262,7 +262,7 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 	tok->tind=btn->node_index;
 	tok->ttype=btn->node_type;
 #if	TBNF
-	tok->bnf_group=TOK_VAR;
+	tok->bnf_group= 1;// TOK_VAR;
 #endif
 	ex_edenv=tok->ttype;
 	btn->node_vtype=VTYPE_NONE;

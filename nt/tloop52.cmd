@@ -45,4 +45,4 @@ _time	: "Mon Dec 28 12:54:09 2015"
 # message("i<"+i+" and j< "+j+" sets p="+p)
 print(_time)	: "Mon Dec 28 12:54:09 2015"
 tdif=show_time("End test",2)
-print(_version+": test concluded in "+tdif+" seconds")
+print(_version,": test concluded in ",tdif," seconds")

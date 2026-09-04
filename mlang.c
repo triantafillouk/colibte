@@ -303,7 +303,7 @@ int combine_tokens(tok_struct *prev_token,tok_struct *op2)
 		// MESG("	term1: set mul function!");
 		prev_token->ttype = op2->ttype;
 		prev_token->tname="num";
-		prev_token->bnf_group = op2->ttype;
+		prev_token->bnf_group = 1;// op2->ttype;
 		prev_token->tgroup = TOK_OPNUM;
 #if	TFINDEX
 		prev_token->function_index = op2->ttype;
@@ -327,7 +327,7 @@ int combine_tokens(tok_struct *prev_token,tok_struct *op2)
  if(prev_token->ttype==TOK_VAR) {
 	if(ttype==TOK_MUL||ttype==TOK_DIV||ttype==TOK_PLUS||ttype==TOK_MINUS) {
 			prev_token->ttype = op2->ttype;
-			prev_token->bnf_group = op2->ttype;
+			prev_token->bnf_group = 1; //op2->ttype;
 			prev_token->tgroup = 19;
 #if	TFINDEX
 			prev_token->function_index = op2->ttype;
@@ -505,7 +505,7 @@ tok_struct *new_tok()
 #if	TBNF
  tok->pushed=-1;
 #if	TBNF
- tok->bnf_group=-1;
+ tok->bnf_group=-1; // -1;
 #endif
  tok->bnf_factor_function=bnf_factor_dummy;
 #endif
@@ -1098,7 +1098,7 @@ void set_bnf_function1(tok_struct *tok, int type)
  // MESG("	set_bnf_function: type=%d [%s]",type,tok_info(tok));
  if(type==0) {
 	int exp_type = factor_bnf_type[type];
-	tok->bnf_group=exp_type;
+	tok->bnf_group= factor_bnf_group[type];
 	int ind_type = (exp_type>0) ? exp_type: -exp_type;
 	tok->bnf_factor_function = factor_bnf_funcs[ind_type];
 #if	TFINDEX
@@ -1107,7 +1107,7 @@ void set_bnf_function1(tok_struct *tok, int type)
 	// MESG("-- set_bnf_function1 to none!!!: num=%2d exp type=%3d",tok->tnum,exp_type);
  } else if(type>0) {
 	int exp_type = factor_bnf_type[type];
-	tok->bnf_group=exp_type;
+	tok->bnf_group= factor_bnf_group[type];
 	int ind_type = (exp_type>0) ? exp_type: -exp_type;
 	tok->bnf_factor_function = factor_bnf_funcs[ind_type];
 #if	TFINDEX
@@ -1116,7 +1116,7 @@ void set_bnf_function1(tok_struct *tok, int type)
 	tok->ttype=type;
 	// MESG("-- set_bnf_function1: ind=%2d exp num=%3d",tok->tnum,exp_type);
  } else {
-	tok->bnf_group=0;
+	tok->bnf_group=factor_bnf_group[-type];
 	tok->bnf_factor_function = factor_bnf_funcs[-type];
 #if	TFINDEX
 	tok->function_index=-type;
