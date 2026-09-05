@@ -274,7 +274,7 @@ int factor_bnf_group[] = {
 	0,	// TOK_SPACE
 	1,	// TOK_LETTER
 	0,	// TOK_LCURL	,
-	TOK_END,	// TOK_RCURL	,
+	BLOCK_END,	// TOK_RCURL	,
 	1,	// TOK_QUOTE
 	1,	// TOK_LPAR
 	0,	// TOK_RPAR	
@@ -291,7 +291,7 @@ int factor_bnf_group[] = {
 	1,	// TOK_TERM1	,	// term1 operators (%,^)
 	1,	// TOK_TERM2	,	// term2 operators (*,/)
 	1,		// TOK_ASSIGN	,	// assignment
-	TOK_END,		// TOK_EOF		,	// end of file token
+	BLOCK_END,		// TOK_EOF		,	// end of file token
 	1,		// TOK_NUM, numeric value
 	0,	// TOK_DIR		,	// directive
 	0,	// TOK_DIR_IF	,	// dir if

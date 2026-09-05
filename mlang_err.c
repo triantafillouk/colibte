@@ -197,7 +197,7 @@ void set_error(tok_struct *tok,int err,char *description)
 #endif
  tok->tgroup=TOK_END;
  tok->ttype=TOK_EOF;
- tok->bnf_group=TOK_END;
+ tok->bnf_group=BLOCK_END;
  current_active_flag=0;
 }
 

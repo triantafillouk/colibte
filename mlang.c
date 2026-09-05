@@ -417,7 +417,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		};
 		check_buffer->tok_bnf_index++;
 		prev_token = dest;
-		if(dest->ttype==TOK_RCURL||dest->ttype==TOK_EOF) dest->bnf_group=TOK_END;
+		if(dest->ttype==TOK_RCURL||dest->ttype==TOK_EOF) dest->bnf_group=BLOCK_END;
 		return dest;
    }
  } else {

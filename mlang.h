@@ -13,6 +13,7 @@
 #define	ARRAY_LOCAL			1
 #define	ARRAY_ALLOCATED		3
 
+#define BLOCK_END	2
 typedef	alist * TLIST;
 #if	TBNF
 typedef void (*VFunction)();

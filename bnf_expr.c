@@ -2278,7 +2278,7 @@ inline static void bnf_factor_rpar()
 inline static void bnf_block1()
 {
 	// MESG("bnf_block1 start! group=%d [%s]",tok->tgroup,tok_info(tok));
-	while(tok->tgroup!=TOK_END) {
+	while(tok->tgroup!=BLOCK_END) {
 		// MESG("!B v@=%d [%s]",VARIND,tok_info(tok));	/*   */
 	 	tok->bnf_factor_function();
 		// MESG("		-- tok %d type %d act=%d",tok->tnum,tok->ttype,current_active_flag);
@@ -2303,7 +2303,7 @@ inline static void bnf_block1()
 inline static void bnf_block1_break(/*FILEBUF *fp*/)
 {
 	// MESG("bnf_block1_break start! group=%d [%s]",tok->tgroup,tok_info(tok));
-	while(tok->tgroup!=TOK_END) {
+	while(tok->tgroup!=BLOCK_END) {
 		// MESG("--- block var@=%d [%s]",VARIND,tok_info(tok));
 	 	tok->bnf_factor_function();
 		// MESG("		-- tok %d type %d",tok->tnum,tok->ttype);
