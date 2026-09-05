@@ -1306,7 +1306,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	parse_block1(bp,use_fp->symbol_tree,start);
 	// MESG("parse_block: ended! err=%d start=%d items=%d",err_num,start,use_fp->symbol_tree->items);
 	if(err_num) { execmd=0;return(0);};
-	// MESG("	comput_block: start=%d",start);
+	// MESG("	compute_block: start=%d",start);
 	if(start || current_stable==NULL) {
 		// MESG("new current_stable with %d items",use_fp->symbol_tree->items);
 		local_symbols=new_symbol_table(use_fp->symbol_tree->items);
@@ -1328,7 +1328,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	init_exec_flags();
 
 	drv_start_checking_break();
-	// MESG("	call exec_block1 ------");
+	// MESG("	call exec_block1 ------ execmd=%d",execmd);
 #if	TNORMAL
 	tok=bp->tok_table;
 	if(execmd) val=exec_block1(bp);
@@ -1337,9 +1337,9 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	// MESG("	after exec_block1 !!!!!");
 
 #if	TBNF
-		// MESG("## execute bnf program block! --------------------");
 		exe_buffer=bp;
 		tok=bp->tok_table_bnf;
+		// MESG("## execute bnf program block! --------------------");
 		if(execmd) bnf_block1();
 		else bnf_block1_break();
 		// next_var("res1");

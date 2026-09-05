@@ -2303,7 +2303,7 @@ inline static void bnf_block1()
 inline static void bnf_block1_break(/*FILEBUF *fp*/)
 {
 	// MESG("bnf_block1_break start! group=%d [%s]",tok->tgroup,tok_info(tok));
-	while(tok->tgroup!=BLOCK_END) {
+	while(tok->bnf_group!=BLOCK_END) {
 		// MESG("--- block var@=%d [%s]",VARIND,tok_info(tok));
 	 	tok->bnf_factor_function();
 		// MESG("		-- tok %d type %d",tok->tnum,tok->ttype);
