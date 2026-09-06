@@ -290,7 +290,7 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 	// MESG("	: before push function tok=[%s]",tok_info(tok));
 #if	TBNF
 #if	TFUNC
-	tok0->t_nargs =ia;
+	tok0->t_nargs =ia; // we need this in var args
 	stack_push("eval_func",tok0,TOK_FUNC);
 #else
 	tok0->number_of_args =ia;

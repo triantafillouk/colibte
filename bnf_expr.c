@@ -105,14 +105,6 @@ void prev_var_ext(char *from)
 	prev_var(from);
 }
 
-inline static void set_var_value()
-{
-	if(bnf_var->var_type==VTYPE_POINTER){
-		memmove(bnf_var,bnf_var->var_pointer,sizeof(struct MVAR));
-		bnf_var->var_alloced=0;
-	};
-}
-
 inline static void	update_ddot_var_position()
 {
 	 tok_struct *ntoken=tok+1;
@@ -2853,15 +2845,15 @@ inline static void bnf_dir_if_then()
 	// MESG(";	 	tok_dir_if:end var@=%d  ival=%d > end [%s]",VARIND,ival,tok_info(tok));
 }
 #else
-inline static void bnf_dir_if()
+inline static void bnf_dir_if_then()
 {
 	tok_struct *tok0=tok;
-	// MESG("## tok_dir_if: var@=%d [%s]",VARIND,tok_info(tok));
+	// MESG("## tok_dir_if_then: var@=%d [%s]",VARIND,tok_info(tok));
 	NTOKEN2;	/* go to next token after if */
 
 	int ival = bnf_expression();
 	prev_var("if result");
-	// MESG("   tok_dir_if: res=%d after expression var@=%d [%s]",ival,VARIND,tok_info(tok));
+	// MESG("   tok_dir_if_then: res=%d after expression var@=%d [%s]",ival,VARIND,tok_info(tok));
 	if(ival) {
 		// MESG("	true: start of [%s]",tok_info(tok));
 		NTOKEN2;
@@ -2874,7 +2866,7 @@ inline static void bnf_dir_if()
 			tok=tok->next_tok;
 			// MESG("skip else up to %s",tok_info(tok));
 		} else tok--;
-		// MESG("## 	tok_dir_if: true: end [%s]",tok_info(tok));
+		// MESG("## 	tok_dir_if_then: true: end [%s]",tok_info(tok));
 		return;
 	} else {
 		tok=tok0->next_tok;
@@ -2887,7 +2879,7 @@ inline static void bnf_dir_if()
 			// if(tok->ttype!=TOK_RCURL) tok--; 
 		};
 	}
-	// MESG(";	 	tok_dir_if:end var@=%d  ival=%d > end [%s]",VARIND,ival,tok_info(tok));
+	// MESG(";	 	tok_dir_if_then:end var@=%d  ival=%d > end [%s]",VARIND,ival,tok_info(tok));
 }
 #endif
 
