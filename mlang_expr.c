@@ -456,7 +456,7 @@ double mul_by()
 		if(ori_type!=TOK_VAR) {
 			// MESG("	mul string val");
 			char *stmp=str_mul(ls_psval[0],v1);
-			free(ls_psval[0]);
+			// free(ls_psval[0]);
 			ls_psval[0]=stmp;
 		} else {
 			// MESG("	mul sarray! sslot ind=%d %d %s",sslot->var_index,get_vtype(),get_sval());

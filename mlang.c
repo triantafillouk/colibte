@@ -1071,14 +1071,21 @@ void set_break(char *from)
 
 char *str_mul(char *sval, double v1)
 {
- if(v1>0) {
-	int mul_size=v1;
+ int mul_size=v1;
+ MESG("str_mul: [%s] by %f %d",sval,v1,mul_size);
+ if(mul_size>0) {
 	int string_size=strlen(sval);
-	char *new_string=malloc(mul_size*string_size+1);
+	char *new_string=realloc(sval,mul_size*string_size+1);
 	
-	for(int i=0;i<mul_size;i++) {
-		memcpy(new_string+string_size*(i),sval,string_size);
-	};new_string[string_size*mul_size]=0;
+	for(int i=1;i<mul_size;i++) {
+		// MESG("	i=%d add to %d",i,string_size*(i));
+		char *n=new_string+string_size*(i);
+		memcpy(n,new_string,string_size);
+		new_string[string_size*(i+1)]=0;
+		// MESG("	-> [%s]",new_string);
+	};
+	MESG("	end at [%s]",new_string);
+	// new_string[string_size*mul_size]=0;
  	return new_string;
  } else return sval;
 }
@@ -1089,6 +1096,7 @@ char *str_cat(char *sval, char *add)
 	int string_size=strlen(sval);
 	sval=realloc(sval,add_size+string_size+1);
 	memcpy(sval+string_size,add,add_size);
+	sval[add_size+string_size]=0;
  return sval;
 }
 

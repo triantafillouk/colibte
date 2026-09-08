@@ -211,7 +211,7 @@ void bnf_mid()	/* TBC  */
 		};
 		} else {
 			syntax_error(1209,"mid: wrong_type of args");
-			set_sval("");
+			// set_sval("");
 		};
 		prev_var("mid1");
 		prev_var("mid2");

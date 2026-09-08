@@ -1778,10 +1778,16 @@ inline static void bnf_mulby()
 		};
 
 		if(avar->var_type==VTYPE_STRING) {
+#if	1
+			// MESG("mul_by: [%s] by %f",avar->sval,bvar->dval);
+			avar->sval=str_mul(avar->sval,bvar->dval);
+			// MESG("	mul_by: result [%s]",avar->sval);
+#else
 			char *new_sval=str_mul(avar->sval,bvar->dval);
 			if(avar->var_alloced) free(avar->sval);
 			avar->sval=new_sval;
 			avar->var_alloced=1;
+#endif
 			bnf_var->sval=avar->sval;
 			bnf_var->var_alloced=0;
 			bnf_var->var_type=VTYPE_STRING;
@@ -3406,6 +3412,7 @@ inline static void bnf_mulby_array2()
 #if	1
 		if(dest_type==VTYPE_STRING) {
 			char *tmp_s = str_mul(adat->mval[index1].sval,bvar->dval);
+			adat->mval[index1].sval = tmp_s;
 			bnf_var->sval = tmp_s;
 			bnf_var->var_type=VTYPE_STRING;
 			bnf_var->var_alloced=0;

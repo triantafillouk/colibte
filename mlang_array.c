@@ -616,15 +616,10 @@ void sarray_add1(array_dat *na,char *s)
  // MESG("sarray_add1: array %d astat=%d atype=%d %d",na->anum,na->astat,na->atype,VTYPE_SARRAY);
  if(na->atype==VTYPE_SARRAY) 
  {
- 	// MESG("String [%s] add to string array!",s);
+ 	// MESG("String [%s] add to string array! rows=%d cols=%d",s,na->rows,na->cols);
 	int i;
 	for(i=0;i<na->rows*na->cols;i++) {
-		char *sval = na->sval[i];
-		char *stmp=malloc(strlen(s)+strlen(sval));
-		strcpy(stmp,sval);
-		strcat(stmp,s);
-		free(na->sval[i]);
-		na->sval[i]=stmp;
+		na->sval[i]=str_cat(na->sval[i],s);
 	};
  }
 
@@ -650,11 +645,15 @@ void sarray_mul1(array_dat *sarray, double factor)
  	// MESG("String [%s] add to string array!",s);
 	int i;
 	for(i=0;i<sarray->rows*sarray->cols;i++) {
+#if	1
+		sarray->sval[i]=str_mul(sarray->sval[i],factor);
+#else
 		char *sval = sarray->sval[i];
 		char *stmp=str_mul(sval,factor);
 
 		free(sarray->sval[i]);
 		sarray->sval[i]=stmp;
+#endif
 	};
  }
 }
