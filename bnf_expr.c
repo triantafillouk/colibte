@@ -105,6 +105,16 @@ void prev_var_ext(char *from)
 	prev_var(from);
 }
 
+#if	!TFUNC
+inline static void set_var_value()
+{
+	if(bnf_var->var_type==VTYPE_POINTER){
+		memmove(bnf_var,bnf_var->var_pointer,sizeof(struct MVAR));
+		bnf_var->var_alloced=0;
+	};
+}
+#endif
+
 inline static void	update_ddot_var_position()
 {
 	 tok_struct *ntoken=tok+1;

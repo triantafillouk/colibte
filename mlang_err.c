@@ -248,7 +248,7 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 		// };
 		if(tok->ttype==TOK_RPAR||tok->ttype==TOK_SEP ||tok->ttype==TOK_EOF) {
 			// MESG("end function parameters");
-#if	!TFUNC
+#if	!TFUNC 
 			if(tok->ttype==TOK_RPAR) stack_push("eval_function )",tok,-TOK_RPAR);
 #endif
 			break;
@@ -2386,25 +2386,29 @@ int err_check_sentence1()
 		tok_struct *dest=stack_push("dir_return",tok,-tok->ttype);
 #else
 		tok_struct *t_return=tok;
-		tok_struct *dest;
+		// tok_struct *dest;
 #endif
 #endif
 		NTOKEN_ERR(664);
 		if(tok->ttype!=TOK_SEP&&tok->ttype!=TOK_RPAR&&tok->ttype!=TOK_RCURL) {	
 			err_num=err_lexpression();
 #if	TFUNC
-			dest=stack_push("dir_return",t_return,-t_return->ttype);
+			stack_push("dir_return",t_return,-t_return->ttype);
 #endif
 #if	TBNF
+#if	!TFUNC
 			dest->bnf_factor_function = bnf_dir_return_value;
-			MESG("dir_return: set factor_function!");
+#endif
+			// MESG("dir_return: set factor_function!");
 #endif
 		} else {
 #if	TFUNC
-			dest=stack_push("dir_return",t_return,-t_return->ttype);
+			stack_push("dir_return",t_return,-t_return->ttype);
 #endif
 #if	TBNF
+#if	!TFUNC
 			dest->bnf_factor_function = bnf_dir_return_novalue;
+#endif
 #endif
 		};
 #if	TBNF

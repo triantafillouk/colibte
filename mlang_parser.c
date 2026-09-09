@@ -1001,7 +1001,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			tok->tname="RCURL";
 			tcr->num=tcl->num;
 			tcl->num=tok->tnum;
+#if	TBNF
 			tok->tgroup=BLOCK_END;
+#else
+			tok->tgroup=TOK_END;
+#endif
 	};
 	
 	if(tok_type==TOK_LETTER) {
