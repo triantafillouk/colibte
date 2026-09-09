@@ -2397,6 +2397,7 @@ int err_check_sentence1()
 #endif
 #if	TBNF
 			dest->bnf_factor_function = bnf_dir_return_value;
+			MESG("dir_return: set factor_function!");
 #endif
 		} else {
 #if	TFUNC

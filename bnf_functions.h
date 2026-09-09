@@ -289,7 +289,7 @@ int factor_bnf_group[] = {
 	0,	// TOK_DIR_IF	,	// dir if
 	0,	// TOK_DIR_ELSE	,	// dir else
 	0,	// TOK_DIR_BREAK	,
-	0,	// TOK_DIR_RETURN	,
+	BLOCK_END,	// TOK_DIR_RETURN	,
 	0,	// TOK_DIR_WHILE	,
 	0,	// TOK_DIR_FOR		,
 	0,	// TOK_COMMA		,

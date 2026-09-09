@@ -2314,8 +2314,8 @@ inline static void bnf_block1_break(/*FILEBUF *fp*/)
 	} 
 	
 	// MESG("-- block end  ! [%s]",tok_info(tok));
+	if(tok->ttype!=TOK_END) 
 	tok->bnf_factor_function();
-
 }
 
 inline static void bnf_dir_lcurl()
@@ -2675,23 +2675,29 @@ inline static double bnf_expression()
 inline static void bnf_dir_return_value()
 {
 	// MESG("return_value:0 @v=%d [%s]",VARIND,tok_info(tok));
+#if	!TFUNC
 	NTOKEN2;
 	bnf_expression();
+#endif
 	// MESG("return_value:1 @v=%d [%s]",VARIND,tok_info(tok));
 	current_active_flag=0;	/* skip rest of function  */
 }
 
 inline static void bnf_dir_return_novalue()
 {
+#if	!TFUNC
 	NTOKEN2;
+#endif
 	current_active_flag=0;	/* skip rest of function  */
 }
 
 inline static void bnf_dir_return()
 {
 	// MESG("bnf_dir_return: var@=%d [%s]",VARIND,tok_info(tok));
+#if	!TFUNC
 	NTOKEN2;
 	bnf_expression();
+#endif
 	// MESG("			dir_return : end var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	current_active_flag=0;	/* skip rest of function  */
 }
