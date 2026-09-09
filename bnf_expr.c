@@ -2691,13 +2691,7 @@ inline static void bnf_dir_return()
 {
 	// MESG("bnf_dir_return: var@=%d [%s]",VARIND,tok_info(tok));
 	NTOKEN2;
-	// MESG("	return : start at [%s]",tok_info(tok));
-	if(tok->ttype!=TOK_SEP && tok->ttype!=TOK_RPAR && tok->ttype!=TOK_RCURL) 
-	{ 
-		// MESG("## ---- dir_return: evaluate return value, var@=%d type=%d",VARIND,bnf_var->var_type);
-		bnf_expression();
-		// show_result();
-	};
+	bnf_expression();
 	// MESG("			dir_return : end var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	current_active_flag=0;	/* skip rest of function  */
 }

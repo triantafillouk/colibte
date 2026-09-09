@@ -197,7 +197,9 @@ void set_error(tok_struct *tok,int err,char *description)
 #endif
  tok->tgroup=TOK_END;
  tok->ttype=TOK_EOF;
+#if	TBNF
  tok->bnf_group=BLOCK_END;
+#endif
  current_active_flag=0;
 }
 
@@ -2380,21 +2382,34 @@ int err_check_sentence1()
 
 		// MESG(" err TOK_DIR_RetURN");
 #if	TBNF
+#if	!TFUNC
 		tok_struct *dest=stack_push("dir_return",tok,-tok->ttype);
+#else
+		tok_struct *t_return=tok;
+		tok_struct *dest;
+#endif
 #endif
 		NTOKEN_ERR(664);
 		if(tok->ttype!=TOK_SEP&&tok->ttype!=TOK_RPAR&&tok->ttype!=TOK_RCURL) {	
 			err_num=err_lexpression();
+#if	TFUNC
+			dest=stack_push("dir_return",t_return,-t_return->ttype);
+#endif
 #if	TBNF
 			dest->bnf_factor_function = bnf_dir_return_value;
 #endif
 		} else {
+#if	TFUNC
+			dest=stack_push("dir_return",t_return,-t_return->ttype);
+#endif
 #if	TBNF
 			dest->bnf_factor_function = bnf_dir_return_novalue;
 #endif
 		};
 #if	TBNF
+#if	!TFUNC
 		stack_push("dir_return )",tok,-tok->ttype);
+#endif
 #endif
 		check_skip_token1(TOK_RPAR);
 		// MESG(" err TOK_DIR_RETURN: after lexpression: tname=[%s] tnum=%d ttype=%d",tok->tname,tok->tnum,tok->ttype); 
