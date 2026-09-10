@@ -252,14 +252,17 @@ void show_var_node(BTNODE *node)
 	var = &current_stable[node->node_index];
 	// mesg_out("type %d",var->var_type);
 	// mesg_out("type name %s",vtype_names[var->var_type]);
+	void (*vfunc)(const char *,...);
+	if(debug_flag()) vfunc = MESG;
+	else vfunc=mesg_out;
 	if(var->var_type==VTYPE_NUM) 
-		mesg_out("%03d %-10s %2d(%12s) %f",
+		vfunc("  %03d %-8s %2d=%-8s   %f",
 			node->node_index,node->node_name,var->var_type,vtype_names[var->var_type],var->dval);
 	else if(var->var_type==VTYPE_STRING)
-		mesg_out("%03d %-10s %2d(%12s) \"%s\"",
+		vfunc("  %03d %-8s %2d=%-8s   \"%s\"",
 			node->node_index,node->node_name,var->var_type,vtype_names[var->var_type],var->sval);
 	else
-		mesg_out("%03d %-10s %2d(%12s)",node->node_index,node->node_name,var->var_type,vtype_names[var->var_type]);
+		vfunc("  %03d %-8s %2d=%-8s",node->node_index,node->node_name,var->var_type,vtype_names[var->var_type]);
 }
 
 void eval_curl_match(tok_struct *tok)
@@ -1612,8 +1615,8 @@ char * tok_info(tok_struct *tok)
 	if(tok->tname!=NULL){
 		// common initials 
 		int ssize;
-		ssize=snprintf(stok,sizeof(stok),"%3d:%2d %3d [%2d=%8s][%5s][%2d=%5s] ",
-			tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup));
+		ssize=snprintf(stok,sizeof(stok),"%2d:%2d %3d [%2d=%7s][%5s][tg=%2d tb=%d] ",
+			tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup/*,tname(tok->tgroup)*/,tok->bnf_group);
 		char *stok1=stok+ssize;
 
 		// MESG("tok_info: %d %s %d",tok->tind,tok->tname,tok->tline);
@@ -1625,32 +1628,32 @@ char * tok_info(tok_struct *tok)
 				rows=tok->tok_adat->rows;
 				cols=tok->tok_adat->cols;
 			};
-			snprintf(stok1,sizeof(stok)-ssize,"rows=%d cols=%d bnf=%2d",rows,cols,tok->bnf_group);
+			snprintf(stok1,sizeof(stok)-ssize,"rows=%d cols=%d",rows,cols);
 		}  else	if(tok->tgroup==TOK_OPNUM) { 
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok1,sizeof(stok)-ssize,"%5.1f bnf=%2d",tok->dval,tok->bnf_group);
+			snprintf(stok1,sizeof(stok)-ssize,"%5.1f",tok->dval);
 		} else 
-		if(tok->ttype==TOK_SHOW) { snprintf(stok1,sizeof(stok)-ssize,"bnf=%2d",tok->bnf_group);
+		if(tok->ttype==TOK_SHOW) { // snprintf(stok1,sizeof(stok)-ssize,"bnf=%2d",tok->bnf_group);
 		} else
 		if(tok->ttype==TOK_LCURL||tok->ttype==TOK_RCURL) {
 				// snprintf(stok,sizeof(stok),"%3d:%4d CURL",tok->tnum,tok->tline);
-				snprintf(stok1,sizeof(stok)-ssize," other is %d bnf=%2d",tok->match_tok->tnum,tok->bnf_group);
+				snprintf(stok1,sizeof(stok)-ssize,"-> %d",tok->match_tok->tnum);
 		} else	if(tok->tgroup>0) {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok1,sizeof(stok)-ssize,"bnf=%2d",tok->bnf_group);
+			// snprintf(stok1,sizeof(stok)-ssize,"bnf=%2d",tok->bnf_group);
 		} else	if(tok->ttype==TOK_NUM) { 
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok1,sizeof(stok)-ssize,"%5.1f bnf=%2d",tok->dval,tok->bnf_group);
+			snprintf(stok1,sizeof(stok)-ssize,"%5.3f",tok->dval);
 		} else if(tok->ttype==TOK_QUOTE) {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok1,sizeof(stok)-ssize,"bnf=%2d",tok->bnf_group);
+			// snprintf(stok1,sizeof(stok)-ssize,"bnf=%2d",tok->bnf_group);
 		}		
 		else if(tok->ttype==TOK_PROC) { 
 			if(tok->proc_buffer == NULL) 
 				snprintf(stok1,sizeof(stok)-ssize," NULL proc bnf=%2d",tok->bnf_group);
 			else {
-				int len=snprintf(stok1,sizeof(stok)-ssize," [%20s] proc bnf=%2d",
-					tok->proc_buffer->b_fname,tok->bnf_group);
+				int len=snprintf(stok1,sizeof(stok)-ssize,"%s",
+					tok->proc_buffer->b_fname);
 				if(len+ssize>=sizeof(stok))  MESG("	truncated");
 			};
 		} else if(tok->ttype==TOK_VAR) {
@@ -1679,11 +1682,11 @@ char * tok_info(tok_struct *tok)
 			snprintf(stok1,sizeof(stok)-ssize," %8s %d size %d [bnf=%2d]",
 				vtype_names[vtype] ,vtype,size,tok->bnf_group);
 #else
-			snprintf(stok1,sizeof(stok)-ssize,"%8s %d [bnf=%2d]",vtype_names[vtype] ,vtype,tok->bnf_group);
+			snprintf(stok1,sizeof(stok)-ssize,"%s",vtype_names[vtype]);
 #endif
 		} else {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok1,sizeof(stok)-ssize,"bnf=%2d",tok->bnf_group);
+			// snprintf(stok1,sizeof(stok)-ssize,"bnf=%2d",tok->bnf_group);
 		};
 // 			
 	} else {
