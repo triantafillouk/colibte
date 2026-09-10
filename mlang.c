@@ -224,10 +224,11 @@ term_type term_types[] = {
 };
 
 char *vtype_names[] = {
-	"UNDEF","NUM","ARRAY","SARRAY","LIST",
-	"SLIST","ALIST","ASLIST","STRING","BUFFER",
-	"ARRAY_EL1","ARRAY_EL2","TREE","TREE_EL",
-	"AMIXED","POINTER","PROC","OPTION","FUNCTION",NULL
+	"UNDEF","NUM","ARRAY","SARRAY","LIST","SLIST",
+	"ALIST","ASLIST","STRING","BUFFER","ARRAY_EL1",
+	"ARRAY_EL2","TREE","TREE_EL","AMIXED","POINTER",
+	"PROC","OPTION","FUNCTION","NUMP","STRINGP",
+	"OTHER",NULL
 };
 
 /* Function definitions */
@@ -255,6 +256,12 @@ void show_var_node(BTNODE *node)
 	void (*vfunc)(const char *,...);
 	if(debug_flag()) vfunc = MESG;
 	else vfunc=mesg_out;
+#if	1
+	if(var->var_assigned!=1)
+		vfunc("  %03d %-8s %2d=%-8s   not assigned!",
+			node->node_index,node->node_name,var->var_type,vtype_names[var->var_type]);
+	else
+#endif
 	if(var->var_type==VTYPE_NUM) 
 		vfunc("  %03d %-8s %2d=%-8s   %f",
 			node->node_index,node->node_name,var->var_type,vtype_names[var->var_type],var->dval);
@@ -441,10 +448,11 @@ void delete_type_tree(BTREE *type_tree)
 inline void init_vars(MVAR *head,int const size)
 {
  // initialize as numeric
- // MESG("init_vars: %d",size);
+ MESG("init_vars: %d",size);
  MVAR *tdp,*tdp_end=head+size;
  for(tdp=head;tdp<tdp_end;tdp++) {
  	tdp->var_type=VTYPE_NUM;
+	tdp->var_assigned=0;
 	tdp->dval=0;
  };
 }
@@ -640,6 +648,7 @@ void init_hash()
 	term_node->node_index = term_types[i].term_type;
 	term_node->node_type = term_types[i].term_group;
 	term_node->node_vtype=VTYPE_NUM;	/* to show the index in value if needed!  */
+	term_node->node_assigned=0;
  };
 	// eval_btree(directiv_table->root,print_node);
  init_common();
@@ -683,7 +692,7 @@ void set_symbol_table(MVAR *stable)
 
 MVAR *new_symbol_table(int const size)
 {
- // MESG("Initialize new_symbol_table: size %d",size);
+ MESG("Initialize new_symbol_table: size %d",size);
  MVAR *td=call_stack_used;
  // MESG("		new symbol table starts at ind=%d",td-call_stack);
  // int size_call_stack_used = call_stack_used - call_stack;
@@ -706,7 +715,7 @@ MVAR *new_symbol_table(int const size)
 #if	0
  }
 #endif
- // MESG("Initialize new_symbol_table: size %d",size);
+ MESG("Initialize new_symbol_table: size %d",size);
  init_vars(td,size);
  return td;
 }
@@ -887,6 +896,10 @@ void create_statement_group(FILEBUF *bf)
 		if(!in_brackets && !in_call) tokp->bnf_group=1;
 	}
 #endif
+	if(tokp->ttype==TOK_VAR) {
+		BTNODE *var_node=find_btnode(bf->symbol_tree,tokp->tname);
+		MESG("	var %s assigned=%d",tokp->tname,var_node->node_assigned);
+	};
 	tokp++;
  };
  // tokp->next_tok=NULL;
@@ -1051,16 +1064,16 @@ void node_to_mvar(BTNODE *node,void *p)
 		// mvar_array[index].var_len=strlen(node->node_sval);
 		// MESG("![%10s] ind=%2d type=%d %s",node->node_name,index,node->node_vtype,node->node_sval);
 	};	
+		mvar_array[index].var_assigned=node->node_assigned;
 }
 
 MVAR *btree_to_mvar(BTREE *bt)
 {
  MVAR *mvar_array = malloc(sizeof(struct MVAR)*bt->items);
- // MESG("-btree_to_mvar: items=%d",bt->items);
+ MESG("## -btree_to_mvar: items=%d",bt->items);
  eval_btree1(bt->root,node_to_mvar,(void *)mvar_array);
  return mvar_array;
 }
-
 
 /* user interupt on, set also break flag  */
 void set_break(char *from)
@@ -1326,7 +1339,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		local_symbols=realloc_symbol_table(current_stable,use_fp->symbol_tree->items,old_items);
 	}
 	current_stable=local_symbols;
- // MESG("compute_block:2 m_mode=%d",bp->m_mode);
+ MESG("compute_block:2 m_mode=%d",bp->m_mode);
  if(bp->m_mode<2)	/* if not already checked!  */
  {
 	err_num=check_init(bp);
@@ -1682,7 +1695,7 @@ char * tok_info(tok_struct *tok)
 			snprintf(stok1,sizeof(stok)-ssize," %8s %d size %d [bnf=%2d]",
 				vtype_names[vtype] ,vtype,size,tok->bnf_group);
 #else
-			snprintf(stok1,sizeof(stok)-ssize,"%s",vtype_names[vtype]);
+			snprintf(stok1,sizeof(stok)-ssize,"%s a=%d stable=%p",vtype_names[vtype],var->var_assigned,current_stable);
 #endif
 		} else {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);

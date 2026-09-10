@@ -139,6 +139,7 @@ typedef struct BTNODE {
 
 	short node_vtype;
 	short node_index;
+	short node_assigned;
 	union {
 		double node_dval;
 		char *node_sval;

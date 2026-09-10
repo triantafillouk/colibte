@@ -851,7 +851,15 @@ tok_struct *tok0_bnf=NULL;
 			tok->tname = tok0->tname;
 			tok->tind = var_index;
 
-			// MESG("	var_name_to_assign: %s [%s]",tok0->tname,tok_info(tok));
+			// MVAR *var=get_left_slot(tok->tind);
+			// if(cbfp) MESG("cbfp_buffer=%s",cbfp->b_fname);
+			// if(check_buffer) MESG("check_buffer=%s",check_buffer->b_fname);
+			// if(cbfp->symbol_tree) MESG("	ok symbol tree!");
+			BTNODE *vnode = find_btnode(check_buffer->symbol_tree,tok->tname);
+			if(vnode) vnode->node_assigned=1;
+			else MESG("	cannot find node with name %s",tok->tname);
+			MESG("	var_name_to_assign: %s [%s] in %s",tok0->tname,tok_info(tok),check_buffer->b_fname);
+			
 		};
 		if(tok->ttype==TOK_INCREASEBY) {
 			// MESG("set normal assign [%s]",tok_info(tok));
