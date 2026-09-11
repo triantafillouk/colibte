@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.8T43t2 (11/9/2026)"
+#define VERSION 	 "#01.8T44 (11/9/2026)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -325,13 +325,13 @@ typedef struct MVAR {
 #if	1
 	unsigned short var_type;
 	unsigned short var_alloced;
+	// unsigned int var_assigned:1;
 #else
 	unsigned int var_type:8;
 	int	var_alloced:1;
 	int size:22;
 #endif
-	short	index1;
-	short	var_assigned;
+	unsigned int index1;
 	// short	index2;
 	union {
 		// long int ival;

@@ -16,6 +16,8 @@ int err_assign_val();
 int err_assign_env();
 
 int assign_type_to=0;
+char *assign_var_name="";
+
 tok_struct *prev_token=NULL;
 
 void mesg_out(const char *fmt, ...)
@@ -854,7 +856,7 @@ tok_struct *tok0_bnf=NULL;
 			NTOKEN_ERR(4982);
 		};
 		if(tok->ttype==TOK_ASSIGN) {
-			MESG("set normal assign prok=[%s]",tok_info(prev_token));
+			// MESG("set normal assign prok=[%s]",tok_info(prev_token));
 #if	TBNF
 			if(bnf_tok!=NULL) bnf_tok->bnf_factor_function=bnf_factor_assign_var_f;
 #endif
@@ -870,7 +872,7 @@ tok_struct *tok0_bnf=NULL;
 			BTNODE *vnode = find_btnode(check_buffer->symbol_tree,tok->tname);
 			if(vnode) {
 				vnode->node_assigned=1;
-				MESG("	- assign var_name: %s [%s] in %s",tok->tname,tok_info(tok),check_buffer->b_fname);
+				// MESG("	- assign var_name: %s [%s] in %s",tok->tname,tok_info(tok),check_buffer->b_fname);
 			} else MESG("	cannot find node with name %s",tok->tname);
 		};
 		if(tok->ttype==TOK_INCREASEBY) {
@@ -1070,6 +1072,7 @@ tok_struct *tok0_bnf=NULL;
 #if	TBNF
 			tok0_bnf->ttype=TOK_ARRAY_L1;
 			tok0_bnf->bnf_factor_function=bnf_factor_array_l1;
+			assign_var_name=tok0_bnf->tname;
 #endif
 			if(tok->ttype==TOK_ASSIGN)	assign_type_to=TOK_ASSIGN_ARRAY1;
 		} else {
@@ -1869,6 +1872,14 @@ int err_lexpression()
 				}; if(assign_type_to==TOK_ASSIGN_ARRAY1) {
 					tok0_bnf_assign->ttype=TOK_ASSIGN_ARRAY1;
 					tok0_bnf_assign->bnf_factor_function=bnf_assign_array1;
+					tok0_bnf_assign->tname=assign_var_name;
+			BTNODE *vnode = find_btnode(check_buffer->symbol_tree,assign_var_name);
+			if(vnode) {
+				vnode->node_assigned=1;
+				// MESG("	- assign var_name: %s [%s] in %s",tok_var->tname,tok_info(tok_var),check_buffer->b_fname);
+			} else MESG("	cannot find node with name %s",assign_var_name);
+										
+
 					// MESG(";2 for [%s] set assign to type %d,bnf_assign_array1",tok_info(tok0_bnf_assign),TOK_ASSIGN_ARRAY1);
 				};
 				if(assign_type_to==TOK_ASSIGN_TYPE) {
@@ -1880,7 +1891,7 @@ int err_lexpression()
 				if(assign_type_to==TOK_TYPE_ELEMENT) {
 					tok0_bnf_assign->tname="EL=";
 					tok0_bnf_assign->ttype=TOK_ASSIGN_ARRAY2;
-					// MESG("	assign noasgn: ind=%d",tok0_bnf_assign->tind);
+					// MESG("	assign type el noasgn: ind=%d [%s]",tok0_bnf_assign->tind,tok_info(tok0_bnf_assign));
 					if(tok0_bnf_assign->tind<0) 
 						tok0_bnf_assign->bnf_factor_function=bnf_assign_element;
 					else {
@@ -2263,10 +2274,8 @@ int err_check_sentence1()
 			BTNODE *vnode = find_btnode(check_buffer->symbol_tree,tok_var->tname);
 			if(vnode) {
 				vnode->node_assigned=1;
-				MESG("	- assign var_name: %s [%s] in %s",tok_var->tname,tok_info(tok_var),check_buffer->b_fname);
+				// MESG("	- assign var_name: %s [%s] in %s",tok_var->tname,tok_info(tok_var),check_buffer->b_fname);
 			} else MESG("	cannot find node with name %s",tok_var->tname);
-
-
 #endif
 				// MESG_TOK_INFO(" equal to",tok);
 			};

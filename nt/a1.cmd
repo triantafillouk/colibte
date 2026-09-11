@@ -1,7 +1,7 @@
 # a array not with values in normal mode SELECTBNF
 cls
 print("---- a1.cmd");
-max1=50000
+max1=30000000
 print("Initializing arrays with ",max1," elements")
 print("")
 show_time("start allocate/define array a",0)

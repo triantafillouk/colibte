@@ -256,12 +256,7 @@ void show_var_node(BTNODE *node)
 	void (*vfunc)(const char *,...);
 	if(debug_flag()) vfunc = MESG;
 	else vfunc=mesg_out;
-#if	1
-	if(var->var_assigned!=1)
-		vfunc("  %03d %-8s %2d=%-8s   not assigned!",
-			node->node_index,node->node_name,var->var_type,vtype_names[var->var_type]);
-	else
-#endif
+
 	if(var->var_type==VTYPE_NUM) 
 		vfunc("  %03d %-8s %2d=%-8s   %f",
 			node->node_index,node->node_name,var->var_type,vtype_names[var->var_type],var->dval);
@@ -452,14 +447,14 @@ inline void init_vars(MVAR *head,int const size)
  MVAR *tdp,*tdp_end=head+size;
  for(tdp=head;tdp<tdp_end;tdp++) {
  	tdp->var_type=VTYPE_NUM;
-	tdp->var_assigned=0;
+	// tdp->var_assigned=0;
 	tdp->dval=0;
  };
 }
 
 void initialize_call_stack(int initial_size)
 {
-	MESG("Initialize call_stack with %d size",initial_size);
+	// MESG("Initialize call_stack with %d size",initial_size);
 	call_stack=(MVAR *)malloc(sizeof(struct MVAR)*initial_size);
 	call_stack_used=call_stack;
 	max_call_stack_end=call_stack;
@@ -1080,7 +1075,7 @@ void node_to_mvar(BTNODE *node,void *p)
 		// mvar_array[index].var_len=strlen(node->node_sval);
 		// MESG("![%10s] ind=%2d type=%d %s",node->node_name,index,node->node_vtype,node->node_sval);
 	};	
-		mvar_array[index].var_assigned=node->node_assigned;
+	//	mvar_array[index].var_assigned=node->node_assigned;
 }
 
 MVAR *btree_to_mvar(BTREE *bt)

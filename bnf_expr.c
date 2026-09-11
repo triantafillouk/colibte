@@ -2287,7 +2287,7 @@ inline static void bnf_block1()
 {
 	// MESG("bnf_block1 start! group=%d [%s]",tok->tgroup,tok_info(tok));
 	while(tok->bnf_group!=BLOCK_END) {
-		MESG("!B v@=%d [%s]",VARIND,tok_info(tok));	/*   */
+		// MESG("!B v@=%d [%s]",VARIND,tok_info(tok));	/*   */
 	 	tok->bnf_factor_function();
 		// MESG("		-- tok %d type %d act=%d",tok->tnum,tok->ttype,current_active_flag);
 		NTOKEN2;
@@ -2303,7 +2303,7 @@ inline static void bnf_block1()
 		};
 	} 
 	
-	MESG("-- block end  ! [%s]",tok_info(tok));
+	// MESG("-- block end  ! [%s]",tok_info(tok));
 	if(tok->ttype!=TOK_END) 
 	tok->bnf_factor_function();
 }
@@ -2407,15 +2407,15 @@ inline static void bnf_dir_fori()
 		return;
 	};
 
-	MESG("# fori: start var@=%d, start_block=[%s]",VARIND,tok_info(start_block));
-	MESG("	from %f to %f step %f",*iterrator_val,dmax,dstep);
+	// MESG("# fori: start var@=%d, start_block=[%s]",VARIND,tok_info(start_block));
+	// MESG("	from %f to %f step %f",*iterrator_val,dmax,dstep);
 	int start_var=VARIND;
 	if(is_curl) {
 
 	if(dstep>0 && dmax > *iterrator_val) {
 		for(;*iterrator_val < dmax; *iterrator_val +=dstep) {
 			tok=start_block;
-			MESG("# fori: iterrator_val=%3f var@=%d, [%s]",*iterrator_val,VARIND,tok_info(tok));
+			// MESG("# fori: iterrator_val=%3f var@=%d, [%s]",*iterrator_val,VARIND,tok_info(tok));
 #if	TPROFILE
 			var_index -= (VARIND-start_var);
 #endif
