@@ -448,7 +448,7 @@ void delete_type_tree(BTREE *type_tree)
 inline void init_vars(MVAR *head,int const size)
 {
  // initialize as numeric
- MESG("init_vars: %d",size);
+ // MESG("init_vars: %d",size);
  MVAR *tdp,*tdp_end=head+size;
  for(tdp=head;tdp<tdp_end;tdp++) {
  	tdp->var_type=VTYPE_NUM;
@@ -459,7 +459,7 @@ inline void init_vars(MVAR *head,int const size)
 
 void initialize_call_stack(int initial_size)
 {
-	// MESG("Initialize call_stack with %d size",initial_size);
+	MESG("Initialize call_stack with %d size",initial_size);
 	call_stack=(MVAR *)malloc(sizeof(struct MVAR)*initial_size);
 	call_stack_used=call_stack;
 	max_call_stack_end=call_stack;
@@ -877,6 +877,7 @@ int create_statement_group(FILEBUF *bf)
  tok_struct *tokp=bf->tok_table_bnf;
  int table_size=bf->tok_bnf_index;
  int assign_error=0;
+ err_line=0;
  // MESG("create_token_pointers:[%s] size=%d",bf->b_fname,table_size);
  int i=0;
 #if	TFUNC
@@ -900,11 +901,17 @@ int create_statement_group(FILEBUF *bf)
 	if(tokp->ttype==TOK_VAR) {
 		BTNODE *var_node=find_btnode(bf->symbol_tree,tokp->tname);
 		if(var_node->node_assigned==0) {
-			MESG("	var %s not assigned line %d",tokp->tname,tokp->tline);
+			MESG("	var %s not assigned line %d",tokp->tname,tokp->tline+1);
+			mesg_out("Error var %s not assigned line %d",tokp->tname,tokp->tline+1);
+			if(err_line==0) err_line=tokp->tline+1;
 		};
 		if(var_node->node_assigned!=1) assign_error=1;
 	};
 	tokp++;
+ };
+ if(assign_error) {
+ 	err_num=4567;
+	err_str="var not defined!";
  };
  return(assign_error);
  // tokp->next_tok=NULL;
@@ -1681,6 +1688,7 @@ char * tok_info(tok_struct *tok)
 		} else if(tok->ttype==TOK_VAR) {
 			// MESG("TOK_VAR:");
 			int vtype=0;
+			// int assigned=0;
 #if	0
 			BTNODE *var_node = tok->tok_node;
 			char *var_name="unknown";
@@ -1689,11 +1697,19 @@ char * tok_info(tok_struct *tok)
 				var_name=var_node->node_name;
 			};
 #endif
-			// MESG("TOK_VAR: vtype=%d",vtype);
 			// MESG("tok_info var! ind=[%d] group=%d vtype=%d",tok->tind,tok->tgroup,vtype);
 			MVAR *var=NULL;
-			if(current_stable) 
+			if(current_stable) { 
 				var = &current_stable[tok->tind];
+			} else MESG("	current_stable is NULL!!");
+#if	0
+			if(check_buffer)
+			if(check_buffer->symbol_tree) {
+				MESG("	check check_buffer symbol_tree!");
+				BTNODE *vnode = find_btnode(check_buffer->symbol_tree,tok->tname);
+				assigned = vnode->node_assigned;
+			};
+#endif
 			if(var!=NULL) vtype=var->var_type;
 #if	0
 			int size=0;
@@ -1704,7 +1720,7 @@ char * tok_info(tok_struct *tok)
 			snprintf(stok1,sizeof(stok)-ssize," %8s %d size %d [bnf=%2d]",
 				vtype_names[vtype] ,vtype,size,tok->bnf_group);
 #else
-			snprintf(stok1,sizeof(stok)-ssize,"%s a=%d stable=%p",vtype_names[vtype],var->var_assigned,current_stable);
+			snprintf(stok1,sizeof(stok)-ssize,"%s",vtype_names[vtype]);
 #endif
 		} else {
 			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);

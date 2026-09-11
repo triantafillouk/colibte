@@ -854,7 +854,7 @@ tok_struct *tok0_bnf=NULL;
 			NTOKEN_ERR(4982);
 		};
 		if(tok->ttype==TOK_ASSIGN) {
-			// MESG("set normal assign prok=[%s]",tok_info(prev_token));
+			MESG("set normal assign prok=[%s]",tok_info(prev_token));
 #if	TBNF
 			if(bnf_tok!=NULL) bnf_tok->bnf_factor_function=bnf_factor_assign_var_f;
 #endif
@@ -868,9 +868,10 @@ tok_struct *tok0_bnf=NULL;
 			// if(check_buffer) MESG("check_buffer=%s",check_buffer->b_fname);
 			// if(cbfp->symbol_tree) MESG("	ok symbol tree!");
 			BTNODE *vnode = find_btnode(check_buffer->symbol_tree,tok->tname);
-			if(vnode) vnode->node_assigned=1;
-			else MESG("	cannot find node with name %s",tok->tname);
-			// MESG("	- assign var_name: %s [%s] in %s",tok->tname,tok_info(tok),check_buffer->b_fname);
+			if(vnode) {
+				vnode->node_assigned=1;
+				MESG("	- assign var_name: %s [%s] in %s",tok->tname,tok_info(tok),check_buffer->b_fname);
+			} else MESG("	cannot find node with name %s",tok->tname);
 		};
 		if(tok->ttype==TOK_INCREASEBY) {
 			// MESG("set normal assign [%s]",tok_info(tok));
@@ -2259,6 +2260,13 @@ int err_check_sentence1()
 			} else {
 #if	TBNF
 				tok0=tok;
+			BTNODE *vnode = find_btnode(check_buffer->symbol_tree,tok_var->tname);
+			if(vnode) {
+				vnode->node_assigned=1;
+				MESG("	- assign var_name: %s [%s] in %s",tok_var->tname,tok_info(tok_var),check_buffer->b_fname);
+			} else MESG("	cannot find node with name %s",tok_var->tname);
+
+
 #endif
 				// MESG_TOK_INFO(" equal to",tok);
 			};
