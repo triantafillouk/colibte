@@ -133,6 +133,7 @@ char * tok_info2(tok_struct *tok)
 
 int parse_level=0;
 char show_type=' ';
+int in_proc_args=0;
 
 int check_skip_token1( int type)
 {
@@ -651,6 +652,7 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 
 
 int skip_next=0;
+char proc_name[128];
 
 int err_factor()
 {
@@ -697,10 +699,12 @@ tok_struct *tok0_bnf=NULL;
  	&& tok->ttype!=TOK_MULBY && tok->ttype!=TOK_DIVBY)) {
 	// MESG("stack push [%s]",tok_info(tok0));
  	tok0_bnf=stack_push("factor",tok0,tok0->ttype);
-	
  };
 #endif
- // MESG("> factor  : tok0 %s",tok_info(tok0));
+ if(tok0->ttype==TOK_PROC) {
+ 	sprintf(proc_name,"[%s]",tok0->tname);
+ };
+ // MESG("> factor [%s]: proc='%s' tok0 %s",check_buffer->b_fname,proc_name,tok_info(tok0));
  switch(tok0->ttype) {
 	/*  the following ends factor  */
  	case TOK_SEP:
@@ -799,7 +803,15 @@ tok_struct *tok0_bnf=NULL;
 		int var_index=tok0->tind;
 		pre_symbol=0;
 		ex_nvars++;
-		// MESG("TOK_VAR: %s var_index=%d [%s]",tok0->tname,var_index,tok_info(tok0));
+		if(in_proc_args && !strcmp(proc_name,check_buffer->b_fname)) {
+			// MESG("TOK_VAR: %s var_index=%d in_args=%d [%s]",tok0->tname,var_index,in_proc_args,tok_info(tok0));
+			// MESG("	proc_name=%s fname=%s",proc_name,check_buffer->b_fname);
+			BTNODE *vnode = find_btnode(check_buffer->symbol_tree,tok0->tname);
+			if(vnode) vnode->node_assigned=1;
+			else MESG("	cannot find node with name %s",tok0->tname);
+			// MESG("	- assign TOK_VAR in proc_args: %s [%s] in %s",tok0->tname,tok_info(tok0),check_buffer->b_fname);
+		};
+
 		if(tok->ttype==TOK_INCREASE) {
 			tok->dval=1;
 #if	TNORMAL
@@ -858,8 +870,7 @@ tok_struct *tok0_bnf=NULL;
 			BTNODE *vnode = find_btnode(check_buffer->symbol_tree,tok->tname);
 			if(vnode) vnode->node_assigned=1;
 			else MESG("	cannot find node with name %s",tok->tname);
-			MESG("	var_name_to_assign: %s [%s] in %s",tok0->tname,tok_info(tok),check_buffer->b_fname);
-			
+			// MESG("	- assign var_name: %s [%s] in %s",tok->tname,tok_info(tok),check_buffer->b_fname);
 		};
 		if(tok->ttype==TOK_INCREASEBY) {
 			// MESG("set normal assign [%s]",tok_info(tok));
@@ -1339,8 +1350,10 @@ tok_struct *tok0_bnf=NULL;
 		// MESG("	end of TOK_FUNC [%s]",tok_info(tok));
 		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)
-		// MESG("------ define TOK_PROC ------ [%s]",tok_info(tok));
+		// MESG("TOK_PROC: proc_name=%s %d",proc_name,strlen(proc_name));
+		// MESG("- define TOK_PROC ---- %s\n	[%s]\n	[%s]",check_buffer->b_fname,tok_info(tok0),tok_info(tok));
 		int nargs=0;
+		in_proc_args=1;
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
 #endif
@@ -1373,6 +1386,8 @@ tok_struct *tok0_bnf=NULL;
 			MESG("503 no right_parenthesis after proc");
 			RT_MESG1(503);
 		};
+		in_proc_args=0;
+		// MESG("proc TOK_RPAR");
 		stack_push("proc ) ",tok,-TOK_RPAR);
 		NTOKEN_ERR(107);
 		after_proc=tok;	// this must be RPAR token!
@@ -1394,9 +1409,8 @@ tok_struct *tok0_bnf=NULL;
 		};
 		CHECK_TOK(504);
 		tok=after_proc;
-		// MESG("	TOK_PROC: end function tnum=%d",tok->tnum);
-		// stack_push("proc ) ",tok,0);
-		// MESG("err TOK_PROC: end ttype=%d",tok->ttype);
+		// MESG("err TOK_PROC: %s end ttype=%d",proc_name,tok->ttype);
+		proc_name[0]=0;
 		RT_MESG;
 	};
 	case TOK_CMD:	{ // 3 editor command
@@ -2480,6 +2494,7 @@ int err_check_block1()
 		case TOK_RPAR:	/* problem if removed  */
 			// MESG_TOK_INFO("# err_check_block1",tok);
 #if	TBNF
+			// MESG("TOK_RPAR:");
 			stack_push("RPAR ",tok,-tok->ttype);
 #endif
 			NTOKEN_ERR(6741);

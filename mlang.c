@@ -692,7 +692,7 @@ void set_symbol_table(MVAR *stable)
 
 MVAR *new_symbol_table(int const size)
 {
- MESG("Initialize new_symbol_table: size %d",size);
+ // MESG("Initialize new_symbol_table: size %d",size);
  MVAR *td=call_stack_used;
  // MESG("		new symbol table starts at ind=%d",td-call_stack);
  // int size_call_stack_used = call_stack_used - call_stack;
@@ -715,7 +715,7 @@ MVAR *new_symbol_table(int const size)
 #if	0
  }
 #endif
- MESG("Initialize new_symbol_table: size %d",size);
+ // MESG("Initialize new_symbol_table: size %d",size);
  init_vars(td,size);
  return td;
 }
@@ -872,10 +872,11 @@ void create_token_pointers(FILEBUF *bf)
 #endif
 
 #if	TBNF
-void create_statement_group(FILEBUF *bf)
+int create_statement_group(FILEBUF *bf)
 {
  tok_struct *tokp=bf->tok_table_bnf;
  int table_size=bf->tok_bnf_index;
+ int assign_error=0;
  // MESG("create_token_pointers:[%s] size=%d",bf->b_fname,table_size);
  int i=0;
 #if	TFUNC
@@ -898,10 +899,14 @@ void create_statement_group(FILEBUF *bf)
 #endif
 	if(tokp->ttype==TOK_VAR) {
 		BTNODE *var_node=find_btnode(bf->symbol_tree,tokp->tname);
-		MESG("	var %s assigned=%d",tokp->tname,var_node->node_assigned);
+		if(var_node->node_assigned==0) {
+			MESG("	var %s not assigned line %d",tokp->tname,tokp->tline);
+		};
+		if(var_node->node_assigned!=1) assign_error=1;
 	};
 	tokp++;
  };
+ return(assign_error);
  // tokp->next_tok=NULL;
 }
 #endif
@@ -965,8 +970,12 @@ int check_init(FILEBUF *bf)
 #if	TOKENN
  create_token_pointers(bf);
 #endif
- create_statement_group(bf);
+ err_num=create_statement_group(bf);
  show_token_table("BNF ",bf,bf->tok_table_bnf,bf->tok_bnf_index);
+ if(err_num) {
+ 	show_error("variables not assigned!","");
+	return err_num;
+ };
  if(bnf_debug() && check_buffer==NULL) exit(0);
 #endif
  return(0);
@@ -1339,7 +1348,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		local_symbols=realloc_symbol_table(current_stable,use_fp->symbol_tree->items,old_items);
 	}
 	current_stable=local_symbols;
- MESG("compute_block:2 m_mode=%d",bp->m_mode);
+ // MESG("compute_block:2 m_mode=%d",bp->m_mode);
  if(bp->m_mode<2)	/* if not already checked!  */
  {
 	err_num=check_init(bp);
