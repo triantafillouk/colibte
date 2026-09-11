@@ -11,6 +11,7 @@ bool=ok and level>=start	:
 if(ok and level>=start)
 {
  print("if ok!")
+ a=0
  if(a==1) ok=1
  else ok=0
 }

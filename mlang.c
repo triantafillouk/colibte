@@ -895,6 +895,7 @@ int create_statement_group(FILEBUF *bf)
 #endif
 	if(tokp->ttype==TOK_VAR) {
 		BTNODE *var_node=find_btnode(bf->symbol_tree,tokp->tname);
+		MESG("	var %s node_type=%d",tokp->tname,var_node->node_vtype);
 		if(var_node->node_assigned==0) {
 			MESG("	var %s not assigned line %d",tokp->tname,tokp->tline+1);
 			mesg_out("Error var %s not assigned line %d",tokp->tname,tokp->tline+1);
@@ -922,13 +923,14 @@ int check_init(FILEBUF *bf)
  int err=0;
  INIT_STAGE;
  // int checked = (bf->tok_table != NULL);
- // MESG("---- check_init: [%s] %d checked=%d err=%d",bf->b_fname,bf->b_type,checked,bf->err);
+ MESG("---- check_init: [%s] %d  err=%d",bf->b_fname,bf->b_type,bf->err);
 
  if(tok_table==NULL) 
  {
- 	// MESG("create token table [%s] err=%d",bf->b_fname,bf->err);
+ 	MESG("no tok_table!");
+ 	MESG("create token table [%s] err=%d",bf->b_fname,bf->err);
 	parse_block1(bf,NULL,1);
-	// MESG("block parsed err = %d",err_num);
+	MESG("block parsed err = %d",err_num);
 	if(err_num>0) {
 		msg_line("found parsed errors: err_num=%d %s",err_num,err_str);
 		check_buffer = ori_buffer;
@@ -943,7 +945,7 @@ int check_init(FILEBUF *bf)
  } else {
  	// MESG("	already checked!");
  };
- // MESG("check_init:2 err=%d %d",bf->err,bf->tok_table==NULL);
+ MESG("check_init:2 err=%d %d",bf->err,bf->tok_table==NULL);
  if(bf->err<1) 
  {
 	tok=bf->tok_table;
@@ -957,7 +959,7 @@ int check_init(FILEBUF *bf)
  };
 
  tok=tok_table;
- // MESG("check_init:end [%s] %d",bf->b_fname,bf->b_type);
+ MESG("check_init:end [%s] %d",bf->b_fname,bf->b_type);
 #if	TNORMAL
  show_token_table("Token table ",bf,bf->tok_table,bf->end_token - bf->tok_table+1);
 #endif
@@ -1318,7 +1320,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  MVAR *local_symbols;
  MVAR *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
-	// MESG("# compute_block1: [%s] use [%s] start=%d",bp->b_fname,use_fp->b_fname,start);
+	MESG("# compute_block1: [%s] use [%s] start=%d",bp->b_fname,use_fp->b_fname,start);
 	if(show_no_time) 
 		MESG("# [%-15s use %s %s ---------------------------------",bp->b_fname,use_fp->b_fname,"Version");
 	else 
@@ -1339,21 +1341,22 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		old_items=use_fp->symbol_tree->items;
 	};
 	parse_block1(bp,use_fp->symbol_tree,start);
-	// MESG("parse_block: ended! err=%d start=%d items=%d",err_num,start,use_fp->symbol_tree->items);
+	MESG("parse_block: ended! err=%d start=%d items=%d",err_num,start,use_fp->symbol_tree->items);
 	if(err_num) { execmd=0;return(0);};
-	// MESG("	compute_block: start=%d",start);
+	MESG("	compute_block: start=%d",start);
 	if(start || current_stable==NULL) {
-		// MESG("new current_stable with %d items",use_fp->symbol_tree->items);
+		MESG("new current_stable with %d items",use_fp->symbol_tree->items);
 		local_symbols=new_symbol_table(use_fp->symbol_tree->items);
 	} else {
 		// MESG("use current_stable new items = %d",use_fp->symbol_tree->items);
 		local_symbols=realloc_symbol_table(current_stable,use_fp->symbol_tree->items,old_items);
 	}
 	current_stable=local_symbols;
- // MESG("compute_block:2 m_mode=%d",bp->m_mode);
+ MESG("compute_block:2 m_mode=%d",bp->m_mode);
  if(bp->m_mode<2)	/* if not already checked!  */
  {
 	err_num=check_init(bp);
+	MESG("after check_init: err_num=%d",err_num);
 	if(err_num>0) 
 	{
 		// mesg_out("Error %d %s line %d ex_vtype=%d ex_value=%f slval=[%s]!",err_num,err_str,err_line,get_vtype(),get_val(),get_sval());
@@ -1363,7 +1366,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	init_exec_flags();
 
 	drv_start_checking_break();
-	// MESG("	call exec_block1 ------ execmd=%d",execmd);
+	MESG("	call exec_block1 ------ execmd=%d",execmd);
 #if	TNORMAL
 	tok=bp->tok_table;
 	if(execmd) val=exec_block1(bp);
@@ -1483,7 +1486,7 @@ int refresh_current_buffer(num nused)
  fp->err=-1;
  // MESG("refresh_current_buffer:1 [%s] %d",fp->b_fname,fp->b_type);
  parse_block1(fp,fp->symbol_tree,1);
-
+ MESG("	block parsed err_num=%d",err_num);
  if(err_num<1){	/* if no errors  */
 	current_stable=new_symbol_table(fp->symbol_tree->items);
 
@@ -1496,7 +1499,7 @@ int refresh_current_buffer(num nused)
 		// mesg_out("syntax error %d line %d [%s]",err_num,err_line,err_str);
 		return(0);
 	};
-	// MESG("refresh_current_buffer: after check_init");
+	MESG("refresh_current_buffer: after check_init");
  	msg_line("evaluating %s",fp->b_fname);
 	init_exec_flags();
 	exe_buffer=fp;

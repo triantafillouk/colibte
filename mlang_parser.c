@@ -550,7 +550,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 
  foffset=0;	/* goto to the beginning of the buffer  */
  curl_stack=new_list(0,"curles_stack"); // create curles stack 
- // MESG("parse_block1: before looping: script_active=%d",script_active);
+ MESG("parse_block1: before looping: script_active=%d",script_active);
  err_num=0;
  err_line=0;
 #if	DEBUG_SYNTAX
@@ -564,7 +564,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  {
 	if(change_script_state(tok_type,&script_active)) continue;
 	// if(tok_type!=TOK_LETTER && cc!=10)
-	// MESG("[%s] parse- cc=%d %c type=%3d [%10s] line=%d",bf->b_fname,cc,cc,tok_type,tname(tok_type),tok_line);
+	MESG("[%s] parse- cc=%d %c type=%3d [%10s] line=%d",bf->b_fname,cc,cc,tok_type,tname(tok_type),tok_line);
 
 	if(err_num>0) {
 		check_buffer = buffer_ori;
@@ -1164,7 +1164,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	if(err_num>0) {ERROR("ERROR: line=%d %d type=%d [%s]",last_correct_line,err_line,err_num,err_str);break;};
  };
   
-  // MESG("	parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
+  MESG("	parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
  	/* add eof token!  */
 	if(tok_type!=TOK_SEP) 
 	{	
@@ -1182,7 +1182,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			SHOW_TOKEN("endsep");
 		};
 	};
-	// MESG("parse_block1: set end token");
+	MESG("parse_block1: set end token");
 	bf->end_token=tok;	/* save end token  */
 	ADD_TOKEN("end token");
 	tok->ttype=TOK_EOF;
@@ -1203,7 +1203,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 
 	bf->m_mode=M_PARSED;
 
- // MESG("parse_block1: create token table from token list");
+ MESG("parse_block1: create token table from token list");
  set_tok_table(bf);
 
  free_list(bf->lex_parser,"lex_parser");
@@ -1215,9 +1215,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 #endif
 	// if(bf->symbol_tree==NULL)MESG("[%s]: --- parse_block1: > end.",bf->b_fname);
 	// else MESG("[%s]: parse_block1 > end. Number of tokens %d",bf->b_fname,bf->symbol_tree->items);
- // MESG("parse_block1: [%s] >> end",bf->b_fname); 
+ MESG("parse_block1: [%s] >> end",bf->b_fname); 
  check_buffer = buffer_ori;
- // MESG("--> parse_block1:[%s] end OK!",bf->b_fname);
+ MESG("--> parse_block1:[%s] end OK!",bf->b_fname);
  return(TRUE); 
 }
 
