@@ -1,1 +1,1 @@
-for i in cmds2/*.cmd;do echo $i;$1 -D -x $i;done 2> check_cmd_$2.err |tee check_cmd_$2.out
+for i in cmds2/*.cmd;do echo $i;$1 -x $i;done |tee check_cmd_$2.out

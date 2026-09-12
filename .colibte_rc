@@ -7,7 +7,7 @@ assign_sub ("test1","M-~")
 assign_sub ("litexl","M-$")
 
 #color_scheme(2)
-font="andale mono 14"
+# font="andale mono 14"
 #_backup_extention=".bak"
 # print("font set ok!")
 #

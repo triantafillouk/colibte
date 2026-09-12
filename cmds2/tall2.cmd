@@ -141,6 +141,7 @@ else
 {
  ok=0
 }
+ a1=0
  a1	:   0.0
  b: 33.340000
  print("result from function call is b="+b+" ok="+ok)

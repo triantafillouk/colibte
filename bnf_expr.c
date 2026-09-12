@@ -71,11 +71,11 @@ inline static void next_var(char *title)
 
 void prev_var(char *title)
 {
- if(bnf_var->var_type==VTYPE_NUM) MESG(" - var (%f) @%d -> %d %s [%s]",bnf_var->dval,VARIND,VARIND-1,title,tok_info(tok));
- else MESG(" - var (t=%d) @%d -> %d %s [%s]",bnf_var->var_type,VARIND,VARIND-1,title,tok_info(tok));
+ if(bnf_var->var_type==VTYPE_NUM) MESG(" -V %d -> %d (%2.2f) %8s %s",VARIND,VARIND-1,bnf_var->dval,title,tok_info(tok));
+ else MESG(" -V %d -> %d (t=%2d) %8s %s",VARIND,VARIND-1,bnf_var->var_type,title,tok_info(tok));
  if(bnf_var>bnf_vars) bnf_var--;
  else {
-	MESG("prev_var (%s) from 0 at [%s]",title,tok_info(tok));
+	MESG(" -V (%s) from 0 at [%s]",title,tok_info(tok));
 	exit(3);
  };
  if(VARIND<0) { MESG("min var exceeded!!! var@=%d [%s]",VARIND,tok_info(tok)); exit(3);};
@@ -84,8 +84,8 @@ void prev_var(char *title)
 void next_var(char *title)
 {
  bnf_var++;
- if(bnf_var->var_type==VTYPE_NUM) MESG(" + var %d -> %d (%f) %s [%s]",VARIND-1,VARIND,bnf_var->dval,title,tok_info(tok));
- else  MESG(" + var %d -> %d (t=%d) %s [%s]",VARIND-1,VARIND,bnf_var->var_type,title,tok_info(tok));
+ if(bnf_var->var_type==VTYPE_NUM) MESG(" +V %d -> %d (%2.2f) %8s %s",VARIND-1,VARIND,bnf_var->dval,title,tok_info(tok));
+ else MESG(" +V %d -> %d (t=%2d) %8s %s",VARIND-1,VARIND,bnf_var->var_type,title,tok_info(tok));
 
 	if(bnf_var->var_type==VTYPE_STRING) {
 		if(bnf_var->var_alloced) free(bnf_var->sval);
@@ -2286,7 +2286,7 @@ inline static void bnf_factor_rpar()
 inline static void bnf_block1()
 {
 	// MESG("bnf_block1 start! group=%d [%s]",tok->tgroup,tok_info(tok));
-	while(tok->tgroup!=BLOCK_END) {
+	while(tok->bnf_group!=BLOCK_END) {
 		// MESG("!B v@=%d [%s]",VARIND,tok_info(tok));	/*   */
 	 	tok->bnf_factor_function();
 		// MESG("		-- tok %d type %d act=%d",tok->tnum,tok->ttype,current_active_flag);
@@ -2408,6 +2408,7 @@ inline static void bnf_dir_fori()
 	};
 
 	// MESG("# fori: start var@=%d, start_block=[%s]",VARIND,tok_info(start_block));
+	// MESG("	from %f to %f step %f",*iterrator_val,dmax,dstep);
 	int start_var=VARIND;
 	if(is_curl) {
 

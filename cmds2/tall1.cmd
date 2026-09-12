@@ -140,6 +140,7 @@ if(!deq(t,result))
 } 
 
  a:    11
+ a1=0
  a1	:     0
  t: 33.340000
  print("result from function call is t="+t+" ok="+ok)

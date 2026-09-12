@@ -701,14 +701,18 @@ extern FILEBUF *exe_buffer;
 
 void bnf_show_vars()	/* ok?  */
 {
-	MESG("bnf_show_vars:");
-	mesg_out("Ind Name       Type             Value      local vars %d",exe_buffer->symbol_tree->items);
+	void (*vfunc)(const char *,...);
+	if(debug_flag()) vfunc = MESG;
+	else vfunc=mesg_out;
+
+	// MESG("bnf_show_vars:");
+	vfunc("# Ind Name      Type         Value      local vars %d",exe_buffer->symbol_tree->items);
 	eval_btree(exe_buffer->symbol_tree->root,show_var_node);
 #if	USE_TYPE_VARS
 	if(global_types_tree->root) {
-	mesg_out("Ind Name       Type             Value      global vars/types %d",exe_buffer->symbol_tree->items);
+	vfunc("# Ind Name      Type         Value      global vars/types %d",exe_buffer->symbol_tree->items);
 		eval_btree(global_types_tree->root,show_var_node);
-	} else mesg_out("global_types_tree: empty!");
+	};// else mesg_out("global_types_tree: empty!");
 #endif
 }
 

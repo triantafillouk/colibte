@@ -65,7 +65,7 @@ TOK_TAB token_table[]= {
 	{TOK_RBRAKET		," RB ",0},	// 54
 	{TOK_SQUOTE			," ' ",0},	// 55
 	{TOK_AT				," @ ",0},	// 56
-	{TOK_RANGE			," range ",0},	// 57
+	{TOK_RANGE			,"range",0},	// 57
 	{TOK_BQUOTE			," BQ ",0},	// 58
 	{TOK_DOLAR			," $ ",0},	// 59
 	{TOK_TILDA			," ~ ",0},	// 60
@@ -77,7 +77,7 @@ TOK_TAB token_table[]= {
 	{TOK_DECREASEBY		," -= ",TOK_TERM0},	// 65
 	{TOK_BSLASH			,"[\\]",0},
 	{TOK_NL				," NL ",0},
-	{TOK_DIR_CONTINUE	,"continue",0},
+	{TOK_DIR_CONTINUE	,"contin",0},
 	{TOK_DIR_FOREACH	,"foreach",0},
 	{TOK_DIR_TYPE		,"type",0},
 	{TOK_ARRAY1			,"array1",0},	// 71
@@ -85,7 +85,7 @@ TOK_TAB token_table[]= {
 	{TOK_ARRAY_L1		,"AL1",0},
 	{TOK_ARRAY_L2		,"AL2",0},
 	{TOK_ASSIGNENV		,"setenv",TOK_TERM0},
-	{TOK_ASSIGNOPT		,"setoption",TOK_TERM0},
+	{TOK_ASSIGNOPT		,"setopt",TOK_TERM0},
 	{TOK_END			,"END",0},
 	{TOK_DEFINE_TYPE	,"::",0},
 	{TOK_ASSIGN_TYPE	,"=type",TOK_TERM0},

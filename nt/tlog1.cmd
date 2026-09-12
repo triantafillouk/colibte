@@ -10,6 +10,7 @@ b1=0
 b2=1
 
 a3 & a4	: 
+c=0
 c: 
 
 if(c==1) print("test1 ok")

@@ -1174,12 +1174,12 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			tok->tname="end 0";
 			SHOW_TOKEN("0");
 		} else {
-			ADD_TOKEN("end sep");
+			ADD_TOKEN("endsep");
 			tok->ttype=TOK_SEP;
 			tok->tind=0;
 			tok->tline=tok_line;
-			tok->tname="end sep";
-			SHOW_TOKEN("end sep");
+			tok->tname="endsep";
+			SHOW_TOKEN("endsep");
 		};
 	};
 	// MESG("parse_block1: set end token");
