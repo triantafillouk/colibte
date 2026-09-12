@@ -6,7 +6,7 @@ function fib2_inner(a,b ,n)
 {
 	if(n==0) { return(a) }
 	f=fib2_inner(b ,a+b ,n-1) 
-	print("f="+f+" b="+b+" a2="+a2+" n2="+n2)
+	print("f="+f+" b="+b+" a="+a+" n="+n)
 	return(f)
 }
 

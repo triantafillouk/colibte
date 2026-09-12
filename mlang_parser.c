@@ -521,7 +521,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	return (0);
  };
 
- // MESG("<-- Parse_block1 [%s] type=%d ---------------------",bf->b_fname,bf->b_type);
+ MESG("<-- Parse_block1 [%s] type=%d ---------------------",bf->b_fname,bf->b_type);
  if(is_mlang(bf)) script_active=1;	/* initial script state  */
 
  if(init && bf->tok_table!=NULL) {

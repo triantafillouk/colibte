@@ -869,16 +869,22 @@ void create_token_pointers(FILEBUF *bf)
 #if	TBNF
 int create_statement_group(FILEBUF *bf)
 {
+ FILEBUF *ori_buffer=check_buffer;
+ check_buffer=bf;
  tok_struct *tokp=bf->tok_table_bnf;
  int table_size=bf->tok_bnf_index;
  int assign_error=0;
  err_line=0;
- // MESG("create_token_pointers:[%s] size=%d",bf->b_fname,table_size);
  int i=0;
 #if	TFUNC
  int in_brackets=0;
  int in_call=0;
 #endif
+ BTREE *use_symbol_tree=bf->symbol_tree;
+ if(use_symbol_tree==NULL) use_symbol_tree=cbfp->symbol_tree;
+ // MESG("create_statement_group [%s] cbfp=%s",bf->b_fname,cbfp->b_fname);
+ // MESG("	symbol_tree of bf=%d of cbfp=%d",bf->symbol_tree!=NULL,cbfp->symbol_tree!=NULL);
+
  for(i=0;i<table_size;i++) {
 	// MESG("tp %3d %s",i,tokp->tname);
  	tokp->statement_group = tokp->ttype != TOK_SEP && tokp->ttype != TOK_RCURL && tokp->ttype != TOK_DIR_ELSE;
@@ -894,14 +900,21 @@ int create_statement_group(FILEBUF *bf)
 	}
 #endif
 	if(tokp->ttype==TOK_VAR) {
-		BTNODE *var_node=find_btnode(bf->symbol_tree,tokp->tname);
-		MESG("	var %s node_type=%d",tokp->tname,var_node->node_vtype);
-		if(var_node->node_assigned==0) {
-			MESG("	var %s not assigned line %d",tokp->tname,tokp->tline+1);
-			mesg_out("Error var %s not assigned line %d",tokp->tname,tokp->tline+1);
-			if(err_line==0) err_line=tokp->tline+1;
+		if(use_symbol_tree) {
+		BTNODE *var_node=find_btnode(use_symbol_tree,tokp->tname);
+		if(var_node) {
+			// MESG("	var %s node_type=%d",tokp->tname,var_node->node_vtype);
+			if(var_node->node_assigned==0) {
+				// MESG("	var %s not assigned line %d",tokp->tname,tokp->tline+1);
+				mesg_out("Error var %s not assigned line %d",tokp->tname,tokp->tline+1);
+				if(err_line==0) err_line=tokp->tline+1;
+				assign_error=1;
+			};
+			// if(var_node->node_assigned!=1) assign_error=1;
+		} else {
+				MESG("var %s node not found!",tokp->tname); 
 		};
-		if(var_node->node_assigned!=1) assign_error=1;
+		};
 	};
 	tokp++;
  };
@@ -909,6 +922,7 @@ int create_statement_group(FILEBUF *bf)
  	err_num=4567;
 	err_str="var not defined!";
  };
+ check_buffer=ori_buffer;
  return(assign_error);
  // tokp->next_tok=NULL;
 }
@@ -923,14 +937,14 @@ int check_init(FILEBUF *bf)
  int err=0;
  INIT_STAGE;
  // int checked = (bf->tok_table != NULL);
- MESG("---- check_init: [%s] %d  err=%d",bf->b_fname,bf->b_type,bf->err);
+ MESG("---- check_init: [%s] %d  err=%d err_num=%d",bf->b_fname,bf->b_type,bf->err,err_num);
 
  if(tok_table==NULL) 
  {
  	// MESG("no tok_table!");
  	// MESG("create token table [%s] err=%d",bf->b_fname,bf->err);
 	parse_block1(bf,NULL,1);
-	// MESG("block parsed err = %d",err_num);
+	MESG("block parsed err = %d",err_num);
 	if(err_num>0) {
 		msg_line("found parsed errors: err_num=%d %s",err_num,err_str);
 		check_buffer = ori_buffer;
@@ -946,7 +960,7 @@ int check_init(FILEBUF *bf)
  	// MESG("	already checked!");
  };
 
- // MESG("check_init:2 err=%d %d",bf->err,bf->tok_table==NULL);
+ MESG("check_init:2 err=%d %d",bf->err,bf->tok_table==NULL);
  if(bf->err<1) 
  {
 	tok=bf->tok_table;
@@ -965,6 +979,7 @@ int check_init(FILEBUF *bf)
  show_token_table("Token table ",bf,bf->tok_table,bf->end_token - bf->tok_table+1);
 #endif
  if(bf->err>0) {
+ 	check_buffer = ori_buffer;
 	return bf->err;
  };
  bf->m_mode |= M_CHECKED;
@@ -979,10 +994,13 @@ int check_init(FILEBUF *bf)
  show_token_table("BNF ",bf,bf->tok_table_bnf,bf->tok_bnf_index);
  if(err_num) {
  	show_error("variables not assigned!","");
+	check_buffer = ori_buffer;
 	return err_num;
  };
  if(bnf_debug() && check_buffer==NULL) exit(0);
 #endif
+ check_buffer = ori_buffer;
+ MESG("check_init: end ok, old buffer is[%s]",check_buffer);
  return(0);
 }
 

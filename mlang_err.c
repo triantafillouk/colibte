@@ -313,8 +313,13 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 int check_var_assigned(char *var_name, tok_struct *ntok)
 {
  BTREE *symbols_to_check=check_buffer->symbol_tree;
- if(check_buffer->symbol_tree==NULL) symbols_to_check=cbfp->symbol_tree;
-
+ FILEBUF *buffer_to_check=check_buffer;
+	// MESG("check_var:'%s' cbfp=[%s]",var_name,cbfp->b_fname);
+ 	// MESG("check_var:'%s' check_buffer=[%s]",var_name,check_buffer->b_fname);
+ if(check_buffer->symbol_tree==NULL) {
+ 	symbols_to_check=cbfp->symbol_tree;
+	buffer_to_check=cbfp;
+ };
  if(symbols_to_check==NULL) return 0;
  BTNODE *vnode = find_btnode(symbols_to_check,var_name);
  
@@ -322,14 +327,16 @@ int check_var_assigned(char *var_name, tok_struct *ntok)
 	if(ntok) {
 		if(vnode->node_assigned==0 && ntok->ttype!=TOK_ASSIGN) {
 			MESG("variable %s assign error!",var_name);
+			MESG("buffer_to_check=%s",buffer_to_check->b_fname);
 			// set_error(tok_a,4790,"var is used before assigned!");
 			return 0;
 		}
-	} else 
-	vnode->node_assigned=1;
-	
-	// MESG("	- assign var_name: %s [%s] in %s",tok_var->tname,tok_info(tok_var),check_buffer->b_fname);
- } else MESG("	cannot find node with name %s",var_name);
+	} else {
+		vnode->node_assigned=1;
+		// MESG("	- assign var_name: %s [%s]",var_name);
+		return 0;
+	}
+ } else MESG("	cannot find node with name %s in %s symbol tree",var_name,buffer_to_check->b_fname);
  return 1;
 }
 
@@ -832,7 +839,8 @@ tok_struct *tok0_bnf=NULL;
 		// MESG("TOK_VAR:");
 		// MESG("	check_buffer=[%s]",check_buffer->b_fname);
 #if	1
-		if(!strcmp(check_buffer->b_fname,"[dofile_string]")) {
+		//if(!strcmp(check_buffer->b_fname,"[dofile_string]")) 
+		{
 		if(in_proc_args && !strcmp(proc_name,check_buffer->b_fname)) {
 			// MESG("TOK_VAR: %s var_index=%d in_args=%d [%s]",tok0->tname,var_index,in_proc_args,tok_info(tok0));
 			// MESG("	proc_name=%s fname=%s",proc_name,check_buffer->b_fname);
