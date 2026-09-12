@@ -653,10 +653,10 @@ double compute_string(char *s,char *new_string)
 	EmptyText(fp);
  	init_error();
 	insert_string(fp,s,strlen(s));
-	MESG("compute_string [%s]",s);
+	// MESG("compute_string [%s]",s);
 	fp->b_type=1;
 	value=compute_block(fp,cbfp,0);
-	MESG("compute_string new_string=[%s]",new_string);
+	// MESG("compute_string new_string=[%s]",new_string);
 
 	if(new_string) {
 		get_text_offs(fp,new_string,0,FLineEnd(fp,0));

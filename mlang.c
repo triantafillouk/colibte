@@ -717,7 +717,7 @@ MVAR *new_symbol_table(int const size)
 
 MVAR *realloc_symbol_table(MVAR *td,int const size,int const old_size)
 {
-  MESG("realloc_symbol_table: ---------------");
+  // MESG("realloc_symbol_table: ---------------");
   call_stack_used += size-old_size;
  if(max_call_stack_end<call_stack_used) {
  	max_call_stack_end=call_stack_used;
@@ -927,10 +927,10 @@ int check_init(FILEBUF *bf)
 
  if(tok_table==NULL) 
  {
- 	MESG("no tok_table!");
- 	MESG("create token table [%s] err=%d",bf->b_fname,bf->err);
+ 	// MESG("no tok_table!");
+ 	// MESG("create token table [%s] err=%d",bf->b_fname,bf->err);
 	parse_block1(bf,NULL,1);
-	MESG("block parsed err = %d",err_num);
+	// MESG("block parsed err = %d",err_num);
 	if(err_num>0) {
 		msg_line("found parsed errors: err_num=%d %s",err_num,err_str);
 		check_buffer = ori_buffer;
@@ -945,7 +945,8 @@ int check_init(FILEBUF *bf)
  } else {
  	// MESG("	already checked!");
  };
- MESG("check_init:2 err=%d %d",bf->err,bf->tok_table==NULL);
+
+ // MESG("check_init:2 err=%d %d",bf->err,bf->tok_table==NULL);
  if(bf->err<1) 
  {
 	tok=bf->tok_table;
@@ -959,7 +960,7 @@ int check_init(FILEBUF *bf)
  };
 
  tok=tok_table;
- MESG("check_init:end [%s] %d",bf->b_fname,bf->b_type);
+ // MESG("check_init:end [%s] %d",bf->b_fname,bf->b_type);
 #if	TNORMAL
  show_token_table("Token table ",bf,bf->tok_table,bf->end_token - bf->tok_table+1);
 #endif
@@ -1341,22 +1342,22 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		old_items=use_fp->symbol_tree->items;
 	};
 	parse_block1(bp,use_fp->symbol_tree,start);
-	MESG("parse_block: ended! err=%d start=%d items=%d",err_num,start,use_fp->symbol_tree->items);
+	// MESG("parse_block: ended! err=%d start=%d items=%d",err_num,start,use_fp->symbol_tree->items);
 	if(err_num) { execmd=0;return(0);};
-	MESG("	compute_block: start=%d",start);
+	// MESG("	compute_block: start=%d",start);
 	if(start || current_stable==NULL) {
-		MESG("new current_stable with %d items",use_fp->symbol_tree->items);
+		// MESG("new current_stable with %d items",use_fp->symbol_tree->items);
 		local_symbols=new_symbol_table(use_fp->symbol_tree->items);
 	} else {
 		// MESG("use current_stable new items = %d",use_fp->symbol_tree->items);
 		local_symbols=realloc_symbol_table(current_stable,use_fp->symbol_tree->items,old_items);
 	}
 	current_stable=local_symbols;
- MESG("compute_block:2 m_mode=%d",bp->m_mode);
+ // MESG("compute_block:2 m_mode=%d",bp->m_mode);
  if(bp->m_mode<2)	/* if not already checked!  */
  {
 	err_num=check_init(bp);
-	MESG("after check_init: err_num=%d",err_num);
+	// MESG("after check_init: err_num=%d",err_num);
 	if(err_num>0) 
 	{
 		// mesg_out("Error %d %s line %d ex_vtype=%d ex_value=%f slval=[%s]!",err_num,err_str,err_line,get_vtype(),get_val(),get_sval());
@@ -1366,7 +1367,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	init_exec_flags();
 
 	drv_start_checking_break();
-	MESG("	call exec_block1 ------ execmd=%d",execmd);
+	// MESG("	call exec_block1 ------ execmd=%d",execmd);
 #if	TNORMAL
 	tok=bp->tok_table;
 	if(execmd) val=exec_block1(bp);
@@ -1477,7 +1478,7 @@ int refresh_current_buffer(num nused)
  INIT_STAGE;
 
  /* clear parse list  */
- MESG("refresh_current_buffer: call empty_tok_table: [%s]",fp->b_fname);
+ // MESG("refresh_current_buffer: call empty_tok_table: [%s]",fp->b_fname);
  empty_tok_table(fp);
 
 #if	TNORMAL
@@ -1486,7 +1487,7 @@ int refresh_current_buffer(num nused)
  fp->err=-1;
  // MESG("refresh_current_buffer:1 [%s] %d",fp->b_fname,fp->b_type);
  parse_block1(fp,fp->symbol_tree,1);
- MESG("	block parsed err_num=%d",err_num);
+ // MESG("	block parsed err_num=%d",err_num);
  if(err_num<1){	/* if no errors  */
 	current_stable=new_symbol_table(fp->symbol_tree->items);
 
@@ -1499,7 +1500,7 @@ int refresh_current_buffer(num nused)
 		// mesg_out("syntax error %d line %d [%s]",err_num,err_line,err_str);
 		return(0);
 	};
-	MESG("refresh_current_buffer: after check_init");
+	// MESG("refresh_current_buffer: after check_init");
  	msg_line("evaluating %s",fp->b_fname);
 	init_exec_flags();
 	exe_buffer=fp;
@@ -1521,7 +1522,7 @@ int refresh_current_buffer(num nused)
 		// msg_line("Error %d [%s] at line %d",err_num,err_str,err_line);
 		// mesg_out("Error %d [%s] at line %d",err_num,err_str,err_line);
 	} else {
-		MESG("refresh_current_buffer: set result!");
+		// MESG("refresh_current_buffer: set result!");
 		msg_result("",0);
 	};
  } else {
@@ -1544,7 +1545,7 @@ int parse_check_current_buffer(num n)
  err_num=0;
  err_line=0;
  show_stage=1;
- MESG("parse_check_current_buffer: %d",is_mlang(fp));
+ // MESG("parse_check_current_buffer: %d",is_mlang(fp));
  if(!is_mlang(fp)) return 0;
 
  /* clear parse list  */
@@ -1904,7 +1905,7 @@ int show_parse_buffer(num n)
  tok_struct *tok_table,*tok_ind;
  fp=cbfp;
 
- MESG("show_parse_buffer:");
+ // MESG("show_parse_buffer:");
  if(!is_mlang(fp)) return 0;
 
  err_num=0;
@@ -2014,7 +2015,7 @@ int exec_named_function(char *name)
 	#endif
 
 #if	TBNF
-	MESG("end of exec_named_function var@=%d value=%f",VARIND,value);
+	// MESG("end of exec_named_function var@=%d value=%f",VARIND,value);
 #endif
 
 	return((int)value);
