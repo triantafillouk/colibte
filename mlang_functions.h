@@ -3,6 +3,7 @@
 
 v_function bnf_functions[] = {
 	{"len",1,bnf_len},        /* STRING LENGTH */
+	{"strlen",1,bnf_len},
 	{"upper",1,bnf_upper},        /* UPPERCASE STRING */
     {"lower",1,bnf_lower},        /* LOWER CASE STRING */
 	{"left",2,bnf_left},

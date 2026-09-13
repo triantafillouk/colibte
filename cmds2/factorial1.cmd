@@ -7,7 +7,7 @@ print("Start factorial1")
 
 function fact(num,s)
 {
- print("fact "+s+num+" var1="+var1)
+ print("fact "+s+num)
  a="aa"	# check 
  a1=""
  if(num==1) 

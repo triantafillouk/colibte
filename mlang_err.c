@@ -312,12 +312,13 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 
 int check_var_assigned(char *from,char *var_name, tok_struct *ntok)
 {
+ if(no_push==1) return 1;
  BTREE *symbols_to_check=check_buffer->symbol_tree;
  FILEBUF *buffer_to_check=check_buffer;
  	// if(ntok) MESG("# check_var: from %s [%s]",from,tok_info(ntok));
 	// else MESG("# check_var: from %s",from);
 	// MESG("  check_var:'%s' cbfp=[%s]",var_name,cbfp->b_fname);
- 	// MESG("  check_var:'%s' check_buffer=[%s]",var_name,check_buffer->b_fname);
+ // MESG("  check_var:'%s' check_buffer=[%s] no_push=%d",var_name,check_buffer->b_fname,no_push);
  if(check_buffer->symbol_tree==NULL) {
  	symbols_to_check=cbfp->symbol_tree;
 	buffer_to_check=cbfp;
@@ -339,7 +340,8 @@ int check_var_assigned(char *from,char *var_name, tok_struct *ntok)
 		return 0;
 	}
  } else {
- 	// MESG("	cannot find node with name %s in %s symbol tree",var_name,buffer_to_check->b_fname);
+	// MESG("	no_push=%d",no_push);
+ 	MESG("	cannot find node with name %s in %s symbol tree",var_name,buffer_to_check->b_fname);
  };
  return 1;
 }
@@ -350,7 +352,7 @@ int err_skip_type_args(tok_struct *tok0)
  BTNODE *nod0=tok0->tok_node;
  BTREE *nb = (BTREE *)nod0->node_dat;
  int args0=nb->items;
- // MESG("err_skip_type_args: items=%d",args0);
+ MESG("err_skip_type_args: items=%d",args0);
  // MESG("	items=%d",args0);
  if(tok->ttype==TOK_LBRAKET) {
  	// MESG("	skip index");
@@ -389,17 +391,18 @@ int err_skip_type_args(tok_struct *tok0)
 	NTOKEN_ERR(670);
 	// MESG("err_skip_type_args: Data definition of [%s] at line %d rows=%d args=%d",tok0->tname,tok0->tline,rows+1,args0);
  };
+ MESG("skip_type_args: end");
  return stat;
 }
 
-int  err_push_args_1(int *nargs)
+int  err_push_args_1(char *proc_name,int *nargs)
 {
  // int i=0;
  int num_args=0;
  TDSERR("push_args");
 
  SHOW_STAGE(410);
- // MESG("err_push_args: [%s]",tok_info(tok));
+ // MESG("err_push_args: proc=%s b=%s [%s]",proc_name,check_buffer->b_fname,tok_info(tok));
  if(tok->ttype!=TOK_RPAR) {
 	if(tok->ttype==TOK_SEP) {
 		*nargs=0;
@@ -462,7 +465,7 @@ int err_assign_args1(int nargs)
  SHOW_STAGE(420);
  stack_push("assign args",tok,0); // ????
  NTOKEN_ERR(4201); /* skip name */
- // MESG("err_assign_args1: nargs=%d",nargs); 
+ MESG("err_assign_args1: nargs=%d",nargs); 
  if(nargs!=0) {
 	xpos=421;
 	for(i=0;i<nargs;i++) {
@@ -505,7 +508,7 @@ int err_assign_args1(int nargs)
 		i++;
 	} ;
  };
- // MESG("err_assign_args1: end tok = [%s] %d",tok->tname,tok->ttype);
+ MESG("err_assign_args1: end tok = [%s] %d",tok->tname,tok->ttype);
  NTOKEN_ERR(434);
  return(0);
 }
@@ -623,7 +626,7 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 #if	DEBUG1
  int save_stage_level=stage_level;
 #endif
- 	// MESG("err_exec_funtion: << %s",name);
+ 	// MESG("err_exec_function: << %s",name);
     FILEBUF *bp;		/* ptr to buffer to execute */
     char bufn[MAXFLEN+2];		/* name of buffer to execute */
 	int parsed;
@@ -670,10 +673,11 @@ int err_exec_function(char *name,int nargs,FILEBUF **bf)
 	stage_level=save_stage_level;
 #endif
 	tok=tok_latest;
-
+#if	0
 	tok=bp->tok_table;
 	no_push=1;
 	err_num=err_assign_args1(nargs);
+#endif
 	tok=bp->tok_table;
 	no_push=0;
 	CHECK_TOK(466);
@@ -1394,7 +1398,7 @@ tok_struct *tok0_bnf=NULL;
 		// MESG("	end of TOK_FUNC [%s]",tok_info(tok));
 		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)
-		// MESG("TOK_PROC: proc_name=%s %d",proc_name,strlen(proc_name));
+		// MESG("TOK_PROC: proc_name='%s' b='%s' [%s]",proc_name,check_buffer->b_fname,tok_info(tok0));
 		// MESG("- define TOK_PROC ---- %s\n	[%s]\n	[%s]",check_buffer->b_fname,tok_info(tok0),tok_info(tok));
 		int nargs=0;
 		in_proc_args=1;
@@ -1408,8 +1412,10 @@ tok_struct *tok0_bnf=NULL;
 
 		/* function */
 		pre_symbol=0;
-		// MESG("	err check:	TOK_PROC: ");
-		err_num = err_push_args_1(&nargs);
+		// MESG("	proc='%s' b='%s' ",proc_name,check_buffer->b_fname);
+		if(strcmp(proc_name,check_buffer->b_fname)) no_push=1;
+		err_num = err_push_args_1(proc_name,&nargs);
+		no_push=0;
 		if(err_num) return(err_num);
 		// MESG("	err check: TOK_PROC: args=%d",nargs);
 		tok0->t_nargs=nargs;

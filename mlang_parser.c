@@ -606,8 +606,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			continue;
 		case TOK_LETTER: 
 			slen=getnword1(bf,cc,nword);
-			// MESG("[%s] parse: TOK_LETTER 		[%s]",bf->b_fname,nword);
-			if(previous_ttype==15) {
+			// MESG("[%s] parse: TOK_LETTER 		[%s], is_storelines=%d",bf->b_fname,nword,is_storelines);
+			if(previous_ttype==TOK_PROC) {
 				strcpy(proc_name,nword);
 				// MESG("[%s]		set proc_name to [%s]",bf->b_fname,proc_name);
 			};
@@ -927,6 +927,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 							SHOW_TOKEN("other");
 						};
 					} else {
+						// MESG("	add token! %d",is_storelines);
 						ADD_TOKEN("letter");
 						SHOW_TOKEN("letter");
 					};

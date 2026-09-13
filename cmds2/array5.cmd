@@ -36,7 +36,7 @@ function scale_perc2(scale,num)
  while(ptotal<num) {
 	pptotal=ptotal
 	ptotal += scale[ind][0]
-	print(" ptotal="+ptotal+" pptotal="+pprotal)
+	print(" ptotal="+ptotal+" pptotal="+pptotal)
 	perc = scale[ind][1]
 	l1=scale[ind][0]
 	print("	ind=",ind," perc=",perc," len=",l1)
