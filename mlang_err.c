@@ -310,12 +310,14 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 	RT_MESG1(408);
 }
 
-int check_var_assigned(char *var_name, tok_struct *ntok)
+int check_var_assigned(char *from,char *var_name, tok_struct *ntok)
 {
  BTREE *symbols_to_check=check_buffer->symbol_tree;
  FILEBUF *buffer_to_check=check_buffer;
-	// MESG("check_var:'%s' cbfp=[%s]",var_name,cbfp->b_fname);
- 	// MESG("check_var:'%s' check_buffer=[%s]",var_name,check_buffer->b_fname);
+ 	// if(ntok) MESG("# check_var: from %s [%s]",from,tok_info(ntok));
+	// else MESG("# check_var: from %s",from);
+	// MESG("  check_var:'%s' cbfp=[%s]",var_name,cbfp->b_fname);
+ 	// MESG("  check_var:'%s' check_buffer=[%s]",var_name,check_buffer->b_fname);
  if(check_buffer->symbol_tree==NULL) {
  	symbols_to_check=cbfp->symbol_tree;
 	buffer_to_check=cbfp;
@@ -336,7 +338,9 @@ int check_var_assigned(char *var_name, tok_struct *ntok)
 		// MESG("	- assign var_name: %s [%s]",var_name);
 		return 0;
 	}
- } else MESG("	cannot find node with name %s in %s symbol tree",var_name,buffer_to_check->b_fname);
+ } else {
+ 	// MESG("	cannot find node with name %s in %s symbol tree",var_name,buffer_to_check->b_fname);
+ };
  return 1;
 }
 
@@ -844,10 +848,10 @@ tok_struct *tok0_bnf=NULL;
 		if(in_proc_args && !strcmp(proc_name,check_buffer->b_fname)) {
 			// MESG("TOK_VAR: %s var_index=%d in_args=%d [%s]",tok0->tname,var_index,in_proc_args,tok_info(tok0));
 			// MESG("	proc_name=%s fname=%s",proc_name,check_buffer->b_fname);
-			check_var_assigned(tok0->tname,0);
+			check_var_assigned("tok_var in",tok0->tname,0);
 			// MESG("	- assign TOK_VAR in proc_args: %s [%s] in %s",tok0->tname,tok_info(tok0),check_buffer->b_fname);
 		} else {
-			if(!check_var_assigned(tok0->tname,tok)) {
+			if(!check_var_assigned("tok_var  ",tok0->tname,tok)) {
 				set_error(tok0,xpos,"var is used before assigned!");
 				RT_MESG(4790);
 			};
@@ -906,7 +910,7 @@ tok_struct *tok0_bnf=NULL;
 			tok->tind = var_index;
 
 			// MVAR *var=get_left_slot(tok->tind);
-			check_var_assigned(tok->tname,0);
+			check_var_assigned("tok_assign",tok->tname,0);
 		};
 		if(tok->ttype==TOK_INCREASEBY) {
 			// MESG("set normal assign [%s]",tok_info(tok));
@@ -1905,13 +1909,13 @@ int err_lexpression()
 					tok0_bnf_assign->ttype=TOK_ASSIGN_ARRAY2;
 					tok0_bnf_assign->bnf_factor_function=bnf_assign_array2;
 					tok0_bnf_assign->tname=assign_var_name;
-					check_var_assigned(assign_var_name,0);
+					check_var_assigned("assign_array2",assign_var_name,0);
 					// MESG(";1 for [%s] set assign to type %d,bnf_assign_array2",tok_info(tok0_bnf_assign),TOK_ASSIGN_ARRAY2);
 				}; if(assign_type_to==TOK_ASSIGN_ARRAY1) {
 					tok0_bnf_assign->ttype=TOK_ASSIGN_ARRAY1;
 					tok0_bnf_assign->bnf_factor_function=bnf_assign_array1;
 					tok0_bnf_assign->tname=assign_var_name;
-					check_var_assigned(assign_var_name,0);
+					check_var_assigned("assign_array1",assign_var_name,0);
 					// MESG(";2 for [%s] set assign to type %d,bnf_assign_array1",tok_info(tok0_bnf_assign),TOK_ASSIGN_ARRAY1);
 				};
 				if(assign_type_to==TOK_ASSIGN_TYPE) {
@@ -2303,7 +2307,7 @@ int err_check_sentence1()
 			} else {
 #if	TBNF
 				tok0=tok;
-				check_var_assigned(tok_var->tname,0);
+				check_var_assigned("dir_fori",tok_var->tname,0);
 #endif
 				// MESG_TOK_INFO(" equal to",tok);
 			};

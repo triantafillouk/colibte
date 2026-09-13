@@ -944,23 +944,25 @@ int check_init(FILEBUF *bf)
  	// MESG("no tok_table!");
  	// MESG("create token table [%s] err=%d",bf->b_fname,bf->err);
 	parse_block1(bf,NULL,1);
-	MESG("block parsed err = %d",err_num);
+	// MESG("block parsed err = %d",err_num);
 	if(err_num>0) {
 		msg_line("found parsed errors: err_num=%d %s",err_num,err_str);
 		check_buffer = ori_buffer;
+		MESG("check_init: return 2 err_num=%d",err_num);
 		return(err_num);
 	};
 	tok_table=bf->tok_table;
 	if(tok_table==NULL)	{
 		ERROR("cannot parse file");
 		check_buffer = ori_buffer;
+		MESG("check_init: return 2 parse error 201");
 		return(201);
 	}
  } else {
  	// MESG("	already checked!");
  };
 
- MESG("check_init:2 err=%d %d",bf->err,bf->tok_table==NULL);
+ // MESG("check_init:2 err=%d %d",bf->err,bf->tok_table==NULL);
  if(bf->err<1) 
  {
 	tok=bf->tok_table;
@@ -980,6 +982,7 @@ int check_init(FILEBUF *bf)
 #endif
  if(bf->err>0) {
  	check_buffer = ori_buffer;
+	MESG("check_init: return 3 bf->err=%d",bf->err);
 	return bf->err;
  };
  bf->m_mode |= M_CHECKED;
@@ -995,12 +998,13 @@ int check_init(FILEBUF *bf)
  if(err_num) {
  	show_error("variables not assigned!","");
 	check_buffer = ori_buffer;
+	MESG("check_init: return 4 err_num=%d",err_num);
 	return err_num;
  };
  if(bnf_debug() && check_buffer==NULL) exit(0);
 #endif
  check_buffer = ori_buffer;
- MESG("check_init: end ok, old buffer is[%s]",check_buffer);
+ // MESG("check_init: end ok, old buffer is[%s]",check_buffer->b_fname);
  return(0);
 }
 
