@@ -1994,7 +1994,11 @@ inline static void bnf_factor_assign_var()
 	// MESG("	bnf_var @ %d type %d",VARIND,btype);
 	char *var_name = tok->tname;
 	// MESG("	bvar value=%f",bvar->dval);
-	// if(tok->tind<0) return(bnf_factor_assign_none());
+	if(tok->tind<0) {
+		set_error(tok,102,"assign operation on non var not supported yet");
+		return;
+	};
+
 	MVAR *avar=get_left_slot(tok->tind);
 	// MESG("assign var %s at slot %d",tok->tname,tok->tind);
 
