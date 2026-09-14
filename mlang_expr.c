@@ -34,7 +34,7 @@ double exec_block1(FILEBUF *fp)
    };
    while(tok->tgroup!=TOK_END) 
    {
-	// MESG_TOK_INFO("- exec_block1 [%s]",tok);
+	MESG_TOK_INFO("- exec_block1 [%s]",tok);
 #if	1
 	if(tok->ttype==TOK_SEP){ 
 		NTOKEN2;
@@ -2355,9 +2355,10 @@ static inline double num_expression()
 {
  double value;
  TDS("num_expression");
- // MESG(";	num_expression: [%s]",tok_info(tok));
  // set_vdval(0);
+ 
  value = num_term1();
+ // MESG(";	num_expression: %f",value);
  while(tok->tgroup==TOK_TERM) {
 	// MESG("	num_expression: while: TERM [%s]",tok_info(tok));
 	value = tok->term_function(value);

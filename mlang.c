@@ -125,7 +125,7 @@ int bnf_debug();
 TLIST ctoklist=NULL;
 int is_break1=0;
 int tok_mask[256];
-int no_push=0;
+int no_check=0;
 #define	USE_VAR	1
 
 static MVAR ex_var; 	/* value of previous expression */
@@ -363,7 +363,6 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
   // MESG("--[%s] try push %d [%s] exp=%d [%s]",check_buffer->b_fname,tok->pushed,title,exp_type,tok_info(tok));
 #if	TBNF
 	static tok_struct *prev_token=NULL;
- // if(no_push) { MESG("stack_push:%s skip %s",title,tok_info(tok));return;};
  if(tok!=NULL) {
  	// MESG("stack_push! at %p",check_buffer->tok_table_bnf+check_buffer->tok_bnf_index);
 	if(tok->pushed>=0) {
@@ -899,6 +898,7 @@ int create_statement_group(FILEBUF *bf)
 		if(!in_brackets && !in_call) tokp->bnf_group=1;
 	}
 #endif
+#if	TBNF
 	if(tokp->ttype==TOK_VAR) {
 		if(use_symbol_tree) {
 		BTNODE *var_node=find_btnode(use_symbol_tree,tokp->tname);
@@ -916,6 +916,7 @@ int create_statement_group(FILEBUF *bf)
 		};
 		};
 	};
+#endif
 	tokp++;
  };
  if(assign_error) {

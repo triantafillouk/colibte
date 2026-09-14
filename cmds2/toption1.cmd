@@ -2,7 +2,7 @@
 
 fillcol				:  72.0
 lmargin				:   0.0
-# keydebug			:     0
+keydebug			:     0
 # global				:     0
 print_precision		:   6.0
 # clear_output		:     1
