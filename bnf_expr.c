@@ -538,7 +538,8 @@ inline static void bnf_factor_plus()
  };
  if(bnf_other_plus(vara,varb)) return;
 	// MESG("factor_plus: vara=%d varb=%d",vara->var_type,varb->var_type);
- 	syntax_error(1105,"factor plus error");
+	 MESG("plus error va type=%s vb type %s [%s]",vtype_names[vara->var_type],vtype_names[bnf_var->var_type],tok_info(tok));
+ 	syntax_error(1105,"plus error");
 }
 
 
@@ -630,7 +631,7 @@ inline static void bnf_factor_minus()
 		return;
  };
  if(bnf_other_minus(vara,varb)) return;
- MESG("Substruction error factor a type=%d,b type=%d [%s]",vara->var_type,varb->var_type,tok_info(tok));
+ MESG("Substruction error factor a type=%s,b type=%s [%s]",vtype_names[vara->var_type],vtype_names[varb->var_type],tok_info(tok));
  syntax_error(1107,"minus error");
 }
 
@@ -723,7 +724,7 @@ inline static void bnf_num_plus()
 	// MESG("	array div by num!");
 	return;
  };
- MESG("Addition error va type=%d bnf_var type %d [%s]",vara->var_type,bnf_var->var_type,tok_info(tok));
+ MESG("Addition error va type=%s vb type %s [%s]",vtype_names[vara->var_type],vtype_names[bnf_var->var_type],tok_info(tok));
  syntax_error(11220,"addition not supported");
 }
 
@@ -753,7 +754,7 @@ inline static void bnf_num_minus()
 	return;
  };
 
- MESG("num_minus: var@=%d a type=%d [%s]",VARIND,vara->var_type,tok_info(tok));
+ MESG("num_minus: var@=%d a type=%s [%s]",VARIND,vtype_names[vara->var_type],tok_info(tok));
  syntax_error(11221,"minus not supported");
 }
 
@@ -801,6 +802,7 @@ inline static void bnf_num_mul()
 	// MESG("	array div by num!");
 	return;
  };
+ MESG("Multuply error va type=%s vb type %s [%s]",vtype_names[vara->var_type],vtype_names[bnf_var->var_type],tok_info(tok));
  syntax_error(1123,"multipy not supported");
 }
 
@@ -828,6 +830,7 @@ inline static void bnf_num_div()
 	// MESG("	array div by num!");
 	return;
  };
+ MESG("Divide error va type=%s vb type %s [%s]",vtype_names[vara->var_type],vtype_names[bnf_var->var_type],tok_info(tok));
  syntax_error(11210,"divide not supported");
 }
 
@@ -955,6 +958,7 @@ inline static void bnf_var_mul()
 	};
 	if(bnf_mul_arrays(vara,varb)) return;
 
+    MESG("Multiply error va type=%s vb type %s [%s]",vtype_names[vara->var_type],vtype_names[bnf_var->var_type],tok_info(tok));
 	syntax_error(11101,"multipy error");
 }
 
@@ -1000,6 +1004,7 @@ inline static void bnf_var_plus()
  };
  if(bnf_other_plus(vara,varb)) return;
 	// MESG("var_plus: vara=%d varb=%d",vara->var_type,varb->var_type);
+    MESG("Plus error va type=%s vb type %s [%s]",vtype_names[vara->var_type],vtype_names[bnf_var->var_type],tok_info(tok));
  	syntax_error(1105,"var_plus error");
 }
 
@@ -1024,7 +1029,7 @@ inline static void bnf_var_minus()
 	};
  };
  if(bnf_other_minus(vara,varb)) return;
- MESG("Substruction error var a type=%d,b type=%d [%s]",vara->var_type,varb->var_type,tok_info(tok));
+ MESG("Substruction error va type=%s vb type %s [%s]",vtype_names[vara->var_type],vtype_names[bnf_var->var_type],tok_info(tok));
  syntax_error(1107,"substruction error");
 }
 
@@ -1106,6 +1111,7 @@ inline static void bnf_var_div()
 	};
 	if(bnf_array_div(vara,varb)) return;
 
+    MESG("Divide error va type=%s vb type %s [%s]",vtype_names[vara->var_type],vtype_names[bnf_var->var_type],tok_info(tok));
 	syntax_error(11103,"divide  error");
 }
 
@@ -1151,6 +1157,7 @@ inline static void bnf_factor_mul()
 	};
 	if(bnf_mul_arrays(vara,varb)) return;
 
+    MESG("Multiply error va type=%s vb type %s [%s]",vtype_names[vara->var_type],vtype_names[bnf_var->var_type],tok_info(tok));
 	syntax_error(11105,"multipy error");
 }
 
@@ -1191,6 +1198,7 @@ inline static void bnf_factor_modulo()
 			return;
 		};
 	};
+    MESG("Mod error va type=%s vb type %s [%s]",vtype_names[vara->var_type],vtype_names[bnf_var->var_type],tok_info(tok));
 	syntax_error(1115,"mod error");
 }
 
@@ -1209,6 +1217,7 @@ inline static void bnf_factor_power()
 			return;
 		};
 	};
+    MESG("Power error va type=%s vb type %s [%s]",vtype_names[vara->var_type],vtype_names[bnf_var->var_type],tok_info(tok));
  	syntax_error(1117,"power error");
 }
 
@@ -1257,6 +1266,7 @@ inline static void bnf_factor_smaller()
 		bnf_var->var_type=VTYPE_NUM;
 		return;
 	};
+    MESG("Smaller than error va type=%s vb type %s [%s]",vtype_names[vara->var_type],vtype_names[bnf_var->var_type],tok_info(tok));
 	syntax_error(1119,"smaller error");
 }
 
@@ -1306,6 +1316,7 @@ inline static void bnf_factor_bigger()
 		bnf_var->var_type=VTYPE_NUM;
 		return;
 	};
+    MESG("bigger error va type=%s vb type %s [%s]",vtype_names[vara->var_type],vtype_names[bnf_var->var_type],tok_info(tok));
 	syntax_error(11211,"bigger error!");
 }
 
@@ -1330,6 +1341,7 @@ inline static void bnf_factor_smallereq()
 		bnf_var->var_type=VTYPE_NUM;
 		return;
 	};
+    MESG("<= error va type=%s vb type %s [%s]",vtype_names[vara->var_type],vtype_names[bnf_var->var_type],tok_info(tok));
  	syntax_error(1124,"<= error!");
 }
 
@@ -1354,6 +1366,7 @@ inline static void bnf_factor_biggereq()
 		bnf_var->var_type=VTYPE_NUM;
 		return;
 	};
+    MESG(">= error va type=%s vb type %s [%s]",vtype_names[vara->var_type],vtype_names[bnf_var->var_type],tok_info(tok));
  	syntax_error(1125,"biggereq error!");
 }
 
@@ -1379,7 +1392,8 @@ inline static void bnf_factor_equal()
 		bnf_var->var_type=VTYPE_NUM;
 		return;
 	};
- 	syntax_error(1127,"equal error!");
+	MESG("error comparing type %s with %s",vtype_names[vara->var_type],vtype_names[varb->var_type]);
+ 	syntax_error(1127,"compare error!");
 }
 
 inline static void bnf_factor_notequal()
@@ -1403,6 +1417,7 @@ inline static void bnf_factor_notequal()
 		bnf_var->var_type=VTYPE_NUM;
 		return;
 	};
+    MESG("notequal error va type=%s vb type %s [%s]",vtype_names[vara->var_type],vtype_names[bnf_var->var_type],tok_info(tok));
  	syntax_error(1129,"notequal error!");
 }
 
@@ -1420,6 +1435,7 @@ inline static void bnf_factor_and()
 		return;
 	};
  };
+ MESG("AND error va type=%s vb type %s [%s]",vtype_names[bnf_var->var_type],vtype_names[bvar->var_type],tok_info(tok));
  syntax_error(1131,"and error");
 }
 
@@ -1437,7 +1453,8 @@ inline static void bnf_factor_nand()
 		return;
 	};
  };
- syntax_error(1133,"and error");
+ MESG("NAND error va type=%s vb type %s [%s]",vtype_names[bnf_var->var_type],vtype_names[bvar->var_type],tok_info(tok));
+ syntax_error(1133,"nand error");
 }
 
 inline static void bnf_factor_or()
@@ -1454,6 +1471,7 @@ inline static void bnf_factor_or()
 		return;
 	};
  };
+ MESG("OR error va type=%s vb type %s [%s]",vtype_names[bnf_var->var_type],vtype_names[bvar->var_type],tok_info(tok));
  syntax_error(1135,"or error");
 }
 
@@ -1471,6 +1489,7 @@ inline static void bnf_factor_nor()
 		return;
 	};
  };
+ MESG("MOR error va type=%s vb type %s [%s]",vtype_names[bnf_var->var_type],vtype_names[bvar->var_type],tok_info(tok));
  syntax_error(1137,"nor error");
 }
 
@@ -1488,6 +1507,7 @@ inline static void bnf_factor_xor()
 		return;
 	};
  };
+ MESG("XOR error va type=%s vb type %s [%s]",vtype_names[bnf_var->var_type],vtype_names[bvar->var_type],tok_info(tok));
  syntax_error(1139,"xor error");
 }
 
@@ -1540,7 +1560,7 @@ inline static void bnf_update_val()
 		return;
 	};
 
-	MESG("update value type %d not supported1",avar_type);
+	MESG("error updating value type %s",vtype_names[avar_type]);
 	syntax_error(1141,"cannot update non numeric value!");
 }
 
@@ -1567,6 +1587,7 @@ inline static void bnf_update_array1()
 			return;
 		}
 	};
+	MESG("Error updating array type %s [%s]",vtype_names[bnf_var->var_type],tok_info(tok));
 	syntax_error(1145,"update operation not supported ");
 }
 
@@ -1677,6 +1698,7 @@ inline static void bnf_increaseby()
 		return;
 	};
 
+	MESG("Error inrceasing type %s [%s]",vtype_names[avar->var_type],tok_info(tok));
 	set_error(tok,1021,"increase_by operation not supported!");
 }
 
@@ -1729,6 +1751,7 @@ inline static void bnf_decreaseby()
 
 	};
 	
+	MESG("Error decreasing type %s [%s]",vtype_names[avar->var_type],tok_info(tok));
 	set_error(tok,1024,"decreaseby operation not supported!");
 }
 
@@ -1806,6 +1829,7 @@ inline static void bnf_mulby()
 
 	};
 	
+	MESG("Error multiply by type %s [%s]",vtype_names[avar->var_type],tok_info(tok));
 	set_error(tok,1021,"mulby operation not supported!");
 }
 
@@ -1870,6 +1894,7 @@ inline static void bnf_divby()
 
 	};
 	
+	MESG("Error decreasing type %s [%s]",vtype_names[avar->var_type],tok_info(tok));
 	set_error(tok,1024,"decrease_by operation not supported!");
 }
 
@@ -1994,11 +2019,6 @@ inline static void bnf_factor_assign_var()
 	// MESG("	bnf_var @ %d type %d",VARIND,btype);
 	char *var_name = tok->tname;
 	// MESG("	bvar value=%f",bvar->dval);
-	if(tok->tind<0) {
-		set_error(tok,102,"assign operation on non var not supported yet");
-		return;
-	};
-
 	MVAR *avar=get_left_slot(tok->tind);
 	// MESG("assign var %s at slot %d",tok->tname,tok->tind);
 
@@ -3200,6 +3220,7 @@ inline static void bnf_decreaseby_array1()
 			return;
 		}
 	};
+	MESG("Error decrease type %s by %s [%s]",vtype_names[adat->atype],vtype_names[bvar->var_type],tok_info(tok));
 	set_error(tok,403,"operation decreaseby not supported");
 }
 

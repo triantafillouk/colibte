@@ -350,8 +350,7 @@ int err_skip_type_args(tok_struct *tok0)
  BTNODE *nod0=tok0->tok_node;
  BTREE *nb = (BTREE *)nod0->node_dat;
  int args0=nb->items;
- MESG("err_skip_type_args: items=%d",args0);
- // MESG("	items=%d",args0);
+ // MESG("err_skip_type_args: items=%d",args0);
  if(tok->ttype==TOK_LBRAKET) {
  	// MESG("	skip index");
 	stack_push("type lbraket",tok,-TOK_LBRAKET);
@@ -389,7 +388,7 @@ int err_skip_type_args(tok_struct *tok0)
 	NTOKEN_ERR(670);
 	// MESG("err_skip_type_args: Data definition of [%s] at line %d rows=%d args=%d",tok0->tname,tok0->tline,rows+1,args0);
  };
- MESG("skip_type_args: end");
+ // MESG("skip_type_args: end");
  return stat;
 }
 
@@ -1578,6 +1577,7 @@ tok_struct *tok0_bnf=NULL;
 	case TOK_DIVBY:
 	case TOK_DECREASEBY:
 		tok0->tname="assign";
+		MESG("assign var: ptok [%s]",tok_info(prev_token));
 		// set_bnf_function1(tok0,tok0->ttype);
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
@@ -1893,13 +1893,17 @@ int err_lexpression()
 		};
 		case TOK_ASSIGN: {
 			// tok->term_function = assign_val;
+			xpos=710;
 #if	TNORMAL
 			set_term_function(tok,assign_val);
 #endif
+			// MESG("TOK_ASSIGN:: ptok [%s]",tok_info(prev_token));
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			// MESG("	normal TOK_ASSIGN prev_token=[%s]",tok_info(prev_token));
-			if(prev_token->ttype==TOK_QUOTE) { set_error(tok,xpos,"NOASIGN");RT_MESG1(709);};
-			NTOKEN_ERR(710);
+			// if(prev_token->ttype==TOK_QUOTE) { set_error(tok,xpos,"NOASIGN");RT_MESG1(709);};
+			if(prev_token->ttype!=TOK_VAR && prev_token->ttype!=TOK_RBRAKET && prev_token->ttype!=TOK_TYPE_ELEMENT) 
+				{ MESG("error:%d ptok=[%s]",xpos,tok_info(prev_token));set_error(tok,xpos,"assign error");RT_MESG1(xpos);};
+			NTOKEN_ERR(xpos);
 			err_num=err_assign_val();
 #if	TBNF
 			tok_struct *tok0_bnf_assign=stack_push("TOK_ASSIGN 1",tok0,tok0->ttype);
@@ -1947,9 +1951,12 @@ int err_lexpression()
 #if	TNORMAL
 			set_term_function(tok,(TFunction)increase_by);
 #endif
+			xpos=7101;
 			// tok->tname = "+=";
 			// tok0=tok;
-			NTOKEN_ERR(710);
+			if(prev_token->ttype!=TOK_VAR && prev_token->ttype!=TOK_RBRAKET && prev_token->ttype!=TOK_TYPE_ELEMENT) 
+				{ MESG("error:%d ptok=[%s]",xpos,tok_info(prev_token));set_error(tok,xpos,"increase by error");RT_MESG1(xpos);};
+			NTOKEN_ERR(xpos);
 			err_num=err_increaseby();
 #if	TBNF
 			tok_struct *dest=stack_push(tok0->tname,tok0,tok0->ttype);
@@ -1983,10 +1990,13 @@ int err_lexpression()
 		case TOK_MULBY: {
 			// tok->term_function = mulby;
 			// MESG_TOK_INFO("# err_lexpression",tok);
+			xpos=7102;
 #if	TNORMAL
 			set_term_function(tok,(TFunction)mul_by);
 #endif
-			NTOKEN_ERR(710);
+			if(prev_token->ttype!=TOK_VAR && prev_token->ttype!=TOK_RBRAKET && prev_token->ttype!=TOK_TYPE_ELEMENT) 
+				{ MESG("error:%d ptok=[%s]",xpos,tok_info(prev_token));set_error(tok,xpos,"mul by error");RT_MESG1(xpos);};
+			NTOKEN_ERR(xpos);
 			err_num=err_mulby();
 #if	TBNF
 			tok_struct *dest=stack_push("*=",tok0,tok0->ttype);
@@ -2024,6 +2034,8 @@ int err_lexpression()
 #if	TNORMAL
 			set_term_function(tok,(TFunction)div_by);
 #endif
+			if(prev_token->ttype!=TOK_VAR && prev_token->ttype!=TOK_RBRAKET && prev_token->ttype!=TOK_TYPE_ELEMENT) 
+				{ set_error(tok,xpos,"div by error");RT_MESG1(xpos);};
 			NTOKEN_ERR(711);
 			err_num=err_mulby();
 #if	TBNF
@@ -2062,7 +2074,10 @@ int err_lexpression()
 #endif
 			// tok->tname = "-=";
 			// tok0=tok;
-			NTOKEN_ERR(710);
+			xpos=7103;
+			if(prev_token->ttype!=TOK_VAR && prev_token->ttype!=TOK_RBRAKET && prev_token->ttype!=TOK_TYPE_ELEMENT) 
+				{ MESG("error:%d ptok=[%s]",xpos,tok_info(prev_token));set_error(tok,xpos,"decrease by error");RT_MESG1(xpos);};
+			NTOKEN_ERR(xpos);
 			err_num=err_decreaseby();
 #if	TBNF
 			tok_struct *dest=stack_push(tok0->tname,tok0,tok0->ttype);
@@ -2102,7 +2117,7 @@ int err_lexpression()
 #if	TBNF
 			// tok->bnf_group=tok->ttype;
 #endif
-			NTOKEN_ERR(710);
+			NTOKEN_ERR(7104);
 			err_num=err_assign_env();
 			// stack_push_replace("tok l",tok_l);
 			stack_push("assign env",tok0,tok0->ttype);
@@ -2116,7 +2131,7 @@ int err_lexpression()
 #if	TBNF
 			tok->bnf_group=tok->ttype;
 #endif
-			NTOKEN_ERR(710);
+			NTOKEN_ERR(7105);
 			err_num=err_assign_env();
 			stack_push("assign option",tok0,tok0->ttype);
 			RT_MESG1(7141);
