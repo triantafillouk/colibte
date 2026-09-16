@@ -34,7 +34,7 @@ double exec_block1(FILEBUF *fp)
    };
    while(tok->tgroup!=TOK_END) 
    {
-	MESG_TOK_INFO("- exec_block1 [%s]",tok);
+	// MESG_TOK_INFO("- exec_block1 [%s]",tok);
 #if	1
 	if(tok->ttype==TOK_SEP){ 
 		NTOKEN2;
@@ -236,7 +236,7 @@ double update_val()
 				if(lsslot==NULL) {
 					MESG("lsslot is NULL!");
 				} else {
-					MESG("set term function to update_val_num!");
+					// MESG("set term function to update_val_num!");
 					set_term_function(tok,(TFunction)update_val_num);
 					v0=lsslot->dval;
 					lsslot->dval += tok->dval;
@@ -277,7 +277,7 @@ double decrease_by()
 	tok_struct *lstok=lstoken;
 #if	0
 	if(ori_type!=TOK_VAR && ori_type!=TOK_ARRAY_L1 && ori_type!=TOK_ARRAY1) {
-		MESG("decrease_by: ori_type=%d ",ori_type);
+		// MESG("decrease_by: ori_type=%d ",ori_type);
 		set_error(lstok,1022,"decrease constant not supported!");
 		return(0);
 	};
@@ -335,7 +335,7 @@ double increase_by()
 	tok_struct *lstok=lstoken;
 #if	0
 	if(ori_type!=TOK_VAR && ori_type!=TOK_ARRAY_L1 && ori_type!=TOK_ARRAY1) {
-		MESG("increase_by: ori_type=%d ",ori_type);
+		// MESG("increase_by: ori_type=%d ",ori_type);
 		set_error(lstok,1022,"increase constant not supported!");
 		return(0);
 	};
@@ -481,12 +481,12 @@ double div_by_num()
 double div_by()
 {
 	double v1,v0;
-	MESG("div_by:");
+	// MESG("div_by:");
 	MVAR *sslot=lsslot;
 	tok_struct *ptok=tok;
 	// TDS("div_by");
 	int ori_type=lstoken->ttype;
-	MESG("ori_type=%d",ori_type);
+	// MESG("ori_type=%d",ori_type);
 	tok_struct *ltok = tok;
 #if	0
 	if(ori_type!=TOK_VAR) {
@@ -495,7 +495,7 @@ double div_by()
 	};
 #endif
 	v1=num_expression();
-	MESG("bvar sslot var_type=%d",sslot->var_type);
+	// MESG("bvar sslot var_type=%d",sslot->var_type);
 	if(sslot->var_type==VTYPE_NUM) {
 		if(ori_type==VTYPE_NUM)	
 			set_term_function(ptok,(TFunction)div_by_num);
@@ -709,7 +709,7 @@ double factor_assign_type()
 	int columns = var_tree->items;
 	MVAR *svar = btree_to_mvar(var_tree);
 	int size2=1;
-	MESG("factor_assign_type: [%s] items=%d",tok_info(tok),columns);
+	// MESG("factor_assign_type: [%s] items=%d",tok_info(tok),columns);
 	// if(lsslot) MESG("	lsslot ind=%d type=%d",lsslot->var_index,lsslot->var_type);
 	// MESG("factor_assign_type: -- var_slot ind=%d vtype=%d",var_slot->var_index,var_slot->var_type);
 	// MESG(" factor_assign_type: $$$$$ name=[%s] type %d vtype=%d line=%d size=%d",tok->tname,tok->ttype,var_slot->var_type,tok->tline,size);
@@ -783,7 +783,7 @@ double factor_assign_type()
 				// MESG("	%2d: type=%d val=[%s]",i,ex_var.var_type,get_sval());
 				row_var[i].sval=strdup(get_sval());
 			} else {
-				MESG("	%2d: type=%d val=%f %f",i,ex_var.var_type,ex_var.dval,value);
+				// MESG("	%2d: type=%d val=%f %f",i,ex_var.var_type,ex_var.dval,value);
 				row_var[i].dval=value;
 			};
 			// MESG("next toke type is %s",tok_info(tok));
@@ -1619,7 +1619,7 @@ double term_plus(double value)
 		 		NTOKEN2;
 				d1=num_term1(); vtype2=get_vtype();
 				if(vtype2==VTYPE_NUM) { // add numeric to array
-					MESG("	array + numeric");
+					// MESG("	array + numeric");
 					if(loc_array->astat==ARRAY_LOCAL) {
 						array_dat *array1;
 						array1=dup_array_add1(loc_array,d1);
@@ -1630,7 +1630,7 @@ double term_plus(double value)
 					};
 					set_vtype(VTYPE_ARRAY);
 					ex_name="Add to numeric";
-					MESG("	array + numeric: ok!");
+					// MESG("	array + numeric: ok!");
 					return 0;
 				} else if(vtype2==VTYPE_ARRAY) {	// array addition
 					array_dat *loc_array2;
@@ -1642,7 +1642,7 @@ double term_plus(double value)
 				}
 #if	1
 				 else if(vtype2==VTYPE_STRING) {
-				 	MESG("add string [%s] to an array",get_sval());
+				 	// MESG("add string [%s] to an array",get_sval());
 					ERROR("operation not_supported err %d vtype1=%d vtype2=%d",err_num,vtype1,vtype2);
 					return value;
 				}
@@ -1660,7 +1660,7 @@ double term_plus(double value)
 		 		NTOKEN2;
 				d1=num_term1();vtype2=get_vtype();
 				if(vtype2==VTYPE_NUM) { // add numeric to array
-					MESG("	mixed array + numeric");
+					// MESG("	mixed array + numeric");
 					if(loc_array->astat==ARRAY_LOCAL) {
 						array_dat *array1;
 						array1=dup_array_add1(loc_array,d1);
@@ -1671,7 +1671,7 @@ double term_plus(double value)
 					};
 					set_vtype(VTYPE_ARRAY);
 					ex_name="Add to numeric";
-					MESG("	array + numeric: ok!");
+					// MESG("	array + numeric: ok!");
 					return 0;
 				} else if(vtype2==VTYPE_ARRAY) {	// array addition
 					array_dat *loc_array2;
@@ -1867,7 +1867,7 @@ double logical_and(double value)
  // MESG("-- logical and: next is [%s] res=%d",tok_info(tok),v2);
  int ires=(value>0) & v2;
  set_dval((double) ires);
- MESG(">> logical_and: %f & %d -> %d",value,v2,ires);
+ // MESG(">> logical_and: %f & %d -> %d",value,v2,ires);
  	return ires;
 }
 
@@ -1964,7 +1964,7 @@ double compare_smaller(double v1)
 		return (lresult < 0 ? 1.0: 0.0);
  } else 
  if(vtype1==VTYPE_NUM && vtype2==VTYPE_NUM) {
-		MESG("change smaller function!");
+		// MESG("change smaller function!");
 		tok0->term_function = num_smaller;
 		return v1 < v2 ? 1.0: 0.0;
  };
@@ -1991,7 +1991,7 @@ double compare_notequal(double v1)
 		return (lresult != 0 ? 1.0: 0.0);
  } else 
  if(vtype1==VTYPE_NUM && vtype2==VTYPE_NUM) {
-		MESG("change notequal function!");
+		// MESG("change notequal function!");
 		tok0->term_function = num_notequal;
 		return v1 != v2 ? 1.0: 0.0;
  };
@@ -2019,7 +2019,7 @@ double compare_bigger(double v1)
 		return (lresult > 0 ? 1.0: 0.0);
  } else 
  if(vtype1==VTYPE_NUM && vtype2==VTYPE_NUM) {
-		MESG("change bigger function!");
+		// MESG("change bigger function!");
 		tok0->term_function = num_bigger;
 		return v1 > v2 ? 1.0: 0.0;
  };
@@ -2046,7 +2046,7 @@ double compare_equal(double v1)
 		return (lresult == 0 ? 1.0: 0.0);
  } else 
  if(vtype1==VTYPE_NUM && vtype2==VTYPE_NUM) {
-		MESG("change equal function! v1=%f v2=%f",v1,v2);
+		// MESG("change equal function! v1=%f v2=%f",v1,v2);
 		tok0->term_function = num_equal;
 		return v1 == v2 ? 1.0: 0.0;
  };
@@ -2073,7 +2073,7 @@ double compare_smallereq(double v1)
 		return (lresult <= 0 ? 1.0: 0.0);
  } else 
  if(vtype1==VTYPE_NUM && vtype2==VTYPE_NUM) {
-		MESG("change smaller equal function!");
+		// MESG("change smaller equal function!");
 		tok0->term_function = num_smallereq;
 		return v1 <= v2 ? 1.0: 0.0;
  };
@@ -2100,7 +2100,7 @@ double compare_biggereq(double v1)
 		return (lresult >= 0 ? 1.0: 0.0);
  } else 
  if(vtype1==VTYPE_NUM && vtype2==VTYPE_NUM) {
-		MESG("change bigger equal function!");
+		// MESG("change bigger equal function!");
 		tok0->term_function = num_biggereq;
 		return v1 >= v2 ? 1.0: 0.0;
  };
@@ -2707,6 +2707,7 @@ FFunction factor_funcs[] = {
 	update_val,		// TOK_DECREASE	,62
 	factor_none,	// TOK_INCREASEBY 63
 	mul_by,			// TOK_MULBY
+	div_by,			// TOK_DIVBY
 	decrease_by,	// TOK_DECREASEBY
 	factor_none,	// TOK_BSLASH		,
 

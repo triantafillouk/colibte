@@ -251,19 +251,23 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 		// };
 		if(tok->ttype==TOK_RPAR||tok->ttype==TOK_SEP ||tok->ttype==TOK_EOF) {
 			// MESG("end function parameters");
+#if	TBNF
 #if	!TFUNC 
 			if(tok->ttype==TOK_RPAR) stack_push("eval_function )",tok,-TOK_RPAR);
+#endif
 #endif
 			break;
 		}
 		if(tok->ttype==TOK_COMMA) {
 			// MESG("	found comma! %s",tok_info(tok));
+#if	TBNF
 #if	TFUNC
 			tok_struct *tok_comma=stack_push("eval_function ,",tok,0);
 			tok_comma->bnf_factor_function=bnf_factor_sep0;
 			tok_comma->tname=",0";
 #else
 			stack_push("eval_function ,",tok,0);
+#endif
 #endif
 			NTOKEN_ERR(403);
 		}
@@ -2288,10 +2292,12 @@ int err_check_sentence1()
 			end_if_tok->next_tok--;
 #endif
 		} else {
+#if	TBNF
 #if	TFUNC
 			tok_struct *ifnext = new_tok();
 			tok_struct *end_if_tok=stack_push("end_of_else",ifnext,TOK_SEP);
 			if_token->next_tok=end_if_tok;
+#endif
 #endif
 			xpos=639;
 		};
@@ -2479,20 +2485,20 @@ int err_check_sentence1()
 		NTOKEN_ERR(664);
 		if(tok->ttype!=TOK_SEP&&tok->ttype!=TOK_RPAR&&tok->ttype!=TOK_RCURL) {	
 			err_num=err_lexpression();
+#if	TBNF
 #if	TFUNC
 			stack_push("dir_return",t_return,-t_return->ttype);
 #endif
-#if	TBNF
 #if	!TFUNC
 			dest->bnf_factor_function = bnf_dir_return_value;
 #endif
 			// MESG("dir_return: set factor_function!");
 #endif
 		} else {
+#if	TBNF
 #if	TFUNC
 			stack_push("dir_return",t_return,-t_return->ttype);
 #endif
-#if	TBNF
 #if	!TFUNC
 			dest->bnf_factor_function = bnf_dir_return_novalue;
 #endif
@@ -2566,6 +2572,7 @@ int err_check_block1()
 			NTOKEN_ERR(6741);
 			continue;
 		case TOK_COMMA:
+#if	TBNF
 #if	TFUNC
 			{
 			// MESG("- Push TOK_COMMA");
@@ -2573,8 +2580,10 @@ int err_check_block1()
 			// comma->tname=",1";
 			// comma->bnf_factor_function=bnf_factor_sep0;
 			comma->bnf_group=1;
-			};break;
+			};
 #endif
+#endif
+			break;
 		case TOK_SHOW:
 			// MESG_TOK_INFO("# err_check_block1",tok);
 #if	TBNF

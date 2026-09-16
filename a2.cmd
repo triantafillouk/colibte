@@ -1,2 +1,4 @@
 
-fillcol+=1
+fillcol:
+fillcol=fillcol+1 :  73.0
+
