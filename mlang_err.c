@@ -1577,6 +1577,12 @@ tok_struct *tok0_bnf=NULL;
 			syntax_error(xpos,"right parenthesis not found");
 			RT_MESG1(5231);
 		};
+		} else {
+#if	TFUNC2
+			tok0->t_nargs=args;
+			stack_push("TOK_CMD",tok0,-tok0->ttype);
+			if(tok->ttype==TOK_RPAR) NTOKEN2;
+#endif
 		};
 		RT_MESG1(524);
 	};

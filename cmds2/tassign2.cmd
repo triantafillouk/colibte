@@ -6,7 +6,8 @@ a=3
 d=log(10)	: 
 print("after log")
 b=assign_function("both_down","^N") 
-l1=3; l2=4
+l1=3; 
+l2=4
 print("after assign_function")
 a=log10(12)	: 
 c=atan(13)	: 

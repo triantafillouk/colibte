@@ -2,7 +2,7 @@
 print("--- e1.cmd")
 function show_out()
 {
- if(!in_view("[out]")) {
+ if(!in_view("["+"out"+"]")) {
 	vsplit_window()
 	next_window()
 	select_file("[out]")
@@ -10,7 +10,7 @@ function show_out()
  }
 }
 
-assign_sub ("show_out","M-,")
+assign_sub ("show"+"_out","M-,")
 
 cls
 

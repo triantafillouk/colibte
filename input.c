@@ -18,6 +18,10 @@
 #include	"mlang.h"
 #include	"display_driver.h"
 
+#if	TFUNC2
+void next_var_ext(char *from);
+#endif
+
 char ascii_cap[256] = {
 	0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,
 	26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,
@@ -381,9 +385,9 @@ int assign_sub(num n)
 	int(*kfunc)(num);
 	int s;
 	funname[0]=0;
-	MESG("assign_sub:");
+	// MESG("assign_sub:");
 	if((s = nextarg("Assign: subroutine name :", funname, 32,true))!=TRUE) return(s);
-	MESG("	after nextarg [%s] ",funname);
+	// MESG("	after nextarg [%s] ",funname);
 #if	TBNF
 #if	!TFUNC2
 		prev_var_ext("assign_sub");
@@ -392,7 +396,7 @@ int assign_sub(num n)
 	kfunc = execsub;
 	msg_line("Press the key to assign!");
 	c = getckey();
-	MESG("	key is c=%d",c);
+	// MESG("	key is c=%d",c);
 	msg_line(xe_key_name(c));
 	return(set_key_function(kfunc,c,funname));
 }
@@ -431,6 +435,7 @@ int assign_function(num n)
 	set_list_type(LCOM);
 	func_name[0]=0;
 	nextarg("Assign: function name :",func_name,MAXFLEN,true);
+	// MESG("assign_function: func_name=%s",func_name);
 	kfunc = get_function(func_name);
 	if (kfunc == NULL) {
 		snprintf(st,sizeof(st),"[%s] no such function",func_name);
@@ -629,6 +634,9 @@ int getckey()
 	// MESG("getckey: macro_exec=%d",macro_exec);
 	if (macro_exec) {
 		strlcpy(key_string,key_str1(),128);
+#if	TFUNC2
+		next_var_ext("getckey");
+#endif
 		return (tstr_to_command(key_string));
 	};
 	c = getcmd();

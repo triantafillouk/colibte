@@ -31,7 +31,7 @@ int varind(){
 	return VARIND;
 }
 
-#if	0
+#if	1
 #if	!TPROFILE
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
@@ -103,6 +103,12 @@ void prev_var_ext(char *from)
 {
 	// MESG("prev_var_ext:");
 	prev_var(from);
+}
+
+void next_var_ext(char *from)
+{
+	// MESG("prev_var_ext:");
+	next_var(from);
 }
 
 #if	!TFUNC
@@ -302,6 +308,7 @@ inline static void bnf_factor_not()
   if(num_var->var_type == VTYPE_NUM) {
  	bnf_var->dval = num_var->dval==0 ? 1:0;
 	bnf_var->var_type=VTYPE_NUM;
+	// show_stack_var("not result",bnf_var);
 	return;
  };
  syntax_error(1101,"factor not error!");
@@ -3885,51 +3892,41 @@ inline static void bnf_factor_cmd()
 	int args = tok->t_nargs;
 
 	findex = tok->tok_node->node_index;
-	MESG(";factor_cmd: editor command: command=%d %s [%s]",findex,ftable[findex].n_name,tok_info(tok));
-	MESG("	v@=%d t_nargs=%d args=%d",VARIND,tok->t_nargs,ftable[findex].arg);
+	// MESG(";factor_cmd: editor command: command=%d %s [%s]",findex,ftable[findex].n_name,tok_info(tok));
 	ed_command = ftable+findex;
 
-	NTOKEN2;
+	// NTOKEN2;
 	save_macro_exec=macro_exec;
-#if	!TFUNC2
-	next_var("cmd");
-#endif
 	macro_exec=MACRO_MODE2;
 	// MESG(";ed_command: [%s] args=%d",ed_command->n_name,ed_command->arg);
+	// MVAR *arg1_var=bnf_var;
 	if(args>0) {
 		// check_par=1;	/* we need parenthesis if arguments.  */
-		bnf_var-=args;
-		MESG("	at start of args v@=%d",VARIND);
+		bnf_var-=args-1;
+		// arg1_var=bnf_var;
+		// show_stack_var("arg1",bnf_var);
 		if(bnf_var->var_type==VTYPE_NUM) { value=bnf_var->dval;};
-		next_var("2 arg");
-	};
+		
+		//if(args>1) show_stack_var("arg2",bnf_var);
+	} else next_var("0 arg");
 
 	macro_exec = MACRO_MODE2;
 
-	// err_num=0;
+	err_num=0;
 	err_line=tok->tline;
 	err_str=NULL;
-	// MESG(";<factor_cmd: before ed_command: var@=%d type=%d",VARIND,bnf_var->var_type);
+	// show_stack_var("arg1_var",arg1_var);
 	int stat=ed_command->n_func((num)value);
+	// MESG("	factor_cmd result %d [%s]",stat,tok_info(tok));
+	if(args) bnf_var -= (args);
+	// show_stack_var("after cmd",bnf_var);
 	macro_exec = save_macro_exec;
 
-	// double pvalue=num_result();
-	// MESG("	after cmd: var@=%d",VARIND);
-	if(bnf_var->var_type==VTYPE_NUM) MESG("	numeric val=%f %f",bnf_var->dval,value);
-	// if(ed_command->arg>0)prev_var("");
-	// if(ed_command->arg>1) prev_var("");
-	next_var("cmd ret");
 	bnf_var->var_type=VTYPE_NUM;
 	bnf_var->dval=stat;
+	// show_stack_var("cmd result",bnf_var);
+	// MESG(";>factor_cmd: after ed_command: var@=%d type=%d value=%f",VARIND,bnf_var->var_type,value);
 
-	MESG(";>factor_cmd: after ed_command: var@=%d type=%d value=%f",VARIND,bnf_var->var_type,value);
-#if	0
-	if(check_par) { 
-		if(check_rparenthesis()) {
-			//NTOKEN2;	// MESG("right parenthesis skipped!");
-		};
-	};
-#endif
 	if(err_num>0) {
 		// ERROR("error %d after function [%s] at line %d: %s",err_num,ftable[findex].n_name,err_line,err_str);
 		set_error(tok,105,"factor_cmd");

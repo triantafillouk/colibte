@@ -32,7 +32,8 @@ extern FILEBUF *cbfp;
 // extern array_dat *main_args;
 FILEBUF *exe_buffer=NULL;
 FILEBUF *check_buffer=NULL;
-void show_vars(MVAR *va, int size,char *title);
+void show_vars (MVAR *va, int size,char *title);
+void show_stack_var(char *from,MVAR *var);
 #if	TNORMAL
 void set_term_function(tok_struct *tok, TFunction term_function);
 #endif
@@ -247,10 +248,25 @@ char *vtype_names[] = {
 #endif
 #endif
 
+void show_stack_var(char *from,MVAR *var)
+{
+	void (*vfunc)(const char *,...);
+	if(debug_flag()) vfunc = MESG;
+	else vfunc=mesg_out;
+
+	if(var->var_type==VTYPE_NUM) 
+		vfunc("  %10s %03d %2d=%-8s   %f",
+			from,(int)(var-bnf_vars),var->var_type,vtype_names[var->var_type],var->dval);
+	else if(var->var_type==VTYPE_STRING)
+		vfunc("  %10s %03d %2d=%-8s   \"%s\"",
+			from,(int)(var-bnf_vars),var->var_type,vtype_names[var->var_type],var->sval);
+	else
+		vfunc("  %10s %03d %2d=%-8s",from,(int)(var-bnf_vars),var->var_type,vtype_names[var->var_type]);
+}
+
 void show_var_node(BTNODE *node)
 {
-	MVAR *var = current_stable;
-	var = &current_stable[node->node_index];
+	MVAR *var = &current_stable[node->node_index];
 	// mesg_out("type %d",var->var_type);
 	// mesg_out("type name %s",vtype_names[var->var_type]);
 	void (*vfunc)(const char *,...);
@@ -1967,16 +1983,19 @@ char * key_str1()
 {
  char *s;
 #if	TBNF
+#if	!TFUNC2
 	bnf_expression();
+#endif
 	// MESG("	key_str1: var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	if(bnf_var->var_type==VTYPE_STRING) s=bnf_var->sval;
 	else s="";
+	// show_stack_var("key_str1:",bnf_var);
 #endif
 #if	TNORMAL
  num_expression();
  s = get_sval();
-#endif
  // MESG("key_str1: ex_vtype=%d ex_value=%f [%s]",get_vtype(),ex_value,get_sval());
+#endif
  return (s);
 }
 
@@ -2024,8 +2043,9 @@ int exec_named_function(char *name)
 	parse_block1(bp,NULL,0);	/* do not init if already parsed!  */
 
 	if((err_num=check_init(bp))>0) {
+		msg_line("error in check_init: %s",name);
 		return(0);
-	};
+	};//  else msg_line("go exec %s",name);;
 	double value;
 	// MESG("exec_named_function: active_flag=%d",current_active_flag);
 
@@ -2190,7 +2210,7 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 /* size of the buffer */
 {
 	/* if we are interactive, go get it! */
-	MESG("nextarg: macro_exec=%d var@=%d",macro_exec,VARIND);
+	// MESG("nextarg: macro_exec=%d var@=%d",macro_exec,VARIND);
 	if (macro_exec == FALSE) {
 		// MESG("getstring: %s",prompt);
 		if(getstring(prompt, buffer, size,show)!=FALSE) {
@@ -2213,7 +2233,10 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 		// MESG("nextarg:2 var_type=%d",bnf_var->var_type);
 #if	TBNF
 			if(bnf_var->var_type==VTYPE_STRING) strlcpy(buffer,bnf_var->sval,size);
-			MESG("nextarf v@=%d type=%d",VARIND,bnf_var->var_type);
+			// MESG("nextarg v@=%d type=%d",VARIND,bnf_var->var_type);
+#if	TFUNC2
+		next_var("nextarg");
+#endif
 #endif
 #if	TNORMAL
 		strlcpy(buffer,get_sval(),size);
