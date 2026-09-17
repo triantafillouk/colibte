@@ -891,7 +891,9 @@ int create_statement_group(FILEBUF *bf)
 	if(tokp->ttype==TOK_LBRAKET) in_brackets=1;
 	if(tokp->ttype==TOK_RBRAKET) in_brackets=0;
 	if(tokp->ttype==TOK_PROC) in_call=1;
+#if	!TFUNC2
 	if(tokp->ttype==TOK_CMD) in_call=1;
+#endif
 	if(tokp->ttype==TOK_LPAR) in_call=1;
 	if(tokp->ttype==TOK_COMMA) {
 		// tokp->statement_group=1;
@@ -2188,7 +2190,7 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 /* size of the buffer */
 {
 	/* if we are interactive, go get it! */
-	// MESG("nextarg: macro_exec=%d var@=%d",macro_exec,VARIND);
+	MESG("nextarg: macro_exec=%d var@=%d",macro_exec,VARIND);
 	if (macro_exec == FALSE) {
 		// MESG("getstring: %s",prompt);
 		if(getstring(prompt, buffer, size,show)!=FALSE) {
@@ -2211,6 +2213,7 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 		// MESG("nextarg:2 var_type=%d",bnf_var->var_type);
 #if	TBNF
 			if(bnf_var->var_type==VTYPE_STRING) strlcpy(buffer,bnf_var->sval,size);
+			MESG("nextarf v@=%d type=%d",VARIND,bnf_var->var_type);
 #endif
 #if	TNORMAL
 		strlcpy(buffer,get_sval(),size);

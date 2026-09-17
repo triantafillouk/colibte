@@ -703,6 +703,9 @@ tok_struct *tok0_bnf=NULL;
 
  if(tok->ttype!=TOK_NOT && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_MINUS && tok->ttype!=TOK_PLUS) {
 	if(tok->ttype!=TOK_VAR)
+#if	TFUNC2
+	if(tok->ttype!=TOK_CMD)
+#endif
 #if	TFUNC
 	if(tok->ttype!=TOK_FUNC)
 #endif
@@ -1464,14 +1467,16 @@ tok_struct *tok0_bnf=NULL;
 	case TOK_CMD:	{ // 3 editor command
 		int index;
 		int check_par;
-
+		int args=0;
 		/* variable's name in tok0->tname */
 		xpos=506;
 		var_node=tok0->tok_node;
 		index = var_node->node_index;
 		// MESG("err: TOK_CMD");
 #if	TBNF
+#if	!TFUNC2
 		stack_push("TOK_CMD",tok0,-tok0->ttype);
+#endif
 #endif
 		pre_symbol=0;
 		if(ftable[index].arg==0) check_par=0;else check_par=1;
@@ -1489,7 +1494,7 @@ tok_struct *tok0_bnf=NULL;
 		save_macro_exec=macro_exec;
 		macro_exec=MACRO_MODE2;
 		{
-			int args=ftable[index].arg;
+			args=ftable[index].arg;
 			int check_end=1;
 			int i;
 			if(args<0) {	/* undefined number of arguments ...  */
@@ -1508,6 +1513,7 @@ tok_struct *tok0_bnf=NULL;
 				if(!check_end) {
 					if(tok->ttype==TOK_RPAR || tok->ttype==TOK_SEP) {
 						// MESG_TOK_INFO("# check RPAR:1",tok);
+						args=i+1;
 						break;
 					} else {
 						syntax_error(xpos,"argument not correct!");
@@ -1554,9 +1560,14 @@ tok_struct *tok0_bnf=NULL;
 		if(check_par){ 
 		// MESG(" ---- skip tok_rpar");
 #if	TBNF
+#if	TFUNC2
+			tok0->t_nargs=args;
+			stack_push("TOK_CMD",tok0,-tok0->ttype);
+#else
 			if(tok->ttype==TOK_RPAR) {
 				stack_push("cmd rpar",tok,-tok->ttype);
 			};
+#endif
 #endif
 		if(!check_skip_token_err1(TOK_RPAR,"editor command",xpos)) 
 		{

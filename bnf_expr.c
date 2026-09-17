@@ -31,7 +31,7 @@ int varind(){
 	return VARIND;
 }
 
-#if	1
+#if	0
 #if	!TPROFILE
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
@@ -3874,6 +3874,71 @@ inline static void bnf_factor_array_l2()
 	// MESG("	factor_array_l2:ind1=%d lsslot ind=%d type=%d rows=%d cols=%d!",ind1,lsslot->index1,lsslot->var_type,lsslot->adat->rows,lsslot->adat->cols);
 }
 
+#if	TFUNC2
+inline static void bnf_factor_cmd()
+{
+	int findex;
+	// int check_par=0;
+	int save_macro_exec;
+	double value=1;
+	FUNCS *ed_command;
+	int args = tok->t_nargs;
+
+	findex = tok->tok_node->node_index;
+	MESG(";factor_cmd: editor command: command=%d %s [%s]",findex,ftable[findex].n_name,tok_info(tok));
+	MESG("	v@=%d t_nargs=%d args=%d",VARIND,tok->t_nargs,ftable[findex].arg);
+	ed_command = ftable+findex;
+
+	NTOKEN2;
+	save_macro_exec=macro_exec;
+#if	!TFUNC2
+	next_var("cmd");
+#endif
+	macro_exec=MACRO_MODE2;
+	// MESG(";ed_command: [%s] args=%d",ed_command->n_name,ed_command->arg);
+	if(args>0) {
+		// check_par=1;	/* we need parenthesis if arguments.  */
+		bnf_var-=args;
+		MESG("	at start of args v@=%d",VARIND);
+		if(bnf_var->var_type==VTYPE_NUM) { value=bnf_var->dval;};
+		next_var("2 arg");
+	};
+
+	macro_exec = MACRO_MODE2;
+
+	// err_num=0;
+	err_line=tok->tline;
+	err_str=NULL;
+	// MESG(";<factor_cmd: before ed_command: var@=%d type=%d",VARIND,bnf_var->var_type);
+	int stat=ed_command->n_func((num)value);
+	macro_exec = save_macro_exec;
+
+	// double pvalue=num_result();
+	// MESG("	after cmd: var@=%d",VARIND);
+	if(bnf_var->var_type==VTYPE_NUM) MESG("	numeric val=%f %f",bnf_var->dval,value);
+	// if(ed_command->arg>0)prev_var("");
+	// if(ed_command->arg>1) prev_var("");
+	next_var("cmd ret");
+	bnf_var->var_type=VTYPE_NUM;
+	bnf_var->dval=stat;
+
+	MESG(";>factor_cmd: after ed_command: var@=%d type=%d value=%f",VARIND,bnf_var->var_type,value);
+#if	0
+	if(check_par) { 
+		if(check_rparenthesis()) {
+			//NTOKEN2;	// MESG("right parenthesis skipped!");
+		};
+	};
+#endif
+	if(err_num>0) {
+		// ERROR("error %d after function [%s] at line %d: %s",err_num,ftable[findex].n_name,err_line,err_str);
+		set_error(tok,105,"factor_cmd");
+		show_error("Factor","factor_cmd");
+	};
+
+	// MESG(";factor_cmd:end @%d value=%f stat=%d err=%d",VARIND,stat,err_num);
+}
+#else
 inline static void bnf_factor_cmd()
 {
 	int findex;
@@ -3955,6 +4020,7 @@ inline static void bnf_factor_cmd()
 
 	// MESG(";factor_cmd:end @%d value=%f stat=%d err=%d",VARIND,stat,err_num);
 }
+#endif
 
 MVAR *btree_to_mvar(BTREE *bt);
 

@@ -381,16 +381,18 @@ int assign_sub(num n)
 	int(*kfunc)(num);
 	int s;
 	funname[0]=0;
-	// MESG("assign_sub:");
+	MESG("assign_sub:");
 	if((s = nextarg("Assign: subroutine name :", funname, 32,true))!=TRUE) return(s);
-	// MESG("	after nextarg [%s] ",funname);
+	MESG("	after nextarg [%s] ",funname);
 #if	TBNF
+#if	!TFUNC2
 		prev_var_ext("assign_sub");
+#endif
 #endif
 	kfunc = execsub;
 	msg_line("Press the key to assign!");
 	c = getckey();
-	// MESG("	key is c=%d",c);
+	MESG("	key is c=%d",c);
 	msg_line(xe_key_name(c));
 	return(set_key_function(kfunc,c,funname));
 }
