@@ -379,6 +379,7 @@ int err_skip_type_args(tok_struct *tok0)
 		if(tok->ttype!=TOK_COMMA && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_SEP) { 
 			return 662;
 		};
+		// MESG("	- err_skip_type_args push separator [%s]",tok_info(tok));
 		stack_push("skip args sep",tok,0);
 		NTOKEN_ERR(668);
 		stat=err_cexpression();
@@ -435,6 +436,7 @@ int  err_push_args_1(char *proc_name,int *nargs)
 		
 		break;
 	} else if (tok->ttype==TOK_COMMA) {
+		// MESG(" - err_push_args_1 push comma [%s]",tok_info(tok));
 		stack_push("arg ,",tok,0);
 		NTOKEN_ERR(416);
 		continue;
@@ -484,6 +486,7 @@ int err_assign_args1(int nargs)
 			break;
 		}
 		if(tok->ttype!=TOK_COMMA) { set_error(tok,xpos,"not separator between args"); RT_MESG1(426);};
+		// MESG(" - err_assign_args1: args>0 push comma [%s]",tok_info(tok));
 		stack_push("assign_args sep",tok,0);
 		NTOKEN_ERR(427);	/* skip separator  */
 	};
@@ -776,7 +779,7 @@ tok_struct *tok0_bnf=NULL;
 				RT_MESG1(xpos);
 			};
 			if(tok->ttype==TOK_SEP || tok->ttype==TOK_COMMA) {
-				// MESG("	tok_sep [%s]",tok->tname);
+				// MESG("	- LBRAKET push separator [%s]",tok_info(tok));
 				stack_push("lbra",tok,-tok->ttype);
 				NTOKEN_ERR(103);
 				continue;
@@ -1522,7 +1525,10 @@ tok_struct *tok0_bnf=NULL;
 				if(i<args-1) {	/* check for a comma  */
 					CHECK_TOK(5172);
 					if(tok->ttype==TOK_COMMA || check_end==0) {
+						// MESG(" - in tok_cmd skip push comma [%s]",tok_info(tok));
+#if	!TFUNC2
 						stack_push("518",tok,0);
+#endif
 						NTOKEN_ERR(518);
 					} else {
 						CHECK_TOK(519);
@@ -2592,7 +2598,7 @@ int err_check_block1()
 #if	TBNF
 #if	TFUNC
 			{
-			// MESG("- Push TOK_COMMA");
+			// MESG(" - check_block1: TOK_COMMA: Push TOK_COMMA [%s]",tok_info(tok));
 			tok_struct *comma = stack_push("comma",tok,tok->ttype);
 			// comma->tname=",1";
 			// comma->bnf_factor_function=bnf_factor_sep0;
