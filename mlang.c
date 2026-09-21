@@ -27,6 +27,8 @@ inline void ntoken();
 // #define	NTOKEN2	ntoken()
 #endif
 
+MVAR *current_stable=NULL; 	/* current symbol table ...  */
+
 void mesg_out(const char *fmt, ...);
 extern FILEBUF *cbfp;
 // extern array_dat *main_args;
@@ -160,19 +162,12 @@ char **ls_psval=NULL;
 double *ls_pdval=NULL;
 MVAR *lmvar=NULL;
 int firt_var=1;
-MVAR *current_stable=NULL; 	/* current symbol table ...  */
 
 // CALL_STACK variables
 MVAR *call_stack;
 MVAR *call_stack_used;
 MVAR *max_call_stack_end;
 MVAR *call_stack_available;
-
-#if	TBNF
-MVAR *exec_stack;
-MVAR *exec_stack_current;
-MVAR *exec_stack_max;
-#endif
 
 int show_stage=0;
 int xpos=0;		/* stage position  */
@@ -469,17 +464,15 @@ inline void init_vars(MVAR *head,int const size)
 
 void initialize_call_stack(int initial_size)
 {
-	// MESG("Initialize call_stack with %d size",initial_size);
+	MESG("Initialize call_stack with %d size",initial_size);
 	call_stack=(MVAR *)malloc(sizeof(struct MVAR)*initial_size);
 	call_stack_used=call_stack;
+#if	TCVARS
+	// bnf_vars=call_stack;
+#endif
 	max_call_stack_end=call_stack;
 	call_stack_available=call_stack+initial_size;
 	// fprintf(stderr,"	initial call_stack=%p\n",(void *)call_stack);
-#if	TBNF
-	exec_stack=(MVAR *)malloc(sizeof(struct MVAR)*512);
-	exec_stack_current=exec_stack;
-	exec_stack_max=exec_stack+512;
-#endif
 }
 
 void init_btree_table()
@@ -708,25 +701,21 @@ MVAR *new_symbol_table(int const size)
  // int size_call_stack_used = call_stack_used - call_stack;
  // MESG("		new_symbol_table: at %lld",td-call_stack);
  call_stack_used += size;
-#if	0
- if(max_call_stack_end<call_stack_used) {
- 	max_call_stack_end=call_stack_used;
-#endif
-	if(call_stack_used>call_stack_available) {
-		if(execmd) {
-			fprintf(stderr,"new_symbol_table: overflow: available=%ld required=%ld\n",call_stack_available-call_stack,call_stack_used-call_stack);
-			exit(0);
-		} else {
-			msg_line("new_symbol_table: overflow: available=%d required=%d",call_stack_available-call_stack,call_stack_used-call_stack);
-		};
-		set_error(tok,301,"call_stack overflow");
-		return NULL;
+ if(call_stack_used>call_stack_available) {
+	if(execmd) {
+		fprintf(stderr,"new_symbol_table: overflow: available=%ld required=%ld\n",call_stack_available-call_stack,call_stack_used-call_stack);
+		exit(0);
+	} else {
+		msg_line("new_symbol_table: overflow: available=%d required=%d",call_stack_available-call_stack,call_stack_used-call_stack);
 	};
-#if	0
- }
-#endif
+	set_error(tok,301,"call_stack overflow");
+	return NULL;
+ };
+
  // MESG("Initialize new_symbol_table: size %d",size);
  init_vars(td,size);
+ bnf_vars=call_stack_used;
+ bnf_var=bnf_vars;
  return td;
 }
 
@@ -1368,12 +1357,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	else 
 		MESG("# [%-15s use %s %s ---------------------------------",bp->b_fname,use_fp->b_fname,VERSION);
 	eval_curl_match(NULL);
-#if	0
- if(show_tokens) {
-	parse_buffer_show_tokens(1);
-	return(0);	
- };
-#endif
+
  if(use_fp->symbol_tree==NULL) {
 	// MESG("create new symbol_tree for use_fp!");
  	use_fp->symbol_tree=new_btree(use_fp->b_fname,0);
@@ -1508,6 +1492,7 @@ int refresh_current_buffer(num nused)
  // double val=0;
 #endif
  FILEBUF *fp=cbfp;
+ MESG("refresh_current_buffer:1 [%s] %d",fp->b_fname,fp->b_type);
  exe_buffer=cbfp;
  num curline = tp_line(cwp->tp_current);
 
@@ -1526,7 +1511,6 @@ int refresh_current_buffer(num nused)
  clean_saved_string(0);
 #endif
  fp->err=-1;
- // MESG("refresh_current_buffer:1 [%s] %d",fp->b_fname,fp->b_type);
  parse_block1(fp,fp->symbol_tree,1);
  // MESG("	block parsed err_num=%d",err_num);
  if(err_num<1){	/* if no errors  */
@@ -1674,7 +1658,6 @@ void MESG_TOK_INFO(char *title,tok_struct *tok)
 }
 
 #if	TBNF
-#if	1
 char * tok_info(tok_struct *tok)
 {
  static char stok[MAXLLEN];
@@ -1775,95 +1758,6 @@ char * tok_info(tok_struct *tok)
 	// MESG("tok_info: end");
 	return stok;
 }
-#else
-char * tok_info(tok_struct *tok)
-{
- static char stok[MAXLLEN];
-	if(tok==NULL) { MESG("tok_info: NULL token!");return "null token";};
-	// MESG("tok_info: ttype=%d",tok->ttype);
-
-	if(tok->tname!=NULL){
-		// MESG("tok_info: %d %s %d",tok->tind,tok->tname,tok->tline);
-		if(tok->ttype==TOK_ARRAY1 || tok->ttype==TOK_ARRAY2) {
-			int rows=0;
-			int cols=0;
-			
-			if(tok->tok_adat) {
-				rows=tok->tok_adat->rows;
-				cols=tok->tok_adat->cols;
-			};
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] rows=%d cols=%d bnf=%2d",
-				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,rows,cols,tok->bnf_group);
-		}  else	if(tok->tgroup==TOK_OPNUM) { 
-			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %5.1f bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval,tok->bnf_group);
-		} else 
-		if(tok->ttype==TOK_SHOW) { snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [:] bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->bnf_group);
-		} else
-		if(tok->ttype==TOK_LCURL||tok->ttype==TOK_RCURL) {
-				// snprintf(stok,sizeof(stok),"%3d:%4d CURL",tok->tnum,tok->tline);
-				snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %s other is %d bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum,tok->bnf_group);
-		} else	if(tok->tgroup>0) {
-			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] [%2d:%5s]!! bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup),tok->bnf_group);
-		} else	if(tok->ttype==TOK_NUM) { 
-			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] %5.1f bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval,tok->bnf_group);
-		} else if(tok->ttype==TOK_QUOTE) {
-			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\" bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->bnf_group);
-		}		
-		
-		else if(tok->ttype==TOK_PROC) { 
-			if(tok->proc_buffer == NULL) 
-				snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\" NULL proc bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->bnf_group);
-			else {
-				int len=snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] \"%s\" [%20s] proc bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->proc_buffer->b_fname,tok->bnf_group);
-				if(len>=sizeof(stok))  MESG("	truncated");
-			};
-		} else if(tok->ttype==TOK_VAR) {
-			// MESG("TOK_VAR:");
-			int vtype=0;
-#if	0
-			BTNODE *var_node = tok->tok_node;
-			char *var_name="unknown";
-			if(var_node!=NULL) {
-				vtype=var_node->node_vtype;
-				var_name=var_node->node_name;
-			};
-#endif
-			// MESG("TOK_VAR: vtype=%d",vtype);
-			// MESG("tok_info var! ind=[%d] group=%d vtype=%d",tok->tind,tok->tgroup,vtype);
-			MVAR *var=NULL;
-			if(current_stable) 
-				var = &current_stable[tok->tind];
-			if(var!=NULL) vtype=var->var_type;
-#if	0
-			int size=0;
-			if(vtype==VTYPE_TREE) {
-				BTREE *type_tree=(BTREE *)var_node->node_dat;
-				size = type_tree->items;
-			};
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] %8s %d size %d [bnf=%2d]",
-				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,vtype_names[vtype] ,vtype,size,tok->bnf_group);
-#else
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] %8s %d [bnf=%2d]",
-				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,vtype_names[vtype] ,vtype,tok->bnf_group);
-#endif
-		} else {
-			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5s] bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->bnf_group);
-		};
-// 			
-	} else {
-			MESG("	null!!! tnum=%d",tok->tnum);
-			return "null tok name !!!!!!!!!!!!!!!!!!!!!!!!!!!";
-		     snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5.1f] bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,"null name",tok->dval,tok->bnf_group);
-	};
-	// MESG("tok_info: end");
-	return stok;
-}
-#endif
 #else
 char * tok_info(tok_struct *tok)
 {

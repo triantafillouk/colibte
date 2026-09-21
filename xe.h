@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.8T56 (18/9/2026)"
+#define VERSION 	 "#01.8T57 (20/9/2026)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -28,6 +28,7 @@
 #endif
 #define	TARROWS		1	/* Use arrow menus in panel curses  */
 #define	USE_UTF8	1	/* Use utf8 characters  */
+#define	TCVARS		1	/* consolidate stack vars into one stack  */
 #define	TFUNC3		1	/* for procs  */
 #define	TFUNC2		1	/* for cmd's  */
 #define	TFUNC		1
@@ -730,7 +731,6 @@ typedef struct  FILEBUF {
 	BTREE *symbol_tree;	/* local symbol table  */
 	struct alist *type_list;	/* type table list  */
 
-	//MVAR *symbol_table;	/* instance of variables data  */
 //	Notes structures
 #if	TNOTES
 	notes_struct *b_note;

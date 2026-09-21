@@ -9,9 +9,13 @@ void show_error(char *from,char *name);
 inline static void bnf_expression0();
 
 #define	MAX_VARS	500
+#if	TCVARS
+static MVAR *bnf_vars=NULL;
+static MVAR *bnf_var=NULL;
+#else
 static MVAR bnf_vars[MAX_VARS];
 static MVAR *bnf_var=bnf_vars;
-
+#endif
 
 #if	TPROFILE
 static long max_var=0;
