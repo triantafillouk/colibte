@@ -1665,78 +1665,86 @@ void MESG_TOK_INFO(char *title,tok_struct *tok)
 }
 
 #if	TBNF
-char * tok_info(tok_struct *tok)
+char * tok_info(tok_struct *tok1)
 {
  static char stok[MAXLLEN];
-	if(tok==NULL) { MESG("tok_info: NULL token!");return "null token";};
+ static int x=0;
+	if(tok1==NULL) { MESG("tok_info: NULL token!");return "null token";};
 	// MESG("tok_info: ttype=%d",tok->ttype);
-
-	if(tok->tname!=NULL){
+	memset(stok,0,sizeof(stok));
+	char *stok1;
+	int ssize;
+	if(tok1->tname!=NULL) {
+		ssize=snprintf(stok,sizeof(stok),"%2d:%2d %3d [%2d=%7s][%5s][tg=%2d tb=%d] x=%2d ",
+			tok1->tnum,tok1->tline,tok1->tind,tok1->ttype,tname(tok1->ttype),(char *)tok1->tname,tok1->tgroup/*,tname(tok1->tgroup)*/,tok1->bnf_group,x++);
+		stok1=stok+ssize;
+	} else {
+		ssize=snprintf(stok,sizeof(stok),"%2d:%2d %3d [%2d=%7s][%5s][tg=%2d tb=%d] x=%2d ",
+			tok1->tnum,tok1->tline,tok1->tind,tok1->ttype,tname(tok1->ttype)," -- ",tok1->tgroup/*,tname(tok1->tgroup)*/,tok1->bnf_group,x++);
+		stok1=stok+ssize;
+	};
+	{
 		// common initials 
-		int ssize;
-		ssize=snprintf(stok,sizeof(stok),"%2d:%2d %3d [%2d=%7s][%5s][tg=%2d tb=%d] ",
-			tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup/*,tname(tok->tgroup)*/,tok->bnf_group);
-		char *stok1=stok+ssize;
-
-		// MESG("tok_info: %d %s %d",tok->tind,tok->tname,tok->tline);
-		if(tok->ttype==TOK_ARRAY1 || tok->ttype==TOK_ARRAY2) {
+		// MESG("	- tok_info [%s]",stok);
+		// MESG("tok_info: %d %s %d",tok1->tind,tok1->tname,tok1->tline);
+		if(tok1->ttype==TOK_ARRAY1 || tok1->ttype==TOK_ARRAY2) {
 			int rows=0;
 			int cols=0;
 			
-			if(tok->tok_adat) {
-				rows=tok->tok_adat->rows;
-				cols=tok->tok_adat->cols;
+			if(tok1->tok_adat) {
+				rows=tok1->tok_adat->rows;
+				cols=tok1->tok_adat->cols;
 			};
 			snprintf(stok1,sizeof(stok)-ssize,"rows=%d cols=%d",rows,cols);
-		}  else	if(tok->tgroup==TOK_OPNUM) { 
-			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok1,sizeof(stok)-ssize,"%5.1f",tok->dval);
+		}  else	if(tok1->tgroup==TOK_OPNUM) { 
+			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok1->tnum,tok1->tline,tok1->tname);
+			snprintf(stok1,sizeof(stok)-ssize,"%5.1f",tok1->dval);
 		} else 
-		if(tok->ttype==TOK_SHOW) { // snprintf(stok1,sizeof(stok)-ssize,"bnf=%2d",tok->bnf_group);
+		if(tok1->ttype==TOK_SHOW) { // snprintf(stok1,sizeof(stok)-ssize,"bnf=%2d",tok1->bnf_group);
 		} else
-		if(tok->ttype==TOK_LCURL||tok->ttype==TOK_RCURL) {
-				// snprintf(stok,sizeof(stok),"%3d:%4d CURL",tok->tnum,tok->tline);
-				snprintf(stok1,sizeof(stok)-ssize,"-> %d",tok->match_tok->tnum);
-		} else	if(tok->tgroup>0) {
-			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			// snprintf(stok1,sizeof(stok)-ssize,"bnf=%2d",tok->bnf_group);
-		} else	if(tok->ttype==TOK_NUM) { 
-			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(stok1,sizeof(stok)-ssize,"%5.3f",tok->dval);
-		} else if(tok->ttype==TOK_QUOTE) {
-			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			// snprintf(stok1,sizeof(stok)-ssize,"bnf=%2d",tok->bnf_group);
+		if(tok1->ttype==TOK_LCURL||tok1->ttype==TOK_RCURL) {
+				// snprintf(stok,sizeof(stok),"%3d:%4d CURL",tok1->tnum,tok1->tline);
+				snprintf(stok1,sizeof(stok)-ssize,"-> %d",tok1->match_tok->tnum);
+		} else	if(tok1->tgroup>0) {
+			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok1->tnum,tok1->tline,tok1->tname);
+			// snprintf(stok1,sizeof(stok)-ssize,"bnf=%2d",tok1->bnf_group);
+		} else	if(tok1->ttype==TOK_NUM) { 
+			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok1->tnum,tok1->tline,tok1->tname);
+			snprintf(stok1,sizeof(stok)-ssize,"%5.3f",tok1->dval);
+		} else if(tok1->ttype==TOK_QUOTE) {
+			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok1->tnum,tok1->tline,tok1->tname);
+			// snprintf(stok1,sizeof(stok)-ssize,"bnf=%2d",tok1->bnf_group);
 		}		
-		else if(tok->ttype==TOK_PROC) { 
-			if(tok->proc_buffer == NULL) 
-				snprintf(stok1,sizeof(stok)-ssize," NULL proc bnf=%2d",tok->bnf_group);
+		else if(tok1->ttype==TOK_PROC) { 
+			if(tok1->proc_buffer == NULL) 
+				snprintf(stok1,sizeof(stok)-ssize," NULL proc bnf=%2d",tok1->bnf_group);
 			else {
 				int len=snprintf(stok1,sizeof(stok)-ssize,"%s",
-					tok->proc_buffer->b_fname);
+					tok1->proc_buffer->b_fname);
 				if(len+ssize>=sizeof(stok))  MESG("	truncated");
 			};
-		} else if(tok->ttype==TOK_VAR) {
+		} else if(tok1->ttype==TOK_VAR) {
 			// MESG("TOK_VAR:");
 			int vtype=0;
 			// int assigned=0;
 #if	0
-			BTNODE *var_node = tok->tok_node;
+			BTNODE *var_node = tok1->tok_node;
 			char *var_name="unknown";
 			if(var_node!=NULL) {
 				vtype=var_node->node_vtype;
 				var_name=var_node->node_name;
 			};
 #endif
-			// MESG("tok_info var! ind=[%d] group=%d vtype=%d",tok->tind,tok->tgroup,vtype);
+			// MESG("tok_info var! ind=[%d] group=%d vtype=%d",tok1->tind,tok1->tgroup,vtype);
 			MVAR *var=NULL;
 			if(current_stable) { 
-				var = &current_stable[tok->tind];
+				var = &current_stable[tok1->tind];
 			};// else MESG("	current_stable is NULL!!");
 #if	0
 			if(check_buffer)
 			if(check_buffer->symbol_tree) {
 				MESG("	check check_buffer symbol_tree!");
-				BTNODE *vnode = find_btnode(check_buffer->symbol_tree,tok->tname);
+				BTNODE *vnode = find_btnode(check_buffer->symbol_tree,tok1->tname);
 				assigned = vnode->node_assigned;
 			};
 #endif
@@ -1748,20 +1756,22 @@ char * tok_info(tok_struct *tok)
 				size = type_tree->items;
 			};
 			snprintf(stok1,sizeof(stok)-ssize," %8s %d size %d [bnf=%2d]",
-				vtype_names[vtype] ,vtype,size,tok->bnf_group);
+				vtype_names[vtype] ,vtype,size,tok1->bnf_group);
 #else
 			snprintf(stok1,sizeof(stok)-ssize,"%s",vtype_names[vtype]);
 #endif
 		} else {
-			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			// snprintf(stok1,sizeof(stok)-ssize,"bnf=%2d",tok->bnf_group);
+			// snprintf(stok,sizeof(stok),"%3d:%4d %s",tok1->tnum,tok1->tline,tok1->tname);
+			// snprintf(stok1,sizeof(stok)-ssize,"bnf=%2d",tok1->bnf_group);
 		};
 // 			
-	} else {
-			MESG("	null!!! tnum=%d",tok->tnum);
-			return "null tok name !!!!!!!!!!!!!!!!!!!!!!!!!!!";
-		     snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5.1f] bnf=%2d",tok->tnum,tok->tline,tok->tind,tok->ttype,"null name",tok->dval,tok->bnf_group);
+	}
+/*  else {
+			MESG("	null!!! tnum=%d",tok1->tnum);
+		     snprintf(stok,sizeof(stok),"%3d:%4d %3d [%2d=%8s] [%5.1f] bnf=%2d",tok1->tnum,tok1->tline,tok1->tind,tok1->ttype,"null name",tok1->dval,tok1->bnf_group);
+			return stok;// "null tok name !!!!!!!!!!!!!!!!!!!!!!!!!!!";
 	};
+*/
 	// MESG("tok_info: end");
 	return stok;
 }

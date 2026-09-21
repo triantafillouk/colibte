@@ -35,7 +35,7 @@ int varind(){
 	return VARIND;
 }
 
-#if	1
+#if	0
 #if	!TPROFILE
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
@@ -284,7 +284,7 @@ inline static void bnf_factor_var()
 	MVAR *var=get_left_slot(tok->tind);
 	memcpy(bnf_var,var,sizeof(struct MVAR));
 	bnf_var->var_alloced=0;
-	// MESG(";- factor_var: put var %s tind=%d at var@=%d [%s]",tok->tname,tok->tind,VARIND,tok_info(tok));
+	MESG(";- factor_var: put var %s tind=%d at var@=%d [%s]",tok->tname,tok->tind,VARIND,tok_info(tok));
 }
 
 inline static void bnf_factor_num()
@@ -292,7 +292,7 @@ inline static void bnf_factor_num()
 	next_var("num");
 	bnf_var->dval = tok->dval;
 	bnf_var->var_type=VTYPE_NUM;
-	// MESG("bnf_factor_num: put numeric %f at var@=%d type=%d",bnf_var->dval,VARIND,bnf_var->var_type);
+	MESG("bnf_factor_num: put numeric %f at var@=%d type=%d",bnf_var->dval,VARIND,bnf_var->var_type);
 }
 
 inline static void bnf_factor_quote()
@@ -2322,7 +2322,7 @@ inline static void bnf_block1()
 {
 	// MESG("bnf_block1 start! group=%d [%s]",tok->tgroup,tok_info(tok));
 	while(tok->bnf_group!=BLOCK_END) {
-		// MESG("!B v@=%d [%s]",VARIND,tok_info(tok));	/*   */
+		MESG("!B v@=%d [%s]",VARIND,tok_info(tok));	/*   */
 	 	tok->bnf_factor_function();
 		// MESG("		-- tok %d type %d act=%d",tok->tnum,tok->ttype,current_active_flag);
 		NTOKEN2;
@@ -2763,15 +2763,22 @@ void bnf_dir_type()
 
 inline static MVAR * push_args_bnf(int const nargs,int const vars_num)
 {
- // MESG("# push_args_bnf: nargs=%d vars_num=%d",nargs,vars_num);
+ MESG("# push_args_bnf: nargs=%d vars_num=%d v@=%d",nargs,vars_num,VARIND);
 
  MVAR *va = new_symbol_table(vars_num);
  if(va==NULL) return NULL;
 
  MVAR *va_i=va;
-
+#if	TFUNC3
+	bnf_var-=nargs;
+#endif
  for(;va_i<va+nargs;va_i++)
  {
+#if	TFUNC3
+	MESG("	v@ %d type=%d",VARIND,bnf_var->var_type);
+	memmove(va_i,bnf_var,sizeof(MVAR));
+	next_var("narg");
+#else
 	NTOKEN2;	/* skip proc name of separator  */
 	// MESG("	[%2d] before var@=%d [%s]",i,VARIND,tok_info(tok));
 	bnf_expression();
@@ -2780,7 +2787,12 @@ inline static MVAR * push_args_bnf(int const nargs,int const vars_num)
 	memmove(va_i,bnf_var,sizeof(MVAR));
 	prev_var("push arg");
 	// MESG("			after2  var@=%d var_type=%d [%s]",VARIND,va_i->var_type,tok_info(tok));
+#endif
  };
+#if	TFUNC3
+ bnf_var -= nargs;
+ MESG("- after push v@=%d",VARIND);
+#endif
  return(va);
 }
 
@@ -2788,13 +2800,17 @@ inline static MVAR * push_args_bnf(int const nargs,int const vars_num)
 inline static void bnf_exec_function(FILEBUF *proc_buffer,int const nargs)
 {
 	MVAR *old_symbol_table=current_stable;
-	// MESG("## bnf_exec_function:[%s] var@=%d args=%d",proc_buffer->b_fname,VARIND,nargs);
+	MESG("## bnf_exec_function:[%s] var@=%d args=%d",proc_buffer->b_fname,VARIND,nargs);
 	current_stable = push_args_bnf(nargs,proc_buffer->symbol_tree->items);
 	tok_struct *after_proc=tok; 
 
 	tok=proc_buffer->tok_table_bnf;	/* start of function  */
-	// MESG("bnf_exec_function:start [%s]",tok_info(tok));
+#if	TFUNC3
+	tok += 1+nargs;
+	MESG("	bnf_exec_function:start [%s]",tok_info(tok));
+#else
 	skip_args1(nargs);
+#endif
 	// if(i0!=VARIND) MESG("	bnf_function:1 var @%d %d",i0,VARIND);
 #if	TNORMAL
 	NTOKEN2;
@@ -2805,7 +2821,7 @@ inline static void bnf_exec_function(FILEBUF *proc_buffer,int const nargs)
 				bnf_block1();
 			// else 
 				// bnf_block1_break();
-	// show_result();
+	show_result();
 	delete_symbol_table(current_stable,proc_buffer->symbol_tree->items,nargs);
 	current_stable=old_symbol_table;
 
@@ -2818,7 +2834,7 @@ inline static void bnf_factor_proc()
 {
 	tok_struct *tok0=tok;
 	FILEBUF *cbuf=exe_buffer;
-	// MESG("bnf_factor_proc:[%s] << v@=%d",tok0->tname,VARIND);
+	MESG("bnf_factor_proc:[%s] << v@=%d [%s]",tok0->tname,VARIND,tok_info(tok0));
 	next_var("proc");		/* to save proc result  */
 	MVAR *result_var=bnf_var;
 	// MESG("	tname [%s]",tok0->tname);

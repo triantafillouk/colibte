@@ -437,7 +437,9 @@ int  err_push_args_1(char *proc_name,int *nargs)
 		break;
 	} else if (tok->ttype==TOK_COMMA) {
 		// MESG(" - err_push_args_1 push comma [%s]",tok_info(tok));
+#if	!TFUNC3
 		stack_push("arg ,",tok,0);
+#endif
 		NTOKEN_ERR(416);
 		continue;
 	}
@@ -706,6 +708,9 @@ tok_struct *tok0_bnf=NULL;
 
  if(tok->ttype!=TOK_NOT && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_MINUS && tok->ttype!=TOK_PLUS) {
 	if(tok->ttype!=TOK_VAR)
+#if	TFUNC3
+	if(tok->ttype!=TOK_PROC)
+#endif
 #if	TFUNC2
 	if(tok->ttype!=TOK_CMD)
 #endif
@@ -722,6 +727,7 @@ tok_struct *tok0_bnf=NULL;
 
  SHOW_STAGE(470);
  tok0=tok;
+ // MESG("# err_factor: ttype=%d tok0=%p  [%s] ",tok0->ttype,tok0,tok_info(tok0));
  switch(tok0->ttype) {
  	case TOK_PLUS:
 	case TOK_MINUS:
@@ -729,7 +735,8 @@ tok_struct *tok0_bnf=NULL;
 	// MESG("err_factor: pre_symbol=%d [%s",pre_symbol,tok_info(tok0));
  };
  NTOKEN_ERR(473);
- // MESG("	>> : next tok (%s)",tok_info(tok));
+ // MESG("	>> : next: tok0=%p tok=%p [%s]",tok0,tok,tok_info(tok));
+ 
  if(tok0->ttype > TOK_OTHER) {
  	// MESG("unknown token type %d line %d %d",tok0->ttype,tok0->tline,last_correct_line);
 	err_num=4730;
@@ -745,7 +752,8 @@ tok_struct *tok0_bnf=NULL;
  if(tok0->ttype==TOK_PROC) {
  	sprintf(proc_name,"[%s]",tok0->tname);
  };
- // MESG("> factor [%s]: proc='%s' tok0 %s",check_buffer->b_fname,proc_name,tok_info(tok0));
+ // MESG("	switch tok0 ttype=%d [%s]",tok0->ttype, tok_info(tok0));
+ // MESG("        tok  ttype=%d [%s]",tok->ttype,tok_info(tok));
  switch(tok0->ttype) {
 	/*  the following ends factor  */
  	case TOK_SEP:
@@ -1402,12 +1410,17 @@ tok_struct *tok0_bnf=NULL;
 		// MESG("	end of TOK_FUNC [%s]",tok_info(tok));
 		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)
-		// MESG("TOK_PROC: proc_name='%s' b='%s' [%s]",proc_name,check_buffer->b_fname,tok_info(tok0));
-		// MESG("- define TOK_PROC ---- %s\n	[%s]\n	[%s]",check_buffer->b_fname,tok_info(tok0),tok_info(tok));
+		MESG("TOK_PROC: proc_name='%s' b='%s' tok0 ttype=%d [%s]",proc_name,check_buffer->b_fname,tok0->ttype,tok_info(tok0));
+		MESG("        :                       tok  ttype=%d [%s]",tok->ttype,tok_info(tok));
+		// MESG("- define TOK_PROC ---- %s\n	tok0=[%s]\n	tok=[%s]",check_buffer->b_fname,tok_info(tok0),tok_info(tok));
 		int nargs=0;
 		in_proc_args=1;
 #if	TBNF
+#if	TFUNC3
+		tok_struct *tok_proc=tok0;
+#else
 		tok0->bnf_group=tok0->ttype;
+#endif
 #endif
 		tok_struct *after_proc;	// this is needed for recursive functions
 		xpos=501;
@@ -1424,6 +1437,7 @@ tok_struct *tok0_bnf=NULL;
 		// MESG("	err check: TOK_PROC: args=%d",nargs);
 		tok0->t_nargs=nargs;
 #if	TBNF
+#if	!TFUNC3
 		if(tok0_bnf!=NULL) {
 			tok0_bnf->t_nargs=nargs;
 			// MESG("	proc function %s pushed ok!",tok0_bnf->tname);
@@ -1433,6 +1447,7 @@ tok_struct *tok0_bnf=NULL;
 			RT_MESG1(502);
 		};
 #endif
+#endif
 		CHECK_TOK(503);
 		after_proc=tok;	// this must be RPAR token!
 		if(tok->ttype!=TOK_RPAR) {
@@ -1440,9 +1455,19 @@ tok_struct *tok0_bnf=NULL;
 			MESG("503 no right_parenthesis after proc");
 			RT_MESG1(503);
 		};
+
 		in_proc_args=0;
 		// MESG("proc TOK_RPAR");
+#if	TFUNC3
+		MESG("	TOK_PROC: push tok0: [%s]",tok_info(tok_proc));
+		tok0_bnf=stack_push("proc",tok_proc,1);
+		tok0_bnf->t_nargs=nargs;
+		tok0_bnf->bnf_group=1;
+		tok0_bnf->bnf_factor_function=bnf_factor_proc;
+		tok0_bnf->ttype=TOK_PROC;
+#else
 		stack_push("proc ) ",tok,-TOK_RPAR);
+#endif
 		NTOKEN_ERR(107);
 		after_proc=tok;	// this must be RPAR token!
 		// MESG("err TOK_PROC: set after_proc [%s] ttype=%d",tok->tname,tok->ttype);

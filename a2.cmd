@@ -1,16 +1,16 @@
-# different final result, but it does not matter TBC
-print("--- e1.cmd")
-function show_out()
+cls
+print("--- factorial1.cmd")
+function fact(num)
 {
- if(!in_view("["+"out"+"]")) {
-	vsplit_window()
-	next_window()
-	select_file("[out]")
-	prev_window()
+ if(num<1) 
+ {
+ 	return(1)
+ } else {
+	f=num*fact(num-1)
+	return(f)
  }
 }
 
-assign_sub ("show"+"_out","M-,")
+fact(3):
 
-cls
-
+# return fact(120)
