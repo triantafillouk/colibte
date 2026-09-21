@@ -697,7 +697,7 @@ MVAR *new_symbol_table(int const size)
 {
  // MESG("Initialize new_symbol_table: size %d",size);
  MVAR *td=call_stack_used;
- // MESG("		new symbol table starts at ind=%d",td-call_stack);
+ // MESG("- new_symbol_table: starts at ind=%d size=%d",(int)(td-call_stack),size);
  // int size_call_stack_used = call_stack_used - call_stack;
  // MESG("		new_symbol_table: at %lld",td-call_stack);
  call_stack_used += size;
@@ -712,10 +712,14 @@ MVAR *new_symbol_table(int const size)
 	return NULL;
  };
 
- // MESG("Initialize new_symbol_table: size %d",size);
  init_vars(td,size);
+#if	TCVARS
  bnf_vars=call_stack_used;
+#endif
+ // MESG("	: bnf_vars @%d %d",(int)(bnf_vars-call_stack),(int)(bnf_vars-td));
+#if	TCVARS
  bnf_var=bnf_vars;
+#endif
  return td;
 }
 
@@ -778,8 +782,11 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 	};
  };
 
- // MESG("delete_symbol_table from: >> %lld",call_stack_used-call_stack);
+ // MESG("	delete_symbol_table from: v@=%d %d >> %d",VARIND,(int)(bnf_var-call_stack),(int)(call_stack_used-call_stack));
  call_stack_used -= size;
+#if	TCVARS
+ bnf_vars -= size;
+#endif
  // MESG("delete_symbol_table: call_stack=%lld upto %lld",call_stack_used-call_stack,call_stack_used-call_stack+nargs+size-1);
  // MESG("                    at  : %lld",call_stack_used-call_stack);
 }
@@ -2165,5 +2172,35 @@ void set_bt_num_val(char *name,double val)
  node->node_type=TOK_OPTION;
  node->node_vtype=VTYPE_NUM;
 }
+
+
+
+/*
+ - initialize vars 
+	initialize_call_stack(initial_size)
+ - allocate vars for first buffer
+	in compute_block
+		local_symbols=new_symbol_table(use_fp->symbol_tree->items)
+			bnf_vars=call_stack_used
+			bnf_var=bnf_vars
+	or in refresh_current_buffer
+		current_stable=new_symbol_table(use_fp->symbol_tree->items)
+
+ - in bnf_refresh_ddot
+	use bnf_var
+
+ - in proc
+ 	bnf_exec_function(fp, nargs)
+		save current_stable
+		push_args_bnf(nargs,vars_num)
+			current_stable=new_symbol_table(vars_num) (vars_num includes nargs at the begining!)
+			bnf_var start at the end
+			bnf_var = current_stable + vars_num
+                    | current_stable        |
+	previous stable |1, nargs, vars_num-nargs |=> bnf_vars,bnf_var
+ - in return of function
+	move bnf_var -> bnf_var-vars_num
+	
+*/
 
 /* -- */

@@ -394,6 +394,7 @@ int assign_sub(num n)
 #endif
 #endif
 	kfunc = execsub;
+	if(!execmd)
 	msg_line("Press the key to assign!");
 	c = getckey();
 	// MESG("	key is c=%d",c);
@@ -444,6 +445,7 @@ int assign_function(num n)
 		return(FALSE);
 	}
 	/* get the key for assignement */
+	if(!execmd)	
 	msg_line("Press the key to assign!");
 	c = getckey();
 

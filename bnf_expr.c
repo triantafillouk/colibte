@@ -2721,6 +2721,7 @@ inline static double bnf_expression()
 inline static void bnf_dir_return_value()
 {
 	// MESG("return_value:0 @v=%d [%s]",VARIND,tok_info(tok));
+	// MESG("	bnf_dir_return_value: v@=%d",VARIND);
 #if	!TFUNC
 	NTOKEN2;
 	bnf_expression();
@@ -2731,6 +2732,7 @@ inline static void bnf_dir_return_value()
 
 inline static void bnf_dir_return_novalue()
 {
+	// MESG("	bnf_dir_return_novalue:");
 #if	!TFUNC
 	NTOKEN2;
 #endif
@@ -2740,6 +2742,7 @@ inline static void bnf_dir_return_novalue()
 inline static void bnf_dir_return()
 {
 	// MESG("bnf_dir_return: var@=%d [%s]",VARIND,tok_info(tok));
+	// MESG("	bnf_dir_return: v@=%d",VARIND);
 #if	!TFUNC
 	NTOKEN2;
 	bnf_expression();
