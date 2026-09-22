@@ -1468,20 +1468,26 @@ tok_struct *tok0_bnf=NULL;
 		in_proc_args=0;
 		// MESG("proc TOK_RPAR");
 #if	TFUNC3
-		// if(same_buffer) 
-		{
 		MESG("	TOK_PROC: push tok0: [%s]",tok_info(tok_proc));
-		if(tok_proc->pushed) {
+#if	0
+		if(strcmp(tok0_bnf->tname,";sep;")&&strcmp(tok0_bnf->tname," ; "))
+		{
+			MESG(" --- already pushed [%s]",tok_info(tok_proc));
 			NTOKEN_ERR(5031);
 			RT_MESG1(5031);
 		};
+#endif
 		tok0_bnf=stack_push("proc",tok_proc,1);
 		tok0_bnf->t_nargs=nargs;
+		MESG("---> pushed proc tname='%s' type=%d",tok0_bnf->tname,tok0_bnf->ttype);
+		// tok0_bnf->ttype=TOK_PROC;
+		if(strcmp(tok0_bnf->tname,";sep;")&&strcmp(tok0_bnf->tname," ; "))
+		{
+			MESG("	change type to TOK_PROC!");
 		tok0_bnf->bnf_group=1;
 		tok0_bnf->bnf_factor_function=bnf_factor_proc;
-		// tok0_bnf->ttype=TOK_PROC;
-		set_ttype("TOK_PROC",tok0_bnf,TOK_PROC);
-		};
+			set_ttype("TOK_PROC",tok0_bnf,TOK_PROC);
+		}
 #else
 		stack_push("proc ) ",tok,-TOK_RPAR);
 #endif
