@@ -292,6 +292,7 @@ void MESG(const char *fmt, ...)
 {
  va_list args;
  static char mline[512];
+ 
  if(!debug_flag()) return;
  // printf("mesg:\n");
     if (fmt != NULL) {

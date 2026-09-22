@@ -35,7 +35,7 @@ int varind(){
 	return VARIND;
 }
 
-#if	0
+#if	1
 #if	!TPROFILE
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
@@ -2770,7 +2770,7 @@ inline static MVAR * push_args_bnf(int const nargs,int const vars_num)
 
  MVAR *va_i=va;
 #if	TFUNC3
-	bnf_var-=nargs;
+	bnf_var-=nargs-1;
 #endif
  for(;va_i<va+nargs;va_i++)
  {
