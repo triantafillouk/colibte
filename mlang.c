@@ -1686,10 +1686,10 @@ char * tok_info(tok_struct *exect)
 	int ssize;
 	if(exect->tname!=NULL) {
 		char name[10];
-		int len;
+		// int len;
 		char *printed_name=&name[0];
 		if(exect->ttype==TOK_NUM) {
-			len=snprintf(name,sizeof(name),"%.1f",exect->dval);
+			snprintf(name,sizeof(name),"%.1f",exect->dval);
 		} else printed_name = exect->tname;
 
 		// if(len>=sizeof(name)) name[len-1]='x';

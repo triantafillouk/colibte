@@ -651,14 +651,14 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 						tok->tind=0;	// ??
 						tok->tname=";sep;";
 						tok->tgroup=TOK_SEP;
-						MESG("	proc end [%s]",tok_info(tok));
+						// MESG("	proc end [%s]",tok_info(tok));
 					};
 #endif
 					is_now_sep=1;
 					is_storelines=0;
 					// if(tok->tok_node) { MESG("token after function: node name=%s",tok->tok_node->node_name);}
 					// else { MESG("token after function: token name=%s",tok->tname);};
-					MESG("	> end of saving buffer");
+					// MESG("	> end of saving buffer");
 					// free(proc_name);
 					proc_name[0]=0;
 					
@@ -1167,8 +1167,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 				case TOK_PROC:	/* 4  */
 					// tok->ttype=TOK_PROC;	
 					set_ttype("tok_proc",tok,TOK_PROC);
-					MESG("	parse: TOK_PROC: set type to TOK_PROC [%s]",tok_info(tok));
-					// MESG("TOK_PROC");
+					// MESG("	parse: TOK_PROC: set type to TOK_PROC [%s]",tok_info(tok));
 					break;
 				case TOK_OPTION:	/* 5  */
 					// tok->ttype=TOK_OPTION; /* editor options */
@@ -1210,7 +1209,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			SHOW_TOKEN("endsep");
 		};
 	};
-	MESG("parse_block1: set end token");
+	// MESG("parse_block1: set end token");
 	bf->end_token=tok;	/* save end token  */
 	ADD_TOKEN("end token");
 	// tok->ttype=TOK_EOF;

@@ -12,5 +12,5 @@ function fact(f)
 }
 
 fact(3):   1.0
-fact(10):  10.0
+fact(10000):  10.0
 

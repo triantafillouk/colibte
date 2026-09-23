@@ -1415,18 +1415,18 @@ tok_struct *tok0_bnf=NULL;
 		// MESG("	end of TOK_FUNC [%s]",tok_info(tok));
 		RT_MESG1(497);
 	case TOK_PROC: {	// 4 ex_proc (normal function)
-		MESG("TOK_PROC: proc_name='%s' b='%s'\n  : tok0 ttype=%d [%s]",proc_name,check_buffer->b_fname,tok0->ttype,tok_info(tok0));
-		MESG("  : tok   ttype=%d [%s]",tok->ttype,tok_info(tok));
+		// MESG("TOK_PROC: proc_name='%s' b='%s'\n  : tok0 ttype=%d [%s]",proc_name,check_buffer->b_fname,tok0->ttype,tok_info(tok0));
+		// MESG("  : tok   ttype=%d [%s]",tok->ttype,tok_info(tok));
 		// MESG("- define TOK_PROC ---- %s\n	tok0=[%s]\n	tok=[%s]",check_buffer->b_fname,tok_info(tok0),tok_info(tok));
 		int nargs=0;
-		int same_buffer=!strcmp(proc_name,check_buffer->b_fname);
+		// int same_buffer=!strcmp(proc_name,check_buffer->b_fname);
 
-		MESG("	same_buffer = %d tname=%s",same_buffer,tok0->tname);
+		// MESG("	same_buffer = %d tname=%s",same_buffer,tok0->tname);
 		in_proc_args=1;
 #if	TBNF
 #if	TFUNC3
 		tok_struct *tok_proc=tok0;
-		MESG("	tok_proc: [%s]",tok_info(tok_proc));
+		// MESG("	tok_proc: [%s]",tok_info(tok_proc));
 #else
 		tok0->bnf_group=tok0->ttype;
 #endif
@@ -1468,22 +1468,13 @@ tok_struct *tok0_bnf=NULL;
 		in_proc_args=0;
 		// MESG("proc TOK_RPAR");
 #if	TFUNC3
-		MESG("	TOK_PROC: push tok0: [%s]",tok_info(tok_proc));
-#if	0
-		if(strcmp(tok0_bnf->tname,";sep;")&&strcmp(tok0_bnf->tname," ; "))
-		{
-			MESG(" --- already pushed [%s]",tok_info(tok_proc));
-			NTOKEN_ERR(5031);
-			RT_MESG1(5031);
-		};
-#endif
+		// MESG("	TOK_PROC: push tok0: [%s]",tok_info(tok_proc));
 		tok0_bnf=stack_push("proc",tok_proc,1);
 		tok0_bnf->t_nargs=nargs;
-		MESG("---> pushed proc tname='%s' type=%d",tok0_bnf->tname,tok0_bnf->ttype);
-		// tok0_bnf->ttype=TOK_PROC;
+		// MESG("---> pushed proc tname='%s' type=%d",tok0_bnf->tname,tok0_bnf->ttype);
 		if(strcmp(tok0_bnf->tname,";sep;")&&strcmp(tok0_bnf->tname," ; "))
 		{
-			MESG("	change type to TOK_PROC!");
+			// MESG("	change type to TOK_PROC!");
 		tok0_bnf->bnf_group=1;
 		tok0_bnf->bnf_factor_function=bnf_factor_proc;
 			set_ttype("TOK_PROC",tok0_bnf,TOK_PROC);
@@ -1491,10 +1482,10 @@ tok_struct *tok0_bnf=NULL;
 #else
 		stack_push("proc ) ",tok,-TOK_RPAR);
 #endif
-		MESG("	toc_proc:1");
+		// MESG("	tok_proc:1");
 		NTOKEN_ERR(107);
 		after_proc=tok;	// this must be RPAR token!
-		MESG("	tok_proc:2 set after_proc [%s] ttype=%d",tok->tname,tok->ttype);
+		// MESG("	tok_proc:2 set after_proc [%s] ttype=%d",tok->tname,tok->ttype);
 		FILEBUF *proc_buffer=NULL;
 		err_num=err_exec_function(tok0->tname,nargs,&proc_buffer);
 		// MESG("		>>>>>>>>>> after exec_function!");
@@ -1512,7 +1503,7 @@ tok_struct *tok0_bnf=NULL;
 		};
 		CHECK_TOK(504);
 		tok=after_proc;
-		MESG("err TOK_PROC: %s end ttype=%d",proc_name,tok->ttype);
+		// MESG("err TOK_PROC: %s end ttype=%d",proc_name,tok->ttype);
 		proc_name[0]=0;
 		RT_MESG;
 	};
