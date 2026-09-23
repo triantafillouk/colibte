@@ -1685,11 +1685,19 @@ char * tok_info(tok_struct *exect)
 	char *sout1;
 	int ssize;
 	if(exect->tname!=NULL) {
-		ssize=snprintf(sout,sizeof(sout),"%2d:l%2d %3d [%2d=%7s][%5s][tg=%2d tb=%d] ",
-			exect->tnum,exect->tline,exect->tind,exect->ttype,tname(exect->ttype),(char *)exect->tname,exect->tgroup/*,tname(exect->tgroup)*/,exect->bnf_group);
+		char name[10];
+		int len;
+		char *printed_name=&name[0];
+		if(exect->ttype==TOK_NUM) {
+			len=snprintf(name,sizeof(name),"%.1f",exect->dval);
+		} else printed_name = exect->tname;
+
+		// if(len>=sizeof(name)) name[len-1]='x';
+		ssize=snprintf(sout,sizeof(sout),"%2d:l%2d %3d [%2d=%7s][%6s][tg=%2d tb=%d] ",
+			exect->tnum,exect->tline,exect->tind,exect->ttype,tname(exect->ttype),printed_name,exect->tgroup/*,tname(exect->tgroup)*/,exect->bnf_group);
 		sout1=sout+ssize;
 	} else {
-		ssize=snprintf(sout,sizeof(sout),"%2d:l%2d %3d [%2d=%7s][%5s][tg=%2d tb=%d] ",
+		ssize=snprintf(sout,sizeof(sout),"%2d:l%2d %3d [%2d=%7s][%6s][tg=%2d tb=%d] ",
 			exect->tnum,exect->tline,exect->tind,exect->ttype,tname(exect->ttype)," -- ",exect->tgroup/*,tname(exect->tgroup)*/,exect->bnf_group);
 		sout1=sout+ssize;
 	};
@@ -1726,10 +1734,13 @@ char * tok_info(tok_struct *exect)
 			if(exect->proc_buffer == NULL) 
 				snprintf(sout1,sizeof(sout)-ssize," NULL proc bnf=%2d",exect->bnf_group);
 			else {
-				int len=snprintf(sout1,sizeof(sout)-ssize,"%s",
-					exect->proc_buffer->b_fname);
+				int len=snprintf(sout1,sizeof(sout)-ssize,"'%s' args %d",
+					exect->proc_buffer->b_fname,exect->t_nargs);
 				if(len+ssize>=sizeof(sout))  MESG("	truncated");
 			};
+		} else if(exect->ttype==TOK_FUNC) {
+				int len=snprintf(sout1,sizeof(sout)-ssize,"args %d",exect->t_nargs);
+				if(len+ssize>=sizeof(sout))  MESG("	truncated");
 		} else if(exect->ttype==TOK_VAR) {
 			// MESG("TOK_VAR:");
 			int vtype=0;

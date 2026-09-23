@@ -35,7 +35,7 @@ int varind(){
 	return VARIND;
 }
 
-#if	9
+#if	0
 #if	!TPROFILE
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
@@ -2726,7 +2726,7 @@ inline static void bnf_dir_return_value()
 	NTOKEN2;
 	bnf_expression();
 #endif
-	// MESG("return_value:1 @v=%d [%s]",VARIND,tok_info(tok));
+	MESG("	return_value:1 @v=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	current_active_flag=0;	/* skip rest of function  */
 }
 
@@ -2736,6 +2736,7 @@ inline static void bnf_dir_return_novalue()
 #if	!TFUNC
 	NTOKEN2;
 #endif
+	MESG("	return_novalue @v=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	current_active_flag=0;	/* skip rest of function  */
 }
 
@@ -2747,7 +2748,7 @@ inline static void bnf_dir_return()
 	NTOKEN2;
 	bnf_expression();
 #endif
-	// MESG("			dir_return : end var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+	MESG("	dir_return :  v@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	current_active_flag=0;	/* skip rest of function  */
 }
 

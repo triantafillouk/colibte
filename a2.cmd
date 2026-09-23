@@ -1,16 +1,16 @@
 cls
 print("--- factorial1.cmd")
-function fact(num)
+
+function fact(f)
 {
- if(num<1) 
+ if(f<5000.123) 
  {
  	return(1)
  } else {
-	f=num*fact(num-1)
-	return(f)
+	return(f-1)
  }
 }
 
-fact(3):
+fact(3):   1.0
+fact(10):  10.0
 
-# return fact(120)
