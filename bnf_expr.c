@@ -2836,7 +2836,10 @@ inline static void bnf_factor_proc()
 	tok_struct *tok0=tok;
 	FILEBUF *cbuf=exe_buffer;
 	// MESG("bnf_factor_proc:[%s] << v@=%d [%s]",tok0->tname,VARIND,tok_info(tok0));
-	MVAR *result_var=bnf_var;
+#if !TFUNC3
+    next_var("proc");		/* to save proc result  */
+#endif
+    MVAR *result_var=bnf_var;
 	// MESG("	tname [%s]",tok0->tname);
 	// MESG("bnf_factor_proc: current_buffer [%s]",cbuf->b_fname);
 	// MESG("	token buffer [%s]",tok0->proc_buffer->b_fname);
