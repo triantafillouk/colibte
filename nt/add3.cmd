@@ -10,7 +10,7 @@ function add(a,b,c)
 
 cls
 
-result = add(1 ,2 ,2)
+result = add(1 ,2 ,3)
 result: 
 
 print("result is new "+result);

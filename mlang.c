@@ -377,7 +377,7 @@ int combine_tokens(tok_struct *prev_token,tok_struct *op2)
 }
 #endif
 
-tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
+tok_struct * stack_push(char *title,tok_struct *tok,int exp_type, int *new_one)
 {
   // MESG("--[%s] try push %d [%s] exp=%d [%s]",check_buffer->b_fname,tok->pushed,title,exp_type,tok_info(tok));
 #if	TBNF
@@ -385,13 +385,15 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
  if(tok!=NULL) {
  	// MESG("stack_push! at %p",check_buffer->tok_table_bnf+check_buffer->tok_bnf_index);
 	if(tok->pushed>=0) {
-		if(check_buffer)
+		// if(check_buffer)
 		// MESG("P[%10s already pushed at %3d %-15s|%s %p",check_buffer->b_fname,tok->pushed,title,tok_info(tok),tok);
 		// else MESG("P[ check buffer is NULL!!!!! %s",title);
+		*new_one=0;
 		return check_buffer->tok_table_bnf+tok->pushed;
 	} else {
 		if(tok->ttype==TOK_LPAR && exp_type>0) { 
 			MESG("skip left paranthesis!");
+			*new_one=0;
 			return NULL;
 		};
 		tok_struct *dest;
@@ -405,6 +407,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 				// MESG("Negate: type1=%d type2=%d",prev_token->ttype,tok->ttype);
 				if(prev_token->ttype==TOK_NUM) {
 					prev_token->dval = - prev_token->dval;
+					*new_one=1;
 					return prev_token;
 				};
 			};
@@ -441,13 +444,16 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type)
 		check_buffer->tok_bnf_index++;
 		prev_token = dest;
 		if(dest->ttype==TOK_RCURL||dest->ttype==TOK_EOF) dest->bnf_group=BLOCK_END;
+		*new_one=1;
 		return dest;
    }
  } else {
  	MESG("P [%s] null token!!!",title);
+	*new_one=0;
 	return NULL;
  }
 #endif
+ *new_one=0;
  return NULL;
 }
 
@@ -1137,7 +1143,7 @@ MVAR *btree_to_mvar(BTREE *bt)
 /* user interupt on, set also break flag  */
 void set_break(char *from)
 {
-	// MESG("set_break: from %s",from);
+	MESG("set_break: from %s",from);
 	is_break1=1;
 	// tok->tgroup=TOK_EOF;
 	// tok->ttype=TOK_EOF;

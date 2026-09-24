@@ -2527,8 +2527,8 @@ inline static void bnf_dir_for()
 	tok_struct *start_block;	// element at block start
 	tok_struct *end_block=NULL;	/* at the block end  */
 	int old_active_flag=current_active_flag;
-
-	// MESG("-- dir_for:start var@=%d active = %d [%s]",VARIND,current_active_flag,tok_info(tok));	
+	// is_break1=0;
+	// MESG("-- dir_for:start var@=%d active = %d [%s] is_break1=%d",VARIND,current_active_flag,tok_info(tok),is_break1);	
 	NTOKEN2;	/* go to next token after for */
 	bnf_expression0();
 	prev_var("for init");
@@ -2595,6 +2595,7 @@ inline static void bnf_dir_for()
 //		MESG("before next loop: val=%f",val);		
 	};
 	current_active_flag=aflag;
+	// MESG("	dir_for: end of loop: is_break1=%d",is_break1,tok_info(end_block));
 	if(is_break1) { tok=exe_buffer->end_token-1;return;};
 	tok=end_block;
 	current_active_flag=old_active_flag;
@@ -2769,16 +2770,23 @@ inline static MVAR * push_args_bnf(int const nargs,int const vars_num)
  MVAR *va = new_symbol_table(vars_num);
  if(va==NULL) return NULL;
 
- MVAR *va_i=va;
 #if	TFUNC3
-	//bnf_var-=nargs;
+	MVAR *va_i=va+nargs-1;
+	// bnf_var-=nargs-1;
+#else
+ MVAR *va_i=va;
 #endif
+#if	TFUNC3
+ for(;va_i>=va;va_i--)
+#else
  for(;va_i<va+nargs;va_i++)
+#endif
  {
 #if	TFUNC3
 	// MESG("	v@ %d type=%d",VARIND,bnf_var->var_type);
 	memmove(va_i,bnf_var,sizeof(MVAR));
-	next_var("narg");
+	// next_var("narg");
+	prev_var("narg");
 #else
 	NTOKEN2;	/* skip proc name of separator  */
 	// MESG("	[%2d] before var@=%d [%s]",i,VARIND,tok_info(tok));
@@ -2791,7 +2799,7 @@ inline static MVAR * push_args_bnf(int const nargs,int const vars_num)
 #endif
  };
 #if	TFUNC3
- bnf_var -= nargs;
+ // bnf_var -= nargs;
  // MESG("- after push v@=%d",VARIND);
 #endif
  return(va);
@@ -2801,7 +2809,7 @@ inline static MVAR * push_args_bnf(int const nargs,int const vars_num)
 inline static void bnf_exec_function(FILEBUF *proc_buffer,int const nargs)
 {
 	MVAR *old_symbol_table=current_stable;
-	// MESG("## bnf_exec_function:[%s] var@=%d args=%d",proc_buffer->b_fname,VARIND,nargs);
+	// MESG("## bnf_exec_function:[%s] var@=%d args=%d vars=%d",proc_buffer->b_fname,VARIND,nargs,proc_buffer->symbol_tree->items-nargs);
 	current_stable = push_args_bnf(nargs,proc_buffer->symbol_tree->items);
 	tok_struct *after_proc=tok; 
 
@@ -3654,7 +3662,7 @@ inline static void bnf_factor_array_l1()
 		int dim = (adat->rows > 1) ? adat->rows: adat->cols;
 		if(dim<=ind1) {
 			double *dval_old = array_slot->adat->dval;
-			MESG("+++ reallocate in factor_array_l1: ind1=%d x %d %X",ind1,sizeof(double),dval_old);
+			// MESG("+++ reallocate in factor_array_l1: ind1=%d x %d %X",ind1,sizeof(double),dval_old);
 			if(array_slot->adat->cols > array_slot->adat->rows) 
 				array_slot->adat->cols=ind1;
 			else
