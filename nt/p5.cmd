@@ -11,4 +11,5 @@ function print_name(name,flag)
 	print("name is ",name," age ",a);
 }
 
-print_name("kt",1)
+return(print_name("kt",1))
+
