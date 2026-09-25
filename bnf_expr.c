@@ -2763,6 +2763,8 @@ void bnf_dir_type()
 	MESG("bnf_dir_type TBD");
 }
 
+// int proc_level=0;
+
 inline static MVAR * push_args_bnf(int const nargs,int const vars_num)
 {
  // MESG("# push_args_bnf: nargs=%d vars_num=%d v@=%d",nargs,vars_num,VARIND);
@@ -2817,6 +2819,8 @@ inline static void bnf_exec_function(FILEBUF *proc_buffer,int const nargs)
 #if	TFUNC3
 	tok += 1+nargs; // inside the function!
 	// MESG("	bnf_exec_function: after push start v@=%d [%s]",VARIND,tok_info(tok));
+	next_var("after push");
+	MVAR *result_var = bnf_var;
 #else
 	skip_args1(nargs);
 #endif
@@ -2824,18 +2828,20 @@ inline static void bnf_exec_function(FILEBUF *proc_buffer,int const nargs)
 #if	TNORMAL
 	NTOKEN2;
 #endif
-	// MESG("-bnf_exec_function: at start of block: [%s] active=%d",tok_info(tok),current_active_flag);
-	// current_active_flag=1;
-			// if(execmd) 
-				bnf_block1();
-			// else 
-				// bnf_block1_break();
-	show_result();
+	// MESG("-bnf_exec_function: at start of block: [%s] active=%d level=%d",tok_info(tok),current_active_flag,proc_level);
+	bnf_block1();
+#if	TFUNC3
+	// MESG(" - factor_proc: >>  @v=%d result @%d ",VARIND,(int)(result_var-bnf_vars)); 
+	memmove(result_var,bnf_var,sizeof(MVAR));
+	bnf_var=result_var;
+#endif
+	// show_result();
 	delete_symbol_table(current_stable,proc_buffer->symbol_tree->items,nargs);
 	current_stable=old_symbol_table;
 
 	// if(i0!=VARIND) MESG("	bnf_function:2 var @%d %d",i0,VARIND);
 	tok=after_proc;
+	
 	// MESG("	continue after function to [%s]",tok_info(tok));
 }
 
@@ -2843,11 +2849,12 @@ inline static void bnf_factor_proc()
 {
 	tok_struct *tok0=tok;
 	FILEBUF *cbuf=exe_buffer;
-	// MESG("bnf_factor_proc:[%s] << v@=%d [%s]",tok0->tname,VARIND,tok_info(tok0));
+	// proc_level++;
+	// MESG("bnf_factor_proc:[%s] << v@=%d level=%d [%s]",tok0->tname,VARIND,proc_level,tok_info(tok0));
 #if !TFUNC3
     next_var("proc");		/* to save proc result  */
-#endif
     MVAR *result_var=bnf_var;
+#endif
 	// MESG("	tname [%s]",tok0->tname);
 	// MESG("bnf_factor_proc: current_buffer [%s]",cbuf->b_fname);
 	// MESG("	token buffer [%s]",tok0->proc_buffer->b_fname);
@@ -2862,7 +2869,9 @@ inline static void bnf_factor_proc()
 	// MESG("factor_proc: tok  [%d %s] %d ",tok->tnum,tok->tname,tok->tind);
 
 	bnf_exec_function(tok->proc_buffer,tok->t_nargs);
-#if	01
+	// proc_level--;
+	// MESG("	- after exec_function! level=%d",proc_level);
+#if	!TFUNC3
 	// if(bnf_var!=result_var) {
 		// MESG("## factor_proc: res@ %d %d [%s]",(int)(result_var-bnf_vars),VARIND,tok_info(tok));
 		memmove(result_var,bnf_var,sizeof(MVAR));
@@ -2882,7 +2891,10 @@ inline static void bnf_factor_proc()
 		};
 	};
 #endif
+	// MESG(" - factor_proc: >> set @v=%d result @ %d",VARIND,(int)(result_var-bnf_vars)); 
+#if	!TFUNC3
 	bnf_var = result_var;
+#endif
 	current_active_flag=1;	/* start checking again  */
 
 	exe_buffer=cbuf;
