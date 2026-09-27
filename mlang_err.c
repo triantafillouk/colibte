@@ -19,6 +19,7 @@ int assign_type_to=0;
 char *assign_var_name="";
 
 tok_struct *prev_token=NULL;
+int stack_var_ind=0;
 
 void mesg_out(const char *fmt, ...)
 {
@@ -31,6 +32,7 @@ void mesg_out(const char *fmt, ...)
 		out_print(mline,1);
     }
 }
+
 
 char * tok_info2(tok_struct *tok)
 {
@@ -863,6 +865,7 @@ tok_struct *tok0_bnf=NULL;
 		pre_symbol=0;
 		ex_nvars++;
 		xpos=4790;
+		stack_var_ind++;
 		// MESG("TOK_VAR:");
 		// MESG("	check_buffer=[%s]",check_buffer->b_fname);
 #if	TBNF
@@ -974,7 +977,7 @@ tok_struct *tok0_bnf=NULL;
 		RT_MESG1(493);}
 	case TOK_ARRAY_L2:{
 		// MESG("TOK_ARRAY_L2: [%s] type %d ind=%d [%s]",tok0->tname,tok0->ttype,tok0->tind,tok_info(tok));
-		
+		stack_var_ind++;
 		err_num=err_num_expression(); 
 		if(tok->ttype==TOK_RBRAKET) {
 			stack_push("array_l2 b1",tok,tok->ttype,&new_one);
@@ -1075,6 +1078,7 @@ tok_struct *tok0_bnf=NULL;
 		// MESG("TOK_ARRAY_L1: [%s] type %d ind=%d [%s]",tok0->tname,tok0->ttype,tok0->tind,tok_info(tok0));
 		pre_symbol=0;
 		ex_nvars++;
+		stack_var_ind++;
 #if	TBNF
 		tok_struct *dest=stack_push("499",tok,tok->ttype,&new_one);
 		// MESG("	push AL1 [%s]",tok_info(tok));
@@ -1126,6 +1130,7 @@ tok_struct *tok0_bnf=NULL;
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
 #endif
+		stack_var_ind++;
 		err_num=err_num_expression(); 
 		// MESG("	err tok_array1: after [%s]",tok_info(tok));
 		xpos=499;
@@ -1192,6 +1197,7 @@ tok_struct *tok0_bnf=NULL;
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
 #endif
+		stack_var_ind++;
 		err_num=err_num_expression(); 
 		// MESG("	err_array2:1 [%s]",tok_info(tok));
 	
@@ -1309,6 +1315,7 @@ tok_struct *tok0_bnf=NULL;
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
 #endif
+		stack_var_ind++;
 		if(pre_symbol) { syntax_error(xpos,"symbol before string");RT_MESG1(4881);};
 		ex_nquote++;
 		RT_MESG1(4882);
@@ -1339,6 +1346,7 @@ tok_struct *tok0_bnf=NULL;
 #if	TBNF
 			// MESG("push minus!!!!!");
 			tok0_bnf=stack_push("minus",tok0,tok0->ttype,&new_one);
+			stack_var_ind--;
 #endif
 			err_factor();
 		};
@@ -1359,6 +1367,7 @@ tok_struct *tok0_bnf=NULL;
 		} else {
 #if	TBNF
 			tok0_bnf=stack_push("plus",tok0,tok0->ttype,&new_one);
+			stack_var_ind--;
 #endif
 			err_factor();
 		};
@@ -1394,6 +1403,7 @@ tok_struct *tok0_bnf=NULL;
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
 		tok0_bnf->tok_node=var_node;
+		stack_var_ind++;
 #endif
 		pre_symbol=0;
 		ex_nvars++;

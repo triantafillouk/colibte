@@ -1435,7 +1435,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		set_result();
 		// if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
 		MESG("	end of program var@=%d type %d",VARIND,bnf_var->var_type);
-		// if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
+		if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
 		// show_results();
 		msg_result(bp->b_fname,show_no_time);
 #endif

@@ -35,7 +35,7 @@ int varind(){
 	return VARIND;
 }
 
-#if	0
+#if	1
 #if	!TPROFILE
 #define	prev_var(x)	bnf_var--
 #define	next_var(x)	bnf_var++
@@ -292,7 +292,7 @@ inline static void bnf_factor_num()
 	next_var("numer");
 	bnf_var->dval = tok->dval;
 	bnf_var->var_type=VTYPE_NUM;
-	MESG("bnf_factor_num: put numeric %f at var@=%d type=%d",bnf_var->dval,VARIND,bnf_var->var_type);
+	// MESG("bnf_factor_num: put numeric %f at var@=%d type=%d",bnf_var->dval,VARIND,bnf_var->var_type);
 }
 
 inline static void bnf_factor_quote()
@@ -1931,7 +1931,7 @@ inline static void bnf_factor_sep1()
 	};
 #else
 	// MESG("	sep1: var@ %d [%s]",VARIND,tok_info(tok));
-#if	!TFUNC3
+#if	!TVARN
 	prev_var("sep1");
 #endif
 #endif
@@ -1969,7 +1969,7 @@ inline static void bnf_factor_sep()
 	if(ntoken->ttype!=TOK_EOF) { 
 		tok->tname=" ;-";
 		// MESG("bnf_factor_sep: < var@=%d set prev_var [%s]",VARIND,tok_info(tok));
-#if	!TFUNC3
+#if	!TVARN
 		prev_var("sep");
 #endif
 		set_bnf_function(tok,"sep->sep1",bnf_factor_sep1);
@@ -2329,7 +2329,6 @@ inline static void bnf_block1()
 		// MESG("!B v@=%d [%s]",VARIND,tok_info(tok));	/*   */
 	 	tok->bnf_factor_function();
 		// MESG("		-- tok %d type %d act=%d",tok->tnum,tok->ttype,current_active_flag);
-		NTOKEN2;
 		// MESG("	  var@=%d group=%d [%s] act=%d",VARIND,tok->tgroup,tok_info(tok),current_active_flag);
 		if(!current_active_flag) 
 		// if(drv_check_break_key())
@@ -2340,6 +2339,7 @@ inline static void bnf_block1()
 			//tok=exe_buffer->end_token;
 			return;
 		};
+		NTOKEN2;
 	} 
 	
 	// MESG("-- block end  ! [%s]",tok_info(tok));
@@ -2731,7 +2731,8 @@ inline static void bnf_dir_return_value()
 	NTOKEN2;
 	bnf_expression();
 #endif
-	// MESG("	return_value:1 @v=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+	
+	MESG("	return_value:1 @v=%d val=%f",VARIND,bnf_var->dval);
 	current_active_flag=0;	/* skip rest of function  */
 }
 
@@ -2741,7 +2742,7 @@ inline static void bnf_dir_return_novalue()
 #if	!TFUNC
 	NTOKEN2;
 #endif
-	// MESG("	return_novalue @v=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+	MESG("	return_novalue @v=%d type=%d",VARIND,bnf_var->var_type);
 	current_active_flag=0;	/* skip rest of function  */
 }
 
@@ -2823,10 +2824,7 @@ inline static void bnf_exec_function(FILEBUF *proc_buffer,int const nargs)
 	tok=proc_buffer->tok_table_bnf;	/* start of function  */
 #if	TFUNC3
 	tok += 1+nargs; // inside the function!
-	MESG("	bnf_exec_function: after push start v@=%d [%s]",VARIND,tok_info(tok));
-	// next_var("after push");
-	// MVAR *result_var = bnf_var;
-	// MESG("	set result_var @=%d",VARIND);
+	// MESG("	bnf_exec_function: after push start v@=%d [%s]",VARIND,tok_info(tok));
 #else
 	skip_args1(nargs);
 #endif
@@ -2856,7 +2854,7 @@ inline static void bnf_factor_proc()
 	tok_struct *tok0=tok;
 	FILEBUF *cbuf=exe_buffer;
 	// proc_level++;
-	MESG("bnf_factor_proc:[%s] << v@=%d [%s]",tok0->tname,VARIND,tok_info(tok0));
+	// MESG("bnf_factor_proc:[%s] << v@=%d [%s]",tok0->tname,VARIND,tok_info(tok0));
 #if !TFUNC3
     next_var("proc");		/* to save proc result  */
     MVAR *result_var=bnf_var;
@@ -2901,7 +2899,7 @@ inline static void bnf_factor_proc()
 #if	!TFUNC3
 	bnf_var = result_var;
 #else
-	MESG(" - factor_proc: >> set result @ %d",VARIND);
+	// MESG(" - factor_proc: >> set result @ %d",VARIND);
 #endif
 	current_active_flag=1;	/* start checking again  */
 
@@ -2920,7 +2918,7 @@ inline static void bnf_dir_if_then()
 	prev_var("if result");
 	// MESG("   tok_then: ival=%d after expression var@=%d [%s]",ival,VARIND,tok_info(tok));
 	if(ival) {
-		MESG("	then true: start of [%s]",tok_info(tok));
+		// MESG("	then true: start of [%s]",tok_info(tok));
 		// NTOKEN2;
 		// MESG("		if true: var@=%d start of [%s]",VARIND,tok_info(tok));
 		bnf_statement(/*"if true"*/);
@@ -2935,7 +2933,7 @@ inline static void bnf_dir_if_then()
 		return;
 	} else {
 		tok=tok0->next_tok;
-		MESG("	then false: var@=%d start of [%s]",VARIND,tok_info(tok));
+		// MESG("	then false: var@=%d start of [%s]",VARIND,tok_info(tok));
 		if(check_skip_token1(TOK_DIR_ELSE)) {
 			// MESG("	execute else at [%s]",tok_info(tok));
 			bnf_statement(/*"if else"*/);

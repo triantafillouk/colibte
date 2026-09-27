@@ -280,12 +280,13 @@ void bnf_print()
 	// out_print(total_printed,1);
 	// MESG("end of print var@=%d",VARIND);
 #if	TFUNC
+	// MESG(" -V %d -> %d print end",VARIND,(int)(bnf_var-bnf_vars)-args);
 	bnf_var -= args;
 #endif
 	bnf_var->var_type=VTYPE_STRING;
 	bnf_var->sval=strdup(total_printed);
 	bnf_var->var_alloced=1;
-	MESG("	>> print end var@=%d [%s]",VARIND,bnf_var->sval);
+	// MESG("	>> print end var@=%d [%s]",VARIND,bnf_var->sval);
 	// printf("	>>print [%s] @var=%d [%s]\n",bnf_var->sval,VARIND,tok_info(tok));
 }
 
