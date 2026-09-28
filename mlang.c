@@ -398,7 +398,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type, int *new_one)
 		};
 		tok_struct *dest;
 
-		if(prev_token!=NULL) 
+		if(prev_token!=NULL) {
 		if(prev_token->ttype==TOK_NUM||prev_token->ttype==TOK_VAR) {
 			// MESG("	push: check combine: exp_type=%d",exp_type);
 			if(exp_type!=TOK_NEGATE) {
@@ -412,7 +412,13 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type, int *new_one)
 				};
 			};
 		};
-
+#if	TFUNC3
+		if(prev_token->ttype==TOK_SEP && tok->ttype==TOK_SEP) {
+			*new_one=0;
+			return prev_token;
+		};
+#endif
+		};
 		dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
     	tok->pushed=check_buffer->tok_bnf_index;
@@ -421,7 +427,20 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type, int *new_one)
 // #endif
 		// MESG("!Push %10s as %d [%s] exp_type=%d",title,tok->pushed,tok_info(tok),exp_type);
 		set_bnf_function1(dest,exp_type);
-
+#if	TFUNC3
+		if(prev_token && dest->ttype==TOK_SEP) {
+		 
+		 // MESG("	push separator! [%s] p=[%s]",tok_info(dest),tok_info(prev_token));
+		 if(prev_token->ttype==TOK_LCURL){
+			dest->bnf_factor_function = bnf_factor_sep0;
+			dest->tname = "sep0";
+			MESG("set sep0!!!!!");
+			prev_token=dest;
+			*new_one=1;
+			return dest;
+		 };
+		};
+#endif
 		if(dest->ttype==TOK_LCURL||dest->ttype==TOK_RCURL) {
 			eval_curl_match(dest);
 			if(dest->ttype==TOK_LCURL) dest->bnf_factor_function = bnf_dir_lcurl;

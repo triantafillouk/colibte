@@ -10,11 +10,13 @@ function fib2_inner(a,b,n)
 }
 
 cls
-show_time("Fibonachi start" ,0)
-for(i=100;i<1500;i+=100) {print("fib2_inner(",i,")=",fib2_inner(0 ,1 ,i)) }
+i=2
+# show_time("Fibonachi start" ,0)
+# for(i=100;i<1500;i+=100) 
+	print("fib2_inner(",i,")=",fib2_inner(0 ,1 ,i))
 # fori(i=100;1500;100) {
 	# f=fib2_inner(0 ,1 ,i)
 	# print("fib2_inner(",i,")=",f)
 # }
-show_time("end " ,2)
+# show_time("end " ,2)
 

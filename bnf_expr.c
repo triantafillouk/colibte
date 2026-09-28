@@ -2824,6 +2824,7 @@ inline static void bnf_exec_function(FILEBUF *proc_buffer,int const nargs)
 	tok=proc_buffer->tok_table_bnf;	/* start of function  */
 #if	TFUNC3
 	tok += 1+nargs; // inside the function!
+	// next_var("exec function");
 	// MESG("	bnf_exec_function: after push start v@=%d [%s]",VARIND,tok_info(tok));
 #else
 	skip_args1(nargs);

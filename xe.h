@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.8T581 (27/9/2026)"
+#define VERSION 	 "#01.8T582 (28/9/2026)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
