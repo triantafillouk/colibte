@@ -2770,6 +2770,25 @@ void bnf_dir_type()
 
 // int proc_level=0;
 
+#if	TFUNC3
+inline static MVAR * push_args_bnf(int const nargs,int const vars_num)
+{
+ // MESG("# push_args_bnf: nargs=%d vars_num=%d v@=%d",nargs,vars_num,VARIND);
+ MVAR *va = new_symbol_table(vars_num);
+#if	1
+ MVAR *va_i=va+nargs-1;
+ for(;va_i>=va;va_i--){
+	memcpy(va_i,bnf_var,sizeof(MVAR));
+	prev_var("narg");
+ };
+#else
+ // MVAR *va_i=va;
+ bnf_var -= nargs-1;
+ memcpy(va,bnf_var,nargs*sizeof(struct MVAR));
+#endif
+ return va;
+}
+#else
 inline static MVAR * push_args_bnf(int const nargs,int const vars_num)
 {
  // MESG("# push_args_bnf: nargs=%d vars_num=%d v@=%d",nargs,vars_num,VARIND);
@@ -2777,24 +2796,10 @@ inline static MVAR * push_args_bnf(int const nargs,int const vars_num)
  MVAR *va = new_symbol_table(vars_num);
  if(va==NULL) return NULL;
 
-#if	TFUNC3
-	MVAR *va_i=va+nargs-1;
-	// bnf_var-=nargs-1;
-#else
  MVAR *va_i=va;
-#endif
-#if	TFUNC3
- for(;va_i>=va;va_i--)
-#else
+
  for(;va_i<va+nargs;va_i++)
-#endif
  {
-#if	TFUNC3
-	// MESG("	v@ %d type=%d",VARIND,bnf_var->var_type);
-	memmove(va_i,bnf_var,sizeof(MVAR));
-	// next_var("narg");
-	prev_var("narg");
-#else
 	NTOKEN2;	/* skip proc name of separator  */
 	// MESG("	[%2d] before var@=%d [%s]",i,VARIND,tok_info(tok));
 	bnf_expression();
@@ -2803,16 +2808,11 @@ inline static MVAR * push_args_bnf(int const nargs,int const vars_num)
 	memmove(va_i,bnf_var,sizeof(MVAR));
 	prev_var("push arg");
 	// MESG("			after2  var@=%d var_type=%d [%s]",VARIND,va_i->var_type,tok_info(tok));
-#endif
- };
+ }
  // MESG("	after getting args! v@=%d",VARIND);
-#if	TFUNC3
- // bnf_var -= nargs;
- // MESG("- after push v@=%d",VARIND);
-#endif
  return(va);
 }
-
+#endif
 
 inline static void bnf_exec_function(FILEBUF *proc_buffer,int const nargs)
 {
@@ -2823,8 +2823,7 @@ inline static void bnf_exec_function(FILEBUF *proc_buffer,int const nargs)
 
 	tok=proc_buffer->tok_table_bnf;	/* start of function  */
 #if	TFUNC3
-	tok += 1+nargs; // inside the function!
-	// next_var("exec function");
+	tok += 2+nargs; // inside the function after left curl!
 	// MESG("	bnf_exec_function: after push start v@=%d [%s]",VARIND,tok_info(tok));
 #else
 	skip_args1(nargs);
@@ -2923,7 +2922,9 @@ inline static void bnf_dir_if_then()
 		// NTOKEN2;
 		// MESG("		if true: var@=%d start of [%s]",VARIND,tok_info(tok));
 		bnf_statement(/*"if true"*/);
-
+#if	TFUNC30
+		prev_var("if true");
+#endif
 		// MESG("		true:3 after if execution! %s",tok_info(tok));
 		NTOKEN2;
 		if(tok->ttype==TOK_DIR_ELSE) {
@@ -2931,6 +2932,7 @@ inline static void bnf_dir_if_then()
 			// MESG("skip else up to %s",tok_info(tok));
 		} else tok--;
 		// MESG("## 	tok_dir_if: true: end [%s]",tok_info(tok));
+		
 		return;
 	} else {
 		tok=tok0->next_tok;
@@ -2938,6 +2940,9 @@ inline static void bnf_dir_if_then()
 		if(check_skip_token1(TOK_DIR_ELSE)) {
 			// MESG("	execute else at [%s]",tok_info(tok));
 			bnf_statement(/*"if else"*/);
+#if	TFUNC30
+			prev_var("if false");
+#endif
 		} else { 
 			tok--;
 			// if(tok->ttype!=TOK_RCURL) tok--; 
