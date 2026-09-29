@@ -246,10 +246,10 @@ char *vtype_names[] = {
 
 void show_stack_var(char *from,MVAR *var)
 {
+#if	TBNF
 	void (*vfunc)(const char *,...);
 	if(debug_flag()) vfunc = MESG;
 	else vfunc=mesg_out;
-
 	if(var->var_type==VTYPE_NUM) 
 		vfunc("  %10s %03d %2d=%-8s   %f",
 			from,(int)(var-bnf_vars),var->var_type,vtype_names[var->var_type],var->dval);
@@ -258,6 +258,7 @@ void show_stack_var(char *from,MVAR *var)
 			from,(int)(var-bnf_vars),var->var_type,vtype_names[var->var_type],var->sval);
 	else
 		vfunc("  %10s %03d %2d=%-8s",from,(int)(var-bnf_vars),var->var_type,vtype_names[var->var_type]);
+#endif
 }
 
 void show_var_node(BTNODE *node)
@@ -288,7 +289,7 @@ void set_ttype(char *from,tok_struct *tok,int type)
 
 void eval_curl_match(tok_struct *tok)
 {
-#define MAX_CURLS 100
+#define MAX_CURLS 50
  static tok_struct *curl_stack[MAX_CURLS];
  static int left_curl_index=0;
 	
@@ -499,7 +500,7 @@ inline void init_vars(MVAR *head,int const size)
 
 void initialize_call_stack(int initial_size)
 {
-	MESG("Initialize call_stack with %d size",initial_size);
+	// MESG("Initialize call_stack with %d size",initial_size);
 	call_stack=(MVAR *)malloc(sizeof(struct MVAR)*initial_size);
 	call_stack_used=call_stack;
 	max_call_stack_end=call_stack;

@@ -2454,9 +2454,7 @@ inline static void bnf_dir_fori()
 			var_index -= (VARIND-start_var);
 #endif
 			bnf_var=bnf_vars+start_var;
-			if(execmd) bnf_block1();
-			else bnf_block1_break();
-			
+			bnf_block1();
 			// MESG("	fori:2 iterrator_val=%3f start var=%d var@=%d, [%s]",*iterrator_val,start_var,VARIND,tok_info(tok));
 			if(current_active_flag==0) {
 				// MESG("end loop!:");
@@ -2475,8 +2473,7 @@ inline static void bnf_dir_fori()
 			var_index -= (VARIND-start_var);
 #endif
 			bnf_var=bnf_vars+start_var;
-			if(execmd) bnf_block1();
-			else bnf_block1_break();
+			bnf_block1();
 
 			if(current_active_flag==0) {
 				if(is_break1) { tok=exe_buffer->end_token;return;};
@@ -2906,6 +2903,7 @@ inline static void bnf_dir_if_then()
 	NTOKEN2;	/* go to next token after if */
 
 	int ival = bnf_var->dval;
+
 	prev_var("if result");
 	// MESG("   tok_then: ival=%d after expression var@=%d [%s]",ival,VARIND,tok_info(tok));
 	if(ival) {
@@ -2925,11 +2923,12 @@ inline static void bnf_dir_if_then()
 	} else {
 		tok=tok0->next_tok;
 		// MESG("	then false: var@=%d start of [%s]",VARIND,tok_info(tok));
-			tok--;
+			// tok--;
 			// if(tok->ttype!=TOK_RCURL) tok--; 
 	}
 	// MESG(";	 	tok_dir_if:end var@=%d  ival=%d > end [%s]",VARIND,ival,tok_info(tok));
 }
+
 
 
 inline static void bnf_dir_if_then_else()
@@ -2958,7 +2957,7 @@ inline static void bnf_dir_if_then_else()
 	} else {
 		tok=tok0->next_tok; // this is else
 		// MESG("	then false: var@=%d start of [%s]",VARIND,tok_info(tok));
-			NTOKEN2;
+			// NTOKEN2;
 			// MESG("	execute else at [%s]",tok_info(tok));
 			bnf_statement(/*"if else"*/);
 #if	TFUNC30
