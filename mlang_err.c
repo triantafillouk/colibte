@@ -2322,7 +2322,7 @@ int err_check_sentence1()
 #if	TBNF
 #if	TFUNC
 		tok_struct *if_token=stack_push("THEN",if1,-if1->ttype,&new_one);
-		if_token->bnf_factor_function=bnf_dir_if_then;
+		// if_token->bnf_factor_function=bnf_dir_if_then;
 #else
 		stack_push("if )",tok,-tok->ttype,&new_one);
 #endif
@@ -2355,13 +2355,14 @@ int err_check_sentence1()
 #if	TFUNC
 		tok_struct *end_if_tok=stack_push("end of if",tok,-tok->ttype,&new_one);
 		if_token->next_tok=end_if_tok;
+		if_token->bnf_factor_function=bnf_dir_if_then_else;
 #endif
 #endif
 			tok0=tok;
 			NTOKEN_ERR(108);
 			err_num=err_check_sentence1();	/* body of else  */
 			xpos=638;
-			tok0->next_tok=tok;
+			tok0->next_tok=tok; // end if else body
 #if	TBNF
 #if	TFUNC
 			tok_struct *ifnext = new_tok();
@@ -2377,6 +2378,7 @@ int err_check_sentence1()
 			tok_struct *ifnext = new_tok();
 			tok_struct *end_if_tok=stack_push("end_of_else",ifnext,TOK_SEP,&new_one);
 			if_token->next_tok=end_if_tok;
+			if_token->bnf_factor_function=bnf_dir_if_then;
 #endif
 #endif
 			xpos=639;

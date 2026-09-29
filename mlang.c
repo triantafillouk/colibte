@@ -502,9 +502,6 @@ void initialize_call_stack(int initial_size)
 	MESG("Initialize call_stack with %d size",initial_size);
 	call_stack=(MVAR *)malloc(sizeof(struct MVAR)*initial_size);
 	call_stack_used=call_stack;
-#if	TCVARS
-	// bnf_vars=call_stack;
-#endif
 	max_call_stack_end=call_stack;
 	call_stack_available=call_stack+initial_size;
 	// fprintf(stderr,"	initial call_stack=%p\n",(void *)call_stack);
@@ -748,13 +745,7 @@ MVAR *new_symbol_table(int const size)
  };
 
  init_vars(td,size);
-#if	TCVARS
- bnf_vars=call_stack_used;
-#endif
  // MESG("	: bnf_vars @%d %d",(int)(bnf_vars-call_stack),(int)(bnf_vars-td));
-#if	TCVARS
- bnf_var=bnf_vars;
-#endif
  return td;
 }
 
@@ -819,9 +810,6 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 
  // MESG("	delete_symbol_table from: v@=%d %d >> %d",VARIND,(int)(bnf_var-call_stack),(int)(call_stack_used-call_stack));
  call_stack_used -= size;
-#if	TCVARS
- bnf_vars -= size;
-#endif
  // MESG("delete_symbol_table: call_stack=%lld upto %lld",call_stack_used-call_stack,call_stack_used-call_stack+nargs+size-1);
  // MESG("                    at  : %lld",call_stack_used-call_stack);
 }
