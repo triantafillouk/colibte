@@ -1352,18 +1352,43 @@ inline static void bnf_factor_smallereq()
  	syntax_error(1124,"<= error!");
 }
 
+inline static void bnf_factor_biggereq_pn()
+{
+ MVAR *varb = bnf_var;
+	prev_var("bigger_pn");
+	bnf_var->dval = bnf_var->var_pointer->dval >= varb->dval;
+	bnf_var->var_type=VTYPE_NUM;
+}
+
+inline static void bnf_factor_biggereq_np()
+{
+ MVAR *varb = bnf_var->var_pointer;
+	prev_var("bigger_pn");
+	bnf_var->dval = bnf_var->dval >= varb->dval;
+}
+
 inline static void bnf_factor_biggereq()
 {
  // MESG("bnf_factor_biggereq : var ind=%d tok ind=%d var type=%d",VARIND,tok->tnum,bnf_var->var_type);
  MVAR *varb = bnf_var;
+ int varb_type = bnf_var->var_type;
  	if(varb->var_type==VTYPE_POINTER) varb=varb->var_pointer;
 	prev_var("biggereq");
 	MVAR *vara = bnf_var;
+	int vara_type = bnf_var->var_type;
 	if(vara->var_type==VTYPE_POINTER) vara=vara->var_pointer;
 	if(vara->var_type==VTYPE_NUM) {
 		if(varb->var_type==VTYPE_NUM) {
 			bnf_var->dval=vara->dval >= varb->dval;
 			bnf_var->var_type=VTYPE_NUM;
+
+			if(vara_type==VTYPE_POINTER && varb_type==VTYPE_NUM) {
+				set_bnf_function(tok,"biggereq_pn",bnf_factor_biggereq_pn);
+			};
+			if(vara_type==VTYPE_NUM && varb_type==VTYPE_POINTER) {
+				set_bnf_function(tok,"biggereq_np",bnf_factor_biggereq_np);
+			};
+
 			return;
 		};
 	};
@@ -2338,9 +2363,8 @@ inline static void bnf_block1()
 		NTOKEN2;
 	} 
 	
-	// MESG("-- block end  ! [%s]",tok_info(tok));
 	if(tok->ttype!=TOK_END) 
-	tok->bnf_factor_function();
+		tok->bnf_factor_function();
 }
 
 inline static void bnf_block1_break(/*FILEBUF *fp*/)
@@ -2360,7 +2384,7 @@ inline static void bnf_block1_break(/*FILEBUF *fp*/)
 	
 	// MESG("-- block end  ! [%s]",tok_info(tok));
 	if(tok->ttype!=TOK_END) 
-	tok->bnf_factor_function();
+		tok->bnf_factor_function();
 }
 
 inline static void bnf_dir_lcurl()
@@ -2477,7 +2501,7 @@ inline static void bnf_dir_fori()
 			bnf_block1();
 
 			if(current_active_flag==0) {
-				if(is_break1) { tok=exe_buffer->end_token;return;};
+				if(is_break1) { tok=exe_buffer->end_token-1;return;};
 				break;
 			};
 		};
@@ -2731,7 +2755,7 @@ inline static void bnf_dir_return_novalue()
 #if	!TFUNC
 	NTOKEN2;
 #endif
-	MESG("	return_novalue @v=%d type=%d",VARIND,bnf_var->var_type);
+	// MESG("	return_novalue @v=%d type=%d",VARIND,bnf_var->var_type);
 	current_active_flag=0;	/* skip rest of function  */
 }
 
