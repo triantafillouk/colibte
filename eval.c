@@ -34,6 +34,7 @@ extern int record_session;
 
 void set_active_flag(int flag);
 int get_active_flag();
+void print_error();
 #if	TBNF
 void set_bnf_string(char *s);
 void set_bnf_num(double v);
@@ -759,7 +760,7 @@ int dofile(char *fname)
 	int status;	/* results of various calls */
 	char bname[MAXFLEN];
 	snprintf(bname,sizeof(bname),"[%s]",fname);
-	// MESG("# dofile:fname=[%s]",fname);
+	// MESG("# dofile:fname=[%s] execmd=%d",fname,execmd);
 	show_stage=0;
 	set_screen_update(false);
 	if((bp=get_filebuf(bname,NULL,0))==NULL) { // file not in memory, load it!
@@ -787,9 +788,12 @@ int dofile(char *fname)
 	int backup_caf=get_active_flag();
 	double d = compute_block(bp,bp,1);
 #if	TBNF
-	// MESG("dofile: after compute_block: var@=%d",varind());
+	// MESG("dofile: after compute_block: var@=%d err_num=%d exe=%d",varind(),err_num,execmd);
 #endif
-	if(err_num>0) return (FALSE);
+	if(err_num>0) {
+		print_error();
+		return (FALSE);
+	};
 	init_error();
 	set_vdval(d);
 	set_active_flag(backup_caf);

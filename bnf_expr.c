@@ -1862,7 +1862,7 @@ inline static void bnf_mulby()
 	};
 	
 	MESG("Error multiply by type %s [%s]",vtype_names[avar->var_type],tok_info(tok));
-	set_error(tok,1021,"mulby operation not supported!");
+	set_error(tok,1022,"mulby operation not supported!");
 }
 
 inline static void bnf_divby_pp_num()
@@ -1927,7 +1927,7 @@ inline static void bnf_divby()
 	};
 	
 	MESG("Error decreasing type %s [%s]",vtype_names[avar->var_type],tok_info(tok));
-	set_error(tok,1024,"decrease_by operation not supported!");
+	set_error(tok,1025,"decrease_by operation not supported!");
 }
 
 inline static void bnf_factor_sep0()
@@ -2126,7 +2126,7 @@ inline static void bnf_factor_assign_var()
 		// print_array1("after array assign",bnf_var->adat);
 		return;
 	};
-	set_error(tok,102,"assign operation not supported yet");
+	set_error(tok,1026,"assign operation not supported yet");
 }
 
 inline static void bnf_factor_assign_var_f()
@@ -2210,7 +2210,7 @@ inline static void bnf_factor_assign_var_f()
 		// print_array1("after array assign",avar->adat);
 		return;
 	};
-	set_error(tok,102,"assign operation not supported yet");
+	set_error(tok,1027,"assign operation not supported yet");
 }
 
 

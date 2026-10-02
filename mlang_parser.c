@@ -191,7 +191,7 @@ double getnum1(FILEBUF *bf, int cc,tok_struct *tok)
 			else if(nc=='d'||nc=='D') base=DEC;
 			else if(nc=='.') base=DEC;
 			else {
-				if(cmask==TOK_LETTER) set_error(tok,101,"numeric error notation");
+				if(cmask==TOK_LETTER) set_error(tok,401,"numeric error notation");
 				return(0);
 			};
 			if(nc!='.') foffset++;
@@ -210,7 +210,7 @@ double getnum1(FILEBUF *bf, int cc,tok_struct *tok)
 		if(after_dot==0) {
 			after_dot=1;
 		} else { 
-			set_error(tok,102,"numeric error. Multiple dots");
+			set_error(tok,4001,"numeric error. Multiple dots");
 			return(vbd+vad);
 		};
 	} else
@@ -219,12 +219,12 @@ double getnum1(FILEBUF *bf, int cc,tok_struct *tok)
 			if(nc>='A'&&nc<='F') v2=nc-'A'+10;
 			else if(nc>='a'&&nc<='f') v2=nc-'a'+10;
 			else { 
-				set_error(tok,103,"numeric error in hex notation");
+				set_error(tok,4031,"numeric error in hex notation");
 				return(vbd+vad);
 			}
 		} else { 
 			// MESG("nc = [%c]",nc);
-			set_error(tok,104,"wrong variable name, must start with a letter");
+			set_error(tok,4034,"wrong variable name, must start with a letter");
 			return(vbd+vad);
 		}
 		if(after_dot) {
@@ -237,7 +237,7 @@ double getnum1(FILEBUF *bf, int cc,tok_struct *tok)
 		v2=nc-'0';
 		if(v2>base-1) 
 		{
-			set_error(tok,105,"numeric error. invalid number");
+			set_error(tok,405,"numeric error. invalid number");
 			return(vbd+vad);
 		}
 		if(after_dot) {
@@ -348,7 +348,7 @@ int type_init_definition(FILEBUF *bf,BTREE *types_tree, tok_struct *tok_var)
 
  tok_type=next_token_type(bf);
  if(tok_type!=TOK_LETTER) { 
-	set_error(tok_var,108,"type_init_definition parse error");
+	set_error(tok_var,408,"type_init_definition parse error");
  	return 0;
  };
  
@@ -374,7 +374,7 @@ int type_init_definition(FILEBUF *bf,BTREE *types_tree, tok_struct *tok_var)
 		free_btree(global_type_node->node_dat);
 		set_global_type(global_type_node,type_dat,nword,tok_var);
 	} else {
-	 	set_error(tok_var,108,"cannot create type in global_types_tree!");
+	 	set_error(tok_var,4081,"cannot create type in global_types_tree!");
 		show_error("type_init",nword);
 	return 0;
 	};
@@ -389,7 +389,7 @@ int type_init_definition(FILEBUF *bf,BTREE *types_tree, tok_struct *tok_var)
  };
 
  if(tok_type!=TOK_LPAR && tok_type!=TOK_LBRAKET) { 
- 	set_error(tok_var,110,"type_init_definition left par,left braket");
+ 	set_error(tok_var,4010,"type_init_definition left par,left braket");
  	return 0; 
  };
  int end_type=0;
@@ -400,7 +400,7 @@ int type_init_definition(FILEBUF *bf,BTREE *types_tree, tok_struct *tok_var)
  	getnc1(bf,&cc,&tok_type);
 	// MESG("-------	w: cc=[%c] type=%d",cc,tok_type);
 	if(tok_type!=TOK_LETTER) { 
-		set_error(tok_var,111,"type_init name not letter or closing error!");
+		set_error(tok_var,4011,"type_init name not letter or closing error!");
 	return 0;};
 	slen=getnword1(bf,cc,nword);
 	strcpy(e_name,nword);
@@ -410,7 +410,7 @@ int type_init_definition(FILEBUF *bf,BTREE *types_tree, tok_struct *tok_var)
 	node->node_index = ind++;
 	if(type_dat->new_flag==0) {
 		// MESG("dublicate error");
-		set_error(tok_var,112,"type_init_definition: dublicate element!");
+		set_error(tok_var,4012,"type_init_definition: dublicate element!");
 		show_error("type_init",nword);
 		// MESG("dublicate error1");
 		return 0;
@@ -447,7 +447,7 @@ int type_init_definition(FILEBUF *bf,BTREE *types_tree, tok_struct *tok_var)
 			node->node_sval=strdup(nword);
 		} else {
 			// MESG("	parse type definition error!");
-			set_error(tok_var,113,"type_init, parse error");
+			set_error(tok_var,4013,"type_init, parse error");
 			show_error("type_init","");
 			return 0;
 		};
@@ -458,7 +458,7 @@ int type_init_definition(FILEBUF *bf,BTREE *types_tree, tok_struct *tok_var)
  getnc1(bf,&cc,&tok_type);
  if(tok_type != end_type) 
  {
- 	set_error(tok_var,114,"type_init_definition rpar,rbracket not found!");
+ 	set_error(tok_var,4014,"type_init_definition rpar,rbracket not found!");
 	return 0;
  }
  if(show_tokens) out_print("----------------------------------------",1);
@@ -635,7 +635,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 				// MESG("[%s]	RCURL:",bf->b_fname);
 				curl_level--;cc=1;
 				if(curl_level<0) {
-					err_num=102;err_str="curls dont match!";
+					err_num=4002;err_str="curls dont match!";
+					if(tok_line) err_line=tok_line;else err_line=last_correct_line;
 					check_buffer = buffer_ori;
 					MESG("--> parse_block1: return in error %d",err_num);
 					return(0);
@@ -886,7 +887,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			break;
 		default:
 			{
-			err_num=103;
+			err_num=4003;
 			if(tok_line) err_line=tok_line;else err_line=last_correct_line;
 			err_str="character unrecognised";
 			check_buffer = buffer_ori;
@@ -1222,10 +1223,10 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
     tok->bnf_group=BLOCK_END;
 #endif
 	SHOW_TOKEN("END");
-	if(curl_level!=0 && err_num<1) set_error(tok,106,"parse error: invalid number of curls");
+	if(curl_level!=0 && err_num<1) set_error(tok,4016,"parse error: invalid number of curls");
 
 	if(par_level!=0 && err_num<1) { 
-		err_num=1014;err_line=tok->tline;err_str="parse error: invalid number of pars";
+		err_num=4014;err_line=tok->tline;err_str="parse error: invalid number of pars";
 		// ERROR("parenthesis error: line %d",tok_line);
 	};
 

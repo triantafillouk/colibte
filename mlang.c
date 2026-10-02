@@ -200,6 +200,11 @@ int simple=0;
 
 //static inline double factor();
 
+void print_error()
+{
+ if(execmd)
+ fprintf(stderr,"error %d %s line %d\n",err_num,err_str,err_line+1);
+}
 
 term_type term_types[] = {
 	{"if"  ,TOK_DIR_IF  ,TOK_DIR },
@@ -1383,11 +1388,11 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
  MVAR *local_symbols;
  MVAR *old_symbol_table=current_stable;
  tok_struct *old_tok=tok;
-	MESG("# compute_block1: [%s] use [%s] start=%d",bp->b_fname,use_fp->b_fname,start);
+	// MESG("# compute_block1: [%s] use [%s] start=%d",bp->b_fname,use_fp->b_fname,start);
 	if(show_no_time) 
-		MESG("# [%-15s use %s %s ---------------------------------",bp->b_fname,use_fp->b_fname,"Version");
+		MESG("# compute_block %s use %s %s ---------------------------------",bp->b_fname,use_fp->b_fname,"Version");
 	else 
-		MESG("# [%-15s use %s %s ---------------------------------",bp->b_fname,use_fp->b_fname,VERSION);
+		MESG("# conpute_block %s use %s %s ---------------------------------",bp->b_fname,use_fp->b_fname,VERSION);
 	eval_curl_match(NULL);
 
  if(use_fp->symbol_tree==NULL) {
@@ -1400,7 +1405,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	};
 	parse_block1(bp,use_fp->symbol_tree,start);
 	// MESG("parse_block: ended! err=%d start=%d items=%d",err_num,start,use_fp->symbol_tree->items);
-	if(err_num) { execmd=0;return(0);};
+	if(err_num) { return(0);};
 	// MESG("	compute_block: start=%d",start);
 	if(start || current_stable==NULL) {
 		// MESG("new current_stable with %d items",use_fp->symbol_tree->items);
