@@ -8,6 +8,7 @@ void skip_sentence1();
 void show_error(char *from,char *name);
 inline static void bnf_expression0();
 
+
 #define	MAX_VARS	500
 static MVAR bnf_vars[MAX_VARS];
 static MVAR *bnf_var=bnf_vars;
@@ -2921,7 +2922,11 @@ inline static void bnf_dir_if_then()
 		
 		return;
 	} else {
+#if	TIFN
+		tok=tok0->ifend;
+#else
 		tok=tok0->next_tok;
+#endif
 		// MESG("	then false: var@=%d start of [%s]",VARIND,tok_info(tok));
 			// tok--;
 			// if(tok->ttype!=TOK_RCURL) tok--; 
@@ -2949,13 +2954,21 @@ inline static void bnf_dir_if_then_else()
 		prev_var("if true");
 #endif
 		// MESG("		true:3 after if execution! %s",tok_info(tok));
+#if	TIFN
+		tok = tok0->ifend; 
+#else
 		NTOKEN2;
-		tok=tok->next_tok; // 
+		tok=tok->next_tok; 
+#endif
 		// MESG("## 	tok_dir_if: true: end [%s]",tok_info(tok));
 		
 		return;
 	} else {
-		tok=tok0->next_tok; // this is else
+#if	TIFN
+		tok=tok0->ifelse;
+#else
+		tok=tok0->next_tok; /* this is else */
+#endif
 		// MESG("	then false: var@=%d start of [%s]",VARIND,tok_info(tok));
 			// NTOKEN2;
 			// MESG("	execute else at [%s]",tok_info(tok));

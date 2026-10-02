@@ -42,6 +42,9 @@ typedef struct tok_struct {
 #if	TFINDEX
 	short function_index; 
 #endif
+#if	TIFN
+	struct tok_struct *ifelse;
+#endif
 	VFunction bnf_factor_function;
 #endif
 	// short tind1;	/* index1 for type elements  */
@@ -62,6 +65,9 @@ typedef struct tok_struct {
 		struct curl_struct *tcurl;
 		struct tok_struct *match_tok;	/* for curl, parenthesis, bracket  */
 		struct tok_struct *next_tok;	/* for directives  */
+#if	TIFN
+		struct tok_struct * ifend;
+#endif
 		TextPoint *ddot;				/* ddot text point  */
 		struct array_dat *tok_adat;		/* used in array definition only in LB  */
 		struct FILEBUF *proc_buffer;
