@@ -1,15 +1,19 @@
-cls
-# print("--- factorial1.cmd")
-function fact(num)
+# function calls tests
+# problem with argument values ,ok
+
+function test2(a,b)
 {
- if(num<2) 
- {
- 	return(1)
- } else {
-	f=num*fact(num-1)
-	return(f)
- }
+ print("a="+a)
+ print("b="+b)
+
+ print("test2: a+b="+a+b)
+ return (a+b)
 }
 
-fact(3):
+# cls
+
+k=4
+k:
+c1=test2(k,2)
+c1: <    6 | 0x6 | 0o6>
 

@@ -2049,7 +2049,7 @@ inline static void bnf_factor_assign_var_nump()
 
 inline static void bnf_factor_assign_var()
 {
-	// MESG("bnf_factor_assign_var:1 %s %d",tok->tname,tok->tind);
+	// MESG("bnf_factor_assign_var:@%d %s ind=%d",VARIND,tok->tname,tok->tind);
 	MVAR *bvar=bnf_var;
 	int btype=bvar->var_type;
 	// MESG("	bnf_var @ %d type %d",VARIND,btype);
@@ -2791,6 +2791,10 @@ inline static MVAR * push_args_bnf(int const nargs,int const vars_num)
 #if	1
  MVAR *va_i=va+nargs-1;
  for(;va_i>=va;va_i--){
+ 	// if(bnf_var->var_type==VTYPE_POINTER)
+		// memcpy(va_i,bnf_var->var_pointer,sizeof(MVAR));
+	// else
+	// MESG("push: v@%d arg type %d",VARIND,bnf_var->var_type); 
 	memcpy(va_i,bnf_var,sizeof(MVAR));
 	prev_var("narg");
  };

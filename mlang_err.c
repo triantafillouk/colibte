@@ -862,6 +862,7 @@ tok_struct *tok0_bnf=NULL;
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
 		int var_index=tok0->tind;
+		MESG("TOK_VAR: var_index=%d tok0=[%s]",var_index,tok_info(tok0));
 		pre_symbol=0;
 		ex_nvars++;
 		xpos=4790;
@@ -927,19 +928,22 @@ tok_struct *tok0_bnf=NULL;
 			NTOKEN_ERR(4982);
 		};
 		if(tok->ttype==TOK_ASSIGN) {
-			// MESG("set normal assign prok=[%s]",tok_info(prev_token));
+			MESG("set normal assign prok=[%s]",tok_info(prev_token));
 #if	TBNF
 			if(bnf_tok!=NULL) bnf_tok->bnf_factor_function=bnf_factor_assign_var_f;
 #endif
 
 			assign_type_to=0;
 			tok->tname = tok0->tname;
+			MESG("	tind=%d var_index=%d",prev_token->tind,var_index);
 			tok->tind = var_index;
 
 			// MVAR *var=get_left_slot(tok->tind);
 #if	TBNF
 			check_var_assigned("tok_assign",tok->tname,0);
 #endif
+			// NTOKEN2;
+			// RT_MESG1(493);
 		};
 		if(tok->ttype==TOK_INCREASEBY) {
 			// MESG("set normal assign [%s]",tok_info(tok));
@@ -1476,11 +1480,11 @@ tok_struct *tok0_bnf=NULL;
 #if	TFUNC3
 		// MESG("	TOK_PROC: push tok0: [%s]",tok_info(tok_proc));
 		tok0_bnf=stack_push("proc",tok_proc,1,&new_one);
-		tok0_bnf->t_nargs=nargs;
 		// MESG("---> pushed proc tname='%s' type=%d new_one=%d",tok0_bnf->tname,tok0_bnf->ttype,new_one);
 		if(new_one)
 		// if(strcmp(tok0_bnf->tname,";sep;")&&strcmp(tok0_bnf->tname," ; "))
 		{
+		tok0_bnf->t_nargs=nargs;
 			// MESG("	change type to TOK_PROC!");
 		tok0_bnf->bnf_group=1;
 		tok0_bnf->bnf_factor_function=bnf_factor_proc;
@@ -1972,7 +1976,7 @@ int err_lexpression()
 #if	TNORMAL
 			set_term_function(tok,assign_val);
 #endif
-			// MESG("TOK_ASSIGN:: ptok [%s]",tok_info(prev_token));
+			MESG("TOK_ASSIGN:: ind=%d ptok [%s]",prev_token->tind,tok_info(prev_token));
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			// MESG("	normal TOK_ASSIGN prev_token=[%s]",tok_info(prev_token));
 			// if(prev_token->ttype==TOK_QUOTE) { set_error(tok,xpos,"NOASIGN");RT_MESG1(709);};
