@@ -2362,7 +2362,7 @@ inline static void bnf_block1()
 		};
 		NTOKEN2;
 	} 
-	
+	// MESG("!B ---> end  v@=%d [%s]",VARIND,tok_info(tok));
 	if(tok->ttype!=TOK_END) 
 		tok->bnf_factor_function();
 }
@@ -2478,6 +2478,7 @@ inline static void bnf_dir_fori()
 #if	TPROFILE
 			var_index -= (VARIND-start_var);
 #endif
+			// MESG("	set bnf_var from %d -> %d",VARIND,start_var);
 			bnf_var=bnf_vars+start_var;
 			bnf_block1();
 			// MESG("	fori:2 iterrator_val=%3f start var=%d var@=%d, [%s]",*iterrator_val,start_var,VARIND,tok_info(tok));
@@ -2497,6 +2498,7 @@ inline static void bnf_dir_fori()
 #if	TPROFILE
 			var_index -= (VARIND-start_var);
 #endif
+			// MESG("	set bnf_var from %d -> %d",VARIND,start_var);
 			bnf_var=bnf_vars+start_var;
 			bnf_block1();
 
@@ -2518,6 +2520,7 @@ inline static void bnf_dir_fori()
 #if	TPROFILE
 			var_index -= (VARIND-start_var);
 #endif
+			// MESG("	set bnf_var from %d -> %d",VARIND,start_var);
 				bnf_var=bnf_vars+start_var;
 				bnf_expression0();
 			};
@@ -2526,6 +2529,7 @@ inline static void bnf_dir_fori()
 #if	TPROFILE
 			var_index -= (VARIND-start_var);
 #endif
+			// MESG("	set bnf_var from %d -> %d",VARIND,start_var);
 				bnf_var=bnf_vars+start_var;
 				tok=start_block;
 				bnf_expression0();
@@ -2738,14 +2742,13 @@ inline static double bnf_expression()
 
 inline static void bnf_dir_return_value()
 {
-	// MESG("return_value:0 @v=%d [%s]",VARIND,tok_info(tok));
-	// MESG("	bnf_dir_return_value: v@=%d",VARIND);
+	// MESG("return_value: @v=%d [%s]",VARIND,tok_info(tok));
 #if	!TFUNC
 	NTOKEN2;
 	bnf_expression();
 #endif
 	
-	MESG("	return_value:1 @v=%d val=%f",VARIND,bnf_var->dval);
+	// MESG("	return_value:1 @v=%d val=%f",VARIND,bnf_var->dval);
 	current_active_flag=0;	/* skip rest of function  */
 }
 
@@ -2755,7 +2758,7 @@ inline static void bnf_dir_return_novalue()
 #if	!TFUNC
 	NTOKEN2;
 #endif
-	// MESG("	return_novalue @v=%d type=%d",VARIND,bnf_var->var_type);
+	// MESG("return_novalue: @v=%d [%s]",VARIND,tok_info(tok));
 	current_active_flag=0;	/* skip rest of function  */
 }
 
@@ -4017,10 +4020,8 @@ inline static void bnf_factor_cmd()
 	// MESG(";ed_command: [%s] args=%d",ed_command->n_name,ed_command->arg);
 	// MVAR *arg1_var=bnf_var;
 	if(args>0) {
-		// check_par=1;	/* we need parenthesis if arguments.  */
 		bnf_var-=args-1;
-		// arg1_var=bnf_var;
-		// show_stack_var("arg1",bnf_var);
+		// MESG(" bnf_var -= %d -> %d",args-1,VARIND);
 		if(bnf_var->var_type==VTYPE_NUM) { value=bnf_var->dval;};
 		
 		//if(args>1) show_stack_var("arg2",bnf_var);

@@ -1192,6 +1192,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
   
   // MESG("	parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
  	/* add eof token!  */
+#if	0
 	if(tok_type!=TOK_SEP) 
 	{	
 		if(tok_type==0) {
@@ -1209,7 +1210,8 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			tok->tname="endsep";
 			SHOW_TOKEN("endsep");
 		};
-	};
+	}
+#endif
 	// MESG("parse_block1: set end token");
 	bf->end_token=tok;	/* save end token  */
 	ADD_TOKEN("end token");
