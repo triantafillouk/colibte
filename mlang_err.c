@@ -268,9 +268,11 @@ int	err_eval_fun1(tok_struct *tok0,int lpar)
 			// MESG("	found comma! %s",tok_info(tok));
 #if	TBNF
 #if	TFUNC
+#if	0
 			tok_struct *tok_comma=stack_push("eval_function ,",tok,0,&new_one);
 			tok_comma->bnf_factor_function=bnf_factor_sep0;
 			tok_comma->tname=",0";
+#endif
 #else
 			stack_push("eval_function ,",tok,0,&new_one);
 #endif
@@ -862,7 +864,7 @@ tok_struct *tok0_bnf=NULL;
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
 		int var_index=tok0->tind;
-		MESG("TOK_VAR: var_index=%d tok0=[%s]",var_index,tok_info(tok0));
+		// MESG("TOK_VAR: var_index=%d tok0=[%s]",var_index,tok_info(tok0));
 		pre_symbol=0;
 		ex_nvars++;
 		xpos=4790;
@@ -928,14 +930,14 @@ tok_struct *tok0_bnf=NULL;
 			NTOKEN_ERR(4982);
 		};
 		if(tok->ttype==TOK_ASSIGN) {
-			MESG("set normal assign prok=[%s]",tok_info(prev_token));
+			// MESG("set normal assign prok=[%s]",tok_info(prev_token));
 #if	TBNF
 			if(bnf_tok!=NULL) bnf_tok->bnf_factor_function=bnf_factor_assign_var_f;
 #endif
 
 			assign_type_to=0;
 			tok->tname = tok0->tname;
-			MESG("	tind=%d var_index=%d",prev_token->tind,var_index);
+			// MESG("	tind=%d var_index=%d",prev_token->tind,var_index);
 			tok->tind = var_index;
 
 			// MVAR *var=get_left_slot(tok->tind);
@@ -1655,8 +1657,7 @@ tok_struct *tok0_bnf=NULL;
 	case TOK_DIVBY:
 	case TOK_DECREASEBY:
 		tok0->tname="assign";
-		MESG("assign var: ptok [%s]",tok_info(prev_token));
-		// set_bnf_function1(tok0,tok0->ttype);
+		// MESG("assign var: ptok [%s]",tok_info(prev_token));
 #if	TBNF
 		tok0->bnf_group=tok0->ttype;
 		// MESG("	-- set bnf_group to %d",tok0->ttype);
@@ -1976,10 +1977,9 @@ int err_lexpression()
 #if	TNORMAL
 			set_term_function(tok,assign_val);
 #endif
-			MESG("TOK_ASSIGN:: ind=%d ptok [%s]",prev_token->tind,tok_info(prev_token));
+			// MESG("TOK_ASSIGN:: ind=%d ptok [%s]",prev_token->tind,tok_info(prev_token));
 			// MESG_TOK_INFO("# err_lexpression",tok);
 			// MESG("	normal TOK_ASSIGN prev_token=[%s]",tok_info(prev_token));
-			// if(prev_token->ttype==TOK_QUOTE) { set_error(tok,xpos,"NOASIGN");RT_MESG1(709);};
 			if(prev_token->ttype!=TOK_VAR && prev_token->ttype!=TOK_RBRAKET && prev_token->ttype!=TOK_TYPE_ELEMENT) 
 				{ MESG("error:%d ptok=[%s]",xpos,tok_info(prev_token));set_error(tok,xpos,"assign error");RT_MESG1(xpos);};
 			NTOKEN_ERR(xpos);
@@ -2693,6 +2693,7 @@ int err_check_block1()
 #if	TBNF
 				tok_struct *dest=stack_push("sep after ddot",tok,-tok->ttype,&new_one);
 				dest->bnf_factor_function=bnf_factor_sep0;
+				dest->tname="sep0";
 #endif
 				NTOKEN_ERR(674);
 			};

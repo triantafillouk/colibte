@@ -1092,7 +1092,7 @@ int bnf_array_div(MVAR *vara,MVAR *varb)
 
 inline static void bnf_var_div()
 {
- MESG("bnf_var_div: tind=%d [%s]",tok->tind,tok_info(tok));
+ // MESG("bnf_var_div: tind=%d [%s]",tok->tind,tok_info(tok));
  MVAR *varb = get_left_slot(tok->tind);
 	// MESG("	> dval=%f",varb->dval);
 	MVAR *vara = bnf_var;
@@ -1170,7 +1170,7 @@ inline static void bnf_factor_mul()
 
 inline static void bnf_factor_div()
 {
- MESG("bnf_factor_div : var@=%d ind=%d [%s]",VARIND,tok->tind,tok_info(tok));
+ // MESG("bnf_factor_div : var@=%d ind=%d [%s]",VARIND,tok->tind,tok_info(tok));
  MVAR *varb = bnf_var;
  	if(varb->var_type==VTYPE_POINTER) varb=varb->var_pointer;
 	prev_var("div21");
@@ -2131,7 +2131,7 @@ inline static void bnf_factor_assign_var()
 
 inline static void bnf_factor_assign_var_f()
 {
-	MESG("bnf_factor_assign_var:f %d",tok->tind);
+	// MESG("bnf_factor_assign_var:f %d",tok->tind);
 	MVAR *bvar=bnf_var;
 	int btype=bvar->var_type;
 	char *var_name = tok->tname;
@@ -2212,8 +2212,6 @@ inline static void bnf_factor_assign_var_f()
 	};
 	set_error(tok,1027,"assign operation not supported yet");
 }
-
-
 
 inline static void set_bnf_string(char *s)
 {
@@ -3588,7 +3586,7 @@ inline static void bnf_mulby_array2()
 
 inline static void bnf_divby_array2()
 {
-	MESG(":mulby_array2:  bvar type=%d [%s]",bnf_var->var_type,tok_info(tok));
+	// MESG(":mulby_array2:  bvar type=%d [%s]",bnf_var->var_type,tok_info(tok));
 	MVAR *bvar = (bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer : bnf_var;
 	prev_var("divby_array2:");
 	if(bvar->dval==0) { set_error(tok,1171,"divide by zeror!");return;};
@@ -4588,7 +4586,7 @@ inline static void bnf_factor_at()
 
 inline static void bnf_factor_array_l2_update()
 {
-	MESG("bnf_factor_array_l2_update:[%s]",tok_info(tok));
+	// MESG("bnf_factor_array_l2_update:[%s]",tok_info(tok));
 	// MESG("	ind=%d val=%f",tok->tind,tok->dval);
 	double update_value=tok->dval;
 	// MESG("	array_l1 var@=%d",VARIND);

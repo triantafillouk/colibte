@@ -6,7 +6,7 @@ function test2(a,b)
  print("a="+a)
  print("b="+b)
 
- print("test2: a+b="+a+b)
+ print("test2:"+" a+b=",a+b)
  return (a+b)
 }
 

@@ -40,7 +40,9 @@ void show_stack_var(char *from,MVAR *var);
 #if	TNORMAL
 void set_term_function(tok_struct *tok, TFunction term_function);
 #endif
+#if	!TFUNC3
 inline static void  skip_args1(int nargs);
+#endif
 inline static MVAR *get_left_slot(int ind);
 inline static int check_token(int type);
 void show_var_node(BTNODE *node);
@@ -533,6 +535,7 @@ curl_struct *new_curl(int level,int mline, struct _el *el)
  return(lcurl);
 }
 
+#if	!TFUNC3
 inline static void  skip_args1(int const nargs)
 {
 #if    TNORMAL
@@ -542,6 +545,7 @@ inline static void  skip_args1(int const nargs)
  tok +=2+2*nargs;
 #endif
 }
+#endif
 
 tok_struct *new_tok()
 {
@@ -1168,7 +1172,7 @@ void set_break(char *from)
 char *str_mul(char *sval, double v1)
 {
  int mul_size=v1;
- MESG("str_mul: [%s] by %f %d",sval,v1,mul_size);
+ // MESG("str_mul: [%s] by %f %d",sval,v1,mul_size);
  if(mul_size>0) {
 	int string_size=strlen(sval);
 	char *new_string=realloc(sval,mul_size*string_size+1);
@@ -1180,7 +1184,7 @@ char *str_mul(char *sval, double v1)
 		new_string[string_size*(i+1)]=0;
 		// MESG("	-> [%s]",new_string);
 	};
-	MESG("	end at [%s]",new_string);
+	// MESG("	end at [%s]",new_string);
 	// new_string[string_size*mul_size]=0;
  	return new_string;
  } else return sval;
@@ -1746,10 +1750,14 @@ char * tok_info(tok_struct *exect)
 		} else	if(exect->tgroup>0) {
 			// snprintf(sout,sizeof(sout),"%3d:%4d %s",exect->tnum,exect->tline,exect->tname);
 			// snprintf(sout1,sizeof(sout)-ssize,"bnf=%2d",exect->bnf_group);
-		} else	if(exect->ttype==TOK_NUM) { 
+		}
+#if	0
+		 else	if(exect->ttype==TOK_NUM) { 
 			// snprintf(sout,sizeof(sout),"%3d:%4d %s",exect->tnum,exect->tline,exect->tname);
 			snprintf(sout1,sizeof(sout)-ssize,"%5.3f",exect->dval);
-		} else if(exect->ttype==TOK_QUOTE) {
+		}
+#endif
+		 else if(exect->ttype==TOK_QUOTE) {
 			// snprintf(sout,sizeof(sout),"%3d:%4d %s",exect->tnum,exect->tline,exect->tname);
 			// snprintf(sout1,sizeof(sout)-ssize,"bnf=%2d",exect->bnf_group);
 		}		
@@ -1757,8 +1765,8 @@ char * tok_info(tok_struct *exect)
 			if(exect->proc_buffer == NULL) 
 				snprintf(sout1,sizeof(sout)-ssize," NULL proc bnf=%2d",exect->bnf_group);
 			else {
-				int len=snprintf(sout1,sizeof(sout)-ssize,"'%s' args %d",
-					exect->proc_buffer->b_fname,exect->t_nargs);
+				// int len=snprintf(sout1,sizeof(sout)-ssize,"'%s' args %d",exect->proc_buffer->b_fname,exect->t_nargs);
+				int len=snprintf(sout1,sizeof(sout)-ssize,"args %d",exect->t_nargs);
 				if(len+ssize>=sizeof(sout))  MESG("	truncated");
 			};
 		} else if(exect->ttype==TOK_FUNC) {
@@ -1802,7 +1810,7 @@ char * tok_info(tok_struct *exect)
 			snprintf(sout1,sizeof(sout)-ssize,"%s",vtype_names[vtype]);
 #endif
 		} else {
-			snprintf(sout1,sizeof(sout),">>");
+			// snprintf(sout1,sizeof(sout),">>");
 			// snprintf(sout,sizeof(sout),"%3d:%4d %s",exect->tnum,exect->tline,exect->tname);
 			// snprintf(sout1,sizeof(sout)-ssize,"bnf=%2d",exect->bnf_group);
 		};

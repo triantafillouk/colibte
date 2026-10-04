@@ -6,7 +6,7 @@ typedef struct TOK_TAB {
 
 TOK_TAB token_table[]= {
 	{TOK_NONE			,"none",0},	// 0
-	{TOK_SEP			," ; " ,0},	// 1
+	{TOK_SEP			," ;1" ,0},	// 1
 	{TOK_SPACE			," sp " ,0},	// 2
 	{TOK_LETTER			,"letter ",0},	
 	{TOK_LCURL			," { ",0},
