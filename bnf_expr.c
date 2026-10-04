@@ -2369,10 +2369,11 @@ inline static void bnf_block1_break(/*FILEBUF *fp*/)
 {
 	// MESG("bnf_block1_break start! group=%d [%s]",tok->tgroup,tok_info(tok));
 	while(tok->bnf_group!=BLOCK_END) {
-		// MESG("--- block var@=%d [%s]",VARIND,tok_info(tok));
+		// MESG("!B var@=%d [%s]",VARIND,tok_info(tok));
 	 	tok->bnf_factor_function();
 		// MESG("		-- tok %d type %d",tok->tnum,tok->ttype);
-		if(drv_check_break_key()) {
+		if(drv_check_break_key())
+		{
 			// MESG("bnf_block1_break:[%s] stop: ind=%d type=%d [%s]",exe_buffer->b_fname,VARIND,bnf_var->var_type,tok_info(tok));
 			// if(VARIND!=block_startvar_pos) MESG("	block break: var@=%d startvar=%d [%s]",VARIND,block_startvar_pos,tok_info(tok));
 			return;
@@ -2623,7 +2624,7 @@ inline static void bnf_dir_for()
 
 inline static void bnf_dir_while()	/* TBC  */
 {
-	// MESG("bnf_dir_while");
+	// MESG("bnf_dir_while v@=%d [%s]",VARIND,tok_info(tok));
 	tok_struct *check_element; // check element pointer
 	tok_struct *start_block;	// element at block start
 	tok_struct *end_block=NULL;	/* at the block end  */
@@ -4033,7 +4034,7 @@ inline static void bnf_factor_cmd()
 	// show_stack_var("arg1_var",arg1_var);
 	int stat=ed_command->n_func((num)value);
 	// MESG("	factor_cmd result %d [%s]",stat,tok_info(tok));
-	if(args) bnf_var -= (args);
+	if(args) bnf_var -= (args)-1;
 	// show_stack_var("after cmd",bnf_var);
 	macro_exec = save_macro_exec;
 
