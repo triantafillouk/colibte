@@ -1154,17 +1154,16 @@ void drv_stop_checking_break()
 	utfokey[0]=0;
 }
 
-int drv_check_break_key()
+inline int drv_check_break_key()
 {
  static int count=0;
  // if(checking_break_key) {
- count++;
  // MESG("drv_check_break_key: %d",count);
- if(count>10000) {
+ if(count++>1000) {
 	// fprintf(stderr,"break_key:\n");
  	int key=getch();
 	count=0;
-	if(key==3) { set_break("drv_check_break_key");return 1;}
+	if(key==3) { ungetch(key);set_break("drv_check_break_key");return 1;}
  };
  // };
  return 0;

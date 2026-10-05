@@ -899,7 +899,9 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	if(tok_type==TOK_NL) {
 		// start_of_line = 1;
 		tok_type=TOK_SEP;
+		//MESG("	add separator nl");
 		ADD_TOKEN("nl");
+		tok->tname="nl";
 		SHOW_TOKEN("nl");
 		continue;
 	};

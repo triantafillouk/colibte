@@ -2691,9 +2691,11 @@ int err_check_block1()
 			NTOKEN_ERR(674);
 			if(tok->ttype==TOK_SEP) {
 #if	TBNF
+#if	0
 				tok_struct *dest=stack_push("sep after ddot",tok,-tok->ttype,&new_one);
 				dest->bnf_factor_function=bnf_factor_sep0;
 				dest->tname="sep0";
+#endif
 #endif
 				NTOKEN_ERR(674);
 			};

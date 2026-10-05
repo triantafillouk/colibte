@@ -1962,6 +1962,9 @@ inline static void bnf_factor_comma()
 {
  // MESG("bnf_factor_comma:");
  // if(bnf_var>bnf_vars) 
+#if	1
+	set_bnf_function(tok,"comma->sep0",bnf_factor_sep0);
+#else
  if(0)
  { 
  	// MESG(";bnf_factor_comma ---  var@=%d [%s]",VARIND,tok_info(tok));
@@ -1970,7 +1973,8 @@ inline static void bnf_factor_comma()
 	tok->tname=" ,-";
  } else {
 	set_bnf_function(tok,"comma->sep0",bnf_factor_sep0);
-};
+ };
+#endif
 }
 
 inline static void bnf_factor_eof()
@@ -2017,7 +2021,7 @@ inline static void bnf_factor_rcurl_no()
 
 inline static void bnf_factor_rcurl()
 {
- // MESG("	rcurl: ind=%ld",VARIND);
+	// MESG("	rcurl: ind=%ld",VARIND);
 }
 
 inline static void bnf_factor_error()
@@ -2350,7 +2354,6 @@ inline static void bnf_block1()
 		// MESG("		-- tok %d type %d act=%d",tok->tnum,tok->ttype,current_active_flag);
 		// MESG("	  var@=%d group=%d [%s] act=%d",VARIND,tok->tgroup,tok_info(tok),current_active_flag);
 		if(!current_active_flag) 
-		// if(drv_check_break_key())
 		{
 			// MESG("bnf_block1:[%s] stop: ind=%d type=%d [%s]",fp->b_fname,VARIND,bnf_var->var_type,tok_info(tok));
 			// if(VARIND!=block_startvar_pos) MESG("	block break: var@=%d startvar=%d [%s]",VARIND,block_startvar_pos,tok_info(tok));
@@ -2361,7 +2364,7 @@ inline static void bnf_block1()
 		NTOKEN2;
 	} 
 	// MESG("!B ---> end  v@=%d [%s]",VARIND,tok_info(tok));
-	if(tok->ttype!=TOK_END) 
+	// if(tok->ttype!=TOK_END) 
 		tok->bnf_factor_function();
 }
 
@@ -2382,7 +2385,7 @@ inline static void bnf_block1_break(/*FILEBUF *fp*/)
 	} 
 	
 	// MESG("-- block end  ! [%s]",tok_info(tok));
-	if(tok->ttype!=TOK_END) 
+	// if(tok->ttype!=TOK_END) 
 		tok->bnf_factor_function();
 }
 
@@ -2479,7 +2482,8 @@ inline static void bnf_dir_fori()
 #endif
 			// MESG("	set bnf_var from %d -> %d",VARIND,start_var);
 			bnf_var=bnf_vars+start_var;
-			bnf_block1();
+			if(execmd) bnf_block1();
+			else bnf_block1_break();
 			// MESG("	fori:2 iterrator_val=%3f start var=%d var@=%d, [%s]",*iterrator_val,start_var,VARIND,tok_info(tok));
 			if(current_active_flag==0) {
 				// MESG("end loop!:");
