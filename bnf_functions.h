@@ -13,7 +13,9 @@ inline static void bnf_factor_pn_plus();
 inline static void bnf_factor_pn_minus();
 inline static void bnf_factor_np_plus();
 inline static void bnf_factor_np_minus();
+#if	NUSE
 inline static void bnf_factor_spn_plus();
+#endif
 inline static void bnf_factor_plus();
 inline static void bnf_factor_minus();
 inline static void bnf_factor_np_num_mul();
