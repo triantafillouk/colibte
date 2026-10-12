@@ -430,9 +430,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type, int *new_one)
 		dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
     	tok->pushed=check_buffer->tok_bnf_index;
-// #if	TFUNC3
 		dest->tnum=tok->pushed;
-// #endif
 		// MESG("!Push %10s as %d [%s] exp_type=%d",title,tok->pushed,tok_info(tok),exp_type);
 		set_bnf_function1(dest,exp_type);
 #if	TFUNC3
@@ -442,7 +440,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type, int *new_one)
 		 if(prev_token->ttype==TOK_LCURL){
 			dest->bnf_factor_function = bnf_factor_sep0;
 			dest->tname = "sep0";
-			MESG("set sep0!!!!!");
+			// MESG("set sep0!!!!!");
 			prev_token=dest;
 			*new_one=1;
 			return dest;
