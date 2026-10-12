@@ -275,20 +275,12 @@ int show_info(num n)
 	SMESG("%s",date_string(1));
 	SMESG("--- Application info ----------------------------------------");
 #if	TBNF
-#if	TOKENN
-	char *xv="t";
-#else
 	char *xv="f";
-#endif
 #else
 	char *xv="n";
 #endif
 
-#if	TOKENN
 	SMESG("%s Version %s %s",PROGNAME,xv,VERSION);
-#else
-	SMESG("%s Version %s %s",PROGNAME,xv,VERSION);
-#endif
 #ifdef	GVERS
 	SMESG("git:%s",GVERS);
 #endif

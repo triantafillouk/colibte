@@ -4,8 +4,8 @@ print("--- tloop520.cmd")
 
 function fact(num)
 {
- if(num<1) return(1)
- else return(num*fact(num-1))
+ if(num<1) return 1
+ return (num*fact(num-1))
 }
 
 function tadd(a1, a2)

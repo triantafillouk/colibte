@@ -9,7 +9,7 @@ void show_error(char *from,char *name);
 inline static void bnf_expression0();
 
 
-#define	MAX_VARS	500
+#define	MAX_VARS	100
 static MVAR bnf_vars[MAX_VARS];
 static MVAR *bnf_var=bnf_vars;
 
@@ -2531,8 +2531,7 @@ inline static void bnf_dir_for()
 	tok_struct *start_block;	// element at block start
 	tok_struct *end_block=NULL;	/* at the block end  */
 	int old_active_flag=current_active_flag;
-	// is_break1=0;
-	// MESG("-- dir_for:start var@=%d active = %d [%s] is_break1=%d",VARIND,current_active_flag,tok_info(tok),is_break1);	
+
 	NTOKEN2;	/* go to next token after for */
 	bnf_expression0();
 	prev_var("for init");
@@ -2560,28 +2559,23 @@ inline static void bnf_dir_for()
 	int aflag=current_active_flag;
 	while(current_active_flag)
 	{
-		double val;
 		// check expression
 		tok=check_element;
-		val=bnf_expression();
+		double val=bnf_expression();
 		prev_var("check");
 		// MESG("			- dir_for: var@=%d check result: %f",VARIND,val);
 		if(val) {
 			tok=start_block;
-			// int ind=VARIND;
 			// MESG("	for: start of loop: var@=%d [%s]",VARIND,tok_info(tok));
 			if(is_curl) { 
 				if(execmd) bnf_block1();
 				else bnf_block1_break();
-				if(current_active_flag==0) {
-					if(is_break1) { tok=exe_buffer->end_token-1;return;};
-					break;
-				};
 			} else { 
 				bnf_expression0();
 				prev_var("for");
 			};
 			if(current_active_flag==0) {
+				if(is_break1) { tok=exe_buffer->end_token-1;return;};
 				tok--;
 				// MESG("	for: break: var@=%d [%s]",VARIND,tok_info(tok));
 				break;
@@ -2589,7 +2583,6 @@ inline static void bnf_dir_for()
 			tok=loop_element;	/*   */
 			val=bnf_expression();	/* exec for loop  */
 			// MESG("	loop var@=%d result %f",VARIND,val);
-			// if(VARIND)
 			prev_var("loop");
 			// MESG("	for: end of loop: var@=%d",VARIND);
 		} else {
@@ -2599,8 +2592,6 @@ inline static void bnf_dir_for()
 //		MESG("before next loop: val=%f",val);		
 	};
 	current_active_flag=aflag;
-	// MESG("	dir_for: end of loop: is_break1=%d",is_break1,tok_info(end_block));
-	if(is_break1) { tok=exe_buffer->end_token-1;return;};
 	tok=end_block;
 	current_active_flag=old_active_flag;
 	// MESG("-- dir_for:end var@=%d active = %d",VARIND,current_active_flag);	
@@ -2613,7 +2604,7 @@ inline static void bnf_dir_while()	/* TBC  */
 	tok_struct *start_block;	// element at block start
 	tok_struct *end_block=NULL;	/* at the block end  */
 	int old_active_flag=current_active_flag;
-	// int loop_num=0;
+
 	// MESG("tok_dir_while:");
 	NTOKEN2;	/* go to next token after while */
 
@@ -2652,10 +2643,6 @@ inline static void bnf_dir_while()	/* TBC  */
 			if(is_curl) {
 				if(execmd) bnf_block1();
 				else bnf_block1_break();
-				if(current_active_flag==0) {
-					if(is_break1) { tok=exe_buffer->end_token-1;return;};
-					break;
-				};
 			} else bnf_expression0();
 			// MESG("		while end loop var@=%d a=%d[%s]",VARIND,current_active_flag,tok_info(tok));
 			if(current_active_flag==0) {	/* only after break  */

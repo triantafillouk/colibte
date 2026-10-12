@@ -12,20 +12,14 @@ inline void ntoken();
 #include	<stdlib.h>
 #include	"xe.h"
 #include	"display_driver.h"
-#include	"alist.h"
+// #include	"alist.h"
 #include	"mlang.h"
 #include	"func.h"
 #include	"token_table.h"
 
 #define	SYNTAX_DEBUG	0
 
-#if	TOKENN
-#define	NTOKEN2 tok=tok->next_token
-// #define	NTOKEN2	ntoken()
-#else
 #define NTOKEN2 tok++
-// #define	NTOKEN2	ntoken()
-#endif
 
 MVAR *current_stable=NULL; 	/* current symbol table ...  */
 
@@ -37,9 +31,6 @@ FILEBUF *exe_buffer=NULL;
 FILEBUF *check_buffer=NULL;
 void show_vars (MVAR *va, int size,char *title);
 void show_stack_var(char *from,MVAR *var);
-#if	TNORMAL
-void set_term_function(tok_struct *tok, TFunction term_function);
-#endif
 #if	!TFUNC3
 inline static void  skip_args1(int nargs);
 #endif
@@ -53,6 +44,7 @@ static inline double num_expression();
 static inline double num_term1();
 static inline double num_term2();
 double cexpression();
+void set_term_function(tok_struct *tok, TFunction term_function);
 void set_tok_function(tok_struct *tok, int type);
 void set_vtype(int type);
 #endif
@@ -569,9 +561,6 @@ tok_struct *new_tok()
 #endif
  tok->tok_node=NULL;
  // MESG("new_tok:");
-#if	TOKENN
- tok->next_token=NULL;
-#endif
  return(tok);
 }
 
@@ -579,12 +568,7 @@ tok_struct *new_tok()
 
 void ntoken()
 {
-#if	TOKENN
-	// MESG("- %s",tok->tname);
-	tok=tok->next_token;
-#else
 	tok++;
-#endif
 }
 
 int tok_type()
@@ -892,22 +876,6 @@ void show_token_table(char *title, FILEBUF *bf,tok_struct *token_start,int size)
  MESG("------------------------------------------------------");
 }
 
-#if	TOKENN
-void create_token_pointers(FILEBUF *bf)
-{
- tok_struct *tokp=bf->tok_table_bnf;
- int table_size=bf->tok_bnf_index;
- MESG("create_token_pointers:[%s] size=%d",bf->b_fname,table_size);
- int i=0;
- for(i=0;i<table_size;i++) {
-	// MESG("tp %3d %s",i,tokp->tname);
- 	tokp->next_token = tokp+1;
-	tokp++;
- };
- // tokp->next_tok=NULL;
-}
-#endif
-
 #if	TBNF
 int create_statement_group(FILEBUF *bf)
 {
@@ -1036,9 +1004,6 @@ int check_init(FILEBUF *bf)
  // bf->tok_bnf_index = 0;
  // bf->tok_bnf = bf->tok_table_bnf;
 #if	TBNF
-#if	TOKENN
- create_token_pointers(bf);
-#endif
  err_num=create_statement_group(bf);
  show_token_table("BNF ",bf,bf->tok_table_bnf,bf->tok_bnf_index);
  if(err_num) {

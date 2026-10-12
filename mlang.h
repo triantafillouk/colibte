@@ -73,9 +73,6 @@ typedef struct tok_struct {
 		struct FILEBUF *proc_buffer;
 		struct BTNODE *tok_node;
 	};
-#if	TOKENN
-	struct tok_struct *next_token;
-#endif
 } tok_struct;
 
 
@@ -139,23 +136,14 @@ double assign(int is_edenv);
 int parse_block1(FILEBUF *bf,BTREE *stree,int start);
 void assign_args1( MVAR *va,MVAR *current_stable,int nargs);
 double factor_1();
+
 #if	TNORMAL
-double term1_1();
-double term2_1();
-double lterm1_1();
-double expression_1();
-double lexpression_1();
-double assign1(int is_edenv);
-double command1();
-double exec_sentence1();
-tok_struct *gettok1();
-double exec_block1(FILEBUF *fp);
-// int check_next_token(int ind);
+// double exec_block1(FILEBUF *fp);
 #endif
 
 int check_skip_token(int type);
 int check_skip_token_err(int type,char *mesg,int err);
-int check_next_token_type(int type);
+// int check_next_token_type(int type);
 void syntax_error(int err,char *description);
 void set_error(tok_struct *tok,int index,char *description);
 int plot_on();
