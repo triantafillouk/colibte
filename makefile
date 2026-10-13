@@ -64,6 +64,8 @@ CC=zig cc -DGVERS='"$(GVERS)"'
 #CC=clang -DGVERS='"$(GVERS)"'
 #CC=gcc-mp-14 -DGVERS='"$(GVERS)"'
 #sudo codesign --force --sign - /usr/local/bin/e
+LIB2=-L/opt/homebrew/lib
+INC2=-I/opt/homebrew/include
 endif
 
 # for Linux
@@ -444,9 +446,10 @@ install_files:
 	sudo install ctg2.desktop "$(SHAREDDIR)"/applications
 	sudo install ctg3.desktop "$(SHAREDDIR)"/applications
 
+
 bigi: big/bigi.c
-	gcc big/bigi.c -o bigi -lcrypto
+	gcc big/bigi.c -o bigi $(INC2) $(LIB2) -lcrypto
 
 bigi2: big/bigi2.c
-	gcc big/bigi2.c -o bigi2 -lgmp
+	gcc big/bigi2.c -o bigi2 $(INC2) $(LIB2) -lgmp
 
