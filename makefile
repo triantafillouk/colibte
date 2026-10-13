@@ -444,5 +444,9 @@ install_files:
 	sudo install ctg2.desktop "$(SHAREDDIR)"/applications
 	sudo install ctg3.desktop "$(SHAREDDIR)"/applications
 
-bigi:
-	gcc bigi.c -o bigi -lcrypto
+bigi: big/bigi.c
+	gcc big/bigi.c -o bigi -lcrypto
+
+bigi2: big/bigi2.c
+	gcc big/bigi2.c -o bigi2 -lgmp
+

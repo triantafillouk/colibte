@@ -12,6 +12,7 @@ function fact(num)
 	return(f)
  }
 }
+}
 
 fact(3):   6.0
 

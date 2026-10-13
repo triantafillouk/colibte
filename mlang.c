@@ -1322,11 +1322,11 @@ void msg_result(char *name,int show_no_time)
 	// MESG("msg_result: @=%d t=%d %s",VARIND,result->var_type,result->sval);
 	if(VARIND==0) bnf_var++;
 	if(show_no_time) {
-		if(result->var_type==VTYPE_NUM) msg_line("%s Result (%f)",name,num_result());
+		if(result->var_type==VTYPE_NUM) msg_line("%s Result n=(%17f)",name,num_result());
 		else if(result->var_type==VTYPE_STRING) msg_line("%s Result \"%s\"",name,string_result());
 		else msg_line("%s Result @%d type %d",name,VARIND,result->var_type);
 	} else {
-		if(result->var_type==VTYPE_NUM) msg_line("[%s Result @%d (%f)",name,VARIND,num_result());
+		if(result->var_type==VTYPE_NUM) msg_line("[%s Result @%d n=(%3.17f)",name,VARIND,num_result());
 		else if(result->var_type==VTYPE_STRING) msg_line("[%s Result @%d \"%s\"",name,VARIND,string_result());
 		else msg_line("[%s Result @%d type %d",name,VARIND,result->var_type);
 	};
