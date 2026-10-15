@@ -1333,7 +1333,11 @@ void vtputwc(WINDP *wp, utfchar *uc)
 	 for(i=0;i<1;)
 	 {
 	 	c=uc->uval[i];
+#if	TNCOLORS
+		ctl_f=COLOR_SQUOTE_FG;
+#else
 		ctl_f=wp->w_fcolor;
+#endif
 		ctl_b=wp->w_bcolor;
 		if(c<0x80) {
 			c1=c;
@@ -1444,7 +1448,11 @@ void vtputwc(WINDP *wp, utfchar *uc)
 			case H_QUOTE7+H_QUOTE2:
 				if(c!=CHR_DQUOTE) 
 				{ 
+#if	TNCOLORS
+					ctl_f = COLOR_SQUOTE_FG;
+#else
 					ctl_f = COLOR_FG;
+#endif
 					ctl_b=COLOR_QUOTE_BG;
 				};
 				break;
