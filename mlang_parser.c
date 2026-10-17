@@ -518,7 +518,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
  proc_name[0]=0;
  // MESG("parse_block1: [%s] check if parsed!",bf->b_fname);
  // return if already parsed and not forced to parse
- if(bf->tok_table !=NULL && init==0) {
+ if(bf->tok_table_bnf !=NULL && init==0) {
  	check_buffer = buffer_ori;
 	return (0);
  };
@@ -1275,7 +1275,7 @@ void set_tok_table(FILEBUF *bf)
  };
  bf->tok_table_bnf=(void *)malloc(sizeof(struct tok_struct)*table_size);
  bf->tok_bnf_index=0;
- bf->tok_bnf = bf->tok_table_bnf;
+ // bf->tok_bnf = bf->tok_table_bnf;
  
  // MESG("	-- set tok_table_bnf: bf=[%s] at %p size %d",bf->b_fname,bf->tok_table_bnf,table_size);
  //eval_curl_match(NULL); // initialize curl stack

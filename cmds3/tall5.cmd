@@ -50,7 +50,7 @@ triantafilloukostas=22	:    22 | 0x16 | 0o26
 #return()
 # --------------------------------
 
-r==a+b		:     0 | 0x0 | 0o0
+r=a+b		:     0 | 0x0 | 0o0
 print("a="+a+" b="+b+" r="+r)
 
 r=="k2k2"	:     1 | 0x1 | 0o1

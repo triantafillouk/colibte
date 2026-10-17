@@ -94,7 +94,7 @@ void highlight_bicep(int c);
 void highlight_ps1(int c);
 
 char *c_w[] = { "if","elseif","else","do","while","switch","case","for","return","break","goto","continue","typedef",
-	"namespace","this","throw","try","catch","@property","default","extern","static","const","" };
+	"namespace","this","throw","try","catch","@property","default","extern","static","const","exit","" };
 char *c_w1[] = { "long", "int", "short","float", "double", "char", "union","struct","register", "unsigned","bool",
 	"void","short","enum","inline","class","public","private","volatile",
 	"@interface","@end","@class","@public","@private","@implementation","self","NULL",
@@ -175,7 +175,7 @@ char *none_w[] = { "" };
 char *text_w[] = { "" };
 
 char *shell_w[] = { "if","in","then","fi","while","for","case","done","do", "elif","else","esac","until","break", "select","" };
-char *shell_w1[] = { "function","export","set","shift","test","exit","echo","return","" };
+char *shell_w1[] = { "function","export","set","shift","test","exit","echo","return","tee","" };
 
 char *sln_w[] = { "EndProjectSection","ProjectSection","EndProject","Project","EndGlobalSection","EndGlobal","GlobalSection","Global","" };
 char *sln_w1[] = { "Debug","Presolution","" };

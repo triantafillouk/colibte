@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.8T596 (15/10/2026)"
+#define VERSION 	 "#01.8T597 (17/10/2026)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -697,9 +697,6 @@ typedef struct  FILEBUF {
 	short int	m_mode;		/* parse status flag  */
 	short int	utf_accent;	/* current utf char is with an accent!  */
 	short int	b_infocol;	/* infocol for the buffer  */
-#if	USE_SLOW_DISPLAY
-	short int slow_display;
-#endif
 	struct  FILEBUF *connect_buffer;
 	union {
 		num		connect_line;
@@ -725,7 +722,6 @@ typedef struct  FILEBUF {
 #if	TBNF
 	struct tok_struct *tok_table_bnf;
 	int tok_bnf_index;
-	struct tok_struct *tok_bnf;
 #endif
 	int err;	/* negative if not syntax checked  */
 	BTREE *symbol_tree;	/* local symbol table  */

@@ -3,11 +3,8 @@ cls
 print("--- tloop52.cmd")
 function factr(num)
 {
- if(num>1) {
-	return(factr(num-1)*num)
- } else {
- 	return(1)
- };
+ if(num>1) 	return(factr(num-1)*num)
+ return(1)
 }
 
 

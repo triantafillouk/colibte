@@ -907,7 +907,6 @@ int create_statement_group(FILEBUF *bf)
 #endif
 	if(tokp->ttype==TOK_LPAR) in_call=1;
 	if(tokp->ttype==TOK_COMMA) {
-		// tokp->statement_group=1;
 		if(!in_brackets && !in_call) tokp->bnf_group=1;
 	}
 #endif
@@ -1125,10 +1124,8 @@ MVAR *btree_to_mvar(BTREE *bt)
 /* user interupt on, set also break flag  */
 void set_break(char *from)
 {
-	MESG("set_break: from %s",from);
+	// MESG("set_break: from %s",from);
 	is_break1=1;
-	// tok->tgroup=TOK_EOF;
-	// tok->ttype=TOK_EOF;
 	current_active_flag=0;
 }
 
@@ -1184,7 +1181,6 @@ void set_bnf_function1(tok_struct *tok, int type)
 #if	TFINDEX
 	tok->function_index=ind_type;
 #endif
-	// tok->ttype=type;
 	set_ttype("set_bnf_function:",tok,type);
 	// MESG("-- set_bnf_function1: ind=%2d exp num=%3d",tok->tnum,exp_type);
  } else {
@@ -1288,8 +1284,7 @@ void update_ddot_line(char *ddot_out)
  int is_ddot=0;
  offs ddot_pos=tp_offset(tp);
  offs i,sl,el; // current offset, start,end of line
- // old_fp=cbfp;
- // sfb(buf);
+
  el=FLineEnd(buf,ddot_pos);
  sl=FLineBegin(buf,ddot_pos);
 
@@ -1311,7 +1306,6 @@ void update_ddot_line(char *ddot_out)
  } else {
 	insert_string(buf,ddot_out,strlen(ddot_out));
  }
- // sfb(old_fp);
 }
 
 #if	TBNF
@@ -1322,11 +1316,11 @@ void msg_result(char *name,int show_no_time)
 	// MESG("msg_result: @=%d t=%d %s",VARIND,result->var_type,result->sval);
 	if(VARIND==0) bnf_var++;
 	if(show_no_time) {
-		if(result->var_type==VTYPE_NUM) msg_line("%s Result n=(%17f)",name,num_result());
+		if(result->var_type==VTYPE_NUM) msg_line("%s Result (%f)",name,num_result());
 		else if(result->var_type==VTYPE_STRING) msg_line("%s Result \"%s\"",name,string_result());
 		else msg_line("%s Result @%d type %d",name,VARIND,result->var_type);
 	} else {
-		if(result->var_type==VTYPE_NUM) msg_line("[%s Result @%d n=(%3.17f)",name,VARIND,num_result());
+		if(result->var_type==VTYPE_NUM) msg_line("[%s Result @%d (%f)",name,VARIND,num_result());
 		else if(result->var_type==VTYPE_STRING) msg_line("[%s Result @%d \"%s\"",name,VARIND,string_result());
 		else msg_line("[%s Result @%d type %d",name,VARIND,result->var_type);
 	};
@@ -1631,7 +1625,7 @@ int parse_buffer_show_tokens(num n)
 #else
  out_print("|-------- Token list ---------------------------------------",1);
 #endif
- // if(tok_ind==NULL) return 0;
+
  while(1)
  {
 	if((ind%25)==0)  out_print("Num Line Ind Type               Val        Group",1);
@@ -1676,13 +1670,11 @@ char * tok_info(tok_struct *exect)
 	int ssize;
 	if(exect->tname!=NULL) {
 		char name[10];
-		// int len;
 		char *printed_name=&name[0];
 		if(exect->ttype==TOK_NUM) {
 			snprintf(name,sizeof(name),"%.1f",exect->dval);
 		} else printed_name = exect->tname;
 
-		// if(len>=sizeof(name)) name[len-1]='x';
 		ssize=snprintf(sout,sizeof(sout),"%2d:l%2d %3d [%2d=%7s][%6s][tg=%2d tb=%d] ",
 			exect->tnum,exect->tline,exect->tind,exect->ttype,tname(exect->ttype),printed_name,exect->tgroup/*,tname(exect->tgroup)*/,exect->bnf_group);
 		sout1=sout+ssize;
@@ -1702,13 +1694,11 @@ char * tok_info(tok_struct *exect)
 			};
 			snprintf(sout1,sizeof(sout)-ssize,"rows=%d cols=%d",rows,cols);
 		}  else	if(exect->tgroup==TOK_OPNUM) { 
-			// snprintf(sout,sizeof(sout),"%3d:%4d %s",exect->tnum,exect->tline,exect->tname);
 			snprintf(sout1,sizeof(sout)-ssize,"%5.1f",exect->dval);
 		} else 
 		if(exect->ttype==TOK_SHOW) { // snprintf(sout1,sizeof(sout)-ssize,"bnf=%2d",exect->bnf_group);
 		} else
 		if(exect->ttype==TOK_LCURL||exect->ttype==TOK_RCURL) {
-				// snprintf(sout,sizeof(sout),"%3d:%4d CURL",exect->tnum,exect->tline);
 				snprintf(sout1,sizeof(sout)-ssize,"-> %d",exect->match_tok->tnum);
 		} else	if(exect->tgroup>0) {
 			// snprintf(sout,sizeof(sout),"%3d:%4d %s",exect->tnum,exect->tline,exect->tname);
@@ -1728,7 +1718,6 @@ char * tok_info(tok_struct *exect)
 			if(exect->proc_buffer == NULL) 
 				snprintf(sout1,sizeof(sout)-ssize," NULL proc bnf=%2d",exect->bnf_group);
 			else {
-				// int len=snprintf(sout1,sizeof(sout)-ssize,"'%s' args %d",exect->proc_buffer->b_fname,exect->t_nargs);
 				int len=snprintf(sout1,sizeof(sout)-ssize,"args %d",exect->t_nargs);
 				if(len+ssize>=sizeof(sout))  MESG("	truncated");
 			};
@@ -1738,7 +1727,6 @@ char * tok_info(tok_struct *exect)
 		} else if(exect->ttype==TOK_VAR) {
 			// MESG("TOK_VAR:");
 			int vtype=0;
-			// int assigned=0;
 #if	0
 			BTNODE *var_node = exect->tok_node;
 			char *var_name="unknown";

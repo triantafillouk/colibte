@@ -4022,7 +4022,9 @@ void  EmptyText(FILEBUF *bp)
    bp->b_state &= ~(FS_CHG);
    bp->maxlinelen=0;
    strlcpy(bp->EolStr,"\n",3);
-   if(bp->tok_table!=NULL){
+
+   if(bp->tok_table!=NULL)
+   {
 	empty_tok_table(bp);
    };
    bp->err=-1;

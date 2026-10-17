@@ -1,1 +1,2 @@
+#!/usr/bin/sh
 for i in cmds2/*.cmd;do echo $i;$1 -x $i;done |tee check_cmd_$2.out
