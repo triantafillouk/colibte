@@ -1671,7 +1671,7 @@ void list_dir1(char *st)
 		strcpy(st,"");
 		list_dir1(st);
 	} else {
-		msg_line("cannot change to dir [%s]",dirname);
+		error_line("cannot change to dir [%s]",dirname);
 	};
  };
  list_off();

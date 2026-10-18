@@ -353,7 +353,7 @@ int set_key_function2(int (*kfunc)(num), int c,char *name,KEYTAB *keytab)
 	} else {	/* otherwise we need to add it to the end */
 		if (ktp >= keytab+MAXASSIGNS) {
 			ERROR("key table FULL\n");
-			msg_line("key table FULL!");
+			error_line("key table FULL!");
 			return(FALSE);
 		}
 
@@ -936,24 +936,16 @@ void out_print(char *s,int nl)
 	// FILEBUF *oldfp = cbfp;
 	// MESG("out_print: current buffer is [%s] discmd=%d",cbfp->b_fname,discmd);
 	if(s==NULL) return;
-#if	0
-	if(!discmd) return ;
-#else
-	if(!discmd) {
-#if	0
-		if(debug_flag()) {
-			if(nl) fprintf(stderr,"%s\n",s);
-			else fprintf(stderr,"%s",s);
-		};
-#endif
-		if(nl) fprintf(stdout,"%s\n",s);
-		else fprintf(stdout,"%s",s);
-		return;
-	};
-#endif
+
 	if(debug_flag()) {
 		if(nl) fprintf(stderr,"%s\n",s);
 		else fprintf(stderr,"%s",s);
+	};
+
+	if(!discmd) {
+		if(nl) fprintf(stdout,"%s\n",s);
+		else fprintf(stdout,"%s",s);
+		return;
 	};
 
 	if((bp=new_filebuf("[out]",0)) !=NULL) {

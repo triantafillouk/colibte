@@ -160,7 +160,7 @@ void efree(void *p,char *des)
 
 void  FError(const char *s)
 {
-	msg_line("File: [%s][%s] %s errno=%d",cbfp->b_dname,cbfp->b_fname,s,errno);
+	error_line("File: [%s][%s] %s errno=%d",cbfp->b_dname,cbfp->b_fname,s,errno);
 	// SYS_ERROR("File: [%s] %s errno=%d",cbfp->b_fname,s,errno);
 }
 
@@ -2264,7 +2264,7 @@ int	writeout(char *name, FILEBUF *bf)
 	  	msg_line("already saved!");
 		return true; // same file already saved!
 	 }
-	  msg_line("cannot save a mmap file with different name!");
+	  error_line("cannot save a mmap file with different name!");
 	  return FALSE;
    }
 
@@ -2317,7 +2317,7 @@ int	writeout(char *name, FILEBUF *bf)
 	 return error_line("cannot lock file %s for write!",name); 
    };
 
-   if(lock_res==-2) msg_line("Warning: file %s locking failed",name);
+   if(lock_res==-2) error_line("Warning: file %s locking failed",name);
 	// MESG("writeout: write buffer contents encrypt=%X",bf->b_mode);
    /* write the buffer contents */
    errno=0;
@@ -3058,7 +3058,7 @@ int next_utf8_error(num n)
  if(!FEofAt(fp,o)) {
  	textpoint_set(fp->tp_current,o);
 	set_update(cwp,UPD_WINDOW);
-	msg_line("Found utf8 error!");
+	error_line("Found utf8 error!");
 	return 1;
  } else {
  	msg_line("No utf8 error!");

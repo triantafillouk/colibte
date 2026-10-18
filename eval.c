@@ -677,7 +677,7 @@ int docmd(char *cmd)
  double value=0;
  value = compute_string(cmd,NULL);
  if(err_num>0) { 
- 	msg_line("Error!: %s",err_str);
+ 	error_line("Error!: %s",err_str);
 	init_error();
  	return(FALSE);
  } else {
@@ -1134,7 +1134,7 @@ int save_session(num n)
 
  sstat=snprintf(session_file,sizeof(session_file),"%s/.colibte/%s",getenv("HOME"),"session.keys");
  if(sstat>=MAXLLEN) {
- 	msg_line("error saving session");
+ 	error_line("error saving session");
 	return 0;
  };
 // MESG("save_session: len=%d to [%s]",len,session_file);
@@ -1209,7 +1209,7 @@ int save_trace(num n)
 	fprintf(fp,"-------------------------------------------------------------\n");
 	fclose(fp);
 //	show_info(1);
-	msg_line("Error ..!!! trace.log created!!!");
+	error_line("Error ..!!! trace.log created!!!");
 	return true;
 }
 #endif
@@ -1304,7 +1304,7 @@ int refresh_current_line(num nused)
 
 	macro_exec=0;
 	if(err_num>0) {
- 		msg_line("Error [%d] %s",err_num,err_str);
+ 		error_line("Error [%d] %s",err_num,err_str);
 		set_update(cwp,UPD_EDIT);
 		return (FALSE);
  	} else {

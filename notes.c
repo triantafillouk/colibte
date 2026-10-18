@@ -495,7 +495,7 @@ int query_rowid(sqlite3 *db,char *sql)
  int row_id=0;
 // MESG("query row_id: [%s]",sql);
 
- if(db==NULL) { msg_line("db is NULL!!!!!");return 0;};
+ if(db==NULL) { error_line("db is NULL!!!!!");return 0;};
  stat = sqlite3_prepare_v2(db, sql, -1, &res, 0);
  if(stat==SQLITE_OK) {
 	step = sqlite3_step(res);
@@ -693,7 +693,7 @@ int save_to_db(notes_struct *note)
 		stat=true;
 		new_note_id=sqlite3_last_insert_rowid(db);
 	} else {
-		msg_line("cannot create note record!");
+		error_line("cannot create note record!");
 		stat=false;
 		new_note_id=0;
 

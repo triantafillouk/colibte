@@ -709,7 +709,7 @@ int  list_filebuf(char *title, char *return_string,int f1,int *return_flag)
 				else {
 					int stat;
 					stat=snprintf(return_string,MAXFLEN,"%s/%s",bp->b_dname,bp->b_fname);
-					if(stat>=MAXLLEN) msg_line("truncated 12 string");
+					if(stat>=MAXLLEN) error_line("truncated 12 string");
 				};
 				break;
 			};
@@ -1869,7 +1869,7 @@ int init_ftype(FILEBUF *bp,char *fname,int *temp_used,int from_note)
 		s= resetkey(bp);
 	};
 	if(close(bp->file_id)!=0) {
-    	msg_line("Error %d closing file",errno);
+    	error_line("Error %d closing file",errno);
 		bp->file_id=0;
         return(false);
     };
@@ -2045,7 +2045,7 @@ int add_to_recent_list(char *full_file_name)
 int save_file_history(num n)
 {
  char *fname;
-
+ // MESG("save_file_history:");
  if(bt_dval("save_history")==0) return 0;
  // MESG("save_file_history:");
  fname = find_file("",APPLICATION_HISTORY,1,1);

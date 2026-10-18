@@ -135,7 +135,7 @@ void set_current_window(WINDP *new_wp,char *title)
 	cwp = new_wp;
 	set_curgwp();
 	if(/* wp->w_fp->b_dname!=NULL && */ new_wp->w_fp->b_dname[0]!=0)
-		if(chdir(new_wp->w_fp->b_dname)!=0) msg_line("cannot set current window dir [%s]",new_wp->w_fp->b_dname);
+		if(chdir(new_wp->w_fp->b_dname)!=0) error_line("cannot set current window dir [%s]",new_wp->w_fp->b_dname);
 	cbfp=new_wp->w_fp;
 	cbfp->tp_current = cwp->tp_current;
 	set_update(new_wp,UPD_STATUS);
@@ -850,7 +850,7 @@ int sh_outwindow(num n)
 				set_update(cwp,UPD_ALL);
 				return (OK_CLRSL);
 			};			
-			msg_line("cannot delete output window while inside it");
+			error_line("cannot delete output window while inside it");
 			return 0;
 		};
 		split_window(1);

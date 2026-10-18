@@ -687,7 +687,7 @@ int is_mlang(FILEBUF *fp)
  int bt=fp->b_type;
  // MESG("check macro file!");
  if(fp->b_flag & FSNLIST) {
- 	msg_line("dir is not an mlang file! %X",fp->b_flag);
+ 	error_line("dir is not an mlang file! %X",fp->b_flag);
 	return 0;
  };
 
@@ -699,12 +699,12 @@ int is_mlang(FILEBUF *fp)
 	!file_type_is("GTEXT",bt)) 
  {
 	MESG("this is NOT a macro file!!!!!!!!!!!!!!");
- 	msg_line("Not an mlang file bt=%d",bt);
+ 	error_line("Not an mlang file bt=%d",bt);
 	return 0;	/* only allowed in selected types  */
  };
 
  if(!strcmp("[out]",fp->b_fname)) {
- 	msg_line("cannot check [out] buffer!!");
+ 	error_line("cannot check [out] buffer!!");
 	return 0;
  };
  // MESG("this is a macro file!");
@@ -730,7 +730,7 @@ MVAR *new_symbol_table(int const size)
 		fprintf(stderr,"new_symbol_table: overflow: available=%ld required=%ld\n",call_stack_available-call_stack,call_stack_used-call_stack);
 		exit(0);
 	} else {
-		msg_line("new_symbol_table: overflow: available=%d required=%d",call_stack_available-call_stack,call_stack_used-call_stack);
+		error_line("new_symbol_table: overflow: available=%d required=%d",call_stack_available-call_stack,call_stack_used-call_stack);
 	};
 	set_error(tok,301,"call_stack overflow");
 	return NULL;
@@ -959,7 +959,7 @@ int check_init(FILEBUF *bf)
 	parse_block1(bf,NULL,1);
 	// MESG("block parsed err = %d",err_num);
 	if(err_num>0) {
-		msg_line("found parsed errors: err_num=%d %s",err_num,err_str);
+		error_line("found parsed errors: err_num=%d %s",err_num,err_str);
 		check_buffer = ori_buffer;
 		// MESG("check_init: return 2 err_num=%d",err_num);
 		return(err_num);
@@ -1441,7 +1441,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	};
 #endif
  } else {
- 	msg_line("parse error %d on %s ",err_num,bp->b_fname);
+ 	error_line("parse error %d on %s ",err_num,bp->b_fname);
 #if	TNORMAL
 	val=0;
 #endif
@@ -1551,13 +1551,13 @@ int refresh_current_buffer(num nused)
 		msg_result("",0);
 	};
  } else {
- 	msg_line("parse error %d line %d [%s]",err_num,err_line+1,err_str);
+ 	error_line("parse error %d line %d [%s]",err_num,err_line+1,err_str);
 	return(0);
  };
 
  if(plot_on()) plot_redraw();
  textpoint_set_lc(cwp->tp_current,curline,0);
- msg_line("");
+ // msg_line("");
  set_update(cwp,UPD_EDIT);
  return(OK_CLRSL);
 }
@@ -1583,7 +1583,7 @@ int parse_check_current_buffer(num n)
  // MESG("parse_check_current_buffer: after check_init");
  if(err_num>0) {
 	macro_exec=0;
-	msg_line("syntax error %d line %d [%s]",err_num,err_line,err_str);
+	error_line("syntax error %d line %d [%s]",err_num,err_line,err_str);
 	show_error("parse_check",fp->b_fname);
 	igotolinecol(err_line+1,1,1);
  	return(0);
@@ -1617,7 +1617,7 @@ int parse_buffer_show_tokens(num n)
 #endif
  // MESG("Print token table to out buffer");
  if(tok_ind==NULL) {
-	msg_line("parsing buffer produced no table!");
+	error_line("parsing buffer produced no table!");
 	return(0);
  };
 #if	TBNF
@@ -1662,9 +1662,7 @@ char * tok_info(tok_struct *exect)
 {
  static char sout[MAXLLEN];
 
- if(!debug_flag()) return "";
 	if(exect==NULL) { MESG("tok_info: NULL token!");return "null token";};
-	// printf("tok_info: ttype=%d\n",tok->ttype);
 	memset(sout,0,sizeof(sout));
 	char *sout1;
 	int ssize;
@@ -1862,7 +1860,7 @@ int show_parse_buffer(num n)
  tok_table=fp->tok_table;
  tok_ind=tok_table;
  if(tok_ind==NULL) {
-	msg_line("parsing buffer produced no table!");
+	error_line("parsing buffer produced no table!");
 	return(0);
  }
  cls_fout(parsebuf);
@@ -1936,7 +1934,7 @@ int exec_named_function(char *name)
 	/* find the pointer to that buffer */
     if ((bp=get_filebuf(bufn,NULL,FSINVS)) == NULL) 
 	{
-		msg_line("No function named %s",bufn);
+		error_line("No function named %s",bufn);
 		return(FALSE);
     };
 	bp->b_type=1;	/* set file type to cmd  */
@@ -1946,7 +1944,7 @@ int exec_named_function(char *name)
 	parse_block1(bp,NULL,0);	/* do not init if already parsed!  */
 
 	if((err_num=check_init(bp))>0) {
-		msg_line("error in check_init: %s",name);
+		error_line("error in check_init: %s",name);
 		return(0);
 	};//  else msg_line("go exec %s",name);;
 	double value;

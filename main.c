@@ -168,7 +168,7 @@ int main(int argc, char **argv)
 		/* initialize the editor */
 		// MESG("init_names");
 		init_names();
-		MESG("init_extensions");
+		// MESG("init_extensions");
 		init_extensions();	// file extensions
 		if(startfile==NULL) {
 			startfile=find_file("",APPLICATION_RC,1,0);

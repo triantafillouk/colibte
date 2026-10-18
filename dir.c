@@ -434,7 +434,7 @@ int dir_size(num n)
   set_unique_tmp_file(tmp_name,"du",MAXFLEN);
   // MESG("results to %s",tmp_name);
   if(snprintf(sline,sizeof(sline),"du -sh %s > %s 2>/dev/null",dir_name,tmp_name)>=sizeof(sline)){
-  	msg_line("command %s too long!",sline);
+  	error_line("command %s too long!",sline);
 	return(FALSE);
   };
   int status=system(sline);
@@ -537,7 +537,7 @@ int scandir2(char *dirname, struct kdirent ***namelist_a)
  } ;
  namelist[i]=NULL;
  if(num_of_files<MAXSTAT)qsort_dir(namelist,num_of_files,current_sort_mode);
- else msg_line("dir too big to sort contains %d files",num_of_files);
+ else error_line("dir too big to sort contains %d files",num_of_files);
 
  *namelist_a = namelist;
  return(num_of_files);
@@ -643,7 +643,7 @@ int dir_edit(num n)
 		status=goto_file(dname);
 		set_working_dir(fp->b_dname);
 		set_hmark(1,"dir_edit:b");
-  	} else msg_line("not normal");
+  	} else error_line("not normal");
 	return(status);
  };
 }
@@ -684,7 +684,7 @@ int copy_1file(char *fname,char *destination,int ftype,num cptype)
   escape_file_name(fname);
   if(snprintf(sline,sizeof(sline),"cp %s %s %s 2> /dev/null",
   	cp_flags,fname,destination)>=MAXLLEN) {
-		msg_line("File name too long!");
+		error_line("File name too long!");
 		return(FALSE);
 	};
 
@@ -710,7 +710,7 @@ int move_1file(char *fname,char *destination)
 
   if(snprintf(sline,sizeof(sline),"mv %s %s 2> /dev/null",
   	fname,destination)>=MAXLLEN) {
-		msg_line("move command too long!");
+		error_line("move command too long!");
 		return(FALSE);
 	};
 
@@ -1655,7 +1655,7 @@ int script_exec(num nuse)
 
 	if(snprintf(script_line,sizeof(script_line),"%s %s/%s > %s 2>%s",
 		script_cmd,dir_name,script_name,out_file,err_file)>=MAXLLEN) {
-			msg_line("script name too long!");
+			error_line("script name too long!");
 			return FALSE;
 		};
 	// MESG("script_exec:[%s]",script_line);

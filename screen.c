@@ -259,7 +259,8 @@ void msg_line(char *fmt, ...)
 		if(app_error || debug_flag()) 
 		{ 
 			if(strlen(mline)>0 && mline[0]!=' ') MESG("%s",mline); 
-		};
+			out_print(mline,1);
+		} 
 		drv_msg_line(mline);
 		set_update(cwp,UPD_MOVE);	/* to force restore cursor after message  */
 	};

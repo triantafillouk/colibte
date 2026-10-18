@@ -71,7 +71,7 @@ int sysexec(char *st)
 				if( *st1=='>' ) {*st1=0;break;};
 				st1++;
 			};
-			msg_line("command error in [%s] status %d",st,status);
+			error_line("command error in [%s] status %d",st,status);
 			events_flush();
 		};
 		return(FALSE);
@@ -100,7 +100,7 @@ int update_tags(num nused)
 	if((tagb=get_filebuf("[tagx.tags]",NULL,0)) == NULL) {
 		if((tagb=new_filebuf("[tagx.tags]", FSINVS)) == NULL) { 
 			list_off();
-			msg_line("cannot create [tagx.tags] buffer!");
+			error_line("cannot create [tagx.tags] buffer!");
 			return(0);
 		};
 	};
@@ -136,10 +136,10 @@ int view_functions (num nused)
 	events_flush();
 	// create the tag file
 	status=snprintf(tag_file,sizeof(tag_file),"%s.tag",cbfp->b_fname);
-	if(status>=sizeof(tag_file)) { msg_line("string overflow 1 in view_functions");events_flush();return false;};
+	if(status>=sizeof(tag_file)) { error_line("string overflow 1 in view_functions");events_flush();return false;};
 
 	status=snprintf(tag_cmd,sizeof(tag_cmd),"ctags -x --c-kinds=%s %s 2>err1 | awk '{printf \"%%4s %%s %%s %%s %%s %%s %%s\\n\", $3,$6,$7,$8,$9,$10,$11}' > %s 2>/dev/null",kind,cbfp->b_fname,tag_file);
-	if(status>sizeof(tag_cmd)) { msg_line("string overflow 2 in view_functions");events_flush();return false;};
+	if(status>sizeof(tag_cmd)) { error_line("string overflow 2 in view_functions");events_flush();return false;};
 
 	status=system(tag_cmd);
 	if(status!=0) {
@@ -254,7 +254,7 @@ int exec_shell(char *tline)
 				change_window(find_buffer_window(bp));
 			};
 		} else {
-			msg_line("cannot create command buffer");
+			error_line("cannot create command buffer");
 			return(0);
 		};
 	
@@ -265,7 +265,7 @@ int exec_shell(char *tline)
 			}
 	
 		} else {
-			msg_line("cannot create error buffer");
+			error_line("cannot create error buffer");
 			return(FALSE);
 		};
 	
@@ -366,7 +366,7 @@ int shell_cmd1(int  nused)
 			change_window(find_buffer_window(bp));
 		};
 	} else {
-		msg_line("cannot create command buffer");
+		error_line("cannot create command buffer");
 		return(0);
 	};
 
@@ -377,7 +377,7 @@ int shell_cmd1(int  nused)
 		}
 
 	} else {
-		msg_line("cannot create error buffer");
+		error_line("cannot create error buffer");
 		return(0);
 	};
 
@@ -400,7 +400,7 @@ int shell_cmd1(int  nused)
 	msg_line("ok!");
 	return(TRUE);
 	} else {
-		msg_line("error in shell command!");
+		error_line("error in shell command!");
 		set_update(cwp,UPD_MOVE);
 		return (FALSE);
 	};
@@ -502,7 +502,7 @@ int grep_cmd(num n)
 #endif
 
 	if(chdir(search_dir)) {
-		msg_line("cannot chdir to %s",search_dir);
+		error_line("cannot chdir to %s",search_dir);
 		return false;
 	};
 
@@ -551,7 +551,7 @@ int grep_cmd(num n)
 		if((bp=new_filebuf(bname,0)) != FALSE) {
 		
 		} else {	
-			msg_line("cannot create grep buffer");
+			error_line("cannot create grep buffer");
 			return(0);
 		};
 	};
@@ -576,7 +576,7 @@ int grep_cmd(num n)
 	/* and get rid of the temporary file */
 	unlink(filnam);
 	if(chdir(search_dir)) {
-		msg_line("cannot chdir to %s",search_dir);
+		error_line("cannot chdir to %s",search_dir);
 		return false;
 	};
 
