@@ -974,10 +974,24 @@ void update_cursor_position()
 				movecursor(cwp->current_note_line-cwp->top_note_line+(cwp->w_fp->b_header!=NULL), 0);
 			} else if(is_wrap_text(cwp->w_fp)) {
 				// MESG("update_cursor_position: wrap");
-				// MESG("update_cursor_position: row=%d col=%d %d",cwp->currow,cwp->curcol,WGetCol());
+				// MESG("update_cursor_position:wrap row=%d col=%d %d",cwp->currow,cwp->curcol,WGetCol());
+				if(cwp->currow>=cwp->w_ntrows-4) {
+					// MESG("update_cursor_position: rows=%d ntrows=%d",cwp->currow,cwp->w_ntrows);
+					move_window(-cwp->currow-4+cwp->w_ntrows);
+					// cwp->currow = cwp->w_ntrows-4;
+					update_window_wrap(cwp,1);
+					update_physical_windows();
+				};
+				// set_update(cwp,UPD_MOVE);
 				movecursor(cwp->currow,cwp->curcol);
 			} else {
 				// MESG("update_cursor_position: regular %d",WGetCol());
+				if(cwp->currow>=cwp->w_ntrows-4) {
+					// MESG("update_cursor_position: rows=%d ntrows=%d",cwp->currow,cwp->w_ntrows);
+					move_window(cwp->currow+4-cwp->w_ntrows);
+					update_window_nowrap(cwp,1);
+					update_physical_windows();
+				};
 				movecursor(cwp->currow+(cwp->w_fp->b_header!=NULL), WGetCol());
 			};
 			// MESG("update_cursor_position: go show_cusor");

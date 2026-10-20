@@ -181,7 +181,7 @@ offs FNext_wrap_line(WINDP *wp,offs start,int lines,int top)
  FILEBUF *fp=wp->w_fp;
  // from the start of the wrap line
  int col=0;
- // MESG_time(";FNext_wrap_line: from %ld lines=%d",start,lines);
+ MESG_time(";FNext_wrap_line:< from o=%ld lines=%d",start,lines);
 
  while(lines-- >0)
  {
@@ -210,7 +210,7 @@ offs FNext_wrap_line(WINDP *wp,offs start,int lines,int top)
   };
   col=0;
  };
- // MESG_time("!: > from %ld to %ld col=%d",start,o,col);
+ MESG_time(";FNext_wrap_line: > from %ld to %ld col=%d",start,o,col);
  return o;
 }
 
@@ -347,18 +347,26 @@ int move_window(num n)
 	offs curoffs;
 	if(!drv_initialized) return false;
 	if(n==0) return FALSE;
+
 	if(is_wrap_text(cwp->w_fp)) 
 		curoffs = tp_offset(cwp->tp_hline);
 	else
 		curoffs = LineBegin(tp_offset(cwp->tp_hline));
-	// MESG("move_window: current=%ld n=%d",curoffs,n);
+	MESG("move_window: current=%ld n=%d",curoffs,n);
     if (n < 0) {
 			if(is_wrap_text(cwp->w_fp)) {
-			curoffs=FNext_wrap_line(cwp,curoffs,-n,1);
+#if	1
+		        while (n++ < 0) {
+					curoffs=FNext_wrap_line(cwp,curoffs,1,1);
+					MESG("	new curoffs %ld",curoffs);
+				};
+#else
+				curoffs=FNext_wrap_line(cwp,curoffs,-n,1);
+#endif
 			} else {	
-        while (n++ < 0) {
-				curoffs=FNextLine(cwp->w_fp,curoffs);
-		}
+		        while (n++ < 0) {
+						curoffs=FNextLine(cwp->w_fp,curoffs);
+				}
 			};
     } else  {
 		if(is_wrap_text(cwp->w_fp)) {
@@ -370,13 +378,14 @@ int move_window(num n)
 	        while ((n-- >0) && (curoffs>0)) curoffs=FPrevLine(cwp->w_fp,curoffs);
 		};
     }
-	set_update(cwp,UPD_MOVE|UPD_WINDOW);
 	tp_copy(cwp->prev_hline,cwp->tp_hline);
 	set_top_hline(cwp,curoffs,"move_window");
+	set_update(cwp,UPD_MOVE|UPD_WINDOW);
 	// textpoint_set(cwp->tp_hline,curoffs);
+	MESG("move_window: new tp_hline: o=%ld line=%ld",tp_offset(cwp->tp_hline),tp_line(cwp->tp_hline));
 	// MESG("move_window: by %d top from (o=%ld l=%ld) to (o=%ld l=%ld) col=%ld",lines_to_move,from_offset,from_line
 		// ,curoffs,tp_line(cwp->tp_hline),tp_col(cwp->tp_hline));
-
+	// redraw_screen();
     return (TRUE);
 }
 
