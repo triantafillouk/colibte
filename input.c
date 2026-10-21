@@ -943,8 +943,10 @@ void out_print(char *s,int nl)
 	};
 
 	if(!discmd) {
+		if(execmd) {
 		if(nl) fprintf(stdout,"%s\n",s);
 		else fprintf(stdout,"%s",s);
+		};
 		return;
 	};
 

@@ -27,6 +27,8 @@ int get_menu_index_from_mouse();
 void utf_string_break(char *utf_string, int column);
 int noop(num);
 void upd_all_wrap_lines(WINDP *wp,char *from);
+void update_window_nowrap(WINDP *wp,int force);
+void update_window_wrap(WINDP *wp,int force);
 
 extern int drv_initialized;
 extern FILEBUF *cbfp;
@@ -975,23 +977,27 @@ void update_cursor_position()
 			} else if(is_wrap_text(cwp->w_fp)) {
 				// MESG("update_cursor_position: wrap");
 				// MESG("update_cursor_position:wrap row=%d col=%d %d",cwp->currow,cwp->curcol,WGetCol());
-				if(cwp->currow>=cwp->w_ntrows-4) {
+#if	1
+				if(cwp->currow>=cwp->w_ntrows-2) {
 					// MESG("update_cursor_position: rows=%d ntrows=%d",cwp->currow,cwp->w_ntrows);
-					move_window(-cwp->currow-4+cwp->w_ntrows);
-					// cwp->currow = cwp->w_ntrows-4;
+					move_window(-cwp->currow-2+cwp->w_ntrows);
+					// cwp->currow = cwp->w_ntrows-2;
 					update_window_wrap(cwp,1);
 					update_physical_windows();
 				};
+#endif
 				// set_update(cwp,UPD_MOVE);
 				movecursor(cwp->currow,cwp->curcol);
 			} else {
 				// MESG("update_cursor_position: regular %d",WGetCol());
-				if(cwp->currow>=cwp->w_ntrows-4) {
+#if	1
+				if(cwp->currow>=cwp->w_ntrows-2) {
 					// MESG("update_cursor_position: rows=%d ntrows=%d",cwp->currow,cwp->w_ntrows);
-					move_window(cwp->currow+4-cwp->w_ntrows);
+					move_window(cwp->currow+2-cwp->w_ntrows);
 					update_window_nowrap(cwp,1);
 					update_physical_windows();
 				};
+#endif
 				movecursor(cwp->currow+(cwp->w_fp->b_header!=NULL), WGetCol());
 			};
 			// MESG("update_cursor_position: go show_cusor");
@@ -1904,7 +1910,7 @@ int get_utf_custom_length(utfchar *utf_char_str)
 #if	DARWIN
 		if (b2==0xA6) return 1;	/* not shown in Dawrin  */
 #else
-		if (b2==0x84) return 3;
+		if (b2==0xA6) return 3;
 #endif
 		return 2;
 	};

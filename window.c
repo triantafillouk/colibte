@@ -572,7 +572,14 @@ int window_cursor_line(WINDP *wp)
 	else if(is_wrap_text(cwp->w_fp)) {	// WRAP mode!
 		return window_cursor_line_wrap(wp);
 	} 
-	else cline = tp_line(wp->tp_current)-tp_line(wp->tp_hline);
+	else {
+#if	1
+		if(is_wrap_text(cwp->w_fp)) 
+			cline = window_cursor_line_wrap(wp);
+		else 
+#endif
+			cline = tp_line(wp->tp_current)-tp_line(wp->tp_hline);
+	};
  // MESG("window_cursor_line: %d",cline);
  return (cline);
 }
