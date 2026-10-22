@@ -208,8 +208,8 @@ offs vt_wrap_line(WINDP *wp, offs tp_offs)
 /*	upd_all_wrap_lines:	update all the lines in a window */
 void upd_all_wrap_lines(WINDP *wp,char *from)
 {
-	register offs lp_offs;	/* offset of line to update */
-	register int sline;	/* physical screen line to update */
+	offs lp_offs;	/* offset of line to update */
+	int sline;	/* physical screen line to update */
 	int head=0;
 
 	if(noupdate) return;
@@ -217,12 +217,13 @@ void upd_all_wrap_lines(WINDP *wp,char *from)
 	if(wp->w_fp == NULL) return;
 	/* search down the lines, updating them */
 	lp_offs = tp_offset(wp->tp_hline);
-	MESG_time("#update_all_wrap_lines:window %d width=%d top offset=%ld", wp->id,wp->w_width, lp_offs);
+
+	// MESG_time("#update_all_wrap_lines:window %d width=%d top offset=%ld", wp->id,wp->w_width, lp_offs);
+
+	// set_goal_column(0,"a");
 	wp->w_fp->hl->h_update(wp);
 	set_selection(0);
 
-	// cline_end=FLineEnd(wp->w_fp,lp_offs);
-	// cstart_offset=lp_offs;
 	cashed_FLend(wp->w_fp,lp_offs,1);
 	highlight_restore_state(wp,0);
 	// MESG("# update_all_wrap_lines: wrap=%d window %d",is_wrap_text(wp->w_fp),wp->id);
