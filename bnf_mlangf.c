@@ -16,7 +16,6 @@ int check_token(int type);
 double determinant(array_dat *aa);
 array_dat * cofactor2(array_dat *numa,double det);
 array_dat *transpose(array_dat *array1);
-void clean_saved_string(int new_size);
 void print_array1(char *title,array_dat *adat);
 void get_uppercase_string(char *upper, char *string);
 void get_lowercase_string(char *lower, char *string);
@@ -317,7 +316,6 @@ void bnf_upper()	/* TBC  */
 	MVAR *va=bnf_var;
 	// if(va->var_type==VTYPE_POINTER) va=va->var_pointer;
 	if(va->var_type==VTYPE_STRING) {
-		// clean_saved_string(strlen(va[0].sval));
 		char *s=(char *)malloc(strlen(va[0].sval+1));
 		get_uppercase_string(s,va[0].sval);
 		if(bnf_var->var_alloced) free(bnf_var->sval);
@@ -337,7 +335,6 @@ void bnf_lower()	/* TBC  */
 	MVAR *va=bnf_var;
 	// if(va->var_type==VTYPE_POINTER) va=va->var_pointer;
 	if(va->var_type==VTYPE_STRING) {
-		// clean_saved_string(strlen(va[0].sval));
 		char *s=(char *)malloc(strlen(va[0].sval+1));
 		get_lowercase_string(s,va[0].sval);
 		if(bnf_var->var_alloced) free(bnf_var->sval);

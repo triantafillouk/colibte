@@ -34,12 +34,13 @@ void show_stack_var(char *from,MVAR *var);
 #if	!TFUNC3
 inline static void  skip_args1(int nargs);
 #endif
-inline static MVAR *get_left_slot(int ind);
 inline static int check_token(int type);
 void show_var_node(BTNODE *node);
 void eval_btree1(BTNODE *node,void do_func(BTNODE *n,void *p),void *p);
 
 #if	TNORMAL
+inline static MVAR *get_left_slot(int ind);
+void clean_saved_string(int new_size);
 static inline double num_expression();
 static inline double num_term1();
 static inline double num_term2();
@@ -50,8 +51,6 @@ void set_vtype(int type);
 #endif
 
 int check_init(FILEBUF *bf);
-
-// inline static void ntoken2();
 
 #if	TBNF
 static inline void bnf_factor_dummy();
@@ -99,7 +98,6 @@ int stage_level=0;	/* stage level  */
 
 int err_check_block1();
 int check_skip_token1( int type);
-void clean_saved_string(int new_size);
 int deq(double v1,double v2);
 char *str_mul(char *sval, double v1);
 char *str_cat(char *sval, char *add);
@@ -120,24 +118,16 @@ int get_vtype();
 #if	TBNF
 int bnf_debug();
 #endif
-TLIST ctoklist=NULL;
 int is_break1=0;
 int tok_mask[256];
 int no_check=0;
-#define	USE_VAR	1
 
-static MVAR ex_var; 	/* value of previous expression */
-array_dat *get_array(char *);
-void set_array(array_dat *);
-
-array_dat *ex_array=NULL;
 char *saved_string=NULL;
 
 int ex_edenv=0;	/* true after encount an editor env variable */
 int ex_nvars=0;	/* true is there are variables in the array definition  */
 int ex_nquote=0;	/* true if there are strings in the array definition  */
 int ex_nums=0;	/* true if array is only numeric  */
-char *ex_name=NULL;	/* variable name of the previous array  */
 
 /* error control variables  */
 int err_num=0;
@@ -149,14 +139,20 @@ static tok_struct *tok=NULL;	/* current token!!  */
 char *err_str;
 BTNODE *var_node=NULL;
 
+#if	TNORMAL
+array_dat *get_array(char *);
+void set_array(array_dat *);
+
+static MVAR ex_var; 	/* value of previous expression */
+char *ex_name=NULL;	/* variable name of the previous array  */
+array_dat *ex_array=NULL;
+
 tok_struct *lstoken=NULL;
 MVAR *lsslot=NULL;
-#if	TNORMAL
 char **ls_psval=NULL;
-#endif
 double *ls_pdval=NULL;
 MVAR *lmvar=NULL;
-int firt_var=1;
+#endif
 
 // CALL_STACK variables
 MVAR *call_stack;
@@ -498,9 +494,11 @@ inline void init_vars(MVAR *head,int const size)
 void initialize_call_stack(int initial_size)
 {
 	// MESG("Initialize call_stack with %d size",initial_size);
-	call_stack=(MVAR *)malloc(sizeof(struct MVAR)*initial_size);
-	call_stack_used=call_stack;
-	max_call_stack_end=call_stack;
+	MVAR *call_stack_init=(MVAR *)malloc(sizeof(struct MVAR)*initial_size);	
+	// static MVAR call_stack_init[500];
+	call_stack = call_stack_init;
+	call_stack_used=call_stack_init;
+	max_call_stack_end=call_stack_init;
 	call_stack_available=call_stack+initial_size;
 	// fprintf(stderr,"	initial call_stack=%p\n",(void *)call_stack);
 }
@@ -1086,12 +1084,13 @@ inline static int check_token(int type)
  return(tok->ttype == type);
 }
 
+#if	TNORMAL
 inline static MVAR *get_left_slot(int const ind)
 {
 	// MESG("get_left_slot: ind=%d",ind);
 	return &current_stable[ind];
 }
-
+#endif
 
 void node_to_mvar(BTNODE *node,void *p)
 {
@@ -1488,9 +1487,6 @@ int empty_tok_table(FILEBUF *fp)
 
 int refresh_current_buffer(num nused)
 {
-#if	TNORMAL
- // double val=0;
-#endif
  FILEBUF *fp=cbfp;
  MESG("refresh_current_buffer:1 [%s] %d",fp->b_fname,fp->b_type);
  exe_buffer=cbfp;
@@ -1501,6 +1497,7 @@ int refresh_current_buffer(num nused)
  err_line=0;
  is_break1=0;
  show_stage=0;
+ pnum=0;
  INIT_STAGE;
 
  /* clear parse list  */
@@ -1660,7 +1657,7 @@ void MESG_TOK_INFO(char *title,tok_struct *tok)
 #if	TBNF
 char * tok_info(tok_struct *exect)
 {
- static char sout[MAXLLEN];
+ static char sout[MAXMLEN];
 
 	if(exect==NULL) { MESG("tok_info: NULL token!");return "null token";};
 	memset(sout,0,sizeof(sout));

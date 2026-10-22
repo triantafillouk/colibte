@@ -46,6 +46,7 @@ void init_array_header(struct array_dat *array, int rows,int cols,int ctype)
 	// MESG("init_array_header: type=%d rows=%d cols=%d",array->atype,array->rows,array->cols);
 }
 
+#if	TNORMAL
 array_dat *get_array(char *pos)
 {
 	// MESG("get_array: %s",pos);
@@ -62,6 +63,7 @@ void set_array(array_dat *a)
 	ex_var.adat=a;
 	ex_var.var_type=a->atype;
 }
+#endif
 
 /* List array is one dimensional string array  */
 struct array_dat * new_list_array(int cols)

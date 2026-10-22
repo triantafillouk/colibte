@@ -790,7 +790,6 @@ tok_struct *tok0_bnf=NULL;
 		int rows=1,cols=0;
 		cdim=1;
 		ex_nvars=0;ex_nquote=0;ex_nums=0;	/* initialize table counters  */
-		ex_array=NULL;
 		int ctype=VTYPE_ARRAY;
 		while(cdim>0){
 		while(1) {
