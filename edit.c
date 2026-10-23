@@ -678,14 +678,17 @@ int prev_wrap_line(num n)
         // If at the last line of the window
 		// MESG("prev_line: row=%d line=%ld col=%ld",cwp->currow,tp_line(cwp->tp_current),tp_col(cwp->tp_current));
 		if(cwp->currow >= cwp->w_ntrows-3-half_last_line
-			|| tp_offset(cwp->tp_current)>cwp->w_width
+			/* || tp_offset(cwp->tp_current)>cwp->w_width */
 		) {
+			// MESG("prev_wrap_line: lock,last lines row=%d",cwp->currow);
 			lock_move=0;
 			int status=prev_wrap_line(n);
 			lock_move=1;
 			if(status==FALSE) return status;
 			// return TRUE;
-		} else {
+		}
+		 else {
+			// MESG("prev_wrap_line: lock,n=%lld row=%d",n,cwp->currow);
 			lock_move=0;
 			int status=prev_wrap_line(n-1);
 			lock_move=1;

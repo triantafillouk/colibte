@@ -353,7 +353,8 @@ int move_window(num n)
 	else
 		curoffs = LineBegin(tp_offset(cwp->tp_hline));
 	// MESG("move_window: current=%ld n=%d",curoffs,n);
-	set_goal_column(0,"b"); // fix for problem on first line during scroll up 1 line
+	int current_goal = cwp->goal_column;
+	cwp->goal_column=0;
     if (n < 0) {
 			if(is_wrap_text(cwp->w_fp)) {
 #if	1
@@ -378,7 +379,8 @@ int move_window(num n)
 		} else {
 	        while ((n-- >0) && (curoffs>0)) curoffs=FPrevLine(cwp->w_fp,curoffs);
 		};
-    }
+    };
+	cwp->goal_column=current_goal;
 	tp_copy(cwp->prev_hline,cwp->tp_hline);
 	set_top_hline(cwp,curoffs,"move_window");
 	set_update(cwp,UPD_MOVE|UPD_WINDOW);
