@@ -9,7 +9,7 @@ void show_error(char *from,char *name);
 inline static void bnf_expression0();
 
 
-#define	MAX_VARS	100
+#define	MAX_VARS	500
 static MVAR bnf_vars[MAX_VARS];
 static MVAR *bnf_var=bnf_vars;
 
@@ -2232,7 +2232,9 @@ inline static void bnf_assign_env()
 	left_index=tok->dval;
 	// MESG("assign_env: left_index=%d",left_index);
 	MVAR *var=bnf_var;
+#if	0
 	prev_var("assign_env");
+#endif
 	if(var->var_type==VTYPE_POINTER) var=bnf_var->var_pointer;
 	// MESG("assign_env: type=%d ind=%d",bnf_var->var_type,left_index);
 	if(var->var_type==VTYPE_NUM) {
@@ -2256,8 +2258,9 @@ inline static void bnf_assign_opt()
 {
 	// MESG("bnf_assign_opt:");
 	MVAR *var=bnf_var;
+#if	!TFUNC4
 	prev_var("assign var");
-
+#endif
 	// MESG("assign_option:");
 	if(var_node->node_vtype==VTYPE_STRING) { free(var_node->node_sval);};
 
@@ -2270,7 +2273,6 @@ inline static void bnf_assign_opt()
 		bnf_var->var_alloced=0;
 	} else {
 		// CHECK !!!!!!!!
-		
 		var_node->node_vtype=VTYPE_NUM;
 		var_node->node_dval=var->dval;
 		bnf_var->var_type=VTYPE_NUM;

@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.8T603 (23/10/2026)"
+#define VERSION 	 "#01.8T604 (24/10/2026)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -30,6 +30,7 @@
 #define	USE_UTF8	1	/* Use utf8 characters  */
 #define	TNCOLORS	1	/* dquote fg_color same as squote  */
 #define	TIFN		1
+#define	TFUNC4		1	/* for options  */
 #define	TFUNC3		1	/* for procs  */
 #define	TFUNC2		1	/* for cmd's  */
 #define	TFUNC		1

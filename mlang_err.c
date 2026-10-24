@@ -722,6 +722,10 @@ tok_struct *tok0_bnf=NULL;
 
  if(tok->ttype!=TOK_NOT && tok->ttype!=TOK_LPAR && tok->ttype!=TOK_MINUS && tok->ttype!=TOK_PLUS) {
 	if(tok->ttype!=TOK_VAR)
+#if	TFUNC4
+	if(tok->ttype!=TOK_OPTION)
+	if(tok->ttype!=TOK_ENV)
+#endif
 #if	TFUNC3
 	if(tok->ttype!=TOK_PROC)
 #endif
@@ -729,9 +733,11 @@ tok_struct *tok0_bnf=NULL;
 	if(tok->ttype!=TOK_CMD)
 #endif
 #if	TFUNC
-	if(tok->ttype!=TOK_FUNC)
+	if(tok->ttype!=TOK_FUNC){
 #endif
+	// MESG("add tok0: %s",tok_info(tok));
  	tok0_bnf=stack_push("factor",tok,tok->ttype,&new_one);	// ????
+	};
  };
 #endif
  int save_macro_exec;
@@ -760,13 +766,14 @@ tok_struct *tok0_bnf=NULL;
  if(tok0->ttype==TOK_VAR && (tok->ttype != TOK_ASSIGN && tok->ttype!=TOK_INCREASEBY && tok->ttype!=TOK_DECREASEBY\
  	&& tok->ttype!=TOK_MULBY && tok->ttype!=TOK_DIVBY)) {
 	// MESG("stack push [%s]",tok_info(tok0));
+	// if(tok0->ttype!=TOK_OPTION)
  	tok0_bnf=stack_push("factor",tok0,tok0->ttype,&new_one);
  };
 #endif
  if(tok0->ttype==TOK_PROC) {
  	sprintf(proc_name,"[%s]",tok0->tname);
  };
- // MESG("	switch tok0 ttype=%d [%s]",tok0->ttype, tok_info(tok0));
+ // MESG(" switch tok0 ttype=%d [%s]-------",tok0->ttype, tok_info(tok0));
  // MESG("        tok  ttype=%d [%s]",tok->ttype,tok_info(tok));
  switch(tok0->ttype) {
 	/*  the following ends factor  */
@@ -1383,6 +1390,7 @@ tok_struct *tok0_bnf=NULL;
 		return(stat);
 	case TOK_OPTION:// 5 editor option
 		/* variable's name in tok0->tname */
+		// MESG("TOK_OPTION: [%s] [%s]",tok_info(tok0),tok_info(tok));
 		xpos=494;
 		ex_nvars++;
 		var_node=tok0->tok_node;
@@ -1391,6 +1399,18 @@ tok_struct *tok0_bnf=NULL;
 #endif
 		ex_edenv=0;
 		pre_symbol=0;
+#if	TFUNC4
+		if(tok->ttype==TOK_ASSIGNOPT) {
+			// MESG("set normal assign [%s]",tok_info(tok));
+			assign_type_to=0;
+			tok->tname = tok0->tname;
+			tok->dval=var_node->node_index;
+			// MESG("	env_name_to_assign: %s ind=%d [%s]",tok0->tname,var_node->node_index,tok_info(tok));
+		} else {
+			// MESG("	tok_option add no assign! %s",tok_info(tok0));
+			stack_push("opt",tok0,tok0->ttype,&new_one);
+		};
+#endif
 		RT_MESG1(xpos);
 	case TOK_ENV:	// 1 editor env var
 		/* variable's name in tok0->tname */
@@ -1398,18 +1418,25 @@ tok_struct *tok0_bnf=NULL;
 		// MESG("+ TOK_ENV tok0=[%s]",tok_info(tok0));
 		// MESG("           tok=[%s]",tok_info(tok));
 #if	TBNF
+#if	!TFUNC4
 		tok0->bnf_group=tok0->ttype;
 		tok0_bnf->tok_node=var_node;
+#endif
 #endif
 		pre_symbol=0;
 		ex_nvars++;
 		if(tok->ttype==TOK_ASSIGNENV) {
-			// MESG("set normal assign [%s]",tok_info(tok));
+			// MESG("set  assign env [%s]",tok_info(tok));
 			assign_type_to=0;
 			tok->tname = tok0->tname;
 			tok->dval=var_node->node_index;
 			// MESG("	env_name_to_assign: %s ind=%d [%s]",tok0->tname,var_node->node_index,tok_info(tok));
+		}
+#if	TFUNC4
+		 else {
+			stack_push("env",tok0,tok0->ttype,&new_one);
 		};
+#endif
 		RT_MESG1(495);
 	case TOK_FUNC:	// 2 editor function 
 		/* function name in tok0->tname */
