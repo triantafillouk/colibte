@@ -472,11 +472,12 @@ int set_option_val(int vnum,char *svalue)
 	return(1);
 }
 
-#if	TBNF
+#if	NUSE
 int set_option_bnf(int vnum,int ival)
 {
  char st[20];
  sprintf(st,"%d",ival);
+ // MESG("set_option_bnf: %s vnum=%d",st,vnum);
  set_option_val(vnum,st);
  return ival;
 }

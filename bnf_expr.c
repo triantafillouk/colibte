@@ -20,7 +20,6 @@ static long var_index=0;
 
 static double bnf_expression();
 int set_option_val(int vnum,char *svalue);
-int set_option_bnf(int vnum,int ival);
 inline static int get_type_index(array_dat *adat, tok_struct *tok);
 inline static void set_result();
 
@@ -2261,23 +2260,12 @@ inline static void bnf_assign_opt()
 #if	!TFUNC4
 	prev_var("assign var");
 #endif
-	// MESG("assign_option:");
-	if(var_node->node_vtype==VTYPE_STRING) { free(var_node->node_sval);};
+	MESG("assign_option: %s t=%d",tok->tname,var->var_type);
 
 	if(var->var_type==VTYPE_POINTER) var=bnf_var->var_pointer;
-	if(var->var_type==VTYPE_STRING){
-		var_node->node_vtype=VTYPE_STRING;
-		var_node->node_sval=strdup(var->sval);
-		bnf_var->var_type=VTYPE_STRING;
-		bnf_var->sval=var->sval;
-		bnf_var->var_alloced=0;
-	} else {
-		// CHECK !!!!!!!!
-		var_node->node_vtype=VTYPE_NUM;
-		var_node->node_dval=var->dval;
-		bnf_var->var_type=VTYPE_NUM;
-		bnf_var->dval=var->dval;
-	};
+	set_bt_num_val(tok->tname,(int)(var->dval));
+	bnf_var->var_type=VTYPE_NUM;
+	bnf_var->dval=var->dval;
 }
 
 inline static void bnf_factor_option()
@@ -2287,17 +2275,15 @@ inline static void bnf_factor_option()
  next_var("option");
 /* variable's name in tok0->tname */
 	bte=tok->tok_node;
-	// MESG("factor_option: set var_node [%s]",tok_info(tok));
-	var_node=bte;
-
-	if(bte->node_vtype==VTYPE_STRING) { /* there is a valid string value */
-		bnf_var->sval=strdup(bte->node_sval);
-		bnf_var->var_type=VTYPE_STRING;
-		bnf_var->var_alloced=1;
-	} else {
+	// MESG("factor_option: get var_node [%s]",tok_info(tok));
+	if(bte) 
+	{
 		bnf_var->dval=bte->node_dval;
 		bnf_var->var_type=VTYPE_NUM;
-		// return(bte->node_dval);
+	} else {
+		bnf_var->dval=0;
+		bnf_var->var_type=VTYPE_NUM;
+		MESG("No such option! %s",tok->tname);
 	};
 }
 
