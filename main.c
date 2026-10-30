@@ -16,8 +16,11 @@
 #include	<sys/stat.h>
 #include	<sys/types.h>
 #include	<syslog.h>
+#include	"edit.h"
+#include	"filebuf.h"
 #include	"mlang.h"
 #include	"display_driver.h"
+#include	"screen.h"
 
 char *startfile=NULL;	/* startfile to execute */
 #if	RSESSION

@@ -14,6 +14,9 @@ inline void ntoken();
 #include	"display_driver.h"
 // #include	"alist.h"
 #include	"mlang.h"
+#include	"edit.h"
+#include	"screen.h"
+#include	"filebuf.h"
 #include	"func.h"
 #include	"token_table.h"
 

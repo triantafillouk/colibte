@@ -14,9 +14,12 @@
 */
 
 #include	"xe.h"
-#include	"keytable.h"
 #include	"mlang.h"
 #include	"display_driver.h"
+#include	"filebuf.h"
+#include	"edit.h"
+#include	"keytable.h"
+#include	"screen.h"
 
 #if	TFUNC2
 void next_var_ext(char *from);

@@ -7,6 +7,10 @@
 	DIR mode functions 
 */
 #include	"xe.h"
+#include	"filebuf.h"
+#include	"edit.h"
+#include	"screen.h"
+
 #include	<sys/stat.h>
 #include	<sys/types.h>
 #include	<dirent.h>

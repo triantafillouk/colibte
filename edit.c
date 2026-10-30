@@ -9,14 +9,13 @@
 
 #include	"xe.h"
 #include	"display_driver.h"
-
-int delete_region();
+#include	"filebuf.h"
+#include	"edit.h"
+#include 	"screen.h"
 
 int is_utf_accent(FILEBUF *fp, offs o);
 offs MoveToColumn(int go_col);
 int export_region(ClipBoard *);	/* this is platform dependant!  */
-void toggle_global_flag(int option_flag);
-void set_global_flag(int option_flag,int value);
 void get_lowercase_string(char *lower, char *string);
 void get_uppercase_string(char *lower, char *string);
 void update_lines(FILEBUF *bp);
@@ -24,6 +23,8 @@ void update_lines(FILEBUF *bp);
 offs FNext_wrap_line(WINDP *wp,offs current_offset,int num_lines,int top);
 offs FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines);
 void set_top_hline(WINDP *wp,offs cof,char *from);
+void update_top_position_wrap();
+offs   FPrevUtfCharAt(FILEBUF *fp,offs o, utfchar *uc);
 
 void next_column(int cols);
 
@@ -335,7 +336,7 @@ int igotooffset(num n,int ppline)
 
 /* move to a specific line. */
 /* Assigned to ALT-G */
-int goto_line(num n)		
+int goto_line(num n)
 {
 	char arg[MAXSLEN];
 	arg[0]=0;
@@ -352,7 +353,7 @@ int goto_line(num n)
 	return(igotolinecol(n,1,0));
 }
 
-int goto_offset(num n)		
+int goto_offset(num n)
 {
 	char arg[MAXSLEN];
 	arg[0]=0;
@@ -660,9 +661,6 @@ int next_line(num n)
 	if(!execmd) set_update(cwp,UPD_MOVE);
 	return(TRUE);
 }
-
-void update_top_position_wrap();
-offs   FPrevUtfCharAt(FILEBUF *fp,offs o, utfchar *uc);
 
 int prev_wrap_line(num n)
 {
@@ -1176,14 +1174,14 @@ int set_no_mark(num n)
 }
 
 /* set line region */
-int set_line_mark(num n)	
+int set_line_mark(num n)
 {
 	return(setmark(REGION_LINE));
 }
 
 /* set column region */
 /* assigned to alt-c */
-int set_column_mark(num n)	
+int set_column_mark(num n)
 {
 	return(setmark(REGION_COLUMN));
 }
@@ -1481,7 +1479,8 @@ int update_menu(num n)
 	return true;
 }
 
-int noop(num n){
+int noop(num n)
+{
 	// MESG("No op!");
 	return true;
 };
@@ -1539,7 +1538,7 @@ int twiddle(num n)
 
 /* Insert a tab  */
 /* Assigned to ^I */
-int tab(num n)
+int ed_tab(num n)
 {
 	// MESG("tab: b_flag=0x%X",cbfp->b_flag);
 	if(cbfp->b_flag & FSDIRED) return(0);
@@ -1933,7 +1932,7 @@ int insert_newline(FILEBUF *fp)
 }
 
 /* delete a number of real chars (first find bytes of  utf chars ) */
-int forw_delete(long n)
+int forw_delete(num n)
 {
 	int clen,i;
 	offs o;
@@ -1958,7 +1957,7 @@ int forw_delete(long n)
 }
 
 /* delete previous character(s) */
-int back_delete(long n)
+int back_delete(num n)
 {
  num reverse=0;
 
@@ -2141,7 +2140,7 @@ int insert_indent(num n)
 
 /* Delete one whole line , put it in local clipboard */ 
 /* assigned to ^D  */
-int delete_line(num n)
+int ed_delete_line(num n)
 {
  int status;
 #if	TNOTES

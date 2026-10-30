@@ -10,6 +10,9 @@
 #include	"xe.h"
 #include	"color.h"
 #include	"display_driver.h"
+#include	"filebuf.h"
+#include	"edit.h"
+#include	"screen.h"
 
 extern alist *window_list;
 extern int *color;

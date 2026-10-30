@@ -10,6 +10,9 @@
 #include "xe.h"
 #include "display_driver.h"
 #include	<wchar.h>
+#include "filebuf.h"
+#include "edit.h"
+#include "screen.h"
 
 long utf8_to_unicode(unsigned char* const utf8_str) ;
 long int unicode_point();
@@ -21,6 +24,13 @@ extern alist *window_list;
 extern SHLIGHT hts[];
 
 extern int drv_type;
+extern char *file_ext[];
+extern int h_type[];
+
+
+int   ReplaceTextFromFile(char *name,FILEBUF *bf,int fd,offs size,offs *act_read);
+int   GetBlock(FILEBUF *bp,char *copy,offs start,offs size);
+int   WriteBlock(int fd,FILEBUF *fp,offs from,offs size,offs *act_written);
 
 /* local variables */
 
@@ -52,48 +62,18 @@ char *tp_name[] = {
 
 /* Local function declarations */
 
-void  CheckPoint(FILEBUF *fp);
-offs  ScanForCharForward(FILEBUF *fp,offs start,byte ch);
-void  EmptyText(FILEBUF *);
-int   ReplaceTextFromFile(char *name,FILEBUF *bf,int fd,offs size,offs *act_read);
-int CheckMode(mode_t mode);
-void textpoint_reset(TextPoint *tp);
+
+
+
 int chardline(WINDP *wp);
 // offs  Fcheck_UtfCharAt(FILEBUF *bf, offs offset, char *c);
-offs  FUtfCharAt_nocheck(FILEBUF *bf, offs offset, utfchar *uc);
+
 
 FILEBUF *cbfp=NULL;
 
 int clen_error=0;
-void undo_CheckSize(UNDOS *u);
-void undo_change_undo(undo_Change *uc);
-void undo_change_redo(undo_Change *uc);
-void   ToLineEnd();
-offs   FNextLine(FILEBUF *fp,offs ptr);
-int BolAt(offs o);
-int FBolAt(FILEBUF *fp,offs o);
-int EolAt(offs o);
-int Eol();
-byte FCharAt(FILEBUF *fp,offs offset);
-byte FCharAt_NoCheck(FILEBUF *,offs offset);
-offs FUtfCharAt(FILEBUF *,offs,utfchar *);
-byte   Char();
-void   MoveLineCol(num l,num c);
-void   HardMove(num l,num c);
-void   NewLine();
-int  InsertChar(FILEBUF *fp,char ch);
-void   ExpandTab();
-void    DeleteChar();
-int   WriteBlock(int fd,FILEBUF *fp,offs from,offs size,offs *act_written);
-void   PreModify(FILEBUF *);
-UNDOS *undo_new();
-void show_points(FILEBUF *bf,FILE *fp);
 
-offs   LineBegin(offs ptr);
-offs   FLineBegin(FILEBUF *fp,offs ptr);
-offs   PrevLine(offs ptr);
-offs   FPrevLine(FILEBUF *fp,offs ptr);
-offs   LineEnd(offs ptr);
+
 
 void FindLineCol(TextPoint *tp);
 
@@ -185,6 +165,7 @@ void set_b_flag(int flag)
 {
 	cbfp->b_flag = flag;
 }
+
 /* set modify flag to buffer */
 void set_modified(FILEBUF *bp)
 {
@@ -245,8 +226,6 @@ void test_time1()
 }
 #endif
 
-extern char *file_ext[];
-extern int h_type[];
 
 /* create message string */
 #define SMESG(format,...) { \
@@ -689,12 +668,6 @@ num	tp_col(TextPoint *tp)
 {
 	return(tp->col);
 }
-
-void  ResetTextPoints(FILEBUF *bp,int);
-void  OrFlags(int mask);
-void  FindOffset(TextPoint *tp);
-int   GetBlock(FILEBUF *bp,char *copy,offs start,offs size);
-
 
 /* textpoint.cc */
 // link textpoint with a buffer
@@ -1474,12 +1447,12 @@ offs CSize()
 // operates on fp, takes info only localy
 // must not be used from window operations
 // // operates on cbfp
- offs    Offset()
+offs    Offset()
 {
    return(cbfp->tp_current->offset);
 }
 
- offs    FOffset(FILEBUF *fp)
+offs    FOffset(FILEBUF *fp)
 {
    return(fp->tp_current->offset);
 }
@@ -1661,12 +1634,6 @@ num GetCol()
 num GetLine()
 {
 	return(tp_line(cbfp->tp_current));
-}
-
-// returns the current column in current file buffer
-num GetColumn()
-{
-	return(tp_col(cbfp->tp_current));
 }
 
 num LastLine()
@@ -2357,7 +2324,6 @@ int	writeout(char *name, FILEBUF *bf)
 
 /* undo function ! */
 
-bool undo_change_join(undo_Change *c1, undo_Change *c);
 
 size_t undo_GetSize(undo_Change *uc)
 {
@@ -2771,19 +2737,23 @@ void   PreModify(FILEBUF *fp)
 	refresh_textpoints(fp);
 }
 
+#if	NUSE
 // return line len of a textpoint
 int tp_llength(TextPoint *tp)
 {
  offs o=tp_offset(tp);
  return LineEnd(o)-LineBegin(o);
 }
+#endif
 
+#if	NUSE
 // independent
 // return line len at an offset
 int offs_llength(offs o)
 {
  return LineEnd(o)-LineBegin(o);
 }
+#endif
 
 offs   LineBegin(offs ptr)
 {
@@ -2815,11 +2785,13 @@ offs   FLineBegin(FILEBUF *fp,offs ptr)
 	return(ptr);
 }
 
+#if	NUSE
 /* Offset of current  point  */
 offs CurrentLineBegin()
 {
 	return(LineBegin(Offset()));
 }
+#endif
 
 // returns offset of line end
 offs   LineEnd(offs ptr)
@@ -3863,6 +3835,7 @@ int   DeleteBlock(FILEBUF *fp,offs left,offs right)
    return(true);
 }
 
+#if	NUSE
 offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
 {
  utfchar uc;
@@ -3910,6 +3883,7 @@ offs	FCheckNextLine(FILEBUF *fp, offs ptr, num *display_size)
  // MESG("Line_size:0 %ld",*display_size);
  return ptr;
 }
+#endif
 
 offs   FNextLine(FILEBUF *fp,offs ptr)
 {

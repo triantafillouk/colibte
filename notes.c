@@ -7,7 +7,9 @@
 	Editor Notes support
 */
 #include "xe.h"
-
+#include "filebuf.h"
+#include "screen.h"
+#include "edit.h"
 
 extern FILEBUF *cbfp;
 #define	MD_NOTES	1

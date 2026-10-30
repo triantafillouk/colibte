@@ -7,6 +7,9 @@
 */
 
 #include	"xe.h"
+#include	"filebuf.h"
+#include	"screen.h"
+
 #if	USE_GLIB
 #include	<glib-2.0/glib/gconvert.h>
 #endif

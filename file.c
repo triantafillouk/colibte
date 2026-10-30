@@ -7,11 +7,14 @@
 	File functions  
 */
 
-#include	"xe.h"
-#include	"menu.h"
 #include	<sys/stat.h>
 #include	<sys/types.h>
 #include	<dirent.h>
+#include	"xe.h"
+#include	"menu.h"
+#include	"filebuf.h"
+#include	"edit.h"
+#include 	"screen.h"
 
 #if	TNOTES
 char *get_notes_key(int key_type);

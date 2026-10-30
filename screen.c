@@ -8,8 +8,11 @@
 /* common screen functions for all interfaces  */
 
 #include "xe.h"
+#include "filebuf.h"
+#include "edit.h"
 #include "color.h"
 #include "display_driver.h"
+#include "screen.h"
 #define	NEW	1
 
 void vtputwc(WINDP *wp, utfchar *uc);
@@ -659,8 +662,6 @@ int checkwords(FILEBUF *fp,char *line, int *start, char **words,int type)
 	*start=i0;
 	return(wordfound);
 }
-
-num utf_FLineLen(FILEBUF *fp, offs ptr);
 
 void  vput_normalize(WINDP *wp, utfchar uc)
 {

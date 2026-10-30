@@ -8,6 +8,9 @@
 /* Seach routines  */
 
 #include	"xe.h"
+#include	"filebuf.h"
+#include	"screen.h"
+#include	"edit.h"
 
 #define	PTBEG	0	/* Leave the point at the beginning on search	*/
 #define	PTEND	1	/* Leave the point at the end on search		*/

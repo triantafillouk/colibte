@@ -8,6 +8,9 @@
 /* word or paragraph related commands */
 
 #include	"xe.h"
+#include	"edit.h"
+#include	"filebuf.h"
+#include	"screen.h"
 
 /*	list of recognized environment variables	*/
 int infword(int c);

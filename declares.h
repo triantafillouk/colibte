@@ -28,12 +28,12 @@ int save_colors(num n);
 int read_colors(num n);
 int color_scheme_save();
 int buffer_in_view(num n);
-int prev_line(num);
-int next_line(num);
-int comment_line(num);
-int comment_line2(num);
-int scroll_up(num);
-int scroll_down(num);
+// int prev_line(num);
+// int next_line(num);
+// int comment_line(num);
+// int comment_line2(num);
+// int scroll_up(num);
+// int scroll_down(num);
 int get_hex_byte();
 void toggle_hex_byte();
 void reset_hex_byte();
@@ -44,21 +44,21 @@ void select_current_word();
 int window_cursor_line(WINDP *wp);
 void set_goal_column(int new_column,char *from);
 void set_xmark(WINDP *smark_wp, int mouse_col,int mouse_row,int f);
-int set_bom(num n);
+// int set_bom(num n);
 void clear_names();
 void clear_snames(char **,int);
 int set_option_val(int vnum,char *value);
-int goto_bol(num);
+// int goto_bol(num);
 int goto_file(char *file_name);
 int open_dir(char *dir_name,int type);
 int goto_dir(char *dir_name,int dir_num);
 int dir_size(num n);
 int dir_count_files(num n);
 int dir_compare(num n);
-int goto_line(num n);
-int goto_offset(num n);
-int igotolinecol(num line,num column,int flag);
-int igotooffset(num n,int ppline);
+// int goto_line(num n);
+// int goto_offset(num n);
+// int igotolinecol(num line,num column,int flag);
+// int igotooffset(num n,int ppline);
 int docmd(char *cmd);
 void hide_cursor(char *from);
 void show_cursor(char *);
@@ -87,7 +87,6 @@ void change_window(WINDP *wp);
 int (*key_function(int c,int f))(num);
 short int get_next_key(num mode);
 char *date_string(num n);
-int insert_date(num n);
 void list_select(char *s,int dire);
 void parse_command_line(int , char **);
 int highlight_index(char *,int *);
@@ -112,6 +111,7 @@ int save_session(num);
 int execute_session(char *);
 int parse_check_current_buffer(num n);
 int parse_buffer_show_tokens(num n);
+
 int set_color(num);
 int color_scheme_read(num);
 
@@ -146,38 +146,12 @@ void vtputc(WINDP *wp, unsigned int c);
 void vt1eol(WINDP *wp,int c,int color);
 void upd_part(WINDP *wp,char *from);
 
-int set_view_mode(num n);
+// int set_view_mode(num n);
 int unix2dos(num n);
 int dos2unix(num n);
-// from basic.c
-int prev_character(num n);
-int goto_eol(num n);
-int next_character(num n);
-int select_next_character(num n);
-int select_prev_character(num n);
-int select_next_line(num n);
-int select_prev_line(num n);
-int goto_bof(num n);
-int goto_eof(num n);
-int emptyline(TextPoint *tp);
-int valid_offset(offs bol,int curcol);
-int goto_bop(num n);
-int goto_eop(num n);
-int next_page(num  n);
-int prev_page(num n);
-int set_mark(num n);
-int set_line_mark(num n);
-int set_column_mark(num n);
-int setmark(num n);
-int set_no_mark(num n);
-int swap_mark(num n);
-int toggle_move_lock(num n);
-int toggle_sync_lock(num n);
+
 int change_color_scheme(num  n);
 int show_version(num n);
-int do_nothing(num n);
-unsigned char *str2out(char *);
-void MoveLineCol(num l,num c);
 
 // system.c
 char *ext_system_paste_line();
@@ -218,16 +192,15 @@ void view_file(char *fname);
 void push_dir(FILEBUF *) ;
 void pop_dir(FILEBUF *);
 void reinit_dir(FILEBUF *);
-void show_textpoints(char *title,FILEBUF *);
-void set_string_val(char **, char *);
+// void show_textpoints(char *title,FILEBUF *);
 
-// filebuf.c
-FILEBUF *current_filebuf();
-void set_current_filebuf(FILEBUF *fp);
+// file.c
+
 int new_file(num n);
 int next_file(num n);
+
 int activate_file(FILEBUF *bp);
-int FUtfCharLen(FILEBUF *bp,offs o);
+// int FUtfCharLen(FILEBUF *bp,offs o);
 int select_filebuf(FILEBUF *bp);
 void link_window_buffer(WINDP *wp,FILEBUF *fp);
 void unlink_filebuf(WINDP *);
@@ -240,10 +213,8 @@ int list_filebuf(char *title, char *st,int f1,int *return_flag);
 int changes_occured();
 FILEBUF * new_filebuf(char *bname,int bflag);
 FILEBUF * get_filebuf(char *bname,char *dname,int flag);
-int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from);
-int DiffColumns(FILEBUF *fp, offs start,offs col_offs,char *from);
 
-
+/* window.c  */
 int window_row_increase(num n);
 int window_column_increase(num n);
 int window_row_decrease(num n);
@@ -252,52 +223,17 @@ int window_column_decrease(num n);
 void msg_log(int priority,const char *fmt, ...);
 int toggle_mouse(num n);
 int toggle_parameter(num type);
-int twiddle(num n);
 int quote(num n);
-int tab(num n);
-int next_tab(num i);
-int detab_line(num n);
-int entab_line(num n);
-int trim_line(num n);
-int new_line(num n);
-int del_blank_lines(num n);
-int insert_indent(num n);
-int del_char(num n);
-int del_prev_char(num n);
-int delete_line(num n);
-int erase_eol(num n);
-int set_optionf(int option_flag,int global);
-void toggle_optionf(int option_flag,int global);
-int set_over(num n);
-int toggle_over(num n);
-int toggle_case(num n);
-int toggle_regexp(num n);
-int set_case(num n);
-int set_regexp(num n);
-int set_crypt(num n);
-int toggle_highlight(num n);
-int toggle_crypt(num n);
-int next_utf8_error(num n);
-int set_just(num n);
-int toggle_just(num n);
-int match_fence(num n);
 int istring(num n);
-char *bname(char *fname) ;
-char *getnw();
 char *getnword();
-char *getcursword();
 char *getcurcword();
-int insword(int c);
 int execute_menu(num fixed);	/* execute menu */
 int menu_command(num n);
 int work_menu(num n);
-int set_doc_lang(num n);
-int set_default_local(num n);
 void hide_cursor_dl();
 void list_select(char *s,int dire);
 int list_update(char *s);
 void init_input();
-int set_dir();
 int insert_dir(FILEBUF *buf_dir,int retain);
 int set_ddir(FILEBUF *file_buf);
 int list_dir(char *d1,FILEBUF *file_buf);
@@ -334,7 +270,7 @@ void sort_dir2(int noStr, struct kdirent **dirlist);
 void init_names();
 void clear_names();
 
-// bind.c
+/* help.c */
 int help(num n);
 char *xe_key_name(int);
 int show_keys(num n);
@@ -390,7 +326,6 @@ double modulo(double value,double factor);
 double lterm1();
 double term1();
 double term2();
-double set_string_value();
 void nword(char *var_name);
 double getdouble();
 int refresh_current_line(num n);
@@ -496,14 +431,13 @@ void list_off();
 void activate_list_mode();
 
 
+// void set_update(WINDP *wp, int flag);
 // edit.c
-void set_update(WINDP *wp, int flag);
+/*
 int insert_chr(int n,int c);
 int insert_string(FILEBUF *,char *c,int size);
 int insert_string_nl(FILEBUF *,char *c);
 int insert_newline(FILEBUF *);
-int forw_delete(long n);
-int back_delete(long n);
 char *getctext();
 int set_linetext(char *iline);
 int ldelnewline();
@@ -522,10 +456,11 @@ void reset_region_textpoints();
 int delete_region();
 int abort_cmd(num n);
 int update_menu(num n);
+*/
 
 
-int undo(num n);
-int redo(num n);
+// int undo(num n);
+// int redo(num n);
 int set_bg(num n);
 
 // window.c
@@ -708,50 +643,50 @@ void tp_copy(TextPoint *tp1,TextPoint *tp2);
 void textpoint_set(TextPoint *tp,offs o);
 TextPoint *new_textpoint_at(FILEBUF *bf,int tp_type,offs o);
 void move_at(offs o);
-offs   LineBegin(offs ptr);
-offs   FLineBegin(FILEBUF *fp,offs ptr);
-offs   LineEnd(offs ptr);
-offs   FLineEnd(FILEBUF *fp,offs ptr);
-offs   Size();
-void   MoveRightChar(FILEBUF *fp);
-void   MoveLeftChar(FILEBUF *fp);
-void	ToLineEnd();
-num FLineLen(FILEBUF *,offs);
-int		Eol();	// if at end of line
-int		Bol();	// if at beginning of line
+// offs   LineBegin(offs ptr);
+// offs   FLineBegin(FILEBUF *fp,offs ptr);
+// offs   LineEnd(offs ptr);
+// offs   FLineEnd(FILEBUF *fp,offs ptr);
+// offs   Size();
+// void   MoveRightChar(FILEBUF *fp);
+// void   MoveLeftChar(FILEBUF *fp);
+// void	ToLineEnd();
+// num FLineLen(FILEBUF *,offs);
+// int		Eol();
+// int		Bol();
 void textpoint_set_lc(TextPoint *tp,num, num c);
-int	BolAt(offs);
-int	FBolAt(FILEBUF *,offs);
-int EolAt(offs);
-int FEol(FILEBUF *fp);
-int FEolAt(FILEBUF *bf,offs o);
+// int	BolAt(offs);
+// int	FBolAt(FILEBUF *,offs);
+// int EolAt(offs);
+// int FEol(FILEBUF *fp);
+// int FEolAt(FILEBUF *bf,offs o);
 byte tp_char(TextPoint *);
 byte FChar(FILEBUF *fp);
 int FEofAt(FILEBUF *,offs);
 int EofAt(offs o);
-int tp_llength(TextPoint *);
-int offs_llength(offs o);
+// int tp_llength(TextPoint *);
+// int offs_llength(offs o);
 byte Char();
 long int utf_value();
 long int utf_value_len(int *len);
 byte FCharAt(FILEBUF *,offs);
-byte CharAt(offs);
-offs FUtfCharAt(FILEBUF *,offs,utfchar *);
-offs Offset();
-offs FOffset(FILEBUF *);
-offs CSize();
+// byte CharAt(offs);
+// offs FUtfCharAt(FILEBUF *,offs,utfchar *);
+// offs Offset();
+// offs FOffset(FILEBUF *);
+// offs CSize();
 void set_Offset(offs);
-int FEof(FILEBUF *);
-int FBof(FILEBUF *);
+// int FEof(FILEBUF *);
+// int FBof(FILEBUF *);
 void DeleteChar();
 int InsertChar(FILEBUF *fp,char ch);
-TextPoint *tp_dup(TextPoint *,int);
-TextPoint *textpoint_init(int tp_type,int,FILEBUF *fp);
-TextPoint *textpoint_new(FILEBUF *b,int tp_type,int);
+// TextPoint *tp_dup(TextPoint *,int);
+// TextPoint *textpoint_init(int tp_type,int,FILEBUF *fp);
+// TextPoint *textpoint_new(FILEBUF *b,int tp_type,int);
 TextPoint *textpoint_o(FILEBUF *p,offs o,int tp_type,int);
 void set_end_line(FILEBUF *fp,num line);
-void  EmptyText(FILEBUF *);
-UNDOS *undo_new();
+// void  EmptyText(FILEBUF *);
+// UNDOS *undo_new();
 void tp_move(TextPoint *tp, offs o, num line, int col);
 offs FSize(FILEBUF *);
 bool test_b_flag(int flag);
@@ -759,21 +694,18 @@ void set_b_flag(int flag);
 offs BufferSize();
 offs lforw(offs);
 offs lback(offs);
-offs FNextLine(FILEBUF *,offs);
-offs FPrevLine(FILEBUF *,offs);
+// offs FNextLine(FILEBUF *,offs);
+// offs FPrevLine(FILEBUF *,offs);
 int   ReadBlock(char *file_name,int fd,offs size,offs *act_read);
-int   DeleteBlock(FILEBUF *fp,offs left,offs right);
-int   InsertBlock(FILEBUF *fp,char *block_left,offs size_left, char *block_right,offs size_right);
 #if	NUSE
 int   ReplaceBlock(char *block,offs size);
 #endif
 void  textpoint_delete(TextPoint *tp);
-offs   get_text_offs(FILEBUF *,char *,offs,offs);
 void set_Char(offs,byte);
-void ToStartColumn();
-int StartColumn(offs o);
-void ToLineBegin();
-void ToLineEnd();
+// void ToStartColumn();
+// int StartColumn(offs o);
+// void ToLineBegin();
+// void ToLineEnd();
 int clipboard_copy(ClipBoard *clip);
 int clipboard_paste(ClipBoard *clip);
 ClipBoard *clipboard_new();
@@ -783,20 +715,19 @@ void syncwb();
 void textpoint_move(TextPoint *tp,offs o);
 void update_lines(FILEBUF *bp);
 int init_ftype(FILEBUF *bf,char *file_name,int *temp_used,int from_note);
-void beginundogroup(UNDOS *u);
-void EndUndoGroup(UNDOS *u);
+// void beginundogroup(UNDOS *u);
+// void EndUndoGroup(UNDOS *u);
 num GetCol();
 num WGetCol();
 num GetLine();
-num GetColumn();
 num getccolumn();
 num LastLine();
 num FGetLine(FILEBUF *fp);
 num FColumn(FILEBUF *fp,offs o);
 num Column(offs o);
 int show_info(num);
-void undo_set_glue();
-void undo_set_noglue();
+// void undo_set_glue();
+// void undo_set_noglue();
 offs NextNLines(offs,num);
 void textpoint_link(TextPoint *,FILEBUF *fp);
 void textpoint_unlink(TextPoint *);

@@ -8,6 +8,9 @@
 /*	Spawn:	System access commands */
 
 #include	"xe.h"
+#include	"filebuf.h"
+#include	"edit.h"
+#include	"screen.h"
 #include	"display_driver.h"
 #include	<sys/stat.h>
 

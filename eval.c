@@ -17,6 +17,9 @@
 #include	"alist.h"
 #include	"mlang.h"
 #include	"display_driver.h"
+#include	"screen.h"
+#include	"edit.h"
+#include	"filebuf.h"
 
 time_t	tclock;
 

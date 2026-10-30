@@ -10,9 +10,12 @@
 #include	"xe.h"
 #include	"color.h"
 #include	"support.h"
+#include	"filebuf.h"
+#include	"edit.h"
+#include	"display_driver.h"
 #include	"menus.h"
 #include	"panel_curses.h"
-#include	"display_driver.h"
+
 #define __USE_XOPEN
 #include	<wchar.h>
 
@@ -1180,10 +1183,10 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
 		else break;
       };
 
-	  if (execf == next_line || execf == prev_line || execf == tab) {
+	  if (execf == next_line || execf == prev_line || execf == ed_tab) {
 	  	if(execf == prev_line) list_select(st2,-1);
 		if(execf == next_line) list_select(st2,+1);
-		if(execf == tab) {
+		if(execf == ed_tab) {
 //			MESG("tab: [%s]",st2);
 			if(check_list_type(LDIR2)) strlcpy(st2,st1,MAXLLEN);
 			else {

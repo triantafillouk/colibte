@@ -44,4 +44,7 @@ void drv_back_color();
 int drv_search_dialog(int n);
 int init_drv_env();
 
+int system_paste(num n);
+int set_color(num n);
+
 #endif

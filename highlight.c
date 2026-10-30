@@ -9,7 +9,9 @@
 /* highlight code  */
 
 #include	"xe.h"
-
+#include	"filebuf.h"
+#include	"edit.h"
+#include	"screen.h"
 #include "highlight.h"
 
 int hselection=0;

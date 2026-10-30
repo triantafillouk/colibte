@@ -26,10 +26,12 @@
 #endif
 #include	<signal.h>
 #include "menu.h"
-
+#include "filebuf.h"
+#include "edit.h"
 #include "rgb_colors.h"
 #include "xthemes.h"
 #include "display_driver.h"
+#include "screen.h"
 
 #define	TLEFT	1
 #define TRIGHT	0
