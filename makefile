@@ -60,9 +60,9 @@ X11lib0= -lX11 -L/opt/X11/lib
 EXTFILE=.$(APP_NAME)_ext_mac
 WSL:=0
 LIBLM=
-CC=zig cc -DGVERS='"$(GVERS)"'
+#CC=zig cc -DGVERS='"$(GVERS)"'
 #CC=clang -DGVERS='"$(GVERS)"'
-#CC=gcc-mp-14 -DGVERS='"$(GVERS)"'
+CC=gcc -DGVERS='"$(GVERS)"'
 #sudo codesign --force --sign - /usr/local/bin/e
 LIB2=-L/opt/homebrew/lib
 INC2=-I/opt/homebrew/include
