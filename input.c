@@ -14,6 +14,7 @@
 */
 
 #include	"xe.h"
+#include	"func_declare.h"
 #include	"mlang.h"
 #include	"display_driver.h"
 #include	"filebuf.h"

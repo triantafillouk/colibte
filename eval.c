@@ -12,7 +12,7 @@
 #include	<stdlib.h>
 #include	"xe.h"
 #include	<time.h>
-
+#include	"func_declare.h"
 #include	"eval.h"
 #include	"alist.h"
 #include	"mlang.h"

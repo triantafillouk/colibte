@@ -8,6 +8,7 @@
 /* word or paragraph related commands */
 
 #include	"xe.h"
+#include	"func_declare.h"
 #include	"edit.h"
 #include	"filebuf.h"
 #include	"screen.h"

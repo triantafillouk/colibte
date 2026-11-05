@@ -7,6 +7,7 @@
 	Editor Notes support
 */
 #include "xe.h"
+#include "func_declare.h"
 #include "filebuf.h"
 #include "screen.h"
 #include "edit.h"

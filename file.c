@@ -11,6 +11,7 @@
 #include	<sys/types.h>
 #include	<dirent.h>
 #include	"xe.h"
+#include	"func_declare.h"
 #include	"menu.h"
 #include	"filebuf.h"
 #include	"edit.h"

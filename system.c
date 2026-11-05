@@ -8,6 +8,7 @@
 /*	Spawn:	System access commands */
 
 #include	"xe.h"
+#include	"func_declare.h"
 #include	"filebuf.h"
 #include	"edit.h"
 #include	"screen.h"
@@ -974,7 +975,7 @@ int insert_text_file(char *filnam)
 }
 #endif
 
-int ext_system_paste()
+int ext_system_paste(num n)
 {
  static char filnam[MAXFLEN];
  int status=0;
@@ -1011,7 +1012,7 @@ int ext_system_paste()
 
 extern struct ClipBoard *MainClipBoard;
 
-int ext_system_copy()
+int ext_system_copy(num n)
 {
 static char filnam[MAXFLEN];
 static char exec_st[MAXFLEN];

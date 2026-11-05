@@ -59,6 +59,8 @@ void show_token0(FILEBUF *bf,tok_struct *tok,char *from,int cc,int tok_line,int 
 	// MESG(";[%s]  [%s] l=%3d n=%3d: cc=%d type=[%s] name=[%s]",
 		// bf->b_fname,from,tok_line,tok->tnum,cc,tname(tok_type),tok->tname);
 }
+
+#if	NUSE
 /* skip one line or till next separator */
 void skip_line1(FILEBUF *bf,int cc)
 {
@@ -73,7 +75,7 @@ void skip_line1(FILEBUF *bf,int cc)
 	foffset++;
  };
 }
-
+#endif
 
 BTNODE * add_to_symbol_tree(BTREE *stable,char *name,int type)
 {
@@ -588,7 +590,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			tok_line++;
 			// MESG("	TOK_NL %d [%c]",tok_line,cc);
 			last_correct_line=tok_line;
-			// skip_line1(bf,cc);
+
 			if(!(next_token_type(bf)==TOK_RCURL)) {
 				if(is_now_sep /* || after_rpar */ || is_now_curl ) continue;
 				is_now_sep=1;
@@ -667,7 +669,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 				} else {
 					int tt=1;
 					// MESG("	TOK_RCURL sep=%d",is_now_sep);
-#if	1
 					while(1){	/* remove all separators,white space after rcurl  */
 						tt=next_token_type(bf);
 						if(tt!=TOK_SEP && tt!=TOK_NL && tt!=TOK_SPACE) {
@@ -676,7 +677,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 						getnc1(bf,&cc,&tok_type);
 						if(tok_type==TOK_NL) tok_line++;
 					};
-#endif
 					tok_type=TOK_RCURL;
 				};
 			};
@@ -790,23 +790,11 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 			break;
 
 		case TOK_MINUS:
-#if	0
-			if(next_token_type(bf)==TOK_MINUS) {
-				getnc1(bf,&cc,&tok_type);
-				if(start_of_line) { 
-					tok_type=TOK_COMMENT;
-					skip_2nl(bf);continue;
-				};
-				tok_type=TOK_DECREASE;
-				break;
-			};
-#else
 			if(next_token_type(bf)==TOK_MINUS) {
 				getnc1(bf,&cc,&tok_type);
 				tok_type=TOK_DECREASE;
 				break;
 			};
-#endif
 			if(next_token_type(bf)==TOK_ASSIGN) {
 				getnc1(bf,&cc,&tok_type);
 				tok_type=TOK_DECREASEBY;
@@ -1194,26 +1182,6 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
   
   // MESG("	parse_block1: END of parsing! type=%d level=%d",tok_type,curl_level);
  	/* add eof token!  */
-#if	0
-	if(tok_type!=TOK_SEP) 
-	{	
-		if(tok_type==0) {
-			ADD_TOKEN("0");
-			// tok->ttype=TOK_SEP;
-			set_ttype("set sep0",tok,TOK_SEP);
-			tok->tname="end 0";
-			SHOW_TOKEN("0");
-		} else {
-			ADD_TOKEN("endsep");
-			// tok->ttype=TOK_SEP;
-			set_ttype("set endsep",tok,TOK_SEP);
-			tok->tind=0;
-			tok->tline=tok_line;
-			tok->tname="endsep";
-			SHOW_TOKEN("endsep");
-		};
-	}
-#endif
 	// MESG("parse_block1: set end token");
 	bf->end_token=tok;	/* save end token  */
 	ADD_TOKEN("end token");

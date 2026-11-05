@@ -8,6 +8,7 @@
 /* window management.  */
 
 #include	"xe.h"
+#include	"func_declare.h"
 #include	"color.h"
 #include	"display_driver.h"
 #include	"filebuf.h"

@@ -8,6 +8,7 @@
 /* bookmarks, history marks support */
 
 #include	"xe.h"
+#include	"func_declare.h"
 #include	"edit.h"
 
  BMARK bmark[BKMAX];	/* bookmarks are window independent  */

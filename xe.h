@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.8T606 (1/10/2026)"
+#define VERSION 	 "#01.8T607 (5/11/2026)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -35,7 +35,7 @@
 #define	TFUNC2		1	/* for cmd's  */
 #define	TFUNC		1
 #define	TBNF		1	/* convert to bnf notation test  */
-#define	TFINDEX		1	/* use function index  */
+#define	TFINDEX		0	/* use function index  */
 #define TNORMAL		0	/* normal ops included  */
 
 #define	TPROFILE		0	/* profile flag  */

@@ -7,6 +7,7 @@
 
 
 #include "xe.h"
+#include "func_declare.h"
 
 const char cfg_group[] = APPLICATION_NAME;
 extern alist *local_key_list;

@@ -8,6 +8,7 @@
 /* common screen functions for all interfaces  */
 
 #include "xe.h"
+#include "func_declare.h"
 #include "filebuf.h"
 #include "edit.h"
 #include "color.h"

@@ -114,6 +114,7 @@ FUNCS	ftable[] = {
 	{"insert",		1,	istring,"insert a string to current position"},
 	{"erase_eol",	0,		erase_eol,"remove characters till the end of line"},
 	{"select_file",	1,		select_file, "Select an edited file to display. If interactive show a list first"},	
+	{"select_file_internal",1,	select_file_internal, "Select internal files"},	
 	{"move_window",	1,	move_window,"Move window"},
 	{"newline",		1,	new_line,"Insert a new line"},
 	{"insert_indent",	1,	insert_indent,"insert indent"},
@@ -307,5 +308,7 @@ FUNCS	ftable[] = {
 #endif
 	{"next_utf8_error",0,next_utf8_error,""},
 	{"do_nothing",0,	do_nothing,"do nothing"},
+	{"insert_euro",1,	insert_money_symbol,"insert euro symbol"},
+	{"select_highlight",1,select_highlight,"select highlight"},
 	{NULL,	0,		NULL,NULL}
 };

@@ -8,6 +8,7 @@
 */
 
 #include	"xe.h"
+#include	"func_declare.h"
 #include	"display_driver.h"
 #include	"filebuf.h"
 #include	"edit.h"

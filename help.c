@@ -9,6 +9,8 @@
 /* Help commands  */
  
 #include	"xe.h"
+#include	"func_declare.h"
+
 extern FILEBUF *cbfp;
 
 /* Show on screen help */

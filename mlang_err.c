@@ -32,50 +32,6 @@ void mesg_out(const char *fmt, ...)
     }
 }
 
-
-char * tok_info2(tok_struct *tok)
-{
- static char stok[MAXLLEN];
- // MESG("tok_info2: ");
-	if(tok){
-	// MESG("tok not null! %d",tok->ttype); 
-	if(tok->ttype>TOK_OTHER || tok->ttype==0) {
-		return("unknown type of token!");
-	};
-	if(tok->tname!=NULL){
-		switch(tok->ttype){
-			case TOK_SHOW:		
-				snprintf(stok,sizeof(stok),"%d:%d %s :",tok->tline,tok->tnum,TNAME);
-				break;
-			case TOK_LCURL:
-			case TOK_RCURL:
-				snprintf(stok,sizeof(stok),"%d:%d %s other is %d",tok->tline,tok->tnum,TNAME,tok->match_tok->tnum);
-				break;
-			case TOK_SEP:
-				snprintf(stok,sizeof(stok),"%d:%d %s",tok->tline,tok->tnum,TNAME);
-				break;
-			case TOK_DIR_IF:
-			case TOK_DIR_ELSE:
-			case TOK_DIR_FOR:
-			case TOK_DIR_WHILE:
-				snprintf(stok,sizeof(stok),"%d:%d %s",tok->tline,tok->tnum,TNAME);
-				break;
-			case TOK_QUOTE:
-				snprintf(stok,sizeof(stok),"%d:%d %s \"%s\"",tok->tline,tok->tnum,TNAME,(char *)tok->tname);
-				break;
-			default:
-				snprintf(stok,sizeof(stok),"%d:%d %s %s",tok->tline,tok->tnum,TNAME,(char *)tok->tname);
-		};
-	} else {
-		// MESG("token name is null! line %d type %d",last_correct_line,tok->ttype);
-		snprintf(stok,sizeof(stok),"type %d tname is null!",tok->ttype);
-		};
-	} else {
-			snprintf(stok,sizeof(stok),"%2d:%3d %s [%f]",tok->tline,tok->tnum,TNAME,tok->dval);
-	};
-	return stok;
-}
-
 #define	SYNTAX_DEBUG1	0
 
 #if	SYNTAX_DEBUG1	/* if debugging  */
@@ -186,12 +142,12 @@ void set_error(tok_struct *tok,int err,char *description)
  err_num=err;
  // MESG("set_error: [%s] line %d name %s",description,tok->tline,tok->tname);
  err_str=strdup(description);
-#if	1
+
  if(execmd) {
 	if(tok->tname==NULL) fprintf(stderr,"[%s] Error:%d tnum=%d ttype=%d %s line %d\n",error_buffer->b_fname,err,tok->tnum,tok->ttype,err_str,err_line);
  	else fprintf(stderr,"[%s] Error:%d [%s] tnum=%d ttype=%d %s line %d\n",error_buffer->b_fname,err,(char *)tok->tname,tok->tnum,tok->ttype,err_str,err_line);
  };
-#endif
+
  tok=error_buffer->end_token;
  if(tok==NULL) return;
  // tok->ttype=TOK_EOF;

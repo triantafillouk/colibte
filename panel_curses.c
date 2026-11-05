@@ -25,6 +25,7 @@
 #include	<glib.h>
 #endif
 #include	<signal.h>
+#include	"func_declare.h"
 #include "menu.h"
 #include "filebuf.h"
 #include "edit.h"
@@ -2228,7 +2229,7 @@ void box_line_print(int line,int start,char *st, int w, int selected,int active_
 
 void export_region(ClipBoard *clip)
 {
-	ext_system_copy();
+	ext_system_copy(1);
 }
 
 int set_fontindex(num n) {
@@ -2662,7 +2663,7 @@ int init_sighandler()
 
 int system_paste(num n)
 {
-	return ext_system_paste();
+	return ext_system_paste(1);
 }
 
 int set_color(num n)

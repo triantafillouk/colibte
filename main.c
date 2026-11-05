@@ -13,6 +13,7 @@
 #define	_MAINDEF_
  
 #include    "xe.h"	/* global structures and definitions */
+#include	"func_declare.h"
 #include	<sys/stat.h>
 #include	<sys/types.h>
 #include	<syslog.h>
