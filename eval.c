@@ -12,13 +12,10 @@
 #include	<stdlib.h>
 #include	"xe.h"
 #include	<time.h>
-#include	"func_declare.h"
 #include	"eval.h"
-#include	"alist.h"
 #include	"mlang.h"
 #include	"display_driver.h"
-#include	"screen.h"
-#include	"edit.h"
+//#include	"screen.h"
 #include	"filebuf.h"
 
 time_t	tclock;
@@ -35,9 +32,28 @@ extern FILEBUF *cbfp;
 extern int record_session;
 #endif
 
+// display driver functions
+int vresize_wind(num n);
+int hresize_wind(num n);
+// input.c
+int set_key_emulation(num emulation);
+// screen.c
+void set_update(WINDP *wp_toset, int flag);
+// mlang.c
 void set_active_flag(int flag);
 int get_active_flag();
 void print_error();
+// edit.c
+int forw_delete(num n);
+int insert_newline(FILEBUF *fp);
+int insert_chr(int n,int c);
+int prev_character(num n);
+int igotolinecol(num line,num column,int line_flag);
+int set_linetext(char *txt);
+int insert_string(FILEBUF *fp,char *c,int size);
+int goto_line(num n);
+int del_char(num n);
+
 #if	TBNF
 void set_bnf_string(char *s);
 void set_bnf_num(double v);
@@ -45,7 +61,6 @@ MVAR *get_bnf_var();
 int varind();
 #endif
 
-int vtype_is(int type);
 int custom_cell_width=0;
 
 // Editor variables

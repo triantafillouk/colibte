@@ -31,6 +31,7 @@ GWINDP * drv_new_twinp();
 void events_flush();
 
 GWINDP *new_twinp();
+GWINDP *drv_new_twinp();
 
 void set_curgwp();
 void drv_set_default_bgcolor();

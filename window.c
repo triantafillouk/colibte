@@ -8,12 +8,9 @@
 /* window management.  */
 
 #include	"xe.h"
-#include	"func_declare.h"
 #include	"color.h"
 #include	"display_driver.h"
 #include	"filebuf.h"
-#include	"edit.h"
-#include	"screen.h"
 
 extern alist *window_list;
 extern int *color;
@@ -21,11 +18,32 @@ extern FILEBUF *cbfp;
 extern int color_scheme_ind;
 extern int drv_initialized;
 
-GWINDP * drv_new_twinp();
+// from filebuf.c
 int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from);
 int DiffColumns(FILEBUF *fp, offs start,offs col_offs,char *from);
+
+// from window.c
 offs FNext_wrap_line(WINDP *wp,offs current_offset,int lines,int top);
+
+// from screen.c
 void set_top_hline(WINDP *wp,offs cof,char *from);
+void set_update(WINDP *wp_toset, int flag);
+
+// from display driver functions
+int delete_window(num n);
+int split_window(num n);
+// void set_curgwp();
+// void drv_flush();
+// from edit.c
+int next_page(num n);
+int prev_page(num num_pages);
+int change_color_scheme(num  scheme);
+int next_tab(num i);
+int valid_offset(offs o_in_line,int column_goal);
+int igotolinecol(num line,num column,int line_flag);
+
+// local functions
+int move_window(num n);
 
 int window_num()
 {

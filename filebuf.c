@@ -14,10 +14,15 @@
 #include "edit.h"
 #include "screen.h"
 
+// from utf8_support.c
 long utf8_to_unicode(unsigned char* const utf8_str) ;
-long int unicode_point();
+// from filebuf.c
 char *get_bom_description(FILEBUF *fp);
+// from dir.c
 void escape_file_name(char *fname);
+
+// from edit.c
+int get_hex_byte ();
 
 extern int custom_cell_width;
 extern alist *window_list;
@@ -27,7 +32,7 @@ extern int drv_type;
 extern char *file_ext[];
 extern int h_type[];
 
-
+// local functions
 int   ReplaceTextFromFile(char *name,FILEBUF *bf,int fd,offs size,offs *act_read);
 int   GetBlock(FILEBUF *bp,char *copy,offs start,offs size);
 int   WriteBlock(int fd,FILEBUF *fp,offs from,offs size,offs *act_written);

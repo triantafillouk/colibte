@@ -9,9 +9,11 @@
 /* Help commands  */
  
 #include	"xe.h"
-#include	"func_declare.h"
 
 extern FILEBUF *cbfp;
+
+// display driver functions
+int split_window(num n);
 
 /* Show on screen help */
 int help(num n)	

@@ -18,13 +18,18 @@
 #include	"mlang.h"
 #include	"display_driver.h"
 #include	"filebuf.h"
-#include	"edit.h"
 #include	"keytable.h"
-#include	"screen.h"
 
 #if	TFUNC2
 void next_var_ext(char *from);
 #endif
+// from screen.c
+void set_update(WINDP *wp_toset, int flag);
+
+// from edit.c
+int insert_string(FILEBUF *fp,char *c,int size);
+int insert_string_nl(FILEBUF *fp,char *str);
+int insert_newline(FILEBUF *fp);
 
 char ascii_cap[256] = {
 	0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,

@@ -8,13 +8,40 @@
 /* Seach routines  */
 
 #include	"xe.h"
-#include	"func_declare.h"
 #include	"filebuf.h"
-#include	"screen.h"
-#include	"edit.h"
 
 #define	PTBEG	0	/* Leave the point at the beginning on search	*/
 #define	PTEND	1	/* Leave the point at the end on search		*/
+
+// edit.c
+int goto_bol(num n);
+int next_character(num n);
+int insert_string(FILEBUF *fp,char *c,int size);
+int insert_string_nl(FILEBUF *fp,char *str);
+int setmark(num n);
+int igotolinecol(num line,num column,int line_flag);
+
+// word.c
+int next_word(num n);
+
+// display driver
+int split_window(num n);
+int drv_search_dialog(int f);
+
+// window.c
+int prev_window(num n);
+int next_window(num n);
+
+// screen.c
+int update_screen(num force);
+void set_update(WINDP *wp_toset, int flag);
+
+// file.c
+int set_window_filebuf(WINDP *wp,FILEBUF *bp);
+
+#if	TNOTES
+void update_tag_linecol();
+#endif
 
 typedef struct {
 	char c;	/* character  */
@@ -30,13 +57,9 @@ typedef struct {
 
 int found=0;
 
-void set_current_file_buffer(FILEBUF *bp);
-FILEBUF *current_file_buffer();
-
 char	search_pattern[MAXLLEN];            /* Search pattern	*/
 char	replace_pattern[MAXLLEN];			/* replacement pattern		*/
 char	search_lowercase_pattern[MAXLLEN];		/* lower case search pattern  */
-void MESG_time_start(const char *fmt, ...);
 num prof_count=0;
 
 unsigned int	matchlen = 0;	/* lenght of matched string  */
@@ -45,27 +68,26 @@ char		patmatch[MAXLLEN];	/* string that satisfies the search command.  */
 /* start of match  */
 offs match_offs;
 
+// local functions
+int backsearch(num n);
+int forw_stat(num n);
+int find_previous(num n);
+int back_stat(num n);
 int	rexp_scanner(REXP_PAT *patptr, int direction, int beg_or_end);
 int	scanner(char *pattern, int direction, int beg_or_end);
-#if	TNOTES
-void update_tag_linecol();
-#endif
+
 void set_global(int beg_or_end,int direction);
 int	replaces(int query,int f,num n);
 int	nextch(int direction);
 int regexp_str(char *pat, char *lower,REXP_PAT *regexp_pat,int dir );
 int	amatch(char c1,REXP_PAT *pat,int direct);
-int utf8charlen_nocheck(int ch);
 
 void rvstrcpy(char *rvstr, char *str,int maxlen);
 char *str2ctrl(char *);
-int set_window_filebuf(WINDP *wp,FILEBUF *bp);
-int drv_search_dialog(int f);
 
 offs curoffs;		/* current offset in file  */
 offs last_offs;		/* position of last replace  */
 int found_bytes_len;		/* found string length of a reg expression  */
-int found_char_len;	/* found character length of reg expression  */
 
 int eq_ignorecase(int x,int y,int z)
 {

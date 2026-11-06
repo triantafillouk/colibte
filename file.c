@@ -11,20 +11,32 @@
 #include	<sys/types.h>
 #include	<dirent.h>
 #include	"xe.h"
-#include	"func_declare.h"
 #include	"menu.h"
 #include	"filebuf.h"
-#include	"edit.h"
-#include 	"screen.h"
 
 #if	TNOTES
 char *get_notes_key(int key_type);
 #endif
 
-/* external defined functions  */
-char *getcurfword();
+// display driver
 int open_file_dialog(char *,num n);
 
+// marks.c
+int delete_hmark(num flag);
+// edit.c
+int goto_bol(num n);
+int goto_bof(num n);
+int prev_line(num n);
+int quit(num n);
+int next_character(num n);
+int igotolinecol(num line,num column,int line_flag);
+// word.c
+int next_word(num n);
+char *getcurfword();
+// screen.c
+void set_update(WINDP *wp_toset, int flag);
+
+// local functions
 void list_buffers(char *position);
 void add_to_file_list(FILEBUF *bp);
 

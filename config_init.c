@@ -7,7 +7,11 @@
 
 
 #include "xe.h"
-#include "func_declare.h"
+
+// from input.c
+int set_key_emulation(num emulation);
+// support.c
+char *find_file(char *subdir,char *fname,int cflag,int create_if_not_found);
 
 const char cfg_group[] = APPLICATION_NAME;
 extern alist *local_key_list;
@@ -17,7 +21,7 @@ extern int color_scheme_ind;
 
 extern VAR option_names[];
 
-char *find_file(char *subdir,char *fname,int cflag,int create_if_not_found);
+// local functions
 void check_config_dir();
 
 void load_config()

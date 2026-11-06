@@ -8,33 +8,32 @@
 /* common screen functions for all interfaces  */
 
 #include "xe.h"
-#include "func_declare.h"
 #include "filebuf.h"
-#include "edit.h"
 #include "color.h"
 #include "display_driver.h"
 #include "screen.h"
 #define	NEW	1
 
+// local functions
 void vtputwc(WINDP *wp, utfchar *uc);
-extern int save_trace(int n);
-extern int drv_type;
-int get_utf_length(utfchar *utf_char_str);
-int  SUtfCharAt(char *utfstr, int offset, utfchar *uc);
-int eq1(int x,int y,int z);
 void vteeoc(WINDP *wp, int endcol);
-int get_current_line();
 void upd_move(WINDP *wp,char *from);
 void vteeol(WINDP *wp, int selected,int inside);
-int SUtfCharLen(char *utfstr,int offset,utfchar *uc);
-int line_bcolor=0;
 void upd_all_wrap_lines(WINDP *wp,char *from);
 void update_window_nowrap(WINDP *wp,int force);
 void update_window_wrap(WINDP *wp,int force);
 void upd_part_wrap(WINDP *wp,char *from);
-offs check_next_char(FILEBUF *fp,offs o,int *col);
 void set_top_hline(WINDP *wp,offs cof,char *from);
 
+// from eval.c
+int save_trace(int n);
+
+// from filebuf.c
+// offs check_next_char(FILEBUF *fp,offs o,int *col);
+
+int line_bcolor=0;
+
+extern int drv_type;
 extern COLOR_SCHEME *current_scheme;
 
 int specialh=0;
@@ -48,13 +47,34 @@ extern int drv_colors;
 extern int sel_tags[11];
 extern int num_of_selected_tags;
 
-int col0,col1;
-int slow_screen_flag=0;
 
 extern int cursor_showing;
 extern alist *window_list;
 extern float CLEN;
 extern int CHEIGHTI;
+
+// from edit.c
+int get_hex_byte ();
+int next_tab(num i);
+int get_current_line();
+
+// from window.c
+int move_window(num n);
+
+// from display driver
+int get_utf_length(utfchar *utf_char_str);
+
+// from utf8_support.c
+int SUtfCharAt(char *utfstr, int offset, utfchar *uc);
+int SUtfCharLen(char *utfstr,int offset,utfchar *uc);
+int SUtfCharLen(char *utfstr,int offset,utfchar *uc);
+
+
+// from search.c
+int eq1(int x,int y,int z);
+
+int col0,col1;
+int slow_screen_flag=0;
 
 int	update_all  = TRUE;                 /* TRUE if screen is garbage	*/
 int	noupdate=1;		/* no need to update the screen , no display started */

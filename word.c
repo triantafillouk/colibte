@@ -8,10 +8,12 @@
 /* word or paragraph related commands */
 
 #include	"xe.h"
-#include	"func_declare.h"
 #include	"edit.h"
 #include	"filebuf.h"
 #include	"screen.h"
+
+int next_word(num n);
+int prev_word(num n);
 
 /*	list of recognized environment variables	*/
 int infword(int c);

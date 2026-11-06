@@ -7,10 +7,23 @@
 	Editor Notes support
 */
 #include "xe.h"
-#include "func_declare.h"
 #include "filebuf.h"
-#include "screen.h"
-#include "edit.h"
+
+// edit.c
+int next_line(num n);
+int goto_eol(num n);
+int goto_bof(num n);
+int insert_string(FILEBUF *fp,char *c,int size);
+int insert_string_nl(FILEBUF *fp,char *str);
+int insert_newline(FILEBUF *fp);
+int igotolinecol(num line,num column,int line_flag);
+// screen.c
+void set_update(WINDP *wp_toset, int flag);
+// dir.c
+int dir_tag(num n) ;
+int dir_edit(num n);
+// file.c
+int bom_type(int file_id);
 
 extern FILEBUF *cbfp;
 #define	MD_NOTES	1
@@ -21,7 +34,6 @@ extern FILEBUF *cbfp;
 offs find_str_reol(FILEBUF *fp, offs start, char *needle_string, char *return_string,int max_len);
 #endif
 extern int scratch_files[];
-int bom_type(int file_id);
 
 #if	TNOTES
 notes_struct *init_note();

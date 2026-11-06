@@ -8,10 +8,8 @@
 /*	Spawn:	System access commands */
 
 #include	"xe.h"
-#include	"func_declare.h"
 #include	"filebuf.h"
 #include	"edit.h"
-#include	"screen.h"
 #include	"display_driver.h"
 #include	<sys/stat.h>
 
@@ -19,13 +17,33 @@
 
 extern int update_all;
 extern FILEBUF *cbfp;
-void set_sval(char *s);
+
+// from edit.c
 int main_clipboard_copy();
-int x_insert_to_file(char *filnam);
-int insert_text_file_nl(char *filnam);
 int get_current_line();
 
+#if	GTK
+int x_insert_to_file(char *filnam);
+#endif
+
+// local functions
+int insert_text_file_nl(char *filnam);
+
+// from screen.c
+void set_update(WINDP *wp_toset, int flag);
+
+// from display_driver
+int split_window(num n);
+
+// from window.c
+int next_window(num n);
+
+// from dir.c
+int dir_reload(num n);
+
+
 struct timeval start_time;	/* editor time started stamp */
+
 
 void set_start_time()
 {

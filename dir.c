@@ -7,10 +7,7 @@
 	DIR mode functions 
 */
 #include	"xe.h"
-#include	"func_declare.h"
 #include	"filebuf.h"
-#include	"edit.h"
-#include	"screen.h"
 
 #include	<sys/stat.h>
 #include	<sys/types.h>
@@ -33,8 +30,31 @@
 #define DIR_CURRENT	0
 #define	DIR_OTHER	1
 
-void set_current_file_buffer(FILEBUF *bp);
-FILEBUF *current_file_buffer();
+// void set_current_file_buffer(FILEBUF *bp);
+// FILEBUF *current_file_buffer();
+
+// file.c
+int reload_file(num n);
+// window.c
+int next_window(num n);
+
+// edit.c
+int next_line(num n);
+int prev_line(num n);
+int igotooffset(num n,int ppline);
+int goto_bof(num n);
+int quick_close(num n);
+int prev_character(num n);
+
+// display driver functions
+int split_window(num n);
+
+// screen.c
+void set_update(WINDP *wp_toset, int flag);
+
+// local functions
+int dir_reload(num n);
+int dir_left(num n);
 
 char **f_extcmd;
 char **f_extension;

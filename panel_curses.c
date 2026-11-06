@@ -28,11 +28,9 @@
 #include	"func_declare.h"
 #include "menu.h"
 #include "filebuf.h"
-#include "edit.h"
 #include "rgb_colors.h"
 #include "xthemes.h"
 #include "display_driver.h"
-#include "screen.h"
 
 #define	TLEFT	1
 #define TRIGHT	0
@@ -46,32 +44,48 @@
 
 #include "panel_curses.h"
 
+// notes.c
+int set_tag_view_position(int line,int column);
+// dir.c
+int change_sort_mode(int mouse_col);
+int listdir(int dtype);
+
+// screen.c
+int slow_screen();
+void set_update(WINDP *wp_toset, int flag);
+// edit.c
+int imove_top_line(num new_top_line);
+int update_menu(num n);
+unsigned char *str2out(char *s);
+// display driver functions
+int set_sposition(WINDP *wp,int *st, int *l);
+// dir.c
+int change_sort_mode(int mouse_col);
+// window.c
+offs FNext_wrap_line(WINDP *wp,offs start,int num_lines,int top);
+// utf8_support.c
+void utf_string_break(char *utf_string, int column);
+
+// xthemes.c
+COLOR_SCHEME *get_scheme_by_index(int scheme_num);
+char **get_scheme_names();
+
+// local functions
 void save_original_colors();
 void update_selection();
 void restore_original_colors();
-int set_tag_view_position(int line,int column);
-int change_sort_mode(int mouse_col);
-int listdir(int dtype);
-int slow_screen();
+void show_debug_color_attr(COLOR_SCHEME *current_scheme);
 
 BOX *cbox=NULL; // current box
 BOX *msg_box=NULL;	// current message box
 
 int drv_type=DRIVER_CURSES;
 int vswidth=1;	/* vertical separator width  */
-void show_debug_color_attr(COLOR_SCHEME *current_scheme);
-num get_lines(FILEBUF *bp);
-int imove_top_line(num new_top_line);
-int set_sposition(WINDP *wp,int *st, int *l);
-void utf_string_break(char *utf_string, int column);
-int change_sort_mode(int mouse_col);
-offs FNext_wrap_line(WINDP *wp,offs start,int num_lines,int top);
+// num get_lines(FILEBUF *bp);
 
 int	colorupdate;
 int color_scheme_ind=0;
 COLOR_SCHEME *current_scheme=NULL;
-char **get_scheme_names();
-COLOR_SCHEME *get_scheme_by_index(int scheme_num);
 
 int cursor_showing=0;
 

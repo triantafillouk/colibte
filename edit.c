@@ -12,25 +12,30 @@
 #include	"display_driver.h"
 #include	"filebuf.h"
 #include	"edit.h"
-#include 	"screen.h"
 
-int is_utf_accent(FILEBUF *fp, offs o);
-offs MoveToColumn(int go_col);
+// display driver functions
 int export_region(ClipBoard *);	/* this is platform dependant!  */
+// search.c
 void get_lowercase_string(char *lower, char *string);
 void get_uppercase_string(char *lower, char *string);
-void update_lines(FILEBUF *bp);
+int delins(int dlength, char *instr);
 
+// window.c
 offs FNext_wrap_line(WINDP *wp,offs current_offset,int num_lines,int top);
 offs FPrev_wrap_line(WINDP *wp,offs ptr,int num_lines);
+void next_column(int cols);
+// screen.c
 void set_top_hline(WINDP *wp,offs cof,char *from);
 void update_top_position_wrap();
-offs   FPrevUtfCharAt(FILEBUF *fp,offs o, utfchar *uc);
-
-void next_column(int cols);
-
+void set_update(WINDP *wp_toset, int flag);
+// filebuf.c
 int GetBlock(FILEBUF *fp,char *copy,offs from,offs size);
-int delins(int dlength, char *instr);
+
+// Local edit functions
+int delete_region();
+void toggle_global_flag(int option_flag);
+void set_global_flag(int option_flag,int value);
+int get_hex_byte ();
 
 ClipBoard *MainClipBoard=NULL;
 extern FILEBUF *cbfp;
@@ -56,10 +61,12 @@ void toggle_hex_byte()
 	hex_byte ^= 1;
 }
 
+#if	NUSE
 void reset_hex_byte()
 {
 	hex_byte = 0;
 }
+#endif
 
 int next_tab(num i)
 {
@@ -211,8 +218,8 @@ int prev_character(num n)
  while (n--) {
  	if(Offset()<=0) return FALSE;
 	MoveLeftChar(cbfp);
-	set_update(cwp,UPD_MOVE);
  };
+ set_update(cwp,UPD_MOVE);
  // MESG_time("prev_char:end");
  set_goal_column(-1,"prev_character");
  return (OK_RSTGOAL);
@@ -259,14 +266,14 @@ int next_character(num n)
 int select_next_character(num n)
 {
 	if(cwp->selection==0) setmark(REGION_CHAR);
-	set_update(cwp,UPD_MOVE);
+	// set_update(cwp,UPD_MOVE);
 	return next_character(n);
 }
 
 int select_prev_character(num n)
 {
 	if(cwp->selection==0) setmark(REGION_CHAR);
-	set_update(cwp,UPD_MOVE);
+	// set_update(cwp,UPD_MOVE);
 	return prev_character(n);
 }
 
