@@ -28,8 +28,11 @@ void next_column(int cols);
 void set_top_hline(WINDP *wp,offs cof,char *from);
 void update_top_position_wrap();
 void set_update(WINDP *wp_toset, int flag);
+// file.c
+int buffer_is_connected(FILEBUF *bf);
+
 // filebuf.c
-int GetBlock(FILEBUF *fp,char *copy,offs from,offs size);
+
 
 // Local edit functions
 int delete_region();

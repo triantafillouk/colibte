@@ -34,6 +34,10 @@ void upd_all_wrap_lines(WINDP *wp,char *from);
 void update_window_nowrap(WINDP *wp,int force);
 void update_window_wrap(WINDP *wp,int force);
 
+// local functions
+int delchar(char *st,int pos);
+int inspace(char *st,int pos);
+
 extern int drv_initialized;
 extern FILEBUF *cbfp;
 extern int clen_error;
@@ -1354,6 +1358,7 @@ int win_getstring(WINDOW *disp_window,char *prompt, char *st1,int maxlen,int dis
 }
 
 /* delete a character in a string at position */
+
 int delchar(char *st,int pos)
 {
  if(pos<0) return(-1);

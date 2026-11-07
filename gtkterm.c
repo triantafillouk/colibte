@@ -8,7 +8,7 @@
 
 #include "xe.h"
 #include "display_driver.h"
-
+#include "func_declare.h"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-prototypes"
 

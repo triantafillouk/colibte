@@ -1,4 +1,6 @@
 
+int GetBlock(FILEBUF *fp,char *copy,offs from,offs size);
+
 void  CheckPoint(FILEBUF *fp);
 offs  ScanForCharForward(FILEBUF *fp,offs start,byte ch);
 void  EmptyText(FILEBUF *);

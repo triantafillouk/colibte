@@ -673,14 +673,6 @@ int dir_edit(num n)
  };
 }
 
-#if	NUSE
-/* goto edit mode  */
-int start_edit(int n)
-{
- return true;
-}
-#endif
-
 // copy/clone file, for the moment no questions asked!
 int copy_1file(char *fname,char *destination,int ftype,num cptype)
 {

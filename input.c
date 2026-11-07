@@ -969,7 +969,6 @@ void out_print(char *s,int nl)
 	// insert string
 	insert_string(bp,s,strlen(s));
 	if(nl) insert_newline(bp);
-	// sfb(oldfp);
 
 	time(&t0);
 
@@ -998,14 +997,9 @@ void out_fprint(char *bname, char *s,int nl)
 
 		if(!activate_file(bp)) return;
 
-		// sfb(bp);
-
 		// insert string
 		insert_string(bp,s,strlen(s));
 		if(nl) insert_newline(bp);
-		// sfb(oldfp);
-
-
 	} else {
 		msg_log(1,"cannot create %s buffer",bname);
 	};

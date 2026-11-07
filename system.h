@@ -40,8 +40,8 @@ int check_pbcopy();
 
 int init_system_clipboard();
 
-int ext_system_paste();
-int ext_system_copy();
+int ext_system_paste(num n);
+int ext_system_copy(num n);
 
 int mkdirRecursive(const char *path, mode_t mode);
 

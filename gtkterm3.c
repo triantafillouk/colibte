@@ -8,7 +8,7 @@
 	
 #include "xe.h"
 #include "display_driver.h"
-
+#include "func_declare.h"
 #define	GTK_SEARCH	0	/* use a different dialog for search operations. */
 
 #include <glib.h>

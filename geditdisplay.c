@@ -8,6 +8,8 @@
 */
 
 #include "xe.h"
+#include "func_declare.h"
+#include "declares.h"
 #include "display_driver.h"
 #include "geditdisplay.h"
 #include "display_driver.h"

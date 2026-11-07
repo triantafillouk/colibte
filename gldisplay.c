@@ -26,6 +26,10 @@ WINDP * make_split(WINDP *oldwindow);
 GWINDP *ge_cedit_new(GtkWidget *parent, WINDP *wp,int ptype);
 void drv_free_win(WINDP *wp);
 void set_cursor(int flag,char *from);
+// edit.c
+int insert_chr(int n,int c);
+// screen.c
+void set_update(WINDP *wp_toset, int flag);
 
 GtkWidget *popup_select_on, *popup_select_off, *popup_boxed_region, *popup_sort_menu,*popup_tag_menu,*popup_notes_menu;
 extern int drv_initialized;

@@ -8,6 +8,7 @@
 */
 
 #include "xe.h"
+#include "func_declare.h"
 #include "color.h"
 #include "display_driver.h"
 #include "geditdisplay3.h"

@@ -20,6 +20,8 @@ char *import_buffer=NULL;
 
 
 long utf8_to_unicode(unsigned char* const utf8_str) ;
+// edit.c
+int insert_chr(int n,int c);
 
 #define RED_BLACK	1
 
@@ -590,7 +592,7 @@ int set_fontindex(num n) {
 int export_region(ClipBoard *clip)
 {
 #if	WSL | DARWIN
- return ext_system_copy();
+ return ext_system_copy(1);
 #else
  long size;
  int nbytes;
@@ -1521,7 +1523,7 @@ int system_paste(num n)
  if(dont_edit() || cbfp->b_flag & FSDIRED )return false;
 // hide_cursor("system_paste");
 #if	1
- if(ext_system_paste())
+ if(ext_system_paste(1))
 #else
  if(x_insert())
 #endif

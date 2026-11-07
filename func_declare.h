@@ -1,4 +1,16 @@
+// filebuf.c
+int set_bom(num bom_type);
+int set_view_mode(num n);
+int next_utf8_error(num n);
+int set_doc_lang(num n);
+int set_default_local(num n);
+int undo(num n);
+int redo(num n);
+int show_info(num n);
+
 // edit.c
+int noop(num n);
+int insert_date(num n);
 int quick_close(num n);
 int quit(num n);
 int save_colors(num n);
@@ -83,6 +95,7 @@ int next_file(num n);
 int close_file(num n);
 int select_file(num n);
 int select_file_internal(num n);
+int rename_file(num n);
 
 /* window.c  */
 int window_row_increase(num n);
@@ -155,10 +168,9 @@ int grep_cmd(num n);
 int rgrep_cmd(num n);
 int filter_buffer(num n);
 int grep_buffer(num n);
-int sysexec(char *st);
+int view_functions(num n);
 
 // file.c
-void edinit(char *bname);
 int reload_file(num n);
 int insert_file(num  n);
 int open_file(num n);
@@ -268,3 +280,48 @@ int dir_showfileinfo(num type) ;
 int listdir1(num);
 int listdir2(num);
 
+#if	XPLOT
+int plot_init(num n);
+int plot_close(num n) ;
+int path_start(num n);
+int path_end(num n);
+int path_move(num n);
+int path_line(num n);
+int path_curve(num n);
+int set_relative(num n);
+int set_absolute(num n);
+int plot_frames(num n);
+int plot_curve_to(num n);
+int plot_clear(num n);
+int plot_move_to(num n);
+int plot_point(num n);
+int plot_line(num n) ;
+int plot_lineto(num n) ;
+int plot_color(num n);
+int plot_set_color(num n);
+int plot_lwidth(num n);
+int plot_resize(num n);
+int plot_title(num n);
+int plot_coord(num n) ;
+int plot_rotate(num n);
+int plot_translate(num n);
+int plot_scale(num n);
+int plot_text(num n);
+int plot_fill(num n);
+int plot_circle(num n) ;
+int plot_rcircle(num n) ;
+int plot_elipsep(num n);
+int plot_fcolor(num n);
+int plot_rectangle(num n);
+int plot_triangle(num n);
+int plot_arc(num n) ;
+int plot_image(num n) ;
+int plot_polyline(num n);
+int plot_alpha(num n);
+int plot_stat(num n) ;
+int plot_close_path(num n);
+int plot_poly_nostroke(num n);
+int plot_zoom(num n) ;
+int plot_move(num direction) ;
+int plot_zoom(num n) ;
+#endif

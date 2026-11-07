@@ -8,6 +8,7 @@
 #include	<sys/time.h>
 #include	<signal.h>
 #include	"xe.h"
+#include	"func_declare.h"
 #include	<X11/Xlib.h>
 //#include	<gdk/gdkx.h>
 
