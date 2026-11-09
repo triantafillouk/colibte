@@ -164,8 +164,10 @@ extern int show_stage;
 extern char search_pattern[];	// search pattern
 extern char replace_pattern[];		// replace pattern
 extern char patmatch[];
+
 extern int found;
 
+char subname[MAXFLEN];
 
 
 extern char slval[];
@@ -728,7 +730,6 @@ int macro_line(num nused)
 
 int execsub(num n)
 {
-char subname[MAXFLEN];
 	// MESG("execsub: %d %s",n,subname);
 	return(exec_named_function(subname));
 }

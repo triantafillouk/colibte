@@ -77,6 +77,8 @@ int utflen=0;
 int	tlist=0 ;
 int liston=0;
 
+extern char subname[MAXFLEN];
+
 #define	NOFUNCTION	(int(*)(num))(-1)
 
 /* input lists */
@@ -742,7 +744,7 @@ int (*key_function(int c,int f))(num)
     
 	ktp = key_item(key_table,c);
 	if(ktp->macro_name==NULL) return NULL;
-	// strlcpy(subname,ktp->macro_name,MAXFLEN);
+	strlcpy(subname,ktp->macro_name,MAXFLEN);
 	if(ktp->k_fp !=NULL && ktp->k_fp!=NOFUNCTION) return(ktp->k_fp);
 	return NULL;
 }
