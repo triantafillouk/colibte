@@ -1605,11 +1605,17 @@ void set_bfname(char *full_name, char *fname)
 		strlcpy(full_name,getcwd(dir_name,MAXFLEN),MAXFLEN);
 	} else {
 		int f1 = fname[0]=='[';
-		
 		if(cbfp) {
 			f1 = f1 || (cbfp->b_fname[0]=='[' && cbfp->b_fname[1]=='D');
 		};
-		// MESG("set_bfame: f1=%d",f1);
+		// MESG("set_bfame: f1=%d dir=[%s] f=[%s]",f1,getcwd(dir_name,MAXFLEN),fname);
+#if	1
+		if(f1) {
+			set_full_name(full_name,getcwd(dir_name,MAXFLEN),fname,MAXFLEN);
+		} else {
+			set_full_name(full_name,get_start_dir(),fname,MAXFLEN);
+		};
+#else		
 		if(f1) {
 			if(cbfp) set_full_name(full_name,cbfp->b_dname,fname,MAXFLEN);
 			else set_full_name(full_name,getcwd(dir_name,MAXFLEN),fname,MAXFLEN);
@@ -1617,6 +1623,7 @@ void set_bfname(char *full_name, char *fname)
 			if(cbfp) set_full_name(full_name,cbfp->b_dname,fname,MAXFLEN);
 			else set_full_name(full_name,get_start_dir(),fname,MAXFLEN);
 		};
+#endif
 	};
 	
 }

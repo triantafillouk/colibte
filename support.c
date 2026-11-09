@@ -294,7 +294,7 @@ void MESG(const char *fmt, ...)
  static char mline[512];
  
  if(!debug_flag()) return;
- // printf("mesg:\n");
+ // fprintf(stderr,"mesg:[%s]\n",fmt);
     if (fmt != NULL) {
 		va_start(args,fmt);
 		vsnprintf(mline,sizeof(mline),fmt,args);

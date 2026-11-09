@@ -299,6 +299,7 @@ void parse_command_line(int argc, char **argv)
 #if	CRYPT
 	cryptflag = FALSE;	/* no encryption by default */
 #endif
+	// MESG("parse_command_line:");
 	set_bt_num_val("reset_position",0);
 	for (carg = 1; carg < argc; ++carg) {
 
