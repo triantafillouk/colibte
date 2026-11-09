@@ -28,9 +28,6 @@ void set_top_hline(WINDP *wp,offs cof,char *from);
 // from eval.c
 int save_trace(int n);
 
-// from filebuf.c
-// offs check_next_char(FILEBUF *fp,offs o,int *col);
-
 int line_bcolor=0;
 
 extern int drv_type;
@@ -47,8 +44,10 @@ extern int drv_colors;
 extern int sel_tags[11];
 extern int num_of_selected_tags;
 
-
+// display driver functions
 extern int cursor_showing;
+
+// main.c
 extern alist *window_list;
 extern float CLEN;
 extern int CHEIGHTI;

@@ -188,7 +188,6 @@ int forwsearch(num n)
 	return(found);
 }
 
-char *get_line_at(FILEBUF *fb,offs offset);
 
 /*
  * find_next -- Search forward for a previously acquired search string.

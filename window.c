@@ -18,10 +18,6 @@ extern FILEBUF *cbfp;
 extern int color_scheme_ind;
 extern int drv_initialized;
 
-// from filebuf.c
-int DiffColumn(FILEBUF *fp, offs *dbo,offs col_offs,char *from);
-int DiffColumns(FILEBUF *fp, offs start,offs col_offs,char *from);
-
 // from window.c
 offs FNext_wrap_line(WINDP *wp,offs current_offset,int lines,int top);
 
@@ -32,8 +28,7 @@ void set_update(WINDP *wp_toset, int flag);
 // from display driver functions
 int delete_window(num n);
 int split_window(num n);
-// void set_curgwp();
-// void drv_flush();
+
 // from edit.c
 int next_page(num n);
 int prev_page(num num_pages);

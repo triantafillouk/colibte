@@ -135,6 +135,8 @@ off_t  GetDevSize(int fd);
 
 void update_lines(FILEBUF *bp);
 num get_lines(FILEBUF *bp);
+char *get_line_at(FILEBUF *fb,offs offset);
+
 num get_utf2to16_size(char *file_name);
 int ifile(FILEBUF *bf,char *name,int ir_flag);
 int CreateBak(FILEBUF *bp);

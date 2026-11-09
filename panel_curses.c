@@ -2241,9 +2241,9 @@ void box_line_print(int line,int start,char *st, int w, int selected,int active_
  wrefresh(cbox->wnd);
 }
 
-void export_region(ClipBoard *clip)
+int export_region(ClipBoard *clip)
 {
-	ext_system_copy(1);
+	return ext_system_copy(1);
 }
 
 int set_fontindex(num n) {

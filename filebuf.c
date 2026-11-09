@@ -16,11 +16,8 @@
 
 // from utf8_support.c
 long utf8_to_unicode(unsigned char* const utf8_str) ;
-// from filebuf.c
-char *get_bom_description(FILEBUF *fp);
 // from dir.c
 void escape_file_name(char *fname);
-
 // from edit.c
 int get_hex_byte ();
 
@@ -36,6 +33,7 @@ extern int h_type[];
 int   ReplaceTextFromFile(char *name,FILEBUF *bf,int fd,offs size,offs *act_read);
 int   GetBlock(FILEBUF *bp,char *copy,offs start,offs size);
 int   WriteBlock(int fd,FILEBUF *fp,offs from,offs size,offs *act_written);
+char *get_bom_description(FILEBUF *fp);
 
 /* local variables */
 

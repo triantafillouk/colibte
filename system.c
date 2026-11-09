@@ -1019,7 +1019,7 @@ int ext_system_paste(num n)
 		} else {	/* Normal paste  */
 			status=insert_text_file_nl(filnam);
 		};
-		// unlink(filnam);
+		unlink(filnam);
 		set_update(cwp,UPD_EDIT);
 		setmark(0);
 		return status;

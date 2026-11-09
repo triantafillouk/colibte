@@ -15,7 +15,6 @@
 #include	"eval.h"
 #include	"mlang.h"
 #include	"display_driver.h"
-//#include	"screen.h"
 #include	"filebuf.h"
 
 time_t	tclock;
@@ -39,10 +38,19 @@ int hresize_wind(num n);
 int set_key_emulation(num emulation);
 // screen.c
 void set_update(WINDP *wp_toset, int flag);
+void set_screen_update(int flag);
 // mlang.c
+char *key_str1();
+int check_init(FILEBUF *bf);
 void set_active_flag(int flag);
 int get_active_flag();
 void print_error();
+double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start);
+double exec_function(FILEBUF *vp,int nargs);
+void set_error(tok_struct *tok,int index,char *description);
+void init_error();
+
+
 // edit.c
 int forw_delete(num n);
 int insert_newline(FILEBUF *fp);
@@ -60,6 +68,12 @@ void set_bnf_num(double v);
 MVAR *get_bnf_var();
 int varind();
 #endif
+
+// local functions
+void set_record_string1(char *st2);
+char *time2a();
+void record_session_key(short);
+double compute_string(char *cc,char *out_string);
 
 int custom_cell_width=0;
 
@@ -134,9 +148,6 @@ enum {
 	EVREGEXP
 };
 
-void set_screen_update(int flag);
-double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start);
-int   GetBlock(FILEBUF *fp,char *copy,offs from,offs size);
 
 short   kbdm[MAXLLEN];			/* keyboard macro buffer  */
 short	*kbdptr;		/* current position in keyboard buf */
@@ -146,27 +157,16 @@ short   kbdm_session[MAXSESSION];			/* keyboard session buffer  */
 short	*kbdsptr=&kbdm_session[0];		/* current position in keyboard session buf */
 short	*kbdsession_end = &kbdm_session[0];	/* ptr to end of the keyboard session buffer*/
 #endif
-extern int show_stage;
 
+// mlang.c
+extern int show_stage;
+// search.c
 extern char search_pattern[];	// search pattern
 extern char replace_pattern[];		// replace pattern
 extern char patmatch[];
-
 extern int found;
 
-double exec_function(FILEBUF *vp,int nargs);
-void show_points(FILEBUF *bf,FILE *fp);
-int check_init(FILEBUF *bf);
-void set_record_string1(char *st2);
 
-char *time2a();
-void record_session_key(short);
-double compute_string(char *cc,char *out_string);
-
-char subname[MAXFLEN];
-
-void set_error(tok_struct *tok,int index,char *description);
-void init_error();
 
 extern char slval[];
 extern int err_num;
@@ -728,6 +728,7 @@ int macro_line(num nused)
 
 int execsub(num n)
 {
+char subname[MAXFLEN];
 	// MESG("execsub: %d %s",n,subname);
 	return(exec_named_function(subname));
 }

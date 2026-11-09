@@ -31,9 +31,6 @@ void set_update(WINDP *wp_toset, int flag);
 // file.c
 int buffer_is_connected(FILEBUF *bf);
 
-// filebuf.c
-
-
 // Local edit functions
 int delete_region();
 void toggle_global_flag(int option_flag);

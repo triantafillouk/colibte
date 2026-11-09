@@ -43,16 +43,24 @@ alist *dir2_list;
 alist *local_key_list;
 alist *color_scheme_list;
 
+// help.c
 void help_arguments(int f);
+// screen.c
 void set_screen_update(int flag);
+
+// file.c
 void set_default_view_mode(int flag);
+void list_buffers(char *position);
 #if	TNOTES
 void init_note_keys();
 #endif
 
-struct array_dat *main_args=NULL;
+// display driver functions
+void main_loop();
+// eval.c
 int dofile(char *fname);
 
+struct array_dat *main_args=NULL;
 int new_in_key_list=0;
 
 void init_lists()
@@ -78,17 +86,15 @@ int scratch_files[100];
 
 extern int err_num;
 extern char *err_str;
-extern int max_colors;
 int drv_max_colors=16;
-extern void main_loop();
+
 int driver_type;
 char *lc_lang;
 int mmnote=0;
 int mmtodo=0;
 int mmcal=0;
 
-FILEBUF *get_first_scratch_buffer();
-void list_buffers(char *position);
+// FILEBUF *get_first_scratch_buffer();
 
 FILEBUF *get_scratch_file()
 {

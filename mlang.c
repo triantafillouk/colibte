@@ -33,13 +33,14 @@ extern FILEBUF *cbfp;
 // extern array_dat *main_args;
 FILEBUF *exe_buffer=NULL;
 FILEBUF *check_buffer=NULL;
-void show_vars (MVAR *va, int size,char *title);
+// void show_vars (MVAR *va, int size,char *title);
 void show_stack_var(char *from,MVAR *var);
 #if	!TFUNC3
 inline static void  skip_args1(int nargs);
 #endif
 inline static int check_token(int type);
 void show_var_node(BTNODE *node);
+// alist.c
 void eval_btree1(BTNODE *node,void do_func(BTNODE *n,void *p),void *p);
 
 #if	TNORMAL

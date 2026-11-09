@@ -31,6 +31,9 @@ int insert_string(FILEBUF *fp,char *c,int size);
 int insert_string_nl(FILEBUF *fp,char *str);
 int insert_newline(FILEBUF *fp);
 
+// mlang.c
+char * key_str1();
+
 char ascii_cap[256] = {
 	0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,
 	26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,
@@ -57,20 +60,22 @@ BTNODE *find_bt_element(char *value);	/* find an element on main bt table  */
 extern FILEBUF *cbfp;
 extern	FUNCS ftable[];			/* name to function table	*/
 
-extern char *key_str1();
+// main.c
 extern alist *local_key_list;
 extern int new_in_key_list;
+// input.c
 extern int in_menu;
 
-char key_string[128];
+// local functions
 char * xe_key_name(int c);
+
+char key_string[128];
+
 int	ctlxc = CNTRL | 'X';		/* current control X prefix char */
 char utfokey[16];
 int utflen=0;
 int	tlist=0 ;
 int liston=0;
-
-extern char subname[MAXFLEN];
 
 #define	NOFUNCTION	(int(*)(num))(-1)
 
@@ -80,6 +85,7 @@ extern alist *var_list;
 extern alist *shell_list;
 extern alist *pat_list;
 extern alist *macro_list;
+
 #if	TBNF
 void prev_var_ext(char *from);
 #endif
@@ -736,7 +742,7 @@ int (*key_function(int c,int f))(num)
     
 	ktp = key_item(key_table,c);
 	if(ktp->macro_name==NULL) return NULL;
-	strlcpy(subname,ktp->macro_name,MAXFLEN);
+	// strlcpy(subname,ktp->macro_name,MAXFLEN);
 	if(ktp->k_fp !=NULL && ktp->k_fp!=NOFUNCTION) return(ktp->k_fp);
 	return NULL;
 }

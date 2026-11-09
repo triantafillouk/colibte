@@ -1317,6 +1317,7 @@ int recreate_notes_db(num init_db)
 						set_bt_num_val("notes_key",0);
 						notes_same++;
 					}};
+					unlink(tmp_file);
 					delete_filebuf(bp,1);
 					continue;
 #endif
