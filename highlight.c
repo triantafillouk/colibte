@@ -2030,6 +2030,7 @@ void highlight_ps1(int c)
 		break;
 	/* double quotes */
 	case CHR_DQUOTE:
+		if(hstate==HS_PREVESC) { hstate=0;break;};
 		if(hquotem&H_QUOTE5) break;
 		if(hstate!=HS_PREVESC) {
 			if(hquotem & H_QUOTE4 && !(hquotem & H_QUOTE1)) {
@@ -2050,6 +2051,11 @@ void highlight_ps1(int c)
 		hstate=0;
 		break;
 	//case '\\':
+	case '`':
+		if(hquotem&H_QUOTE2) {
+			hstate=(hstate==HS_PREVESC)?0:HS_PREVESC;
+		};
+		break;
 	case '$':{
 		if(hquotem == H_QUOTE1) break;
 		hstate=(hstate==HS_PREVESC)?0:HS_PREVESC;
