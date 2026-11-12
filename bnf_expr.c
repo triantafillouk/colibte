@@ -2042,6 +2042,8 @@ inline static void bnf_factor_assign_var()
 	// MESG("	bvar value=%f",bvar->dval);
 	MVAR *avar=&current_stable[tok->tind];
 	// MESG("assign var %s at slot %d",tok->tname,tok->tind);
+	int old_avar_type=avar->var_type;
+	array_dat *old_avar_adat=avar->adat;
 
 	// MESG("bnf_factor_assign_var: vara@=%d atype=%d btype %d",VARIND,atype,btype);
 
@@ -2093,17 +2095,32 @@ inline static void bnf_factor_assign_var()
 		||bvar->var_type==VTYPE_AMIXED
 		||bvar->var_type==VTYPE_SARRAY) {
 		// MESG("assign var array! to name '%s'",var_name);
-#if	1
-		avar->var_type=bvar->var_type;
-		avar->adat=bvar->adat;
-		avar->var_alloced=bvar->var_alloced;
-#else
-		bnf_var->var_type=bvar->var_type;
-		bnf_var->adat=bvar->adat;
-		bnf_var->var_alloced=bvar->var_alloced;
-#endif
+		if(bvar->var_type==VTYPE_AMIXED) {
+			avar->var_type=bvar->var_type;
+			avar->adat=bvar->adat;
+			avar->var_alloced=bvar->var_alloced;
+		} else {
+			/* free the array previously bound to this variable before rebinding it  */
+			if((old_avar_type==VTYPE_ARRAY||old_avar_type==VTYPE_SARRAY)
+				&& old_avar_adat!=NULL && old_avar_adat!=bvar->adat
+				&& old_avar_adat->astat!=ARRAY_UNALLOCATED) {
+				free_array("assign_var array",old_avar_adat);
+			};
+			if(bvar->var_alloced) {
+				/* bvar owns a freshly computed, uniquely referenced array: take ownership  */
+				avar->var_type=bvar->var_type;
+				avar->adat=bvar->adat;
+				avar->var_alloced=1;
+			} else {
+				/* bvar only references another variable's array (e.g. "b=a"): copy it, don't alias it  */
+				array_dat *acopy=(bvar->var_type==VTYPE_SARRAY) ? dup_sarray(bvar->adat) : dup_array_add1(bvar->adat,0);
+				avar->var_type=acopy->atype;
+				avar->adat=acopy;
+				avar->var_alloced=1;
+			};
+		};
 		bvar->var_alloced=0;
-		bvar->adat->array_name=var_name;
+		avar->adat->array_name=var_name;
 		// print_array1("after array assign",bnf_var->adat);
 		return;
 	};
@@ -2132,7 +2149,9 @@ inline static void bnf_factor_assign_var_f()
 	// MESG("	avar  type=%d",avar->var_type);
 	// if(avar->var_type==VTYPE_STRING) MESG("	avar val=\"%s\"",avar->sval);
 	// if(atype!=VTYPE_POINTER) MESG("assign_var: error not a variable!!!!");
-	
+	int old_avar_type=avar->var_type;
+	array_dat *old_avar_adat=avar->adat;
+
 	// MESG("bnf_factor_assign_var: vara@=%d atype=%d btype %d",VARIND,atype,btype);
 
 	// MVAR *aval=bnf_var->var_pointer;
@@ -2185,11 +2204,32 @@ inline static void bnf_factor_assign_var_f()
 			bvar->adat->array_name = strdup(tok->tname);
 		};
 #endif
-		avar->var_type=bvar->var_type;
-		avar->adat=bvar->adat;
-		avar->var_alloced=bvar->var_alloced;
+		if(bvar->var_type==VTYPE_AMIXED) {
+			avar->var_type=bvar->var_type;
+			avar->adat=bvar->adat;
+			avar->var_alloced=bvar->var_alloced;
+		} else {
+			/* free the array previously bound to this variable before rebinding it  */
+			if((old_avar_type==VTYPE_ARRAY||old_avar_type==VTYPE_SARRAY)
+				&& old_avar_adat!=NULL && old_avar_adat!=bvar->adat
+				&& old_avar_adat->astat!=ARRAY_UNALLOCATED) {
+				free_array("assign_var array",old_avar_adat);
+			};
+			if(bvar->var_alloced) {
+				/* bvar owns a freshly computed, uniquely referenced array: take ownership  */
+				avar->var_type=bvar->var_type;
+				avar->adat=bvar->adat;
+				avar->var_alloced=1;
+			} else {
+				/* bvar only references another variable's array (e.g. "b=a"): copy it, don't alias it  */
+				array_dat *acopy=(bvar->var_type==VTYPE_SARRAY) ? dup_sarray(bvar->adat) : dup_array_add1(bvar->adat,0);
+				avar->var_type=acopy->atype;
+				avar->adat=acopy;
+				avar->var_alloced=1;
+			};
+		};
 		bvar->var_alloced=0;
-		bvar->adat->array_name=var_name;
+		avar->adat->array_name=var_name;
 		// print_array1("after array assign",avar->adat);
 		return;
 	};
@@ -3071,6 +3111,7 @@ inline static void bnf_factor_line_array()
 	// print_array1("end of array definition",adat);
 	bnf_var->adat=adat;
 	bnf_var->var_type=adat->atype;
+	bnf_var->var_alloced=1;	/* this array literal is freshly built and uniquely owned by this stack slot  */
 	// MESG("-> array definition: @%d  end [%s]",VARIND,tok_info(tok));
 }
  
