@@ -211,7 +211,7 @@ int get1key()
  return (c0);
 }
 
-extern char *kbdptr;
+extern short *kbdptr;
 
 int set_record_key(int key)
 {

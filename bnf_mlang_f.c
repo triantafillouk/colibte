@@ -314,6 +314,7 @@ void bnf_print()
 	out_print("",1);
 	// prev_var("pend");
 	// out_print(total_printed,1);
+	if(bnf_var->var_type==VTYPE_STRING && bnf_var->var_alloced) free(bnf_var->sval);
 	bnf_var->var_type=VTYPE_STRING;
 	bnf_var->sval=strdup(total_printed);
 	bnf_var->var_alloced=1;

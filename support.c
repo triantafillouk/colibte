@@ -23,7 +23,7 @@
 #include "alist.h"
 
 int utf_num_chars(char *utf);
-void msg_line(char *);
+void msg_line(char *, ...);
 char * utf8_rtruncate(char *utf_string, int len);
 int	macbug = 0;		/* macro debuging flag		*/
 int bnf_flag = 0;

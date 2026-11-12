@@ -46,7 +46,7 @@ int lock_sync=0;	/* lock page movement  */
 int hex_input=0;
 int hex_byte=0;
 
-extern char utfokey[10];
+extern char utfokey[16];
 extern int utflen;
 extern int color_scheme_ind;
 extern VAR option_names[];

@@ -282,6 +282,7 @@ void bnf_print()
 	// MESG(" -V %d -> %d print end",VARIND,(int)(bnf_var-bnf_vars)-args);
 	bnf_var -= args;
 #endif
+	if(bnf_var->var_type==VTYPE_STRING && bnf_var->var_alloced) free(bnf_var->sval);
 	bnf_var->var_type=VTYPE_STRING;
 	bnf_var->sval=strdup(total_printed);
 	bnf_var->var_alloced=1;
