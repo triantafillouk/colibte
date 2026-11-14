@@ -56,7 +56,7 @@ inline static void next_var(char *title)
 		exit(2);
 	};
 	if(bnf_var->var_type==VTYPE_STRING) {
-		if(bnf_var->var_alloced) {
+		if(bnf_var->var_alloced==1) {
 			MESG("next_var free [%s] -- [%s] alloced",tok_info(tok),bnf_var->sval);
 			free(bnf_var->sval);
 		};
@@ -87,7 +87,7 @@ void next_var(char *title)
  else MESG(" +V %d -> %d (t=%2d) %8s %s",VARIND-1,VARIND,bnf_var->var_type,title,tok_info(tok));
 
 	if(bnf_var->var_type==VTYPE_STRING) {
-		if(bnf_var->var_alloced) free(bnf_var->sval);
+		if(bnf_var->var_alloced==1) free(bnf_var->sval);
 		bnf_var->var_alloced=0;
 	};
  if(VARIND>MAX_VARS) {
@@ -414,7 +414,7 @@ inline static void bnf_factor_spn_plus()
 	else stat=snprintf(svalue,sizeof(svalue),"%s%f",svala,valb);
 
 	if(stat>MAXLLEN) MESG("truncated spn_plus");
-	if(bnf_var->var_alloced) free(svala);
+	if(bnf_var->var_alloced==1) free(svala);
 	bnf_var->sval=strdup(svalue);
 	bnf_var->var_alloced=1;
 	// MESG("var string + varb pointer num! [%s]",vara->sval);
@@ -465,7 +465,7 @@ int bnf_other_plus(MVAR *vara,MVAR *varb)
 		// MESG("	add string+string! [%s]+[%s]",vara->sval,varb->sval);
 		stat = snprintf(svalue,new_size,"%s%s",vara->sval,varb->sval);
 		if(stat>=new_size) MESG("truncated s+s");
-		if(bnf_var->var_type==VTYPE_STRING && bnf_var->var_alloced) free(vara->sval);
+		if(bnf_var->var_type==VTYPE_STRING && bnf_var->var_alloced==1) free(vara->sval);
 		bnf_var->sval=svalue;
 		bnf_var->var_alloced=1;
 		bnf_var->var_type=VTYPE_STRING;
@@ -603,7 +603,7 @@ int bnf_other_minus(MVAR *vara,MVAR *varb)
 		int a1,b1;
 		a1 = strlen(vara->sval)>0 ? vara->sval[0]: 0;
 		b1 = strlen(varb->sval)>0 ? varb->sval[0]: 0;
-		if(bnf_var->var_alloced) free(bnf_var->sval);
+		if(bnf_var->var_alloced==1) free(bnf_var->sval);
 		bnf_var->dval=a1-b1;
 		bnf_var->var_type=VTYPE_NUM;
 		return 1;
@@ -1711,7 +1711,7 @@ inline static void bnf_increaseby()
 		memcpy(s+strlen(avar->sval),bvar->sval,strlen(bvar->sval));
 		s[strlen(avar->sval)+strlen(bvar->sval)]=0;
 		bnf_var->sval=s; bnf_var->var_alloced=0;bnf_var->var_type=VTYPE_STRING;
-		if(avar->var_alloced) free(avar->sval);
+		if(avar->var_alloced==1) free(avar->sval);
 		avar->sval=s; avar->var_alloced=1;
 		return;
 	};
@@ -1847,7 +1847,7 @@ inline static void bnf_mulby()
 			// MESG("	mul_by: result [%s]",avar->sval);
 #else
 			char *new_sval=str_mul(avar->sval,bvar->dval);
-			if(avar->var_alloced) free(avar->sval);
+			if(avar->var_alloced==1) free(avar->sval);
 			avar->sval=new_sval;
 			avar->var_alloced=1;
 #endif
@@ -2034,16 +2034,14 @@ inline static void bnf_factor_assign_var_nump()
 
 inline static void bnf_factor_assign_var()
 {
-	// MESG("bnf_factor_assign_var:@%d %s ind=%d",VARIND,tok->tname,tok->tind);
 	MVAR *bvar=bnf_var;
 	int btype=bvar->var_type;
 	// MESG("	bnf_var @ %d type %d",VARIND,btype);
 	char *var_name = tok->tname;
 	// MESG("	bvar value=%f",bvar->dval);
 	MVAR *avar=&current_stable[tok->tind];
-	// MESG("assign var %s at slot %d",tok->tname,tok->tind);
+	// MESG("assign var %s at slot %d type=%d bvar type=%d",tok->tname,tok->tind,avar->var_type,bvar->var_type);
 	int old_avar_type=avar->var_type;
-	array_dat *old_avar_adat=avar->adat;
 
 	// MESG("bnf_factor_assign_var: vara@=%d atype=%d btype %d",VARIND,atype,btype);
 
@@ -2078,7 +2076,7 @@ inline static void bnf_factor_assign_var()
 		// MESG("	bvar=\"%s\"",bvar->sval);
 		if(avar->var_type==VTYPE_STRING) {
 			// MESG("	old value @%d avar=\"%s\"",avar->sval);
-			if(avar->var_alloced) free(avar->sval);
+			if(avar->var_alloced==1) free(avar->sval);
 		} else avar->var_type=VTYPE_STRING;
 
 		avar->sval=strdup(bvar->sval);
@@ -2095,145 +2093,29 @@ inline static void bnf_factor_assign_var()
 		||bvar->var_type==VTYPE_AMIXED
 		||bvar->var_type==VTYPE_SARRAY) {
 		// MESG("assign var array! to name '%s'",var_name);
-		if(bvar->var_type==VTYPE_AMIXED) {
-			avar->var_type=bvar->var_type;
-			avar->adat=bvar->adat;
-			avar->var_alloced=bvar->var_alloced;
-		} else {
-			/* free the array previously bound to this variable before rebinding it  */
-			if((old_avar_type==VTYPE_ARRAY||old_avar_type==VTYPE_SARRAY)
-				&& old_avar_adat!=NULL && old_avar_adat!=bvar->adat
-				&& old_avar_adat->astat!=ARRAY_UNALLOCATED) {
-				free_array("assign_var array",old_avar_adat);
-			};
-			if(bvar->var_alloced) {
-				/* bvar owns a freshly computed, uniquely referenced array: take ownership  */
-				avar->var_type=bvar->var_type;
-				avar->adat=bvar->adat;
-				avar->var_alloced=1;
-			} else {
-				/* bvar only references another variable's array (e.g. "b=a"): copy it, don't alias it  */
-				array_dat *acopy=(bvar->var_type==VTYPE_SARRAY) ? dup_sarray(bvar->adat) : dup_array_add1(bvar->adat,0);
-				avar->var_type=acopy->atype;
-				avar->adat=acopy;
-				avar->var_alloced=1;
-			};
+		if((old_avar_type==VTYPE_ARRAY||old_avar_type==VTYPE_SARRAY||old_avar_type==VTYPE_AMIXED)
+			&& avar->adat!=NULL && avar->adat!=bvar->adat
+			&& avar->adat->astat==ARRAY_ALLOCATED) {
+			free_array("assign_var array",avar->adat);
+			// MESG("	old array freed ok!");
 		};
-		bvar->var_alloced=0;
+		if(bvar->adat->astat==ARRAY_PRESERVE) {
+			/* bvar owns a freshly computed, uniquely referenced array: take ownership  */
+			avar->adat=bvar->adat;
+			avar->adat->astat = ARRAY_ALLOCATED;
+		} else {
+			/* bvar only references another variable's array (e.g. "b=a"): copy it, don't alias it  */
+			array_dat *acopy=(bvar->var_type==VTYPE_SARRAY) ? dup_sarray(bvar->adat) : dup_array_add1(bvar->adat,0);
+			avar->var_type=acopy->atype;
+			avar->adat=acopy;
+			bvar->var_alloced=0;
+		};
+		avar->var_alloced=1;
 		avar->adat->array_name=var_name;
 		// print_array1("after array assign",bnf_var->adat);
 		return;
 	};
 	set_error(tok,1026,"assign operation not supported yet");
-}
-
-inline static void bnf_factor_assign_var_f()
-{
-	// MESG("bnf_factor_assign_var:f %d",tok->tind);
-	MVAR *bvar=bnf_var;
-	int btype=bvar->var_type;
-	char *var_name = tok->tname;
-
-	// MESG("bnf_factor_assign_var: name=%s bvar@=%d t=%d [%s]",var_name,VARIND,bvar->var_type,tok_info(tok));
-	// if(bvar->var_type==VTYPE_STRING) MESG("	bvar val=\"%s\"",bvar->sval);
-	prev_var("assign var");
-#if	NUSE
-	if(bnf_var->var_type!=VTYPE_POINTER) { 
-		MESG("assign_var: var@=%d [%s]",VARIND,tok_info(tok));
-		set_error(tok,5051,"cannot assign to non var!");
-		return;
-    };
-#endif
-	// MESG("	avar0 type=%d",bnf_var->var_type);
-	MVAR *avar=bnf_var->var_pointer;
-	// MESG("	avar  type=%d",avar->var_type);
-	// if(avar->var_type==VTYPE_STRING) MESG("	avar val=\"%s\"",avar->sval);
-	// if(atype!=VTYPE_POINTER) MESG("assign_var: error not a variable!!!!");
-	int old_avar_type=avar->var_type;
-	array_dat *old_avar_adat=avar->adat;
-
-	// MESG("bnf_factor_assign_var: vara@=%d atype=%d btype %d",VARIND,atype,btype);
-
-	// MVAR *aval=bnf_var->var_pointer;
-
-	if(btype==VTYPE_POINTER) {
-		// MESG("bvar is pointer");
-		bvar = bvar->var_pointer;
-	};
-	// MESG("	bvar=%d",bvar->var_type);
-	avar->var_type = bvar->var_type;
-
-	if(bvar->var_type==VTYPE_NUM) { 
-		avar->dval = bvar->dval;
-		bnf_var->var_type = bvar->var_type;
-		bnf_var->dval = bvar->dval;
-		// MESG("	assign set aval to %f tok [%s]",aval,avar->dval,tok_info(tok));
-		if(btype==VTYPE_POINTER) {
-			set_bnf_function(tok,"assign_var_nump",bnf_factor_assign_var_nump);
-		};
-#if	0
-		if(btype==VTYPE_NUM) {
-			// set_bnf_function(tok,"assign_var_num",bnf_factor_assign_var_num);
-		};
-#endif
-		return;
-	};
-	if(bvar->var_type==VTYPE_STRING) {
-		if(avar->var_type==VTYPE_STRING) {
-			if(avar->var_alloced) free(avar->sval);
-		} else avar->var_type=VTYPE_STRING;
-
-		avar->var_alloced=bvar->var_alloced;
-		if(bvar->var_alloced) { avar->sval=bvar->sval;bvar->var_alloced=0;}
-		else avar->sval = strdup(bvar->sval);
-#if	0
-		bnf_var->sval = avar->sval;
-		bnf_var->var_type=VTYPE_STRING;
-		bnf_var->var_alloced=0;
-#endif
-		return;
-	};
-	
-	// set for any different type!
-	if(bvar->var_type==VTYPE_ARRAY
-		||bvar->var_type==VTYPE_AMIXED
-		||bvar->var_type==VTYPE_SARRAY) {
-		// MESG("assign var array! to name '%s [%s]'",var_name,tok_info(tok));
-#if	0
-		if(btype!=VTYPE_POINTER) { // set the array name!
-			bvar->adat->array_name = strdup(tok->tname);
-		};
-#endif
-		if(bvar->var_type==VTYPE_AMIXED) {
-			avar->var_type=bvar->var_type;
-			avar->adat=bvar->adat;
-			avar->var_alloced=bvar->var_alloced;
-		} else {
-			/* free the array previously bound to this variable before rebinding it  */
-			if((old_avar_type==VTYPE_ARRAY||old_avar_type==VTYPE_SARRAY)
-				&& old_avar_adat!=NULL && old_avar_adat!=bvar->adat
-				&& old_avar_adat->astat!=ARRAY_UNALLOCATED) {
-				free_array("assign_var array",old_avar_adat);
-			};
-			if(bvar->var_alloced) {
-				/* bvar owns a freshly computed, uniquely referenced array: take ownership  */
-				avar->var_type=bvar->var_type;
-				avar->adat=bvar->adat;
-				avar->var_alloced=1;
-			} else {
-				/* bvar only references another variable's array (e.g. "b=a"): copy it, don't alias it  */
-				array_dat *acopy=(bvar->var_type==VTYPE_SARRAY) ? dup_sarray(bvar->adat) : dup_array_add1(bvar->adat,0);
-				avar->var_type=acopy->atype;
-				avar->adat=acopy;
-				avar->var_alloced=1;
-			};
-		};
-		bvar->var_alloced=0;
-		avar->adat->array_name=var_name;
-		// print_array1("after array assign",avar->adat);
-		return;
-	};
-	set_error(tok,1027,"assign operation not supported yet");
 }
 
 inline static void set_bnf_string(char *s)
@@ -2737,7 +2619,7 @@ inline static void bnf_dir_return_value()
 	bnf_expression();
 #endif
 	
-	// MESG("	return_value:1 @v=%d val=%f",VARIND,bnf_var->dval);
+	// MESG("	bnf_dir_return_value:1 @v=%d type=%d",VARIND,bnf_var->var_type);
 	current_active_flag=0;	/* skip rest of function  */
 }
 
@@ -2747,7 +2629,7 @@ inline static void bnf_dir_return_novalue()
 #if	!TFUNC
 	NTOKEN2;
 #endif
-	// MESG("return_novalue: @v=%d [%s]",VARIND,tok_info(tok));
+	// MESG("bnf_return_novalue: @v=%d [%s]",VARIND,tok_info(tok));
 	current_active_flag=0;	/* skip rest of function  */
 }
 
@@ -2758,8 +2640,19 @@ inline static void bnf_dir_return()
 #if	!TFUNC
 	NTOKEN2;
 	bnf_expression();
+#else
+	if(bnf_var->var_type==VTYPE_NUM) {
+		tok->bnf_factor_function=bnf_dir_return_value;
+		current_active_flag=0;
+		return;
+	};
+	if(bnf_var->var_type==VTYPE_ARRAY) {
+		bnf_var->adat->astat=ARRAY_PRESERVE;
+		// MESG("	bnf_dir_return :global array  v@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+		return;
+	};
 #endif
-	// MESG("	dir_return :  v@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
+	// MESG("	bnf_dir_return :  v@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	current_active_flag=0;	/* skip rest of function  */
 }
 
@@ -2897,7 +2790,7 @@ inline static void bnf_factor_proc()
 	MVAR *mv_i;
 	for(mv_i=result_var+1;mv_i<=bnf_var;mv_i++){
 		if(mv_i->var_type==VTYPE_STRING) {
-			if(mv_i->var_alloced) {
+			if(mv_i->var_alloced==1) {
 				free(mv_i->sval);mv_i->var_alloced=0;
 			};
 		};
@@ -3182,7 +3075,7 @@ inline static void bnf_assign_array1()
 		bnf_var->sval = adat->sval[ind1];
 		bnf_var->var_type=VTYPE_STRING;
 		bnf_var->var_alloced=0;
-		if(bvar->var_alloced) { 
+		if(bvar->var_alloced==1) { 
 			free(bvar->sval);bvar->var_alloced=0;
 		};
 		return;
@@ -3222,7 +3115,7 @@ inline static void bnf_increaseby_array1()
 			int newsize=strlen(adat->mval[ind1].sval)+strlen(bvar->sval)+1;
 			char *result=malloc(newsize);
 			sprintf(result,"%s%s",adat->mval[ind1].sval,bvar->sval);
-			if(adat->mval[ind1].var_alloced) free(adat->mval[ind1].sval);
+			if(adat->mval[ind1].var_alloced==1) free(adat->mval[ind1].sval);
 			adat->mval[ind1].sval=result;
 			adat->mval[ind1].var_alloced=1;
 			bnf_var->sval=result;
@@ -3238,13 +3131,13 @@ inline static void bnf_increaseby_array1()
 			bnf_var->sval=adat->mval[ind1].sval;
 			bnf_var->var_type=VTYPE_STRING;
 			bnf_var->var_alloced=0;
-			if(bvar->var_alloced) free(bvar->sval);
+			if(bvar->var_alloced==1) free(bvar->sval);
 			return;
 		} else if(bvar->var_type==VTYPE_NUM && adat->mval[ind1].var_type==VTYPE_STRING){
 			char sval[MAXLLEN];
 			int stat=snprintf(sval,MAXLLEN,"%s%f",adat->mval[ind1].sval,bvar->dval);
 			if(stat>=sizeof(sval)) MESG("result truncated!");
-			if(adat->mval[ind1].var_alloced) free(adat->mval[ind1].sval);
+			if(adat->mval[ind1].var_alloced==1) free(adat->mval[ind1].sval);
 			adat->mval[ind1].sval=strdup(sval);
 			adat->mval[ind1].var_alloced=1;
 			bnf_var->sval=adat->mval[ind1].sval;
@@ -3267,7 +3160,7 @@ inline static void bnf_increaseby_array1()
 			else stat=snprintf(svalue,sizeof(svalue),"%s%f",svala,bvar->dval);
 
 			if(stat>MAXLLEN) MESG("truncated 2");
-			// if(vara->var_alloced) 
+			// if(vara->var_alloced==1) 
 				free(svala);
 			adat->sval[ind1]=strdup(svalue);
 			bnf_var->sval=adat->sval[ind1];
@@ -3454,7 +3347,7 @@ inline static void bnf_increaseby_array2()
 			int ind1 = index1%adat->cols;
 			char *tmp_s = malloc(strlen(adat->mval[ind1].sval)+strlen(bvar->sval)+1);
 			sprintf(tmp_s,"%s%s",adat->mval[ind1].sval,bvar->sval);
-			if(adat->mval[ind1].var_alloced) free(adat->mval[ind1].sval);
+			if(adat->mval[ind1].var_alloced==1) free(adat->mval[ind1].sval);
 			else adat->mval[ind1].var_alloced=1;
 			adat->mval[ind1].sval = tmp_s; 
 			bnf_var->sval = tmp_s;
@@ -4319,7 +4212,7 @@ inline static void bnf_assign_element()
 	MVAR *vara = bnf_var->var_pointer;
 	// MESG("	vara @=%d type=%d",VARIND,vara->var_type);
 
-	if(vara->var_type==VTYPE_STRING && vara->var_alloced) {
+	if(vara->var_type==VTYPE_STRING && vara->var_alloced==1) {
 		// MESG("	old element value is [%s]",vara->sval);
 		free(vara->sval);
 	};

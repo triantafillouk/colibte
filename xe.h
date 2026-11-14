@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.8T615 (12/11/2026)"
+#define VERSION 	 "#01.8T616 (14/11/2026)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -331,8 +331,8 @@ typedef struct MVAR {
 	// unsigned int var_assigned:1;
 #else
 	unsigned int var_type:8;
-	int	var_alloced:1;
-	int size:22;
+	int	var_alloced:4;
+	int size:20;
 #endif
 	unsigned int index1;
 	// short	index2;
@@ -512,6 +512,11 @@ typedef struct MLQUOTES {
 #define VTYPE_NUMP		19	/* numeric pointer in array  */
 #define VTYPE_STRINGP	20	/* string pointer in array  */
 #define VTYPE_OTHER		21
+
+#define	VAR_UNALLOCED	0
+#define	VAR_ALLOCED		1
+#define	VAR_GLOBAL		4
+#define	VAR_PRESERVE	5
 
 /* textpoint */
 #define  FULLDEFINED	0

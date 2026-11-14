@@ -95,7 +95,7 @@ inline static void bnf_factor_error();	/* rbracket  */
 inline static void bnf_factor_assign_var_num();
 inline static void bnf_factor_assign_var_nump();
 inline static void bnf_factor_assign_var();
-inline static void bnf_factor_assign_var_f();
+// inline static void bnf_factor_assign_var_f();
 inline static void bnf_factor_env();
 inline static void bnf_assign_env();
 inline static void bnf_assign_opt();

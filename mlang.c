@@ -770,7 +770,7 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
  {
 	// string arguments are dublicated, must be freed
  	if(sslot->var_type==VTYPE_STRING) {
-		if(sslot->var_alloced)
+		if(sslot->var_alloced==1)
 		{
 			free(sslot->sval);
 			sslot->sval=NULL;
@@ -783,11 +783,13 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 	// MESG("dst vars %d",i);
 	if(sslot->var_type==VTYPE_STRING) {
 		// MESG("delete_symbol_table:%d [%s] free %X",i,sslot->sval,sslot->sval);
-		 	if(sslot->var_alloced)  {
+		 	if(sslot->var_alloced==1)  {
 				free(sslot->sval);
 				sslot->sval=NULL;
 			};
-	} else
+	}
+#if	1
+	else
 	if(sslot->var_type==VTYPE_ARRAY) {
 		// MESG("delete_symbol_table:array %s",sslot->adat->array_name);
 		if(sslot->adat!=NULL) {
@@ -801,6 +803,7 @@ void delete_symbol_table(MVAR *td, int size,int nargs)
 			sslot->dval=0;
 		};
 	};
+#endif
  };
 
  // MESG("	delete_symbol_table from: v@=%d %d >> %d",VARIND,(int)(bnf_var-call_stack),(int)(call_stack_used-call_stack));
@@ -2068,7 +2071,7 @@ void set_nsval(char *s,int max)
 void set_sval(char *s)
 {
 #if	TBNF
-		if(bnf_var->var_type==VTYPE_STRING && bnf_var->var_alloced)
+		if(bnf_var->var_type==VTYPE_STRING && bnf_var->var_alloced==1)
 			free(bnf_var->sval);
 		bnf_var->sval=strdup(s);
 		bnf_var->var_type=VTYPE_STRING;

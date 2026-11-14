@@ -10,8 +10,10 @@
 #include "alist.h"
 
 #define	ARRAY_UNALLOCATED	0
-#define	ARRAY_LOCAL			1
-#define	ARRAY_ALLOCATED		3
+#define	ARRAY_LOCAL			1	// local in function
+#define	ARRAY_ALLOCATED		3	// allocated local
+#define	ARRAY_GLOBAL		4	// allocated global array
+#define	ARRAY_PRESERVE		5	// allocated preserved for assignment
 
 #define BLOCK_END	2
 typedef	alist * TLIST;

@@ -826,15 +826,13 @@ tok_struct *tok0_bnf=NULL;
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
 		int var_index=tok0->tind;
-		// MESG("TOK_VAR: var_index=%d tok0=[%s]",var_index,tok_info(tok0));
+		MESG("TOK_VAR: var_index=%d tok0=[%s]",var_index,tok_info(tok0));
 		pre_symbol=0;
 		ex_nvars++;
 		xpos=4790;
 		// MESG("TOK_VAR:");
 		// MESG("	check_buffer=[%s]",check_buffer->b_fname);
 #if	TBNF
-		//if(!strcmp(check_buffer->b_fname,"[dofile_string]")) 
-		{
 		if(in_proc_args && !strcmp(proc_name,check_buffer->b_fname)) {
 			// MESG("TOK_VAR: %s var_index=%d in_args=%d [%s]",tok0->tname,var_index,in_proc_args,tok_info(tok0));
 			// MESG("	proc_name=%s fname=%s",proc_name,check_buffer->b_fname);
@@ -845,7 +843,6 @@ tok_struct *tok0_bnf=NULL;
 				set_error(tok0,xpos,"var is used before assigned!");
 				RT_MESG1(4790);
 			};
-		};
 		};
 #endif
 		if(tok->ttype==TOK_INCREASE) {
@@ -874,9 +871,6 @@ tok_struct *tok0_bnf=NULL;
 #endif
 			NTOKEN_ERR(4981);
 		};
-#if	TBNF
-		tok_struct *bnf_tok=NULL;
-#endif
 		if(tok->ttype==TOK_TYPE_ELEMENT) {
 			// MESG("err tok_type_element: %s",tok->tname);
 #if	TNORMAL
@@ -892,11 +886,6 @@ tok_struct *tok0_bnf=NULL;
 			NTOKEN_ERR(4982);
 		};
 		if(tok->ttype==TOK_ASSIGN) {
-			// MESG("set normal assign prok=[%s]",tok_info(prev_token));
-#if	TBNF
-			if(bnf_tok!=NULL) bnf_tok->bnf_factor_function=bnf_factor_assign_var_f;
-#endif
-
 			assign_type_to=0;
 			tok->tname = tok0->tname;
 			// MESG("	tind=%d var_index=%d",prev_token->tind,var_index);
