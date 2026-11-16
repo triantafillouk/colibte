@@ -2034,13 +2034,14 @@ inline static void bnf_factor_assign_var_nump()
 
 inline static void bnf_factor_assign_var()
 {
+	// MESG("bnf_factor_assign_var:@%d %s ind=%d",VARIND,tok->tname,tok->tind);
 	MVAR *bvar=bnf_var;
 	int btype=bvar->var_type;
 	// MESG("	bnf_var @ %d type %d",VARIND,btype);
 	char *var_name = tok->tname;
 	// MESG("	bvar value=%f",bvar->dval);
 	MVAR *avar=&current_stable[tok->tind];
-	// MESG("assign var %s at slot %d type=%d bvar type=%d",tok->tname,tok->tind,avar->var_type,bvar->var_type);
+	// MESG("assign var %s at slot %d",tok->tname,tok->tind);
 	int old_avar_type=avar->var_type;
 
 	// MESG("bnf_factor_assign_var: vara@=%d atype=%d btype %d",VARIND,atype,btype);
@@ -2076,7 +2077,7 @@ inline static void bnf_factor_assign_var()
 		// MESG("	bvar=\"%s\"",bvar->sval);
 		if(avar->var_type==VTYPE_STRING) {
 			// MESG("	old value @%d avar=\"%s\"",avar->sval);
-			if(avar->var_alloced==1) free(avar->sval);
+			if(avar->var_alloced) free(avar->sval);
 		} else avar->var_type=VTYPE_STRING;
 
 		avar->sval=strdup(bvar->sval);
@@ -2093,24 +2094,43 @@ inline static void bnf_factor_assign_var()
 		||bvar->var_type==VTYPE_AMIXED
 		||bvar->var_type==VTYPE_SARRAY) {
 		// MESG("assign var array! to name '%s'",var_name);
+		array_dat *old_avar_adat=avar->adat;
 		if((old_avar_type==VTYPE_ARRAY||old_avar_type==VTYPE_SARRAY||old_avar_type==VTYPE_AMIXED)
-			&& avar->adat!=NULL && avar->adat!=bvar->adat
-			&& avar->adat->astat==ARRAY_ALLOCATED) {
-			free_array("assign_var array",avar->adat);
-			// MESG("	old array freed ok!");
+			&& old_avar_adat!=NULL && old_avar_adat!=bvar->adat
+			&& old_avar_adat->astat!=ARRAY_UNALLOCATED) {
+			free_array("assign_var array",old_avar_adat);
 		};
-		if(bvar->adat->astat==ARRAY_PRESERVE) {
-			/* bvar owns a freshly computed, uniquely referenced array: take ownership  */
+		if(bvar->adat->astat==ARRAY_PRESERVE||bvar->adat->astat==ARRAY_ALLOCATED)
+		{
+			// MESG("	assign_var link array!");
+			avar->var_type=bvar->var_type;
 			avar->adat=bvar->adat;
-			avar->adat->astat = ARRAY_ALLOCATED;
-		} else {
-			/* bvar only references another variable's array (e.g. "b=a"): copy it, don't alias it  */
-			array_dat *acopy=(bvar->var_type==VTYPE_SARRAY) ? dup_sarray(bvar->adat) : dup_array_add1(bvar->adat,0);
-			avar->var_type=acopy->atype;
-			avar->adat=acopy;
-			bvar->var_alloced=0;
+			avar->var_alloced=bvar->var_alloced;
+			avar->adat->astat=ARRAY_LOCAL;
+		} else 
+		{
+#if	NUSE
+			/* free the array previously bound to this variable before rebinding it  */
+			if(bvar->var_alloced) {
+				/* bvar owns a freshly computed, uniquely referenced array: take ownership  */
+				// MESG("	assign_var array take ownership! a t=%d [%s]",bvar->adat->astat,tok_info(tok));
+				avar->var_type=bvar->var_type;
+				avar->adat=bvar->adat;
+				avar->var_alloced=bvar->var_alloced;
+			} else 
+#endif
+			{
+				// MESG("	assign_var copy array!");
+				/* bvar only references another variable's array (e.g. "b=a"): copy it, don't alias it  */
+				array_dat *acopy=(bvar->var_type==VTYPE_SARRAY) ? dup_sarray(bvar->adat) : dup_array_add1(bvar->adat,0);
+				avar->var_type=acopy->atype;
+				avar->adat=acopy;
+				avar->adat->astat=ARRAY_LOCAL;
+				avar->var_alloced=1;
+				bvar->adat->astat=ARRAY_LOCAL;
+			};
 		};
-		avar->var_alloced=1;
+		bvar->var_alloced=0;
 		avar->adat->array_name=var_name;
 		// print_array1("after array assign",bnf_var->adat);
 		return;
@@ -2999,7 +3019,7 @@ inline static void bnf_factor_line_array()
 		prev_var("array end");
 	};
 	// MESG("bnf_factor_line_array: end");
-	adat->astat=ARRAY_LOCAL;
+	adat->astat=ARRAY_PRESERVE;
 	// MESG("        end line_array:%d var@=%d Array definition ------------",adat->anum,VARIND);
 	// print_array1("end of array definition",adat);
 	bnf_var->adat=adat;
@@ -4018,7 +4038,7 @@ inline static void bnf_assign_type()
 		adat->mval=(struct MVAR *)malloc(sizeof(struct MVAR)*asize);
 		// MESG("	allocate %d elements in mval",asize);
 	};
-	adat->astat=ARRAY_ALLOCATED;
+	adat->astat=ARRAY_PRESERVE;
 	adat->array_name=strdup(tok0->tname);
 	adat->var_tree = var_tree;
 	// MESG("		array %d [%s] >> rows %d columns %d [%s]",adat->anum,adat->array_name,size2,columns,tok_info(tok));
