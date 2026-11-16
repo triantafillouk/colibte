@@ -226,16 +226,8 @@ void bnf_print()
 	int i;
 	char total_printed[MAXLLEN];
 	total_printed[0]=0;
-#if	TFUNC
 	bnf_var -= args-1;
-#else
-	next_var("print0");
-#endif
 	for(i=0;i<args;i++) {
-#if	!TFUNC
-		NTOKEN2;
-		bnf_expression();
-#endif
 		MVAR *avar=(bnf_var->var_type==VTYPE_POINTER) ? bnf_var->var_pointer: bnf_var;
 		// MVAR *avar=bnf_var;
 		// MESG("	bnf_print: after %d expression var@=%d type=%d [%s]",i,VARIND,bnf_var->var_type,tok_info(tok));
@@ -267,21 +259,16 @@ void bnf_print()
 				strncat(total_printed,avar->sval,MAXLLEN-1);
 			};
 		};
-#if	TFUNC
 		next_var("el");
-#else
-		prev_var("print el");
-#endif
 		// MESG("	if: after switch tnum=%d ttype=%d",tok->tnum,tok->ttype);
 	};
 	out_print("",1);
 	// prev_var("pend");
 	// out_print(total_printed,1);
 	// MESG("end of print var@=%d",VARIND);
-#if	TFUNC
 	// MESG(" -V %d -> %d print end",VARIND,(int)(bnf_var-bnf_vars)-args);
 	bnf_var -= args;
-#endif
+
 	if(bnf_var->var_type==VTYPE_STRING && bnf_var->var_alloced) free(bnf_var->sval);
 	bnf_var->var_type=VTYPE_STRING;
 	bnf_var->sval=strdup(total_printed);

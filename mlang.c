@@ -13,7 +13,6 @@ inline void ntoken();
 #include	"xe.h"
 #include	"func_declare.h"
 #include	"display_driver.h"
-// #include	"alist.h"
 #include	"mlang.h"
 #include	"edit.h"
 #include	"screen.h"
@@ -35,9 +34,8 @@ FILEBUF *exe_buffer=NULL;
 FILEBUF *check_buffer=NULL;
 // void show_vars (MVAR *va, int size,char *title);
 void show_stack_var(char *from,MVAR *var);
-#if	!TFUNC3
-inline static void  skip_args1(int nargs);
-#endif
+
+// inline static void  skip_args1(int nargs);
 inline static int check_token(int type);
 void show_var_node(BTNODE *node);
 // alist.c
@@ -237,11 +235,7 @@ char *vtype_names[] = {
 
 #if	TBNF
 #include "bnf_expr.c"
-#if	TFUNC
 #include "bnf_mlangf.c"
-#else
-#include "bnf_mlang_f.c"
-#endif
 #endif
 
 void show_stack_var(char *from,MVAR *var)
@@ -413,12 +407,10 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type, int *new_one)
 				};
 			};
 		};
-#if	TFUNC3
 		if(prev_token->ttype==TOK_SEP && tok->ttype==TOK_SEP) {
 			*new_one=0;
 			return prev_token;
 		};
-#endif
 		};
 		dest = check_buffer->tok_table_bnf+check_buffer->tok_bnf_index;
 		memcpy((void *)dest,(void *)tok,sizeof(tok_struct));
@@ -426,7 +418,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type, int *new_one)
 		dest->tnum=tok->pushed;
 		// MESG("!Push %10s as %d [%s] exp_type=%d",title,tok->pushed,tok_info(tok),exp_type);
 		set_bnf_function1(dest,exp_type);
-#if	TFUNC3
+
 		if(prev_token && dest->ttype==TOK_SEP) {
 		 
 		 // MESG("	push separator! [%s] p=[%s]",tok_info(dest),tok_info(prev_token));
@@ -439,7 +431,7 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type, int *new_one)
 			return dest;
 		 };
 		};
-#endif
+
 		if(dest->ttype==TOK_LCURL||dest->ttype==TOK_RCURL) {
 			eval_curl_match(dest);
 			if(dest->ttype==TOK_LCURL) dest->bnf_factor_function = bnf_dir_lcurl;
@@ -527,18 +519,6 @@ curl_struct *new_curl(int level,int mline, struct _el *el)
  lcurl->num=0;
  return(lcurl);
 }
-
-#if	!TFUNC3
-inline static void  skip_args1(int const nargs)
-{
-#if    TNORMAL
- if(nargs) tok +=1+2*nargs;
- else tok+=2;
-#else
- tok +=2+2*nargs;
-#endif
-}
-#endif
 
 tok_struct *new_tok()
 {
@@ -892,10 +872,9 @@ int create_statement_group(FILEBUF *bf)
  int assign_error=0;
  err_line=0;
  int i=0;
-#if	TFUNC
  int in_brackets=0;
  int in_call=0;
-#endif
+
  BTREE *use_symbol_tree=bf->symbol_tree;
  if(use_symbol_tree==NULL) use_symbol_tree=cbfp->symbol_tree;
  // MESG("create_statement_group [%s] cbfp=%s",bf->b_fname,cbfp->b_fname);
@@ -904,18 +883,15 @@ int create_statement_group(FILEBUF *bf)
  for(i=0;i<table_size;i++) {
 	// MESG("tp %3d %s",i,tokp->tname);
  	tokp->statement_group = tokp->ttype != TOK_SEP && tokp->ttype != TOK_RCURL && tokp->ttype != TOK_DIR_ELSE;
-#if	TFUNC
+
 	if(tokp->ttype==TOK_LBRAKET) in_brackets=1;
 	if(tokp->ttype==TOK_RBRAKET) in_brackets=0;
 	if(tokp->ttype==TOK_PROC) in_call=1;
-#if	!TFUNC2
-	if(tokp->ttype==TOK_CMD) in_call=1;
-#endif
 	if(tokp->ttype==TOK_LPAR) in_call=1;
 	if(tokp->ttype==TOK_COMMA) {
 		if(!in_brackets && !in_call) tokp->bnf_group=1;
 	}
-#endif
+
 #if	TBNF
 	if(tokp->ttype==TOK_VAR) {
 		if(use_symbol_tree) {
@@ -1265,9 +1241,6 @@ void skip_sentence1()
 			};
 			break;
 		case TOK_CMD:
-#if	!TFUNC
-		case TOK_FUNC:
-#endif
 		case TOK_DIR_IF:
 		case TOK_DIR_FORI:
 		case TOK_DIR_FOR:
@@ -1889,9 +1862,6 @@ char * key_str1()
 {
  char *s;
 #if	TBNF
-#if	!TFUNC2
-	bnf_expression();
-#endif
 	// MESG("	key_str1: var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	if(bnf_var->var_type==VTYPE_STRING) s=bnf_var->sval;
 	else s="";
@@ -2140,9 +2110,7 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 #if	TBNF
 			if(bnf_var->var_type==VTYPE_STRING) strlcpy(buffer,bnf_var->sval,size);
 			// MESG("nextarg v@=%d type=%d",VARIND,bnf_var->var_type);
-#if	TFUNC2
 		next_var("nextarg");
-#endif
 #endif
 #if	TNORMAL
 		strlcpy(buffer,get_sval(),size);

@@ -20,9 +20,7 @@
 #include	"filebuf.h"
 #include	"keytable.h"
 
-#if	TFUNC2
 void next_var_ext(char *from);
-#endif
 // from screen.c
 void set_update(WINDP *wp_toset, int flag);
 
@@ -405,11 +403,6 @@ int assign_sub(num n)
 	// MESG("assign_sub:");
 	if((s = nextarg("Assign: subroutine name :", funname, 32,true))!=TRUE) return(s);
 	// MESG("	after nextarg [%s] ",funname);
-#if	TBNF
-#if	!TFUNC2
-		prev_var_ext("assign_sub");
-#endif
-#endif
 	kfunc = execsub;
 	if(!execmd)
 	msg_line("Press the key to assign!");
@@ -653,9 +646,7 @@ int getckey()
 	// MESG("getckey: macro_exec=%d",macro_exec);
 	if (macro_exec) {
 		strlcpy(key_string,key_str1(),128);
-#if	TFUNC2
 		next_var_ext("getckey");
-#endif
 		return (tstr_to_command(key_string));
 	};
 	c = getcmd();
