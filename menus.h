@@ -677,12 +677,13 @@ M_element e_topn[] =
 	{MMENU,'H',"Help","", NULL, &m_help,"H"},
 #if	!GTK & TARROWS
 #if	USE_UTF8
+	{MMENU,'C'," 🔆 ","Color edit", NULL, &m_color,"CE" },
 	{0,    'B'," ←  ","previous", prev_hmark, (struct MENUS *)1, "EWB"},
 	{0,    '1'," →  ","next", next_hmark, (struct MENUS *)1, "EWF"},
 	{0,    '2'," ↓  ","find next",	find_next, (struct MENUS *)1,"S5" },	
 	{0,    '3'," ↑  ","find previous",	find_previous, (struct MENUS *)1,"S6" },
-	{MMENU,'C'," 🔆 ","Color edit", NULL, &m_color,"CE" },
 #else
+	{MMENU,'C'," CE ","Color edit", NULL, &m_color,"CE" },
 	{0,    '0'," <- ","back", prev_hmark, (struct MENUS *)1, "EWB"},
 	{0,    '1'," -> ","next", next_hmark, (struct MENUS *)1, "EWF"},
 	{0,    '2',"Next","find next",	find_next, (struct MENUS *)1,"S5" },	

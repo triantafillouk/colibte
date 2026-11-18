@@ -454,6 +454,7 @@ int goto_eof(num n)
 	set_hmark(0,"goto_eof");
 	set_update(cwp,UPD_WINDOW);
 	if(cwp) cwp->w_ppline=0;
+	reposition(1);
 	msg_line(time2a());
 	return (OK_RSTGOAL);
 }
