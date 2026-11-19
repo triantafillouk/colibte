@@ -2180,6 +2180,7 @@ int err_check_sentence1()
 #if	TBNF
 		tok_struct *if1=tok;
 		if1->tname="then";
+		MESG("tok_dir_if: %s",tok_info(if1));
 #endif
 		NTOKEN_ERR(631);	/* go to next token after if */
 		xpos=632;
@@ -2187,6 +2188,7 @@ int err_check_sentence1()
 		err_num=err_lexpression();
 		// MESG("err: TOK_DIR_IF! after lexpr");
 		CHECK_TOK(633);
+		tok_struct *tok1=tok;
 		if(err_num) { 
 			// MESG("err: TOK_DIR_IF! error!!");
 			return err_num;
@@ -2195,6 +2197,9 @@ int err_check_sentence1()
 #if	TBNF
 		tok_struct *if_token=stack_push("THEN",if1,-if1->ttype,&new_one);
 		// if_token->bnf_factor_function=bnf_dir_if_then;
+#if	TJUMP
+		// token_ind = ind(tok)
+#endif
 #endif
 		check_skip_token_err1(TOK_RPAR,"tok_dir_if",xpos);
 
@@ -2208,12 +2213,19 @@ int err_check_sentence1()
 #if	TBNF
 #endif
 
-		// MESG("err tok_dir_if: end next_token [%s]",tok_info(end_if_tok));
+		MESG("err tok_dir_if: end next_token [%s]",tok_info(tok));
 
 		tok0->next_tok=tok;
 		// MUST: No separator before else, handle this in parser !!!!! CHECK
 		// check for else statement!
 		
+#if	TJUMP
+		// change if_token to jzero
+		if_token->ttype = TOK_JZERO;
+		if_token->t_nargs = tok - tok1-1;
+		if_token->bnf_factor_function=bnf_factor_jzero;
+		MESG("TJUMP: + %d",if_token->t_nargs);
+#endif
 		if(tok->ttype==TOK_DIR_ELSE) {
 			// MESG("we have an else statement!");
 #if	TBNF
@@ -2223,7 +2235,9 @@ int err_check_sentence1()
 #else
 		if_token->next_tok=end_if_tok+1;
 #endif
+#if	!TJUMP
 		if_token->bnf_factor_function=bnf_dir_if_then_else;
+#endif
 #endif
 			tok0=tok;
 			NTOKEN_ERR(108);
@@ -2239,6 +2253,12 @@ int err_check_sentence1()
 			end_if_tok->next_tok=stack_push("end_of_else",ifnext,TOK_SEP,&new_one);
 #if	TIFN
 			if_token->ifend = end_if_tok->next_tok-1;
+#endif
+#if	TJUMP
+			end_if_tok->ttype=TOK_JUMP;
+			end_if_tok->tname="jump";
+			end_if_tok->bnf_factor_function=bnf_factor_jump;
+			end_if_tok->t_nargs=tok-tok0-1;
 #endif
 			end_if_tok->next_tok--;
 #endif

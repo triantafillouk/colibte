@@ -147,6 +147,8 @@ inline static void bnf_mulby_element();
 inline static void bnf_divby_element();
 inline static void bnf_type_l2_result();
 inline static void bnf_factor_at();
+inline static void bnf_factor_jump();
+inline static void bnf_factor_jzero();
 
 #if	TBNF
 VFunction factor_bnf_funcs[] = {
@@ -256,6 +258,10 @@ VFunction factor_bnf_funcs[] = {
 	bnf_update_val,		// TOK_DECREASE_ARRAY2,
 	bnf_factor_negate,	// TOK_NEGATE,
 	bnf_factor_none,	// TOK_OPNUM,
+#if	TJUMP
+	bnf_factor_jump,	// TOK_JUMP
+	bnf_factor_jzero,	// TOK_JZERO
+#endif
 	bnf_factor_none		// TOK_OTHER,
 };
 
@@ -356,6 +362,10 @@ int factor_bnf_group[] = {
 	1,
 	1,
 	1,
+#if	TJUMP
+	0,		// TOK_JUMP
+	0,		// TOK_JZERO
+#endif
 	0		// TOK_OTHER,
 };
 
@@ -456,6 +466,10 @@ int factor_bnf_type[] = {
 	TOK_DECREASE_ARRAY2,
 	TOK_NEGATE,
 	TOK_OPNUM,
+#if	TJUMP
+	TOK_JUMP,
+	TOK_JZERO,
+#endif
 	0		// TOK_OTHER,
 };
 

@@ -254,6 +254,8 @@ enum {
 	TOK_DECREASE_ARRAY2,
 	TOK_NEGATE,
 	TOK_OPNUM,
+	TOK_JUMP,			// jump
+	TOK_JZERO,			// jump if zero
 	TOK_OTHER			// 81
 };
 

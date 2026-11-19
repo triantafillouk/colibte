@@ -1697,8 +1697,12 @@ char * tok_info(tok_struct *exect)
 				int len=snprintf(sout1,sizeof(sout)-ssize,"args %d",exect->t_nargs);
 				if(len+ssize>=sizeof(sout))  MESG("	truncated");
 			};
-		} else if(exect->ttype==TOK_FUNC) {
+		} else if(exect->ttype==TOK_FUNC)
+		{
 				int len=snprintf(sout1,sizeof(sout)-ssize,"args %d",exect->t_nargs);
+				if(len+ssize>=sizeof(sout))  MESG("	truncated");
+		} else if(exect->ttype==TOK_JUMP||exect->ttype==TOK_JZERO ) { 
+				int len=snprintf(sout1,sizeof(sout)-ssize,"skip %d",exect->t_nargs);
 				if(len+ssize>=sizeof(sout))  MESG("	truncated");
 		} else if(exect->ttype==TOK_VAR) {
 			// MESG("TOK_VAR:");

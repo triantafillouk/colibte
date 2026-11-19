@@ -944,12 +944,12 @@ void out_print(char *s,int nl)
 	// FILEBUF *oldfp = cbfp;
 	// MESG("out_print: current buffer is [%s] discmd=%d",cbfp->b_fname,discmd);
 	if(s==NULL) return;
-
+#if	0
 	if(debug_flag()) {
 		if(nl) fprintf(stderr,"%s\n",s);
 		else fprintf(stderr,"%s",s);
 	};
-
+#endif
 	if(!discmd) {
 		if(execmd) {
 		if(nl) fprintf(stdout,"%s\n",s);

@@ -101,5 +101,9 @@ TOK_TAB token_table[]= {
 	{TOK_DECREASE_ARRAY2	,"A2-",0},
 	{TOK_NEGATE,	"Neg",0},
 	{TOK_OPNUM,		"OPNUM",TOK_TERM},
+#if	TJUMP
+	{TOK_JUMP,		"JUMP",0},
+	{TOK_JZERO,		"JZERO",0},
+#endif
 	{TOK_OTHER			,"OTHER",0}
 };
