@@ -2209,8 +2209,6 @@ int err_check_sentence1()
 		// check_skip_token1(TOK_RPAR);	/* ???????????  */
 		// NTOKEN_ERR(635);	/* go after sentence  */
 		CHECK_TOK(635);
-#if	TBNF
-#endif
 
 		MESG("err tok_dir_if: end next_token [%s]",tok_info(tok));
 

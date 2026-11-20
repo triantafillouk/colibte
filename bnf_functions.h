@@ -147,8 +147,10 @@ inline static void bnf_mulby_element();
 inline static void bnf_divby_element();
 inline static void bnf_type_l2_result();
 inline static void bnf_factor_at();
+#if	TJUMP
 inline static void bnf_factor_jump();
 inline static void bnf_factor_jzero();
+#endif
 
 #if	TBNF
 VFunction factor_bnf_funcs[] = {

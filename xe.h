@@ -29,7 +29,7 @@
 #define	TARROWS		1	/* Use arrow menus in panel curses  */
 #define	USE_UTF8	1	/* Use utf8 characters  */
 #define	TNCOLORS	1	/* dquote fg_color same as squote  */
-#define	TJUMP		1	/* use jump in mlang  */
+#define	TJUMP		0	/* use jump in mlang  */
 #define	TIFN		1
 #define	TFUNC4		1	/* for options  */
 #define	TFUNC3		1	/* for procs  */

@@ -4333,14 +4333,15 @@ inline static void bnf_type_l2_result_update()
 	MESG("error in bnf_type_l2_result_update");
 }
 
-void bnf_factor_jump()
+#if	TJUMP
+static  void bnf_factor_jump()
 {
 	// MESG("bnf_factor_jump: %d %d",tok->t_nargs,tok->next_tok - tok);
 	// tok += tok->t_nargs;
 	tok = tok->next_tok;
 }
 
-void bnf_factor_jzero()
+static void bnf_factor_jzero()
 {
 	int ival = bnf_var->dval;
 	// MESG("bnf_factor_jzero: ival =%d %d %d",ival,tok->t_nargs,tok->next_tok - tok);
@@ -4352,5 +4353,6 @@ void bnf_factor_jzero()
 		tok = tok->next_tok;
 	}// else printf("	no jump!\n");
 }
+#endif
 
 /* --- */
