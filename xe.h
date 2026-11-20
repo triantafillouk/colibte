@@ -12,7 +12,7 @@
 
 /*	Program Identification..... */
 #define	PROGNAME	"Colibri text editor"
-#define VERSION 	 "#01.8T621 (20/11/2026)"
+#define VERSION 	 "#01.8T622 (20/11/2026)"
 
 // merged from kle4 #776T46 (28/7/2022)
 #include "config.h"
@@ -33,7 +33,6 @@
 #define	TIFN		1
 #define	TBNF		1	/* convert to bnf notation test  */
 #define	TFINDEX		0	/* use function index  */
-#define TNORMAL		0	/* normal ops included  */
 
 #define	TPROFILE		0	/* profile flag  */
 #define	USE_TYPE_VARS	1
@@ -722,10 +721,8 @@ typedef struct  FILEBUF {
 // Macro language sructures
 	struct tok_struct *tok_table;
 	struct tok_struct *end_token;	/* the last (EOF) token in tok_table  */
-#if	TBNF
 	struct tok_struct *tok_table_bnf;
 	int tok_bnf_index;
-#endif
 	int err;	/* negative if not syntax checked  */
 	BTREE *symbol_tree;	/* local symbol table  */
 	struct alist *type_list;	/* type table list  */

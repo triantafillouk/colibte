@@ -343,16 +343,6 @@ void parse_command_line(int argc, char **argv)
 				case 'b':	/* open as binary file  */
 					binflag=1;
 					break;
-				case 'g':
-					show_bnf_tokens=1;
-					set_debug(2);
-					execmd=1;
-					carg++;
-					startfile=argv[carg];
-						main_args = new_list_array(argc-carg-1);
-						allocate_array(main_args);
-						a_arg=0;
-					break;
 				case 't':
 					show_tokens=1;
 					break;

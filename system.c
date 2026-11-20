@@ -83,7 +83,7 @@ int sysexec(char *st)
 			msg_line("command [%s] exit status %d",st,status);
 			events_flush();
 		} else {
-			if(!(exebnf)) msg_line("ok!");
+			msg_line("ok!");
 		};
 		return(TRUE);
 	} else {

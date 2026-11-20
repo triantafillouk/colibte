@@ -256,13 +256,8 @@ int show_info(num n)
  int stat;
 	SMESG("%s",date_string(1));
 	SMESG("--- Application info ----------------------------------------");
-#if	TBNF
-	char *xv="f";
-#else
-	char *xv="n";
-#endif
 
-	SMESG("%s Version %s %s",PROGNAME,xv,VERSION);
+	SMESG("%s Version bnf %s",PROGNAME,VERSION);
 #ifdef	GVERS
 	SMESG("git:%s",GVERS);
 #endif

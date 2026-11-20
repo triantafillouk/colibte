@@ -1,4 +1,4 @@
-# in normal mode last value not correct SELECTBNF
+# in normal mode last value not correct ok with bnf
 cls
 print("--- a11.cmd")
 max1=50

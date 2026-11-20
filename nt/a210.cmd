@@ -1,5 +1,5 @@
 # simple double MIXED array ops
-# ok with bnf, uncorrect with normal SELECTBNF
+# ok with bnf, uncorrect with normal ok with bnf
 
 cls
 print("--- a210.cmd")

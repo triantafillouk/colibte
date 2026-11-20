@@ -1,4 +1,4 @@
-# a array not with values in normal mode SELECTBNF
+# a array not with values in normal mode ok with bnf
 cls
 print("---- a13.cmd");
 show_time("start allocate/define array a",0)

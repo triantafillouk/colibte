@@ -61,13 +61,11 @@ int set_linetext(char *txt);
 int insert_string(FILEBUF *fp,char *c,int size);
 int goto_line(num n);
 int del_char(num n);
-
-#if	TBNF
+// mlang.c
 void set_bnf_string(char *s);
 void set_bnf_num(double v);
 MVAR *get_bnf_var();
 int varind();
-#endif
 
 // local functions
 void set_record_string1(char *st2);
@@ -764,9 +762,7 @@ int exec_file(num n)
 	while (n-- > 0) 
 	{
 		status=dofile(fspec);
-#if	TBNF
 		MESG("exec_file: return status = %d var@=%d val=%f",status,varind(),get_val());
-#endif
 		if (status != TRUE) return(status);
 	};
 	return(TRUE);	/* status return! */
@@ -808,9 +804,6 @@ int dofile(char *fname)
 	/* go execute it! */
 	int backup_caf=get_active_flag();
 	double d = compute_block(bp,bp,1);
-#if	TBNF
-	// MESG("dofile: after compute_block: var@=%d err_num=%d exe=%d",varind(),err_num,execmd);
-#endif
 	if(err_num>0) {
 		print_error();
 		return (FALSE);
@@ -1316,9 +1309,6 @@ int refresh_current_line(num nused)
 	set_Offset(sl);
 	// MESG("refresh_current_line:[%s] %d",text_line,ddot_pos);
 	value = compute_string(text_line,text_line);
-#if	TBNF
-	// MESG("	after compute_string var@=%d value=%f [%s]",varind(),value,text_line);
-#endif
 	if(is_ddot) {
 		insert_string(cbfp,text_line,strlen(text_line));
 	};
@@ -1329,15 +1319,13 @@ int refresh_current_line(num nused)
 		set_update(cwp,UPD_EDIT);
 		return (FALSE);
  	} else {
-#if	TBNF
-			MVAR *result=get_bnf_var();
-			
-			if(result->var_type==VTYPE_STRING) msg_line("res=[%s]",result->sval);
-			else if (result->var_type==VTYPE_NUM) {
-				value=result->dval;
-				msg_line("b res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
-			} else msg_line("result is of type %d",result->var_type);
-#endif
+		MVAR *result=get_bnf_var();
+		
+		if(result->var_type==VTYPE_STRING) msg_line("res=[%s]",result->sval);
+		else if (result->var_type==VTYPE_NUM) {
+			value=result->dval;
+			msg_line("b res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
+		} else msg_line("result is of type %d",result->var_type);
  	};
 	if(is_ddot){
 		el=FLineEnd(cbfp,sl);

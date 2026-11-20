@@ -152,7 +152,6 @@ inline static void bnf_factor_jump();
 inline static void bnf_factor_jzero();
 #endif
 
-#if	TBNF
 VFunction factor_bnf_funcs[] = {
 	bnf_factor_none,	// TOK_NONE
 	bnf_factor_sep,		// TOK_SEP
@@ -475,4 +474,3 @@ int factor_bnf_type[] = {
 	0		// TOK_OTHER,
 };
 
-#endif

@@ -86,9 +86,10 @@ extern alist *shell_list;
 extern alist *pat_list;
 extern alist *macro_list;
 
-#if	TBNF
+// mlang.c
 void prev_var_ext(char *from);
-#endif
+
+// local functions
 inline int normalize(int c);
 
 void set_list_type(int type)

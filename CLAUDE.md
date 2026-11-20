@@ -73,9 +73,6 @@ through the built binary in batch mode and diffing output:
   (optionally `-D`) against each `.cmd`, and `tee` combined stdout/stderr to a `*.out`/`*.err` file for
   comparison against a previous known-good run (there are many such captured `*.out` files checked into the
   repo root, e.g. `check4_995_f.out`, used as before/after baselines when changing the macro engine).
-- `cdif.sh` / `check3.sh` specifically diff the **BNF** evaluator output (`-x`, the `TBNF` path) against the
-  normal/legacy evaluator output (`-f`) for the same `.cmd` file — use this when touching `bnf_expr.c` or
-  `mlang_expr.c` to confirm the two engines still agree.
 - `test_files/` and `UTF-8`/encoding sample files are fixtures for file-reading/encoding edge cases (BOM,
   UTF-16, compressed `.gz`/`.bz2`, CRLF, etc.), exercised through `file.c`/`convert.c`/`utf8_support.c`.
 
@@ -89,7 +86,7 @@ running it with `-x -d` rather than inventing a new test mechanism.
 - `FILEBUF` — one open file/buffer. Holds the actual text in a gap buffer (`buffer`, `BufferSize`, `GapSize` —
   implemented in `filebuf.c`), undo state (`main_undo`, `undo.h`), highlight state, dir-mode state
   (`rdir`/`cdir`/`dir_list_str` when the buffer is a directory listing), and — when the macro language has
-  parsed it — a token table (`tok_table` / `tok_table_bnf` when `TBNF`), a local symbol table (`symbol_tree`),
+  parsed it — a token table (`tok_table_bnf`), a local symbol table (`symbol_tree`),
   and notes/tags data (`b_note`, `b_tag_list`) when `TNOTES`.
 - `TextPoint` — a position within a `FILEBUF` (`offset`/`line`/`col`), the unit cursors, marks and selections
   are expressed in. Several well-known points are cached on `FILEBUF`/`WINDP` (`tp_base`, `tp_text_end`,
@@ -126,10 +123,6 @@ A C-like scripting/macro language is both the user-facing automation feature (`.
 F7/F8 keyboard macros) and the mechanism used internally to bind names to editor actions: `func.h`'s `ftable[]`
 maps macro function names (e.g. `"goto_line"`) straight to C functions, and `assign_function`/`assign_sub`
 let users rebind keys to either.
-
-There are **two parallel expression-evaluator implementations**, selected by the `TBNF` flag in `xe.h`
-(currently `TBNF=1`, i.e. the BNF engine is the active default engine), both parsing the same token stream
-produced by `mlang_parser.c` (`tok_struct`, defined in `mlang.h`):
 
 - Legacy/generic evaluator: `mlang.c`, `mlang_expr.c`, `mlang_err.c`, `mlang_array.c`, `mlang_functions.c`,
   `mlangf.c` — a conventional recursive-descent expression evaluator.

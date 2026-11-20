@@ -43,10 +43,8 @@ void eval_btree1(BTNODE *node,void do_func(BTNODE *n,void *p),void *p);
 
 int check_init(FILEBUF *bf);
 
-#if	TBNF
 static inline void bnf_factor_dummy();
 void set_bnf_function1(tok_struct *tok, int type);
-#endif
 void delete_symbol_table(MVAR *td, int size,int nargs);
 MVAR *new_symbol_table(int const size);
 void init_vars(MVAR *head,int size);
@@ -106,9 +104,7 @@ void MESG_TOK_INFO(char *title,tok_struct *tok);
 
 int vtype_is(int type);
 int get_vtype();
-#if	TBNF
 int bnf_debug();
-#endif
 int is_break1=0;
 int tok_mask[256];
 int no_check=0;
@@ -200,14 +196,11 @@ char *vtype_names[] = {
 };
 
 /* Function definitions */
-#if	TBNF
 #include "bnf_expr.c"
 #include "bnf_mlangf.c"
-#endif
 
 void show_stack_var(char *from,MVAR *var)
 {
-#if	TBNF
 	void (*vfunc)(const char *,...);
 	if(debug_flag()) vfunc = MESG;
 	else vfunc=mesg_out;
@@ -219,7 +212,6 @@ void show_stack_var(char *from,MVAR *var)
 			from,(int)(var-bnf_vars),var->var_type,vtype_names[var->var_type],var->sval);
 	else
 		vfunc("  %10s %03d %2d=%-8s",from,(int)(var-bnf_vars),var->var_type,vtype_names[var->var_type]);
-#endif
 }
 
 void show_var_node(BTNODE *node)
@@ -276,7 +268,6 @@ void eval_curl_match(tok_struct *tok)
 	};
 }
 
-#if	TBNF
 int combine_tokens(tok_struct *prev_token,tok_struct *op2)
 {
  int combined=0;
@@ -337,12 +328,10 @@ int combine_tokens(tok_struct *prev_token,tok_struct *op2)
  
  return combined;
 }
-#endif
 
 tok_struct * stack_push(char *title,tok_struct *tok,int exp_type, int *new_one)
 {
   // MESG("--[%s] try push %d [%s] exp=%d [%s]",check_buffer->b_fname,tok->pushed,title,exp_type,tok_info(tok));
-#if	TBNF
 	static tok_struct *prev_token=NULL;
  if(tok!=NULL) {
  	// MESG("stack_push! at %p",check_buffer->tok_table_bnf+check_buffer->tok_bnf_index);
@@ -431,7 +420,6 @@ tok_struct * stack_push(char *title,tok_struct *tok,int exp_type, int *new_one)
 	*new_one=0;
 	return NULL;
  }
-#endif
  *new_one=0;
  return NULL;
 }
@@ -498,13 +486,9 @@ tok_struct *new_tok()
  tok->dval=0;
  tok->ttype=0;
  tok->tgroup=0;
-#if	TBNF
  tok->pushed=-1;
-#if	TBNF
  tok->bnf_group=-1; // -1;
-#endif
  tok->bnf_factor_function=bnf_factor_dummy;
-#endif
  tok->tok_node=NULL;
  // MESG("new_tok:");
  return(tok);
@@ -585,15 +569,9 @@ void init_hash()
 	insert_bt_element(bt_table,ftable[i].n_name,TOK_CMD,i);
   };
 	/* editor function */
-#if	TBNF
   for(i=0; bnf_functions[i].f_name != NULL;i++){ 
 	insert_bt_element(bt_table,bnf_functions[i].f_name,TOK_FUNC,i);
   };
-#else
-  for(i=0; m_functions[i].f_name != NULL;i++){ 
-	insert_bt_element(bt_table,m_functions[i].f_name,TOK_FUNC,i);
-  };
-#endif
 
 /* env variable */
   for(i=0;fvars[i]!=NULL;i++)
@@ -825,7 +803,6 @@ void show_token_table(char *title, FILEBUF *bf,tok_struct *token_start,int size)
  MESG("------------------------------------------------------");
 }
 
-#if	TBNF
 int create_statement_group(FILEBUF *bf)
 {
  FILEBUF *ori_buffer=check_buffer;
@@ -855,7 +832,6 @@ int create_statement_group(FILEBUF *bf)
 		if(!in_brackets && !in_call) tokp->bnf_group=1;
 	}
 
-#if	TBNF
 	if(tokp->ttype==TOK_VAR) {
 		if(use_symbol_tree) {
 		BTNODE *var_node=find_btnode(use_symbol_tree,tokp->tname);
@@ -878,7 +854,6 @@ int create_statement_group(FILEBUF *bf)
 		tokp->next_tok = tokp+tokp->t_nargs;
 	};
 #endif
-#endif
 	tokp++;
  };
  if(assign_error) {
@@ -889,7 +864,6 @@ int create_statement_group(FILEBUF *bf)
  return(assign_error);
  // tokp->next_tok=NULL;
 }
-#endif
 
 /* Check for any errors and initialize parsed list  */
 int check_init(FILEBUF *bf)
@@ -949,7 +923,6 @@ int check_init(FILEBUF *bf)
  check_buffer = ori_buffer;
  // bf->tok_bnf_index = 0;
  // bf->tok_bnf = bf->tok_table_bnf;
-#if	TBNF
  err_num=create_statement_group(bf);
  show_token_table("BNF ",bf,bf->tok_table_bnf,bf->tok_bnf_index);
  if(err_num) {
@@ -959,7 +932,6 @@ int check_init(FILEBUF *bf)
 	return err_num;
  };
  if(bnf_debug() && check_buffer==NULL) exit(0);
-#endif
  check_buffer = ori_buffer;
  // MESG("check_init: end ok, old buffer is[%s]",check_buffer->b_fname);
  return(0);
@@ -1094,7 +1066,6 @@ char *str_cat(char *sval, char *add)
  return sval;
 }
 
-#if	TBNF
 void set_bnf_function1(tok_struct *tok, int type)
 {
  // MESG("	set_bnf_function: type=%d [%s]",type,tok_info(tok));
@@ -1126,7 +1097,6 @@ void set_bnf_function1(tok_struct *tok, int type)
 	// MESG("-- set_bnf_function1: ind=%2d exp num=%3d",tok->tnum,type);
  };
 }
-#endif
 
 #include "mlang_parser.c"
 
@@ -1210,7 +1180,6 @@ void update_ddot_line(char *ddot_out)
  }
 }
 
-#if	TBNF
 void msg_result(char *name,int show_no_time)
 {
 	// set_result();
@@ -1228,20 +1197,6 @@ void msg_result(char *name,int show_no_time)
 	};
 	// if(VARIND>1) bnf_show_vars();
 }
-#else
-void msg_result(char *name, int show_no_time)
-{
-	if(show_no_time) {
-		if(vtype_is(VTYPE_NUM)) msg_line("%s Result (%f)",name,get_val());
-		else if(vtype_is(VTYPE_STRING)) msg_line("%s Result \"%s\"",name,get_sval());
-		else msg_line("%s Result type %d",name,get_vtype());
-	} else {
-		if(vtype_is(VTYPE_STRING)) msg_line("%s Result n is \"%s\"",name,get_sval());
-		else if(vtype_is(VTYPE_NUM)) msg_line("%s Result n is (%f)",name,get_val());
-		else msg_line("%s Result n type %d",name,get_vtype());
-	};
-}
-#endif
 
 
 /* execute a block from a file  */
@@ -1294,21 +1249,19 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	// MESG("	call exec_block1 ------ execmd=%d",execmd);
 	// MESG("	after exec_block1 !!!!!");
 
-#if	TBNF
-		exe_buffer=bp;
-		tok=bp->tok_table_bnf;
-		// MESG("## execute bnf program block! --------------------");
-		if(execmd) bnf_block1();
-		else bnf_block1_break();
-		// next_var("res1");
-		// next_var("res2");
-		set_result();
-		// if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
-		MESG("	end of program var@=%d type %d",VARIND,bnf_var->var_type);
-		if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
-		// show_results();
-		msg_result(bp->b_fname,show_no_time);
-#endif
+	exe_buffer=bp;
+	tok=bp->tok_table_bnf;
+	// MESG("## execute bnf program block! --------------------");
+	if(execmd) bnf_block1();
+	else bnf_block1_break();
+	// next_var("res1");
+	// next_var("res2");
+	set_result();
+	// if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
+	MESG("	end of program var@=%d type %d",VARIND,bnf_var->var_type);
+	if(bnf_var->var_type==VTYPE_NUM) MESG("	dval=%f",bnf_var->dval);
+	// show_results();
+	msg_result(bp->b_fname,show_no_time);
 	drv_stop_checking_break();
 
 	/* cleaning  */
@@ -1323,22 +1276,16 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 		};
 		current_stable=old_symbol_table;
 	};
-#if	TBNF
-		show_var_stats();
-		// next_var("result");
-		// prev_var("r");
-		// MESG("show result executing buffer [%s]!",bp->b_fname);
-#endif
+	show_var_stats();
+	// next_var("result");
+	// prev_var("r");
+	// MESG("show result executing buffer [%s]!",bp->b_fname);
  } else {
  	error_line("parse error %d on %s ",err_num,bp->b_fname);
  };
  tok=old_tok;
  // MESG("compute_block return %f %f",val,num_result());
-#if	TBNF
  return(num_result()); 
-#else
- return(val);
-#endif
 }
 
 int empty_tok_table(FILEBUF *fp)
@@ -1365,10 +1312,8 @@ int empty_tok_table(FILEBUF *fp)
  };
  fp->err=0;
  fp->m_mode=0;
-#if	TBNF
 // Initialize var stack
  bnf_var=bnf_vars;
-#endif
  return(1);
 }
 
@@ -1411,11 +1356,9 @@ int refresh_current_buffer(num nused)
 	init_exec_flags();
 	exe_buffer=fp;
 
-#if	TBNF
-		tok=fp->tok_table_bnf;
-		bnf_block1_break();
-		// MESG("== end program!");
-#endif
+	tok=fp->tok_table_bnf;
+	bnf_block1_break();
+	// MESG("== end program!");
 	drv_stop_checking_break();
 	if(err_num>0) {
 		macro_exec=0;
@@ -1486,21 +1429,13 @@ int parse_buffer_show_tokens(num n)
  // clear out buffer
  cls_fout("[out]");
  err_num=check_init(fp);
-#if	TBNF
  tok_ind=fp->tok_table_bnf;
-#else
- tok_ind=fp->tok_table;
-#endif
  // MESG("Print token table to out buffer");
  if(tok_ind==NULL) {
 	error_line("parsing buffer produced no table!");
 	return(0);
  };
-#if	TBNF
  out_print("|-------- Token list bnf -----------------------------------",1);
-#else
- out_print("|-------- Token list ---------------------------------------",1);
-#endif
 
  while(1)
  {
@@ -1533,7 +1468,6 @@ void MESG_TOK_INFO(char *title,tok_struct *tok)
 	};
 }
 
-#if	TBNF
 char * tok_info(tok_struct *exect)
 {
  static char sout[MAXMLEN];
@@ -1649,77 +1583,6 @@ char * tok_info(tok_struct *exect)
 		};
 	return sout;
 }
-#else
-char * tok_info(tok_struct *tok)
-{
- static char sout[MAXLLEN];
-	if(tok==NULL) { MESG("tok_info: NULL token!");return "null token";};
-	// MESG("tok_info: ttype=%d",tok->ttype);
-
-	if(tok->tname!=NULL){
-		// MESG("tok_info: %d %s %d",tok->tind,tok->tname,tok->tline);
-		if(tok->ttype==TOK_ARRAY1 || tok->ttype==TOK_ARRAY2) {
-			int rows=0;
-			int cols=0;
-			
-			if(tok->tok_adat) {
-				rows=tok->tok_adat->rows;
-				cols=tok->tok_adat->cols;
-			};
-			snprintf(sout,sizeof(sout),"%3d:%4d %3d [%2d=%8s] [%5s] rows=%d cols=%d",
-				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,rows,cols);
-		} else 
-		if(tok->ttype==TOK_SHOW) { snprintf(sout,sizeof(sout),"%3d:%4d %3d [%2d=%8s] [:]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME);
-		} else
-		if(tok->ttype==TOK_LCURL||tok->ttype==TOK_RCURL) {
-				// snprintf(sout,sizeof(sout),"%3d:%4d CURL",tok->tnum,tok->tline);
-				snprintf(sout,sizeof(sout),"%3d:%4d %3d [%2d=%8s] %s other is %d",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->match_tok->tnum);
-		} else
-		if(tok->tgroup>0) {
-			// snprintf(sout,sizeof(sout),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(sout,sizeof(sout),"%3d:%4d %3d [%2d=%8s] [%5s] [%2d:%5s]!!",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,tok->tgroup,tname(tok->tgroup));
-		} else 
-			if(tok->ttype==TOK_NUM) { 
-			// snprintf(sout,sizeof(sout),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(sout,sizeof(sout),"%3d:%4d %3d [%2d=%8s] %5.1f",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,tok->dval);
-		} else if(tok->ttype==TOK_QUOTE) {
-			// snprintf(sout,sizeof(sout),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(sout,sizeof(sout),"%3d:%4d %3d [%2d=%8s] \"%s\"",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
-		} else if(tok->ttype==TOK_VAR) {
-			// MESG("TOK_VAR:");
-			BTNODE *var_node = tok->tok_node;
-			int size=0;
-			int vtype=0;
-#if	0
-			char *var_name="unknown";
-			if(var_node!=NULL) {
-				vtype=var_node->node_vtype;
-				var_name=var_node->node_name;
-			};
-#endif
-			// MESG("TOK_VAR: vtype=%d",vtype);
-			// MESG("tok_info var! ind=[%d] group=%d vtype=%d",tok->tind,tok->tgroup,vtype);
-			if(vtype==VTYPE_TREE) {
-				BTREE *type_tree=(BTREE *)var_node->node_dat;
-				size = type_tree->items;
-			};
-			// snprintf(sout,sizeof(sout),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-
-			snprintf(sout,sizeof(sout),"%3d:%4d %3d [%2d=%8s] [%5s] %8s %d size %d",
-				tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname,vtype_names[vtype] ,vtype,size);
-		} else {
-			// snprintf(sout,sizeof(sout),"%3d:%4d %s",tok->tnum,tok->tline,tok->tname);
-			snprintf(sout,sizeof(sout),"%3d:%4d %3d [%2d=%8s] [%5s]",tok->tnum,tok->tline,tok->tind,tok->ttype,TNAME,(char *)tok->tname);
-		};
-// 			
-	} else {
-			return "null tok name !!!!!!!!!!!!!!!!!!!!!!!!!!!";
-		     snprintf(sout,sizeof(sout),"%3d:%4d %3d [%2d=%8s] [%5.1f]",tok->tnum,tok->tline,tok->tind,tok->ttype,"null name",tok->dval);
-	};
-	// MESG("tok_info: end");
-	return sout;
-}
-#endif
 
 int show_parse_buffer(num n)
 {
@@ -1767,12 +1630,10 @@ int show_parse_buffer(num n)
 char * key_str1()
 {
  char *s;
-#if	TBNF
 	// MESG("	key_str1: var@=%d type=%d [%s]",VARIND,bnf_var->var_type,tok_info(tok));
 	if(bnf_var->var_type==VTYPE_STRING) s=bnf_var->sval;
 	else s="";
 	// show_stack_var("key_str1:",bnf_var);
-#endif
  return (s);
 }
 
@@ -1821,16 +1682,10 @@ int exec_named_function(char *name)
 	double value;
 	// MESG("exec_named_function: active_flag=%d",current_active_flag);
 
-	# if TBNF
-			bnf_exec_function(bp,0);
-			if(bnf_var->var_type==VTYPE_NUM) 
-				value=bnf_var->dval;
-			else value=0;
-	#endif
-
-#if	TBNF
-	// MESG("end of exec_named_function var@=%d value=%f",VARIND,value);
-#endif
+	bnf_exec_function(bp,0);
+	if(bnf_var->var_type==VTYPE_NUM) 
+		value=bnf_var->dval;
+	else value=0;
 
 	return((int)value);
 }
@@ -1839,22 +1694,17 @@ int exec_named_function(char *name)
 double expression(char *from)
 {
 	// MESG("expression from: %s",from);
-#if	TBNF
-		return bnf_expression();
-#endif
+	return bnf_expression();
 }
 
 inline double get_val()
 {
-#if	TBNF
-		return bnf_var->dval;
-#endif
+	return bnf_var->dval;
 }
 
 
 char *get_sval()
 {
-#if	TBNF
 	if(bnf_var->var_type==VTYPE_STRING) return bnf_var->sval;
 	else if(bnf_var->var_type==VTYPE_NUM) {
 		char *s=malloc(16);
@@ -1864,48 +1714,37 @@ char *get_sval()
 		bnf_var->var_alloced=1;
 		return s;
 	} else return "";
-#endif
 }
 
 inline int get_vtype()
 {
-#if	TBNF
-		return bnf_var->var_type;
-#endif
+	return bnf_var->var_type;
 }
 
 inline int vtype_is(int type)
 {
 	// MESG("vtype_is: type=%d ex type=%d",type,ex_var.var_type);
-#if	TBNF
-		return bnf_var->var_type==type;
-#endif
+	return bnf_var->var_type==type;
 }
 
 void set_sval(char *s)
 {
-#if	TBNF
-		if(bnf_var->var_type==VTYPE_STRING && bnf_var->var_alloced==1)
-			free(bnf_var->sval);
-		bnf_var->sval=strdup(s);
-		bnf_var->var_type=VTYPE_STRING;
-		bnf_var->var_alloced=1;
-#endif
+	if(bnf_var->var_type==VTYPE_STRING && bnf_var->var_alloced==1)
+		free(bnf_var->sval);
+	bnf_var->sval=strdup(s);
+	bnf_var->var_type=VTYPE_STRING;
+	bnf_var->var_alloced=1;
 }
 
 inline void set_vdval(double value)
 {
-#if	TBNF
-		bnf_var->dval=value;
-		bnf_var->var_type=VTYPE_NUM;
-#endif
+	bnf_var->dval=value;
+	bnf_var->var_type=VTYPE_NUM;
 }
 
 inline void set_dval(double value)
 {
-#if	TBNF
-		bnf_var->dval=value;
-#endif
+	bnf_var->dval=value;
 }
 
 #include "mlang_err.c"
@@ -1922,10 +1761,8 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 		// MESG("getstring: %s",prompt);
 		if(getstring(prompt, buffer, size,show)!=FALSE) {
 			// MESG("nextarg: buffer=[%s]",buffer);
-#if	TBNF
-				bnf_var->dval=atof(buffer);
-				bnf_var->var_type=VTYPE_NUM;
-#endif
+			bnf_var->dval=atof(buffer);
+			bnf_var->var_type=VTYPE_NUM;
 		} else {
 			set_update(cwp,UPD_MOVE);
 			return(FALSE);
@@ -1935,11 +1772,9 @@ int nextarg(char *prompt,char *buffer, int size,int show)
 		/* slval has already the next argument */
 		// MESG("nextarg: slval=%s",get_sval());	
 		// MESG("nextarg:2 var_type=%d",bnf_var->var_type);
-#if	TBNF
-			if(bnf_var->var_type==VTYPE_STRING) strlcpy(buffer,bnf_var->sval,size);
-			// MESG("nextarg v@=%d type=%d",VARIND,bnf_var->var_type);
+		if(bnf_var->var_type==VTYPE_STRING) strlcpy(buffer,bnf_var->sval,size);
+		// MESG("nextarg v@=%d type=%d",VARIND,bnf_var->var_type);
 		next_var("nextarg");
-#endif
 	};
 	return(TRUE);
 }

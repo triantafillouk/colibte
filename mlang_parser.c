@@ -264,9 +264,7 @@ void set_var(BTREE *stree, tok_struct *tok, char *name)
 	tok->tind=btn->node_index;
 	// tok->ttype=btn->node_type;
 	set_ttype("parse set_var",tok,btn->node_type);
-#if	TBNF
 	tok->bnf_group= 1;// TOK_VAR;
-#endif
 	ex_edenv=tok->ttype;
 	btn->node_vtype=VTYPE_NONE;
 	btn->node_name=strdup(name);
@@ -1176,9 +1174,7 @@ int parse_block1(FILEBUF *bf,BTREE *use_stree,int init)
 	tok->tline=tok_line;
 	tok->tname="eof";
 	tok->tgroup=TOK_END;
-#if TBNF
     tok->bnf_group=BLOCK_END;
-#endif
 	SHOW_TOKEN("END");
 	if(curl_level!=0 && err_num<1) set_error(tok,4016,"parse error: invalid number of curls");
 
@@ -1221,19 +1217,15 @@ void set_tok_table(FILEBUF *bf)
  if(bf->tok_table != NULL) {
  	free(bf->tok_table);
  };
-#if	TBNF
  if(bf->tok_table_bnf != NULL) {
 	// MESG("	-- [%s] recreate bnf token table!",bf->b_fname);
  	free(bf->tok_table_bnf);
  };
  bf->tok_table_bnf=(void *)malloc(sizeof(struct tok_struct)*table_size);
  bf->tok_bnf_index=0;
- // bf->tok_bnf = bf->tok_table_bnf;
  
  // MESG("	-- set tok_table_bnf: bf=[%s] at %p size %d",bf->b_fname,bf->tok_table_bnf,table_size);
  //eval_curl_match(NULL); // initialize curl stack
-
-#endif
  tok_table=(void *)malloc(sizeof(struct tok_struct)*table_size);
  bf->tok_table = (void *) tok_table;
  // MESG("-----------> set_tok_table: bf=[%s]",bf->b_fname);

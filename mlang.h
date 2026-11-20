@@ -17,9 +17,7 @@
 
 #define BLOCK_END	2
 typedef	alist * TLIST;
-#if	TBNF
 typedef void (*VFunction)();
-#endif
 
 typedef struct tok_struct {
 	union {
@@ -30,7 +28,6 @@ typedef struct tok_struct {
 	short tnum;	/* token number for debugging  */
 	short ttype;	/* token type */
 	short tgroup;	/* token group  */
-#if	TBNF
 	short bnf_group;
 	union {
 		short pushed;
@@ -43,7 +40,6 @@ typedef struct tok_struct {
 	struct tok_struct *ifelse;
 #endif
 	VFunction bnf_factor_function;
-#endif
 	// short tind1;	/* index1 for type elements  */
 	// short tind2;	/* index2 for type elements  */
 	char *tname;	// token name or string value
@@ -97,13 +93,11 @@ typedef struct key_type {
 } key_type;
 
 // #define SEP_FUNCTIONS	1
-#if	TBNF
 typedef struct v_function {
 	char *f_name;	/* function name  */
 	short f_args;	/* number of function arguments  */
 	VFunction vfunction;
 } v_function;
-#endif
 
 typedef struct term_type {
 	char *term_name;

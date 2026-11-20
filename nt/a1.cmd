@@ -1,4 +1,4 @@
-# a array not with values in normal mode SELECTBNF
+# a array not with values in normal mode ok with bnf
 cls
 print("---- a1.cmd");
 max1=30000000
