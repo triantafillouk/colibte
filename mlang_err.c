@@ -779,7 +779,7 @@ tok_struct *tok0_bnf=NULL;
 	/* start of logic ---------  */
 	case TOK_VAR:{	// 0 variable
 		int var_index=tok0->tind;
-		MESG("TOK_VAR: var_index=%d tok0=[%s]",var_index,tok_info(tok0));
+		// MESG("TOK_VAR: var_index=%d tok0=[%s]",var_index,tok_info(tok0));
 		pre_symbol=0;
 		ex_nvars++;
 		xpos=4790;
@@ -2188,7 +2188,9 @@ int err_check_sentence1()
 		err_num=err_lexpression();
 		// MESG("err: TOK_DIR_IF! after lexpr");
 		CHECK_TOK(633);
+#if	TJUMP
 		tok_struct *tok1=tok;
+#endif
 		if(err_num) { 
 			// MESG("err: TOK_DIR_IF! error!!");
 			return err_num;
@@ -2197,9 +2199,6 @@ int err_check_sentence1()
 #if	TBNF
 		tok_struct *if_token=stack_push("THEN",if1,-if1->ttype,&new_one);
 		// if_token->bnf_factor_function=bnf_dir_if_then;
-#if	TJUMP
-		// token_ind = ind(tok)
-#endif
 #endif
 		check_skip_token_err1(TOK_RPAR,"tok_dir_if",xpos);
 
@@ -2223,17 +2222,21 @@ int err_check_sentence1()
 		// change if_token to jzero
 		if_token->ttype = TOK_JZERO;
 		if_token->t_nargs = tok - tok1-1;
+		if_token->next_tok = if_token+if_token->t_nargs;
 		if_token->bnf_factor_function=bnf_factor_jzero;
-		MESG("TJUMP: + %d",if_token->t_nargs);
+		MESG("!TJUMP: + %d",if_token->t_nargs);
+		MESG("!	%p %p",if_token,if_token->next_tok);
 #endif
 		if(tok->ttype==TOK_DIR_ELSE) {
-			// MESG("we have an else statement!");
+			MESG("we have an else statement!");
 #if	TBNF
 		tok_struct *end_if_tok=stack_push("end of if",tok,-tok->ttype,&new_one);
 #if	TIFN
 		if_token->ifelse=end_if_tok+1;
 #else
+#if	!TJUMP
 		if_token->next_tok=end_if_tok+1;
+#endif
 #endif
 #if	!TJUMP
 		if_token->bnf_factor_function=bnf_dir_if_then_else;
@@ -2248,6 +2251,7 @@ int err_check_sentence1()
 #else
 			tok0->next_tok=tok; // end if else body
 #endif
+
 #if	TBNF
 			tok_struct *ifnext = new_tok();
 			end_if_tok->next_tok=stack_push("end_of_else",ifnext,TOK_SEP,&new_one);
@@ -2259,10 +2263,15 @@ int err_check_sentence1()
 			end_if_tok->tname="jump";
 			end_if_tok->bnf_factor_function=bnf_factor_jump;
 			end_if_tok->t_nargs=tok-tok0-1;
-#endif
+			end_if_tok->next_tok = end_if_tok+end_if_tok->t_nargs;
+			MESG("!TOK_JZERO: %d %d",end_if_tok->t_nargs,end_if_tok->next_tok - end_if_tok);
+			MESG("!	%p %p",end_if_tok,end_if_tok->next_tok);
+#else
 			end_if_tok->next_tok--;
 #endif
+#endif
 		} else {
+			MESG("NO else statement!");
 #if	TBNF
 			tok_struct *ifnext = new_tok();
 			tok_struct *end_if_tok=stack_push("end_of_else",ifnext,TOK_SEP,&new_one);

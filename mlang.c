@@ -910,6 +910,11 @@ int create_statement_group(FILEBUF *bf)
 		};
 		};
 	};
+#if	TJUMP
+	if(tokp->ttype==TOK_JZERO||tokp->ttype==TOK_JUMP) {
+		tokp->next_tok = tokp+tokp->t_nargs;
+	};
+#endif
 #endif
 	tokp++;
  };
@@ -1701,10 +1706,14 @@ char * tok_info(tok_struct *exect)
 		{
 				int len=snprintf(sout1,sizeof(sout)-ssize,"args %d",exect->t_nargs);
 				if(len+ssize>=sizeof(sout))  MESG("	truncated");
-		} else if(exect->ttype==TOK_JUMP||exect->ttype==TOK_JZERO ) { 
+		}
+#if	TJUMP
+		 else if(exect->ttype==TOK_JUMP||exect->ttype==TOK_JZERO ) { 
 				int len=snprintf(sout1,sizeof(sout)-ssize,"skip %d",exect->t_nargs);
 				if(len+ssize>=sizeof(sout))  MESG("	truncated");
-		} else if(exect->ttype==TOK_VAR) {
+		}
+#endif
+		 else if(exect->ttype==TOK_VAR) {
 			// MESG("TOK_VAR:");
 			int vtype=0;
 #if	0

@@ -4335,18 +4335,21 @@ inline static void bnf_type_l2_result_update()
 
 void bnf_factor_jump()
 {
-	// MESG("TOK_JUMP: %d",tok->t_nargs);
-	tok += tok->t_nargs;
+	// MESG("bnf_factor_jump: %d %d",tok->t_nargs,tok->next_tok - tok);
+	// tok += tok->t_nargs;
+	tok = tok->next_tok;
 }
 
 void bnf_factor_jzero()
 {
-	// MESG("bnf_factor_jzero:");
 	int ival = bnf_var->dval;
+	// MESG("bnf_factor_jzero: ival =%d %d %d",ival,tok->t_nargs,tok->next_tok - tok);
+	// MESG("	%p %p",tok,tok->next_tok);
 	prev_var("jzero");
 	if(ival==0)	{
 		// MESG("jzero ival=%d + %d",ival,tok->t_nargs);
-		tok += tok->t_nargs;
+		// tok += tok->t_nargs;
+		tok = tok->next_tok;
 	}// else printf("	no jump!\n");
 }
 
