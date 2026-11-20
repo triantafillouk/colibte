@@ -1221,11 +1221,7 @@ int recreate_notes_db(num init_db)
 	set_bt_num_val("notes_recreate",1);
 	// create notes db
 #if	TBNF
-#if	TNORMAL
-	if(exebnf)  prev_var_ext("recreate_notes_db");
-#else
 	prev_var_ext("recreate_notes_db");
-#endif
 #endif
 	if(init_db==INIT_DB){
 		MESG("recreate_note_db: Initialize database!");

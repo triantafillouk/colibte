@@ -234,15 +234,15 @@ eval.o: xe.h eval.c eval.h alist.h
 
 config_init.o: config_init.c
 
-mlang.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang_functions.c mlang.h alist.h xe.h func.h token_table.h bnf_expr.c bnf_mlangf.c mlang_expr.c mlangf.c 
+mlang.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c  mlang.h alist.h xe.h func.h token_table.h bnf_expr.c bnf_mlangf.c mlang_functions.h 
 
-mlang_ce.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang_functions.c mlang.h alist.h xe.h func.h token_table.h
+mlang_ce.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c  mlang.h alist.h xe.h func.h token_table.h
 	${CC} mlang.c $(FLAGS1)  -c -Wall $(CPU_OPTIONS) -I/usr/include/ncursesw -funsigned-char -o mlang_ce.o
 
-mlangg.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang_functions.c mlang.h alist.h xe.h
+mlangg.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c  mlang.h alist.h xe.h
 	${CC} $(FLAGS1) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char mlang.c -o mlangg.o
 
-mlangg4.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang_functions.c mlang.h alist.h xe.h
+mlangg4.o: mlang.c mlang_err.c mlang_parser.c mlang_array.c mlang.h alist.h xe.h
 	${CC} $(FLAGS4) -c -Wall $(CPU_OPTIONS) $(GTKINCLUDE) -funsigned-char mlang.c -o mlangg.o
 
 tldisplay.o: xe.h tldisplay.c screen.c menus.h keytable.h menu.h

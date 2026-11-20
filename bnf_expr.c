@@ -2669,9 +2669,6 @@ inline static void bnf_exec_function(FILEBUF *proc_buffer,int const nargs)
 	tok += 2+nargs; // inside the function after left curl!
 	// MESG("	bnf_exec_function: after push start v@=%d [%s]",VARIND,tok_info(tok));
 	// if(i0!=VARIND) MESG("	bnf_function:1 var @%d %d",i0,VARIND);
-#if	TNORMAL
-	NTOKEN2;
-#endif
 	// MESG("-bnf_exec_function: at start of block: [%s] active=%d level=%d",tok_info(tok),current_active_flag,proc_level);
 	bnf_block1();
 
@@ -2726,7 +2723,6 @@ inline static void bnf_factor_proc()
 	exe_buffer=cbuf;
 }
 
-
 inline static void bnf_dir_if_then()
 {
 	tok_struct *tok0=tok;
@@ -2756,7 +2752,6 @@ inline static void bnf_dir_if_then()
 	}
 	// MESG(";	 	tok_dir_if:end var@=%d  ival=%d > end [%s]",VARIND,ival,tok_info(tok));
 }
-
 
 
 inline static void bnf_dir_if_then_else()
@@ -4353,6 +4348,7 @@ static void bnf_factor_jzero()
 		tok = tok->next_tok;
 	}// else printf("	no jump!\n");
 }
+
 #endif
 
 /* --- */

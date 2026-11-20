@@ -20,11 +20,6 @@ typedef	alist * TLIST;
 #if	TBNF
 typedef void (*VFunction)();
 #endif
-#if	TNORMAL
-typedef double (*FFunction)();
-typedef double (*TFunction)(double v1);
-typedef double (*EFunction)(double v1,double v2);
-#endif
 
 typedef struct tok_struct {
 	union {
@@ -53,14 +48,6 @@ typedef struct tok_struct {
 	// short tind2;	/* index2 for type elements  */
 	char *tname;	// token name or string value
 	double dval;	// double value
-#if	TNORMAL
-	union {
-		FFunction factor_function;
-		TFunction term_function;
-		EFunction cexpr_function;
-	};
-	FFunction directive;
-#endif
 	union {	
 		int	number_of_args;
 		struct MVAR *var_pointer;
@@ -110,15 +97,6 @@ typedef struct key_type {
 } key_type;
 
 // #define SEP_FUNCTIONS	1
-#if	TNORMAL
-/*	list of recognized user type functions	*/
-typedef struct m_function {
-	char *f_name;	/* function name  */
-	short f_args;	/* number of function arguments  */
-	FFunction ffunction;
-} m_function;
-#endif
-
 #if	TBNF
 typedef struct v_function {
 	char *f_name;	/* function name  */
@@ -138,10 +116,6 @@ double assign(int is_edenv);
 int parse_block1(FILEBUF *bf,BTREE *stree,int start);
 void assign_args1( MVAR *va,MVAR *current_stable,int nargs);
 double factor_1();
-
-#if	TNORMAL
-// double exec_block1(FILEBUF *fp);
-#endif
 
 int check_skip_token(int type);
 int check_skip_token_err(int type,char *mesg,int err);

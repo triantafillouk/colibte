@@ -1338,12 +1338,6 @@ int refresh_current_line(num nused)
 				msg_line("b res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
 			} else msg_line("result is of type %d",result->var_type);
 #endif
-#if	TNORMAL
-	 		if(vtype_is(VTYPE_STRING)) msg_line("res=[%s]",value,get_sval());
-			else {
-				msg_line("n res=%15.3f = 0x%lX = o%lo",value,(int)value,(int)value);
-			}
-#endif
  	};
 	if(is_ddot){
 		el=FLineEnd(cbfp,sl);
