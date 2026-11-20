@@ -43,7 +43,6 @@ void eval_btree1(BTNODE *node,void do_func(BTNODE *n,void *p),void *p);
 
 int check_init(FILEBUF *bf);
 
-static inline void bnf_factor_dummy();
 void set_bnf_function1(tok_struct *tok, int type);
 void delete_symbol_table(MVAR *td, int size,int nargs);
 MVAR *new_symbol_table(int const size);
@@ -160,7 +159,6 @@ BTREE *global_types_tree;
 #endif
 int simple=0;
 
-//static inline double factor();
 
 void print_error()
 {
@@ -1701,7 +1699,6 @@ inline double get_val()
 {
 	return bnf_var->dval;
 }
-
 
 char *get_sval()
 {

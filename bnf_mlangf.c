@@ -22,7 +22,7 @@ void get_lowercase_string(char *lower, char *string);
 int deq(double v1,double v2);
 void show_var_node(BTNODE *node);
 
-void bnf_len()
+static void bnf_len()
 {
 	if(bnf_var->var_type==VTYPE_STRING) { 
 		bnf_var->dval=strlen(bnf_var->sval);
@@ -34,7 +34,7 @@ void bnf_len()
 	bnf_var->var_type=VTYPE_NUM;
 }
 
-void bnf_array_cols()	/* TBC  */
+static void bnf_array_cols()	/* TBC  */
 {
 	MVAR *va=bnf_var;
 	// MESG("array_cols: va type=%d",va->var_type);
@@ -47,7 +47,7 @@ void bnf_array_cols()	/* TBC  */
 	bnf_var->var_type = VTYPE_NUM;
 }
 
-void bnf_array_rows()
+static void bnf_array_rows()
 {
 	MVAR *va=bnf_var;
 	// MESG("array_rows: va type=%d",va->var_type);
@@ -62,7 +62,7 @@ void bnf_array_rows()
 }
 
 /* clear output buffer */
-void bnf_cls()
+static void bnf_cls()
 {
 	/* clear screen with ncursor TODO  */
 	if(check_token(TOK_RPAR)) ntoken();
@@ -72,7 +72,7 @@ void bnf_cls()
 }
 
 /* get array determinant */
-void bnf_determinant()	/* TBC  */
+static void bnf_determinant()	/* TBC  */
 {
 	double value=0;
 	if(bnf_var->var_type==VTYPE_ARRAY) {
@@ -92,7 +92,7 @@ void bnf_determinant()	/* TBC  */
 	// MESG("	determinant: %f var@=%d",value,(int)(bnf_var-bnf_vars));
 }
 
-void bnf_inverse()	/* TBC  */
+static void bnf_inverse()	/* TBC  */
 {
 	double value=0;
 	MVAR *va = bnf_var;
@@ -125,7 +125,7 @@ void bnf_inverse()	/* TBC  */
 	syntax_error(1206,"inverse a non array!");
 }
 
-void bnf_transpose()	/* TBC  */
+static void bnf_transpose()	/* TBC  */
 {
 	MVAR *va = bnf_var;
 	// if(va->var_type==VTYPE_POINTER) va=va->var_pointer;
@@ -145,7 +145,7 @@ void bnf_transpose()	/* TBC  */
 	// free(va);
 }
 
-void bnf_left()	/* TBC  */
+static void bnf_left()	/* TBC  */
 {
 	// bnf_function_args(2);
 	MVAR *va=bnf_var-1;
@@ -169,7 +169,7 @@ void bnf_left()	/* TBC  */
 	prev_var("left");
 }
 
-void bnf_right()	/* TBC  */
+static void bnf_right()	/* TBC  */
 {
 	// bnf_function_args(2);
 	MVAR *va=bnf_var-1;
@@ -191,7 +191,7 @@ void bnf_right()	/* TBC  */
 	// MESG("- right: var@=%d next is [%s]",VARIND,tok_info(tok));
 }
 
-void bnf_mid()	/* TBC  */
+static void bnf_mid()	/* TBC  */
 {
 	// bnf_function_args(3);
 	MVAR *va=bnf_var-2;
@@ -218,8 +218,7 @@ void bnf_mid()	/* TBC  */
 		// MESG("- mid : var@=%d next is [%s]",VARIND,tok_info(tok));
 }
 
-
-void bnf_print()
+static void bnf_print()
 {
 	int args=tok->t_nargs;
 	// MESG("bnf_print: << tnum=%d args=%d var@=%d",tok->tnum,tok->t_nargs,VARIND);
@@ -276,7 +275,7 @@ void bnf_print()
 	// MESG("	>> print end var@=%d [%s]",VARIND,bnf_var->sval);
 }
 
-void bnf_show_time()
+static void bnf_show_time()
 {
 	// MESG("	show_time: start var@=%d",VARIND);
 	// bnf_function_args(2);
@@ -299,7 +298,7 @@ void bnf_show_time()
 }
 
 
-void bnf_upper()	/* TBC  */
+static void bnf_upper()	/* TBC  */
 {
 	MVAR *va=bnf_var;
 	// if(va->var_type==VTYPE_POINTER) va=va->var_pointer;
@@ -318,7 +317,7 @@ void bnf_upper()	/* TBC  */
 	// MESG("- upper: next is [%s]",tok_info(tok));
 }
 
-void bnf_lower()	/* TBC  */
+static void bnf_lower()	/* TBC  */
 {
 	MVAR *va=bnf_var;
 	// if(va->var_type==VTYPE_POINTER) va=va->var_pointer;
@@ -337,7 +336,7 @@ void bnf_lower()	/* TBC  */
 	// MESG("- lower: next is [%s]",tok_info(tok));
 }
 
-void bnf_ascii()	/* TBC  */
+static void bnf_ascii()	/* TBC  */
 {
 	MVAR *va=bnf_var;
 	// if(bnf_var->var_type==VTYPE_POINTER) va=bnf_var->var_pointer;
@@ -352,7 +351,7 @@ void bnf_ascii()	/* TBC  */
 	// MESG("- ascii: next is [%s]",tok_info(tok));
 }
 
-void bnf_chr()	/* TBC  */
+static void bnf_chr()	/* TBC  */
 {
 	MVAR *va=bnf_var;
 
@@ -364,7 +363,7 @@ void bnf_chr()	/* TBC  */
 	bnf_var->var_alloced=1;
 }
 
-void bnf_getchar() /* TBC  */
+static void bnf_getchar() /* TBC  */
 {
 	// ntoken();
 	next_var("getchar");
@@ -380,7 +379,7 @@ void bnf_getchar() /* TBC  */
 }
 
 /* returns big! int */
-void bnf_rand()	/* TBC  */
+static void bnf_rand()	/* TBC  */
 {
  // static long =
  long max=(long) bnf_var->dval;
@@ -394,14 +393,14 @@ void bnf_rand()	/* TBC  */
 	bnf_var->var_type=VTYPE_NUM;
 }
 
-void bnf_seed()
+static void bnf_seed()
 {
 	long seed=(long) bnf_var->dval;
 	srand(seed);
 }
 
 
-void bnf_abs()
+static void bnf_abs()
 {
 	// MESG("- <bnf_abs: %f",bnf_var->dval);
 	bnf_var->dval=fabs(bnf_var->dval);
@@ -409,7 +408,7 @@ void bnf_abs()
 }
 
 /* string of a value */
-void bnf_sindex()	/* TBC  */
+static void bnf_sindex()	/* TBC  */
 {
 	// bnf_function_args(2);
 	MVAR *va=bnf_var;
@@ -426,7 +425,7 @@ void bnf_sindex()	/* TBC  */
 }
 
 /* string of a value */
-void bnf_string()	/* TBC  */
+static void bnf_string()	/* TBC  */
 {
 	MVAR *va=bnf_var;
 	if(va[0].var_type==VTYPE_NUM) {
@@ -445,7 +444,7 @@ void bnf_string()	/* TBC  */
 	va->var_type=VTYPE_STRING;
 }
 
-void bnf_message()	/* TBC  */
+static void bnf_message()	/* TBC  */
 {
 	MVAR *va=bnf_var;
 	if(va[0].var_type==VTYPE_STRING) {
@@ -454,7 +453,7 @@ void bnf_message()	/* TBC  */
 	events_flush();
 }
 
-void bnf_error()	/* TBC  */
+static void bnf_error()	/* TBC  */
 {
 	MVAR *va=bnf_var;
 	if(va[0].var_type==VTYPE_STRING) 
@@ -463,7 +462,7 @@ void bnf_error()	/* TBC  */
 	events_flush();
 }
 
-void bnf_wait()	/* TBC  */
+static void bnf_wait()	/* TBC  */
 {
 	int f_entry=entry_mode;
 	entry_mode=KENTRY;
@@ -486,7 +485,7 @@ void bnf_wait()	/* TBC  */
 	bnf_var->var_type=VTYPE_STRING;
 }
 
-void bnf_input()	/* TBC  */
+static void bnf_input()	/* TBC  */
 {
 	int f_entry=entry_mode;
 	MVAR *va=bnf_var;
@@ -503,7 +502,7 @@ void bnf_input()	/* TBC  */
 }
 
 // prompt and get a numeric value
-void bnf_dinput()	/* TBC  */
+static void bnf_dinput()	/* TBC  */
 {
 	MVAR *va=bnf_var;
 	char sval[80];
@@ -513,14 +512,14 @@ void bnf_dinput()	/* TBC  */
 	bnf_var->var_type=VTYPE_NUM;
 }
 
-void bnf_init()	/* TBC  */
+static void bnf_init()	/* TBC  */
 {
 	MESG("initialize: bnf_init");
 	init_stack();
 	NTOKEN2;
 }
 
-void bnf_val()	/* TBC  */
+static void bnf_val()	/* TBC  */
 {
 	MVAR *va=bnf_var;
 	if(va[0].var_type==VTYPE_STRING) {
@@ -532,17 +531,17 @@ void bnf_val()	/* TBC  */
 	} else syntax_error(1217,"val: wrong_type of args");
 }
 
-void bnf_sqrt()	/* OK?  */
+static void bnf_sqrt()	/* OK?  */
 {
 	bnf_var->dval=sqrt(bnf_var->dval);
 }
 
-void bnf_cbrt()	/* OK?  */
+static void bnf_cbrt()	/* OK?  */
 {
 	bnf_var->dval=cbrt(bnf_var->dval);
 }
 
-void bnf_dbg_message()	/* TBC  */
+static void bnf_dbg_message()	/* TBC  */
 {
 	// MVAR *va=bnf_var;
 	if(bnf_var->var_type==VTYPE_STRING) {
@@ -551,56 +550,57 @@ void bnf_dbg_message()	/* TBC  */
 	};
 }
 
-void bnf_sin()	/* OK?  */
+static void bnf_sin()	/* OK?  */
 {
 	// MESG("!X: sin(%f @%d): [%s]",bnf_var->dval,VARIND,tok_info(tok));
 	bnf_var->dval=sin(bnf_var->dval);
 }
 
-void bnf_cos()	/* OK?  */
+static void bnf_cos()	/* OK?  */
 {
 	bnf_var->dval=cos(bnf_var->dval);
 }
 
-void bnf_tan()	/* OK?  */
+static void bnf_tan()	/* OK?  */
 {
 	bnf_var->dval=tan(bnf_var->dval);
 // 	prev_var("tan");
 }
 
-void bnf_log10()	/* OK?  */
+static void bnf_log10()	/* OK?  */
 {
 	bnf_var->dval=log10(bnf_var->dval);
 }
 
-void bnf_atan()	/* OK?  */
+static void bnf_atan()	/* OK?  */
 {
 	bnf_var->dval=atan(bnf_var->dval);
 }
 
-void bnf_log()	/* OK?  */
+static void bnf_log()	/* OK?  */
 {
 	bnf_var->dval=log(bnf_var->dval);
 }
 
-void bnf_trunc()	/* OK?  */
+static void bnf_trunc()	/* OK?  */
 {
 	bnf_var->dval=trunc(bnf_var->dval);
 }
 
-void bnf_round()	/* OK?  */
+static void bnf_round()	/* OK?  */
 {
 	bnf_var->dval=round(bnf_var->dval);
 }
 
-void bnf_getpoint()	/* dummy ?? only for plot!  */
+static void bnf_getpoint()	/* dummy ?? only for plot!  */
 {
 	//NTOKEN2;
 	// bnf_expression();
 	// bnf_var->dval=tan(bnf_var->dval);
 }
 
-void bnf_time()	/* OK????  */
+#if	NUSE
+static void bnf_time()	/* OK????  */
 {
 	// MESG("-- bnf_time");
 	// bnf_function_args(2);
@@ -617,8 +617,9 @@ void bnf_time()	/* OK????  */
 	}
 	prev_var("time");
 }
+#endif
 
-void bnf_deq()	/* OK?  */
+static void bnf_deq()	/* OK?  */
 {
 	MVAR *va=bnf_var-1;
 	// MESG("bnf_deq: v@=%d %f %f",VARIND,va[0].dval,va[1].dval);
@@ -627,7 +628,7 @@ void bnf_deq()	/* OK?  */
 	prev_var("deq");
 }
 
-void bnf_atbof()	/* TBC  */
+static void bnf_atbof()	/* TBC  */
 {
 	next_var("atbof");
 
@@ -635,35 +636,35 @@ void bnf_atbof()	/* TBC  */
 	bnf_var->var_type=VTYPE_NUM;
 }
 
-void bnf_ateof()	/* TBC  */
+static void bnf_ateof()	/* TBC  */
 {
 	next_var("ateof");
 	bnf_var->var_type=VTYPE_NUM;
 	bnf_var->dval = FEof(cbfp);
 }
 
-void bnf_atbol()	/* OK?  */
+static void bnf_atbol()	/* OK?  */
 {
 	next_var("atbol");
 	bnf_var->var_type=VTYPE_NUM;
 	bnf_var->dval = FBolAt(cbfp,Offset());
 }
 
-void bnf_ateol()	/* OK?  */
+static void bnf_ateol()	/* OK?  */
 {
 	next_var("ateol");
 	bnf_var->var_type=VTYPE_NUM;
 	bnf_var->dval=FEolAt(cbfp,Offset());
 }
 
-void bnf_mainargsize()	/* TBC  */
+static void bnf_mainargsize()	/* TBC  */
 {
 	next_var("mainargsize");
 	bnf_var->var_type=VTYPE_NUM;
 	bnf_var->dval = main_args->cols;
 }
 
-void bnf_mainarg()	/* TBC  */
+static void bnf_mainarg()	/* TBC  */
 {
 	if(!main_args) { NTOKEN2;};
 
@@ -737,7 +738,7 @@ void bnf_test_loop()
 	};
 }
 
-void bnf_new_array_I()
+static void bnf_new_array_I()
 {
 	// MESG("bnf_new_array_I: var@=%d type=%d",VARIND,bnf_var->var_type);
 	int dim=0;
@@ -762,7 +763,7 @@ void bnf_new_array_I()
 }
 
 
-void bnf_new_array_J()
+static void bnf_new_array_J()
 {
 	// bnf_function_args(2);
 	int rows=bnf_var->dval;
@@ -781,7 +782,7 @@ void bnf_new_array_J()
 }
 
 
-void bnf_to_num_array()	/* TBC  */
+static void bnf_to_num_array()	/* TBC  */
 {
 	// NTOKEN2;
 	// MESG("bnf_to_num_array: var@=%d [%s]",VARIND,tok_info(tok));
@@ -813,7 +814,7 @@ void bnf_to_num_array()	/* TBC  */
 
 int dofile(char *fname);
 
-void bnf_dofile()	
+static void bnf_dofile()	
 {
 	char *fname;	/* name of file to execute */
 	char *fspec=NULL;		/* full file spec */
