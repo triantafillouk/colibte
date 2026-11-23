@@ -76,7 +76,8 @@ OSYSTEM=LINUX
 LIBLM=-lX11 -lm
 X11include=-I/opt/X11/include/
 X11lib0=-L/usr/X11R6/lib -lX11 -L/opt/X11/lib 
-CC=gcc -O3  -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
+#CC=gcc -O3 -flto -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
+CC=gcc -O3 -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
 #CC=clang -O3  -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
 #CC=zig cc -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
 endif
@@ -180,7 +181,7 @@ xe.h :
 #	This for SCO. -J is for unsigned char
 #	cc -c -J -O2 -b elf $*.c
 
-main.o: main.c xe.h globals.h  keytable.h func.h
+main.o: main.c xe.h globals.h  keytable.h func.h eval.h
 	${CC} $(FLAGS1) -c  -Wall $(CPU_OPTIONS) -funsigned-char  $(GLIBINCLUDE) $*.c -o main.o
 
 main_ce.o: main.c xe.h globals.h  keytable.h func.h

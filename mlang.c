@@ -443,7 +443,7 @@ inline void init_vars(MVAR *head,int const size)
 
 void initialize_call_stack(int initial_size)
 {
-	// MESG("Initialize call_stack with %d size",initial_size);
+	MESG("Initialize call_stack with %d size",initial_size);
 	MVAR *call_stack_init=(MVAR *)malloc(sizeof(struct MVAR)*initial_size);	
 	// static MVAR call_stack_init[500];
 	call_stack = call_stack_init;
@@ -643,17 +643,17 @@ MVAR *new_symbol_table(int const size)
 {
  // MESG("Initialize new_symbol_table: size %d",size);
  MVAR *td=call_stack_used;
- // MESG("- new_symbol_table: starts at ind=%d size=%d",(int)(td-call_stack),size);
- // int size_call_stack_used = call_stack_used - call_stack;
- // MESG("		new_symbol_table: at %lld",td-call_stack);
+ // MESG("- new_symbol_table: starts at ind=%d size=%d available=%d",(int)(td-call_stack),size,(call_stack_available-call_stack_used));
  call_stack_used += size;
  if(call_stack_used>call_stack_available) {
+#if	0
 	if(execmd) {
 		fprintf(stderr,"new_symbol_table: overflow: available=%ld required=%ld\n",call_stack_available-call_stack,call_stack_used-call_stack);
 		exit(0);
 	} else {
 		error_line("new_symbol_table: overflow: available=%d required=%d",call_stack_available-call_stack,call_stack_used-call_stack);
 	};
+#endif
 	set_error(tok,301,"call_stack overflow");
 	return NULL;
  };
@@ -665,7 +665,7 @@ MVAR *new_symbol_table(int const size)
 
 MVAR *realloc_symbol_table(MVAR *td,int const size,int const old_size)
 {
-  // MESG("realloc_symbol_table: ---------------");
+  MESG("realloc_symbol_table: ---------------");
   call_stack_used += size-old_size;
  if(max_call_stack_end<call_stack_used) {
  	max_call_stack_end=call_stack_used;
@@ -680,7 +680,7 @@ MVAR *realloc_symbol_table(MVAR *td,int const size,int const old_size)
 }
 
 /* free symbol table after execute */
-void delete_symbol_table(MVAR *td, int size,int nargs)
+inline void delete_symbol_table(MVAR *td, int size,int nargs)
 {
  // MESG("delete_symbol_table: << nargs=%d size=%d",nargs,size);
  MVAR *sslot=td;
@@ -1225,6 +1225,7 @@ double compute_block(FILEBUF *bp,FILEBUF *use_fp,int start)
 	if(start || current_stable==NULL) {
 		// MESG("new current_stable with %d items",use_fp->symbol_tree->items);
 		local_symbols=new_symbol_table(use_fp->symbol_tree->items);
+		if(local_symbols==NULL) return 0;
 	} else {
 		// MESG("use current_stable new items = %d",use_fp->symbol_tree->items);
 		local_symbols=realloc_symbol_table(current_stable,use_fp->symbol_tree->items,old_items);
@@ -1339,7 +1340,7 @@ int refresh_current_buffer(num nused)
  // MESG("	block parsed err_num=%d",err_num);
  if(err_num<1){	/* if no errors  */
 	current_stable=new_symbol_table(fp->symbol_tree->items);
-
+	if(current_stable==NULL) return 0;
  	msg_line("checking ...");
 	drv_start_checking_break();
 	if(check_init(fp)>0) {

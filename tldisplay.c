@@ -58,7 +58,7 @@ extern short *kbdptr;
 extern int slang;
 extern alist *window_list;
 extern int *color;
-extern char utfokey[10];
+extern char utfokey[16];
 extern int utflen;
 extern short	*kbdsptr;
 extern int sort_mode;

@@ -142,7 +142,7 @@ extern alist *color_scheme_list;
 
  /* from ICU utf8.h modified */
 //extern int utf8_countBytes[256];
-extern char utfokey[10];
+extern char utfokey[16];
 extern int utflen;
 
 
@@ -1171,9 +1171,12 @@ void drv_stop_checking_break()
 	utfokey[0]=0;
 }
 
+extern int err_num;
+
 inline int drv_check_break_key()
 {
  static int count=0;
+ if(err_num) return err_num;
  // if(checking_break_key) {
  // MESG("drv_check_break_key: %d",count);
  if(count++>1000) {

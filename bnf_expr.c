@@ -2646,6 +2646,7 @@ inline static MVAR * push_args_bnf(int const nargs,int const vars_num)
 {
  // MESG("# push_args_bnf: nargs=%d vars_num=%d v@=%d",nargs,vars_num,VARIND);
  MVAR *va = new_symbol_table(vars_num);
+ if(va==NULL) return NULL;
  MVAR *va_i=va+nargs-1;
 
  for(;va_i>=va;va_i--){
@@ -2664,6 +2665,7 @@ inline static void bnf_exec_function(FILEBUF *proc_buffer,int const nargs)
 	MVAR *old_symbol_table=current_stable;
 	// MESG("## bnf_exec_function:[%s] var@=%d args=%d vars=%d",proc_buffer->b_fname,VARIND,nargs,proc_buffer->symbol_tree->items-nargs);
 	current_stable = push_args_bnf(nargs,proc_buffer->symbol_tree->items);
+	if(!current_stable) return;
 	tok_struct *after_proc=tok; 
 
 	tok=proc_buffer->tok_table_bnf;	/* start of function  */
@@ -2674,6 +2676,7 @@ inline static void bnf_exec_function(FILEBUF *proc_buffer,int const nargs)
 	bnf_block1();
 
 	// show_result();
+	if(err_num) return;
 	delete_symbol_table(current_stable,proc_buffer->symbol_tree->items,nargs);
 	current_stable=old_symbol_table;
 
@@ -2702,8 +2705,9 @@ static void bnf_factor_proc()
 	// MESG("factor_proc: tok  [%d %s] %d ",tok->tnum,tok->tname,tok->tind);
 
 	bnf_exec_function(tok0->proc_buffer,tok0->t_nargs);
+	// MESG("	- after exec_function!  err_num=%d",err_num);
+	if(err_num) return;
 	// proc_level--;
-	// MESG("	- after exec_function! level=%d",proc_level);
 #if	TPROFILE
 	var_index -= (int)(bnf_var-result_var);
 #endif

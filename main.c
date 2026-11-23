@@ -153,6 +153,7 @@ int main(int argc, char **argv)
 		exit(1);
 	};
 		initialize_call_stack((int)bt_dval("call_stack_size"));
+		// initialize_call_stack(20);
 		if(firstbp==NULL && !execmd) {
 			// scratch_files[0] = load_scratch_files();
 			firstbp=get_scratch_file();
