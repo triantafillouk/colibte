@@ -2705,6 +2705,7 @@ static void bnf_factor_proc()
 	// MESG("	- after exec_function!  err_num=%d",err_num);
 	if(err_num) return;
 	// proc_level--;
+	// MESG("	- after exec_function! level=%d",proc_level);
 #if	TPROFILE
 	var_index -= (int)(bnf_var-result_var);
 #endif

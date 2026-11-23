@@ -443,7 +443,7 @@ inline void init_vars(MVAR *head,int const size)
 
 void initialize_call_stack(int initial_size)
 {
-	MESG("Initialize call_stack with %d size",initial_size);
+	// MESG("Initialize call_stack with %d size",initial_size);
 	MVAR *call_stack_init=(MVAR *)malloc(sizeof(struct MVAR)*initial_size);	
 	// static MVAR call_stack_init[500];
 	call_stack = call_stack_init;
@@ -643,7 +643,9 @@ MVAR *new_symbol_table(int const size)
 {
  // MESG("Initialize new_symbol_table: size %d",size);
  MVAR *td=call_stack_used;
- // MESG("- new_symbol_table: starts at ind=%d size=%d available=%d",(int)(td-call_stack),size,(call_stack_available-call_stack_used));
+ // MESG("- new_symbol_table: starts at ind=%d size=%d",(int)(td-call_stack),size);
+ // int size_call_stack_used = call_stack_used - call_stack;
+ // MESG("		new_symbol_table: at %lld",td-call_stack);
  call_stack_used += size;
  if(call_stack_used>call_stack_available) {
 #if	0
@@ -665,7 +667,7 @@ MVAR *new_symbol_table(int const size)
 
 MVAR *realloc_symbol_table(MVAR *td,int const size,int const old_size)
 {
-  MESG("realloc_symbol_table: ---------------");
+  // MESG("realloc_symbol_table: ---------------");
   call_stack_used += size-old_size;
  if(max_call_stack_end<call_stack_used) {
  	max_call_stack_end=call_stack_used;
@@ -680,7 +682,7 @@ MVAR *realloc_symbol_table(MVAR *td,int const size,int const old_size)
 }
 
 /* free symbol table after execute */
-inline void delete_symbol_table(MVAR *td, int size,int nargs)
+void delete_symbol_table(MVAR *td, int size,int nargs)
 {
  // MESG("delete_symbol_table: << nargs=%d size=%d",nargs,size);
  MVAR *sslot=td;

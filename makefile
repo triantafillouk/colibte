@@ -62,7 +62,8 @@ WSL:=0
 LIBLM=
 #CC=zig cc -DGVERS='"$(GVERS)"'
 #CC=clang -DGVERS='"$(GVERS)"'
-CC=gcc -DGVERS='"$(GVERS)"'
+ CC=gcc -flto -DGVERS='"$(GVERS)"'
+#CC=gcc -DGVERS='"$(GVERS)"'
 #sudo codesign --force --sign - /usr/local/bin/e
 LIB2=-L/opt/homebrew/lib
 INC2=-I/opt/homebrew/include
