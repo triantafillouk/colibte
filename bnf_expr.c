@@ -2640,13 +2640,9 @@ void bnf_dir_type()
 	MESG("bnf_dir_type TBD");
 }
 
-// int proc_level=0;
-
-inline static MVAR * push_args_bnf(int const nargs,int const vars_num)
+inline static MVAR * push_args_bnf(MVAR *va,int const nargs)
 {
- // MESG("# push_args_bnf: nargs=%d vars_num=%d v@=%d",nargs,vars_num,VARIND);
- MVAR *va = new_symbol_table(vars_num);
- if(va==NULL) return NULL;
+ // MESG("# push_args_bnf: nargs=%d v@=%d",nargs,VARIND);
  MVAR *va_i=va+nargs-1;
 
  for(;va_i>=va;va_i--){
@@ -2664,8 +2660,9 @@ inline static void bnf_exec_function(FILEBUF *proc_buffer,int const nargs)
 {
 	MVAR *old_symbol_table=current_stable;
 	// MESG("## bnf_exec_function:[%s] var@=%d args=%d vars=%d",proc_buffer->b_fname,VARIND,nargs,proc_buffer->symbol_tree->items-nargs);
-	current_stable = push_args_bnf(nargs,proc_buffer->symbol_tree->items);
-	if(!current_stable) return;
+	MVAR *va = new_symbol_table(proc_buffer->symbol_tree->items);
+	if(va==NULL) return ;
+	current_stable = push_args_bnf(va,nargs);
 	tok_struct *after_proc=tok; 
 
 	tok=proc_buffer->tok_table_bnf;	/* start of function  */
