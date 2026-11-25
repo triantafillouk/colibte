@@ -26,6 +26,7 @@ make all      # cleanall + cte ctg3 ctg2 ctg4 ctxe
 make clean    # remove *.o, *~, tagx
 make cleanall # clean + remove built binaries (cte, ctxe, ctg2, ctg3, ce, *.exe)
 make install  # builds cte/ctg2/ctg3 and installs rc/ext/menu/colors files + binaries system-wide (uses sudo)
+make ce-pgo   # two-pass profile-guided-optimization build of `ce` (see "PGO build" below)
 ```
 
 Each target sets its own combination of `PCURSES`, `GTK`/`GTK3`/`GTK4`, `XLIB`, `_X11_`, `TNOTES`, `USE_GLIB`,
@@ -43,6 +44,17 @@ several variants, follow this existing pattern rather than introducing a new bui
 `find_tags` is a small standalone ctags-like helper also built from this tree (`make find_tags`).
 
 There is no automated CI config in this repo — building/testing is manual, see below.
+
+### PGO build
+
+`make ce-pgo` builds a profile-guided-optimized `ce` (the console binary used when iterating on the
+macro/bnf evaluator in `mlang.c`/`bnf_expr.c`): it builds an instrumented `ce` with `-fprofile-generate`,
+runs it over a training workload (`pgo_train.cmd`, a synthetic script exercising the evaluator's hot loops/
+function calls/arrays/string ops, plus the full `nt2.lst` regression corpus for broader coverage), then
+rebuilds `ce` with `-fprofile-use` against the collected profile (`pgo-data/`, gitignored). The `PGO` make
+variable it threads through `CC` is empty by default, so `make ce`/`cte`/etc. are unaffected. Re-run
+`make ce-pgo` (not plain `make ce`) after evaluator changes you want reflected in the profile — a plain
+`make ce` after it just reuses whatever flags were last passed via a fresh, non-instrumented compile.
 
 ## Versioning convention — IMPORTANT
 

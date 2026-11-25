@@ -16,4 +16,7 @@ err1
 *.out
 *.err
 err*
+pgo-data/
+*.gcda
+*.gcno
 

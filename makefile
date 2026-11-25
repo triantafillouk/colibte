@@ -78,7 +78,9 @@ LIBLM=-lX11 -lm
 X11include=-I/opt/X11/include/
 X11lib0=-L/usr/X11R6/lib -lX11 -L/opt/X11/lib 
 #CC=gcc -O3 -flto -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
-CC=gcc -O3 -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
+# PGO is empty by default; set on the command line by the ce-pgo target
+# (see "PGO build" below) to build an instrumented or profile-optimized binary.
+CC=gcc -O3 -DWSL=$(WSL) -DGVERS='"$(GVERS)"' $(PGO)
 #CC=clang -O3  -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
 #CC=zig cc -DWSL=$(WSL) -DGVERS='"$(GVERS)"'
 endif
@@ -378,7 +380,28 @@ ce : main_ce.o filebuf.o system.o edit_ce.o screen_ce.o  tldisplay_ce.o eval.o m
 gplotc.o: gplotc.c plot_cairo.c plot_commonc.c gplot.h
 	${CC}  -c ${FLAGS1}  ${GTKINCLUDE} -o $*.o  $*.c
 
-all : cleanall cte ctg3 ctg2 ctg4 ctxe 
+all : cleanall cte ctg3 ctg2 ctg4 ctxe
+
+# PGO build: two-pass profile-guided optimization of the console `ce` binary
+# (the one the macro/bnf evaluator's performance work targets). Builds an
+# instrumented binary, trains it on a representative workload (the synthetic
+# pgo_train.cmd plus the real nt2.lst regression corpus for broad coverage),
+# then rebuilds `ce` using the collected profile. Final result is a normal
+# ./ce binary; pgo-data/ holds the intermediate .gcda profile and can be
+# deleted any time.
+PGO_DATA_DIR=$(CURDIR)/pgo-data
+
+ce-pgo:
+	@echo "=== PGO pass 1/3: build instrumented ce ==="
+	rm -rf $(PGO_DATA_DIR)
+	$(MAKE) cleanall
+	$(MAKE) ce PGO="-fprofile-generate -fprofile-dir=$(PGO_DATA_DIR)"
+	@echo "=== PGO pass 2/3: train on representative workload ==="
+	for f in pgo_train.cmd `cat nt2.lst`; do timeout 15 ./ce -x "$$f" -d > /dev/null 2>&1; done
+	@echo "=== PGO pass 3/3: rebuild using collected profile ==="
+	$(MAKE) cleanall
+	$(MAKE) ce PGO="-fprofile-use -fprofile-dir=$(PGO_DATA_DIR) -fprofile-correction -Wno-coverage-mismatch -Wno-missing-profile"
+	@echo "=== PGO build complete: ./ce ==="
 
 clean :
 	echo clean all files!
