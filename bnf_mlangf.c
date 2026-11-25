@@ -666,18 +666,21 @@ static void bnf_mainargsize()	/* TBC  */
 
 static void bnf_mainarg()	/* TBC  */
 {
-	if(!main_args) { NTOKEN2;};
-
 	MVAR *va=bnf_var;
 	int ind;
 
 	ind=(int)va[0].dval;
-	if(ind<main_args->cols) {
-		bnf_var->sval=main_args->sval[(int)va[0].dval];
+	/* main_args can be smaller than args_size() implies: trailing command-line
+	   switches (e.g. -d) are counted into its allocated size but never filled,
+	   leaving a NULL slot - hand back an empty string instead of that NULL  */
+	if(main_args && ind>=0 && ind<main_args->cols && main_args->sval[ind]!=NULL) {
+		bnf_var->sval=main_args->sval[ind];
 		bnf_var->var_type=VTYPE_STRING;
 		bnf_var->var_alloced=0;
 	} else {
-		bnf_var->var_type=VTYPE_NUM;
+		bnf_var->sval="";
+		bnf_var->var_type=VTYPE_STRING;
+		bnf_var->var_alloced=0;
 	};
 }
 

@@ -86,6 +86,21 @@ void free_array_dat(struct array_dat *adat)
  	ERROR("error array with zero dims %d %d",adat->rows,adat->cols);
 	return;
  };
+ if(adat->atype==VTYPE_AMIXED) {
+ 	/* free each individually-owned string element before freeing the container  */
+ 	if(adat->mval!=NULL) {
+		int k,dim=adat->rows*adat->cols;
+		for(k=0;k<dim;k++) {
+			if(adat->mval[k].var_type==VTYPE_STRING && adat->mval[k].var_alloced) {
+				free(adat->mval[k].sval);
+			};
+		};
+		free(adat->mval);
+		adat->mval=NULL;
+	};
+	adat->astat=ARRAY_UNALLOCATED;
+	return;
+ };
  if(adat->dval==NULL) return;
  if(adat->rows==1 || adat->cols==1) {
  	if(adat->dval!=NULL) free(adat->dval);
@@ -218,12 +233,12 @@ array_dat * dup_array_add1(array_dat *a,double plus)
  array_dat *na;	/* new array  */
  // MESG("dup_array_add1:");
  // na=new_array_similar(a);
- na=new_array(a->rows,a->cols,VTYPE_ARRAY);
+ na=new_array(a->rows,a->cols,(a->atype==VTYPE_AMIXED)?VTYPE_AMIXED:VTYPE_ARRAY);
  allocate_array(na);
- 	if(a->atype==VTYPE_ARRAY) {	
+ 	if(a->atype==VTYPE_ARRAY) {
 		int i,j,dim=1;
 		if(na->rows>1 && na->cols>1) {
-			for(j=0;j<na->rows;j++) for(i=0;i<na->cols;i++) 
+			for(j=0;j<na->rows;j++) for(i=0;i<na->cols;i++)
 				na->dval2[j][i]=a->dval2[j][i]+plus;
 		} else {
 			if(na->rows > 1) dim=na->rows; else dim=na->cols;
@@ -232,21 +247,23 @@ array_dat * dup_array_add1(array_dat *a,double plus)
 		 na->astat=ARRAY_ALLOCATED;
 	};
 
- 	if(a->atype==VTYPE_AMIXED) {	
-		int i,j,dim=1;
-		int k=0;
-		if(na->rows>1 && na->cols>1) {
-			for(j=0;j<na->rows;j++) for(i=0;i<na->cols;i++) {
-				if(a->mval[k].var_type==VTYPE_NUM) 
-					na->dval2[j][i]=a->mval[k].dval+plus;
-				k++;
-			};
-		} else {
-			if(na->rows > 1) dim=na->rows; else dim=na->cols;
-			for(i=0;i<dim;i++) {
-				if(a->mval[k].var_type==VTYPE_NUM) 
-					na->dval[i]=a->mval[k].dval+plus;
-				k++;
+ 	if(a->atype==VTYPE_AMIXED) {
+		/* deep-copy every element by its own type, preserving strings
+		   instead of silently dropping them (plus is only meaningful
+		   for numeric elements; non-numeric ones are copied as-is)  */
+		int dim=a->rows*a->cols;
+		int k;
+		for(k=0;k<dim;k++) {
+			if(a->mval[k].var_type==VTYPE_STRING) {
+				na->mval[k].var_type=VTYPE_STRING;
+				na->mval[k].sval=strdup(a->mval[k].sval);
+				na->mval[k].var_alloced=1;
+			} else if(a->mval[k].var_type==VTYPE_NUM) {
+				na->mval[k].var_type=VTYPE_NUM;
+				na->mval[k].dval=a->mval[k].dval+plus;
+			} else {
+				na->mval[k]=a->mval[k];
+				na->mval[k].var_alloced=0;
 			};
 		};
 		na->astat=ARRAY_ALLOCATED;
