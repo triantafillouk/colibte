@@ -403,6 +403,18 @@ ce-pgo:
 	$(MAKE) ce PGO="-fprofile-use -fprofile-dir=$(PGO_DATA_DIR) -fprofile-correction -Wno-coverage-mismatch -Wno-missing-profile"
 	@echo "=== PGO build complete: ./ce ==="
 
+cte-pgo:
+	@echo "=== PGO pass 1/3: build instrumented cte ==="
+	rm -rf $(PGO_DATA_DIR)
+	$(MAKE) cleanall
+	$(MAKE) cte PGO="-fprofile-generate -fprofile-dir=$(PGO_DATA_DIR)"
+	@echo "=== PGO pass 2/3: train on representative workload ==="
+	for f in pgo_train.cmd `cat nt2.lst`; do timeout 15 ./cte -x "$$f" -d > /dev/null 2>&1; done
+	@echo "=== PGO pass 3/3: rebuild using collected profile ==="
+	$(MAKE) cleanall
+	$(MAKE) cte PGO="-fprofile-use -fprofile-dir=$(PGO_DATA_DIR) -fprofile-correction -Wno-coverage-mismatch -Wno-missing-profile"
+	@echo "=== PGO build complete: ./tce ==="
+
 clean :
 	echo clean all files!
 	rm -f *.o

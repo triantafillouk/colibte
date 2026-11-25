@@ -72,7 +72,7 @@ static GtkIMContext *im_context;
 GtkWidget *table1,*colors_win=NULL;
 
 extern int utflen;
-extern char utfokey[10];
+extern char utfokey[16];
 
 void show_color_sample(GtkWidget *table,int ypos,char *text);
 void color_ok_select(GtkWidget *wd, gpointer *data);

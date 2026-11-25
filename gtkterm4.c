@@ -81,7 +81,7 @@ GtkWidget *table1,*colors_win=NULL;
 void set_box_background_color(GtkWidget *box,char *color);
 
 extern int utflen;
-extern char utfokey[10];
+extern char utfokey[16];
 
 void show_color_sample(GtkWidget *table,int ypos,char *text);
 void color_close_select(GtkWidget *wd, gpointer *data);

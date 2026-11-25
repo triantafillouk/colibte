@@ -923,7 +923,7 @@ void insert_key_string(char *ch,int n)
  int i;
  for(i=0;i<n;i++) {
 	for(j=0;j<clen;j++) utfokey[j]=ch[j];
-	utfokey[j]=0;
+	utfokey[clen]=0;
 	insert_chr(1,ch[0]); 
  }
 }

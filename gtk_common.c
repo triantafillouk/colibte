@@ -983,7 +983,7 @@ int insert_key_string(char *ch)
 	int clen=strlen(ch);
 	int j=0;
 	for(j=0;j<clen;j++) utfokey[j]=ch[j];
-	utfokey[j]=0;
+	utfokey[clen]=0;
 	return clen;
 }
 
