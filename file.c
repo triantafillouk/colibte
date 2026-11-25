@@ -452,6 +452,11 @@ int load_scratch_files()
 /* close current window file */
 int close_file(num n)
 {
+ if(execmd) {
+ 	// MESG("close_file: [%s]",cbfp->b_fname);
+	delete_filebuf(cbfp,1);
+	return 1;
+ };
 	FILEBUF *f_toclose,*bp,*f_previous=NULL;
 	WINDP *wp;
 	alist *wlist;;

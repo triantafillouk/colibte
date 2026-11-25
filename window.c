@@ -115,6 +115,7 @@ void change_window(WINDP *wp)
 /* set current goal column  */
 void set_goal_column(int new_column,char *from)
 {
+ if(execmd) return;
  FILEBUF *fp = cwp->w_fp;
 #if	WRAPD
  int old_column=cwp->goal_column;
