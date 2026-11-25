@@ -46,6 +46,7 @@ int check_init(FILEBUF *bf);
 void set_bnf_function1(tok_struct *tok, int type);
 void delete_symbol_table(MVAR *td, int size,int nargs);
 MVAR *new_symbol_table(int const size);
+MVAR *new_symbol_table_nargs(int const size,int const nargs);
 void init_vars(MVAR *head,int size);
 MVAR *btree_to_mvar(BTREE *bt);
 void skip_sentence1();
@@ -662,6 +663,22 @@ MVAR *new_symbol_table(int const size)
 
  init_vars(td,size);
  // MESG("	: bnf_vars @%d %d",(int)(bnf_vars-call_stack),(int)(bnf_vars-td));
+ return td;
+}
+
+/* same as new_symbol_table, but skips zero-initializing the first "nargs" slots:
+   bnf_exec_function always overwrites those via push_args_bnf() right after this
+   call, so pre-zeroing them is wasted work on every single function call  */
+MVAR *new_symbol_table_nargs(int const size,int const nargs)
+{
+ MVAR *td=call_stack_used;
+ call_stack_used += size;
+ if(call_stack_used>call_stack_available) {
+	set_error(tok,301,"call_stack overflow");
+	return NULL;
+ };
+
+ init_vars(td+nargs,size-nargs);
  return td;
 }
 

@@ -2660,7 +2660,7 @@ inline static void bnf_exec_function(FILEBUF *proc_buffer,int const nargs)
 {
 	MVAR *old_symbol_table=current_stable;
 	// MESG("## bnf_exec_function:[%s] var@=%d args=%d vars=%d",proc_buffer->b_fname,VARIND,nargs,proc_buffer->symbol_tree->items-nargs);
-	MVAR *va = new_symbol_table(proc_buffer->symbol_tree->items);
+	MVAR *va = new_symbol_table_nargs(proc_buffer->symbol_tree->items,nargs);
 	if(va==NULL) return ;
 	current_stable = push_args_bnf(va,nargs);
 	tok_struct *after_proc=tok; 
