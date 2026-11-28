@@ -62,7 +62,7 @@ WSL:=0
 LIBLM=
 #CC=zig cc -DGVERS='"$(GVERS)"'
 #CC=clang -DGVERS='"$(GVERS)"'
-CC=gcc -O3 -DWSL=$(WSL) -DGVERS='"$(GVERS)"' $(PGO)
+CC=gcc-16 -O3  -DGVERS='"$(GVERS)"' $(PGO)
 #CC=gcc -DGVERS='"$(GVERS)"'
 #sudo codesign --force --sign - /usr/local/bin/e
 LIB2=-L/opt/homebrew/lib
@@ -413,7 +413,7 @@ cte-pgo:
 	@echo "=== PGO pass 3/3: rebuild using collected profile ==="
 	$(MAKE) cleanall
 	$(MAKE) cte PGO="-fprofile-use -fprofile-dir=$(PGO_DATA_DIR) -fprofile-correction -Wno-coverage-mismatch -Wno-missing-profile"
-	@echo "=== PGO build complete: ./tce ==="
+	@echo "=== PGO build complete: ./cte ==="
 
 clean :
 	echo clean all files!
